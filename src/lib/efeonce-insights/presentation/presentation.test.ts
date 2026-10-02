@@ -99,14 +99,30 @@ describe('TASK-1957 — plan apto para cliente', () => {
     expect(clientFitViolations({ model, reportTitle: defaultReportTitle(['seo', 'aeo'], { start: '2026-09-01', endExclusive: '2026-09-21' }, 'es-CL'), facts: berelLike.facts })).toEqual([])
   })
 
-  it('separa magnitudes, descarta la posición en barras y dice el empate de presencia en una frase', () => {
+  it('el gate rechaza magnitudes incomparables en un eje compartido', () => {
+    const shared: InsightWebModelV1 = {
+      ...model,
+      chapters: model.chapters.map(chapter => ({
+        ...chapter,
+        charts: chapter.charts.map(chart => ({ ...chart, spec: { ...chart.spec, scale: { kind: 'linear' as const, baseline: 0 as const } } }))
+      }))
+    }
+
+    expect(clientFitViolations({ model: shared, facts: berelLike.facts }).map(violation => violation.rule)).toContain('shared_axis_incomparable')
+  })
+
+  it('compara cada métrica en su escala, descarta la posición en barras y dice el empate de presencia en una frase', () => {
     const seo = plan.chapters.find(chapter => chapter.module === 'seo')!
     const aeo = plan.chapters.find(chapter => chapter.module === 'aeo')!
-    const plotted = seo.charts.flatMap(chart => chart.series.at(-1)!.factIds)
+    const counts = seo.charts.find(chart => chart.unit === 'count')!
 
     expect(seo.charts.every(chart => chart.unit !== 'position')).toBe(true)
-    expect(seo.charts.some(chart => chart.series.at(-1)!.factIds.includes('seo.impressions') && chart.series.at(-1)!.factIds.includes('seo.keywords_tracked'))).toBe(false)
-    expect(plotted).toContain('seo.clicks')
+    // Una sola figura: clics, impresiones y keywords contra su período anterior, cada fila en su escala. Partirlas por
+    // magnitud dejaba figuras de una barra sin página y el capítulo sin conclusiones (vista previa Berel, 2026-10-02).
+    expect(seo.charts.filter(chart => chart.unit === 'count')).toHaveLength(1)
+    expect(counts.series.at(-1)!.factIds).toEqual(['seo.clicks', 'seo.impressions', 'seo.keywords_tracked'])
+    expect(counts.scale.perDimension).toBe(true)
+    expect(seo.readings?.some(reading => reading.chartId === counts.chartId)).toBe(true)
     expect(aeo.charts).toEqual([])
     expect(aeo.claims[0]).toMatchObject({ text: 'La marca aparece en 2 de 6 consultas en cada motor.', role: 'finding' })
     expect(seo.limits).toEqual(['Tráfico orgánico estimado: no forma parte de esta edición.'])

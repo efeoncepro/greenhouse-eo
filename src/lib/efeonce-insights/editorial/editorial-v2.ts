@@ -511,7 +511,9 @@ export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map
 
 /** Conclusiones de un capítulo en orden de peso editorial: metas primero, luego tendencias, luego comparaciones. */
 const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {
-  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : 2)
+  // TASK-1957 — el puntaje por dimensión (`chart.aeo.score`) va al final: un empate de dimensiones no es el hallazgo del
+  // mes frente a una meta, una tendencia o un cambio real (Berel, 2026-10-02: la tesis era «… lideran con 100»).
+  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : chartId.endsWith('.score') ? 3 : 2)
 
   return [...(chapter.readings ?? [])]
     .sort((a, b) => rank(a.chartId) - rank(b.chartId))

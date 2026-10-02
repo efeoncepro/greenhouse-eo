@@ -460,3 +460,9 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
 - **Un `$` en el texto de reemplazo de `String.replace` es un patrón**, y una búsqueda de ancla con `indexOf` puede
   casar antes de tiempo (`"  return {…"` dentro de `"      return {…"`). En ediciones por script: reemplazo por
   función o por `slice`, y anclas únicas.
+- **Partir una figura puede borrar las conclusiones del capítulo.** Las lecturas, la tesis y «Lo esencial» salen de
+  figuras con página; una figura de una sola barra no tiene página. Separar métricas SEO por magnitud dejó tres figuras
+  de una barra y el resumen de Berel cayó en «… lideran con 100» (2026-10-02). Antes de cambiar la elegibilidad de
+  figuras, regenerar la vista previa real y mirar tesis + esenciales, no sólo el gate.
+- **Un puntaje compuesto hereda la falla de sus partes.** Excluir `competitive_sov` = 100 sin competidores no basta: pesa
+  15 % del global del Grader, así que el global también queda fuera hasta que el Grader lo corrija.

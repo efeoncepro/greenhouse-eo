@@ -72,9 +72,22 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
     evidenceRef: `grader_report:${organizationId}:${asOf}:${report.provenance.scoreVersion}`
   }
 
-  facts.push({ ...base, factId: factId('aeo', 'overall_score', window), metricId: 'overall_score', label: GH_INSIGHTS.metrics.overall_score!, value: report.overallScore, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds.overall_score ?? null })
+  // TASK-1957 — sin competidores detectados, el Grader puntúa `competitive_sov` con 100 (marca / (marca + 0)): no es una
+  // medición frente a nadie y en un informe se lee como liderazgo. No entra como hecho; el límite de Share of Voice lo
+  // declara. Y como esa dimensión pesa en el puntaje global, un global con ella puntuada sin competidores arrastra puntos
+  // que nadie midió: tampoco entra (límite propio). Corrección de raíz del puntaje: follow-up del Grader.
+  const hasCompetitors = (report.competitiveSov?.competitors ?? []).length > 0
+  const inflatedOverall = !hasCompetitors && report.dimensions.some(dimension => dimension.key === 'competitive_sov' && (dimension.score ?? 0) > 0)
+
+  if (inflatedOverall) {
+    rejections.push({ module: 'aeo', metricId: 'overall_score', reason: 'insufficient_data', detail: 'El puntaje global incluye participación frente a competencia sin competidores detectados' })
+  } else {
+    facts.push({ ...base, factId: factId('aeo', 'overall_score', window), metricId: 'overall_score', label: GH_INSIGHTS.metrics.overall_score!, value: report.overallScore, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds.overall_score ?? null })
+  }
 
   for (const dimension of report.dimensions) {
+    if (dimension.key === 'competitive_sov' && !hasCompetitors) continue
+
     const key = `dimension.${dimension.key}`
 
     // El label del contrato del grader es inglés («Entity Clarity»); el documento usa el label es-CL que el propio grader

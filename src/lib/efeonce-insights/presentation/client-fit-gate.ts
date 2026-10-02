@@ -10,6 +10,7 @@
 
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { InsightWebChartV1, InsightWebModelV1 } from '../contracts/web-model'
+import { BANDED_UNITS, MAGNITUDE_BAND } from '../editorial/deterministic-planner'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 export type ClientFitRule =
@@ -21,6 +22,7 @@ export type ClientFitRule =
   | 'chart_without_information'
   | 'count_without_denominator'
   | 'rank_as_bars_from_zero'
+  | 'shared_axis_incomparable'
 
 export interface ClientFitViolation {
   path: string
@@ -137,6 +139,15 @@ const chartViolations = (path: string, chart: InsightWebChartV1, factsById: Read
 
   if (spec.unit === 'count' && parts.length > 0 && (parts.length !== plotted.length || new Set(parts.map(fact => fact.denominator)).size > 1)) {
     out.push({ path, rule: 'count_without_denominator', excerpt: spec.title })
+  }
+
+  // Magnitudes incomparables en UN eje (impresiones junto a keywords): la menor queda invisible. Sólo es válido si cada
+  // dimensión declara su propia escala (`scale.perDimension`). Mismo umbral y unidades que el planner.
+  const magnitudes = values.map(Math.abs).filter(value => value > 0)
+
+  if ((spec.family === 'bar' || spec.family === 'bar_grouped') && !spec.scale.perDimension && BANDED_UNITS.has(spec.unit)
+    && magnitudes.length >= 2 && Math.min(...magnitudes) * MAGNITUDE_BAND < Math.max(...magnitudes)) {
+    out.push({ path, rule: 'shared_axis_incomparable', excerpt: spec.title })
   }
 
   // Posición media: menor es mejor; barras desde cero invierten la lectura.

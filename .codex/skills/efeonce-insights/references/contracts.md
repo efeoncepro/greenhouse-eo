@@ -334,7 +334,8 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   queda como vocabulario de diagnóstico interno y el gate lo trata como prohibido en límites.
 - Gate `clientFitViolations({ model, reportTitle, facts })`: reglas `internal_identifier`, `raw_unit_code`,
   `raw_iso_date`, `internal_limit_wording`, `duplicated_limit`, `chart_without_information`,
-  `count_without_denominator`, `rank_as_bars_from_zero`. Claves estructurales (ids, `unit`, `asOf`, `spec.data`,
+  `count_without_denominator`, `rank_as_bars_from_zero`, `shared_axis_incomparable` (magnitudes ≥10× en un eje sin
+  `scale.perDimension`). Claves estructurales (ids, `unit`, `asOf`, `spec.data`,
   `spec.tabularEquivalent`…) no se leen como texto. Emitir una edición cliente con violaciones ⇒ `409 not_ready`
   con `details.reason = client_fit` y hasta 20 violaciones.
 
@@ -345,3 +346,9 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   `share_of_voice`/`insufficient_data`. `presence.*` is only read from snapshots sealed before v2.
 - Planner: AEO percent facts group by family (`mention_rate`, `sov`, `single`); `single` never charts; headline
   metrics (`share_of_model`, `sov.brand`, `citation_share`) are always `finding`.
+- No competitors and `competitive_sov` scored > 0 ⇒ neither `dimension.competitive_sov` nor `overall_score` is emitted
+  (the Grader weights that dimension 15 % of the global); rejection `overall_score`/`insufficient_data`.
+- `ChartScaleV1.perDimension` (aditivo, 1.2): distinct metrics of one channel, each with its previous period, are ONE
+  `bar_grouped` figure read row by row on its own scale (the PDF «comparison» page already did this; Think must honor
+  it, TASK-1958). Magnitude bands apply only to shared-axis charts; a one-figure band is never a chart. Score readings
+  rank last for the summary thesis and essentials.

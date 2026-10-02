@@ -437,10 +437,28 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 - Hallazgo para el Grader (fuera de esta task): la dimensión «Participación frente a competencia» marca 100 cuando el
   panel no detectó competidores (Berel). Para un cliente se lee como liderazgo; requiere revisión del scoring del Grader.
 
+## Delta 2026-10-02 (c) — «Lo esencial» sin hallazgos y puntaje global inflado
+
+- Observado por el operador en la vista previa de Berel: la tesis y «Lo esencial» decían «Claridad de entidad y
+  participación frente a competencia lideran con 100». Dos causas, corregidas:
+  1. La separación por magnitud partía las métricas SEO (clics, impresiones, keywords) en figuras de UNA barra, que no
+     tienen página; el capítulo SEO perdía sus conclusiones y el resumen caía en el puntaje de dimensiones. Regla nueva:
+     métricas distintas de un canal, cada una con su período anterior, son UNA figura en la que cada fila se lee en su
+     escala (`ChartScaleV1.perDimension`, contrato aditivo; el PDF ya las dibujaba así). La banda por magnitud queda sólo
+     para cifras que comparten eje, y una banda de una cifra no es figura. El gate suma `shared_axis_incomparable`
+     (magnitudes ≥10× en un eje sin `perDimension`). El puntaje por dimensión ordena último en tesis y esenciales.
+  2. El Grader puntúa `competitive_sov` = 100 sin competidores (marca / (marca + 0)) y esa dimensión pesa 15 % del puntaje
+     global. El adapter (`aeo_report_adapter_v2`) ya no emite la dimensión en ese caso y ahora tampoco el puntaje global
+     (límite propio «Puntaje de visibilidad en IA: sin datos suficientes»). Medido 2026-10-02: 10 de 50 runs con
+     competidores vacíos y la dimensión en 100; 9 entregados como informe público (Berel dos veces).
+- Vista previa regenerada con datos reales: Berel abre con «El mayor cambio fue en clics orgánicos: de 10.662 a 9.377
+  (-12,1 %)» y «Lo esencial» trae las impresiones; validación y gate sin hallazgos para Berel y Sky.
+
 ## Follow-ups
 
+- Grader (task propia): `competitive_sov` = null sin competidores y renormalizar el global; decidir cómo comunicar los
+  informes públicos ya entregados con el puntaje inflado.
 - Llevar el gate client-fit a otros documentos públicos por token (Grader, X-Ray) si comparten la misma frontera.
-- Grader: revisar la dimensión `competitive_sov` cuando el panel no detecta competidores (hoy 100); en Insights ese caso ya se declara como límite de Share of Voice.
 
 ## Open Questions
 

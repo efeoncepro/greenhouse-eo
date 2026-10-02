@@ -106,6 +106,15 @@ const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
   return { claimId: `claim.${fact.factId}`, text, factIds }
 }
 
+/**
+ * TASK-1957 — métricas distintas de UN canal, todas con su período anterior: cada fila se lee en su propia escala
+ * (`scale.perDimension`). Lo usan la elegibilidad (no se parten por magnitud) y el spec (lo declara).
+ */
+const isOwnScaleComparison = (facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>): boolean =>
+  facts.length > 0
+  && facts.every(fact => fact.value !== null && fact.comparisonFactId !== null && fact.comparisonFactId !== undefined && byId.get(fact.comparisonFactId)?.value != null)
+  && new Set(facts.map(fact => fact.channelId ?? null)).size === 1
+
 const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, unit: string, chartId: string, title: string, editorialV2 = false): ChartSpecV1 | null => {
   const withValue = facts.filter(fact => fact.value !== null)
 
@@ -141,7 +150,7 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
     dimensionLabels: labelled.map(fact => fact.label),
     ...channels,
     unit,
-    scale: { kind: 'linear', baseline: 0 },
+    scale: { kind: 'linear', baseline: 0, ...(series.length > 1 && isOwnScaleComparison(withValue, byId) ? { perDimension: true as const } : {}) },
     references: [],
     tabularEquivalent: {
       columns: series.length > 1 ? ['Métrica', 'Período anterior', 'Período'] : ['Métrica', 'Período'],
@@ -157,12 +166,14 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
  *    sueltos; si no, va a la afirmación con su «n de m»;
  *  - sin varianza (todas las cifras iguales, sin cambio impreso) no hay figura: todas las barras a la misma altura no
  *    dicen nada; la afirmación lo dice en una frase;
- *  - magnitudes incomparables no comparten eje lineal: se separan en bandas (impresiones lado a lado con keywords
- *    dejaban las keywords invisibles).
+ *  - métricas distintas de un canal con su período anterior se comparan fila por fila, cada una en su escala;
+ *  - sólo cuando las cifras comparten eje (sin período anterior o por canal), las magnitudes incomparables se separan
+ *    en bandas (impresiones lado a lado con keywords dejaban las keywords invisibles), y una banda de una cifra no es
+ *    figura.
  */
-const MAGNITUDE_BAND = 10
+export const MAGNITUDE_BAND = 10
 /** Sólo las unidades SIN tope se separan por magnitud; un puntaje 0–100 o un porcentaje se comparan en su escala. */
-const BANDED_UNITS = new Set(['count', 'visits_estimated', 'usd', 'clp', 'days'])
+export const BANDED_UNITS: ReadonlySet<string> = new Set(['count', 'visits_estimated', 'usd', 'clp', 'days'])
 const NO_BAR_UNITS = new Set(['position'])
 
 const isPartOfTotal = (fact: EvidenceFactV1): boolean =>
@@ -202,6 +213,12 @@ export const chartableGroupsFor = (unit: string, facts: EvidenceFactV1[], byId: 
   if (candidates.length === 0) return { groups: [], uniform: null }
   if (!hasInformation(candidates, byId, locale)) return { groups: [], uniform: candidates.length >= 2 ? candidates : null }
 
+  // Métricas distintas de UN canal, cada una con su período anterior, se dibujan fila por fila en su propia escala
+  // (figura «comparación»: actual contra anterior por métrica). No comparten eje, así que la magnitud no las separa:
+  // partirlas dejaba figuras de UNA barra, que no tienen página, y el capítulo perdía sus conclusiones (TASK-1957,
+  // vista previa Berel 2026-10-02: «Lo esencial» quedaba vacío y la tesis caía en un puntaje).
+  if (isOwnScaleComparison(candidates, byId)) return { groups: [candidates], uniform: null }
+
   // Bandas de magnitud: de mayor a menor, un hecho entra a la banda si su pico no es MAGNITUDE_BAND veces menor que
   // el mayor de la banda. El orden de las dimensiones dentro de cada banda conserva el del snapshot.
   const sorted = [...candidates].sort((a, b) => peakOf(b, byId) - peakOf(a, byId))
@@ -221,7 +238,8 @@ export const chartableGroupsFor = (unit: string, facts: EvidenceFactV1[], byId: 
 
   const groups = bands
     .map(band => [...band].sort((a, b) => order.get(a.factId)! - order.get(b.factId)!))
-    .filter(band => hasInformation(band, byId, locale))
+    // Una figura de una sola cifra no compara nada: esa cifra queda en su afirmación y en la tabla.
+    .filter(band => band.length >= 2 && hasInformation(band, byId, locale))
     // La figura de la banda con el primer hecho del snapshot conserva el id histórico del capítulo.
     .sort((a, b) => order.get(a[0]!.factId)! - order.get(b[0]!.factId)!)
 

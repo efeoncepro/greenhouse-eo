@@ -184,6 +184,26 @@ describe('AEO adapter', () => {
     expect(result.rejections).toEqual([])
   })
 
+  it('sin competidores detectados no entra la participación frente a competencia ni el puntaje global que la pondera', async () => {
+    // Caso real Berel 2026-09-03: competitive_sov = 100 contra nadie (marca / (marca + 0)) y pesa 15 % del global.
+    const base = report('2026-08-20', 'ready')
+
+    aeoMocks.readClientGraderReport.mockResolvedValue({
+      report: {
+        ...base.report,
+        dimensions: [...base.report.dimensions, { key: 'competitive_sov', label: 'Competitive Share of Voice', score: 100 }],
+        competitiveSov: { brandMentions: 5, competitors: [] }
+      }
+    })
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.some(fact => fact.metricId === 'overall_score' || fact.metricId === 'dimension.competitive_sov')).toBe(false)
+    expect(result.facts.find(fact => fact.metricId === 'dimension.presence')).toMatchObject({ value: 70 })
+    expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual(expect.arrayContaining([['overall_score', 'insufficient_data'], ['share_of_voice', 'insufficient_data']]))
+  })
+
   it('el último run fuera de la ventana NO se proyecta como histórico: unsupported_window', async () => {
     aeoMocks.readClientGraderReport.mockResolvedValue(report('2026-09-10', 'ready'))
     const { aeoReportAdapter } = await import('./aeo-adapter')

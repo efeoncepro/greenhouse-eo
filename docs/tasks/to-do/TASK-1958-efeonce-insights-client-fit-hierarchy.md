@@ -338,6 +338,7 @@ GVC).
 - [ ] GVC desktop + mobile capturado y mirado; scorecard con promedio ≥ 4,2.
 - [ ] Sin scroll horizontal de pagina en 1440 ni 390, con tabla abierta y cerrada.
 - [ ] Ningún texto visible casa con los patrones del gate de TASK-1957.
+- [ ] Un `bar_grouped` con `scale.perDimension` se dibuja fila por fila, cada una en su escala; sin el campo, eje compartido.
 - [ ] Todo canal nombrado en el capítulo AEO lleva su isotipo oficial de `EngineMark` (o el grupo en la frase de empate); ninguna métrica SEO lo repite.
 - [ ] PDF reales de Berel y Sky aprobados por el operador; fidelidad al canvas ≤1 % en regiones no modificadas.
 
@@ -371,6 +372,14 @@ GVC).
   `EngineMark.astro` + `EngineAvatarGroup.astro` con los SVG de los cinco canales (los usa el Grader) y los catálogos PDF
   ya pintan isotipos por `channelId`. El informe live de Insights no los usaba y el modelo no traía el canal por hecho;
   TASK-1957 agregó `InsightWebFactV1.channelId` (1.2). El uso queda en el Slice 2 y en el wireframe.
+
+## Delta 2026-10-02 (c)
+
+- TASK-1957 agregó `spec.scale.perDimension` (aditivo en 1.2): clics, impresiones y keywords contra su período anterior
+  forman UNA figura y cada fila se lee en su escala. Think hoy calcula una escala única para todo `bar_grouped`
+  (`ChartFigure.astro`, `niceScale(max(seriesValues))`), así que 9.377 junto a 512.113 queda invisible. Esta task la
+  dibuja fila por fila cuando el campo viene (igual que la figura «comparación» del PDF) y conserva el eje compartido
+  cuando no.
 
 ## Follow-ups
 
