@@ -300,7 +300,7 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   tools (29 write routes + `studio.campaign.brief.get`), state machines, `CampaignDetail.permissions`, `ETag`, CLI
   `pnpm studio:write`; migration `1790967435017` applied on staging and prod (5 real campaigns stay `onedrive`);
   sandbox `CMP-900`. Greenhouse write capabilities on `develop` only. Gateway: synced 2026-10-02 (efeonce-mcp#23, v1.10.0)
-  with the read-only federation filter — **never federate a Studio write before TASK-1899**; gateway deploy pending. Entregable C deferred by the operator.
+  with the read-only federation filter — **never federate a Studio write before TASK-1899**; deployed (revision 00064). Entregable C deferred by the operator.
 - Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
   Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
 - Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of

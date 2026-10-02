@@ -261,8 +261,8 @@ was verified.
 | Gateway | read-only federation filter | prepared | not committed, not synced |
 
 **Gateway synced 2026-10-02** (efeonce-mcp#23 merged `1ddc7db`, v1.10.0, writes in the manifest but never
-federated — `MARKETING_STUDIO_FEDERATED_TOOLS`). **Pending (operator):** Greenhouse production release; gateway
-deploy (manual `deploy.yml`). Deferred: Entregable C (Slices 8–10); TASK-1898/1899 (session person, T2 confirmation by API,
+federated — `MARKETING_STUDIO_FEDERATED_TOOLS`). Deployed by the operator (revision `efeonce-mcp-gateway-00064-q6w`).
+**Pending (operator):** Greenhouse production release. Deferred: Entregable C (Slices 8–10); TASK-1898/1899 (session person, T2 confirmation by API,
 write federation). CMP-004 media authorization stays in the OneDrive catalog until its cutover (C); in Studio it can
 only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:write authorizeMedia … --apply --confirm`.
 
