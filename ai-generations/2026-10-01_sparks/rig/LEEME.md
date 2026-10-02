@@ -21,7 +21,7 @@ Producción en `capas/` (en orden; todo reproducible):
 1. `mask-anillo.png`: anillo segmentado con SAM 2 (`fal-ai/sam2/image`, puntos sobre el tubo y la esfera; el cuerpo
    como punto negativo) sobre `fuente/spark-engine-sin-cara.png`. SAM no sirvió para brazos ni manos (salían
    incompletos).
-2. `mascaras.cjs`: el resto por geometría. Cuerpo = elipse medida (cx 794, cy 716, rx 417, ry 410 sobre 1600);
+2. `mascaras.cjs`: el resto por geometría (manos: más allá de la banda navy de la muñeca). Cuerpo = elipse medida (cx 794, cy 716, rx 417, ry 410 sobre 1600);
    brazos = fuera de la elipse, bajo y = 780 y a los lados; manos = más allá de la muñeca (x < 232 / x > 1368);
    antena = sobre y = 292; anillo partido en mitad trasera (sobre la línea entre sus extremos) y delantera (con la
    esfera).
@@ -34,6 +34,19 @@ Producción en `capas/` (en orden; todo reproducible):
    gris y crea las izquierdas en espejo, llevadas a su muñeca.
 6. `islas.cjs` quita motas; `lineas.cjs` recolorea la luz azul a las seis líneas y exporta WebP de 1000 px
    (`web/<línea>/`, ~190 KB por línea). `manifiesto-v2.json`: SHA-256 de los masters.
-7. Bucket: `sparks/v1/web/rig/v2/<línea>/` y `sparks/v1/masters/rig/v2/engine/`.
+7. Bucket: `sparks/v1/web/rig/v2.1/<línea>/` y `sparks/v1/masters/rig/v2.1/engine/` (la v2 quedó obsoleta: ver abajo).
+
+### v2.1 — las costuras que vio el operador (2026-10-01)
+
+- **El anillo se quebraba en sus dos cortes.** Causa: el componente movía sus dos mitades en sentidos opuestos (un
+  paralaje) y eso partía el tubo justo donde se cortó. Regla: **las piezas de un mismo objeto reciben SIEMPRE la misma
+  transformación.** Y aun juntas dejaban una línea fina: al reducir a 1000 px cada mitad tiene un borde
+  semitransparente en el corte. Regla: **las capas vecinas se solapan unos píxeles en el corte** (5 px en la línea,
+  8 px en el borde de la esfera).
+- **Las poses de mano mostraban un corte vertical en el puño.** La pose generada redibuja el puño con otra geometría y
+  fundirla sobre el original duplica bordes. Arreglo: la muñeca se corta en la **banda navy** antes del puño (x≈1280),
+  el puño viaja con la mano y la banda oscura esconde el escalón. El brazo izquierdo original no es simétrico al
+  derecho, así que el **lado izquierdo entero es el espejo del derecho**, alineado en el hombro.
+- Capas nuevas en una carpeta nueva (`v2.1`): pisar `v2` mezclaba capas viejas en caché con pivotes nuevos.
 
 Costo: ~USD 2 (2 ediciones descartadas, 2 inpaints de banda, 6 de manos, 6 SAM).

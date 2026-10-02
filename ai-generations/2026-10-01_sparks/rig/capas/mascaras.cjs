@@ -21,8 +21,13 @@ const D = __dirname
     const i = y * W + x
     const ring = ringSam[i] > 127
     if (ring) {
+      // Las dos mitades se SOLAPAN 5 px a cada lado del corte: al reducir a 1000 px, cada mitad deja un borde
+      // semitransparente en el corte y, apiladas, marcan una línea fina sobre el tubo. Con el solape no hay costura.
       const front = sphere(x, y) || y > lineY(x)
-      masks[front ? 'anillo-adelante' : 'anillo-atras'][i] = 255
+      // Lo mismo en el borde de la esfera: la delantera la toma con 8 px de más y la trasera la suelta 8 px antes.
+      const inSphere = (r) => (x - 1320) ** 2 + (y - 530) ** 2 < r ** 2
+      if (inSphere(103) || y > lineY(x) - 5) masks['anillo-adelante'][i] = 255
+      if (!inSphere(87) && y < lineY(x) + 5) masks['anillo-atras'][i] = 255
       if (front && inC(x, y, 0.995)) masks.relleno[i] = 255
       continue
     }
@@ -30,7 +35,9 @@ const D = __dirname
     if (y < 292) { masks.antena[i] = 255; continue }
     if (y > 780 && !inC(x, y, 1.01) && Math.abs(x - cx) > R * 0.55) {
       const left = x < cx
-      const hand = left ? x < 232 : x > 1368
+      // La muñeca es la banda navy antes del puño (x≈316 izquierda, ≈1280 derecha): el puño viaja con la mano y la
+      // banda oscura esconde cualquier escalón entre el brazo original y una pose generada.
+      const hand = left ? x < 316 : x > 1280
       masks[(hand ? 'mano-' : 'brazo-') + (left ? 'izq' : 'der')][i] = 255
       continue
     }

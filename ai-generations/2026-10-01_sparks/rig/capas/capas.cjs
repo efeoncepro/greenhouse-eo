@@ -38,9 +38,9 @@ const load = async (f, ch) => sharp(path.join(D, f)).toColourspace('srgb')[ch ==
       if (lum < 95) put(L[x < G.cx ? 'brazo-izq' : 'brazo-der'], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], a)
     }
   }
-  // Mano y antebrazo se solapan 6 px en el corte de la muñeca, para que al girar la mano no se abra una ranura.
-  for (let y = 0; y < W; y++) for (let x = 226; x < 238; x++) { const i = y * W + x; if (L['brazo-izq'][i * 4 + 3] > 0 && x < 238) L['mano-izq'].copy(L['mano-izq'], i * 4, i * 4, i * 4), put(L['mano-izq'], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], cut[i * 4 + 3]) }
-  for (let y = 0; y < W; y++) for (let x = 1362; x < 1374; x++) { const i = y * W + x; if (L['brazo-der'][i * 4 + 3] > 0) put(L['mano-der'], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], cut[i * 4 + 3]) }
+  // Mano y brazo se solapan 6 px en la banda de la muñeca, para que al girar la mano no se abra una ranura.
+  for (let y = 0; y < W; y++) for (let x = 316; x < 322; x++) { const i = y * W + x; if (L['brazo-izq'][i * 4 + 3] > 0) put(L['mano-izq'], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], cut[i * 4 + 3]) }
+  for (let y = 0; y < W; y++) for (let x = 1274; x <= 1280; x++) { const i = y * W + x; if (L['brazo-der'][i * 4 + 3] > 0) put(L['mano-der'], i, cut[i * 4], cut[i * 4 + 1], cut[i * 4 + 2], cut[i * 4 + 3]) }
   fs.mkdirSync(path.join(D, 'engine'), { recursive: true })
   for (const [k, buf] of Object.entries(L)) await sharp(buf, { raw: { width: W, height: W, channels: 4 } }).png().toFile(path.join(D, 'engine', `${k}.png`))
   // Pivotes
@@ -50,8 +50,8 @@ const load = async (f, ch) => sharp(path.join(D, f)).toColourspace('srgb')[ch ==
     body: G,
     shoulderL: centroid(L['brazo-izq'], (x, y) => er(x, y) >= 0.98 && er(x, y) < 1.1),
     shoulderR: centroid(L['brazo-der'], (x, y) => er(x, y) >= 0.98 && er(x, y) < 1.1),
-    wristL: centroid(L['brazo-izq'], (x) => x >= 232 && x < 252),
-    wristR: centroid(L['brazo-der'], (x) => x > 1348 && x <= 1368),
+    wristL: centroid(L['brazo-izq'], (x) => x >= 316 && x < 328),
+    wristR: centroid(L['brazo-der'], (x) => x > 1268 && x <= 1280),
     ring: centroid(L['anillo-atras'], () => true) && (() => { const a = centroid(L['anillo-adelante'], (x, y) => (x - 1320) ** 2 + (y - 530) ** 2 > 95 ** 2), b = centroid(L['anillo-atras'], () => true); return [Math.round((a[0] + b[0]) / 2), Math.round((a[1] + b[1]) / 2)] })(),
     antenna: [794, 292],
     visor: { cx: 496, cy: 414, rx: 252, ry: 96, viewBox: 1000 }

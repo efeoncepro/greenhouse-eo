@@ -1,68 +1,68 @@
 {
  "masters": {
   "anillo-adelante": {
-   "sha256": "774eaec95f04c598048d0a506283f1878ee1f32cd95597c4862bf34e41fb7ce3",
-   "bytes": 66571
+   "sha256": "e118f24ef956d361ee3d870ac5dc598fcd1b7b463fb542e84c33fccbafe549f0",
+   "bytes": 67691
   },
   "anillo-atras": {
-   "sha256": "eb1c2292ef3b8e3f1591131967026954596ad5a6f5c1e75bebe219ecf8024170",
-   "bytes": 20363
+   "sha256": "80229d436c41cf5b6b0bd0937c862f150b70cb23ca416d4aeadbe4b4cf57a524",
+   "bytes": 21580
   },
   "antena": {
    "sha256": "29c2dc1910d2b123abf08182d4cefa71d8990c205897d09299c0710071d230b9",
    "bytes": 15362
   },
   "brazo-der": {
-   "sha256": "6299ffa4d4583400c7bfc8d69d6055c71cacfc535f3cf187719eaa689440d723",
-   "bytes": 55931
+   "sha256": "c1217f16fcfca1a48ab6c975a835ff09b5400651543bd20464ea839f76249b27",
+   "bytes": 37757
   },
   "brazo-izq": {
-   "sha256": "5b9fc80088dfb94eef2bda20491dbb705af5aab012401a553d5b9f30dd329fb5",
-   "bytes": 52247
+   "sha256": "77286e23e446392c5561799f5c902311fbd61d8777f0b8cf343e62ce38aac02f",
+   "bytes": 37615
   },
   "cuerpo": {
    "sha256": "59e721c40b95ffdb35c210050f786546ea83b0d7dc7ecaeffe0d158943cd462c",
    "bytes": 413180
   },
   "mano-der-abierta": {
-   "sha256": "f9ee01eb202c004004c5830d0dec44c31ca1dbdf42dccaff900993a75d7c705b",
-   "bytes": 113381
+   "sha256": "490a2dee25dadf0d4dd1392a66cecf74838f9e5c89a07cdb23f2b0fbddb63fd0",
+   "bytes": 155968
   },
   "mano-der-palma": {
-   "sha256": "11932bf18805f390e3ec5991986569bcd1db0426a4f3e7dfa6e5ce85e8608034",
-   "bytes": 39123
+   "sha256": "e55b63b2f5c9935e80073100d65aacb19bc2b76275f7e0f77f5b1a667d8fb7a1",
+   "bytes": 56099
   },
   "mano-der-puno": {
-   "sha256": "2370799bc618299f01774f2e4568b9801dc87ea92cf4ce265f20fa800feda787",
-   "bytes": 69701
+   "sha256": "94b1c0ed9b32cfeb981c63ded2a3009d180550bf1d4939d8f5684573e6063255",
+   "bytes": 117869
   },
   "mano-der-senala": {
-   "sha256": "d8262cf2d263228023fd7e803d3bc08d454f3734d755c35927c14ae87cb7b0b3",
-   "bytes": 69025
+   "sha256": "f5a7a924605ae2470e3ca4bfb0d912acdc89203c91a4c713159bb97b1fc6d8eb",
+   "bytes": 113444
   },
   "mano-izq-abierta": {
-   "sha256": "5c74ac7c95c4343cbc7fcfde45f4a425f7b17918cc2e88b8dda1c8abe1cb42c9",
-   "bytes": 113264
+   "sha256": "023cb33c65e275de4b7a97ffab500679ce355ba677c5eb94e0a4af0feb330079",
+   "bytes": 155874
   },
   "mano-izq-palma": {
-   "sha256": "401603f581b221d773b6e675d04c052d6cf6cbfc69e311cab4fd546a4a3e5242",
-   "bytes": 40179
+   "sha256": "b155ff312c903850b5a61dbd067dba2b068103132582fc91d433da8d1d4c23ec",
+   "bytes": 56331
   },
   "mano-izq-puno": {
-   "sha256": "829cf8e635d24e86a9a06b6fe72a501005cdaa15453cd3e10c36f358c3769ac3",
-   "bytes": 69599
+   "sha256": "f04d8ce9a206cfe9a7a76437cc2577c997b3237bd0d1893b687367c800cfd82c",
+   "bytes": 117847
   },
   "mano-izq-senala": {
-   "sha256": "8eae0cefd1239c2712260b98a58c93ae76c4612f84b7996049faab76bfbba30b",
-   "bytes": 68916
+   "sha256": "325138933a731fcadc38f1c3dbdb4e53afbca1d4cd45c6b2b1264b7fd711725a",
+   "bytes": 113446
   }
  },
  "webBytesPorLinea": {
-  "brand": 192142,
-  "engine": 191578,
-  "growth": 191948,
-  "revenue-hubspot": 191816,
-  "revenue-salesforce": 191850,
-  "voice": 192344
+  "brand": 217282,
+  "engine": 216174,
+  "growth": 217158,
+  "revenue-hubspot": 216610,
+  "revenue-salesforce": 216732,
+  "voice": 217420
  }
 }
