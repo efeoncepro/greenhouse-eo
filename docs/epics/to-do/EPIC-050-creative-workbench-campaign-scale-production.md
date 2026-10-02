@@ -190,5 +190,6 @@ Consecuencias para el programa:
 
 - Hoy diseñan las piezas de Berel **Daniela, Andrés y Melkin**. Son quienes deben aprobar la receta
   declarada del adaptador Berel (TASK-1955) y la revisión de su regresión contra los entregables de referencia.
-- Pendiente con ellos: confirmar si `Guia de infografías y Formatos.ai` y `Reticulas CHIP.ai` son la
-  referencia vigente o si hay versiones posteriores.
+- Confirmado por el operador (2026-10-02): `Guia de infografías y Formatos.ai` y `Reticulas CHIP.ai` son la
+  **referencia vigente** del adaptador declarado de Berel. Al usarlas se sellan por SHA; una versión nueva de
+  esos archivos es una revisión nueva del adaptador, no una edición en sitio.
