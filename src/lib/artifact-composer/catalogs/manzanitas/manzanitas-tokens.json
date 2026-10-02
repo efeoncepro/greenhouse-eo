@@ -4,7 +4,7 @@
     "export": "manzanitasRegister",
     "versions": {
       "@efeoncepro/axis-tokens": "0.3.41",
-      "@efeoncepro/axis-brand-assets": "0.4.7",
+      "@efeoncepro/axis-brand-assets": "0.4.10",
       "@efeoncepro/axis-graphic-line": "0.11.0",
       "@efeoncepro/axis-ui-contracts": "0.3.40"
     }
