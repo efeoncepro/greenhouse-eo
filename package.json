@@ -308,6 +308,7 @@
     "ai:omni": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
+    "ai:mask": "tsx scripts/ai/inpaint/mask-cli.ts",
     "foto:doctor": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/foto/doctor.ts",
     "foto:prompt": "node scripts/foto/build-prompt.mjs",
     "foto:validar": "node scripts/foto/validar-reservas.mjs",
