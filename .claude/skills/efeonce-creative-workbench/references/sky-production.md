@@ -1,24 +1,8 @@
 # SKY: producir una campaña y sus adaptaciones
 
-## Recorrido productivo vigente — 2026-10-01
-
-Se puede componer con agentes hoy desde Workbench actualizado: recetas y planes por adaptación,
-jobs completos, `marca:disenar` o `marca:lote`, runs/QA y revisión de PNG. PR15 integra los
-componentes autónomos y tokens; PR16 integra el Lab premium sobre esa base. Leer
-[flujo de agentes](agent-production.md) como procedimiento de principio a fin y
-[continuidad](state-continuity.md) para estados vigentes. No ejecutar ejemplos históricos como
-campaña, pagar IA o crear otro AUTH para poder probar la composición.
-
-La comparación independiente está completa técnicamente para 126/126 fuentes, con controles
-REST y renders revisados. El módulo autónomo conserva esos 126 PNG y SVG por bytes. Esto no
-certifica nuevo copy ni nuevo encuadre; cada pieza nueva conserva su propia evaluación.
-Una actualización del engine invalida preparaciones con otro digest: nueva preparación/run,
-sin modificar un UUID incierto de IA para reintentar un pago. La recuperación monetaria conserva
-la intención original; el mantenimiento de composición es un flujo separado.
-
 ## Producción con las correcciones Figma — 2026-09-30
 
-La unidad local Workbench `f9f0ef7` incorpora las correcciones contrastadas contra las
+La unidad Workbench integrada en main por PR14 (`be57032`) incorpora las correcciones contrastadas contra las
 126 referencias Figma independientes. `marca:disenar` y el driver de `marca:lote` usan
 el mismo adapter modular corregido. No son reparaciones manuales que deba repetir el
 agente en cada campaña. Consultar [components.md](components.md) y, en Workbench,
@@ -32,7 +16,7 @@ sellada. Multilínea usa baseline real. La URL legal canónica prefiere `/` y `-
 separadores de wrap, sin eliminar caracteres ni cambiar pesos. No pasar overrides al job.
 
 Verificar que el checkout contiene esta unidad o un sucesor integrado antes de producir.
-El commit local no demuestra push/merge ni que el equipo ya lo recibió. Tokens, fuentes,
+Una corrección posterior local no demuestra push/merge ni que el equipo ya la recibió. Tokens, fuentes,
 assets y pack `sky-airline@0.1.0` conservan sus sellos; estas correcciones de código no
 requieren publicar un paquete nuevo ni cambiar el broker para componer.
 
@@ -256,13 +240,3 @@ Guardar evaluación con run, marca, PNG SHA, método, hallazgos y alcance. Estad
 significa que el motor terminó. Criterio fotográfico confirmado no aprueba KV, legibilidad,
 tarifa o publicación. Registrar aprobación comercial/entrega aparte cuando realmente existan.
 Archivar resultados binarios fuera de Git con ubicación y SHA; conservar intent/locks.
-
-## Nombres y alineación vigentes — 2026-10-01
-
-Leer [destinos y espacios adaptativos](destination-content-flow.md) y el
-[cierre del feedback](layout-feedback-handoff.md). Contenido 1.5.0 / destino 1.2.0 corrige
-los 76 badges tarifarios y las relaciones footer/fila/prefijo/editorial; v6 es el export local
-revisado. La auditoría conserva cobertura, runs y checks. Preservar geometría admitida,
-fotos/ventanas y corridas históricas; aceptación visual del operador y aprobación comercial
-siguen pendientes. El pedido posterior autoriza commit local de lo propio; registrar su
-evidencia separada de push, publicación y deploy.

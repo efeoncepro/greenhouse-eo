@@ -1,9 +1,7 @@
 # Creative Workbench — harness del equipo Efeonce para múltiples marcas
 
-Estado vigente: producción modular SKY y Lab integrados en Workbench; rollout completo del equipo/IA y segunda marca pendientes.
-Plan original: 2026-09-29. Actualización: 2026-10-01. Operador: Julio Reyes.
-
-[Continuidad operativa vigente](WORKBENCH_CURRENT_STATE.md) separa código, pruebas, Packages y runtime. El motor activo se desarrolla en Workbench; Greenhouse conserva gobernanza/skills. No efectuar un sync total del plan inicial sobre las rutas nativas.
+Estado: foundation neutral y primer sistema candidato SKY verificados localmente; integración y rollout pendientes.
+Fecha: 2026-09-29. Operador: Julio Reyes.
 
 ## Objetivo y alcance confirmado
 
@@ -29,9 +27,8 @@ a una sola marca y no mezcla contexto, cachés, referencias o recetas entre corr
 
 ## Fronteras de implementación
 
-1. Foundation común: catálogo, contexto, resolver, preflight, wrappers, validadores y procedencia son
-   implementación nativa de Workbench; Greenhouse mantiene decisiones, skills y control de distribución
-   sellada. No reinstalar mirrors del template ni confundir gobernanza con ownership del motor.
+1. Foundation común, gobernada desde Greenhouse: catálogo de marcas, contexto de ejecución, resolver,
+   preflight, wrappers de IA, validadores, rutas de skills y procedencia. Neutral respecto de marcas.
 2. Sistemas independientes por marca: tokens, assets, contratos creativos, recetas y referencia web.
    Consumo por versiones exactas; ningún cliente hereda identidad de otro.
 3. Workbench del equipo: selección explícita de marca/proyecto, acceso según asignaciones reales,

@@ -1,18 +1,5 @@
 # Preflight de marca en Creative Workbench
 
-> Estado actual 2026-10-01: [continuidad vigente](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-> y [manual del Lab](usar-creative-workbench-lab.md). PR14/15/16/17 integrados; revisión técnica 126/126
-> completada. Lab v6 publicado en el alias Vercel protegido; UUID y pruebas del demo de abajo son históricos.
-> Este manual conserva la prueba fechada del demo y sus UUID inmutables; sus cifras, selecciones y
-> pendientes históricos no describen el último renderer/Lab, ni autorizan reejecutar samples como campaña.
-> Flujo IA y Efeonce ID siguen separados; no modificar CLIs Greenhouse ni sync total.
-
-> Corrección local posterior: contenido `1.5.0`, destino `1.2.0`, 76 badges tarifarios LEFT
-> y export de 24 adaptaciones `prueba-modular-24-v6`. Leer el
-> [handoff vigente de la skill](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md)
-> antes de producir; los cuatro jobs y sus tests de abajo siguen siendo evidencia histórica.
-
-
 ## Flujo productivo nativo verificado — 2026-09-30
 
 La prioridad del operador es cerrar composición y adaptaciones antes de continuar con

@@ -1,10 +1,12 @@
 # SKY Airline — primer onboarding del harness multimarcas
 
-> Estado vigente: [continuidad operativa](../WORKBENCH_CURRENT_STATE.md), corte 2026-10-01.
-> El sistema activo vive en `creative-workbench/brands/sky-airline`: 126 referencias Figma revisadas,
-> producción modular y Lab integrados. Paquetes 0.1 publicados; contratos0.2 sin publicar.
-> Lo siguiente conserva el bootstrap/evidencia de 2026-09-29; sus rutas y pendientes no son instrucciones
-> actuales ni autorizan sync total, IAM, lectura de llaves por el equipo o distribución de Metric.
+> Corte de actualización 2026-09-30: App Workbench registrada/instalada por el operador y API
+> GitHub de instalación verificada; secreto propio con una versión/SA exacta reportados, token
+> efectivo y runtime pendientes. Pins App admitidos y vínculo del operador aprobado/preparado
+> en privado; no runtime, rollout o IA habilitados. Ver
+> [decisiones actuales](OPERATOR_DECISIONS.md#identidad-del-workbench--corte-2026-09-30) y
+> [continuidad del harness](../../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md).
+> El contenido siguiente conserva la evidencia y el plan iniciales del 2026-09-29.
 
 Estado: foundation y tres paquetes candidatos verificados localmente; distribución y despliegue pendientes.
 Fecha: 2026-09-29. Operador: Julio Reyes. Identidad canónica: `sky-airline`.

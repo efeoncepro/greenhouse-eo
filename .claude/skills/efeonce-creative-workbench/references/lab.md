@@ -1,85 +1,6 @@
 # Lab premium · operación para Codex y Claude
 
-## Lab integrado y criterio vigente — 2026-10-01
-
-**Acceso actual:** [visor sin login autorizado por el operador](../../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
-Deployment actual y seis respuestas anónimas 200 verificados; la protección v6 siguiente es histórica.
-
-PR17 integra selectores v6 en main `7e4c617`, encima de premium v5 (PR16) y componentes
-autónomos (PR15). El contrato de superficies v5 y la mesa opción 2 siguen vigentes. El
-[estado Greenhouse](../../../../docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-y [continuidad](state-continuity.md) distinguen source, QA y publicación protegida. El corte
-v6 conserva 29 archivos remotos cotejados y revisión de ambos menús en el alias Vercel;
-`creative.efeonce.org` continúa como dominio previsto. Revalidar runtime antes de otra operación.
-
-El Lab es el Design System de SKY como cliente de Efeonce dentro de un espacio multimarcas;
-no tiene editor ni producción en el navegador. El header firma Efeonce | cliente, sin caption;
-footer Efeonce, `Design System Lab` e información institucional. Bricolage/Poppins y tokens host
-separados de Metric/colores/artwork SKY. Portada: «Design System / SKY Airline», CTA compacto
-«Consultar composiciones» y acceso secundario «Ver adaptaciones». Consumir roles compilados
-actuales: no reaplicar el padding/tamaño del primer CTA host histórico descrito más abajo.
-
-Navegación principal de tres accesos: Composiciones, Adaptaciones, Sistema de marca, más Guía.
-Shell lateral de bibliotecas; hasta 1050 px, menú compacto «Explorar bibliotecas». Cada tarea
-puede tener panel y cada entidad con decisión propia una card; cuerpos, registros, fuentes y
-metadatos internos quedan planos con reglas/espacio. **V5 supera la contención excesiva v4**.
-No reintroducir un fondo/borde/radio por cada dato ni animar todas las cards al abrir details.
-
-- Composiciones `#recetas`: 37 recetas reales, seis iniciales, búsqueda antes de paginar,
-  detalle `RecipeDialog`, variantes de la misma receta y acceso profundo `#recipe-…`.
-- Adaptaciones `#adaptaciones`: 126 formatos propios, imagen completa, búsqueda/familia,
-  conteo/vacío/reset/Ver más y originales conservados. Familias usa `FilterSelect` host;
-  el menú abierto también tiene presentación propia, con fallback nativo.
-- Mesa `#pieza=<formatId>`: variantes a la izquierda, original proporcional en navy y
-  zonas/campos a la derecha; móvil pieza primero y variantes horizontales. `#zonas` compatible.
-  Volver restaura query, scroll y foco; no sustituir vínculos por destinos parecidos.
-- Bibliotecas `/tokens/`, `/tipografia/`, `/recursos/` y `/lab-guide/`: rutas específicas,
-  layouts host comunes. Tokens agrupa por familia con valor/copia/procedencia próximos
-  y `FilterSelect` para colección, compartido con Adaptaciones.
-  Metric ofrece cinco specimens SVG, nunca binaries; Recursos combina vectores y relaciones
-  semánticas sin fingir que todos los componentes aparecen en todas las adaptaciones.
-- Muestras `#composiciones`: cuatro corridas en la selección premium actual; no todas las recetas.
-  IDs/counts son derivados del input del build, no una constante de seis muestras en UI.
-
-Código principal adicional: `src/lib/review-model.ts`, `featured-artwork.ts`, `motion-model.ts`,
-`src/components/RecipeDialog.astro`, `LabIcon.astro`, `LibraryCover.astro`, `ScrollComposition.astro`,
-`src/scripts/motion.ts` y estilos premium/surfaces/review-shell/disclosures. Verificar paths en
-el checkout antes de modificar; no cambiar el renderer SKY para resolver una card del host.
-
-Motion GSAP 3.15.0 es un módulo host independiente: scroll normal, sin smoother/snap/loops,
-full sólo >1050 px y altura >=650; demás calm/static. Reduced-motion reactivo revierte estilos
-sin ocultar contenido. Coreografía en la escena original, no refresh global por cada disclosure.
-Con HTML sin JS siguen las 37 recetas y 126 originales; sin ResizeObserver sigue grid natural.
-Dialog/foco/Escape por capas y retorno al elemento visible son parte del contrato, no sólo QA visual.
-
-Dos modos de referencia excluyentes: `--native-previews` recompone desde recursos propios;
-`--reference-projection <site> --projection-sha256 <SHA>` consume proyección exacta admitida.
-El segundo no importa ni ejecuta el engine archivado. Ambos conservan previews históricos,
-catálogo/pack y muestras originales; sólo uno por build. Sin modo explícito, referencias históricas.
-El manual Workbench contiene la selección `review-design-selection.json` y comando reproducible.
-
-Checks v6: TS7, Astro 47 archivos sin diagnósticos, 17 pruebas Lab y cuatro gates; 16
-recorridos de navegador separados de los tests. Build
-`0b815c5e7ee07a56a24d24d1e4962ad378a235726325138105098daa250118e2`, 310 archivos,
-cinco WOFF2 host OFL y cero fonts privadas; 298 archivos no UI byte-idénticos a v5.
-Los 348/7 tests privados del harness/SKY son evidencia de integración v5, no una ejecución
-privada nueva v6. CI postmerge v6 gates/native-harness/Lab PASS para el mismo main.
-No atribuir aceptación visual ni approval comercial a esos resultados. Dueños en Workbench:
-manual, `workbench-lab-navigation.md`, `design-qa.md`, dirección/QA
-`workbench-surface-economy-v5` y `workbench-filter-selects-v6`. Los cortes históricos
-inferiores conservan los hechos de su fecha y no sustituyen este estado.
-
-## Extensión local: íconos SKY — 2026-10-01
-
-La página `/iconos/` queda enlazada desde Recursos y sidebar del cliente; la
-colección es candidata y no cambia los siete vectores permitidos por la biblioteca
-anterior ni el pack. Reutiliza `FilterSelect` para kind/tamaño, filtro por nombre/ID,
-24 iniciales/más/reset, SVG/Figma/selector y archivo de originales. Host Efeonce y
-SVG SKY separados. HTML sin JS conserva familias y todas las variantes.
-[Íconos](icons.md) conserva fuente, API/CLI, procedencia, admisión pendiente y QA
-local; el deploy v6 anterior no acredita esta extensión ni se modifica por ella.
-
-## Histórico: demostración productiva local — 2026-09-30
+## Corte local de demostración productiva — 2026-09-30
 
 El Lab en `http://127.0.0.1:4194/` se recargó y comprobó con una captura real: muestra las
 cuatro corridas de los nodos 2630, 2611, 4616 y 3378. El nodo 4616 se corrigió en la nueva
@@ -127,10 +48,7 @@ Dentro del checkout `creative-workbench`, abrir:
 | Cómo está construido y por qué | `docs/architecture/workbench-lab-astro.md` |
 | Identidad Efeonce host, fonts OFL y galerías de altura variable | `docs/architecture/workbench-lab-efeonce-host.md` |
 | Cómo lo usa una persona y cómo compilarlo | `docs/manual/workbench-lab.md` |
-| Colección candidata de íconos y variantes nativas | `docs/manual/sky-icon-library.md`, `docs/ui/reviews/workbench-sky-icons-2026-10-01.md`; [referencia](icons.md) |
-| Navegación, mesa opción 2 y filtros | `docs/architecture/workbench-lab-navigation.md` |
-| Dirección vigente de superficies y menús | `docs/ui/visual-directions/workbench-surface-economy-v5.md`, `workbench-filter-selects-v6.md`; v1–v4 son antecedentes |
-| Coreografía host y sus modos | `docs/ui/motion/workbench-premium-v2.md` y corrección de alcance v5 |
+| Dirección visual y criterios premium | `docs/ui/visual-directions/workbench-lab-v1.md` |
 | Qué se observó, revisó o desplegó | `docs/operations/HARNESS_STATUS.md`, `docs/ui/reviews/` |
 | Qué puede entrar en la galería modular | `docs/architecture/workbench-reference-design-gallery.md` |
 | Quién y qué marca pueden producir | `AGENTS.md`, catálogo, pack y entradas gobernadas |
@@ -201,22 +119,19 @@ archivo privado y lectura de bytes servidos. No enviar assets de SKY a un Lab de
 
 Bajo `apps/brand-reference`:
 
-- `src/pages/index.astro`, `lab-guide.astro`, `tokens.astro`, `tipografia.astro`, `recursos.astro` e `iconos.astro`: portada, ayuda y bibliotecas dedicadas; consumen
+- `src/pages/index.astro`, `lab-guide.astro`, `tokens.astro`, `tipografia.astro` y `recursos.astro`: portada, ayuda y bibliotecas dedicadas; consumen
   `readLabData()` de `src/lib/lab-data.ts`.
 - `src/layouts/LabLayout.astro`: documento, landmarks, imports compilados de `src/styles/global.css` y `galleries.css`, y
   entrada `src/scripts/lab.ts` para páginas de biblioteca; cada módulo inicializa sólo sus controles presentes.
 - `src/components/`: `LabHeader`, `LabFooter`, `LabHero`, `DesignGallery`, `AdaptationGallery`,
   `ZoneInspector`, `TokenLibrary`, `BrandResources`, `MetricSpecimen`, `AssetGallery`, `ProductionGuide`, `PieceDialog`,
-  `CompositionLibrary`, `RecipeAdaptation`, `RecipeDialog`, `FilterSelect` e `IconLibrary`, todos `.astro`.
+  `CompositionLibrary` y `RecipeAdaptation`, todos `.astro`.
   Usan props `LabData` y escaping normal; no insertar strings de markup con `set:html`.
-  `IconLibrary` serializa sólo datos en `application/json`, escapando `<`; el cliente
-  los valida por schema antes de usar DOM. Esa serialización no admite HTML de la fuente.
 - `src/scripts/`: `tokens.ts`, `gallery.ts`, `compositions.ts`, `dialog.ts`, `navigation.ts`, `zones.ts`, `catalog.ts`,
-  separados por responsabilidad; `filter-select.ts` mejora ambos selectores y `motion.ts`
-  limita la coreografía host. `src/lib/gallery-model.ts` posee el filtrado puro tipado.
+  separados por responsabilidad. `src/lib/gallery-model.ts` posee el filtrado puro tipado.
 - `src/scripts/masonry.ts` inicializa/refresca spans de galería y `src/lib/masonry-model.ts` posee
   `masonrySpan`; el layout no pertenece a geometría/recetas productivas.
-- `build.mjs`, `design-samples.mjs`, `host-assets.mjs`, `icon-projection.mjs`: admisión gobernada, datos/bytes de build,
+- `build.mjs`, `design-samples.mjs`, `host-assets.mjs`: admisión gobernada, datos/bytes de build,
   galería seleccionada y host. No llevar esa lectura privada a componentes o módulos navegador.
 
 El body fija marca, packVersion, catalogVersion y SHA de los bytes exactos servidos de `kv-zones.json`.
@@ -298,9 +213,8 @@ el script desde producción ordinaria. El build normal es offline para host y s�
 
 ## Inventario SKY y lectura correcta
 
-El input de marca tiene 126 reconstrucciones históricas, 19 tipos de zonas, cinco pesos Metric
-y 193 recursos admitidos. La selección premium contiene cuatro corridas; el inventario histórico
-inicial contenía seis. Las cantidades de muestras pertenecen a la selección real del build. Los conteos UI se
+El input inicial de esta unidad tiene 126 reconstrucciones históricas, 19 tipos de zonas, cinco
+pesos Metric, 193 recursos admitidos y seis corridas modulares seleccionadas. Los conteos UI se
 derivan del input real y no deben hardcodearse. Dos galerías responden preguntas distintas:
 
 - **Muestras del Workbench**: resultados sellados del compositor modular con logo/flecha/CTA corregidos.
@@ -322,20 +236,15 @@ afirma ausencia total de archivos font host OFL admitidos. Comprobar familia efe
 
 ## Operación humana que el agente debe preservar
 
-La navegación actual ofrece Composiciones, Adaptaciones y Sistema de marca; Guía mantiene
-su acceso. Portada conserva recetas, muestras, adaptaciones y mesa de zonas; Tokens `/tokens/`,
-Tipografía `/tipografia/`, Recursos `/recursos/` y ayuda son páginas dedicadas. Recetas identifica
-sistemas nombrados y variantes; Muestras identifica corridas. El shell de bibliotecas mantiene
-accesos y menú compacto en pantallas pequeñas.
+Navegación por Vista general, Recetas, Muestras del Workbench, Adaptaciones y Zonas en la portada; Tokens `/tokens/`, Tipografía `/tipografia/`, Recursos `/recursos/` y ayuda son páginas dedicadas. Recetas identifica sistemas nombrados y variantes; Muestras identifica corridas.
 Un h1, landmarks, skip link y anchors expresan jerarquía. IDs, SHAs y detalles de fuente quedan en
 información plegable o archivos para agentes; no dominan la portada frente al cliente.
 
 Galería: búsqueda y familia filtran antes de paginar; el conteo, vacío, reset y Ver más son visibles.
 Se pagina de 24 en 24, con foco al primer control nuevo; reset limpia consulta/familia/página y
-devuelve foco a la búsqueda. No perder selección ni foco al ampliar resultados. Una adaptación abre la mesa contextual;
-un original/muestra usa dialog nativo, con loading/error, Close/Escape/fondo y retorno al invocador.
-RecipeDialog restaura sus nodos sin clonación; Escape cierra primero una segunda capa abierta.
-Un fallo mantiene acceso al archivo permitido y nunca usa una imagen ajena como reemplazo.
+devuelve foco a la búsqueda. No perder selección ni foco al ampliar resultados. Modal: HTML dialog nativo, imagen original,
+loading/error claros, Close/Escape/fondo y retorno al invocador. Un fallo mantiene acceso al archivo
+permitido y nunca usa una imagen ajena como reemplazo.
 
 Muestras y Adaptaciones usan grid de alturas variables con spans derivados de la tarjeta visible.
 Mantener DOM/Tab/source order; no columnas CSS, `dense`, CSS order o duplicados que cambien el
@@ -364,33 +273,6 @@ Ver todas. El default SKY inicial es `2026:2630`/`footer-legal`; el contenido y 
 Tokens: búsqueda, conteo/empty y copiar con feedback visible/anunciado; error de clipboard recuperable.
 Sin JavaScript el catálogo HTML completo conserva navegación, imágenes y links; modal, filtros e
 inspector interactivos dependen de sus módulos y datos, con aviso explícito de esa dependencia. Reduced-motion mantiene el estado final y evita desplazamientos innecesarios.
-
-## Selectores y desplegables
-
-Separar disclosure de información (`details`/`summary`) y selector de filtro: diseñar el
-cuerpo de un disclosure no moderniza el menú abierto del select. Los disclosures conservan
-cabecera/chevron con inset y lectura interna plana; no añadir una card por campo, fuente o
-fila. La anatomía actual consume tokens host compilados en `disclosures.css` y `surfaces.css`.
-
-`FilterSelect.astro`, `filter-select.ts` y `filter-select.css` comparten familia y colección.
-El select nativo conserva IDs, valores y eventos de filtros; sólo se oculta tras admitir
-Popover API y completar la mejora. Sin JavaScript o sin esa API queda etiquetado y visible.
-El panel nativo top layer evita clipping por el canvas; mide control/viewport, gira arriba
-si falta espacio, limita ancho/alto y usa scroll. Filas de 44 px, Poppins, check y conteos
-reales sobre una superficie host; móvil da una fila completa al selector de familia.
-
-Foco en el combobox con `aria-expanded`/`aria-controls`/`aria-activedescendant`, listbox y
-`aria-selected`. Flechas, Home/End y typeahead navegan sin filtrar hasta Enter/Espacio o
-clic; Escape cancela, Tab cierra y avanza, clic exterior cierra. Cambiar/resetear el valor
-emite `change` y sincroniza etiqueta/selección: no escribir sólo el texto del botón.
-Reduced motion desactiva apertura y transición del chevron. No añadir dependencias,
-Vuexy o fuentes cliente para arreglar un control host.
-
-QA exige **abrir** ambos menús en desktop/móvil, teclado, reset, viewport/scroll, reduced
-y fallback sin JS; comprobar fuente efectiva, valor, conteo y foco. Una captura cerrada
-no prueba el interior. En v6: Always On 7, Eventos 24, Display 53 y reset 126; Tokens
-Primitives 27, Semantic 33, Typography 48, reset 24/108. Son controles del catálogo de
-este corte, no valores a hardcodear en otra marca o colección.
 
 ## Referencias con contornos nativos y muestras productivas
 
@@ -444,13 +326,11 @@ y estabilidad. No registrar aceptación de Bricolage/Poppins desde su declaraci�
 capturas de primer fold y review final desktop/390 px: filtros/query/familia/vacío/reset/Ver más,
 layout/resize/imagen/font disponibles/no JS/orden DOM, modal/keyboard/foco, inspector con legal
 presente/ausente, copy/error, carga fallida, reduced-motion,
-contraste UI medido, menús de familia/colección abiertos y ausencia de overflow horizontal. El scorecard de 14 dimensiones debe conservar
+contraste UI medido y ausencia de overflow horizontal. El scorecard de 14 dimensiones debe conservar
 criterio y evidencia; media ≥4.5, ninguna <4 y dimensiones prioritarias ≥4.5. No puntuar a partir de tests.
 
-`pnpm lab:test` comprueba 17 casos en este corte: admisión de inputs, marca/paths/recursos,
-proyección pinneada, modelo de mesa, paginación de recetas/accesos profundos y modos motion.
-El inventario actual está en `apps/brand-reference/test/`; usar su salida real, no la cuenta antigua
-de dos pruebas de migración. CI `lab-checks` instala sólo
+`pnpm lab:test` comprueba dos casos de entrada: mezcla de marcas, paths inseguros, fuentes ajenas,
+cobertura engañosa y ausencia de payload/default entre workspaces. CI `lab-checks` instala sólo
 runtime público de la app y ejecuta TS7, Astro check y app tests sin canon/credenciales. Su configuración
 no prueba un run remoto en verde; verificar el ref y resultado real antes de anunciarlo.
 
@@ -492,11 +372,6 @@ piezas, producción IA general, onboarding de cada persona o packs propios de ot
 `--location` y header `x-vercel-skip-toolbar: 1`, sin exponer credenciales ni bypass.
 La prueba anónima se hace separada, sin credenciales ni seguimiento del redirect. Registrar el
 número real de archivos remotos cotejados; archivo completo local no significa readback remoto completo.
-Promover y asignar un alias manual son pasos distintos: comprobar el alias corto después
-de la promoción y asignarlo explícitamente cuando corresponda. Verificar en ambos hosts
-source/ref/build, bytes autenticados y rechazo anónimo. Una API de proyecto puede incluir
-secretos de bypass: procesar la respuesta en memoria y emitir sólo metadata necesaria,
-sin volcarla íntegra. Confirmar interacción real en el alias publicado además de sus hashes.
 
 
 Entorno comprobado del Lab: Node 24.17.0, pnpm 10.32.1; CI Node 24. Usar Node 24 LTS
@@ -568,154 +443,3 @@ La navegación activa de las páginas se vuelve a revelar al redimensionar y tra
 ### Dominio previsto
 
 El operador fijó `creative.efeonce.org` como dominio institucional del Design System Lab (2026-09-30). Astro lo declara como site; pertenece a la plataforma Efeonce multimarcas. No usar el hostname como brandId ni como autorización de producción. El snapshot actual sigue siendo SKY. Declarar site no configura DNS, Vercel, protección o una promoción a Production. El estado vivo de esos pasos se verifica y registra por separado; no inferir que ya hay selector o rutas para otras marcas.
-
-## Historial de modernización y publicaciones
-
-Los siguientes cortes conservan decisiones, rechazos y evidencia de su momento. Sus
-URLs locales, hashes, estados sin merge/deploy y conteos son históricos; arriba rige v6.
-
-### Mesa de revisión seleccionada — 2026-09-30
-
-El operador seleccionó la opción 2 de Product Design. El Lab mantiene Astro estático y readonly:
-header de tres grupos, `#pieza=<formatId>` con historial/recarga, variantes de la receta propia,
-PNG proporcional sobre navy y zonas presentes/ausentes. Retorno y Escape conservan filtros/scroll/foco.
-`#zonas` continúa como entrada compatible. Más zonas, Campos y fuente y Vista y fuentes pliegan
-las capas adicionales; los contornos son opcionales y no alteran el PNG. En móvil, pieza primero.
-
-El build admite la continuidad de un snapshot ya producido con `--reference-projection <site>`
-y `--projection-sha256 <SHA de reference-projections.json>` al final del comando. Ambos son inputs
-explícitos del mantenedor, nunca fallback del renderer o autoridad de un job. Verifica metadata,
-marca/version/pack, cobertura, nodo/template/hash histórico propio y hash/geometría de cada PNG.
-Los previews históricos también se validan y sus seals no cambian. Manifest registra la proyección
-exacta; no ejecuta código archivado ni promueve aprobación comercial. Sin flags mantiene el build
-histórico. Source y comando de esta entrega: `creative-workbench/docs/manual/workbench-lab.md`;
-selección de cuatro corridas: `apps/brand-reference/review-design-selection.json`.
-
-La raíz Workbench `design-qa.md` registra aceptación local y evidencia. Commit/push/CI/deploy se
-verifican por separado; el gate managed-drift preexistente no se elude ni se rehasha. No ejecutar
-sync total o CLIs Greenhouse para resolver esta unidad. Las notas anteriores de navegación de ocho
-secciones describen la versión previa; el contrato vigente de esta mesa es la decisión de navegación.
-
-
-### Modernización premium integral v2 — 2026-10-01
-
-El operador amplió la opción 2 a todo el Lab y autorizó coreografía al bajar. Cubre portada,
-Composiciones, Muestras, Adaptaciones/revisión, sistema, Tokens, Metric, Recursos, guía y footer.
-Canon y evidencia viven en creative-workbench: `docs/ui/visual-directions/workbench-premium-integral-v2.md`,
-`docs/ui/motion/workbench-premium-v2.md`, manual y `design-qa.md`. El mock es una dirección visual;
-las fotografías, logos, specimen y PNG/SVG publicados siguen siendo los admitidos del pack propio.
-
-Composiciones muestra seis por vez, filtra antes de paginar y revela cualquier anchor profundo.
-GSAP 3.15.0 se carga aparte del core y sólo anima la interfaz host. Scroll normal, sin smoother,
-snap o loops; scene sticky en desktop amplio, compacta en móvil/ventanas bajas, reduced motion
-reactivo. La entrada a revisión revierte la escena; al volver, reconstruye sin repetir entradas.
-Sin JavaScript todas las recetas y links originales siguen disponibles. No ocultar contenido
-por defecto ni mezclar motion con el renderer de cliente. Anclas de capítulos son directas.
-
-El build explícito de continuidad sigue siendo el del manual; produce un nuevo digest inmutable.
-No sobrescribir el sitio local original 49615. Commit, push, CI y deploy siguen separados de
-aceptación visual; no eludir managed-drift, ejecutar sync total ni CLIs Greenhouse desde esta unidad.
-
-
-### Superficies de producto v3 — 2026-10-01
-
-El operador pidió corregir integralmente la contención de v2. Fuente y QA local en
-creative-workbench: `docs/ui/visual-directions/workbench-surfaces-v3.md` y
-`docs/ui/reviews/workbench-surfaces-v3-qa.md`. Shell persistente, paneles de tarea,
-cards de receta/recurso/specimen, tokens contenidos y detalle RecipeDialog nativo.
-Mover/restaurar nodos existentes, no clonar IDs/listeners. Sin JS conservar details;
-retorno desde review enfoca summary visible de la card, no un invocador oculto.
-Valores/copias/colección/procedencia permanecen en la consulta móvil. Full motion
-requiere >1050 px y altura >=650, alineado con navegación lateral; demás calm/static.
-
-Preview local 49617, digest `1c71d3bc88826327ed288dbd1e8d653f30da7abb3b9711deab306a2e4beef2a5`.
-309 archivos, 296 recursos idénticos a v2, 126 KV y cuatro muestras intactos.
-45 Astro files sin diagnósticos, TypeScript y 17 tests passed; CUA verificó bibliotecas,
-modales/foco/retorno, original descargado, reduced/no-JS y fuentes efectivas.
-QA local no equivale a aceptación del operador. Gate general conserva 11 managed-drift
-previos; sin rehash/bypass. Sin commit, push, CI ni deploy; previews anteriores preservadas.
-
-
-### Biblioteca del cliente y disclosures v4 — 2026-10-01
-
-El operador precisó que SKY es cliente del Design System Lab de Efeonce, no un sitio de
-la aerolínea. Dirección/QA actuales en creative-workbench:
-`docs/ui/visual-directions/workbench-client-library-v4.md` y
-`docs/ui/reviews/workbench-client-library-v4-qa.md`. v2/v3 ampliaron el shell general;
-la opción 2 conserva la mesa de tres regiones. No reclamar fidelidad literal al mock ni
-inventar variantes de otras recetas para replicarlo.
-
-Títulos funcionales y details nativo con `.disclosure-body` explícito, incluidos los
-campos/fuentes/Más zonas dinámicos. Cabecera/chevron con inset, interior suave, registros,
-metadatos y acciones de 44 px. Móvil reduce capas redundantes. No envolver con JS ni
-perder fallback/teclado; preservar originales y relaciones reales.
-Preview local 49617, digest `891eeb3743bfab8971a6eec6b6935045993ce04fdd8fcfc6cf8d8a0f19817f19`.
-296 recursos idénticos a v3; 45 Astro files sin diagnósticos, TypeScript y 17 tests passed.
-QA local no acredita aceptación del operador/publicación. Sin commit/push/CI/deploy;
-no bypass, sync total ni CLIs Greenhouse. El gate general previo sigue separado.
-
-### Equilibrio de superficies v5 — 2026-10-01
-
-V4 fue cuestionada por el operador por cards sucesivas. Criterio vigente: panel de tarea
-+ entidad cuando hay decisión propia; cuerpos, fuentes y registros internos planos con
-espacio y reglas. Recetas/resources/inspector/tokens/guía corregidos; tipografía conserva
-specimens. No reintroducir fondos/bordes/radios por dato. Bibliotecas sin entradas por
-card ni refresh global de motion al abrir details; coreografía sólo escena original.
-Opción 2 conserva tres regiones. Preview 49617, digest `12ed9ba1da11e0c0b5399c914c92c494055347cdb332ef2a6dfc5ab50603798e`.
-QA en `docs/ui/reviews/workbench-surface-economy-v5-qa.md`; dirección homónima bajo
-`docs/ui/visual-directions/`. Desktop/móvil, reduced y fallback sin JS verificados;
-Astro/TypeScript y 17 pruebas pasan; 298 archivos no código iguales a v4. No aceptación
-visual del operador acreditada, ni commit/push/deploy. V4 es historia, no criterio vigente.
-
-### Publicación de la modernización en main — 2026-10-01
-
-El operador autorizó main. PR 16 fusionado por squash, main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
-readback GitHub y ls-remote comprobados; árbol igual al head probado b77031d. Integración
-sobre 2392758 mediante unidad UI ecf0b15, no historia vieja completa. Constructor conserva
-native-previews y projection por SHA, excluyentes, con regresión. Gate drift viejo resuelto
-por la base vigente, sin editar sello. Gates, harness y Lab CI postmerge SUCCESS
-(36846606818/36846606907). Local: 348 harness +7 SKY, cero omisiones privadas; 17 Lab,
-Astro45/0 y TypeScript. Build335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985,
-285 imágenes/previews/fonts intactos. Preview49617 ahora sirve esa integración.
-Worktree aislado /Users/jreye/Documents/creative-workbench-lab-main, rama codex/lab-premium-main;
-checkout original y WIP fotográfico intactos. Evidencia privada en canon operations/
-2026-10-01-workbench-main-integration. Código main y CI verificados; estado Vercel SUCCESS
-leído, pero no reclamar un snapshot nuevo del sitio ni broker/paquetes publicados por eso.
-
-
-### SKY premium v5 publicado en Vercel — 2026-10-01
-
-Publicado el snapshot revisado de main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
-build `335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985`, en el proyecto
-SKY `prj_7D9AODtfOOEf1su21wqyQASOdzOc` del scope `efeonce-7670142f`.
-Deployment `dpl_2sJFNXzxEdVFBykzKsnbtQVqr56x` READY/production, promovido y alias corto
-asignado explícitamente: https://creative-workbench-sky.vercel.app.
-
-Readback de 28 archivos remotos coincide por SHA con el snapshot local (cinco páginas,
-CSS/JS, catálogos, cinco WOFF2 host OFL y artwork seleccionado). Después de promover,
-seis respuestas autenticadas en deployment y alias estable coinciden por bytes; ocho
-requests anónimos a raíz/manifest/PNG/WOFF2 devuelven 302. Protección `all` verificada;
-no se desprotege el visor ni se amplía acceso. La URL localhost anterior era sólo local.
-
-Evidencia privada: `/Users/jreye/Documents/creative/creative-workbench-canon/operations/2026-10-01-workbench-vercel-premium-v5`.
-Publicación del Lab únicamente; sin cambio de broker, paquetes ni aprobación comercial SKY.
-
-
-### Publicación verificada de selectores v6 — 2026-10-01
-
-PR 17 fusionado en main `7e4c6177992785c02430dd238c267991e097c4c9`; tree idéntico
-al head revisado `2b0bf8bd7fbd0eb69701827e958e2573269e60d2`. Checks postmerge gates,
-native-harness y lab-checks completed/success. Snapshot `0b815c5e7ee07a56a24d24d1e4962ad378a235726325138105098daa250118e2`,
-310 archivos, 5 WOFF2 host OFL y cero fuentes privadas. Deployment SKY
-`dpl_139Fyz3vV85jfHBHXw7CNuMqAE2d` READY/production, source main exacto en metadata.
-Promoción y asignación explícita de https://creative-workbench-sky.vercel.app verificadas.
-
-29 archivos críticos remotos coinciden por SHA, incluidas las cinco páginas y
-CSS/JS de selectores. Después de promover, seis respuestas autenticadas (raíz,
-tokens y CSS) en deployment/alias son idénticas; cuatro anónimas dan 302 y protección
-all permanece. Navegador en el alias Vercel: ambos menús abiertos capturados; Always On
-filtra a 7, reset vuelve a 126, cuatro opciones de tokens y consola limpia.
-Capturas `families-vercel-desktop.png` y `tokens-vercel-desktop.png`, readbacks y
-checks en el dossier privado `2026-10-01-workbench-filter-selects-v6` del canon local.
-16 recorridos interactivos locales desktop/móvil/reduced/no-JS respaldan el contrato.
-No se infiere aceptación visual del operador. Sin cambios de broker/paquetes/pack.

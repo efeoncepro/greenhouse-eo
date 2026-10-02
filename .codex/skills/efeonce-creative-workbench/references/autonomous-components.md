@@ -1,15 +1,5 @@
 # Componentes autónomos y tokens de propiedades SKY
 
-## Adopción y evidencia — 2026-10-01
-
-Disponible en main por PR15 (`2392758`) y conservado en PR16 (`c3e85b6`). No es sólo un inventario:
-el renderer de producción consume la escena recompuesta antes de aplicar contenido y fotografía.
-Cobertura: 126 variantes, 11.096 instancias, 1.196 campos, 24 máscaras y 445 nodos ocultos;
-193.920 recibos de propiedades. Regresión sellada: 126 PNG **y** SVG exactos frente a la
-comparación completa anterior; revisión técnica transferida sólo por esas igualdades, sin
-nueva aprobación comercial. Run propio con copy nuevo y fotografía histórica, cero proveedores.
-La foto nueva se ejercitó mediante fixture, no por paid canary. [Estado](state-continuity.md).
-
 Fuente activa: checkout de **Creative Workbench**, no motores/CLIs de Greenhouse.
 Canon: `docs/architecture/workbench-sky-autonomous-components.md`,
 `docs/manual/autonomous-components.md` y `docs/documentation/autonomous-components.md` allí.
@@ -31,7 +21,7 @@ floats, adivinar fuentes ni tratar un cuadrado plenamente redondeado como círcu
 
 `figma-property-bindings.mjs` sólo reconoce ID propio/propiedad/valor original exactos. Inventario:
 108 tokens; 20 usados directamente en las fuentes; 4.996 fills/strokes originales con evidencia
-admitida; 4.684 permanecen en la escena productiva efectiva. Las reparaciones que cambian un valor retiran ese binding. Variables externas, typo/
+admitida. Las reparaciones que cambian un valor retiran ese binding. Variables externas, typo/
 spacing/radii sin evidencia y pinturas discrepantes 4471/4495 permanecen explícitas; nunca
 resolver por hex, email, semejanza visual o alias semántico inventado.
 

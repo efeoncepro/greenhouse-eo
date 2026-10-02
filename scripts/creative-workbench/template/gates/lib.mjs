@@ -19,6 +19,15 @@ export function readLock() {
   return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null
 }
 
+/**
+ * Rutas nativas del workbench, tal como las selló greenhouse-eo en `.workbench/sync.lock.json`.
+ * Ruta exacta o carpeta `dir/**`. Mismo matcher que `scripts/creative-workbench/lib.mjs`.
+ * La lista se lee SÓLO del sello: cualquier otra declaración en el repo no exime nada.
+ */
+export function isNative(rel, patterns = []) {
+  return patterns.some(p => (p.endsWith('/**') ? rel.startsWith(p.slice(0, -2)) : rel === p))
+}
+
 /** Archivos versionados en git (lo que el PR realmente trae), no lo que hay en disco. */
 export function trackedFiles() {
   return execFileSync('git', ['ls-files', '-z'], { cwd: ROOT, encoding: 'utf8' }).split('\0').filter(Boolean)

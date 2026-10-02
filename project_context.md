@@ -182,6 +182,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 
 | Pregunta | Fuente primaria |
 | --- | --- |
+| Creative Workbench / SKY | `.codex/skills/efeonce-creative-workbench/SKILL.md` + `references/state-continuity.md`; motor en Workbench |
 | Qué hago ahora | `Handoff.md` + artefacto activo |
 | Qué existe y qué contrato gobierna | `docs/architecture/**`, ADRs, código/runtime |
 | Por qué se decidió | `docs/architecture/DECISIONS_INDEX.md` + ADR |
@@ -274,13 +275,10 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 
 ## Contexto por dominio
 
-Router: [AGENTS.md](AGENTS.md#router-de-dominios) y `docs/operations/agent-context-router.json`.
-Workbench: [canon](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md) · [skill espejo](.codex/skills/efeonce-creative-workbench/SKILL.md).
-Si falta una regla:
-
-1. buscar keyword en arquitectura, operations y skills;
-2. buscar en el snapshot `docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`;
-3. contrastar con código/runtime y corregir el router o el doc canónico antes de fiarse de memoria histórica.
+[Router AGENTS](AGENTS.md#router-de-dominios): cargar skill, invariantes, arquitectura y task de la fila aplicable.
+Manifest: `docs/operations/agent-context-router.json`. Fallback: arquitectura/operations/skills →
+`docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`. Verificar código/runtime y
+corregir router o canon antes de usar memoria histórica.
 
 ## Memoria histórica e integridad
 

@@ -1,67 +1,73 @@
-# Creative Workbench — taller del equipo creativo
+# Creative Workbench — Taller del equipo creativo
 
-Tipo: documentación funcional. Creado: 2026-09-29. Actualizado: 2026-10-01.
-Arquitectura: [ADR multimarcas](../../architecture/EFEONCE_CREATIVE_WORKBENCH_MULTIBRAND_ISOLATION_DECISION_V1.md).
-Estado y evidencia: [continuidad vigente](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
+> **Tipo de documento:** Documentacion funcional (lenguaje simple)
+> **Version:** 1.1
+> **Creado:** 2026-09-29 por Claude
+> **Ultima actualizacion:** 2026-09-30 por Claude
+> **Documentacion tecnica:** [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md)
 
-## Qué es y cómo se reparte
+## Qué es
 
-`efeoncepro/creative-workbench` es el espacio del equipo Efeonce para producir con agentes y
-mantener bibliotecas de varias marcas. SKY es el primer sistema admitido. Cada corrida tiene una
-marca, versión, receta y recursos exactos; compartir el taller no mezcla SKY, Berel y Efeonce.
+`efeoncepro/creative-workbench` es el repositorio donde trabaja el equipo creativo de Efeonce con Claude y
+Codex: diseño, redacción, fotografía de marca y producción con IA para Efeonce, Berel y SKY.
 
-Greenhouse conserva gobernanza, decisiones y skills de enseñanza. Workbench posee el motor nativo,
-componentes, CLI productiva, paquetes SKY y el Lab. Los archivos gestionados siguen sellados, con
-ownership verificable. Los motores y CLIs locales de Greenhouse no se alteran para operar Workbench.
+No es una copia de Greenhouse. Recibe desde Greenhouse sólo lo que el equipo necesita, y siempre lo mismo que
+Greenhouse tiene:
 
-## Qué puede hacerse hoy
+- **Skills de oficio:** copy, dirección de arte, social, publicidad, línea gráfica, tipografía, motion, audio,
+  selección de modelos y la skill de Berel.
+- **CLIs:** fotografía de marca (`foto:*`) y generación con IA (`ai:image`, `ai:fal`, `ai:omni`).
+- **Documentos de marca:** línea gráfica «La órbita», canon fotográfico, social y publicidad.
+- **Reglas de trabajo** para personas y agentes.
 
-Los agentes pueden identificar una composición/receta, elegir sus adaptaciones, inspeccionar campos
-y zonas, declarar imagen y todos los textos, componer corridas o lotes exclusivos y revisar PNG/SVG/QA.
-Hay 126 adaptaciones nativas SKY y componentes autónomos con tokens, slots, dependencias y procedencia.
-Se pueden descomponer, inspeccionar, extraer y recomponer dentro de su contrato admitido. Las nuevas
-campañas mantienen QA propio: una escena técnicamente correcta no autentica tarifas, vigencias o derechos.
+## Cómo se controla
 
-La corrección SKY local de 2026-10-01 alinea los badges de tarifa a la izquierda de su columna,
-manteniendo el texto centrado dentro de su cápsula adaptable. También distingue el pie legal
-centrado de las condiciones LEFT y corrige el espacio entre prefijo y destino. Las 24 adaptaciones
-de prueba están en el export v6; su revisión técnica no concede aprobación comercial ni actualiza
-las referencias del sitio publicado. Alcance, recetas y aceptación visual pendiente en
-[el cierre documental](../../audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md).
+| Qué | Quién decide | Dónde |
+|---|---|---|
+| Qué skills, CLIs y documentos recibe el equipo | Julio | Manifest de exportación en Greenhouse |
+| Quién entra y a qué clientes | Julio | `control.json` en Greenhouse |
+| Quién puede generar con IA | Julio | `control.json` (`ia: true`) |
+| Qué produce el equipo | El equipo | Carpeta `projects/` del workbench |
 
-El [Lab premium integral](../creative/creative-workbench-lab.md) muestra composiciones, adaptaciones,
-recetas e inspector, con subpáginas de tokens, tipografía y recursos. La opción 2 conserva variantes
-propias/original proporcional/zonas, y v6 completa los menús abiertos de familias y colecciones.
-Host Efeonce (Bricolage/Poppins y roles AXIS) y piezas SKY (Metric/recursos cliente) mantienen
-admisiones separadas. Sirve para explorar y revisar; la producción escalable ocurre mediante la CLI
-y los contratos. El corte publicado es [Vercel protegido](https://creative-workbench-sky.vercel.app/),
-PR17/main `7e4c617`, con readback del snapshot SKY; CI genérico no acredita ese deployment.
-`creative.efeonce.org` sigue previsto, sin disponibilidad acreditada por este cierre.
+Lo que llega desde Greenhouse queda **sellado**: si alguien lo edita en el workbench, la revisión automática
+lo detecta y la siguiente sincronización lo restaura.
 
-## Personas, aprobación y costos
+Desde el 2026-09-30 el workbench tiene además un **harness propio** (sus comandos de producción por marca,
+su guardarraíl y su `package.json`). Esos archivos son **nativos**: los mantiene el workbench y la
+sincronización no los toca. Qué archivos son nativos lo decide Greenhouse y queda escrito en el sello, así
+que el workbench no puede declararse dueño de algo por su cuenta. Las revisiones automáticas (gates) siguen
+siendo siempre de Greenhouse.
 
-Julio autorizó todo el equipo para todas las marcas admitidas. La identidad Git se verifica por persona,
-incluidos autor y committer; la configuración del operador no se distribuye al equipo. Esto no sustituye
-AUTH del broker. El consumer Efeonce ID está diferido en TASK-1952; no se construye otro login.
+| Tipo de archivo | Quién lo mantiene |
+|---|---|
+| Skills, herramientas de IA y fotografía, documentos de marca, revisiones automáticas | Greenhouse (sellado) |
+| Harness del workbench (comandos `marca:*`, guardarraíl, dependencias) | El workbench (nativo) |
+| Piezas en `projects/` | El equipo |
 
-La producción con fotografías admitidas y copy explícito se probó sin llamadas IA. El flujo pagado,
-cotizaciones y admisión completa del equipo siguen abiertos en TASK-1947; no concluir que IA está
-habilitada por un merge. El presupuesto autorizado es USD 50 por integrante y USD 500 por organización
-al mes, sumando todas las marcas. Julio puede aumentarlo por la política gobernada. Ningún agente
-se autoasigna cupo ni credenciales de proveedores.
+## Qué puede y qué no puede el equipo
+
+| Puede | No puede |
+|---|---|
+| Crear piezas, briefs y prompts en `projects/` | Editar skills, CLIs, reglas o documentos |
+| Generar con IA a través de los CLIs, si tiene acceso | Ver las llaves de los proveedores |
+| Bajar las referencias aprobadas de marca | Borrar o sobrescribir archivos en los buckets |
+| Subir entregables de sus clientes | Ver o subir material de clientes que no tiene asignados |
+| Proponer cambios por issue | Publicar hacia clientes o redes desde el repo |
 
 ## Cómo circula una pieza
 
-1. Definir brief, receta/adaptaciones, imagen admitida y contenido comercial/legal vigente.
-2. Preparar y validar cada job/lote; ejecutar crea UUID y outputs propios, sin sobrescribir otros.
-3. Revisar pieza completa, miniatura y QA; resolver errores en fuente/componente, nunca retocar PNG.
-4. Registrar revisión y aprobación humana independiente; una prueba interna no es campaña aprobada.
-5. Entregar/publicar sólo mediante su carril autorizado; producción local no autoriza publicación cliente.
+1. Se crea la pieza y su brief.
+2. Se produce con ayuda del agente; los archivos quedan fuera de git.
+3. Los entregables se suben al bucket del cliente y quedan registrados con su huella.
+4. Se revisa en un pull request; aprueba otra persona, con nombre y fecha.
+5. La entrega o publicación ocurre fuera del repo. La versión final de campaña es de Marketing Studio.
 
-## Qué sigue pendiente
+## IA y costos
 
-Contratos 0.2 están preparados y no publicados; paquetes 0.1 sí publicados. Faltan distribución
-licenciada de Metric, instalación/onboarding completo, segunda marca y cierre del flujo IA/Efeonce ID.
-Consultar [matriz con owners y evidencia](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
-El [manual de operación](../../manual-de-uso/plataforma/operar-creative-workbench.md) enruta a comandos
-actuales del repo; no ejecutar el bootstrap histórico sobre las rutas nativas.
+El equipo usa llaves **dedicadas al workbench**, distintas de las de Greenhouse y con tope de gasto en cada
+proveedor. La llave nunca está en el equipo ni en el repo: el CLI la lee en el momento con la identidad Google
+de la persona. Quitar el acceso a alguien es inmediato.
+
+> Detalle técnico: [ADR del workbench](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md) ·
+> [manual de operación](../../manual-de-uso/plataforma/operar-creative-workbench.md) ·
+> código en `scripts/creative-workbench/`.

@@ -21,28 +21,19 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Corte 2026-10-01: sistema SKY activo en creative-workbench/brands/sky-airline; PR14 corrige 126 referencias independientes y PR15 integra componentes autónomos/recibos de propiedades preservando PNG y SVG exactos. Lab PR16/17 integrado main 7e4c617; íconos adicionales/componentes y página Lab en commit local af6f5e2, candidatos sin admisión productiva ni deploy. Skill PR246 integrado develop d4dad02; actualización documental/skill de íconos local. Figma126 revisión técnica completada, sin aprobación comercial. Contratos 0.2.0 preparados localmente; publicación/consumo de esa versión y distribución licenciada Metric/onboarding pendientes. El sistema inicial sky-brand-system es histórico; ver WORKBENCH_CURRENT_STATE.`
+- Status real: `Corte 2026-09-30: catálogo de 126 fuentes SKY y baseline geométrico corregido en main 2bb761a (PR 12): 21 PNG cambian, 105 intactos; pack/originales conservados. Referencias del Lab recompiladas localmente con native-previews. Comparación visual independiente 126/126, licencias/distribución y dos muestras antiguas por recomponer siguen pendientes.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
-## Continuidad vigente — 2026-10-01
+## Continuidad documental — 2026-09-30 (corte posterior a PR 12)
 
-Consultar [estado consolidado del Workbench](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-y la [skill espejo](../../../.codex/skills/efeonce-creative-workbench/SKILL.md).
-PR15/PR16 Workbench y PR246 Greenhouse están integrados; los cortes fechados inferiores conservan
-historia y no sustituyen el estado actual. Esta actualización no cierra onboarding, distribución,
-IA ni Efeonce ID por inferencia y no mueve la task a complete.
+Consultar el [estado fechado del Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+para código, evidencia y pendientes. Los cortes de PR 7/canary de identidad y cifras anteriores
+registrados abajo son historia; no obligan a terminar OAuth propio antes de componer ni acreditan
+rollout nuevo. Esta publicación documental no mueve la task a complete.
 
-Actualización documental 2026-10-01: biblioteca adicional de íconos SKY importada y
-componentizada en Workbench local (101 familias, 1.919 variantes y 303 originales/
-alternativas), con `/iconos/` en el Lab. Se documentó consulta/selección exacta;
-`productionAdmitted: false` y no hay release de paquete ni admisión en jobs por
-este avance. Pendientes: exports independientes para las 1.022 proyecciones REST,
-revisión/admisión de recursos/placement y publicación autorizada del snapshot.
-[Evidencia y owners](../../audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md).
-Los acceptance criteria de distribución/licencias/producción no cambian de estado.
 
 ## Summary
 
@@ -52,9 +43,8 @@ Metric y assets verificados. El motor multimarcas sigue siendo neutral y propied
 
 ## Why This Task Exists
 
-El inventario inicial tenía 107 variables y una dependencia de alias adicional (108 tokens). Hoy los
-paquetes 0.1 están publicados y contratos 0.2 añaden componentes/recibos como candidato local, pendiente
-de publicar y verificar consumo. Las plantillas usan Metric confirmado; Inter es auxiliar.
+El inventario Figma ya tiene 107 variables y una dependencia de alias adicional; falta un artefacto
+portable y versionado. Las plantillas usan Metric confirmado por el operador; Inter es auxiliar.
 
 ## Goal
 
@@ -95,30 +85,24 @@ Sólo packages SKY propios; el catálogo del motor admite marcas por contrato, n
 ### Files owned
 
 - `docs/operations/creative-production/sky-airline/`
-- En `creative-workbench`: `brands/sky-airline/`, paquetes SKY y herramientas de build/recursos gobernadas.
-- `/Users/jreye/Documents/sky-brand-system/` fue el bootstrap inicial; no es source of truth actual.
+- `/Users/jreye/Documents/sky-brand-system/` (nuevo sistema autorizado por el plan; no es un checkout aislado de Greenhouse).
 
 ## Current Repo State
 
 ### Already exists
 
-- Catálogo 126, componentes autónomos, templates/recursos sellados y 108 tokens originales en Workbench.
-- Paquetes `sky-tokens`, `sky-brand-assets` y `sky-creative-contracts`0.1 publicados en GitHub Packages.
-- Revisión técnica 126/126 contra controles Figma independientes y regresión modular exacta PNG/SVG.
-- Metric verificado localmente; binarios licenciados fuera de npm/Git.
+- Inventarios JSON, logo descargado fuera del repo, decisión Metric.
 
 ### Gap
 
-- Contratos 0.2 preparados pero no publicados ni instalados por el equipo.
-- Distribución licenciada de Metric y onboarding multipersona no acreditados.
-- QA técnico y corrida interna no constituyen aprobación comercial de una nueva campaña.
+- Sin paquete publicado ni pieza completa verificada. Metric local verificado; distribución remota no establecida.
 
 ## Modular Placement Contract
 
 - Topology impact: `domain-package`
-- Current home: `creative-workbench/brands/sky-airline/`; gobernanza/documentación en `docs/operations/creative-production/sky-airline/`
+- Current home: `docs/operations/creative-production/sky-airline/`
 - Future candidate home: `domain-package`
-- Boundary: `paquetes SKY aislados; consumers Workbench y Lab con versiones exactas, sin defaults de otras marcas`
+- Boundary: `nuevo sistema SKY explícitamente autorizado; consumers workbench y referencia web`
 - Server/browser split: `datos browser-safe; filesystem sólo en herramientas de build`
 - Build impact: `Node puro para packages; sin dependencia del build portal`
 - Extraction blocker: `admisión fotográfica y distribución tipográfica antes del rollout`
@@ -186,9 +170,7 @@ Retirar nuevos entrypoints; no hay mutación remota ni migraciones.
 
 ### Production verification sequence
 
-Publicar contratos 0.2 sólo bajo su carril autorizado; comprobar archivo empaquetado, ausencia de
-recursos licenciados, versión privada, instalación limpia y consumer exacto. No reemplazar rutas
-nativas por sync total. El catálogo/Lab integrado no acredita la publicación de esa versión.
+No rollout productivo en esta unidad. La adopción exige sync desde commit y readback del consumer.
 
 ### Out-of-band coordination required
 
@@ -203,12 +185,6 @@ Ninguna para pruebas locales; permisos y distribución pertenecen al rollout pos
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
-
-- [x] 126 referencias SKY comparadas con controles Figma independientes y correcciones técnicas registradas: PR14, ledger `comparison-final-02`; sin aprobación comercial.
-- [x] Componentes/tokens/recibos nativos integrados y 126 PNG/SVG exactos frente al baseline previo: PR15, auditoría/regresión selladas enlazadas en continuidad vigente.
-- [x] Paquetes 0.1 privados publicados: API GitHub version IDs 1313424154/1313424278/1313424409; corte 2026-10-01.
-- [ ] Contratos 0.2 publicados y consumo limpio del equipo verificados; hoy candidato local sin publicar.
-- [ ] Distribución remota de Metric autorizada y provisionamiento del equipo acreditados; licencia de distribución no establecida.
 
 - [x] Packages SKY tienen identidad única, versiones exactas y procedencia de fuente.
 - [x] Aliases tienen cierre completo sin referencias externas silenciosas.
@@ -237,9 +213,7 @@ La receta requiere preflight, verificación de aprobación, pixel QA y revisión
 
 ## Follow-ups
 
-Distribución contratos 0.2 y recursos licenciados; instalación limpia y consumo del equipo.
-Referencia/Lab y piloto local SKY ya están integrados; IA y permisos efectivos siguen TASK-1947,
-Efeonce ID TASK-1952. [Readback fechado](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
+Referencia web SKY y pilotos; wrappers IA con permisos efectivos del equipo.
 
 
 ## Corte de continuidad 2026-09-30 — autoridad preparada, operación pendiente

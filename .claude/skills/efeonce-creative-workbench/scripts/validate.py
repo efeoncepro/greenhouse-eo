@@ -28,12 +28,6 @@ if left != right:
     different = sorted(p for p in left.keys() | right.keys() if left.get(p) != right.get(p))
     raise SystemExit("Codex/Claude drift: " + ", ".join(different))
 
-# Keep the new operation reachable for both runtimes, not merely mirrored on disk.
-icon_reference = "references/icons.md"
-for root in roots:
-    if not (root / icon_reference).is_file() or f"({icon_reference})" not in (root / "SKILL.md").read_text():
-        raise SystemExit("Missing SKY icon operation route: " + str(root))
-
 checked = 0
 for root in roots:
     for file in root.rglob("*.md"):

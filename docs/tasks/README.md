@@ -2,6 +2,19 @@
 
 Panel operativo de tasks del repo.
 
+## Creative Workbench: estado y continuidad
+
+El código activo vive en el repo Workbench. [Skill y corte fechado](../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+separan main integrado, pruebas locales y runtime. Foundation, packs y producción no se marcan
+complete por el merge de contornos; autenticación definitiva queda diferida.
+
+| Task | Estado | Dependencia |
+| --- | --- | --- |
+| [TASK-1945](in-progress/TASK-1945-creative-workbench-multibrand-foundation.md) | in-progress: foundation multimarcas | none |
+| [TASK-1946](in-progress/TASK-1946-sky-brand-system-candidate-packages.md) | in-progress: packs SKY y fidelidad visual | TASK-1945 |
+| [TASK-1947](in-progress/TASK-1947-creative-workbench-brand-production-entry.md) | in-progress: entrada productiva y presupuesto | TASK-1945, TASK-1946 |
+| [TASK-1952](to-do/TASK-1952-creative-workbench-efeonce-id-integration.md) | to-do: Efeonce ID diferido | TASK-1834 |
+
 ## Portal de servicios: EPIC-046
 
 TASK-1852 en `in-progress`: 392 tests, Production `released` y siete canaries HTTP; [rollout/PR #231](../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).

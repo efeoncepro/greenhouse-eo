@@ -1,13 +1,7 @@
 # Creative Workbench — aislamiento multimarcas y multipersona
 
 Estado: Accepted para arquitectura, 2026-09-29, decisión de Julio Reyes en esta conversación.
-Implementación activa: producción modular SKY y Lab premium integral en Workbench. Versiones integradas, snapshot publicado y readbacks en [continuidad vigente](../operations/creative-production/WORKBENCH_CURRENT_STATE.md); TASK-1945 conserva onboarding/segunda marca, TASK-1946 distribución y TASK-1947 IA.
-
-Greenhouse mantiene gobernanza/skills; ownership nativo y rutas gestionadas se distinguen por el sello vigente. No restaurar mirrors del template ni sync total. La revisión técnica de 126 referencias no concede aprobación comercial ni acredita acceso de todo el equipo.
-
-Las reglas de composición SKY se versionan y verifican en Workbench, sin ampliar este ADR
-ni el pack por inferencia. El [cierre local de alineación](../audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md)
-documenta contenido `1.5.0` / destino `1.2.0`; no representa despliegue ni aprobación comercial.
+Implementación: TASK-1945 (foundation); rollout e integración completos siguen pendientes.
 
 ## Contexto
 

@@ -1,26 +1,7 @@
 # Componentes y correcciones nativas SKY
 
-## Alcance integrado — 2026-10-01
-
-PR14 cerró la comparación técnica independiente de 126 referencias; PR15 añadió los componentes
-estructurales consumidos por la producción. El Lab de PR16 sólo presenta sus recursos y relaciones.
-Para operar, leer [flujo de agentes](agent-production.md) y [autónomos](autonomous-components.md).
-Los conteos de reparaciones de apartados iniciales registran unidades históricas: el inventario
-efectivo posterior contiene 12 logos, 105 flechas y las admisiones source-specific detalladas
-al final. No volver a arreglar cada pieza a mano ni generalizar pins a otra marca/fuente.
-
-El logo, iconos (incluido avión) y curvas nativas son vectoriales cuando la fuente conserva paths.
-La foto y los PNG de referencia son raster; ver un icono dentro de un PNG no convierte su fuente
-en raster. Inspeccionar instancia/definición/assets originales y extracción contextual para
-comprobar escala y máscara; no agrandarlo con CSS del Lab ni dibujar otro avión por parecido.
-
 Canon Workbench: `docs/architecture/workbench-sky-modular-components.md` y
 `brands/sky-airline/components/`. La composición no redibuja cada adaptación a mano.
-
-La biblioteca adicional de [íconos SKY](icons.md) contiene 101 familias y variantes
-nativas `kind`/tamaño, con receta `sky.icon.native-variant.v1`. Es una colección
-candidata separada del grafo productivo: seleccionar una variante no sustituye
-las instancias admitidas ni amplía recursos/slots de una campaña.
 
 ## Biblioteca y grafo
 
@@ -35,10 +16,10 @@ en componentes semánticos sin duplicar dibujo. Los 1196 campos de las 126 escen
 exactamente un módulo responsable, incluido CTA. Un footer ausente no aparece por herencia.
 Plan y QA exponen `components`, `contentSlots` y `nativeInstances`.
 
-La unidad integrada por PR15 el 2026-10-01 añade la representación ejecutable de cada capa, definiciones,
+La unidad local 2026-10-01 añade la representación ejecutable de cada capa, definiciones,
 tokens tipados, assets y recetas. Consultar [autonomous-components.md](autonomous-components.md)
 para readers/export/extracción/roundtrip y evidencia de bindings. No confundir el grafo semántico
-anterior con esa biblioteca estructural; ambas ya están integradas en main, con contratos distintos.
+anterior con esa biblioteca estructural, ni una implementación local con disponibilidad en main.
 
 La variante es la escena realmente admitida, con jerarquía, orden, placement, clips, masks y
 paints originales. El job cambia contenido, no define módulos ejecutables ni geometría nueva.
@@ -218,63 +199,3 @@ recetas, fuentes y módulos. `index.html` permite inspeccionar las dos piezas en
 nativo y la diferencia amplificada. La revisión humana/técnica se registra aparte:
 una métrica o un render exitoso no aprueba una campaña. Para fotografía/copy nuevos,
 usar `marca:disenar`/`marca:lote` con la autoridad normal y contenido explícito.
-
-## Reglas de la diseñadora para contenido variable — 2026-10-01
-
-Canon: Workbench `docs/architecture/workbench-sky-designer-content-rules.md`.
-La base `sky-airline.content-layout.designer-rules@1.0.0` admitió 104 fuentes selladas:
-119 campos de precio, 126 de sticker, 76 relaciones destino/origen y 42 pilas simples en flecha.
-El contrato vigente es 1.5.0: la ampliación tarifaria cubre 76 badges del catálogo de 126 fuentes.
-4685 se trata como editorialDiscount LEFT, con su admisión propia, no como sticker circular.
-Cada variante sólo recibe las reglas de sus elementos admitidos.
-
-- Medir tinta real de Metric para centrar stickers y alinear cada moneda con su precio.
-- Importes en Metric Black sellado, tamaño nativo; sin shrinking ni fallback.
-- Condiciones debajo del precio en estilo de oración, conservando acrónimos y URLs.
-- Origen tras las líneas efectivas del destino con gap nativo; badge de origen con icono, altura
-  y padding nativos, ancho adaptativo. No mover un frame compartido que también contiene la ciudad.
-- Badge de tarifa adaptativo: cápsula LEFT y label centrado dentro; pila con separación admitida.
-  El legal de tarifa permanece dentro de la flecha. `footer-legal` sigue independiente.
-- Filas dobles de moneda se resuelven por pares fuente; un overflow se rechaza, no se omite la moneda.
-
-El plan declara `contentLayoutRecipe` y la fuente efectiva Black. QA expone `contentLayouts`,
-`badgeLayouts`, `measurements[].conditionCopyTransform` y `finalSceneSha256`. La escena modular
-es la base; la extensión registra aparte sus ajustes productivos. Los checks finales de tinta
-contra clips efectivos son obligatorios incluso para los campos que se recolocan.
-
-Revisión recibida: `ajustes.pdf`, SHA c6fe9d463a74a119d314e030e3513b176f7d890f6b07a0f69811f60afd42c24a.
-Prueba nueva: `projects/sky/calama-reglas-diseno-7-formatos` (7 formatos, copy completo, fotos
-históricas, cero proveedores). No inventar fechas, descuentos ni código monetario desde `$`.
-Leer `review.md` de esa pieza para corridas seleccionadas, documento y verificación.
-Cambios locales sin publicación acreditada; nunca modificar los CLIs de Greenhouse para producir.
-
-### Condiciones compactas, regla 1.1.0 — local 2026-10-01
-
-El operador autorizó una sola línea y tamaño menor en condiciones de la flecha compacta. `content-layout-admissions.mjs` fija 24 ofertas: display 12 px, banners 10 px y verticales 8 px; se conserva Metric/peso/color. Contenido 1.5.0 conserva LEFT de condiciones; centra únicamente los dos footer-legal revisados según [cierre del feedback](layout-feedback-handoff.md); lineHeight 1,2; sin selección desde job ni cálculo de autofit por longitud. Máximo una línea: copy excesivo falla explícitamente. Plan `conditionTypography` y QA `offer-stack.conditionTypography` + `measurements.size`. No aplicar a pies legales, doble moneda o financiación. Prueba `projects/sky/prueba-modular-24-adaptaciones/`, incluyendo condiciones completas en display/vertical. Leer contrato Workbench actualizado, no redibujar la pieza o corregir PNG.
-
-La prueba de 24 variantes añadió dos reglas de visibilidad/separación: al mover condiciones dentro de una flecha, heredar la pintura sellada del precio (también en los estilos de glifos), para evitar morado sobre morado; las dobles monedas conservan la orientación fijada por fuente y sus slots laterales o filas, con cajas finales que no se intersectan. QA `conditionPaintFromPrice`, `dual-currency-row` y `dual-currency-separation`. No aceptar fit como evidencia de visibilidad.
-
-Los badges tarifarios complejos/dobles usan 34 pins, además de las 42 pilas simples. Incluyen
-18 prefijos IDA Y VUELTA DESDE antes catalogados como other-copy. Todos usan ancla LEFT:
-ancho de tinta + padding fuente, altura fija, extremos reales y centro interno de label comprobados.
-Plan `contentLayoutRecipe.fareBadges`; QA `fare-badge-adaptive` y `fare-badge-price-conditions-axis`.
-No asumir que una doble moneda participa en `offer-stack`; revisar su admisión propia. Overflow se rechaza.
-
-### Titular porcentual en flecha: eje izquierdo
-
-Receta local 1.2.0: seis fuentes 3032/3040/3051/3059/3070/3078. El bloque «20% Dcto. / en rutas de prueba» sigue la referencia «50% Dcto. / en todos los destinos»: titular multilineal LEFT, todas las líneas y condiciones sobre el eje izquierdo nativo del badge HASTA. HASTA permanece centrado dentro de su badge. Se conservan tamaños, fuentes y bandas verticales; no centrar el titular como sticker. Pins exactos y `promotion-arrow-left-axis` en QA; ancho y clips finales obligatorios.
-
-## Corrección local de relaciones y TODOS los badges — 2026-10-01
-
-Contenido 1.5.0 / destino 1.2.0, con admisiones selladas propias. [Cierre y evidencia](layout-feedback-handoff.md).
-Todos los 76 badges tarifarios usan LEFT: 42 pilas en flecha (`offer.badgeAnchor`) y 34 Tags
-complejos/dobles (`fareBadges[].anchor`). La cápsula se alinea con el borde izquierdo de su
-bloque de tarifa, y el label se centra por tinta dentro. Los offsets nativos del frame de precio,
-importe/moneda y orientación de dobles se preservan. No centrar por ancho sobrante del padre.
-`fare-badge-left-axis` y `fare-badge-price-conditions-axis` comprueban ambos contratos.
-
-Footer CENTER sólo en 1387 de 2611/2668, condiciones LEFT. 2668 usa balance de fila completo y
-ambos KV separan prefijo con flecha de ciudad por 16 px. 4685 usa editorialDiscount LEFT y
-QA de eje con destino/CTA después del reflujo. Mantener clipping final y rechazo de overflow.
-Export v6 local revisado; aceptación visual del operador y aprobación comercial permanecen
-separadas. No mover fotos/ventanas por inferencia ni sustituir resultados/recursos históricos.

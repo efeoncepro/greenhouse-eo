@@ -1,64 +1,10 @@
 # Operar el Creative Workbench
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-29 por Claude
-> **Ultima actualizacion:** 2026-10-01 — continuidad vigente y bootstrap preservado
+> **Ultima actualizacion:** 2026-09-30 por Claude
 > **Documentacion tecnica:** [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](../../architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md)
-
-## Operación vigente — 2026-10-01
-
-Fuente activa: `efeoncepro/creative-workbench`; Greenhouse conserva gobernanza y skills, sin alterar
-sus engines. Consultar [continuidad actual](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-y [skill Codex/Claude](../../../.codex/skills/efeonce-creative-workbench/SKILL.md) antes de operar.
-
-Para producir una campaña SKY, ejecutar desde Workbench el flujo documentado en
-`docs/manual/native-design.md` y `docs/manual/design-batches.md` y `docs/manual/autonomous-components.md`: recetas/adaptaciones/zonas,
-copy y fotografía admitidos, validación, ejecución exclusiva y QA. Los nombres/argumentos actuales
-salen de `package.json` y del manual de ese repo. Para Git usar `git:identidad`/`git:hooks` por persona,
-sin copiar la configuración del operador. Para el Lab consultar
-[usar Creative Workbench Lab](../creative/usar-creative-workbench-lab.md) y su manual nativo
-`docs/manual/workbench-lab.md`; revisar variante/receta y sus zonas. PR17/main `7e4c617` y el
-[alias Vercel protegido](https://creative-workbench-sky.vercel.app/) tienen evidencia propia de
-publicación del snapshot SKY; un servidor local o status CI Vercel genérico no la sustituye.
-
-Sólo los archivos gestionados van por su mecanismo de distribución sellada. Cambios en motor,
-componentes, Lab y broker nativos se hacen por PR en Workbench. No restaurar mirrors de template
-ni ejecutar un sync total heredado. La prohibición genérica de edición del bootstrap histórico
-sólo corresponde hoy a rutas gestionadas según su sello; no impide cambios nativos revisados por PR.
-En mantenimiento del control plane, inspeccionar el plan y
-ownership actuales antes de cualquier acción; este manual no autoriza cambios IAM/cloud/secrets.
-
-No entregar llaves de proveedor al equipo ni reactivar `ai:*`/`foto:*` legacy para saltarse el broker.
-La producción local cero IA está probada; flujo pagado y onboarding requieren su cierre separado.
-Auth definitivo usa Efeonce ID (TASK-1952 diferida), no Google OAuth paralelo ni binding por email.
-Los topes50/500 admiten aumentos por decisión del operador; nadie los eleva automáticamente.
-
-### Revisar la corrección SKY local
-
-Consultar el [cierre del feedback](../../../.codex/skills/efeonce-creative-workbench/references/layout-feedback-handoff.md)
-y los contratos Workbench `workbench-sky-designer-content-rules.md` y
-`workbench-sky-destination-content-flow.md` en `docs/architecture/`.
-Contenido `1.5.0` y destino `1.2.0` son las recetas de este corte; no usar la instrucción histórica
-de corregir en el próximo chat ni aplicar una alineación global a todos los legales.
-
-1. Abrir el PDF local `prueba-modular-24-v6/SKY-24-adaptaciones.pdf` en el canon privado
-   `sky-airline/2026-10-01`, junto a sus PNG/SVG y `reproducibilidad/final-review.json`.
-2. Revisar badge de tarifa LEFT en su columna y label centrado dentro; conservar los offsets
-   nativos del precio, los badges de origen y los contratos de moneda/doble tarifa.
-3. Comprobar footer/condiciones por función, separación de prefijo/ciudad, balance de 2668
-   y eje común del bloque editorial 4685. Registrar aceptación visual por separado de los tests.
-4. Si se cambia copy, recurso o receta, validar y ejecutar un job propio nuevo desde Workbench.
-   Conservar los UUID anteriores; los exports v3/v4/v5 no se sobrescriben.
-
-El PDF v6 es una prueba sintética; comparte número de versión con el Lab publicado, pero es
-otro artefacto. Su existencia no acredita que el renderer corregido esté publicado.
-
-## Bootstrap histórico — 2026-09-29
-
-El bloque siguiente preserva el procedimiento original. Sus instrucciones de sync total, templates,
-CLIs crudos y secreto por ADC personal quedaron superadas en el carril nativo. **No ejecutarlo como
-procedimiento de producción vigente**. Source de verdad actual y pendientes están enlazados arriba.
 
 ## Para qué sirve
 
@@ -76,9 +22,10 @@ y reglas recibe, quién entra, a qué clientes y con qué acceso a IA y buckets.
 
 | Comando | Qué hace | Toca algo |
 |---|---|---|
-| `pnpm creative:status` | Sello publicado, sync pendiente, drift, PRs, último CI, equipo y skills con docs que no viajan | No |
-| `pnpm creative:sync` | Escribe el plan de `HEAD` en el checkout local, sin commit | Sólo el disco local |
-| `pnpm creative:sync --pr` | Lo mismo, con rama, commit, push y PR en el workbench | GitHub |
+| `pnpm creative:status` | (Sólo lectura, drift medido en un clon temporal) Sello publicado y si está íntegro, sync pendiente (incluye rutas que pasan a nativas), drift, dependencias que faltan en el `package.json` nativo, PRs que tocan lo gestionado, último CI, equipo y skills con docs que no viajan. Sólo usa la API REST de GitHub | No |
+| `pnpm creative:sync` | Vista previa: calcula el plan de `HEAD` sobre un **clon temporal** de `main` del workbench y muestra el diff | Nada (el clon se borra) |
+| `pnpm creative:sync --pr` | Lo mismo, con rama, commit, push y PR desde el clon temporal | GitHub (tu checkout local no se toca) |
+| `pnpm creative:sync --in-place` | Escribe en tu checkout local, sólo si está limpio, en `main` y al día con origin; si no, se niega | Tu checkout |
 | `pnpm creative:sync --ref origin/develop --pr` | Exporta otro ref | GitHub |
 | `pnpm creative:access plan` / `apply` | Reconcilia GitHub y GCP con `control.json` | `apply` sí |
 | `pnpm creative:provision plan` / `apply` | Crea proyecto, APIs, buckets y secretos vacíos | `apply` sí (cobro) |
@@ -104,8 +51,11 @@ y reglas recibe, quién entra, a qué clientes y con qué acceso a IA y buckets.
 1. Agrega un miembro en `scripts/creative-workbench/control.json`:
 
    ```json
-   { "github": "usuario-github", "gcp": "nombre@efeonce.org", "clientes": ["berel", "sky"], "ia": true }
+   { "github": "usuario-github", "gcp": "nombre@efeonce.org", "ia": true }
    ```
+
+   Sin `clientes`, la persona recibe todos (`clientesPorDefecto: "todos"`, decisión del 2026-09-30). Para
+   restringirla, agrega `"clientes": ["berel", "sky"]`.
 
 2. `pnpm creative:access plan`: debe listar el alta en el equipo y los bindings de canon, clientes y, si
    `ia: true`, las llaves y Vertex.
@@ -125,6 +75,26 @@ bindings `workbench-*`. Si la persona tenía `ia: true`, **rota las llaves**: pu
 3. `pnpm creative:status` muestra el sync pendiente.
 4. `pnpm creative:sync --pr`, revisa el PR y mergéalo cuando el CI `gates` esté verde.
 
+### Entregar una ruta al workbench (hacerla nativa)
+
+Cuando el workbench necesita poseer un archivo que hoy recibe sellado (por ejemplo, su `package.json`):
+
+1. Agrega la ruta a `native.paths` en `scripts/creative-workbench/export-manifest.json`. Sólo rutas exactas
+   o carpetas `dir/**`. No se aceptan `gates/**`, el workflow `gates`, `CODEOWNERS` ni `.workbench/**`.
+2. **No la quites** de la plantilla ni del manifest para "soltarla": el sync la borraría del workbench.
+3. Commitea, corre `pnpm creative:status` (debe listarla con `→ … (pasa a nativo)`) y `creative:sync --pr`.
+   El PR la saca del sello sin tocar el archivo.
+
+Para devolverla a greenhouse-eo, quítala de `native.paths`. Si el archivo del workbench difiere de la
+plantilla, el sync aborta con una colisión: decide qué versión queda antes de reintentar.
+
+### Cambiar la nota «En el Workbench» de las skills
+
+Las skills que mencionan `pnpm foto:*`, `ai:*` o `assets:pull` llegan al workbench con una nota al inicio que
+traduce esos comandos al harness (`marca:*`). Para cambiarla, edita `scripts/creative-workbench/skill-overlay.md`
+(`{{comandos}}` se reemplaza por los comandos de cada skill), commitea y corre `creative:sync --pr`. Qué skills la
+reciben lo lista `.workbench/export-report.json → skillOverlays`.
+
 ### Agregar un cliente
 
 1. Agrégalo a `clientes` en `control.json`.
@@ -141,10 +111,20 @@ bindings `workbench-*`. Si la persona tenía `ia: true`, **rota las llaves**: pu
 | `managed-drift` rojo en un PR del equipo | El PR toca archivos gestionados | Pide que lo propongan por issue |
 | `⚠ N rutas exportables tienen cambios sin commitear` | Tu disco tiene cambios que **no** viajan | Normal en checkout compartido; commitea lo tuyo si debía viajar |
 | Skills que citan docs que no viajan | Rutas internas referidas por skills | Decide caso a caso: allowlist o nada |
+| `Sello íntegro: ✗ N anomalías` | El sello publicado no es el que greenhouse-eo habría escrito para su commit (una exención o una huella editada a mano) | Revisa el historial de `.workbench/sync.lock.json` y re-sincroniza |
+| `PR #N … ⚠ toca N gestionados` | Un PR edita archivos sellados sin re-sellar, o re-sella con un sello que no es el de greenhouse-eo (`sync íntegro` = PR de sync auténtico) |
+| `managed-drift`: «este PR cambia el sello y no es un sync» | Un PR que no viene de `creative:sync` modificó `.workbench/sync.lock.json` | Revertir ese cambio; lo nativo se pide por issue | Si el cambio es legítimo, pórtalo aquí o declara la ruta nativa; si no, pide revertirlo |
+| `Dependencias … faltan N` | El `package.json` nativo no declara lo que necesitan los engines que se siguen entregando | Puede ser a propósito (engine desactivado); si no, pide agregarlas |
+| `native-policy` rojo en el workbench | El harness nativo dejó de cumplir una regla sellada: el guard ya no bloquea algo, `settings.json` perdió una denegación o apagó los hooks, o hay código fuera del broker que llama a un proveedor, importa un SDK de IA o importa el adaptador del broker | Corregirlo en el workbench; si la regla debe cambiar, se cambia en `template/gates/native-policy.json` aquí |
+| `✗ N rutas del plan ya existen en el workbench y no las gestiona el sello` (sync) | La plantilla trae un archivo que el workbench ya tiene como propio | Decláralo nativo o quítalo de la plantilla; el sync no lo pisa |
 
 ## Qué no hacer
 
 - No edites archivos del workbench directamente, ni siquiera tú: el siguiente sync los pisa.
+- No uses `--in-place` mientras tú o un agente trabajan en tu checkout del workbench: el sync por defecto (clon
+  temporal) no lo necesita.
+- No aceptes en el workbench una declaración de propiedad propia (como `.workbench/native-ownership.json`):
+  lo nativo sólo se decide en el manifest de aquí.
 - No des IAM a mano en `efeonce-creative-workbench` ni en `efeonce-group` para el equipo.
 - No uses las llaves de Greenhouse en los secretos del workbench.
 - No agregues a la allowlist de docs nada de finanzas, contratación, modelo de negocio o tasks.
@@ -159,6 +139,7 @@ bindings `workbench-*`. Si la persona tenía `ia: true`, **rota las llaves**: pu
 | `pnpm install` falla por `@efeoncepro/*` | Credencial de GitHub sin `read:packages` | `gh auth refresh -s read:packages` |
 | CI del workbench: `Unable to locate executable file: pnpm` | `setup-node@v5` buscó pnpm por `packageManager` | La plantilla ya lleva `package-manager-cache: false`; no lo quites |
 | Una persona ve «sin acceso» en `pnpm doctor` para IA | No tiene `ia: true` o falta la versión del secreto | Revisa `control.json` y `creative:provision plan` |
+| `creative:status` dice «Equipo … no disponible desde este entorno» | El entorno sólo permite endpoints `repos/...` (p. ej. sesión remota de agente) | Córrelo en tu equipo para ver el equipo de GitHub; el resto del tablero es válido |
 
 ### Proteger `main` cuando la org tenga GitHub Team
 

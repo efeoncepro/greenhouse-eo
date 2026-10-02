@@ -122,9 +122,6 @@ Nuevas rutas de callback, storage o comando se determinan en Discovery y se regi
 - El operador autorizó todo el equipo para todas las marcas y topes mensuales de USD 50 por integrante
   y USD 500 por organización, con aumentos por decisión del operador.
 - El canary Google/GitHub documentado en TASK-1947 es antecedente fechado; no demuestra sesión Efeonce ID.
-- PR15 producción modular y PR16 Lab ya integrados: [estado actual](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md).
-  Composición local con cero IA y hooks Git funcionan independientemente de esta integración pendiente.
-  No usar la reparación de autor/committer como prueba de login, binding o sesión Efeonce ID.
 
 ### Gap
 

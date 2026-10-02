@@ -1,18 +1,5 @@
 # Presupuesto del broker — continuidad 2026-09-30
 
-## Adopción actual y pendiente operativo — 2026-10-01
-
-El guard monetario del PR10 sigue integrado en main `c3e85b6`; PR15/16 no despliegan el broker
-ni habilitan pagos. Policy revisada `status: draft`, `limitMicros: 50000000` y
-`organizationLimitMicros: 500000000`: **50 USD por persona y 500 USD globales por mes UTC**.
-Los aumentos se deciden por el operador conforme el contrato inferior, sin autoservicio ni
-borrado del consumo. Secretos/flags/cotizaciones/deploy/readback/canary requieren su carril.
-La identidad definitiva reutilizará Efeonce ID en TASK-1952; no construir AUTH propio para
-cerrar presupuesto. El antiguo canary App del operador es evidencia de candidata, no de equipo.
-Ver [continuidad](state-continuity.md) y arquitectura propietaria antes de operar dinero.
-Los conteos/headers/estado de PR7 en apartados inferiores son historia de esa candidata,
-no describen automáticamente el baseline actual o su runtime.
-
 ## Corte nuevo: port monetario independiente mergeado en PR 10 — 2026-09-30
 
 [Workbench PR 10](https://github.com/efeoncepro/creative-workbench/pull/10), head
@@ -43,16 +30,17 @@ entrega no se porta en PR 10 ni debe darse por desplegada. Revalidar PR/CI/runti
 Canon: `creative-workbench/docs/architecture/workbench-broker-budget.md`; implementación
 `services/production-broker/budget.mjs`, esquema policy v2. El operador aprobó **50 USD por
 integrante y 500 USD para toda la organización por mes UTC**, compartidos entre todas las marcas.
-También pidió poder aumentarlos por decisión suya. El guard está integrado por PR10: policy
-incluida draft, reserva cero y sin cotizaciones; la activación/runtime sigue pendiente. No habilitó IA ni desplegó broker o IAM.
+También pidió poder aumentarlos por decisión suya. El código está en revisión local: policy
+incluida draft, reserva cero y sin cotizaciones. No habilitó IA ni desplegó broker o IAM.
 
 ## Identidad, costos y autoridad
 
 La persona es el GitHub ID verificado, no responsable del brief, email de Google ni un ID del job.
-La candidata App/Google del PR7 tuvo canary positivo del operador, scopes mínimos y revocación
-medidos; permanece sin promoción. No atribuir ese transporte al main ni al equipo entero.
-El estado definitivo se retomará con Efeonce ID, sin coincidencia por email. Ver
-[state-continuity.md](state-continuity.md). Policy server-owned,
+El código del vínculo aplicativo Google/GitHub y credencial App mínima está preparado;
+pins App admitidos por owner y vínculo del operador aprobado/preparado en policy privada
+0600 hasta 2026-12-29, sin runtime verificado. App registrada/instalada por operador y API de
+instalación verificada; secreto propio con una versión y SA exacta reportados. Primer token
+pendiente por grant de impersonación SA ausente, sin ampliar IAM; runtime pendiente. Ver [state-continuity.md](state-continuity.md). Policy server-owned,
 clonada al construir consumer, jamás desde job/env/resource. Montos enteros de microdólares USD.
 La reserva uniforme debe cubrir un techo conservador demostrado de TODOS los inputs y output
 exactos. La cotización sella marca/cliente/versión/operación/pack/recursos y settings, con vencimiento

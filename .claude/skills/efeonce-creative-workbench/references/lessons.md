@@ -1,34 +1,10 @@
 # Aprendizajes y errores que no deben repetirse
 
-## Aplicación vigente — 2026-10-01
-
-El [corte actual](state-continuity.md) prevalece sobre estados históricos de esta tabla.
-La comparación independiente de 126/126 está completa; las propuestas OAuth propias se
-retiraron en favor de Efeonce ID diferido. Git identity ya tiene configuración/hook por persona,
-pero presupuesto/broker y acceso de todo el equipo no se cierran por un merge de componentes.
-
-Aprendizajes nuevos: conservar identidades visuales por ejecución; reconstruir el árbol completo
-con dependencias antes de copy/foto; inferencia por hex no prueba binding; un snapshot editado
-con SHA recalculado no se auto-admite; extracción con fondo/Multiply requiere contexto. El
-PNG de un icono no cambia su fuente vectorial. Ver [autónomos](autonomous-components.md).
-
-Registro de causas verificadas durante el onboarding SKY, con cortes hasta 2026-10-01. Aplicar a la variante/
+Registro de causas verificadas durante el onboarding SKY, hasta 2026-09-30. Aplicar a la variante/
 contrato que respalda cada caso, sin transformar un ejemplo en excepción general de marca.
 
 | Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
 | --- | --- | --- |
-| Descargar una librería se anuncia como íconos operativos en campañas | Candidata importada y selector de lectura no amplían IDs/slots del pack | Admitir recurso/placement por revisión, nueva corrida y QA; [íconos](icons.md) |
-| Duotone 24 devuelve otro tamaño o familia homónima | Selección implícita por parecido/nombre y fallback | ID de familia/nodo + kind/tamaño exactos; vacío/rechazo y alternativa sólo explícita |
-| 2.222 SVG se anuncian como exports directos cotejados | 429 tras 1.200; 1.022 proceden de paths REST sin control SVG directo | Conservar representation y cobertura; 1.200 controles PASS no certifican los restantes |
-| Token o binding de íconos se asume igual a Brandlift | Fuente Figma diferente y coincidencia de hex/nombre | IDs y recibos propios, sin traducción visual automática ni recolor libre |
-| Archivo parcial importado tras 429 se copia como colección completa | Export incompleto sin cobertura | Respetar Retry-After, canon privado nuevo y validación de cobertura; no eludir cuota ni sobrescribir |
-| Lab cliente usa titulares de venta de vuelos | Confundir marca presentada con autoría/objetivo del producto | Design System Lab de Efeonce para SKY; títulos funcionales, host Bricolage/Poppins y artwork Metric separados |
-| Card dentro de card en recetas, fuente y metadatos | Interpretar contención como un borde/fondo/radio por dato; v4 rechazada | V5: panel por tarea y card sólo para entidad seleccionable; interiores planos con espacio/reglas |
-| Bibliotecas animan cada card al abrir details | Extender coreografía narrativa a lectura densa | Escena de composición localizada; bibliotecas estáticas, reduced/reactivo y HTML visible |
-| “Interior del desplegable optimizado”, pero picker sigue del sistema | QA del campo cerrado/disclosure no revisó menú de select abierto | Abrir familia y colección: primitive host compartida, teclado/reset/collision y fallback nativo; [contrato](lab.md#selectores-y-desplegables) |
-| Popover se ve bien pero no filtra o reset muestra valor viejo | Botón decorativo separado del select dueño de eventos | Mantener select/IDs, confirmar con change y sincronizar etiqueta/aria-selected; Escape no aplica navegación |
-| Localhost entregado como Vercel actualizado | URL del servidor local no prueba publicación remota | Source/main/build → deployment de marca → bytes/alias → navegador real; comunicar URL verificada |
-| Promoción READY deja alias corto con versión anterior | Alias manual no se reasigna necesariamente al promover | Comprobar/asignar alias explícito y repetir readback autenticado/anónimo en ambos hosts |
 | “Está en carpeta SKY, por tanto es SKY” | Folder no valida procedencia de dependencia | Resolver cliente, pack exacto y cada ID/SHA; rechazar cruces |
 | Root instala AXIS aunque cliente es SKY | Herencia de identidad en dependencias raíz | Runtime neutral y biblioteca propia; no sync total antiguo |
 | “El productor está en el JSON” | Campo local es atribución falsificable | Identidad GitHub viva y autoridad del ingreso |
@@ -44,7 +20,7 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Legal pierde énfasis / cuotas uniformes | Mixed styles olvidados durante shapeado | Regular/Semibold y Black/Medium exactos, case nativo |
 | Cielo correcto aislado pero texto ilegible | Reserva no proyectada al FILL/crop o nubes bajo texto blanco | Medir pieza final; foto/variante apropiada, sin scrim que esconda fallo |
 | “Sí, la imagen sigue el criterio” | Confirmación humana de fotografía | No extenderla a KV, contraste, precio, derechos o publicación |
-| 126 renders coinciden con source propio | Regresión interna no basta como referencia independiente | Usar los 126 controles REST sellados y comparación por nodo; PR14 cerró esa revisión y PR15 conserva PNG/SVG exactos |
+| 126 renders coinciden con source propio | Regresión interna, no referencia independiente | Mantener 5 controles Figma y 121 faltantes explícitos |
 | 4,495581 se presenta como 4,5 aprobado | Redondeo oculta fallo del umbral | Registrar valor real y límite del método |
 | “Vercel está bloqueado” | Sesión/scope equivocada no es build roto | Verificar identidad y project exactos, no mezclar cuentas |
 | Vercel CI genérico verde | Otro proyecto/alias que visor SKY separado | Readback del deployment y superficie SKY concretos |
@@ -67,18 +43,14 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Revisión READY/tagged se informa como rollout completo | 00009-cep tiene 0% tráfico y producción sigue en 00008-tv6 al 100% | Verificar revisión/tráfico y endpoint; separar build, deploy candidato y promoción |
 | Identity400 se atribuye a token App o vínculo Google | Filtro rechaza antes de ambos lectores | No afirmar primer token/scopes o binding positivo; corregir transporte y volver a medir |
 | Cloud Run recibe token IAM pero aplicativo no obtiene JWT íntegro | Dos controles consumen el transporte firmado | Header aplicativo propio X-Workbench-Identity + X-Serverless-Authorization IAM, sin fallback Authorization; exigir readback tras corrección |
-| Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | Reusar Efeonce ID mediante TASK-1952 y demostrar admisión individual; no crear OIDC propio ni inferir aceptación del riesgo |
+| Aprobación del operador se usa para aceptar audiencia compartida | Comentario PR7 identifica riesgo MEDIO sin aceptación específica | OIDC propio antes de habilitar otros tres integrantes; no inferir aceptación del riesgo |
 | Miembros GitHub/correos se presentan como productores habilitados | API de equipo no certifica binding Google ni IAM | Evidencia por persona y cuenta; correos sólo referencia, no grant |
 | Perfil legacy malformed se interpreta como firma eliminada | Rechazo Cloud Run400 no describe transformación exacta de bytes | Registrar conducta medida y header propio íntegro; no inferir mecanismo no observado |
 | Primer token válido se extiende a todos los miembros | Canary9/9 probó sólo al operador, scope de un repo y revocación de cuatro tokens | Separar mint/token/identidad positiva del operador y admisión individual del resto |
-| Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | Autoridad definitiva conforme Efeonce ID, presupuesto/cotizaciones admitidos y autorización del pago antes del canary de costo |
+| Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | OAuth propio, presupuesto admitido y autorización del pago antes de cualquier canary de costo |
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
 
 ## Propuestas rechazadas o retiradas
-
-- UI v4 con cards sucesivas: contención excesiva cuestionada por el operador. V5 conserva
-  límites de tarea/entidad y aplana registros; no volver a proponer nested cards ni animación
-  individual como acabado premium. V6 completa menús de filtros y conserva ese equilibrio.
 
 - Prompt canary genérico de SKY: sirvió para probar infraestructura, luego retirado al admitir la
   skill fotográfica. No seguir generando con ese recurso antiguo ni adoptar su quality low como
@@ -86,7 +58,7 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 - Primera implementación de texto mixto: legal URL Regular y headings sin UPPER. Rechazada;
   nuevas corridas v2, no sobrescritura de v1 ni etiqueta de aprobación retroactiva.
 - Parche de seam por expandir piezas separadas o retocar imagen final: resuelve una escala,
-  no la topología compartida. Biblioteca continua verificable con los 105 pins efectivos (74 iniciales, 25 ampliaciones y seis unions); no una regla libre para fuentes nuevas.
+  no la topología compartida. Biblioteca continua verificable en las 74 variantes.
 - Reconstruir logo con letras, redibujar icono o copiar uno distinto por adaptación: pierde fuente
   oficial y repite errores de escala. Reparar instancia admitida, no cambiar artwork.
 - Prompt+ancla correctos como certificación visual: faltan inspección del PNG/encuadre y mediciones
@@ -99,70 +71,3 @@ Identificar capa: **fuente** (datos/fonts/template), **admisión** (pack/receta)
 resuelve cambiando silenciosamente otra. Conservar error redactado, identidad del recurso/run y
 evidencia suficiente sin secretos; corregir causa en dueño canónico y volver a verificar el paso
 afectado. No repetir todos los tests ni llamadas pagadas si no aportan evidencia nueva.
-
-## Aprendizajes del feedback de composición — 2026-10-01
-
-- Una caja de texto heredada no centra el nuevo contenido. Centrar por tinta shapeada, no por
-  cantidad de caracteres, advance de la cifra anterior o el ancho original de una cápsula.
-- Cambiar Bold a Black altera el ancho: reservar la zona efectiva y comprobar ambas filas cuando
-  hay dos monedas. Posponer clipping sólo para campos admitidos que se recolocan, con check final obligatorio.
-- Un origen de una línea no conserva el hueco de un destino largo. Refluir el badge/wrapper exclusivo;
-  jamás mover el frame que también contiene la ciudad.
-- Un badge de tarifa y un badge de origen tienen recetas distintas. El primero centra su label y
-  usa su ancla tarifaria admitida (pila simple o Tag complejo/doble); el segundo conserva su icono y padding nativo.
-- Condiciones en mayúsculas, fuera de la flecha o pegadas al precio son errores de componente,
-  no algo que se arregle recortando el PNG. Actualizar receta, probar y crear otra corrida.
-- Convertir feedback en regla no significa render QA de todo el catálogo ni aprobación comercial.
-  Registrar cobertura de pins, tests y fuentes rechazadas con su razón.
-
-- Condiciones de una flecha compacta: preferir una línea con un tamaño aprobado por variante. Un tamaño fijo versionado y autorizado no equivale a un bucle de reducción automática. Mostrar el tamaño efectivo y comprobar tinta final; si excede, rechazar. No importar esta política a un pie legal o financiación por semejanza.
-
-- La prueba visual descubrió condiciones invisibles aunque su caja cabía: al reparentar hay que considerar la pintura del nuevo fondo y los overrides de `styleTable`, no sólo coordenadas. Usar la pintura de precio del propio source pin.
-- Doble moneda no significa siempre dos filas. Un banner conserva sus dos slots laterales; centrar ambas parejas en el mismo contenedor provoca solapamiento sin overflow. Conservar orientación de fuente y comprobar intersección de tinta entre parejas.
-
-### No confundir titulares de promoción con stickers
-
-La zona semántica promotion-sticker contenía también el titular porcentual en la flecha de Cyber. Aplicar CENTER por ese nombre centró sus líneas y rompió la referencia de 50%. Clasificar por receta/pin y función visual: sticker circular centrado; bloque editorial porcentual con eje izquierdo compartido por badge y condiciones. La extensión 1.2.0 separa seis fuentes y prueba 20%/50% en todas.
-
-## Corrección aplicada y revisión local — 2026-10-01
-
-Leer [destinos y espacios adaptativos](destination-content-flow.md) y el
-[cierre del feedback](layout-feedback-handoff.md) antes de producir. El contrato vigente es
-contenido 1.5.0 / destino 1.2.0: 76 badges tarifarios LEFT, con label centrado dentro de la
-cápsula; footer CENTER sólo en 2611/2668 y condiciones LEFT; prefijo separado 16 px de la
-ciudad y fila 2668 equilibrada; 4685 editorial LEFT con destino/CTA. Los offsets fuente de
-precio y orientación de dobles se conservan. Las 24 adaptaciones v6 y el atlas de 76 badges
-se revisaron localmente; 384 pruebas harness, 10 SKY y cuatro gates PASS acreditan ese corte.
-Aceptación visual del operador y aprobación comercial siguen pendientes. No mover fotos/ventanas,
-aplicar autofit a otros componentes ni sustituir corridas históricas. Commit local autorizado
-por el pedido posterior; push, publicación y deploy requieren su propio alcance autorizado.
-
-### No convertir «legal» en una alineación global
-
-El PDF de feedback se interpretó como LEFT para 169 campos, incluyendo pies legales que el
-operador luego señaló que deben ir centrados. Un comentario sobre condiciones dentro de
-una flecha no autoriza trasladar esa alineación a un footer de otra composición. Clasificar
-por función/source pin y revisar la relación del conjunto: un badge puede ser adaptativo
-y estar centrado dentro de sí mismo, pero seguir en un eje incorrecto respecto del precio.
-Tampoco un fit de destino/origen elimina por sí mismo el vacío hasta el pie legal o equilibra
-un panel HASTA/porcentaje/CTA. Los 377 tests no cerraron esos problemas de diseño.
-[Handoff y cierre](layout-feedback-handoff.md) conserva el diagnóstico previo y la corrección 1.5.0/1.2.0.
-
-
-Diagnóstico histórico anterior a la corrección de las fuentes selladas: footer 1387 CENTER en 01-2611/03-2668,
-condiciones 1241/1242/1254 LEFT. La oferta compleja de 01-2611 carece de `offer-stack`;
-el centrado del badge 1231 en un parent ancho pierde el eje nativo de precio/condiciones.
-En 23-4685, `pin.stickers` aplica centros individuales a HASTA 4692/porcentaje 4694/
-DE DCTO. 4695, aunque la fuente LEFT define un conjunto editorial con eje compartido.
-Y el hueco de 03-2668 conserva dependencias con altura de fila/flecha/posición de footer:
-no se corrige desplazando una sola capa sin comprobar colisiones. Contenido 1.5.0 y destino
-1.2.0 resuelven esos casos con relaciones finales verificadas; el diagnóstico anterior conserva
-la razón de la corrección. No autoriza geometría en un job.
-
-### Auditar el alcance completo de «TODAS»
-
-Corregir un pin no corrige sus variantes hermanas. El primer cambio del badge 2611 no cubría
-2668; el barrido de las 126 fuentes encontró 18 IDA Y VUELTA DESDE bajo other-copy además
-de los 58 badges ya admitidos. La receta 1.5.0 cubre los 76, con test universal USD/DESDE,
-atlas nativo y comprobación de offsets de precio. La cápsula sigue LEFT y el label centrado
-dentro; no confundir esas dos alineaciones ni imponer LEFT a origen, stickers o CTA.

@@ -21,26 +21,28 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Corte 2026-10-01: PR15 modular/identidad Git integrado en Workbench main 2392758; PR16 Lab premium integrado en c3e85b6. 126 escenas autónomas y producción con copy explícito verificados; skill espejo/continuidad PR246 integrado en Greenhouse develop d4dad02. Suite PR15 366 PASS privado y 325 PASS/30 SKIP público; Lab posterior 17 tests locales. Onboarding completo, segunda marca e IA permanecen pendientes. Efeonce ID diferido en TASK-1952; contratos 0.2.0 preparados sin publicación acreditada. Ver WORKBENCH_CURRENT_STATE; no sync total heredado ni cambios a CLIs Greenhouse.`
+- Status real: `Corte 2026-10-01: baseline Workbench PR14 en main be57032. Goal local de componentes autónomos SKY sobre rama codex/sky-autonomous-components: 126 árboles y renders exactos; privado 344 PASS, público 303 PASS/30 SKIP. Lectores, descomposición/extracción/roundtrip, tokens de propiedades y pipeline modular verificados; contratos 0.2.0 preparados sin publicación; código modular/identidad Git 531c6de commiteado/pusheado en PR15 draft; Vercel SUCCESS, sin merge. Skill espejo en PR246 draft, sin merge. Onboarding completo del equipo y runtime IA siguen pendientes; Efeonce ID diferido en TASK-1952, sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse.`
 - Rank: `1`
 - Domain: `platform|tooling|content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
-## Continuidad vigente — 2026-10-01
+## Continuidad documental — 2026-09-30 (corte posterior a PR 12)
 
-Consultar [estado consolidado del Workbench](../../operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-y la [skill espejo](../../../.codex/skills/efeonce-creative-workbench/SKILL.md).
-PR15/PR16 Workbench y PR246 Greenhouse están integrados; los cortes fechados inferiores conservan
-historia y no sustituyen el estado actual. Esta actualización no cierra onboarding, distribución,
-IA ni Efeonce ID por inferencia y no mueve la task a complete.
+### Delta local 2026-10-01: componentes autónomos
 
-## Delta 2026-10-02
+Arquitectura y triple documentación pertenecen a Workbench: `workbench-sky-autonomous-components.md`,
+`docs/documentation/autonomous-components.md`, `docs/manual/autonomous-components.md`.
+Skill Codex/Claude añade `references/autonomous-components.md`. Se conserva el ADR de aislamiento;
+no se cambia fuente de recursos, pack, broker ni CLIs Greenhouse. Evidencia detallada en
+HARNESS_STATUS de Workbench y continuidad de la skill. La task permanece in-progress por su
+rollout/alcance superior; pruebas locales no cierran onboarding/IA/Efeonce ID/distribución.
 
-- EPIC-050 (producción creativa a escala para todos los clientes) eligió a **Berel** como segundo cliente por
-  decisión del operador. Su criterio de salida depende de que esta task habilite Berel como marca productiva
-  (pack, fuente de diseño sellada y recursos admitidos). EPIC-050 aporta la derivación del adaptador
-  (TASK-1955) para que no se escriba a mano; no reclama el onboarding de la marca.
+Consultar el [estado fechado del Workbench](../../../.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
+para código, evidencia y pendientes. Los cortes de PR 7/canary de identidad y cifras anteriores
+registrados abajo son historia; no obligan a terminar OAuth propio antes de componer ni acreditan
+rollout nuevo. Esta publicación documental no mueve la task a complete.
+
 
 ## Summary
 
@@ -110,17 +112,15 @@ excepciones al sello; la reconciliación con el control plane sigue separada.
 
 ### Already exists
 
-- Foundation neutral nativa y consumers de producción en Workbench, con locks/versiones y corridas exclusivas.
-- Composición autónoma SKY PR15 y Lab PR16 integrados; routers/skill PR246 integrada en Greenhouse.
-- Entradas foto/IA legacy desactivadas en Workbench; usar sus wrappers admitidos.
+- Cliente/carpeta/entregables comprobados por `template/gates/piezas.mjs`.
+- Export de skills, CLIs foto y generación con IA.
 
 ### Gap
 
 - El gap inicial de identidad/versión/corrida motivó la foundation del 29/09; no describe el estado
   actual del harness nativo. Consultar su código, pruebas y status en `creative-workbench`.
-- Onboarding completo/segunda marca y rollout IA pendientes; los resultados locales no prueban
-  acceso remoto de cada integrante. Ownership nativo y rutas selladas se verifican en el inventario
-  actual; el retiro de mirrors no concede nuevas exenciones ni autoriza un sync total.
+- Reconciliación del ownership nativo y distribución sellada; el PR Greenhouse #244 y el retiro
+  de mirrors no prueban merge, adopción del consumer ni aislamiento productivo por sí solos.
 
 ## Modular Placement Contract
 
@@ -130,7 +130,7 @@ excepciones al sello; la reconciliación con el control plane sigue separada.
 - Boundary: `preflight neutral; consumidores CLI del workbench`
 - Server/browser split: `Node filesystem; sin browser ni runtime portal`
 - Build impact: `Node puro; sin dependencias nuevas`
-- Extraction blocker: `mantener ownership nativo/sello; rollout y onboarding se acreditan separadamente`
+- Extraction blocker: `reconciliar control plane y ownership sellado antes de afirmar integración`
 
 
 <!-- ═══════════════════════════════════════════════════════════

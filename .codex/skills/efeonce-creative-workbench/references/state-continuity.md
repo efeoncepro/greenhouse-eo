@@ -1,102 +1,6 @@
-# Estado y continuidad de Workbench
+# Corte de continuidad: 2026-09-30
 
-**Último corte local SKY — 2026-10-01:** [cierre del feedback](layout-feedback-handoff.md).
-Contenido 1.5.0 / destino 1.2.0: TODOS los 76 badges tarifarios LEFT, footer por función,
-balance 2668, prefijo separado 16 px en 2611/2668 y descuento editorial 4685. Export v6;
-aceptación visual del operador pendiente, sin aprobación comercial, push ni deploy.
-El pedido posterior autoriza subagentes, actualización documental y commit local de lo propio;
-registrar los hashes cuando se cree el commit, sin alterar la evidencia anterior al commit.
-Los estados de rollout/acceso del host se verifican por separado; esta unidad sólo cambia
-componentes SKY y continuidad documental. El corte final prevalece sobre los históricos.
-
-## Corte consolidado — 2026-10-01
-
-**Acceso/runtime posterior:** [estado vigente del visor abierto](../../../../docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md).
-SSO retirado por autorización explícita; alias/deployment existente preservado y seis rutas anónimas 200.
-Los readbacks protegidos de v6 de la tabla siguiente conservan su fecha, no son el acceso actual.
-
-Este corte prevalece sobre los registros históricos inferiores. Fuentes: código Workbench,
-GitHub PR/CI y evidencia privada enlazada; el [estado operativo Greenhouse](../../../../docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md)
-conserva la matriz de entregado/pendiente. Revalidar el proveedor antes de una nueva operación.
-
-| Superficie | Estado y alcance verificados |
-| --- | --- |
-| Código SKY y Git | [PR15](https://github.com/efeoncepro/creative-workbench/pull/15) MERGED en `2392758ab47966e422570ac813551e3597ac5efb`; 126 variantes modulares, readers/extracción/roundtrip y hooks de identidad incluidos |
-| Código Lab vigente | [PR17](https://github.com/efeoncepro/creative-workbench/pull/17) MERGED en `7e4c6177992785c02430dd238c267991e097c4c9` (2026-10-01T11:05:43Z); selectores v6 sobre premium integral v5 de PR16; tree igual al head revisado `2b0bf8b` |
-| Skills/base documental | [PR246 Greenhouse](https://github.com/efeoncepro/greenhouse-eo/pull/246) MERGED en `develop` `d4dad02f994c2bc0493b24a2e810c1a1485c7532`; las actualizaciones posteriores se versionan por su propio commit documental |
-| CI de main 7e4c617 | gates `36853208420` y native-harness/Lab `36853208477` completed/success. Las cantidades de harness/SKY privadas siguientes pertenecen al dossier de integración v5 |
-| Pruebas privadas de integración v5 | 348 harness + 7 SKY + 17 Lab = 372 PASS/0 SKIP; Astro 45 archivos/0 diagnósticos y TS7 PASS según dossier de integración; no confundir con una ejecución nueva de esta revisión documental |
-| Producción SKY demostrada | 126 PNG y SVG byte-idénticos a la comparación completa previa; 11.096 instancias/1.196 campos. Run con copy nuevo `6f287c46-574a-49a3-9351-51fc259f9f1e`, fotografía histórica, cero proveedores; no aprobación comercial |
-| QA local v6 | TS7 PASS, Astro 47 archivos/0 diagnósticos, 17 tests Lab, cuatro gates y 16 recorridos browser; 298 archivos no UI exactos frente a v5 |
-| Lab SKY protegido v6 | Deployment `dpl_139Fyz3vV85jfHBHXw7CNuMqAE2d` READY/production; build `0b815c5e7ee07a56a24d24d1e4962ad378a235726325138105098daa250118e2`, 310 archivos/5 WOFF2 host OFL/0 fonts privadas. Alias `creative-workbench-sky.vercel.app` promovido y asignado; 29 archivos remotos SHA exactos, seis respuestas autenticadas exactas y cuatro anónimas 302. Protección `all` sin ampliar acceso; menú familia/tokens comprobados en navegador sobre el alias |
-| Dominio institucional | `creative.efeonce.org` es destino previsto. No resuelve DNS desde la máquina en el corte; falta conexión/TLS/protección/readback, no anunciarlo operativo |
-
-Lab vigente: biblioteca cliente con títulos funcionales, shell lateral, una superficie por
-tarea y cards de entidad; interiores planos, mesa opción 2 y motion localizado sin entradas
-por card. Familias/colecciones usan el mismo popover host con teclado/reset/fallback nativo.
-Ver [contrato completo](lab.md) y [selectores](lab.md#selectores-y-desplegables); dossiers
-privados `2026-10-01-workbench-main-integration`, `2026-10-01-workbench-vercel-premium-v5`
-y `2026-10-01-workbench-filter-selects-v6` en el canon local de operations.
-
-Disponibilidad actual de código: receta/planes → jobs explícitos → validación/lote → runs y QA →
-revisión de PNG → selección y snapshot Lab. No necesita editor visual ni activar IA para componer.
-Usar [flujo de agentes](agent-production.md), [SKY](sky-production.md),
-[autónomos](autonomous-components.md) y [Lab](lab.md) según el paso.
-
-### Extensión local de íconos — 2026-10-01
-
-Sobre integración de PR17, la fuente adicional SKY está importada/componentizada:
-101 familias, 1.919 variantes exactas y 303 originales/alternativas; 2.222 SVG.
-1.200 exports directos y 1.022 proyecciones REST; comparación técnica de 1.200
-controles PASS, sin controles SVG directos de los restantes. CLI/API readonly,
-`kind`/canvas obligatorios, SHA/IDs propios, sin default/cross-brand/recolor.
-`/iconos/` queda enlazada desde Recursos/sidebar Efeonce, con búsqueda, filtros,
-descargas, selector y fallback HTML. Fuente y flujo completos en [íconos](icons.md).
-
-Snapshot local `97833101dac0cd43824982f2ffea9605dc01d12e78282f4ebc7955a462b0bfe2`,
-2.537 archivos, cero fuentes licenciadas; QA Workbench registra 20 tests Lab, tres
-componentes, cuatro Python, cuatro gates, TS7/Astro y browser desktop/móvil.
-Preview fechado 49732 y QA `docs/ui/reviews/workbench-sky-icons-2026-10-01.md`.
-Commit local Workbench `af6f5e273249f8902c9bae8fb0334667b3cc23dc` en
-`codex/workbench-docs-consolidation`; no acredita push/merge/CI remoto/deploy
-de esta unidad. La publicación v6 anterior no la contiene por inferencia.
-La colección permanece `imported-source-candidate`, `productionAdmitted: false`;
-no cambia jobs, pack, 108 tokens, 126 adaptaciones ni Packages.
-
-### Pendientes vigentes y siguiente evidencia
-
-- **Íconos nuevos:** commit local registrado arriba; push/CI/deploy/readback
-  son pasos posteriores. Para campaña, maintainer admite recurso y placement propios
-  en revisión del pack/receta y revisa nueva corrida; no ampliar el activador de fuentes
-  ni transportar SVG/path/URL libres en jobs. Ver [íconos](icons.md).
-- **IA/broker:** el último estado fechado continúa IA OFF; no hubo deploy monetario por PR15/16/17.
-  Refrescar revisión/tráfico/policy, demostrar techos/cotizaciones/reservas y hacer canary autorizado
-  antes de anunciar generación operativa. 50 USD/persona y 500 USD/organización por mes UTC,
-  ampliables por decisión explícita del operador; límites aprobados no autorizan un pago.
-- **Acceso de equipo/Efeonce ID:** TASK-1952 diferida, reusar Efeonce ID. No crear OAuth/AUTH propio
-  ni inferir bindings de correos; canary del operador no acredita al equipo. Git identity es aparte.
-- **Packages:** registro GitHub Packages leído el 2026-10-01: tokens/assets/contracts sólo tienen
-  0.1.0 publicada el 29/09. `sky-creative-contracts@0.2.0` quedó preparado/verificado localmente,
-  no publicado. Verificar el registro antes de distribuir otra versión; no cambiar sellos del pack.
-- **Fotografía/campañas nuevas:** nueva foto con guards sólo fue fixture en la unidad autónoma.
-  La fotografía histórica y las cuatro muestras antiguas no son nuevas ofertas aprobadas. Validar
-  reservas/contraste/crop y aprobación comercial por formato/run; renovar selección con nuevos UUID.
-- **Otras marcas y operación global:** SKY es el primer driver; admitir packs propios y canaries,
-  completar onboarding individual y certificar recuperación/retención donde aún no hay evidencia.
-- **Aceptación/publicación:** premium integral v5 con selectores v6 tiene QA técnico y publicación
-  protegida; no atribuir aceptación visual del operador,
-  entrega al cliente ni dominio institucional a tests/merge. La comparación Figma de 126/126 sí
-  está cerrada técnicamente: no volver a declarar 121 referencias faltantes.
-
-### Cómo leer la historia preservada
-
-Todos los cortes siguientes registran lo observado en su momento. «Sin merge», «main96eab1e»,
-«11 managed-drift», previews 49615/49616/49617, v3/v4, despliegue v5, «PR246 draft»,
-«cinco controles/121 pendientes» y propuestas OAuth propias
-quedaron supersedidos donde este corte lo indica; no repetirlos como instrucciones vigentes.
-Conservar hashes, rechazos, outcomes y evidencias privadas originales sin reescribirlos.
-
-## Histórico de entrega: identidad Git — 2026-10-01
+## Identidad Git — corrección persistente 2026-10-01
 
 El operador exigió resolver los rechazos recurrentes por autor Git. Mac: include condicional
 para efeoncepro HTTPS/SSH con noreply propio, Git user.useConfigOnly=true y clones existentes
@@ -117,7 +21,7 @@ SKIP exactos (56+2 archivos). Skills commiteadas/pusheadas en
 [PR246 draft Greenhouse](https://github.com/efeoncepro/greenhouse-eo/pull/246), base develop.
 Ambos PR abiertos, sin merge ni nueva publicación de Packages/producción. Shared Lab WIP preservado.
 
-## Histórico de preparación: componentes autónomos — 2026-10-01
+## Componentes autónomos — unidad local 2026-10-01
 
 Goal autorizado: completar componentización/tokenización SKY en Workbench. Rama
 `codex/sky-autonomous-components` desde main PR14 `be57032`; contrato y manual propios allí.
@@ -138,17 +42,7 @@ Contratos 0.2.0 preparados localmente (compiler/bindings/tokens), no publicados.
 Código commiteado y pusheado en `1d48c26`; [PR15 draft](https://github.com/efeoncepro/creative-workbench/pull/15)
 abierto sobre main. No merge, Packages, broker, Efeonce ID ni UI nuevos de esta unidad.
 La apertura del PR no confirma CI ni publicación Vercel; verificar sus estados live.
-No sobreescribir WIP de UI v3 ni interpretar la prueba como campaña lista para entregar.
-
-## Histórico: UI local v3 — 2026-10-01
-
-Corrección integral de superficies autorizada: shell, paneles, cards, RecipeDialog,
-tokens/Metric/recursos y coreografía; ver [lab.md](lab.md), sección v3. Preview 49617,
-digest `1c71d3bc88826327ed288dbd1e8d653f30da7abb3b9711deab306a2e4beef2a5`;
-QA actual en `creative-workbench/docs/ui/reviews/workbench-surfaces-v3-qa.md`.
-Checks de UI y browser local verificados; 296 recursos preservados. Gate general
-mantiene 11 managed-drift anteriores. Sin commit/push/deploy de esta unidad.
-Este corte no modifica el baseline de producción/motor descrito abajo.
+No interpretar la prueba como campaña lista para entregar ni sobreescribir WIP ajeno del Lab.
 
 ## Exportación REST independiente completa — 2026-09-30 (Chile)
 
@@ -172,7 +66,7 @@ Los cortes inferiores «PNG incompleto» son historia. Comparación visual indiv
 aprobación comercial y actualización del Lab NO se cierran por descargar los PNG.
 No cambió pack, broker, IA, Packages ni Vercel. No certificar push de este corte local.
 
-## Histórico: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
+## Corte vigente: lotes de agentes y círculos nativos integrados — 2026-09-30 (Chile)
 
 Workbench [PR 11](https://github.com/efeoncepro/creative-workbench/pull/11) está mergeado en
 `b8e944dd3e8b6717a7690cfb705a3d2820156b5d`. [PR 12](https://github.com/efeoncepro/creative-workbench/pull/12)
@@ -267,7 +161,7 @@ de este candidato; no habilitan pagos ni certifican toda la matriz de controles 
 | Authorization legacy solo / junto al header propio | 400 / 400 |
 | Bearer GitHub falso | 400 |
 | Body con otro ID | 400 |
-| Validate SKY | 200, providerInvocations 0 |
+| Validate SKY | 200, providerInvocations0 |
 | Execute con IA OFF | 400, sin paid call |
 
 **Primer mint real medido:** audit/readback de cuatro tokens, GET de scope para cada uno con
@@ -449,7 +343,7 @@ y `docs/operations/HARNESS_STATUS.md`. Unidad 6 cerrada en Git/main/CI; objetivo
 Continuar admisión semántica, minting/binding/transporte, cotizaciones, runtime y comparación
 Figma completa por sus carriles propios, con pruebas y readback antes de habilitar IA.
 
-## Histórico: transición fusionada 244 → 3 → 4 — 2026-09-30
+## Estado vigente · transición fusionada 244 → 3 → 4 — 2026-09-30
 
 Este bloque supersede «PR 3 abierto/draft», «sin merge», «transición sin publicar» y la
 reautenticación pendiente y «PR 4 abierto» descritos anteriormente. Los bloques inferiores conservan historia
@@ -647,7 +541,7 @@ Doce corridas anteriores de texto/artwork archivadas remotamente y releídas por
 Fuente de evidencia: Workbench `docs/audits/sky-native-archives-2026-09-30.json`.
 Las seis corridas modulares tienen archivo privado local, no afirmar nuevo archivo GCS.
 
-## Histórico: pendientes del arranque, supersedidos por el corte consolidado
+## Pendientes concretos
 
 | Pendiente | Próximo paso y evidencia necesaria |
 | --- | --- |
@@ -758,175 +652,3 @@ las cuatro muestras de producción antiguas como corridas originales. Audit
 a81b8a2a81f4814bccbb170f9b00de5513e2df63917f76bd643258a5123a45a7, privados
 en `comparison-final-02` del canon SKY. Registro completo en HARNESS_STATUS; un
 cambio local no implica push, merge, Packages o publicación en creative.efeonce.org.
-
-
-### Biblioteca del cliente y disclosures v4 — 2026-10-01
-
-El operador precisó que SKY es cliente del Design System Lab de Efeonce, no un sitio de
-la aerolínea. Dirección/QA actuales en creative-workbench:
-`docs/ui/visual-directions/workbench-client-library-v4.md` y
-`docs/ui/reviews/workbench-client-library-v4-qa.md`. v2/v3 ampliaron el shell general;
-la opción 2 conserva la mesa de tres regiones. No reclamar fidelidad literal al mock ni
-inventar variantes de otras recetas para replicarlo.
-
-Títulos funcionales y details nativo con `.disclosure-body` explícito, incluidos los
-campos/fuentes/Más zonas dinámicos. Cabecera/chevron con inset, interior suave, registros,
-metadatos y acciones de 44 px. Móvil reduce capas redundantes. No envolver con JS ni
-perder fallback/teclado; preservar originales y relaciones reales.
-Preview local 49617, digest `891eeb3743bfab8971a6eec6b6935045993ce04fdd8fcfc6cf8d8a0f19817f19`.
-296 recursos idénticos a v3; 45 Astro files sin diagnósticos, TypeScript y 17 tests passed.
-QA local no acredita aceptación del operador/publicación. Sin commit/push/CI/deploy;
-no bypass, sync total ni CLIs Greenhouse. El gate general previo sigue separado.
-
-### Equilibrio de superficies v5 — 2026-10-01
-
-V4 fue cuestionada por el operador por cards sucesivas. Criterio vigente: panel de tarea
-+ entidad cuando hay decisión propia; cuerpos, fuentes y registros internos planos con
-espacio y reglas. Recetas/resources/inspector/tokens/guía corregidos; tipografía conserva
-specimens. No reintroducir fondos/bordes/radios por dato. Bibliotecas sin entradas por
-card ni refresh global de motion al abrir details; coreografía sólo escena original.
-Opción 2 conserva tres regiones. Preview 49617, digest `12ed9ba1da11e0c0b5399c914c92c494055347cdb332ef2a6dfc5ab50603798e`.
-QA en `docs/ui/reviews/workbench-surface-economy-v5-qa.md`; dirección homónima bajo
-`docs/ui/visual-directions/`. Desktop/móvil, reduced y fallback sin JS verificados;
-Astro/TypeScript y 17 pruebas pasan; 298 archivos no código iguales a v4. No aceptación
-visual del operador acreditada, ni commit/push/deploy. V4 es historia, no criterio vigente.
-
-### Publicación de la modernización en main — 2026-10-01
-
-El operador autorizó main. PR 16 fusionado por squash, main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
-readback GitHub y ls-remote comprobados; árbol igual al head probado b77031d. Integración
-sobre 2392758 mediante unidad UI ecf0b15, no historia vieja completa. Constructor conserva
-native-previews y projection por SHA, excluyentes, con regresión. Gate drift viejo resuelto
-por la base vigente, sin editar sello. Gates, harness y Lab CI postmerge SUCCESS
-(36846606818/36846606907): harness 320 PASS/28 SKIP, SKY 5 PASS/2 SKIP, Lab 17 PASS,
-total público 342 PASS/30 SKIP, cero fallos. Deployment GitHub Production `6781523756`
-success para c3e85b6 es evidencia del flujo automático, separado del snapshot SKY. Local: 348 harness +7 SKY, cero omisiones privadas; 17 Lab,
-Astro45/0 y TypeScript. Build335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985,
-285 imágenes/previews/fonts intactos. Preview49617 ahora sirve esa integración.
-Worktree aislado /Users/jreye/Documents/creative-workbench-lab-main, rama codex/lab-premium-main;
-checkout original y WIP fotográfico intactos. Evidencia privada en canon operations/
-2026-10-01-workbench-main-integration. Código main y CI verificados; estado Vercel SUCCESS
-leído, pero no reclamar un snapshot nuevo del sitio ni broker/paquetes publicados por eso.
-
-
-### SKY premium v5 publicado en Vercel — 2026-10-01
-
-Publicado el snapshot revisado de main `c3e85b6cb1927fdeb13fea9aeddbdfbefc857852`,
-build `335e56a10c11833951de2055135c072c58ad9e89795303f436b47a78a8c97985`, en el proyecto
-SKY `prj_7D9AODtfOOEf1su21wqyQASOdzOc` del scope `efeonce-7670142f`.
-Deployment `dpl_2sJFNXzxEdVFBykzKsnbtQVqr56x` READY/production, promovido y alias corto
-asignado explícitamente: https://creative-workbench-sky.vercel.app.
-
-Readback de 28 archivos remotos coincide por SHA con el snapshot local (cinco páginas,
-CSS/JS, catálogos, cinco WOFF2 host OFL y artwork seleccionado). Después de promover,
-seis respuestas autenticadas en deployment y alias estable coinciden por bytes; ocho
-requests anónimos a raíz/manifest/PNG/WOFF2 devuelven 302. Protección `all` verificada;
-no se desprotege el visor ni se amplía acceso. La URL localhost anterior era sólo local.
-
-Evidencia privada: `/Users/jreye/Documents/creative/creative-workbench-canon/operations/2026-10-01-workbench-vercel-premium-v5`.
-Publicación del Lab únicamente; sin cambio de broker, paquetes ni aprobación comercial SKY.
-
-
-### Publicación verificada de selectores v6 — 2026-10-01
-
-PR 17 fusionado en main `7e4c6177992785c02430dd238c267991e097c4c9`; tree idéntico
-al head revisado `2b0bf8bd7fbd0eb69701827e958e2573269e60d2`. Checks postmerge gates,
-native-harness y lab-checks completed/success. Snapshot `0b815c5e7ee07a56a24d24d1e4962ad378a235726325138105098daa250118e2`,
-310 archivos, 5 WOFF2 host OFL y cero fuentes privadas. Deployment SKY
-`dpl_139Fyz3vV85jfHBHXw7CNuMqAE2d` READY/production, source main exacto en metadata.
-Promoción y asignación explícita de https://creative-workbench-sky.vercel.app verificadas.
-
-29 archivos críticos remotos coinciden por SHA, incluidas las cinco páginas y
-CSS/JS de selectores. Después de promover, seis respuestas autenticadas (raíz,
-tokens y CSS) en deployment/alias son idénticas; cuatro anónimas dan 302 y protección
-all permanece. Navegador en el alias Vercel: ambos menús abiertos capturados; Always On
-filtra a 7, reset vuelve a 126, cuatro opciones de tokens y consola limpia.
-Capturas `families-vercel-desktop.png` y `tokens-vercel-desktop.png`, readbacks y
-checks en el dossier privado `2026-10-01-workbench-filter-selects-v6` del canon local.
-16 recorridos interactivos locales desktop/móvil/reduced/no-JS respaldan el contrato.
-No se infiere aceptación visual del operador. Sin cambios de broker/paquetes/pack.
-
-### Reglas SKY de la diseñadora + siete Calama — 2026-10-01, local
-
-En /private/tmp/cw-sky-production-flow, rama codex/lab-efeonce-favicon, extensión nativa content-layout designer-rules@1.0.0: centrado por tinta, precio Metric Black, condiciones sentence case, badge proporcional, origen reflow y tarifa/condiciones contenidas en flecha. 104 fuentes fijadas con cobertura por elemento; packs/FIG/assets originales intactos. Contrato docs/architecture/workbench-sky-designer-content-rules.md, sin fallback de geometría o reducción de fuente.
-
-Siete Calama desde Santiago/$999.999/tasas incluidas, más siete Buenos Aires anteriores corregidas. Producción con autoridad viva, cero providers. Fotografías históricas ilustrativas, datos de prueba y ninguna aprobación comercial. Corridas/selección propias de cada proyecto, PDF ocho páginas/campaña, 7 PNG + 7 SVG y ZIP. Revisados visualmente ambos documentos. Canon privado /Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-10-01/calama-reglas-diseno y buenos-aires-prueba-v3; versiones previas preservadas.
-
-Harness privado 362/362 sin skips y cuatro gates PASS. Diagnóstico copy histórico 123/126: dos URLs partidas y una condición demasiado larga rechazadas; siete jobs Calama completos sí pasan. No afirmar revisión visual completa de 126 ni admisión de copy arbitrario. Skills mirrors validadas. Código local; no commit/push/deploy de esta extensión. No ejecutar/alterar CLIs Greenhouse.
-
-## SKY — 24 adaptaciones y badges tarifarios — 2026-10-01, local
-
-Receta content-layout designer-rules@1.1.0: condiciones compactas centradas en una línea, con tamaño fijo por formato (12/10/8 px), sin autofit por longitud. El paint efectivo se toma del precio sellado para conservar contraste sobre la flecha. Las dobles monedas respetan orientación y contenedor nativo; QA verifica separación de tinta. Badges tarifarios adaptativos: 42 ofertas simples más 16 Tags adicionales fijados por fuente; ancho por tinta y padding, altura preservada y centrado real. En 3638, DESDE pasa de 121 a 55,8 px de ancho manteniendo altura 24 px. Packs, FIG, fotografías y fuentes originales intactos.
-
-24 piezas seleccionadas de 24 variantes fuente, ocho dimensiones y datos explícitos ficticios; autoridad viva y cero providers. Proyecto projects/sky/prueba-modular-24-adaptaciones, recetas/jobs/locks/outcomes/QA y selección reproducible. Canon privado /Users/jreye/Documents/creative/creative-workbench-canon/sky-airline/2026-10-01/prueba-modular-24: PDF A4 de 25 páginas, HTML autocontenido, 24 PNG + 24 SVG y ZIP. Revisión visual de las 24 piezas y las 25 páginas rasterizadas del PDF; surround oscuro preservado. Fotografías históricas ilustrativas, no aprobación comercial.
-
-Harness privado 366/366 PASS, cero skips, 58 archivos; cuatro gates PASS. Skills Codex/Claude espejadas y validadas. Extensión local sin commit/push/deploy, sin publicación de paquete ni ejecución/alteración de CLIs Greenhouse. Las corridas previas permanecen inmutables; receipts.json selecciona los outcomes finales y preserva sus locks particulares.
-
-## SKY — promociones en flecha alineadas a la izquierda — 2026-10-01, local
-
-Feedback del operador: el titular del20% debe seguir el eje de la referencia50%. Causa corregida: promotion-sticker incluía bloques editoriales a los que se aplicaba CENTER. Receta content-layout designer-rules@1.2.0 distingue seis fuentes3032/3040/3051/3059/3070/3078: todas las líneas del titular y condiciones alineadas por tinta al eje izquierdo nativo del badge HASTA, con texto del badge centrado dentro. Geometría, tamaño y tipografía nativos preservados; QA promotion-arrow-left-axis y clipping final obligatorios. Packs/FIG/fuentes históricos intactos.
-
-Regeneradas09-3032 (ea7067ad-4b57-49d8-93fd-ad3e7aa9c755) y10-3059 (3bb0f914-1652-4a9e-be81-88dfc77c451a), identidad viva, cero providers. Las otras22 piezas seleccionadas conservan sus bytes; corridas y documento anterior intactos. Revisión visual de ambos PNG, portada y páginas10/11 del PDF nuevo. PDF25 páginas con QA de geometría/fuentes/imágenes en todas; canon privado sky-airline/2026-10-01/prueba-modular-24-v2.
-
-Harness privado367/367 PASS, cero skips/58 archivos; cuatro gates PASS. Skills Codex/Claude byte-equivalentes (18 archivos,256links) y diff sin whitespaceerrors. Local, sin commit/push/deploy ni aprobación comercial. No ejecutar/alterar CLIs Greenhouse.
-
-## Histórico técnico: destinos adaptativos y feedback PDF — 2026-10-01, local
-
-Content-layout1.3.0 sustituye CENTER por LEFT para169 campos legales de 104 fuentes; condiciones compactas siguen tamaños fijos 12/10/8 px y una línea. Destino content-flow1.0.0 admite95 fuentes: tamaños Metric finitos, dos líneas por palabras, origen/precio por tinta y banda limitada, banners centrados y panel blanco refluido. Fotos, ventanas, logo, CTA, fidelidad y servicios conservan posición. El PDF Mesa de trabajo2 copia2 aporta los tres criterios; no contiene lógica ejecutable. Leer [destinos y espacios](destination-content-flow.md) y el contrato en Workbench.
-
-Verificación:377/377 harness privado PASS sin skips (59 archivos),10/10 suite SKY y cuatro gates PASS. Regresiones propias25/25: short/long/acento, fuente/sello ajeno, overflow explícito, ventanas/fotos fijas, legales por línea y footer preservado. Inventario CI explícito:53 casos licenciados en ambas suites, sin afirmar ejecución de public mode.
-
-24/24 corridas nuevas completadas con autoridad real, cero providers; selecciones previas/runs/documentos inmutables. Export v3:24 PNG+24 SVG coinciden con outcomes; ZIP48 originales. PDF25 páginas A4, fuentes listas/imágenes decodificadas, mínimo margen cuerpo-footer75,9375 px. Revisado contacto24, detalles de destino/panel y páginas12/15 del PDF real. Matriz adicional de9 renders de diagnóstico: Calama/Buenos Aires/San Pedro de Atacama en banner/fidelidad/servicios; no son recibos productivos. Canon privado: sky-airline/2026-10-01/prueba-modular-24-v3. Sin commit/push/deploy ni aprobación comercial. CLIs de Greenhouse intactas.
-
-
-## Histórico: feedback visual diferido antes de la continuación autorizada — 2026-10-01
-
-El operador pidió actualizar docs/skills con subagentes ahora y corregir en otro chat.
-[Handoff de alineación](layout-feedback-handoff.md) y el canon Workbench
-`docs/operations/sky-layout-feedback-handoff-2026-10-01.md` gobiernan la continuación.
-LEFT global de legales ya no es la regla visual aprobada: centrar los pies señalados,
-separar footer/condiciones/cláusulas/ejes editoriales y fijar cada decisión por source pin.
-La implementación 1.3.0 sigue forzando LEFT; no se corrigió código ni se regeneraron piezas
-por registrar este feedback. No deducir CENTER global para todos los contenidos.
-
-Casos: 03-2668 hueco entre destino/origen y pie legal;01-2611 badge DESDE y eje de la
-pila precio/condiciones;23-4685 conjunto HASTA/5%/DE DCTO./CTA y relación con destino.
-El PDF v3 está parcial/rechazado en estos aspectos. Los 377 tests/gates anteriores son
-evidencia técnica histórica, no aceptación visual. Preservar v1/v2/v3, locks, outcomes,
-corridas y selección para comparaciones posteriores, sin declarar nueva entrega corregida.
-
-Documentación únicamente; sin commit/push/deploy ni comprobación nueva de runtime.
-Greenhouse sólo contiene la skill espejo; sus CLIs y el resto del WIP permanecen intactos.
-
-## Corte final vigente: TODOS los badges de tarifa LEFT — 2026-10-01, local
-
-**Status real: implementación y verificación local completas; aceptación visual del operador pendiente.**
-Contenido 1.5.0 / destino 1.2.0: 76 badges tarifarios = 42 pilas simples + 34 Tags complejos/dobles.
-Incluye 18 IDA Y VUELTA DESDE antes catalogados como other-copy; barrido de las 126 fuentes,
-sin DESDE tarifario sin admisión. Cápsulas LEFT con label centrado dentro, offsets de precio y
-orientación de dobles conservados. [Componentes](components.md), [destinos](destination-content-flow.md)
-y [handoff/cierre](layout-feedback-handoff.md) contienen el contrato y sus límites actuales.
-
-Evidencia previa al commit en el canon privado `sky-airline/2026-10-01/layout-feedback-correction-v6/`:
-
-- `final-review.json`: 384/384 harness, 10/10 SKY, cuatro gates PASS; atlas 76 y matriz 13 revisados.
-- `selection-and-immutability-verification.json`: 14 runs nuevos, 24 selecciones/output hashes
-  verificados, cero proveedores y 2.310 archivos anteriores inmutables. Contra v5 cambian 13 PNG;
-  contra v3 cambian 15. Jobs/copy, recursos, v3/v4/v5 y outcomes previos preservados.
-- `fare-badge-catalog-coverage.json`: cobertura completa de badges en las 126 fuentes.
-- `prueba-modular-24-v6/`: PDF/HTML de 25 páginas A4, 24 PNG + 24 SVG y ZIP de 48 originales.
-  PDF real revisado en contacto completo y páginas 4/14/17/18/19/21; fuentes listas, imágenes
-  decodificadas y clearance mínimo cuerpo/footer 75,9375 px. PDF SHA
-  `489244b17e7979c475ce353e22f345c05d93de8b77098b4859667c5c49fc0113`.
-
-Canon técnico y registro detallado: Workbench `docs/audits/sky-layout-feedback-correction-2026-10-01.md`.
-No duplicar aquí la tabla de UUIDs; los receipts de la pieza y la auditoría conservan sus vínculos.
-Copy ficticio y fotografía source-reference, sin aprobación comercial. Pendiente visual: revisar v6.
-El operador autorizó después subagentes, actualización de docs/skills y commit local; evidencia de
-commit, push y deploy se registra por separado. No editar el snapshot `git.commit: false` para
-simular un commit posterior. No hay cambio de arquitectura del host, de autoridad, auth/infra ni pack.
-
-Esta revisión sincroniza todas las referencias de la skill afectadas y conserva ambos bundles byte
-a byte. Ejecutar `scripts/validate.py` después de la última edición para el conteo vigente de archivos
-y enlaces; el snapshot previo de 20 archivos/298 enlaces sigue siendo histórico. Preservar el WIP
-concurrente en `ai-generations/` y el resto de las skills; no ejecutar/alterar CLIs Greenhouse.
