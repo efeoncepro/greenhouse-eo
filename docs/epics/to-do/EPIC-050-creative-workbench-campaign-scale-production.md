@@ -180,7 +180,15 @@ Consecuencias para el programa:
   formatos y las retículas, caso Berel), validada contra piezas entregadas de referencia y aprobada por la
   diseñadora. Leer las mesas de trabajo de los `.ai` (tamaños, retículas) es un insumo, no un requisito.
 - **Licencia tipográfica:** la institucional es **Gotham Rounded** (comercial) y la complementaria Arial
-  Rounded. Igual que Metric en SKY, sus binarios no se distribuyen al equipo ni a buckets sin confirmar la
-  licencia; corresponde al onboarding de la marca (TASK-1945, criterio de TASK-1946).
+  Rounded. El operador confirmó el 2026-10-02 que **Efeonce tiene licencia de Gotham Rounded**. Al admitirla
+  en el pack de Berel hay que adjuntar la evidencia de licencia (documento y alcance de usuarios) y, como con
+  Metric, no publicarla en buckets compartidos ni paquetes que salgan del equipo (TASK-1945).
 - **Referencia visual sellada:** las piezas de `04_Entregables` (agosto en adelante, nomenclatura estable)
   sirven como base de regresión del adaptador declarado: la composición nativa debe reproducir su estructura.
+
+## Delta 2026-10-02 — equipo de diseño Berel
+
+- Hoy diseñan las piezas de Berel **Daniela, Andrés y Melkin**. Son quienes deben aprobar la receta
+  declarada del adaptador Berel (TASK-1955) y la revisión de su regresión contra los entregables de referencia.
+- Pendiente con ellos: confirmar si `Guia de infografías y Formatos.ai` y `Reticulas CHIP.ai` son la
+  referencia vigente o si hay versiones posteriores.
