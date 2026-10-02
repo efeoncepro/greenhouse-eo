@@ -486,6 +486,12 @@ const main = async () => {
     throw new Error('--mask requires --image: the mask marks the area to edit on a base image.')
   }
 
+  // GPT Image redibuja la imagen entera aunque reciba la máscara (medido 2026-09-17: delta máximo 221/255 en la zona
+  // protegida). Este comando no recompone ni verifica; el pipeline que sí lo hace es `pnpm ai:inpaint image` (TASK-1965).
+  if (args.mask) {
+    console.error('  ⚠ --mask indica dónde editar, pero este comando NO recompone ni verifica la zona protegida. Para una pieza final usa pnpm ai:inpaint image (garantiza delta 0 fuera de la máscara).')
+  }
+
   // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,
   // protegida del garbage collector). Tiene prioridad sobre --out-dir.
   const conceptLoop = args.concept ? slugify(args.concept) : null
