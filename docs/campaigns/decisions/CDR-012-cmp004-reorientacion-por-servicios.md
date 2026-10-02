@@ -23,11 +23,11 @@ Los pilotos R01–R04 de CMP-004 no generaban impacto para el operador («necesi
 | S03 | Campaign & Key Visual Systems | ¿En cuántos formatos funciona tu idea? · En todos | 2 |
 | S04 | Audiovisual, Motion & Audio | ¿Qué cabe en seis segundos? · Cada detalle | 2 |
 | S05 | Run & Gun Production | ¿Contenido para todo el mes? · En un día | 3 |
-| S06 | Content & Social Operations | ¿Quién cuida tu conversación? · Personas | 2 |
+| S06 | Content Production System, desde la agencia creativa | ¿Contenido que se publica o que se mira? · Que se mira | 2 |
 | S07 | Managed Creative Capacity | ¿Más piezas, mismo estándar? · Mismo criterio | 1 |
 | S08 | AI Creative Operations | ¿Producción con IA? · Marca intacta | 1 |
 
-Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí.
+Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí. **Ajustes del operador del 2026-10-02 sobre los pilotos:** S06 vende contenido desde la agencia creativa (community management va por otro carril); S08 cambia de premisa a escalar producción con IA sin perder consistencia de marca; S02 y S03 cambian de escena para expresar mejor el texto.
 
 ## 4. Evidencia
 
