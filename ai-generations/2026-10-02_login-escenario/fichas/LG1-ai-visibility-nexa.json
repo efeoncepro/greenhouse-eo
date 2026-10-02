@@ -1,0 +1,51 @@
+{
+  "id": "LG1-ai-visibility-nexa",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "conviccion"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "suspendido": "a falling storm of thousands of thin dark glass answer cards FROZEN mid-fall around and behind her on the right, stopped at 1/8000 s with not a trace of motion blur; the shutter freezes them, the lens does not focus them all: only the cards within arm's reach of her are crisp, the ones deeper in the hangar soften progressively with distance and the farthest melt into the haze; tiny dust motes and a few glass shards hang motionless inside the beam",
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, freeze-frame at 1/8000 s, the instant the storm stops, a vast dark hangar at night): Nexa stands well to the RIGHT of the frame, her face just right of the centre of the frame, her nose at about 62 % of the width and at about one third of the frame height; between the left edge of the frame and her raised hand there is a wide band of empty darkness; the outer fifth of the frame on each side holds only haze, the far storm and bokeh: no part of her, of the Spark, of the beam or of the caught card reaches it, framed from the waist up, a heroic medium shot. All around and behind her on the right, a storm of THOUSANDS of thin dark glass answer cards is falling from the darkness above, FROZEN mid-fall, every card perfectly still in the air, anonymous and barely lit, like every answer nobody reads. From far above, ONE narrow volumetric azure-blue (#0375DB) beam cuts straight down through the haze and lands on her raised right hand (on the left side of her body in the frame, held at chest height about 35 cm in front of her face): between her index and middle finger she has just CAUGHT one single card out of the storm, and that card blazes brilliant azure-white, the brightest thing in the frame, casting hard light up onto her face, her glasses and her right shoulder plate (on the left of the frame); her chest plate with the small isotype, turned away from the card, stays in soft shadow, white and never washed azure. Her whole right forearm is visible from elbow to fingertips; her left arm hangs relaxed at her side, its hand hidden below the console edge. The Research Spark is PERCHED ON HER LEFT SHOULDER (on the right side of the frame), its little hands resting on her shoulder plate, its LED eyes turned down toward the caught card, its magnifying glass held beside its own body and never in front of her face, lit softly from below by the card, sharp. It is the ONLY robot in the frame: no other Spark, drone or figure anywhere in the hangar. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate exactly as in the reference and the macro (no other logo, no lettering), the bionic glasses exactly as in their reference, small gold earrings, NO watch, NO bracelet, NO ring. She looks straight into the lens through her clear glasses with calm conviction, both eyes and both eyebrows visible, razor-thin focus on her eyes. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm at f/1.8, her head about one quarter of the frame height, shoulders clearly wider than two head-widths. Her face stays well clear of the beam and of the caught card: the card sits below and to the left of her chin. GEOGRAPHY: the beam, the caught card, her hand, every falling card that catches any spill of light and the Spark stay inside the RIGHT 58% of the frame; the LEFT 42% of the frame is calm, dark, empty hangar space with only faint haze; at most a few far, dim, out-of-focus cards in its upper half and none in its lower half; no beam, no lit object, no bokeh light. The lower-left quarter of the frame stays the darkest, quietest area of the picture. Deep navy blacks, enormous contrast, awe-inspiring. No logos of any other brand, no readable text on any card.",
+  "lecho": {
+    "objeto": "the near-black matte rubber edge of a launch console, the lens only a few centimetres behind it, filling the bottom sixth of the frame across its whole width, completely out of focus, with no reflections and no light reaching it",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty hangar space on the left half",
+      "tinta": "blanca"
+    }
+  },
+  "desde": "NX7d",
+  "alcance": "nexa",
+  "llave": {
+    "fuente": "the single blazing azure-white answer card she has just caught between her index and middle finger",
+    "lado": "below her chin and to the LEFT of her face in the frame (on her own right side)",
+    "distancia": "about 35 cm from her face"
+  },
+  "primerPlano": "two falling dark glass cards very close to the lens, low in the frame just right of the centre, in front of her waist, huge, soft and out of focus, cut by the bottom edge of the frame, frozen mid-fall",
+  "fondo": "a row of large cold practical lights far behind her in the hangar, only on the right half of the frame, melted into round bokeh, and the frozen card storm fading into the haze",
+  "fenomeno": {
+    "que": "one narrow azure-blue (#0375DB) beam falls from far above through the haze and stops ONE answer card out of a falling storm of thousands, the only lit card in the whole storm",
+    "esServicio": "AEO / AI Visibility Report: entre miles de respuestas, la IA te encuentra y te elige a ti"
+  }
+}

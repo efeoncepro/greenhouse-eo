@@ -36,6 +36,11 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
+const kenBurns = keyframes`
+  from { transform: scale(1.07); }
+  to { transform: scale(1); }
+`
+
 const rise = keyframes`
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: none; }
@@ -100,7 +105,7 @@ const LoginStage = ({ announcements, variant, onActiveLensChange }: LoginStagePr
 
   useEffect(() => {
     if (!onActiveLensChange) return
-    onActiveLensChange(active ? (active.kind === 'banner' ? null : (active.lens ?? LOGIN_STAGE_FALLBACK.lens)) : LOGIN_STAGE_FALLBACK.lens)
+    onActiveLensChange(active ? (active.kind === 'banner' ? null : active.lens) : LOGIN_STAGE_FALLBACK.lens)
   }, [active, onActiveLensChange])
   const progress = Math.min(100, (elapsed / LOGIN_CAROUSEL_INTERVAL_MS) * 100)
 
@@ -126,6 +131,23 @@ const LoginStage = ({ announcements, variant, onActiveLensChange }: LoginStagePr
           src={item.image.path}
           alt={item.image.alt}
           sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : item.image && !item.lens && item.id !== 'fallback' ? (
+        // Foto en registro cine: la luz de la escena ya es la órbita de la pieza y va una sola por pieza, así que
+        // no se dibuja la lente; la reserva oscura de la propia toma sostiene el texto.
+        <Box
+          component='img'
+          src={item.image.path}
+          alt={item.image.alt}
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            animation: isPanel ? `${kenBurns} 10s ${emphasized} both` : 'none',
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+          }}
         />
       ) : item.image ? (
         <LoginLens

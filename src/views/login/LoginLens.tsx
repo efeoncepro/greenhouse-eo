@@ -28,6 +28,7 @@ import type { LoginAnnouncementLens } from '@/lib/login-announcements/types'
  *   **sólo por ancho** (`lens.anatomy` × ancho / 794).
  * - El acento (arco y esfera) es el de la línea de servicio de la novedad, sobre fondo oscuro.
  *
+ * `lens.x`/`lens.y` son a la vez un punto de la foto y del escenario: `object-position` los hace coincidir.
  * El radio es una fracción del lado corto del escenario. La foto se recorta con CSS (`cqmin`, sin JS); la órbita se
  * dibuja en píxeles del escenario una vez medido, con `pathLength` sin `vector-effect` (combinados parten el arco).
  * Ningún elemento depende de su animación para verse (`animation-fill-mode: both`).
@@ -105,6 +106,9 @@ const LoginLens = ({ src, alt, lens: geometry, accent, drift = true }: LoginLens
     width: '100%',
     height: '100%',
     objectFit: 'cover',
+    // Ancla el punto (x, y) de la foto al mismo punto del escenario: con `cover` el recorte cambia según la proporción
+    // de la pantalla (1,06 a 1,5) y sin esto la lente se corría del sujeto.
+    objectPosition: origin,
     transformOrigin: origin
   } as const
 

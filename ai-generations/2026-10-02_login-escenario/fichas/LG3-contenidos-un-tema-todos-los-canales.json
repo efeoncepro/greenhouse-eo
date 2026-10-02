@@ -1,0 +1,27 @@
+{
+  "id": "LG3-contenidos-un-tema-todos-los-canales",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": [
+    "andres"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "polvo",
+  "suspendido": "a whole editorial content plan thrown into the air from the table — printed article pages, storyboard frames, index cards, a few instant photos and loose sticky notes — FROZEN mid-air in an upward burst, every sheet razor sharp and perfectly still, shot at 1/8000 s with a fast flash, not a trace of motion blur",
+  "escena": "SCENE (staged editorial photograph, freeze-frame at 1/8000 s, a real content studio in Santiago at dusk, warm wood table, NO fantasy, NO glowing effects): a content strategist wearing the deep navy EFEONCE BOMBER (deep navy, never royal blue) stands behind a long wooden editorial table, his face centred at about 58% of the frame width and at about one third of the frame height, framed from the waist up, camera about two meters away at chest height, 85mm f/2.8. He has just slapped both palms down on ONE printed master article lying on the table, and at that instant the whole content plan around it LEAPS into the air: printed article pages, storyboard frames of a short video, index cards with headlines, a few instant photos of a podcast mic and a camera, loose sticky notes — all FROZEN mid-air in an upward burst around his hands and shoulders, every sheet sharp and perfectly still, some catching the light. He looks straight into the lens with a quick, delighted grin, eyes sharp. The ONE color accent of the frame is TEAL (#36C8BF): the sticky notes and the cover of the master article are teal, nothing else is teal. Behind him on the right, a large studio monitor glows a plain azure-blue (#0375DB) screen with nothing on it, the cool light of the scene; a single warm practical desk lamp on the right lights his face and the flying pages from the side. His face, both hands and the burst of pages all fit inside a circle centred at about 58% of the width and one third of the height, with air around them; nothing important sits in the upper-left of that circle. The LEFT 40% of the frame and the lower-left quarter are calm: the dim end of the table and an unlit plain wall, no pages, no objects, no people. Natural white balance, no color grade, completely unbranded except his bomber.",
+  "lecho": {
+    "objeto": "the near, out-of-focus edge of the wooden table at the bottom of the frame, in shadow",
+    "tono": "DARK, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, unlit plain wall and the dim end of the table on the left 40% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}
