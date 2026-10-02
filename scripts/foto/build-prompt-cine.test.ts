@@ -6,7 +6,7 @@
 //    versión mínima que corre en CI.
 import { describe, expect, it } from 'vitest'
 
-import { ALCANCES_CINE, auditarCine, bloqueCine, construirPrompt, esObjetoPersonaje } from './build-prompt.mjs'
+import { AJUSTES_CINE, ALCANCES_CINE, ajustarParaCine, auditarCine, bloqueCine, construirPrompt, esObjetoPersonaje } from './build-prompt.mjs'
 
 const base = {
   id: 'cine-prueba',
@@ -46,7 +46,7 @@ describe('registro cine en la ficha', () => {
 
     expect(prompt).toContain('KEY LIGHT: a fist-sized core of azure light, below and to the right of her face, about 30 cm away.')
     expect(prompt).toContain('NO fill light, NO front light')
-    expect(prompt).toContain('DEPTH: in the immediate foreground, very close to the lens, the dark corner of the meeting table')
+    expect(prompt).toContain('DEPTH: in the immediate foreground, very close to the lens: the dark corner of the meeting table. It is soft and out of focus')
     expect(prompt).toContain('BACKGROUND: a row of large cold practical lights melted into bokeh.')
     expect(prompt).toContain('THE LIGHT PHENOMENON: one azure beam picks a single card out of thousands.')
     expect(prompt).toContain('matte and non-reflective, outside the reach of the key light')
@@ -101,5 +101,52 @@ describe('registro cine en la ficha', () => {
     expect(esObjetoPersonaje('codex')).toBe(true)
     expect(esObjetoPersonaje('polo-efeonce')).toBe(false)
     expect(esObjetoPersonaje('traje-bionico-nexa')).toBe(false)
+  })
+})
+
+// Prueba ciega del 2026-10-02: las tres sesiones salieron con la cara rellena y una con el fondo ámbar porque
+// los bloques compartidos piden «documentary», «shadows open», «real sunlight» y «warm-neutral».
+describe('bloques compartidos en cine', () => {
+  it('ninguna frase documental sobrevive en un prompt cine', () => {
+    const { prompt } = construirPrompt(completa)
+
+    for (const [de, a] of AJUSTES_CINE) {
+      expect(prompt).not.toContain(de)
+      if (prompt.includes(a.slice(0, 20))) expect(prompt).toContain(a)
+    }
+
+    expect(prompt).toContain('a real cinematic film still')
+    expect(prompt).toContain('white balance cool-neutral')
+    expect(prompt).toContain('never as a flat horizontal band')
+  })
+
+  it('fuera de cine los bloques quedan intactos', () => {
+    const { prompt } = construirPrompt(base)
+
+    expect(prompt).toContain('a real candid documentary photograph')
+    expect(prompt).toContain('shadows open')
+    expect(prompt).toContain('white balance warm-neutral')
+    expect(ajustarParaCine('sin frases')).toBe('sin frases')
+  })
+
+  it('en vertical también el fondo queda bajo el 36 %', () => {
+    expect(construirPrompt({ ...completa, formato: '9:16' }).prompt).toContain('Every background light and figure stays BELOW 36%')
+    expect(construirPrompt(completa).prompt).not.toContain('Every background light')
+  })
+
+  it('la sección partida 1:1 reserva la izquierda sólo si la ficha lo pide', () => {
+    const izquierda = construirPrompt({ ...completa, formato: '1:1', alcance: 'deck-seccion', reservas: { texto: { muro: 'the dark studio wall', tinta: 'blanca', lado: 'izquierda' } } }).prompt
+
+    expect(izquierda).toContain('the LEFT 40% of the frame is the dark studio wall')
+    expect(izquierda).not.toContain('the TOP 28%')
+
+    const arriba = { ...completa, formato: '1:1', alcance: 'deck-seccion', reservas: { texto: { muro: 'the dark studio wall', tinta: 'blanca' } } }
+
+    expect(construirPrompt(arriba).prompt).toContain('the TOP 28%')
+    expect(auditarCine(arriba).join('\n')).toContain('"lado": "izquierda"')
+  })
+
+  it('una ficha con __completar avisa', () => {
+    expect(auditarCine({ ...completa, __completar: ['llave'] }).join('\n')).toContain('__completar')
   })
 })

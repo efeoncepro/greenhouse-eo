@@ -118,6 +118,54 @@ y 19 de otros registros (ads de visibilidad, CMP-002 HubSpot, palancas). Sólo d
 `profundidad` y `llave` se imprimen como información, sin gate. Si algún día una métrica separa estos casos, entra
 como gate con su calibración en esta tabla.
 
+## Prueba ciega del 2026-10-02 — lo que aprendimos
+
+Tres sesiones nuevas, sin poder consultar, con un encargo real cada una y dos generaciones como tope
+(`ai-generations/2026-10-02_prueba-ciega-cine/`): A, sección partida 1:1 «Contenido que la IA cita»; B, propuesta
+HubSpot 16:9; C, destacado 9:16 «Agentes» con Nexa. **Las tres llegaron solas a un plate razonable** (≈ USD 0,10 a
+0,15 cada una) y las tres se dieron CORREGIR con la rúbrica del revisor, el mismo juicio que hizo la sesión de la
+línea gráfica al mirarlas. La falla común fue la misma: **la cara salió con relleno**.
+
+**La causa era del compilador, no de las sesiones**, y quedó corregida el mismo día (sólo en fichas cine; los
+demás registros siguen idénticos, regresión: 332 fichas, 0 no cine cambiadas):
+
+- Los bloques compartidos pedían «documentary», «shadows open», «real sunlight», «white balance warm-neutral»,
+  «a mug, a notebook», personas genéricas y una sombra «warm» en la reserva. En cine `foto:prompt` los reemplaza
+  (`AJUSTES_CINE`): película, sombras casi negras sin relleno, una sola fuente dura de lado, balance frío, nada
+  analógico, sólo las personas que la escena declara.
+- La llave pide ahora una cara **en dos tonos**: la mitad lejos de la llave cae casi a negro.
+- El lecho en cine ya no se pide como «abstract blur with no visible edges» (que es la banda de la falla 7): se pide
+  como una masa real con la lente a centímetros de su borde.
+- `primerPlano` se compila como un objeto **separado** del lecho.
+- En vertical, el `fondo` también queda bajo el 36 % (antes sólo el fenómeno).
+- Sección partida 1:1: `"reservas": { "texto": { "lado": "izquierda", … } }` compila la reserva a la izquierda.
+- `foto:cine:nueva` acepta `--formato` y `--alcance`; al cambiar el formato descarta las reservas de la receta.
+- `foto:prompt` avisa si la ficha todavía tiene `__completar`.
+
+**Tres fallas nuevas, con su corrección:**
+
+| # | Síntoma | Corrección | Caso |
+|---|---|---|---|
+| 11 | **Pedir un número no alcanza**: «cinco en total» dio seis | Ubicar cada figura por geografía: «ONE far on the left at chest height… ONE farther on the right» | C (AG1 → AG1b) |
+| 12 | **El sujeto se corre a la reserva** aunque la ficha pida «face at 70 %» | Anclar por geografía, no por porcentaje: «her left elbow is at about 58 % of the frame width; between the left edge and her body there is a wide band of empty darkness» | A, B |
+| 13 | **La llave de color tiñe el emblema** y lo aplana | Mirar el pecho con `foto:emblema`; si se lee teñido o estampado, la llave va de lado y no de frente al pecho | B (magenta) |
+
+**Lo que el medidor sigue sin ver y mira el revisor:** relleno en la cara, Sparks lejanos demasiado nítidos y la
+reserva lateral en 16:9 y 1:1 (`foto:validar` mide la banda de arriba).
+
+**Decisiones abiertas del operador** (contradicciones del canon que las sesiones encontraron):
+
+1. **Aros de Nexa:** el bloque de identidad dice plata, «never gold», y el ancla `nexa-ancla-1-rostro-frontal` los
+   lleva dorados; salen dorados.
+2. **Destacado «Agents»:** la línea gráfica §10.1.1 lo aprobó con tres Sparks, sin Nexa ni texto; un encargo pidió
+   «Agentes» con Nexa y el nombre arriba.
+3. **Cabeza ≈ ¼ del alto** (registro cine §4) sólo vale en 16:9; falta su equivalente vertical.
+4. **Mirada en la sección partida:** al lente (canon §1) o hacia el panel (recetas `section-split*` y SP2b).
+5. **Vestuario en cine con personas:** código por registro de escena (canon §7.2) o prenda de la línea (roster).
+6. **Luces prácticas:** en cine están encendidas en bokeh (NX5b, NX7d aprobadas); la regla común las pide apagadas.
+   Aquí se trata el cine como excepción hasta que decidas.
+7. **Una sección partida por deck** (`DECISIONES.md` del deck SEO/AEO): ningún comando lo controla.
+
 ## Lo que no se automatiza (y por eso existe el revisor)
 
 `foto:prompt` y `foto:validar:cine` atrapan lo medible. El juicio que queda —si el fenómeno ES el servicio, si la

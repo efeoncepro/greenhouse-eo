@@ -40,6 +40,10 @@ Si el caso trae un personaje del catálogo (Sparks, Clawd, Codex, Gigi) o el tra
    - **Uniforme (falla 6)** y **lecho (falla 7)**: navy, y el lecho es lo que de verdad hay entre la cámara y el
      sujeto, negro mate, fuera de la llave.
    - **Isotipo (falla 8).** La prenda va por su kit en `objetos`, nunca descrita a mano.
+   - **Conteo y posición (fallas 11 y 12).** Un número de figuras o un porcentaje no alcanzan: cada figura y el
+     borde del sujeto se ubican por geografía («ONE far on the left…», «her elbow at about 58 % of the width»).
+   - **Formato.** Si la ficha cambió de formato respecto a su receta, sus `reservas` son nuevas; en una sección
+     partida 1:1 la reserva va con `"lado": "izquierda"`. La ficha no puede tener `__completar`.
    - **Contradicciones.** La escena no puede contradecir a la palanca ni a los bloques: gana la escena.
 3. Compara con la receta aprobada más cercana de `cine-recetas.json` y di qué conserva y qué cambió.
 
@@ -48,7 +52,8 @@ Si el caso trae un personaje del catálogo (Sparks, Clawd, Codex, Gigi) o el tra
 1. Corre `pnpm -s foto:validar:cine <plate>` y `pnpm -s foto:validar <plate>`; anota los números.
 2. **Mira el plate** con Read. El medidor no ve tres fallas y tú sí: los **stickers** (objetos nítidos, del mismo
    tamaño, con luz propia, en abanico), la **luz con relleno** (la cara pareja, sin sombra de la nariz en la mejilla) y
-   el **azul rey** del uniforme. Mira también manos (una acción por persona, brazo entero visible), contacto físico de
+   el **azul rey** del uniforme. Mira también si los personajes lejanos salieron nítidos (deben ser siluetas desenfocadas) y si la llave de
+   color tiñó o aplanó el emblema (falla 13). Mira también manos (una acción por persona, brazo entero visible), contacto físico de
    las criaturas, la cara contra la referencia de identidad y si la escena se entiende sin titular.
 3. Corre `pnpm -s foto:emblema <plate>` si hay prenda o traje y mira la ampliación: nave, tres ventanas, órbita,
    esfera.

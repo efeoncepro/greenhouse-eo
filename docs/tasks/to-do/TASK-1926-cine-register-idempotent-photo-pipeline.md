@@ -27,7 +27,13 @@ con la condición de no tocar los comandos de los demás registros. Se suma a es
   de formato fijo.
 - **AXIS**: sección «Registro cine» en el banco fotográfico del Lab con las 10 fotos y su receta (commit local
   `4efeb8d` en `axis-design-system`, push pendiente de visto bueno).
-- Pendiente: la prueba ciega con tres sesiones nuevas (criterio abajo) y el orquestador idempotente.
+- **Prueba ciega corrida el mismo día** (`ai-generations/2026-10-02_prueba-ciega-cine/`): las tres sesiones llegaron
+  solas a un plate razonable, sin consultar, pero las tres se dieron CORREGIR (cara con relleno). La causa eran los
+  bloques compartidos del compilador; quedó corregida para cine (`AJUSTES_CINE`, cara en dos tonos, lecho, fondo
+  vertical, sección partida 1:1 a la izquierda, `--formato`/`--alcance`). Siete contradicciones del canon quedan para
+  el operador (casebook, «Prueba ciega»). El criterio de la prueba sigue abierto hasta repetirla con el compilador
+  corregido.
+- Pendiente: repetir la prueba ciega y el orquestador idempotente.
 
 ## Delta 2026-10-02
 

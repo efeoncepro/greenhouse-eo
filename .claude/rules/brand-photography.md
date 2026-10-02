@@ -65,7 +65,7 @@ y perder. La regla correcta es **la criatura como único acento de color, y Efeo
 estructura**) y **la contaminación del emblema**.
 
 🔴 **El registro cine tiene documento propio: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)**
-(2026-09-27) — sólo Nexa protagonista o la receta `proposal-cinematic`; cámara ≈ 2 m y 85 mm, la línea como luz, isotipo
+(2026-09-27) — sólo en los casos de su §2 (Nexa protagonista, `proposal-cinematic`, secciones y «about» del deck, portadas y contraportadas, Manzanitas con el roster, perfiles sociales con Nexa); cámara ≈ 2 m y 85 mm, la línea como luz, isotipo
 compuesto, plantilla de ficha y trampas del compilador. Cárgalo antes de escribir una ficha cine.
 🔴 **Para producir cine, el flujo es el del [casebook](../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**
 (2026-10-02), no la memoria de otra sesión: `pnpm foto:cine:nueva --desde <id>` (parte de una foto aprobada; `--listar`) →

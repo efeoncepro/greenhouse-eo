@@ -45,3 +45,15 @@ describe('foto:cine:nueva', () => {
     }
   })
 })
+
+describe('foto:cine:nueva con otro formato', () => {
+  it('cambiar el formato descarta las reservas de la receta y pide reescribirlas', () => {
+    const receta = recetas.recetas.find(r => r.id === 'NX7d')!
+    const original = { id: 'NX7d', formato: '16:9', escena: 'SCENE: …', reservas: { texto: { muro: 'x' } } }
+    const ficha = nuevaFichaDesde(receta, original, 'AG2', { formato: '9:16', alcance: 'social-nexa' })
+
+    expect(ficha).toMatchObject({ formato: '9:16', alcance: 'social-nexa' })
+    expect(ficha.reservas).toBeUndefined()
+    expect(ficha.__completar).toContain('reservas')
+  })
+})

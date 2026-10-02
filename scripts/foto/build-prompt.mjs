@@ -2482,6 +2482,14 @@ export const auditarCine = ficha => {
     )
   }
 
+  if (ficha.__completar) {
+    avisos.push(`la ficha todavía lista \`__completar\` (${[].concat(ficha.__completar).join(', ')}): complétalos y borra la clave antes de generar.`)
+  }
+
+  if (ficha.formato === '1:1' && ficha.reservas?.texto && ficha.reservas.texto.lado !== 'izquierda' && ['deck-seccion'].includes(ficha.alcance)) {
+    avisos.push('sección partida 1:1 con la reserva arriba: declara `"reservas": { "texto": { "lado": "izquierda", … } }` para que el titular vaya a la izquierda (prueba ciega A, 2026-10-02).')
+  }
+
   if (avisos.length) avisos.push(`casebook: ${ref} · revisión antes de gastar: agente \`cine-reviewer\`.`)
 
   return avisos
@@ -2494,6 +2502,41 @@ const textoLlave = llave => {
 }
 
 // El bloque se compila desde los campos; nunca se escribe a mano. Va después de la escena y antes del lecho.
+// Los bloques compartidos (realismo, impacto, tinta, lecho) se escribieron para el registro documental y
+// contradicen al cine: «documentary», «shadows open», «real sunlight», «warm-neutral», «a mug, a notebook».
+// Las tres sesiones de la prueba ciega del 2026-10-02 salieron con la cara rellena y una con el fondo ámbar
+// por esto. En cine se reemplazan esas frases; en los demás registros el bloque queda idéntico (regresión).
+export const AJUSTES_CINE = [
+  ['a real candid documentary photograph', 'a real cinematic film still'],
+  ['only one or two lived-in details (a mug, a notebook)', 'nothing lived-in, nothing analog: no mugs, notebooks, books or paper'],
+  ['highlights keep detail, shadows open.', 'highlights keep detail; shadows fall to deep near-black that still keeps texture (there is no fill light).'],
+  ['Latin American people with real, characterful faces.', 'Only the people the scene declares are in the frame, with real, characterful faces; no extra people.'],
+  [
+    'PRINTED MATTER EXISTS but is never readable: book spines, labels, packaging, papers and screens are present exactly as they would be in any real working room, and they are kept ILLEGIBLE BY PHYSICAL MEANS ONLY — too small, out of focus, cut by the frame edge, at a steep angle, turned away or lost in shadow — NEVER by being blank. NO blank book spines, NO empty labels, NO unmarked packaging, NO featureless screens: a room where nothing at all carries writing reads as fabricated.',
+    'There is no printed matter, no books and no screens unless the scene declares them; anything that carries writing is illegible by physical means (too small, out of focus or in shadow).'
+  ],
+  [
+    'a hard, directional beam of real sunlight or a single strong source sculpting the subject',
+    'a single hard source, close to the subject and to one side, sculpting the subject with NO fill light'
+  ],
+  [
+    'a restrained palette where bright azure blue (#0375DB) emerges naturally in the spatial composition through scene light, reflections, real materials or the relationship between depth planes, creating graphic rhythm without requiring a separate blue prop; everything else calm and neutral-warm',
+    'a restrained palette where the colour of the light phenomenon declared in the scene is the only accent; everything else deep cool navy and near-black'
+  ],
+  ['white balance warm-neutral, shadows never blue.', 'white balance cool-neutral; shadows deep navy-black, never amber, never warm tungsten, never saturated blue.'],
+  ['a DEEP, warm, evenly toned shadow', 'a DEEP, evenly toned near-black shadow']
+]
+
+export const ajustarParaCine = texto => AJUSTES_CINE.reduce((t, [de, a]) => t.split(de).join(a), texto)
+
+// En una sección partida 1:1 del deck la reserva va a la IZQUIERDA, no arriba (prueba ciega A, 2026-10-02:
+// el formato 1:1 sólo sabía reservar la banda superior y la frase salía rota). Sólo en cine.
+const SECCION_PARTIDA_1_1 = {
+  limite: 'All people and objects stay entirely inside the RIGHT 60% of the frame.',
+  zonaTexto: ({ muro, tinta }) =>
+    `TEXT SPACE (planned, essential): the LEFT 40% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right part of the frame.`
+}
+
 export const bloqueCine = (ficha, formato) => {
   if (ficha.registro !== 'cine') return null
 
@@ -2501,17 +2544,22 @@ export const bloqueCine = (ficha, formato) => {
 
   if (ficha.llave) {
     partes.push(
-      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light. The far side of the face falls into deep shadow and the nose shadow is legible on the cheek.`
+      `KEY LIGHT: ${textoLlave(ficha.llave)}. It is the ONLY key light: NO fill light, NO front light, NO bounce. The face is a two-tone portrait: the half of the face turned away from the key falls into near-black shadow, as dark as the background, and the nose shadow is legible on the cheek.`
     )
   }
 
   if (ficha.primerPlano) {
     partes.push(
-      `DEPTH: in the immediate foreground, very close to the lens, ${ficha.primerPlano}, soft and out of focus. The subject is razor sharp; everything behind recedes into progressively softer focus.`
+      `DEPTH: in the immediate foreground, very close to the lens: ${ficha.primerPlano}. It is soft and out of focus, and it is a separate object from the bed at the bottom of the frame. The subject is razor sharp; everything behind recedes into progressively softer focus.`
     )
   }
 
-  if (ficha.fondo) partes.push(`BACKGROUND: ${ficha.fondo}.`)
+  if (ficha.fondo) {
+    partes.push(
+      `BACKGROUND: ${ficha.fondo}.` +
+        (FORMATOS_VERTICALES.includes(formato) ? ' Every background light and figure stays BELOW 36% of the frame height; nothing bright hangs in the top third.' : '')
+    )
+  }
 
   if (ficha.fenomeno?.que) {
     let f = `THE LIGHT PHENOMENON: ${ficha.fenomeno.que}.`
@@ -2588,10 +2636,11 @@ export const construirPrompt = ficha => {
   if (suspendido) partes.push(suspendido)
 
   // Composición: el formato se declara UNA vez, acá, con el texto de la tabla.
-  const comp = [fmt.declara, fmt.limite]
   const r = ficha.reservas ?? {}
+  const partida = ficha.registro === 'cine' && ficha.formato === '1:1' && r.texto?.lado === 'izquierda' ? SECCION_PARTIDA_1_1 : null
+  const comp = [fmt.declara, (partida ?? fmt).limite]
 
-  if (r.texto) comp.push(fmt.zonaTexto({ muro: r.texto.muro ?? 'a plain wall', tinta: TINTA[r.texto.tinta ?? 'blanca'] }))
+  if (r.texto) comp.push((partida ?? fmt).zonaTexto({ muro: r.texto.muro ?? 'a plain wall', tinta: TINTA[r.texto.tinta ?? 'blanca'] }))
 
   for (const [k, args] of Object.entries(r)) {
     if (k !== 'texto') {
@@ -2631,7 +2680,7 @@ export const construirPrompt = ficha => {
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
   if (ficha.lecho === 'sin-lecho') {
     return {
-      prompt: partes.join('\n\n'),
+      prompt: ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n'),
       size: fmt.size,
       sinValidar: Boolean(fmt.sinValidar),
       imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
@@ -2644,7 +2693,9 @@ export const construirPrompt = ficha => {
   }
 
   partes.push(
-    `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.` +
+    (ficha.registro === 'cine'
+      ? `FOREGROUND (planned): ${ficha.lecho.objeto}, the lens only a few centimetres behind its near edge, so it is a soft out-of-focus mass that rises unevenly from the bottom of the frame and covers the bottom ${fmt.lecho} — it reads as a real object, never as a flat horizontal band — ${ficha.lecho.tono}; its center calm and even.`
+      : `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`) +
       // En cine el lecho lo mata el REFLEJO de la fuente, no la luz directa (NX7d: 2,98:1). Sólo en cine.
       (ficha.registro === 'cine'
         ? ' It is matte and non-reflective, outside the reach of the key light: no light and no reflection falls on it.'
@@ -2652,7 +2703,7 @@ export const construirPrompt = ficha => {
   )
 
   return {
-    prompt: partes.join('\n\n'),
+    prompt: ficha.registro === 'cine' ? ajustarParaCine(partes.join('\n\n')) : partes.join('\n\n'),
     size: fmt.size,
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
@@ -2831,7 +2882,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   // Las piezas que el operador aprobó son el estándar, y hoy ninguna sesión las tiene delante al
   // armar. Recordarlas cuesta dos líneas y evita reconstruir de memoria lo que ya existe medido.
   console.log(
-    '\n  Antes de gastar, mirá el estándar aprobado:\n' +
+    '\n  Antes de gastar, mira el estándar aprobado:\n' +
       '    ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/  (la ronda que el operador aprobó)\n' +
       '    ai-generations/2026-09-20_piloto-reservas/rondas/p1/                  (piloto de las reservas nuevas)'
   )

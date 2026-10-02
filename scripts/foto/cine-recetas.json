@@ -1,6 +1,6 @@
 {
   "schema": "efeonce.foto.cine-recetas.v1",
-  "nota": "Fotos cine aprobadas por el operador, desde las que se parte con `pnpm foto:cine:nueva --desde <id>`. Casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md. `isotipoPintado: true` = la foto aprobada lleva el isotipo compuesto plano (casebook, falla 8): sirve como receta de luz, encuadre y escena, no de bordado.",
+  "nota": "Fotos cine aprobadas por el operador, desde las que se parte con `pnpm foto:cine:nueva --desde <id>`. Casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md. `isotipoPintado: true` = la foto aprobada lleva el isotipo compuesto plano (casebook, falla 8): sirve como receta de luz, encuadre y escena, no de bordado. No hay ninguna foto cine vertical aprobada todavía (2026-10-02): para 9:16 o 4:5 usa --formato y declara las reservas de nuevo.",
   "recetas": [
     {
       "id": "NX7d",
@@ -104,6 +104,26 @@
       "protagonista": "Desarrollador con el polo",
       "porque": "El polo del kit editado con su receta y el emblema bordado en el pecho: el modelo de cómo corregir un isotipo pintado.",
       "ojo": "Receta de edición en ai-generations/2026-09-26_deck-web/fichas/WB1c/LEEME.md."
+    },
+    {
+      "id": "PH2",
+      "ficha": "ai-generations/2026-09-30_portadas-sociales/fichas/PH2-aeo.json",
+      "plate": "ai-generations/2026-09-30_portadas-sociales/plates/PH2-aeo.png",
+      "formato": "1:1",
+      "alcance": "social-nexa",
+      "protagonista": "Nexa, retrato centrado",
+      "porque": "Destacado de Instagram aprobado (2026-10-01): Nexa centrada de medio pecho, un solo color de luz sobre oscuro, todo dentro del círculo central.",
+      "ojo": "No hay ningún plate cine vertical aprobado: el destacado es 1:1 y su historia 9:16 se arma por relleno. Para 9:16 parte de aquí con --formato 9:16 y declara las reservas de nuevo; sin texto ni firma en el círculo (línea gráfica §10.1.1)."
+    },
+    {
+      "id": "PS1b",
+      "ficha": "ai-generations/2026-09-30_portadas-sociales/fichas/PS1b-nexa-todos-los-formatos.json",
+      "plate": "ai-generations/2026-09-30_portadas-sociales/plates/PS1b-nexa-todos-los-formatos.png",
+      "formato": "3:1",
+      "alcance": "social-nexa",
+      "protagonista": "Nexa con la softshell del kit",
+      "porque": "Portada de perfil social aprobada (2026-10-01): Nexa a la derecha, reserva izquierda para la voz, una sola fuente.",
+      "ojo": "Formato de portada 3:1, con la softshell del kit: para Nexa con traje biónico, combínala con NX5b o NX7d."
     }
   ]
 }
