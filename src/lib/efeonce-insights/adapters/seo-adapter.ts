@@ -31,7 +31,33 @@ const RANK_METHOD = { name: 'dataforseo_serp_rank', version: 'seo_rank_v1' }
 
 const daysBetween = (from: string, to: string): number => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000)
 
-const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
+/**
+ * TASK-1962 — bloques de 7 días desde el inicio de la ventana (1–7, 8–14…; el último puede ser más corto y su etiqueta lo
+ * dice). Un bloque se compara con el MISMO bloque del período anterior, así que ventanas de largo distinto (30 y 31 días)
+ * siguen alineadas. Etiqueta humana («1–7 sept»), nunca una fecha ISO.
+ */
+const WEEK_DAYS = 7
+
+const weekBlocksOf = (window: ResolvedInsightWindow, locale = 'es-CL') => {
+  const blocks: Array<{ index: number; start: string; endExclusive: string; label: string }> = []
+  const startMs = Date.parse(`${window.start}T00:00:00Z`)
+  const endMs = Date.parse(`${window.endExclusive}T00:00:00Z`)
+  const day = (ms: number) => new Date(ms).toISOString().slice(0, 10)
+  const month = new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' })
+
+  for (let from = startMs, index = 1; from < endMs; from += WEEK_DAYS * 86_400_000, index += 1) {
+    const to = Math.min(from + WEEK_DAYS * 86_400_000, endMs)
+    const last = new Date(to - 86_400_000)
+    const first = new Date(from)
+    const label = `${first.getUTCDate()}–${last.getUTCDate()} ${month.format(last).replace('.', '')}`
+
+    blocks.push({ index, start: day(from), endExclusive: day(to), label })
+  }
+
+  return blocks
+}
+
+const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false) => {
   const kpis = await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
@@ -76,6 +102,29 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
     { ...base, factId: factId('seo', 'ctr', window), metricId: 'ctr', label: 'CTR', value: kpis.totals.ctr === null ? null : Number((kpis.totals.ctr * 100).toFixed(2)), unit: 'percent', numerator: kpis.totals.clicks, denominator: kpis.totals.impressions, comparisonFactId: comparisonIds.ctr ?? null },
     { ...base, factId: factId('seo', 'position', window), metricId: 'position', label: 'Posición media (ponderada por impresiones)', value: kpis.totals.position === null ? null : Number(kpis.totals.position.toFixed(2)), unit: 'position', numerator: null, denominator: null, comparisonFactId: comparisonIds.position ?? null }
   )
+
+  // TASK-1962 — clics por bloque de 7 días (suma de los días medidos del MISMO reader): la evolución dentro del mes.
+  // Un bloque sin días medidos queda sin valor (ausente ≠ 0). Sólo con contrato v2.
+  if (editorialV2) {
+    for (const block of weekBlocksOf(window)) {
+      const points = kpis.series.filter(point => point.date >= block.start && point.date < block.endExclusive)
+      const metricId = `clicks_week.${block.index}`
+
+      facts.push({
+        ...base,
+        factId: factId('seo', metricId, window),
+        metricId,
+        label: block.label,
+        value: points.length > 0 ? points.reduce((sum, point) => sum + point.clicks, 0) : null,
+        unit: 'count',
+        numerator: null,
+        denominator: null,
+        window: { start: block.start, endExclusive: block.endExclusive, granularity: 'day', partial: window.partial },
+        comparisonFactId: comparisonIds[metricId] ?? null,
+        dimension: { block: String(block.index), from: block.start, to: block.endExclusive }
+      })
+    }
+  }
 
   const source: EvidenceSourceV1 = {
     module: 'seo',
@@ -354,6 +403,21 @@ const moverFacts = async (
       )
     })
 
+    // TASK-1962 — aportes de cada consulta al cambio total de clics, y el resto, para la cascada «qué explica el cambio».
+    // La suma por consulta es exactamente el total del informe (misma tabla), así que el resto es medido, no estimado.
+    if (dimension === 'query') {
+      let explained = 0
+
+      result.movers.forEach((mover, index) => {
+        const delta = mover.clicks - mover.previousClicks
+
+        explained += delta
+        facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, String(index + 1)), metricId: 'driver.query.delta', label: mover.key, value: delta, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: null, dimension: { query: mover.key, rank: String(index + 1) } })
+      })
+
+      facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, 'rest'), metricId: 'driver.query.delta', label: GH_INSIGHTS.figures.driversRestLabel, value: result.totalClicks - result.previousTotalClicks - explained, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversRestLabel, rank: 'rest' } })
+    }
+
     sources.push({ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoWindowMovers', asOf: current.freshness.asOf, method: MOVERS_METHOD, coverage: current.coverage, servedWindow: null })
   }
 
@@ -361,7 +425,7 @@ const moverFacts = async (
 }
 
 const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>) => {
-  const gsc = await gscFacts(input.organizationId, window, comparisonIds)
+  const gsc = await gscFacts(input.organizationId, window, comparisonIds, input.editorialV2 === true)
   const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
   const etv = seoTargetId ? await etvFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
 

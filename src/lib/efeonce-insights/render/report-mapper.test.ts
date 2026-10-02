@@ -354,7 +354,7 @@ describe('buildInsightReportPlanInput', () => {
     expect(slots.provenance[0]).toEqual({ label: 'Unidad', text: 'porcentaje' })
   })
 
-  it('compone metas, tendencia, columnas y comparación en el PDF A4; una familia sin página se rechaza', async () => {
+  it('compone metas, tendencia, columnas y comparación en el PDF A4; una familia sin página se omite (la web la dibuja)', async () => {
     const facts = [
       ['otd', 82, 'percent'], ['otd-target', 90, 'percent'], ['otd-band', 70, 'percent'],
       ['m1', 10, 'count'], ['m2', 30, 'count'], ['m3', 20, 'count'],
@@ -402,9 +402,11 @@ describe('buildInsightReportPlanInput', () => {
     const pie = { ...base, chartId: 'chart.pie', family: 'pie', relation: 'composition', title: 'Composición', unit: 'count', dimensionLabels: ['A', 'B'],
       series: [{ seriesId: 's', label: 'Partes', factIds: ['m1', 'm2'], unit: 'count' }] }
 
-    expect(() =>
-      buildInsightReportPlanInput({ edition, report, snapshot: { facts, sources: [], rejections: [] } as never, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }) })
-    ).toThrow(InsightsRenderRejectedError)
+    // TASK-1962 — una familia sin página PDF no se dibuja en una plantilla ajena: el mapper la OMITE a propósito
+    // (`PDF_FIGURE_FAMILIES`; la web la dibuja y el PDF conserva su hallazgo y su tabla). Nunca cae en otra plantilla.
+    const withPie = buildInsightReportPlanInput({ edition, report, snapshot: { facts, sources: [], rejections: [] } as never, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }) })
+
+    expect(withPie.slides.some(slide => JSON.stringify(slide).includes('chart.pie'))).toBe(false)
   }, 120_000)
 
   it('«Lo esencial» (v2) va en la página de resumen, con el folio real de la figura que lo respalda', async () => {

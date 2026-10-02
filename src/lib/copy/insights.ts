@@ -223,7 +223,14 @@ export const GH_INSIGHTS = {
     driversPageColumn: 'Página',
     driversTableTitle: 'Consultas y páginas que más movieron los clics',
     driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
-    driversEntityColumn: 'Consulta o página'
+    driversEntityColumn: 'Consulta o página',
+    driversRestLabel: 'Resto de consultas',
+    driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
+    previousTotal: 'Período anterior',
+    currentTotal: 'Este período',
+    weeklyTitle: 'Clics orgánicos por semana',
+    weeklyLead: 'Los clics por semana',
+    weeklyPrevious: 'En el período anterior, de'
   },
 
   /**

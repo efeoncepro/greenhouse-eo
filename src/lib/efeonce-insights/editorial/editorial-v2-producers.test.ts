@@ -243,7 +243,8 @@ describe('TASK-1888 — canales y matriz', () => {
     }
 
     expect(FAMILY_EVIDENCE_MATRIX).toHaveLength(15)
-    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet'])
+    // TASK-1962 — cascada (SEO) y waffle (AEO) pasaron a tener evidencia; se dibujan en la web (sin página PDF).
+    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet', 'waterfall', 'waffle'])
     expect(() => assertChartsAllowed('ico', [{ ...v2(icoSnapshot, ['ico']).chapters[0]!.charts[0]!, family: 'donut' }])).toThrow(/matriz/)
   })
 })
@@ -547,14 +548,74 @@ describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente
     ]))
     // La cifra suelta del Share of Voice de la marca ya no es un hallazgo aparte, y lleva «menciones», no «respuestas».
     expect(chapter.claims.find(claim => claim.claimId === 'claim.aeo.sov.brand.w')).toMatchObject({ role: 'backing', text: 'Tu marca: 25,0 % (10 de 40 menciones).' })
-    // «Sin clasificar» no encabeza la figura de tipos de fuente (sigue en la tabla).
-    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.count.source-type')!.dimensionLabels).toEqual(['Medios de noticias', 'Sitios propios'])
+    // Tono y tipo de fuente son partes de un todo: waffle con TODAS las categorías (incluida «sin clasificar»), que
+    // suman el total; nunca columnas.
+    const types = chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.source-type')!
+
+    expect(types).toMatchObject({ family: 'waffle', relation: 'composition', series: [] })
+    expect(types.dimensionLabels).toEqual(['Sin clasificar', 'Medios de noticias', 'Sitios propios'])
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.sentiment')!.dimensionLabels).toEqual(['Positivas', 'Neutras', 'Negativas'])
+    expect(chapter.charts.some(chart => chart.family === 'bar' && chart.unit === 'count')).toBe(false)
     expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('Sin clasificar')
     // Los dominios no van en columnas (una palabra larga no se puede partir): hallazgo y tabla.
     expect(chapter.charts.some(chart => chart.chartId === 'chart.aeo.count.cited-source')).toBe(false)
     expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('chocale.cl')
     expect(chapter.tables.find(table => table.tableId === 'table.aeo')!.rows.map(row => row[0])).not.toContain('chocale.cl')
-    expect(chapter.readings!.find(reading => reading.chartId === 'chart.aeo.count.source-type')!.conclusion!.text).toBe('Los motores citan más medios de noticias (16) que sitios propios (3).')
+    // Sin página PDF, el waffle no lleva lectura de página: lo dice su hallazgo.
+    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.waffle.source-type')).toBe(false)
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1962 — más familias con evidencia: cascada de consultas y línea semanal de clics', () => {
+  const seo = (factId: string, metricId: string, label: string, value: number, comparisonFactId: string | null = null, dimension?: Record<string, string>): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module: 'seo', metricId, label, unit: 'count', numerator: null, denominator: null, dimension, channelId: 'google', comparisonFactId })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      seo('seo.clicks', 'clicks', 'Clics orgánicos', 9377, 'seo.clicks.prev'),
+      seo('seo.clicks.prev', 'clicks', 'Clics orgánicos', 10662),
+      seo('seo.driver.query.clicks.w.1', 'driver.query.clicks', 'berel', 1579, 'seo.driver.query.clicks.p.1', { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.clicks.p.1', 'driver.query.clicks', 'berel', 1933, null, { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.delta.w.1', 'driver.query.delta', 'berel', -354, null, { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.delta.w.2', 'driver.query.delta', 'pinturas berel', -149, null, { query: 'pinturas berel', rank: '2' }),
+      seo('seo.driver.query.delta.w.rest', 'driver.query.delta', 'Resto de consultas', -782, null, { query: 'Resto de consultas', rank: 'rest' }),
+      ...[1, 2, 3, 4].flatMap(block => [
+        seo(`seo.clicks_week.${block}.w`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} sept`, 2300 + block * 10, `seo.clicks_week.${block}.p`, { block: String(block) }),
+        seo(`seo.clicks_week.${block}.p`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} ago`, 2600 + block * 10, null, { block: String(block) })
+      ])
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('las consultas van en cascada: anterior → aporte de cada consulta → resto → este período, y cuadra', () => {
+    const plan = v2(snapshot, ['seo'])
+    const waterfall = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.drivers.query')!
+
+    expect(waterfall).toMatchObject({ family: 'waterfall', relation: 'decomposition', series: [] })
+    expect(waterfall.data).toMatchObject({ kind: 'waterfall', steps: [
+      { stepId: 'previous', factId: 'seo.clicks.prev', isTotal: true },
+      { stepId: 'delta.1', factId: 'seo.driver.query.delta.w.1', isTotal: false },
+      { stepId: 'delta.2', factId: 'seo.driver.query.delta.w.2', isTotal: false },
+      { stepId: 'delta.rest', factId: 'seo.driver.query.delta.w.rest', isTotal: false },
+      { stepId: 'current', factId: 'seo.clicks', isTotal: true }
+    ] })
+    // 10.662 − 354 − 149 − 782 = 9.377: el validador de la cascada (geometría compartida con el render) lo exige.
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('los clics por semana van en línea, este período contra el mismo bloque del anterior; no son hallazgos sueltos', () => {
+    const plan = v2(snapshot, ['seo'])
+    const line = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.line.clicks-week')!
+
+    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept'] })
+    expect(line.series.map(series => series.label)).toEqual(['Período', 'Período anterior'])
+    expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('clicks_week')))).toBe(false)
+    expect(plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.seo.line.clicks-week')).toMatchObject({
+      conclusion: { text: 'Los clics por semana subieron de 2.310 (1–7 sept) a 2.340 (22–28 sept).' },
+      meaning: { text: 'En el período anterior, de 2.610 (1–7 ago) a 2.640 (22–28 ago).' }
+    })
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 })

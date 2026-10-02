@@ -123,6 +123,16 @@ describe('SEO adapter', () => {
     expect(result.facts.find(fact => fact.metricId === 'driver.page.clicks' && fact.value === 300)!.label).toBe('Página de inicio')
     expect(pageLabelOf('https://x.cl/colores/grises/')).toBe('/colores/grises')
     expect(result.sources.some(source => source.reader === 'readSeoWindowMovers')).toBe(true)
+    // Aportes al cambio de clics: cada consulta más el resto suman exactamente el cambio total (500 − 400).
+    const deltas = result.facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.window.start === '2026-08-01')
+
+    expect(deltas.map(fact => [fact.label, fact.value])).toEqual([['pintura 19 litros', 60], ['x marca', -20], ['Resto de consultas', 60]])
+    expect(deltas.reduce((sum, fact) => sum + fact.value!, 0)).toBe(100)
+    // Bloques de 7 días: agosto tiene 5 (1–7 … 29–31), cada uno con su par del período anterior.
+    const weeks = result.facts.filter(fact => fact.metricId.startsWith('clicks_week.') && fact.window.start >= '2026-08-01')
+
+    expect(weeks.map(fact => fact.label)).toEqual(['1–7 ago', '8–14 ago', '15–21 ago', '22–28 ago', '29–31 ago'])
+    expect(weeks[0]!.comparisonFactId).toMatch(/^seo\.clicks_week\.1\.2026-07-01/)
     expectContentContract(result.facts)
 
     // Sin período anterior no hay qué descomponer, y sin v2 la evidencia queda igual que antes.

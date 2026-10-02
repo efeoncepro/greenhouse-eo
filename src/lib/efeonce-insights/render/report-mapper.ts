@@ -51,7 +51,7 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, hasPdfFigurePage, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -169,7 +169,8 @@ const chapterBodyPages = (
   // afirmación del plan que cita los hechos que la figura dibuja.
   const chapterTab = running.runningSection.split(' · ')[0]!
 
-  for (const chart of chapter.charts) {
+  // TASK-1962 — sólo familias con página PDF; las demás viven en la web (`PDF_FIGURE_FAMILIES`).
+  for (const chart of chapter.charts.filter(hasPdfFigurePage)) {
     for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.report)) {
       const where = `${chapter.chapterId}.${chart.chartId}`
 

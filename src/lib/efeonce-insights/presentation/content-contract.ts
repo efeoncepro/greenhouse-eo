@@ -18,7 +18,7 @@
 
 import type { InsightModule } from '../contracts/request'
 
-export const CONTENT_CONTRACT_VERSION = 'content_contract_v2' as const
+export const CONTENT_CONTRACT_VERSION = 'content_contract_v3' as const
 
 /** Las ocho preguntas, en el orden en que un informe de agencia las responde. */
 export const INSIGHT_CONTENT_QUESTIONS = [
@@ -165,6 +165,7 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'seo', prefix: 'keywords_tracked', question: 'outcome' },
   { module: 'seo', prefix: 'page_one_keywords', question: 'outcome' },
   { module: 'seo', prefix: 'organic_etv', question: 'outcome' },
+  { module: 'seo', prefix: 'clicks_week.', question: 'outcome' },
   { module: 'seo', prefix: 'driver.', question: 'drivers' },
   { module: 'seo', prefix: 'opportunity.', question: 'recommendations' },
   { module: 'aeo', prefix: 'overall_score', question: 'outcome' },

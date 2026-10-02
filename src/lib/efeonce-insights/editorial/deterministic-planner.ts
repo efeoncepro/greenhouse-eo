@@ -8,7 +8,8 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
 import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
+import { canProduceFamily } from './family-evidence-matrix'
+import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, LINE_MIN_POINTS, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
@@ -372,6 +373,108 @@ const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId:
  */
 const isDriverFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('driver.')
 
+/** TASK-1962 — clics por bloque de 7 días: su propia figura de línea, no hallazgos sueltos ni filas de la tabla general. */
+const isWeeklyFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('clicks_week.')
+
+/**
+ * TASK-1962 — evolución semanal de clics (familia `line`, con página PDF de tendencia): este período contra el mismo
+ * bloque del anterior. Sólo con ≥ 3 bloques medidos y todos con su par; si falta uno, una sola serie.
+ */
+const weeklyLineChart = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>): ChartSpecV1 | null => {
+  const blocks = facts.filter(isWeeklyFact).sort((a, b) => Number(a.dimension?.block ?? 0) - Number(b.dimension?.block ?? 0))
+
+  if (blocks.length < LINE_MIN_POINTS || blocks.some(fact => fact.value === null) || !canProduceFamily('line', moduleKey)) return null
+
+  const previous = blocks.map(fact => (fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined))
+  const paired = previous.every(fact => fact && fact.value !== null)
+  const chartId = `chart.${moduleKey}.line.clicks-week`
+  const channel = blocks[0]!.channelId
+
+  return {
+    specVersion: 'chart_spec_v1',
+    chartId,
+    family: 'line',
+    relation: 'trend',
+    title: GH_INSIGHTS.figures.weeklyTitle,
+    series: [
+      { seriesId: `${chartId}.current`, label: GH_INSIGHTS.figures.currentLabel, factIds: blocks.map(fact => fact.factId), unit: 'count', ...(channel ? { channelId: channel } : {}) },
+      ...(paired ? [{ seriesId: `${chartId}.previous`, label: GH_INSIGHTS.figures.previousLabel, factIds: previous.map(fact => fact!.factId), unit: 'count', ...(channel ? { channelId: channel } : {}) }] : [])
+    ],
+    dimensionLabels: blocks.map(fact => fact.label),
+    unit: 'count',
+    scale: { kind: 'linear', baseline: 0 },
+    references: [],
+    tabularEquivalent: {
+      columns: ['Semana', GH_INSIGHTS.figures.currentLabel, ...(paired ? [GH_INSIGHTS.figures.previousLabel] : [])],
+      rows: blocks.map((fact, index) => [null, fact.factId, ...(paired ? [previous[index]!.factId] : [])])
+    }
+  }
+}
+
+/** TASK-1962 — lectura propia de la línea semanal (la genérica nombraba la semana como sujeto: «1–7 sept: de…»). */
+const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1 | null => {
+  const [current, previous] = chart.series.map(series => series.factIds.map(id => byId.get(id)!))
+  const first = current?.[0]
+  const last = current?.at(-1)
+
+  if (!first || !last || first.value === null || last.value === null) return null
+
+  const n = (fact: EvidenceFactV1) => formatFactValue(fact.value, 'count', locale)
+  const R = GH_INSIGHTS.reading
+  const verb = last.value > first.value ? R.roseMany : last.value < first.value ? R.fellMany : R.heldMany
+  const conclusion = `${GH_INSIGHTS.figures.weeklyLead} ${verb} ${R.from} ${n(first)} (${first.label}) ${R.lineTo} ${n(last)} (${last.label}).`
+  const before = previous?.[0]
+  const after = previous?.at(-1)
+  const meaning = before && after && before.value !== null && after.value !== null ? `${GH_INSIGHTS.figures.weeklyPrevious} ${n(before)} (${before.label}) ${R.lineTo} ${n(after)} (${after.label}).` : null
+
+  if (conclusion.length > PLAN_TEXT_LIMITS.conclusion) return null
+
+  return {
+    chartId: chart.chartId,
+    keyFigure: { factId: last.factId, value: n(last), caption: { claimId: `caption.${chart.chartId}`, text: last.label, factIds: [last.factId] } },
+    conclusion: { claimId: `conclusion.${chart.chartId}`, text: conclusion, factIds: [first.factId, last.factId] },
+    ...(meaning && meaning.length <= PLAN_TEXT_LIMITS.meaning ? { meaning: { claimId: `meaning.${chart.chartId}`, text: meaning, factIds: [before!.factId, after!.factId] } } : {}),
+    nextStep: null
+  }
+}
+
+/**
+ * TASK-1962 — composición del Grader en waffle (familia de parte de un todo contable): el tono de las respuestas y el
+ * tipo de fuente citada. Las partes son conteos que suman el total (todas las categorías del Grader, incluida «sin
+ * clasificar»). Sin página PDF: en el informe A4 quedan el hallazgo y la tabla.
+ */
+const AEO_WAFFLE_FAMILIES = [
+  { prefix: 'sentiment.', key: 'sentiment' },
+  { prefix: 'source_type.', key: 'source_type' }
+] as const
+
+const aeoWaffleCharts = (moduleKey: InsightModule, facts: EvidenceFactV1[]): ChartSpecV1[] => {
+  if (moduleKey !== 'aeo' || !canProduceFamily('waffle', moduleKey)) return []
+
+  return AEO_WAFFLE_FAMILIES.flatMap(({ prefix, key }) => {
+    const parts = facts.filter(fact => fact.metricId.startsWith(prefix) && fact.value !== null && fact.value > 0)
+
+    if (parts.length < 2) return []
+
+    const chartId = `chart.aeo.waffle.${key.replace(/_/g, '-')}`
+
+    return [{
+      specVersion: 'chart_spec_v1' as const,
+      chartId,
+      family: 'waffle' as const,
+      relation: 'composition' as const,
+      title: GH_INSIGHTS.aeoFamilyTitles[key] ?? key,
+      series: [],
+      dimensionLabels: parts.map(fact => fact.label),
+      unit: 'count',
+      scale: { kind: 'linear' as const, baseline: 0 },
+      references: [],
+      data: { kind: 'waffle' as const, parts: parts.map(fact => ({ partId: fact.metricId, label: fact.label, factId: fact.factId })), totalFactId: null },
+      tabularEquivalent: { columns: ['Parte', 'Cantidad'], rows: parts.map(fact => [null, fact.factId]) }
+    }]
+  })
+}
+
 /**
  * TASK-1962 — lo que el Grader ya mide y el informe no usaba: sitios citados y tipo de fuente («¿por qué?»: de dónde sale
  * lo que dicen los motores) y tono. Cada familia es su figura (`chartGroupKeyOf`) y un hallazgo propio con sus cifras;
@@ -515,7 +618,7 @@ const DRIVER_DIMENSIONS = [
   { dimension: 'page', lead: GH_INSIGHTS.reading.driverPageLead, title: GH_INSIGHTS.figures.driversPageTitle }
 ] as const
 
-const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string) => {
+const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string, totalClicks?: EvidenceFactV1) => {
   const charts: ChartSpecV1[] = []
   const claims: PlanClaimV1[] = []
   const readings: PlanFigureReadingV1[] = []
@@ -546,7 +649,41 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
     const topPeak = Math.max(...movers.map(peak))
     const band = movers.filter(fact => peak(fact) * MAGNITUDE_BAND >= topPeak)
 
-    if (band.length >= 2) {
+    // TASK-1962 — las consultas se dicen en CASCADA (familia waterfall, «qué explica un cambio»): clics del período
+    // anterior → aporte de cada consulta → resto → clics de este período. Los aportes los entrega el adapter y suman el
+    // cambio exacto (misma tabla que el total). Sin página PDF: en el A4 quedan el hallazgo y la tabla.
+    const deltas = dimension === 'query' ? facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.value !== null) : []
+    const previousTotal = totalClicks?.comparisonFactId ? byId.get(totalClicks.comparisonFactId) : undefined
+
+    if (deltas.length >= 2 && totalClicks?.value != null && previousTotal?.value != null && canProduceFamily('waterfall', moduleKey)) {
+      const ordered = [...deltas].sort((a, b) => (a.dimension?.rank === 'rest' ? 1 : b.dimension?.rank === 'rest' ? -1 : Number(a.dimension?.rank) - Number(b.dimension?.rank)))
+      const chartId = `chart.${moduleKey}.drivers.${dimension}`
+
+      charts.push({
+        specVersion: 'chart_spec_v1',
+        chartId,
+        family: 'waterfall',
+        relation: 'decomposition',
+        title: GH_INSIGHTS.figures.driversWaterfallTitle,
+        series: [],
+        dimensionLabels: [GH_INSIGHTS.figures.previousTotal, ...ordered.map(fact => fact.label), GH_INSIGHTS.figures.currentTotal],
+        unit: 'count',
+        scale: { kind: 'linear', baseline: 0 },
+        references: [],
+        data: {
+          kind: 'waterfall',
+          steps: [
+            { stepId: 'previous', label: GH_INSIGHTS.figures.previousTotal, factId: previousTotal.factId, isTotal: true },
+            ...ordered.map(fact => ({ stepId: `delta.${fact.dimension?.rank}`, label: fact.label, factId: fact.factId, isTotal: false })),
+            { stepId: 'current', label: GH_INSIGHTS.figures.currentTotal, factId: totalClicks.factId, isTotal: true }
+          ]
+        },
+        tabularEquivalent: {
+          columns: [GH_INSIGHTS.figures.driversQueryColumn, GH_INSIGHTS.reading.variation],
+          rows: [[null, previousTotal.factId], ...ordered.map(fact => [null, fact.factId]), [null, totalClicks.factId]]
+        }
+      })
+    } else if (band.length >= 2) {
       const chartId = `chart.${moduleKey}.drivers.${dimension}`
       const channel = band[0]!.channelId
 
@@ -626,8 +763,9 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // hecho de REFERENCIA (TASK-1888): se cita en gráficos y lecturas, nunca como hallazgo propio.
     const moduleFacts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact) && !isPlanFact(fact))
     // TASK-1962 — las causas (`driver.*`) tienen su propia sección; no compiten como hallazgo ni van a la tabla general.
-    const facts = moduleFacts.filter(fact => !isDriverFact(fact))
-    const drivers = editorialV2 ? driverSectionFor(moduleKey, moduleFacts.filter(isDriverFact), byId, input.locale) : null
+    const facts = moduleFacts.filter(fact => !isDriverFact(fact) && !isWeeklyFact(fact))
+    const drivers = editorialV2 ? driverSectionFor(moduleKey, moduleFacts.filter(isDriverFact), byId, input.locale, facts.find(fact => fact.metricId === 'clicks')) : null
+    const weekly = editorialV2 ? weeklyLineChart(moduleKey, moduleFacts, byId) : null
     const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact) && !isPlanFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const v2Context = editorialV2 ? contextOfFacts(facts) : null
@@ -652,7 +790,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       // TASK-1962 — «sin clasificar» es la parte que el Grader no pudo tipificar: va a la tabla, no encabeza la figura.
       // Los sitios citados tampoco van en columnas: un dominio es una sola palabra («greatplacetowork.com.mx») que la
       // figura no puede partir y el render falla cerrado (Berel, 2026-10-02). Van en su hallazgo y en la tabla.
-      if (fact.metricId === 'source_type.unknown' || fact.metricId.startsWith('cited_source.')) continue
+      // El tono y el tipo de fuente son partes de un todo: van en waffle (`aeoWaffleCharts`), no en columnas.
+      if (fact.metricId.startsWith('source_type.') || fact.metricId.startsWith('sentiment.') || fact.metricId.startsWith('cited_source.')) continue
 
       const key = chartGroupKeyOf(moduleKey, fact)
 
@@ -681,7 +820,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — roles: hallazgos materiales arriba, el resto respaldo. Las frases de figuras descartadas abren la lista.
     const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? [])]
 
-    charts.push(...(drivers?.charts ?? []))
+    charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? aeoWaffleCharts(moduleKey, facts) : []))
 
     if (editorialV2) {
       charts.push(...bulletCharts(moduleKey, facts, referenceFacts), ...lineCharts(moduleKey, facts))
@@ -704,7 +843,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
         ...(drivers?.tables ?? [])
       ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(charts, claims, byId, input.locale) : [])]) } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(charts, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))]) } : {})
     })
   }
 
