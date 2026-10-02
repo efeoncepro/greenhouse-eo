@@ -7,7 +7,7 @@
 import { randomUUID } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 
-import { loadGreenhouseToolEnv } from '/Users/jreye/Documents/greenhouse-eo/scripts/lib/load-greenhouse-tool-env'
+import { loadGreenhouseToolEnv } from '../../../scripts/lib/load-greenhouse-tool-env'
 
 loadGreenhouseToolEnv()
 
