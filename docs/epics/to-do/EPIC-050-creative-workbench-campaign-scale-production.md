@@ -24,7 +24,7 @@ la entrega llega lista para el canal del cliente.
 
 **SKY es el primer piloto, no el alcance.** Su volumen (muchas ofertas, seis mercados con monedas
 distintas, 126 formatos nativos) sirve de prueba de esfuerzo; todo contrato nace neutral y SKY lo consume
-como adaptador. Ningún criterio del epic se cumple con SKY solo: se exige un segundo cliente.
+como adaptador. Ningún criterio del epic se cumple con SKY solo: el segundo cliente es **Berel**.
 
 ## Why This Epic Exists
 
@@ -106,8 +106,9 @@ SKY como primer consumidor.
 
 - [ ] El núcleo (derivación, plan, ejecución, entrega, fotos) no contiene ninguna referencia a una marca
       concreta; un test lo comprueba con un adaptador sintético.
-- [ ] Un segundo cliente, además de SKY, se incorpora por derivación de su fuente y produce una campaña
-      completa por el mismo flujo (requiere TASK-1945).
+- [ ] **Berel** (segundo cliente, decisión del operador 2026-10-02) se incorpora por derivación de su fuente
+      de diseño y produce una campaña completa (banners e insumo social, es-MX/MXN) por el mismo flujo, con
+      entrega como handoff a la agencia que publica (requiere TASK-1945).
 - [ ] Un despliegue de prueba con al menos 3 variantes × 3 mercados × todos los formatos de una familia se
       produce desde un brief, con control previo, ejecución y paquete por canal, sin editar jobs.
 - [ ] Un cambio del motor genera en CI el informe de piezas cambiadas/idénticas por cliente y bloquea el
@@ -123,3 +124,20 @@ SKY como primer consumidor.
 - Entrega dentro del portal cliente (Creative Hub, TASK-1857): follow-up que consume los paquetes de TASK-1954.
 - Publicación o pauta en plataformas de medios; la entrega termina en el paquete por canal.
 - Habilitar cada marca como productiva (TASK-1945); este epic aporta la herramienta para hacerlo barato.
+
+## Delta 2026-10-02 — Berel como segundo cliente
+
+Decisión del operador: el segundo cliente del programa es **Berel** (Pinturas Berel, México). Lo que
+cambia respecto de SKY, según `creative-workbench/clients/berel/README.md` y la skill `berel-content-production`:
+
+- **Estado de partida:** Berel está `gated` en `clients/brands.json` y sólo tiene README; no hay pack,
+  fuente de diseño sellada ni componentes. Habilitarlo (pack, fuente, licencias de fuentes) es de TASK-1945;
+  este epic aporta la derivación para que su adaptador no se escriba a mano.
+- **Piezas:** banners, insumo social (texto + imagen) y contenido editorial; Berel entrega sus propios
+  masters de campaña. El volumen viene de variantes de producto/color y de formatos, en un solo mercado
+  (México, es-MX, MXN).
+- **Entrega:** Efeonce **no publica** para Berel. El paquete por canal de TASK-1954 debe poder salir como
+  handoff a la agencia que opera sus redes, con revisión visual en Frame.io y estados en Notion.
+- **Pregunta abierta bloqueante:** ¿existe una fuente de diseño de Berel (plantillas Figma de banners y
+  social) que se pueda sellar como se hizo con el FIG de SKY? Si no existe, el primer paso es crearla con la
+  diseñadora; sin fuente no hay derivación.

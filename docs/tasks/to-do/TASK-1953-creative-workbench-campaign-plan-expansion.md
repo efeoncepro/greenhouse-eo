@@ -336,3 +336,8 @@ Reglas obligatorias:
 
 - Reencuadre multicliente por decisión del operador: plan, perfiles de mercado y planilla de oferta son
   neutrales con esquema por cliente (`offer-schema.json`); la planilla de tarifas SKY es el primer esquema.
+
+## Delta 2026-10-02 — Berel segundo cliente
+
+- Segundo esquema de oferta y perfil de mercado a validar: Berel (México, es-MX, MXN; variantes por
+  producto/color). El esquema neutral debe expresarlo sin cambios en el núcleo.

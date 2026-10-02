@@ -339,3 +339,9 @@ Reglas obligatorias:
 
 - Reencuadre multicliente por decisión del operador: núcleo neutral, recursos licenciados declarados por el
   pack de cada cliente, archivo por prefijo de cliente y medición del tiempo de entrega por cliente.
+
+## Delta 2026-10-02 — Berel: entrega como handoff
+
+- Berel es el segundo cliente y Efeonce no publica en sus redes: otra agencia las opera. El paquete por
+  canal debe admitir un destino de tipo **handoff a agencia** (nomenclatura y manifiesto para quien publica)
+  y referenciar la revisión visual en Frame.io; nunca una parrilla de publicación.

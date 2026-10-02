@@ -333,3 +333,8 @@ Reglas obligatorias:
 
 - ¿Cada cliente entrega sus fotos con licencia, o las produce/compra Efeonce? (SKY primero.)
 - ¿Cuántos sujetos tiene un despliegue típico por cliente y cuántas fotos por sujeto se esperan?
+
+## Delta 2026-10-02 — Berel segundo cliente
+
+- La biblioteca de Berel tendrá sujetos de producto, color y espacios pintados; Berel entrega sus propios
+  masters de campaña, que entran como fotos admitidas con su licencia.

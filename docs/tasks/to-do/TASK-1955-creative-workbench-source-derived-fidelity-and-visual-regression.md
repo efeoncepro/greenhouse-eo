@@ -371,3 +371,9 @@ Reglas obligatorias:
 - Reencuadre multicliente por decisión del operador: la capacidad es para todos los clientes de Efeonce,
   SKY es el primer adaptador. Se agregan núcleo neutral, interfaz de adaptador, adaptador sintético y
   procedimiento de incorporación (Slice 6).
+
+## Delta 2026-10-02 — Berel segundo adaptador
+
+- El segundo cliente del EPIC-050 es Berel. La interfaz de adaptador debe admitir su fuente de diseño
+  (plantillas de banners y social), que hoy no existe sellada en el Workbench; el adaptador sintético del
+  Slice 6 debe parecerse a ese caso (pocos formatos, un mercado) además de al caso SKY.

@@ -35,6 +35,13 @@ PR15/PR16 Workbench y PR246 Greenhouse están integrados; los cortes fechados in
 historia y no sustituyen el estado actual. Esta actualización no cierra onboarding, distribución,
 IA ni Efeonce ID por inferencia y no mueve la task a complete.
 
+## Delta 2026-10-02
+
+- EPIC-050 (producción creativa a escala para todos los clientes) eligió a **Berel** como segundo cliente por
+  decisión del operador. Su criterio de salida depende de que esta task habilite Berel como marca productiva
+  (pack, fuente de diseño sellada y recursos admitidos). EPIC-050 aporta la derivación del adaptador
+  (TASK-1955) para que no se escriba a mano; no reclama el onboarding de la marca.
+
 ## Summary
 
 Foundation neutral del Creative Workbench para múltiples marcas y personas del equipo Efeonce.
