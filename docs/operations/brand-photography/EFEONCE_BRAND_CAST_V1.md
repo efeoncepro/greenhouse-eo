@@ -216,7 +216,7 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
 | Humberly | Aprobada (roster). Pendiente: vistas derivadas y bloque ampliado (§3.2) |
 | Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Siguen la marca de carácter y su set de vistas |
-| Karo | Favorita: B de la ronda 1 (`ronda-1/karo-b.png`), comparada contra la ronda 2 |
+| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia |
 | Antonio | Ronda 2: cuatro candidatos en `ronda-2/` |
-| Sophia | Espera al elegido de Karo |
+| Sophia | Cuatro candidatas por edición desde Karo A: `ai-generations/2026-10-02_elenco-efeonce/sophia/` |
 | Catálogo `ELENCO` | Propuesto (§7.5) |
