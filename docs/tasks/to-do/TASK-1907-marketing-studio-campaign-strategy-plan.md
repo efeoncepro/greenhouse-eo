@@ -100,7 +100,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-marketing-studio/SKILL.md` (contrato de mantenimiento).
 - `.claude/skills/efeonce-customer-model-operator/SKILL.md` (roles y evidencia en la matriz).
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` + `mcp-craft`.
-- `docs/tasks/to-do/TASK-1894-marketing-studio-write-commands-authority-cutover.md` §«Brief como entidad» y §«Forma
+- `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` §«Brief como entidad» y §«Forma
   común de un command»; `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` §«Aprobación».
 - `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md` §8 (contrato del brief ampliado; convención de nombres de archivo).
 

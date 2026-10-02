@@ -6,6 +6,84 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02 — Entregable A en producción
+
+- **Qué se entregó** (repo `efeonce-marketing-studio`, `main`; push a `main` = deploy de producción en Vercel):
+  commits `a450a3c` (puerta de ingreso), `3fe85a2` (seed de CMP-004: conceptos S01–S08 y BF1–BF3, `creativeState`
+  `approved`, CDR-012) y `aa91ce3` (un anónimo recibe `write_not_allowed` antes de validar el cuerpo).
+  `https://studio.efeonce.org/api/v1/health` responde `version 1.3.0`.
+  - Migración `packages/database/migrations/1790956839977_asset-ingest-door.sql`: `asset.revision`; en
+    `asset_version` las columnas `origin`, `review_state`, `created_by`, `original_filename`, `reviewed_by`,
+    `reviewed_at` y `review_note` con los CHECK `asset_version_origin_review_chk` y `asset_version_reviewed_chk`;
+    tablas `studio.asset_upload` (vence a las 24 h) y `studio.idempotency_record` (24 h). Aplicada en
+    `marketing_studio_staging` y `marketing_studio` (producción) el 2026-10-02 con el rol migrador.
+  - Kernel `packages/domain/src/commands/kernel.ts` (`runCommand`, `authorize`, `requestDigest`,
+    `sweepIdempotencyRecords`): anónimo ⇒ `write_not_allowed`; `user` ⇒ `forbidden` hasta TASK-1898; `api_client`
+    exige el scope de la tool y nunca aprueba; `operator_cli` escribe. El `riskTier` se lee del registro (`T1` exige
+    `Idempotency-Key`; `T2` bloqueado hasta TASK-1899); organización ajena ⇒ 404; idempotencia con replay, `422
+    idempotency_key_reused` y carrera resuelta por `ON CONFLICT`; `dryRun` sin escribir; respuesta terminal guardada
+    en la transacción.
+  - `packages/domain/src/media/upload.ts`: `requestAssetVersionUploadCommand`, `createAssetVersionCommand`
+    (`202` + `Retry-After: 5` mientras verifica, `201`, `422 upload_rejected`, `410 upload_expired`),
+    `completeAssetVersionFromUpload`, `verifyUploadedOriginal` (en el worker) y `sweepUploads`.
+    `filename-convention.ts` infiere la pieza desde `CMP###-<seq> - <título> - <WxH>.<ext>`.
+  - Lectores: la versión vigente es la de mayor `version_no` con `review_state` ∈ {`imported`, `approved`}; los DTO
+    suman `origin`, `reviewState`, `createdBy` (etiqueta legible), `createdAt`, `revision` y `pendingVersionNo`.
+  - Guarda del importador: una pieza con versiones `origin = 'studio'` no recibe versiones del catálogo
+    (`skipped_studio_owned_asset`).
+  - Contratos y registro: DTO en `packages/contracts/src/commands.ts`, errores nuevos en el catálogo, `riskTier`
+    explícito en las 20 operaciones (18 lecturas `T0` + 2 escrituras `T1`), `ToolSpec` lectura|escritura y
+    `WriteTransport`. Tools nuevas `studio.asset.upload.request` (`POST /api/v1/campaigns/{campaignId}/uploads`) y
+    `studio.asset.version.create` (`POST /api/v1/campaigns/{campaignId}/asset-versions`), capability
+    `marketing_studio.asset.write`, scope `studio:assets:write`. `API_VERSION` 1.3.0; manifiesto de 15 tools con hash
+    regenerado. Scopes de api-client nuevos: `studio:assets:write` y `studio:write`.
+  - Storage (`signUploadUrlV4`, reanudable para video o > 32 MiB) y worker (`deleteObjectIfGeneration`,
+    `listObjects`); `domain-boundary-gate` con allowlist de escritores de `studio.*`.
+  - CLI `pnpm studio:upload` (token del cliente de API en Secret Manager `marketing-studio-upload-cli-token` y
+    `marketing-studio-upload-cli-token-staging`) y CLI de operador `pnpm studio:review approve|request-changes
+    <assetId> <versionNo> --reviewer "…" [--note]` y `pending --campaign`.
+  - Infra: `scripts/ops/infra/media-originals.sh --env <env> --upload-door [--apply]` aplicado en staging y
+    producción el 2026-10-02 (SA del runtime con `storage.objectCreator` condicionado a `originals/sha256/`; rol custom
+    `marketingStudioOriginalsDeleter` al worker con la misma condición; CORS PUT/POST).
+  - Flags: `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED=true` en el worker de staging
+    (`marketing-studio-media-worker-staging-00003-2h9`) y producción (`marketing-studio-media-worker-00002-hzn`,
+    imagen `3fe85a228e0d`); `STUDIO_UPLOADS_ENABLED=true` en Vercel de Studio Production y en Preview sólo para la
+    rama `task-1894-upload-door`. Orden aplicado: worker antes que la web.
+- **Evidencia:**
+  - Pruebas unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integration.test.ts` contra
+    staging (transacción revertida) en verde; `pnpm check` verde.
+  - Staging: anónimo `403 write_not_allowed`; `dryRun` sin escribir; PUT firmado `200`; confirmación `202 → 202 →
+    201` (`CMP004-S01-imagen-4x5` v1 `pending_review`); `worker_run` con `versions_created 1, generated 5`;
+    `studio:review approve` deja `currentVersion` aprobada y `pendingVersionNo` en `null`.
+  - Producción: import del seed con 11 conceptos nuevos y segundo apply en 0 filas. 33 piezas de CMP-004 subidas
+    con `studio:upload` (`--new-asset`, licencia `ai_generated`, nota «Aprobada por el operador el 2026-10-02
+    (CDR-012)»): 33 versiones `origin = 'studio'`, 33 sha256 únicos, 33 `pending_review`, 132 derivados y 33
+    subidas `completed`; los 33 sha256 coinciden con `CONTROL-DE-PIEZAS.csv` de OneDrive. Piezas
+    `CMP004-<S01..S08|BF1..BF3>-imagen-<4x5|9x16|1x1>`. Quedan `pending_review`: no son la vigente hasta que el
+    operador las apruebe, y aprobar no autoriza pauta (`media_authorization` sigue `pending`).
+- **Desviaciones respecto de la spec:**
+  - La CLI `pnpm studio:upload` llama a la API por HTTP como `api_client` con scope `studio:assets:write` (misma
+    puerta que la UI y los agentes, sin firma desde la CLI), no como `operator_cli` impersonando la SA de ingesta.
+    Consecuencia: `createdBy` muestra «Cliente de API», no a la persona.
+  - `studio:review` (aprobar o pedir cambios, sólo `operator_cli`; un `api_client` recibe
+    `approval_requires_person`) es un adelanto del Slice 4 limitado al operador. `operations.ts` aún no tiene
+    entrada ni exclusión para ese CLI (pendiente de decidir).
+  - La expresión del nombre de archivo se relajó: el `seq` admite 0–2 letras + 1–2 dígitos para aceptar `BF1`
+    además de `S01`.
+  - CORS de staging declara `https://*.vercel.app` y `http://localhost:3100`, pero GCS no soporta comodines parciales
+    en CORS: la subida desde el navegador en previews queda por validar con TASK-1895.
+  - El puerto `ChannelValidator` y `CommandResult.warnings` no se implementaron todavía (TASK-1905 los enchufa).
+- **Pendiente:**
+  - Greenhouse: capability `marketing_studio.asset.write` en `entitlements-catalog.ts`, seed en
+    `capabilities_registry`, grants a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer`, y release
+    por el control plane. **No autorizado por el operador en esta sesión.** Hoy no bloquea: el kernel no deja
+    escribir a personas por sesión (TASK-1898) y los clientes de API usan scope.
+  - Gateway `efeonce-mcp`: `pnpm studio:manifest:sync` sin correr; las tools de escritura quedarían fuera por el
+    guard `write_tool_without_scope_class` hasta TASK-1899.
+  - Aprobación de las 33 versiones de CMP-004 por el operador (`pnpm studio:review approve <assetId> 1 --reviewer
+    "…"`).
+  - Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
+
 ## Delta 2026-09-26 (capa de estrategia)
 
 - **Decisión nueva que también gobierna esta task:**
@@ -131,7 +209,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -144,7 +222,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Diseno — re-scope 2026-09-26 por el ADR de fuente de verdad e ingreso; ningún slice empezado; la puerta de ingreso (Slices 1–3) es el primer entregable a producción`
+- Status real: `Entregable A (Slices 1–3) en producción desde 2026-10-02 (Studio 1.3.0, migración aplicada en staging y producción, flags ON, 33 piezas de CMP-004 en pending_review); pendientes: capability y release en Greenhouse (sin autorizar), sync del gateway, ChannelValidator/warnings, aprobación de las 33 versiones por el operador y Entregables B y C (Slices 4–10)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (2026-09-26: TASK-1890, TASK-1893 y TASK-1896 complete)
@@ -882,24 +960,24 @@ El kernel resuelve el `riskTier` de la operación desde el registro (nunca desde
 
 Entregable A — puerta de ingreso:
 
-- [ ] `pnpm studio:upload` sobre un final real en producción crea exactamente una versión `origin = 'studio'`, `review_state = 'pending_review'`, `storage_provider = 'gcs'`, con `created_by` = la persona, `original_filename`, derechos y un `audit_event asset_version.created`; la versión y sus derivados nacen en la misma corrida del worker (`versions_created = 1`).
-- [ ] Repetir la misma subida sobre la misma pieza responde duplicado y no crea versión ni objeto.
-- [ ] Confirmar una subida sin que el worker la haya verificado responde `202 pending_verification` y no crea ninguna fila en `asset_version` ni en `media_object` (test de dominio + consulta en staging): no existe versión con sha256 no recalculado.
-- [ ] Unos bytes cuyo sha256 no coincide con el declarado terminan en `rejected sha256_mismatch`, el objeto queda borrado (precondición de generación) y ninguna fila nueva existe.
-- [ ] Un formato de trabajo (`.psd`, o un PSD renombrado a `.png`) se rechaza (`415` al pedir o `type_rejected` al verificar).
-- [ ] Sin `rights.licenseKind` (o sin `reference` cuando es obligatoria), `requestAssetVersionUpload` responde `422 rights_required`, no crea la subida y no firma URL.
-- [ ] La inferencia resuelve los nombres reales de OneDrive listados en «Already exists» y devuelve `unmatched` para el archivo de taller con sufijo; `unmatched` sin `assetId` responde `422 filename_not_inferable`.
-- [ ] Una proporción probada distinta de la de la pieza deja la subida `rejected aspect_ratio_mismatch` y la confirmación responde `422 upload_rejected`.
-- [ ] Una subida sin confirmar vence a las 24 h (`expired`) y el barrido horario borra su objeto si no tiene `media_object` (conteo `orphans_deleted`).
-- [ ] Sin bearer 403 `write_not_allowed`; bearer sin `studio:assets:write` 403; organización ajena 404; misma `Idempotency-Key` con otro cuerpo 422; `If-Match` viejo 412; sin `If-Match` sobre pieza existente 428.
-- [ ] Una versión `pending_review` nunca aparece como vigente en los readers; las filas importadas siguen siendo vigentes como antes.
-- [ ] Tras una subida, `pnpm import:catalog` (dry-run y apply) no inserta, adopta ni renumera versiones de esa pieza y reporta `skipped_studio_owned_asset`.
-- [ ] La SA del runtime web no puede crear objetos fuera de `originals/sha256/` ni borrar objetos; la SA del worker no puede borrar fuera de `originals/sha256/` (pruebas negativas registradas).
-- [ ] `marketing_studio.asset.write` existe en catálogo TS y `capabilities_registry` con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer` (coverage test verde).
-- [ ] Las dos operaciones figuran en el manifiesto como tools de clase `write` con su scope y capability; guard de paridad y leak test verdes; gateway sincronizado sin federarlas.
-- [ ] El manifiesto generado exporta, por cada tool de escritura, `method`, `path`, `class`, `requiresPerson`, `destructive`, `idempotent`, `capability`, `capabilityAction`, `apiScope` y `transport` (`pathParams`, `Idempotency-Key` desde `idempotencyKey`, `If-Match` desde `expectedRevision` con su obligatoriedad, `dryRun` en query, resto en cuerpo); un test falla si una tool de escritura no lo declara.
-- [ ] La respuesta de `requestAssetVersionUpload` expone `inference` con lo deducido del nombre y `missing` con lo que falta preguntar.
-- [ ] `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su estado real por runtime.
+- [ ] `pnpm studio:upload` sobre un final real en producción crea exactamente una versión `origin = 'studio'`, `review_state = 'pending_review'`, `storage_provider = 'gcs'`, con `created_by` = la persona, `original_filename`, derechos y un `audit_event asset_version.created`; la versión y sus derivados nacen en la misma corrida del worker (`versions_created = 1`). — *Sin tildar (2026-10-02): 33 versiones `origin = 'studio'`, `pending_review` y 132 derivados en producción, y `versions_created 1` en staging; pero `created_by` es el cliente de API, no la persona (desviación de la CLI por HTTP), y el `audit_event asset_version.created` no quedó registrado como evidencia.*
+- [ ] Repetir la misma subida sobre la misma pieza responde duplicado y no crea versión ni objeto. — *Sin tildar: implementado (`duplicate` si el sha256 ya es versión de la pieza); falta evidencia runtime.*
+- [ ] Confirmar una subida sin que el worker la haya verificado responde `202 pending_verification` y no crea ninguna fila en `asset_version` ni en `media_object` (test de dominio + consulta en staging): no existe versión con sha256 no recalculado. — *Sin tildar: en staging se observó `202 → 202 → 201`; falta registrar la consulta que pruebe cero filas mientras está en `202`.*
+- [ ] Unos bytes cuyo sha256 no coincide con el declarado terminan en `rejected sha256_mismatch`, el objeto queda borrado (precondición de generación) y ninguna fila nueva existe. — *Sin tildar: implementado en `verifyUploadedOriginal`; falta evidencia runtime.*
+- [ ] Un formato de trabajo (`.psd`, o un PSD renombrado a `.png`) se rechaza (`415` al pedir o `type_rejected` al verificar). — *Sin tildar: falta evidencia.*
+- [ ] Sin `rights.licenseKind` (o sin `reference` cuando es obligatoria), `requestAssetVersionUpload` responde `422 rights_required`, no crea la subida y no firma URL. — *Sin tildar: derechos mínimos con pruebas unitarias; falta evidencia de «no crea la subida y no firma URL».*
+- [ ] La inferencia resuelve los nombres reales de OneDrive listados en «Already exists» y devuelve `unmatched` para el archivo de taller con sufijo; `unmatched` sin `assetId` responde `422 filename_not_inferable`. — *Sin tildar: inferencia con pruebas unitarias (expresión relajada para admitir `BF1`); falta registrar la corrida contra los nombres reales listados.*
+- [ ] Una proporción probada distinta de la de la pieza deja la subida `rejected aspect_ratio_mismatch` y la confirmación responde `422 upload_rejected`. — *Sin tildar: implementado (±1 %); falta evidencia runtime.*
+- [ ] Una subida sin confirmar vence a las 24 h (`expired`) y el barrido horario borra su objeto si no tiene `media_object` (conteo `orphans_deleted`). — *Sin tildar: `sweepUploads` implementado; falta evidencia runtime.*
+- [ ] Sin bearer 403 `write_not_allowed`; bearer sin `studio:assets:write` 403; organización ajena 404; misma `Idempotency-Key` con otro cuerpo 422; `If-Match` viejo 412; sin `If-Match` sobre pieza existente 428. — *Sin tildar: anónimo `403 write_not_allowed` verificado en staging; el resto lo cubren las pruebas del kernel, sin evidencia runtime registrada.*
+- [x] Una versión `pending_review` nunca aparece como vigente en los readers; las filas importadas siguen siendo vigentes como antes. — *Verificado 2026-10-02: en staging la versión pasó a vigente sólo tras `studio:review approve`; en producción las 33 versiones `pending_review` no son la vigente.*
+- [ ] Tras una subida, `pnpm import:catalog` (dry-run y apply) no inserta, adopta ni renumera versiones de esa pieza y reporta `skipped_studio_owned_asset`. — *Sin tildar: guarda implementada (`skipped_studio_owned_asset`); falta correr el import después de las subidas.*
+- [ ] La SA del runtime web no puede crear objetos fuera de `originals/sha256/` ni borrar objetos; la SA del worker no puede borrar fuera de `originals/sha256/` (pruebas negativas registradas). — *Sin tildar: IAM condicionado aplicado en staging y producción; pruebas negativas no registradas.*
+- [ ] `marketing_studio.asset.write` existe en catálogo TS y `capabilities_registry` con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer` (coverage test verde). — *Sin tildar: capability, seed, grants y release en Greenhouse no autorizados por el operador el 2026-10-02.*
+- [ ] Las dos operaciones figuran en el manifiesto como tools de clase `write` con su scope y capability; guard de paridad y leak test verdes; gateway sincronizado sin federarlas. — *Sin tildar: tools en el manifiesto (15 tools, hash regenerado) y `pnpm check` verde; falta `pnpm studio:manifest:sync` en el gateway.*
+- [ ] El manifiesto generado exporta, por cada tool de escritura, `method`, `path`, `class`, `requiresPerson`, `destructive`, `idempotent`, `capability`, `capabilityAction`, `apiScope` y `transport` (`pathParams`, `Idempotency-Key` desde `idempotencyKey`, `If-Match` desde `expectedRevision` con su obligatoriedad, `dryRun` en query, resto en cuerpo); un test falla si una tool de escritura no lo declara. — *Sin tildar: `ToolSpec` de escritura y `WriteTransport` existen; no se verificó en esta pasada el test que falla sin la declaración.*
+- [ ] La respuesta de `requestAssetVersionUpload` expone `inference` con lo deducido del nombre y `missing` con lo que falta preguntar. — *Sin tildar: falta evidencia.*
+- [x] `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su estado real por runtime. — *Hecho 2026-10-02: filas espejo en el ledger con su estado por runtime.*
 
 Entregable B — commands del catálogo:
 

@@ -122,3 +122,28 @@
 - **`gcloud run deploy --set-env-vars` splits on commas**: a value like `3961547,5105024` needs the `^;^` delimiter.
 - **GCS `customTime` only moves forward** (cannot be cleared or set earlier): tiering sits behind its own flag and a
   reopened campaign is reported (`tiering_reopened`) for a manual class rewrite.
+
+## 2026-10-02 — TASK-1894 Entregable A (ingest door)
+
+- **A freshly created custom IAM role takes ~1 min to propagate.** The bucket binding of
+  `marketingStudioOriginalsDeleter` failed with «does not exist in the resource's hierarchy». Rule: wait and re-run
+  `media-originals.sh --upload-door --apply` (idempotent); do not rename or recreate the role.
+- **`vercel env add NAME preview` in non-interactive mode demands an existing branch.** It would not create the var
+  for all preview branches, so `STUDIO_UPLOADS_ENABLED` lives only on branch `task-1894-upload-door`. Rule: for all
+  preview branches use the interactive CLI or the dashboard; verify with `vercel env ls` which branch it landed on.
+- **Studio previews have no bypass secret.** Rule: canary staging through `vercel curl … --deployment <preview>
+  --scope efeonce-7670142f`; the upload CLI with `--base-url <preview>` cannot get through the protection.
+- **GCS CORS does not support partial wildcards** (`https://*.vercel.app`). The CLI does not need CORS, but browser
+  uploads from previews are unproven. Rule: validate in TASK-1895 before relying on preview browser uploads.
+- **The anonymous actor must be refused before the body is validated.** `aa91ce3` moved the authority check ahead of
+  body validation, so an open-mode anonymous caller always gets 403 `write_not_allowed`, whatever it sends. Rule: in a
+  write route, authority first, then validation.
+- **Flag order is worker first, then web.** With the web signing uploads and the worker not verifying (flag off = no
+  verification and no sweep), confirmations would stay at 202 (inferred from the code, not observed). Rule: `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` before
+  `STUDIO_UPLOADS_ENABLED`; roll back in reverse.
+- **An uploaded version is not the current one.** New versions are `pending_review`; the current version is the highest
+  `version_no` with `review_state` ∈ {imported, approved}. Approving a piece is not media authorization. Rule: never
+  report an uploaded final as "in use" or "approved" until `studio:review approve` ran.
+- **Spec deviation recorded, not hidden.** The spec had the CLI as `operator_cli` impersonating the ingest SA; it was
+  built as an HTTP `api_client` (`studio:assets:write`) so CLI, UI and agents share one door. Rule: when the build
+  departs from the spec, write it in the ledger and the architecture, not only in the commit.

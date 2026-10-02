@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Marketing Studio: puerta de ingreso de originales en producción (TASK-1894, Entregable A)
+
+- Studio 1.3.0 recibe finales por una sola puerta: `studio.asset.upload.request` (URL firmada V4 directo al bucket)
+  y `studio.asset.version.create` (confirmación; el worker recalcula sha256, tamaño, tipo y proporción antes de crear
+  la versión en `pending_review`). Kernel de commands con autoridad, `riskTier`, idempotencia y `dryRun`; CLI
+  `pnpm studio:upload` (cliente de API `studio:assets:write`) y CLI de operador `pnpm studio:review`.
+- Migración `1790956839977_asset-ingest-door` aplicada en staging y producción; `STUDIO_UPLOADS_ENABLED` y
+  `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON. 33 piezas de CMP-004 cargadas en producción, pendientes de revisión.
+  Capability en Greenhouse y sync del gateway quedan pendientes.
+  [Task](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md).
+
 ## 2026-10-02 — Kortex profundamente hibernado y forecast GCP reconciliado
 
 - Kortex queda reversible y sin compute productivo: Vercel pausado, Cloud Run internal/IAM/min0, Cloud Tasks
@@ -665,13 +676,3 @@ contra producción (job 49 s) con ensayo mensual programado; Greenhouse lo obser
 `platform.marketing_studio.health` y avisa a Teams «EO - Admin» en `error`. Release Greenhouse `92002873ced9` (PR #243).
 Pendientes en los Follow-ups de cada task. Rollback: flags a `false` + redeploy, pausar schedulers, `media:ingest
 --revert-provider`.
-
-## 2026-09-26 — Efeonce Insights: diseño premium en producción (TASK-1889)
-
-Los informes A4 y los decks de Insights salen con el diseño premium aprobado por el operador: portada blanca o navy
-con el logo del cliente, índice, «Lo esencial», capítulos, páginas de gráfico por familia, tabla de respaldo, límites y
-contraportada; el diseño anterior se retiró del código. Las variaciones muestran la dirección del valor con el triángulo
-y, con el tono, si el cambio es mejor o peor para esa métrica (posición y RpA: menor es mejor). Código en los releases
-`0e87c7a443a2` y `f9257b9c94af`. Verificado en producción con las primeras ediciones internas de Berel (A4 16 páginas +
-deck 15 láminas) y Sky (A4 12 + deck 10), los cuatro PDF al primer intento. Emisión y compartir siguen OFF en
-producción. Rollback: revert del código de catálogos y release.

@@ -130,7 +130,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-campaign-planning/SKILL.md` (consumidor agéntico del catálogo y de las referencias ICP).
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` y la skill `mcp-craft` (nombres, descripciones y anotaciones de tools).
 - `.claude/skills/greenhouse-backend/SKILL.md`.
-- `docs/tasks/to-do/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, forma común de un
+- `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, forma común de un
   command) y `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` (contratos de canje y flujo MCP).
 - `docs/context/11_hubspot-bowtie.md` (internal names de etapas del bow-tie).
 

@@ -1,16 +1,16 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1890 / TASK-1891)
+> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
 ## Para qué sirve
 
 Revisar el estado de las campañas y preparar la pauta, actualizar Studio cuando cambian los datos en OneDrive,
-generar sus imágenes, dar acceso por API a una integración y, cuando esté encendido, pedirle a un agente que lea
+subir finales y aprobarlos, generar sus imágenes, dar acceso por API a una integración y, cuando esté encendido, pedirle a un agente que lea
 Studio por Efeonce MCP.
 
 ## Antes de empezar
@@ -85,6 +85,106 @@ pieza (los videos, con un fotograma). Hay que generarlas cuando entran piezas nu
 2. Revisa el resumen (cuántas piezas procesaría) y repite con `--apply`.
 3. Es seguro repetirlo: lo que ya existe no se vuelve a generar.
 4. Abre la campaña en la web y confirma que las piezas nuevas se ven.
+
+## Subir un final a Studio
+
+Desde el 2026-10-02 un final puede entrar a Studio directamente, sin pasar por el import de OneDrive. El archivo se
+sube al almacén privado de Studio, Studio comprueba que llegó intacto (misma huella, mismo tamaño, tipo real y
+proporción correcta) y crea una **versión nueva pendiente de revisión**. La versión sólo pasa a ser la vigente cuando
+una persona la aprueba.
+
+### Antes de empezar
+
+- El repo `efeonce-marketing-studio` instalado y `gcloud` autenticado (igual que arriba).
+- El **token de subida**, que vive en Secret Manager. Cárgalo en la terminal sin imprimirlo:
+  ```bash
+  export STUDIO_API_TOKEN="$(gcloud secrets versions access latest --secret=marketing-studio-upload-cli-token)"
+  ```
+  Para staging, el secreto es `marketing-studio-upload-cli-token-staging` (y agrega `--base-url` con la dirección de
+  staging).
+- La **campaña** (`CMP-###`) ya existe en Studio.
+- El **concepto** de la pieza ya existe en Studio. Si el concepto no está, hay que sembrarlo primero (registro semilla
+  + import); esta subida no crea conceptos.
+- El archivo es un **final** (PNG, JPG, WebP, MP4, MOV, audio o PDF). Los archivos de trabajo (PSD, AI, AEP, INDD,
+  comprimidos) se rechazan.
+- Sabes la **licencia** del archivo: `owned`, `client_supplied`, `stock`, `talent`, `music`, `ai_generated` o `mixed`.
+
+### Paso a paso
+
+1. Prueba primero sin subir nada, con `--dry-run`. Te dice qué pieza y qué número de versión deduciría:
+   ```bash
+   pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated --dry-run
+   ```
+2. **Si el archivo tiene el nombre canónico** (`CMP###-<concepto> - <título> - <ancho>x<alto>.<ext>`, por ejemplo
+   `CMP004-S01 - … - 4x5.png`), Studio deduce la pieza sola. Sube igual, sin `--dry-run`:
+   ```bash
+   pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated
+   ```
+   Puedes pasar varios archivos en la misma llamada.
+3. **Si la pieza todavía no existe**, créala junto con su primera versión (un archivo por llamada):
+   ```bash
+   pnpm studio:upload <archivo> --campaign CMP-004 --license ai_generated \
+     --new-asset --concept CMP004-S01 --title "<título>" --ratio 4x5
+   ```
+4. **Si el nombre no permite deducir la pieza** pero ya existe, indícala con `--asset <id de la pieza>`.
+5. Si tienes más datos de derechos, agrégalos: `--reference "…"`, `--from AAAA-MM-DD`, `--until AAAA-MM-DD`,
+   `--territory CL`, `--channel <canal>`. Una nota para quien revisa va con `--note "…"`.
+6. Lee el resultado de cada archivo (tabla de abajo). Al terminar, cierra la variable del token: `unset STUDIO_API_TOKEN`.
+
+| Línea del resultado | Qué significa |
+|---|---|
+| `creado <pieza> vN · pendiente de revisión` | La versión existe y espera que alguien la apruebe. Todavía no es la que se usa. |
+| `duplicado de <pieza> vN` | Ese mismo archivo ya es una versión de esa pieza. No se creó nada. |
+| `dry-run · …` | Modo de prueba: muestra la pieza y versión que deduciría, sin escribir. |
+| `rechazado: <código>` | No se creó la versión. El código dice por qué (ver problemas comunes). |
+| `pendiente de verificación (retoma con --resume <id>)` | El archivo se subió pero la verificación tardó más de 10 minutos. Retoma después (ver problemas comunes). |
+
+### Revisar y aprobar
+
+1. Lista lo pendiente de una campaña (necesitas las variables `STUDIO_PG_*` de la base, como en el import):
+   ```bash
+   pnpm studio:review pending --campaign CMP-004
+   ```
+2. Mira la pieza en la web o por la API y decide.
+3. Para aprobar:
+   ```bash
+   pnpm studio:review approve <id de la pieza> <número de versión> --reviewer "Nombre Apellido" --note "…"
+   ```
+   Desde ese momento esa versión es la vigente.
+4. Para pedir cambios (la nota es obligatoria y dice qué cambiar):
+   ```bash
+   pnpm studio:review request-changes <id de la pieza> <número de versión> --reviewer "Nombre Apellido" --note "qué cambiar"
+   ```
+
+Sólo una persona puede aprobar: una integración o un agente con token de API no puede.
+
+### Qué no hacer al subir
+
+- **No confundas aprobar una pieza con autorizar la pauta.** Aprobar sólo dice que ese archivo es el bueno; la
+  autorización de medios sigue en su propio estado.
+- **No subas archivos de trabajo** (PSD, AI, AEP, ni copias con sufijos de taller en el nombre). Studio guarda sólo
+  finales; el taller sigue en OneDrive.
+- **No reutilices una llave de idempotencia** con otro archivo o con otros datos: Studio lo rechaza
+  (`idempotency_key_reused`). La CLI arma la llave sola; si integras por API, usa una llave nueva por cada subida
+  distinta.
+- No imprimas el token de subida ni lo pegues en chats o tickets.
+
+### Problemas comunes al subir
+
+| Síntoma | Qué hacer |
+|---|---|
+| `rechazado: filename_not_inferable` | El nombre no sigue el patrón canónico. Renómbralo o indica la pieza con `--asset`, o créala con `--new-asset`. |
+| `rechazado: rights_required` | Faltan los derechos mínimos. Agrega `--license` (la línea dice qué falta). |
+| `rechazado: revision_conflict` | La pieza cambió mientras subías (otra persona subió o editó). Vuelve a correr el comando: la CLI lee la revisión actual. |
+| `rechazado: upload_rejected: sha256_mismatch` o `size_mismatch` | El archivo que llegó no coincide con el que declaraste (se corrompió o cambió durante la subida). Vuelve a subirlo. |
+| `rechazado: upload_rejected: type_rejected` | El contenido real del archivo no es del tipo que dice su extensión, o es un formato de trabajo. Exporta el final de nuevo. |
+| `rechazado: upload_rejected: aspect_ratio_mismatch` | La proporción del archivo no es la de la pieza (más de 1 % de diferencia). Revisa que subes el formato correcto. |
+| `rechazado: upload_expired` | La subida venció (24 h). Corre el comando de nuevo. |
+| `rechazado: too_many_open_uploads` | Tienes más de 20 subidas abiertas. Termínalas o deja que venzan. |
+| `rechazado: upload_disabled` | La subida está apagada en ese ambiente. Avisa al equipo técnico. |
+| `Falta: STUDIO_API_TOKEN …` | No cargaste el token de subida en la terminal. Cárgalo como en «Antes de empezar». |
+| `rechazado: forbidden` | El token no tiene permiso de subida (`studio:assets:write`). Usa el de `marketing-studio-upload-cli-token`. |
+| `pendiente de verificación (retoma con --resume <id>)` | Espera unos minutos y corre `pnpm studio:upload --campaign CMP-### --resume <id>`. El barrido de Studio también retoma solo las verificaciones atascadas. |
 
 ## Paso a paso: dar acceso por API a una integración
 

@@ -234,3 +234,51 @@ STUDIO_IT_PG_URL="postgres://marketing_studio_staging_app@127.0.0.1:15433/market
   DLQ must stay empty: `gcloud pubsub subscriptions pull marketing-studio-originals-finalized[-staging]-dlq-sub --limit 5`.
 - Rollback: flags off + redeploy; pause jobs; delete the bucket notification; `media:ingest --revert-provider --apply`;
   `migrate down` only with no `gcs` version (the Down aborts otherwise).
+
+## Ingest door: uploads and review (TASK-1894 Entregable A, in production since 2026-10-02)
+
+Live flags: `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` `true` staging (`…-staging-00003-2h9`) + prod (`…-00002-hzn`, image
+`3fe85a228e0d`); `STUDIO_UPLOADS_ENABLED` Vercel Production `true`, Preview only branch `task-1894-upload-door`.
+**Order: worker before web.** Signer: `STUDIO_UPLOAD_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` →
+`GCP_SERVICE_ACCOUNT_EMAIL`. Full runbook: `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Subidas.
+
+```bash
+# 1. Migration 1790956839977_asset-ingest-door (migrator) on the target DB before pushing main
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:15433/<db>" \
+  PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-migrator-password)" pnpm migrate up
+# 2. Infra stage (dry-run without --apply): runtime objectCreator + worker custom role marketingStudioOriginalsDeleter,
+#    both conditioned to originals/sha256/, and CORS PUT/POST on the originals bucket
+bash scripts/ops/infra/media-originals.sh --env staging --upload-door [--apply]
+# 3. Worker: UPLOAD_VERIFY_ENABLED="true" in apps/worker/deploy.sh → commit → deploy
+bash apps/worker/deploy.sh --env staging --apply
+# 4. Web: STUDIO_UPLOADS_ENABLED=true in Studio's Vercel → redeploy
+
+# Upload (HTTP api_client with studio:assets:write — same door as UI/agents; never writes DB or bucket directly)
+export STUDIO_API_TOKEN="$(gcloud secrets versions access latest --secret=marketing-studio-upload-cli-token)"   # staging: …-token-staging
+pnpm studio:upload <file…> --campaign CMP-### --license <owned|client_supplied|stock|talent|music|ai_generated|mixed> \
+  [--asset <assetId> | --new-asset --concept CMP###-<seq> --title "…" --ratio 4x5] \
+  [--reference "…"] [--from YYYY-MM-DD] [--until YYYY-MM-DD] [--territory CL] [--channel <key>] [--note "…"] \
+  [--dry-run] [--resume <uploadId>] [--base-url https://studio.efeonce.org]
+unset STUDIO_API_TOKEN
+# Review (operator_cli; STUDIO_PG_* of the target DB, like import:catalog)
+pnpm studio:review pending --campaign CMP-###
+pnpm studio:review approve <assetId> <versionNo> --reviewer "Nombre Apellido" [--note "…"]
+pnpm studio:review request-changes <assetId> <versionNo> --reviewer "…" --note "what to change"
+```
+
+- `studio:upload` prints one line per file (`creado <asset> vN · pendiente de revisión`, `duplicado de …`,
+  `rechazado: <code>[: reason]`, `pendiente de verificación (retoma con --resume <uploadId>)`); exit 2 = missing
+  arguments, 1 = some file failed. `--new-asset` takes one file per call. Idempotency key is deterministic per file and
+  target (re-running does not duplicate); confirmation polls 202 → 201 up to 10 min.
+- Verification runs in the worker on `OBJECT_FINALIZE` (`verifyUploadedOriginal`); the hourly
+  `/jobs/reconcile-derivatives` also runs `sweepUploads` (expire, resume `pending_verification` > 15 min, delete orphans
+  > 24 h) and purges idempotency records — both only with `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED`.
+- Staging canary through `vercel curl … --deployment <preview> --scope efeonce-7670142f` (Studio previews have no
+  bypass secret): anonymous 403 `write_not_allowed` → dry-run → signed PUT 200 → confirm 202→202→201 → `worker_run`
+  `versions_created 1` → `studio:review approve` → reader `currentVersion` approved, `pendingVersionNo` null.
+- Checks: `SELECT origin, review_state, count(*) FROM studio.asset_version GROUP BY 1,2;` ·
+  `SELECT status, reject_code, count(*) FROM studio.asset_upload GROUP BY 1,2;`
+- Rollback: flags `false` + redeploy (web → 403 `upload_disabled`; worker via `deploy.sh`); `gcloud storage buckets
+  remove-iam-policy-binding … --condition "<same condition>"` for both bindings; `--clear-cors`; `pnpm migrate down` only
+  if no version has `origin = 'studio'`.
+- Production state (2026-10-02): 33 CMP-004 versions `origin=studio`, all `pending_review` until the operator approves.

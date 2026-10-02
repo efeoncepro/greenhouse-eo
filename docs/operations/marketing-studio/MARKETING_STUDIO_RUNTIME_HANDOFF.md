@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Runtime handoff
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (cierre en producción de TASK-1893 y TASK-1896)
+> **Última actualización:** 2026-10-02 por Claude (TASK-1894 Entregable A en producción: §Subidas; antes, 2026-09-26: cierre en producción de TASK-1893 y TASK-1896)
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -24,6 +24,7 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | Provider MCP | Encendido en producción desde 2026-09-26: gateway `958c9de30` (`00061-sbc`), `MARKETING_STUDIO_PROVIDER_ENABLED=true`, canary MCP real verde (TASK-1891) |
 | Greenhouse | Capabilities `marketing_studio.campaign.read` y `marketing_studio.asset.download`, cliente de canje y manual en producción; señal `platform.marketing_studio.health` + aviso Teams «EO - Admin» desde el release `92002873ced9` (2026-09-26) |
 | Originales y worker (TASK-1893) | En producción desde 2026-09-26: buckets de originales, worker `marketing-studio-media-worker` (`00001-sgb`) y `-staging` (`00002-svt`), 30 versiones en `gcs` por ambiente (24 de CMP-002 siguen en OneDrive, sin sha256), descarga ON sólo en production, readback de Metricool activo |
+| Puerta de ingreso (TASK-1894 Entregable A) | En producción desde 2026-10-02: API 1.3.0 (15 tools), migración `1790956839977` en ambas bases, `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON, 33 piezas de CMP-004 subidas por `studio:upload` y pendientes de revisión (§Subidas) |
 | Observabilidad y restauración (TASK-1896) | En producción desde 2026-09-26: Sentry, uptime con email, health profundo, `studio.ops_run`, ensayo verde contra `marketing_studio` y scheduler mensual activo |
 
 ## Recursos
@@ -199,6 +200,9 @@ tópico; agente de Pub/Sub → `pubsub.publisher` en la DLQ, `pubsub.subscriber`
 | Vercel de Studio (preview + development) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals-staging` |
 | Vercel de Studio | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` | production `true` desde 2026-09-26 (canary verde); preview `false` |
 | Vercel de Studio (opcional) | `STUDIO_DOWNLOAD_SIGNER_EMAIL` | por defecto `GCP_SERVICE_ACCOUNT_EMAIL` |
+| Vercel de Studio (TASK-1894) | `STUDIO_UPLOADS_ENABLED` | production `true` desde 2026-10-02; preview sólo rama `task-1894-upload-door` (§Subidas) |
+| Vercel de Studio (opcional, TASK-1894) | `STUDIO_UPLOAD_SIGNER_EMAIL` | por defecto `STUDIO_DOWNLOAD_SIGNER_EMAIL`, luego `GCP_SERVICE_ACCOUNT_EMAIL` |
+| Cloud Run (SoT `apps/worker/deploy.sh`, TASK-1894) | `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` | `true` en staging (`00003-2h9`) y prod (`00002-hzn`) desde 2026-10-02; se prende antes que `STUDIO_UPLOADS_ENABLED` |
 | Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_DERIVATIVES_ENABLED` · `MEDIA_WORKER_METRICOOL_READBACK_ENABLED` · `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` | `true` en staging y prod · `true` en prod, `false` en staging · `false` |
 | Cloud Run prod | `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | ref de `marketing-studio-metricool-api-token` (v1) · `3116862` · `3961547,5105024` (verificados) |
 
@@ -277,6 +281,145 @@ de esas piezas y reimportar (el import la adopta en la misma versión), luego vo
 ~20 GB/mes). Disparador de revisión: > USD 25/mes en el billing export (en CLP, ÷ ~898). Costo real del primer mes:
 pendiente (se contrasta al mes de la ingesta).
 
+## Subidas (puerta de ingreso, TASK-1894 Entregable A)
+
+Estado: **en producción desde 2026-10-02** (Studio `a450a3c`, `3fe85a2`, `aa91ce3`; API 1.3.0). Contrato, kernel e
+invariantes: arquitectura §7.3. Una versión nueva nace sólo por esta puerta: pedir subida → `PUT` firmado a GCS →
+confirmar (202 mientras verifica, 201 al crearse) → el worker recalcula sha256, tamaño, firma de bytes y proporción y
+crea la versión `pending_review` → una persona la aprueba.
+
+### Recursos y flags
+
+| Recurso | Valor |
+|---|---|
+| Migración | `1790956839977_asset-ingest-door.sql` (staging y producción, 2026-10-02, rol migrador) |
+| Token de la CLI | Secret Manager `marketing-studio-upload-cli-token` (producción) y `marketing-studio-upload-cli-token-staging`: cliente de API con scope `studio:assets:write` |
+| IAM | runtime → `storage.objectCreator` condicionado a `originals/sha256/` · worker → rol custom `marketingStudioOriginalsDeleter` (`storage.objects.delete`) con la misma condición |
+| CORS del bucket de originales | `PUT`/`POST`; producción `https://studio.efeonce.org`; staging `https://*.vercel.app` y `http://localhost:3100` |
+| Worker | staging `marketing-studio-media-worker-staging-00003-2h9`; producción `marketing-studio-media-worker-00002-hzn` (imagen `3fe85a228e0d`) |
+
+Flags (viven en Studio y no se leen en Greenhouse; la fuente de verdad es Vercel de Studio y `apps/worker/deploy.sh`):
+
+| Dónde | Flag | Estado |
+|---|---|---|
+| Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` | `true` en staging y producción desde 2026-10-02. Apagado, el worker no verifica ni barre subidas |
+| Vercel de Studio | `STUDIO_UPLOADS_ENABLED` | Production `true` desde 2026-10-02; Preview sólo la rama `task-1894-upload-door`. Apagado (o sin bucket o firmante), 403 `upload_disabled` |
+| Vercel de Studio (opcional) | `STUDIO_UPLOAD_SIGNER_EMAIL` | firmante de las URLs de subida; si falta, `STUDIO_DOWNLOAD_SIGNER_EMAIL`, y si no, `GCP_SERVICE_ACCOUNT_EMAIL` |
+
+**Orden de encendido: el worker antes que la web.** Con el flag del worker apagado no hay verificación ni barrido: si la
+web firmara subidas antes, las confirmaciones se quedarían en 202 (deducido del código, no observado).
+
+### Rollout (en orden; staging primero)
+
+```bash
+cd ~/Documents/efeonce-marketing-studio
+# 1. Migración en la base del ambiente (credencial de migrador), antes de empujar main
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:15433/<base>" \
+  PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-migrator-password)" pnpm migrate up
+# 2. Infra de la puerta (dry-run sin --apply; imprime cómo verificar y cómo revertir)
+bash scripts/ops/infra/media-originals.sh --env staging --upload-door            # revisar
+bash scripts/ops/infra/media-originals.sh --env staging --upload-door --apply
+# 3. Worker con MEDIA_WORKER_UPLOAD_VERIFY_ENABLED: cambiar UPLOAD_VERIFY_ENABLED en apps/worker/deploy.sh → commit → deploy
+bash apps/worker/deploy.sh --env staging --apply
+# 4. Web: STUDIO_UPLOADS_ENABLED=true en Vercel de Studio (ver trampas sobre Preview) → redeploy
+# 5. Canary (abajo) → repetir 1–4 con --env production / base marketing_studio / Production
+```
+
+Verificar la infra:
+
+```bash
+gcloud storage buckets get-iam-policy gs://efeonce-marketing-studio-originals --format=json \
+  | jq -r '.bindings[] | "\(.role) \(.members|join(",")) \(.condition.title // "")"'
+gcloud storage buckets describe gs://efeonce-marketing-studio-originals --format='yaml(cors_config)'
+```
+
+### Subir finales (`pnpm studio:upload`)
+
+Usa la API (la misma puerta que la UI y los agentes); nunca escribe directo en la base ni en el bucket.
+
+```bash
+export STUDIO_API_TOKEN="$(gcloud secrets versions access latest --secret=marketing-studio-upload-cli-token)"
+# Pieza deducida del nombre canónico (CMP###-<seq> - <título> - <WxH>.<ext>)
+pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated --dry-run
+pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated
+# Pieza existente explícita (manda If-Match con su revision) o pieza nueva (un archivo por llamada)
+pnpm studio:upload <archivo> --campaign CMP-### --license <kind> --asset <assetId>
+pnpm studio:upload <archivo> --campaign CMP-### --license <kind> --new-asset --concept CMP###-<seq> --title "…" --ratio 4x5
+# Retomar una confirmación que quedó en verificación
+pnpm studio:upload --campaign CMP-### --resume <uploadId>
+unset STUDIO_API_TOKEN
+```
+
+Opciones de derechos: `--license owned|client_supplied|stock|talent|music|ai_generated|mixed` (obligatoria),
+`--reference`, `--from`/`--until` (`AAAA-MM-DD`), `--territory` y `--channel` (repetibles); `--note`; `--base-url`
+(por defecto `https://studio.efeonce.org` o `STUDIO_API_URL`). Salida: una línea por archivo (`creado <assetId> vN ·
+pendiente de revisión`, `duplicado de <assetId> vN`, `rechazado: <code>[: reason]`, `pendiente de verificación (retoma
+con --resume <uploadId>)`); código 2 si faltan argumentos, 1 si algún archivo falló. La llave de idempotencia es
+determinista por archivo y destino: repetir el mismo comando no duplica la subida.
+
+### Revisar (`pnpm studio:review`)
+
+Sólo operador (`operator_cli`), con las variables `STUDIO_PG_*` de la base destino (como `import:catalog`):
+
+```bash
+pnpm studio:review pending --campaign CMP-004
+pnpm studio:review approve <assetId> <versionNo> --reviewer "Nombre Apellido" [--note "…"]
+pnpm studio:review request-changes <assetId> <versionNo> --reviewer "Nombre Apellido" --note "qué cambiar"
+```
+
+Aprobar convierte la versión en vigente (`currentVersion`, `pendingVersionNo` null). No aprueba la campaña ni
+autoriza pauta (`media_authorization` no cambia). Un cliente de API recibe `approval_requires_person`.
+
+### Canary (como se hizo el 2026-10-02)
+
+Staging, contra un deployment de preview con el flag: las previews de Studio **no tienen secreto de bypass**, así que
+se usa `vercel curl … --deployment <url-preview> --scope efeonce-7670142f`. Resultados esperados:
+
+1. Anónimo → 403 `write_not_allowed`.
+2. Pedir subida con `dryRun` → inferencia sin escribir.
+3. `PUT` a la URL firmada → 200.
+4. Confirmar → 202, 202, 201 (versión `pending_review`); `studio.worker_run` con `versions_created 1` y derivados
+   generados (5 en el canary de `CMP004-S01-imagen-4x5`).
+5. `pnpm studio:review approve …` → el reader muestra la versión aprobada como `currentVersion` y `pendingVersionNo` null.
+
+Producción (2026-10-02): 33 piezas de CMP-004 con `--new-asset`, licencia `ai_generated` y nota «Aprobada por el
+operador el 2026-10-02 (CDR-012)» → 33 versiones `origin = studio`, 33 sha256 únicos (iguales a
+`CONTROL-DE-PIEZAS.csv` de OneDrive), 33 `pending_review`, 132 derivados, 33 subidas `completed`. Quedan pendientes de
+aprobación del operador.
+
+Consultas útiles:
+
+```sql
+SELECT origin, review_state, count(*) FROM studio.asset_version GROUP BY 1, 2;
+SELECT status, reject_code, count(*) FROM studio.asset_upload GROUP BY 1, 2;
+SELECT kind, status, counts, started_at FROM studio.worker_run ORDER BY started_at DESC LIMIT 10;
+```
+
+### Rollback
+
+| Qué | Cómo |
+|---|---|
+| Web | `STUDIO_UPLOADS_ENABLED=false` en Vercel de Studio + redeploy (las escrituras responden 403 `upload_disabled`) |
+| Worker | `UPLOAD_VERIFY_ENABLED="false"` en `apps/worker/deploy.sh` → commit → redeploy (nunca `--update-env-vars` suelto) |
+| IAM | `gcloud storage buckets remove-iam-policy-binding gs://<originales> --member … --role … --condition "<la misma>"` para los dos bindings condicionados |
+| CORS | `gcloud storage buckets update gs://<originales> --clear-cors` |
+| Migración | `pnpm migrate down` sólo si no existe ninguna versión con `origin = 'studio'` |
+
+### Trampas
+
+- **El rol custom tarda ~1 min en propagarse.** Recién creado `marketingStudioOriginalsDeleter`, el binding falla con
+  «does not exist in the resource's hierarchy»; esperar y reintentar el `--upload-door --apply` (es idempotente).
+- **`vercel env add … preview` en modo no interactivo exige una rama existente.** No deja crear la variable para todas
+  las ramas de preview; por eso `STUDIO_UPLOADS_ENABLED` quedó sólo en la rama `task-1894-upload-door`. Para todas las
+  ramas, crearla de forma interactiva o desde el dashboard.
+- **Las previews de Studio no tienen secreto de bypass.** El canary de staging va por `vercel curl`; `pnpm
+  studio:upload --base-url <preview>` no atraviesa la protección.
+- **CORS sin comodines parciales.** GCS no acepta `https://*.vercel.app`: la subida desde el navegador en previews
+  queda por validar en TASK-1895. La CLI no depende de CORS.
+- **Pendientes fuera de Studio:** capability `marketing_studio.asset.write` en Greenhouse (no autorizada aún; hoy no
+  bloquea) y `pnpm studio:manifest:sync` en el gateway (las tools de escritura quedarían fuera por
+  `write_tool_without_scope_class` hasta TASK-1899).
+
 ## DNS (aplicado 2026-09-25)
 
 | Tipo | Nombre | Valor | TTL |
@@ -347,7 +490,7 @@ Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_
 
 - **Autor de commit.** Vercel bloquea deployments por Git (`COMMIT_AUTHOR_REQUIRED`) si el email del autor no se asocia a una cuenta del team. El repo usa `user.email = jreyes@efeonce.cl`; con `jreye@MacBook-Air.local` o `jreyes@efeoncepro.com` los deployments quedaron `BLOCKED`.
 - **`axis-packages-read-token`.** Guarda un `.npmrc` completo. A `NODE_AUTH_TOKEN` va sólo el valor `_authToken`; copiado entero, pnpm falla con `ERR_INVALID_CHAR`.
-- **`vercel api` para variables.** El POST de env acepta un objeto por request con `--input`. Para todas las ramas de preview: `vercel env add NAME preview ""`.
+- **`vercel api` para variables.** El POST de env acepta un objeto por request con `--input`. Para todas las ramas de preview: `vercel env add NAME preview ""`. Ojo (2026-10-02): en modo no interactivo el CLI pidió una rama existente para `preview` y no dejó crearla para todas; ver §Subidas › Trampas.
 - **Usuarios en Cloud SQL.** Crearlos por SQL (`SET ROLE cloudsqlsuperuser`), nunca con `gcloud sql users create`: quedarían en `cloudsqlsuperuser` y podrían leer Greenhouse.
 - **IAM DB auth no está disponible** en la instancia; activarla modificaría la instancia compartida con Greenhouse. Por eso usuario + contraseña en Secret Manager.
 - **Tope de conexiones.** `marketing_studio_app` admite 20. Cualquier patrón «una consulta por elemento» en una grilla lo agota; las imágenes van por enlace firmado sin base.

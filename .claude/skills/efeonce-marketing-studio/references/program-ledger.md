@@ -7,14 +7,14 @@ EPIC: `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`. Ex
 **1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898** (login last). TASK-1888/1889 are
 Insights (EPIC-045), not Studio.
 
-| Task | Scope | Lifecycle (2026-09-26) | Live where |
+| Task | Scope | Lifecycle (2026-10-02) | Live where |
 |---|---|---|---|
 | TASK-1887 | Foundation: repo, DBs/roles, domain model, API v1, catalog import, private renditions, approved UI, Vercel + domain (open mode) | **complete** | `studio.efeonce.org` |
 | TASK-1890 | Agent-ready contract: operations registry + tool manifest, semantics, service bearer, canonical org, capability, served manual | **complete** | Studio prod; Greenhouse release `0e87c7a443a2` serves the manual |
 | TASK-1891 | Federation of every manifest tool in Efeonce MCP | **complete** | Gateway provider **ON** in production |
 | TASK-1892 | Marketing metrics from Greenhouse (Search Console, GA4, SEO) via ecosystem lane `/api/platform/ecosystem/growth/*`, never SQL; paid (Meta/LinkedIn) and organic social (Metricool) as Studio adapters | to-do (GA4 not in production yet: TASK-1284) | — |
 | TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | **complete 2026-09-26** | Studio prod + staging (worker `00001-sgb` / `00002-svt`); Greenhouse release `92002873ced9` |
-| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | to-do | — |
+| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | **in progress** — Entregable A (ingest door) **in production 2026-10-02**; B and C (Slices 4–10) pending | Studio prod + staging (API 1.3.0, 15 tools; worker `00002-hzn` / staging `00003-2h9`) |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
@@ -160,6 +160,58 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 `api_client` with `studio:assets:download` (scopes are immutable). Metricool: `marketing-studio-metricool-api-token`
 (the `userToken`) + `METRICOOL_USER_ID` in `deploy.sh`; blogs `3961547` (Efeonce Group) and `5105024` (personal).
 
+## TASK-1894 — write commands; Entregable A = ingest door (in production 2026-10-02)
+
+**Studio commits (`main`, pushed = Vercel prod):** `a450a3c` ingest door · `3fe85a2` CMP-004 seed (concepts S01–S08,
+BF1–BF3; `creativeState approved`; CDR-012) · `aa91ce3` anonymous gets `write_not_allowed` before body validation ·
+`43e4711` CLI header: where the `studio:upload` token comes from. `GET https://studio.efeonce.org/api/v1/health` →
+`version 1.3.0`.
+
+- **Migration** `1790956839977_asset-ingest-door.sql` applied 2026-10-02 (migrator) on `marketing_studio_staging` and
+  `marketing_studio`: `asset.revision`; `asset_version.{origin, review_state, created_by, original_filename,
+  reviewed_by, reviewed_at, review_note}` + CHECKs `asset_version_origin_review_chk` / `asset_version_reviewed_chk`;
+  tables `studio.asset_upload` (24 h) and `studio.idempotency_record` (24 h).
+- **Kernel** `packages/domain/src/commands/kernel.ts` (`runCommand`, `authorize`, `requestDigest`,
+  `sweepIdempotencyRecords`); **upload** `packages/domain/src/media/upload.ts` (`requestAssetVersionUploadCommand`,
+  `createAssetVersionCommand`, `completeAssetVersionFromUpload`, `verifyUploadedOriginal`, `sweepUploads`);
+  `filename-convention.ts`; `commands/review.ts` + CLI `pnpm studio:review` (operator only — early Slice 4 for the
+  operator). Importer guard: no catalog versions on pieces with `origin='studio'` versions (`skipped_studio_owned_asset`).
+- **Contracts:** 20 operations with explicit `riskTier` (18 reads T0 + 2 writes T1); new tools
+  `studio.asset.upload.request` and `studio.asset.version.create` (capability `marketing_studio.asset.write`, scope
+  `studio:assets:write`); manifest 15 tools (hash regenerated). New `api_client` scopes `studio:assets:write`,
+  `studio:write`. Details: `contracts.md` §Writes.
+- **Infra:** `media-originals.sh --upload-door --apply` on staging + production (runtime `objectCreator` and worker
+  custom role `marketingStudioOriginalsDeleter`, both conditioned to `originals/sha256/`; CORS PUT/POST).
+- **Flags:** `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED=true` staging (`marketing-studio-media-worker-staging-00003-2h9`) and
+  prod (`marketing-studio-media-worker-00002-hzn`, image `3fe85a228e0d`); `STUDIO_UPLOADS_ENABLED=true` Vercel
+  Production (2026-10-02) and Preview only for branch `task-1894-upload-door`. Order: worker before web. Derivatives
+  and readback untouched.
+- **CLI deviation from the spec:** the spec had `studio:upload` as `operator_cli` impersonating the ingest SA; it was
+  built over HTTP as an `api_client` with `studio:assets:write` (one door, no signing from the CLI). Token secrets
+  `marketing-studio-upload-cli-token` (prod) / `marketing-studio-upload-cli-token-staging`.
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | door, kernel, review, contracts | shipped | unit (kernel, inference, rights, V4 signing) + `upload.integration.test.ts` against staging (rolled back) green; `pnpm check` green |
+| Staging | end-to-end canary (via `vercel curl`, previews have no bypass) | verified | anonymous 403 `write_not_allowed`; dry-run no writes; signed PUT 200; confirm 202→202→201 (`CMP004-S01-imagen-4x5` v1 `pending_review`); `worker_run` `versions_created 1, generated 5`; `studio:review approve` → `currentVersion` approved, `pendingVersionNo` null |
+| Production | seed import | applied | 11 new concepts; second apply 0 rows |
+| Production | 33 CMP-004 pieces via `studio:upload --new-asset`, license `ai_generated`, note «Aprobada por el operador el 2026-10-02 (CDR-012)» | done | 33 versions `origin=studio`, 33 unique sha256 = `CONTROL-DE-PIEZAS.csv` (OneDrive), 33 `pending_review`, 132 derivatives, 33 uploads `completed`; pieces `CMP004-<S01..S08\|BF1..BF3>-imagen-<4x5\|9x16\|1x1>` |
+
+The 33 versions stay `pending_review` (not current) until the operator runs `pnpm studio:review approve …`. Approving
+does not authorize media (`media_authorization` stays `pending`).
+
+**Pending (not done):**
+
+- Greenhouse: capability `marketing_studio.asset.write` in `entitlements-catalog.ts` + `capabilities_registry` seed +
+  grants (`efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`) + release — **not authorized by the
+  operator this session**. Not blocking today: the kernel refuses session persons (TASK-1898) and API clients use scope.
+- Gateway: `pnpm studio:manifest:sync` not run; the write tools would be dropped by `write_tool_without_scope_class`
+  until TASK-1899.
+- Spec of Entregable A not yet built: `ChannelValidator` port and `CommandResult.warnings` (TASK-1905 plugs them);
+  `operations.ts` has no entry for `studio:review` (operator CLI; exclusion still to decide).
+- Entregables B and C (Slices 4–10). API approval (`approveAssetVersion`) = Slice 4 + TASK-1899.
+- Browser upload from previews: GCS CORS has no partial wildcards (`https://*.vercel.app`); validate in TASK-1895.
+
 ## Sessions
 
 - 2026-09-25 — Skill created from the verified facts inventory (Studio `d3ab68e`, gateway `9b93d6a`).
@@ -169,3 +221,5 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 - 2026-09-26 — ADR accepted by the operator: Studio + GCS as single source of truth, OneDrive as workshop, one command
   (`createAssetVersion`) with three doors (CLI, MCP, UI), human approval, dated per-campaign cutover; Graph mirror not
   planned (`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`). Docs only.
+- 2026-10-02 — TASK-1894 Entregable A (ingest door) shipped and rolled out to staging + production (Studio `a450a3c`,
+  `3fe85a2`, `aa91ce3`, `43e4711`; API 1.3.0, 15 tools); 33 CMP-004 finals uploaded, pending operator review.

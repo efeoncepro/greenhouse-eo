@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Marketing Studio — puerta de ingreso en producción (02/10):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress: Entregable A en producción (Studio `main` `a450a3c`/`3fe85a2`/`aa91ce3`, `/api/v1/health` 1.3.0; migración `1790956839977` en staging y prod; `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON). 33 piezas de CMP-004 subidas con `pnpm studio:upload`, en `pending_review` (sha256 = `CONTROL-DE-PIEZAS.csv`). Siguiente: (1) aprobarlas desde `~/Documents/efeonce-marketing-studio` con `STUDIO_PG_*` de producción: `pnpm studio:review approve <assetId> 1 --reviewer "…"` (aprobar no autoriza pauta); (2) capability `marketing_studio.asset.write` + grants + release en Greenhouse, **sin autorizar**; (3) `pnpm studio:manifest:sync` en `efeonce-mcp`. Desviaciones (CLI por HTTP como `api_client`, CORS con comodín en previews) en el delta de la task.
+
 **Kortex hibernado + corte FinOps (02/10):** desde `2026-10-02T13:44:27Z`, Vercel pausado, Cloud Run internal/IAM/min0,
 Cloud Tasks pausado/0 y `kortex-pg-dev` `STOPPED/NEVER`; no ejecutar adapter, smokes ni deploys para despertarlo.
 Backlog Kortex retirado: `TASK-264/377/413/889/948/949` pasaron a `cancelled` por la pausa; ya no queda ninguna

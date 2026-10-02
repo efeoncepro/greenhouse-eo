@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-02 por Claude (TASK-1894 Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -185,7 +185,7 @@ como contrato:
 
 ## 4. Contrato API v1
 
-- Base `/api/v1`. Documento `GET /api/v1/openapi.json` (OpenAPI 3.1, versión **1.2.0** desde TASK-1893: descarga de originales, derechos y evidencia de publicación).
+- Base `/api/v1`. Documento `GET /api/v1/openapi.json` (OpenAPI 3.1, versión **1.3.0** desde TASK-1894 Entregable A, 2026-10-02: las dos primeras escrituras, §7.3; 1.2.0 trajo con TASK-1893 la descarga de originales, derechos y evidencia de publicación).
 - **Registro único:** toda operación nace en `packages/contracts/src/operations.ts` con `exposure` = `tool` (se federa a agentes) o `exclusion` (con razón). De ese registro se derivan el OpenAPI y el manifiesto de tools (§4.1), y un test de paridad lo compara con los route handlers reales: una ruta sin entrada, o una entrada sin ruta, rompe `pnpm check`. Las descripciones salen del glosario `semantics.ts`. La paridad queda así garantizada por construcción, no por revisión.
 - Formato de error canónico (mismo espíritu que Greenhouse): `{ "error": "<es-CL seguro>", "code": "<snake_case estable>", "actionable": <bool> }`. Nunca stack traces, SQL ni rutas.
 - `X-Correlation-Id` se acepta y se devuelve.
@@ -212,7 +212,8 @@ como contrato:
 
 - **Organización:** toda lectura acepta `organizationId` (id canónico `org-…`). **Intersecta, nunca amplía**: una organización fuera de lo visible responde 404 (anti-oráculo); en modo `open` restringe el resultado.
 - Paginación por cursor opaco en listas que pueden crecer (`assets`, `ads`, `copies`); orden estable por ID.
-- **Escrituras:** hoy no hay escrituras HTTP. El import corre por CLI con credencial de migrador. Los commands (crear campaña, versionar asset, revisar copy, aprobar) llegan en TASK-1894 con `Idempotency-Key` + digest, `If-Match` por `revision` y auditoría, y nacen en el mismo registro con su tool de clase `write` o una exclusión con razón. Toda versión nueva entra por **un solo command** (`createAssetVersion`, tool `studio.asset.version.create`) desde CLI, MCP o UI, con subida firmada directa a GCS (§7).
+- **Escrituras:** hasta el 2026-10-02 no había escrituras HTTP. El import corre por CLI con credencial de migrador. Los commands (crear campaña, versionar asset, revisar copy, aprobar) llegan en TASK-1894 con `Idempotency-Key` + digest, `If-Match` por `revision` y auditoría, y nacen en el mismo registro con su tool de clase `write` o una exclusión con razón. Toda versión nueva entra por **un solo command** (`createAssetVersion`, tool `studio.asset.version.create`) desde CLI, MCP o UI, con subida firmada directa a GCS (§7).
+- **Delta 2026-10-02 (TASK-1894 Entregable A):** existen las dos primeras escrituras, `POST /api/v1/campaigns/{campaignId}/uploads` (tool `studio.asset.upload.request`) y `POST /api/v1/campaigns/{campaignId}/asset-versions` (tool `studio.asset.version.create`), ambas riskTier T1, capability `marketing_studio.asset.write` y scope `studio:assets:write`. El registro declara `riskTier` explícito en sus 20 operaciones (18 lecturas T0 + 2 escrituras T1) y el manifiesto queda en 15 tools + 5 exclusiones. Contrato completo, kernel y compuertas en §7.3. La revisión (aprobar o pedir cambios) existe sólo como CLI de operador; la aprobación por API es Slice 4 + TASK-1899.
 
 ## 4.1 Agentes y Efeonce MCP
 
@@ -428,6 +429,151 @@ mes. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing
   TASK-1896): `scripts/ops/infra/media-originals.sh --env <env> [--wiring] [--apply]` y `apps/worker/deploy.sh`.
   No se adoptó Terraform: el repo no lo usa.
 
+## 7.3 Puerta de ingreso de originales (TASK-1894, Entregable A)
+
+Estado: **en producción desde 2026-10-02** (Studio `a450a3c` puerta de ingreso, `3fe85a2` semilla de CMP-004 con los
+conceptos S01–S08 y BF1–BF3 y creatividad aprobada por CDR-012, `aa91ce3` el anónimo recibe `write_not_allowed` antes de
+validar el cuerpo; API **1.3.0**). Es la primera puerta del command único de §7: la CLI `pnpm studio:upload` ya la usa;
+MCP (TASK-1899) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Subidas.
+
+**Flujo.**
+
+1. **Pedir la subida** — `POST /api/v1/campaigns/{campaignId}/uploads` (`requestAssetVersionUploadCommand`, tool
+   `studio.asset.upload.request`) con `filename`, `byteSize`, `mimeType`, `sha256`, derechos mínimos (`licenseKind`) y la
+   pieza (`assetId` con `If-Match` = `revision`, o `newAsset { conceptId, title, kind, aspectRatio }`, o inferida del
+   nombre). Valida tamaño (≤ 1 GiB), extensión y tipo, derechos e `If-Match`; deduce la pieza; tope de 20 subidas
+   abiertas por actor. Respuestas: `duplicate` si el sha256 ya es una versión de esa pieza; `awaiting_confirmation` sin
+   URL si los bytes ya están en el bucket; si no, `awaiting_upload` con una URL V4 de 30 min a
+   `originals/sha256/<aa>/<sha256>`. `dryRun` devuelve la inferencia sin escribir.
+2. **Subir** — el cliente hace `PUT` directo a GCS. Cabeceras firmadas: `content-type`, `x-goog-if-generation-match: 0` y
+   `x-goog-meta-sha256`; para video o archivos de más de 32 MiB la URL es reanudable (`x-goog-resumable: start`). Los
+   bytes nunca pasan por Vercel ni por MCP.
+3. **Confirmar** — `POST /api/v1/campaigns/{campaignId}/asset-versions` (`createAssetVersionCommand`, tool
+   `studio.asset.version.create`) con el `uploadId`: **202** + `Retry-After: 5` mientras el worker verifica; **201** cuando
+   la versión existe; **422** `upload_rejected` con `reason`; **410** `upload_expired`.
+4. **Verificar en el worker** — el `OBJECT_FINALIZE` del objeto llega al worker (§7.2), que ejecuta
+   `verifyUploadedOriginal`: recalcula sha256, tamaño, firma de bytes y proporción (±1 %). Si pasa, crea el
+   `media_object` y la versión con `review_state = pending_review` y actor = quien pidió la subida, y genera los
+   derivados en la misma corrida. Si falla, marca la subida `rejected` con su `reject_code` y borra el objeto con
+   precondición de generación cuando nadie más lo usa.
+5. **Revisar** — una persona aprueba o pide cambios (`commands/review.ts`, CLI `pnpm studio:review`). Hasta entonces la
+   versión no es la vigente.
+
+**Invariantes.**
+
+- Ninguna fila de `asset_version` ni de `media_object` nace con un sha256 que Studio no recalculó. La versión la crea el
+  **worker**, nunca la web ni el cliente.
+- El actor de la versión es quien pidió la subida (`created_by`), no el worker.
+- **Vigente** = la mayor `version_no` con `review_state` ∈ {`imported`, `approved`}. Una versión `pending_review` o
+  `changes_requested` nunca reemplaza a la vigente.
+- Aprobar una pieza no autoriza pauta: `media_authorization` sigue en su estado (hoy `pending`).
+- Un cliente de API nunca aprueba (`approval_requires_person`); la revisión es hoy sólo de `operator_cli` (adelanto del
+  Slice 4 para el operador).
+- El importador no agrega versiones del catálogo a una pieza que ya tiene versiones `origin = 'studio'` (las cuenta como
+  `skipped_studio_owned_asset`).
+- El `domain-boundary-gate` mantiene una allowlist de los módulos del dominio que escriben en `studio.*`.
+
+**Kernel de commands** (`packages/domain/src/commands/kernel.ts`: `runCommand`, `authorize`, `requestDigest`,
+`sweepIdempotencyRecords`). Compuertas, en orden:
+
+| Compuerta | Regla |
+|---|---|
+| Autoridad | anónimo del modo open → 403 `write_not_allowed` (antes de validar el cuerpo); `user` → `forbidden` hasta TASK-1898; `api_client` → exige el scope de la tool y nunca aprueba; `operator_cli` → escribe |
+| Riesgo | `riskTier` leído del registro: T1 exige `Idempotency-Key` (400 `idempotency_key_required`); T2 bloqueado hasta TASK-1899 |
+| Organización | fuera de lo visible → 404 (anti-oráculo) |
+| Idempotencia | misma llave + mismo cuerpo (digest) = replay de la respuesta guardada; otro cuerpo = 422 `idempotency_key_reused`; la carrera se resuelve con `ON CONFLICT`; registros de 24 h |
+| `dryRun` | ejecuta las validaciones sin escribir |
+| Respuesta terminal | se guarda en la misma transacción que la escritura |
+
+**Persistencia** (migración `1790956839977_asset-ingest-door.sql`, aplicada el 2026-10-02 con el rol migrador en
+`marketing_studio_staging` y `marketing_studio`):
+
+- `studio.asset.revision` (entero, default 1): base del `If-Match`.
+- `studio.asset_version`: `origin` (`catalog_import` | `studio`), `review_state` (`imported` | `pending_review` |
+  `approved` | `changes_requested`), `created_by`, `original_filename`, `reviewed_by`, `reviewed_at`, `review_note`;
+  CHECK `asset_version_origin_review_chk` y `asset_version_reviewed_chk`.
+- `studio.asset_upload`: estados `awaiting_upload`, `awaiting_confirmation`, `pending_verification`, `completed`,
+  `rejected`, `expired`; `reject_code` `sha256_mismatch`, `size_mismatch`, `type_rejected`, `aspect_ratio_mismatch`,
+  `revision_conflict`; vence a las 24 h.
+- `studio.idempotency_record`: PK (actor, `operation_id`, `idempotency_key`), 24 h.
+- Barrido `sweepUploads` (dentro de `/jobs/reconcile-derivatives`): vence subidas, retoma `pending_verification` de más
+  de 15 min y borra objetos huérfanos de más de 24 h sin fila ni subida viva; además purga registros de idempotencia
+  vencidos.
+
+**Inferencia por nombre** (`filename-convention.ts`): patrón `CMP###-<seq> - <título> - <WxH>.<ext>`, donde `seq` admite
+0–2 letras y 1–2 dígitos (`S01`, `BF1`); la pieza deducida es `<concepto>-<imagen|video>-<WxH>`. Un sufijo de taller deja
+el archivo sin inferir (`filename_not_inferable`): hay que indicar `--asset` o `--new-asset`.
+
+**Contrato** (`packages/contracts/src/commands.ts`):
+
+- DTO `AssetVersion` suma `origin`, `reviewState`, `createdBy` (etiqueta legible: «Cliente de API», «Operador (x)») y
+  `createdAt`; `Asset` suma `revision` (para `If-Match`) y `pendingVersionNo`.
+- `ToolSpec` distingue lectura y escritura; `WriteTransport` describe el transporte de la escritura. Scopes nuevos de
+  `api_client`: `studio:assets:write` y `studio:write`.
+- `ErrorBody` admite `reason` y `missing`. Errores nuevos:
+
+| `code` | HTTP | Cuándo |
+|---|---|---|
+| `write_not_allowed` | 403 | actor de sólo lectura (anónimo del modo open) |
+| `upload_disabled` | 403 | `STUDIO_UPLOADS_ENABLED` apagado, o sin bucket o firmante en el ambiente (nunca firma a medias) |
+| `approval_requires_person` | 403 | un cliente de API intenta aprobar |
+| `precondition_required` | 428 | falta `If-Match` |
+| `revision_conflict` | 412 | la `revision` cambió |
+| `idempotency_key_required` | 400 | escritura T1 sin `Idempotency-Key` |
+| `idempotency_key_reused` | 422 | misma llave con otro cuerpo |
+| `validation_failed` | 422 | valores inválidos |
+| `rights_required` | 422 | faltan los derechos mínimos (`missing`) |
+| `filename_not_inferable` | 422 | el nombre no permite deducir la pieza |
+| `upload_rejected` | 422 | la verificación falló (`reason`) |
+| `upload_expired` | 410 | la subida venció |
+| `payload_too_large` | 413 | más de 1 GiB |
+| `unsupported_media_type` | 415 | tipo fuera de la allowlist |
+| `too_many_open_uploads` | 429 | más de 20 subidas abiertas del actor |
+| `invalid_state_transition` | 409 | cambio de estado no permitido |
+
+**Flags y orden de encendido.** Primero el worker, después la web:
+
+1. `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` (SoT `apps/worker/deploy.sh`): `true` en staging
+   (`marketing-studio-media-worker-staging-00003-2h9`) y producción (`marketing-studio-media-worker-00002-hzn`, imagen
+   `3fe85a228e0d`). Apagado, el worker no verifica ni barre subidas.
+2. `STUDIO_UPLOADS_ENABLED` (Vercel de Studio): `true` en Production desde 2026-10-02 y en Preview sólo para la rama
+   `task-1894-upload-door`. Apagado (o sin bucket o firmante), las escrituras de subida responden 403 `upload_disabled`.
+
+Firmante de las URLs de subida: `STUDIO_UPLOAD_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` →
+`GCP_SERVICE_ACCOUNT_EMAIL` (primera definida).
+
+**IAM por prefijo** (etapa `scripts/ops/infra/media-originals.sh --env <env> --upload-door [--apply]`, aplicada en
+staging y producción el 2026-10-02): la SA del runtime recibe `storage.objectCreator` condicionado a
+`originals/sha256/` (sin borrar ni sobrescribir); el worker recibe el rol custom `marketingStudioOriginalsDeleter`
+(sólo `storage.objects.delete`) condicionado al mismo prefijo y siempre borra con precondición de generación. CORS
+`PUT`/`POST` en el bucket de originales: producción `https://studio.efeonce.org`; staging `https://*.vercel.app` y
+`http://localhost:3100`. GCS no admite comodines parciales en CORS, así que la subida desde el navegador en previews
+queda por validar en TASK-1895; la CLI no usa CORS.
+
+**Desviación de la spec.** La spec pedía la CLI como `operator_cli` impersonando la SA de ingesta; se implementó por
+HTTP como `api_client` con scope `studio:assets:write` (token en Secret Manager `marketing-studio-upload-cli-token`,
+staging `marketing-studio-upload-cli-token-staging`): una sola puerta para CLI, UI y agentes, sin firmar desde la CLI.
+
+**Evidencia.** Staging: anónimo 403 `write_not_allowed`; `dryRun` sin escribir; `PUT` firmado 200; confirmación
+202 → 202 → 201 (`CMP004-S01-imagen-4x5` v1 `pending_review`); `worker_run` con `versions_created 1, generated 5`;
+`studio:review approve` → `currentVersion` aprobada y `pendingVersionNo` null. Producción: import de la semilla con 11
+conceptos nuevos (segundo apply 0 filas); 33 piezas de CMP-004 (`CMP004-<S01..S08|BF1..BF3>-imagen-<4x5|9x16|1x1>`)
+subidas con `studio:upload --new-asset`, licencia `ai_generated`: 33 versiones `origin = studio`, 33 sha256 únicos que
+coinciden con `CONTROL-DE-PIEZAS.csv` de OneDrive, 33 `pending_review`, 132 derivados, 33 subidas `completed`. Pruebas
+unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integration.test.ts` contra staging
+(transacción revertida) verdes; `pnpm check` verde.
+
+**Pendiente.**
+
+- Greenhouse: capability `marketing_studio.asset.write` en `entitlements-catalog.ts`, seed en `capabilities_registry`,
+  grants (`efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`) y release — no autorizado aún. Hoy no
+  bloquea: el kernel no deja escribir a personas por sesión (TASK-1898) y los clientes de API usan scope.
+- Gateway: `pnpm studio:manifest:sync` sin correr; las tools de escritura quedarían fuera por
+  `write_tool_without_scope_class` hasta TASK-1899.
+- De la spec del Entregable A: puerto `ChannelValidator` y `CommandResult.warnings` (los enchufa TASK-1905); decidir la
+  exclusión de `studio:review` en `operations.ts` (CLI de operador, hoy sin entrada).
+- Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
+
 ## 8. Interfaz
 
 - Diseño aprobado por el operador el 2026-09-25 (artifact «v2 · Claro y oscuro»).
@@ -546,7 +692,7 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1893 | Originales en GCS + worker de medios | Complete 2026-09-26 (en producción) |
 | TASK-1896 | Observabilidad, alertas y restauración | Complete 2026-09-26 (en producción; restauración probada) |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
-| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | To-do |
+| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregables B y C pendientes |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |
 | TASK-1899 | Escrituras, subida y aprobaciones por MCP (scopes `.write`/`.approve`, identidad delegada) | To-do |
 | TASK-1897 | Revocar `CONNECT` de PUBLIC en `greenhouse_app` | To-do |
