@@ -1,5 +1,9 @@
 # TASK-1854 — Inicio y Mis servicios: resultados, avance y próximos pasos
 
+## Delta 2026-10-02
+
+- El operador aprobó en canvas una Home de clientes nueva (artboard `Cliente.dc.html` de https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU) dentro del programa `TASK-1967` (Homes por rol). Choca con esta task en `/home` cliente y en su dirección visual del 2026-09-09. Antes de implementar, el operador decide si esta task se absorbe como hija G de `TASK-1967` o si actualiza su dirección al canvas aprobado. Hallazgos que aplican aquí: la mezcla de servicios sale de los módulos asignados (`creative_hub_globe_v1`, `seo_v2`, `ai_visibility_v1`); `loadHomeAiInsightsBento` puede filtrar datos entre clientes (corrección en la hija A de `TASK-1967`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
