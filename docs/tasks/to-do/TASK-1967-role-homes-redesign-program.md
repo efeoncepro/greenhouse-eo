@@ -31,13 +31,13 @@
 
 ## Summary
 
-Coordina la implementación de las tres Homes que el operador aprobó el 2026-10-02 en el canvas «Greenhouse Home renovada» (https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU): equipo interno/admin, clientes y colaboradores. Las tres comparten chrome (logo Efeonce arriba, Greenhouse al pie, topbar flotante), el saludo con el Spark rig 2.5D y el composer de Elio que abre la conversación debajo, y difieren en sus paneles por rol. Este umbrella fija el orden, el dueño de cada pieza y los hallazgos de discovery; el código vive en las hijas.
+Coordina la implementación de las tres Homes que el operador aprobó el 2026-10-02 en el canvas «Greenhouse Home renovada» (https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU): equipo interno/admin, clientes y colaboradores. Las tres comparten chrome (logo Efeonce arriba, Greenhouse al pie, topbar flotante), el saludo con el Spark rig 2.5D y el composer de Nexa que abre la conversación debajo, y difieren en sus paneles por rol. Este umbrella fija el orden, el dueño de cada pieza y los hallazgos de discovery; el código vive en las hijas.
 
 ## Why This Task Exists
 
 La Home actual no sostiene la dirección aprobada y el discovery del 2026-10-02 (4 agentes en paralelo) encontró que casi todo el dato existe en dominios productores pero no está expuesto con el alcance correcto, y que hay defectos vivos en la Home de hoy:
 
-- El composer de Elio de la Home v2 no abre nada: `HomeHeroAi.tsx:53` hace `router.push('/home?nexa=…')` y nadie lee `?nexa=`.
+- El composer de Nexa de la Home v2 no abre nada: `HomeHeroAi.tsx:53` hace `router.push('/home?nexa=…')` y nadie lee `?nexa=`.
 - `loadHomeAiInsightsBento()` (`src/lib/home/loaders/load-ai-insights-bento.ts:38-43`) no recibe contexto de tenant y su audiencia incluye `client`: **posible fuga entre clientes** (inferido del código, no verificado en runtime).
 - El pulse-strip del cliente muestra Reliability y Sync Notion con enlaces a `/admin` (`load-pulse-strip.ts:339`); `/api/client-portal/account-summary` entrega costo laboral y margen al cliente (`src/lib/account-360/organization-executive.ts:30`).
 - «Continúa donde lo dejaste» guarda títulos como «Persona e603fade» porque el cliente arma el título desde la URL (`src/components/greenhouse/RecentsTracker.tsx:27-33`) y el upsert lo conserva.
@@ -79,7 +79,7 @@ Reglas obligatorias:
 - Toda variante de shell nueva nace como fila en `greenhouse_serving.home_rollout_flags` (extender el CHECK y los dos type unions), nunca como env var binaria.
 - El cliente nunca ramifica por `session.businessLines`; el tipo de servicio sale de los módulos asignados (`resolveClientPortalModulesForOrganization`).
 - Una métrica con `dataStatus` `suppressed` o `low_confidence` no se muestra como si fuera válida (metric trust policy).
-- El Spark es el Spark de Efeonce: nunca se rotula con el nombre del asistente. El asistente del composer se llama **Elio** (decisión del operador 2026-10-02); en estas Homes el copy visible dice «Elio» y sale de `src/lib/copy/*`. El runtime y los identificadores técnicos existentes (`src/lib/nexa/**`, `/api/home/nexa`) no se renombran en este programa.
+- El Spark del saludo se llama **Elio** (decisión del operador 2026-10-02): su etiqueta y su nombre accesible dicen «Elio · <estado>». Elio no es el asistente: el composer y la conversación siguen siendo de **Nexa**. Si algún día Elio reemplaza a Nexa, lo decide el operador en otra task.
 
 ## Normative Docs
 
@@ -128,7 +128,7 @@ Reglas obligatorias:
 ### Gap
 
 - **Chrome y saludo**: bump de los paquetes AXIS; hospedaje de las capas del rig (`sparkRigBase(línea, '/static/…')`); logo Efeonce en el menú con isotipo al colapsar; wordmark Greenhouse al footer con estado de plataforma y versión; topbar como tarjeta flotante; composer que abre la conversación debajo del saludo (hoy no abre nada).
-- **Interna**: no hay reader único de «Performance del equipo» (KPIs + throughput semanal con cycle time + piezas trabadas + utilización + headcount) con filtro por equipo o cliente; la taxonomía de equipos (creativo, contenido, estrategia) no existe (`TeamRoleCategory` no tiene «content»); `stuck-assets` tiene SQL inline en la ruta; no hay contador unificado de aprobaciones; no hay reader de portafolio de señales por cliente (AEO + SEO + comercial) y faltan la indexación (ICR) y la actividad de HubSpot (deals sin actividad, renovaciones sin reunión); la banda de capacidad del código (≥85 alto) no coincide con el glosario (80–90 % sano); la segmentación de novedades por audiencia no existe; no hay fuente de versión expuesta a la UI; no hay integración de clima.
+- **Interna**: no hay reader único de «Performance del equipo» (KPIs + throughput semanal con cycle time + piezas trabadas + utilización + headcount) con filtro por equipo o cliente; la taxonomía de equipos (creativo, contenido, estrategia) no existe (`TeamRoleCategory` no tiene «content»); `stuck-assets` tiene SQL inline en la ruta; no hay contador unificado de aprobaciones; no hay reader de portafolio de señales por cliente (AEO + SEO + comercial) y faltan la indexación (ICR) y la actividad de HubSpot (deals sin actividad, renovaciones sin reunión); la banda de capacidad del código (≥ 85 % alta, 35–85 % equilibrada) es la que manda; el glosario (80–90 %) queda por alinear; la segmentación de novedades por audiencia no existe; no hay fuente de versión expuesta a la UI; no hay integración de clima.
 - **Clientes**: no hay resolver de «mezcla de servicios» que entregue el modo del panel; ICO por organización no está expuesto en client-portal; no hay serie semanal de entregas; ACR, OTL, PVR e ICR sólo existen en el glosario (ACR es una foto, la recurrencia es `TASK-1707`); no hay share of voice por motor contra un competidor; la cola de revisión vive dentro de la ruta; el equipo devuelve `avatar_url` crudo y filtra por `client_id`; el director de cuenta no está expuesto; no hay reader de próximos hitos (QBR no existe como entidad).
 - **Colaboradores**: no hay lista de tareas por persona (`greenhouse_delivery.tasks` tiene las columnas); no hay serie semanal personal; el conteo de piezas en revisión del cliente por persona no existe; la «próxima fecha de pago» no es un concepto canónico (sólo `scheduled_for` de órdenes existentes); la próxima evaluación necesita el plazo del ciclo; `/api/my/assignments` expone `costPerHourTarget` y `suggestedBillRateTarget`; varias rutas `/api/my/*` responden 500 con mensaje crudo.
 
@@ -138,7 +138,7 @@ Reglas obligatorias:
 - Current home: `src/app/(dashboard)/home`, `src/app/(dashboard)/my`, `src/lib/home/**`, `src/views/greenhouse/home/v2/**`, `src/components/layout/**`
 - Future candidate home: `portal`
 - Boundary: readers por dominio productor en `src/lib/**`; la Home sólo compone bloques del registro de Home v2; el cliente consume vía el BFF `src/lib/client-portal/**`
-- Server/browser split: loaders y readers server-only; el Spark rig y el composer de Elio son client components que reciben datos ya resueltos
+- Server/browser split: loaders y readers server-only; el Spark rig y el composer de Nexa son client components que reciben datos ya resueltos
 - Build impact: bump de tres paquetes AXIS y capas del rig como estáticos versionados; sin dependencias nuevas fuera de AXIS salvo el adapter de clima, que decide su hija
 - Extraction blocker: none
 
@@ -167,8 +167,8 @@ Cada slice de este umbrella es una task hija que se crea con `greenhouse-task-pl
 
 ### Slice 2 — Hija B · Chrome compartido y saludo con Spark (ui-ux, primitive)
 
-- Bump de `@efeoncepro/axis-graphic-line`, `axis-brand-assets` y `axis-ui-contracts`; capas del rig como estáticos versionados; primitive de saludo con `<SparkRig line="engine">`, indicador de pensamiento bajo el Spark (sin rotular con el nombre del asistente) y halo sin anillo.
-- Composer de Elio (sobre el runtime Nexa existente) que abre la conversación debajo del saludo sobre el runtime existente (reemplaza el `router.push('/home?nexa=…')` muerto), sugerencias como burbujas pequeñas.
+- Bump de `@efeoncepro/axis-graphic-line`, `axis-brand-assets` y `axis-ui-contracts`; capas del rig como estáticos versionados; primitive de saludo con `<SparkRig line="engine">`, indicador de pensamiento bajo el Spark (rotulado «Elio · <estado>», nunca «Nexa») y halo sin anillo.
+- Composer de Nexa (runtime existente) que abre la conversación debajo del saludo sobre el runtime existente (reemplaza el `router.push('/home?nexa=…')` muerto), sugerencias como burbujas pequeñas.
 - Logo Efeonce en el menú con isotipo al colapsar; Greenhouse al footer con estado de plataforma y versión; topbar flotante; menú de teléfono como barra con botón.
 
 ### Slice 3 — Hija C · Readers de la Home interna (backend-data)
@@ -219,7 +219,7 @@ Decisiones de diseño del operador (2026-10-02) que todas las hijas heredan:
 | Elemento | Decisión aprobada |
 |---|---|
 | Saludo | Fecha + clima (sin «Efeonce Group»), título en Bricolage, bajada que resume el día; Spark rig 2.5D (línea Engine) con halo y sin anillo; bajo él, indicador de pensamiento de tres esferas con la palabra del estado (En espera, Escuchando, Pensando, Trabajando, Respuesta lista); con movimiento reducido quedan quietas |
-| Composer | Campo sin lupa con indicación «Enter ↵»; al enviar, la conversación con Elio se abre debajo, dentro del saludo (pregunta, respuesta con fuente y acciones, «Abrir en pantalla completa», cerrar); sin aviso de IA generativa en la portada |
+| Composer | Campo sin lupa con indicación «Enter ↵»; al enviar, la conversación con Nexa se abre debajo, dentro del saludo (pregunta, respuesta con fuente y acciones, «Abrir en pantalla completa», cerrar); sin aviso de IA generativa en la portada |
 | Sugerencias | Tres burbujas pequeñas (34 px) con la esquina superior izquierda casi recta, ligadas a lo que muestra la Home de cada rol; se ocultan al abrir la conversación |
 | Chrome | Logo Efeonce arriba del menú, isotipo al colapsar; Greenhouse a color en el footer de contenido con «Greenhouse™ es una plataforma de Efeonce Group», enlaces, estado de plataforma vivo y versión; topbar como tarjeta blanca flotante igual al portal en vivo; en teléfono el menú es una barra con botón |
 | Interna | Performance del equipo (OTD, FTR, RpA, Cycle Time con meta y estado + throughput semanal con cycle time + piezas trabadas, utilización y personas) con desplegable por equipo/cliente; Tu foco hoy; Señales de tus clientes con filtros AEO/SEO/Comercial; novedades tipo login; capacidad del equipo; Continúa donde lo dejaste |
@@ -312,16 +312,16 @@ Umbrella: el runtime lo define cada hija. Aquí sólo el impacto y el orden que 
 
 - Crear las hijas A–F y H con `greenhouse-task-planner` (empezar por A); la G es `TASK-1854`.
 - Si la fuga de `loadHomeAiInsightsBento` se confirma, `ISSUE-###` en `docs/issues/open/`.
-- Decidir la fuente de verdad de la banda de capacidad (código ≥ 85 alto vs glosario 80–90 % sano).
+- Alinear `docs/context/06_glosario-metricas.md` (hoy dice 80–90 %) a la banda del código, que es la que manda (decisión del operador 2026-10-02).
 - Taxonomía de equipos para el filtro de performance (creativo, contenido, estrategia).
 - Entidad de hitos de cuenta (QBR) si el operador la quiere real.
 
 ## Delta 2026-10-02
 
-- Decisiones del operador del mismo día: el asistente se llama **Elio**; la Home de colaboradores sigue en `/my`; el clima va con un proveedor gratuito sin API key. Los artboards del canvas ya dicen «Elio».
+- Decisiones del operador del mismo día: el Spark se llama **Elio** y el asistente sigue siendo **Nexa** (reemplazarlo queda para otra decisión); la Home de colaboradores sigue en `/my`; el clima va con un proveedor gratuito sin API key; la banda de capacidad que manda es la del código (`getCapacityHealth` en `src/lib/team-capacity/units.ts`: alta desde 85 %, equilibrada 35–85 %, baja bajo 35 %). Los artboards del canvas ya lo reflejan.
 - El operador decidió absorber `TASK-1854` como hija G de este programa. Mantiene su ID, su epic (EPIC-046), sus bloqueos `TASK-1852`/`TASK-1853` y su alcance de «Mis servicios»; su dirección visual se reemplaza por el artboard `Cliente.dc.html` aprobado.
 
 ## Open Questions
 
-- ¿«Elio» reemplaza a «Nexa» en todo el portal (menú, chat flotante, insights, copy de `GH_NEXA`) o sólo en estas Homes? Si es global, es una task aparte de renombre.
-- ¿Qué banda de capacidad manda: la del código o la del glosario?
+- Ninguna abierta al 2026-10-02: las cinco decisiones de diseño quedaron registradas en el Delta.
+
