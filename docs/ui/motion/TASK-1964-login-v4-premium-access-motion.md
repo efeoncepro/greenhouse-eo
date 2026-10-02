@@ -36,3 +36,11 @@
 ## Non-goals
 
 - Sin parallax por puntero, sin partículas, sin logo 3D (reemplaza a `TASK-233`).
+
+## Delta 2026-10-02 — Lo implementado
+
+- **M4 (lente):** la geometría sale del canon de AXIS (`paintGraphicLine` / resolver de la lente): arco de 50° con ángulo derivado de `AXIS_GRAPHIC_LINE_POSITION_DEGREES` (`upper-start`), trazos y esfera escalados por ancho. Corregido un defecto: `vector-effect: non-scaling-stroke` junto con `pathLength` partía el arco en dos tramos.
+- **Novedad sin lente:** M4 no corre; la foto entra a color entero con M2/M3.
+- **Voz:** el anillo pequeño del kicker y la esfera del titular son estáticos (marcas tipográficas, no animación).
+- **Sin verificar:** captura con `prefers-reduced-motion: reduce`; visibilidad real de M9 (`OrbitLoader`) en caliente; sin evidencia registrada de M10 (llegada).
+- **Pendiente (operador: «después»):** transiciones adicionales del acceso.

@@ -1,6 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo `develop` en `d1a41babb` — 2026-10-01 (última entrada: los perfiles sociales y los
+> Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964, sin commit propio todavía) —
+> 2026-10-02 (última entrada: el login V4 de Greenhouse); antes, `d1a41babb` — 2026-10-01 (los perfiles sociales y los
 > destacados de Instagram); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO, TASK-1949); antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
 > módulos de correo); antes, greenhouse-eo@f05c26e2f (`develop`) — 2026-09-29, noche (el deck de práctica
 > Salesforce, TASK-1942; antes, greenhouse-eo@2c95e60b2: la órbita del AI
@@ -365,6 +366,11 @@
   operador cuál es su foto actual y cómo se viste hoy; ancla la identidad en esa foto (o márcala «falta foto actual»,
   como Humberly y Luis en el [roster](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md)) y
   declara el vestuario en la escena (si no, lo decide la referencia).
+  **Actualización 2026-10-02:** la pregunta ya tiene respuesta del operador: la referencia de identidad del equipo es
+  el **avatar oficial con la bomber** («Es el último, descarta los anteriores, es donde salen con la bomber»;
+  `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png`, maestro de `team/avatars/v1/1080/`), para
+  Andrés, Daniela, Melkin, Humberly y Valentina; Julio conserva su set. `actual` y `antiguo` quedan en disco pero ya no
+  son referencia ([ledger](ledger.md), 2026-10-02 (c); roster §«Quién está y de qué foto sale»).
 
 ## 2026-09-29 (la órbita del AI Visibility Report dice la gravedad)
 
@@ -551,6 +557,33 @@
 - **Una edición de nitidez puede meter personas.** En Portafolio y Recetas, la edición con GPT Image que pedía sólo
   detalle agregó personas ajenas al roster; se sacaron con recorte. Regla: después de una edición, mirar al 100 % si
   apareció alguien; nunca personas fuera del roster en una foto de marca.
+
+## 2026-10-02 (el login V4 de Greenhouse, TASK-1964)
+
+- **`vector-effect: non-scaling-stroke` con `pathLength` + `stroke-dasharray` parte el arco en dos.** Síntoma: en
+  Chrome, el arco de acento de la lente salía como dos tramos separados. Causa: el trazo deja de escalar con el SVG
+  pero el guion sigue normalizado por `pathLength`, y el patrón de guiones ya no calza con el largo real del trazo
+  [la explicación es inferencia; el síntoma, medido en Chrome]. Regla: el arco es **un path con sus dos extremos**
+  (`arcPath` en `src/components/greenhouse/motion/orbit-geometry.ts`), nunca un círculo con guiones, y el grosor se
+  escala a mano (× ancho/794, `orbitWidthScale`) en vez de `non-scaling-stroke`.
+- **Con `object-fit: cover` la lente se corre del sujeto según la proporción del contenedor.** Síntoma: al cambiar
+  el ancho de la ventana, el círculo caía sobre otra parte de la foto. Causa: `cover` recorta distinto según la proporción y
+  el punto de la foto ya no es el punto del contenedor. Regla: `object-position: x% y%` con el mismo `lens.x`/`lens.y`
+  de la lente; así el punto de la foto y el del escenario coinciden en cualquier proporción (`LoginLens.tsx`).
+- **La anatomía de la lente se escala por el ancho, con piso.** Trazos y esfera crecen × ancho/794
+  (`orbit.baseWidthPx`, `orbitWidthScale`); en lienzos chicos manda el piso del token, `orbit.arcStrokePx[0]` y
+  `orbit.sphereRadiusPx[0]`. Nunca un grosor fijo en px ni transcrito del canvas.
+- **El paquete raíz `@efeoncepro/axis-graphic-line` arrastra el pintor SVG y los íconos al bundle del cliente.** Para
+  una pantalla del producto que sólo necesita una medida (la esfera de la respuesta), se lee el token y se replica la
+  función mínima: `answerSphere` en `orbit-geometry.ts` sale de `efeonceGraphicLine.sphere` con el mismo cálculo del
+  paquete. Regla: en UI de cliente, tokens (`@efeoncepro/axis-tokens`) sí; el paquete de pintura, no, salvo un subpath
+  liviano verificado en el bundle.
+- **La voz en una pantalla del producto también es par pregunta-respuesta.** El operador pidió «El ring y la esfera
+  faltan como manda /efeonce-graphic-line»: el anillo pequeño va delante del kicker y la esfera es el punto del
+  titular, en el acento de la línea. Quedó **pendiente** que la respuesta sea de 1–3 palabras y que el kicker, que hoy
+  es una etiqueta, no se escriba como pregunta si no lo es ([criteria.md](criteria.md) §4).
+- **Una foto cuya luz ya es una órbita no lleva lente.** Las novedades cine del login (`LG1`, `LG2e`) van sin lente
+  (una órbita por pieza); la foto en registro B (`LG3e`) sí la lleva. El operador lo aceptó.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

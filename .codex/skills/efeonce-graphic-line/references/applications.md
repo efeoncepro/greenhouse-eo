@@ -11,7 +11,8 @@ vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28 · §C4
 de la medida: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29 · §L «El deck SEO/AEO» (catálogo `2f2784d93`,
 intents `2382ed624`, orden `b84ec7084`; sin plantillas ni AXIS todavía) — 2026-09-30 · §A11 (perfiles sociales de
 Efeonce): `develop` en `d1a41babb` (commits `877165732`, `9e8f5feda`, `d8cb83b9a`, `4e362bb8b`, `d1a41babb`, sin
-push) — 2026-10-01
+push) — 2026-10-01 · §A12 (el login V4 de Greenhouse, TASK-1964): árbol local de `develop` sobre `b0efd42a3`
+(`src/views/login/LoginLens.tsx`, `src/components/greenhouse/motion/orbit-geometry.ts`) — 2026-10-02
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -389,6 +390,39 @@ vale en toda aplicación:
   en cada red del perfil de Efeonce y crear los destacados en Instagram; las historias de adentro de cada destacado
   (más allá de la de portada).
 - **Fuente:** [ledger.md](ledger.md), filas 2026-10-01, (b), (c) y (d).
+
+### A12. Escenario del login de Greenhouse (TASK-1964, 2026-10-02 — excepción en curso)
+
+- **Estado:** dirección V4 aprobada por el operador el 2026-10-02 e implementada en local (TASK-1964 en curso). Es la
+  **primera pantalla del producto Greenhouse con La órbita**, contra el alcance escrito de esta skill («No: la interfaz
+  del producto Greenhouse»): **riesgo abierto**, no regla nueva. Falta la decisión del operador y su canon en AXIS
+  ([ledger.md](ledger.md), Pendientes). No se extiende a otra pantalla del producto.
+- **Para qué:** la primera impresión del producto. Formulario sobre papel con Efeonce como marca principal y un
+  escenario fotográfico con la **Lente**, donde rota un carrusel de novedades.
+- **Va:** la Lente (sólo en una foto que no traiga su propia órbita), la voz de la novedad (anillo pequeño delante del
+  kicker, esfera como punto del titular) y la mini órbita del botón y del `OrbitLoader` post-login (motion de la task).
+- **La Lente, al canon de AXIS** (`LoginLens.tsx`, valores desde `efeonceGraphicLine`, nunca transcritos):
+  - anillo **con aire**: a 1,12 × el radio de la foto (`1 + orbit.ringAirRatio`);
+  - la foto de adentro **ampliada × `lens.zoom`** (1,25), a color, no saturada; afuera, `lens.outside` (gris,
+    contraste, brillo y multiplicado con el fondo Efeonce), que es la reserva del texto;
+  - trazos y esfera **× ancho/794** (`orbitWidthScale`, base `orbit.baseWidthPx`), con los pisos
+    `orbit.arcStrokePx[0]` y `orbit.sphereRadiusPx[0]` en lienzos chicos;
+  - arco de **50°** (`lens.anatomy.arcSweepDeg`) centrado en `upper-start`, con la esfera en su punta, en el
+    **acento de la línea de servicio** de la novedad (`lineAccentOnDark`; sin línea, Growth).
+- **Encuadre de la foto:** `object-fit: cover` corre la lente del sujeto según la proporción; `object-position: x% y%`
+  con el mismo `lens.x`/`lens.y` hace que el punto de la foto y el del escenario coincidan en cualquier ancho.
+- **Fotos del escenario:** `LG1` (Nexa, cine) y `LG2e` (directora de casting, cine) van **sin lente**, porque su luz ya
+  es la órbita de la pieza (una órbita por pieza; el operador lo aceptó); `LG3e` (registro B) lleva la lente. El cine
+  con una persona de casting es una excepción del login (registro cine, delta 2026-10-02 (c)). Fotos y fichas:
+  `ai-generations/2026-10-02_login-escenario/`; las fotos de referencia se reemplazan antes de producción (task).
+- **Voz:** anillo y esfera en el acento («El ring y la esfera faltan como manda /efeonce-graphic-line»). La esfera se
+  calcula como `answerSphere` de AXIS, replicada desde el token en `orbit-geometry.ts` porque el paquete raíz
+  `@efeoncepro/axis-graphic-line` arrastra el pintor y los íconos al bundle del cliente. **Pendiente:** respuesta de
+  1–3 palabras y kicker como etiqueta, no como pregunta ([criteria.md](criteria.md) §4).
+- **Nunca:** extender la línea a otra pantalla del producto mientras siga abierto el riesgo · un arco con
+  `non-scaling-stroke` + `pathLength`/`stroke-dasharray` (Chrome lo parte en dos tramos: [lessons.md](lessons.md),
+  2026-10-02) · lente sobre una foto que ya trae su órbita · valores de la lente escritos a mano.
+- **Fuente:** [ledger.md](ledger.md), 2026-10-02 (b); `docs/tasks/in-progress/TASK-1964-login-v4-premium-access-transition.md`.
 
 ---
 
@@ -919,6 +953,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Avatar de redes | ninguna (el isotipo ya es órbita); halo sin anillo ni arco | isotipo negativo al 60 % sobre `#001a33` | A11 |
 | Favicon / ícono de app | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
 | Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
+| Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |

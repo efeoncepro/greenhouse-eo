@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `none`
-- Status real: `Code complete local (2026-10-02). Migración 20261002200000000 aplicada en la instancia Cloud SQL compartida (dev/staging) con autorización del operador: SELECT confirma lgan-seed-ai-visibility-report (engine, prioridad 20) y lgan-seed-globe-studio (brand, 10) published, y login_announcements.manage activa (create/update, tenant). Tests 10/10, typecheck y lint de los archivos verdes; la página /login local lee el reader. Pendiente: smoke de la API pública en staging tras el deploy, commit/push y cierre documental.`pnpm pg:connect:migrate`) y la evidencia del SELECT.`
+- Status real: `Code complete y migración aplicada (2026-10-02). Migración 20261002200000000 aplicada con autorización del operador en la instancia Cloud SQL compartida (dev/staging/prod son una sola instancia); SELECT confirmó las dos filas seed lgan-seed-* publicadas y la capability login_announcements.manage (create/update, tenant, deprecated_at null). Tests src/lib/login-announcements 10/10 y typecheck verdes; smoke staging de GET /api/public/login-announcements devolvió el DTO público. Contenido vigente cargado con los commands canónicos: 3 novedades publicadas (Engine 40, Brand 30, Growth 10) y lgan-seed-globe-studio archivada. Pendiente para cerrar: evidencia runtime de forbidden sin capability y de [] ante error de base de datos, Down sin ejecutar, pnpm test completo y cierre documental.`
 - Rank: `TBD`
 - Domain: `platform|content`
 - Blocked by: `none`
@@ -32,6 +32,16 @@
 ## Summary
 
 El login V4 aprobado por el operador el 2026-10-02 (canvas «Login Greenhouse · La órbita») muestra sobre la foto un carrusel de novedades para clientes — productos nuevos, funciones de Greenhouse y cross selling por línea de servicio. Esta task crea la fuente de verdad de esas novedades: la tabla `greenhouse_core.login_announcements`, el reader canónico que entrega las vigentes al login, la API pública de lectura y los commands de administración gateados por capability, para que marketing, la UI y Nexa operen el mismo contrato.
+
+## Delta 2026-10-02
+
+- Migración aplicada en la instancia compartida con autorización del operador; el `Down` no se ejecutó.
+- La guarda admin `requireLoginAnnouncementsManager` devuelve una unión discriminada (`{ actorId, response: null } | { actorId: null, response }`) y las rutas discriminan por `gate.response`; con eso `pnpm typecheck` quedó verde.
+- Contenido vigente (actor `operator:julio-reyes:task-1964-login-escenarios`), en orden de prioridad: Engine «Que la IA te encuentre» (`lgan-seed-ai-visibility-report`, 40, `/images/login/announcement-ai-visibility-report.webp`, sin lente); Brand «Una idea, todos los formatos» (Escalar producción creativa, 30, `/images/login/announcement-escalar-produccion-creativa.webp`, sin lente); Growth «Un tema, todos los canales» (Marketing de contenidos, 10, `/images/login/announcement-marketing-de-contenidos.webp`, lente x61 y36 r0,29). `lgan-seed-globe-studio` quedó archivada (reversible). CTA de las dos nuevas: «Conocer el servicio» → `https://efeoncepro.com` (URL provisoria).
+- El id real es `TEXT` con forma `lgan-<uuid>` (migración), no `uuid` como dice el bloque SQL del Detailed Spec.
+- Las fotos del escenario ya son producidas (TASK-1964): el bloqueo de release por fotos de referencia quedó resuelto.
+- Hallazgo en código, sin prueba runtime: las rutas admin pasan primero por `requireAdminTenantContext`, que exige `routeGroup admin` + `efeonce_admin`. Hoy `efeonce_account` y `efeonce_operations` tienen la capability pero no pasan esa guarda; decidirlo junto con la pregunta abierta de roles.
+- Documentación funcional y manual: [Novedades del login](../../documentation/identity/novedades-del-login.md) y [Administrar las novedades del login](../../manual-de-uso/identity/administrar-novedades-del-login.md).
 
 ## Why This Task Exists
 
@@ -271,7 +281,7 @@ DTO público: `{ id, kind, serviceLine, tabLabel, kicker, title, body, cta: { la
 
 ### Out-of-band coordination required
 
-- Confirmación del operador para aplicar la migración en la instancia compartida; reemplazo de las fotos de referencia por fotos producidas antes de producción (bloqueo de release compartido con TASK-1964).
+- Confirmación del operador para aplicar la migración en la instancia compartida (obtenida 2026-10-02); reemplazo de las fotos de referencia por fotos producidas antes de producción (resuelto 2026-10-02 en TASK-1964).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -283,10 +293,10 @@ DTO público: `{ id, kind, serviceLine, tabLabel, kicker, title, body, cta: { la
 ## Acceptance Criteria
 
 - [ ] La migración crea `greenhouse_core.login_announcements` con los checks de invariantes, siembra dos novedades y la capability, y su `Down` revierte ambas. (Up verificado con SELECT el 2026-10-02; el `Down` no se ejecutó.)
-- [ ] `listActiveLoginAnnouncements` devuelve como máximo 3 novedades `published` y vigentes, ordenadas por prioridad, y `[]` ante error de base de datos.
-- [ ] `GET /api/public/login-announcements` responde sin sesión con el DTO público y cabeceras de caché.
-- [ ] Crear/editar/cambiar estado exige `login_announcements.manage` y responde `forbidden` sin ella.
-- [ ] La capability está en el catálogo TS, en el registry y concedida a `efeonce_admin`, `efeonce_account` y `efeonce_operations`.
+- [ ] `listActiveLoginAnnouncements` devuelve como máximo 3 novedades `published` y vigentes, ordenadas por prioridad, y `[]` ante error de base de datos. (Orden y tope vistos en staging con 3 publicadas; el `[]` ante error está en código, sin evidencia runtime.)
+- [ ] `GET /api/public/login-announcements` responde sin sesión con el DTO público y cabeceras de caché. (DTO verificado en staging con `pnpm staging:request`; la llamada sin sesión y las cabeceras no se midieron.)
+- [ ] Crear/editar/cambiar estado exige `login_announcements.manage` y responde `forbidden` sin ella. (En código; sin prueba runtime del `forbidden`.)
+- [x] La capability está en el catálogo TS, en el registry y concedida a `efeonce_admin`, `efeonce_account` y `efeonce_operations`. (Registry por SELECT 2026-10-02; catálogo y grant en código.)
 - [x] Tests de validación y selección pasan.
 
 ## Verification
@@ -305,7 +315,7 @@ DTO público: `{ id, kind, serviceLine, tabLabel, kicker, title, body, cta: { la
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Migración aplicada en staging con evidencia del `SELECT`.
+- [x] Migración aplicada en staging con evidencia del `SELECT`. (2026-10-02, instancia compartida.)
 
 ## Follow-ups
 

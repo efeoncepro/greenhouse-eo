@@ -704,6 +704,17 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 - 🔴 **Editar en otro aspect ratio REENCUADRA al sujeto.** El canon es 4:5 y el modelo sólo entrega 1:1, 2:3
   y 3:2: hay que **padear, editar y recortar** o la cabeza sale desproporcionada. Receta medida en
   [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+- 🔴 **El resto del equipo se ancla en su avatar oficial con la bomber** **[operador, 2026-10-02: «Es el último,
+  descarta los anteriores, es donde salen con la bomber»]**: Andrés, Daniela, Melkin, Humberly y Valentina, con
+  `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png` (maestro 1080 de `team/avatars/v1/1080/`);
+  `actual` y `antiguo` ya no son referencia. Lo resuelve `foto:prompt` desde `PERSONAS`; la prenda la sigue decidiendo
+  la línea de la pieza, no la bomber de la referencia. Canon: [roster](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md).
+- 🔴 **Personaje de casting nuevo (fuera del roster): primero su retrato ancla** **[operador, 2026-10-02, escenario
+  del login]**. Sin ancla, la piel salió «muy IA»; retocar sólo la cara después (`pnpm ai:inpaint image`) no la
+  arregló **[medido]**. Lo aprobado: un retrato de pecho con la piel v3 (`pnpm ai:image`, `gpt-image-2.5-sunburst`
+  high `1024x1536`, 85 mm f/2, ventana grande con rebote) y la escena con `casting` apuntando a él; la escena a
+  2560×1440 (a 3840×2160 la cara salió craquelada, una corrida). Método y fallas 14–20:
+  [casebook cine, escenario del login](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
 - Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
   · [ficha del Character Bible](../../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)
   · [el Bible completo](../../../../docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md).

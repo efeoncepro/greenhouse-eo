@@ -234,6 +234,26 @@
       "protagonista": "Ella aprueba una pieza en su tablet mientras cientos llegan como estelas",
       "porque": "La pieza aprobada en la tablet es la llave desde abajo; la grilla consistente detrás dice escala.",
       "ojo": "Ad aprobado de CMP-004 (2026-10-02): el registro cine con personas del equipo está aprobado sólo para estos ads (CDR-012). Sus versiones 9:16 y 1:1 nativas están en el banco «finales» de AXIS."
+    },
+    {
+      "id": "LG1",
+      "ficha": "ai-generations/2026-10-02_login-escenario/fichas/LG1-ai-visibility-nexa.json",
+      "plate": "ai-generations/2026-10-02_login-escenario/plates/LG1-ai-visibility-nexa.png",
+      "formato": "16:9",
+      "alcance": "nexa",
+      "protagonista": "Nexa con el traje biónico + un Spark en el hombro",
+      "porque": "Freeze motion: una tormenta de miles de tarjetas de respuesta congelada; un haz azul engine detiene UNA y Nexa la atrapa entre dos dedos. La tarjeta es la única llave, desde abajo y al costado de la cara.",
+      "ojo": "Escenario del login (aprobada 2026-10-02): el Spark queda en el 75–91 % del ancho y se recorta en pantallas de 1440; en el login va sin lente (la luz es la órbita)."
+    },
+    {
+      "id": "LG2e",
+      "ficha": "ai-generations/2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json",
+      "plate": "ai-generations/2026-10-02_login-escenario/plates/LG2e-escalar-produccion-orbita.png",
+      "formato": "16:9",
+      "alcance": "publicidad-prueba",
+      "protagonista": "Directora de casting (ancla con piel v3) con el hoodie",
+      "porque": "UNA órbita naranja cerrada de larga exposición con flash de segunda cortina rodea a la persona («ella dirige»); la esfera sobre la palma es la única llave y seis piezas de una campaña viajan congeladas sobre el anillo. Parte de NX6b.",
+      "ojo": "Excepción del operador para el login (cine con casting). Generada a 2560×1440: a 3840 la piel salió craquelada. La órbita ocupa ~27–93 % del ancho y se corta en 1440."
     }
   ]
 }

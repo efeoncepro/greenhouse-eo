@@ -1,6 +1,6 @@
 # La foto y la órbita — contrato de convergencia
 
-> Verificado contra: axis-design-system@220fc23 y greenhouse-eo@e54a888c3 — 2026-09-26 (capa gráfica sobre la foto aprobada entera; banco y guía «El porqué» en AXIS). Antes: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D9 y
+> Verificado contra: greenhouse-eo `develop` sobre `b0efd42a3` — 2026-10-02 (P-4 en el escenario del login, TASK-1964). Antes: axis-design-system@220fc23 y greenhouse-eo@e54a888c3 — 2026-09-26 (capa gráfica sobre la foto aprobada entera; banco y guía «El porqué» en AXIS). Antes: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D9 y
 > D10 del 2026-09-26: reglas P1–P12 aprobadas y conflictos P-1 a P-9 resueltos). Ejemplo de §10 re-verificado ese día
 > con `foto:prompt` y `creative:orbit:render`.
 > Canon fotográfico: `docs/operations/brand-photography/` (maestro v1.3, reserva de espacio, firma, colorimetría) y
@@ -322,6 +322,10 @@ gráfica** encima (registro cine §9.4: el anillo de la portada y la contraporta
 operador; el moño de RevOps, la órbita de pantallas y las cinco esferas de la lámina de líneas, por extensión). Una
 sola órbita por pieza, venga de la foto o de la línea. Las cinco esferas de color de la lámina de líneas son luz de la
 foto, no la esfera de la voz.
+
+**P-4 en el escenario del login (2026-10-02, TASK-1964).** Lo mismo en una pantalla: las novedades del carrusel cuya
+foto cine ya trae la luz de la línea, que cuenta como su órbita (`LG1`, el haz que elige una tarjeta; `LG2e`, la órbita
+naranja cerrada), van **sin lente**; la foto en registro B (`LG3e`) la lleva. El operador lo aceptó. [applications.md](applications.md) §A12.
 
 Estas decisiones se escriben también en la sección recíproca de los dos canon (manual de la línea y maestro
 fotográfico); esta referencia no los edita.

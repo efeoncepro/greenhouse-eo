@@ -75,3 +75,13 @@
 - `h1` visible: «Accede a tu cuenta corporativa». Logo con `alt="Efeonce"`.
 - Carrusel: `section` con `aria-roledescription="carrusel"`, diapositivas `role="group"` con «n de m», pestañas como botones con `aria-current`, botón de pausa (WCAG 2.2.2), se pausa con hover/foco y arranca pausado con `prefers-reduced-motion`. `aria-live` sólo cuando está en pausa.
 - Contraste: texto sobre foto apagada blanco/`#cfe4fa`; acento sólo en anillo/arco/esfera (gráfico, ≥ 3:1).
+
+## Delta 2026-10-02 — Lo implementado
+
+- **Lente al canon de AXIS:** anillo con aire `orbit.ringAirRatio` (1,12× el radio de la foto), foto interior ampliada ×`lens.zoom` (1,25), trazos y esfera escalados por ancho (`lens.anatomy` × ancho/794, con pisos `orbit.*Px`), arco de 50° centrado en `upper-start` y acento por línea de servicio (`lineAccentOnDark`). Reemplaza el «a color ×1.25» del dibujo de arriba, que se aplicaba como saturación.
+- **Anclaje:** la lente se ancla al punto de la foto con `object-position: x% y%`; con `cover` el recorte cambia entre proporción 1,06 (móvil) y 1,5 (desktop) y sin anclaje la lente se corría del sujeto.
+- **Novedad sin lente:** si la novedad no trae `lens` (fotos en registro cine), la foto va a color entero y sin lente: la luz de la escena ya es la órbita de la pieza (una órbita por pieza). Hoy dos de las tres novedades publicadas van así.
+- **Voz:** el kicker lleva delante el anillo pequeño (receta `question` de AXIS) y el titular cierra con la esfera en lugar del punto tipeado, ambos en el acento de la línea.
+- **Avisos de proveedor:** aviso discreto con texto `text.secondary` (el `Alert` warning daba 1,5:1); la alerta de error usa `text.primary` (el `Alert` del theme daba ~3,5:1 sobre el papel); enlaces sueltos con área táctil ≥ 24 px.
+- **Fotos:** `public/images/login/*.webp` ya son producidas (fichas revisadas por `cine-reviewer`); la fila «Fotos de referencia» de la tabla de regiones queda resuelta.
+- **Pendiente visual:** anillo de la órbita de Escalar producción cortado en 1440; respuesta del titular en 4–5 palabras (objetivo 1–3); el kicker es una etiqueta y no una pregunta del cliente.

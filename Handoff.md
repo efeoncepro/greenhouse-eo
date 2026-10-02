@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
+
 **Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
 
 **Inpainting (02/10):** [TASK-1965](docs/tasks/in-progress/TASK-1965-ai-inpaint-image-video-cli-pipeline.md) code complete local, sin push: `pnpm ai:mask` + `ai:inpaint image|video` (delta 0). Sunburst con máscara = panel negro → edita sin máscara. Faltan canarios Sunburst, boceto y Seedream (autorización de gasto).

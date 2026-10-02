@@ -20,7 +20,8 @@ propón agregarlo.
 - **Sí:** marca propia Efeonce y su familia (Globe, Wave, Reach, RevOps, Greenhouse como marca), piezas sociales,
   deck, informes, firma de correo, merch, oficina, eventos, video de marca.
 - **No:** trabajo de clientes, la interfaz del producto Greenhouse, piezas de otra marca. La órbita no es un adorno
-  genérico.
+  genérico. Excepción en curso, sin canon todavía: el **login V4 de Greenhouse** (TASK-1964, 2026-10-02), con la
+  decisión pendiente del operador; no se extiende a otra pantalla ([applications.md](references/applications.md) §A12).
 
 ### Glitch: sub-línea sólo para Glitch
 

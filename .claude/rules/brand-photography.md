@@ -393,6 +393,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   1024×1536 no tiene, así que hay que verificar al 100% contra el maestro. Costo: `max` a 2560×3200 son
   **USD 0,565** por imagen, diez veces una de 1024² en `high`. Receta completa y las tres iteraciones:
   `ai-generations/_identidad-nexa/LEEME.md`.
+- 🔴 **Personaje de casting nuevo (fuera del roster): primero su retrato ancla, después la escena** **[operador,
+  2026-10-02]**. Sin ancla, la piel sale «muy IA»; retocar después sólo la cara con `pnpm ai:inpaint image` no la
+  arregla (delta medio ~10/255 en una, reencuadre de ~6 px en otra) **[medido]**. Ancla con la piel v3 (`pnpm ai:image`,
+  `gpt-image-2.5-sunburst` high `1024x1536`, de pecho, 85 mm f/2, ventana grande con rebote) y la escena con `casting`
+  apuntando a ella. Plates con personas a **2560×1440**, no 3840×2160. Casos y prompts:
+  [casebook, escenario del login](../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
 - 🔴 **Para vestir a alguien con material de otra identidad, injerta el rostro; no describas el pelo**
   **[medido 2026-09-21]**. Imagen 1 la escena original, imagen 2 el ancla de identidad, y se pide cambiar
   **sólo los rasgos de la cara** conservando pose, gesto, vestuario, fondo y luz. Aguantó los casos difíciles
@@ -451,6 +457,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
   **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con
   personas del equipo, no. Receta 9:16: design-studio, `efeonce-photographic-language.md` §Cine.
+  **Escenario del login de Greenhouse (2026-10-02):** excepción del operador para cine con una persona de casting en
+  uniforme, sólo ahí (registro cine, delta 2026-10-02 c).
 - 🔴 **Una referencia que no se usa NO avisa** **[medido 2026-09-21]**. Con DOS personas el cupo baja a 2 por
   cabeza y recortaba **por orden de lista**: Julio se quedaba sin cuerpo entero siempre (sus dos primeras son
   de rostro) y Nexa lo perdía al pedir una vista. El modelo **inventaba la silueta y la pieza salía igual**.

@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
+
+- Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
+  compartida), reader `listActiveLoginAnnouncements` (hasta 3 publicadas y vigentes por prioridad), `GET
+  /api/public/login-announcements` y API admin con `login_announcements.manage`. Vigentes: Engine, Brand y Growth.
+- `/login` pasa al V4 premium en develop/staging: formulario sobre papel con Efeonce como marca principal, escenario con
+  fotos producidas, lente reconstruida al canon de AXIS y anclada al sujeto, voz con anillo y esfera, transición «La
+  lente te lleva adentro» y mejoras de contraste en avisos y alertas. No está en producción; `pnpm test` completo pendiente.
+- Canon de foto y skills: la referencia de cara del equipo pasa al avatar con la bomber; personajes de casting con retrato ancla (piel v3) antes de la escena; casebook cine (fallas 14–20, `LG1`/`LG2e` como recetas), registro cine (excepción del login), guía de modelos, regla `brand-photography` y `efeonce-graphic-line` (lecciones, ledger, aplicación §A12) actualizados.
+- Docs: [funcional](docs/documentation/identity/novedades-del-login.md) y [manual](docs/manual-de-uso/identity/administrar-novedades-del-login.md).
+
 ## 2026-10-02 — Inpainting de imagen y video en los CLIs (TASK-1965)
 
 - Nuevos `pnpm ai:mask` (máscara canónica con fuentes, operaciones y guardas de cobertura) y `pnpm ai:inpaint image|video`:
@@ -662,13 +673,3 @@ oficina, merch, eventos, video), el motion del logo, la convergencia con el leng
 decisiones y pendientes del operador, y un contrato de mantenimiento. El manual de la línea suma §9.1 (la foto en la
 línea) y fija «Revenue» como palabra del eslogan de RevOps; el lenguaje fotográfico suma §11 (la línea en la foto). El
 router de CLAUDE.md y AGENTS.md apunta a la skill nueva.
-
-## 2026-09-26 — Marketing Studio: capa de estrategia y operación híbrida con agentes (ADR aceptados)
-
-Quedaron aceptadas tres decisiones de EPIC-049. Studio + un bucket GCP son la fuente única de los archivos de campaña, con
-ingesta por CLI, MCP y agentes sobre un solo command. La capa de estrategia suma catálogo de canales, referencia al ICP
-de la organización, plan de campaña, plan SEO/AEO sobre Search Visibility 360, IA con procedencia y medición de solo
-lectura, todo operable por agentes con niveles de riesgo (T0 lectura, T1 borradores reversibles, T2 aprobar/publicar/
-gastar con confirmación humana). La operación híbrida reparte cada campaña en work items asignables a personas o a roles
-de agente (planificador de medios, SEO/AEO, copywriter, QA creativo, analista), con un despachador en Studio y
-adaptadores Claude y OpenAI detrás de flags. Tasks TASK-1905–1916 en to-do; sin cambios de runtime todavía.

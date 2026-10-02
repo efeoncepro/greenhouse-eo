@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1964-login-v4-premium-access-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Implementación local verificada en localhost (2026-10-02): GVC auth-login-v4 sin hallazgos de axe/layout/consola en 1440×960 y 390×844; error de credenciales (401 → alerta con foco) y login válido del agente (/login → apertura → /auth/landing → /home) probados. Lente reconstruida al canon de AXIS (anillo con aire 1,12, foto ampliada ×1,25, anatomía por ancho, acento por línea de servicio). Pendiente: capturas de error, banner, sin novedades y reduced motion; scorecard; reemplazo de fotos de referencia; aborto no capturado de la view transition en el helper compartido (follow-up).`
+- Status real: `En develop y desplegado en staging (2026-10-02; commits 4b32cbe4b, 52196aa9e, 9ebf58ac3, 2098e9845, 300a2e030). Localhost: GVC auth-login-v4 sin hallazgos de axe/layout/consola en 1440×960 y 390×844 (1280×800 agregado después, sin re-correr); error de credenciales (401 → alerta con foco) y login válido del agente (/login → apertura de la lente → /auth/landing → /home) probados. pnpm build verde una vez (tras 4b32cbe4b); typecheck, lint y ui:code-lint --changed verdes en cada commit. Fotos del escenario ya producidas. Pendiente: copy de la respuesta en 1–3 palabras y kicker como pregunta del cliente, anillo de Escalar producción cortado en 1440, capturas de error/banner/sin novedades/reduced motion y scorecard, GVC en staging (bloqueado por Vercel SSO en modo anónimo), OrbitLoader visible sin confirmar, aborto no capturado de la view transition en el helper compartido (tarea aparte), pnpm test completo.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1963`
@@ -32,6 +32,19 @@
 ## Summary
 
 Reemplaza el login actual (panel navy con tarjetas de valor + formulario Vuexy) por el **V4 premium** aprobado el 2026-10-02: formulario sobre papel con Efeonce como marca principal y Greenhouse como sello secundario, y un escenario fotográfico con la Lente de «La órbita» donde rota un carrusel de novedades (texto o banner) servido por el reader de TASK-1963. Suma la transición de acceso aprobada en el prototipo: botón con mini órbita, la lente que se abre hacia el portal con el logo Efeonce como elemento compartido, y un `OrbitLoader` de marca en `/auth/landing`.
+
+## Delta 2026-10-02
+
+- Implementado en `develop` y desplegado en staging (`dev-greenhouse.efeoncepro.com`): `4b32cbe4b` (implementación), `52196aa9e` (escenarios Sunburst, anclaje de la lente e identidad del equipo), `9ebf58ac3` (piel real con casting anclado), `2098e9845` (anillo y esfera en la voz), `300a2e030` (Escalar producción con órbita de luz).
+- Lente reconstruida al canon de AXIS (`paintGraphicLine` / resolver de la lente): anillo con aire `orbit.ringAirRatio` (1,12× el radio de la foto), foto interior ampliada ×`lens.zoom` (1,25; antes se aplicaba mal como saturación), trazos y esfera escalados por ancho (`lens.anatomy` × ancho/794 con pisos `orbit.*Px`), arco de 50° centrado en `upper-start` (ángulo derivado de `AXIS_GRAPHIC_LINE_POSITION_DEGREES`) y acento por línea de servicio (`lineAccentOnDark`). Corregido: `vector-effect: non-scaling-stroke` + `pathLength` partía el arco en dos tramos.
+- La lente se ancla al punto de la foto con `object-position: x% y%` (con `cover` el recorte cambia entre proporción 1,06 y 1,5 y la lente se corría del sujeto).
+- Novedad sin `lens` (foto en registro cine): se muestra a color entero y sin lente, porque la luz de la escena ya es la órbita de la pieza (una órbita por pieza).
+- Voz (pedido del operador): el kicker lleva el anillo pequeño delante (0,42 em, trazo máx(1 px, 0,06 em), 0,35 em de aire; receta `question` de AXIS) y el titular cierra con la esfera (0,20 em sobre la línea base con el aire óptico de la última letra, `efeonceGraphicLine.sphere`; se quita el punto tipeado), ambos en el acento de la línea.
+- Accesibilidad: avisos de proveedor SSO pasan de `Alert` warning (texto 1,5:1) a aviso discreto con texto `text.secondary`; texto de la alerta de error en `text.primary` (el Alert del theme daba ~3,5:1 sobre el papel); enlaces sueltos con área táctil ≥ 24 px.
+- Fotos generadas con `pnpm foto:generar` (gpt-image-2.5-sunburst) desde fichas en `ai-generations/2026-10-02_login-escenario/fichas/` revisadas por `cine-reviewer`; casting anclado a retratos con la receta de piel v3 (el operador rechazó las primeras por piel «muy IA»). El bloqueo de release por fotos de referencia queda resuelto.
+- GVC `scripts/frontend/scenarios/auth-login-v4.scenario.ts` (anónimo): en staging no captura porque el modo anónimo no envía bypass y Vercel SSO lo bloquea.
+- En frío se vio pantalla en blanco ~30 s entre `/auth/landing` y `/home` (compilación dev); en caliente no se confirmó si el `OrbitLoader` se ve.
+- `src/lib/motion/view-transition.ts` deja un `InvalidStateError` sin capturar al abortar la transición; se propuso como tarea aparte.
 
 ## Why This Task Exists
 
@@ -183,7 +196,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `tests/gvc/scenarios/login-v4.scenario.ts` [verificar convención del runner]
+- Scenario file: `scripts/frontend/scenarios/auth-login-v4.scenario.ts`
 - Route: `/login`
 - Viewports: 1440×960, 1280×800, 390×844
 - Quality profile: `premium`
@@ -202,7 +215,7 @@ Reglas obligatorias:
 - Alternatives considered: V1 oscuro con voz «¿Dónde está todo? Aquí», V3 recepción con órbita y logo dentro; descartadas por el operador por falta de carácter premium y por priorizar el login en móvil.
 - Why this pattern: la foto da el momento visual dominante; la Lente aporta la órbita completa y es la única excepción legítima al «nunca scrim» para leer texto sobre foto.
 - Reuse / extend / new primitive: nuevo `OrbitLoader`; resto one-off.
-- Open risks: fotos de referencia generadas con IA deben reemplazarse antes de producción; la guía de La órbita aún dice que la línea no va en la interfaz de Greenhouse (actualizar AXIS).
+- Open risks: (resuelto 2026-10-02: las fotos ya son producidas) la guía de La órbita aún dice que la línea no va en la interfaz de Greenhouse (actualizar AXIS).
 
 ### Visual verification
 
@@ -213,7 +226,7 @@ Reglas obligatorias:
 - Scroll-width check: sí.
 - Accessibility/focus checks: orden de foco, `aria-current` en pestañas, pausa operable.
 - Before/after evidence: captura del login anterior y del V4.
-- Known visual debt: fotos de referencia.
+- Known visual debt: anillo de la órbita de Escalar producción cortado en 1440; copy de la respuesta en 4–5 palabras (objetivo 1–3) y kicker como etiqueta en vez de pregunta del cliente.
 - Visual scorecard: `docs/ui/reviews/TASK-1964-login-v4-premium-access.scorecard.json`
 - Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
 
@@ -277,7 +290,7 @@ Reglas obligatorias:
 | Regresión en el ingreso (SSO/credenciales) | identity | medium | se conserva la lógica de auth existente sin cambios; smoke de los tres métodos | `auth smoke` / Sentry `identity` |
 | La animación oculta el formulario | UI | low | sin `opacity: 0` base; formulario visible por defecto | revisión visual |
 | View transition falla en navegadores sin soporte | UI | low | el helper hace fallback síncrono | — |
-| Fotos IA en producción | content | medium | bloqueo de release documentado | checklist de release |
+| Fotos IA en producción | content | low | resuelto 2026-10-02: fotos producidas con fichas revisadas | checklist de release |
 
 ### Feature flags / cutover
 
@@ -295,11 +308,11 @@ Reglas obligatorias:
 
 1. Localhost: `/login` desktop y 390 px, los tres métodos de ingreso, error, magic link.
 2. Staging: smoke de auth con el usuario agente + GVC.
-3. Producción con el release, tras reemplazar las fotos de referencia.
+3. Producción con el release (fotos producidas desde 2026-10-02).
 
 ### Out-of-band coordination required
 
-- Fotos producidas para el escenario (operador / estudio) antes de producción.
+- Fotos producidas para el escenario: hechas 2026-10-02 (`pnpm foto:generar`, fichas revisadas por `cine-reviewer`).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -316,7 +329,7 @@ Reglas obligatorias:
 - [ ] Sin novedades, el escenario muestra la foto por defecto sin texto ni pestañas.
 - [x] En 390×844 el botón Entrar es visible sin scroll y la novedad baja como tarjeta.
 - [ ] Todo el copy visible nuevo vive en `src/lib/copy/client-portal.ts`.
-- [ ] El ingreso por credenciales usa `startViewTransition` y `/auth/landing` muestra `OrbitLoader`.
+- [ ] El ingreso por credenciales usa `startViewTransition` y `/auth/landing` muestra `OrbitLoader`. (Login válido probado en localhost con la apertura de la lente; no se confirmó que el `OrbitLoader` se vea.)
 - [ ] Ningún elemento depende de su animación para ser visible.
 - [x] Sin scroll horizontal en los tres viewports.
 - [ ] `UI ready` queda en `no` hasta tener mapping, plan GVC y decision log completos con evidencia; `pnpm task:lint --task TASK-1964` sin hallazgos.
@@ -343,7 +356,8 @@ Reglas obligatorias:
 ## Follow-ups
 
 - Adoptar la dirección V4 en la pantalla de Efeonce ID (TASK-1834).
-- Reemplazar fotos de referencia por fotos producidas.
+- Corregir el `InvalidStateError` sin capturar al abortar la transición en `src/lib/motion/view-transition.ts` (tarea aparte).
+- Transiciones adicionales del acceso (el operador las pidió para después).
 - Actualizar la guía de La órbita en AXIS para permitir la interfaz de Greenhouse.
 
 ## Open Questions

@@ -11,6 +11,8 @@
 > voces»); `docs/context/05_voz-tono-estilo.md` y `09_marca-agencia.md`; decisiones del operador del 2026-09-26.
 > §3.4 «El camino recorrido» (operador, 2026-09-29): AXIS `main@c92160b`, tag `v0.3.38` — 2026-09-29.
 > §4 «Portadas de perfil social» y §7 «Destacados» (operador, 2026-10-01): `develop` en `d1a41babb` — 2026-10-01.
+> §3.8 «En una pantalla» y §4 «En una pantalla del producto» (login V4, TASK-1964): árbol local de `develop` sobre
+> `b0efd42a3` (`src/views/login/LoginLens.tsx`) — 2026-10-02.
 > Lo que no está en una fuente va marcado **«inferido»**: tómalo como lectura razonada, no como regla.
 
 Este archivo no repite números: esos viven en los tokens `efeonceGraphicLine` y los explica
@@ -321,6 +323,10 @@ condiciones que no se negocian:
 - **Nunca:** un disco suelto en vez de la órbita (se corrigió el 2026-09-26: la esfera suelta era seis veces más grande
   y sin arco); velo navy sobre fotos de banco; emblema legible en la ropa («el logo lo pone la pieza, no la ropa»,
   lámina 5.2); la órbita sobre la cara o el gesto (lámina 4.1).
+- **En una pantalla (login V4, 2026-10-02):** la lente vive en un contenedor que cambia de proporción. Los mismos
+  tokens, escalados por el ancho (× ancho/794, con piso), y `object-position` con el centro de la lente para que no se
+  corra del sujeto; una foto cuya luz ya es una órbita (cine) va **sin lente**. Receta: [applications.md](applications.md)
+  §A12. La línea en la interfaz de Greenhouse sigue siendo un pendiente del operador ([ledger.md](ledger.md)).
 
 ### 3.9 Foco — «Te hacemos visible»
 
@@ -513,6 +519,13 @@ portada general del brochure— se rechazó como portada social («Really? WTF?�
 objetada (el operador notó que Efeonce no hace sólo eso; ledger, 2026-09-29). Lo aprobado: «¿Cuántos formatos?
 **Todos.**» y «¿Entre cientos de marcas, a quién cita la IA? **A ti.**», con Nexa en registro cine. Un par aprobado en una lámina o en otra pieza no se traslada solo a una portada social: se escribe para
 ella ([applications.md](applications.md) §A11).
+
+**En una pantalla del producto (login V4, 2026-10-02; riesgo abierto).** El operador pidió la voz completa sobre la
+novedad del escenario: «El ring y la esfera faltan como manda /efeonce-graphic-line». El anillo pequeño va delante del
+kicker y la esfera es el punto del titular, en el acento de la línea. Lo que aún no cumple la gramática, y queda
+**pendiente**: la respuesta debe ser de 1–3 palabras, y un kicker que es una etiqueta no lleva forma de pregunta (el
+anillo abre una pregunta real; si no la hay, se reescribe el kicker como pregunta o la novedad va sin anillo
+[inferido]). [applications.md](applications.md) §A12.
 
 **Pares aprobados en las láminas del deck (operador, 2026-09-27;** catálogo
 `docs/operations/brand-graphic-line/deck-recipes/`**).** Las 69 láminas quedaron aprobadas con su voz; estos pares son
@@ -824,7 +837,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Ícono dibujado a mano** en una pieza, o **Trazo y Plastilina en un mismo grupo** | el glifo sale de `ICON_CATALOG` con `resolveIcon`; uno nuevo pasa por `icons:check` y la aprobación; una voz por grupo | operador 2026-09-26 (D22); guía de iconografía de AXIS |
 | **Todos los íconos respondiendo**, o un ícono respondiendo junto a otra esfera | responde uno solo y sólo si la pieza no tiene otra esfera | operador 2026-09-26 (D17); `auditIconGroup` |
 | **Un acento por objeto** en los íconos («el pincel en naranja») | el acento es de la línea de la pieza y va sólo en la esfera | operador 2026-09-26 (D18) |
-| **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce | ADR, decisión 6 |
+| **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce; el login V4 (TASK-1964) es la única excepción en curso, sin canon todavía ([applications.md](applications.md) §A12) | ADR, decisión 6 |
 | **Un par del catálogo como portada de perfil social** («¿Qué hace Efeonce? Crecer.») | la portada pide una idea propia | operador 2026-10-01 (§4) |
 | **Destacados de Instagram con la misma toma o con íconos planos**, o firma en el círculo | mezcla de recursos, una escena y un color de luz por destacado; la marca la pone el avatar | operador 2026-10-01 (§7) |
 

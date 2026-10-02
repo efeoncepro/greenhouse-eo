@@ -33,3 +33,11 @@
 - Sin soporte de View Transitions o con `prefers-reduced-motion`: N2 → N6 con cambio directo (el helper corre la actualización sin animación).
 - Sin novedades: el escenario muestra la foto por defecto; el flow no cambia.
 - Error del reader: igual que sin novedades (el reader devuelve `[]`).
+
+## Delta 2026-10-02 — Verificado
+
+- N1 → N2 → N3 probado en localhost: credenciales inválidas → 401 → alerta con foco y campos reactivados.
+- N1 → N2 → N5 → N6 → N7 probado en localhost con el usuario agente: `/login` → apertura de la lente → `/auth/landing` → `/home`.
+- N6: en frío se vio pantalla en blanco ~30 s entre `/auth/landing` y `/home` (compilación de `pnpm dev`); en caliente no se confirmó si el `OrbitLoader` llega a verse. Queda por medir en staging.
+- Aborto de la transición: `src/lib/motion/view-transition.ts` deja un `InvalidStateError` sin capturar cuando la transición se aborta; el ingreso no se bloquea, pero el error queda suelto (tarea aparte).
+- N4 (SSO): sin evidencia registrada en esta pasada.
