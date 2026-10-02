@@ -45,7 +45,9 @@ lente y media sonrisa—:
 `conviccion` copiada entera) **no cambió nada**, porque esa referencia trae el mismo tres cuartos; `NX7g` (todo, con
 `sorprendida` y la pose descrita en la escena) salió **sin la inclinación y con otra expresión**, con la identidad A
 intacta (delineado con rabillo, lunar). El giro hacia el lado pedido **no** se cumplió: el ángulo se pide con `vista`,
-que trae su propia imagen. **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
+que trae su propia imagen. **Cerrado el mismo día:** `vista` + `expresion` se combinan con una persona sola (orden de
+imágenes: vista → expresión → ancla frontal → cuerpo) y en `NX7j` (`45-izq` + `curiosa`) la cabeza tomó el giro de la vista
+con la identidad intacta. Con el traje, además, Nexa no lleva reloj ni anillo (`ajustarParaTraje`). **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
 frase fija «confident half-smile» deja de copiarse entre fichas.** Plates en
 `ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7{d,e,f,g}-nexa-despliega-squad.png`.
 

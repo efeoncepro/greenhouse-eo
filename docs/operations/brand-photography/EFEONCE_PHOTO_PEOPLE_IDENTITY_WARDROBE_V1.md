@@ -841,8 +841,8 @@ Nexa salía casi siempre con la misma cabeza en tres cuartos, ladeada y con medi
 - Las referencias de identidad dicen **quién** es, no **cómo** está: el giro, la inclinación, la mirada y el gesto los
   pone la escena. Por eso la vista puesta del traje que va a escena es la **13 sin rostro**, recortada bajo el mentón.
 - Una ficha con Nexa declara **una** de dos cosas: `expresion` (una de las 12 fotográficas de
-  `_identidad-nexa/5-expresiones/` o de las ocho del Bible) **o** `vista` (el ángulo). Pedir las dos aborta, porque
-  ocupan la misma ranura. Las 12 comparten el mismo tres cuartos del ancla y por eso aportan **sólo el gesto**: el
+  `_identidad-nexa/5-expresiones/` o de las ocho del Bible) **o** `vista` (el ángulo), o las dos juntas si Nexa está sola
+  en la toma (desde el 2026-10-02 conviven: con una persona sola en la toma, `vista` + `expresion` juntas — el ángulo de la vista y el gesto de la expresión; medido en `NX7j`). Las 12 comparten el mismo tres cuartos del ancla y por eso aportan **sólo el gesto**: el
   ángulo se pide con `vista`. Si Nexa llega sin ninguna, `foto:prompt` avisa.
 - Las anclas van con la **frontal primero** (ver §5.1). Lista y nombres en la
   [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-02--traje-biónico-12-expresiones-fotográficas-y-la-pose);

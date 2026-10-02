@@ -45,7 +45,7 @@ aprobadas como deuda sintética quedan superadas por esta confirmación.
 - **La pose sale de la escena, no de la referencia** **[medido, A/B `NX7d`→`NX7g`]**. Las 12 comparten el **mismo
   tres cuartos** del ancla (se editaron desde ella): copiadas enteras arrastraban también el giro (`NX7f`, con
   `conviccion`, no cambió nada). Hoy la referencia de expresión aporta sólo ojos, cejas y boca; el ángulo se pide con
-  `vista`, nunca las dos a la vez. Causa completa en
+  `vista`, y desde el 2026-10-02 las dos van juntas con Nexa sola en la toma (`NX7j`: la cabeza toma el giro de la vista). Causa completa en
   [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está).
 - **Aretes dorados en el traje, aprobados** **[decisión del operador, 2026-10-02]**: en las vistas puestas del kit los
   aretes salieron dorados, como en las anclas, aunque §5.1 los pide de plata. El operador aprobó las vistas así. No
@@ -67,7 +67,8 @@ pnpm foto:prompt <ficha.json>
 { "identidad": [{ "persona": "nexa", "vista": "perfil-izq" }] }
 ```
 
-Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone— así que pedir dos aborta.
+Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone— así que pedir dos aborta, **salvo**
+`vista` + `expresion` con una persona sola (desde el 2026-10-02 conviven: con una persona sola en la toma, `vista` + `expresion` juntas — el ángulo de la vista y el gesto de la expresión; medido en `NX7j`).
 
 ### Las ocho expresiones canónicas (Bible §6)
 

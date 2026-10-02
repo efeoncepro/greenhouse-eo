@@ -121,8 +121,9 @@ caja toca a las personas. Hay punto dulce, no monotonía.
   paso a paso: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md); vestuario:
   [personas, delta 2026-10-02](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo).
 - **La pose de Nexa sale de la escena, no de la referencia** **[medido, A/B `NX7d`→`NX7g`]**: las referencias de
-  identidad dicen quién es, no cómo sostiene la cabeza. La ficha pide **una** expresión (`expresion`, 12 fotográficas
-  nuevas) **o** un ángulo (`vista`), nunca las dos, y `foto:prompt` avisa si Nexa llega sin ninguna. Detalle en
+  identidad dicen quién es, no cómo sostiene la cabeza. La ficha pide una expresión (`expresion`, 12 fotográficas
+  nuevas), un ángulo (`vista`) o **las dos juntas** con Nexa sola en la toma (desde el 2026-10-02, `NX7j`), y
+  `foto:prompt` avisa si Nexa llega sin ninguna. Detalle en
   [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)
   y en la [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-02--traje-biónico-12-expresiones-fotográficas-y-la-pose).
 - **La escena de referencia con Nexa en el traje es `NX7d`**, «Nexa despliega a su squad» **[decisión del operador,

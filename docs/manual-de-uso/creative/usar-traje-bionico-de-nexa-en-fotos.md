@@ -67,7 +67,9 @@ documental ni en puesta en escena, nunca en piezas de clientes.
 
 ### Paso 2 · Elige la expresión de Nexa (o el ángulo)
 
-Declara **una** de estas dos cosas en su entrada de `identidad`, nunca las dos:
+Declara una de estas dos cosas en su entrada de `identidad`, o **las dos juntas** si Nexa está sola en la toma (el
+ángulo sale de la vista y el gesto de la expresión: `{ "persona": "nexa", "vista": "45-izq", "expresion": "curiosa" }`,
+medido en `NX7j`). Con dos personas, una sola:
 
 | Quieres fijar… | Campo | Valores |
 |---|---|---|

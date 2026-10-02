@@ -667,7 +667,7 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   en casi todas las fotos sale con la misma pose de cara de un lado teniendo tantas poses»*. Las referencias dicen
   quién es; el giro, la inclinación y el gesto los dirige la ficha: declara **una** dimensión, `"expresion"` (12
   fotográficas de `_identidad-nexa/5-expresiones/`, de `carcajada` a `mirada-lateral`) **o** `"vista"` (el ángulo),
-  nunca las dos. Las 12 comparten el tres cuartos del ancla y sólo mandan en el gesto: si la toma necesita otro
+  o las dos juntas con una persona sola (la vista da el ángulo, la expresión el gesto; `NX7j`). Las 12 comparten el tres cuartos del ancla y sólo mandan en el gesto: si la toma necesita otro
   ángulo, pídelo con `vista`. Describe la pose en la escena y no copies «confident half-smile» de ficha en ficha;
   `foto:prompt` avisa si Nexa llega sin ninguna. A/B y causa:
   [bloques y pipeline, delta 2026-10-02](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
