@@ -352,3 +352,18 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   `bar_grouped` figure read row by row on its own scale (the PDF «comparison» page already did this; Think must honor
   it, TASK-1958). Magnitude bands apply only to shared-axis charts; a one-figure band is never a chart. Score readings
   rank last for the summary thesis and essentials.
+
+## Portada y alcance por servicio (TASK-1957, 2026-10-02)
+
+- `request.scope?: InsightScopeKey[]` (≤4, sin repetir): alcance que muestra la portada, del catálogo
+  `presentation/scope-catalog.ts` (seo, aeo, ico, creative, design, content, performance, paid_social, social, revenue,
+  crm, email, automation, web, analytics). Cada clave trae etiqueta (`GH_INSIGHTS.scopeChips`), glifo Trazo de AXIS y
+  línea de marca. Sin `scope` el hash no cambia y los chips se derivan de `modules`. `get_insights_catalog` lista los
+  alcances. Un alcance nuevo = entrada en el catálogo + etiqueta; el test exige que el glifo exista en AXIS.
+- Cabecera compartida: `header.scopeChips` (Think los dibuja con `/branding/icons/trazo-<glyph>-dark.svg`, exportados
+  con `pnpm insights:think-icons`; nunca a mano).
+- Modelo web 1.2 suma `metricId`, `comparisonFactId` por hecho y `figure {display, direction, kind: change|level}` por
+  frase de resumen/esencial (cambio sólo si la frase lo dice; si no, el valor citado).
+- Portada con UNA fecha (el período); el título por defecto no lleva período (`defaultReportTitle(modules)`).
+- El adapter AEO lee el análisis que TERMINÓ dentro de la ventana, del mercado principal
+  (`readClientGraderReport({ finishedWithin })` → `getLatestClientGraderRunInWindow`).
