@@ -90,7 +90,9 @@ export const GH_INSIGHTS = {
   readerLimits: {
     outOfScope: 'no forma parte de esta edición',
     noComparison: 'sin comparación con el período anterior en esta edición',
-    insufficientData: 'sin datos suficientes en este período'
+    insufficientData: 'sin datos suficientes en este período',
+    /** TASK-1962 — una fuente que el cliente todavía no conectó (la petición del plan lo pide). */
+    notConnected: 'falta conectar la fuente'
   },
 
   rejections: {
@@ -187,6 +189,23 @@ export const GH_INSIGHTS = {
     driversTableTitle: 'Consultas y páginas que más movieron los clics',
     driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
     driversEntityColumn: 'Consulta o página'
+  },
+
+  /**
+   * TASK-1962 — plan de acción determinista desde la cola SEO (sólo orígenes propios) y peticiones al cliente. Las cifras
+   * que se citan son hechos del snapshot (impresiones y posición medidas, posición objetivo, techo estimado).
+   */
+  plan: {
+    verbs: { optimize: 'Optimizar', create: 'Crear contenido para', consolidate: 'Consolidar las páginas que compiten por', measure: 'Medir' } as Readonly<Record<string, string>>,
+    in: 'en',
+    inHome: 'en la página de inicio',
+    isAt: 'está en',
+    with: 'con',
+    impressions: 'impresiones',
+    atTarget: 'en la posición',
+    wouldAdd: 'sumaría hasta',
+    clicks: 'clics',
+    connectSearchConsole: 'Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.'
   },
 
   /**
@@ -300,6 +319,7 @@ export const GH_INSIGHTS = {
    */
   sources: {
     gsc_window_aggregate: 'Google Search Console',
+    seo_work_queue: 'cola de trabajo SEO priorizada',
     gsc_window_movers: 'Google Search Console',
     dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
     dataforseo_etv: 'estimación de tráfico orgánico',

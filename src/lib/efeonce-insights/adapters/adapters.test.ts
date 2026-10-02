@@ -31,7 +31,9 @@ const seoMocks = vi.hoisted(() => ({
   readSeoOverviewKpisForWindow: vi.fn(),
   readRankEvolution: vi.fn(),
   readDomainOverviewForTarget: vi.fn(),
-  readSeoWindowMovers: vi.fn()
+  readSeoWindowMovers: vi.fn(),
+  readSeoWorkQueue: vi.fn(),
+  readSeoOverviewConnection: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
@@ -40,6 +42,8 @@ vi.mock('@/lib/growth/seo/overview/read-overview-kpis', () => ({ readSeoOverview
 vi.mock('@/lib/growth/seo/rank-evolution-reader', () => ({ readRankEvolution: seoMocks.readRankEvolution }))
 vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewForTarget: seoMocks.readDomainOverviewForTarget }))
 vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
+vi.mock('@/lib/growth/seo/work-queue/reader', () => ({ readSeoWorkQueue: seoMocks.readSeoWorkQueue }))
+vi.mock('@/lib/growth/seo/overview/read-overview-connection', () => ({ readSeoOverviewConnection: seoMocks.readSeoOverviewConnection }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
 
@@ -84,6 +88,16 @@ describe('SEO adapter', () => {
       { keyword: 'c', points: [{ date: '2026-09-01', position: 1, url: null }] }
     ], provenance: [] })
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
+    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'connected', dataAsOf: '2026-08-31' })
+    seoMocks.readSeoWorkQueue.mockResolvedValue({
+      ok: true,
+      snapshot: { snapshotId: 'seowqs-1', organizationId: 'org', seoTargetId: 'tgt-1', priorityScoreVersion: 'v2', windowDays: 28, itemCount: 40, computedAt: '2026-09-02T13:00:00.000Z', expiresAt: '2026-09-03T13:00:00.000Z' },
+      items: [
+        { itemId: 'i1', rank: 1, origin: 'gsc_striking_distance', keyword: 'barniz para madera', targetUrl: 'https://x.cl/barniz', recommendedVerb: 'optimize', scoreBasis: 'measured_incremental_clicks', scoreBand: 1, priorityScore: 75.88, breakdown: { impressions: 10522, clicks: 17, currentCtr: 0.0016, weightedPosition: 8.36, targetPosition: 5, expectedCtrAtTarget: 0.009, ctrCurveSource: 'org_measured', curveSampleImpressions: 1, curveSampleClicks: 1, windowDays: 28, incrementalClicks: 76, basisReason: 'r' }, evidenceRef: 'e', sourceScoreVersion: null },
+        { itemId: 'i2', rank: 2, origin: 'consolidation', keyword: 'pintura para exteriores', targetUrl: 'https://x.cl/exteriores', recommendedVerb: 'consolidate', scoreBasis: 'measured_without_curve', scoreBand: 2, priorityScore: null, breakdown: { impressions: 3000, clicks: 9, currentCtr: null, weightedPosition: 12.1, targetPosition: 5, expectedCtrAtTarget: null, ctrCurveSource: 'not_applicable', curveSampleImpressions: null, curveSampleClicks: null, windowDays: 28, incrementalClicks: null, basisReason: 'r', competingPages: 3 }, evidenceRef: 'e', sourceScoreVersion: null }
+      ],
+      originHealth: [], priorityScoreVersion: 'v2', asOf: '2026-09-02T13:00:00.000Z', staleness: 'fresh', nextCursor: null, provenance: []
+    })
     seoMocks.readSeoWindowMovers.mockImplementation(async (_org: string, input: { dimension: 'query' | 'page' }) => ({
       ok: true,
       dimension: input.dimension,
@@ -117,6 +131,28 @@ describe('SEO adapter', () => {
 
     expect(noComparison.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
     expect(v1.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
+  })
+
+  it('TASK-1962 — oportunidades de la cola SEO (sólo orígenes propios) como hechos de plan, y Search Console sin conectar', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    // La cola se pide filtrada a orígenes propios: nunca competidores ni candidatos de descubrimiento.
+    expect(seoMocks.readSeoWorkQueue).toHaveBeenCalledWith('tgt-1', { origins: ['gsc_striking_distance', 'consolidation', 'declared_target'], limit: 5 })
+    expect(result.facts.find(fact => fact.factId === 'seo.opportunity.1.ceiling')).toMatchObject({ value: 76, observation: 'estimated', dimension: { keyword: 'barniz para madera', page: '/barniz', verb: 'optimize', rank: '1' } })
+    expect(result.facts.find(fact => fact.factId === 'seo.opportunity.1.target_position')).toMatchObject({ value: 5, role: 'reference' })
+    // Banda 2: sin techo en clics (nunca un 0 de relleno).
+    expect(result.facts.some(fact => fact.factId === 'seo.opportunity.2.ceiling')).toBe(false)
+    expectContentContract(result.facts)
+
+    // Sin la conexión OAuth, la ausencia de capturas es `not_connected` (una petición), no «sin datos».
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(0, 0, 0, null))
+    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'not_connected', dataAsOf: null })
+    const disconnected = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(disconnected.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'gsc', reason: 'not_connected' })]))
   })
 
   it('TASK-1962 — un reader de causas sin datos se declara como límite, no como silencio', async () => {

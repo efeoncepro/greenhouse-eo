@@ -10,9 +10,12 @@ import 'server-only'
 import { readDomainOverviewForTarget } from '@/lib/growth/seo/domain-overview/reader'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-overview-kpis'
+import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
 import { type SeoMoverDimension, readSeoWindowMovers } from '@/lib/growth/seo/overview/read-window-movers'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
+import { readSeoWorkQueue } from '@/lib/growth/seo/work-queue/reader'
+import type { SeoWorkQueueOrigin } from '@/lib/growth/seo/work-queue/contracts'
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -42,7 +45,12 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
   }
 
   if (kpis.coveredDays === 0) {
-    rejections.push({ module: 'seo', metricId: 'gsc', reason: 'no_data', detail: `Search Console no tiene capturas materializadas en ${window.start}–${window.endInclusive}` })
+    // TASK-1962 — sin la conexión OAuth de Search Console no es «sin datos»: es una fuente que el cliente tiene que
+    // conectar, y el plan lo convierte en petición. Con conexión y sin capturas en la ventana sigue siendo `no_data`.
+    const connection = await readSeoOverviewConnection(organizationId)
+    const notConnected = connection.state === 'not_connected'
+
+    rejections.push({ module: 'seo', metricId: 'gsc', reason: notConnected ? 'not_connected' : 'no_data', detail: notConnected ? 'Search Console no está conectado para la organización' : `Search Console no tiene capturas materializadas en ${window.start}–${window.endInclusive}` })
 
     return { facts, rejections, source: null as EvidenceSourceV1 | null }
   }
@@ -219,6 +227,76 @@ export const pageLabelOf = (url: string): string => {
   }
 }
 
+/**
+ * TASK-1962 — «¿qué recomendamos?» (contrato de contenido, pregunta 5): las oportunidades de la cola SEO priorizada
+ * (TASK-1700, autoridad de orden del módulo), SÓLO de orígenes propios. Nunca `competitor_gap` (la comparativa
+ * competitiva SEO no es client-facing, auditoría §7) ni candidatos de descubrimiento. Cada oportunidad trae sus
+ * cifras como hechos (impresiones y posición medidas, posición objetivo como referencia, techo de clics estimado por
+ * el modelo de CTR propio) para que la acción del plan las cite. Son hechos de PLAN: no compiten como hallazgo.
+ */
+const OPPORTUNITY_ORIGINS: readonly SeoWorkQueueOrigin[] = ['gsc_striking_distance', 'consolidation', 'declared_target']
+const OPPORTUNITY_LIMIT = 5
+const OPPORTUNITY_METHOD = { name: 'seo_work_queue', version: 'seo_work_queue_v1' }
+
+const opportunityFacts = async (seoTargetId: string): Promise<{ facts: EvidenceFactV1[]; sources: EvidenceSourceV1[] }> => {
+  const queue = await readSeoWorkQueue(seoTargetId, { origins: OPPORTUNITY_ORIGINS, limit: OPPORTUNITY_LIMIT })
+
+  if (!queue.ok || !queue.snapshot || queue.items.length === 0) return { facts: [], sources: [] }
+
+  const computedAt = queue.snapshot.computedAt
+  const end = computedAt.slice(0, 10)
+  const start = new Date(Date.parse(`${end}T00:00:00Z`) - queue.snapshot.windowDays * 86_400_000).toISOString().slice(0, 10)
+  const coverage = { kind: 'complete' as const, ratio: null, populationSize: queue.snapshot.itemCount }
+
+  const base = {
+    factVersion: 'evidence_fact_v1' as const,
+    module: 'seo' as const,
+    population: 'Cola de trabajo SEO priorizada del sitio',
+    source: 'greenhouse_growth.seo_work_queue_items',
+    method: OPPORTUNITY_METHOD,
+    coverage,
+    freshness: { asOf: computedAt },
+    window: { start, endExclusive: end, granularity: 'period' as const, partial: false },
+    evidenceRef: `seo_work_queue:${queue.snapshot.snapshotId}`,
+    comparisonFactId: null,
+    numerator: null,
+    denominator: null,
+    channelId: SEO_SEARCH_CHANNEL
+  }
+
+  const facts = queue.items
+    .filter(item => OPPORTUNITY_ORIGINS.includes(item.origin))
+    .slice(0, OPPORTUNITY_LIMIT)
+    .flatMap((item, index): EvidenceFactV1[] => {
+      const rank = String(index + 1)
+      const dimension = { keyword: item.keyword, page: item.targetUrl ? pageLabelOf(item.targetUrl) : '', verb: item.recommendedVerb, origin: item.origin, rank }
+      const id = (name: string) => `seo.opportunity.${rank}.${name}`
+
+      const out: EvidenceFactV1[] = [
+        { ...base, factId: id('impressions'), metricId: `opportunity.${rank}.impressions`, label: item.keyword, value: item.breakdown.impressions, unit: 'count', observation: 'observed', dimension }
+      ]
+
+      if (item.breakdown.weightedPosition !== null) {
+        out.push({ ...base, factId: id('position'), metricId: `opportunity.${rank}.position`, label: item.keyword, value: Number(item.breakdown.weightedPosition.toFixed(1)), unit: 'position', observation: 'observed', dimension })
+        // La posición objetivo es un entero de la cola (un parámetro, no una medición): se cita como «la posición 5», no
+        // con el formato de una posición media («#5,0»).
+        out.push({ ...base, factId: id('target_position'), metricId: `opportunity.${rank}.target_position`, label: item.keyword, value: item.breakdown.targetPosition, unit: 'count', observation: 'observed', dimension, role: 'reference' })
+      }
+
+      // Sólo la banda 1 tiene techo en clics (curva de CTR propia utilizable); en las demás no hay cifra, nunca un 0.
+      if (item.priorityScore !== null) {
+        out.push({ ...base, factId: id('ceiling'), metricId: `opportunity.${rank}.ceiling`, label: item.keyword, value: Math.round(item.priorityScore), unit: 'count', observation: 'estimated', dimension })
+      }
+
+      return out
+    })
+
+  return {
+    facts,
+    sources: facts.length > 0 ? [{ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoWorkQueue', asOf: computedAt, method: OPPORTUNITY_METHOD, coverage, servedWindow: null }] : []
+  }
+}
+
 const moverFacts = async (
   organizationId: string,
   window: ResolvedInsightWindow,
@@ -333,6 +411,8 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds)
 
+    const opportunities = input.editorialV2 === true && seoTargetId ? await opportunityFacts(seoTargetId) : { facts: [], sources: [] }
+
     const movers = input.editorialV2 === true && input.comparison
       ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'))
       : { facts: [], rejections: [], sources: [] }
@@ -343,8 +423,8 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
       input.editorialV2 === true ? facts.map(fact => (SEO_LOWER_IS_BETTER.has(fact.metricId) ? { ...fact, dimension: { ...fact.dimension, direction: 'lower_is_better' } } : fact)) : facts
 
     return {
-      facts: [...directed(current.facts), ...directed(comparison?.facts ?? []), ...movers.facts],
-      sources: [...current.sources, ...(comparison?.sources ?? []), ...movers.sources],
+      facts: [...directed(current.facts), ...directed(comparison?.facts ?? []), ...movers.facts, ...opportunities.facts],
+      sources: [...current.sources, ...(comparison?.sources ?? []), ...movers.sources, ...opportunities.sources],
       rejections: [...rejections, ...current.rejections, ...movers.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }

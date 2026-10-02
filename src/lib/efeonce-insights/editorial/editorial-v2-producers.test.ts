@@ -461,3 +461,50 @@ describe('TASK-1962 — «¿por qué cambió?»: consultas y páginas que más m
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 })
+
+describe('TASK-1962 — «¿qué recomendamos?» y «¿qué necesitamos de ustedes?»', () => {
+  const opp = (rank: number, name: string, value: number, unit: EvidenceFactV1['unit'], dims: Record<string, string>, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `seo.opportunity.${rank}.${name}`, module: 'seo', metricId: `opportunity.${rank}.${name}`, label: dims.keyword!, unit, numerator: null, denominator: null, comparisonFactId: null, channelId: 'google', dimension: { ...dims, rank: String(rank) }, ...extra })
+
+  const first = { keyword: 'barniz para madera', page: '/pintura-y-barniz-para-madera-como-elegir', verb: 'optimize', origin: 'gsc_striking_distance' }
+  const second = { keyword: 'pintura para exteriores', page: '/exteriores', verb: 'consolidate', origin: 'consolidation' }
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      { ...aeo('x', 9377), factId: 'seo.clicks', module: 'seo', metricId: 'clicks', label: 'Clics orgánicos', unit: 'count', numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId: null },
+      opp(1, 'impressions', 10522, 'count', first),
+      opp(1, 'position', 8.4, 'position', first),
+      opp(1, 'target_position', 5, 'count', first, { role: 'reference' }),
+      opp(1, 'ceiling', 76, 'count', first, { observation: 'estimated' }),
+      opp(2, 'impressions', 3000, 'count', second),
+      opp(2, 'position', 12.1, 'position', second),
+      opp(2, 'target_position', 5, 'count', second, { role: 'reference' }),
+      opp(3, 'impressions', 8189, 'count', { keyword: 'pintura', page: 'Página de inicio', verb: 'optimize', origin: 'gsc_striking_distance' })
+    ],
+    sources: [],
+    rejections: [{ module: 'seo', metricId: 'gsc', reason: 'not_connected', detail: 'x' }]
+  }
+
+  it('una acción por oportunidad, en el orden de la cola, citando sus cifras; las oportunidades no son hallazgos', () => {
+    const plan = v2(snapshot, ['seo'])
+
+    expect(plan.actions.map(action => action.text)).toEqual([
+      'Optimizar «barniz para madera» en /pintura-y-barniz-para-madera-como-elegir: está en #8,4 con 10.522 impresiones; en la posición 5 sumaría hasta 76 clics.',
+      'Consolidar las páginas que compiten por «pintura para exteriores» (/exteriores).',
+      // Sin posición medida no hay estado ni techo: sólo el verbo y el sujeto; la portada se nombra en minúscula.
+      'Optimizar «pintura» en la página de inicio.'
+    ])
+    expect(plan.actions[0]!.factIds).toEqual(['seo.opportunity.1.impressions', 'seo.opportunity.1.position', 'seo.opportunity.1.target_position', 'seo.opportunity.1.ceiling'])
+    expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('opportunity')))).toBe(false)
+    expect(plan.chapters[0]!.tables[0]!.rows.map(row => row[0])).toEqual(['Clics orgánicos'])
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('Search Console sin conectar es la petición al cliente; otra ausencia no lo es', () => {
+    expect(v2(snapshot, ['seo']).ask?.text).toBe('Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.')
+    // El límite dice que falta conectar la fuente (algo que el cliente resuelve), no que «no forma parte».
+    expect(v2(snapshot, ['seo']).limits).toContain('Search Console: falta conectar la fuente.')
+    expect(v2({ ...snapshot, rejections: [{ module: 'seo', metricId: 'gsc', reason: 'no_data', detail: 'x' }] }, ['seo']).ask).toBeUndefined()
+    expect(v2({ ...snapshot, rejections: [{ module: 'aeo', metricId: null, reason: 'not_connected', detail: 'x' }] }, ['seo', 'aeo']).ask).toBeUndefined()
+  })
+})

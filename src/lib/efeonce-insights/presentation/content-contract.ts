@@ -124,9 +124,9 @@ export const CONTENT_CONTRACT: readonly InsightContentQuestionRow[] = [
     planSections: ['ask'],
     answeredBy: 'plan',
     byModule: {
-      seo: { verdict: 'producer_now', evidence: 'fuente esperada sin conectar (`not_connected`): acceso a Search Console o propiedad del sitio' },
-      aeo: { verdict: 'producer_now', evidence: 'sin análisis configurado (`not_connected`)' },
-      ico: { verdict: 'producer_now', evidence: 'sin space activo (`not_connected`)' }
+      seo: { verdict: 'producer_now', evidence: 'Search Console sin conectar (`gsc` `not_connected`): el cliente da el acceso; es lo único que se le puede pedir sin una persona' },
+      aeo: { verdict: 'needs_input', evidence: 'sin análisis configurado es trabajo interno de Efeonce, no un pedido al cliente; las peticiones de negocio las agrega una persona en la revisión' },
+      ico: { verdict: 'needs_input', evidence: 'sin space activo es configuración interna de Efeonce; lo que se pide al cliente (aprobaciones, insumos) lo agrega una persona en la revisión' }
     }
   },
   {
@@ -166,6 +166,7 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'seo', prefix: 'page_one_keywords', question: 'outcome' },
   { module: 'seo', prefix: 'organic_etv', question: 'outcome' },
   { module: 'seo', prefix: 'driver.', question: 'drivers' },
+  { module: 'seo', prefix: 'opportunity.', question: 'recommendations' },
   { module: 'aeo', prefix: 'overall_score', question: 'outcome' },
   { module: 'aeo', prefix: 'dimension.', question: 'outcome' },
   { module: 'aeo', prefix: 'mention_rate.', question: 'outcome' },

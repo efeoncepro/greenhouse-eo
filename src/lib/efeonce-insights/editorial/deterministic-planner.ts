@@ -6,7 +6,7 @@
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
-import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
+import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
@@ -34,8 +34,13 @@ const READER = GH_INSIGHTS.readerLimits
 const subjectOfRejection = (rejection: EvidenceRejectionV1): string =>
   (rejection.metricId ? GH_INSIGHTS.metrics[rejection.metricId] : undefined) ?? GH_INSIGHTS.modules[rejection.module].label
 
-const currentLimitText = (reason: EvidenceRejectionV1['reason']): string =>
-  reason === 'insufficient_data' || reason === 'no_data' ? READER.insufficientData : READER.outOfScope
+const currentLimitText = (reason: EvidenceRejectionV1['reason'], metricId: string | null): string =>
+  reason === 'insufficient_data' || reason === 'no_data'
+    ? READER.insufficientData
+    : // TASK-1962 — Search Console sin conectar es algo que el cliente puede resolver (lo pide el plan), no un alcance.
+      reason === 'not_connected' && metricId === 'gsc'
+      ? READER.notConnected
+      : READER.outOfScope
 
 const limitsFor = (rejections: readonly EvidenceRejectionV1[]): string[] => {
   const bySubject = new Map<string, { current: EvidenceRejectionV1 | null; comparison: boolean }>()
@@ -50,7 +55,7 @@ const limitsFor = (rejections: readonly EvidenceRejectionV1[]): string[] => {
   }
 
   // Si falta el período actual, la línea de comparación no se agrega: el tema ya está dicho.
-  return [...bySubject].map(([subject, entry]) => `${subject}: ${entry.current ? currentLimitText(entry.current.reason) : READER.noComparison}.`)
+  return [...bySubject].map(([subject, entry]) => `${subject}: ${entry.current ? currentLimitText(entry.current.reason, entry.current.metricId) : READER.noComparison}.`)
 }
 
 const cutoffLabel = (asOf: string | null, locale: string): string => {
@@ -365,6 +370,58 @@ const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId:
  */
 const isDriverFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('driver.')
 
+/** TASK-1962 — hechos que sólo sostienen el plan de acción (oportunidades de la cola SEO): no son hallazgos ni tabla. */
+const isPlanFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('opportunity.')
+
+/**
+ * TASK-1962 — «¿qué recomendamos?»: una acción por oportunidad de la cola SEO, en su orden (la cola es la autoridad),
+ * citando sus cifras. Sin techo estimado no se promete un número; sin posición, sólo el verbo y el sujeto.
+ */
+const actionsFor = (facts: EvidenceFactV1[], locale: string): PlanActionV1[] => {
+  const P = GH_INSIGHTS.plan
+  const byRank = new Map<string, EvidenceFactV1[]>()
+
+  for (const fact of facts.filter(isPlanFact)) {
+    const rank = fact.dimension?.rank ?? ''
+
+    byRank.set(rank, [...(byRank.get(rank) ?? []), fact])
+  }
+
+  return [...byRank.entries()]
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .flatMap(([rank, group]) => {
+      const pick = (name: string) => group.find(fact => fact.metricId === `opportunity.${rank}.${name}`)
+      const impressions = pick('impressions')
+      const position = pick('position')
+      const target = pick('target_position')
+      const ceiling = pick('ceiling')
+      const dims = (impressions ?? group[0])!.dimension ?? {}
+      const verb = P.verbs[dims.verb ?? '']
+
+      if (!verb || !dims.keyword) return []
+
+      const where = !dims.page ? '' : dims.page === GH_INSIGHTS.reading.homePage ? ` ${P.inHome}` : ` ${P.in} ${dims.page}`
+      const head = `${verb} «${dims.keyword}»${dims.verb === 'consolidate' ? '' : where}`
+      const fmt = (fact: EvidenceFactV1) => formatFactValue(fact.value, fact.unit, locale)
+
+      const state = dims.verb === 'optimize' && position && impressions ? `: ${P.isAt} ${fmt(position)} ${P.with} ${fmt(impressions)} ${P.impressions}` : ''
+      const gain = state && target && ceiling ? `; ${P.atTarget} ${fmt(target)} ${P.wouldAdd} ${fmt(ceiling)} ${P.clicks}` : ''
+      const cited = [impressions, position, target, ceiling].filter((fact): fact is EvidenceFactV1 => Boolean(fact) && Boolean(state))
+
+      return [{ actionId: `action.seo.opportunity.${rank}`, text: `${head}${dims.verb === 'consolidate' && dims.page ? ` (${dims.page})` : ''}${state}${gain}.`, ownerRef: null, factIds: cited.map(fact => fact.factId) }]
+    })
+}
+
+/**
+ * TASK-1962 — «¿qué necesitamos de ustedes?»: lo único que el plan puede pedir sin una persona es una fuente que el
+ * cliente tiene que conectar (Search Console). Lo que falta por configuración interna (análisis de IA, spaces) no es un
+ * pedido al cliente; las peticiones de negocio las agrega una persona en la revisión.
+ */
+const askFor = (rejections: readonly EvidenceRejectionV1[], modules: InsightModule[]): PlanClaimV1 | null =>
+  modules.includes('seo') && rejections.some(rejection => rejection.module === 'seo' && rejection.metricId === 'gsc' && rejection.reason === 'not_connected' && rejection.scope !== 'comparison')
+    ? { claimId: 'ask.connect_search_console', text: GH_INSIGHTS.plan.connectSearchConsole, factIds: [] }
+    : null
+
 const DRIVER_DIMENSIONS = [
   { dimension: 'query', lead: GH_INSIGHTS.reading.driverQueryLead, title: GH_INSIGHTS.figures.driversQueryTitle },
   { dimension: 'page', lead: GH_INSIGHTS.reading.driverPageLead, title: GH_INSIGHTS.figures.driversPageTitle }
@@ -479,11 +536,11 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
   for (const moduleKey of input.modules) {
     // Hechos del período actual (los del período anterior sólo entran como comparación). Una meta oficial es un
     // hecho de REFERENCIA (TASK-1888): se cita en gráficos y lecturas, nunca como hallazgo propio.
-    const moduleFacts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
+    const moduleFacts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact) && !isPlanFact(fact))
     // TASK-1962 — las causas (`driver.*`) tienen su propia sección; no compiten como hallazgo ni van a la tabla general.
     const facts = moduleFacts.filter(fact => !isDriverFact(fact))
     const drivers = editorialV2 ? driverSectionFor(moduleKey, moduleFacts.filter(isDriverFact), byId, input.locale) : null
-    const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact))
+    const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact) && !isPlanFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const v2Context = editorialV2 ? contextOfFacts(facts) : null
 
@@ -565,7 +622,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     locale: input.locale,
     executiveSummary,
     chapters,
-    actions: [],
+    // TASK-1962 — plan de acción determinista desde fuentes dueñas (hoy, la cola SEO); sin contrato v2, vacío como antes.
+    actions: editorialV2 ? actionsFor(snapshot.facts, input.locale) : [],
     limits: limitsFor(snapshot.rejections),
     methodology: unique(snapshot.sources.map(source => methodologyFor(source, input.locale))),
     references,
@@ -574,6 +632,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       ? {
           essentials: essentialsFor(chapters, byId, input.locale, findings),
           scopeLines: scopeLinesFor(input.modules),
+          ...((ask => (ask ? { ask } : {}))(askFor(snapshot.rejections, input.modules))),
           ...(input.cover ? { cover: input.cover } : {})
         }
       : {})
