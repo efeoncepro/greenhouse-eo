@@ -466,3 +466,19 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
   figuras, regenerar la vista previa real y mirar tesis + esenciales, no sólo el gate.
 - **Un puntaje compuesto hereda la falla de sus partes.** Excluir `competitive_sov` = 100 sin competidores no basta: pesa
   15 % del global del Grader, así que el global también queda fuera hasta que el Grader lo corrija.
+
+## 2026-10-02 — TASK-1962: qué dice el informe antes de cómo se ve
+
+- **Una UI que «filtra» puede estar decidiendo contenido.** Think infería el módulo de un hallazgo por la primera cifra,
+  buscaba su figura recorriendo capítulos y contaba hallazgos para ocultar el tablero. Ninguna cifra era inventada, pero
+  eran decisiones que el PDF, el deck, Nexa y el MCP habrían tenido que repetir. Regla: si otro consumer tendría que
+  hacer lo mismo, va al modelo.
+- **«Más cambió» tiene que significar lo mismo en todo el informe.** La lectura genérica de barras elegía el mayor cambio
+  RELATIVO (/colores, -20,7 %) mientras el hallazgo de causas hablaba del mayor cambio en clics (la portada). Las figuras
+  de un productor especializado traen su propia lectura.
+- **Una petición al cliente es sólo lo que el cliente puede dar.** Sin perfil del Grader o sin space es trabajo nuestro;
+  pedírselo al cliente lo confunde. Search Console sin conectar sí es suyo.
+- **La regla de exposición competitiva vive en el dominio dueño.** El código de competidores SEO lo dice («la comparativa
+  competitiva no se expone al cliente»): leer el dominio antes de sumar un dato evitó llevar la competencia SEO al
+  informe sin decisión del operador.
+- **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.

@@ -374,3 +374,23 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   «Efeonce AEO Assessment» (`GH_INSIGHTS.sources.ai_visibility_grader`). Los lockups (`positive|negative|white`) se
   exportan con `pnpm insights:think-icons` desde `@efeoncepro/axis-brand-assets`; nunca se copian ni se arman a mano.
   Reservado: `ai_visibility_report` (enlazar el entregable cuando exista el vínculo) y portadas PDF/deck.
+
+## Contrato de contenido y su mantenimiento (TASK-1962 — en código local 2026-10-02)
+
+- **Qué dice un informe**: ocho preguntas del cliente en `presentation/content-contract.ts` (resultado, causas,
+  competencia, trabajo entregado, recomendaciones, peticiones, medición, límites), con veredicto por módulo
+  (`producer_now | no_evidence | policy_blocked | needs_input | agent_task`) y su evidencia. Espejo legible en la
+  arquitectura §15.
+- **Agregar un dato** = hecho en el adapter dueño + regla en `CONTENT_METRIC_RULES` + veredicto `producer_now` + productor
+  del planner (+ fila de la matriz de familias si dibuja) + subir `CONTENT_CONTRACT_VERSION`, en el mismo cambio.
+  Gate: `content-contract.test.ts` (consistencia en las dos direcciones) y `expectContentContract` en
+  `adapters/adapters.test.ts` (un hecho emitido sin regla rompe).
+- **Competencia SEO al cliente: `policy_blocked`** (auditoría §7 del módulo SEO). La de IA (Share of Voice) sí va.
+- **Prefijos con sección propia en el planner**: `driver.*` (causas: figura de la misma escala, hallazgo de
+  descomposición, tabla con `lead`) y `opportunity.*` (hechos de PLAN: sólo sostienen acciones). Ninguno compite como
+  hallazgo de resultado ni va a la tabla general.
+- **Modelo web 1.3**: `claim.module`, `claim.evidence`, `essentialsByModule`, `chapter.label`, `chart.note`,
+  `fact.priorLabel`, `action.module`, `table.lead`. Think los consume y no deduce ninguno (la muestra de Think los
+  emula SÓLO en fixtures).
+- **Peticiones**: sólo `gsc` `not_connected` (Search Console sin conectar) produce `ask`; lo interno no se le pide al
+  cliente.

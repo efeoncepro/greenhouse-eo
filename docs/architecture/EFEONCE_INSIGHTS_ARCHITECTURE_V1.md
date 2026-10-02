@@ -1492,7 +1492,7 @@ Un informe de Insights responde ocho preguntas del cliente, en este orden. El re
 | 3 | ¿Cómo estamos frente a la competencia? | capítulo | **bloqueada por política** (comparativa SEO nunca client-facing, auditoría §7 del módulo SEO) | productor (Share of Voice) | no aplica |
 | 4 | ¿Qué hicimos este mes? | capítulo | necesita registro de entregables | necesita registro de entregables | productor (piezas completadas, throughput) |
 | 5 | ¿Qué recomendamos? | `actions` | productor (cola SEO, sólo orígenes propios) | agente redactor (TASK-1903) | agente redactor |
-| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (fuente sin conectar) | productor | productor |
+| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (Search Console sin conectar) | persona en la revisión (lo que falta es configuración interna) | persona en la revisión |
 | 7 | ¿Cómo lo mediremos? | `measurement` | necesita metas pactadas | necesita metas pactadas | productor (metas oficiales) |
 | 8 | ¿Qué no podemos afirmar? | `limits` | productor | productor | productor |
 
@@ -1514,3 +1514,32 @@ una pregunta sin productor; ninguna pregunta de hechos con productor queda sin m
 (`expectContentContract`) ejercita los adapters reales: un hecho emitido sin regla rompe el test. `contentCoverageOf`
 calcula la cobertura de una edición (qué responde y por qué no lo demás) para la revisión interna y el agente
 redactor; nunca llega al cliente.
+
+**Productores de esta task (TASK-1962), todos con contrato editorial v2:**
+
+- **Causas SEO** (`driver.<query|page>.clicks`): reader dueño `readSeoWindowMovers`
+  (`src/lib/growth/seo/overview/read-window-movers.ts`) sobre `seo_gsc_daily`, la misma suma que los clics del
+  informe. El planner arma, por dimensión, un hallazgo de descomposición («La consulta que más cambió fue…», nunca una
+  causa), una figura sólo con las que comparten escala con la de mayor pico (10×) y una tabla única con bajada propia
+  (`PlanTableV1.lead`). La lectura de la figura sale del mismo productor que el hallazgo (más clics movidos, no el mayor
+  cambio relativo) y las causas van detrás del resultado en la tesis (rango de `.drivers.` en `conclusionsOf`).
+- **Trabajo entregado ICO** (`delivered.completed`): piezas completadas por space y mes, del mismo snapshot
+  (`context.completedTasks`).
+- **Plan de acción** (`opportunity.<n>.*`, hechos de PLAN que no compiten como hallazgo ni van a tablas): la cola SEO
+  priorizada (`readSeoWorkQueue`) filtrada a orígenes propios (`gsc_striking_distance`, `consolidation`,
+  `declared_target`; nunca `competitor_gap` ni `discovery_candidate`), máximo 5, en su orden. Cada acción cita
+  impresiones y posición medidas, la posición objetivo (referencia) y el techo estimado de la banda 1; sin techo no
+  promete cifra. Depende de `GROWTH_SEO_WORK_QUEUE_ENABLED` (Vercel, ON en staging y Production).
+- **Petición** (`ask`): sólo Search Console sin conectar (`readSeoOverviewConnection` → rechazo `gsc`
+  `not_connected`, límite «falta conectar la fuente»). Lo que falta por configuración interna (perfil del Grader,
+  spaces, target SEO) no se le pide al cliente.
+
+**Modelo web 1.3 — las decisiones de contenido viven en el API.** Cada frase del resumen y de las esenciales trae
+`module` y `evidence {chapterId, chartId}`; el modelo trae `essentialsByModule` (incluido 0), cada capítulo su `label`
+corto (`GH_INSIGHTS.modules[*].navLabel`), cada figura su `note`, cada hecho su `priorLabel` («período anterior: X»),
+cada acción su `module` y cada tabla su `lead`. Think resuelve referencias y dibuja; no deduce. La única
+transformación de texto que queda en Think es tipográfica (partir el titular en negrita y resto, TASK-1958).
+
+**Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
+ni la petición (sólo la decisión); Think sí. Página de plan en los PDF y cascada para «qué explica el cambio» quedan
+como follow-up de UI (TASK-1958/TASK-1902).

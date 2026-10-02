@@ -1,5 +1,9 @@
 # TASK-1901 — Efeonce Insights: evidencia más rica para más familias de gráfico
 
+## Delta 2026-10-02 (TASK-1962)
+
+- TASK-1962 agregó el contrato de contenido (`presentation/content-contract.ts`) con gate: toda métrica nueva de esta task necesita su regla en `CONTENT_METRIC_RULES` y el veredicto de su pregunta, o rompe `expectContentContract`. Las causas por consulta/página (`readSeoWindowMovers`) ya existen como hechos `driver.*`; la composición marca/sin marca de esta task es otra evidencia (no se duplicó). — por trabajo en TASK-1962
+
 ## Delta 2026-09-26
 
 - **Preguntas abiertas resueltas por el operador (2026-09-26), con recomendación de la skill `seo-aeo`:**

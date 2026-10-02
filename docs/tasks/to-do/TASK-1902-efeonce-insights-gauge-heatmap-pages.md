@@ -1,5 +1,9 @@
 # TASK-1902 — Efeonce Insights: páginas de medidor y mapa de calor
 
+## Delta 2026-10-02 (TASK-1962)
+
+- TASK-1962: «qué explica el cambio» hoy sale como comparación agrupada porque la cascada (`waterfall`) no tiene página PDF; cuando exista, las causas SEO pueden pasar a cascada sin evidencia nueva (la suma por consulta es exactamente el total de clics). — por trabajo en TASK-1962
+
 ## Delta 2026-09-26
 
 - Filas del mapa de calor: sólo keywords del set monitoreado con intención `target` (prioritarias acordadas con el cliente), posición semanal desde la captura diaria de ranking; con menos de 3, la página no se produce. Decisión del operador 2026-09-26 — registrada en TASK-1901.

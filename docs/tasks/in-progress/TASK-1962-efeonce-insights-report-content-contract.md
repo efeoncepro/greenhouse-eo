@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `En ejecución; pedido del operador 2026-10-02 («avanza con todo lo que corresponda end-to-end»)`
+- Status real: `Code complete local 2026-10-02 (Slices 1–6, commits 873b66e60…35e7f9f69 en develop + efeonce-think 70785c1/58df9e9); rollout pendiente: release de Greenhouse junto con TASK-1957 y push de efeonce-think después`
 - Rank: `TBD`
 - Domain: `insights|growth`
 - Blocked by: `none`
@@ -205,11 +205,11 @@ Revisión del operador 2026-10-02 sobre los previews reales de Berel y Sky:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — reader de causas ejercitado contra PG real (Berel, 0,5 s, suma = total de clics del informe).
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -331,13 +331,13 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
 
 ## Acceptance Criteria
 
-- [ ] El registro declara las 8 preguntas con veredicto por módulo y el test de cobertura falla si un productor no está declarado.
-- [ ] El modelo web 1.3 trae módulo y evidencia por hallazgo, esenciales por módulo, nombre de capítulo y notas; Think no deduce ninguno.
-- [ ] Una edición de Berel trae la figura de consultas y páginas que más movieron los clics con su hallazgo.
-- [ ] Una edición de Sky Diseño trae piezas completadas por space.
-- [ ] El plan de acción de Berel sale de la cola SEO sin ningún ítem de origen competidor.
-- [ ] Una fuente `not_connected` produce una petición al cliente.
-- [ ] Gate client-fit sin violaciones en Berel y Sky.
+- [x] El registro declara las 8 preguntas con veredicto por módulo y el test de cobertura falla si un productor no está declarado. — `presentation/content-contract.test.ts` (6 pruebas) + `expectContentContract` en `adapters/adapters.test.ts`; atrapó evidencias «ídem» al escribirlo.
+- [x] El modelo web 1.3 trae módulo y evidencia por hallazgo, esenciales por módulo, nombre de capítulo y notas; Think no deduce ninguno. — `sharing.test.ts` «1.3 …»; Think `insights-view.ts` sin `findEvidence` ni inferencia de módulo, filtro por `essentialsByModule` (verificado en navegador: Berel `{seo:3, aeo:0}`, tablero oculto con «Respuestas de IA»). Queda en Think el pie del titular (tipografía, delta a TASK-1958).
+- [x] Una edición de Berel trae la figura de consultas y páginas que más movieron los clics con su hallazgo. — preview contra la base: «La consulta que más cambió fue «berel»: bajó de 1.933 a 1.579 clics (-18,3 %)»; PDF A4 local 16 páginas sin rechazos (figura y tabla de causas).
+- [x] Una edición de Sky Diseño trae piezas completadas por space. — preview: «Las piezas entregadas subieron de 256 a 328 (+28,1 %)».
+- [x] El plan de acción de Berel sale de la cola SEO sin ningún ítem de origen competidor. — reader pedido con `origins: [gsc_striking_distance, consolidation, declared_target]` (test); preview Berel con 5 acciones `gsc_striking_distance`.
+- [x] Una fuente `not_connected` produce una petición al cliente. — Search Console sin conectar (Sky Blog, `seot-sky-blog-cl`) ⇒ `ask` visible en Think; lo interno (Grader, spaces) no se pide (test).
+- [x] Gate client-fit sin violaciones en Berel y Sky. — preview: `gate berel {}`, `gate sky {}`, `gate sky-blog {}`; validación del plan sin violaciones.
 
 ## Verification
 
@@ -356,11 +356,22 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] Skill `efeonce-insights` actualizada y espejada a `.codex/`.
 
+## Delta 2026-10-02 — ejecución
+
+- Hallazgos durante la ejecución: los catálogos PDF no dibujan el plan de acción ni la petición (sólo Think); la
+  lectura genérica de barras elegía el mayor cambio relativo y contradecía el hallazgo de causas (se corrigió con una
+  lectura propia del productor); Sky Blog no tiene Search Console conectado.
+- Verificación local: `pnpm vitest run src/lib/efeonce-insights` 298 verdes; `pnpm typecheck` y eslint limpios;
+  Think `astro check` 0 errores y `test:insights` 18 verdes; previews Berel, Sky Diseño y Sky Blog contra la base
+  compartida; PDF A4 y deck de Berel y Sky renderizados localmente sin rechazos.
+- Sin probar en runtime desplegado (no hubo release).
+
 ## Follow-ups
 
 - Metas pactadas por cliente para SEO/AEO (pregunta 7).
 - Registro de trabajo entregado por servicio (pregunta 4 en SEO/contenido).
-- Página PDF/deck de cascada para «qué explica el cambio».
+- Página PDF/deck del plan de acción y la petición (hoy sólo Think) y de cascada para «qué explica el cambio» (TASK-1958/TASK-1902).
+- Exponer `contentCoverageOf` en la revisión interna y al agente redactor (TASK-1903).
 - Decisión del operador sobre competencia SEO en el informe al cliente (auditoría §7).
 
 ## Open Questions

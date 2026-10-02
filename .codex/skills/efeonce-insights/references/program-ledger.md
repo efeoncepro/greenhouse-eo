@@ -716,3 +716,7 @@ internas, y TASK-1958 para la jerarquía visual (Think todavía imprime `spec.un
   hallazgos, afirmaciones con verbo, empate, tabla, orden de lecturas, dirección por hecho), gateway v1.9.0, flag en
   staging + ediciones internas, fix del empate. Codex ejecutó merge del gateway, redeploy de producción, flag del
   ops-worker y los dos releases que el clasificador bloqueó.
+- 2026-10-02 · Claude (TASK-1962) · contrato de contenido del informe (8 preguntas + gate de mantenimiento), modelo web
+  1.3 (decisiones de contenido en el API; Think deja de deducir), causas SEO (`readSeoWindowMovers`), piezas entregadas
+  ICO, plan de acción desde la cola SEO (orígenes propios) y petición de Search Console. Código local en develop; sin
+  release. Think consume 1.3 en commits locales de `efeonce-think`.

@@ -1,5 +1,9 @@
 # TASK-1960 — Efeonce Insights: un informe por servicio contratado (alcance, módulos y destinatarios del servicio)
 
+## Delta 2026-10-02 (TASK-1962)
+
+- TASK-1962 midió el informe Blog de Sky contra datos reales: `seot-sky-blog-cl` no tiene Search Console conectado (0 filas), ni seguimiento de posiciones, ni competidores SEO. El informe sale con la petición «Darnos acceso a Google Search Console…» y casi sin cifras propias hasta que la cuenta conecte la fuente; el registro de contenido dice qué preguntas aplican a cada servicio. — por trabajo en TASK-1962
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
