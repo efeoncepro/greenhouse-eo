@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseño acordado con el operador 2026-10-02; sin implementación`
+- Status real: `En implementación 2026-10-03 (Claude, develop local-first, sin push)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
