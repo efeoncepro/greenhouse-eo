@@ -204,6 +204,14 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    y derecha, perfil, cuerpo entero y tres o cuatro expresiones. Mismo método que el casting de CMP-004
    (`ai-generations/2026-10-02_cmp004-cine-nativo/casting/`). Sophia sale del elegido de Karo, y después se hace una
    toma de las dos juntas.
+   **Set del elenco, 2026-10-02 [medido]:** seis vistas por personaje en
+   `ai-generations/2026-10-02_elenco-efeonce/sets/<clave>/` (frente, 45° a cada lado, perfil a cada lado y cuerpo
+   entero; prompts en `sets/build-jobs.cjs`). Dos lecciones: (a) pedir el giro por el lado de la PERSONA («toward the
+   person's own right») devolvió las dos vistas de 45° hacia el mismo lado en los cinco; se rehicieron nombrando el
+   lado del CUADRO («the nose points to the right edge of the image») y pasando el perfil de ese lado como segunda
+   referencia, solo para la dirección (`<clave>-45-der-v2.png`). (b) El cuerpo entero sale bien por edición desde un
+   retrato si el prompt fija la proporción (cabeza ≈ 13 % de la altura, 85 mm a 7 m); el fallo de Humberly venía de
+   una referencia de medio cuerpo con la cara muy grande en cuadro.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
 5. **Registro.** Hoy un personaje de campaña se declara ficha por ficha en `casting`
@@ -218,9 +226,9 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Personaje | Estado |
 |---|---|
 | Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
-| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas. Humberly sigue en el roster sin cambios |
-| Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Siguen la marca de carácter y su set de vistas |
-| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia |
-| Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas |
-| Sophia | **Elegida: candidata B con pelo castaño oscuro** (`sophia/sophia-b-castano.png`, editada desde Karo A) **[aprobada por el operador, 2026-10-02: «Esta queda aprobada para Sophia»]**. Sigue su set de vistas |
+| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/hum/`). Humberly sigue en el roster sin cambios |
+| Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/isabella/`); pendiente la marca de carácter |
+| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia. Set de 6 vistas listo (`sets/karo/`) |
+| Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/antonio/`); revisar al zoom el 45° derecha |
+| Sophia | **Elegida: candidata B con pelo castaño oscuro** (`sophia/sophia-b-castano.png`, editada desde Karo A) **[aprobada por el operador, 2026-10-02: «Esta queda aprobada para Sophia»]**. Set de 6 vistas listo (`sets/sophia/`) |
 | Catálogo `ELENCO` | Propuesto (§7.5) |
