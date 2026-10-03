@@ -1,5 +1,14 @@
 # TASK-1975 — Figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — decisiones del operador
+
+- **Tarjeta de cifra:** se diseña y aprueba en un canvas antes de implementarla (Slice 1). Las tres direcciones del
+  wireframe son el punto de partida; ninguna está aprobada todavía.
+- **Waffle de un cuadro por unidad:** aprobado (8 respuestas = 8 cuadros, no 100 repartidos por porcentaje), en el PDF,
+  el deck y Think. Exige **definir los tokens de color de estas figuras** (tono, tipo de fuente y partes de un todo) en
+  AXIS antes de dibujarlas: ningún valor escrito a mano; el color del paso «Sumó» de la cascada entra en el mismo trabajo.
+- **Mismo release:** TASK-1974 y TASK-1975 salen juntas, con `efeonce-think` desplegado antes o junto con ese release.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
