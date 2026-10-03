@@ -218,7 +218,7 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Personaje | Estado |
 |---|---|
 | Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
-| Hum | Cuatro candidatas desde cero en `hum/`; espera elección. Humberly sigue en el roster sin cambios |
+| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas. Humberly sigue en el roster sin cambios |
 | Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Siguen la marca de carácter y su set de vistas |
 | Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia |
 | Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas |
