@@ -828,3 +828,23 @@ paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan 
   `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`; resumen en `contracts.md` § Criterio de
   selección de gráficos. Sólo documentación: la implementación (planificador, tarjeta de cifra, plantillas PDF/deck de
   cascada, waffle, dona y apiladas, gate sobre fixtures de Berel y Sky) queda en una task nueva de EPIC-045, por crear.
+
+## TASK-1990 / TASK-1996 — Tarjeta de cifra con isotipo de canal (in-progress, 2026-10-03)
+
+- **Aprobación:** el operador, 2026-10-03 (canvas «TASK-1975 · Tarjeta de cifra», tableros `*-Cifras-Canal` y su
+  inventario). Dirección: `docs/ui/visual-directions/TASK-1996-efeonce-insights-channel-stat-card-direction.md`.
+- **AXIS publicado en `v0.3.42`** (`1d86d7c`): contrato `efeonce.insights-stat-card` 0.2.0, tokens
+  `efeonceInsights.statCard.channel`, `AXIS_PLATFORM_ASSETS` en `axis-brand-assets` 0.4.15 (20 isotipos con procedencia)
+  y cinco glifos Trazo D30 en `axis-graphic-line` 0.15.0 (competencia, keyword, enlace, velocidad, pausa).
+- **Greenhouse** (`643d38846` + slice de contexto/docs, sin push): la plataforma de cada cifra la resuelve
+  `statPlatformOf` (fuente primero: Search Console, GA4, ICO → Greenhouse; si no, el `channelId`) y el tablero
+  `statBoardChannelsOf` (título si todas salen de las mismas plataformas, celda si mezcla motores de respuesta). La usan
+  `buildStatSlides` (A4 y deck) y el modelo web 1.4 (`titlePlatforms`, `items[].channel`, `context`, aditivos: 1.4 aún
+  no está publicado). Brand-assets fijado en 0.4.15; isotipos de los catálogos verificados byte a byte
+  (`src/config/insights-channel-isotypes.test.ts`). AI Overview pasa a su lupa con el degradado de la G.
+- **Think** (`42b45bf`, `759100a`, `fb27adb`, sin push): `StatCard.astro` dibuja los discos desde el modelo; `EngineMark`
+  usa la lupa para AI Overview.
+- **Evidencia real:** Berel A4 (Search Console y Google en el título del capítulo SEO) y Sky deck (Greenhouse en el
+  título del capítulo ICO), en `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/`.
+- **Pendiente:** glifos Trazo para clics, impresiones, CTR y posición (para retirar Tabler), los 10 isotipos sin
+  productor (entran con TASK-1991/1992), `channelForDomain` y la validación del plan (TASK-1990), y el release.

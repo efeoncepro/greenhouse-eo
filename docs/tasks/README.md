@@ -165,12 +165,12 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 | [TASK-1902](to-do/TASK-1902-efeonce-insights-gauge-heatmap-pages.md) | páginas de medidor y mapa de calor (A4 y deck) y columnas por tramo; bloqueada por TASK-1901 | to-do |
 | [TASK-1974](in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador: la pregunta elige la familia, tarjeta de cifra en el contrato, sin datos repetidos, dona y barras apiladas con evidencia | in-progress |
 | [TASK-1975](in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas (canvas TASK-1889; tarjeta pendiente de diseño); bloqueada por TASK-1974 | to-do |
-| [TASK-1990](to-do/TASK-1990-efeonce-insights-channel-stat-card-contract.md) | contrato de la tarjeta de cifra con canal: 19 plataformas, dominio → plataforma, canal o glifo Trazo por cifra, canal del tablero, modelo web 1.5 y visitas por asistente como tarjetas; bloqueada por TASK-1974 | to-do |
+| [TASK-1990](in-progress/TASK-1990-efeonce-insights-channel-stat-card-contract.md) | contrato de la tarjeta de cifra con canal: 19 plataformas, dominio → plataforma, canal o glifo Trazo por cifra, canal del tablero, modelo web 1.5 y visitas por asistente como tarjetas; bloqueada por TASK-1974 | in-progress |
 | [TASK-1991](to-do/TASK-1991-efeonce-insights-aeo-per-engine-facts.md) | visibilidad en IA por motor: lugar en la respuesta, cita con enlace, tono positivo, Share of Voice y plataforma citada; bloqueada por TASK-1424, TASK-1961 y TASK-1990 | to-do |
 | [TASK-1992](to-do/TASK-1992-efeonce-insights-seo-visibility-360-facts.md) | hechos nuevos del Search Visibility 360: AI Overview y bloques del SERP, plataformas que rankean, movimiento de keywords, pagado, enlaces, salud técnica, visibilidad por URL y competidores con gate de política; bloqueada por TASK-1990 | to-do |
 | [TASK-1994](to-do/TASK-1994-efeonce-insights-ico-production-facts.md) | indicadores de producción ICO: ciclo, throughput, velocidad, piezas trabadas, atrasos, SLO y revisiones; bloqueada por TASK-1990 | to-do |
 | [TASK-1995](to-do/TASK-1995-efeonce-insights-missing-sources-decision.md) | policy: decidir las fuentes que faltan (Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta) | to-do |
-| [TASK-1996](to-do/TASK-1996-efeonce-insights-channel-stat-card-render.md) | tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think (AI Overview con la lupa); bloqueada por TASK-1975, TASK-1990 y la publicación de AXIS | to-do |
+| [TASK-1996](in-progress/TASK-1996-efeonce-insights-channel-stat-card-render.md) | tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think (AI Overview con la lupa); bloqueada por TASK-1975, TASK-1990 y la publicación de AXIS | in-progress |
 
 ## Proveedor de imagen OpenAI
 
@@ -2637,13 +2637,13 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - [TASK-1987](to-do/TASK-1987-video-physical-product-composite-occlusion.md): tooling (EPIC-051); producto físico exacto por cuadro con dedos por delante y pase de integración; canario C12; P2/Alto.
 - [TASK-1988](to-do/TASK-1988-video-ui-motion-kit-cut-on-action.md): tooling (EPIC-051); `pnpm video:ui` — guion de interfaz, capas de interacción, inserto P6/flotante P7, corte en la acción; canario C13; P1/Alto.
 - [TASK-1989](to-do/TASK-1989-video-production-runner.md): tooling (EPIC-051); runner `pnpm video:*` — plan declarativo por toma, compuertas, ledger con retome e invalidación, recetas (ADR-025 aceptada); P1/Alto.
-- [TASK-1990](to-do/TASK-1990-efeonce-insights-channel-stat-card-contract.md): EPIC-045; contrato de la tarjeta de cifra con canal (plataformas, glifo por métrica, canal del tablero, modelo web 1.5); P1/Medio; backend-data; bloqueada por TASK-1974.
+- [TASK-1990](in-progress/TASK-1990-efeonce-insights-channel-stat-card-contract.md): EPIC-045; contrato de la tarjeta de cifra con canal (plataformas, glifo por métrica, canal del tablero, modelo web 1.5); P1/Medio; backend-data; bloqueada por TASK-1974.
 - [TASK-1991](to-do/TASK-1991-efeonce-insights-aeo-per-engine-facts.md): EPIC-045; visibilidad en IA por motor y plataforma citada; P1/Medio; backend-data; bloqueada por TASK-1424, TASK-1961 y TASK-1990.
 - [TASK-1992](to-do/TASK-1992-efeonce-insights-seo-visibility-360-facts.md): EPIC-045; hechos nuevos del Search Visibility 360 (SERP, movimiento, pagado, enlaces, salud técnica, URL; competidores con gate); P1/Alto; backend-data; bloqueada por TASK-1990.
 - [TASK-1993](to-do/TASK-1993-growth-seo-ai-overview-citation-capture.md): EPIC-022; captura de las referencias del AI Overview en la captura diaria de clientes (costo de proveedor cero) y reader «citado dentro del AI Overview»; P1/Medio; backend-data.
 - [TASK-1994](to-do/TASK-1994-efeonce-insights-ico-production-facts.md): EPIC-045; indicadores de producción ICO en Insights; P2/Medio; backend-data; bloqueada por TASK-1990.
 - [TASK-1995](to-do/TASK-1995-efeonce-insights-missing-sources-decision.md): EPIC-045; policy — fuentes de Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta; P2/Bajo.
-- [TASK-1996](to-do/TASK-1996-efeonce-insights-channel-stat-card-render.md): EPIC-045; tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think; P1/Alto; ui-ux; bloqueada por TASK-1975, TASK-1990 y la publicación de AXIS.
+- [TASK-1996](in-progress/TASK-1996-efeonce-insights-channel-stat-card-render.md): EPIC-045; tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think; P1/Alto; ui-ux; bloqueada por TASK-1975, TASK-1990 y la publicación de AXIS.
 - [TASK-1972](to-do/TASK-1972-collaborator-home-ui.md): hija H de TASK-1967; Home de colaboradores en `/my`; P1/Medio; bloqueada por TASK-1969 y TASK-1970.
 
 ## AEO X-Ray — composición y experiencia

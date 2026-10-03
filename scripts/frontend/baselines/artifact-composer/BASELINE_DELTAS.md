@@ -1,5 +1,17 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-03 (x) — TASK-1996: la línea de contexto va bajo la cifra, como en la hoja aprobada
+
+<!-- sealed-by-freeze: 9b438fe74b0d584526cff8b1609b341a0423d16138158e2eb9e5f95df09cfcea -->
+
+Las hojas `Premium-Cifras-Canal` y `Deck-Cifras-Canal` (exportadas a
+`docs/ui/visual-directions/TASK-1996-efeonce-insights-channel-stat-card/paginas/`) ponen la métrica bajo la cifra, en 12 px
+y en tinta (navy en papel, `navyLead` en el deck). La sección (w) la había dejado bajo el nombre, en 10 px y gris.
+
+Frames que cambian (existían):
+- `templates-insights-report/ReportFigureStatPage.png` — cambia: la línea de contexto del probe baja bajo la cifra
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: lo mismo en la lámina navy
+
 ## 2026-10-03 (w) — TASK-1996: la tarjeta de cifra con isotipo de canal
 
 <!-- sealed-by-freeze: 0035b899eaafcf9f346623a1319aa115fcc6ac92829305cf45d42e08cb5c3524 -->
@@ -1204,7 +1216,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 0035b899eaafcf9f346623a1319aa115fcc6ac92829305cf45d42e08cb5c3524 -->
+<!-- manifest-digest: 9b438fe74b0d584526cff8b1609b341a0423d16138158e2eb9e5f95df09cfcea -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

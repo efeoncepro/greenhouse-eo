@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseño; dirección aprobada por el operador el 2026-10-03 (canvas, tableros Cifras-Canal); hojas por exportar al repo`
+- Status real: `En curso 2026-10-03: AXIS v0.3.42 publicado; isotipo por celda o en el título en A4, deck (643d38846) y Think (42b45bf, 759100a, fb27adb); faltan glifos Trazo para las métricas sin uno y los 10 isotipos sin productor`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo), publicación de AXIS (push + tag `v0.3.42`, `@efeoncepro/axis-brand-assets` 0.4.15 y glifos D30) con OK del operador
@@ -372,16 +372,16 @@ coincidencia, sólo el nombre.
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux`, `UI impact: layout` y el wireframe existe en `docs/ui/wireframes/TASK-1996-efeonce-insights-channel-stat-card-render.md`.
+- [x] Se declaró `Execution profile: ui-ux`, `UI impact: layout` y el wireframe existe en `docs/ui/wireframes/TASK-1996-efeonce-insights-channel-stat-card-render.md`.
 - [ ] `UI ready` sigue en `no` hasta que las hojas aprobadas estén exportadas al repo y el wireframe y el contrato tengan mapping, GVC plan y decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1996` queda sin hallazgos.
-- [ ] AI Overview se dibuja con la lupa en color en A4, deck y Think (captura).
-- [ ] Los 19 isotipos del catálogo coinciden con `PLATFORM_ASSET_SEALS` (el script falla si uno cambia).
-- [ ] Un tablero mezclado lleva isotipo por celda con nombre del canal y contexto; un tablero de una plataforma lleva el canal sólo en el título; ninguna celda tiene isotipo y glifo juntos (fixtures y captura).
-- [ ] Ningún ícono de cifra usa rutas Tabler; todos son glifos Trazo.
-- [ ] Fidelidad ≤ 1 % contra `Premium-Cifras-Canal` y `Deck-Cifras-Canal` en color y en gris.
-- [ ] `composer:visual-gate` a 0 px salvo los frames declarados en `BASELINE_DELTAS.md`.
-- [ ] Think sin scroll horizontal a 390 px y `audit:insights-a11y` verde.
-- [ ] El copy visible reusable vive en `src/lib/copy/insights.ts`.
+- [x] AI Overview se dibuja con la lupa en color en A4, deck y Think (captura). Evidencia: `CHANNEL_ISOTYPES.google_ai_overview` y `EngineMark` de Think a `google-ai-overview`; `derivada-Cifras-Canal-Celdas.png`.
+- [ ] Los 19 isotipos del catálogo coinciden con `PLATFORM_ASSET_SEALS` (el script falla si uno cambia). Parcial: los 9 que hoy tienen productor (motores, Google, Search Console, GA4, Greenhouse) están copiados y verificados byte a byte por `src/config/insights-channel-isotypes.test.ts`; los otros 10 entran con TASK-1991/1992, que producen sus hechos.
+- [x] Un tablero mezclado lleva isotipo por celda con nombre del canal y contexto; un tablero de una plataforma lleva el canal sólo en el título; ninguna celda tiene isotipo y glifo juntos (fixtures y captura).
+- [ ] Ningún ícono de cifra usa rutas Tabler; todos son glifos Trazo. Pendiente: el set Trazo no tiene glifo para clics, impresiones, CTR ni posición; hay que dibujarlos y aprobarlos antes del cambio.
+- [ ] Fidelidad ≤ 1 % contra `Premium-Cifras-Canal` y `Deck-Cifras-Canal` en color y en gris. No medible: las hojas del canvas no traen el cromo de página; revisión lado a lado en `docs/ui/visual-directions/TASK-1996-efeonce-insights-channel-stat-card-direction.md`. Las hojas aprobadas existentes siguen ≤ 1 % (cifras 0,05 % A4 y 0,53 % deck).
+- [x] `composer:visual-gate` a 0 px salvo los frames declarados en `BASELINE_DELTAS.md` (secciones (w) y (x); 37 frames a 0 px).
+- [x] Think sin scroll horizontal a 390 px y `audit:insights-a11y` verde (`verify:insights` y AA a 390 px).
+- [x] El copy visible reusable vive en `src/lib/copy/insights.ts` (`GH_INSIGHTS.stat.channelNames` y `channelContext`).
 
 ## Verification
 

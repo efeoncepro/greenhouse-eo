@@ -18,7 +18,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -31,7 +31,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Diseño; tarjetas con isotipo de canal e inventario aprobados por el operador el 2026-10-03`
+- Status real: `En curso 2026-10-03: la regla vive en presentation/stat-card.ts (statPlatformOf, statBoardChannelsOf) y la usan PDF, deck y modelo web 1.4 (aditivo, aún no publicado); faltan el vocabulario de 19 plataformas, channelForDomain y la validación del plan`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `TASK-1974` (su contrato de tarjeta de cifra está en develop sin release; esta task lo extiende y sale en el mismo release o después)
@@ -353,8 +353,8 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 - [ ] `INSIGHT_CHANNEL_IDS` contiene las 19 plataformas de AXIS y un test falla si las listas difieren.
 - [ ] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test).
 - [ ] Un plan con canal y glifo en la misma celda, canal sin `label` igual al nombre, `context` sin canal, canal en título y celda, o todas las celdas de una plataforma sin canal en el título es rechazado por `plan-validation.ts` (test por cada código).
-- [ ] El capítulo SEO de Berel sale con Search Console en el título y glifo por celda; un capítulo ICO sale con Greenhouse en el título (vista previa).
-- [ ] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test).
+- [x] El capítulo SEO de Berel sale con Search Console en el título y glifo por celda; un capítulo ICO sale con Greenhouse en el título (vista previa). Evidencia: `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/berel-2026-09-a4-cifras-seo.png` (Search Console y Google) y `sky-2026-09-deck-cifras-ico.png` (Greenhouse).
+- [ ] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test). Cambio de decisión: el modelo 1.4 aún no está publicado, así que `titlePlatforms`, `items[].channel` y `context` entran como aditivos en 1.4 (resueltos por `statItemView` y `statBoardChannelsOf`); falta `metricIcon` (depende de los glifos Trazo de TASK-1996).
 - [ ] El criterio de selección documenta la regla de visitas por asistente como tarjetas o dona y su §11 queda vigente con fecha 2026-10-03.
 
 ## Verification

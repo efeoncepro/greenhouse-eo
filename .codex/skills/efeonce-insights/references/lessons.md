@@ -534,3 +534,12 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
   estaba en «Manufactura» y sus sets curados nunca se aprobaron: las corridas usaban el paquete genérico. Antes de leer un
   resultado del Grader, mirar `prompt_set_id` de la corrida.
 - **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.
+
+- **2026-10-03 — Un slot opcional ausente se VACÍA, no se quita (TASK-1996).** El contenedor `titleChannels` quedaba vacío
+  en el DOM y un `:has(.title-channels)` lo daba por presente: movió el título 8 px y la fidelidad de `Premium-Cifras` subió
+  de 0,05 % a 1,4 %. Regla: estilar por el ÍTEM (`:has(.title-channel)`) y ocultar el contenedor sin ítems.
+- **2026-10-03 — El sintetizador del gate no arma objetos dentro de un ítem de arreglo.** Un campo `channel: { channelId }`
+  en `statItems` salió como el texto «channel» en el probe. Un dato por ítem va como campo string con su propio resolver
+  (`<prefijo>-stat-channel`), que apunta al `<img>` interno.
+- **2026-10-03 — Mirar la hoja aprobada antes de ubicar un elemento nuevo.** Puse la línea de contexto bajo el nombre;
+  la hoja la tenía bajo la cifra, en 12 px y en tinta. Exportar el tablero del canvas al repo primero lo habría evitado.
