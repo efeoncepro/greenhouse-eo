@@ -307,17 +307,17 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 
 ## Acceptance Criteria
 
-- [ ] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1.
-- [ ] `pnpm foto:expandir` conserva flags y salidas; su recomposición vive en el núcleo y la regresión contra dos horizontales aprobadas de CMP-004 está documentada.
-- [ ] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real.
-- [ ] `pnpm ai:mask --from-layer` produce una máscara canónica desde una capa con nombre, y la edición resultante deja el resto de la ORIGINAL en delta 0.
-- [ ] Layerize está medido sobre fotografía y sobre un KV plano: capas obtenidas, calidad del clean plate y si la base se cobra, en la guía de selección.
-- [ ] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real.
-- [ ] `background` cambia el fondo con el sujeto en delta 0 y reporta la costura en la franja de borde.
-- [ ] `detail` rehace una zona a la resolución pedida y vuelve a su lugar en delta 0 fuera de la zona.
-- [ ] Mover una capa sobre el clean plate + halo de integración produce una pieza con el resto en delta 0.
-- [ ] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa los módulos nuevos.
-- [ ] Manuales, spec, guía y skills (+ espejos) describen los modos nuevos.
+- [ ] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1. — implementado y probado con adaptador simulado (`expand.test.ts`, escena intacta) y dry-run real 9:16; **falta el canario real** (autorización de gasto).
+- [ ] `pnpm foto:expandir` conserva flags y salidas; su recomposición vive en el núcleo y la regresión contra dos horizontales aprobadas de CMP-004 está documentada. — **pendiente**: `scripts/foto/expandir.mjs` tiene WIP sin commitear de otra sesión (2026-10-03); requiere coordinación con CMP-004.
+- [ ] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real. — implementado y probado con fal simulado (`layers.test.ts`: capas, cajas, costo, caché, tope) y dry-run real; **falta la corrida real**.
+- [x] `pnpm ai:mask --from-layer` produce una máscara canónica desde una capa con nombre, y la edición resultante deja el resto de la ORIGINAL en delta 0. — `layers.test.ts` (alfa ubicado con su caja y reescalado de base 400×200 a original 800×400, unión de capas) + `erase.test.ts`/`move.test.ts` (resto en delta 0).
+- [ ] Layerize está medido sobre fotografía y sobre un KV plano: capas obtenidas, calidad del clean plate y si la base se cobra, en la guía de selección. — **falta el canario real** (KV medido el 2026-09-16; fotografía sin dato).
+- [ ] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real. — implementado; `erase.test.ts` cubre clean plate (sin proveedor, delta 0), residuo → código 3 y guarda de marca por nombre de capa; **falta el canario real**.
+- [x] `background` cambia el fondo con el sujeto en delta 0 y reporta la costura en la franja de borde. — `background-detail.test.ts` (sujeto intacto, fondo nuevo, costura impresa); canario real pendiente como validación visual.
+- [x] `detail` rehace una zona a la resolución pedida y vuelve a su lugar en delta 0 fuera de la zona. — `background-detail.test.ts` (zona generada a ≥ 2000 px de lado largo, PASS, rango 512–4096 validado).
+- [ ] Mover una capa sobre el clean plate + halo de integración produce una pieza con el resto en delta 0. — `move.test.ts` cubre el compuesto sin halo (elemento con píxeles de la ORIGINAL, hueco con plate, resto en delta 0); **la pasada de halo con modelo falta en canario real**.
+- [x] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa los módulos nuevos. — `grep -rlE "inpaint/(layers|erase|move|expand|background|techniques)" src` vacío (2026-10-03).
+- [x] Manuales, spec, guía y skills (+ espejos) describen los modos nuevos. — commit `0e469024d`; `skills:mirrors` y `models:inventory` verdes.
 
 ## Verification
 
