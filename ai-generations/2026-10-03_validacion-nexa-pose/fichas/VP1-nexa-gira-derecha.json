@@ -1,0 +1,8 @@
+{
+ "id": "VP1-nexa-gira-derecha",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [{ "persona": "nexa", "expresion": "conviccion" }],
+ "escena": "SCENE: Nexa sits at a matte graphite desk in a quiet studio at dusk, chest-up medium shot, at the instant a result appears on a large frameless monitor placed to the RIGHT edge of the frame: her head and gaze turn toward the RIGHT edge of the image to read it, nose pointing to the right edge, the left side of her face toward the camera. She wears a dark navy fine-knit top. The monitor glow is a cool azure-blue (#0375DB) light from the right that rims her cheek and hair. Soft fill from the left. 85mm lens at f/2, camera at about 2 m at eye height.",
+ "lecho": { "objeto": "the dark near edge of the graphite desk in the lower foreground", "tono": "DARK near black, matte" }
+}

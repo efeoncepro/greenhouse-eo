@@ -490,7 +490,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.
 - 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: las
   referencias dicen quién es; el giro, la inclinación y el gesto los da la escena. Declara `{ "persona": "nexa",
-  "expresion": "…" }` (12 fotográficas en `5-expresiones/`, todas con el mismo tres cuartos: copian sólo el gesto) y no
+  "expresion": "…" }` (12 fotográficas en `5-expresiones/`, todas con el mismo tres cuartos: van DETRÁS del ancla frontal y copian sólo el gesto; puestas primeras, la serie salía con la cara volteada al mismo lado — corregido el 2026-10-03; en grupo no viajan) y no
   copies «confident half-smile» de ficha en ficha: `foto:prompt` avisa si falta. Detalle: bloques de prompt, delta 2026-10-02.
 - 🔴 **La cabeza casi no gira: giran los ojos.** Pedir «gira la cabeza hacia el hombro» es pedir un **tres cuartos
   marcado**, y **pedir un ángulo que el set de referencias no cubre hace que el modelo reconstruya el rostro**. En la

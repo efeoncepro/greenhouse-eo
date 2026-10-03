@@ -336,6 +336,9 @@ export const PERSONAS = {
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
       'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
+      // 🔴 2026-10-03: comparten el giro del ancla en tres cuartos, así que NUNCA van primeras (el ancla frontal va antes;
+      // ver `resolverIdentidad`). Se intentó rehacerlas de frente y el operador las rechazó: «se ven muy IA, rasgos muy
+      // ficticios; Nexa debe tener sí o sí rasgos reales». No se rehacen sin un método que conserve la piel de las anclas.
       // Las 12 expresiones FOTOGRÁFICAS de `5-expresiones/` (acabado de las anclas, no sintético). Existían en disco y
       // el catálogo no las conocía: por eso casi toda ficha caía en el gesto por defecto (2026-10-02).
       carcajada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png',
@@ -512,6 +515,9 @@ export const ELENCO = {
 // el bloque REFERENCES de un grupo prohíbe que esa luz pase a la escena.
 const REFS_POR_PERSONA = { 1: 3, 2: 2, 3: 1, 4: 1, 5: 1 }
 
+// Personas del roster que pueden sumarse a un grupo del elenco (3 a 5): una referencia frontal cada una, como el elenco.
+export const GRUPO_CON_ELENCO = ['nexa', 'julio']
+
 // Las tres dimensiones de una persona resuelven a la MISMA ranura —la referencia que se antepone a las
 // frontales— así que una ficha puede pedir UNA, no dos. `vista` es el ángulo, `expresion` una de las ocho
 // canónicas del Bible §6 y `vestuario` uno de sus contextos. Cada una dice su propio error: antes, pedir
@@ -560,11 +566,16 @@ function resolverIdentidad(ficha) {
 
   const claveDe = p => (typeof p === 'string' ? p : p?.persona)
 
-  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(p => ELENCO[claveDe(p)]))) {
+  // El elenco no sale sólo: puede ir con Nexa y con Julio [operador, 2026-10-03: «no quiero que se entienda que el elenco
+  // sale siempre solo; también puede salir con Nexa (…) y conmigo»]. En un grupo de 3 a 5 entran los personajes del
+  // ELENCO más `GRUPO_CON_ELENCO`, siempre con al menos un personaje del elenco; el resto del roster sigue con tope dos.
+  const enGrupo = p => ELENCO[claveDe(p)] || GRUPO_CON_ELENCO.includes(claveDe(p))
+
+  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(enGrupo) || !pedidas.some(p => ELENCO[claveDe(p)]))) {
     throw new Error(
-      'Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 personajes del ELENCO ' +
-        '(EC1-brazo2, 2026-10-03). Con personas del roster, la ronda llegó a dos (más dos mascotas con su propio bloque): ' +
-        'divide la pieza o documenta la medición antes de subir el tope.'
+      'Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 con al menos un personaje ' +
+        `del ELENCO y el resto del ELENCO o ${GRUPO_CON_ELENCO.join(' / ')} (EC1-brazo2, 2026-10-03). Con otras personas del ` +
+        'roster, la ronda llegó a dos (más dos mascotas con su propio bloque): divide la pieza o documenta la medición antes de subir el tope.'
     )
   }
 
@@ -656,7 +667,14 @@ function resolverIdentidad(ficha) {
       refs = parAngulo
         ? // vista + expresión + el ancla frontal (la cara); el cuerpo se suma abajo como cuarta si la vista no lo es.
           [disponibles[pedidaEnDimension], persona[ordenadas[1].mapa][pedido[ordenadas[1].campo]], persona.refs[0]]
-        : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+        : dimension.campo === 'expresion'
+          ? // 🔴 La expresión NUNCA va primera [operador, 2026-10-03: «sale con la misma pose de nuevo, volteando la cara»].
+            // La primera imagen manda en la pose más que cualquier frase, y las expresiones de Nexa se editaron desde un
+            // ancla en tres cuartos: puesta primera, la serie entera salía con la cara girada al mismo lado. Va el ancla
+            // frontal primero y la expresión detrás; en un grupo (una referencia por persona) la expresión no cabe y el
+            // gesto lo da la escena.
+            (cupo >= 2 ? [persona.refs[0], disponibles[pedidaEnDimension], ...persona.refs.slice(1, Math.max(1, cupo - 1))] : [persona.refs[0]])
+          : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
     }
 
     // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
@@ -688,8 +706,14 @@ function resolverIdentidad(ficha) {
     const hasta = imagenes.length + refs.length
 
     imagenes.push(...refs)
+
     // Qué imagen manda en qué: la primera (o las dos primeras, con el par) son la vista y/o la expresión pedidas.
-    tramos.push({ persona, desde, hasta, marcas: ordenadas.map((d, i) => ({ campo: d.campo, imagen: desde + i })) })
+    // Cada marca apunta a la imagen REAL de su dimensión (la expresión ya no va siempre primera, y en grupo puede no viajar).
+    const marcas = ordenadas
+      .map(d => ({ campo: d.campo, imagen: desde + refs.indexOf(persona[d.mapa][pedido[d.campo]]) }))
+      .filter(m => m.imagen >= desde)
+
+    tramos.push({ persona, desde, hasta, marcas })
   }
 
   // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran

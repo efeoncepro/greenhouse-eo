@@ -44,7 +44,7 @@ Lógica del reparto **[propuesta]**: cada línea tiene una cara. Las hermanas cu
 |---|---|
 | Interpretar el rol de su línea en piezas de campaña, social, deck y propuestas (como hoy el casting por rol del registro cine: «la estratega», «la líder de RevOps») | Aparecer como persona del equipo con nombre en la página de equipo, firmas, organigrama, LinkedIn o cualquier superficie que diga «quiénes somos» |
 | Vestir la prenda de su línea cuando interpreta ese rol (§4) | Presentarse como cliente, ni con nombre de empresa ni en un testimonio firmado ([personas §7](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)) |
-| Aparecer junto a Julio y Nexa | Llevar el nombre de un personaje en pantalla, salvo una narrativa de campaña que lo declare como ficción |
+| Salir solo, con otros personajes del elenco, **con Nexa y con Julio**, en dupla o en grupo de hasta cinco (§7b) | Llevar el nombre de un personaje en pantalla, salvo una narrativa de campaña que lo declare como ficción |
 | | Cambiar de rol o de línea de una pieza a otra |
 
 Los nombres de los ficticios son **claves internas** del elenco, no nombres públicos. Las piezas con personas generadas
@@ -267,10 +267,13 @@ logotipo trasero («efeonce» + «Empower your Growth») correctos al 100 %. Con
 asomaba junto al de la chaqueta («doble logo»): la escena declara que el borde de la chaqueta tapa el del polo.
 
 **Grupo [operador: «una prueba cinemática juntos»].** Los cinco se piden en `identidad` en el orden del cuadro; desde el
-2026-10-03 el compilador admite **grupos de 3 a 5 personajes del elenco** con una referencia frontal cada uno, bloques
-IDENTITY etiquetados y la luz de las referencias cortada (medición y fallas en el
-[casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#elenco-en-grupo-2026-10-03--lo-que-aprendimos), filas 21–25). Con
-personas del roster el tope sigue en dos. Prueba `EC2` (cine, `publicidad-prueba`, no se publica): identidad de los cinco
+2026-10-03 el compilador admite **grupos de 3 a 5** con al menos un personaje del elenco, y el elenco **no sale sólo:
+Nexa y Julio se suman al grupo** **[operador, 2026-10-03: «no quiero que se entienda que el elenco sale siempre solo»]**.
+Cada persona lleva una referencia frontal, su bloque IDENTITY etiquetado y la luz de las referencias cortada (medición y
+fallas en el [casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#elenco-en-grupo-2026-10-03--lo-que-aprendimos), filas
+21–25). En dupla, cualquier combinación (un personaje con Nexa, con Julio o con otro personaje) funciona como siempre,
+con dos referencias por persona. Con otras personas del roster el tope sigue en dos. En un grupo, la expresión de Nexa
+no viaja como imagen (no cabe con una referencia por persona): su gesto lo da la escena. Prueba `EC2` (cine, `publicidad-prueba`, no se publica): identidad de los cinco
 sostenida; bordados de Hum y Antonio con isotipo oficial compuesto; el del hoodie de Karo y los de los polos quedan sin
 corregir.
 

@@ -56,6 +56,14 @@ Julio, no de sus prompts, porque el de perfil se contradice solo y documentarlo 
 
 ### `5-expresiones/` — qué funcionó y qué no **[medido]**
 
+> **Delta 2026-10-03 — la pose repetida.** Las 12 comparten el tres cuartos del ancla desde la que se editaron, y cuando
+> una ficha pedía `expresion` la imagen entraba PRIMERA: la serie salía con la cara volteada al mismo lado aunque la
+> frase pidiera copiar sólo el gesto. Desde ahora `foto:prompt` pone el ancla frontal primero y la expresión detrás (en
+> un grupo no viaja). Validado: con la misma `conviccion`, una escena que pide girar a la derecha gira a la derecha y una
+> de frente sale de frente (`2026-10-03_validacion-nexa-pose/`). Se intentó rehacer las 12 de frente y el operador las
+> rechazó: «se ven muy IA, rasgos muy ficticios; Nexa debe tener sí o sí rasgos reales». No se rehacen sin un método
+> que conserve la piel de las anclas.
+
 Doce registros desde el ancla fotográfica, 2048×2560, `high`, ≈ USD 0,099 cada uno.
 
 **Logradas, distintas entre sí:** `01-carcajada` (risa real, ojos cerrados, cabeza atrás) · `03-sorprendida` ·

@@ -308,11 +308,22 @@ conAssets('foto:prompt · identidad', () => {
     expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
   })
 
-  it('una expresión pedida va primero y se nombra como la que manda en el gesto', () => {
+  // 🔴 2026-10-03: la expresión ya NO va primera. Puesta primera, la serie salía con la cara girada al mismo lado (las
+  // expresiones se editaron desde un ancla en tres cuartos): la primera imagen manda en la pose más que la frase.
+  it('una expresión pedida va DETRÁS del ancla frontal y se nombra como la que manda sólo en el gesto', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] })
 
-    expect(r.imagenes[0]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
-    expect(r.prompt).toContain("Image 1 is Nexa's EXPRESSION reference: copy only its facial expression")
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[1]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
+    expect(r.prompt).toContain("Image 2 is Nexa's EXPRESSION reference: copy only its facial expression")
+  })
+
+  it('en un grupo (una referencia por persona) la expresión no desplaza al ancla frontal', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }, 'karo', 'antonio'] })
+
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes.some(x => x.includes('nexa-expr-08'))).toBe(false)
+    expect(r.prompt).not.toContain("Nexa's EXPRESSION reference")
   })
 
   it('vista + expresión conviven con una persona sola: ángulo primero, gesto segundo, cara y cuerpo después', () => {
@@ -457,10 +468,11 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
   // Las 8 expresiones y los 17 vestuarios existían en disco desde el 2026-09-21 y NO eran direccionables:
   // `vistas` sólo declaraba anclas y ángulos. Los nombres de las expresiones son los del Character Bible
   // §6, que pide usarlos como shorthand de producción.
-  it('antepone la expresión pedida a las referencias frontales', () => {
+  it('suma la expresión pedida detrás del ancla frontal', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'the-read' }] })
 
-    expect(r.imagenes[0]).toContain('nexa-pose-the-read.png')
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[1]).toContain('nexa-pose-the-read.png')
   })
 
   it('antepone el vestuario pedido', () => {
@@ -1823,9 +1835,18 @@ describe('foto:prompt · elenco de marca', () => {
     expect(() => validarVestuarioDeLinea(ficha('antonio', 'revenue-salesforce', 'chaqueta-bomber-efeonce'))).not.toThrow()
   })
 
-  it('un grupo de 3 a 5 sólo vale con personajes del elenco; con el roster sigue el tope de dos', () => {
-    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'karo', 'hum'] })).toThrow(/no está medido/)
+  // El elenco también sale con Nexa y con Julio (operador, 2026-10-03); el resto del roster sigue con tope dos.
+  it('un grupo de 3 a 5 lleva al menos un personaje del elenco, y suma a Nexa y a Julio; el resto del roster no', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['andres', 'karo', 'hum'] })).toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'andres'] })).toThrow(/no está medido/)
     expect(() => construirPrompt({ ...fichaBase, identidad: ['karo', 'hum', 'sophia', 'isabella', 'antonio', 'karo'] })).toThrow(/no está medido/)
+  })
+
+  itConAssets('Nexa y Julio se suman a un grupo del elenco con su referencia frontal', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'karo', 'antonio'] })
+
+    expect(r.imagenes.slice(0, 4)).toEqual([PERSONAS.julio.refs[0], PERSONAS.nexa.refs[0], ELENCO.karo.refs[0], ELENCO.antonio.refs[0]])
+    expect(r.prompt).toContain('PERSON 2 — NEXA (Image 2): IDENTITY (critical):')
   })
 
   itConAssets('el grupo de cinco lleva una referencia frontal por persona, bloques etiquetados y corta la luz de la referencia', () => {
