@@ -167,7 +167,7 @@ Reglas obligatorias:
 ### Interaction contract
 
 - Primary interaction: preguntar a Nexa con Enter o con una sugerencia
-- Hover / focus / active: foco visible `#2fb8ff` en oscuro; botones suben 1 px
+- Hover / focus / active: foco visible `#2fb8ff` en oscuro; botones suben 1 px; las burbujas de sugerencia muestran la «magia» de IA (barrido de luz, halo y destello del Spark) al pasar el cursor o con el foco, y al hacer clic un pulso con giro del destello y chispas antes de enviar (aprobado por el operador el 2026-10-03; detalle en el motion contract)
 - Pending / disabled: botón enviar deshabilitado con campo vacío; puntos «revisando» mientras responde
 - Escape / click-away: Escape cierra el panel; click fuera no lo cierra
 - Focus restore: al cerrar el panel el foco vuelve al campo
@@ -330,6 +330,7 @@ Reglas obligatorias:
 - [ ] Los paquetes AXIS quedaron en ≥ 0.14.0 / 0.4.12 / 0.3.41 y `pnpm build` pasa.
 - [ ] Elio se muestra con capas cargadas y su etiqueta dice «Elio · <estado>»; ninguna etiqueta de Elio dice «Nexa».
 - [ ] Enviar una pregunta abre la conversación debajo del saludo sin navegar; «Abrir en pantalla completa» conserva el hilo.
+- [ ] Las burbujas de sugerencia tienen la «magia» de IA del motion contract: barrido, halo y destello en hover/foco; pulso, giro del destello y chispas al hacer clic (≤ 420 ms antes de enviar); con movimiento reducido sólo cambia el color y el clic envía de inmediato.
 - [ ] El sidebar muestra el logo Efeonce y el isotipo al colapsar; el footer muestra Greenhouse, estado de plataforma y versión.
 - [ ] El copy visible reusable vive en `src/lib/copy/*`.
 - [ ] Los estados loading/empty/error/degraded/mobile quedan cubiertos.
