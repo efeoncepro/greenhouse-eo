@@ -1,0 +1,6 @@
+  ⤢ lienzo 1536x2730 · escena 1536x1024 en (0, 853) · relleno previo mirror · fundido 24 px
+  ✂ imagen completa → 1088x1904 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.150 · 1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 82/255
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/df9cfdbda52e/manifest.json

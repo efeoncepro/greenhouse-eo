@@ -1,0 +1,7 @@
+Reproduciendo 3 pieza(s) con el comando vigente y segmentación nueva…
+✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:
+✗ CMP004-BF2-KV-45-N1: la firma mide 2.63:1 contra su fondo (canon: ≥ 4.5:1). Prueba `logo.y: "auto"`
+✗ CMP004-BF2-KV-45-N1: la firma queda sobre el sujeto (1787 px de su silueta)
+✗ CMP004-BF2-KV-45-N1: la firma cae sobre un canto: la luz bajo su caja sube de golpe (52.91, normalizada; techo 18.5). Llévala a la materia calma del lecho o rehaz el plate con el lecho más alto
+
+✗ 3 fallo(s) en 3 pieza(s) con CTA.

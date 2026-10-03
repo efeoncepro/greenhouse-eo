@@ -1,0 +1,25 @@
+{
+  "id": "S07-11-squad-criterio",
+  "formato": "1:1",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, ensemble movie poster still with real depth of field, an empty dark studio at night with no desks, no monitors, no plants and no lamps, the native layout of a square feed ad). GEOGRAPHY, the most important instruction: the UPPER 56% of the frame is one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture: no light falls on it, no glow, no bokeh, no ribbon and no objects; it is calm from edge to edge. Everything lit lives between 57% and 86% of the frame height. The LOWEST 14% of the frame is a near-black matte stage riser right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: a creative squad of EXACTLY FOUR Latin American people in their late twenties to early forties, two women and two men with varied hair, all wearing the Efeonce hoodie exactly as in its reference, stand in ONE single line shoulder to shoulder across the frame, framed from the waist up, the TOP of ALL FOUR heads at about 59% of the frame height, all four heads in the same band between 59% and 68%, the riser cutting them at the waist; they all look straight into the lens with calm, confident expressions. Running in front of their chests from left to right, a long, flowing RIBBON of warm orange (#FF6500) light carries dozens of small glowing deliverables of different formats (stories, square posts, banners, video frames), all different yet sharing one brand look. The woman second from the right has lifted ONE piece off the ribbon and holds it up just in front of her chin, never above her head, fully visible arm, checking it closely: that piece is the brightest element and lights her face. The ribbon is the only key light on the squad; NO fill light. A cool azure (#0375DB) rim light from behind outlines their hair and shoulders. Thin haze catches the ribbon, only below 57%. Nobody looks at anybody else. The pieces are rounded rectangles: no circles, no dots, no spheres, no rings. Camera about five meters away at chest height, 85mm, realistic adult proportions, nothing foreshortened. Fine dust, real sensor grain, genuine depth of field. Rich contrast, deep navy blacks. No readable text, no letters, no logos of any other brand. HEAD LIMIT (essential, checked): the camera is a little farther away and the people are smaller in the frame: the TOP of every head, every Spark and every lit element is at least at 56% of the frame height; above that line there is only the dark calm surface.",
+  "lecho": {
+    "objeto": "a near-black matte stage riser right in front of the lens, crossing the whole width of the lowest 14% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture",
+      "tinta": "blanca"
+    }
+  },
+  "piloto": "../../composicion/plates/N07b-45-squad-criterio.png"
+}

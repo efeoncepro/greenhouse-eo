@@ -1,0 +1,76 @@
+{
+  "916": {
+    "_uso": "Meta Stories y Reels (FB/IG) y Messenger. Plate 1024x1792. Texto y CTA dentro de la zona segura de Meta (14 % arriba, 35 % abajo, 6 % por lado); firma abajo, en la zona AXIS de story, como las stories aprobadas.",
+    "layout": {
+      "top": 0.14,
+      "textWidth": 0.84,
+      "leadSize": 29,
+      "dominantSize": 110,
+      "afterSize": 27,
+      "safeArea": {
+        "x0": 0.1,
+        "y0": 0.14,
+        "x1": 0.9,
+        "y1": 0.65
+      },
+      "final": [
+        1440,
+        2560
+      ]
+    },
+    "cta": {}
+  },
+  "11": {
+    "_uso": "Meta feed cuadrado, columna derecha y Marketplace; LinkedIn cuadrado. Plate 1024x1024.",
+    "layout": {
+      "top": 0.04,
+      "textWidth": 0.84,
+      "leadSize": 26,
+      "dominantSize": 88,
+      "afterSize": 24,
+      "afterGap": 0.44,
+      "leadGap": 0.2,
+      "final": [
+        1440,
+        1440
+      ]
+    },
+    "cta": {
+      "fontSize": 29,
+      "descriptorSize": 24,
+      "paddingY": 8,
+      "gapAfterNote": 28,
+      "descriptorGap": 4
+    }
+  },
+  "191": {
+    "_uso": "Horizontal de imagen: Meta columna derecha y búsqueda de Facebook, LinkedIn horizontal 1200x628 (escritorio y móvil). Plate 2048x1072. Texto en la columna izquierda; piso de legibilidad en teléfono (CTA 11 CSS px, demás voces 9).",
+    "layout": {
+      "top": 0.075,
+      "textWidth": 0.46,
+      "leadSize": 48,
+      "dominantSize": 146,
+      "afterSize": 48,
+      "logo": {
+        "width": 0.25,
+        "x": 0.1524,
+        "y": 0.86,
+        "variant": "negative"
+      },
+      "afterGap": 0.5,
+      "dominantMax": 0.7,
+      "after": null
+    },
+    "cta": {
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "paddingX": 34,
+      "paddingY": 16,
+      "radius": 20,
+      "gapAfterNote": 70,
+      "descriptorGap": 8
+    },
+    "_bajada": "En 1,91:1 la bajada no va en la imagen: pasa al titular del anuncio (LinkedIn/Meta). Decisión 2026-10-02: con todo el copy al piso legible no cabe sobre la escena.",
+    "_logo": "Firma alineada al borde izquierdo de la columna de texto (x=178 px) y a altura fija (0,86 del alto, fuera del canto del lecho) en las 11 horizontales; decisión del operador 2026-10-02."
+  }
+}

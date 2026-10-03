@@ -1,0 +1,39 @@
+{
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "id": "S03-916N-campana-escala",
+  "formato": "9:16",
+  "casting": {
+    "s03-directora": {
+      "etiqueta": "the creative director (S03)",
+      "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference images, in her early forties exactly as in them. Her face is an OVAL with soft cheekbones and a gentle chin. HAIR dark brown, a WAVY CHIN-LENGTH BOB with natural volume and a side part. EYES dark brown, slightly almond; BROWS dark and softly arched. Small gold hoop earrings. Warm tan skin with visible pores and a few natural freckles. Keep her real age as in the references: do NOT age her, do NOT add wrinkles, eye bags or grey hair, do NOT beautify or slim her.",
+      "refs": [
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/casting-frente.png",
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/casting-tres-cuartos.png",
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/origen-crop.png"
+      ]
+    }
+  },
+  "identidad": [
+    "s03-directora"
+  ],
+  "piloto": "../../../composicion/plates/N03b-45-campana-escala.png",
+  "lecho": {
+    "objeto": "the near-black matte edge of a concrete bench right in front of the lens, crossing the whole width of the lowest 18% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, starless overcast night sky in deep navy-black with fine grain",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, a real night photograph in a city plaza, epic scale, inverted scale read in two beats, composed NATIVELY for a VERTICAL 9:16 full-screen Stories and Reels ad). THE IDEA, which must read in two seconds: the same campaign works at every scale, a giant facade and a phone in her hand show the same key visual. GEOGRAPHY: the UPPER 40% of the frame is one continuous, evenly dark, starless overcast night sky in deep navy-black with fine grain: no light, no glow, no buildings, no signs and no objects; it is calm from edge to edge. Everything lit lives between 42% and 82% of the frame height. The LOWEST 18% of the frame is the near-black matte edge of a concrete bench right in front of the lens, completely out of focus, outside every light. THE MOMENT: behind her rises a MONUMENTAL VERTICAL LED tower facade, a tall portrait screen on a dark building, from 42% to 80% of the frame height, showing ONE campaign key visual of a fictitious running-shoe brand: a real photograph of an athlete frozen mid-stride on wet asphalt at dusk, wearing a vivid orange (#FF6500) jacket, shot from a low angle, with a single bold diagonal of orange light; no letters, no logo; the vertical screen fits the athlete full-figure. In the foreground, slightly RIGHT of center, the creative director, framed CLOSE from the chest up so her face is large and sharp: the top of her head at about 50% of the frame height and her chin at about 60%. She holds up her phone beside her face with her right hand, fully visible: on its screen, the SAME key visual, the same athlete and the same orange diagonal, sharp. Her head is almost frontal and she looks straight into the lens with a calm, knowing half-smile. LIGHT: the facade is the only key light: it washes her from behind and the left with warm orange; the phone screen lights her chin and hand from below; NO fill, the far side of her face in shadow with the nose shadow legible. A cool azure (#0375DB) rim from a distant streetlight outlines her hair. COLOR GRADE exactly like a cinema still: deep navy-black night, the warm orange of the facade as the only warm light, a cool azure rim. Thin night haze in front of the facade only. Her skin is natural, exactly as in the casting references: real pores, even healthy tone, her real age, no retouching. She wears the Efeonce hoodie exactly as in its reference. REALISTIC ADULT PROPORTIONS: camera about one and a half meters away at chest height, 85mm at f/1.8, nothing foreshortened. Real sensor grain, genuine depth of field: the facade soft but legible. No readable text, no letters, no logos of any brand."
+}

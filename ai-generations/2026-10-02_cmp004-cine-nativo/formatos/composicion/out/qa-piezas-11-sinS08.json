@@ -1,0 +1,3564 @@
+[
+  {
+    "id": "CMP004-S01-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 586.1270857142856,
+        "top": 105.96,
+        "bottom": 165.272
+      },
+      "answerSphere": {
+        "left": 589.2070857142857,
+        "right": 606.8070857142857,
+        "top": 146.44,
+        "bottom": 164.04
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 606.8070857142857,
+        "top": 105.96,
+        "bottom": 165.272
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 5.7,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Te reconocen"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.28,
+      "dominante": 18.98,
+      "cierre-frase": 18.85,
+      "cta": 18.98,
+      "descriptor": 19.26,
+      "logo": 18.48
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Y si tapamos el logo?"
+      ],
+      "cierre": [
+        "Estrategia e identidad para tu marca en cada canal."
+      ],
+      "cta": [
+        "Hablemos de tu marca"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.7,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.27,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.15,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1163,
+            "caja": [
+              111,
+              61,
+              396,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 18.98,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.87,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 14220,
+            "caja": [
+              89,
+              105,
+              587,
+              166
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.34,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 18.85,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.74,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3060,
+            "caja": [
+              89,
+              204,
+              718,
+              230
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 18.98,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 18.88,
+            "deutan": 19.01,
+            "tritan": 18.96
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.87,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3247,
+            "caja": [
+              111,
+              265,
+              448,
+              287
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.43,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.77,
+            "deutan": 7.49,
+            "tritan": 5.41
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 4.63,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.27,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.15,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1034,
+            "caja": [
+              89,
+              315,
+              292,
+              341
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Una directora creativa tapa con cinta el logo de una pantalla mientras un foco naranja proyecta la pincelada de la marca sobre el muro y sobre ella. Texto en la imagen: «¿Y si tapamos el logo?» «Te reconocen» «Estrategia e identidad para tu marca en cada canal.» Llamado a la acción: «Hablemos de tu marca» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "576b12e6f6c287e489e05f921bad6b76423a7f83618a64cd10b9a6652ba37e7b",
+      "cobertura": 0.2119
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 18.75,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "a18f8c6d75da83865d6c545ceaf1455646f4215e28589ac7af33dd8e4eafe9f7",
+      "plate": "88a28a0937d419aa436d7c4d363ec849e282d9c83323dc0bc96c3ee5b30ba853",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "491c3a4dbc5d297ce45530a94158966dca216ad115b610a6487d0b9d87ce611c",
+      "layout": "fdda37ebdeacf87bc7c9a2299465c53284abb0ea8ac00bd6fcbed0780224820b",
+      "alt": "d6bd8bf0ec361d793e05faeaa48adb85b3baf3fed85c0d7f3c596cb84cacd4fd"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S05-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 422.329473015873,
+        "top": 105.69999999999999,
+        "bottom": 168.97199999999998
+      },
+      "answerSphere": {
+        "left": 424.969473015873,
+        "right": 442.56947301587303,
+        "top": 150.14,
+        "bottom": 167.73999999999998
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 442.56947301587303,
+        "top": 105.69999999999999,
+        "bottom": 168.97199999999998
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 3.47,
+    "marcaEnEscena": false,
+    "dominante": [
+      "En un día"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 18.97,
+      "dominante": 18.99,
+      "cierre-frase": 19.1,
+      "cta": 19.13,
+      "descriptor": 18.87,
+      "logo": 19.27
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Contenido para todo el mes?"
+      ],
+      "cierre": [
+        "Una jornada de captura con equipo, luz y sonido."
+      ],
+      "cta": [
+        "Planifiquemos tu jornada"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.39,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 18.97,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.87,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1594,
+            "caja": [
+              111,
+              61,
+              501,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 18.99,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.95,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 9851,
+            "caja": [
+              89,
+              105,
+              423,
+              169
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.44,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.1,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.01,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2771,
+            "caja": [
+              89,
+              207,
+              673,
+              233
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.13,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 19.04,
+            "deutan": 19.16,
+            "tritan": 19.13
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.09,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3837,
+            "caja": [
+              111,
+              268,
+              486,
+              300
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.48,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.81,
+            "deutan": 7.55,
+            "tritan": 5.46
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 5.47,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 18.85,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.82,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1044,
+            "caja": [
+              89,
+              328,
+              292,
+              354
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Larga exposición de una jornada de rodaje: un camarógrafo quieto con su gimbal y la estela naranja de la cámara recorriendo cinco sets. Texto en la imagen: «¿Contenido para todo el mes?» «En un día» «Una jornada de captura con equipo, luz y sonido.» Llamado a la acción: «Planifiquemos tu jornada» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "f152bfb95f2a6144057f106342291ee6f8ade7b4b016da53ca0bdfc1632e472b",
+      "cobertura": 0.1377
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 19.26,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "441a5a63343a74fe434e877da5257a824affc8712b112ced3eb22dd9b7e8a643",
+      "plate": "c1cdd99bb040533afc23697a024ccb74e2a938675ef09e84692212d59913e8cf",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "631866f20c1db21b4e667c502c2e228b060ac9d841c765b0ba801b4e59dd0327",
+      "layout": "f22950f33d39e35e0d4d466b28fc52f18aec6abc00b565861c98c3da3b1d2dac",
+      "alt": "fedbc812f1b739ef083374b76bb1df97456d0b05062fd55e138c598f1f8d7a2b"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S04-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 514.2622669427192,
+        "top": 104.428,
+        "bottom": 162.976
+      },
+      "answerSphere": {
+        "left": 517.1322669427192,
+        "right": 533.5322669427192,
+        "top": 145.428,
+        "bottom": 161.828
+      },
+      "answerSize": 82,
+      "sphereCssPx": 6.246093750000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 533.5322669427192,
+        "top": 104.428,
+        "bottom": 162.976
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 7.08,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Cada detalle"
+    ],
+    "ratioDominanteEntrada": 3.2,
+    "contraste": {
+      "entrada": 19.27,
+      "dominante": 19.32,
+      "cierre-frase": 19.43,
+      "cta": 19.54,
+      "descriptor": 19.55,
+      "logo": 18.61
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 16,
+        "ratioDominante": 0.195
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 36,
+        "ratioDominante": 0.439
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Qué cabe en seis segundos?"
+      ],
+      "cierre": [
+        "Dirección, edición, motion y audio en cada instante."
+      ],
+      "cta": [
+        "Descubre cómo lo hacemos"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.61,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.27,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.18,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1607,
+            "caja": [
+              111,
+              61,
+              494,
+              89
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 31.2,
+          "grande": true,
+          "wcag": 19.32,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.3,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 13014,
+            "caja": [
+              89,
+              104,
+              515,
+              163
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.59,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.43,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.42,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2818,
+            "caja": [
+              89,
+              198,
+              706,
+              225
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.54,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 19.45,
+            "deutan": 19.56,
+            "tritan": 19.49
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.52,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3858,
+            "caja": [
+              111,
+              260,
+              521,
+              285
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.62,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.92,
+            "deutan": 7.71,
+            "tritan": 5.56
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 5.94,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.55,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.52,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1055,
+            "caja": [
+              89,
+              313,
+              292,
+              339
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Larga exposición en un set: un director de arte quieto y una estela de luz naranja que termina en el brillo de un frasco de perfume ficticio. Texto en la imagen: «¿Qué cabe en seis segundos?» «Cada detalle» «Dirección, edición, motion y audio en cada instante.» Llamado a la acción: «Descubre cómo lo hacemos» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "fae0b6423db12214bda377e6c28fad37760c2a6731f88468161597dd3b173b9a",
+      "cobertura": 0.1698
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8936,
+      "trazo": {
+        "wcag": 18.79,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": false,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "734ef5252f065e9ce0d2b22dbab084a33728931183746114bae60be63e1f9910",
+      "plate": "4324d814f5e3382ea46528d619532d1ae71e7c87e9e81b2167fbe2ec450a8289",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "c88261136585e8d7cf6dbd193eb07f7264915fad455a24a316f85981c2012783",
+      "layout": "9389c0a7b3c8368f09db30aaeb825cc490fc07cdd394fd0d209c8aa42ebe9472",
+      "alt": "4c48163fea63159061fea51ed8f9a766cf2b9131f44106c721513045ebaac3ac"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S07-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 584.5890095238095,
+        "top": 104.16799999999998,
+        "bottom": 164.19199999999998
+      },
+      "answerSphere": {
+        "left": 587.4590095238095,
+        "right": 603.8590095238095,
+        "top": 146.64399999999998,
+        "bottom": 163.04399999999998
+      },
+      "answerSize": 82,
+      "sphereCssPx": 6.246093750000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 603.8590095238095,
+        "top": 104.16799999999998,
+        "bottom": 164.19199999999998
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 3.76,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Mismo criterio"
+    ],
+    "ratioDominanteEntrada": 3.2,
+    "contraste": {
+      "entrada": 18.81,
+      "dominante": 18.55,
+      "cierre-frase": 18.55,
+      "cta": 18.81,
+      "descriptor": 19.11,
+      "logo": 18.98
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 16,
+        "ratioDominante": 0.195
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 36,
+        "ratioDominante": 0.439
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Más piezas, mismo estándar?"
+      ],
+      "cierre": [
+        "Un squad creativo gestionado, con dirección humana."
+      ],
+      "cta": [
+        "Escala tu producción"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.64,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 18.81,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.69,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1668,
+            "caja": [
+              111,
+              61,
+              503,
+              89
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 31.2,
+          "grande": true,
+          "wcag": 18.55,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.51,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 14463,
+            "caja": [
+              89,
+              104,
+              585,
+              165
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.28,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 18.55,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.53,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3109,
+            "caja": [
+              89,
+              200,
+              738,
+              226
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 18.81,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 18.58,
+            "deutan": 18.86,
+            "tritan": 18.71
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.7,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3057,
+            "caja": [
+              111,
+              261,
+              421,
+              294
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.36,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.7,
+            "deutan": 7.43,
+            "tritan": 5.34
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 6.45,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.11,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.13,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1055,
+            "caja": [
+              89,
+              322,
+              292,
+              348
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Un squad de cuatro personas en línea frente a una cinta de luz con entregables; una de ellas revisa una pieza de cerca. Texto en la imagen: «¿Más piezas, mismo estándar?» «Mismo criterio» «Un squad creativo gestionado, con dirección humana.» Llamado a la acción: «Escala tu producción» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "137bac5525484fd7ac200660dfdb2bf719ba4b4898496c26984d1e373a7cc48c",
+      "cobertura": 0.3464
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 19.23,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "39e91faf53eb0d0510259a69a7674268deeb3e167cfaa414a39b999ba8d9a713",
+      "plate": "ec51ec0818e97e38f25ae7c2659659b35eb7ffd0a4266d54c463b68d0fdeae3a",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "4732bf9c0d99bcfcd04c2276d2b61061af08cf091b6d3623353775fa058111e2",
+      "layout": "1e3dc68d1a8736ec935a90b4931f9e8b5c040c87e8f8e2562f2dd78c5bbca595",
+      "alt": "47a2dff53e8d405237c04333abd5ac4f5cc06a1d8fd23cfd8df3f1e083685af0"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S03-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 411.5015619047619,
+        "top": 103.672,
+        "bottom": 166.504
+      },
+      "answerSphere": {
+        "left": 414.1415619047619,
+        "right": 431.7415619047619,
+        "top": 147.672,
+        "bottom": 165.272
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 431.7415619047619,
+        "top": 103.672,
+        "bottom": 166.504
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 1.41,
+    "marcaEnEscena": false,
+    "dominante": [
+      "En todos"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.11,
+      "dominante": 19.11,
+      "cierre-frase": 19.11,
+      "cta": 19.11,
+      "descriptor": 4.24,
+      "logo": 17.98
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿En cuántos formatos funciona tu idea?"
+      ],
+      "cierre": [
+        "Campaña, key visual y adaptaciones desde una idea."
+      ],
+      "cta": [
+        "Hablemos de tu campaña"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.52,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.11,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.1,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2059,
+            "caja": [
+              111,
+              61,
+              622,
+              86
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 19.11,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.09,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 9971,
+            "caja": [
+              89,
+              103,
+              412,
+              167
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.48,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.11,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.1,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3104,
+            "caja": [
+              89,
+              205,
+              733,
+              231
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.11,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 18.99,
+            "deutan": 19.15,
+            "tritan": 19.05
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.09,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3811,
+            "caja": [
+              111,
+              266,
+              494,
+              296
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.47,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.78,
+            "deutan": 7.55,
+            "tritan": 5.44
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 5.06,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 3.95,
+          "umbralWcag": 4.5,
+          "cumpleWcag": false,
+          "apca": -72.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 2.71,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 4.26,
+            "umbralWcag": 4.5,
+            "cumpleWcag": false,
+            "pctBajoUmbral": 1.52,
+            "pixeles": 1055,
+            "caja": [
+              89,
+              324,
+              292,
+              350
+            ]
+          }
+        }
+      },
+      "cumpleWcag": false,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": false,
+      "altText": "De noche, en una plaza, una directora creativa sostiene su teléfono con la misma imagen de campaña de un corredor que se ve en una gigantesca pantalla curva detrás de ella. Texto en la imagen: «¿En cuántos formatos funciona tu idea?» «En todos» «Campaña, key visual y adaptaciones desde una idea.» Llamado a la acción: «Hablemos de tu campaña» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "fd866a50937d52fdb82f5126551b7e8eaf566654af27c159fa72558b3c1ae9b8",
+      "cobertura": 0.1945
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 18.04,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "88e486200773477929598de36a37e13713534ea8d0687e8fbe1204470b6a4e61",
+      "plate": "a4466b3aa310dde916645b32542d61a20cfa77234935929fe446848854a0a34e",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "47775478d73899b3972cff0e23f2227469574881f9600911e8414c253755dffc",
+      "layout": "0f8cffb778de131a9821af0856b0a8a003bc8e097c9b12fe8bf6e26a997723bf",
+      "alt": "3bed4b4914ef347904ffd2018e101444a6703fe6646e3bb3490cb78b35a62c2a"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S02-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 614.3437968253967,
+        "top": 105.69999999999999,
+        "bottom": 182.964
+      },
+      "answerSphere": {
+        "left": 616.9837968253967,
+        "right": 634.5837968253967,
+        "top": 151.284,
+        "bottom": 168.884
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 634.5837968253967,
+        "top": 105.69999999999999,
+        "bottom": 182.964
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 3.2,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Imagen propia"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 17.25,
+      "dominante": 17.6,
+      "cierre-frase": 17.81,
+      "cta": 18.47,
+      "descriptor": 19.35,
+      "logo": 18.56
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Tu marca ya cuenta lo que viene?"
+      ],
+      "cierre": [
+        "Marca y campañas para la siguiente etapa de tu negocio."
+      ],
+      "cta": [
+        "Hablemos de lo que viene"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.47,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 17.25,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 16.93,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1728,
+            "caja": [
+              111,
+              61,
+              561,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 17.6,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -106.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.46,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 17070,
+            "caja": [
+              89,
+              105,
+              615,
+              183
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.07,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 17.79,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.8,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.74,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3310,
+            "caja": [
+              89,
+              221,
+              786,
+              247
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 18.47,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.2,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 18.42,
+            "deutan": 18.55,
+            "tritan": 18.49
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.44,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3651,
+            "caja": [
+              111,
+              282,
+              490,
+              314
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.26,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.66,
+            "deutan": 7.31,
+            "tritan": 5.28
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 6.3,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.35,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.32,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1034,
+            "caja": [
+              89,
+              342,
+              292,
+              368
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "De noche, en el lobby de una empresa, una ejecutiva mira cómo cae la tela que cubría un mural monumental con su nueva marca, mientras dos técnicos sueltan las cuerdas. Texto en la imagen: «¿Tu marca ya cuenta lo que viene?» «Imagen propia» «Marca y campañas para la siguiente etapa de tu negocio.» Llamado a la acción: «Hablemos de lo que viene» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "7b73a0cb4f57d616ccb7a3526363aa21fa76f82019fa849a06f53ede2db1a79e",
+      "cobertura": 0.0202
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 18.71,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "668c51f3586012d5e45f13f66d20644e7dd9edf4b226a36df9d91cab86cb9ae4",
+      "plate": "1df0a2bc251122ccb2de26427824b0470f5208b90898d07520693fc5f40b6452",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "4e83a7e016e7eb36d4758f5e21e1822aa0cd81c34ff6a923790a977eb1b0479e",
+      "layout": "8ddee9e93aa28b95b79b084b38a24ca39d57414fb27927cd5e17799037078778",
+      "alt": "6bed8ffb2063d5fde66d57b95c92dfe434ed842bcf2471ca91649971deaca548"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-S06-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 528.6790095238094,
+        "top": 105.69999999999999,
+        "bottom": 184.13
+      },
+      "answerSphere": {
+        "left": 531.3190095238094,
+        "right": 548.9190095238095,
+        "top": 151.284,
+        "bottom": 168.884
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 548.9190095238095,
+        "top": 105.69999999999999,
+        "bottom": 184.13
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 2.38,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Que se mira"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.15,
+      "dominante": 19.25,
+      "cierre-frase": 19.53,
+      "cta": 19.54,
+      "descriptor": 19.64,
+      "logo": 18.66
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Contenido que se publica o que se mira?"
+      ],
+      "cierre": [
+        "Contenido con idea, dirección creativa y producción en cada formato."
+      ],
+      "cta": [
+        "Conversemos de tu contenido"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.41,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.15,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.02,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 2124,
+            "caja": [
+              111,
+              61,
+              654,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 19.25,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.15,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 13064,
+            "caja": [
+              89,
+              105,
+              529,
+              185
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.62,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.53,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.42,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3987,
+            "caja": [
+              89,
+              223,
+              932,
+              249
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.54,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 19.44,
+            "deutan": 19.57,
+            "tritan": 19.51
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.52,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4261,
+            "caja": [
+              111,
+              284,
+              557,
+              308
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.62,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.92,
+            "deutan": 7.74,
+            "tritan": 5.57
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 3.08,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.64,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.56,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1030,
+            "caja": [
+              89,
+              336,
+              292,
+              362
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "En un set de producción, una directora de arte levanta la mano frente a un muro LED donde un feed corre desenfocado y solo una pieza, una bailarina con abrigo naranja, se ve nítida y quieta. Texto en la imagen: «¿Contenido que se publica o que se mira?» «Que se mira» «Contenido con idea, dirección creativa y producción en cada formato.» Llamado a la acción: «Conversemos de tu contenido» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "77dad7f7761c8cdb5576290eb9b26d003d5e0e1816cd2e24931fa36dd7b4f3c8",
+      "cobertura": 0.2006
+    },
+    "firmaSobreSujeto": 13,
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8936,
+      "trazo": {
+        "wcag": 18.7,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": false,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "c89ea2197609b2f8c212276e14abcf513577bdc56fc386ceaef18cb183efd0bc",
+      "plate": "38cdaf6d7783a8c5ba565b5e74e363e20b3abd34ecffc5ef4b0ad02295060240",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "743a3503d836dae5e871ffbfc466eae9b8636b2b613c45c802d4dffdbb6aaaf0",
+      "layout": "1d0756422dd4fc3a20ed21b5f973136823d890d15fcc8fbf4b420bb801c02340",
+      "alt": "fa9d5fba530595ccefc9e0a32e7ed60764bf8417af5246072def32bdd93ae81b"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-BF1-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 529.6246603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      },
+      "answerSphere": {
+        "left": 532.2646603174603,
+        "right": 549.8646603174603,
+        "top": 149.7,
+        "bottom": 167.29999999999998
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 549.8646603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 43.72,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Ya llegamos"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.27,
+      "dominante": 19.3,
+      "cierre-frase": 19.31,
+      "cta": 19.3,
+      "descriptor": 18.84,
+      "logo": 13.64
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Corriendo para el Black Friday?"
+      ],
+      "cierre": [
+        "Refuerzos creativos: agentes que se suman a tu equipo."
+      ],
+      "cta": [
+        "Refuerza tu Black Friday"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.53,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.27,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.18,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1701,
+            "caja": [
+              111,
+              61,
+              522,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 19.3,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.29,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 13905,
+            "caja": [
+              89,
+              105,
+              530,
+              182
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.57,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.31,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.3,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3180,
+            "caja": [
+              89,
+              220,
+              755,
+              246
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.3,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 19.28,
+            "deutan": 19.3,
+            "tritan": 19.31
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.3,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3586,
+            "caja": [
+              111,
+              281,
+              468,
+              313
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.53,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.85,
+            "deutan": 7.61,
+            "tritan": 5.5
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 6.46,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 18.84,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.8,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1070,
+            "caja": [
+              89,
+              341,
+              292,
+              367
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Nexa, el personaje de Efeonce, recibe con la mano en alto a un escuadrón de Sparks que llega volando por un hangar oscuro dejando estelas de luz naranja; uno se posa en su hombro. Texto en la imagen: «¿Corriendo para el Black Friday?» «Ya llegamos» «Refuerzos creativos: agentes que se suman a tu equipo.» Llamado a la acción: «Refuerza tu Black Friday» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "fb63f8a611edace442a2ad73e9a029338a2b8071bff541f295efe2c9283dd2e2",
+      "cobertura": 0.2277
+    },
+    "firmaSobreSujeto": 121,
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8936,
+      "trazo": {
+        "wcag": 17.53,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": false,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "a019c35b28a37bba985003b2f4e3244139492f2a4fae740f653f430c30468704",
+      "plate": "0bad3dd44d3a1b6ce83fafd045e0287c6031e6763241ea1de4ef8732b444cdf1",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "4461b46c88f240cf8aac82dcb74b0a2ad3cc9abbe96514fdaad7cbe0ac236b2b",
+      "layout": "e38559cf0f9b06bb3d8cc463cc306df8fe19ac76eb26905c5c0141ea304554d4",
+      "alt": "469b6d3ae898e988284cdbcea5895684c418267f5ab64e4ff7d74d7d12be5f0e"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-BF2-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 529.6246603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      },
+      "answerSphere": {
+        "left": 532.2646603174603,
+        "right": 549.8646603174603,
+        "top": 149.7,
+        "bottom": 167.29999999999998
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 549.8646603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 1.16,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Ya llegamos"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.25,
+      "dominante": 19.27,
+      "cierre-frase": 18.81,
+      "cta": 16.92,
+      "descriptor": 5.34,
+      "logo": 19.28
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Corriendo para el Black Friday?"
+      ],
+      "cierre": [
+        "Refuerzos creativos: un squad y sus agentes para tu campaña."
+      ],
+      "cta": [
+        "Refuerza tu Black Friday"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.53,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.25,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.16,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1701,
+            "caja": [
+              111,
+              61,
+              522,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 19.27,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.17,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 13905,
+            "caja": [
+              89,
+              105,
+              530,
+              182
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.48,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 18.81,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.3,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 18.83,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3587,
+            "caja": [
+              89,
+              220,
+              842,
+              246
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 16.88,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -106.1,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 17.23,
+            "deutan": 16.67,
+            "tritan": 16.9
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.04,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3586,
+            "caja": [
+              111,
+              281,
+              468,
+              313
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 5.5,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 4.22,
+            "deutan": 6.28,
+            "tritan": 4.65
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 4.19,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 5.15,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -80.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 1.35,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 5.02,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0.47,
+            "pixeles": 1070,
+            "caja": [
+              89,
+              341,
+              292,
+              367
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Un squad de cuatro personas sale de un portón de hangar inundado de luz naranja y mira a la cámara, con Sparks volando a la altura de sus hombros. Texto en la imagen: «¿Corriendo para el Black Friday?» «Ya llegamos» «Refuerzos creativos: un squad y sus agentes para tu campaña.» Llamado a la acción: «Refuerza tu Black Friday» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "3b12d6c6f0fd1b8c2cc4f1555e88d09bd4c930459a443e5430aaf7179a65551b",
+      "cobertura": 0.2658
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 19.27,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "b939198a17620eb3322bef3489ad844dc1eecd246bdf28f6674dde067126fc61",
+      "plate": "b33c67c90a54dcd2693449aa0eceeb26996e969fe2aee9598a20928c68709eb0",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "6cce287c5f087dca5db041a6742a07cc276797bf0d839d6bca064478d5782f27",
+      "layout": "cea36404979244edee39064acb68b6681b57a7229ee5d0a5a0795856f0e33af0",
+      "alt": "3a1ab13f38b9e212a8c40cd09c0bafd1822002a37ce24edd242dfbbf795ffe98"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  },
+  {
+    "id": "CMP004-BF3-KV-11-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 89.088,
+        "right": 102.63364102564103,
+        "top": 64.56,
+        "bottom": 78.10564102564103
+      },
+      "answerText": {
+        "left": 89.088,
+        "right": 529.6246603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      },
+      "answerSphere": {
+        "left": 532.2646603174603,
+        "right": 549.8646603174603,
+        "top": 149.7,
+        "bottom": 167.29999999999998
+      },
+      "answerSize": 88,
+      "sphereCssPx": 6.703125000000001,
+      "answerGroup": {
+        "left": 89.088,
+        "right": 549.8646603174603,
+        "top": 105.69999999999999,
+        "bottom": 181.38
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 10.27,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Ya llegamos"
+    ],
+    "ratioDominanteEntrada": 3.4,
+    "contraste": {
+      "entrada": 19.29,
+      "dominante": 19.49,
+      "cierre-frase": 19.78,
+      "cta": 19.89,
+      "descriptor": 19.87,
+      "logo": 13.21
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 18,
+        "ratioDominante": 0.205
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 39,
+        "ratioDominante": 0.443
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Corriendo para el Black Friday?"
+      ],
+      "cierre": [
+        "Refuerzos creativos: producción a escala, rápida y consistente."
+      ],
+      "cta": [
+        "Refuerza tu Black Friday"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.79,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.9,
+          "grande": false,
+          "wcag": 19.29,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.27,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1701,
+            "caja": [
+              111,
+              61,
+              522,
+              88
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 33.5,
+          "grande": true,
+          "wcag": 19.49,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -107.6,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.42,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 13905,
+            "caja": [
+              89,
+              105,
+              530,
+              182
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.62,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.78,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.77,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3566,
+            "caja": [
+              89,
+              220,
+              839,
+              246
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 19.89,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 19.79,
+            "deutan": 19.92,
+            "tritan": 19.88
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.89,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 3596,
+            "caja": [
+              111,
+              281,
+              468,
+              313
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.74,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 5,
+            "deutan": 7.85,
+            "tritan": 5.68
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 6.19,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.87,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.7,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.8,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 1045,
+            "caja": [
+              89,
+              341,
+              292,
+              367
+            ]
+          }
+        }
+      },
+      "cumpleWcag": true,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Larga exposición de una noche de producción: cientos de piezas de una campaña de temporada llegan como estelas naranjas a una gran grilla, y una directora de arte aprueba una pieza en su tablet. Texto en la imagen: «¿Corriendo para el Black Friday?» «Ya llegamos» «Refuerzos creativos: producción a escala, rápida y consistente.» Llamado a la acción: «Refuerza tu Black Friday» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "8942b9f927ff0422802fac758e9ca6f50e763c2d7a3606926a0ddad1cf336019",
+      "cobertura": 0.1583
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.2,
+      "y": 0.8926,
+      "trazo": {
+        "wcag": 13.53,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": true,
+      "banda": [
+        0.75,
+        0.9395
+      ]
+    },
+    "huellas": {
+      "pieza": "3b323248994f085891d7f351e0543452a86ab7bae3daa0584caea9c02b875758",
+      "plate": "2e028d974bf6393708ea3626be183426290e5274f10a1a9c90f09d9d192247b0",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "132576d3cb1437ace93a1f72275cb049c8dcacc9fa830f2c3e92fa5ec34286be",
+      "layout": "a0b91bef1254e129b2c86dc45cf224446ec46a378406cf431a2dfeca1e7e7ab3",
+      "alt": "549149331e15c030aa46dd6ec95d06d5d1ab53c680e28e1cc5c9c73e78b4e97d"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  }
+]

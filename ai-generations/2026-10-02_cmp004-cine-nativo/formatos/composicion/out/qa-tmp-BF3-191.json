@@ -1,0 +1,361 @@
+[
+  {
+    "id": "CMP004-BF3-KV-191-N1",
+    "graphicVoice": {
+      "contract": "efeonce.graphic-line-orbit",
+      "questionWeight": 300,
+      "answerWeight": 760,
+      "line": "brand",
+      "accent": "#ff6500",
+      "questionRing": {
+        "left": 178.176,
+        "right": 203.58728205128205,
+        "top": 91.52000000000001,
+        "bottom": 116.93128205128205
+      },
+      "answerText": {
+        "left": 178.176,
+        "right": 909.0663682539682,
+        "top": 168.24,
+        "bottom": 293.8
+      },
+      "answerSphere": {
+        "left": 913.4463682539682,
+        "right": 942.6463682539683,
+        "top": 241.24,
+        "bottom": 270.44
+      },
+      "answerSize": 146,
+      "sphereCssPx": 5.560546875000001,
+      "answerGroup": {
+        "left": 178.176,
+        "right": 942.6463682539683,
+        "top": 168.24,
+        "bottom": 293.8
+      }
+    },
+    "canon": "2026-09-23",
+    "firmaCanto": 9.42,
+    "marcaEnEscena": false,
+    "dominante": [
+      "Ya llegamos"
+    ],
+    "ratioDominanteEntrada": 3,
+    "contraste": {
+      "entrada": 16.06,
+      "dominante": 17.35,
+      "cierre-frase": 8.81,
+      "cta": 15.62,
+      "descriptor": 19.2,
+      "logo": 18.88
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 34,
+        "ratioDominante": 0.233
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 73,
+        "ratioDominante": 0.5
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "compact",
+        "paddingRatio": {
+          "inline": 0.008,
+          "block": 0.007
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "criterio"
+        }
+      ]
+    },
+    "escala": 1,
+    "lineas": {
+      "entrada": [
+        "¿Corriendo para el Black Friday?"
+      ],
+      "cierre": [
+        "Refuerzos creativos: producción",
+        "a escala, rápida y consistente."
+      ],
+      "cta": [
+        "Refuerza tu Black Friday"
+      ],
+      "descriptor": [
+        "Agencia creativa"
+      ]
+    },
+    "accesibilidad": {
+      "voces": {
+        "pregunta-anillo": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 6.41,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0,
+          "metodo": "limite"
+        },
+        "entrada": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 16.06,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.92,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 5966,
+            "caja": [
+              220,
+              85,
+              978,
+              135
+            ]
+          }
+        },
+        "dominante": {
+          "cssPx": 27.8,
+          "grande": true,
+          "wcag": 17.35,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": -106.4,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 17.52,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 38402,
+            "caja": [
+              178,
+              168,
+              910,
+              294
+            ]
+          }
+        },
+        "respuesta-esfera": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 1.75,
+          "umbralWcag": 3,
+          "cumpleWcag": false,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 5.33,
+          "metodo": "limite"
+        },
+        "cierre-frase": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 8.74,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -94,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 1.18,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 5.43,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0.5,
+            "pixeles": 14654,
+            "caja": [
+              178,
+              366,
+              935,
+              490
+            ]
+          }
+        },
+        "cta": {
+          "cssPx": 11,
+          "grande": false,
+          "wcag": 15.54,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -105.1,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "daltonismo": {
+            "protan": 15.55,
+            "deutan": 15.49,
+            "tritan": 15.53
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 14.25,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 14493,
+            "caja": [
+              212,
+              573,
+              926,
+              635
+            ]
+          }
+        },
+        "cta-borde": {
+          "cssPx": null,
+          "grande": null,
+          "wcag": 4.36,
+          "umbralWcag": 3,
+          "cumpleWcag": true,
+          "apca": null,
+          "umbralApca": null,
+          "cumpleApca": null,
+          "pctBajoUmbral": 0.09,
+          "daltonismo": {
+            "protan": 3.38,
+            "deutan": 4.99,
+            "tritan": 3.66
+          },
+          "cumpleDaltonismo": true,
+          "metodo": "limite",
+          "anillo": {
+            "wcag": 3.22,
+            "umbralWcag": 3,
+            "cumpleWcag": true,
+            "grosorCssPx": 1.14
+          }
+        },
+        "descriptor": {
+          "cssPx": 9.1,
+          "grande": false,
+          "wcag": 19.2,
+          "umbralWcag": 4.5,
+          "cumpleWcag": true,
+          "apca": -107.5,
+          "umbralApca": 60,
+          "cumpleApca": true,
+          "pctBajoUmbral": 0,
+          "metodo": "pixel",
+          "glifo": {
+            "wcag": 19.12,
+            "umbralWcag": 4.5,
+            "cumpleWcag": true,
+            "pctBajoUmbral": 0,
+            "pixeles": 4129,
+            "caja": [
+              178,
+              692,
+              583,
+              742
+            ]
+          }
+        }
+      },
+      "cumpleWcag": false,
+      "cumpleApca": true,
+      "cumpleDaltonismo": true,
+      "cumpleTrazo": true,
+      "altText": "Larga exposición de una noche de producción: cientos de piezas de una campaña de temporada llegan como estelas naranjas a una gran grilla, y una directora de arte aprueba una pieza en su tablet. Texto en la imagen: «¿Corriendo para el Black Friday?» «Ya llegamos» «Refuerzos creativos: producción a escala, rápida y consistente.» Llamado a la acción: «Refuerza tu Black Friday» Agencia creativa Firma: logotipo de Efeonce",
+      "altTextEscena": true
+    },
+    "guardaSujeto": "segmentacion",
+    "mascara": {
+      "origen": "cache-canonica",
+      "sha": "ab5a77696cd2e1e504f5a24147084577b8c12f058f911c0e08d23e8603914a78",
+      "cobertura": 0.1824
+    },
+    "maquetacion": [],
+    "zonaSegura": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94
+    },
+    "zonaFirma": {
+      "perfil": "feed",
+      "x0": 0.075,
+      "y0": 0.06,
+      "x1": 0.925,
+      "y1": 0.94,
+      "declarada": false
+    },
+    "fueraDeZona": [
+      "logo"
+    ],
+    "anchoPantalla": 390,
+    "firma": {
+      "anchoLadoCorto": 0.25,
+      "y": 0.8274,
+      "trazo": {
+        "wcag": 19.32,
+        "umbralWcag": 4.5,
+        "cumpleWcag": true,
+        "pctBajoUmbral": 0
+      },
+      "auto": true,
+      "encontrada": false,
+      "banda": [
+        0.75,
+        0.8862
+      ]
+    },
+    "huellas": {
+      "pieza": "858c305b624d862a00c2a6fd0d6d98ffbb5b58816310b2eb64e545196a34978d",
+      "plate": "d643b0c57dbca111716b75cccec99b1766520a045de37448b739c56eec2e07bf",
+      "compositor": "ce804da9eac3f92fae15a307dd4cd98abd5c3466c3503d9ce5271f05f78cb11d",
+      "png": "4bad5b187d31e2dd4a8996007a0f923cdc6d3ff0b109ef5ac088469fb3b62c3e",
+      "layout": "150abdaaa1418145162a4fcc791feb655b1d08387320cca19f52c58d935b1c71",
+      "alt": "549149331e15c030aa46dd6ec95d06d5d1ab53c680e28e1cc5c9c73e78b4e97d"
+    },
+    "ctaColorPolicy": {
+      "version": 1,
+      "policyId": "CMP-004-pilots-color-v2",
+      "campaignId": "CMP-004",
+      "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+      "treatment": "decision-warm-selection",
+      "strategy": "scene-related",
+      "prominence": "delimitada",
+      "variant": "outline",
+      "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "treatmentReason": "El contorno naranja relaciona la acción con el signo de identidad o de fricción. La tinta clara mantiene lectura; la selección AXIS de ocho controles hace visible la intervención. Sin relleno blanco.",
+      "roles": {
+        "ink": {
+          "token": "inkOnDark",
+          "value": "#ffffff"
+        },
+        "border": {
+          "token": "accentSurface",
+          "value": "#ff6500"
+        }
+      },
+      "visualReview": "required"
+    }
+  }
+]

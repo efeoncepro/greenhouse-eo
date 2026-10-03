@@ -1,0 +1,9 @@
+S03-11H-campana-escala · 2048x2048 · 4 referencia(s):
+   ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/casting-frente.png
+   ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/casting-tres-cuartos.png
+   ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/origen-crop.png
+   ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png
+  $ costo estimado ≈ USD 0.107 (1 × 3568 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_cmp004-cine-nativo/formatos/nativas/plates/S03-11H-campana-escala-b/S03-11H-campana-escala.png (edit) …
+  ✗ ./ai-generations/2026-10-02_cmp004-cine-nativo/formatos/nativas/plates/S03-11H-campana-escala-b/S03-11H-campana-escala.png FAILED: fetch failed
+done

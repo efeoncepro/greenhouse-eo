@@ -1,0 +1,11 @@
+  ⇢ elemento pegado en (207, 369) a 261x225 px · píxeles tomados de la imagen de ORIGEN
+  ⚠ fal:image-apps-relighting: contrato verificado, generación real SIN verificar todavía.
+  · fal:image-apps-relighting edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ imagen completa → 1536x1024 · la zona con contexto ocupa 33 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.040 · 1 × 1 imagen(es) × USD 0.04
+  → candidato 1/1 …
+    · color corregido en el anillo (16880 px): desplazamiento RGB +64.7 / +60.2 / +35.5
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 220/255
+    ⚠ el modelo movió la zona protegida en promedio 42.5/255: mira la unión al 100 %.
+    ✓ PASS · destino fuera de lo pegado y su acabado: delta máximo 0/255 · ./ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/inpaint/3ba6bf834dae/candidate-1.png
+exit=0

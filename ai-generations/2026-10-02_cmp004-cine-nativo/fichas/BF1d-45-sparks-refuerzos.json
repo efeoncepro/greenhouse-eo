@@ -1,0 +1,54 @@
+{
+  "id": "BF1d-45-sparks-refuerzos",
+  "formato": "4:5",
+  "registro": "cine",
+  "alcance": "nexa",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "risa-elegante"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "llave": {
+    "fuente": "the warm orange light trail of the Content Spark flying just ahead of her, about half a metre in front of her left shoulder",
+    "lado": "from the front left, at face height",
+    "distancia": "close",
+    "tamano": "a long bright streak, the size of an arm"
+  },
+  "primerPlano": "the near-black matte rubber top of a launch console right in front of the lens, out of focus",
+  "fondo": "far back in the dark hangar, a row of large round cold practical lights melted into big soft bokeh discs, only between 50% and 70% of the frame height",
+  "fenomeno": {
+    "que": "a squadron of Sparks arriving out of the depth of the hangar, each drawing a warm orange light trail as it flies in",
+    "esServicio": "the reinforcements are the agents arriving to work with her: the light trails are the extra creative capacity coming in"
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, the instant the reinforcements arrive inside a vast dark hangar at night, the native layout of a vertical feed ad). GEOGRAPHY, the most important instruction: the UPPER 46% of the frame is the deep, evenly dark, navy-black matte ceiling of the hangar with fine visible texture: no light falls on it, no trails, no glow, no bokeh, no lamps and no objects; it is calm from edge to edge. Everything lit, Nexa and every Spark included, lives between 48% and 80% of the frame height; no Spark and no trail rises above 48%. The LOWEST 20% of the frame is the near-black matte rubber top of a launch console right in front of the lens, crossing the whole width, completely out of focus, non-reflective, with no light and no reflection reaching it. THE MOMENT: Nexa is ARRIVING: she strides toward the camera mid-step, slightly LEFT of center, framed from the waist up and SMALLER in the frame: the TOP OF HER HAIR sits at 46% of the frame height and her chin at about 58%, so the whole upper 44% of the frame shows nothing of her, not even a strand of hair, and nothing of the Sparks; the console cutting her at the waist so the white plates of her suit end above it. Her body is turned about thirty degrees to her left, her right shoulder leading toward the camera, while her head turns back to face the lens straight on, chin slightly lowered, both eyes and both brows visible. Her right hand is raised to her face, two fingertips touching the side temple of her bionic glasses as if switching them on; her left arm swings naturally down at her side, below the frame. She is laughing softly with a wide, confident open smile showing her upper teeth, eyes slightly narrowed by the smile, NOT a closed-mouth half-smile, NO head tilt to either side. Razor-thin focus on her eyes. THE SPARKS, copied EXACTLY from their two references, each smaller than her head, all above her waist: the Content Spark flies just ahead of her, half a metre in front of her LEFT shoulder, sharp, dragging a long warm orange (#FF6500) light trail that curves back behind her; the Research Spark flies beside her RIGHT elbow keeping pace with her, sharp, NOT touching her. FAR AWAY in the depth of the hangar, four to twelve meters behind her, EXACTLY FOUR more Sparks (SIX in total, never more), the same figures as the two Spark references, small, clearly OUT OF FOCUS, flying in the same direction she walks, in a loose formation at unequal heights, each drawing a long warm orange light trail behind it, all Sparks and trails between 50% and 74% of the frame height. LIGHT: the Content Spark's trail is the only key light on her: hard, warm orange, from the front left at face height; NO fill light, the far side of her face in deep shadow with the nose shadow legible. A low cool azure (#0375DB) rim light from behind outlines her hair and shoulders. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate exactly as in the reference and the macro (no other logo, no lettering), the bionic glasses exactly as in their reference, small silver earrings, NO watch, NO bracelet, NO ring. REALISTIC ADULT PROPORTIONS: camera about three and a half meters away at chest height, 85mm at f/1.8, nothing foreshortened. Thin haze catches the trails, only below 48%. Rich contrast, deep navy blacks, awe-inspiring. No readable text, no letters, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near-black matte rubber top of a launch console right in front of the lens, crossing the whole width of the lowest 20% of the frame, completely out of focus, non-reflective, with no light and no reflection reaching it",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the deep, evenly dark, navy-black matte ceiling of the hangar with fine visible texture",
+      "tinta": "blanca"
+    }
+  }
+}

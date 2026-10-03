@@ -1,0 +1,12 @@
+  ⇢ elemento pegado en (207, 369) a 261x225 px · píxeles tomados de la imagen de ORIGEN
+  ⚠ Sunburst edita sin máscara (por instrucción, la imagen entera); el pipeline recompone sólo la zona. Pide en el prompt que no cambie el encuadre.
+  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)
+  · openai edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ imagen completa → 1536x1024 · la zona con contexto ocupa 33 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.010 · 1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    · color corregido en el anillo (16880 px): desplazamiento RGB -0.1 / -1.8 / -0.7
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 140/255 · salida USD 0.0103
+    ⚠ la zona editable casi no cambió (delta medio 8.9/255): mira si el modelo cumplió el pedido.
+    ✓ PASS · destino fuera de lo pegado y su acabado: delta máximo 0/255 · ./ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/inpaint/0fde0812b198/candidate-1.png
+exit=0

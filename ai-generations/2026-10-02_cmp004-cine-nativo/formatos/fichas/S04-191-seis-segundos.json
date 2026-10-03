@@ -1,0 +1,25 @@
+{
+  "id": "S04-191-seis-segundos",
+  "formato": "1.91:1",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, a real SIX-SECOND long-exposure photograph taken on a tripod in a dark film studio at night during the shooting of a short product ad, the native layout of a horizontal feed and link ad). GEOGRAPHY, the most important instruction: the LEFT 44% of the frame, from the top edge to the bottom edge, is one continuous, evenly dark, deep navy-black matte acoustic studio wall with fine visible fabric texture: no light falls on it, no glow, no bokeh, no lamps, no light stands, no trail and no objects; it is calm from edge to edge. Everything lit lives in the RIGHT 54% of the frame, between 14% and 84% of the frame height. The LOWEST 16% of the frame is the near-black matte edge of a director's monitor cart right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: a Latin American art director in his late thirties, short dark hair and a trimmed beard, wearing the Efeonce hoodie exactly as in its reference, stands perfectly still and SHARP in the RIGHT half of the frame, centered at about 70% of the width, framed from the waist up, the top of his head at about 21% of the frame height, the cart edge cutting him at the waist; he looks straight into the lens with calm, exacting focus, a slight confident half-smile, both arms relaxed at his sides. In front of him and to the LEFT, on a slim matte black stand at chest height, sits a fictitious faceted glass perfume bottle with NO label and NO lettering, razor sharp. During the six seconds a light on a motion-control arm traced the planned camera move of the ad: ONE single clean, continuous vivid orange (#FF6500) light trail enters from the deep background on the left at about 66% of the frame height, glides forward in one smooth decisive curve and ENDS exactly on the main highlight of the bottle, where it ignites a brilliant pinpoint of light. The trail never circles him and never rises into the LEFT 44% of the frame. Two crew members who walked behind him are soft translucent ghosts with long blur, below 18%. LIGHT: the trail and the ignited highlight are the brightest elements and the only key light: they paint the bottle and the near side of his face warm orange, the far side of his face in shadow, NO fill light. A cool azure (#0375DB) rim light from behind outlines his head and shoulders. Thin haze catches the trail. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm, nothing foreshortened. Real long-exposure physics, real sensor grain, slight chromatic aberration on the brightest edges. Enormous contrast, deep navy blacks. No readable text, no letters, no logos of any brand. HORIZONTAL LIMIT (essential, checked): every person, creature, light trail, projected shape, screen, mural and prop sits entirely to the RIGHT of the vertical line at 56% of the frame width; the LEFT half of the frame shows only the dark calm surface, with nothing in it. The main subject is a little smaller in the frame so the whole scene fits in the right part.",
+  "lecho": {
+    "objeto": "the near-black matte edge of a director's monitor cart right in front of the lens, crossing the whole width of the lowest 16% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, deep navy-black matte acoustic studio wall with fine visible fabric texture",
+      "tinta": "blanca"
+    }
+  },
+  "piloto": "../../composicion/plates/N04-45-seis-segundos.png"
+}

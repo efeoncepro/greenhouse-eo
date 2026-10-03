@@ -1,0 +1,4 @@
+S01-191-marca-sombra-b exit=0
+S07-191-squad-criterio-b exit=0
+BF2-191-squad-refuerzos-b exit=0
+S08-191-ia-memoria-b exit=0

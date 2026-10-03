@@ -1,0 +1,39 @@
+{
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "id": "S01-11N-marca-sombra",
+  "formato": "1:1",
+  "casting": {
+    "s01-directora": {
+      "etiqueta": "the creative director (S01)",
+      "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference images, in her mid thirties exactly as in them. Her face is an OVAL with defined cheekbones and a soft rounded chin. HAIR dark brown, very CURLY and voluminous, shoulder length, with loose ringlets framing the face. EYES dark brown; BROWS dark and softly arched. Small silver hoop earrings. Warm light-brown skin with visible pores. Keep her real age as in the references: do NOT age her, do NOT add wrinkles or grey hair, do NOT beautify or slim her.",
+      "refs": [
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s01-directora/casting-frente.png",
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s01-directora/casting-tres-cuartos.png",
+        "ai-generations/2026-10-02_cmp004-cine-nativo/casting/s01-directora/origen-crop.png"
+      ]
+    }
+  },
+  "identidad": [
+    "s01-directora"
+  ],
+  "piloto": "../../../composicion/plates/N01b-45-marca-sombra.png",
+  "lecho": {
+    "objeto": "the near-black matte edge of a long work table right in front of the lens, crossing the whole width of the lowest 16% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, a dark film studio at night, composed NATIVELY for a SQUARE 1:1 feed ad). THE IDEA, which must read in two seconds: she has covered the logo with tape, and the brand is still recognizable everywhere, because its signature brushstroke is projected across her and the wall. Both halves of the idea are essential and must be clearly visible together. GEOGRAPHY: the UPPER 42% of the frame is one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture: no light falls on it, no glow, no bokeh, no lamps and no objects; it is calm from edge to edge. Everything lit lives between 44% and 84% of the frame height. The LOWEST 16% of the frame is the near-black matte edge of a long work table right in front of the lens, completely out of focus, outside every light. THE MOMENT: the creative director stands slightly RIGHT of center, framed CLOSE, from the chest up, so her face is large and sharp: the top of her head at about 44% of the frame height and her chin at about 62%. Her head is almost frontal and she looks straight into the lens with a knowing, amused half-smile. On the LEFT of the frame, at the height of her shoulders, a slim computer monitor faces the camera and is SWITCHED ON, glowing with a bright, clean, light-grey interface; she reaches over with her left hand and presses a strip of matte black gaffer tape over the logo corner of that glowing screen, her fingertips still on the tape: the taped corner is clearly visible against the lit screen. The tape is ONLY on the screen: there is NO tape anywhere on her, and the embroidered emblem on the chest of her hoodie stays fully visible and uncovered. The monitor's glow is a soft secondary light on her hand. THE BRAND: a single hard, low, vivid orange (#FF6500) spotlight from the far left shines through a hand-cut stencil and PROJECTS one large, crisp-edged diagonal brushstroke with ragged dry-brush ends and visible bristle streaks: the orange slash crosses the wall behind her AND falls across her hoodie, her shoulder and her cheek, between 46% and 84% of the frame height. The projected brushstroke is the brightest element and the key light on her face; NO fill, the far side of her face in shadow with the nose shadow legible. A cool azure (#0375DB) rim light from behind outlines her curls. COLOR GRADE exactly like a cinema still: deep navy-black shadows, the single saturated orange slash, a cool azure rim, nothing else warm. She wears the Efeonce hoodie exactly as in its reference. REALISTIC ADULT PROPORTIONS: camera about one and a half meters away at chest height, 85mm at f/2, nothing foreshortened. Fine dust, real sensor grain, genuine depth of field. No readable text, no letters, no logos of any brand anywhere; the projected shape is ONLY that diagonal brushstroke, no circle, ring or orbit."
+}

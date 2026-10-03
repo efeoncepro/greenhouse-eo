@@ -1,0 +1,10 @@
+  ◐ sombra proyectada incluida: 10219 px, 49.3 niveles más oscura que el plate (--shadow off para dejarla)
+  ✎ máscara de borrado desde 1 capa(s), agrandada 16 px: ./ai-generations/2026-10-03_task-1973-canary/erase-masks/cb5e600359b1.png
+  ◫ relleno: clean plate de Layerize sin #2 (base + las demás capas; sin proveedor, sin gasto)
+  ✂ imagen completa → 1536x1024 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.000 · clean plate local (00-base.png + capas restantes); sin proveedor
+  → candidato 1/1 …
+    · color corregido en el anillo (17604 px): desplazamiento RGB +6.6 / +6.4 / +7.7
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 217/255 · salida USD 0.0000
+    · candidato 1: borrado (cambio en el núcleo 46.27/255)
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/4576abc21a5f/manifest.json

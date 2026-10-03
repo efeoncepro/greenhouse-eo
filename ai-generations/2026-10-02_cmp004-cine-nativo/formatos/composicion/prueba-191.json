@@ -1,0 +1,158 @@
+[
+  {
+    "id": "CMP004-S04-KV-191-N1",
+    "plate": "plates/CMP004-S04-KV-191-N1.png",
+    "align": "left",
+    "top": 0.12,
+    "textWidth": 0.38,
+    "label": null,
+    "lead": "¿Qué cabe en seis segundos?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 40,
+    "leadGap": 0.23,
+    "dominant": "Cada detalle",
+    "dominantSize": 124,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Dirección, edición, motion y audio en cada instante.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 38,
+    "afterGap": 0.62,
+    "logo": {
+      "width": 0.25,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Descubre cómo lo hacemos",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 34,
+      "paddingX": 28,
+      "paddingY": 12,
+      "fontSize": 46,
+      "descriptorSize": 38,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición en un set: un director de arte quieto y una estela de luz naranja que termina en el brillo de un frasco de perfume ficticio.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: banda oscura continua arriba, carro de monitor negro mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-BF3-KV-191-N1",
+    "plate": "plates/CMP004-BF3-KV-191-N1.png",
+    "align": "left",
+    "top": 0.12,
+    "textWidth": 0.38,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 40,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 124,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Refuerzos creativos: producción a escala, rápida y consistente.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 38,
+    "afterGap": 0.62,
+    "logo": {
+      "width": 0.25,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 34,
+      "paddingX": 28,
+      "paddingY": 12,
+      "fontSize": 46,
+      "descriptorSize": 38,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de una noche de producción: cientos de piezas de una campaña de temporada llegan como estelas naranjas a una gran grilla, y una directora de arte aprueba una pieza en su tablet.",
+    "styleReason": "Black Friday · cine: velocidad en las estelas, consistencia en la grilla, aprobación humana en primer plano. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  }
+]

@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "fdd790982b85",
+  "key": "fdd790982b85e9bc6914c26bb86a8d9c5dd28d3718a6b3801d793e605698a02a",
+  "status": "completed",
+  "createdAt": "2026-10-02T22:45:46.582Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_login-escenario/plates/LG3d-contenidos-estratega.png",
+    "imageSha256": "ec2b6365c06f8e8e13727ab64f288505809e1236caf49147e43d4f447ba17870",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_login-escenario/piel/LG3d-cara-mask.png",
+    "maskSha256": "c87869e0a4765d0fcc402ba6fb87b66db48db2db4f4c46ffa52b7b837c0c4909",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Re-render ONLY the skin of the face, ears and neck inside the marked zone so it looks like an UNRETOUCHED photograph of a real person shot on a full-frame camera with an 85mm lens, not a 3D render or an AI image.\nSkin texture comes ONLY from real, IRREGULAR pores (larger and more visible on the nose, cheeks and forehead, finer on the eyelids and lips) and fine, soft vellus hair catching the light along the jaw, cheeks and upper lip. Natural specular sheen on the nose tip, forehead and cheekbones that follows the existing light, with micro-texture breaking up every highlight. Healthy, even skin tone; no redness, no blemishes, no dark circles, no added wrinkles: do NOT age the person. No airbrushing, no beauty filter, no waxy or plastic smoothness, no porcelain or CGI sheen, no painterly look.\nKeep EVERYTHING else exactly as it is: the same person, identity, face shape, eyes, gaze direction, expression, smile, teeth, eyebrows, hair and every curl or strand, earrings, beard, the clothing, the light direction, colour and intensity, the shadows, the depth of field and the framing. Change only how the skin is rendered.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRe-render ONLY the skin of the face, ears and neck inside the marked zone so it looks like an UNRETOUCHED photograph of a real person shot on a full-frame camera with an 85mm lens, not a 3D render or an AI image.\nSkin texture comes ONLY from real, IRREGULAR pores (larger and more visible on the nose, cheeks and forehead, finer on the eyelids and lips) and fine, soft vellus hair catching the light along the jaw, cheeks and upper lip. Natural specular sheen on the nose tip, forehead and cheekbones that follows the existing light, with micro-texture breaking up every highlight. Healthy, even skin tone; no redness, no blemishes, no dark circles, no added wrinkles: do NOT age the person. No airbrushing, no beauty filter, no waxy or plastic smoothness, no porcelain or CGI sheen, no painterly look.\nKeep EVERYTHING else exactly as it is: the same person, identity, face shape, eyes, gaze direction, expression, smile, teeth, eyebrows, hair and every curl or strand, earrings, beard, the clothing, the light direction, colour and intensity, the shadows, the depth of field and the framing. Change only how the skin is rendered.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.04321735146604938,
+    "editable": 266888,
+    "soft": 91574,
+    "protected": 7935938
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1740,
+      "top": 0,
+      "width": 1205,
+      "height": 1012
+    },
+    "target": {
+      "width": 1200,
+      "height": 1008
+    },
+    "aspectError": 0.0001976284584979471,
+    "reason": "la zona con contexto ocupa 14.5 % de la imagen: se genera recortada a 1200x1008"
+  },
+  "estimate": {
+    "usd": 0.0462,
+    "basis": "1 × salida 1200x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 15.412,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -6,
+        "dy": 0,
+        "scale": 0.98,
+        "stillError": 12.16,
+        "bestError": 9.75,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -3.29,
+        -2.75,
+        -1.64
+      ],
+      "protected": {
+        "pixels": 7935938,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 266888,
+        "maxDelta": 228,
+        "meanDelta": 19.659,
+        "worst": {
+          "x": 2266,
+          "y": 335
+        }
+      },
+      "seam": {
+        "pixels": 91574,
+        "maxDelta": 118,
+        "meanDelta": 3.035,
+        "worst": {
+          "x": 2574,
+          "y": 436
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7935938,
+        "maxDelta": 255,
+        "meanDelta": 1.57,
+        "worst": {
+          "x": 2459,
+          "y": 938
+        }
+      },
+      "outputUsd": 0.0462,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2816,
+        "input_tokens_details": {
+          "image_tokens": 2432,
+          "text_tokens": 384
+        },
+        "output_tokens": 1541,
+        "output_tokens_details": {
+          "image_tokens": 1541,
+          "text_tokens": 0
+        },
+        "total_tokens": 4357
+      },
+      "meta": {
+        "size": "1200x1008",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "S06-916-contenido-scroll",
+  "formato": "9:16",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, a real long-exposure photograph on a dark content production set at night, the native layout of a vertical full-screen Stories and Reels ad). GEOGRAPHY, the most important instruction: the UPPER 44% of the frame is one continuous, evenly dark, deep navy-black matte acoustic studio wall with fine visible fabric texture: no light falls on it, no glow, no bokeh, no lamps and no objects; it is calm from edge to edge. Everything lit lives between 46% and 80% of the frame height. The LOWEST 20% of the frame is the near-black matte edge of a director's monitor cart right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: behind her, a wide LED wall between 46% and 78% of the frame height plays a social feed scrolling upward so fast that, in the long exposure, every post has melted into vertical streaks of cool blurred color: a waterfall of anonymous content. In the middle of that waterfall, ONE single vertical post has STOPPED: perfectly sharp, still and bright, it shows a striking real photograph of a dancer frozen mid-turn in a vivid orange (#FF6500) coat against deep navy, the only sharp thing on the wall. In front of the wall, slightly RIGHT of center, a Latin American art director in her early thirties, dark wavy hair tied back, wearing the Efeonce hoodie exactly as in its reference, framed from the waist up, the top of her head at about 50% of the frame height, the cart edge cutting her at the waist; her right arm is fully visible, raised with the open palm toward the wall right next to the stopped post, the gesture that stopped the scroll. Her head is almost frontal and she looks straight into the lens with calm confidence. LIGHT: the stopped post is the only key light on her: warm orange on her raised hand and the near side of her face, the far side in shadow with the nose shadow legible; NO fill light. The blurred waterfall throws a soft cool azure (#0375DB) rim on her hair and shoulders. Thin haze in front of the wall, only below 46%. A real face: natural skin with irregular pores, fine facial hair, even healthy tone, no retouching, no plastic skin. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm, nothing foreshortened. Real long-exposure physics, real sensor grain, genuine depth of field. Enormous contrast, deep navy blacks. No readable text, no letters, no logos, no interface icons of any brand.",
+  "lecho": {
+    "objeto": "the near-black matte edge of a director's monitor cart right in front of the lens, crossing the whole width of the lowest 20% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, deep navy-black matte acoustic studio wall with fine visible fabric texture",
+      "tinta": "blanca"
+    }
+  },
+  "piloto": "../../composicion/plates/N06b-45-contenido-scroll.png"
+}

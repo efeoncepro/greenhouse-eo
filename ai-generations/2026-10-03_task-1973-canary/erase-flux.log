@@ -1,0 +1,9 @@
+  ◐ sombra proyectada incluida: 10219 px, 49.3 niveles más oscura que el plate (--shadow off para dejarla)
+  ✎ máscara de borrado desde 1 capa(s), agrandada 16 px: ./ai-generations/2026-10-03_task-1973-canary/erase-masks/cb5e600359b1.png
+  ✂ imagen completa → 1536x1024 · la zona con contexto ocupa 39 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.100 · 1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 74/255
+    ⚠ candidato 1: la zona casi no cambió (17.8/255): el objeto puede seguir ahí.
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/ea98000e9736/manifest.json
+  ⚠ REVISAR (código 3): en ningún candidato quedó el fondo (el objeto sigue ahí o el modelo dibujó otro).

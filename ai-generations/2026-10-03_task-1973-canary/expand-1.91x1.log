@@ -1,0 +1,8 @@
+  ⤢ lienzo 1956x1024 · escena 1536x1024 en (210, 0) · relleno previo mirror · fundido 24 px
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+  ✂ imagen completa → 1952x1024 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.009 · 1 × salida 1952x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 215/255 · salida USD 0.0094
+    ⚠ el modelo REENCUADRÓ (≈ -81 px, -143 px, escala 0.88): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/12969d9f3f7e/manifest.json

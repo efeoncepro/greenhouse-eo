@@ -1,0 +1,172 @@
+{
+  "_": "Ajustes finos por pieza, a la vista. Sólo tamaños: el copy no cambia.",
+  "CMP004-S08-KV-916-N1": {
+    "dominantSize": 88,
+    "leadSize": 26,
+    "afterSize": 24,
+    "afterGap": 0.34,
+    "cta": {
+      "fontSize": 30,
+      "descriptorSize": 24,
+      "gapAfterNote": 30
+    }
+  },
+  "CMP004-S06-KV-916-N1": {
+    "dominantSize": 96,
+    "leadSize": 27,
+    "afterSize": 24,
+    "afterGap": 0.3,
+    "cta": {
+      "fontSize": 30,
+      "descriptorSize": 24,
+      "gapAfterNote": 30
+    },
+    "textWidth": 0.8
+  },
+  "CMP004-S08-KV-11-N1": {
+    "dominantSize": 80,
+    "leadGap": 0.21,
+    "afterGap": 0.44,
+    "cta": {
+      "gapAfterNote": 26,
+      "cursorScale": 0.4
+    }
+  },
+  "CMP004-BF3-KV-916-N1": {
+    "dominantSize": 100,
+    "afterSize": 25,
+    "cta": {
+      "fontSize": 31,
+      "descriptorSize": 25
+    }
+  },
+  "CMP004-S04-KV-11-N1": {
+    "dominantSize": 82
+  },
+  "CMP004-S07-KV-11-N1": {
+    "dominantSize": 82
+  },
+  "CMP004-S01-KV-11-N1": {
+    "leadSize": 37,
+    "dominantSize": 124,
+    "afterSize": 34,
+    "afterGap": 0.44,
+    "cta": {
+      "fontSize": 41,
+      "descriptorSize": 34,
+      "paddingX": 31,
+      "paddingY": 11,
+      "radius": 20,
+      "gapAfterNote": 39,
+      "descriptorGap": 6
+    }
+  },
+  "CMP004-S03-KV-11-N1": {
+    "leadSize": 37,
+    "dominantSize": 124,
+    "afterSize": 34,
+    "afterGap": 0.44,
+    "cta": {
+      "fontSize": 41,
+      "descriptorSize": 34,
+      "paddingX": 31,
+      "paddingY": 11,
+      "radius": 20,
+      "gapAfterNote": 39,
+      "descriptorGap": 6
+    }
+  },
+  "CMP004-S03-KV-916-N1": {
+    "dominantSize": 98,
+    "leadSize": 27,
+    "afterSize": 25,
+    "afterGap": 0.36,
+    "cta": {
+      "fontSize": 31,
+      "descriptorSize": 24,
+      "gapAfterNote": 30
+    }
+  },
+  "CMP004-S02-KV-191-N1": {
+    "cta": {
+      "cursorScale": 0.45
+    },
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "5eac5ce123123511dab19d0f80069507d0af22c53f7c08161b1703e785b65f70"
+    }
+  },
+  "CMP004-S03-KV-191-N1": {
+    "dominantSize": 200,
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "86cde43d3125aef7107376f7a018b0e228e7c60ec999ee4852c2e59997395b18"
+    }
+  },
+  "CMP004-S05-KV-191-N1": {
+    "dominantSize": 200,
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "76a43ebf6cd20d256898024a73a79d0fc95f45dc72004b3e8ff1b370e440452d"
+    }
+  },
+  "CMP004-S01-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "dc8efeabbbff6746f63e1324a55fb74c8d2fb91a6a6a1e845954d12bc4ffa59c"
+    }
+  },
+  "CMP004-S04-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "fcd45eb6ccc867a4c28384eae47da9ef0d7a8895a196d7baa596826931b681f9"
+    }
+  },
+  "CMP004-S06-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "5cb4b614c93a323ab4a02f7587294ea83a0d231c2f69857553bc99f9d1845876"
+    }
+  },
+  "CMP004-S07-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "a5fd6cb4accf6c08ea4b5382798adb65498ce82781671d6e7ac30c9c7fed9d7f"
+    }
+  },
+  "CMP004-S08-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "4cff8f585c9adc532b5b8121fea83f7fe595710512f130f9a487dfe5457c6d82"
+    }
+  },
+  "CMP004-BF1-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "3fd1358f29755e9c708e4a2636550d22164cae641bc397dab64392aaa5de7c2f"
+    }
+  },
+  "CMP004-BF2-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "43d7cb1025195179a5294fb21bd2ce2de2cb1168598e16ee0913e9cc49e35a17"
+    }
+  },
+  "CMP004-BF3-KV-191-N1": {
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "9a5d2fc574e0fcdc43b94484a0304863218442a0f33dd699fde97d86e7729500"
+    }
+  }
+}

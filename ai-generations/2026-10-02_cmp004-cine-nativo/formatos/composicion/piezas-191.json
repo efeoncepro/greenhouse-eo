@@ -1,0 +1,915 @@
+[
+  {
+    "id": "CMP004-S01-KV-191-N1",
+    "plate": "plates/CMP004-S01-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Y si tapamos el logo?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Te reconocen",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Hablemos de tu marca",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Una directora creativa tapa con cinta el logo de una pantalla mientras un foco naranja proyecta la pincelada de la marca sobre el muro y sobre ella.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: muro oscuro continuo arriba, mesa negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "dc8efeabbbff6746f63e1324a55fb74c8d2fb91a6a6a1e845954d12bc4ffa59c"
+    }
+  },
+  {
+    "id": "CMP004-S05-KV-191-N1",
+    "plate": "plates/CMP004-S05-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Contenido para todo el mes?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "En un día",
+    "dominantSize": 200,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Planifiquemos tu jornada",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de una jornada de rodaje: un camarógrafo quieto con su gimbal y la estela naranja de la cámara recorriendo cinco sets.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: techo oscuro continuo arriba, maleta de equipo negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "76a43ebf6cd20d256898024a73a79d0fc95f45dc72004b3e8ff1b370e440452d"
+    }
+  },
+  {
+    "id": "CMP004-S04-KV-191-N1",
+    "plate": "plates/CMP004-S04-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Qué cabe en seis segundos?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Cada detalle",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Descubre cómo lo hacemos",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición en un set: un director de arte quieto y una estela de luz naranja que termina en el brillo de un frasco de perfume ficticio.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: banda oscura continua arriba, carro de monitor negro mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "fcd45eb6ccc867a4c28384eae47da9ef0d7a8895a196d7baa596826931b681f9"
+    }
+  },
+  {
+    "id": "CMP004-S07-KV-191-N1",
+    "plate": "plates/CMP004-S07-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Más piezas, mismo estándar?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Mismo criterio",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Escala tu producción",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Un squad de cuatro personas en línea frente a una cinta de luz con entregables; una de ellas revisa una pieza de cerca.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con personas del equipo: muro oscuro continuo arriba, tarima negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "a5fd6cb4accf6c08ea4b5382798adb65498ce82781671d6e7ac30c9c7fed9d7f"
+    }
+  },
+  {
+    "id": "CMP004-S08-KV-191-N1",
+    "plate": "plates/CMP004-S08-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Producción con IA?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Marca intacta",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Escala tu producción con IA",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Nexa, el personaje de Efeonce, sostiene una pieza elegida de un túnel de cientos de piezas creativas, con un Spark en su hombro.",
+    "styleReason": "Registro cine con Nexa protagonista en composición nativa de ad: techo oscuro continuo arriba, consola negra mate al pie. Voz y CTA en el acento de la línea Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "4cff8f585c9adc532b5b8121fea83f7fe595710512f130f9a487dfe5457c6d82"
+    }
+  },
+  {
+    "id": "CMP004-S03-KV-191-N1",
+    "plate": "plates/CMP004-S03-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿En cuántos formatos funciona tu idea?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "En todos",
+    "dominantSize": 200,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Hablemos de tu campaña",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "De noche, en una plaza, una directora creativa sostiene su teléfono con la misma imagen de campaña de un corredor que se ve en una gigantesca pantalla curva detrás de ella.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: escala invertida (fachada LED y teléfono con la misma campaña), cielo nocturno continuo arriba, banca negra mate al pie. Voz y CTA en el acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "86cde43d3125aef7107376f7a018b0e228e7c60ec999ee4852c2e59997395b18"
+    }
+  },
+  {
+    "id": "CMP004-S02-KV-191-N1",
+    "plate": "plates/CMP004-S02-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Tu marca ya cuenta lo que viene?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Imagen propia",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Hablemos de lo que viene",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.45,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "De noche, en el lobby de una empresa, una ejecutiva mira cómo cae la tela que cubría un mural monumental con su nueva marca, mientras dos técnicos sueltan las cuerdas.",
+    "styleReason": "Registro cine en composición nativa de ad: el instante del lanzamiento de la nueva marca, techo oscuro continuo arriba, mostrador negro mate al pie. Voz y CTA en el acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "5eac5ce123123511dab19d0f80069507d0af22c53f7c08161b1703e785b65f70"
+    }
+  },
+  {
+    "id": "CMP004-S06-KV-191-N1",
+    "plate": "plates/CMP004-S06-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Contenido que se publica o que se mira?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Que se mira",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Conversemos de tu contenido",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "En un set de producción, una directora de arte levanta la mano frente a un muro LED donde un feed corre desenfocado y solo una pieza, una bailarina con abrigo naranja, se ve nítida y quieta.",
+    "styleReason": "Registro cine en composición nativa de ad, prueba con persona del equipo: el contenido de la agencia creativa como la pieza que detiene el feed. Muro oscuro continuo arriba, carro de monitor negro mate al pie. Voz y CTA en el acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "5cb4b614c93a323ab4a02f7587294ea83a0d231c2f69857553bc99f9d1845876"
+    }
+  },
+  {
+    "id": "CMP004-BF1-KV-191-N1",
+    "plate": "plates/CMP004-BF1-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Nexa, el personaje de Efeonce, recibe con la mano en alto a un escuadrón de Sparks que llega volando por un hangar oscuro dejando estelas de luz naranja; uno se posa en su hombro.",
+    "styleReason": "Black Friday · cine con Nexa y Sparks (caso aprobado): los refuerzos llegan como luz. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "3fd1358f29755e9c708e4a2636550d22164cae641bc397dab64392aaa5de7c2f"
+    }
+  },
+  {
+    "id": "CMP004-BF2-KV-191-N1",
+    "plate": "plates/CMP004-BF2-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Un squad de cuatro personas sale de un portón de hangar inundado de luz naranja y mira a la cámara, con Sparks volando a la altura de sus hombros.",
+    "styleReason": "Black Friday · cine con el squad y Sparks: los refuerzos salen de la luz. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "43d7cb1025195179a5294fb21bd2ce2de2cb1168598e16ee0913e9cc49e35a17"
+    }
+  },
+  {
+    "id": "CMP004-BF3-KV-191-N1",
+    "plate": "plates/CMP004-BF3-KV-191-N1.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.46,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 48,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 146,
+    "dominantMax": 0.7,
+    "dominantTracking": -0.035,
+    "after": null,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 48,
+    "afterGap": 0.5,
+    "logo": {
+      "width": 0.25,
+      "x": 0.1524,
+      "y": 0.86,
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 20,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 70,
+      "paddingX": 34,
+      "paddingY": 16,
+      "fontSize": 58,
+      "descriptorSize": 48,
+      "descriptorGap": 8,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de una noche de producción: cientos de piezas de una campaña de temporada llegan como estelas naranjas a una gran grilla, y una directora de arte aprueba una pieza en su tablet.",
+    "styleReason": "Black Friday · cine: velocidad en las estelas, consistencia en la grilla, aprobación humana en primer plano. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand",
+    "conceptoReducido": {
+      "razon": "Horizontal 1,91:1 de pauta: la bajada va en el titular del anuncio de LinkedIn/Meta; con todo el copy al piso legible no cabe sobre la escena (CMP-004, 2026-10-02). Aprobado por el operador en el canvas el 2026-10-02.",
+      "aprobadoPor": "julio-reyes",
+      "plate": "9a5d2fc574e0fcdc43b94484a0304863218442a0f33dd699fde97d86e7729500"
+    }
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "id": "BF3-191-escala-temporada",
+  "formato": "1.91:1",
+  "registro": "cine",
+  "alcance": "publicidad-prueba",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "llave": {
+    "fuente": "the one approved piece glowing on her tablet",
+    "lado": "from below and the front right",
+    "distancia": "about forty centimetres from her face",
+    "tamano": "a tablet screen"
+  },
+  "primerPlano": "the near-black matte edge of a long production table right in front of the lens, out of focus",
+  "fondo": "the giant wall of campaign pieces in deep perspective, its far end melting into soft bokeh",
+  "fenomeno": {
+    "que": "hundreds of pieces of one sale campaign flying into a giant wall in long-exposure streaks and locking into a perfectly consistent grid",
+    "esServicio": "the streaks are the speed of the production and the perfect grid is the brand kept consistent across every piece of the campaign"
+  },
+  "escena": "SCENE (cinematic, a real long-exposure photograph of one night of campaign production inside a vast dark studio, the native layout of a horizontal feed and link ad). GEOGRAPHY, the most important instruction: the LEFT 44% of the frame, from the top edge to the bottom edge, is one continuous, evenly dark, deep navy-black matte studio wall with fine visible texture: no light falls on it, no pieces, no streaks, no glow, no bokeh and no objects; it is calm from edge to edge. Everything lit lives in the RIGHT 54% of the frame, between 14% and 84% of the frame height. The LOWEST 16% of the frame is the near-black matte edge of a long production table right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: behind her, a GIANT wall in deep perspective between 14% and 77% of the frame height holds HUNDREDS of pieces of ONE sale campaign for a fictitious fashion retailer: vertical stories, square posts, wide banners, email headers, product cards and a billboard, all in the same bold black-and-orange (#FF6500) visual system with the same product photography and the same diagonal composition, no letters, no numbers, no logos. During the exposure, new pieces flew in from the darkness and locked into place: they are drawn as long warm orange motion streaks that end exactly in their slot of the grid, while the pieces already placed are sharp and perfectly aligned. In the foreground, in the RIGHT half of the frame, centered at about 70% of the width, a Latin American art director in her late twenties, dark hair in a low bun, wearing the Efeonce hoodie exactly as in its reference, framed from the waist up, the top of her head at about 21% of the frame height, the table edge cutting her at the waist, stands perfectly still and SHARP, holding a tablet at chest height with both arms fully visible: on it, ONE of the campaign pieces with a small approval check; she looks straight into the lens with calm confidence. LIGHT: the tablet is the key light on her face from below and the front right, warm; the streaks of the wall throw a warm orange rim on her shoulders; NO fill light, the far side of her face in shadow with the nose shadow legible. A cool azure (#0375DB) rim from a distant practical outlines her hair. Thin haze catches the streaks, only in the RIGHT half of the frame. A real face: natural skin with irregular pores, fine facial hair, even healthy tone, no retouching. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm, nothing foreshortened. Real long-exposure physics, real sensor grain, genuine depth of field. Enormous contrast, deep navy blacks. No readable text, no letters, no numbers, no percent signs, no logos of any brand. HORIZONTAL LIMIT (essential, checked): every person, creature, light trail, projected shape, screen, mural and prop sits entirely to the RIGHT of the vertical line at 56% of the frame width; the LEFT half of the frame shows only the dark calm surface, with nothing in it. The main subject is a little smaller in the frame so the whole scene fits in the right part.",
+  "lecho": {
+    "objeto": "the near-black matte edge of a long production table right in front of the lens, crossing the whole width of the lowest 16% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "one continuous, evenly dark, deep navy-black matte studio wall with fine visible texture",
+      "tinta": "blanca"
+    }
+  },
+  "piloto": "../../composicion-bf/plates/BF3-45-escala-temporada.png"
+}

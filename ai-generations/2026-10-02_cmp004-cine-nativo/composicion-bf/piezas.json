@@ -1,0 +1,236 @@
+[
+  {
+    "id": "CMP004-BF1-KV-45-N1",
+    "plate": "plates/BF1b-45-sparks-refuerzos.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Refuerzos creativos: agentes que se suman a tu equipo.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Nexa, el personaje de Efeonce, recibe con la mano en alto a un escuadrón de Sparks que llega volando por un hangar oscuro dejando estelas de luz naranja; uno se posa en su hombro.",
+    "styleReason": "Black Friday · cine con Nexa y Sparks (caso aprobado): los refuerzos llegan como luz. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-BF2-KV-45-N2",
+    "plate": "plates/BF2b-45-squad-refuerzos.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Refuerzos creativos: un squad y sus agentes para tu campaña.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Un squad de cuatro personas sale de un portón de hangar inundado de luz naranja y mira a la cámara, con Sparks volando a la altura de sus hombros.",
+    "styleReason": "Black Friday · cine con el squad y Sparks: los refuerzos salen de la luz. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  },
+  {
+    "id": "CMP004-BF3-KV-45-N1",
+    "plate": "plates/BF3-45-escala-temporada.png",
+    "align": "left",
+    "top": 0.042,
+    "textWidth": 0.84,
+    "label": null,
+    "lead": "¿Corriendo para el Black Friday?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Ya llegamos",
+    "dominantSize": 110,
+    "dominantMax": 0.82,
+    "dominantTracking": -0.035,
+    "after": "Refuerzos creativos: producción a escala, rápida y consistente.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 27,
+    "afterGap": 0.23,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": "auto",
+      "variant": "negative"
+    },
+    "marcaEnEscena": false,
+    "cta": {
+      "variant": "outline",
+      "variantReason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento.",
+      "radius": 14,
+      "text": "Refuerza tu Black Friday",
+      "descriptor": "Agencia creativa",
+      "align": "left",
+      "x": "columna",
+      "gapAfterNote": 24,
+      "paddingX": 22,
+      "paddingY": 9,
+      "fontSize": 34,
+      "descriptorSize": 26,
+      "descriptorGap": 6,
+      "inkToken": "inkOnDark",
+      "cursorScale": 0.6,
+      "seleccion": {
+        "padding": "compact",
+        "marco": "ninguno"
+      },
+      "prominencia": "delimitada",
+      "colorPolicy": {
+        "version": 1,
+        "campaignId": "CMP-004",
+        "source": "CMP-004-pilots-color-v2.json",
+        "sha256": "31731d59d7334132084b2c057f5394487c1db771482697e6745d53dee69fde39",
+        "treatment": "decision-warm-selection",
+        "reason": "Contorno naranja: retoma la luz de la escena y el acento de la línea Brand; la voz (anillo y esfera) usa el mismo acento."
+      },
+      "surfaceToken": "accentSurface"
+    },
+    "safeArea": "axis",
+    "altText": "Larga exposición de una noche de producción: cientos de piezas de una campaña de temporada llegan como estelas naranjas a una gran grilla, y una directora de arte aprueba una pieza en su tablet.",
+    "styleReason": "Black Friday · cine: velocidad en las estelas, consistencia en la grilla, aprobación humana en primer plano. Voz y CTA en acento Brand.",
+    "graphicVoice": "efeonce",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "criterio",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "graphicLine": "brand"
+  }
+]

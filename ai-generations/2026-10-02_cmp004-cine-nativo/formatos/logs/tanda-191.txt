@@ -1,0 +1,12 @@
+S02-191-capitulo-reveal-a exit=0
+S01-916-marca-sombra-a exit=0
+BF2-191-squad-refuerzos-a exit=0
+BF3-191-escala-temporada-a exit=0
+S01-191-marca-sombra-a exit=0
+BF1-191-sparks-refuerzos-a exit=0
+S04-191-seis-segundos-a exit=0
+S06-191-contenido-scroll-a exit=0
+S03-191-campana-escala-a exit=0
+S07-191-squad-criterio-a exit=0
+S05-191-runandgun-jornada-a exit=0
+S08-191-ia-memoria-a exit=0
