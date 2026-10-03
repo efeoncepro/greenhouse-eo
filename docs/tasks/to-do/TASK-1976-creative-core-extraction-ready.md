@@ -86,7 +86,7 @@ debe ser mover archivos, no reescribirlos.
 
 ### Blocks / Impacts
 
-- La futura task de extracción a `@efeoncepro/creative-core` (por crear cuando Globe despierte).
+- La futura task de extracción a `@efeoncepro/axis-creative-core` (por crear cuando Globe despierte).
 - TASK-1925 (migración al taller y convergencia de `foto:expandir`): consume la misma frontera.
 - Cualquier técnica o adaptador nuevo de `ai:inpaint` (video incluido) debe respetar el manifiesto desde que exista.
 
@@ -123,7 +123,7 @@ debe ser mover archivos, no reescribirlos.
 - Topology impact: `tooling`
 - Current home: `scripts/ai/inpaint/**`, ejecutado con `tsx` en el equipo del operador
 - Future candidate home: `undecided`
-- Future candidate home note: paquete `@efeoncepro/creative-core` en GitHub Packages (ADR-024 §D5); qué repo lo publica es pregunta abierta del ADR
+- Future candidate home note: paquete `@efeoncepro/axis-creative-core` en el repo de AXIS (decisión del operador 2026-10-03, ADR-024 §D5): sólo Node, `sharp` como peerDependency
 - Boundary: núcleo = módulos del manifiesto, sin `@/`, `node:fs`, red, `child_process`, adaptadores ni secretos; orquestación y adaptadores fuera del núcleo; consumidores autorizados: CLIs `ai:inpaint`, `ai:layers`, `ai:mask`
 - Server/browser split: `n/a` (Node CLI; nunca en bundle ni runtime de producto)
 - Build impact: `none` (fuera del grafo de Next)
@@ -172,7 +172,7 @@ debe ser mover archivos, no reescribirlos.
 
 ## Out of Scope
 
-- Crear `packages/*`, publicar `@efeoncepro/creative-core` o decidir qué repo lo publica.
+- Crear `packages/*`, publicar `@efeoncepro/axis-creative-core` o decidir qué repo lo publica.
 - Cualquier cambio en Globe (hibernado) o en su runtime.
 - Tocar adaptadores de proveedor más allá de los imports que el gate exija.
 - Nuevas técnicas o modelos; canarios con gasto (es un refactor sin cambio de comportamiento).
@@ -257,7 +257,7 @@ los dry-runs de referencia sin gasto.
 
 ## Follow-ups
 
-- Task de extracción a `@efeoncepro/creative-core` cuando Globe despierte y se decida el hogar del paquete (ADR-024 §9).
+- Task de extracción a `@efeoncepro/axis-creative-core` en el repo de AXIS (hogar decidido 2026-10-03) cuando una capacidad se gradúe.
 - Canarios de video en CLI antes de graduar el video (operador, 2026-10-03): borrar y seguir objetos con VACE + SAM2,
   relight de video (ID-V2V, fal lightx) y edición de zona con Seedance 2.5.
 

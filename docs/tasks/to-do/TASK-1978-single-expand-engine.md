@@ -126,7 +126,7 @@ problema se resuelven en un núcleo, no copiando.
 - Topology impact: `tooling`
 - Current home: `scripts/ai/inpaint/**` y `scripts/foto/expandir.mjs`, ejecutados con `tsx`/`node` en el equipo del operador
 - Future candidate home: `undecided`
-- Future candidate home note: el núcleo de expansión es candidato a `@efeoncepro/creative-core` (ADR-024 §D5)
+- Future candidate home note: el núcleo de expansión es candidato a `@efeoncepro/axis-creative-core` (repo de AXIS) (ADR-024 §D5)
 - Boundary: un solo núcleo de expansión (`expand.ts`); `foto:expandir` sólo traduce flags y llama al motor; consumidores autorizados: CLIs `ai:inpaint expand` y `foto:expandir`
 - Server/browser split: `n/a` (Node CLI; nunca en bundle ni runtime de producto)
 - Build impact: `none` (fuera del grafo de Next)

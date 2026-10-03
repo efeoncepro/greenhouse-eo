@@ -9,8 +9,8 @@
 > Harness, promoción de rutas)
 > **Reversibility:** `two-way` para el proceso (es una regla de cómo se construye); `two-way-but-slow` para el paquete
 > compartido una vez publicado y consumido por dos repos
-> **Confidence:** `high` en la regla de secuencia y en la frontera; `medium` en el hogar y el mecanismo del paquete
-> (pregunta abierta §9)
+> **Confidence:** `high` en la regla de secuencia y en la frontera; `high` en el hogar del paquete (AXIS, decidido por
+> el operador el 2026-10-03, §D5); `medium` en su forma exacta hasta la extracción
 > **Validated as of:** 2026-10-03 — carril CLI medido en TASK-1965 y TASK-1973 (canarios reales); arquitectura de
 > Globe contrastada con el overlay `arch-architect/globe-overlay.md` (G1–G13) y este índice
 > **Relacionados:** [ADR-010 promoción comercial](EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md) ·
@@ -103,7 +103,12 @@ nacer (SPEC-001).
 ### D5. Núcleo compartido: un paquete, nunca dos implementaciones
 
 Al graduar, el núcleo se extrae a un paquete versionado y publicado bajo el scope `@efeoncepro` en GitHub Packages,
-el mismo mecanismo de `@efeoncepro/axis-*`. **Nombre candidato:** `@efeoncepro/creative-core`. Requisitos:
+el mismo mecanismo de `@efeoncepro/axis-*`. **Hogar: el repo de AXIS** (`efeoncepro/axis-design-system`, decisión del
+operador 2026-10-03), que ya publica los paquetes compartidos y contiene lógica creativa (los renderizadores de
+`axis-graphic-line`). **Nombre:** `@efeoncepro/axis-creative-core`, por la convención del repo. A diferencia de los
+cinco paquetes actuales de AXIS (sin dependencias nativas, usables en navegador), éste es **sólo Node**: declara
+`engines` y lleva `sharp` como `peerDependency`, para que ningún consumidor de navegador arrastre un binario nativo; y no
+depende de los otros paquetes de AXIS en su primera versión. Requisitos:
 
 - Domain-free y sin proveedor: no importa `@/lib/**`, no lee secretos, no hace red.
 - Versionado semántico; el CLI y Globe **fijan** versión. Un cambio de comportamiento sube versión y se re-mide.
@@ -199,16 +204,17 @@ orquestación con llamadas al adapter; hay que separar la orquestación pura del
 ## 8. Roadmap
 
 1. **Ahora:** las capacidades nuevas siguen D1–D3. Sin cambios de runtime.
-2. **Task de extracción del inpainting** (por crear, bajo EPIC-026/027): separar la orquestación pura del I/O en
-   `pipeline-image.ts`, extraer el núcleo de §D7 a `@efeoncepro/creative-core`, que el CLI lo consuma y quede todo en
-   verde.
+2. **Preparar la extracción** (TASK-1976: manifiesto, gate de frontera, lógica separada del I/O, sin publicar) y, al
+   graduar, **extraer** el núcleo de §D7 a `@efeoncepro/axis-creative-core` en el repo de AXIS, con el CLI como
+   consumidor y todo en verde.
 3. **Task de Globe:** capability semántica de edición (p. ej. editar zona, borrar, expandir) sobre el paquete, con su
    adapter por proveedor, spend fence, golden briefs desde los canarios y su ruta.
 4. **Convergencia de `foto:expandir`** en TASK-1978 (un solo motor de expansión con lo mejor de los dos), como primer caso de dos implementaciones resueltas.
 
 ## 9. Preguntas abiertas (deliberadamente no decididas)
 
-- **Hogar del paquete:** qué repo lo publica (Globe, Greenhouse o uno propio, como AXIS) y quién es su dueño.
+- ~~**Hogar del paquete.**~~ Resuelta 2026-10-03 por el operador: AXIS (`@efeoncepro/axis-creative-core`, §D5). Queda
+  abierto quién es el dueño de su mantenimiento entre AXIS y el carril CLI de Greenhouse.
 - **Costo base de Globe:** no se midió aquí. Antes de la task de Globe, medir la factura actual para dimensionar D6.
 - **Creative Workbench:** si consume el paquete directamente o sigue recibiendo copias selladas por `creative:sync`.
 - **Retiro del CLI:** si un CLI graduado se mantiene a largo plazo como herramienta interna o se retira.

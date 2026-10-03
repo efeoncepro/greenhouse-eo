@@ -127,7 +127,7 @@ que no se toca queda en delta 0, como en el resto de `pnpm ai:inpaint`.
 - Topology impact: `tooling`
 - Current home: `scripts/ai/inpaint/**`, ejecutado con `tsx` en el equipo del operador
 - Future candidate home: `undecided`
-- Future candidate home note: núcleo de luz candidato a `@efeoncepro/creative-core` (ADR-024 §D5); el adaptador de geometría se queda en Greenhouse
+- Future candidate home note: núcleo de luz candidato a `@efeoncepro/axis-creative-core` (repo de AXIS) (ADR-024 §D5); el adaptador de geometría se queda en Greenhouse
 - Boundary: núcleo de luz puro (buffers, máscaras, números, `sharp`); orquestación y adaptadores fuera; consumidores autorizados: CLI `ai:inpaint relight` y `place --finish element`
 - Server/browser split: `n/a` (Node CLI; nunca en bundle ni runtime de producto)
 - Build impact: `none` (fuera del grafo de Next)

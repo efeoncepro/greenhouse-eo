@@ -1016,7 +1016,7 @@ una capacidad creativa se prueba primero en el carril CLI de Greenhouse (`script
 equivocarse cuesta centavos, y llega a Globe sólo con **cinco requisitos**: canario real documentado, contrato estable
 (flags + manifiesto JSON), defaults elegidos por medición, modos de falla con detector y modelo de costo.
 
-- Se gradúa el **núcleo determinístico** como paquete `@efeoncepro/*` (candidato `@efeoncepro/creative-core`) que
+- Se gradúa el **núcleo determinístico** como paquete `@efeoncepro/axis-creative-core` en el repo de AXIS (hogar decidido por el operador el 2026-10-03; sólo Node, `sharp` como peerDependency) que
   consumen el CLI y Globe. **NUNCA** copies código del CLI a Globe.
 - Los **adapters de proveedor no se gradúan**: Globe acuña el suyo por proveedor (G8, ADR-013) con secreto propio. El
   adapter del CLI es evidencia del contrato del proveedor (campos, convención de máscara, precios medidos).
