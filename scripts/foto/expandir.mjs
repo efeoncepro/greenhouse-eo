@@ -16,10 +16,12 @@ import sharp from 'sharp'
 
 const argv = process.argv.slice(2)
 
+
 const flag = name => {
   const i = argv.indexOf(`--${name}`)
 
   return i >= 0 ? argv.splice(i, 2)[1] : undefined
+
 }
 
 const lienzo = flag('lienzo')
@@ -67,6 +69,7 @@ const pista = lienzo
       .extend({ left, right: W - left - w, top, bottom: H - top - h, extendWith: 'copy' })
       .blur(24)
       .png()
+
       .toBuffer()
   : await sharp(plate).resize(W, H).blur(60).modulate({ brightness: 0.6 }).png().toBuffer()
 
@@ -91,6 +94,7 @@ const mascara = await sharp({ create: { width: W, height: H, channels: 4, backgr
   .toBuffer()
 
 writeFileSync(`${tmp}-mascara.png`, mascara)
+
 
 const lugar = ancla === 'derecha' ? 'right' : ancla === 'izquierda' ? 'left' : 'central lower'
 const zonas = ancla === 'centro' ? `the top band, the side strips${abajo ? ' and the bottom band' : ''}` : `the ${ancla === 'derecha' ? 'left' : 'right'} side${h < H ? ' and the remaining bands' : ''}`
