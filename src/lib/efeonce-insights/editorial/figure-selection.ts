@@ -138,7 +138,10 @@ export const metricDirectionOf = (fact: Pick<EvidenceFactV1, 'metricId' | 'unit'
 
   if (own) return own
 
-  const declared = METRIC_DIRECTIONS[fact.metricId] ?? Object.entries(METRIC_DIRECTIONS).find(([key]) => key.endsWith('.') && fact.metricId.startsWith(key))?.[1]
+  const metricId = fact.metricId ?? ''
+
+  const declared =
+    METRIC_DIRECTIONS[metricId] ?? Object.entries(METRIC_DIRECTIONS).find(([key]) => key.endsWith('.') && metricId.startsWith(key))?.[1]
 
   if (declared) return declared
 

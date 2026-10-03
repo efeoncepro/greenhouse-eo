@@ -99,13 +99,19 @@ export const iconEffects = (value: string): FieldEffect[] | null => {
  */
 export const DELTA_VALUES = ['up', 'down', 'flat', 'up:better', 'up:worse', 'up:neutral', 'down:better', 'down:worse', 'down:neutral', 'flat:neutral'] as const
 
-export const parseDelta = (value: string): { direction: 'up' | 'down' | 'flat'; better: boolean } | null => {
+export const parseDelta = (value: string): { direction: 'up' | 'down' | 'flat'; better: boolean; tone: 'better' | 'worse' | 'neutral' } | null => {
   if (!(DELTA_VALUES as readonly string[]).includes(value)) return null
 
-  const [direction, tone] = value.split(':') as ['up' | 'down' | 'flat', string | undefined]
+  const [direction, declared] = value.split(':') as ['up' | 'down' | 'flat', 'better' | 'worse' | 'neutral' | undefined]
+  // Sin tono declarado se lee como el canvas de TASK-1889: subir es mejor; bajar, neutro (nunca rojo adivinado).
+  const tone = declared ?? (direction === 'up' ? 'better' : 'neutral')
 
-  return { direction, better: tone ? tone === 'better' : direction === 'up' }
+  return { direction, better: tone === 'better', tone }
 }
+
+/** TASK-1975 — clase de la píldora por tono semántico: verde mejor, rojo peor, gris neutro. */
+const DELTA_TONE_CLASS = { better: 'delta--better', worse: 'delta--worse', neutral: 'delta--plain' } as const
+const DELTA_TONE_GROUP = ['delta--better', 'delta--worse', 'delta--plain']
 
 export const deltaToneEffects = (value: string): FieldEffect[] | null => {
   const parsed = parseDelta(value)
@@ -113,7 +119,7 @@ export const deltaToneEffects = (value: string): FieldEffect[] | null => {
   if (!parsed) return null
 
   const effects: FieldEffect[] = [
-    { selector: ':field', toneClass: parsed.better ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] }
+    { selector: ':field', toneClass: DELTA_TONE_CLASS[parsed.tone], toneGroup: DELTA_TONE_GROUP }
   ]
 
   if (parsed.direction !== 'up') effects.push({ selector: '.delta-mark-up', remove: true })
@@ -191,7 +197,8 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
     { selector: ':self', styleProp: '--achieved', styleValue: `${((value / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--target', styleValue: `${((target / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--zone', styleValue: band === null ? '0%' : `${((band / scale) * 100).toFixed(1)}%` },
-    { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] },
+    // Meta alcanzada = mejor (verde); no alcanzada = peor (rojo) — tonos semánticos de TASK-1975.
+    { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--worse', toneGroup: DELTA_TONE_GROUP },
     { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
   ]
 

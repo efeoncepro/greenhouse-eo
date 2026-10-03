@@ -263,7 +263,8 @@ body { background: var(--axis-deck-role-navy); }
 
 .fig-note:empty { display: none; }
 
-/* Variación: la dirección se dice con forma (triángulo); el tono sólo distingue si subió. */
+/* Variación: la dirección se dice con forma (triángulo); el tono dice si el cambio es mejor (verde), peor (coral) o
+   neutro (TASK-1975, aprobado el 2026-10-03). */
 .delta-pill {
   display: flex;
   align-items: center;
@@ -279,9 +280,13 @@ body { background: var(--axis-deck-role-navy); }
 
 .delta-pill svg { display: block; flex-shrink: 0; }
 
-.delta--better { background: rgba(var(--axis-deck-role-navyAccent-rgb), 0.16); color: var(--axis-deck-role-navyAccent); }
+.delta--better { background: rgba(var(--axis-deck-role-deltaBetterOnNavy-rgb), 0.16); color: var(--axis-deck-role-deltaBetterOnNavy); }
 
-.delta--better .delta-mark { fill: var(--axis-deck-role-navyAccent); }
+.delta--better .delta-mark { fill: var(--axis-deck-role-deltaBetterOnNavy); }
+
+.delta--worse { background: rgba(var(--axis-deck-role-deltaWorseOnNavy-rgb), 0.16); color: var(--axis-deck-role-deltaWorseOnNavy); }
+
+.delta--worse .delta-mark { fill: var(--axis-deck-role-deltaWorseOnNavy); }
 
 .delta--plain { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.12); color: var(--axis-deck-role-navyInk); }
 
@@ -357,6 +362,10 @@ body { background: var(--axis-deck-role-navy); }
 .fig-delta { font-family: var(--axis-deck-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-deck-role-navyAccent); }
 
 .fig-delta--plain { fill: var(--axis-deck-role-dataPriorOnNavy); }
+
+.fig-delta--better { fill: var(--axis-deck-role-deltaBetterOnNavy); }
+
+.fig-delta--worse { fill: var(--axis-deck-role-deltaWorseOnNavy); }
 
 .fig-swatch--opportunity { width: 13px; box-sizing: border-box; border-radius: 3px; border: 1.3px dashed var(--axis-deck-role-dataOpportunityOnNavy); background: rgba(var(--axis-deck-role-dataOpportunityOnNavy-rgb), 0.14); }
 

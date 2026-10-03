@@ -134,7 +134,7 @@ describe('resolvers de figura', () => {
 
     expect(rpa).toContainEqual({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
     expect(rpa).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '90.9%' })
-    expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--better', toneGroup: ['delta--better', 'delta--plain'] })
+    expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--better', toneGroup: ['delta--better', 'delta--worse', 'delta--plain'] })
 
     // TASK-1974 — una figura con todas las metas: cada fila con SU dirección. RpA (menor es mejor) junto a OTD (mayor es
     // mejor) bajo la dirección de la figura: RpA 1,33 bajo 1,5 cumple; OTD 81,9 bajo 90 es la brecha.

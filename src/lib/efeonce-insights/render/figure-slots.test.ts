@@ -213,7 +213,9 @@ describe('una sola regla de variación: triángulo = valor, tono = mejor o peor'
   it('sin dirección declarada, tono neutro (nunca adivinado); sin cambio, plano', async () => {
     const { trendOf } = await import('./figure-slots')
 
-    expect(trendOf(9377, 10662, f({ metricId: 'clicks', unit: 'count' }), []).value).toBe('down:neutral')
+    expect(trendOf(9377, 10662, f({ metricId: 'delivered.completed', unit: 'count' }), []).value).toBe('down:neutral')
+    // Con dirección declarada por métrica (TASK-1974), los clics que bajan son peor.
+    expect(trendOf(9377, 10662, f({ metricId: 'clicks', unit: 'count' }), []).value).toBe('down:worse')
     expect(trendOf(3, 3, f({}), []).value).toBe('flat:neutral')
   })
 })

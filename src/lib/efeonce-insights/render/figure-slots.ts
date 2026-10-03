@@ -25,6 +25,7 @@ import type { EvidenceFactV1, EvidenceUnit } from '../contracts/evidence'
 import type { PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
+import { metricDirectionOf } from '../editorial/figure-selection'
 import { sourcesLabelOf } from '../presentation/vocabulary'
 
 export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend'
@@ -114,10 +115,10 @@ const directionValue = (direction: string | undefined): boolean | null =>
   direction === 'higher_is_better' ? true : direction === 'lower_is_better' ? false : null
 
 export const higherIsBetterOf = (fact: EvidenceFactV1, facts: Iterable<EvidenceFactV1>): boolean | null => {
-  const own = directionValue(fact.dimension?.direction)
+  // TASK-1974/1975 — la dirección del propio hecho, la declarada por métrica (`METRIC_DIRECTIONS`) o la de la posición.
+  const declared = metricDirectionOf(fact)
 
-  if (own !== null) return own
-  if (fact.unit === 'position') return false
+  if (declared) return declared === 'higher_is_better'
 
   for (const other of facts) {
     if (other === fact || other.module !== fact.module) continue

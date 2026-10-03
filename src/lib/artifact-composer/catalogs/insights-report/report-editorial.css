@@ -377,9 +377,15 @@ body { background: var(--axis-report-role-navy); }
 
 .delta-pill svg { display: block; flex-shrink: 0; }
 
-.delta--better { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
+/* TASK-1975 — tonos semánticos aprobados el 2026-10-03: verde mejor, rojo peor, gris neutro (sin dirección o sin
+   cambio). Siempre con el triángulo y la cifra: el color nunca es la única codificación. */
+.delta--better { background: rgba(var(--axis-report-role-deltaBetterOnPaper-rgb), 0.12); color: var(--axis-report-role-deltaBetterOnPaper); }
 
-.delta--better .delta-mark { fill: var(--axis-report-role-navyAccent); }
+.delta--better .delta-mark { fill: var(--axis-report-role-deltaBetterOnPaper); }
+
+.delta--worse { background: rgba(var(--axis-report-role-deltaWorseOnPaper-rgb), 0.1); color: var(--axis-report-role-deltaWorseOnPaper); }
+
+.delta--worse .delta-mark { fill: var(--axis-report-role-deltaWorseOnPaper); }
 
 .delta--plain { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
 
@@ -427,6 +433,10 @@ body { background: var(--axis-report-role-navy); }
 .fig-delta { font-family: var(--axis-report-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
 
 .fig-delta--plain { fill: var(--axis-report-role-labelMuted); }
+
+.fig-delta--better { fill: var(--axis-report-role-deltaBetterOnPaper); }
+
+.fig-delta--worse { fill: var(--axis-report-role-deltaWorseOnPaper); }
 
 /* Leyenda de columnas: muestra cuadrada y la de oportunidad con su borde discontinuo. */
 .figure-legend--columns .figure-legend-swatch { width: 10px; height: 10px; }

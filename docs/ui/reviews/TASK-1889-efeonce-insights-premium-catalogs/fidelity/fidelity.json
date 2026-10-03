@@ -4,9 +4,9 @@
     {
       "reference": "Deck-Agrupadas",
       "template": "InsightsFigureColumnsSlide",
-      "changed": 20503,
+      "changed": 20492,
       "total": 921600,
-      "ratio": 0.022247178819444446,
+      "ratio": 0.022235243055555555,
       "pass": true,
       "exception": "operador 2026-09-25: Corrimiento de 3 px del propio canvas; la plantilla queda alineada con las otras tres láminas de figura."
     },
@@ -61,9 +61,9 @@
     {
       "reference": "Premium-Agrupadas",
       "template": "ReportFigureColumnsPage",
-      "changed": 254,
+      "changed": 256,
       "total": 891662,
-      "ratio": 0.0002848613039470113,
+      "ratio": 0.00028710430634029487,
       "pass": true
     },
     {
