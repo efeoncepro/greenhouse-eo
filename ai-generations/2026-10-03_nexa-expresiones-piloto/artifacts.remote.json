@@ -1,0 +1,263 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T11:06:02.408Z",
+  "run": "ai-generations/2026-10-03_nexa-expresiones-piloto",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_nexa-expresiones-piloto",
+  "totalBytes": 289436879,
+  "fileCount": 42,
+  "files": [
+    {
+      "path": "a2-hoja-12.png",
+      "sizeBytes": 2076092,
+      "sha256": "57176d3571ba247c710fafd60cf4aa2a96f190c2a4ccf1882e8013fa5e5dda4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/a2-hoja-12.png"
+    },
+    {
+      "path": "ancla-1-v2-proporcion.png",
+      "sizeBytes": 17329787,
+      "sha256": "2937f1fe3d37383d2e80b74282a8543eb30e161c92c25d98717552ac8a850aa2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/ancla-1-v2-proporcion.png"
+    },
+    {
+      "path": "descartes/A2-25-mirada-lateral-izq.png",
+      "sizeBytes": 7552720,
+      "sha256": "abbd307d13924a7036c889a63845b705be051549f6603049ce257e53520677e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/descartes/A2-25-mirada-lateral-izq.png"
+    },
+    {
+      "path": "euforia-vista.png",
+      "sizeBytes": 1244553,
+      "sha256": "59d158168ce3baffcf3efed5b6500313ccecaacdb4bce54c537fb8f78b683807",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/euforia-vista.png"
+    },
+    {
+      "path": "faltantes-hoja.png",
+      "sizeBytes": 2758153,
+      "sha256": "3edc36497098163914d6647aedd87863c745a162b30e756f55f63483363c2fb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/faltantes-hoja.png"
+    },
+    {
+      "path": "ojos-12-25.png",
+      "sizeBytes": 761524,
+      "sha256": "eb8c4f746b4e80b966c3d28e296be139167298b2c347ca2e73228a516dc68c89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/ojos-12-25.png"
+    },
+    {
+      "path": "out/A-01-carcajada.png",
+      "sizeBytes": 8131687,
+      "sha256": "b40234d133016bb9b4ff96b9e9abeb7369deb6e0b05559648d016d2342539135",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A-01-carcajada.png"
+    },
+    {
+      "path": "out/A-04-esceptica.png",
+      "sizeBytes": 7703338,
+      "sha256": "a1a7ad3cc386bbd5c4157c576481d3183738ac637daf344b4b0f543524dc057b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A-04-esceptica.png"
+    },
+    {
+      "path": "out/A-08-conviccion.png",
+      "sizeBytes": 7522790,
+      "sha256": "0904a95982212f4bf906c000707715609cad5aea2d9787eaba37e5ef15be065e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A-08-conviccion.png"
+    },
+    {
+      "path": "out/A2-01-carcajada.png",
+      "sizeBytes": 8027232,
+      "sha256": "a2baf677d1580aadd02002d61450f40612b661523febcfc9542aeaa13dd83684",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-01-carcajada.png"
+    },
+    {
+      "path": "out/A2-02-risa-elegante.png",
+      "sizeBytes": 7629740,
+      "sha256": "85d0aba9bd1a514cf5c544dd36ede859727d3b572f8c8eaec6f0ef4aa24f0c77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-02-risa-elegante.png"
+    },
+    {
+      "path": "out/A2-03-sorprendida.png",
+      "sizeBytes": 7541615,
+      "sha256": "3c172a94f7a024130adb398a07fb5ac8573d5fa9d7057156750e02de48403c25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-03-sorprendida.png"
+    },
+    {
+      "path": "out/A2-04-esceptica.png",
+      "sizeBytes": 7685423,
+      "sha256": "db585c35561866a6d60513f807b6f56762f062419c784cf77e2948f2acd86648",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-04-esceptica.png"
+    },
+    {
+      "path": "out/A2-05-pensativa.png",
+      "sizeBytes": 7622236,
+      "sha256": "3b7bb83ba81ff340ff7e1309f3d838bb54e39b122c62c83908eb858c911d0c4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-05-pensativa.png"
+    },
+    {
+      "path": "out/A2-06-neutra-reposo.png",
+      "sizeBytes": 7673581,
+      "sha256": "11db091e4262cc91b3b7fb3a3a31732259f34c4cdd5b4b54a1a4024ce0371e3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-06-neutra-reposo.png"
+    },
+    {
+      "path": "out/A2-07-preocupada.png",
+      "sizeBytes": 7648828,
+      "sha256": "181d84888948bc58d35b549a946974c0a77977718493bc2f7508eeff5bd113b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-07-preocupada.png"
+    },
+    {
+      "path": "out/A2-08-conviccion.png",
+      "sizeBytes": 7513463,
+      "sha256": "72613f246cc9abb8661e7b7bbfe874c6514ce2b19b21c0c80b99db4a9c6bfa0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-08-conviccion.png"
+    },
+    {
+      "path": "out/A2-09-escucha-empatica.png",
+      "sizeBytes": 7835781,
+      "sha256": "2c228bc3057b3be00be206759ba97ec7564f5b2230b36ed7da901902e33520cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-09-escucha-empatica.png"
+    },
+    {
+      "path": "out/A2-10-curiosa.png",
+      "sizeBytes": 7769106,
+      "sha256": "b3a6138f348c91b001d4cf05e8b6c94ef3bd698672b55ed2be5dbd20b813701a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-10-curiosa.png"
+    },
+    {
+      "path": "out/A2-11-complicidad.png",
+      "sizeBytes": 7609187,
+      "sha256": "4711963a23ac1262057808ff6592aa48e682ea503137a53a160407120bee44e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-11-complicidad.png"
+    },
+    {
+      "path": "out/A2-12-mirada-lateral.png",
+      "sizeBytes": 7598313,
+      "sha256": "3ad780587e358a5a16fa090e55e6f410eb78dfb6f5758ea3e7dd5ca1be1a9fa8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-12-mirada-lateral.png"
+    },
+    {
+      "path": "out/A2-13-euforia.png",
+      "sizeBytes": 8031854,
+      "sha256": "2a86b0c3de338a578a820f221dc3d97cd56768e28a3f17404594ed304318ea14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-13-euforia.png"
+    },
+    {
+      "path": "out/A2-14-alivio.png",
+      "sizeBytes": 7767043,
+      "sha256": "8b7e9b575942cf752651ab8491dba2442996d3627217f5f8cff3a63a52a3ff68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-14-alivio.png"
+    },
+    {
+      "path": "out/A2-15-orgullo-sereno.png",
+      "sizeBytes": 7702113,
+      "sha256": "ff50fb5ae2cfa30a213690910fad6fb71eb87f15eb3f3aadbf4f91d376d0ec0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-15-orgullo-sereno.png"
+    },
+    {
+      "path": "out/A2-16-te-lo-dije.png",
+      "sizeBytes": 7715715,
+      "sha256": "015b30a6b45373ff94071b07cf77378c7b8ab4d4241813db232f0314e7c5a2a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-16-te-lo-dije.png"
+    },
+    {
+      "path": "out/A2-17-hartazgo.png",
+      "sizeBytes": 7575998,
+      "sha256": "3b1659b4298750a2b64e221c6b035f8d8d347115466dce80c56636ad27354a36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-17-hartazgo.png"
+    },
+    {
+      "path": "out/A2-18-agobio.png",
+      "sizeBytes": 8350635,
+      "sha256": "873c211f5651d1779b7352aa0797a57ebd71cd94ea1336495e44e96d8f803d2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-18-agobio.png"
+    },
+    {
+      "path": "out/A2-19-alarma.png",
+      "sizeBytes": 7882993,
+      "sha256": "0d49fb9bc70f7f9814ac1fefb82a170d6505d535ad195bb0617aab87d3055c8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-19-alarma.png"
+    },
+    {
+      "path": "out/A2-20-confusion.png",
+      "sizeBytes": 7770926,
+      "sha256": "3526cb6a3ed23e5bc891bfac85559fc794e1019c540144de26038054b624d2d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-20-confusion.png"
+    },
+    {
+      "path": "out/A2-21-concentracion.png",
+      "sizeBytes": 7599727,
+      "sha256": "a5a3ae640627fb9e605680a0608aa867c7754eefd72674cb24640e55bc9342a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-21-concentracion.png"
+    },
+    {
+      "path": "out/A2-22-determinacion.png",
+      "sizeBytes": 7616039,
+      "sha256": "d6f30d581251b186d4292a5bac91f45f17e2834ae50d862e707a5d04ccd34d55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-22-determinacion.png"
+    },
+    {
+      "path": "out/A2-23-explicando.png",
+      "sizeBytes": 7410666,
+      "sha256": "a5be606715e0ad1f6f6e21adfa3f6b4676f15360f51ec54f1dd0f848530baa01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-23-explicando.png"
+    },
+    {
+      "path": "out/A2-24-bienvenida.png",
+      "sizeBytes": 7453827,
+      "sha256": "75a8f30ca7884e7a291b6df0928b9951295bfbd4f6f8170118db20b3f3f5fe5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-24-bienvenida.png"
+    },
+    {
+      "path": "out/A2-25-mirada-lateral-izq.png",
+      "sizeBytes": 7467184,
+      "sha256": "ac99f093b2744c6b56cad591ff73c6068cc7efa881d890bf6f35735fb4fca01c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/A2-25-mirada-lateral-izq.png"
+    },
+    {
+      "path": "out/B-01-carcajada.png",
+      "sizeBytes": 7910714,
+      "sha256": "b75029fd36bd9d50b9d65d2611d2d6349ba9e2b444f5f371b1dec8e12c22c491",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/B-01-carcajada.png"
+    },
+    {
+      "path": "out/B-04-esceptica.png",
+      "sizeBytes": 7891586,
+      "sha256": "1ef650d043ea36694412d9ffb53096b7baf9b22c86a0effe514a61275f42adbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/B-04-esceptica.png"
+    },
+    {
+      "path": "out/B-08-conviccion.png",
+      "sizeBytes": 8124280,
+      "sha256": "b4c9e6418e2e70b28a40fe24a96d88da7afc9216853debd2892b7723e82c91ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/out/B-08-conviccion.png"
+    },
+    {
+      "path": "piloto-a2.png",
+      "sizeBytes": 4472512,
+      "sha256": "8f118741ba1de8c86b00cbaf191ea969151a6f49d69bd497135033388673e966",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/piloto-a2.png"
+    },
+    {
+      "path": "piloto-hoja-rotulada.png",
+      "sizeBytes": 4091294,
+      "sha256": "84ee85f688b027b38225292a69bfc976d214b0de2f4e37674095ab89c562efea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/piloto-hoja-rotulada.png"
+    },
+    {
+      "path": "piloto-hoja.png",
+      "sizeBytes": 4080100,
+      "sha256": "3074f43ec33a8ce93a880c855aaf8e093941dfda97d5a57b15a6d267b03c5928",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/piloto-hoja.png"
+    },
+    {
+      "path": "revision-25-17.png",
+      "sizeBytes": 1533256,
+      "sha256": "05b244fc098d9fb98a72c98450ddb964a36dfc0234f10c67f991829bf46d93a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/revision-25-17.png"
+    },
+    {
+      "path": "set-25.png",
+      "sizeBytes": 3753268,
+      "sha256": "2de21ca14652647e3824251dbe5efa5718967d262bc7be9c2e6811c92c920c16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-piloto/set-25.png"
+    }
+  ]
+}
