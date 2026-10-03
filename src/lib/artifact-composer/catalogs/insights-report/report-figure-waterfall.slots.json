@@ -156,7 +156,7 @@
         },
         "added": {
           "type": "string",
-          "required": true,
+          "required": false,
           "maxCharacters": 24,
           "maxLines": 1
         },
@@ -173,7 +173,7 @@
           "maxLines": 1
         }
       },
-      "notes": "Rótulo del total anterior y del actual (de los pasos `isTotal` del plan), «Sumó» y —sólo si algún paso resta— «Restó»."
+      "notes": "Rótulo del total anterior y del actual (de los pasos `isTotal` del plan), «Sumó» y —sólo si algún paso resta— «Restó». «Sumó» y «Restó» son opcionales: la leyenda sólo nombra los pasos que la figura dibuja."
     },
     "waterfallSteps": {
       "selector": "[data-slot='waterfallSteps']",

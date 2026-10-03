@@ -708,6 +708,36 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
       const ordered = [...deltas].sort((a, b) => (a.dimension?.rank === 'rest' ? 1 : b.dimension?.rank === 'rest' ? -1 : Number(a.dimension?.rank) - Number(b.dimension?.rank)))
       const chartId = `chart.${moduleKey}.drivers.${dimension}`
 
+      // TASK-1975 — la cascada tiene su propia lectura (sin ella, la página repetía la conclusión de las cifras): la cifra
+      // principal es el aporte de la consulta que más cambió (un hecho medido) y la conclusión la nombra, sin cifras nuevas.
+      const named = ordered.filter(fact => fact.dimension?.rank !== 'rest')
+      const top = [...named].sort((a, b) => Math.abs(b.value!) - Math.abs(a.value!))[0]
+
+      if (top) {
+        const gained = top.value! > 0
+        const period = windowLabelOf(previousTotal.window, locale)
+        const F = GH_INSIGHTS.figures
+
+        readings.push({
+          chartId,
+          keyFigure: {
+            factId: top.factId,
+            value: fmtCount(top.value),
+            caption: {
+              claimId: `caption.${chartId}`,
+              text: [F.waterfallCaption(gained, top.label, period), F.waterfallCaptionShort(gained, period)].find(text => text.length <= PLAN_TEXT_LIMITS.keyFigureCaption)!,
+              factIds: [top.factId]
+            }
+          },
+          conclusion: {
+            claimId: `conclusion.${chartId}`,
+            text: [F.waterfallConclusion(gained, top.label), F.waterfallConclusionShort(gained)].find(text => text.length <= PLAN_TEXT_LIMITS.conclusion)!,
+            factIds: [top.factId]
+          },
+          nextStep: null
+        })
+      }
+
       charts.push({
         specVersion: 'chart_spec_v1',
         chartId,
@@ -784,11 +814,16 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
   return { charts, claims, tables, readings }
 }
 
-/** Reemplaza la lectura genérica de cada figura de causas por la del productor de causas (mismo criterio que el hallazgo). */
+/**
+ * Reemplaza la lectura genérica de cada figura de causas por la del productor de causas (mismo criterio que el hallazgo).
+ * Una figura SIN lectura genérica (la cascada: TASK-1975) recibe la del productor; antes se perdía y la página repetía la
+ * conclusión de las cifras.
+ */
 const withDriverReadings = (readings: PlanFigureReadingV1[], driverReadings: PlanFigureReadingV1[]): PlanFigureReadingV1[] => {
   const byChart = new Map(driverReadings.map(reading => [reading.chartId, reading]))
+  const present = new Set(readings.map(reading => reading.chartId))
 
-  return readings.map(reading => byChart.get(reading.chartId) ?? reading)
+  return [...readings.map(reading => byChart.get(reading.chartId) ?? reading), ...driverReadings.filter(reading => !present.has(reading.chartId))]
 }
 
 export interface DeterministicPlanInput {

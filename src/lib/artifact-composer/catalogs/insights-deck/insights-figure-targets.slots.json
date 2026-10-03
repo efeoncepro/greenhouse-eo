@@ -205,8 +205,8 @@
           "name": {
             "type": "string",
             "required": true,
-            "maxCharacters": 26,
-            "maxLines": 1
+            "maxCharacters": 32,
+            "maxLines": 2
           },
           "unit": {
             "type": "string",

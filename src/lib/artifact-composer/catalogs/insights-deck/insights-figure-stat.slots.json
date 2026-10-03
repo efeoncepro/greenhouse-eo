@@ -117,10 +117,11 @@
         "text": {
           "type": "string",
           "required": true,
-          "maxCharacters": 64,
+          "maxCharacters": 96,
           "maxLines": 2
         }
-      }
+      },
+      "notes": "La lámina de cifras junta varias fuentes (Search Console, posiciones, tráfico estimado): admite hasta 96 caracteres en dos líneas."
     },
     "statCount": {
       "selector": "[data-slot='statCount']",

@@ -40,6 +40,9 @@
 
   /* Lo que resta va en el tono de oportunidad y con su signo «−» impreso: nunca sólo color. */
   .fig-wf-value--remove { fill: var(--axis-deck-role-dataOpportunityOnNavy); }
+
+  /* Una muestra sin su rótulo (paso ausente, campo quitado por el motor) no se dibuja. */
+  .fig-legend-item:not(:has([data-slot-field])) { display: none; }
 </style>
 </head>
 <body>

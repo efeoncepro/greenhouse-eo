@@ -247,6 +247,11 @@ export const GH_INSIGHTS = {
     driversEntityColumn: 'Consulta o página',
     driversRestLabel: 'Resto de consultas',
     driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
+    /** TASK-1975 — lectura de la cascada: la cifra es el aporte de la consulta que más cambió (un hecho, no una resta). */
+    waterfallCaption: (gained: boolean, label: string, period: string) => `clics ${gained ? 'más' : 'menos'} en «${label}» que en ${period}`,
+    waterfallCaptionShort: (gained: boolean, period: string) => `clics ${gained ? 'más' : 'menos'} que en ${period} en la consulta que más cambió`,
+    waterfallConclusion: (gained: boolean, label: string) => `«${label}» es la consulta que más ${gained ? 'sumó' : 'restó'} en el cambio de clics.`,
+    waterfallConclusionShort: (gained: boolean) => `Una consulta lidera lo que ${gained ? 'sumó' : 'restó'} en el cambio de clics.`,
     previousTotal: 'Período anterior',
     currentTotal: 'Este período',
     weeklyTitle: 'Clics orgánicos por semana',

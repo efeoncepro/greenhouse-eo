@@ -151,8 +151,9 @@ const compositionSpec = (chartId: string, family: Extract<FigureFamily, 'waffle'
     return { ...base, family, relation: 'composition', series: [], dimensionLabels: parts.map(fact => fact.label), data: { kind: 'waffle', parts: parts.map(fact => ({ partId: fact.metricId, label: fact.label, factId: fact.factId })), totalFactId: null } }
   }
 
-  // Dona: una serie de partes de un total. Barras: las partes ORDENADAS de mayor a menor (más de 4 categorías).
-  return { ...base, family, relation: family === 'donut' ? 'composition' : 'comparison', series: [{ seriesId: 'parts', label: title, factIds: parts.map(fact => fact.factId), unit: 'count' }], dimensionLabels: parts.map(fact => fact.label) }
+  // Dona: una serie de partes de un total. Barras: las partes ORDENADAS de mayor a menor (más de 4 categorías). La serie
+  // se rotula como el período, igual que las demás figuras: la leyenda la imprime (el título ya va en el tablero).
+  return { ...base, family, relation: family === 'donut' ? 'composition' : 'comparison', series: [{ seriesId: 'parts', label: GH_INSIGHTS.figures.currentLabel, factIds: parts.map(fact => fact.factId), unit: 'count' }], dimensionLabels: parts.map(fact => fact.label) }
 }
 
 /**

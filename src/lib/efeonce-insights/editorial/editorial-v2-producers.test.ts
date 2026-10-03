@@ -614,6 +614,13 @@ describe('TASK-1962 — más familias con evidencia: cascada de consultas y lín
     ] })
     // 10.662 − 354 − 149 − 782 = 9.377: el validador de la cascada (geometría compartida con el render) lo exige.
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+
+    // TASK-1975 — la cascada trae su propia lectura: la cifra es el aporte de la consulta que más cambió (un hecho) y la
+    // conclusión la nombra; sin ella, la página repetía la conclusión de las cifras.
+    const reading = plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.seo.drivers.query')!
+
+    expect(reading.keyFigure).toMatchObject({ factId: 'seo.driver.query.delta.w.1' })
+    expect(reading.conclusion!.text).toMatch(/es la consulta que más restó en el cambio de clics\.$/)
   })
 
   it('los clics por semana van en línea, este período contra el mismo bloque del anterior; no son hallazgos sueltos', () => {

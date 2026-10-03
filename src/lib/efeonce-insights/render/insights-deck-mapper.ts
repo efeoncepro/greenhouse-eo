@@ -141,7 +141,8 @@ const chapterSlides = (
           conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
           ...(deckLead ? { lead: rejectIfLonger(deckLead, 170, `${where}.lead`) } : {}),
           figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
-          source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 64, `${where}.source`) },
+          // La lámina de cifras junta varias fuentes: su molde admite dos líneas (96); el resto de las figuras, 64.
+          source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, figure.kind === 'stat' ? 96 : 64, `${where}.source`) },
           ...figure.body,
           ...(figure.closing.length > 0
             ? { closing: figure.closing.map(block => ({ ...block, text: rejectIfLonger(block.text, 160, `${where}.closing`) })) }

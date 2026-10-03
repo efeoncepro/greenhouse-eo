@@ -334,6 +334,7 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
 
     const stat = {
       figureId: 'stats.seo', question: 'value_change', title: 'Cifras del período',
+      note: { claimId: 'n', text: 'El tráfico estimado se calcula con la posición y el volumen.', factIds: [] },
       items: [
         { itemId: 'pos', label: 'Posición media', factId: 'pos', comparisonFactId: 'pos.prev', direction: 'lower_is_better', estimated: false },
         { itemId: 'etv', label: 'Tráfico estimado', factId: 'etv', comparisonFactId: null, direction: 'higher_is_better', estimated: true }
@@ -344,6 +345,8 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     const items = (slide!.body as { statItems: Array<Record<string, string>> }).statItems
 
     expect(slide!.keyFigure).toBeNull()
+    // La nota es una afirmación del plan: se imprime su texto, nunca el objeto.
+    expect((slide!.body as { note: { text: string } }).note.text).toBe('El tráfico estimado se calcula con la posición y el volumen.')
     expect(items[0]).toMatchObject({ name: 'Posición media', prefix: '#', value: '6,9', trend: 'up:worse', lowerIsBetter: 'Menor es mejor' })
     expect(items[0]!.versus).toMatch(/^vs <strong>#5,7<\/strong> en /)
     expect(items[1]).toMatchObject({ name: 'Tráfico estimado', estimated: 'Estimado', value: '—' })

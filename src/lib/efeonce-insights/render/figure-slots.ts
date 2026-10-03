@@ -479,10 +479,14 @@ export const buildFigureSlides = (
           ...(band ? { band: fmt(band, locale) } : {}),
           // Una métrica en % se lee contra la meta en puntos porcentuales («10,9 pp»): «114 %» de un porcentaje se
           // confunde con una variación. Las cantidades conservan el «% de la meta» del canvas («107 %»).
+          // Con «menos es mejor» se imprime la distancia a la meta en su unidad («0,50»): «67 % de la meta» se leería como
+          // que faltó. El triángulo (resolver) dice si quedó sobre o bajo la meta.
           pct:
             value.unit === 'percent'
               ? unsigned(formatDeltaForUnit(value.value!, target.value!, 'percent', locale) ?? '0 pp')
-              : `${Math.round((value.value! / target.value!) * 100)} %`
+              : lowerIsBetter
+                ? formatFactValue(Math.abs(value.value! - target.value!), value.unit, locale)
+                : `${Math.round((value.value! / target.value!) * 100)} %`
         }
       }]
     })
@@ -539,6 +543,7 @@ export const buildFigureSlides = (
 
     const unit = end.fact!.unit
     const removes = middle.some(entry => entry.fact!.value! < 0)
+    const adds = middle.some(entry => entry.fact!.value! >= 0)
 
     return [{
       kind,
@@ -547,7 +552,8 @@ export const buildFigureSlides = (
         {
           legend: {
             prior: start.step.label,
-            added: L.stepAdded,
+            // La leyenda sólo nombra lo que la figura dibuja: sin pasos que sumen, no hay «Sumó».
+            ...(adds ? { added: L.stepAdded } : {}),
             ...(removes ? { removed: L.stepRemoved } : {}),
             current: end.step.label
           },
@@ -815,7 +821,8 @@ export const buildStatSlides = (
           ...(view.noData ? { noData: view.noData } : {}),
           ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
         })),
-        ...(stat.note ? { note: { text: stat.note } } : {})
+        // La nota del tablero es una afirmación del plan (con sus hechos): se imprime su texto.
+        ...(stat.note ? { note: { text: stat.note.text } } : {})
       }
     }
   })

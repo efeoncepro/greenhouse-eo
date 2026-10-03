@@ -203,7 +203,9 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
     { selector: ':self', styleProp: '--zone', styleValue: band === null ? '0%' : `${((band / scale) * 100).toFixed(1)}%` },
     // Meta alcanzada = mejor (verde); no alcanzada = peor (rojo) — tonos semánticos de TASK-1975.
     { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--worse', toneGroup: DELTA_TONE_GROUP },
-    { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
+    // El triángulo dice dónde quedó el valor respecto de la meta (▲ sobre, ▼ bajo); el tono, si eso es bueno. Con «menos
+    // es mejor» (RpA, rondas) cumplir es quedar BAJO la meta: ▼ en verde, nunca un ▲ que sugiera lo contrario.
+    { selector: value >= target ? '.delta-mark-down' : '.delta-mark-up', remove: true }
   ]
 
   // Más oscuro = peor (Few): con «menos es mejor» la zona crítica queda SOBRE el límite, no bajo él.
