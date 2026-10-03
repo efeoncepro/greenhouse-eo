@@ -297,5 +297,5 @@ que le tape el pecho (`tapa`). En un grupo, cada prenda declara `persona`. El ki
 | Karo | **Elenco listo** |
 | Sophia | **Elenco listo** |
 | Isabella | **Elenco listo**, con su marca de carácter: pecas suaves en nariz y pómulos en todo el set **[criterio de Claude, a pedido del operador «vamos con todas»]**; ancla en alta resolución rehecha sin la frente craquelada |
-| Antonio | **Elenco listo**. Su ancla en alta resolución sigue con la frente rugosa aun rehecha: para primeros planos se usa `antonio-frente.png` (`antonio-ancla-hd-no-usar.png` queda como evidencia) |
+| Antonio | **Elenco listo**. Su ancla en alta resolución sigue con la frente rugosa aun rehecha: para primeros planos se usa `antonio-frente.png` (la ancla fallida quedó archivada con la exploración del elenco) |
 | Catálogo `ELENCO` | Registrado, sellado y publicado (§7.5) |

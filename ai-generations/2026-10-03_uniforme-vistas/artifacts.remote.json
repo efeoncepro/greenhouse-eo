@@ -1,11 +1,11 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-03T09:50:13.480Z",
+  "generatedAt": "2026-10-03T11:14:39.253Z",
   "run": "ai-generations/2026-10-03_uniforme-vistas",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-10-03_uniforme-vistas",
-  "totalBytes": 495412592,
-  "fileCount": 241,
+  "totalBytes": 503789254,
+  "fileCount": 246,
   "files": [
     {
       "path": "compuestas-hoja.png",
@@ -468,6 +468,36 @@
       "sizeBytes": 2658222,
       "sha256": "179e7a972953d7bc5360ef2f676b534fa434a6a875cf994782ae8851b1c455d9",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-ola23.png"
+    },
+    {
+      "path": "kit-bomber.png",
+      "sizeBytes": 1850015,
+      "sha256": "087b7b07c245007874b07e7d551971332e0b86bd07f76e3bb4e09b7c29acb92a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-bomber.png"
+    },
+    {
+      "path": "kit-gorra.png",
+      "sizeBytes": 442841,
+      "sha256": "a560cc790fd30f64dd98c97b63f3e55cfb7dba0ab58a55a1b9f8560e713bfa7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-gorra.png"
+    },
+    {
+      "path": "kit-hoodie.png",
+      "sizeBytes": 2128277,
+      "sha256": "0ced92cefe159720850e6ecaaa9392354353b0786148805c3b483be720076b29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-hoodie.png"
+    },
+    {
+      "path": "kit-polo.png",
+      "sizeBytes": 2080158,
+      "sha256": "239e29e2378f9790d515f2c7f875c502f320c19e003c48fdbe200ed274b1dd24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-polo.png"
+    },
+    {
+      "path": "kit-softshell.png",
+      "sizeBytes": 1875371,
+      "sha256": "ea6c92beb02ba2017877b3aaaf2618bcd295ea7fe85ad70e81dbf35c0fa7bd51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-softshell.png"
     },
     {
       "path": "letras-espaldas.png",

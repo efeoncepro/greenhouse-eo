@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-03T10:14:54.137Z",
+  "generatedAt": "2026-10-03T11:14:26.130Z",
   "run": "ai-generations/2026-10-03_nexa-expresiones-frente",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-10-03_nexa-expresiones-frente",

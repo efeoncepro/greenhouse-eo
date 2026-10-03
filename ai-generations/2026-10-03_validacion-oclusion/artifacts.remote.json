@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T11:15:00.107Z",
+  "run": "ai-generations/2026-10-03_validacion-oclusion",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_validacion-oclusion",
+  "totalBytes": 7284770,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "plates/validacion-hoja.png",
+      "sizeBytes": 2559164,
+      "sha256": "7817ee7052a0752a9cded87269e87fc171f1d782f17a2c0ddad1bd3a0191b47b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-oclusion/plates/validacion-hoja.png"
+    },
+    {
+      "path": "plates/validacion-marcas.png",
+      "sizeBytes": 801984,
+      "sha256": "072743673b3a35cc14a380959dab01f224b443f4ad54f98bd30da7301f21c2f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-oclusion/plates/validacion-marcas.png"
+    },
+    {
+      "path": "plates/VO-isabella-cruza.png",
+      "sizeBytes": 1976841,
+      "sha256": "aec95c010f6992c7baf57c66712709d4f02b8c780537daeb8c46a6c4d7709ec6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-oclusion/plates/VO-isabella-cruza.png"
+    },
+    {
+      "path": "plates/VO-karo-mano.png",
+      "sizeBytes": 1946781,
+      "sha256": "1a604d4367a77bc1c62d51eff8bf3dab1a124c853e044f8d4db366e69d4e60f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-oclusion/plates/VO-karo-mano.png"
+    }
+  ]
+}

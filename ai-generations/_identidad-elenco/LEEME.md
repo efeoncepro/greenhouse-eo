@@ -24,7 +24,7 @@ Ninguno es persona del equipo real. Interpretan el rol de su línea y no se pres
 | `<clave>-45-izq/45-der/perfil-izq/perfil-der.png` | Vistas; el nombre dice hacia qué lado **del cuadro** mira | sí, `vistas` |
 | `<clave>-manos.png` | Ancla de manos | no (para escenas de manos, se pasa a mano como referencia de piel) |
 | `<clave>-ancla-hd.png` | Ancla de rostro en alta resolución para primeros planos | no |
-| `antonio-ancla-hd-no-usar.png` | Ancla HD de Antonio: la frente sale rugosa al 100 %; usar `antonio-frente.png` | no |
+| ~~`antonio-ancla-hd-no-usar.png`~~ | Ancla HD de Antonio fallida (frente rugosa al 100 %): archivada el 2026-10-03 con la exploración del elenco (`2026-10-02_elenco-efeonce/descartes-identidad/`, `pnpm ai-gen:pull` para verla). Para primeros planos, `antonio-frente.png` | no |
 
 ## Cómo se hicieron
 

@@ -1,12 +1,18 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-03T09:47:54.189Z",
+  "generatedAt": "2026-10-03T11:14:22.651Z",
   "run": "ai-generations/2026-10-02_elenco-efeonce",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-10-02_elenco-efeonce",
-  "totalBytes": 349458831,
-  "fileCount": 192,
+  "totalBytes": 359328307,
+  "fileCount": 194,
   "files": [
+    {
+      "path": "descartes-identidad/antonio-ancla-hd-no-usar.png",
+      "sizeBytes": 7385950,
+      "sha256": "0f37d13703d8848b413d933162e743a7acb37f17b0d10669a70653518716127e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/descartes-identidad/antonio-ancla-hd-no-usar.png"
+    },
     {
       "path": "hum/hum-a.png",
       "sizeBytes": 2077632,
@@ -84,6 +90,12 @@
       "sizeBytes": 2229120,
       "sha256": "1d72c1fbb16d9340bcebc54335e9fa3cfc7f85acc89fc67dc1839dbd488062ef",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-A-b.png"
+    },
+    {
+      "path": "julio-edad-ab/julio-ab-hoja.png",
+      "sizeBytes": 2483526,
+      "sha256": "6d0d31a3186416d317444185dcee34e5290fd057ecab4e893601bb05dcad1e2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-ab-hoja.png"
     },
     {
       "path": "julio-edad-ab/julio-B-a.png",
