@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
+> **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
 > **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
 > **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
 > **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
@@ -183,6 +184,102 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **Wan 3.0 Prime** · `wan3prime-t2v`, `-i2v`, `-r2v` | Igual que base [contrato] | 1080p [contrato] | Igual | 30 | Igual | Igual | Igual; "versión acelerada" [oficial] | 0,05/s registro → 480p 0,068 · 720p 0,14 · **1080p 0,28** (más cara que base) [oficial] | Más rápida [oficial]; "hasta 7×" [tercero]; sin medir | Verificadas 2026-09-16 | No figura [tercero] |
 
 🔴 **Ninguna familia de esta matriz ofrece `4:5`** — medido en los cinco motores fal [verificado 2026-09-22]; Gemini Omni 1.1 Cloud publica sólo `16:9`/`9:16` [oficial]. En fal, el aspecto más cercano es `3:4`, y el camino a 4:5 es generar en 3:4 y recortar: ver la fila de 4:5 en §3.
+
+### 4.3 Video por operación y fase (operación × motor)
+
+Organiza §4.2 por **operación** según la [taxonomía de producción de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)
+(§3.5: preproducción, producción, posproducción). **Ningún motor es el default**: cada fila lista todos los que hacen
+la operación; se elige por contrato de fidelidad (§0) y por esta evidencia. Leído y armado el 2026-10-03.
+
+**Estado:** `[verificado AAAA-MM-DD]` = generación real nuestra que verificó el **contrato del endpoint** (resolución,
+duración, audio, que el CLI arma bien el pedido), según la leyenda de §1 · `[contrato]` = conectado, nunca corrido ·
+`[sin dato]` = no medido · `[mcp]` = sólo en un MCP de sesión de Claude (out-of-band, sin presupuesto gobernado ni
+manifiesto: no es carril de producción). **Canario** = corrida real con **garantía medida** y README de evidencia
+(ADR-024 req. 1); hoy hay **uno** en video. Precio: USD por segundo **publicado** a 720p · 1080p (§4.2 manda; donde
+el escalón difiere se indica). Los costos por canario están en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md).
+
+#### Preproducción
+
+| Operación | Herramienta | Estado | Nota |
+|---|---|---|---|
+| `pre.storyboard`, `pre.keyframe-still`, `pre.reference-build`, `pre.cast-sheet` | modelos de imagen (§2, §4.1): GPT Image 2.5, Seedream 5.0; `pnpm foto:*` para piezas de marca; `pnpm ai:inpaint` para corregir un still | ver §4.1 | El still de entrada se aprueba al 100 % antes de animarlo; la marca va resuelta ahí |
+| `pre.previs3d` | Blender vía puente MCP local `higgsfield-use-blender` | conectado 2026-09-24 (skill `higgsfield-provider`); playblast → referencia de movimiento **[sin dato]** como receta | Previs exportado → r2v: capacidad investigada, no receta validada (workflow de selección) |
+| `pre.pilot` | el motor más barato que conserve lo que se juzga: `h3turbo-*` 480P/768P, `flux3-*-draft`, `seedance20-mini-*` 480p, `wan3-*` 480p, Omni 360p | [verificado 2026-09-16] (Omni 2026-09-24) | §7.2 |
+| `pre.estimate` | `--estimate` (`ai:fal`, `ai:omni`), `--dry-run` (`ai:inpaint`); MCP Magnific `simulate_cost` [mcp] | [contrato] | La estimación no es techo de factura (§7.3, caso SKY V11) |
+
+#### Producción
+
+| Operación | Motor · id | Estado | Canario | USD/s 720p · 1080p | Nota |
+|---|---|---|---|---|---|
+| `gen.t2v` | Seedance 2.5 · `seedance25-t2v` | [verificado 2026-09-16] | no | 0,473 · 1,164 (el CLI estima 1,04 a 1080p) | hasta 30 s |
+| | Seedance 2.0 base/fast/mini/us · `seedance20-*-t2v` | [verificado 2026-09-16] | no | base 0,302 · ≈0,685; fast 0,242 · —; mini 0,155 · — | único 4K nativo-o-reescalado entregado (base) |
+| | Flux 3 · `flux3-t2v` (+ `-draft`) | [verificado 2026-09-16] | no | 0,17 · 0,29 (draft 0,06) | ≤ 20 s |
+| | Wan 3.0 / Prime · `wan3-t2v`, `wan3prime-t2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 (Prime 0,14 · 0,28) | 30 fps; ≤ 30 s, puede cortar entre encuadres |
+| | MiniMax H3 base/Max/Turbo · `h3-t2v`, `h3max-t2v`, `h3turbo-t2v` | [verificado 2026-09-16] | no | base 0,06 (768P) · 0,13 (2K reesc.); Max 0,04 · 0,08; Turbo 0,02 · 0,04 | audio siempre, sin toggle |
+| | Gemini Omni 1.1 · `ai:omni` modo texto | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 (output nominal) | 3–10 s; 16:9/9:16 |
+| | Higgsfield API · Kling 3.0 std/pro/4K/Turbo, Kling 2.6, LTX 2.5, PixVerse 6, Happy Horse, Hailuo 2.3, Wan 2.6/2.7, H3 2K | [contrato] (sólo `--estimate`) | no | por `--estimate` (§5.8) | ninguna capacidad de video corrida en salida |
+| `gen.i2v` | Seedance 2.5 · `seedance25-i2v` | [verificado 2026-09-16]; 1080×1920 entregado 2026-09-22 | no | 0,473 · 1,164 | filtro de personas reales y marcas, cobrado |
+| | Seedance 2.0 · `seedance20-*-i2v` | [verificado 2026-09-16] | no | ídem t2v | ídem filtro |
+| | Flux 3 · `flux3-i2v` (+ draft → `flux3-enhance`) | [verificado 2026-09-16] | no | 0,17 · 0,29 | enhance publicado [sin dato] |
+| | Wan 3.0 / Prime · `wan3-i2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 | prompt opcional |
+| | H3 base/Max/Turbo · `h3-i2v`, `h3max-i2v`, `h3turbo-i2v` | [verificado 2026-09-16] | no | ídem t2v | Max #1 AA imagen a video con audio [tercero] |
+| | Gemini Omni 1.1 · modo imagen | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | Social Wall publicado con el modelo anterior |
+| | Higgsfield API · `hf-kling3-*-i2v`, `hf-kling25turbo-i2v`, `hf-seedance*-i2v`, `hf-wan3-i2v` | [contrato] | no | `--estimate` | |
+| `gen.r2v` | Seedance 2.5 · `seedance25-r2v` (30 img · 10 video · 10 audio) | [verificado 2026-09-16]; 1080p 2026-09-22 | no | 0,473 · 1,164 (menos con video de referencia, §4.2) | el que más referencias acepta |
+| | Seedance 2.0 · `seedance20-*-r2v` (9/3/3, video sólo guía) | [verificado 2026-09-16] | no | ídem | |
+| | Wan 3.0 / Prime · `wan3-r2v` (10/5/5) | [verificado 2026-09-16] | no | 0,10 · 0,20 | sin filtro de personas reales observado |
+| | H3 base/Max · `h3-r2v`, `h3max-r2v` (9/3/3) | [verificado 2026-09-16]; CMP-001 2026-09-22 | no | ídem t2v | sin `--aspect` sale 1920×1080 horizontal |
+| | Gemini Omni 1.1 · modo referencias (10 img · 3 video) | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | |
+| | Higgsfield API · `hf-seedance*-r2v`, `hf-wan3-r2v`, `hf-grok-video15-r2v`; Kling `elements` vía `--input` | [contrato] | no | `--estimate` | `elements` = candidato a consistencia de cast |
+| `gen.flf` | Flux 3 · `flux3-flf` (ambos cuadros obligatorios) | [verificado 2026-09-16] | no | 0,17 · 0,29 | sin `auto` |
+| | Wan · `wan3-i2v --end-image`; Seedance 2.5/2.0 · `-i2v --end-image`; H3 · `h3*-i2v --end-image` | [verificado 2026-09-16] (generación; el último cuadro no se midió) | no | según familia | |
+| | Gemini Omni 1.1 · modo cuadros | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | |
+| | Higgsfield API · `hf-kling-o3-flf`, `hf-kling-omni-flf` | [contrato] | no | `--estimate` | |
+| `gen.keyframes` | Flux 3 · `flux3-keyframes` (1–10, `img@cuadro`) | [verificado 2026-09-16] | no | 0,17 · 0,29 (draft 0,06) | único con keyframes |
+| `gen.camera` | H3 Max · `h3max-camera` (≤ 12 keyframes de trayectoria) | [verificado 2026-09-16] | no | registro 0,025; escalones [sin dato] | escena congelada |
+| | Higgsfield Cinema Studio 4.0 (cámara, lente, rig de luz) | [mcp], fuera del catálogo de API | no | [sin dato] | |
+| `gen.source-doc` | Wan 3.0 · `wan3-r2v --thinking --web-url` / `--file` | web [verificado 2026-09-16]; `--file` [sin dato] | no | 0,10 · 0,20 | exige guion en el prompt |
+| `gen.multishot` | Seedance 2.0 (multi-shot declarado [oficial]); Wan 3.0 (puede cortar en 30 s [tercero]); Kling 3 `multi_prompt` vía Higgsfield [contrato] | [sin dato] como operación medida | no | según familia | |
+| `time.extend` | Seedance 2.5 · `seedance25-r2v --task extension` | [verificado 2026-09-16] | no | 0,473 · 1,164 (+ entrada) | sin personas ni marcas |
+| | Flux 3 · `flux3-extend` (+ draft) | [verificado 2026-09-16] | no | 0,41 · 0,53 | origen con audio; entrega sólo la continuación |
+| | Gemini Omni 1.1 · modo extender | [verificado 2026-09-24, 360p → 6 s] | no | 0,101 · 0,152 | aspecto heredado |
+| | Higgsfield API · `hf-seedance25-extend` | [contrato] | no | `--estimate` | |
+| `audio.native` | Seedance, Wan, Flux 3 (`--no-audio`), H3 (siempre), Omni (AAC) | [verificado] por familia | no | incluido | provisional por regla |
+| `cast.train` | H3 · `h3-train-*` + `h3-*-lora` | [contrato]; postergado [decisión] | no | piso 100 steps (§5.5) | |
+| | Higgsfield Soul ID | [mcp] / app | no | [sin dato] | |
+
+#### Posproducción
+
+| Operación | Motor · id | Estado | Canario | USD/s 720p · 1080p | Nota |
+|---|---|---|---|---|---|
+| `edit.zone` | `pnpm ai:inpaint video` + Flux 3 · `fal:flux3-edit` (máscara fija o cajas por keyframes) | [verificado 2026-09-16] | ✅ **sí**, 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`): 5 s cámara quieta, 120 cuadros PASS, deriva 11,16/255 (umbral 12) | 0,03 (720p) | único canario de video; cámara quieta |
+| | `pnpm ai:inpaint video` + `fal:seedance25-edit` (+ estrategia `first-frame`) | [contrato] (`verifiedAt: null` en el adaptador) | no | tokens de Seedance | nunca corrido |
+| `edit.global` | Flux 3 · `flux3-edit` | [verificado 2026-09-16] | no (sólo dentro de `edit.zone`) | 0,03 (720p) | sale a 720p |
+| | Seedance 2.5 · `seedance25-r2v --task editing` | [verificado 2026-09-16] | no | ≈ 0,284 con video de referencia (720p) | filtro cobrado |
+| | Gemini Omni 1.1 · modo editar | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | cadena stateful sin probar |
+| | Higgsfield API · `hf-seedance25-edit` | [contrato] | no | `--estimate` | |
+| | Magnific `video_modify` (Aleph 2, Seedance 2/2.5, Omni, H3, Grok) | [mcp] | no | créditos Magnific [sin dato USD] | |
+| `edit.erase` | — **ningún motor conectado** · candidato Wan VACE 14B inpainting (`fal-ai/wan-vace-14b/inpainting`, `mask_video_url`) | esquema leído (TASK-1965), sin conectar | no | [sin dato] | TASK-1979 |
+| `edit.track` | — · candidato SAM 2 video (`fal-ai/sam2/video`); hoy sólo cajas interpoladas en `ai:inpaint video` | esquema leído, sin conectar | no | [sin dato] | TASK-1979 |
+| `edit.background` | — en el CLI · Magnific `video_remove_background` (alfa en webm, ≤ 20 s) | [mcp] | no | créditos | TASK-1983 |
+| `edit.relight` | — en el CLI · Magnific `video_relight` (Beeble SwitchLight, ≤ 240 cuadros); Higgsfield Cinema Studio `video_edit`; candidatos fal ID-V2V y LightX (§10.3) | [mcp] / sin conectar | no | ID-V2V 0,20 · LightX 0,10 [tercero] | TASK-1984 |
+| `time.loop` | `gen.flf` con el mismo cuadro al inicio y al final (Flux 3, Wan, Seedance, H3); crossfade o palíndromo determinístico | [sin dato] como loop medido | no | según familia · 0 | TASK-1982 |
+| `time.retime` | ffmpeg (constante, local) · Magnific `video_speed` (constante gratis, rampas con créditos) | D sin CLI de manifiesto · [mcp] | no | 0 | TASK-1981 |
+| `time.interpolate` | — en el CLI · Topaz vía Magnific `video_upscale` (`frameInterpolation`) | [mcp] | no | créditos | follow-up |
+| `assemble.cut`, `assemble.edit` | ffmpeg / HyperFrames (determinístico); Magnific `video_cut`, `video_concatenate` | D sin CLI genérico · [mcp] | no | 0 | TASK-1981 |
+| `finish.overlay`, `finish.captions` | HyperFrames, ffmpeg, motor de Glitch (taller) | D por pieza | no | 0 | TASK-1981 |
+| `finish.grade` | ffmpeg `lut3d` (determinístico) · Magnific `video_color_grade` / `video_color_transfer` | D sin CLI · [mcp] | no | 0 · créditos | TASK-1981 |
+| `finish.reframe` | ffmpeg `crop` con medición manual de franjas (4:5 desde 3:4) · Aleph 2 `targetAspectRatio` vía Magnific | D manual · [mcp] | no | 0 | TASK-1981 |
+| `finish.upscale` | Flux 3 · `flux3-enhance` (sólo su propio draft) · H3 base 2K/4K (reescalado interno) · Magnific `video_upscale` (Topaz, Magnific) | [verificado 2026-09-16] · [mcp] | no | enhance [sin dato] · créditos | detalle nativo sin detector; TASK-1983 |
+| `audio.voice`, `audio.sfx` | ElevenLabs (MCP de sesión); motor de sonido de Glitch (taller) | [mcp] · D | no | [sin dato] | TASK-1985 |
+| `audio.music` | Stable Audio 2.5 / ElevenLabs Music v2.5 vía fal, fuera de `ai:fal` (§5.9) | [verificado 2026-09-27] (Glitch) | no | §5.9 | |
+| `audio.lipsync` | Seedance 2.x / Flux 3 (diálogo declarado [oficial]); Wan 3.0 (débil [tercero]); Higgsfield LipSync [mcp] | [sin dato] en español | no | según familia | TASK-1985 |
+| `audio.mix` | ffmpeg `loudnorm` | D sin CLI de manifiesto | no | 0 | TASK-1981 |
+| `deliver.export` | ffmpeg + hash | D manual | no | 0 | TASK-1981 |
+
+🔴 **Lo que la matriz deja a la vista:** de 30 operaciones de producción y post, **una** tiene canario de garantía
+(`edit.zone` con cámara quieta). Todo lo demás está, como mucho, verificado a nivel de contrato del endpoint, y nueve
+operaciones de post no tienen carril CLI. El plan para cerrarlo es EPIC-051.
 
 ---
 
@@ -994,7 +1091,7 @@ Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una
 | Nitidez de Seedance 2.5 a 1080p | Sin verificar | 5 s a 1080p revisado cuadro a cuadro |
 | **BFL FLUX Tools** (Erase, Outpainting) | No están en fal; API propia de BFL (`https://api.bfl.ai/v1/flux-tools/outpainting-v1` hasta 4 MP, desde USD 0,10/MP; `.../erase-v1` desde USD 0,034 por imagen). Requiere cuenta BFL del operador y el secreto `greenhouse-bfl-api-key` | Adaptador en `pnpm ai:inpaint` + canario comparativo contra clean plate, Sunburst y Flux Fill |
 | **Relight dedicado** | Ninguno conectado; estudio de mercado del 2026-10-03 sin verificar en vivo (§10.3) | Canario de un candidato contra `place --finish element` sobre el mismo composite |
-| **Video con máscara real** (Wan VACE + SAM 2) | Esquemas leídos, sin conectar | Task aparte con canario |
+| **Video con máscara real** (Wan VACE + SAM 2) | Esquemas leídos, sin conectar | TASK-1979 (EPIC-051) con canario; resto del programa de video en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md) |
 
 ---
 
@@ -1136,13 +1233,13 @@ inventó una ventana; el de estilos le cambió el color. Para un compuesto, el g
 <!-- INVENTARIO-GENERADO:INICIO -->
 <!-- NO EDITAR A MANO: lo regenera `pnpm models:inventory --write` desde los contratos de código. -->
 
-> **Inventario generado el 2026-10-02** desde `src/lib/ai/fal-capabilities.ts` y
+> **Inventario generado el 2026-10-03** desde `src/lib/ai/fal-capabilities.ts` y
 > `src/lib/ai/higgsfield-capabilities.ts`. Es la lista COMPLETA de lo que `pnpm ai:fal` puede ejecutar
 > —y por tanto de lo que puede **gastar**—. Si un id aparece acá y no tiene ficha en §5, la ficha es la que
 > falta. La columna «verificado» es la fecha de una generación real nuestra; `—` significa que **nadie la
 > ha corrido**, no que no funcione.
 
-**Carril fal · 56 capacidades** (51 con corrida real)
+**Carril fal · 58 capacidades** (53 con corrida real)
 
 | id | slug | tipo | operación | verificado |
 |---|---|---|---|---|
@@ -1176,6 +1273,8 @@ inventó una ventana; el de estilos le cambió el color. Para un compuesto, el g
 | `h3max-t2v` | `minimax/h3-max/text-to-video` | video | text-to-video | 2026-09-16 |
 | `h3turbo-i2v` | `minimax/h3-max-turbo/image-to-video` | video | image-to-video | 2026-09-16 |
 | `h3turbo-t2v` | `minimax/h3-max-turbo/text-to-video` | video | text-to-video | 2026-09-16 |
+| `iclight-v2` | `fal-ai/iclight-v2` | image | relight | 2026-10-03 |
+| `image-apps-relighting` | `fal-ai/image-apps-v2/relighting` | image | relight | 2026-10-03 |
 | `seedance20-fast-i2v` | `bytedance/seedance-2.0/fast/image-to-video` | video | image-to-video | 2026-09-16 |
 | `seedance20-fast-r2v` | `bytedance/seedance-2.0/fast/reference-to-video` | video | reference-to-video | 2026-09-16 |
 | `seedance20-fast-t2v` | `bytedance/seedance-2.0/fast/text-to-video` | video | text-to-video | 2026-09-16 |

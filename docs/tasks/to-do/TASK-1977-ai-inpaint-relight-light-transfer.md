@@ -4,6 +4,10 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-03
+
+- El follow-up «relight de video» quedó como `TASK-1984` (EPIC-051), bloqueada por esta task: extiende el núcleo de luz a secuencias con coherencia temporal y compara contra un relight de video dedicado. No duplicar acá.
+
 ## Status
 
 - Lifecycle: `to-do`

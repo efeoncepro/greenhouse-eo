@@ -139,6 +139,13 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
   (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
   (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
 
+### Video: clasificar por operación y fase
+
+Para video, la pregunta no es «¿qué modelo?» sino «¿qué operación de qué fase?»: la
+[taxonomía de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) fija el vocabulario
+(pre, producción, post) y la guía §4.3 cruza cada operación con todos los motores que la hacen, separando
+`[verificado]` (contrato del endpoint) de **canario de garantía** (medido). No hay motor por defecto.
+
 ### Editar lo que ya existe: otra pregunta, otro árbol
 
 «¿Con qué genero?» y «¿con qué edito sin tocar el resto?» **no tienen la misma respuesta**: el ranking de edición no

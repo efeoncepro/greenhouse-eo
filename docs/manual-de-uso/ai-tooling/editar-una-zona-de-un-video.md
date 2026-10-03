@@ -113,7 +113,7 @@ intento (guia de seleccion, §6.8).
 ## Que no hacer
 
 - **No edites con la camara en movimiento y una mascara fija**: la zona queda pegada a la pantalla, no al objeto.
-  Usa keyframes o espera el seguimiento automatico (follow-up de TASK-1965: VACE + SAM2, en una task aparte).
+  Usa keyframes o espera el seguimiento automatico (TASK-1979: SAM 2 + VACE).
 - **No subas `--max-drift` para forzar un clip que aborto** sin mirar `engine-raw.mp4`: el aborto existe porque
   recomponer sobre un encuadre corrido se ve fantasma. Ojo: el aborto ocurre despues de recibir la salida del motor,
   asi que ese intento ya se pago.
@@ -147,7 +147,7 @@ Para un agente que opera `pnpm ai:inpaint video` sin supervision continua. El co
 ¿La camara esta quieta?
 ├─ si, y la zona no se mueve ....... --mask mascara.png              (mascara fija, del tamano del video)
 ├─ la zona se desplaza ............. --mask-keyframes zona.json       (caja interpolada en linea recta)
-└─ camara en movimiento ............ no hay seguimiento automatico: esperar el follow-up (VACE + SAM2) o no editar
+└─ camara en movimiento ............ no hay seguimiento automatico: esperar TASK-1979 (SAM 2 + VACE) o no editar
 
 Motor y estrategia
 ├─ default, verificado 2026-10-02 .. --engine fal:flux3-edit --strategy edit-recompose

@@ -73,6 +73,14 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+**Clasificar antes de producir:** toda pieza de video se clasifica primero con la
+[taxonomía de producción de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md):
+pieza, nivel, contrato de fidelidad, operaciones por fase (preproducción, producción, posproducción), cast,
+referencias, texto, audio, formato y derechos. Es **neutral de motor**: cada operación la resuelven varios
+motores (Seedance, Flux 3, Wan, H3, Omni, Kling vía Higgsfield…) y la
+[guía §4.3](../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) dice cuáles y con qué
+evidencia (sólo `edit.zone` tiene canario de garantía al 2026-10-03). Programa de capacidades: EPIC-051.
+
 Para producción de principio a fin, empieza por el
 [método operativo](../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md).
 Carga sólo la etapa necesaria: [preproducción y producción](companions/video-preproduction-and-production.md),

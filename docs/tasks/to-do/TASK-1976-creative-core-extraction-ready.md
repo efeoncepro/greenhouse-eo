@@ -4,6 +4,10 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-03
+
+- EPIC-051 (producción de video con IA) agrega núcleo nuevo en `scripts/ai/inpaint/` (TASK-1979: máscara por cuadro, detector de residuo; TASK-1984: luz temporal) y en `scripts/ai/video/` (TASK-1980–1983, 1985: métricas, costura, reencuadre, detalle). El manifiesto y el gate de frontera de esta task deberían cubrir también `scripts/ai/video/**`; el código nuevo nace puro y sin I/O para que esta task lo absorba sin reescribirlo.
+
 ## Status
 
 - Lifecycle: `to-do`
