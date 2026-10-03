@@ -1,0 +1,31 @@
+{
+  "schema": "efeonce.foto.isotipo.v2",
+  "plate": "EC2-final.png",
+  "salida": "EC2-c-3karo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.10",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "marca": "isotipo",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.5776,
+      0.5672
+    ],
+    "ancho": 0.022,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "oclusion": {
+    "pixelesEnCaja": 872,
+    "pixelesDeMarcaTapados": 0
+  },
+  "pliegues": {
+    "intensidad": 1,
+    "relieve": 1
+  },
+  "creado": "2026-10-03T09:11:31.371Z"
+}

@@ -1,319 +1,581 @@
 {
-  "prenda": "Polo piqué Efeonce (ropa corporativa del equipo)",
-  "decision": "Prenda principal del equipo frente a cliente. Navy #023c70 con emblema bordado en hilo blanco (elegida por el operador) y blanco con bordado navy como segunda. El bordado tono sobre tono se descartó: el logo se perdía.",
-  "invariantes": {
-    "construccion": "piqué de algodón peso medio, corte regular entallado, tapeta de tres botones tono sobre tono, cuello y puños de punto plano, aberturas laterales, sin bolsillo ni etiqueta visible",
-    "emblema": "isotipo BORDADO en el pecho izquierdo, ~7 cm de ancho, a un palmo bajo la costura del hombro; hilo blanco sobre navy y navy #023c70 sobre blanco",
-    "espalda": "limpia. La estampa de logo + eslogan es de merch, no de ropa corporativa",
-    "realismo": "contrato de realismo en el prompt (lente 100 mm, arrugas asimétricas, textura del piqué, puntada satinada con relieve)"
+ "prenda": "Polo piqué Efeonce (ropa corporativa del equipo)",
+ "decision": "Prenda principal del equipo frente a cliente. Navy #023c70 con emblema bordado en hilo blanco (elegida por el operador) y blanco con bordado navy como segunda. El bordado tono sobre tono se descartó: el logo se perdía.",
+ "invariantes": {
+  "construccion": "piqué de algodón peso medio, corte regular entallado, tapeta de tres botones tono sobre tono, cuello y puños de punto plano, aberturas laterales, sin bolsillo ni etiqueta visible",
+  "emblema": "isotipo BORDADO en el pecho izquierdo, ~7 cm de ancho, a un palmo bajo la costura del hombro; hilo blanco sobre navy y navy #023c70 sobre blanco",
+  "espalda": "limpia. La estampa de logo + eslogan es de merch, no de ropa corporativa",
+  "realismo": "contrato de realismo en el prompt (lente 100 mm, arrugas asimétricas, textura del piqué, puntada satinada con relieve)"
+ },
+ "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo de la persona. En prendas corporativas el emblema va bordado y sin eslogan.",
+ "vistas": [
+  {
+   "color": "blanco",
+   "id": "01-frente",
+   "descripcion": "Frente (maniquí invisible)",
+   "cuando_usarla": "tomas frontales; referencia por defecto",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-01-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
   },
-  "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo de la persona. En prendas corporativas el emblema va bordado y sin eslogan.",
-  "vistas": [
-    {
-      "color": "blanco",
-      "id": "01-frente",
-      "descripcion": "Frente (maniquí invisible)",
-      "cuando_usarla": "tomas frontales; referencia por defecto",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-01-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "blanco",
-      "id": "02-espalda",
-      "descripcion": "Espalda limpia, sin estampa",
-      "cuando_usarla": "tomas de espaldas",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-02-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "blanco",
-      "id": "03-tres-cuartos-izquierda",
-      "descripcion": "Tres cuartos izquierda",
-      "cuando_usarla": "sujeto girado hacia su derecha",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "blanco",
-      "id": "08-plano-frente",
-      "descripcion": "Plano cenital, frente",
-      "cuando_usarla": "mockups",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "blanco",
-      "id": "10-detalle-bordado",
-      "descripcion": "Macro del bordado del pecho",
-      "cuando_usarla": "primeros planos y verificación del bordado",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "blanco",
-      "id": "13-puesto-frente",
-      "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
-      "cuando_usarla": "caída en el cuerpo",
-      "archivo_fondo_estudio": "efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "01-frente",
-      "descripcion": "Frente (maniquí invisible)",
-      "cuando_usarla": "tomas frontales; referencia por defecto",
-      "archivo_fondo_estudio": "efeonce-polo-navy-01-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "02-espalda",
-      "descripcion": "Espalda limpia, sin estampa",
-      "cuando_usarla": "tomas de espaldas",
-      "archivo_fondo_estudio": "efeonce-polo-navy-02-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "03-tres-cuartos-izquierda",
-      "descripcion": "Tres cuartos izquierda",
-      "cuando_usarla": "sujeto girado hacia su derecha",
-      "archivo_fondo_estudio": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "04-tres-cuartos-derecha",
-      "descripcion": "Tres cuartos derecha",
-      "cuando_usarla": "sujeto girado hacia su izquierda",
-      "archivo_fondo_estudio": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "05-lateral",
-      "descripcion": "Lateral",
-      "cuando_usarla": "perfiles",
-      "archivo_fondo_estudio": "efeonce-polo-navy-05-lateral-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-05-lateral-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "06-doblado",
-      "descripcion": "Doblado",
-      "cuando_usarla": "bodegón, entrega de bienvenida",
-      "archivo_fondo_estudio": "efeonce-polo-navy-06-doblado-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-06-doblado-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "07-percha",
-      "descripcion": "En percha",
-      "cuando_usarla": "vestuario, tienda interna",
-      "archivo_fondo_estudio": "efeonce-polo-navy-07-percha-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-07-percha-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "08-plano-frente",
-      "descripcion": "Plano cenital, frente",
-      "cuando_usarla": "mockups",
-      "archivo_fondo_estudio": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "09-plano-espalda",
-      "descripcion": "Plano cenital, espalda",
-      "cuando_usarla": "mockups de espalda",
-      "archivo_fondo_estudio": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "10-detalle-bordado",
-      "descripcion": "Macro del bordado del pecho",
-      "cuando_usarla": "primeros planos y verificación del bordado",
-      "archivo_fondo_estudio": "efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "11-detalle-cuello-tapeta",
-      "descripcion": "Detalle de cuello y tapeta",
-      "cuando_usarla": "primeros planos de acabado",
-      "archivo_fondo_estudio": "efeonce-polo-navy-11-detalle-cuello-tapeta-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "12-detalle-puno-abertura",
-      "descripcion": "Macro de puño y abertura lateral",
-      "cuando_usarla": "primeros planos de acabado",
-      "archivo_fondo_estudio": "efeonce-polo-navy-12-detalle-puno-abertura-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "13-puesto-frente",
-      "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
-      "cuando_usarla": "caída en el cuerpo",
-      "archivo_fondo_estudio": "efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "14-puesto-espalda",
-      "descripcion": "Puesto, espalda, cuerpo neutro sin rostro",
-      "cuando_usarla": "tomas de espaldas con persona",
-      "archivo_fondo_estudio": "efeonce-polo-navy-14-puesto-espalda-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "color": "navy",
-      "id": "15-puesto-frente-cuerpo-b",
-      "descripcion": "Puesto, frente, otro cuerpo y tono de piel",
-      "cuando_usarla": "evitar un único tipo de modelo",
-      "archivo_fondo_estudio": "efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "id": "navy-16-puesto-espalda-mujer",
-      "descripcion": "El polo navy puesto, vista de espalda, en cuerpo femenino, sin rostro. La espalda va LIMPIA.",
-      "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el polo. La vista 14 es la misma toma en cuerpo masculino.",
-      "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
-      "resolucion": "1024x1536",
-      "brief": "brief/polo-navy-puesto-espalda-mujer.prompt.txt",
-      "nota": "Generada SIN referencia de arte: el polo es la única prenda de espalda limpia, y pasarle la estampa empuja al modelo a imprimirla igual."
-    },
-    {
-      "id": "navy-02-espalda-v02",
-      "descripcion": "La prenda sola, espalda, con el logo y eslogan BORDADOS.",
-      "cuando_usarla": "La referencia de construcción de la espalda desde el 2026-09-21.",
-      "archivo_fondo": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-fondo-estudio.png",
-      "resolucion": "1024x1024",
-      "brief": "brief/navy-02-espalda.prompt.txt",
-      "archivo_transparente": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-transparente.png"
-    },
-    {
-      "id": "navy-09-plano-espalda-v02",
-      "descripcion": "Plano cenital de la espalda con el bordado.",
-      "cuando_usarla": "Mockups y composiciones planas.",
-      "archivo_fondo": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-fondo-estudio.png",
-      "resolucion": "1024x1024",
-      "brief": "brief/navy-09-plano-espalda.prompt.txt",
-      "archivo_transparente": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-transparente.png"
-    },
-    {
-      "id": "navy-14-puesto-espalda-v02",
-      "descripcion": "Puesta de espalda en cuerpo masculino, sin rostro.",
-      "cuando_usarla": "Asset de USO: alguien de espaldas con el polo.",
-      "archivo_fondo": "final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png",
-      "resolucion": "1024x1536",
-      "brief": "brief/navy-14-puesto-espalda.prompt.txt"
-    },
-    {
-      "id": "navy-16-puesto-espalda-mujer-v02",
-      "descripcion": "Puesta de espalda en cuerpo femenino, sin rostro.",
-      "cuando_usarla": "Asset de USO con una mujer de espaldas.",
-      "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png",
-      "resolucion": "1024x1536",
-      "brief": "brief/navy-16-puesto-espalda-mujer.prompt.txt"
-    },
-    {
-      "id": "blanco-02-espalda-v02",
-      "descripcion": "El polo BLANCO, espalda, con el bordado en hilo navy.",
-      "cuando_usarla": "La variante clara; el hilo invierte a navy.",
-      "archivo_fondo": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-fondo-estudio.png",
-      "resolucion": "1024x1024",
-      "brief": "brief/blanco-02-espalda.prompt.txt",
-      "archivo_transparente": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-transparente.png"
-    }
-  ],
-  "delta_2026_09_21": "Se agrega la espalda puesta en cuerpo femenino. El kit sólo la tenía en cuerpo masculino.",
-  "delta_2026_09_21_espalda_bordada": "🔴 CAMBIO DE PRODUCTO. El operador REVIRTIÓ su decisión del 2026-09-17 («la única prenda con espalda limpia es el polo»): desde el 2026-09-21 el polo lleva en la espalda el logo y el eslogan, BORDADOS. Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce, y ése era el hueco que no se podía tapar de otra forma. Diferencia con el hoodie y las chaquetas: ahí la espalda es SERIGRAFÍA plastisol; en el polo es BORDADO de puntada satinada con relieve, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado. El arte se compone determinísticamente con `estampa-espalda.mjs` (dos versiones: hilo blanco para el polo navy, hilo navy para el blanco) y al modelo sólo se le pide la puntada. Las vistas de espalda v01 quedan OBSOLETAS: documentan el producto anterior y no deben usarse."
+  {
+   "color": "blanco",
+   "id": "02-espalda",
+   "descripcion": "Espalda limpia, sin estampa",
+   "cuando_usarla": "tomas de espaldas",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-02-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "blanco",
+   "id": "03-tres-cuartos-izquierda",
+   "descripcion": "Tres cuartos izquierda",
+   "cuando_usarla": "sujeto girado hacia su derecha",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "blanco",
+   "id": "08-plano-frente",
+   "descripcion": "Plano cenital, frente",
+   "cuando_usarla": "mockups",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "blanco",
+   "id": "10-detalle-bordado",
+   "descripcion": "Macro del bordado del pecho",
+   "cuando_usarla": "primeros planos y verificación del bordado",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "blanco",
+   "id": "13-puesto-frente",
+   "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
+   "cuando_usarla": "caída en el cuerpo",
+   "archivo_fondo_estudio": "efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "01-frente",
+   "descripcion": "Frente (maniquí invisible)",
+   "cuando_usarla": "tomas frontales; referencia por defecto",
+   "archivo_fondo_estudio": "efeonce-polo-navy-01-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "02-espalda",
+   "descripcion": "Espalda limpia, sin estampa",
+   "cuando_usarla": "tomas de espaldas",
+   "archivo_fondo_estudio": "efeonce-polo-navy-02-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "03-tres-cuartos-izquierda",
+   "descripcion": "Tres cuartos izquierda",
+   "cuando_usarla": "sujeto girado hacia su derecha",
+   "archivo_fondo_estudio": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "04-tres-cuartos-derecha",
+   "descripcion": "Tres cuartos derecha",
+   "cuando_usarla": "sujeto girado hacia su izquierda",
+   "archivo_fondo_estudio": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "05-lateral",
+   "descripcion": "Lateral",
+   "cuando_usarla": "perfiles",
+   "archivo_fondo_estudio": "efeonce-polo-navy-05-lateral-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-05-lateral-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "06-doblado",
+   "descripcion": "Doblado",
+   "cuando_usarla": "bodegón, entrega de bienvenida",
+   "archivo_fondo_estudio": "efeonce-polo-navy-06-doblado-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-06-doblado-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "07-percha",
+   "descripcion": "En percha",
+   "cuando_usarla": "vestuario, tienda interna",
+   "archivo_fondo_estudio": "efeonce-polo-navy-07-percha-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-07-percha-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "08-plano-frente",
+   "descripcion": "Plano cenital, frente",
+   "cuando_usarla": "mockups",
+   "archivo_fondo_estudio": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "09-plano-espalda",
+   "descripcion": "Plano cenital, espalda",
+   "cuando_usarla": "mockups de espalda",
+   "archivo_fondo_estudio": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "10-detalle-bordado",
+   "descripcion": "Macro del bordado del pecho",
+   "cuando_usarla": "primeros planos y verificación del bordado",
+   "archivo_fondo_estudio": "efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "11-detalle-cuello-tapeta",
+   "descripcion": "Detalle de cuello y tapeta",
+   "cuando_usarla": "primeros planos de acabado",
+   "archivo_fondo_estudio": "efeonce-polo-navy-11-detalle-cuello-tapeta-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "12-detalle-puno-abertura",
+   "descripcion": "Macro de puño y abertura lateral",
+   "cuando_usarla": "primeros planos de acabado",
+   "archivo_fondo_estudio": "efeonce-polo-navy-12-detalle-puno-abertura-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "13-puesto-frente",
+   "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
+   "cuando_usarla": "caída en el cuerpo",
+   "archivo_fondo_estudio": "efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "14-puesto-espalda",
+   "descripcion": "Puesto, espalda, cuerpo neutro sin rostro",
+   "cuando_usarla": "tomas de espaldas con persona",
+   "archivo_fondo_estudio": "efeonce-polo-navy-14-puesto-espalda-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "color": "navy",
+   "id": "15-puesto-frente-cuerpo-b",
+   "descripcion": "Puesto, frente, otro cuerpo y tono de piel",
+   "cuando_usarla": "evitar un único tipo de modelo",
+   "archivo_fondo_estudio": "efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "id": "navy-16-puesto-espalda-mujer",
+   "descripcion": "El polo navy puesto, vista de espalda, en cuerpo femenino, sin rostro. La espalda va LIMPIA.",
+   "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el polo. La vista 14 es la misma toma en cuerpo masculino.",
+   "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-puesto-espalda-mujer.prompt.txt",
+   "nota": "Generada SIN referencia de arte: el polo es la única prenda de espalda limpia, y pasarle la estampa empuja al modelo a imprimirla igual."
+  },
+  {
+   "id": "navy-02-espalda-v02",
+   "descripcion": "La prenda sola, espalda, con el logo y eslogan BORDADOS.",
+   "cuando_usarla": "La referencia de construcción de la espalda desde el 2026-09-21.",
+   "archivo_fondo": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/navy-02-espalda.prompt.txt",
+   "archivo_transparente": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-transparente.png"
+  },
+  {
+   "id": "navy-09-plano-espalda-v02",
+   "descripcion": "Plano cenital de la espalda con el bordado.",
+   "cuando_usarla": "Mockups y composiciones planas.",
+   "archivo_fondo": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/navy-09-plano-espalda.prompt.txt",
+   "archivo_transparente": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-transparente.png"
+  },
+  {
+   "id": "navy-14-puesto-espalda-v02",
+   "descripcion": "Puesta de espalda en cuerpo masculino, sin rostro.",
+   "cuando_usarla": "Asset de USO: alguien de espaldas con el polo.",
+   "archivo_fondo": "final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/navy-14-puesto-espalda.prompt.txt"
+  },
+  {
+   "id": "navy-16-puesto-espalda-mujer-v02",
+   "descripcion": "Puesta de espalda en cuerpo femenino, sin rostro.",
+   "cuando_usarla": "Asset de USO con una mujer de espaldas.",
+   "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/navy-16-puesto-espalda-mujer.prompt.txt"
+  },
+  {
+   "id": "blanco-02-espalda-v02",
+   "descripcion": "El polo BLANCO, espalda, con el bordado en hilo navy.",
+   "cuando_usarla": "La variante clara; el hilo invierte a navy.",
+   "archivo_fondo": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/blanco-02-espalda.prompt.txt",
+   "archivo_transparente": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-transparente.png"
+  },
+  {
+   "id": "polo-navy-17-puesto-frente-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente.",
+   "cuando_usarla": "Asset de USO con una persona mujer de frente. Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-17-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-17-puesto-frente-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-18-puesto-45-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-18-puesto-45-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-18-puesto-45-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-19-puesto-45-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-19-puesto-45-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-19-puesto-45-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-20-puesto-70-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-20-puesto-70-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-20-puesto-70-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-21-puesto-70-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-21-puesto-70-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-21-puesto-70-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-22-puesto-45-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-22-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-22-puesto-45-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-23-puesto-45-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-23-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-23-puesto-45-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-24-puesto-70-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-24-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-24-puesto-70-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-25-puesto-70-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-25-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-25-puesto-70-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-26-puesto-frente-mano",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: la mano del portador sobre el pecho tapa la mitad de la marca; el resto se ve a su tamaño real.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (mano). Lo pide `tapa: \"mano\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-26-puesto-frente-mano-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-26-puesto-frente-mano.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-27-puesto-frente-mano-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: la mano del portador sobre el pecho tapa la mitad de la marca; el resto se ve a su tamaño real.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (mano). Lo pide `tapa: \"mano\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-27-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-27-puesto-frente-mano-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-28-puesto-frente-brazos",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: brazos cruzados; el antebrazo queda bajo la marca, que se ve entera.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (brazos). Lo pide `tapa: \"brazos\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-28-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-28-puesto-frente-brazos.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-29-puesto-frente-brazos-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: brazos cruzados; el antebrazo queda bajo la marca, que se ve entera.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (brazos). Lo pide `tapa: \"brazos\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-29-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-29-puesto-frente-brazos-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-30-puesto-frente-objeto",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: una tablet sostenida contra el pecho tapa la mitad inferior de la marca.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (objeto). Lo pide `tapa: \"objeto\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-30-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-30-puesto-frente-objeto.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-31-puesto-frente-objeto-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: una tablet sostenida contra el pecho tapa la mitad inferior de la marca.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (objeto). Lo pide `tapa: \"objeto\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-31-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-31-puesto-frente-objeto-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-32-puesto-frente-cruza",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: un antebrazo con una taza pasa por delante de la marca y tapa su parte inferior izquierda.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (cruza). Lo pide `tapa: \"cruza\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-32-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-32-puesto-frente-cruza.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-33-puesto-frente-cruza-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: un antebrazo con una taza pasa por delante de la marca y tapa su parte inferior izquierda.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (cruza). Lo pide `tapa: \"cruza\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-polo-navy-33-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-33-puesto-frente-cruza-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-34-puesto-frente-bajo",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona hombre de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-34-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-34-puesto-frente-bajo.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-35-puesto-frente-bajo-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona mujer de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-35-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-35-puesto-frente-bajo-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-36-puesto-espalda-45-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-36-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-36-puesto-espalda-45-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-37-puesto-espalda-45-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-37-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-37-puesto-espalda-45-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-38-puesto-espalda-70-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-38-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-38-puesto-espalda-70-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-39-puesto-espalda-70-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-39-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-39-puesto-espalda-70-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-40-puesto-espalda-bajo",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-40-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-40-puesto-espalda-bajo.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-41-puesto-espalda-45-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-41-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-41-puesto-espalda-45-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-42-puesto-espalda-45-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-42-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-42-puesto-espalda-45-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-43-puesto-espalda-70-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-43-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-43-puesto-espalda-70-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-44-puesto-espalda-70-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-44-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-44-puesto-espalda-70-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "polo-navy-45-puesto-espalda-bajo-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-polo-navy-45-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/polo-navy-45-puesto-espalda-bajo-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  }
+ ],
+ "delta_2026_09_21": "Se agrega la espalda puesta en cuerpo femenino. El kit sólo la tenía en cuerpo masculino.",
+ "delta_2026_09_21_espalda_bordada": "🔴 CAMBIO DE PRODUCTO. El operador REVIRTIÓ su decisión del 2026-09-17 («la única prenda con espalda limpia es el polo»): desde el 2026-09-21 el polo lleva en la espalda el logo y el eslogan, BORDADOS. Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce, y ése era el hueco que no se podía tapar de otra forma. Diferencia con el hoodie y las chaquetas: ahí la espalda es SERIGRAFÍA plastisol; en el polo es BORDADO de puntada satinada con relieve, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado. El arte se compone determinísticamente con `estampa-espalda.mjs` (dos versiones: hilo blanco para el polo navy, hilo navy para el blanco) y al modelo sólo se le pide la puntada. Las vistas de espalda v01 quedan OBSOLETAS: documentan el producto anterior y no deben usarse.",
+ "delta_2026_10_03": "Vistas puestas por silueta, giro (45° y 70°) y oclusión (mano, brazos, objeto, antebrazo), editadas desde la vista puesta de frente aprobada con el macro del bordado. foto:prompt las elige solo (`elegirPuesta`) e imprime las alternativas. Corrida: ai-generations/2026-10-03_uniforme-vistas/LEEME.md."
 }

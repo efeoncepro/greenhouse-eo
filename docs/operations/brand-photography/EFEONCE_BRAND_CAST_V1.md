@@ -275,6 +275,15 @@ personas del roster el tope sigue en dos. Prueba `EC2` (cine, `publicidad-prueba
 sostenida; bordados de Hum y Antonio con isotipo oficial compuesto; el del hoodie de Karo y los de los polos quedan sin
 corregir.
 
+## 7c. La prenda se elige por quien la viste (2026-10-03)
+
+Cada personaje declara `silueta` (Hum, Karo, Sophia e Isabella `mujer`; Antonio `hombre`), y `foto:prompt` elige la
+vista puesta de su prenda por esa silueta, por el giro de su vista (45° y perfil → 70°), por `camara: "baja"` y por lo
+que le tape el pecho (`tapa`). En un grupo, cada prenda declara `persona`. El kit tiene 126 vistas puestas nuevas
+(bomber, softshell, polo y hoodie de frente, a 45° y 70°, de espaldas, desde abajo y con oclusión; la gorra a 45° y
+70°), selladas y en el canon. Método, trampas y opciones: `garment-reference-kit.md` §Delta 2026-10-03 · corrida
+`ai-generations/2026-10-03_uniforme-vistas/LEEME.md`.
+
 ## 8. Estado
 
 | Personaje | Estado |

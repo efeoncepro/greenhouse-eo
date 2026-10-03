@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/hum/hum-c.png …
+  ✓ 1975KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 385 (img 0 · txt 385) · out 1372 · total 1757
+done

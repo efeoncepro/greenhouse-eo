@@ -1,0 +1,1163 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T09:47:54.189Z",
+  "run": "ai-generations/2026-10-02_elenco-efeonce",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-02_elenco-efeonce",
+  "totalBytes": 349458831,
+  "fileCount": 192,
+  "files": [
+    {
+      "path": "hum/hum-a.png",
+      "sizeBytes": 2077632,
+      "sha256": "499ab92b29ebda1715f4bde492cc2d7eb19925365ce03bcd089b800423610a66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/hum/hum-a.png"
+    },
+    {
+      "path": "hum/hum-b.png",
+      "sizeBytes": 2174445,
+      "sha256": "e92c5260e417e23610dad16a11cc66d09d002a457ee5dd38274501413cc24c28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/hum/hum-b.png"
+    },
+    {
+      "path": "hum/hum-c.png",
+      "sizeBytes": 2022704,
+      "sha256": "94e60c79761badd4d5cafccee08c2475c909737271bcf6d95e43b1a2185576e2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/hum/hum-c.png"
+    },
+    {
+      "path": "hum/hum-d.png",
+      "sizeBytes": 1962604,
+      "sha256": "832a154651ab4626c9f3a5699e3657690ddc1ea81007b5b83431ce154eef0f85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/hum/hum-d.png"
+    },
+    {
+      "path": "humberly/humberly-34.png",
+      "sizeBytes": 1955082,
+      "sha256": "a5b185679d31786bd70b259d41c1bae731e8b5d192fd4b8bcfabc8b57b6550e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-34.png"
+    },
+    {
+      "path": "humberly/humberly-45-izq.png",
+      "sizeBytes": 1344620,
+      "sha256": "e77bde91b0037b1bff615327f75e2123a1fe46eaa4adae212e2f0c4827a5c25e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-45-izq.png"
+    },
+    {
+      "path": "humberly/humberly-cuerpo-frontal.png",
+      "sizeBytes": 1846844,
+      "sha256": "62c232d515f86fb1dbdf270cdfcf1ef10e56e563367820d150b8eb498d2ea847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-cuerpo-frontal.png"
+    },
+    {
+      "path": "humberly/humberly-cuerpo-v2-a.png",
+      "sizeBytes": 1872882,
+      "sha256": "5641bd0b9aa619fbf9c893938239dbc335400ca57c8a0d94049f7cbd6ed91ef5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-cuerpo-v2-a.png"
+    },
+    {
+      "path": "humberly/humberly-cuerpo-v2-b.png",
+      "sizeBytes": 1881214,
+      "sha256": "f4d8489351f479cef23dd040c3a1f9767ad6f1f7f3365f22ebd1d23fe9df8b39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-cuerpo-v2-b.png"
+    },
+    {
+      "path": "humberly/humberly-cuerpo-v3-fix.png",
+      "sizeBytes": 1750049,
+      "sha256": "5f9e29d074fd7b2f7d64601ba1a51958d2db31a48d222e3b05fb72bd515cb960",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-cuerpo-v3-fix.png"
+    },
+    {
+      "path": "humberly/humberly-cuerpo-v3-wide.png",
+      "sizeBytes": 1820894,
+      "sha256": "dc06c74afe05e310481f7d592d4732c4fac13a5f17e8ad83663c582804a09c6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-cuerpo-v3-wide.png"
+    },
+    {
+      "path": "julio-edad-ab/julio-A-a.png",
+      "sizeBytes": 2377345,
+      "sha256": "b532235a81cc1ac4120408e957383d8128d01aa34c7ce1d63038e6e8bf5d9571",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-A-a.png"
+    },
+    {
+      "path": "julio-edad-ab/julio-A-b.png",
+      "sizeBytes": 2229120,
+      "sha256": "1d72c1fbb16d9340bcebc54335e9fa3cfc7f85acc89fc67dc1839dbd488062ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-A-b.png"
+    },
+    {
+      "path": "julio-edad-ab/julio-B-a.png",
+      "sizeBytes": 2336873,
+      "sha256": "560cd7e857eb25be48419b4239ec9f9371b3f52375c93787d7850ab7c10f5085",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-B-a.png"
+    },
+    {
+      "path": "julio-edad-ab/julio-B-b.png",
+      "sizeBytes": 2263741,
+      "sha256": "b99ede8ed9faab927d8f086034bcd203baf993b98153b584f6dfaa4bf63d8473",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-B-b.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-45-der-v3.png",
+      "sizeBytes": 1539774,
+      "sha256": "8398bcbb008bf404bca1334cc0bdb3df26b2014a8821639c0d5e5386bfce3999",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-45-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-45-izq-v3.png",
+      "sizeBytes": 1491407,
+      "sha256": "e5e24a53c969854116695d3b292b6838355bb39b4c5e4659cbbba64e9888a81c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-45-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-ancla-hd-v2.png",
+      "sizeBytes": 7385950,
+      "sha256": "0f37d13703d8848b413d933162e743a7acb37f17b0d10669a70653518716127e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-ancla-hd-v2.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-ancla-hd.png",
+      "sizeBytes": 11466232,
+      "sha256": "0b77d7081682525ee569d46fec718aa95bb7315c078445f76976a0cf71765f99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-ancla-hd.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-cuerpo-v3.png",
+      "sizeBytes": 1797678,
+      "sha256": "5c57f38c35cb6d76015a959969802523e367e4bf406ab5a8dbed1dfe3de42ad4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-cuerpo-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-cuerpo-v4.png",
+      "sizeBytes": 1816298,
+      "sha256": "ddb6d73b036d661ba339337d598af3938b56c95947a225cf346afb20a62f6210",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-cuerpo-v4.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-elegida-v3.png",
+      "sizeBytes": 1914472,
+      "sha256": "ba7a3165ecdd767ad7ceff3c37bf8d7692aab4ca1dfdcfdea2a4b20e11293fd9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-elegida-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-frente-v3.png",
+      "sizeBytes": 1547111,
+      "sha256": "c4c63e4c6f9b9747cd0d8848bf2374367c29f084bcae83218ce5cfcd81dcd834",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-frente-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-manos-v3.png",
+      "sizeBytes": 1629905,
+      "sha256": "d193f0be407365c2e0219ba2c3e3fcbf3f78b1ca7af033b6cdb734f240a59642",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-manos-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-perfil-der-v3.png",
+      "sizeBytes": 1538695,
+      "sha256": "9315f0c0cb013f267b60fa25eedf3d0e2c1a56f1f8e4b42d44da225a59e2bf62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-perfil-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/antonio-perfil-izq-v3.png",
+      "sizeBytes": 1499934,
+      "sha256": "b5135dbc2da64b3057c38cdeae838e2dcdba312a79d339efd6826e89f5ef02b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/antonio-perfil-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5-86/antonio-cuerpo-v5-86-a.png",
+      "sizeBytes": 1784933,
+      "sha256": "9137329f108f085b48c54a67790c5099bb78ec258e65b25b132d3c1f0cfebc59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5-86/antonio-cuerpo-v5-86-a.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5-86/antonio-cuerpo-v5-86-b.png",
+      "sizeBytes": 1780704,
+      "sha256": "6b89768ff7cea4bc8c876bbd626979bd5a5c8382eee82fa1f0a0c482eab57963",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5-86/antonio-cuerpo-v5-86-b.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5-86/base.png",
+      "sizeBytes": 248158,
+      "sha256": "26abe9cfeb75409d5ac3667967882c50e089d33cb1218ddbcbdf9a9e981237ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5-86/base.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5-86/mascara.png",
+      "sizeBytes": 8294,
+      "sha256": "54a4e7b9302692c129477b8094c7649b5877811745cbaf547bd7b250f9e24c89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5-86/mascara.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5/antonio-cuerpo-v5-a.png",
+      "sizeBytes": 1826122,
+      "sha256": "687d76ab99c30ddc45dce396d7aa9d67ef2f2421760518280e5a278d4731971c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5/antonio-cuerpo-v5-a.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5/antonio-cuerpo-v5-b.png",
+      "sizeBytes": 1847763,
+      "sha256": "f22793309341379a5586b00e3ef51e4d78218a16cadce49bbe4e96cefced4da0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5/antonio-cuerpo-v5-b.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5/base.png",
+      "sizeBytes": 283283,
+      "sha256": "cebf02ef7da63808948a08e9d13fcdb532cd64a741a8cb702ee527dbaef00c9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5/base.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir-v5/mascara.png",
+      "sizeBytes": 8630,
+      "sha256": "d38e791c604a54ef73b62df69bf4929c204578ea1312ab2a8c4d5b19d7733050",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir-v5/mascara.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir/base.png",
+      "sizeBytes": 579392,
+      "sha256": "30ec8f3abeb7603438b83b791cf9880565a1994a4e721ae6a2da063bc5540e13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir/base.png"
+    },
+    {
+      "path": "realismo-v3/antonio/expandir/mascara.png",
+      "sizeBytes": 11623,
+      "sha256": "e33121b2a84520b474b454058b021ddb77279e5dff1827213dd0fb80c6feea51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/antonio/expandir/mascara.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5-86/base.png",
+      "sizeBytes": 890732,
+      "sha256": "fe29d4e651e2e7ef76e4c9878e079ddb7ed5602cc741342bd8e9dd52f1c6a712",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5-86/base.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5-86/hum-cuerpo-v5-86-a.png",
+      "sizeBytes": 1794454,
+      "sha256": "03f86da12243126537c31f086ce3643613e5a89357429bb728fd7e3d73b00089",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5-86/hum-cuerpo-v5-86-a.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5-86/hum-cuerpo-v5-86-b.png",
+      "sizeBytes": 1801893,
+      "sha256": "a7e9b8b1471b1d0f735219e6f59b125caf1f8375374d34854015316958fb8377",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5-86/hum-cuerpo-v5-86-b.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5-86/mascara.png",
+      "sizeBytes": 15350,
+      "sha256": "c226da0dfb4ce1253e8f6985719791a734c0f37355d589c5dfdf1f7013878c69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5-86/mascara.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5/base.png",
+      "sizeBytes": 1047537,
+      "sha256": "085eaac9db286966bab7d3a4a3ac81760be12df6a3990927863ee702424e36a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5/base.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5/hum-cuerpo-v5-a.png",
+      "sizeBytes": 1861218,
+      "sha256": "77f9d8604911b02e3d189c61c57e3f46574c97e502ec747093e94f43b7a04f6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5/hum-cuerpo-v5-a.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5/hum-cuerpo-v5-b.png",
+      "sizeBytes": 1851506,
+      "sha256": "74d78653f60f7cf79330e8989fe7047442a5362a19b52f3a31658e9e76380fe4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5/hum-cuerpo-v5-b.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir-v5/mascara.png",
+      "sizeBytes": 17036,
+      "sha256": "60278f8e6c302cd0bed0123e2b91b013d212bfd4505d48daf1aebe112966a765",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir-v5/mascara.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir/base.png",
+      "sizeBytes": 1061341,
+      "sha256": "d9e337865eba871977b88891a36c8f6e508952f5bf7833f249cd1f8f0d34110d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir/base.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir/mascara.png",
+      "sizeBytes": 16801,
+      "sha256": "6b4a74622383b0f9d46f9d3ed9f7c005dc87dabfa14e4742eccebdd7a9170d83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir/mascara.png"
+    },
+    {
+      "path": "realismo-v3/hum/expandir/relleno.png",
+      "sizeBytes": 1867049,
+      "sha256": "dd85526cc3ba446e603f565f8eda660d85ed63fc2c8bd2602805cf47cd49e3c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/expandir/relleno.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-45-der-v3.png",
+      "sizeBytes": 1595944,
+      "sha256": "3b5dee69bb61d27fc1081337a1bbd8f0d8384af72f555417321744dc76e5ef52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-45-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-45-izq-v3.png",
+      "sizeBytes": 1551449,
+      "sha256": "464a0947e232191306813e143e468e9be3546e29e3135b52befaa3b0e0fc6adc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-45-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-ancla-hd.png",
+      "sizeBytes": 8680291,
+      "sha256": "da5ef1254c15f3b97aba56fef511c12915ba68361043514e2585524e1b7e9a1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-ancla-hd.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-cuerpo-v3.png",
+      "sizeBytes": 1828269,
+      "sha256": "e10a4ac6cc4020f93c375266b99d694f24c9f99e7a9c3733fb5897758fd22751",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-cuerpo-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-cuerpo-v4.png",
+      "sizeBytes": 1867049,
+      "sha256": "dd85526cc3ba446e603f565f8eda660d85ed63fc2c8bd2602805cf47cd49e3c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-cuerpo-v4.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-elegida-v3.png",
+      "sizeBytes": 2125768,
+      "sha256": "b87203efdb0388aa077af4231bbfb2da9fc41c72dae577c64e8c3cb85cbfa6d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-elegida-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-frente-v3.png",
+      "sizeBytes": 1579134,
+      "sha256": "7ee0892973ea5d95005a731fbb972d449266c793a941701c0aaea10f04967213",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-frente-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-manos-v3.png",
+      "sizeBytes": 1517600,
+      "sha256": "4371c0870005cfcf7f1a1cbf9430be5fbc3d44d8e29be61cda289845273d7e3a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-manos-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-perfil-der-v3.png",
+      "sizeBytes": 1540449,
+      "sha256": "f445da8f3cfeef861f2a890d819016ab9ef6ccfc6f60eadd069309758b054649",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-perfil-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/hum/hum-perfil-izq-v3.png",
+      "sizeBytes": 1537463,
+      "sha256": "45105067edb1964231a8e9b27551b261e15b170d7f6aa9288f2fcf4690c1cb37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/hum/hum-perfil-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5-86/base.png",
+      "sizeBytes": 316362,
+      "sha256": "420cda619de24b6dd2aefb2cea72d4c69d84af0536815c3d47615232a50e180b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5-86/base.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5-86/isabella-cuerpo-v5-86-a.png",
+      "sizeBytes": 1814723,
+      "sha256": "72751d864adba5733f862f3514254e886e01c9646ecb61c94cedaaf986773e68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5-86/isabella-cuerpo-v5-86-a.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5-86/isabella-cuerpo-v5-86-b.png",
+      "sizeBytes": 1773474,
+      "sha256": "fff4022f4cd0f84c269a66f9b841c84ede3a236409a334609d927827131f0a14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5-86/isabella-cuerpo-v5-86-b.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5-86/mascara.png",
+      "sizeBytes": 8492,
+      "sha256": "62a324c714bd1d2d9823c12f9e53200e1b994aa0ca9d04c488207d7a9d8e6f40",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5-86/mascara.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5/base.png",
+      "sizeBytes": 360499,
+      "sha256": "c5508f8b042c676ca75408ce50f8918922a38526d3e2829259515ed28c3b42c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5/base.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5/isabella-cuerpo-v5-a.png",
+      "sizeBytes": 1804598,
+      "sha256": "d652cb9c50560718f5fb3af227a10da86b52ba91118a7f8c09a24fafa28bbe51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5/isabella-cuerpo-v5-a.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5/isabella-cuerpo-v5-b.png",
+      "sizeBytes": 1793571,
+      "sha256": "80964d4c31aeb96c3faa1d55f59776fadef490f6e5885b336e593b674d17c749",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5/isabella-cuerpo-v5-b.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir-v5/mascara.png",
+      "sizeBytes": 8736,
+      "sha256": "ebe13ab110467d6c600bf1ce60f27c3ef43bd2eae8b4d09713399747035df8e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5/mascara.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir/base.png",
+      "sizeBytes": 689652,
+      "sha256": "6468d06ab7133fe511ba9acf989c2d520b4df7dd464b192ae164040789b25123",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir/base.png"
+    },
+    {
+      "path": "realismo-v3/isabella/expandir/mascara.png",
+      "sizeBytes": 11623,
+      "sha256": "e33121b2a84520b474b454058b021ddb77279e5dff1827213dd0fb80c6feea51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir/mascara.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-45-der-v3-pecas.png",
+      "sizeBytes": 1593884,
+      "sha256": "38221320d5ff706e3f7b062e3e1e3f427e214990c9db2aa99cd48f723824a34b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-45-der-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-45-der-v3.png",
+      "sizeBytes": 1668388,
+      "sha256": "4125ba51b54cb8716d0e0f6e19252b3bc7238553741a2472b7532068f03e976d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-45-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-45-izq-v3-pecas.png",
+      "sizeBytes": 1573217,
+      "sha256": "926744f71f0d628ffe0bcef5612ca078fa73ee48d3a4f2af54852c5e28fb200e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-45-izq-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-45-izq-v3.png",
+      "sizeBytes": 1667441,
+      "sha256": "7ee72ff71ad4e09d2b030ba3f84e7826dfd4f46e77797824183a1a4fa039197d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-45-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-ancla-hd-v2.png",
+      "sizeBytes": 7734671,
+      "sha256": "a7f4d9e9d20e9b2bc2476cf6cd6046539418d957e7d67d84faef7af4eefc8505",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-ancla-hd-v2.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-ancla-hd.png",
+      "sizeBytes": 11725712,
+      "sha256": "3354b601b89b03379b0929916423ddeea04a7d2ca3519c08b57e4876556eac59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-ancla-hd.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-cuerpo-v3.png",
+      "sizeBytes": 1839299,
+      "sha256": "710b0f9a28afd6856111189e41835b17891c8954f94aa881724baa96b3672717",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-cuerpo-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-cuerpo-v4-pecas.png",
+      "sizeBytes": 1710617,
+      "sha256": "39ee61bc3d85426645f9e2ae1de7325b09199bd1a64e23e69357ac5dbf1855aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-cuerpo-v4-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-cuerpo-v4.png",
+      "sizeBytes": 1816375,
+      "sha256": "36e3248b39dbe4e1ea1c763fdee81bee01f57f5769a2a15257488d0040bb0822",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-cuerpo-v4.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-elegida-v3-pecas.png",
+      "sizeBytes": 1989748,
+      "sha256": "f9518b2c97bb8d2da8aee0fff65d1bd4d5f6a3ff9607cacf3c4fa19c168a4c53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-elegida-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-elegida-v3.png",
+      "sizeBytes": 2119038,
+      "sha256": "8584ab2b33dc4c9f6060818b30ba4f0c052773f0624859f22024debe45013c9d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-elegida-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-frente-v3-pecas.png",
+      "sizeBytes": 1607026,
+      "sha256": "0881c53155305afa1f5748a3d5b208f6e9e05d2147185b1a5813823ccac24d2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-frente-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-frente-v3.png",
+      "sizeBytes": 1707015,
+      "sha256": "ea56c0cf6d23bfb45b628b24a0b77e314cc8fd5dbd458c4b980c9c970dab0f78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-frente-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-manos-v3.png",
+      "sizeBytes": 1662863,
+      "sha256": "563f342f70a65d93406f39e1e69475c6973ae9a1091d2029040ae8a1623328da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-manos-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-perfil-der-v3-pecas.png",
+      "sizeBytes": 1545456,
+      "sha256": "109aaa031adb9221c4611ceb3599648e1312dc20d7110530d93f39849b96abdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-perfil-der-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-perfil-der-v3.png",
+      "sizeBytes": 1644115,
+      "sha256": "e7af7baf11e9c225dd4d15eebedb61bdd06efcfcea178f0baa447e8e672355ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-perfil-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-perfil-izq-v3-pecas.png",
+      "sizeBytes": 1485267,
+      "sha256": "fcdd4e429738fa60bfff86cd688272f7796d2c94840e165d3c4f6dfad71c9ffb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-perfil-izq-v3-pecas.png"
+    },
+    {
+      "path": "realismo-v3/isabella/isabella-perfil-izq-v3.png",
+      "sizeBytes": 1559153,
+      "sha256": "82766410dc74e4908d26e14ecca70adbff073a3c45c1727d209a649d7c915e51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/isabella-perfil-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5-86/base.png",
+      "sizeBytes": 363767,
+      "sha256": "1775865dc6516e7da63b5659c32ba420fb900c6b275813d4c5e918ddf5ba7f89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5-86/base.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5-86/karo-cuerpo-v5-86-a.png",
+      "sizeBytes": 1795399,
+      "sha256": "322e5fd8b0015eafcd306ab05b66525f0ea2e2c92c3693ef686863c14fdda74f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5-86/karo-cuerpo-v5-86-a.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5-86/karo-cuerpo-v5-86-b.png",
+      "sizeBytes": 1786099,
+      "sha256": "66423b7b969ecca9c27ff44855c58d573b95d37b5a16e04d03af7f11500f7376",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5-86/karo-cuerpo-v5-86-b.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5-86/mascara.png",
+      "sizeBytes": 9176,
+      "sha256": "6f81750699eb4ef6c657e8355a73edc8bbec97b3d622aab1a93a01aec604afab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5-86/mascara.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5/base.png",
+      "sizeBytes": 419009,
+      "sha256": "730c8298d954d6b9482e87dddb7c667ebecf0dafa93479597c02b40b7f507b19",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5/base.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5/karo-cuerpo-v5-a.png",
+      "sizeBytes": 1830798,
+      "sha256": "c32ed943935bcd7ccba223540dc385fa4eed2719b1a3e3e952f902f63b7ed631",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5/karo-cuerpo-v5-a.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5/karo-cuerpo-v5-b.png",
+      "sizeBytes": 1800216,
+      "sha256": "ff7e6d8d3bdc82540c3c3ca1c7255c4d891ae6fbddb526be22edbb64e6b747ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5/karo-cuerpo-v5-b.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir-v5/mascara.png",
+      "sizeBytes": 9440,
+      "sha256": "7fd0a428547332464fee563f3950d13b4e3106ed9020f91743f025d88a0dfe1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir-v5/mascara.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir/base.png",
+      "sizeBytes": 679796,
+      "sha256": "a44bbc53474ffc64e37bfacf9a7d6d84ab33d1d82595b1de9a19559d8f1f349f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir/base.png"
+    },
+    {
+      "path": "realismo-v3/karo/expandir/mascara.png",
+      "sizeBytes": 11623,
+      "sha256": "e33121b2a84520b474b454058b021ddb77279e5dff1827213dd0fb80c6feea51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/expandir/mascara.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-45-der-v3.png",
+      "sizeBytes": 1654551,
+      "sha256": "348d788ce26a8b9207451fb93c49238adcc14888bf808866acd697bc42a5748d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-45-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-45-izq-v3.png",
+      "sizeBytes": 1697817,
+      "sha256": "d05b9ca0182738e73266d088ec74bbdc3c165fe60e6d8e02abb914297134ec2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-45-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-ancla-hd.png",
+      "sizeBytes": 11721088,
+      "sha256": "de5be110d9ed0449222016fbfe8af958dd6db8ffae53d909a2be3b52c5520346",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-ancla-hd.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-cuerpo-v3.png",
+      "sizeBytes": 1833504,
+      "sha256": "1d460d2588bf758e619f85e930904a97b857c1a80a4909891124ca5338a8de45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-cuerpo-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-cuerpo-v4.png",
+      "sizeBytes": 1823434,
+      "sha256": "1c3203d363c2afa9f614c7feda005d748db175deeecab6d99132486c0abbbfb4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-cuerpo-v4.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-elegida-v3.png",
+      "sizeBytes": 2009992,
+      "sha256": "3c40a7d756a5dfa05e02db3b9b64d0bc24832277a9c79f09fb33688e57be480e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-elegida-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-frente-v3.png",
+      "sizeBytes": 1766620,
+      "sha256": "2d49683fcdd5b6f5d5eea9bcc5b8357edccbc7ab7f1551077a03c876c4508d12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-frente-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-manos-v3.png",
+      "sizeBytes": 1512984,
+      "sha256": "125249396e676d608478cdf83f44fd90658e243d05629b525815b1a0c3762b54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-manos-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-perfil-der-v3.png",
+      "sizeBytes": 1648820,
+      "sha256": "ebe1a26997cd7abade29c00a47724bd0bb147b8224abde5772a11dd457724309",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-perfil-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/karo/karo-perfil-izq-v3.png",
+      "sizeBytes": 1625278,
+      "sha256": "47bdddde389ba42ec8ef18376e788ce2b42eb40b087a30046f1bdd68c12a6dc7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/karo/karo-perfil-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5-86/base.png",
+      "sizeBytes": 367022,
+      "sha256": "9c48d3e9ac7557e7894e2ff3f946b24719df66e2c2d9ff6562ea5c0206a97931",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5-86/base.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5-86/mascara.png",
+      "sizeBytes": 8705,
+      "sha256": "2d4a079bce12a0de615fd26d7c38915c3e8f88331d425e2e51efed8bc8dcd848",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5-86/mascara.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5-86/sophia-cuerpo-v5-86-a.png",
+      "sizeBytes": 1786436,
+      "sha256": "96158cea289beda0de1f25b9773e1daad36ff0f56c82e2734322a97f4a75526d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5-86/sophia-cuerpo-v5-86-a.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5-86/sophia-cuerpo-v5-86-b.png",
+      "sizeBytes": 1793470,
+      "sha256": "0ee11c52197e2218475b5838aa28fd98cc8d650f705c57340e7d9f44d299cead",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5-86/sophia-cuerpo-v5-86-b.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5/base.png",
+      "sizeBytes": 381682,
+      "sha256": "2fc513fea0a5449f884b5bdef217e617bf27b08329350c4a9e7f7fa28d567bf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5/base.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5/mascara.png",
+      "sizeBytes": 9312,
+      "sha256": "083177bf4b491ded9808b0902c6e5bbc358033e7570e7a734412c65f8e03306a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5/mascara.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5/sophia-cuerpo-v5-a.png",
+      "sizeBytes": 1809298,
+      "sha256": "8f6dae384703e4c144a59c25d09a8dc40063b651bfb0dd2d602fb25b5f23d543",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5/sophia-cuerpo-v5-a.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir-v5/sophia-cuerpo-v5-b.png",
+      "sizeBytes": 1827113,
+      "sha256": "a744df81d3e9fe01442de620228fcc6e9a668dfa9be6d678ce6a888d2e6d51f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir-v5/sophia-cuerpo-v5-b.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir/base.png",
+      "sizeBytes": 639025,
+      "sha256": "35bcf7e3a88bdc38b50a362519bc2b0b6826bbbb7dc34fbc2cc19d8160464e7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir/base.png"
+    },
+    {
+      "path": "realismo-v3/sophia/expandir/mascara.png",
+      "sizeBytes": 11623,
+      "sha256": "e33121b2a84520b474b454058b021ddb77279e5dff1827213dd0fb80c6feea51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/expandir/mascara.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-45-der-v3.png",
+      "sizeBytes": 1544793,
+      "sha256": "0da1ecbb1b17669297405bbc73858b69094d45f75c3299518145dce5ce49bfa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-45-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-45-izq-v3.png",
+      "sizeBytes": 1503651,
+      "sha256": "b3c14abba40b1b52ec62ce1dd335755ffeeaf4e26f278e7c2249d23ebc1fd60a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-45-izq-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-ancla-hd.png",
+      "sizeBytes": 11036209,
+      "sha256": "bc5952b2a68086b3586c0f43f76d4fab2c68f9de8a31f7c5f716ce95e42eb2a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-ancla-hd.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-cuerpo-v3.png",
+      "sizeBytes": 1796885,
+      "sha256": "e626114293a1fb0f8ed362db2a3162df97a8148d639e8297a143bb83f0166703",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-cuerpo-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-cuerpo-v4.png",
+      "sizeBytes": 1847100,
+      "sha256": "60aa5b11f42fb0c14bba6dd59fc8367fc1785e8723637cb9161c6542894880b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-cuerpo-v4.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-elegida-v3.png",
+      "sizeBytes": 1896470,
+      "sha256": "0e617e87f2e1e08532305b5581cdb7d918299cbf6e221f973b41e075242594b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-elegida-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-frente-v3.png",
+      "sizeBytes": 1574883,
+      "sha256": "5e812949011d6acf9fe33e9b120871e3ba5b40925799acffb0ac6a7da7def86b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-frente-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-manos-v3.png",
+      "sizeBytes": 1510084,
+      "sha256": "2797c752e08e11ea9945b1c6c99084c99c93b9cf3b787f6af0c8c04dcf4e8da6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-manos-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-perfil-der-v3.png",
+      "sizeBytes": 1493648,
+      "sha256": "fb2d5f49f764592d48e7985d8df8c96b67ba1d5d481f80a71c51f601858b08a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-perfil-der-v3.png"
+    },
+    {
+      "path": "realismo-v3/sophia/sophia-perfil-izq-v3.png",
+      "sizeBytes": 1486851,
+      "sha256": "9741b1dcc48e422740592211b6c82ec2b7b4563ab1f122e72ff808386a2fb12c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia/sophia-perfil-izq-v3.png"
+    },
+    {
+      "path": "ronda-1/antonio-a.png",
+      "sizeBytes": 1514660,
+      "sha256": "828e12d613090cae3737d0012d14714cafaca3681468330afffe811ad67d11e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/antonio-a.png"
+    },
+    {
+      "path": "ronda-1/antonio-b.png",
+      "sizeBytes": 1473878,
+      "sha256": "d938c1d8b565d3b65dc336227ce7c1df1cc40b217af1bf311ac694b9789a9e7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/antonio-b.png"
+    },
+    {
+      "path": "ronda-1/antonio-c.png",
+      "sizeBytes": 1454547,
+      "sha256": "9e0ad1b42ef75380a2f8e0832bd24b693c137bf3e219e8dd7df2c333603ff905",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/antonio-c.png"
+    },
+    {
+      "path": "ronda-1/antonio-d.png",
+      "sizeBytes": 1489224,
+      "sha256": "53344106a7a0bcab2ef3c3f77bf4713e413a7d75b24760388a8e2b0135f91951",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/antonio-d.png"
+    },
+    {
+      "path": "ronda-1/isabella-a.png",
+      "sizeBytes": 1551303,
+      "sha256": "0c75975eb533b7c20f07e9d0e7436cc39b6db2ee2e5956fe580cb450b9bb9d5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/isabella-a.png"
+    },
+    {
+      "path": "ronda-1/isabella-b.png",
+      "sizeBytes": 1766783,
+      "sha256": "71b5001f9a35b1aa9b67f740635d68debad94fc57a883ddc498354713d7476fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/isabella-b.png"
+    },
+    {
+      "path": "ronda-1/isabella-c.png",
+      "sizeBytes": 1753772,
+      "sha256": "88258301d356e20565dbe1410cabc16b43e8b2eafd010c7325e281037be451a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/isabella-c.png"
+    },
+    {
+      "path": "ronda-1/isabella-d.png",
+      "sizeBytes": 1800717,
+      "sha256": "d1eb38c42bae76fd035bd9a76ce4383181ce815523d3ea9fc6563fbc974b5b39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/isabella-d.png"
+    },
+    {
+      "path": "ronda-1/karo-a.png",
+      "sizeBytes": 1785350,
+      "sha256": "68ea02ad7edbe98b44ba5af8495502a552c155eb4d0eb109b368a7cf2217047c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/karo-a.png"
+    },
+    {
+      "path": "ronda-1/karo-b.png",
+      "sizeBytes": 1596839,
+      "sha256": "aae9af75070f1b4180e135901a157b8d8f25460cc57f0a95ee1d0a21d6bccbcf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/karo-b.png"
+    },
+    {
+      "path": "ronda-1/karo-c.png",
+      "sizeBytes": 1652607,
+      "sha256": "5f0af84b21596cd49cb0e49bc1b584913337f1b7362604e9c423a3f3bc0cfcb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/karo-c.png"
+    },
+    {
+      "path": "ronda-1/karo-d.png",
+      "sizeBytes": 1681935,
+      "sha256": "bae0ba9297bad3551d8ffecf664afa321fe8bc64ef6c17afaa17a21c01db3d9d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-1/karo-d.png"
+    },
+    {
+      "path": "ronda-2/antonio-a.png",
+      "sizeBytes": 2032234,
+      "sha256": "46163096326310d5b2df643c623ca4a6d3eeee0f272f102a1855729e782d890a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/antonio-a.png"
+    },
+    {
+      "path": "ronda-2/antonio-b.png",
+      "sizeBytes": 2049139,
+      "sha256": "b9f41ba4b18ecbc129c9f4c28e959ca52d0b09ef087047bd108a19baa3f4ad31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/antonio-b.png"
+    },
+    {
+      "path": "ronda-2/antonio-c.png",
+      "sizeBytes": 2018111,
+      "sha256": "29d5d8c0a2494c3bd1176df7f146d02d6c1904c0627d0940eb98651fa255fa3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/antonio-c.png"
+    },
+    {
+      "path": "ronda-2/antonio-d.png",
+      "sizeBytes": 1994271,
+      "sha256": "4fec5311dd297811b6edf145f16913382a86aaac2805973c3b5f61ee6df71e22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/antonio-d.png"
+    },
+    {
+      "path": "ronda-2/isabella-a.png",
+      "sizeBytes": 1893676,
+      "sha256": "cd7dcdd89e785819a209bcaeaebe2451b249848f0872f71f3721a168ed1e7654",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/isabella-a.png"
+    },
+    {
+      "path": "ronda-2/isabella-b.png",
+      "sizeBytes": 2230546,
+      "sha256": "e23684d44f5af8dccac6e921c56e7922cd7402441f1feb88f6e90172b7ab6a0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/isabella-b.png"
+    },
+    {
+      "path": "ronda-2/isabella-c.png",
+      "sizeBytes": 2108380,
+      "sha256": "3e07b78472a5b2b7dbd7f921591264daf49fae5329b75b7e56631b73864db7e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/isabella-c.png"
+    },
+    {
+      "path": "ronda-2/isabella-d.png",
+      "sizeBytes": 2153874,
+      "sha256": "14ef8197f92bff662cae464075345bd5def57afd9ce20656f1b6d39f6cbdfa9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/isabella-d.png"
+    },
+    {
+      "path": "ronda-2/karo-a.png",
+      "sizeBytes": 2021482,
+      "sha256": "ebe187f405d541db3bd3cb2c01a44c37f19f53cfbbfb9769a3dad3da72c78af3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/karo-a.png"
+    },
+    {
+      "path": "ronda-2/karo-b.png",
+      "sizeBytes": 2005170,
+      "sha256": "973b17179661feb56854f4265795e2a2b9b829d3cb644cb51c765ee184f2644d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/karo-b.png"
+    },
+    {
+      "path": "ronda-2/karo-c.png",
+      "sizeBytes": 1925821,
+      "sha256": "4f4018415a5e69b4d21702a4ac2ce9eda7f6e2c926138647a912d6a3a33f4240",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/karo-c.png"
+    },
+    {
+      "path": "ronda-2/karo-d.png",
+      "sizeBytes": 2115349,
+      "sha256": "e268fc59a43f4e66cfbaff67070c62358974d325687b6f24eeacbef89c90521f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/ronda-2/karo-d.png"
+    },
+    {
+      "path": "sets/antonio/antonio-45-der-v2.png",
+      "sizeBytes": 1539077,
+      "sha256": "4d712fc06174f70ccb8b030a92402abac0114ac24c05af259554ae0fdf8f6035",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-45-der-v2.png"
+    },
+    {
+      "path": "sets/antonio/antonio-45-der.png",
+      "sizeBytes": 1461524,
+      "sha256": "0f66a9d897ed85991fe77449fda8091c7a998411c742f721e9a5f450eb1a8db1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-45-der.png"
+    },
+    {
+      "path": "sets/antonio/antonio-45-izq.png",
+      "sizeBytes": 1514401,
+      "sha256": "e01ac237c9e5ea12c7d6c9645314856ac29528f49245e059fb3cfcc27a2c7859",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-45-izq.png"
+    },
+    {
+      "path": "sets/antonio/antonio-cuerpo.png",
+      "sizeBytes": 1884852,
+      "sha256": "1feefb2322993f67c3f29948234f48425acd464647659034a8e5f9605d0a5a62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-cuerpo.png"
+    },
+    {
+      "path": "sets/antonio/antonio-frente.png",
+      "sizeBytes": 1544646,
+      "sha256": "2c4ddc1fd67b314881fe003b382021cb187cb17d1840ccb07d91381af60fc3e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-frente.png"
+    },
+    {
+      "path": "sets/antonio/antonio-perfil-der.png",
+      "sizeBytes": 1575385,
+      "sha256": "7965ad956a4bfcd355d818fd2ac6ae821a20a8ad36f8f86cb78b61969d2e1c5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-perfil-der.png"
+    },
+    {
+      "path": "sets/antonio/antonio-perfil-izq.png",
+      "sizeBytes": 1512105,
+      "sha256": "d4cb44671a29388e02c58d1eba59cdb2e441707375e258efa668f8e172de3908",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/antonio/antonio-perfil-izq.png"
+    },
+    {
+      "path": "sets/hum/hum-45-der-v2.png",
+      "sizeBytes": 1612987,
+      "sha256": "53f4364de5ecd204aa67a73d84385cb7aee4d58c52689041ffc7e7ef3d310adb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-45-der-v2.png"
+    },
+    {
+      "path": "sets/hum/hum-45-der.png",
+      "sizeBytes": 1562610,
+      "sha256": "cee5fb45547cb32b5f042804ddf1b26698f484cae0acda205103979987e012bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-45-der.png"
+    },
+    {
+      "path": "sets/hum/hum-45-izq.png",
+      "sizeBytes": 1551183,
+      "sha256": "034eab62bb54d160099624870d02edb96aa62fd1e75a6d073fc06ff4fb4499cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-45-izq.png"
+    },
+    {
+      "path": "sets/hum/hum-cuerpo.png",
+      "sizeBytes": 1856045,
+      "sha256": "58898e12456b38634fd99934e340f26fd90f9e2229b7530a82c02e0623a3ecc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-cuerpo.png"
+    },
+    {
+      "path": "sets/hum/hum-frente.png",
+      "sizeBytes": 1598993,
+      "sha256": "7b6992f2f94c762d1d64618c23cba48445afd4b86a152a8b9b8599dbbea946ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-frente.png"
+    },
+    {
+      "path": "sets/hum/hum-perfil-der.png",
+      "sizeBytes": 1562743,
+      "sha256": "d24aa8f79c15aa7024e9459d44fa57b3c0e1aad4efbfe00940815e561aa0974e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-perfil-der.png"
+    },
+    {
+      "path": "sets/hum/hum-perfil-izq.png",
+      "sizeBytes": 1537154,
+      "sha256": "ec2a418e997c55d181b813c2febef7c8638168b856b373e48ce485af360115da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/hum/hum-perfil-izq.png"
+    },
+    {
+      "path": "sets/isabella/isabella-45-der-v2.png",
+      "sizeBytes": 1686310,
+      "sha256": "36a92dac034f1d6f2bd2bc2f95e62b2c8a54ddc271cdded9a138004db29d1d0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-45-der-v2.png"
+    },
+    {
+      "path": "sets/isabella/isabella-45-der.png",
+      "sizeBytes": 1692013,
+      "sha256": "3c16a448ec4fc18c27d07a9e08c10501a9707a31db5eeebad873866ee10d78b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-45-der.png"
+    },
+    {
+      "path": "sets/isabella/isabella-45-izq.png",
+      "sizeBytes": 1720221,
+      "sha256": "aadc942c32d861cc219e04982d29cb4f0c3848187ad24070f9f1ac53e33febdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-45-izq.png"
+    },
+    {
+      "path": "sets/isabella/isabella-cuerpo.png",
+      "sizeBytes": 1918394,
+      "sha256": "0b03892debf26ce0cbe85f673a4983356f6e04d0a93b67fc41750c0bcd380689",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-cuerpo.png"
+    },
+    {
+      "path": "sets/isabella/isabella-frente.png",
+      "sizeBytes": 1758852,
+      "sha256": "ff0434285e01f108d1a12594e2b9b4739f0719ea6a30936d14cbd894336bf791",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-frente.png"
+    },
+    {
+      "path": "sets/isabella/isabella-perfil-der.png",
+      "sizeBytes": 1674339,
+      "sha256": "b26f1cfac4f59c330cac4c40ba1ef8def76b7c2e74bb2f1cb4f08817fae04f4a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-perfil-der.png"
+    },
+    {
+      "path": "sets/isabella/isabella-perfil-izq.png",
+      "sizeBytes": 1611425,
+      "sha256": "2e9c02d426b6425c7195b6c6253014737c705028f20f3d086ac955ccac563111",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/isabella/isabella-perfil-izq.png"
+    },
+    {
+      "path": "sets/karo/karo-45-der-v2.png",
+      "sizeBytes": 1685351,
+      "sha256": "8e0248ba46b74e03ef76b12f3e1b44d28c282be5bca96b5f494505b5f1fa9442",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-45-der-v2.png"
+    },
+    {
+      "path": "sets/karo/karo-45-der.png",
+      "sizeBytes": 1647664,
+      "sha256": "8dada028a2a99f399a0bf8276213e07e050b4ca8291ddff1ae472830c0dc3241",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-45-der.png"
+    },
+    {
+      "path": "sets/karo/karo-45-izq.png",
+      "sizeBytes": 1691146,
+      "sha256": "cc38a074ddc033e0ce9cd6c89c588aa7534cbcf2567407824cfc5ce251c61d1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-45-izq.png"
+    },
+    {
+      "path": "sets/karo/karo-cuerpo.png",
+      "sizeBytes": 1898399,
+      "sha256": "2a58499005047d354b13cb6af42f3b1cdb49c4ff532cba58898a3ddf5c9e453d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-cuerpo.png"
+    },
+    {
+      "path": "sets/karo/karo-frente.png",
+      "sizeBytes": 1789092,
+      "sha256": "c89ba0447e137b750f58077cef3aba05d6259413caf3de778c23e60c1dbf55e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-frente.png"
+    },
+    {
+      "path": "sets/karo/karo-perfil-der.png",
+      "sizeBytes": 1642181,
+      "sha256": "b46d8258c52c1880fa15df02ba3f9cf68fa2b5f1cc1ec3c4786b4c1dc58d051f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-perfil-der.png"
+    },
+    {
+      "path": "sets/karo/karo-perfil-izq.png",
+      "sizeBytes": 1610788,
+      "sha256": "c11c04d484f23caaecbdc9a60977abd1852d5ba47ae903188509c78234cd9c2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/karo/karo-perfil-izq.png"
+    },
+    {
+      "path": "sets/sophia/sophia-45-der-v2.png",
+      "sizeBytes": 1513446,
+      "sha256": "2b4c044939f10bf26ddb20d97d8593f7b8961531b4cffbbfe79907d07870ac54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-45-der-v2.png"
+    },
+    {
+      "path": "sets/sophia/sophia-45-der.png",
+      "sizeBytes": 1469674,
+      "sha256": "129612ced34c0a506f9581eef82e2d71ff02f5707d67deded37eeb0b94e3de8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-45-der.png"
+    },
+    {
+      "path": "sets/sophia/sophia-45-izq.png",
+      "sizeBytes": 1497822,
+      "sha256": "5be93ed500d2d8afeaa8365cc5b7658ad11f3ac8f4dbff75118be6e4be643ea0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-45-izq.png"
+    },
+    {
+      "path": "sets/sophia/sophia-cuerpo.png",
+      "sizeBytes": 1846381,
+      "sha256": "dc6891758dda0d33ba8bf227d0b5f9b1102323a3d024b47c9ab9c2505e3aeca3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-cuerpo.png"
+    },
+    {
+      "path": "sets/sophia/sophia-frente.png",
+      "sizeBytes": 1566409,
+      "sha256": "4f7358914e5bbccb529db3ea26b8d050a61c3a04ede591847f8c2dfd8bdb381d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-frente.png"
+    },
+    {
+      "path": "sets/sophia/sophia-perfil-der.png",
+      "sizeBytes": 1474099,
+      "sha256": "4d3b5be9bd7f70f0c87b7533a9ac03523483423ed24afee55484502c6ff693ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-perfil-der.png"
+    },
+    {
+      "path": "sets/sophia/sophia-perfil-izq.png",
+      "sizeBytes": 1460520,
+      "sha256": "2bb0b55dcc302210c63be264978c1455a8ec4465ce55a77ab104311eca6d5268",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sets/sophia/sophia-perfil-izq.png"
+    },
+    {
+      "path": "sophia/sophia-a-castano.png",
+      "sizeBytes": 1718179,
+      "sha256": "871bdcca65d4ba6ac5b8071e72891e29727dda8f738a6e7dec44261ae27dab0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-a-castano.png"
+    },
+    {
+      "path": "sophia/sophia-a.png",
+      "sizeBytes": 1903794,
+      "sha256": "14b3ae708c64fb09ae11e685c0033f03bd7c6e1eaa6f6050b5ac61a1bef7fe0f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-a.png"
+    },
+    {
+      "path": "sophia/sophia-b-castano.png",
+      "sizeBytes": 1757873,
+      "sha256": "41cb52c95a47aa6877a80b80c177fcabb9aebea1f9d1b1b51d2f9ba0e9d7bd0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-b-castano.png"
+    },
+    {
+      "path": "sophia/sophia-b.png",
+      "sizeBytes": 1936415,
+      "sha256": "8f68825c72038186b0d11a2828e30abaf2ac9bc1447c40a25dad7175252556fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-b.png"
+    },
+    {
+      "path": "sophia/sophia-c-castano.png",
+      "sizeBytes": 1761828,
+      "sha256": "7b2f7456eea0c0f784c6a93d72d58bf2a9ee817b9e1ce432fc0a73ba6fd3c9ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-c-castano.png"
+    },
+    {
+      "path": "sophia/sophia-c.png",
+      "sizeBytes": 1947749,
+      "sha256": "398120f61bbdc37aa088721bd7019dcf25e1b5471fc38a1842a805e1a0d06cb7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-c.png"
+    },
+    {
+      "path": "sophia/sophia-d-castano.png",
+      "sizeBytes": 1757216,
+      "sha256": "762f0a5b0ee9448d2e232e0e56968bd45a3ab66a9fa99c76dafb304dfcfeedd4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-d-castano.png"
+    },
+    {
+      "path": "sophia/sophia-d.png",
+      "sizeBytes": 1912452,
+      "sha256": "48526d5a5adc8eb0d925f4bea757dc3063f20adc15b02b36eae38c3ba08fde1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-d.png"
+    }
+  ]
+}

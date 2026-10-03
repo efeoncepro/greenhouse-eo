@@ -12,6 +12,7 @@ import { readFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { construirPrompt } from './build-prompt.mjs'
+import { activarCanon } from './canon-sync.mjs'
 
 const args = process.argv.slice(2)
 const fichaPath = args.find(a => !a.startsWith('--'))
@@ -31,6 +32,10 @@ marca y el MACRO DEL BORDADO de cada prenda con emblema. Nadie copia rutas a man
 }
 
 const ficha = JSON.parse(readFileSync(fichaPath, 'utf8'))
+
+// Las referencias selladas que falten o estén viejas se traen del bucket canon antes de generar.
+activarCanon()
+
 const { prompt, size, imagenes, avisoCaso } = construirPrompt(ficha)
 
 // Ficha cine recién creada con `foto:cine:nueva`: no se gasta mientras la escena siga siendo la de la receta.

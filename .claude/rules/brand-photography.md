@@ -334,6 +334,13 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   (`foto:isotipo --marca logotipo`). Escena con Sparks que sí es cine: **dos Sparks con referencia como máximo**, el resto
   lejos y desenfocado (registro cine, delta 2026-10-02). **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
   sirve, a 520 px un bordado no se lee y pasa por bueno.
+- 🔴 **La vista puesta la ELIGE `foto:prompt` por quien la viste** **[operador, 2026-10-03]**: silueta (`hombre`/`mujer`
+  en roster y elenco), giro (de la vista de identidad, o `giro` en el objeto si va de espaldas), `camara: "baja"` y
+  `tapa` (`mano`/`cruza`/`objeto`/`brazos`; con una persona se infiere de la escena). Imprime la elegida y **las demás
+  opciones**; en un grupo, declara `persona` en cada prenda. El macro viaja también con la prenda puesta. **Una marca
+  tapada por una mano se pide con su vista de oclusión, nunca componiendo una marca más chica al lado** («la vista real
+  sería que se viera sólo la parte del logo que no tapa la mano»). Kit, trampas y `foto:isotipo --oclusion/--pliegues/
+  --escorzo`: `garment-reference-kit.md` §Delta 2026-10-03.
 - 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: «*cuando compones el isotipo no
   siempre queda bien; pásalo al modelo pidiéndole que haga el acabado sin alterar lo que está bien*». Compuesto
   solo, se ve pegado encima. **Comando (desde el 2026-09-29): `pnpm foto:isotipo <plate.png> --centro x,y --ancho w

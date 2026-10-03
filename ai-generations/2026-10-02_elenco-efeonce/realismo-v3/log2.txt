@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/realismo-v3/sophia-cuerpo-v3.png (edit) …
+  ✓ 1755KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 2066 (img 1536 · txt 530) · out 1372 · total 3438
+done

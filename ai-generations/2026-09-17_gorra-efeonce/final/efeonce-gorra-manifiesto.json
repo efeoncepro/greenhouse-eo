@@ -1,145 +1,236 @@
 {
-  "producto": "Gorra Efeonce",
-  "decision": "Cinco variantes sobre la gorra existente del sitio. Principal: navy con logotipo blanco (kit completo). Alternativas: navy sólo con isotipo (discreta) y trucker navy con malla (terreno). Royal queda por continuidad con la landing de contacto; blanca como pieza estacional.",
-  "fuente": "efeonce-gorra-referencia-oficial-sitio.png — gorra royal del héroe de /contacto en el sitio público, usada como única fuente de construcción",
-  "invariantes": {
-    "construccion": "seis paneles, visera curva, botón forrado, dos ojetillos por lado, cierre de cinta con corredera metálica (snapback plástico sólo en la trucker)",
-    "emblema": "bordado en puntada satinada con relieve; logotipo completo o isotipo según variante; nunca espejado",
-    "trasera": "sin bordado",
-    "color": "navy de marca #023c70; royal sólo en la variante existente"
+ "producto": "Gorra Efeonce",
+ "decision": "Cinco variantes sobre la gorra existente del sitio. Principal: navy con logotipo blanco (kit completo). Alternativas: navy sólo con isotipo (discreta) y trucker navy con malla (terreno). Royal queda por continuidad con la landing de contacto; blanca como pieza estacional.",
+ "fuente": "efeonce-gorra-referencia-oficial-sitio.png — gorra royal del héroe de /contacto en el sitio público, usada como única fuente de construcción",
+ "invariantes": {
+  "construccion": "seis paneles, visera curva, botón forrado, dos ojetillos por lado, cierre de cinta con corredera metálica (snapback plástico sólo en la trucker)",
+  "emblema": "bordado en puntada satinada con relieve; logotipo completo o isotipo según variante; nunca espejado",
+  "trasera": "sin bordado",
+  "color": "navy de marca #023c70; royal sólo en la variante existente"
+ },
+ "vistas": [
+  {
+   "id": "v1-royal-logotipo",
+   "descripcion": "Royal con logotipo completo (la existente del sitio)",
+   "cuando_usarla": "continuidad con la landing de contacto; producción y regalo",
+   "archivo_fondo_estudio": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
   },
-  "vistas": [
-    {
-      "id": "v1-royal-logotipo",
-      "descripcion": "Royal con logotipo completo (la existente del sitio)",
-      "cuando_usarla": "continuidad con la landing de contacto; producción y regalo",
-      "archivo_fondo_estudio": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-01-frente",
-      "descripcion": "Navy, frente recto",
-      "cuando_usarla": "fichas y catálogo",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-01-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-02-lateral",
-      "descripcion": "Navy, lateral",
-      "cuando_usarla": "perfil de la copa y curva de la visera",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-02-lateral-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v2-02-lateral-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-03-trasera",
-      "descripcion": "Navy, trasera con el cierre",
-      "cuando_usarla": "construcción; declara que atrás no lleva bordado",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-03-trasera-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v2-03-trasera-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-04-macro-bordado",
-      "descripcion": "Navy, macro del bordado",
-      "cuando_usarla": "verificación del emblema y de la puntada",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-04-macro-bordado-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-05-cenital",
-      "descripcion": "Navy, cenital",
-      "cuando_usarla": "paneles y costuras; base de mockups",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-05-cenital-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v2-05-cenital-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v2-navy-logotipo",
-      "descripcion": "Navy con logotipo blanco — PRINCIPAL",
-      "cuando_usarla": "uso general del equipo; combina con polo y softshell",
-      "archivo_fondo_estudio": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v3-02-trasera",
-      "descripcion": "Navy isotipo, trasera",
-      "cuando_usarla": "construcción",
-      "archivo_fondo_estudio": "efeonce-gorra-v3-02-trasera-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v3-02-trasera-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v3-navy-isotipo",
-      "descripcion": "Navy sólo con isotipo",
-      "cuando_usarla": "alternativa discreta frente a cliente",
-      "archivo_fondo_estudio": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v4-blanco-logotipo",
-      "descripcion": "Blanco con logotipo navy",
-      "cuando_usarla": "verano y eventos",
-      "archivo_fondo_estudio": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v5-02-trasera",
-      "descripcion": "Trucker, trasera con malla y snapback",
-      "cuando_usarla": "construcción",
-      "archivo_fondo_estudio": "efeonce-gorra-v5-02-trasera-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v5-02-trasera-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "v5-trucker-navy",
-      "descripcion": "Trucker navy con malla blanca",
-      "cuando_usarla": "terreno, grabación y exteriores",
-      "archivo_fondo_estudio": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    }
-  ]
+  {
+   "id": "v2-01-frente",
+   "descripcion": "Navy, frente recto",
+   "cuando_usarla": "fichas y catálogo",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-01-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v2-02-lateral",
+   "descripcion": "Navy, lateral",
+   "cuando_usarla": "perfil de la copa y curva de la visera",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-02-lateral-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v2-02-lateral-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v2-03-trasera",
+   "descripcion": "Navy, trasera con el cierre",
+   "cuando_usarla": "construcción; declara que atrás no lleva bordado",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-03-trasera-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v2-03-trasera-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v2-04-macro-bordado",
+   "descripcion": "Navy, macro del bordado",
+   "cuando_usarla": "verificación del emblema y de la puntada",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-04-macro-bordado-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v2-05-cenital",
+   "descripcion": "Navy, cenital",
+   "cuando_usarla": "paneles y costuras; base de mockups",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-05-cenital-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v2-05-cenital-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v2-navy-logotipo",
+   "descripcion": "Navy con logotipo blanco — PRINCIPAL",
+   "cuando_usarla": "uso general del equipo; combina con polo y softshell",
+   "archivo_fondo_estudio": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v3-02-trasera",
+   "descripcion": "Navy isotipo, trasera",
+   "cuando_usarla": "construcción",
+   "archivo_fondo_estudio": "efeonce-gorra-v3-02-trasera-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v3-02-trasera-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v3-navy-isotipo",
+   "descripcion": "Navy sólo con isotipo",
+   "cuando_usarla": "alternativa discreta frente a cliente",
+   "archivo_fondo_estudio": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v4-blanco-logotipo",
+   "descripcion": "Blanco con logotipo navy",
+   "cuando_usarla": "verano y eventos",
+   "archivo_fondo_estudio": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v5-02-trasera",
+   "descripcion": "Trucker, trasera con malla y snapback",
+   "cuando_usarla": "construcción",
+   "archivo_fondo_estudio": "efeonce-gorra-v5-02-trasera-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v5-02-trasera-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "v5-trucker-navy",
+   "descripcion": "Trucker navy con malla blanca",
+   "cuando_usarla": "terreno, grabación y exteriores",
+   "archivo_fondo_estudio": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "gorra-v2-10-puesto-frente",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo masculino, de frente.",
+   "cuando_usarla": "Asset de USO con una persona hombre de frente. Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-10-puesto-frente-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-10-puesto-frente.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-11-puesto-frente-mujer",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo femenino, de frente.",
+   "cuando_usarla": "Asset de USO con una persona mujer de frente. Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-11-puesto-frente-mujer-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-11-puesto-frente-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-12-puesto-45-izq",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo masculino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-12-puesto-45-izq-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-12-puesto-45-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-13-puesto-45-der",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo masculino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-13-puesto-45-der-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-13-puesto-45-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-14-puesto-70-izq",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo masculino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-14-puesto-70-izq-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-14-puesto-70-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-15-puesto-70-der",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo masculino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-15-puesto-70-der-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-15-puesto-70-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-16-puesto-45-izq-mujer",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo femenino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-16-puesto-45-izq-mujer-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-16-puesto-45-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-17-puesto-45-der-mujer",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo femenino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-17-puesto-45-der-mujer-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-17-puesto-45-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-18-puesto-70-izq-mujer",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo femenino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-18-puesto-70-izq-mujer-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-18-puesto-70-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "gorra-v2-19-puesto-70-der-mujer",
+   "descripcion": "La gorra navy con el logotipo bordado, puesta, cuerpo femenino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-gorra-v2-19-puesto-70-der-mujer-1024x1024-v01-fondo-estudio.png",
+   "resolucion": "1024x1024",
+   "brief": "brief/gorra-v2-19-puesto-70-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  }
+ ],
+ "delta_2026_10_03": "Vistas puestas por silueta, giro (45° y 70°) y oclusión (mano, brazos, objeto, antebrazo), editadas desde la vista puesta de frente aprobada con el macro del bordado. foto:prompt las elige solo (`elegirPuesta`) e imprime las alternativas. Corrida: ai-generations/2026-10-03_uniforme-vistas/LEEME.md."
 }

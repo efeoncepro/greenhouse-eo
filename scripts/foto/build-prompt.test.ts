@@ -26,6 +26,11 @@ import {
   CLAVES_SIN_ARCHIVO,
   castingDeFicha,
   construirPrompt,
+  cadenaDeGiro,
+  elegirPuesta,
+  giroDeVista,
+  SILUETAS,
+  tapaEnEscena,
   detectarValorDeFormato,
   familiaDeLecho,
   OBJETOS,
@@ -1544,11 +1549,14 @@ describe('el asset de USO es la prenda puesta, y es el defecto', () => {
   // Contrato EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1: arte plano → producir vistas · prenda aislada
   // → construir · prenda PUESTA → usar en escena. Medido: con la prenda puesta el logotipo sale legible
   // a la primera en las dos personas; con la prenda aislada falló cuatro veces seguidas.
-  itConAssets('sin vista declarada usa la prenda PUESTA, y entonces el macro sobra', () => {
+  // Delta 2026-10-03: el macro viaja TAMBIÉN con la prenda puesta (default de toda prenda; `macroEnUso: false` lo
+  // apaga). En la prueba de uniforme del elenco la marca del pecho salió reinventada con sólo la vista puesta.
+  itConAssets('sin vista declarada usa la prenda PUESTA, con el macro del bordado detrás', () => {
     const { imagenes, prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
 
-    expect(imagenes).toHaveLength(1)
+    expect(imagenes).toHaveLength(2)
     expect(imagenes[0]).toMatch(/puesto-frente/)
+    expect(imagenes[1]).toMatch(/detalle-bordado/)
     expect(prompt).toMatch(/ALREADY WORN/)
   })
 
@@ -1837,3 +1845,71 @@ describe('foto:prompt · elenco de marca', () => {
   })
 })
 
+
+describe('foto:prompt · selección de la vista puesta (2026-10-03)', () => {
+  const kit = {
+    usoPorVista: {
+      'frente-mujer': 'a', '45-izq': 'b', '45-der': 'c', '45-der-mujer': 'd', '70-der': 'e',
+      espalda: 'f', 'espalda-mujer': 'g', 'frente-mano': 'h', 'frente-mano-mujer': 'i'
+    }
+  }
+
+  it('toda persona del roster y del elenco declara su silueta', () => {
+    for (const [clave, p] of [...Object.entries(PERSONAS), ...Object.entries(ELENCO)]) {
+      expect(SILUETAS, clave).toContain((p as { silueta?: string }).silueta)
+    }
+  })
+
+  it('el giro sale de la vista de identidad: perfil → 70°, tres cuartos → 45°, espalda', () => {
+    expect(giroDeVista(null)).toBe('frente')
+    expect(giroDeVista('45-izq')).toBe('45-izq')
+    expect(giroDeVista('tres-cuartos-der')).toBe('45-der')
+    expect(giroDeVista('perfil-der')).toBe('70-der')
+    expect(giroDeVista('espalda')).toBe('espalda')
+    expect(giroDeVista('trasero')).toBe('espalda')
+  })
+
+  it('elige por silueta y giro, y cae a la más cercana avisándolo', () => {
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: '45-der' })).toMatchObject({ clave: '45-der-mujer', exacta: true })
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: '45-izq' })).toMatchObject({ clave: '45-izq', exacta: false })
+    expect(elegirPuesta(kit, { silueta: 'hombre', vista: 'perfil-der' })).toMatchObject({ clave: '70-der', exacta: true })
+    // El ángulo pesa más que la silueta: lo que se pierde con el ángulo es la marca (operador, 2026-10-03).
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: 'perfil-der' })).toMatchObject({ clave: '70-der', exacta: false })
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: 'espalda' }).clave).toBe('espalda-mujer')
+    expect(elegirPuesta(kit, { silueta: 'mujer' }).clave).toBe('frente-mujer')
+    expect(elegirPuesta(kit, {}).clave).toBe('frente')
+  })
+
+  it('con algo delante del pecho, gana la vista de oclusión', () => {
+    expect(elegirPuesta(kit, { silueta: 'mujer', tapa: 'mano' }).clave).toBe('frente-mano-mujer')
+    expect(elegirPuesta(kit, { silueta: 'hombre', vista: '45-der', tapa: 'mano' }).clave).toBe('frente-mano')
+    expect(elegirPuesta(kit, { silueta: 'hombre', tapa: 'brazos' })).toMatchObject({ clave: 'frente', exacta: false })
+  })
+
+  it('lista las alternativas para que se pueda forzar otra con `puesta`', () => {
+    const r = elegirPuesta(kit, { silueta: 'mujer', vista: '45-der' })
+
+    expect(r.alternativas).toContain('frente')
+    expect(r.alternativas).toContain('frente-mano-mujer')
+    expect(r.alternativas).not.toContain('45-der-mujer')
+  })
+
+  it('de espaldas: el 70° cae al 45° y éste a la espalda; la cámara baja pide su vista desde abajo', () => {
+    const espalda = { usoPorVista: { espalda: 'a', 'espalda-mujer': 'b', 'espalda-45-izq': 'c', 'espalda-bajo': 'd', 'frente-bajo-mujer': 'e' } }
+
+    expect(cadenaDeGiro('espalda-70-izq')).toEqual(['espalda-70-izq', 'espalda-45-izq', 'espalda'])
+    expect(cadenaDeGiro('70-der')).toEqual(['70-der', '45-der', 'frente'])
+    expect(elegirPuesta(espalda, { silueta: 'hombre', giro: 'espalda-70-izq' }).clave).toBe('espalda-45-izq')
+    expect(elegirPuesta(espalda, { silueta: 'mujer', giro: 'espalda-70-der' }).clave).toBe('espalda-mujer')
+    expect(elegirPuesta(espalda, { silueta: 'hombre', giro: 'espalda', camara: 'baja' }).clave).toBe('espalda-bajo')
+    expect(elegirPuesta(espalda, { silueta: 'mujer', camara: 'baja' }).clave).toBe('frente-bajo-mujer')
+  })
+
+  it('infiere qué tapa la marca desde la escena', () => {
+    expect(tapaEnEscena('She stands with her arms crossed')).toBe('brazos')
+    expect(tapaEnEscena('his right hand rests flat on his chest')).toBe('mano')
+    expect(tapaEnEscena('holding a closed tablet against her chest')).toBe('objeto')
+    expect(tapaEnEscena('he raises a coffee cup near his opposite shoulder')).toBe('cruza')
+    expect(tapaEnEscena('she walks toward the window')).toBeNull()
+  })
+})

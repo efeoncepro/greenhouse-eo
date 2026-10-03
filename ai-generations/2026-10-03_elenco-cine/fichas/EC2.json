@@ -1,0 +1,49 @@
+{
+ "id": "EC2",
+ "formato": "4:5",
+ "impacto": true,
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce"
+  },
+  {
+   "objeto": "chaqueta-bomber-efeonce"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic ensemble still with real depth of field, an empty dark studio at night with no desks, no monitors, no plants and no lamps). GEOGRAPHY, the most important instruction: the UPPER 46% of the frame is one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture: no light falls on it, no glow, no bokeh, no ribbon and no objects. Everything lit lives between 48% and 80% of the frame height. The LOWEST 20% is a near-black matte stage riser right in front of the lens, completely out of focus, non-reflective, outside every light. THE MOMENT: the Efeonce squad of EXACTLY FIVE people stands in ONE single line shoulder to shoulder, framed from the waist up — this is a five-person group, not a chest-up portrait: each head is only about one tenth of the frame height — all five heads in the same band between 50% and 60% of the frame height, the riser cutting them at the waist. From LEFT to RIGHT: ONE, Isabella (image 1), a Colombian woman of 27 with deep brown skin, soft freckles and big natural 3C-4A curls, in the deep navy bomber jacket over the polo; TWO, Sophia (image 2), a slim woman of 31 with a short dark-brown curly bob and thin gold-wire glasses, in the deep navy bomber jacket over the polo; THREE, in the CENTER, Karo — the woman of image 3, long copper-brown 3A-3B ringlets and gold hoops — in the Efeonce hoodie exactly as in its reference; FOUR, Hum — the woman of image 4, long very dark brown loose waves and a tiny silver stud on one nostril — in the deep navy bomber jacket over the polo; FIVE, Antonio (image 5), a Mexican man of 35 with straight black hair combed back, his beard SHORT, 3 to 5 mm, with clean lines exactly as in his reference, never full or long, in the deep navy bomber jacket over the polo. Running in front of their chests from left to right, ONE long, flowing RIBBON of pure teal light (#36C8BF) carries small glowing work cards. The four others each rest ONE hand on the ribbon where it passes, the arm fully visible from shoulder to hand, the other hand relaxed at their side. Karo does NOT touch the ribbon: with both hands she holds ONE piece just in front of her chin, never above her head, checking it, and the ribbon passes unbroken in front of her chest; that piece is the brightest element and lights her face. The ribbon is the only key light; NO fill. On every face the ONLY light is the teal ribbon below the chin: a soft teal-cyan glow from BELOW lights the jaw, the underside of the nose and the brows, while the forehead and the top of the head fall into darkness. No white frontal light, no studio light on any face; the light of the identity references does NOT carry over. A cool azure (#0375DB) rim light from behind outlines hair and shoulders. Thin haze catches the ribbon, only below 48%. Nobody else is in the frame. The ribbon enters at the left frame edge and leaves at the right frame edge. All except Karo look straight into the lens with calm, confident expressions; nobody looks at anybody else. The pieces are rounded rectangles: no circles, no dots, no spheres, no rings. Camera about six meters away at chest height, 85mm, realistic adult proportions, nothing foreshortened. Fine dust, real sensor grain, genuine depth of field. Rich contrast, deep navy blacks. No readable text, no letters, no logos of any other brand.",
+ "lecho": {
+  "objeto": "a near-black matte stage riser right in front of the lens, crossing the whole width of the lowest 20% of the frame, completely out of focus, non-reflective, outside every light",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "one continuous, evenly dark, deep navy-black matte plaster studio wall with fine visible texture",
+   "tinta": "blanca"
+  }
+ },
+ "registro": "cine",
+ "desde": "C4S07",
+ "alcance": "publicidad-prueba",
+ "identidad": [
+  "isabella",
+  "sophia",
+  "karo",
+  "hum",
+  "antonio"
+ ],
+ "llave": {
+  "fuente": "ONE long, flowing ribbon of pure teal light (#36C8BF) running in front of their chests, and ONE piece lifted off it in Karo hands",
+  "lado": "below the faces, in front of the chests",
+  "distancia": "about 20 to 40 cm from their chests"
+ },
+ "fondo": "about six meters behind the squad, a row of large cold practical lights melted into round bokeh, kept low, never in the upper 46%",
+ "fenomeno": {
+  "que": "one continuous ribbon of orange light passes from hand to hand across the five people: each one touches it at the point where their service acts, and it never breaks",
+  "esServicio": "Un solo equipo integrado: el mismo trabajo pasa por las cinco líneas sin cortarse ni cambiar de manos ajenas"
+ }
+}

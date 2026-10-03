@@ -561,3 +561,61 @@ esa imagen sólo muestra cómo cae, nunca su cara), `acabadoMarca` y `macroEnUso
 escena va **recortada bajo el mentón** (`13-puesto-frente-sin-rostro`): con la cara completa, la escena copiaba el
 gesto de esa foto. Una pieza de ficción con regla de uso lleva además su guarda (`validarTrajeNexa`: sólo Nexa, sólo
 con `"registro": "cine"` explícito) en vez de una advertencia en prosa.
+
+## Delta 2026-10-03 — la vista puesta se ELIGE por quien la viste, y el kit cubre giro, espalda y oclusión
+
+Pedido del operador: «dale a los comandos la capacidad de elegir la más adecuada para que sepan que tienen opciones».
+Antes, sin `puesta`, la prenda viajaba SIEMPRE con su vista frontal de hombre: Karo, Sophia, Isabella y Hum recibían un
+pecho masculino de frente aunque la escena las pusiera a 45°, y el modelo dibujaba la caída de la tela y el bordado a ojo.
+
+**Lo que hace ahora `pnpm foto:prompt`** (`elegirPuesta` en `scripts/foto/build-prompt.mjs`):
+
+- Cada persona del roster y del elenco declara `silueta: 'hombre' | 'mujer'` (el casting de campaña también puede).
+- Quién viste la prenda: `persona` en el objeto, o la única persona de `identidad`. En un grupo, sin `persona`, la prenda
+  va de frente y el comando lo avisa.
+- El **giro** sale de la vista de identidad (`45-*` → 45°, `perfil-*` → 70°, `espalda`/`trasero` → espalda) o de
+  `giro` en el objeto (obligatorio de espaldas: la identidad no tiene esa vista). `camara: "baja"` pide la vista desde
+  abajo. `tapa: "mano" | "cruza" | "objeto" | "brazos"` pide la vista de oclusión; con una persona, se infiere de la escena.
+- Cadena de respaldo: oclusión → cámara baja → el giro → el 45° del mismo lado → la familia (frente o espalda); en cada
+  paso, primero la de la silueta. **El ángulo pesa más que la silueta**: lo que se pierde con el ángulo es la marca.
+- Imprime una línea `·` por prenda con la vista elegida, el motivo y **las demás opciones del kit**; `puesta` sigue
+  ganando siempre. Si no existe la vista exacta, avisa cuál usó.
+- **El macro del bordado viaja también con la prenda puesta** (default de toda prenda; `macroEnUso: false` lo apaga). Con sólo la vista puesta, la marca del pecho a
+  escala de escena salió reinventada en polo y hoodie (prueba de uniforme del elenco). La gorra sigue sin macro: su
+  logotipo ya se lee grande y el macro la empujaba a redibujarlo (2026-09-20).
+
+**Convención de `usoPorVista`:** `<giro>[-<tapa>|-bajo][-mujer]`. El lado (`izq`/`der`) dice hacia qué borde del CUADRO
+apunta la nariz de la persona, de frente o de espaldas, igual que las vistas del elenco.
+
+**El kit completo (2026-10-03, corrida `ai-generations/2026-10-03_uniforme-vistas/`)**, por prenda (bomber, softshell,
+polo navy, hoodie), hombre y mujer: frente · 45° y 70° a cada lado · frente con cámara baja · espalda a 45° y 70° a cada
+lado · espalda con cámara baja · oclusión con mano, antebrazo con taza, tablet y brazos cruzados. Gorra navy: frente,
+45° y 70° a cada lado, hombre y mujer (encuadre de la copa a las cejas: sin rostro). Método: **editar** la vista puesta
+aprobada (frente o espalda) con el macro como segunda imagen; entradas 3:4 padeadas a 2:3 espejando el pie.
+
+Cinco trampas medidas en esa corrida:
+
+1. **En el giro el modelo ROTA la marca en el plano** (hasta ~35° a 70°): la dibuja a mano porque no tiene esa
+   perspectiva. Se corrigió pidiendo que el eje largo de la órbita quede horizontal y que el giro sólo la estreche, y
+   **partiendo del frente**, no del 45°: editar desde un 45° rotado arrastra la rotación.
+2. **Medir la rotación no es trivial**: la correlación x·y de los píxeles de la marca es invariante a un escorzo
+   uniforme, pero en una superficie curva el escorzo no es uniforme y el indicador lo confunde con rotación
+   (`rotacion-marca.mjs` en la corrida: indicador, no gate). Lo que delata la rotación a ojo: la esfera fuera de lo alto
+   de la órbita y la fila de ventanas inclinada.
+3. **El modelo ESQUIVA la oclusión**: pedido «que tape la mitad», baja la tablet o sube la taza hasta dejar la marca
+   entera (7 de 16 en la primera pasada). Se ancla la altura del objeto contra la marca misma («el borde de la tablet a
+   la altura del centro de la marca», «los nudillos delante de la marca»). Con brazos cruzados la marca queda entera
+   sobre el antebrazo: es realista y se conserva como vista.
+4. **Componer la marca sobre la vista de kit la empeora**: con `foto:isotipo --escorzo` las 24 recomposiciones se veían
+   pegadas, con manchas de limpieza y el borde de la silueta escalonado. La referencia sale buena desde la vista o se
+   rehace; no se parcha.
+5. **En la oclusión, la vista real es la marca a su tamaño con sólo la parte visible** (operador, sobre la mano de Karo
+   en EC2: componer una marca más chica al lado de la mano «no sería la vista real»). Por eso la oclusión es una VISTA del
+   kit, no una composición sobre la escena.
+
+**`pnpm foto:isotipo` (2026-10-03)**, para cuando sí hay que componer: clasifica la caja en tela, marca inventada y
+**oclusor** (piel, pelo, otro material por color, más `--oclusion <máscara de pnpm ai:mask>` para lo que tiene el color de
+la prenda: una manga, separada con `pnpm ai:layers`); limpia sólo la marca inventada y compone la oficial **por detrás**
+de lo que está delante. `--pliegues` (default 1) tiñe la marca con la luz local de la tela y `--relieve` la desplaza con
+el gradiente del pliegue; `--escorzo` la comprime en horizontal. Sigue valiendo la regla: si la marca no se puede
+componer limpia, se rehace la toma.

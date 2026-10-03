@@ -1,0 +1,26 @@
+{
+ "id": "UN-hum-C",
+ "formato": "4:5",
+ "impacto": true,
+ "piloto": "ai-generations/2026-10-03_elenco-uniforme/plates/UN-hum-A.png",
+ "identidad": [
+  {
+   "persona": "hum",
+   "vista": "45-izq"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "puesta": "espalda-mujer"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "escena": "SCENE: Hum seen FROM BEHIND, standing at a window that looks over the city, head turned back over her left shoulder toward the camera with a warm half-smile, so the face is in three-quarter view. She wears the deep navy bomber jacket of the kit over the deep navy pique polo of the kit (only the polo collar shows at the neck), with dark jeans; the BACK of the jacket shows its embroidered mark exactly as in the reference, centered between the shoulder blades. Three-quarter length from the head to mid-thigh. Soft daylight from the window with gentle fill from the room; 85mm lens at f/2.8, camera at chest height about 2.5 m behind. A small azure-blue (#0375DB) mug on the sill, out of focus.",
+ "lecho": {
+  "objeto": "the dark back of a sofa in the lower foreground",
+  "tono": "DARK near black"
+ }
+}
