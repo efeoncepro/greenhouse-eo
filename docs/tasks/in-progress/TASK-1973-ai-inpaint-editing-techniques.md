@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `En implementación 2026-10-03 (Claude, develop local-first, sin push)`
+- Status real: `Code complete local 2026-10-03 para Slices 1, 3–8 (commits fd7e17c4b…0e469024d en develop, sin push; 99 pruebas del pipeline, dry-runs reales de ai:layers y expand). Pendiente: canarios reales (autorización de gasto) y Slice 2 (foto:expandir tiene WIP de otra sesión: coordinar con CMP-004)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`

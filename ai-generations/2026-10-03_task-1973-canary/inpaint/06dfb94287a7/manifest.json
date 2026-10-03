@@ -1,0 +1,79 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "06dfb94287a7",
+  "key": "06dfb94287a7660ff269180415bfe77e1fde18c7bddd78acde85f380b3d9cb99",
+  "status": "dry-run",
+  "createdAt": "2026-10-03T09:06:04.964Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-canvas.png",
+    "imageSha256": "90854c716fc77959d70ed650ec78bbea6a18c7de19ecce5a28932096c5cf97c2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-mask.png",
+    "maskSha256": "0d00f89dc25b184459f5cfe044b019d314f7f341975776b70f4ed1870add720e",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 2730,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "the same quiet office continues above and below the desk",
+    "providerPrompt": "the same quiet office continues above and below the desk Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.6424908424908425,
+    "editable": 2623488,
+    "soft": 70656,
+    "protected": 1499136
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 2730
+    },
+    "target": {
+      "width": 1440,
+      "height": 2560
+    },
+    "aspectError": 0.00024420024420024333,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0143,
+    "basis": "1 × salida 1440x2560 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "sourceSha256": "69afa01a78f40b7f4997b07449e4bfd5487877c6abb71f301d6e87f5a81defa7",
+    "to": "9:16",
+    "plan": {
+      "canvas": {
+        "width": 1536,
+        "height": 2730
+      },
+      "scene": {
+        "left": 0,
+        "top": 853,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 24
+  }
+}
