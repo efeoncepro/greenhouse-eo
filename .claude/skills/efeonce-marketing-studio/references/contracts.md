@@ -3,6 +3,9 @@
 Verified against `packages/contracts/src/{operations,semantics,tool-manifest,errors,dto,openapi}.ts` on 2026-09-25
 (Studio `d3ab68e`, API `1.1.0`, manifest hash `96d1f0caf6e5571d1d51a93dd8824cb69f578f514945c563b7c6bd5bb39326bb`).
 
+> **Current (2026-10-02):** API `1.3.0`, 20 operations = 15 tools + 5 exclusions (two `T1` writes). The 17-row table
+> below is the TASK-1890 baseline; op 18 (download) is in §Originals and ops 19–20 (writes) in §Writes.
+
 ## Operations registry (17: 12 tools + 5 exclusions)
 
 All are `GET`. Tools: capability `marketing_studio.campaign.read`, API scope `studio:read`, `writes: false`.
@@ -122,7 +125,163 @@ Health body: `{ status: ok|degraded, database: reachable|unreachable, accessMode
   `placementPreview`, `publishedAt`, `permalink`.
 - Worker endpoints (`/events/original-finalized`, `/jobs/*`) are NOT `/api/v1` and not in the registry (Cloud Run only).
 
-## Asset version ingest — DECIDED, NOT IN CODE (ADR 2026-09-26)
+## Writes — ingest door (TASK-1894 Entregable A, verified against code 2026-10-02, Studio `a450a3c`/`aa91ce3`, API `1.3.0`)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` §7.3. The registry now has
+**20 operations with explicit `riskTier`** (18 reads `T0` + 2 writes `T1`) = **15 tools + 5 exclusions**; manifest hash
+regenerated (read the live one from `GET /api/v1/tool-manifest`, do not trust an old hash).
+
+| # | Method + path | operationId | Tool | Transport |
+|---|---|---|---|---|
+| 19 | `POST /api/v1/campaigns/{campaignId}/uploads` | `requestAssetVersionUpload` | `studio.asset.upload.request` | `Idempotency-Key` required · `If-Match` optional (required when targeting an existing piece) · `dryRun` query · 200/201 |
+| 20 | `POST /api/v1/campaigns/{campaignId}/asset-versions` | `createAssetVersion` | `studio.asset.version.create` | `Idempotency-Key` required · no `If-Match` · `dryRun` · 201/202 |
+
+Both: `WriteToolSpec { writes: true, class: 'write', requiresPerson: false, destructive: false, idempotent: true,
+capability: 'marketing_studio.asset.write', capabilityAction: 'create', apiScope: 'studio:assets:write' }`,
+`riskTier: 'T1'`, `organizationFilter: false`. `ToolSpec = ReadToolSpec | WriteToolSpec`; `class: 'approve'` tools have
+`apiScope: null` (a service client never approves). `WriteTransport { idempotencyKey: 'required', ifMatch:
+'required'|'optional'|'none', dryRun }`. New `API_SCOPES` for `api_client`: `studio:assets:write`, `studio:write`.
+
+**DTOs** (`packages/contracts/src/commands.ts`):
+
+- `RequestAssetVersionUploadBody { filename, byteSize (≤ 1 GiB), mimeType (ORIGINAL_MIME), sha256 (hex 64), assetId?,
+  newAsset? { conceptId, title, kind: image|video, aspectRatio 'WxH' }, rights: UploadRights, note? }`.
+- `UploadRights { licenseKind: owned|client_supplied|stock|talent|music|ai_generated|mixed, reference? (required for
+  client_supplied/stock/talent/music/mixed), usageStartsOn?, usageEndsOn? (inclusive), territories?, channelKeys? }`.
+- `AssetUploadTicket { status: awaiting_upload|awaiting_confirmation|duplicate|dry_run, uploadId|null, inference
+  { status: matched|new_asset|unmatched|conflict, campaignId, conceptId, assetId, title, aspectRatio, kind,
+  nextVersionNo, missing[] }, duplicateOf|null, upload { mode: single|resumable, method: PUT|POST, url, headers,
+  expiresAt }|null }` — V4 URL, 30 min, object `originals/sha256/<aa>/<sha256>`, signed headers `content-type`,
+  `x-goog-if-generation-match: 0`, `x-goog-meta-sha256`; resumable (`x-goog-resumable: start`) for video or > 32 MiB.
+- `CreateAssetVersionBody { uploadId (uuid) }` → `CreateAssetVersionResult` = `created { assetId, versionNo,
+  reviewState: 'pending_review', revision }` (201) | `pending_verification { uploadId }` (202 + `Retry-After: 5`) |
+  `dry_run { uploadState, assetId, nextVersionNo }`.
+- Readers: `AssetVersion` adds `origin` (`catalog_import`|`studio`), `reviewState`
+  (`imported`|`pending_review`|`approved`|`changes_requested`), `createdBy` (human label: «Cliente de API»,
+  «Operador (x)»), `createdAt`. `Asset` adds `revision` (for `If-Match`) and `pendingVersionNo`. **Current version =
+  highest `version_no` with `review_state` ∈ {imported, approved}.**
+
+**Kernel gates** (`kernel.ts`, in order): authority (anonymous open-mode actor → 403 `write_not_allowed`, before body
+validation; session `user` → `forbidden` until TASK-1898; `api_client` → needs the tool's scope, else `forbidden`, and
+never approves; `operator_cli` writes) → riskTier from the registry (T1 needs `Idempotency-Key`; T2 → `forbidden` until
+TASK-1899) → organization (404 anti-oracle) → idempotency (same key + same body digest = replay of the stored terminal
+response; other body = 422 `idempotency_key_reused`; race resolved by `ON CONFLICT`; records 24 h) → `dryRun` (no
+writes) → terminal response stored in the same transaction.
+
+**New error codes** (`ErrorBody` may carry `reason` and `missing[]`):
+
+| code | HTTP | actionable |
+|---|---|---|
+| `write_not_allowed` | 403 | false |
+| `upload_disabled` | 403 | false — flag off or no bucket/signer: never signs half-configured |
+| `approval_requires_person` | 403 | false |
+| `precondition_required` | 428 | true |
+| `revision_conflict` | 412 | true |
+| `idempotency_key_required` | 400 | true |
+| `idempotency_key_reused` | 422 | false |
+| `validation_failed` | 422 | true |
+| `rights_required` | 422 | true |
+| `filename_not_inferable` | 422 | true |
+| `upload_rejected` | 422 | false — `reason`: `sha256_mismatch`, `size_mismatch`, `type_rejected`, `aspect_ratio_mismatch`, `revision_conflict` |
+| `upload_expired` | 410 | true |
+| `payload_too_large` | 413 | false |
+| `unsupported_media_type` | 415 | false |
+| `too_many_open_uploads` | 429 | true (20 open uploads per actor) |
+| `invalid_state_transition` | 409 | false |
+
+**Aspect ratio:** `aspectRatio` matches `^\d+x\d+$` (integers only): a decimal ratio is scaled, 1,91:1 → `191x100`.
+The worker checks the file's real ratio within 1 % (2048/1072 = 1,9104 passes); a mismatch is `upload_rejected` with
+`reason: aspect_ratio_mismatch`. The web labels it with `ratioLabel` (`191x100` → «1,91:1»).
+
+**Filename convention** (`filename-convention.ts`): `CMP###-<seq> - <title> - <WxH>.<ext>`, `seq` = 0–2 letters + 1–2
+digits (`S01`, `BF1`); inferred piece `<concept>-<imagen|video>-<WxH>`; workshop suffixes ⇒ `unmatched`.
+
+**Review** (`commands/review.ts`): `approve` | `request_changes` (note required, ≤ 1000 chars); operator CLI only today;
+an `api_client` gets `approval_requires_person`. API approval (`approveAssetVersion`) = Slice 4 + TASK-1899.
+`studio:review` has **no** `operations.ts` entry yet (operator CLI; exclusion pending decision).
+
+**Not in Studio's contract yet:** Greenhouse capability `marketing_studio.asset.write` (catalog + registry seed + grants
+admin/account/operations/designer) is NOT seeded (*update 2026-10-02 night: seeded and granted on `develop`
+`9d0d698d4`, not released; the `ChannelValidator` port and `warnings` now exist — see §Catalog commands*); the gateway has not synced the manifest, and its parity guard would
+drop the write tools (`write_tool_without_scope_class`) until TASK-1899. `ChannelValidator` port and
+`CommandResult.warnings` are spec'd but not built (TASK-1905).
+
+## Catalog commands (TASK-1894 Entregable B, verified against code and staging 2026-10-02, Studio `a8c7886`, API `1.4.0`)
+
+> **Not in production:** `a8c7886` lives on local `main`, not pushed; verified on the preview of branch
+> `task-1894-entregable-b` (staging DB). Production serves API 1.3.0 until the operator pushes. Canon:
+> `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` §7.4.
+
+**Registry:** split by slice — `operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts`, helper
+`operations-write.ts`. 29 write routes (POST/PATCH/PUT/DELETE) + new read `GET /api/v1/campaigns/{id}/brief` (tool
+`studio.campaign.brief.get`). Manifest **44 tools**, hash `6478cab73538` (read the live one; do not trust an old hash).
+
+**Authority per campaign:** `campaign.source_of_truth` ∈ {`onedrive` (default), `studio`} + `cutover_on` +
+`cutover_by`; CHECK `campaign_cutover_chk` (studio ⇔ `cutover_on`). Any catalog write on an `onedrive` campaign ⇒
+**409 `campaign_not_studio_owned`**, except `createCampaign`, the ingest door (§Writes above) and version review. The
+importer skips a whole `studio` campaign (`skipped_studio_owned_campaign`). `createCampaign` creates `studio` with
+`cutover_on` = today (Santiago); ids `CMP-###` free below 900; 900+ reserved for sandbox/tests.
+
+**State machines** (`packages/domain/src/state-machines`, table-driven; illegal ⇒ 409 `invalid_state_transition`):
+
+| State | Legal transitions |
+|---|---|
+| review | `pending_review → approved \| changes_requested` |
+| creative | `unknown → in_production → final_available → approved`; `final_available → in_production`; `approved → in_production` |
+| media | `unknown → pending \| not_applicable`; `pending → authorized \| blocked`; `blocked → pending`; `authorized → blocked` |
+| launch | `not_launched → launch_unverified`; `launch_unverified → not_launched \| ended`; `paused → ended`; `live_observed` and `paused` only by observation |
+
+Approval targets only via dedicated commands; a generic transition to them ⇒ 422 `approval_requires_dedicated_command`.
+
+**Commands and tiers:**
+
+| Slice | Command | Tier / notes |
+|---|---|---|
+| 4 | `approveAssetVersion` | T2 |
+| 4 | `requestAssetVersionChanges` | T1, note |
+| 4 | `transitionCreativeState`, `transitionMediaAuthorization`, `transitionLaunchState` | T1, note required, `decisionRefs` |
+| 4 | `approveCreative`, `authorizeMedia` | T2, person, dedicated command |
+| 5 | `createCampaign`, `updateCampaign` | `studio` at birth |
+| 5 | `upsertCampaignBrief` | literal text; editing an approved brief returns it to draft |
+| 5 | `approveCampaignBrief` | T2 |
+| 5 | `createConcept`, `updateConcept` | id `CMP###-NN` |
+| 5 | `createAsset`, `updateAsset` | id `<concept>-<imagen\|video>-<WxH>` |
+| 5 | `setAssetVersionRights` | scope `studio:assets:write`; no campaign guard (the importer does not write rights) |
+| 6 | `createCopyVariant`, `updateCopyVariant` | byte-for-byte |
+| 6 | `createAdConfiguration`, `updateAdConfiguration` | piece with current version, copy and audience of the same campaign |
+| 6 | `createMediaFlight`, `updateMediaFlight` | one per campaign |
+| 6 | `setBudgetLine` | only `proposed`; else 422 `budget_kind_violation` |
+| 6 | `approveBudgetLine` | T2; creates the `approved` line with `approvalRef`, keeps the proposal |
+| 6 | `removeBudgetLine` | T2, only `proposed` |
+| 6 | `createScheduledPost`, `updateScheduledPost`, `cancelScheduledPost` | Studio plans `PLANNED`, cancels `CANCELLED`, never publishes; a provider post is not editable. Readers and health ignore planned/cancelled as provider pending |
+
+**T2 rule (kernel):** T2 (approval or destructive) runs today only for `operator_cli`; via API ⇒ 403
+`confirmation_required` until TASK-1899; an `api_client` that approves ⇒ 403 `approval_requires_person`.
+
+**DTO/transport additions:** `CampaignDetail.permissions { writable, lockReason: open_mode | missing_capability |
+authority_onedrive | null, canApprove, sourceOfTruth, allowedTransitions, revision }`; `revision` on copy, ad, post,
+concept and plan reads (`flightId`, `budgetLineId`); `ETag` = revision on entity reads; empty body accepted (DELETE
+and approvals); replays answer `Idempotent-Replayed: true`. `ChannelValidator` port (default adapter, no validation,
+`catalogVersion null`) and `warnings` on every write result (real validator: TASK-1905).
+
+**New error codes:**
+
+| code | HTTP |
+|---|---|
+| `approval_requires_dedicated_command` | 422 |
+| `campaign_not_studio_owned` | 409 |
+| `budget_kind_violation` | 422 |
+| `confirmation_required` | 403 |
+| `already_exists` | 409 |
+
+**Greenhouse:** `marketing_studio.asset.write` + `marketing_studio.campaign.write` (`create`/`update`, scope `tenant`)
+seeded and granted (admin, account, operations, designer) on `develop` `9d0d698d4`; not released to production.
+
+## Asset version ingest — decision record (ADR 2026-09-26)
+
+> **Delta 2026-10-02:** implemented by TASK-1894 Entregable A with the names below; the final contract is §Writes above.
+> The upload request tool is `studio.asset.upload.request`; the ingest scope is `studio:assets:write`; sha256 is
+> recomputed by the worker; unconfirmed uploads expire at 24 h and orphans are swept.
 
 Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`. Names are working
 names; TASK-1894/1899 fix the final ones in the registry.
@@ -170,6 +329,12 @@ names; TASK-1894/1899 fix the final ones in the registry.
 - Image tools return MCP `image` content (webp/png/jpeg, 1 byte – 2 MB).
 - Parity findings: `manifest_tool_not_registered`, `registered_tool_not_in_manifest`, `write_tool_without_scope_class`,
   `skill_governs_unknown_tool`.
+- **Write tools must be filtered before syncing (2026-10-02).** The provider federated EVERY manifest tool and always
+  calls Studio with GET, so syncing the API 1.4.0 manifest would federate the write tools broken. Prepared change
+  (not committed, not synced; branch `task-1894-studio-write-manifest` from `origin/main` `8ff029d`):
+  `MARKETING_STUDIO_FEDERATED_TOOLS` = reads only, used by the provider and `tool-policy`; `call()` rejects writes and
+  non-GET; parity flags `write_tool_without_scope_class` only if a write gets registered; the sync script accepts write
+  methods/fields in its type; new test. Only new federated read: `studio.campaign.brief.get`.
 - Policy: exact names from the manifest (never by prefix); Entra issuer only; native = `unsupported`
   (`marketing_studio_native_policy_missing`).
 

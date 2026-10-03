@@ -1086,6 +1086,11 @@ const main = async () => {
     throw new Error(`"${capability.id}" no se puede operar desde este CLI: ${capability.unsupportedReason}`)
   }
 
+  // El inpainting con máscara necesita máscara canónica, recorte y recomposición: vive en su propio pipeline.
+  if (capability?.mask) {
+    throw new Error(`"${capability.id}" edita con máscara: usa pnpm ai:inpaint image --adapter fal:${capability.id} (recompone y verifica la zona protegida).`)
+  }
+
   const slug = args.model ?? capability?.slug
 
   if (!slug) throw new Error('No se pudo resolver el slug del modelo.')

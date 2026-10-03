@@ -64,6 +64,13 @@ export interface ChartScaleV1 {
   kind: 'linear'
   /** Barras: SIEMPRE 0. Líneas: 0 o null (auto) declarado, nunca implícito. */
   baseline: 0 | null
+  /**
+   * TASK-1957 — cada dimensión en SU escala: métricas distintas (clics, impresiones, keywords) comparadas cada una contra
+   * su período anterior. Las barras de una fila se comparan entre sí; nunca con las de otra fila. Sólo `bar_grouped`
+   * (la fila necesita su par). Sin el campo, todas las barras comparten eje. El PDF ya dibujaba así esta figura; el
+   * campo lo declara para que la web no tenga que deducirlo.
+   */
+  perDimension?: true
 }
 
 export interface ChartReferenceV1 {
@@ -319,6 +326,10 @@ export const validateChartSpec = (spec: ChartSpecV1, knownFactIds: ReadonlySet<s
 
   if (spec.family.startsWith('bar') && spec.scale.baseline !== 0) {
     push('bar_zero_baseline', 'las barras nacen en cero')
+  }
+
+  if (spec.scale.perDimension && (spec.family !== 'bar_grouped' || spec.series.length !== 2)) {
+    push('per_dimension_pairs', 'una escala por dimensión exige barras agrupadas con período anterior y actual')
   }
 
   if (isDataChartFamily(spec.family)) {

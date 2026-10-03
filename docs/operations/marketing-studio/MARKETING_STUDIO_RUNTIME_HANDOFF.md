@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Runtime handoff
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.3
+> **Versión:** 1.5
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (cierre en producción de TASK-1893 y TASK-1896)
+> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B verificado en staging, sin desplegar en producción: §Commands del catálogo; antes, el mismo día: Entregable A en producción: §Subidas; antes, 2026-09-26: cierre en producción de TASK-1893 y TASK-1896)
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -24,6 +24,8 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | Provider MCP | Encendido en producción desde 2026-09-26: gateway `958c9de30` (`00061-sbc`), `MARKETING_STUDIO_PROVIDER_ENABLED=true`, canary MCP real verde (TASK-1891) |
 | Greenhouse | Capabilities `marketing_studio.campaign.read` y `marketing_studio.asset.download`, cliente de canje y manual en producción; señal `platform.marketing_studio.health` + aviso Teams «EO - Admin» desde el release `92002873ced9` (2026-09-26) |
 | Originales y worker (TASK-1893) | En producción desde 2026-09-26: buckets de originales, worker `marketing-studio-media-worker` (`00001-sgb`) y `-staging` (`00002-svt`), 30 versiones en `gcs` por ambiente (24 de CMP-002 siguen en OneDrive, sin sha256), descarga ON sólo en production, readback de Metricool activo |
+| Puerta de ingreso (TASK-1894 Entregable A) | En producción desde 2026-10-02: API 1.3.0 (15 tools), migración `1790956839977` en ambas bases, `STUDIO_UPLOADS_ENABLED` y `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON, 33 piezas de CMP-004 subidas por `studio:upload` y pendientes de revisión (§Subidas) |
+| Commands del catálogo (TASK-1894 Entregable B) | Verificado en staging el 2026-10-02 (preview de la rama `task-1894-entregable-b`, API 1.4.0, 44 tools); **en producción** desde 2026-10-02 (`a8c7886`, health 1.4.0, smoke de sólo lectura); ningún `api_client` de producción tiene `studio:write`. Migración `1790967435017` aplicada en ambas bases (aditiva; las 5 campañas reales en `onedrive`). Sandbox `CMP-900` en staging (§Commands del catálogo) |
 | Observabilidad y restauración (TASK-1896) | En producción desde 2026-09-26: Sentry, uptime con email, health profundo, `studio.ops_run`, ensayo verde contra `marketing_studio` y scheduler mensual activo |
 
 ## Recursos
@@ -52,6 +54,7 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | `marketing-studio-sentry-auth-token` | token de org para subir source maps (**sin crear**, opcional; Follow-up de TASK-1896) | Vercel (`SENTRY_AUTH_TOKEN`, encrypted) |
 | `marketing-studio-pg-restore-password` | contraseña del rol `marketing_studio_restore` (TASK-1896; generada, nunca impresa) | `marketing-studio-restore@` |
 | `greenhouse-marketing-studio-health-token` | token `mst_…` con scope `studio:health` para la señal de Greenhouse (TASK-1896, en uso desde 2026-09-26) | `greenhouse-portal@` (Vercel de Greenhouse y ops-worker) |
+| `marketing-studio-write-tests-token-staging` | token `mst_…` del `api_client` de pruebas de escritura en staging (scopes `studio:read`, `studio:write`, `studio:assets:write`; organización Efeonce; TASK-1894 Entregable B, 2026-10-02) | operador (canary contra previews) |
 
 Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets versions add <secreto> --data-file=-`.
 
@@ -199,6 +202,9 @@ tópico; agente de Pub/Sub → `pubsub.publisher` en la DLQ, `pubsub.subscriber`
 | Vercel de Studio (preview + development) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals-staging` |
 | Vercel de Studio | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` | production `true` desde 2026-09-26 (canary verde); preview `false` |
 | Vercel de Studio (opcional) | `STUDIO_DOWNLOAD_SIGNER_EMAIL` | por defecto `GCP_SERVICE_ACCOUNT_EMAIL` |
+| Vercel de Studio (TASK-1894) | `STUDIO_UPLOADS_ENABLED` | production `true` desde 2026-10-02; preview sólo rama `task-1894-upload-door` (§Subidas) |
+| Vercel de Studio (opcional, TASK-1894) | `STUDIO_UPLOAD_SIGNER_EMAIL` | por defecto `STUDIO_DOWNLOAD_SIGNER_EMAIL`, luego `GCP_SERVICE_ACCOUNT_EMAIL` |
+| Cloud Run (SoT `apps/worker/deploy.sh`, TASK-1894) | `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` | `true` en staging (`00003-2h9`) y prod (`00002-hzn`) desde 2026-10-02; se prende antes que `STUDIO_UPLOADS_ENABLED` |
 | Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_DERIVATIVES_ENABLED` · `MEDIA_WORKER_METRICOOL_READBACK_ENABLED` · `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` | `true` en staging y prod · `true` en prod, `false` en staging · `false` |
 | Cloud Run prod | `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | ref de `marketing-studio-metricool-api-token` (v1) · `3116862` · `3961547,5105024` (verificados) |
 
@@ -277,6 +283,222 @@ de esas piezas y reimportar (el import la adopta en la misma versión), luego vo
 ~20 GB/mes). Disparador de revisión: > USD 25/mes en el billing export (en CLP, ÷ ~898). Costo real del primer mes:
 pendiente (se contrasta al mes de la ingesta).
 
+## Subidas (puerta de ingreso, TASK-1894 Entregable A)
+
+Estado: **en producción desde 2026-10-02** (Studio `a450a3c`, `3fe85a2`, `aa91ce3`; API 1.3.0). Contrato, kernel e
+invariantes: arquitectura §7.3. Una versión nueva nace sólo por esta puerta: pedir subida → `PUT` firmado a GCS →
+confirmar (202 mientras verifica, 201 al crearse) → el worker recalcula sha256, tamaño, firma de bytes y proporción y
+crea la versión `pending_review` → una persona la aprueba.
+
+### Recursos y flags
+
+| Recurso | Valor |
+|---|---|
+| Migración | `1790956839977_asset-ingest-door.sql` (staging y producción, 2026-10-02, rol migrador) |
+| Token de la CLI | Secret Manager `marketing-studio-upload-cli-token` (producción) y `marketing-studio-upload-cli-token-staging`: cliente de API con scope `studio:assets:write` |
+| IAM | runtime → `storage.objectCreator` condicionado a `originals/sha256/` · worker → rol custom `marketingStudioOriginalsDeleter` (`storage.objects.delete`) con la misma condición |
+| CORS del bucket de originales | `PUT`/`POST`; producción `https://studio.efeonce.org`; staging `https://*.vercel.app` y `http://localhost:3100` |
+| Worker | staging `marketing-studio-media-worker-staging-00003-2h9`; producción `marketing-studio-media-worker-00002-hzn` (imagen `3fe85a228e0d`) |
+
+Flags (viven en Studio y no se leen en Greenhouse; la fuente de verdad es Vercel de Studio y `apps/worker/deploy.sh`):
+
+| Dónde | Flag | Estado |
+|---|---|---|
+| Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` | `true` en staging y producción desde 2026-10-02. Apagado, el worker no verifica ni barre subidas |
+| Vercel de Studio | `STUDIO_UPLOADS_ENABLED` | Production `true` desde 2026-10-02; Preview sólo la rama `task-1894-upload-door`. Apagado (o sin bucket o firmante), 403 `upload_disabled` |
+| Vercel de Studio (opcional) | `STUDIO_UPLOAD_SIGNER_EMAIL` | firmante de las URLs de subida; si falta, `STUDIO_DOWNLOAD_SIGNER_EMAIL`, y si no, `GCP_SERVICE_ACCOUNT_EMAIL` |
+
+**Orden de encendido: el worker antes que la web.** Con el flag del worker apagado no hay verificación ni barrido: si la
+web firmara subidas antes, las confirmaciones se quedarían en 202 (deducido del código, no observado).
+
+### Rollout (en orden; staging primero)
+
+```bash
+cd ~/Documents/efeonce-marketing-studio
+# 1. Migración en la base del ambiente (credencial de migrador), antes de empujar main
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:15433/<base>" \
+  PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-migrator-password)" pnpm migrate up
+# 2. Infra de la puerta (dry-run sin --apply; imprime cómo verificar y cómo revertir)
+bash scripts/ops/infra/media-originals.sh --env staging --upload-door            # revisar
+bash scripts/ops/infra/media-originals.sh --env staging --upload-door --apply
+# 3. Worker con MEDIA_WORKER_UPLOAD_VERIFY_ENABLED: cambiar UPLOAD_VERIFY_ENABLED en apps/worker/deploy.sh → commit → deploy
+bash apps/worker/deploy.sh --env staging --apply
+# 4. Web: STUDIO_UPLOADS_ENABLED=true en Vercel de Studio (ver trampas sobre Preview) → redeploy
+# 5. Canary (abajo) → repetir 1–4 con --env production / base marketing_studio / Production
+```
+
+Verificar la infra:
+
+```bash
+gcloud storage buckets get-iam-policy gs://efeonce-marketing-studio-originals --format=json \
+  | jq -r '.bindings[] | "\(.role) \(.members|join(",")) \(.condition.title // "")"'
+gcloud storage buckets describe gs://efeonce-marketing-studio-originals --format='yaml(cors_config)'
+```
+
+### Subir finales (`pnpm studio:upload`)
+
+Usa la API (la misma puerta que la UI y los agentes); nunca escribe directo en la base ni en el bucket.
+
+```bash
+export STUDIO_API_TOKEN="$(gcloud secrets versions access latest --secret=marketing-studio-upload-cli-token)"
+# Pieza deducida del nombre canónico (CMP###-<seq> - <título> - <WxH>.<ext>)
+pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated --dry-run
+pnpm studio:upload "<…>/CMP004-S01 - <título> - 4x5.png" --campaign CMP-004 --license ai_generated
+# Pieza existente explícita (manda If-Match con su revision) o pieza nueva (un archivo por llamada)
+pnpm studio:upload <archivo> --campaign CMP-### --license <kind> --asset <assetId>
+pnpm studio:upload <archivo> --campaign CMP-### --license <kind> --new-asset --concept CMP###-<seq> --title "…" --ratio 4x5
+# Retomar una confirmación que quedó en verificación
+pnpm studio:upload --campaign CMP-### --resume <uploadId>
+unset STUDIO_API_TOKEN
+```
+
+Opciones de derechos: `--license owned|client_supplied|stock|talent|music|ai_generated|mixed` (obligatoria),
+`--reference`, `--from`/`--until` (`AAAA-MM-DD`), `--territory` y `--channel` (repetibles); `--note`; `--base-url`
+(por defecto `https://studio.efeonce.org` o `STUDIO_API_URL`). Salida: una línea por archivo (`creado <assetId> vN ·
+pendiente de revisión`, `duplicado de <assetId> vN`, `rechazado: <code>[: reason]`, `pendiente de verificación (retoma
+con --resume <uploadId>)`); código 2 si faltan argumentos, 1 si algún archivo falló. La llave de idempotencia es
+determinista por archivo y destino: repetir el mismo comando no duplica la subida.
+
+### Revisar (`pnpm studio:review`)
+
+Sólo operador (`operator_cli`), con las variables `STUDIO_PG_*` de la base destino (como `import:catalog`):
+
+```bash
+pnpm studio:review pending --campaign CMP-004
+pnpm studio:review approve <assetId> <versionNo> --reviewer "Nombre Apellido" [--note "…"]
+pnpm studio:review request-changes <assetId> <versionNo> --reviewer "Nombre Apellido" --note "qué cambiar"
+```
+
+Aprobar convierte la versión en vigente (`currentVersion`, `pendingVersionNo` null). No aprueba la campaña ni
+autoriza pauta (`media_authorization` no cambia). Un cliente de API recibe `approval_requires_person`.
+
+### Canary (como se hizo el 2026-10-02)
+
+Staging, contra un deployment de preview con el flag: las previews de Studio **no tienen secreto de bypass**, así que
+se usa `vercel curl … --deployment <url-preview> --scope efeonce-7670142f`. Resultados esperados:
+
+1. Anónimo → 403 `write_not_allowed`.
+2. Pedir subida con `dryRun` → inferencia sin escribir.
+3. `PUT` a la URL firmada → 200.
+4. Confirmar → 202, 202, 201 (versión `pending_review`); `studio.worker_run` con `versions_created 1` y derivados
+   generados (5 en el canary de `CMP004-S01-imagen-4x5`).
+5. `pnpm studio:review approve …` → el reader muestra la versión aprobada como `currentVersion` y `pendingVersionNo` null.
+
+Producción (2026-10-02): 33 piezas de CMP-004 con `--new-asset`, licencia `ai_generated` y nota «Aprobada por el
+operador el 2026-10-02 (CDR-012)» → 33 versiones `origin = studio`, 33 sha256 únicos (iguales a
+`CONTROL-DE-PIEZAS.csv` de OneDrive), 33 `pending_review`, 132 derivados, 33 subidas `completed`. Quedan pendientes de
+aprobación del operador.
+
+Consultas útiles:
+
+```sql
+SELECT origin, review_state, count(*) FROM studio.asset_version GROUP BY 1, 2;
+SELECT status, reject_code, count(*) FROM studio.asset_upload GROUP BY 1, 2;
+SELECT kind, status, counts, started_at FROM studio.worker_run ORDER BY started_at DESC LIMIT 10;
+```
+
+### Rollback
+
+| Qué | Cómo |
+|---|---|
+| Web | `STUDIO_UPLOADS_ENABLED=false` en Vercel de Studio + redeploy (las escrituras responden 403 `upload_disabled`) |
+| Worker | `UPLOAD_VERIFY_ENABLED="false"` en `apps/worker/deploy.sh` → commit → redeploy (nunca `--update-env-vars` suelto) |
+| IAM | `gcloud storage buckets remove-iam-policy-binding gs://<originales> --member … --role … --condition "<la misma>"` para los dos bindings condicionados |
+| CORS | `gcloud storage buckets update gs://<originales> --clear-cors` |
+| Migración | `pnpm migrate down` sólo si no existe ninguna versión con `origin = 'studio'` |
+
+### Trampas
+
+- **El rol custom tarda ~1 min en propagarse.** Recién creado `marketingStudioOriginalsDeleter`, el binding falla con
+  «does not exist in the resource's hierarchy»; esperar y reintentar el `--upload-door --apply` (es idempotente).
+- **`vercel env add … preview` en modo no interactivo exige una rama existente.** No deja crear la variable para todas
+  las ramas de preview; por eso `STUDIO_UPLOADS_ENABLED` quedó sólo en la rama `task-1894-upload-door`. Para todas las
+  ramas, crearla de forma interactiva o desde el dashboard.
+- **Las previews de Studio no tienen secreto de bypass.** El canary de staging va por `vercel curl`; `pnpm
+  studio:upload --base-url <preview>` no atraviesa la protección.
+- **CORS sin comodines parciales.** GCS no acepta `https://*.vercel.app`: la subida desde el navegador en previews
+  queda por validar en TASK-1895. La CLI no depende de CORS.
+- **Pendientes fuera de Studio:** capability `marketing_studio.asset.write` en Greenhouse (en `develop` desde
+  2026-10-02, release a producción sin autorizar; hoy no bloquea) y `pnpm studio:manifest:sync` en el gateway (las tools de escritura quedarían fuera por
+  `write_tool_without_scope_class` hasta TASK-1899).
+
+## Commands del catálogo (TASK-1894 Entregable B)
+
+Estado: **code complete y verificado en staging; no está en producción.** Studio `a8c7886` vive en `main` local sin
+empujar (el clasificador de permisos de la sesión bloqueó el push, que es el deploy de producción); la rama
+`task-1894-entregable-b` (mismo commit) está en origin y su preview (`efeonce-marketing-studio-62vtv3yrm…`, base
+staging) quedó verificada. API 1.4.0, 44 tools. Contrato, autoridad por campaña, máquinas de estado y errores:
+arquitectura §7.4.
+
+### Recursos
+
+| Recurso | Valor |
+|---|---|
+| Migración | `packages/database/migrations/1790967435017_catalog-write-commands.sql` (aditiva), aplicada el 2026-10-02 en `marketing_studio_staging` **y** `marketing_studio` (producción). Las 5 campañas reales quedan `source_of_truth = 'onedrive'` |
+| Sandbox | `CMP-900` en staging (organización Efeonce, datos sintéticos), creada por `createCampaign`; ids 900+ reservados a sandbox y pruebas |
+| `api_client` de pruebas (staging) | «Pruebas de escritura TASK-1894 B (staging)», scopes `studio:read` + `studio:write` + `studio:assets:write`, organización Efeonce; token en Secret Manager `marketing-studio-write-tests-token-staging` (nunca impreso) |
+| Capabilities en Greenhouse | `marketing_studio.asset.write` y `marketing_studio.campaign.write` en `develop` (`9d0d698d4`; seed aplicado en la instancia compartida); release a producción pendiente |
+
+### Escribir desde la terminal (`pnpm studio:write`)
+
+Corre como operador (`operator_cli`) con las variables `STUDIO_PG_*` del ambiente destino (como `import:catalog` y
+`studio:review`), por los mismos primitives que la API. **Dry-run por defecto**; `--apply` escribe y una operación T2
+(aprobación o destructiva) exige además `--confirm` después de ver su dry-run. Mientras Studio no esté empujado a
+`main`, el Entregable B sólo está verificado en staging.
+
+```bash
+cd ~/Documents/efeonce-marketing-studio
+pnpm studio:write --list                                   # operaciones, nivel de riesgo y ruta
+# Transición T1: nota obligatoria e If-Match con la revisión vigente (la lectura la trae en revision/ETag)
+pnpm studio:write transitionMediaAuthorization --param campaignId=CMP-900 --file to-pending.json --if-match 3        # dry-run
+pnpm studio:write transitionMediaAuthorization --param campaignId=CMP-900 --file to-pending.json --if-match 3 --apply
+# Aprobación T2: primero el dry-run, después --apply --confirm (la hace una persona)
+pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.json --if-match 4
+pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.json --if-match 4 --apply --confirm
+```
+
+`--key <llave>` permite reintentar sin duplicar; si no se indica, la CLI genera una y la imprime. Las subidas siguen por
+`pnpm studio:upload` (§Subidas).
+
+Respuestas a esperar (observadas en staging el 2026-10-02):
+
+| Respuesta | Qué significa |
+|---|---|
+| `campaign_not_studio_owned` (409) | La campaña sigue gobernada por OneDrive (p. ej. CMP-004): el próximo import pisaría la escritura |
+| `approval_requires_dedicated_command` (422) | Se pidió un destino aprobatorio por la transición genérica; usar `approveCreative` o `authorizeMedia` |
+| `invalid_state_transition` (409) | La transición no está en la máquina de estados |
+| `precondition_required` (428) / `revision_conflict` (412) | Falta `--if-match` o la revisión cambió; releer y repetir |
+| T2 sin `--confirm` | La CLI no escribe |
+| `confirmation_required` (403) | T2 por API: sólo `operator_cli` hasta TASK-1899 |
+| `approval_requires_person` (403) | Un `api_client` intentó aprobar |
+
+Canary HTTP (como se hizo el 2026-10-02, contra la preview con `vercel curl … --deployment <preview> --scope
+efeonce-7670142f` y el token de `marketing-studio-write-tests-token-staging`): permisos proyectados + `ETag` en
+`CMP-900`; anónimo 403 `write_not_allowed`; concepto 201 y replay con `Idempotent-Replayed: true`; aprobación por
+bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas tipográficas, `\n\n`, espacio final) con
+`ETag`; copy byte a byte; flight + plan con `flightId`/`revision`.
+
+### Rollback
+
+| Qué | Cómo |
+|---|---|
+| Escritura por API | Revocar a los clientes con `studio:write`: `STUDIO_PG_…(base destino) pnpm api-client:revoke --id <api_client_id> --reason "…"` (hoy sólo el de pruebas de staging) |
+| Deploy de Studio | Revertir el deploy (§Rollback: `vercel rollback` o revert + push a `main`) |
+| Migración `1790967435017` | `pnpm migrate down` **sólo si ninguna campaña está en `source_of_truth = 'studio'`** (en staging, `CMP-900` lo está) |
+
+### Pendiente (operador)
+
+1. **Push de Studio a `main`** (= deploy de producción): `git push origin main` en `~/Documents/efeonce-marketing-studio`.
+2. **Sync del gateway** `efeonce-mcp` — **hecho 2026-10-02** ([efeoncepro/efeonce-mcp#23](https://github.com/efeoncepro/efeonce-mcp/pull/23), `1ddc7db`, v1.10.0; desplegado por el operador con `deploy.yml`, revisión `efeonce-mcp-gateway-00064-q6w`). Contexto: el gateway federaba todas las tools del manifiesto y su proveedor llama siempre
+   con GET, así que sincronizar el manifiesto con escrituras las federaría rotas. Cambio preparado sin commit (rama
+   `task-1894-studio-write-manifest` desde `origin/main` `8ff029d`): `MARKETING_STUDIO_FEDERATED_TOOLS` = sólo
+   lecturas; `call()` rechaza escrituras y métodos no-GET; `write_tool_without_scope_class` sólo si una escritura se
+   registra; test nuevo. Pasos: aplicar el cambio → `pnpm studio:manifest:sync` → test → PR → merge → deploy. La única
+   lectura federada nueva es `studio.campaign.brief.get`.
+3. **Release de Greenhouse a producción** con las dos capabilities (no autorizado aún).
+4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898/1899 para persona por sesión,
+   confirmación T2 por API y federación de escrituras.
+
 ## DNS (aplicado 2026-09-25)
 
 | Tipo | Nombre | Valor | TTL |
@@ -347,7 +569,7 @@ Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_
 
 - **Autor de commit.** Vercel bloquea deployments por Git (`COMMIT_AUTHOR_REQUIRED`) si el email del autor no se asocia a una cuenta del team. El repo usa `user.email = jreyes@efeonce.cl`; con `jreye@MacBook-Air.local` o `jreyes@efeoncepro.com` los deployments quedaron `BLOCKED`.
 - **`axis-packages-read-token`.** Guarda un `.npmrc` completo. A `NODE_AUTH_TOKEN` va sólo el valor `_authToken`; copiado entero, pnpm falla con `ERR_INVALID_CHAR`.
-- **`vercel api` para variables.** El POST de env acepta un objeto por request con `--input`. Para todas las ramas de preview: `vercel env add NAME preview ""`.
+- **`vercel api` para variables.** El POST de env acepta un objeto por request con `--input`. Para todas las ramas de preview: `vercel env add NAME preview ""`. Ojo (2026-10-02): en modo no interactivo el CLI pidió una rama existente para `preview` y no dejó crearla para todas; ver §Subidas › Trampas.
 - **Usuarios en Cloud SQL.** Crearlos por SQL (`SET ROLE cloudsqlsuperuser`), nunca con `gcloud sql users create`: quedarían en `cloudsqlsuperuser` y podrían leer Greenhouse.
 - **IAM DB auth no está disponible** en la instancia; activarla modificaría la instancia compartida con Greenhouse. Por eso usuario + contraseña en Secret Manager.
 - **Tope de conexiones.** `marketing_studio_app` admite 20. Cualquier patrón «una consulta por elemento» en una grilla lo agota; las imágenes van por enlace firmado sin base.

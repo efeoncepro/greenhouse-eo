@@ -24,6 +24,7 @@ Genera el plate con las referencias que la ficha declara: identidad con su vista
 marca y el MACRO DEL BORDADO de cada prenda con emblema. Nadie copia rutas a mano.
 
   --out <dir>   destino (por defecto, ./plates junto a la ficha)
+  --size WxH    resolución del plate (misma proporción que el formato), p. ej. 2048x2048 para un 1:1 con caras chicas
   --dry         imprime qué haría y no gasta
 `)
   process.exit(1)
@@ -67,12 +68,24 @@ const cli = [
   '--quality',
   valor('quality') ?? 'high',
   '--size',
-  size.replace('1152x1440', '1024x1280').replace('1152x2048', '1024x1792').replace('2048x1152', '1792x1024').replace('1152x1152', '1024x1024'),
+  // `--size ANCHOxALTO` pide el plate a otra resolución con la MISMA proporción del formato (2026-10-02): una cara chica en
+  // el cuadro necesita píxeles, no un encuadre más cerrado (CMP-004: el estrabismo de los 1:1 venía de caras de ~60 px).
+  valor('size') ?? size.replace('1152x1440', '1024x1280').replace('1152x2048', '1024x1792').replace('2048x1152', '1792x1024').replace('1152x1152', '1024x1024'),
   '--out',
   salida
 ]
 
-console.log(`${ficha.id} · ${size} · ${imagenes.length} referencia(s):`)
+if (valor('size')) {
+  const [w, h] = valor('size').split('x').map(Number)
+  const [fw, fh] = size.split('x').map(Number)
+
+  if (!w || !h || Math.abs(w / h - fw / fh) > 0.012) {
+    console.error(`  ✗ --size ${valor('size')} no tiene la proporción del formato ${ficha.formato} (${size}).`)
+    process.exit(1)
+  }
+}
+
+console.log(`${ficha.id} · ${valor('size') ?? size} · ${imagenes.length} referencia(s):`)
 for (const i of imagenes) console.log(`   ${i}`)
 
 if (args.includes('--dry')) process.exit(0)

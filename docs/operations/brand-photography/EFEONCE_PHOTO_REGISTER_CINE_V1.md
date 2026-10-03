@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.9 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.10 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-02 por Claude (1.10: el escenario del login de Greenhouse — excepción del operador para cine con una persona de casting en uniforme en una superficie de producto, y el alcance que falta; [delta 2026-10-02 (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse). 1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -35,6 +35,26 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-02 (c) — el escenario del login de Greenhouse
+
+**[decisión del operador, 2026-10-02]** El carrusel de novedades del login V4 (TASK-1964) usa fotos de marca en un
+escenario con la Lente de «La órbita». Para ese escenario el operador aceptó, **como excepción del login**, cine con una
+**persona de casting** (no del roster) vestida con el uniforme de la línea. No amplía el registro a la web ni a otras
+pantallas del producto: §2 sigue diciendo que un hero web va en A, B o C.
+
+- **Con Nexa protagonista** (`LG1`, `alcance: "nexa"`) la foto cae en el caso 1 y no necesita excepción.
+- **Con una persona de casting** (`LG2e`) no hay alcance que lo describa: `ALCANCES_CINE` no tiene uno web ni de
+  producto, y la ficha declara `alcance: "publicidad-prueba"` con la excepción escrita en `nota` **[medido en las
+  fichas]**. **[pendiente]** que el operador decida si el login (o «superficie de producto con foto de marca») pasa a
+  ser un caso de §2 con su alcance propio; el [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos)
+  propone `producto-escenario`. Hasta entonces, nadie extiende esta excepción a otra pantalla.
+- **El personaje de casting nace de un retrato ancla** con la receta de piel v3, y la escena lo pide por el campo
+  `casting`: sin ancla, la piel salió «muy IA» y el operador la rechazó **[decisión del operador]**; retocar la cara
+  después no la arregló **[medido]**. Método y fallas 14–20: casebook.
+- **Una órbita por pieza (§9.4):** las novedades cine cuya luz ya es una órbita (`LG2e`) van **sin lente** en el
+  login; el operador lo aceptó. La foto en registro B (`LG3e`) sí la lleva.
+- Fotos aprobadas: `LG1`, `LG2e` (cine) y `LG3e` (registro B), en `ai-generations/2026-10-02_login-escenario/`.
 
 ## Delta 2026-10-02 (b) — decisiones del operador tras la prueba ciega
 
@@ -266,7 +286,8 @@ cinematográficas». Las portadas del brochure llevan a Nexa como protagonista (
 **Cuándo NO [decisión del operador, 2026-09-27]:** una pieza social, un hero web o una lámina de contenido con
 personas del equipo **siguen en A, B o C** (las portadas de perfil y los destacados del caso 5 llevan a Nexa, no al
 equipo). La publicidad con personas del equipo en cine **no está aprobada**: queda
-en prueba (§11).
+en prueba (§11). **Excepción del login de Greenhouse (2026-10-02):** cine con una persona de casting en el escenario de
+novedades del login, sólo ahí; [delta (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse).
 
 ⚠️ **No todo lo aprobado esa noche es cine [medido en archivos]:** «BEX escalera» es la receta
 `method-staircase` —**sin foto**, la escalera es la imagen ([superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck))—,

@@ -1,7 +1,7 @@
 # Operar Kortex Command Adapter
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-17 por Codex
 > **Modulo:** Plataforma / Integraciones / Kortex
 > **Ruta en portal:** API interna `POST /api/admin/kortex/commands`
@@ -13,6 +13,9 @@ Sirve para pedirle a Kortex que ejecute operaciones HubSpot/estrategia/admin des
 
 ## Antes de empezar
 
+- Confirmar primero el estado runtime en
+  [`docs/architecture/kortex/operations/runbook.md`](../../architecture/kortex/operations/runbook.md). Desde
+  `2026-10-02T13:44:27Z`, Kortex está hibernado y **no se ejecutan estos pasos** hasta una reactivación completa.
 - Tener sesion interna admin.
 - Confirmar binding Kortex con `GET /api/admin/kortex/control-plane`.
 - Usar un `Idempotency-Key` nuevo por intento real.
@@ -108,7 +111,7 @@ Admin/breakglass:
 - `kortex_preview_required`: no hay dry-run vigente.
 - `kortex_preflight_failed`: Kortex rechazo el preflight/upstream; revisar `sources` y logs de Kortex sin exponer secretos.
 
-## Estado rollout 2026-06-17
+## Estado rollout 2026-06-17 — histórico
 
 Staging Greenhouse esta desplegado y el adapter responde con el catalogo completo. Kortex esta instalado en HubSpot portal `48713323`.
 
@@ -128,6 +131,22 @@ Smokes vigentes:
 - Admin: `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `EO-APC-E138ACF4`; idempotente, valida admin flag + token sin tocar HubSpot.
 
 Production no fue modificado por este rollout.
+
+## Reactivar antes de volver a usar el adapter
+
+La reactivación no consiste en enviar un comando para “probar si despierta”. Un operador autorizado debe seguir el
+runbook del repo Kortex, `docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`, y verificar en orden:
+
+1. fuente/configuración y secretos aptos para reactivar;
+2. callers y Tasks todavía pausados;
+3. Cloud SQL `RUNNABLE` con su política restaurada;
+4. Cloud Run accesible sólo bajo el contrato IAM esperado;
+5. smoke read-only del control-plane;
+6. Vercel y colas reanudados;
+7. writes/live/admin habilitados al final y sólo con aprobación vigente.
+
+Si Kortex sigue `STOPPED/NEVER`, Vercel devuelve `DEPLOYMENT_PAUSED` o Tasks sigue pausado, no ejecutar comandos.
+Escalar al dueño de Kortex; no usar un deploy o una llamada facturable como mecanismo de diagnóstico.
 
 ## Que no hacer
 

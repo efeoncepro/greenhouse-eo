@@ -6,6 +6,8 @@
  * el payload: proviene de la autoridad autenticada (arquitectura Insights §5).
  */
 
+import type { InsightScopeKey } from '../presentation/scope-catalog'
+
 export const INSIGHT_REQUEST_VERSION = 'insight_request_v1' as const
 
 export const INSIGHT_MODULES = ['seo', 'aeo', 'ico'] as const
@@ -67,6 +69,11 @@ export interface InsightRequestV1 {
   depth: InsightDepth
   outputs: InsightOutput[]
   brand: InsightBrandV1
+  /**
+   * Alcance que muestra la portada (chips con ícono): el servicio o módulos que cubre el informe, del catálogo
+   * `presentation/scope-catalog.ts` (`creative`, `performance`, `revenue`…). Opcional: sin él, se deriva de `modules`.
+   */
+  scope?: InsightScopeKey[]
   policy?: InsightPolicyV1
   /** 8–200 chars. Misma key + mismo payload = misma edición; payload distinto = conflicto. */
   idempotencyKey?: string

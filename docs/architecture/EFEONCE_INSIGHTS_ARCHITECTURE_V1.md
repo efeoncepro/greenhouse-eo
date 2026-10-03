@@ -1444,3 +1444,127 @@ respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y
 3. Release de Greenhouse a producción por el control plane.
 4. Push del `main` de Think (despliega producción).
 5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.
+
+### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (code complete local, 2026-10-02)
+
+**Decisión.** La frontera entre evidencia interna y documento de cliente tiene dueño y gate. El vocabulario de cara al
+lector (fuente, unidad, corte, ventana, título) vive en `src/lib/efeonce-insights/presentation/vocabulary.ts` y lo
+comparten el modelo web y el PDF; antes el PDF traducía la fuente en el render y el modelo web proyectaba la tabla
+lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente legible». Think sigue siendo render tonto.
+
+- **Modelo web 1.2** (aditivo, compatible con Think 1.x): `source` legible, `unitLabel`/`asOfLabel`, `unitLabel` por
+  figura y `role` (`finding`|`backing`) en claims de capítulo.
+- **Planner**: límites en lenguaje del lector y una línea por tema (`GH_INSIGHTS.readerLimits`); referencias y corte
+  sin fechas ISO; elegibilidad de figuras (sin varianza ⇒ sin figura; posición media nunca en barras desde cero; «n de
+  m» sólo junto a otros del mismo total; bandas de magnitud en unidades sin tope); hasta 5 hallazgos materiales por
+  capítulo (1 pp · 0,5 pos. · 5 % relativo).
+- **Gate client-fit** (`presentation/client-fit-gate.ts`): reglas derivadas del payload y del copy; `issueInsightEdition`
+  lo corre para audiencia cliente y responde `409 not_ready` con `details.reason=client_fit`.
+- **Indicadores AEO estándar** (adapter `aeo_report_adapter_v2`): tasa de mención por motor (`mention_rate.<proveedor>`,
+  % de respuestas con canal), `share_of_model`, Share of Voice frente a competidores (`sov.brand` + `sov.competitor.*`,
+  vía `buildCompetitiveBenchmark` del Grader) y `citation_share`, todos con numerador/denominador; reemplazan los
+  conteos `presence.*`. Sin competidores en el panel, Share of Voice es un límite declarado. Cada familia es su figura;
+  Share of Model y citas son hallazgos con su base de respuestas, nunca barras comparadas entre sí.
+- **Puntaje del Grader sin competidores**: `competitive_sov` vale 100 cuando el panel no detecta competidores
+  (marca / (marca + 0)) y pesa 15 % del global. En ese caso el adapter no emite la dimensión ni el puntaje global
+  (límite declarado) hasta que el Grader lo corrija.
+- **Escala por dimensión** (`ChartScaleV1.perDimension`, aditivo): métricas distintas de un canal, cada una contra su
+  período anterior, son UNA figura que se lee fila por fila en su escala (la página «comparación» del PDF; Think lo
+  adopta en TASK-1958). La separación por magnitud aplica sólo a figuras con eje compartido y nunca deja figuras de una
+  cifra: sin página no hay lectura y el capítulo pierde sus conclusiones. El gate suma `shared_axis_incomparable`.
+- **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
+  informes ya creados conservan su título: no existe comando de renombre.
+
+Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insights:canvas-fidelity` verdes; planes
+regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
+producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
+
+
+## 15. Contrato de contenido del informe (TASK-1962)
+
+Un informe de Insights responde ocho preguntas del cliente, en este orden. El registro canónico es
+`src/lib/efeonce-insights/presentation/content-contract.ts` (`CONTENT_CONTRACT_VERSION`), browser-safe.
+
+| # | Pregunta | Sección del plan | SEO | AEO | ICO |
+|---|---|---|---|---|---|
+| 1 | ¿Cómo nos fue? | resumen, esenciales, capítulos | productor | productor | productor |
+| 2 | ¿Por qué cambió? | capítulo | productor (consultas y páginas que más movieron los clics) | productor (sitios que más citan los motores y tipo de fuente) | sin evidencia por cliente |
+| 3 | ¿Cómo estamos frente a la competencia? | capítulo | **bloqueada por política** (comparativa SEO nunca client-facing, auditoría §7 del módulo SEO) | productor (Share of Voice) | no aplica |
+| 4 | ¿Qué hicimos este mes? | capítulo | necesita registro de entregables | necesita registro de entregables | productor (piezas completadas, throughput) |
+| 5 | ¿Qué recomendamos? | `actions` | productor (cola SEO, sólo orígenes propios) | agente redactor (TASK-1903) | agente redactor |
+| 6 | ¿Qué necesitamos de ustedes? | `ask` | productor (Search Console o GA4 sin conectar) | productor (GA4 sin conectar); lo demás, persona en la revisión | persona en la revisión |
+| 7 | ¿Cómo lo mediremos? | `measurement` | necesita metas pactadas | necesita metas pactadas | productor (metas oficiales) |
+| 8 | ¿Qué no podemos afirmar? | `limits` | productor | productor | productor |
+
+Veredictos: `producer_now`, `no_evidence`, `policy_blocked`, `needs_input` (dato que pone una persona) y `agent_task`
+(redacción con aceptación humana). Una pregunta sin respuesta se declara; nunca se rellena con texto genérico.
+
+**Contrato de mantenimiento.** El contrato de contenido es hermano de la matriz familia × evidencia
+(`editorial/family-evidence-matrix.ts`): una dice qué figuras puede dibujar un productor, la otra qué preguntas
+responde. Agregar un dato nuevo al informe exige, en el mismo cambio:
+
+1. el hecho en el adapter del dominio dueño, leído de un reader dueño;
+2. su regla en `CONTENT_METRIC_RULES` (nombre exacto o espacio de nombres terminado en «.»);
+3. el veredicto `producer_now` de esa pregunta y módulo, con su evidencia;
+4. el productor del planner, y la fila de la matriz de familias si dibuja una figura nueva;
+5. subir `CONTENT_CONTRACT_VERSION`.
+
+Gate mecánico: `presentation/content-contract.test.ts` exige consistencia en las dos direcciones (ninguna regla apunta a
+una pregunta sin productor; ninguna pregunta de hechos con productor queda sin métrica) y `adapters/adapters.test.ts`
+(`expectContentContract`) ejercita los adapters reales: un hecho emitido sin regla rompe el test. `contentCoverageOf`
+calcula la cobertura de una edición (qué responde y por qué no lo demás) para la revisión interna y el agente
+redactor; nunca llega al cliente.
+
+**Productores de esta task (TASK-1962), todos con contrato editorial v2:**
+
+- **Causas SEO** (`driver.<query|page>.clicks`): reader dueño `readSeoWindowMovers`
+  (`src/lib/growth/seo/overview/read-window-movers.ts`) sobre `seo_gsc_daily`, la misma suma que los clics del
+  informe. El planner arma, por dimensión, un hallazgo de descomposición («La consulta que más cambió fue…», nunca una
+  causa), una figura sólo con las que comparten escala con la de mayor pico (10×) y una tabla única con bajada propia
+  (`PlanTableV1.lead`). La lectura de la figura sale del mismo productor que el hallazgo (más clics movidos, no el mayor
+  cambio relativo) y las causas van detrás del resultado en la tesis (rango de `.drivers.` en `conclusionsOf`).
+- **Lo que el Grader ya mide** (`cited_source.<n>`, `source_type.<tipo>`, `sentiment.<tono>`, del mismo
+  `readClientGraderReport`): hallazgos propios («El sitio más citado por los motores es «chocale.cl»: 11 de 246
+  citas», «Los motores citan más medios de noticias (16) que sitios propios (3)», «De 16 respuestas evaluadas, 3 son
+  positivas y 3 negativas»), figuras de tipo de fuente y tono (sin «sin clasificar»; los dominios no van en columnas
+  porque una palabra larga no se parte y el render falla cerrado) y una tabla aparte. El Share of Voice se dice
+  comparando con quien concentra las menciones y su base son menciones. El gate client-fit admite exactamente los
+  dominios citados. El mapper A4 reparte las filas de tabla por altura (una etiqueta de más de 26 caracteres pesa doble).
+- **Trabajo entregado ICO** (`delivered.completed`): piezas completadas por space y mes, del mismo snapshot
+  (`context.completedTasks`).
+- **Plan de acción** (`opportunity.<n>.*`, hechos de PLAN que no compiten como hallazgo ni van a tablas): la cola SEO
+  priorizada (`readSeoWorkQueue`) filtrada a orígenes propios (`gsc_striking_distance`, `consolidation`,
+  `declared_target`; nunca `competitor_gap` ni `discovery_candidate`), máximo 5, en su orden. Cada acción cita
+  impresiones y posición medidas, la posición objetivo (referencia) y el techo estimado de la banda 1; sin techo no
+  promete cifra. Depende de `GROWTH_SEO_WORK_QUEUE_ENABLED` (Vercel, ON en staging y Production).
+- **GA4 en el Search Visibility 360** (`content_contract_v4`, `adapters/ga4-site-facts.ts`): una consulta por ventana al
+  reader dueño `readGa4Analytics` (conexión OAuth por organización de TASK-1284) con la agrupación de canales por defecto
+  de GA4. SEO recibe `site.organic_sessions` y `site.organic_engaged_sessions` (canal Organic Search, todos los
+  buscadores: sin canal `google`), en figura propia que no comparte eje con los clics de Search Console. AEO recibe
+  `ai_sessions` (canal AI Assistant; hallazgo siempre, como el Share of Model) y `ai_source.<asistente>` (partes del
+  total con isotipo; varios hosts de un asistente son una fila). La figura por asistente va completa o no va (si las
+  bandas de magnitud la parten queda el hallazgo «ChatGPT trae la mayoría…: 1.648 de 1.686» y la tabla). Flag apagado
+  en el runtime ⇒ sin hechos ni límite; sin conexión ⇒ rechazo `ga4` `not_connected` y petición; fallo ⇒
+  `insufficient_data`. Lo leen Vercel y el `ops-worker` (ediciones programadas; declarado en su `deploy.sh`).
+- **Petición** (`ask`): Search Console y/o GA4 sin conectar (rechazos `gsc`/`ga4` `not_connected`, límite «falta
+  conectar la fuente»), en una sola frase si faltan los dos. Lo que falta por configuración interna (perfil del Grader,
+  spaces, target SEO) no se le pide al cliente.
+- **Línea semanal**: la lectura compara sólo bloques COMPLETOS de 7 días (el último del mes puede ser de 2 o 3 días y
+  se leía como caída); la figura sigue mostrando el bloque corto con su etiqueta.
+
+**Modelo web 1.3 — las decisiones de contenido viven en el API.** Cada frase del resumen y de las esenciales trae
+`module` y `evidence {chapterId, chartId}`; el modelo trae `essentialsByModule` (incluido 0), cada capítulo su `label`
+corto (`GH_INSIGHTS.modules[*].navLabel`), cada figura su `note`, cada hecho su `priorLabel` («período anterior: X»),
+cada acción su `module` y cada tabla su `lead`. Think resuelve referencias y dibuja; no deduce. La única
+transformación de texto que queda en Think es tipográfica (partir el titular en negrita y resto, TASK-1958).
+
+**Familias de gráfico (matriz v2).** Con evidencia hoy: barras y barras agrupadas, línea (ICO mensual, ETV mensual y
+clics por bloque de 7 días contra el mismo bloque del período anterior), bullet (metas ICO), cascada (aporte de cada
+consulta al cambio de clics, más el resto) y waffle (tono y tipo de fuente del Grader). Los catálogos PDF tienen página
+sólo para barras, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`): los mappers OMITEN a propósito
+las demás familias (la web las dibuja; el PDF conserva el hallazgo y la tabla), en vez de rechazar el informe entero.
+Una familia nueva en el PDF exige su plantilla en el catálogo y sumarla a ese conjunto.
+
+**Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
+ni la petición (sólo la decisión); Think sí. Página de plan en los PDF y cascada para «qué explica el cambio» quedan
+como follow-up de UI (TASK-1958/TASK-1902).

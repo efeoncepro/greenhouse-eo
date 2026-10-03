@@ -3327,6 +3327,31 @@ export interface GreenhouseCoreLaunchNotifications {
   user_id: string | null;
 }
 
+export interface GreenhouseCoreLoginAnnouncements {
+  announcement_id: Generated<string>;
+  body: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cta_label: string | null;
+  cta_url: string | null;
+  ends_at: Timestamp | null;
+  image_alt: string | null;
+  image_path: string | null;
+  kicker: string | null;
+  kind: string;
+  lens_radius_ratio: Numeric | null;
+  lens_x: Numeric | null;
+  lens_y: Numeric | null;
+  priority: Generated<number>;
+  service_line: string;
+  starts_at: Generated<Timestamp>;
+  status: Generated<string>;
+  tab_label: string;
+  title: string | null;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
 export interface GreenhouseCoreMemberCertifications {
   /**
    * FK to assets — PDF/image evidence uploaded via private assets
@@ -7526,6 +7551,32 @@ export interface GreenhouseGrowthFormVersion {
   version: number;
 }
 
+export interface GreenhouseGrowthGa4Connections {
+  connected_at: Timestamp | null;
+  connected_by_user_id: string | null;
+  connection_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  last_error_code: string | null;
+  last_verified_at: Timestamp | null;
+  organization_id: string;
+  property_id: string | null;
+  property_name: string | null;
+  scopes: Generated<string[]>;
+  status: Generated<string>;
+  token_secret_ref: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthGa4OauthStates {
+  consumed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  expires_at: Timestamp;
+  organization_id: string;
+  state_hash: string;
+  state_id: Generated<string>;
+}
+
 export interface GreenhouseGrowthGraderBrandAliasHistory {
   aliases_json: Json;
   created_at: Generated<Timestamp>;
@@ -7561,6 +7612,21 @@ export interface GreenhouseGrowthGraderBusinessModelHistory {
   profile_id: string;
   reason: string | null;
   to_business_model: string;
+  to_source: string;
+}
+
+export interface GreenhouseGrowthGraderCategoryHistory {
+  changed_at: Generated<Timestamp>;
+  changed_by: string;
+  from_label: string | null;
+  from_node_id: string | null;
+  history_id: Generated<string>;
+  organization_id: string | null;
+  profile_id: string;
+  reason: string | null;
+  taxonomy_version: string;
+  to_label: string;
+  to_node_id: string;
   to_source: string;
 }
 
@@ -13947,6 +14013,7 @@ export interface DB {
   "greenhouse_core.internal_native_access_audit": GreenhouseCoreInternalNativeAccessAudit;
   "greenhouse_core.internal_native_enrollments": GreenhouseCoreInternalNativeEnrollments;
   "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
+  "greenhouse_core.login_announcements": GreenhouseCoreLoginAnnouncements;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
   "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
@@ -14129,9 +14196,12 @@ export interface DB {
   "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.ga4_connections": GreenhouseGrowthGa4Connections;
+  "greenhouse_growth.ga4_oauth_states": GreenhouseGrowthGa4OauthStates;
   "greenhouse_growth.grader_brand_alias_history": GreenhouseGrowthGraderBrandAliasHistory;
   "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
   "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;
+  "greenhouse_growth.grader_category_history": GreenhouseGrowthGraderCategoryHistory;
   "greenhouse_growth.grader_competitor_sets": GreenhouseGrowthGraderCompetitorSets;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;

@@ -6,6 +6,33 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02
+
+- **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`); Entregable C diferido por el
+  operador. El bloqueo de esta task por TASK-1894 (commands, manifiesto, kernel) está cubierto.
+- **Manifiesto de Studio `1.4.0`:** 44 tools (hash `6478cab73538`); 30 escrituras viajan en el manifiesto pero **no se
+  federan** hasta esta task. Nueva lectura `studio.campaign.brief.get` (`GET /api/v1/campaigns/{id}/brief`).
+- **Gateway `efeonce-mcp` v1.10.0** (PR efeoncepro/efeonce-mcp#23, merge `1ddc7db`; desplegado por el operador, revisión
+  `efeonce-mcp-gateway-00064-q6w` al 100 %): superficie 72 → 74 tools (`studio.asset.download` de TASK-1893, que no se
+  había sincronizado, y `studio.campaign.brief.get`). Filtro nuevo `MARKETING_STUDIO_FEDERATED_TOOLS` = sólo lecturas,
+  usado por el proveedor, `tool-policy`, `src/surface.ts` y la paridad; `call()` rechaza escrituras y métodos no-GET;
+  `write_tool_without_scope_class` se marca sólo si una escritura se registra. La regla está en `AGENTS.md` del gateway
+  (§Marketing Studio — escrituras en el manifiesto, fuera de la federación). **Esta task es la que abre ese filtro** a
+  las escrituras, con su clase de scope y su canje. Choque de versión: la rama `feat/task-1921-brand-render` del
+  gateway también sube a 1.10.0; la que mergee segunda mueve la versión.
+- **Kernel de Studio que esta task extiende:** `T2` hoy sólo para `operator_cli`; por API responde
+  **`403 confirmation_required`** (esta task especifica `428 confirmation_required`: conciliar el código al tomarla);
+  un `api_client` que aprueba recibe `approval_requires_person`; la transición genérica a un destino aprobatorio
+  responde `422 approval_requires_dedicated_command` (`approveCreative` y `authorizeMedia` son commands dedicados).
+- **Autoridad por campaña:** toda escritura del catálogo sobre una campaña gobernada por OneDrive (hoy CMP-001…005)
+  responde `409 campaign_not_studio_owned`; las escrituras delegadas por MCP la recibirán igual hasta el Entregable C.
+- **Greenhouse:** `marketing_studio.asset.write` y `marketing_studio.campaign.write` sembradas con grant en `develop`
+  (`9d0d698d4`, migración aplicada en la instancia compartida); release a producción pendiente de decisión del
+  operador. `marketing_studio.campaign.approve` sigue sin existir (es de esta task).
+- **Para verificar en staging:** sandbox `CMP-900` y `api_client` «Pruebas de escritura TASK-1894 B (staging)»
+  (`studio:read` + `studio:write` + `studio:assets:write`; token en Secret Manager
+  `marketing-studio-write-tests-token-staging`).
+
 ## Delta 2026-09-26 — decisiones del operador
 
 Decisiones de Julio Reyes (operador) del 2026-09-26 que tocan la mecánica de esta task:
@@ -291,10 +318,16 @@ Reglas obligatorias:
   `apiScope` `studio:assets:download`) + 5 exclusiones; `API_SCOPES = ['studio:read', 'studio:health',
   'studio:assets:download']`; `Actor` con `anonymous_open | api_client | user | operator_cli`; `pnpm api-client:create`
   admite varios `--scope`; `pnpm api-client:revoke`.
+- (2026-10-02) Studio API `1.4.0` con manifiesto de 44 tools (30 escrituras de TASK-1894 Entregable B, no federadas).
+  Gateway v1.10.0 con `MARKETING_STUDIO_FEDERATED_TOOLS` (sólo lecturas) y superficie de 74 tools, que ya incluye
+  `studio.asset.download` y `studio.campaign.brief.get`. Las líneas de arriba sobre la versión del gateway y del
+  manifiesto describen el estado del 2026-09-26.
 
 ### Gap
 
-- Ninguna tool de escritura federada; `studio.asset.download` sin federar.
+- Ninguna tool de escritura federada (el filtro `MARKETING_STUDIO_FEDERATED_TOOLS` las excluye a propósito).
+  `studio.asset.download` ya está en la superficie del gateway desde 2026-10-02; no se verificó en esa entrega que el
+  `api_client` del gateway tenga `studio:assets:download`.
 - El canje no sabe pedir otra capability que `campaign.read`; no hay clientes de canje para `asset.download`,
   `asset.write` ni `campaign.approve`.
 - `userinfo` no revalida la capability: una revocación de rol entre el canje y el uso no se detecta.

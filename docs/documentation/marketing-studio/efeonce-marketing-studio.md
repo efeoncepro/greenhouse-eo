@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1890 / TASK-1891)
+> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894 Entregable B)
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -89,8 +89,9 @@ explica qué hacer.
 
 ## Acceso
 
-Hoy Studio se puede ver sin iniciar sesión y es sólo de lectura: nadie puede cambiar datos desde la web. Los
-buscadores no lo indexan. El inicio de sesión con la cuenta Efeonce (`auth.efeonce.org`) llega al final del
+Hoy Studio se puede ver sin iniciar sesión y la web es sólo de lectura: nadie puede cambiar datos desde ella. Cada
+campaña lo explica en sus permisos: mientras el acceso sea abierto, el motivo es «acceso abierto». Los buscadores no
+lo indexan. El inicio de sesión con la cuenta Efeonce (`auth.efeonce.org`) llega al final del
 programa, por decisión del equipo, cuando ya existan la edición y las aprobaciones.
 
 ## Acceso para integraciones y agentes
@@ -117,7 +118,9 @@ persona: si la persona no tiene el permiso, el agente tampoco puede leer.
 la próxima publicación de Greenhouse a producción y de una prueba con una persona real. Hasta entonces, un agente
 no ve Studio por MCP.
 
-**Qué no pueden hacer los agentes todavía:** crear, editar ni aprobar nada. Cuando llegue la escritura, una
+**Qué no pueden hacer los agentes todavía:** crear, editar ni aprobar nada. Desde el 2026-10-02 las operaciones de
+escritura ya existen en la API de Studio y viajan en su lista de herramientas, pero Efeonce MCP no las ofrece a los
+agentes hasta que exista la puerta de escritura con la persona como responsable (TASK-1899). Cuando llegue la escritura, una
 aprobación seguirá siendo una **decisión de una persona**: el agente podrá prepararla y ejecutarla sólo en
 nombre de alguien que tenga el permiso de aprobar, y queda registrada con esa persona como responsable.
 
@@ -125,11 +128,63 @@ nombre de alguien que tenga el permiso de aprobar, y queda registrada con esa pe
 
 ## De dónde salen los datos
 
-Hoy los datos se importan desde el Campaign Manager de OneDrive y del registro de campañas. Mientras no exista
-la edición en Studio, OneDrive sigue siendo la fuente y Studio se actualiza reimportando. Reimportar no duplica
-nada: si nada cambió, no se agrega ninguna fila.
+Hoy los datos de las cinco campañas reales (CMP-001 a CMP-005) se importan desde el Campaign Manager de OneDrive y
+del registro de campañas. Reimportar no duplica nada: si nada cambió, no se agrega ninguna fila.
 
-> Detalle técnico: import y renditions en las secciones 7 y 7.1 de la [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
+## Quién gobierna cada campaña: Studio u OneDrive
+
+Desde el 2026-10-02 cada campaña declara quién manda sobre sus datos, y sólo uno de los dos lados manda. Nunca hay
+una copia que se edite en dos lugares.
+
+| Campaña | Quién la gobierna | Qué significa |
+|---|---|---|
+| **Gobernada por OneDrive** (hoy CMP-001 a CMP-005) | Su catálogo en OneDrive | Studio la muestra tal como se importó. Si alguien intenta cambiar en Studio su brief, conceptos, piezas, copys, anuncios, plan de medios, posts o estados, Studio responde **«esta campaña no está gobernada por Studio»** (código `409 campaign_not_studio_owned`) y no escribe nada. La única excepción es subir y revisar versiones de piezas. |
+| **Gobernada por Studio** | Studio | Nace al crear la campaña en Studio, con la fecha de ese día como fecha de corte. Sus datos se cambian sólo en Studio, y el importador de OneDrive ya no la toca. |
+
+¿Por qué una campaña de OneDrive responde «no»? Porque si Studio aceptara el cambio, la próxima importación desde
+OneDrive lo pisaría, o habría dos versiones distintas de la misma campaña sin saber cuál es la buena. Hasta su corte,
+esas campañas se corrigen en OneDrive.
+
+**El corte de las campañas actuales está pendiente.** Pasar CMP-001 a CMP-005 a Studio, con fecha de corte y aviso al
+equipo, es una entrega posterior del programa (TASK-1894, Entregable C) que el equipo dejó para después. La primera
+será CMP-004. Mientras tanto, por ejemplo, la autorización de medios de CMP-004 se sigue registrando en su catálogo de
+OneDrive.
+
+### Qué se puede editar en una campaña gobernada por Studio
+
+- Los datos de la campaña y su **brief** (objetivo, audiencias, KPIs y el resto), guardado tal como se escribió.
+  Editar un brief ya aprobado lo devuelve a borrador.
+- **Conceptos**, **piezas**, los **derechos** de cada versión y la **revisión** de versiones (aprobar o pedir cambios con
+  una nota).
+- **Copys** (se guardan exactamente como se escriben) y **anuncios** configurados.
+- El **plan de medios**: un vuelo por campaña y líneas de presupuesto **propuestas**. Una línea aprobada no se escribe a
+  mano: nace cuando una persona aprueba la propuesta, que se conserva al lado.
+- Los **posts planificados** del calendario: Studio los planifica y los cancela, pero **nunca publica**. Un post que ya
+  viene de la plataforma de publicación no se edita.
+- Los **tres estados**, siguiendo su orden: por ejemplo, la creatividad pasa de «En producción» a «Piezas finales» y
+  luego a «Aprobada». «Activa» y «Pausada» sólo aparecen cuando la plataforma lo observa; nadie los marca a mano.
+
+Cada cambio queda registrado y lleva un número de revisión: si dos personas editan lo mismo a la vez, la segunda recibe
+un aviso de conflicto en lugar de pisar el cambio de la primera.
+
+**Cómo se edita hoy:** todavía no desde las pantallas de la web (llegan con TASK-1895). Hoy se edita por la API de
+Studio, con un token de integración que tenga permiso de escritura, o por la consola del equipo
+(`pnpm studio:write`), que por defecto sólo muestra lo que haría y escribe únicamente si se le pide de forma
+explícita. En producción, hoy ninguna integración tiene permiso de escritura.
+
+### Quién aprueba
+
+**Aprobar es una decisión de una persona.** Aprobar una versión de pieza, el brief, la creatividad, una línea de
+presupuesto, o autorizar medios, y también quitar una línea propuesta, exigen que una persona lo
+confirme de forma explícita. Hoy eso sólo se puede hacer desde la consola del equipo, con una confirmación adicional.
+Una integración nunca aprueba (recibe «la aprobación requiere a una persona») y por la API una aprobación queda
+detenida pidiendo confirmación hasta que llegue la puerta de aprobación con la persona como responsable (TASK-1899).
+Aprobar la creatividad y autorizar medios tienen su propio paso: no se pueden lograr con un cambio de estado genérico.
+
+En Greenhouse, los permisos de escritura de Studio (piezas y campañas) quedaron preparados para los roles de
+**administración**, **cuentas**, **operaciones** y **diseño** de Efeonce; todavía no están publicados en producción.
+
+> Detalle técnico: commands, máquinas de estado, autoridad por campaña y errores en el [Delta del Entregable B de TASK-1894](../../tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) y en la [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 
 ## Qué viene
 
@@ -139,8 +194,8 @@ El programa (EPIC-049) avanza en este orden, sin fechas comprometidas:
 2. **Originales en la nube y avisos** — los archivos originales dejan de depender de OneDrive, y el equipo recibe
    alertas en Teams si algo falla.
 3. **Métricas** — resultados de pauta y publicaciones traídos desde Greenhouse.
-4. **Edición y brief como parte de Studio** — cambiar datos, subir piezas y registrar el brief dentro de Studio;
-   desde ahí Studio deja de depender de OneDrive como fuente.
+4. **Edición y brief como parte de Studio** — ya en Studio desde el 2026-10-02 para campañas gobernadas por Studio
+   (por API y consola). Falta el **corte de las campañas actuales** desde OneDrive, empezando por CMP-004.
 5. **Pantallas de edición, revisión y métricas**, y **escritura y aprobaciones por agentes**, siempre con una
    persona responsable.
 6. **Inicio de sesión con la cuenta Efeonce**, al final.

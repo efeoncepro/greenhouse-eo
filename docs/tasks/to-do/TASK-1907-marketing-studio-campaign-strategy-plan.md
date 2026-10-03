@@ -6,6 +6,26 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02
+
+- **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`); Entregable C diferido por el
+  operador. La parte de TASK-1894 de la que depende esta task (kernel, brief como entidad, commands de
+  pieza/copy/anuncio/post) ya existe; siguen bloqueando TASK-1899, TASK-1905 y TASK-1906.
+- **Brief como entidad:** tablas `campaign_brief`, `campaign_brief_audience` y `campaign_brief_kpi` (migración
+  `1790967435017_catalog-write-commands.sql`, aplicada en staging y producción); `upsertCampaignBrief` (texto literal;
+  editar uno aprobado lo devuelve a borrador), `approveCampaignBrief` (`T2`) y la lectura
+  `GET /api/v1/campaigns/{id}/brief` (tool `studio.campaign.brief.get`).
+- **Plan de medios con revisión:** `revision` en `media_flight` y en las lecturas del plan (`flightId`, `budgetLineId`);
+  `createMediaFlight`/`updateMediaFlight` (uno por campaña); `setBudgetLine` sólo `proposed`; `approveBudgetLine`
+  (`T2`) crea la línea `approved` con `approvalRef` (columnas `approval_ref`, `approved_by`, `approved_at`) y conserva
+  la propuesta. Es el patrón de aprobación con referencia que esta task puede imitar para `strategy_plan_version`; el
+  plan estratégico sigue sin tocar la ruta del plan de medios.
+- **Ids a los que se vinculan los ítems del plan:** concepto `CMP###-NN`, pieza `<concepto>-<imagen|video>-<WxH>`;
+  `revision` en concepto, anuncio, copy y post.
+- **Autoridad por campaña:** CMP-001…005 siguen gobernadas por OneDrive (`409 campaign_not_studio_owned` ante
+  escrituras del catálogo) hasta el Entregable C; para probar en staging existe la sandbox `CMP-900`, gobernada por
+  Studio. `T2` por API responde hoy `403 confirmation_required` hasta TASK-1899.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -100,7 +120,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-marketing-studio/SKILL.md` (contrato de mantenimiento).
 - `.claude/skills/efeonce-customer-model-operator/SKILL.md` (roles y evidencia en la matriz).
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` + `mcp-craft`.
-- `docs/tasks/to-do/TASK-1894-marketing-studio-write-commands-authority-cutover.md` §«Brief como entidad» y §«Forma
+- `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` §«Brief como entidad» y §«Forma
   común de un command»; `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` §«Aprobación».
 - `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md` §8 (contrato del brief ampliado; convención de nombres de archivo).
 
@@ -140,7 +160,10 @@ Reglas obligatorias:
 - `studio.campaign` con `funnel_phase`, `audience_summary`, `brief_ref` (texto libre) y los tres estados.
 - Plan de **medios** (`getCampaignPlan`, `GET /api/v1/campaigns/{id}/plan`, tool `studio.campaign.media_plan.get`):
   flights y líneas de presupuesto por naturaleza. Es otra cosa; esta task no lo toca y no reutiliza su ruta.
-- Brief estructurado con audiencias y KPIs planificado en TASK-1894.
+- Brief estructurado con audiencias y KPIs: existe desde 2026-10-02 (TASK-1894 Entregable B; tablas `campaign_brief`,
+  `campaign_brief_audience`, `campaign_brief_kpi`, commands `upsertCampaignBrief`/`approveCampaignBrief`, lectura
+  `studio.campaign.brief.get`).
+- Plan de medios con `revision` y aprobación de línea con `approvalRef` (TASK-1894 Entregable B, 2026-10-02).
 - Método de planificación en la skill `efeonce-campaign-planning` (documento, sin persistencia).
 
 ### Gap

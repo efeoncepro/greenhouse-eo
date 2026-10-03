@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.9
+> **Version:** 1.11
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
+> **Ultima actualizacion:** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
+> **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
 > **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
 > 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
 > 2026-09-23 por Claude — v1.6: 🔴 `--mask` de 2.5 no sirve para mover material que ya está en la foto: sobre un primer plano oscuro y desenfocado, Sunburst rellenó toda la zona editable con un panel plano de borde recto y borró un objeto que el prompt pedía conservar [verificado 2026-09-23] (§5.1). · v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
@@ -74,7 +75,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
-| **Pieza final con edición precisa o inpainting con máscara** | GPT Image 2.5 **Sunburst** `xhigh`/`max` + `--mask` | #1 edición en Arena (1520) y AA (1164) [tercero]; máscara PNG con alfa [oficial]; deriva media fuera de zona 2,4/255 con máscara [verificado 2026-09-16]; la media esconde picos: delta máximo 221/255 en zona protegida [verificado 2026-09-17], así que lo protegido se recompone desde la base ([paso 5](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)) | 2.5 Flare (mismo costo, más rápido) | Seedream Pro Edit cuando la zona protegida debe quedar intacta: sin máscara en fal, MAE protegido 0,0458 vs 0,0308 de GPT Image 2 con máscara [verificado 2026-07-18] |
+| **Inpainting: editar una zona y dejar el resto idéntico** | `pnpm ai:inpaint image` (TASK-1965) con **GPT Image 2.5 Flare** `medium` + máscara, o `fal:flux-pro-fill` | El pipeline recompone y verifica el archivo en **delta máximo 0** fuera de la zona [verificado 2026-10-02, 5 corridas]; Flare y Flux Fill colocaron el objeto [verificado 2026-10-02]. 🔴 **Sunburst CON máscara devuelve la zona como panel negro plano** (3 de 3: 2026-09-23 y dos el 2026-10-02) [verificado]; con `--provider-mask auto` Sunburst edita sin máscara, recibe la zona en magenta como guía y el pipeline recompone [verificado 2026-10-02: objeto dentro de la zona; sin la guía lo puso fuera] | Sunburst sin máscara cuando la pieza pide su calidad | Seedream Pro Edit sin máscara (la máscara sólo recompone) |
 | **Generación cotidiana de calidad, rápida** | GPT Image 2.5 **Flare** `medium`/`high` | Mismo costo que Sunburst; en `high` 18,7 s vs 29,1 s, en `max` 46,0 s vs 80,6 s a 1024² [verificado 2026-09-16] | Sunburst si la pieza es de edición | Dejar el default del CLI (`gpt-image-2` `high` 1536×1024 ≈ USD 0,165): cuesta lo mismo que 2.5 `max` [cálculo] |
 | **Máxima calidad OpenAI sin importar latencia** | 2.5 Sunburst `max` | `max` ≈ tokens de GPT Image 2 `high` [cálculo sobre fórmula oficial] | 2.5 Flare `max` (#1 AA texto a imagen, 1189) [tercero] | `xhigh`/`max` con `gpt-image-2`: el CLI lo rechaza antes de la red [contrato] |
 | **Mínimo costo por pieza en OpenAI** | 2.5 `low` (≈ 0,006 a 1024²) o `medium` (≈ 0,013) | [cálculo] fórmula oficial | Seedream Lite (0,035 por imagen) si buscas divergencia | Esperar calidad final en `low` |
@@ -201,7 +202,7 @@ Cada ficha: qué es · cuándo SÍ · cuándo NO · capacidades y límites · co
 | Imágenes de entrada | ≤ 16, < 50 MB c/u [oficial] [contrato] | igual |
 | Formatos de entrada en edits | [sin dato] | [sin dato] |
 | Máscara | PNG con alfa, mismas dimensiones y formato que la primera imagen; transparente = editable; guía, no matte exacto [oficial]; el CLI la valida con `sharp` antes de gastar [contrato] | igual |
-| `input_fidelity` | No existe [oficial]; el CLI lo ignora en silencio [contrato] | Se omite [oficial] |
+| `input_fidelity` | No existe [oficial]; el CLI lo **rechaza antes de gastar** desde el 2026-09-27 [contrato] | Se omite [oficial]; también rechazado |
 | Tamaños | recomendados `1024x1024`, `1536x1024`, `1024x1536`, `auto`; custom múltiplos de 16, ratio 1:3–3:1, borde ≤ 3840, área 655.360–8.294.400, > 2560×1440 experimental [oficial] | igual + populares 2048×2048, 2048×1152, 3840×2160, 2160×3840 [oficial] |
 | Calidad | `low`, `medium`, `high`, `xhigh`, `max`, `auto` [oficial] | `low`, `medium`, `high`, `auto` [oficial] |
 | Transparencia | Plena, PNG/WebP [oficial] | Preview [oficial] |
@@ -258,8 +259,10 @@ pnpm ai:image --prompt "<descripción>" --model gpt-image-2.5-flare --quality hi
 # Pieza final con edición precisa (Sunburst, xhigh)
 pnpm ai:image --image base.png --prompt "<qué cambia + qué debe quedar idéntico>" --model gpt-image-2.5-sunburst --quality xhigh --out ai-generations/2026-09-16_mi-pieza/kv-final.png
 
-# Inpainting con máscara (PNG con alfa, mismas dimensiones y formato que la primera --image)
-pnpm ai:image --image base.png --mask mask.png --prompt "<qué va en la zona transparente>" --model gpt-image-2.5-sunburst --quality high --out ai-generations/2026-09-16_mi-pieza/inpaint.png
+# Inpainting: máscara canónica + recomposición y verificación automáticas (TASK-1965)
+pnpm ai:mask --base base.png --rect 0.33,0.42,0.67,0.72 --feather 24 --out mask.png
+pnpm ai:inpaint image --image base.png --mask mask.png --prompt "<qué va en la zona>" --run ai-generations/2026-10-02_mi-pieza   # Flare medium por defecto
+# (pnpm ai:image --mask sigue existiendo, pero no recompone ni verifica: el modelo redibuja toda la imagen)
 
 # Fondo transparente
 pnpm ai:image --prompt "<objeto aislado>" --model gpt-image-2.5-flare --quality high --size 1024x1024 --background transparent --out ai-generations/2026-09-16_mi-pieza/icono.png
@@ -273,7 +276,10 @@ pnpm ai:image:rmbg
 
 Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `--image` (repetible), `--mask`, `--input-fidelity`, `--out`, `--out-dir`, `--concept`, `--task`, `--size`, `--quality`, `--background`, `--format`, `--model`, `--count`, `--timeout` (default 280000 ms), `--open`, `--help`. Defaults: `gpt-image-2` · `1536x1024` · `high` · `opaque` · `public/images/generated`.
 
-**Trampas.** 🔴 **`--mask` no sirve para MOVER material que ya está en la foto** [verificado 2026-09-23]: sobre una franja de primer plano oscuro y desenfocado (subir el lecho de un plate), Sunburst llenó toda la zona transparente con un panel plano de borde superior recto justo en el límite de la máscara y borró el apoyabrazos que había en ella, aunque el prompt pedía conservar lo que quedaba sobre el nuevo borde; los dos candidatos, igual: se lee como un velo. Para desplazar material fotográfico existente no uses inpainting generativo: mueve los píxeles de la propia foto (caso y script: `ai-generations/2026-09-23_v07-lecho-04-elegida/`). Ver §8.1: `--count` = N pedidos pagados; `--input-fidelity` ignorado; sin `--moderation`; default de salida en `public/`. Ya no son trampas (commit `17196ead1`): `--size` se valida en local (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400; 1.5/1/mini: sólo `1024x1024`, `1536x1024`, `1024x1536` o `auto`), `--background` se valida y existe `--format`. Deprecaciones de modelos anteriores que el CLI aún acepta: `gpt-image-1` retira 2026-10-23; `gpt-image-1.5` y `gpt-image-1-mini` 2026-12-01 [oficial].
+**Trampas.** 🔴 **Sunburst con `--mask` devuelve la zona totalmente editable como un PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos pasadas el 2026-10-02 con máscara de RGB negro y con el RGB de la imagen bajo el alfa]; Flare, con la misma máscara y el mismo prompt, colocó el objeto. `pnpm ai:inpaint image` usa Flare por defecto, edita con Sunburst sin máscara (`--provider-mask auto`) y marca `suspectFlatPanel` si la salida cruda vuelve negra. 🔴 **`--mask` no sirve para MOVER material que ya está en la foto** [verificado 2026-09-23]: sobre una franja de primer plano oscuro y desenfocado (subir el lecho de un plate), Sunburst llenó toda la zona transparente con un panel plano de borde superior recto justo en el límite de la máscara y borró el apoyabrazos que había en ella, aunque el prompt pedía conservar lo que quedaba sobre el nuevo borde; los dos candidatos, igual: se lee como un velo. Para desplazar material fotográfico existente no uses inpainting generativo: mueve los píxeles de la propia foto (caso y script: `ai-generations/2026-09-23_v07-lecho-04-elegida/`). Ver §8.1: `--count` = N pedidos pagados; `--input-fidelity` rechazado antes de gastar (desde 2026-09-27); sin `--moderation`; default de salida en `public/`. Ya no son trampas (commit `17196ead1`): `--size` se valida en local (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400; 1.5/1/mini: sólo `1024x1024`, `1536x1024`, `1024x1536` o `auto`), `--background` se valida y existe `--format`. Deprecaciones de modelos anteriores que el CLI aún acepta: `gpt-image-1` retira 2026-10-23; `gpt-image-1.5` y `gpt-image-1-mini` 2026-12-01 [oficial].
+
+🔴 **`pnpm ai:inpaint image` con Sunburst NO sirve para retocar la piel de una cara** [verificado 2026-10-02, 2 corridas, `ai-generations/2026-10-02_login-escenario/piel/inpaint/`]. Plates de 3840×2160, máscara de cara, orejas y cuello (4–7 % del cuadro), prompt que pide re-renderizar **sólo** la piel; el pipeline recortó con contexto (1488×1168 y 1200×1008, ≈ USD 0,05 cada una) y editó sin enviar máscara (`providerMaskSent: false`). Run `e29414c20458`: PASS, zona protegida idéntica, pero la zona cambió poco (`editedMeanDelta` 10,4/255): la piel siguió viéndose IA. Run `fdd790982b85`: el modelo **reencuadró** (dx −6 px, escala 0,98, `suspectMisaligned`; el pipeline marcó REVISAR, salida 3). La piel de un personaje se resuelve en su **retrato ancla** antes de la escena, no retocando la foto terminada (método: [casebook cine, escenario del login](../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos)). Flare (el default de `ai:inpaint`) sobre piel no se probó [sin dato].
+🔴 **Resolución de una escena con personas: 2560×1440, no 3840×2160** [verificado 2026-10-02, una sola corrida; que la causa sea la resolución no se aisló: sin dato]. La misma ficha con Sunburst `high`: a **3840×2160** (sobre 2560×1440, zona experimental) la cara de un personaje de casting salió con microtextura craquelada y la punta de la nariz más ancha y brillante que su retrato ancla; regenerada a **2560×1440** (el máximo no experimental) salió fina (`LG2d` → `LG2e`, `revision/LG2d-vs-LG2e-cara.jpg`). Coincide con lo ya medido en retratos: más resolución no es más fidelidad, el modelo inventa poro que la referencia no tiene (`.claude/rules/brand-photography.md`, «Realismo NO es castigo»).
 
 **Estado.** Conectados. Línea base de consumo 2.5 medida 2026-09-16 (7 piezas 1024²) [verificado]; canary transparente GPT Image 2 2026-08-21 [verificado].
 **Fuentes.** O1–O8 (§12).
@@ -765,6 +771,7 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 - **Sin personas ni marcas:** `seedance25-r2v --task editing`, costo = tokens de la salida + duración del video de entrada que cuenta para el cobro [oficial]; clip de 5 s a 720p con referencia de video ≈ 1,42 [cálculo con 0,2838/s; confírmalo con `--balance`].
 - **Con personas o marcas:** `flux3-edit` 10 s **0,30** (720p).
+- **Editar sólo una ZONA y dejar el resto idéntico cuadro a cuadro:** `pnpm ai:inpaint video` (TASK-1965) sobre `flux3-edit` — normaliza la salida, aborta si el motor corrió el encuadre (deriva media de la zona protegida > 12/255), recompone cada cuadro y verifica delta 0 sobre PNG. Canario 5 s cámara quieta: 120 cuadros PASS, deriva 11,16/255, objeto estable, **0,15** [verificado 2026-10-02]. Manual: `docs/manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md`.
 
 ### 6.9 Extender
 
@@ -892,7 +899,7 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 | Sin `--output-compression` | No controlas la compresión de JPEG/WebP | Recomprime en post |
 | `--count N` = N pedidos pagados secuenciales | Multiplica costo y tiempo (el CLI lo avisa y la estimación ya multiplica por N) | Cuenta `N × costo` |
 | Estimación sólo informativa | No hay tope ni `--yes` en `ai:image`; sin estimación con `--size auto` o modelos sin grilla | Revisa la línea `$ costo estimado` antes de dejarlo correr |
-| `--input-fidelity` con 2.5 o GPT Image 2 se ignora en silencio | Crees controlar algo que no viaja | No lo uses |
+| `--input-fidelity` con 2.5 o GPT Image 2 | Desde el 2026-09-27 el CLI lo **rechaza antes de la red** (antes se ignoraba en silencio) | Pide la preservación por prompt |
 | Sin `--moderation` | No puedes usar `moderation=low` | — |
 | `--batch` no usa la Batch API | Sin descuento 50 % | Batch sólo vía API directa con `gpt-image-2` |
 | Default de salida `public/images/generated` | Riesgo de commitear assets | Siempre `--out`/`--out-dir` |
@@ -1015,16 +1022,17 @@ Conectar cualquiera exige: slug + contrato en `fal-capabilities.ts`, corrida rea
 <!-- INVENTARIO-GENERADO:INICIO -->
 <!-- NO EDITAR A MANO: lo regenera `pnpm models:inventory --write` desde los contratos de código. -->
 
-> **Inventario generado el 2026-09-22** desde `src/lib/ai/fal-capabilities.ts` y
+> **Inventario generado el 2026-10-02** desde `src/lib/ai/fal-capabilities.ts` y
 > `src/lib/ai/higgsfield-capabilities.ts`. Es la lista COMPLETA de lo que `pnpm ai:fal` puede ejecutar
 > —y por tanto de lo que puede **gastar**—. Si un id aparece acá y no tiene ficha en §5, la ficha es la que
 > falta. La columna «verificado» es la fecha de una generación real nuestra; `—` significa que **nadie la
 > ha corrido**, no que no funcione.
 
-**Carril fal · 55 capacidades** (50 con corrida real)
+**Carril fal · 56 capacidades** (51 con corrida real)
 
 | id | slug | tipo | operación | verificado |
 |---|---|---|---|---|
+| `flux-pro-fill` | `fal-ai/flux-pro/v1/fill` | image | inpaint | 2026-10-02 |
 | `flux3-edit` | `blackforestlabs/flux-3/edit-video` | video | video-edit | 2026-09-16 |
 | `flux3-enhance` | `blackforestlabs/flux-3/draft-enhance` | video | draft-enhance | 2026-09-16 |
 | `flux3-extend` | `blackforestlabs/flux-3/extend-video` | video | video-extend | 2026-09-16 |

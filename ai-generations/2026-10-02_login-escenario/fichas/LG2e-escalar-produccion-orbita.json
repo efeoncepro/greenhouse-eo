@@ -1,0 +1,51 @@
+{
+  "id": "LG2e-escalar-produccion-orbita",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a long exposure closed by a rear-curtain flash, a vast dark creative studio at night): the creative director from the reference portrait stands just right of the centre of the frame, her face at about one third of the frame height, framed from the waist up, wearing the EFEONCE HOODIE, a heroic medium shot. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm at f/2, she does not lean toward the lens. Her right forearm (on the left of the frame) reaches out to the side, palm up and open at chest height, about 50 cm from her body, so the sphere lights her from the side, not straight onto her chest. AROUND HER turns ONE wide orbit of hot orange light (#FF6500): a single luminous ring, slightly tilted, that passes BEHIND her shoulders at the height of her collarbones, always BELOW her chin, and comes forward IN FRONT of her hips; the space around her head and face is empty dark air, leaving a smooth long-exposure light trail along its whole path, like a long-exposure photograph; the trail traces exactly ONE revolution and closes on itself: a single thin closed ellipse of even width with the sphere at its leading tip; no second loop, no offset copy, no spiral; the flash freezes her and the pieces sharp while the light draws the ring; it is one continuous ring, never two, never a spiral. Riding along that orbit, SIX thin frameless finished pieces of ONE campaign, each the same bold key visual re-cut for its format so they read as one family, never as copies: ONE tall phone screen just right of her palm, ONE square post over her stomach, ONE wide video frame over her left hip, ONE tall poster at the right turn of the ring, and TWO small soft ones on the far arc behind her shoulders, one on each side of her neck. They are matte prints and dark-glass screens that give off NO light of their own; only the edge facing the orange trail catches a thin orange rim. Different sizes, different angles, never a fan, never a row. At the leading tip of the orbit, just above her open palm, burns ONE sphere of hot orange light the size of an orange, the brightest thing in the frame and the only key light on her: it lights her face, hand and hoodie from below and to the frame-left, while the far side of her face falls into deep shadow with the nose shadow legible on her cheek. NO fill light, NO front light; a hard cool rim light from behind separates her hair and shoulders from the dark; the BLUE of the frame is carried only by her royal-blue Efeonce hoodie, blue-rimmed by the cool back light; the embroidered mark on her chest sits away from the sphere, lit only by a soft grazing light, white and crisp, never orange; no coloured panel on any wall. Outside the orange light the whole frame stays cool and contemporary: deep navy and near-black, nothing amber, golden or tungsten; the haze is lit only by the cold rim and the far practicals and reads cool blue-grey; the orange glow stays within a hand's width of the ring and the sphere and never washes the air or the background. She looks straight into the lens with a confident, closed-mouth half-smile, head almost frontal, both eyes and both eyebrows visible. Real skin exactly as in the reference portrait: irregular pores and fine vellus hair, healthy even tone, natural sheen with micro-texture in the highlights; never waxy, airbrushed or CGI-smooth; smooth forehead in relief, no expression lines, no redness, no under-eye shadows; the orange light warms her near cheek, jaw and palm but her skin keeps its natural light-brown tone, never orange-tinted or aged. At full resolution her skin texture is fine and soft: pores and vellus hair only, no crackled, cross-hatched or reticulated micro-texture, no leathery grain, no sharpening halo; her lower lashes are fine and sparse, never clumped or spidery. Her nose exactly as in the reference portrait: straight and narrow with a refined tip, matte, with only a small soft highlight; no glossy hotspot on the tip, the orange light only grazes the near nostril. GEOGRAPHY: her nose is just right of centre; her right hand, the one nearest the frame-left, and the sphere above it are at about 42% of the frame width, and between the frame-left edge and her palm there is a wide band of empty darkness. The ring is only a little wider than her body: its left end is the sphere just above her open palm, and its right end turns back just past her left elbow; nothing of the ring, its glow or any piece reaches the right fifth of the frame, which is empty dark studio, so the closed ellipse reads whole. The lower-left area, from the left edge to about 45% of the width and from about 60% of the height down, is the darkest, calmest part of the picture: no ring, no glow, no piece, no haze highlight. Rich contrast, punchy color, no readable text on any piece, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the deep dark studio wall and floor far behind her, in shadow",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "publicidad-prueba",
+  "nota": "Casting (no es del roster), anclado a un retrato con la receta de piel v3. Cine con persona de casting en uniforme para el escenario del login: excepción del operador (2026-10-02); alcance publicidad-prueba porque no existe un alcance web. Parte de NX6b: la órbita de luz que rodea a la persona (cerrada = ella dirige).",
+  "casting": {
+    "directora": {
+      "etiqueta": "Directora creativa (casting 2)",
+      "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean creative director in her late twenties with long straight black hair in a sleek low ponytail and a few loose strands framing her face, warm light-brown skin, dark brown almond-shaped eyes, full natural brows, a straight well-proportioned nose and small gold stud earrings. Preserve her face, skin and hair exactly; her pose, expression, clothing and light come from the scene. Do not age, beautify or smooth her.",
+      "refs": [
+        "ai-generations/2026-10-02_login-escenario/casting/ancla-directora-2.png"
+      ],
+      "cuerpo": "ai-generations/2026-10-02_login-escenario/casting/ancla-directora-2.png"
+    }
+  },
+  "identidad": [
+    "directora"
+  ],
+  "llave": {
+    "fuente": "the sphere of hot orange light (#FF6500) at the leading tip of the orbit, hovering just above her open right palm",
+    "lado": "below her face and slightly to the frame-left, at chest height",
+    "distancia": "about 45 cm from her face"
+  },
+  "primerPlano": "the dark unlit back of a tall printed campaign poster on a floor stand, about 40 cm from the lens just right of centre, huge, soft and out of focus, cut by the bottom edge; it is NOT on the orbit and catches no orange light",
+  "fondo": "a vast dark studio 8–10 m behind her with a row of large cold practical lights melted into round bokeh, between 50% and 80% of the frame width, above her shoulders",
+  "fenomeno": {
+    "que": "ONE wide orbit of hot orange light (#FF6500) that encircles her, passing in front of her and behind her, leaving a luminous long-exposure trail; riding along it are the finished pieces of ONE campaign in every format, and at its leading tip burns one sphere of orange light over her palm",
+    "esServicio": "Escalar producción creativa: una idea maestra gira alrededor de quien la dirige y sale en todos los formatos, con la misma marca"
+  }
+}

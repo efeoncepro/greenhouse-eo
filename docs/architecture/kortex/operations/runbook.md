@@ -1,6 +1,33 @@
 # Runbook operativo Kortex desde Greenhouse
 
-## Estado staging validado
+## Estado vigente — hibernación profunda desde 2026-10-02
+
+Kortex está profundamente hibernado desde `2026-10-02T13:44:27Z`. Este estado **supersede operativamente** los
+smokes y el rollout de junio que se conservan más abajo como evidencia histórica:
+
+- proyecto Vercel pausado (`503 DEPLOYMENT_PAUSED`);
+- Cloud Run `kortex-control-plane` con ingress interno, IAM obligatorio y mínimo 0;
+- Cloud Tasks pausado, 0 tareas pendientes;
+- Cloud SQL `kortex-pg-dev` `STOPPED` con `activationPolicy=NEVER`;
+- datos, secretos, imágenes, instalaciones HubSpot y deployments retenidos para una reactivación reversible.
+
+Mientras este estado siga vigente:
+
+1. no ejecutar `pnpm staging:request` contra el control-plane ni command smokes;
+2. no interpretar timeout, `503` o upstream inaccesible como incidente de Greenhouse;
+3. no reactivar SQL por sí solo ni enviar un caller contra SQL detenido;
+4. no desplegar Kortex desde source stale: podría reabrir ingress, reanudar colas o cambiar scaling;
+5. usar el runbook canónico del repo hermano Kortex,
+   `docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`, para encenderlo.
+
+Secuencia mínima de reactivación: validar fuente y secretos → mantener callers pausados → reactivar SQL y esperar
+`RUNNABLE` → restaurar Cloud Run/IAM → hacer smoke read-only → reanudar Tasks/Vercel → habilitar writes/callers al
+final. Si una verificación falla, volver a pausar callers/Tasks/Vercel y dejar SQL en `NEVER`.
+
+Costo y evidencia fechada:
+[`CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md`](../../../audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
+## Estado staging validado en 2026-06-17 — histórico
 
 - Greenhouse deploy TASK-1166: `greenhouse-bfym2m5lx-efeonce-7670142f.vercel.app`
 - Previous Kortex runtime command rollout deploy: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`

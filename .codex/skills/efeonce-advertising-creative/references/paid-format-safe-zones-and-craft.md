@@ -1,11 +1,150 @@
 # Formatos de pauta: safe zones, cursores y las trampas medidas
 
-> **as-of 2026-09-22** (zona segura de AXIS y firma del gate, §1 y §2c: **2026-09-23**) · evidencia de composición local; separar mediciones, decisiones editoriales y especificaciones de plataforma. Caduca 2027-03.
+> **as-of 2026-09-22** (zona segura de AXIS y firma del gate, §1 y §2c: **2026-09-23**; horizontal 1,91:1 por expansión, §0c: **2026-10-02**) · evidencia de composición local; separar mediciones, decisiones editoriales y especificaciones de plataforma. Caduca 2027-03.
 > Hermanos: [evidencia](ad-creative-evidence-2026.md) (qué está medido) ·
 > [playbook](paid-visual-attention-playbook.md) (cómo se produce y se mide) ·
 > [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) (el CTA) ·
 > [compositor de CTA](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (el contrato del gate) ·
 > [brief y QA](creative-brief-and-qa.md#gate-del-compositor-de-cta) (qué certifica el gate y qué se mira a ojo).
+
+## 0. 🔴 Un ad nace multiformato: se diseña para el formato más estrecho desde la ficha *(operador, 2026-10-02)*
+
+> «Al producir ads hay que pensar desde el inicio que la pieza de forma nativa pueda servir para todos los formatos
+> para evitar esto.» — operador, al cerrar las adaptaciones de CMP-004.
+
+**Qué pasó [medido, CMP-004, 11 piezas × 4 formatos]:** los 4:5 se aprobaron primero y las adaptaciones se
+plantearon después. Regenerar cada escena por formato desde su ficha costó ~60 generaciones y aun así:
+
+| Formato | Resultado | Por qué |
+|---|---|---|
+| 9:16 | 11/11 certificadas | La escena 4:5 (cielo arriba, escena al medio, lecho abajo) traslada casi igual. |
+| 1:1 | 9/11 | El bloque completo (pregunta, respuesta, bajada de 2–3 líneas, CTA, descriptor) al tamaño mínimo legible ocupa **~35 % del alto**. El modelo **no respeta las alturas pedidas**: sube cabezas y pantallas hasta el 26–38 % aun pidiéndolas bajo el 56–60 %. Las dos piezas de **Nexa** (cine con identidad) no entraron. |
+| 1,91:1 | 0/11 regenerando · **11/11 por expansión (§0c)** | A 390 px de teléfono el piso exige voces de **47 px** y CTA de **58 px** sobre 2048 de ancho: el bloque pide **~46 % del ancho y ~75 % del alto**. Las escenas regeneradas invaden la mitad izquierda aun con límite explícito al 52–56 %. Se resolvió expandiendo la escena 1:1 aprobada y llevando la bajada al titular del anuncio (§0c). |
+
+**La regla:**
+
+1. **Antes de la primera ficha, fija los formatos de la pieza** y el **presupuesto de texto del más estrecho**. El 1:1
+   y el horizontal mandan sobre el 4:5, no al revés. Si va a haber horizontal, el copy de la imagen se diseña para
+   caber ahí; la bajada larga puede vivir en el titular del anuncio y no en la imagen.
+2. **Una escena, una geometría que sirva a todos:** sujeto **compacto** y **bajo** (cabeza bajo el 50 % del alto),
+   aire calmo continuo arriba **y** a un costado, lecho oscuro al pie, elementos de luz que no suban. Un grupo de
+   cuatro personas o un muro LED de lado a lado no cabe en 1:1 ni en horizontal: se decide en la idea.
+3. **El piloto se prueba en los formatos antes de aprobar el 4:5:** componer el piloto también en 1:1 y en el
+   horizontal (y pasar `foto:cta:gate`) es más barato que descubrirlo con la pieza aprobada.
+4. **Proporciones de pauta verificadas (2026-10-02; Meta Ads Guide y ayuda de LinkedIn):**
+
+| Proporción · tamaño | Ubicaciones |
+|---|---|
+| 4:5 · 1440×1800 | feed FB/IG, Explorar IG, LinkedIn móvil (LinkedIn no lo muestra en escritorio) |
+| 9:16 · 1440×2560 | Stories y Reels FB/IG, Messenger · zona segura **14 % arriba, 35 % abajo, 6 % lados** (40 % abajo con texto legal) |
+| 1:1 · 1440×1440 (LinkedIn 1200×1200) | Marketplace, columna derecha FB, **LinkedIn escritorio y móvil** |
+| **1,91:1** · LinkedIn 1200×628 | imagen horizontal: columna derecha y búsqueda FB, LinkedIn. **16:9 es sólo la recomendada de video in-stream** |
+
+   LinkedIn: máximo **5 MB** por imagen. Meta genera sola la variante que falte (relleno, expansión o recorte con
+   IA): entregar 4:5 + 9:16 + 1:1 cubre la pauta; el horizontal es opcional. Si se entrega, se hace con el método de
+   §0c (CMP-004 cerró 44 piezas: 11 conceptos × 4:5, 9:16, 1:1 y 1,91:1).
+5. **Tamaño exacto:** `foto:generar` produce el 9:16 a **1024×1792 = 4:7** (1,6 % fuera; Meta tolera 1 %). Recorta el
+   plate a **1008×1792** antes de componer y entrega con `final: [1440, 2560]` (el gate certifica al tamaño de
+   entrega). 1:1 → `final: [1440, 1440]`; 4:5 → `final: [1440, 1800]`. El 1,91:1 existe en `foto:prompt` desde el
+   2026-10-02 (`2048×1072`), pero esa fila es para generar **de cero**, y de cero el modelo centra al sujeto: la
+   horizontal de una pieza aprobada se hace **por expansión de la escena 1:1** (§0c).
+6. **Herramientas de la corrida** (copiar, no reinventar): `ai-generations/2026-10-02_cmp004-cine-nativo/formatos/`
+   — `armar-fichas.py` (reubica la geometría vertical de una ficha aprobada por formato), `probar-variantes.sh` y
+   `certificar-variantes.sh` (compone y certifica cada variante de plate y deja la primera que pasa),
+   `composicion/armar-plan.py` + `formatos.json` + `ajustes.json` (el layout por formato y los ajustes por pieza a la
+   vista).
+
+## 0b. 🔴 Adaptar sin perder la pieza: patrones medidos y método nativo *(operador, 2026-10-02)*
+
+> «Mientras armamos las referencias del casting, piensa si vas a adaptar la misma escena […] tal vez al referenciar
+> la misma imagen pierde la épica y calidad de la primera aprobada.» — operador, CMP-004.
+
+**Qué aprobó y qué descartó el operador [medido, CMP-004, 11 piezas × 3 formatos]:**
+
+| Resultado | Casos | Por qué |
+|---|---|---|
+| ✅ Aprobada aunque cambió la persona | S07 y BF3 (grupos), S02 (de espalda, escena similar), S04, S05 | «No veo defectos anatómicos y estructurales y mantiene la esencia»: la persona es parte del oficio, no el retrato. |
+| ⚠️ Aprobada de momento | S06 en 9:16 y 1:1 | Perdió la colorimetría cine del 4:5 (muro frío + una sola pieza cálida): el modelo repartió la luz de otra manera. |
+| ❌ Descartada | S03 9:16 · S03 1:1 | La cara ES la pieza (retrato a cámara): sin ancla de identidad envejeció o cambió. La ficha pedía «líneas en los ojos y canas» y el modelo lo exageró. |
+| ❌ Descartada | S01 1:1 | Se rompió la relación que dice la idea (cinta sobre el logo de una pantalla + pincelada proyectada): quedó un gesto sobre una pantalla apagada. |
+| ❌ No producible | S08 y BF1 en 1:1 (Nexa) · los 1,91:1 regenerados | El texto completo legible no cabe sin achicar o tapar al sujeto. Los 1,91:1 se resolvieron después por expansión (§0c, 11/11 aprobados). |
+
+**Patrones:**
+
+1. **El cambio de personaje sólo reprueba cuando la cara es la protagonista.** En grupo, de espalda o en acción, se
+   acepta si la esencia y la anatomía están bien. En retrato a cámara, la identidad es la pieza.
+2. **La idea vive en la RELACIÓN entre elementos, no en los elementos sueltos.** Regenerar conserva los objetos y
+   pierde su relación (la cinta ya no tapa un logo encendido; la pincelada ya no cae sobre ella).
+3. **El 1:1 concentra las fallas** porque el bloque de texto empuja al sujeto: el sujeto se achica, la cara pierde
+   píxeles y aparece el estrabismo.
+4. **El modelo no respeta alturas con encuadres cerrados:** pedir «cara grande» y «cabeza al 46 %» a la vez da cabeza
+   al ~30 % (medido en 8 de 8 pasadas). Pedir «sujeto en la mitad derecha» tampoco se cumple con un sujeto solo.
+5. **La colorimetría no viaja sola:** si no se declara la gradación del aprobado, cada formato la reinventa.
+6. **Elegir variantes por el gate es insuficiente:** el gate no ve ojos, identidad ni idea.
+
+**Método nativo (aplicado a S01 1:1 y S03 9:16/1:1, certificado):**
+
+1. **Ficha de esencia** antes de adaptar: la idea en una frase y la relación de elementos que la sostiene, escrita
+   como obligatoria en la escena; la gradación de color del aprobado, explícita.
+2. **Casting de campaña** si una persona protagonista va a reaparecer (otros formatos u otros contextos): set de rostro
+   frente y tres cuartos creado por **edición** desde la pieza aprobada (luz neutra, fondo gris, sin escena), declarado
+   en `casting` de la ficha y pedido en `identidad` (`foto:prompt`, desde 2026-10-02). La edad sale del casting: nunca
+   «líneas» ni «canas» en la escena. Se arma **al hacer el casting de la pieza**, no después de que algo falle.
+3. **Escena escrita para el formato**, con la cara a resolución suficiente: un 1:1 con sujeto de cuerpo medio se
+   genera a **2048×2048** (`foto:generar --size 2048x2048`) y se compone a 1440.
+4. **Si el sujeto quedó alto, zoom out por expansión** en vez de otra pasada: `pnpm foto:expandir <plate> <salida>
+   <escala> "<qué hay alrededor>" [abajo]` achica la escena, el modelo SÓLO rellena muro o cielo y el lecho de la firma,
+   y los píxeles originales se reponen encima. La persona no se regenera. Medido: cabeza de 0,30 → 0,46 del alto con
+   escala 0,72 y `abajo` 0,08, sin costura visible.
+5. **QA antes del gate:** caras al 100 % contra el casting (ojos simétricos, misma edad), la idea leída en dos segundos
+   y la gradación contra el aprobado. Después, `foto:cta:gate --reproducir`.
+
+## 0c. 🔴 La horizontal 1,91:1 nace de la escena 1:1 aprobada *(operador, 2026-10-02)*
+
+**Qué pasó [medido, CMP-004, 11 piezas: S01–S08, BF1–BF3]:** las 11 horizontales (LinkedIn 1200×628 y Meta
+horizontal) quedaron aprobadas por el operador en el canvas y certificadas con
+`pnpm foto:cta:gate piezas-191.json --reproducir` (exit 0). Se entregan a **2048×1072** (2,3–2,9 MB, bajo los 5 MB de
+LinkedIn).
+
+**Método (canon):** la horizontal **no se genera de cero**: se parte de la escena 1:1 aprobada, apoyada a la derecha al
+**80 % del alto** (escala 0,8, lecho abajo 0,04) en un lienzo 2048×1072, y el modelo extiende sólo la columna de
+texto a la izquierda:
+
+```bash
+pnpm foto:expandir <plate-1x1> <salida> 0.8 "<el mismo fondo continúa oscuro y calmo, el lecho continúa, sin luces ni objetos brillantes ni pantallas>" 0.04 --lienzo 2048x1072 --ancla derecha --fundido 120 --reponer no
+```
+
+**Lecciones medidas:**
+
+1. **De cero, el modelo centra al sujeto:** en el intento anterior 10 de 11 chocaban con el texto.
+2. **Reponer el original encima de la extensión deja un recuadro visible** (cambio de tono y objetos cortados en el
+   borde). Con `--reponer no` la salida del modelo queda sin costura y conserva a la persona (cara de S04 comparada al
+   100 % contra la aprobada: misma persona). Por eso **exige revisar caras**.
+3. **La pista importa:** con la pista desenfocada del plate el modelo rellenaba más oscuro sin continuar el lecho; con
+   la pista que estira los bordes reales (extend `copy` + blur 24) continúa lecho y luz.
+4. **80 %, no 86 %:** con la escena al 86 % los elementos del borde (soportes, estelas, muros de piezas) quedaban bajo
+   el CTA; al 80 % hay muro limpio. Si el borde de la escena trae luces (BF3, muro de piezas naranjas), pedir
+   explícitamente que el muro **termine donde termina la foto** (en BF3 se usó 0,76).
+5. **El titular crece hasta llenar la columna:** `dominantMax` se mide contra el ancho del lienzo; en 1,91:1 se fijó
+   `dominantMax` **0,42** de base.
+
+**Concepto reducido — la bajada va al titular del anuncio:** con todo el copy al piso legible en teléfono (voces
+9 CSS px, CTA 11 CSS px a 390 px de ancho) la bajada no cabe sobre la escena. La horizontal lleva **pregunta, titular,
+CTA y descriptor**; la bajada va en el **titular del anuncio** de LinkedIn/Meta. Se declara por pieza
+`conceptoReducido: { razon, aprobadoPor: "julio-reyes", plate: <sha256 del plate> }`: el gate exige un aprobador del
+registro `scripts/foto/aprobadores.json` y el sha256 del plate. **Requiere la aprobación del operador** (dada el
+2026-10-02 para CMP-004); un agente **nunca** la declara por su cuenta.
+
+**Firma — izquierda, alineada a la columna de texto, a altura fija:** el logo se alinea al borde izquierdo de la
+columna (x del centro = (178 + ancho/2)/2048 ⇒ **0,1524** con ancho **0,25 del lado corto**) y va a la misma altura en
+toda la serie (`logo.y` **0,86** del alto; a 0,8274/0,80/0,85 caía sobre el canto iluminado del lecho en 2–4
+piezas). Centrada (canon general) cae en la unión columna/escena, sobre el canto, y el gate la rechaza. Decisión del
+operador: izquierda alineada.
+
+**Parámetros base del formato 191** (`formatos.json` del lote): `top` 0,075 · `textWidth` 0,46 · `leadSize` 48 ·
+`dominantSize` 146 · `dominantMax` 0,42 · `after` null · CTA 58/48 px con padding 34×16 · `logo { width: 0.25,
+x: 0.1524, y: 0.86 }`. Ajustes por pieza: S03 y S05 `dominantSize` 200 (titulares cortos: el CTA competía); S02
+`cursorScale` 0,45. Receta en Recursos `2026-10-02-formatos-pauta/{composicion,nativas/horizontal}`.
 
 ## 1. 🔴 La reserva del comando NO es la safe zone de la plataforma
 

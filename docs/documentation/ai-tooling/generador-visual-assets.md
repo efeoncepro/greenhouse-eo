@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-24 por Claude — (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-10-02 por Claude — (1.17, TASK-1965) editar una zona de una imagen o de un video tiene comandos propios que recomponen y verifican solos: `pnpm ai:mask` y `pnpm ai:inpaint image|video`; Sunburst con mascara devuelve un panel negro, por eso edita sin mascara. Antes (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -152,13 +152,31 @@ la zona que se quiere reemplazar.
 imagen entera redibujada: medido el 2026-09-17, una zona que debia quedar igual cambio hasta **221 de 255** en algunos
 pixeles (en los ojos de la persona, **147**), aunque en promedio casi no se notaba (4,85). Por eso, cuando fuera de la
 zona hay algo que no se puede tocar —una cara, un logo aprobado, un texto— el resultado del modelo se combina despues
-con la imagen original usando la misma mascara, y se comprueba que lo protegido quedo identico. Como hacerlo:
-[manual, paso 5](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
+con la imagen original usando la misma mascara, y se comprueba que lo protegido quedo identico. Desde el 2026-10-02
+lo hace `pnpm ai:inpaint image` ([manual](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md)).
 
 > Detalle técnico: [delta 2026-09-17 en la spec](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
 
 Sirve, por ejemplo, para poner un objeto sobre una mesa vacia, cambiar un color puntual o corregir un
 detalle sin volver a generar la pieza completa.
+
+**Desde el 2026-10-02 ese trabajo lo hace un comando** (TASK-1965). `pnpm ai:mask` arma la mascara y avisa si quedo
+vacia o si deja editable toda la imagen. `pnpm ai:inpaint image` recorta la zona, la genera, vuelve a pegar solo lo
+que la mascara abre y revisa el archivo final: si fuera de la zona cambio un solo punto, lo marca como fallido. Antes
+de gastar muestra el costo y una vista previa, y si se repite la misma edicion no se vuelve a pagar. Cuatro cosas
+medidas en la prueba real:
+
+- La zona que no se debia tocar quedo identica en todas las pruebas, aunque el modelo la habia cambiado.
+- **Sunburst, el modelo de las piezas mas impactantes, devuelve la zona como un rectangulo negro cuando recibe la
+  mascara.** Por eso el comando le pide la edicion sin mascara y despues pega la zona, corrigiendo el leve cambio de
+  luz que ese modelo le da a toda la imagen. Flare (el default) y Flux Fill si aceptan la mascara.
+- Que el resultado este bien pegado no dice que el modelo haya hecho lo pedido: hay que mirarlo.
+- La mascara tiene que cubrir el objeto entero con margen; si el objeto se sale, queda cortado.
+
+Para **video** existe `pnpm ai:inpaint video`: el motor edita el clip y el comando pega la zona cuadro a cuadro,
+conserva el audio y se detiene si el motor movio la camara (pegar sobre una camara movida deja imagenes fantasma).
+Manuales: [imagen](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) y
+[video](../../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md).
 
 **Cuidado con una suposicion muy comun: editar no sale mas barato que generar de nuevo.** Aunque el cambio
 sea chico, el sistema devuelve la imagen completa, asi que se cobra lo mismo que una imagen nueva, y ademas

@@ -23,11 +23,11 @@ Los pilotos R01–R04 de CMP-004 no generaban impacto para el operador («necesi
 | S03 | Campaign & Key Visual Systems | ¿En cuántos formatos funciona tu idea? · En todos | 2 |
 | S04 | Audiovisual, Motion & Audio | ¿Qué cabe en seis segundos? · Cada detalle | 2 |
 | S05 | Run & Gun Production | ¿Contenido para todo el mes? · En un día | 3 |
-| S06 | Content & Social Operations | ¿Quién cuida tu conversación? · Personas | 2 |
+| S06 | Content Production System, desde la agencia creativa | ¿Contenido que se publica o que se mira? · Que se mira | 2 |
 | S07 | Managed Creative Capacity | ¿Más piezas, mismo estándar? · Mismo criterio | 1 |
-| S08 | AI Creative Operations | ¿IA en tu producción? · Con memoria | 1 |
+| S08 | AI Creative Operations | ¿Producción con IA? · Marca intacta | 1 |
 
-Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí.
+Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí. **Ajustes del operador del 2026-10-02 sobre los pilotos:** S06 vende contenido desde la agencia creativa (community management va por otro carril); S08 cambia de premisa a escalar producción con IA sin perder consistencia de marca; S02 y S03 cambian de escena para expresar mejor el texto.
 
 ## 4. Evidencia
 
@@ -47,12 +47,82 @@ Roles, bajadas, CTA y destino lógico viven en el BRIEF (§0b), no aquí.
 
 - [x] Mapa servicio → ad decidido y documentado.
 - [x] Pilotos 4:5 N2 producidos y certificados por el gate.
-- [ ] Revisión creativa del operador de los ocho pilotos.
-- [ ] Decisión sobre personas del equipo en registro cine (S01–S07; hoy en prueba). S08 (Nexa) está en el caso aprobado.
-- [ ] Claims por validar: «En un día» (S05) y «memoria de marca» (S08).
+- [x] Revisión creativa del operador: **aprobados los ocho** (2026-10-02) como ads Always On de Q4 (S02, S03, S06 y S08 en N3).
+- [x] Personas del equipo en registro cine: aprobadas por el operador para estos ads de CMP-004 (no amplía el canon general del registro).
+- [ ] Claim por validar: «En un día» (S05). S08 corregido por el operador el 2026-10-02: la premisa es escalar producción creativa con IA sin perder consistencia de marca (pieza N3); «memoria de marca» deja de usarse.
 - [ ] Destino, formulario y atribución por ruta.
 - [ ] Export final 1440×1800 y formatos 1:1, 9:16 y 16:9 nativos.
 - [ ] Video, orgánico y documentos por servicio replanificados.
 - [ ] Monto, pagador, geografía, T0 y permiso de medios.
 
 No hay publicación, pauta ni envío. Aprobar la dirección no aprueba cada render ni autoriza medios.
+
+## Delta 2026-10-02 · serie táctica Black Friday
+
+El operador pidió tres ads más con la idea «¿Corriendo para el Black Friday? ¡Llegaron los refuerzos!»: uno con los Sparks, uno con el squad y sus agentes, y uno que muestre producción creativa a escala, rápida y consistente sin perder la marca. Es una serie de temporada que no reemplaza al Always On de Q4.
+
+| ID | Refuerzo | Bajada |
+|---|---|---|
+| CMP004-BF1-KV-45-N1 | Nexa y los Sparks | Refuerzos creativos: agentes que se suman a tu equipo. |
+| CMP004-BF2-KV-45-N2 | El squad y sus agentes | Refuerzos creativos: un squad y sus agentes para tu campaña. |
+| CMP004-BF3-KV-45-N1 | Producción a escala | Refuerzos creativos: producción a escala, rápida y consistente. |
+| ~~CMP004-BF4-KV-45-N1~~ · descartada | Nexa llega (otra pose de BF1) | — |
+
+Copy común: «¿Corriendo para el Black Friday?» → «Ya llegamos» · CTA «Refuerza tu Black Friday». «Llegaron los refuerzos» no cabe como respuesta de la voz de la línea (1 a 3 palabras, cursor dentro de la zona), así que «refuerzos» va en la bajada. No se usa «garantizando» por los límites de promesa del brief (§11).
+
+Evidencia: `foto:cta:gate --reproducir` con código 0 en las tres piezas; contraste de texto 8–19:1, logo 19:1; bordados revisados al 100 %. BF2 se regeneró porque el reflejo naranja del portón en el piso llegaba al pie y la firma medía 2,63:1; una tarima negra mate más alta lo resolvió. Pilotos en OneDrive `5. Contenidos/15. Paid Media/02. Pilotos/CMP-004/4x5/BF-black-friday/`; receta en `01. Recursos/CMP-004 - Produccion y editables/2026-10-02-black-friday/`; registro en `ASSETS.md` §Black Friday y BRIEF §0c.
+
+- [x] Tres pilotos 4:5 producidos y certificados por el gate, más BF4 (otra pose de Nexa), descartada por el operador: «no buscaba una selfie de Nexa, no estamos vendiendo eso»; BF1 queda vigente.
+- [ ] Aprobación creativa del operador.
+- [ ] Fechas de vuelo de temporada, destino y permiso de medios.
+- [ ] Formatos 1:1, 9:16 y 16:9 nativos y export final 1440×1800.
+
+## Delta 2026-10-02 · formatos de pauta
+
+El operador aprobó los vigentes (S01–S08 Always On Q4, BF1–BF3 Black Friday) y pidió adaptaciones para Meta y LinkedIn, verificando las proporciones de cada ubicación. Verificado en el Meta Ads Guide y la ayuda de LinkedIn: la horizontal de **imagen** es **1,91:1** (16:9 es sólo video in-stream); 9:16 tiene zona segura 14/35/6 %; 1:1 es la única que LinkedIn muestra en escritorio y móvil.
+
+- [x] 4:5 1440×1800 (11), 9:16 1440×2560 (11) y 1:1 1440×1440 (9), certificados con `foto:cta:gate --reproducir` al tamaño de entrega. Finales en OneDrive `5. Contenidos/15. Paid Media/03. Finales/CMP-004 - Agencia creativa premium/`.
+- [ ] Decisión del operador sobre 1,91:1 (el texto completo legible no cabe: menos texto o no producirlo) y 1:1 de S08 y BF1.
+- [ ] Aprobación creativa de las adaptaciones; permiso de medios.
+
+Aprendizaje canonizado a pedido del operador: un ad nace multiformato desde la ficha (`efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0).
+
+## Delta 2026-10-02 — revisión de formatos y método nativo
+
+- **Revisión del operador sobre las adaptaciones 9:16 y 1:1:** aprobadas S01 4:5/9:16, S02, S03 4:5, S04, S05, S07
+  (las tres), S08 y BF1 (4:5 y 9:16) y BF3; S06 aprobada de momento con la nota de que perdió la colorimetría cine
+  del 4:5. Descartadas S01 1:1 (la cinta tapa una pantalla apagada y se pierde la relación con el titular), S03 9:16
+  (la protagonista envejeció) y S03 1:1 (cambió aún más).
+- **Patrón:** el cambio de personaje sólo reprueba cuando la cara es la protagonista; la idea vive en la relación
+  entre elementos; el 1:1 concentra las fallas porque el texto achica al sujeto.
+- **Decisión:** las tres descartadas se rehacen como escenas nativas (N2) con casting de campaña desde la pieza
+  aprobada, generación a 2048 y zoom out por expansión (`pnpm foto:expandir`); quedan en revisión del operador.
+  Método canónico: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0b.
+- **Pendientes:** S08 y BF1 en 1:1 y la horizontal 1,91:1 (el texto completo no cabe), recuperar el color de S06.
+
+## Delta 2026-10-02 (tarde) — set completo aprobado y canonizado
+
+- **Aprobadas por el operador las 33 piezas** (S01–S08 y BF1–BF3 en 4:5, 9:16 y 1:1), incluidas las nativas N2
+  (S01 1:1 con la pantalla real rehecha por edición enmascarada, S03 9:16 y 1:1 con casting, S08 y BF1 1:1 con escena
+  a 2048 y zoom out, S08 9:16 con proporciones corregidas). La horizontal 1,91:1 no se produce por ahora.
+- **Canon:** las 33 entran a la sección «finales» del banco de fotografía de AXIS (Lab, commit `d94695d`) con su
+  receta; las 11 escenas 4:5 entran a `scripts/foto/cine-recetas.json` como recetas cine (`C4*`) con la advertencia
+  de alcance de este CDR. El canon de `assets.lock` no aplica: es para referencias de prompt, no para piezas finales.
+- **Limpieza:** el canvas conserva sólo Estrategia y Formatos de pauta; los descartes de Finales en OneDrive se
+  borraron. La exploración local queda en `ai-generations/` (citada por las recetas cine, por lo tanto protegida).
+- **Pendiente:** cargar las piezas a Marketing Studio (la campaña existe; faltan las piezas). La autorización de
+  medios sigue `pending`: aprobar no autoriza pauta.
+
+## Delta 2026-10-02 (noche) — horizontales 1,91:1 aprobadas
+
+- **11 horizontales 1,91:1** (LinkedIn 1200×628 y Meta horizontal), una por concepto, **aprobadas por el operador**
+  en el canvas: el set queda en **44 piezas** (11 conceptos × 4:5, 9:16, 1:1 y 1,91:1).
+- **Método:** cada una parte de la escena 1:1 aprobada; la escena se apoya a la derecha (80 % del alto) y el modelo
+  extiende sólo la columna de texto (`pnpm foto:expandir … --lienzo 2048x1072 --ancla derecha --fundido 120 --reponer no`).
+  Reponer el original encima dejaba un recuadro visible; la salida del modelo conserva a la persona (verificado en S04).
+- **Concepto reducido aprobado:** con todo el copy al piso legible no cabía sobre la escena, así que la horizontal lleva
+  pregunta, titular, CTA y descriptor; **la bajada va en el titular del anuncio** de LinkedIn/Meta. Registrado como
+  `conceptoReducido` con `aprobadoPor: julio-reyes` y el sha256 de cada plate; certificadas por reproducción.
+- **Firma:** alineada al borde izquierdo de la columna de texto y a altura fija (0,86 del alto) en las 11.
+- **Destino:** OneDrive Finales `01 - Imagenes/1.91x1`, Marketing Studio (`CMP004-<clave>-imagen-191x100` v1 aprobada)
+  y banco «finales» del Lab de AXIS (`25f1b40`). La autorización de medios sigue pendiente.

@@ -214,6 +214,8 @@ oficio y receta del plan en la skill `efeonce-advertising-creative`. Lo que un a
   salen con 3 hasta recomponerlas. Nunca compongas en la carpeta de otra sesión para «probar»: usa una copia temporal
   (dos composiciones en la misma `out/` no se mezclan: la segunda se rechaza).
 
+🔴 **Un ad nace multiformato** *(operador, 2026-10-02)*: decide los formatos y el presupuesto de texto del más estrecho (1:1, 1,91:1) **antes** de la primera ficha; sujeto compacto y bajo; prueba el piloto en todos los formatos antes de aprobar el 4:5. Horizontal de imagen = **1,91:1** (16:9 es video). Regla, medición y proporciones verificadas de Meta/LinkedIn: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0. **Adaptar sin perder la pieza** (§0b): casting de campaña (`casting` en la ficha) para la persona protagonista, la idea escrita como relación obligatoria, `pnpm foto:expandir` si el sujeto queda alto, `foto:generar --size` para caras chicas, QA de caras al 100 % antes del gate. **Cambio de formato** (§0c): la horizontal 1,91:1 sale de la escena 1:1 aprobada con `pnpm foto:expandir <plate-1x1> <salida> 0.8 "<relleno>" 0.04 --lienzo 2048x1072 --ancla derecha --fundido 120 --reponer no`, nunca generada de cero (de cero el modelo centra al sujeto); con `--reponer no` revisa las caras al 100 %.
+
 🔴 **Para un AD con titular, los valores por formato ya están medidos — no los redescubras.**
 [`RECETA-POR-FORMATO.json`](../../ai-generations/2026-09-21_ads-brand-visibility/RECETA-POR-FORMATO.json)
 trae `top`, `textWidth`, tamaños de las tres voces, gaps, anclas de cursores y firma para **4:5, 9:16 y
@@ -391,6 +393,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   1024×1536 no tiene, así que hay que verificar al 100% contra el maestro. Costo: `max` a 2560×3200 son
   **USD 0,565** por imagen, diez veces una de 1024² en `high`. Receta completa y las tres iteraciones:
   `ai-generations/_identidad-nexa/LEEME.md`.
+- 🔴 **Personaje de casting nuevo (fuera del roster): primero su retrato ancla, después la escena** **[operador,
+  2026-10-02]**. Sin ancla, la piel sale «muy IA»; retocar después sólo la cara con `pnpm ai:inpaint image` no la
+  arregla (delta medio ~10/255 en una, reencuadre de ~6 px en otra) **[medido]**. Ancla con la piel v3 (`pnpm ai:image`,
+  `gpt-image-2.5-sunburst` high `1024x1536`, de pecho, 85 mm f/2, ventana grande con rebote) y la escena con `casting`
+  apuntando a ella. Plates con personas a **2560×1440**, no 3840×2160. Casos y prompts:
+  [casebook, escenario del login](../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
 - 🔴 **Para vestir a alguien con material de otra identidad, injerta el rostro; no describas el pelo**
   **[medido 2026-09-21]**. Imagen 1 la escena original, imagen 2 el ancla de identidad, y se pide cambiar
   **sólo los rasgos de la cara** conservando pose, gesto, vestuario, fondo y luz. Aguantó los casos difíciles
@@ -449,6 +457,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
   **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con
   personas del equipo, no. Receta 9:16: design-studio, `efeonce-photographic-language.md` §Cine.
+  **Escenario del login de Greenhouse (2026-10-02):** excepción del operador para cine con una persona de casting en
+  uniforme, sólo ahí (registro cine, delta 2026-10-02 c).
 - 🔴 **Una referencia que no se usa NO avisa** **[medido 2026-09-21]**. Con DOS personas el cupo baja a 2 por
   cabeza y recortaba **por orden de lista**: Julio se quedaba sin cuerpo entero siempre (sus dos primeras son
   de rostro) y Nexa lo perdía al pedir una vista. El modelo **inventaba la silueta y la pieza salía igual**.

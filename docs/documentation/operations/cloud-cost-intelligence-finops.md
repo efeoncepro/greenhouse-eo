@@ -1,7 +1,7 @@
 # Cloud Cost Intelligence y Copiloto FinOps
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-03 por Codex
 > **Modulo:** operaciones / cloud / FinOps
 > **Ruta en portal:** `/admin/integrations`
@@ -59,6 +59,16 @@ El forecast es deterministico y esta pensado para ser conservador:
 - si no hay suficientes datos, baja la confianza y lo declara
 
 Esto puede diferir de la proyeccion que muestra GCP Console, porque Google puede usar reglas propietarias o datos internos no expuestos igual en Billing Export. La lectura de Greenhouse debe tratarse como una explicacion operativa y reproducible, no como reemplazo de la factura.
+
+Toda comunicación FinOps debe etiquetar explícitamente:
+
+- **observado:** costo presente en export/factura;
+- **modelado:** run-rate o residual calculado;
+- **realizado:** ahorro confirmado con ventanas completas equivalentes posteriores al cambio.
+
+Una cancelación o un recurso apagado no convierte inmediatamente su proyección en ahorro realizado. El corte
+2026-10-02 de Kortex y el forecast consolidado vigente están en la
+[auditoría fechada](../../audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
 
 ## Vercel Billing FOCUS
 

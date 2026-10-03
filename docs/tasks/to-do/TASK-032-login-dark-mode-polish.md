@@ -96,3 +96,7 @@ Reglas obligatorias:
 - `pnpm lint`
 - `npx tsc --noEmit`
 - Toggle dark mode en preview y verificar visualmente ambos paneles
+
+## Delta 2026-10-02 — Login V4 premium (TASK-1964)
+
+Reemplazada por `TASK-1964`: el panel oscuro y el formulario que esta task ajustaba se retiraron con el login V4 premium aprobado por el operador el 2026-10-02. Si se decide un modo oscuro para el V4, nace como delta de `TASK-1964`, no aquí.

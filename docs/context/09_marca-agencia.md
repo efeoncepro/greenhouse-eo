@@ -59,6 +59,8 @@ El **switching cost NO nace de dejar al cliente dependiente y a oscuras** (el ju
 
 ### Doctrina narrativa de Creative Studio
 
+> **Nombres (2026-10-02):** en copy visible, Globe se nombra **Globe** («Globe, el estudio creativo de Efeonce»); «Creative Studio» nunca va suelto ni abreviado a «Studio», que es de **Efeonce Marketing Studio**. Ver [ADR](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
+
 En la historia de Globe, el héroe no es la IA ni Efeonce. **El equipo creativo es protagonista** y el operador
 activo es el punto de vista desde el que se vive la experiencia. El Head of Creative/Brand conserva autoridad;
 el CMO patrocina el outcome; Globe funciona como guía y sistema; los modelos son maquinaria intercambiable.

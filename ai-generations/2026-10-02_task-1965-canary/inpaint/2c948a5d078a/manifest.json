@@ -1,0 +1,148 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "2c948a5d078a",
+  "key": "2c948a5d078af2c496d97a99bde1c3032249d835f4d11bc95a6d8f1494de7762",
+  "status": "completed",
+  "createdAt": "2026-10-02T22:19:11.954Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": null,
+    "maskSha256": "44ca5a0e9ede3101d120592fbeb96a653d79f351e65ecd0673187aa577694bff",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/sketch-planta.png",
+      "sha256": "bd0f78276ce0238de271f519a33ad110a45c05551ba5e2c004fd7b40477a400e",
+      "form": "overlay"
+    },
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/referencia-helecho.png",
+        "sha256": "fd9154d12cc78e8dc50fcc22773ccab9c4c52fcd702c66b5d677fa4066f97ab1"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "Add the potted fern from the reference, in the position and size the sketch marks, standing on the desk with a soft contact shadow and the same window light from the right.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a hand-drawn sketch that marks only where, at what size and with what silhouette the change goes. Use it as a placement guide only: do not reproduce any sketch lines or their color.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nAdd the potted fern from the reference, in the position and size the sketch marks, standing on the desk with a soft contact shadow and the same window light from the right.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.10994784037272136,
+    "editable": 111453,
+    "soft": 61480,
+    "protected": 1399931
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 45 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 38.935,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 31496,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.45,
+        "bestError": 1.45,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -2.7,
+        -3.99,
+        -7.77
+      ],
+      "protected": {
+        "pixels": 1368435,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 145840,
+        "maxDelta": 151,
+        "meanDelta": 52.061,
+        "worst": {
+          "x": 305,
+          "y": 600
+        }
+      },
+      "seam": {
+        "pixels": 58589,
+        "maxDelta": 122,
+        "meanDelta": 6.263,
+        "worst": {
+          "x": 448,
+          "y": 224
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1399931,
+        "maxDelta": 132,
+        "meanDelta": 3.981,
+        "worst": {
+          "x": 448,
+          "y": 224
+        }
+      },
+      "outputUsd": 0.0103,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3865,
+        "input_tokens_details": {
+          "image_tokens": 3672,
+          "text_tokens": 193
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "image_tokens": 343,
+          "text_tokens": 0
+        },
+        "total_tokens": 4208
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ]
+}

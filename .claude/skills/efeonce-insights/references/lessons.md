@@ -435,3 +435,60 @@ Síntoma: el servidor de Think contra staging salía con código 1 en 4 s («Ano
 running»). Regla: parar el servidor de fixtures antes de levantar el de staging; en `--mode staging` los tokens
 `fixture-*` siguen resolviendo porque `import.meta.env.DEV` sigue en `true`.
 
+
+
+## 2026-10-02 · TASK-1957 — la traducción vivía en el render, no en el contrato
+
+- **Dos humanizaciones divergen en silencio.** El PDF traducía la fuente en `figure-slots.ts`; el modelo web copiaba
+  `fact.source` (la tabla lectora) aunque su propio contrato decía «fuente legible». Nadie lo vio hasta mirar el
+  informe con datos reales. Regla: el vocabulario de cara al lector es UNA función que comparten todas las formas.
+- **El gate atrapó un fixture que mentía.** El primer fixture rotulaba la presencia con el código del proveedor
+  (`google_ai_overview`); el adapter real usa el nombre visible. Un gate derivado del payload no se ajusta para pasar:
+  se corrige el dato que lo viola.
+- **Una regla nueva puede producir su propio caso borde.** Las bandas de magnitud dejaban un cero en banda aparte y
+  dos puntajes empatados sin figura; se limitaron a unidades sin tope y el cero se lee en cualquier eje desde cero.
+- **Planner y gate deben compartir la regla, no parecerse.** «n de m junto a su total» pasaba el planner y lo marcaba el
+  gate; la salida fue UNA regla escrita en los dos con el mismo predicado.
+- Vista previa local con datos reales sin emitir: mock del lector público (sirve el JSON armado por
+  `buildInsightWebModel` sobre un plan regenerado desde el snapshot sellado) + Think dev con
+  `GREENHOUSE_API_BASE` apuntando al mock. No escribe nada salvo la bitácora de acceso al logo.
+
+- **El indicador tiene nombre estándar y una sola fórmula.** «Presencia 2 de 6» era un dato correcto con la forma
+  equivocada: el operador pidió Share of Voice / Share of Model (skill `seo-aeo` §07). La definición se toma del Grader
+  (misma fórmula), no se reescribe en Insights; el roster del Grader NO se reusó porque descarta motores desconocidos y
+  el contrato de canales de Insights promete mostrarlos sin isotipo.
+- **Un `$` en el texto de reemplazo de `String.replace` es un patrón**, y una búsqueda de ancla con `indexOf` puede
+  casar antes de tiempo (`"  return {…"` dentro de `"      return {…"`). En ediciones por script: reemplazo por
+  función o por `slice`, y anclas únicas.
+- **Partir una figura puede borrar las conclusiones del capítulo.** Las lecturas, la tesis y «Lo esencial» salen de
+  figuras con página; una figura de una sola barra no tiene página. Separar métricas SEO por magnitud dejó tres figuras
+  de una barra y el resumen de Berel cayó en «… lideran con 100» (2026-10-02). Antes de cambiar la elegibilidad de
+  figuras, regenerar la vista previa real y mirar tesis + esenciales, no sólo el gate.
+- **Un puntaje compuesto hereda la falla de sus partes.** Excluir `competitive_sov` = 100 sin competidores no basta: pesa
+  15 % del global del Grader, así que el global también queda fuera hasta que el Grader lo corrija.
+
+## 2026-10-02 — TASK-1962: qué dice el informe antes de cómo se ve
+
+- **Una UI que «filtra» puede estar decidiendo contenido.** Think infería el módulo de un hallazgo por la primera cifra,
+  buscaba su figura recorriendo capítulos y contaba hallazgos para ocultar el tablero. Ninguna cifra era inventada, pero
+  eran decisiones que el PDF, el deck, Nexa y el MCP habrían tenido que repetir. Regla: si otro consumer tendría que
+  hacer lo mismo, va al modelo.
+- **«Más cambió» tiene que significar lo mismo en todo el informe.** La lectura genérica de barras elegía el mayor cambio
+  RELATIVO (/colores, -20,7 %) mientras el hallazgo de causas hablaba del mayor cambio en clics (la portada). Las figuras
+  de un productor especializado traen su propia lectura.
+- **Una petición al cliente es sólo lo que el cliente puede dar.** Sin perfil del Grader o sin space es trabajo nuestro;
+  pedírselo al cliente lo confunde. Search Console sin conectar sí es suyo.
+- **La regla de exposición competitiva vive en el dominio dueño.** El código de competidores SEO lo dice («la comparativa
+  competitiva no se expone al cliente»): leer el dominio antes de sumar un dato evitó llevar la competencia SEO al
+  informe sin decisión del operador.
+- **Un dominio es una sola palabra.** La figura de columnas parte etiquetas sólo por espacios: «greatplacetowork.com.mx»
+  hizo fallar cerrado el PDF de Berel. Las listas de dominios van a hallazgo y tabla, no a columnas.
+- **Una página de tabla se llena por altura, no por filas.** 16 filas con etiquetas de dos líneas se desbordaban; el
+  mapper ahora pesa doble una etiqueta larga.
+- **El PDF rechazaba el informe entero ante una familia sin página.** Por eso todo salía en barras aunque Think dibuja
+  15 familias. Ahora los mappers filtran con `PDF_FIGURE_FAMILIES`: la web dibuja cascada y waffle, el PDF conserva
+  hallazgo y tabla. Una figura de familia nueva no debe tener lectura de página si no tiene página.
+- **Las preguntas del Grader importan más que el informe.** Berel aparecía citado por indeed y glassdoor porque su perfil
+  estaba en «Manufactura» y sus sets curados nunca se aprobaron: las corridas usaban el paquete genérico. Antes de leer un
+  resultado del Grader, mirar `prompt_set_id` de la corrida.
+- **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.

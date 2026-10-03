@@ -65,6 +65,19 @@ For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_R
 
 Do not conflate portal IDs, OAuth apps, CLI profiles, private-app tokens, Kortex OAuth, or the Greenhouse bridge.
 
+## Kortex deep-hibernation boundary
+
+Before routing any HubSpot work through Kortex, read the current state in
+`docs/architecture/kortex/README.md` and the canonical sibling runbook
+`/Users/jreye/Documents/dev/kortex/docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`.
+While that state is `hibernated`, Kortex-backed operations are unavailable: do not call its control plane,
+run audits or command smokes, deploy it, query its database, enqueue work, or use its OAuth runtime for a
+HubSpot mutation. Do not wake a Kortex surface merely to verify access.
+
+This does not prohibit an independently authenticated HubSpot MCP or Agent CLI operation when that direct lane,
+portal and write approval have been verified; it prohibits silently falling back to or exercising Kortex. A
+Kortex restart requires explicit operator approval and the ordered restart procedure in the sibling runbook.
+
 ## Operating loop
 
 Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> execute -> verify -> document -> measure`.

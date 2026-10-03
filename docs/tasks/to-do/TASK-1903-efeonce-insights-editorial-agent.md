@@ -1,5 +1,9 @@
 # TASK-1903 — Efeonce Insights: agente redactor de informes de clientes
 
+## Delta 2026-10-02 (TASK-1962)
+
+- TASK-1962 dejó una base determinista que el agente parte, no reemplaza: el plan de acción ya trae acciones desde la cola SEO (sólo orígenes propios, con cifras citadas) y `ask` cuando Search Console no está conectado; las causas SEO son hechos `driver.*` con hallazgo de descomposición. El registro `presentation/content-contract.ts` marca como `agent_task` las recomendaciones AEO/ICO y `needs_input` las metas pactadas y las peticiones de negocio: son el alcance natural del agente. `contentCoverageOf` da la cobertura de una edición (qué pregunta queda abierta y por qué) para orientar su propuesta. — por trabajo en TASK-1962
+
 ## Delta 2026-09-28 — operable por MCP en dos modos (decisión del operador)
 
 - El operador pidió que el agente redactor sea **operable por MCP en ambos modos**: (1) **operar el redactor de

@@ -1,5 +1,12 @@
 # TASK-1863 — AEO Grader multi-mercado: una marca, N mercados, selección múltiple y matriz comparativa
 
+## Delta 2026-10-02 — mercados nuevos corren sin competidores (hallazgo de TASK-1959)
+
+- Los runs de Efeonce CO/MX/PE del 2026-09-28 (EO-GRUN-00062/63/64) corrieron contra sets `market_created` sin miembros,
+  aunque el perfil declara 4 competidores. El Grader puntuó `competitive_sov = 100` (marca contra nadie) e infló el global
+  ~+10 puntos; los tres tienen informe público. La corrección de la fórmula vive en `TASK-1959`; que un mercado nuevo
+  proponga competidores al crearse queda como follow-up de esa task. Berel MX recibió su set el 2026-10-02 (versión 2).
+
 ## Delta 2026-09-28 — Google AI Mode falló con `market="Perú"`
 
 La ejecución `EO-GRUN-00056` produjo siete observaciones Google `failed` con task `40501`: el adapter

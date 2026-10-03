@@ -102,7 +102,7 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
       // TASK-1888 — con el contrato v2 la etiqueta es el NOMBRE HUMANO de la métrica; space y mes sólo si la ventana
       // tiene más de uno (el encabezado del informe ya dice cliente y período). La etiqueta compuesta «OTD · Sky ·
       // 2026-08» llegaba tal cual a filas, esenciales y bajadas (revisión de 1846, 2026-09-25). Sin v2, la de siempre.
-      const labelFor = (metricId: 'rpa' | 'otd' | 'ftr', legacy: string): string => {
+      const labelFor = (metricId: string, legacy: string): string => {
         if (!editorialV2) return legacy
 
         const qualifiers = [spaces.length > 1 ? space.space_name : null, window.months.length > 1 ? month : null].filter(Boolean)
@@ -166,6 +166,12 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         } else {
           rejections.push({ module: 'ico', metricId: 'ftr', reason: ftr ? 'insufficient_data' : 'no_data', detail: ftr ? `FTR sin valor en ${space.space_name} ${month}` : `El snapshot ICO de ${space.space_name} en ${month} no trae FTR` })
         }
+      }
+
+      // TASK-1962 — «¿qué hicimos este mes?» (contrato de contenido, pregunta 4): las piezas que el space completó en el
+      // mes, del MISMO snapshot (`context.completedTasks`). Sólo con v2, para que la evidencia v1 quede idéntica.
+      if (editorialV2) {
+        facts.push({ ...base, factId: factId('ico', 'delivered.completed', window, dimension), metricId: 'delivered.completed', label: labelFor('delivered.completed', `Piezas entregadas · ${space.space_name} · ${month}`), value: snapshot.context.completedTasks, unit: 'count', numerator: null, denominator: null, coverage: { kind: 'complete', ratio: 1, populationSize: snapshot.context.totalTasks }, comparisonFactId: comparisonIds[`delivered.completed.${space.space_id}`] ?? null })
       }
 
       source = source ?? { module: 'ico', adapterVersion: ICO_ADAPTER_VERSION, reader: 'readSpaceMetrics', asOf, method, coverage: { kind: 'complete', ratio: null, populationSize: spaces.length }, servedWindow: { start: `${window.months[0]}-01`, endExclusive: window.endExclusive, granularity: 'month', partial: window.partial } }

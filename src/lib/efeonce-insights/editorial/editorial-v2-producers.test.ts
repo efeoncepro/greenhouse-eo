@@ -172,12 +172,14 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
       'Entregas a tiempo es la única meta sin cumplir: 81,9 % (meta 90,0 %).',
       'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).'
     ])
-    // Un hecho, una esencial: ni los de la tesis y su bajada, ni FTR dos veces (mayor cambio y meta).
-    const essentialFacts = plan.essentials!.map(item => item.factIds[0])
+    // Un HALLAZGO, una esencial (revisión del operador 2026-10-02): la portada dijo las metas de OTD y FTR; «Lo esencial»
+    // puede decir sus CAMBIOS (citan su período anterior), nunca repetir la meta, y nunca el mismo hallazgo dos veces.
+    const findings = plan.essentials!.map(item => `${item.factIds[0]}:${item.factIds.some(id => id.endsWith('.prev')) ? 'change' : 'other'}`)
 
-    expect(essentialFacts).not.toContain('ico.otd.cur')
-    expect(essentialFacts).not.toContain('ico.ftr.cur')
-    expect(new Set(essentialFacts).size).toBe(essentialFacts.length)
+    expect(findings).not.toContain('ico.otd.cur:other')
+    expect(findings).not.toContain('ico.ftr.cur:other')
+    expect(findings).toContain('ico.ftr.cur:change')
+    expect(new Set(findings).size).toBe(findings.length)
   })
 
   it('con dos meses no hay línea (la matriz exige ≥ 3 puntos)', () => {
@@ -222,7 +224,8 @@ describe('TASK-1888 — canales y matriz', () => {
 
   it('si todo el gráfico mide UN canal (SEO: todo es Google), el canal va en la serie, no en cada dimensión', () => {
     const seo = (metricId: string, value: number): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}.w`, module: 'seo', metricId, label: metricId, numerator: null, denominator: null, dimension: undefined, channelId: 'google' })
-    const snapshot = { facts: [seo('clicks', 9377), seo('impressions', 512113)], sources: [], rejections: [] }
+    // Magnitudes comparables (TASK-1957 separa por banda las que no lo son: 9.377 junto a 512.113 no se leía).
+    const snapshot = { facts: [seo('clicks', 9377), seo('sessions', 12480)], sources: [], rejections: [] }
     const chart = v2(snapshot, ['seo']).chapters[0]!.charts[0]!
 
     expect(chart.dimensionChannelIds).toBeUndefined()
@@ -240,7 +243,8 @@ describe('TASK-1888 — canales y matriz', () => {
     }
 
     expect(FAMILY_EVIDENCE_MATRIX).toHaveLength(15)
-    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet'])
+    // TASK-1962 — cascada (SEO) y waffle (AEO) pasaron a tener evidencia; se dibujan en la web (sin página PDF).
+    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet', 'waterfall', 'waffle'])
     expect(() => assertChartsAllowed('ico', [{ ...v2(icoSnapshot, ['ico']).chapters[0]!.charts[0]!, family: 'donut' }])).toThrow(/matriz/)
   })
 })
@@ -266,11 +270,13 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     const snapshot = { facts: [position('p.cur', 6.6, 'p.prev'), position('p.prev', 5.8, null), ctr('r.cur', 3.1, 'r.prev'), ctr('r.prev', 3.0, null)], sources: [], rejections: [] }
     const seo = v2(snapshot, ['seo'])
 
-    expect(seo.chapters[0]!.readings![0]!.conclusion!.text).toBe('El mayor cambio fue en posición media: de #5,8 a #6,6 (+0,8 pos.).')
+    // TASK-1957 — una posición (menor es mejor) nunca va en barras desde cero: no hay figura; el cambio lo dice la afirmación.
+    expect(seo.chapters[0]!.charts).toEqual([])
+    expect(seo.chapters[0]!.claims.map(claim => claim.text).join(' ')).toMatch(/#5,8.*#6,6/)
     expect(validateEditorialPlan(seo, snapshot)).toEqual([])
   })
 
-  it('una esencial nunca cita un hecho sin página (caso Berel: CTR solo en su figura, que no se dibuja)', () => {
+  it('una esencial puede citar un hecho sin figura propia: se respalda en su narrativa o en su capítulo (Berel 2026-10-02)', () => {
     const seo = (metricId: string, value: number, unit: EvidenceFactV1['unit'], comparisonFactId: string | null = null): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}`, module: 'seo', metricId, label: metricId, unit, numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId })
 
     const snapshot = {
@@ -282,8 +288,9 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     const plan = v2(snapshot, ['seo'])
 
     expect(plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.percent')).toBeDefined()
-    expect(plan.essentials!.flatMap(item => item.factIds)).not.toContain('seo.ctr')
-    expect(plan.executiveSummary.flatMap(item => item.factIds)).not.toContain('seo.ctr')
+    // El CTR (figura de una métrica, sin página) entra a «Lo esencial» como CAMBIO, con su período anterior citado;
+    // los dos mapeadores del PDF le resuelven folio por narrativa o capítulo (sus tests cubren el render).
+    expect(plan.essentials!.find(item => item.factIds[0] === 'seo.ctr')?.factIds).toEqual(['seo.ctr', 'seo.ctr.prev'])
   })
 
   it('el validador rechaza una conclusión que no cabe en el molde (90)', () => {
@@ -325,19 +332,17 @@ describe('TASK-1888 — autoría IA v2', () => {
 describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y afirmaciones humanas (Berel 2026-09-25)', () => {
   const conclusionOf = (plan: ReturnType<typeof v2>, chartId: string) => plan.chapters.flatMap(chapter => chapter.readings ?? []).find(reading => reading.chartId === chartId)?.conclusion
 
-  it('cuatro motores empatados en 2 de 6 se dicen como empate, nunca «el que más»', () => {
+  it('cuatro motores empatados en 2 de 6: sin figura (no informa) y una frase con la proporción por motor', () => {
     const tie = { facts: [aeo('gemini', 2, 'gemini'), aeo('google_ai_overview', 2, 'google_ai_overview'), aeo('openai', 2, 'chatgpt'), aeo('perplexity', 2, 'perplexity')].map(fact => ({ ...fact, denominator: 6 })), sources: [], rejections: [] }
     const plan = v2(tie, ['aeo'])
-    const texts = [conclusionOf(plan, 'chart.aeo.count')?.text, ...plan.essentials!.map(item => item.text), ...plan.executiveSummary.map(item => item.text)]
+    const chapter = plan.chapters[0]!
+    const texts = [...chapter.claims.map(item => item.text), ...plan.essentials!.map(item => item.text), ...plan.executiveSummary.map(item => item.text)]
 
-    expect(conclusionOf(plan, 'chart.aeo.count')?.text).toBe('Todos los motores mencionan la marca en 2 de 6.')
-    expect(texts.join(' ')).not.toMatch(/el motor que más/)
-
-    // La bajada de la cifra principal es la figura (el empate no tiene dueño), nunca «Presencia en gemini.».
-    const reading = plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.count')!
-
-    expect(reading.keyFigure!.caption.text).toBe('Presencia por motor.')
-    expect(reading.keyFigure!.caption.text).not.toMatch(/Presencia en/)
+    // TASK-1957 — cuatro barras a la misma altura no dicen nada (revisión del operador con Berel, 2026-10-02).
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.count')).toBeUndefined()
+    expect(chapter.claims[0]).toMatchObject({ text: 'La marca aparece en 2 de 6 consultas en cada motor.', role: 'finding' })
+    expect(texts.join(' ')).not.toMatch(/el motor que más|Todos los motores/)
+    expect(validateEditorialPlan(plan, tie)).toEqual([])
   })
 
   it('un empate parcial nombra a los empatados; un máximo único conserva el superlativo', () => {
@@ -348,22 +353,15 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
     expect(conclusionOf(unique, 'chart.aeo.count')?.text).toMatch(/^ChatGPT es el motor que más menciona la marca/)
   })
 
-  it('dos dimensiones en 100 no producen «la mejor evaluada»', () => {
+  it('los puntajes internos del Grader no se grafican: ni figura, ni lectura, ni «la mejor evaluada» (Berel 2026-10-02)', () => {
     const dimension = (key: string, label: string, value: number): EvidenceFactV1 => ({ ...aeo(key, value), factId: `aeo.dimension.${key}.w`, metricId: `dimension.${key}`, label, unit: 'score', numerator: null, denominator: null, dimension: { dimension: key } })
     const snapshot = { facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Share of voice competitivo', 100), dimension('ai_visibility', 'Visibilidad en IA', 0)], sources: [], rejections: [] }
     const plan = v2(snapshot, ['aeo'])
-    const text = conclusionOf(plan, 'chart.aeo.score')?.text ?? ''
 
-    expect(text).not.toMatch(/La dimensión mejor evaluada es/)
-    expect(text).toBe('Las dimensiones mejor evaluadas son claridad de entidad y share of voice competitivo: 100.')
-    // Bajada del empate sin «(0 a 100)»: cifras que ningún hecho citado respalda (violación vista en Berel real).
-    expect(plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!.caption.text).toBe('Dimensiones evaluadas.')
-    // La cifra principal es el valor empatado, aunque la figura traiga antes otro hecho (el puntaje global, 39).
-    const withOverall = { ...snapshot, facts: [{ ...dimension('overall', 'Puntaje de visibilidad en IA', 39), factId: 'aeo.overall_score.w', metricId: 'overall_score', dimension: undefined }, ...snapshot.facts] }
-    const key = v2(withOverall, ['aeo']).chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!
-
-    expect(key.value).toBe('100')
-    expect(key.caption.text).toBe('Dimensiones evaluadas.')
+    expect(plan.chapters[0]!.charts.some(chart => chart.unit === 'score')).toBe(false)
+    expect(conclusionOf(plan, 'chart.aeo.score')).toBeUndefined()
+    // Los puntajes siguen en la tabla de respaldo del capítulo.
+    expect(plan.chapters[0]!.tables[0]!.rows.length).toBe(3)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 
@@ -396,5 +394,327 @@ describe('TASK-1888 — tabla de respaldo y hallazgo principal primero (Sky 2026
     expect(chapter.tables[0]!.title).toBe('Entrega y cumplimiento: todas las cifras')
     // El orden de las figuras (y de sus páginas) no cambia.
     expect(chapter.charts.map(chart => chart.chartId)).toEqual(v2(icoSnapshot, ['ico']).chapters[0]!.charts.map(chart => chart.chartId))
+  })
+})
+
+describe('TASK-1962 — «¿por qué cambió?»: consultas y páginas que más movieron los clics', () => {
+  const seo = (factId: string, metricId: string, label: string, value: number, comparisonFactId: string | null = null, dimension?: Record<string, string>): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module: 'seo', metricId, label, unit: 'count', numerator: null, denominator: null, dimension, channelId: 'google', comparisonFactId })
+
+  const mover = (dimension: 'query' | 'page', rank: number, label: string, now: number, before: number): EvidenceFactV1[] => {
+    const id = `seo.driver.${dimension}.clicks.w.${rank}`
+
+    return [
+      seo(id, `driver.${dimension}.clicks`, label, now, `${id}.prev`, { [dimension]: label, rank: String(rank) }),
+      seo(`${id}.prev`, `driver.${dimension}.clicks`, label, before, null, { [dimension]: label, rank: String(rank) })
+    ]
+  }
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      seo('seo.clicks', 'clicks', 'Clics orgánicos', 9377, 'seo.clicks.prev'),
+      seo('seo.clicks.prev', 'clicks', 'Clics orgánicos', 10662),
+      seo('seo.impressions', 'impressions', 'Impresiones', 512113, 'seo.impressions.prev'),
+      seo('seo.impressions.prev', 'impressions', 'Impresiones', 566297),
+      ...mover('query', 1, 'berel', 1579, 1933),
+      ...mover('query', 2, 'pinturas berel', 910, 1059),
+      ...mover('query', 3, 'pintura 19 litros', 16, 40),
+      ...mover('page', 1, 'Página de inicio', 4263, 4893),
+      ...mover('page', 2, '/colores', 875, 1104),
+      ...mover('page', 3, '/colores/grises', 79, 124)
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('hallazgo de descomposición por dimensión, figura de la misma escala y una tabla con todas', () => {
+    const plan = v2(snapshot, ['seo'])
+    const chapter = plan.chapters[0]!
+    const texts = chapter.claims.map(item => item.text)
+
+    expect(texts).toContain('La consulta que más cambió fue «berel»: bajó de 1.933 a 1.579 clics (-18,3 %).')
+    expect(texts).toContain('La página que más cambió fue «Página de inicio»: bajó de 4.893 a 4.263 clics (-12,9 %).')
+    expect(chapter.claims.find(item => item.claimId === 'claim.seo.drivers.query')!.role).toBe('finding')
+
+    const queries = chapter.charts.find(chart => chart.chartId === 'chart.seo.drivers.query')!
+    const pages = chapter.charts.find(chart => chart.chartId === 'chart.seo.drivers.page')!
+
+    // Una consulta de decenas no comparte eje con una de miles; la portada tampoco con una página de decenas.
+    expect(queries.dimensionLabels).toEqual(['berel', 'pinturas berel'])
+    expect(pages.dimensionLabels).toEqual(['Página de inicio', '/colores'])
+    expect(queries.scale).not.toHaveProperty('perDimension')
+
+    const table = chapter.tables.find(item => item.tableId === 'table.seo.drivers')!
+
+    expect(table.rows.map(row => row[0])).toEqual(['berel', 'pinturas berel', 'pintura 19 litros', 'Página de inicio', '/colores', '/colores/grises'])
+    // Las causas no se mezclan con la tabla general ni compiten como hallazgo de resultado.
+    expect(chapter.tables[0]!.rows.map(row => row[0])).toEqual(['Clics orgánicos', 'Impresiones'])
+    // La causa nunca es la tesis del resumen: el resultado va primero.
+    expect(plan.executiveSummary[0]!.factIds).not.toEqual(expect.arrayContaining(['seo.driver.query.clicks.w.1']))
+    // La lectura de la figura dice lo mismo que el hallazgo (más clics movidos), no el mayor cambio relativo (/colores).
+    const pageReading = chapter.readings!.find(reading => reading.chartId === 'chart.seo.drivers.page')!
+
+    expect(pageReading.conclusion!.text).toBe('La página que más cambió fue «Página de inicio»: bajó de 4.893 a 4.263 clics (-12,9 %).')
+    expect(pageReading.keyFigure).toMatchObject({ factId: 'seo.driver.page.clicks.w.1', value: '4.263' })
+    // La primera lectura del capítulo sigue siendo la del resultado, no la de una causa.
+    expect(chapter.readings![0]!.chartId).not.toContain('.drivers.')
+    // Una consulta con dígitos no se lee como cifra sin respaldo.
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1962 — «¿qué recomendamos?» y «¿qué necesitamos de ustedes?»', () => {
+  const opp = (rank: number, name: string, value: number, unit: EvidenceFactV1['unit'], dims: Record<string, string>, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `seo.opportunity.${rank}.${name}`, module: 'seo', metricId: `opportunity.${rank}.${name}`, label: dims.keyword!, unit, numerator: null, denominator: null, comparisonFactId: null, channelId: 'google', dimension: { ...dims, rank: String(rank) }, ...extra })
+
+  const first = { keyword: 'barniz para madera', page: '/pintura-y-barniz-para-madera-como-elegir', verb: 'optimize', origin: 'gsc_striking_distance' }
+  const second = { keyword: 'pintura para exteriores', page: '/exteriores', verb: 'consolidate', origin: 'consolidation' }
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      { ...aeo('x', 9377), factId: 'seo.clicks', module: 'seo', metricId: 'clicks', label: 'Clics orgánicos', unit: 'count', numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId: null },
+      opp(1, 'impressions', 10522, 'count', first),
+      opp(1, 'position', 8.4, 'position', first),
+      opp(1, 'target_position', 5, 'count', first, { role: 'reference' }),
+      opp(1, 'ceiling', 76, 'count', first, { observation: 'estimated' }),
+      opp(2, 'impressions', 3000, 'count', second),
+      opp(2, 'position', 12.1, 'position', second),
+      opp(2, 'target_position', 5, 'count', second, { role: 'reference' }),
+      opp(3, 'impressions', 8189, 'count', { keyword: 'pintura', page: 'Página de inicio', verb: 'optimize', origin: 'gsc_striking_distance' })
+    ],
+    sources: [],
+    rejections: [{ module: 'seo', metricId: 'gsc', reason: 'not_connected', detail: 'x' }]
+  }
+
+  it('una acción por oportunidad, en el orden de la cola, citando sus cifras; las oportunidades no son hallazgos', () => {
+    const plan = v2(snapshot, ['seo'])
+
+    expect(plan.actions.map(action => action.text)).toEqual([
+      'Optimizar «barniz para madera» en /pintura-y-barniz-para-madera-como-elegir: está en #8,4 con 10.522 impresiones; en la posición 5 sumaría hasta 76 clics.',
+      'Consolidar las páginas que compiten por «pintura para exteriores» (/exteriores).',
+      // Sin posición medida no hay estado ni techo: sólo el verbo y el sujeto; la portada se nombra en minúscula.
+      'Optimizar «pintura» en la página de inicio.'
+    ])
+    expect(plan.actions[0]!.factIds).toEqual(['seo.opportunity.1.impressions', 'seo.opportunity.1.position', 'seo.opportunity.1.target_position', 'seo.opportunity.1.ceiling'])
+    expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('opportunity')))).toBe(false)
+    expect(plan.chapters[0]!.tables[0]!.rows.map(row => row[0])).toEqual(['Clics orgánicos'])
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('Search Console sin conectar es la petición al cliente; otra ausencia no lo es', () => {
+    expect(v2(snapshot, ['seo']).ask?.text).toBe('Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.')
+    // El límite dice que falta conectar la fuente (algo que el cliente resuelve), no que «no forma parte».
+    expect(v2(snapshot, ['seo']).limits).toContain('Search Console: falta conectar la fuente.')
+    expect(v2({ ...snapshot, rejections: [{ module: 'seo', metricId: 'gsc', reason: 'no_data', detail: 'x' }] }, ['seo']).ask).toBeUndefined()
+    expect(v2({ ...snapshot, rejections: [{ module: 'aeo', metricId: null, reason: 'not_connected', detail: 'x' }] }, ['seo', 'aeo']).ask).toBeUndefined()
+  })
+})
+
+describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente, tono y Share of Voice', () => {
+  const count = (metricId: string, label: string, value: number, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `aeo.${metricId}.w`, metricId, label, unit: 'count', numerator: null, denominator: null, comparisonFactId: null, dimension: undefined, channelId: undefined, ...extra })
+
+  const pct = (metricId: string, label: string, value: number, numerator: number, denominator: number): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId: `aeo.${metricId}.w`, metricId, label, unit: 'percent', numerator, denominator, comparisonFactId: null, dimension: undefined, channelId: undefined })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      count('cited_source.1', 'chocale.cl', 11, { numerator: 11, denominator: 246 }),
+      count('cited_source.2', 'trustpilot.com', 9, { numerator: 9, denominator: 246 }),
+      count('source_type.unknown', 'Sin clasificar', 21),
+      count('source_type.news', 'Medios de noticias', 16),
+      count('source_type.owned', 'Sitios propios', 3),
+      count('sentiment.positive', 'Positivas', 3, { numerator: 3, denominator: 16 }),
+      count('sentiment.neutral', 'Neutras', 9, { numerator: 9, denominator: 16 }),
+      count('sentiment.negative', 'Negativas', 3, { numerator: 3, denominator: 16 }),
+      pct('sov.brand', 'Tu marca', 25, 10, 40),
+      pct('sov.competitor.latam', 'LATAM', 50, 20, 40),
+      pct('sov.competitor.jetsmart', 'JetSMART', 17.5, 7, 40)
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('cada familia tiene su hallazgo, su figura y una lectura que dice lo mismo', () => {
+    const plan = v2(snapshot, ['aeo'])
+    const chapter = plan.chapters[0]!
+    const findings = chapter.claims.filter(claim => claim.role === 'finding').map(claim => claim.text)
+
+    expect(findings).toEqual(expect.arrayContaining([
+      'El sitio más citado por los motores es «chocale.cl»: 11 de 246 citas.',
+      'Los motores citan más medios de noticias (16) que sitios propios (3).',
+      'LATAM concentra el 50,0 % de las menciones; tu marca, el 25,0 %.',
+      'De 16 respuestas evaluadas, 3 son positivas y 3 negativas.'
+    ]))
+    // La cifra suelta del Share of Voice de la marca ya no es un hallazgo aparte, y lleva «menciones», no «respuestas».
+    expect(chapter.claims.find(claim => claim.claimId === 'claim.aeo.sov.brand.w')).toMatchObject({ role: 'backing', text: 'Tu marca: 25,0 % (10 de 40 menciones).' })
+    // Tono y tipo de fuente son partes de un todo: waffle con TODAS las categorías (incluida «sin clasificar»), que
+    // suman el total; nunca columnas.
+    const types = chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.source-type')!
+
+    expect(types).toMatchObject({ family: 'waffle', relation: 'composition', series: [] })
+    expect(types.dimensionLabels).toEqual(['Sin clasificar', 'Medios de noticias', 'Sitios propios'])
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.sentiment')!.dimensionLabels).toEqual(['Positivas', 'Neutras', 'Negativas'])
+    expect(chapter.charts.some(chart => chart.family === 'bar' && chart.unit === 'count')).toBe(false)
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('Sin clasificar')
+    // Los dominios no van en columnas (una palabra larga no se puede partir): hallazgo y tabla.
+    expect(chapter.charts.some(chart => chart.chartId === 'chart.aeo.count.cited-source')).toBe(false)
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('chocale.cl')
+    expect(chapter.tables.find(table => table.tableId === 'table.aeo')!.rows.map(row => row[0])).not.toContain('chocale.cl')
+    // Sin página PDF, el waffle no lleva lectura de página: lo dice su hallazgo.
+    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.waffle.source-type')).toBe(false)
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1962 — más familias con evidencia: cascada de consultas y línea semanal de clics', () => {
+  const span = (month: string, block: number) => ({
+    from: `2026-${month}-${String(block * 7 - 6).padStart(2, '0')}`,
+    to: new Date(Date.UTC(2026, Number(month) - 1, block * 7 + 1)).toISOString().slice(0, 10)
+  })
+
+  const seo = (factId: string, metricId: string, label: string, value: number, comparisonFactId: string | null = null, dimension?: Record<string, string>): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module: 'seo', metricId, label, unit: 'count', numerator: null, denominator: null, dimension, channelId: 'google', comparisonFactId })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      seo('seo.clicks', 'clicks', 'Clics orgánicos', 9377, 'seo.clicks.prev'),
+      seo('seo.clicks.prev', 'clicks', 'Clics orgánicos', 10662),
+      seo('seo.driver.query.clicks.w.1', 'driver.query.clicks', 'berel', 1579, 'seo.driver.query.clicks.p.1', { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.clicks.p.1', 'driver.query.clicks', 'berel', 1933, null, { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.delta.w.1', 'driver.query.delta', 'berel', -354, null, { query: 'berel', rank: '1' }),
+      seo('seo.driver.query.delta.w.2', 'driver.query.delta', 'pinturas berel', -149, null, { query: 'pinturas berel', rank: '2' }),
+      seo('seo.driver.query.delta.w.rest', 'driver.query.delta', 'Resto de consultas', -782, null, { query: 'Resto de consultas', rank: 'rest' }),
+      ...[1, 2, 3, 4].flatMap(block => [
+        seo(`seo.clicks_week.${block}.w`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} sept`, 2300 + block * 10, `seo.clicks_week.${block}.p`, { block: String(block), ...span('09', block) }),
+        seo(`seo.clicks_week.${block}.p`, `clicks_week.${block}`, `${block * 7 - 6}–${block * 7} ago`, 2600 + block * 10, null, { block: String(block), ...span('08', block) })
+      ]),
+      // Bloque corto de fin de mes (29–30): se dibuja, pero la lectura no lo compara con una semana entera.
+      seo('seo.clicks_week.5.w', 'clicks_week.5', '29–30 sept', 552, 'seo.clicks_week.5.p', { block: '5', from: '2026-09-29', to: '2026-10-01' }),
+      seo('seo.clicks_week.5.p', 'clicks_week.5', '29–31 ago', 980, null, { block: '5', from: '2026-08-29', to: '2026-09-01' })
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('las consultas van en cascada: anterior → aporte de cada consulta → resto → este período, y cuadra', () => {
+    const plan = v2(snapshot, ['seo'])
+    const waterfall = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.drivers.query')!
+
+    expect(waterfall).toMatchObject({ family: 'waterfall', relation: 'decomposition', series: [] })
+    expect(waterfall.data).toMatchObject({ kind: 'waterfall', steps: [
+      { stepId: 'previous', factId: 'seo.clicks.prev', isTotal: true },
+      { stepId: 'delta.1', factId: 'seo.driver.query.delta.w.1', isTotal: false },
+      { stepId: 'delta.2', factId: 'seo.driver.query.delta.w.2', isTotal: false },
+      { stepId: 'delta.rest', factId: 'seo.driver.query.delta.w.rest', isTotal: false },
+      { stepId: 'current', factId: 'seo.clicks', isTotal: true }
+    ] })
+    // 10.662 − 354 − 149 − 782 = 9.377: el validador de la cascada (geometría compartida con el render) lo exige.
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('los clics por semana van en línea, este período contra el mismo bloque del anterior; no son hallazgos sueltos', () => {
+    const plan = v2(snapshot, ['seo'])
+    const line = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.line.clicks-week')!
+
+    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept', '29–30 sept'] })
+    expect(line.series.map(series => series.label)).toEqual(['Período', 'Período anterior'])
+    expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('clicks_week')))).toBe(false)
+    expect(plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.seo.line.clicks-week')).toMatchObject({
+      conclusion: { text: 'Los clics por semana subieron de 2.310 (1–7 sept) a 2.340 (22–28 sept).' },
+      meaning: { text: 'En el período anterior, de 2.610 (1–7 ago) a 2.640 (22–28 ago).' }
+    })
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+})
+
+describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
+  const base = (factId: string, module: 'seo' | 'aeo', metricId: string, label: string, value: number, extra: Partial<EvidenceFactV1> = {}): EvidenceFactV1 =>
+    ({ ...aeo('x', value), factId, module, metricId, label, unit: 'count', numerator: null, denominator: null, dimension: undefined, comparisonFactId: null, method: { name: 'ga4_channel_sessions', version: 'ga4_default_channel_group_v1' }, ...extra })
+
+  const assistant = (key: string, label: string, value: number, channelId?: EvidenceFactV1['channelId']) =>
+    base(`aeo.ai_source.${key}.w`, 'aeo', `ai_source.${key}`, label, value, { numerator: value, denominator: 1687, dimension: { assistant: label }, ...(channelId ? { channelId } : {}) })
+
+  const snapshot: EvidenceSnapshotContentV1 = {
+    facts: [
+      base('aeo.ai_sessions.w', 'aeo', 'ai_sessions', 'Visitas desde asistentes de IA', 1687, { comparisonFactId: 'aeo.ai_sessions.prev' }),
+      base('aeo.ai_sessions.prev', 'aeo', 'ai_sessions', 'Visitas desde asistentes de IA', 1210),
+      assistant('chatgpt', 'ChatGPT', 1200, 'chatgpt'),
+      assistant('gemini', 'Gemini', 300, 'gemini'),
+      assistant('copilot', 'Copilot', 187),
+      base('seo.site.organic_sessions.w', 'seo', 'site.organic_sessions', 'Visitas orgánicas al sitio', 43575, { comparisonFactId: 'seo.site.organic_sessions.prev' }),
+      base('seo.site.organic_sessions.prev', 'seo', 'site.organic_sessions', 'Visitas orgánicas al sitio', 41000),
+      base('seo.site.organic_engaged_sessions.w', 'seo', 'site.organic_engaged_sessions', 'Visitas orgánicas con interacción', 29636, { comparisonFactId: 'seo.site.organic_engaged_sessions.prev' }),
+      base('seo.site.organic_engaged_sessions.prev', 'seo', 'site.organic_engaged_sessions', 'Visitas orgánicas con interacción', 27100),
+      base('seo.clicks.w', 'seo', 'clicks', 'Clics orgánicos', 9377, { channelId: 'google', comparisonFactId: 'seo.clicks.prev' }),
+      base('seo.clicks.prev', 'seo', 'clicks', 'Clics orgánicos', 10662, { channelId: 'google' })
+    ],
+    sources: [],
+    rejections: []
+  }
+
+  it('las visitas desde IA son hallazgo y se reparten por asistente en su propia figura, con isotipo', () => {
+    const plan = v2(snapshot, ['seo', 'aeo'])
+    const chapter = plan.chapters.find(item => item.module === 'aeo')!
+    const finding = chapter.claims.find(claim => claim.factIds.includes('aeo.ai_sessions.w'))!
+
+    expect(finding.role).toBe('finding')
+    expect(finding.text).toBe('Las visitas desde asistentes de IA subieron de 1.210 a 1.687 (+39,4 %).')
+    // Cada asistente vive en la figura y la tabla; la frase dice sólo cuál trae más, con su parte del total.
+    expect(chapter.claims.filter(claim => claim.factIds.some(id => id.startsWith('aeo.ai_source.'))).map(claim => [claim.role, claim.text])).toEqual([
+      ['finding', 'ChatGPT trae la mayoría de las visitas desde asistentes de IA: 1.200 de 1.687.']
+    ])
+
+    const byAssistant = chapter.charts.find(chart => chart.chartId.startsWith('chart.aeo.count.ai-source'))!
+
+    expect(byAssistant.title).toBe('Visitas desde cada asistente de IA')
+    expect(byAssistant.dimensionLabels).toEqual(['ChatGPT', 'Gemini', 'Copilot'])
+    expect(byAssistant.dimensionChannelIds).toEqual(['chatgpt', 'gemini', null])
+    expect(byAssistant.series).toHaveLength(1)
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('si un asistente deja a los demás sin escala no hay figura parcial: quedan el hallazgo y la tabla', () => {
+    const skewed = { ...snapshot, facts: snapshot.facts.map(fact => (fact.factId === 'aeo.ai_source.gemini.w' ? { ...fact, value: 30, numerator: 30 } : fact.factId === 'aeo.ai_source.copilot.w' ? { ...fact, value: 2, numerator: 2 } : fact)) }
+    const chapter = v2(skewed, ['aeo']).chapters[0]!
+
+    expect(chapter.charts.some(chart => chart.chartId.includes('ai-source'))).toBe(false)
+    // GA4 va en su propia tabla (otra fuente), no en la de los indicadores del Grader.
+    const ga4Table = chapter.tables.find(table => table.tableId === 'table.aeo.ga4')!
+
+    expect(ga4Table.title).toBe('Visitas desde asistentes de IA')
+    expect(ga4Table.rows.map(row => row[0])).toEqual(['Visitas desde asistentes de IA', 'ChatGPT', 'Gemini', 'Copilot'])
+    expect(chapter.tables.some(table => table.tableId === 'table.aeo')).toBe(false)
+  })
+
+  it('las visitas orgánicas al sitio son figura propia, sin compartir eje con los clics de Search Console', () => {
+    const plan = v2(snapshot, ['seo'])
+    const chapter = plan.chapters[0]!
+    const site = chapter.charts.find(chart => chart.chartId === 'chart.seo.count.site')!
+
+    expect(site.title).toBe('Visitas orgánicas al sitio')
+    expect(site.dimensionLabels).toEqual(['Visitas orgánicas al sitio', 'Visitas orgánicas con interacción'])
+    expect(chapter.charts.find(chart => chart.chartId === 'chart.seo.count')?.dimensionLabels ?? []).not.toContain('Visitas orgánicas al sitio')
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('sin un asistente dominante, la frase dice cuál trae más sin decir «la mayoría»', () => {
+    const balanced = { ...snapshot, facts: snapshot.facts.map(fact => (fact.factId === 'aeo.ai_source.chatgpt.w' ? { ...fact, value: 700, numerator: 700 } : fact)) }
+    const chapter = v2(balanced, ['aeo']).chapters[0]!
+
+    expect(chapter.claims.find(claim => claim.claimId.endsWith('.top'))?.text).toBe('ChatGPT es el asistente de IA que más visitas trae: 700 de 1.687.')
+  })
+
+  it('GA4 sin conectar se pide al cliente, solo o junto con Search Console, y su límite dice que falta conectarlo', () => {
+    const ga4 = { module: 'aeo' as const, metricId: 'ga4', reason: 'not_connected' as const, detail: 'x' }
+    const gsc = { module: 'seo' as const, metricId: 'gsc', reason: 'not_connected' as const, detail: 'x' }
+
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['aeo']).ask?.text).toBe('Darnos acceso de lectura a Google Analytics 4 del sitio para medir las visitas que llegan desde buscadores y asistentes de IA.')
+    expect(v2({ ...snapshot, rejections: [gsc, { ...ga4, module: 'seo' }] }, ['seo', 'aeo']).ask?.claimId).toBe('ask.connect_search_console_ga4')
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['aeo']).limits).toContain('Google Analytics 4: falta conectar la fuente.')
+    // Un rechazo de un módulo que no está en la edición no se pide.
+    expect(v2({ ...snapshot, rejections: [ga4] }, ['seo']).ask).toBeUndefined()
+    // Del período anterior no se pide nada.
+    expect(v2({ ...snapshot, rejections: [{ ...ga4, scope: 'comparison' }] }, ['aeo']).ask).toBeUndefined()
   })
 })

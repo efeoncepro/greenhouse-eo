@@ -121,6 +121,7 @@ Antes de correr, confirma también el **costo a la resolución que vas a pedir**
 | Video Flux 3 por keyframes | `flux3-keyframes` o `flux3-keyframes-draft` | `--prompt` + de 1 a 10 `--keyframe <imagen>@<frame_index>` |
 | Mejorar un borrador de Flux 3 | `flux3-enhance` | `--draft-cache <url>` (lo imprime el borrador) |
 | Editar un video existente | `flux3-edit` (verificado) o `seedance25-r2v --task editing` (verificado) | `--prompt` + `--video` |
+| Editar solo **una zona** de una imagen o de un video y dejar el resto identico | **No es este comando**: `pnpm ai:inpaint image --adapter fal:flux-pro-fill` o `pnpm ai:inpaint video` (TASK-1965) | `--mask` (de `pnpm ai:mask`); recompone y verifica la zona protegida en delta 0. `ai:fal --capability flux-pro-fill` se niega y te deriva |
 | Extender un video existente | `flux3-extend` / `flux3-extend-draft` (verificados) o `seedance25-r2v --task extension` (verificado) | `--prompt` + `--video` (en Flux 3, con pista de audio) |
 | Video Wan 3.0 desde texto | `wan3-t2v` o `wan3prime-t2v` (verificados) | `--prompt` |
 | Video Wan 3.0 desde una imagen | `wan3-i2v` o `wan3prime-i2v` (verificados) | un `--image` (primer cuadro); `--end-image` y `--prompt` opcionales |

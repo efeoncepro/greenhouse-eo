@@ -163,6 +163,7 @@
     "claude-md:inventory": "node scripts/ci/claude-md.mjs inventory",
     "claude-md:rule-audit": "node scripts/ci/claude-md.mjs audit",
     "growth:ai-visibility:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/ai-visibility-smoke.ts",
+    "growth:aeo-prompt-set": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/aeo-prompt-set.ts",
     "dataforseo": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/dataforseo/cli.ts",
     "dataforseo:catalog:sync": "tsx scripts/dataforseo/generate-catalog.ts",
     "dataforseo:catalog:check": "tsx scripts/dataforseo/generate-catalog.ts --check",
@@ -308,12 +309,15 @@
     "ai:omni": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
+    "ai:inpaint": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/inpaint/cli.ts",
+    "ai:mask": "tsx scripts/ai/inpaint/mask-cli.ts",
     "foto:doctor": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/foto/doctor.ts",
     "foto:prompt": "node scripts/foto/build-prompt.mjs",
     "foto:validar": "node scripts/foto/validar-reservas.mjs",
     "foto:validar:cine": "node scripts/foto/validar-cine.mjs",
     "foto:cine:nueva": "node scripts/foto/cine-nueva.mjs",
     "foto:componer": "node scripts/foto/componer.mjs",
+    "foto:expandir": "node scripts/foto/expandir.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",
     "brand:compose": "tsx scripts/brand-surfaces/compose.ts",
@@ -417,7 +421,8 @@
     "ai-gen:archive": "node scripts/ai-generations/archive.mjs",
     "ai-gen:test": "node --test scripts/ai-generations/*.test.mjs",
     "security:public-burst-guard": "tsx scripts/security/public-burst-guard.ts",
-    "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts"
+    "security:public-burst-guard:verify": "tsx --require ./scripts/lib/server-only-shim.cjs --env-file=.env.local scripts/security/public-burst-guard-verify.ts",
+    "insights:think-icons": "node scripts/insights/export-think-icons.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

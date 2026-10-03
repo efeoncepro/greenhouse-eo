@@ -12,13 +12,14 @@ import { getServerMode } from '@core/utils/serverHelpers'
 // Lib Imports
 import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
 import { getOptionalServerSession } from '@/lib/auth/require-server-session'
+import { listActiveLoginAnnouncements } from '@/lib/login-announcements/reader'
 
 // Depende de cookies/headers via NextAuth — siempre dynamic.
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Login',
-  description: 'Sign in to the Greenhouse client portal.'
+  description: 'Accede al portal de clientes Greenhouse de Efeonce.'
 }
 
 const LoginPage = async () => {
@@ -33,7 +34,12 @@ const LoginPage = async () => {
   // Vars
   const mode = await getServerMode()
 
-  return <Login mode={mode} hasMicrosoftAuth={hasMicrosoftAuth} hasGoogleAuth={hasGoogleAuth} />
+  // TASK-1964 — novedades del escenario (TASK-1963). El reader nunca rompe el login: ante error devuelve [].
+  const announcements = await listActiveLoginAnnouncements()
+
+  return (
+    <Login mode={mode} hasMicrosoftAuth={hasMicrosoftAuth} hasGoogleAuth={hasGoogleAuth} announcements={announcements} />
+  )
 }
 
 export default LoginPage

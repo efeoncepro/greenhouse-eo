@@ -1,0 +1,107 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "52f4e5d799dd",
+  "key": "52f4e5d799dd572f4fa46ebcc1f1dbca13582a963f3e2f8efd91cabe9b86cf6b",
+  "status": "completed",
+  "createdAt": "2026-10-02T21:05:51.949Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/mask.png",
+    "maskSha256": "91fb8a55965123950ff4d656daae726ca48b813b27a6e00efa74f6b4a9e5d245",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": null
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "A small green potted plant in a matte terracotta pot standing on the bare wooden desk, lit by the same soft window light from the right, with a soft contact shadow on the wood. Keep everything else exactly the same."
+  },
+  "mask": {
+    "touchedFraction": 0.17076810201009116,
+    "editable": 189567,
+    "soft": 79028,
+    "protected": 1304269
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 55 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 22.797,
+      "protected": {
+        "pixels": 1304269,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 189567,
+        "maxDelta": 144,
+        "meanDelta": 31.39,
+        "worst": {
+          "x": 327,
+          "y": 322
+        }
+      },
+      "seam": {
+        "pixels": 79028,
+        "maxDelta": 62,
+        "meanDelta": 2.184,
+        "worst": {
+          "x": 345,
+          "y": 183
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1304269,
+        "maxDelta": 97,
+        "meanDelta": 2.862,
+        "worst": {
+          "x": 1159,
+          "y": 512
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a0fe70-2a7a-7063-a82e-1c126cde377d",
+        "account": "FAL_API_KEY_B",
+        "seed": 269972139
+      }
+    }
+  ]
+}

@@ -142,3 +142,21 @@ describe('TASK-1888 — setInsightCoverPreference / getInsightCoverPreference', 
     expect(await resolveInsightCoverForEdition({ organizationId: 'org-a', requested: 'light' })).toEqual({ theme: 'light', source: 'request', logoAssetId: 'asset-default', logoVariant: 'default' })
   })
 })
+
+describe('alcance de la portada (scope) en el encargo', () => {
+  it('sin scope el encargo y su hash no cambian; con scope válido entra deduplicado', () => {
+    const plain = validate(baseRequest)
+
+    expect('scope' in plain).toBe(false)
+
+    const scoped = validate({ ...baseRequest, scope: ['creative', 'performance', 'creative'] })
+
+    expect(scoped.scope).toEqual(['creative', 'performance'])
+    expect(hashCanonical(scoped)).not.toBe(hashCanonical(plain))
+  })
+
+  it('un alcance fuera del catálogo o más de cuatro es error de entrada', () => {
+    expect(() => validate({ ...baseRequest, scope: ['marketing'] })).toThrow(/scope/)
+    expect(() => validate({ ...baseRequest, scope: ['seo', 'aeo', 'web', 'crm', 'email'] })).toThrow(/scope/)
+  })
+})

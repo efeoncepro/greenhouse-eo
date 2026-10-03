@@ -28,6 +28,7 @@ const PT: Record<string, string> = {
   Telecommunications: 'Telecomunicações',
   'Consumer goods': 'Bens de consumo',
   'Food and beverage': 'Alimentos e bebidas',
+  'Paints and coatings': 'Tintas e revestimentos',
   'Passenger airlines': 'Companhias aéreas de passageiros',
   'Supermarkets and grocery': 'Supermercados e mercearias',
   'Apparel and fashion': 'Vestuário e moda',

@@ -7,14 +7,14 @@ EPIC: `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`. Ex
 **1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898** (login last). TASK-1888/1889 are
 Insights (EPIC-045), not Studio.
 
-| Task | Scope | Lifecycle (2026-09-26) | Live where |
+| Task | Scope | Lifecycle (2026-10-02) | Live where |
 |---|---|---|---|
 | TASK-1887 | Foundation: repo, DBs/roles, domain model, API v1, catalog import, private renditions, approved UI, Vercel + domain (open mode) | **complete** | `studio.efeonce.org` |
 | TASK-1890 | Agent-ready contract: operations registry + tool manifest, semantics, service bearer, canonical org, capability, served manual | **complete** | Studio prod; Greenhouse release `0e87c7a443a2` serves the manual |
 | TASK-1891 | Federation of every manifest tool in Efeonce MCP | **complete** | Gateway provider **ON** in production |
 | TASK-1892 | Marketing metrics from Greenhouse (Search Console, GA4, SEO) via ecosystem lane `/api/platform/ecosystem/growth/*`, never SQL; paid (Meta/LinkedIn) and organic social (Metricool) as Studio adapters | to-do (GA4 not in production yet: TASK-1284) | — |
 | TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | **complete 2026-09-26** | Studio prod + staging (worker `00001-sgb` / `00002-svt`); Greenhouse release `92002873ced9` |
-| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | to-do | — |
+| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | **in progress** — Entregable A (ingest door) **in production 2026-10-02**; Entregable B (Slices 4–7) **code complete, verified in staging, NOT in production** (Studio `main` not pushed); C (Slices 8–10) deferred by the operator | Studio prod (API 1.3.0, 15 tools; worker `00002-hzn`) · staging preview of branch `task-1894-entregable-b` (API 1.4.0, 44 tools) |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
@@ -160,6 +160,112 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 `api_client` with `studio:assets:download` (scopes are immutable). Metricool: `marketing-studio-metricool-api-token`
 (the `userToken`) + `METRICOOL_USER_ID` in `deploy.sh`; blogs `3961547` (Efeonce Group) and `5105024` (personal).
 
+## TASK-1894 — write commands; Entregable A = ingest door (in production 2026-10-02)
+
+**Studio commits (`main`, pushed = Vercel prod):** `a450a3c` ingest door · `3fe85a2` CMP-004 seed (concepts S01–S08,
+BF1–BF3; `creativeState approved`; CDR-012) · `aa91ce3` anonymous gets `write_not_allowed` before body validation ·
+`43e4711` CLI header: where the `studio:upload` token comes from · `23e5787` the pieces grid shows every ratio the
+campaign has (1,91:1). `GET https://studio.efeonce.org/api/v1/health` →
+`version 1.3.0`.
+
+- **Migration** `1790956839977_asset-ingest-door.sql` applied 2026-10-02 (migrator) on `marketing_studio_staging` and
+  `marketing_studio`: `asset.revision`; `asset_version.{origin, review_state, created_by, original_filename,
+  reviewed_by, reviewed_at, review_note}` + CHECKs `asset_version_origin_review_chk` / `asset_version_reviewed_chk`;
+  tables `studio.asset_upload` (24 h) and `studio.idempotency_record` (24 h).
+- **Kernel** `packages/domain/src/commands/kernel.ts` (`runCommand`, `authorize`, `requestDigest`,
+  `sweepIdempotencyRecords`); **upload** `packages/domain/src/media/upload.ts` (`requestAssetVersionUploadCommand`,
+  `createAssetVersionCommand`, `completeAssetVersionFromUpload`, `verifyUploadedOriginal`, `sweepUploads`);
+  `filename-convention.ts`; `commands/review.ts` + CLI `pnpm studio:review` (operator only — early Slice 4 for the
+  operator). Importer guard: no catalog versions on pieces with `origin='studio'` versions (`skipped_studio_owned_asset`).
+- **Contracts:** 20 operations with explicit `riskTier` (18 reads T0 + 2 writes T1); new tools
+  `studio.asset.upload.request` and `studio.asset.version.create` (capability `marketing_studio.asset.write`, scope
+  `studio:assets:write`); manifest 15 tools (hash regenerated). New `api_client` scopes `studio:assets:write`,
+  `studio:write`. Details: `contracts.md` §Writes.
+- **Infra:** `media-originals.sh --upload-door --apply` on staging + production (runtime `objectCreator` and worker
+  custom role `marketingStudioOriginalsDeleter`, both conditioned to `originals/sha256/`; CORS PUT/POST).
+- **Flags:** `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED=true` staging (`marketing-studio-media-worker-staging-00003-2h9`) and
+  prod (`marketing-studio-media-worker-00002-hzn`, image `3fe85a228e0d`); `STUDIO_UPLOADS_ENABLED=true` Vercel
+  Production (2026-10-02) and Preview only for branch `task-1894-upload-door`. Order: worker before web. Derivatives
+  and readback untouched.
+- **CLI deviation from the spec:** the spec had `studio:upload` as `operator_cli` impersonating the ingest SA; it was
+  built over HTTP as an `api_client` with `studio:assets:write` (one door, no signing from the CLI). Token secrets
+  `marketing-studio-upload-cli-token` (prod) / `marketing-studio-upload-cli-token-staging`.
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | door, kernel, review, contracts | shipped | unit (kernel, inference, rights, V4 signing) + `upload.integration.test.ts` against staging (rolled back) green; `pnpm check` green |
+| Staging | end-to-end canary (via `vercel curl`, previews have no bypass) | verified | anonymous 403 `write_not_allowed`; dry-run no writes; signed PUT 200; confirm 202→202→201 (`CMP004-S01-imagen-4x5` v1 `pending_review`); `worker_run` `versions_created 1, generated 5`; `studio:review approve` → `currentVersion` approved, `pendingVersionNo` null |
+| Production | seed import | applied | 11 new concepts; second apply 0 rows |
+| Production | 33 CMP-004 pieces via `studio:upload --new-asset`, license `ai_generated`, note «Aprobada por el operador el 2026-10-02 (CDR-012)» | done | 33 versions `origin=studio`, 33 unique sha256 = `CONTROL-DE-PIEZAS.csv` (OneDrive), 33 `pending_review`, 132 derivatives, 33 uploads `completed`; pieces `CMP004-<S01..S08\|BF1..BF3>-imagen-<4x5\|9x16\|1x1>` |
+| Production | 33 CMP-004 versions approved (`studio:review approve`) | done | the operator approved `S01` 4:5 himself; the other 32 were recorded in his name at his request |
+| Production | 11 horizontals 1,91:1 (S01–S08, BF1–BF3) via `studio:upload … --new-asset --concept CMP004-<key> --title "<title> · 1,91:1" --ratio 191x100`, approved with `studio:review approve` (reviewer «Julio Reyes», note «Aprobada por el operador en el canvas el 2026-10-02 (CDR-012)») | done | ratio stored as `191x100` (API demands `^\d+x\d+$`); worker ratio check accepts 2048/1072 = 1,9104 within 1 %. **CMP-004: 44 pieces approved, 0 pending review** |
+| Studio prod | grid of pieces showed fixed columns (16:9, 1:1, 4:5, 9:16): the 1,91:1 were loaded and approved but invisible | fixed `23e5787` | `PiecesWorkspace.tsx` adds the ratios present in the campaign, widest to tallest; `ratioLabel('191x100')` → «1,91:1» (`copy.ts`, test in `copy.test.ts`); `pnpm check` + `pnpm build` green; verified in browser at `studio.efeonce.org/campaigns/CMP-004` (column «1,91:1» first, with thumbnails) |
+
+Uploaded versions stay `pending_review` (not current) until `pnpm studio:review approve …` runs; all 44 CMP-004 pieces
+are approved as of 2026-10-02. Approving does not authorize media (`media_authorization` stays `pending`).
+
+**Pending (not done):**
+
+- Greenhouse: capability `marketing_studio.asset.write` in `entitlements-catalog.ts` + `capabilities_registry` seed +
+  grants (`efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`) + release — **not authorized by the
+  operator this session**. Not blocking today: the kernel refuses session persons (TASK-1898) and API clients use scope.
+  *Update 2026-10-02 (night): catalog + seed + grants landed on `develop` (`9d0d698d4`) with Entregable B; production
+  release still not authorized.*
+- Gateway: `pnpm studio:manifest:sync` not run; the write tools would be dropped by `write_tool_without_scope_class`
+  until TASK-1899.
+- Spec of Entregable A not yet built: `ChannelValidator` port and `CommandResult.warnings` (TASK-1905 plugs them);
+  `operations.ts` has no entry for `studio:review` (operator CLI; exclusion still to decide).
+- Entregables B and C (Slices 4–10). API approval (`approveAssetVersion`) = Slice 4 + TASK-1899.
+- Browser upload from previews: GCS CORS has no partial wildcards (`https://*.vercel.app`); validate in TASK-1895.
+
+### Entregable B — catalog commands (code complete 2026-10-02, verified in staging, NOT in production)
+
+Operator decisions (2026-10-02): scope "close A + Entregable B"; Entregable C (campaign cutover, OneDrive retirement)
+later; Greenhouse only up to `develop`/staging; media authorization is a person's decision — Claude does not run it.
+
+**Studio:** commit `a8c7886` on **local** `main`, **not pushed** (pushing `main` = Studio production deploy; the session
+permission classifier blocked it as «Production Deploy»; the operator runs `git push origin main`). Branch
+`task-1894-entregable-b` (same commit) is on origin; its preview `efeonce-marketing-studio-62vtv3yrm…` (staging DB)
+was verified.
+
+- **Migration** `packages/database/migrations/1790967435017_catalog-write-commands.sql` (additive) applied 2026-10-02
+  on `marketing_studio_staging` AND `marketing_studio` (prod): `campaign.source_of_truth` (`onedrive` default |
+  `studio`) + `cutover_on` + `cutover_by` + CHECK `campaign_cutover_chk` (studio ⇔ cutover_on); `revision` on
+  `concept`, `ad_configuration`, `media_flight`, `scheduled_post`; `budget_line.updated_at/approval_ref/approved_by/
+  approved_at`; tables `campaign_brief`, `campaign_brief_audience`, `campaign_brief_kpi`. The 5 real campaigns stay
+  `onedrive`.
+- **Slice 4:** table-driven state machines (`packages/domain/src/state-machines`) + review/transition/approval
+  commands (`contracts.md` §Catalog commands).
+- **Slice 5:** campaign, brief, concept, asset and rights commands. **Slice 6:** copy, ads, flight, budget lines,
+  scheduled posts (Studio plans `PLANNED`, cancels `CANCELLED`, never publishes).
+- **Slice 7:** 29 write routes + `GET /api/v1/campaigns/{id}/brief` (`studio.campaign.brief.get`); registry split by
+  slice; `CampaignDetail.permissions`; `revision`/`ETag`; API 1.4.0; manifest 44 tools (hash `6478cab73538`); CLI
+  `pnpm studio:write`; `ChannelValidator` port (default adapter, no validation) + `warnings` on every write result.
+- **Greenhouse** (`develop` `9d0d698d4`, on `origin/develop`): capabilities `marketing_studio.asset.write` +
+  `marketing_studio.campaign.write` (`create`/`update`, scope `tenant`) in `entitlements-catalog.ts`; migration
+  `20261002185625608_task-1894-marketing-studio-write-capabilities.sql` applied on the shared instance (SELECT: both
+  live); grants `efeonce_admin`, `efeonce_account`, `efeonce_operations`, `designer`; coverage test green. **No
+  production release** (operator decision pending).
+- **Gateway** (`efeonce-mcp`): change **prepared, not synced, not committed** (isolated scratchpad copy, branch
+  `task-1894-studio-write-manifest` from `origin/main` `8ff029d`). The classifier blocked `studio:manifest:sync`
+  («Merge Without Review»). See `contracts.md` §Gateway contract and `lessons.md`.
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | commands, state machines, permissions, CLI | code complete | gates, lint of the changed files, `mcp:manifest:check`, typecheck, 134 tests (contracts 9, domain 118 + 4 skipped, web 7); catalog/plan/upload integrations against staging (rolled back). Full `pnpm check` fails ONLY on 2 lint errors in `StatusBar.tsx`/`StatusLive.tsx` from another session (`aaed507`/`5756d2b`) |
+| Staging | sandbox `CMP-900` via `createCampaign` (org Efeonce, synthetic) + CLI | verified | creative `unknown→in_production→final_available→approved` (`approveCreative --confirm`); media `unknown→pending→authorized` (`authorizeMedia`); guards seen: `precondition_required`, `invalid_state_transition`, `approval_requires_dedicated_command`, T2 without `--confirm`, `revision_conflict`, `campaign_not_studio_owned` on CMP-004 |
+| Staging preview | HTTP with the test `api_client` | verified | permissions + `ETag`; anonymous 403 `write_not_allowed`; concept 201 + replay `Idempotent-Replayed: true`; bearer approval → `approval_requires_person`; CMP-004 → 409; literal brief (curly quotes, `\n\n`, trailing space) with `ETag`; copy byte-for-byte; flight + plan with `flightId`/`revision` |
+| Staging | test `api_client` «Pruebas de escritura TASK-1894 B (staging)» | created | scopes `studio:read` + `studio:write` + `studio:assets:write`, org Efeonce; token in `marketing-studio-write-tests-token-staging` (never printed) |
+| Production | migration `1790967435017` | applied | additive; 5 real campaigns `onedrive`. **Code not deployed** |
+| Greenhouse | two write capabilities | `develop` only | coverage test green; no prod release |
+| Gateway | read-only federation filter | prepared | not committed, not synced |
+
+**Gateway synced 2026-10-02** (efeonce-mcp#23 merged `1ddc7db`, v1.10.0, writes in the manifest but never
+federated — `MARKETING_STUDIO_FEDERATED_TOOLS`). Deployed by the operator (revision `efeonce-mcp-gateway-00064-q6w`).
+**Pending (operator):** Greenhouse production release. Deferred: Entregable C (Slices 8–10); TASK-1898/1899 (session person, T2 confirmation by API,
+write federation). CMP-004 media authorization stays in the OneDrive catalog until its cutover (C); in Studio it can
+only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:write authorizeMedia … --apply --confirm`.
+
 ## Sessions
 
 - 2026-09-25 — Skill created from the verified facts inventory (Studio `d3ab68e`, gateway `9b93d6a`).
@@ -169,3 +275,11 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 - 2026-09-26 — ADR accepted by the operator: Studio + GCS as single source of truth, OneDrive as workshop, one command
   (`createAssetVersion`) with three doors (CLI, MCP, UI), human approval, dated per-campaign cutover; Graph mirror not
   planned (`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`). Docs only.
+- 2026-10-02 — TASK-1894 Entregable A (ingest door) shipped and rolled out to staging + production (Studio `a450a3c`,
+  `3fe85a2`, `aa91ce3`, `43e4711`; API 1.3.0, 15 tools); 33 CMP-004 finals uploaded, pending operator review.
+- 2026-10-02 (later) — the 33 CMP-004 versions approved; 11 horizontals 1,91:1 uploaded (`--ratio 191x100`) and
+  approved: CMP-004 = 44 pieces approved, 0 pending. Studio grid bug (fixed ratio columns hid 1,91:1) fixed in `23e5787`.
+- 2026-10-02 (night) — TASK-1894 Entregable B code complete and verified in staging (Studio `a8c7886` on local `main`,
+  not pushed; branch `task-1894-entregable-b` preview; API 1.4.0, 44 tools; migration `1790967435017` on both DBs;
+  sandbox `CMP-900`). Greenhouse `9d0d698d4` (two write capabilities, `develop` only). Gateway change prepared, not
+  synced. Entregable C deferred.

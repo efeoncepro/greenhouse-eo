@@ -24,6 +24,7 @@ import {
   auditarVestuario,
   CLAVES_DE_REFERENCIA,
   CLAVES_SIN_ARCHIVO,
+  castingDeFicha,
   construirPrompt,
   detectarValorDeFormato,
   familiaDeLecho,
@@ -1741,5 +1742,38 @@ describe('foto:prompt · traje biónico: sólo Nexa, sólo cine (TASK-1940)', ()
     expect(traje.assetDeUso).not.toMatch(/sin-marca/)
     expect(traje.instruccionEnUso).toMatch(/Do NOT remove it/)
     expect(traje.acabadoMarca).toMatch(/inlaid/)
+  })
+})
+
+describe('foto:prompt · casting de campaña (2026-10-02)', () => {
+  const casting = {
+    directora: {
+      etiqueta: 'la directora',
+      identity: 'IDENTITY (critical): the woman is the SAME person shown in the reference images; do not age her.',
+      refs: ['scripts/foto/build-prompt.mjs'],
+      cuerpo: 'scripts/foto/build-prompt.mjs'
+    }
+  }
+
+  it('resuelve una identidad declarada en la ficha', () => {
+    expect(castingDeFicha({ casting }, 'directora')).toMatchObject({ etiqueta: 'la directora', refs: ['scripts/foto/build-prompt.mjs'] })
+    expect(castingDeFicha({ casting }, 'otra')).toBeUndefined()
+  })
+
+  it('rechaza un casting sin identidad, sin referencias o que pisa el roster', () => {
+    expect(() => castingDeFicha({ casting: { x: { identity: 'una cara', refs: ['a'] } } }, 'x')).toThrow(/IDENTITY \(critical\)/)
+    expect(() => castingDeFicha({ casting: { x: { identity: 'IDENTITY (critical): ok', refs: [] } } }, 'x')).toThrow(/referencia/)
+    expect(() => castingDeFicha({ casting: { julio: casting.directora } }, 'julio')).toThrow(/roster/)
+  })
+
+  it('la ficha la pide en `identidad` y sus referencias viajan al prompt', () => {
+    const r = construirPrompt({ ...fichaBase, casting, identidad: ['directora'] })
+
+    expect(r.prompt).toContain('IDENTITY (critical): the woman is the SAME person')
+    expect(r.imagenes).toContain('scripts/foto/build-prompt.mjs')
+  })
+
+  it('una persona desconocida explica cómo declarar el casting', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['nadie'] })).toThrow(/casting/)
   })
 })

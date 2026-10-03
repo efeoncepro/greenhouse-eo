@@ -241,3 +241,7 @@ return <ThreeCanvas>...</ThreeCanvas>
 
 - Material del logo: metallic reflectivo, glass translucido, o matte solido? Impacta la percepcion de marca. Definir con el owner antes de Slice 2.
 - Color del logo 3D en brand panel: blanco como el SVG actual sobre fondo dark, o verde Greenhouse (#2d6a4f)? Podria ser gradient entre ambos.
+
+## Delta 2026-10-02 — Login V4 premium (TASK-1964)
+
+Reemplazada por `TASK-1964`: el login V4 premium no usa el isotipo de Greenhouse en 3D; el momento visual es la foto con la Lente de «La órbita» y la espera post-login es el `OrbitLoader`. El motion contract de TASK-1964 declara el 3D como non-goal.

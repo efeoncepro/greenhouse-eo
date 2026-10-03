@@ -76,6 +76,12 @@ only; never write values here.
 | `apps/worker/` | `src/{config,handlers,server}.ts` (`node:http`), `Dockerfile` (+ ffmpeg), `cloudbuild.yaml`, `deploy.sh` (SoT of env vars) |
 | `scripts/media-ingest.ts`, `scripts/media-rights.ts` | `pnpm media:ingest`, `pnpm media:rights`; `media-renditions.ts` now uses the domain toolkit |
 | `scripts/ops/infra/media-originals.sh`, `scripts/ops/sql/media-worker-roles.sql` | Buckets/SA/IAM/Pub/Sub/Scheduler (`--env`, `--wiring`, dry-run default); worker PG roles |
+| `packages/domain/src/commands/` (TASK-1894) | `kernel.ts` (`runCommand`, `authorize`; T2 only `operator_cli` until TASK-1899), `support.ts` (organization lookup, `lockStudioCampaign` → 409, `assertRevision`, `audit`, `written`), `review.ts` + `asset-review.ts`, `state-transitions.ts`, `catalog.ts` + `catalog/` (campaign, brief, concept/asset, rights), `plan.ts` + `plan/` (copy, ads, media plan, posts), `permissions.ts` (`campaignPermissions`), `registry.ts` (`CATALOG_WRITE_COMMANDS`, test against the operations registry) |
+| `packages/domain/src/state-machines/` | Review, creative, media-authorization and launch machines (table-driven, approval targets, note-required) |
+| `packages/domain/src/channels/validator.ts` | `ChannelValidator` port, `enforceChannels`, `normalizeChannelKeys`, default `unvalidatedChannels` (TASK-1905 plugs the catalog) |
+| `packages/contracts/src/operations-{write,review,catalog,plan}.ts` | `writeOperation` helper + write operations by slice, spread into `operations.ts` |
+| `apps/web/src/server/commands.ts` | `commandRoute` (thin write route: body schema → `runCommand`) |
+| `scripts/studio-upload.ts`, `scripts/studio-review.ts`, `scripts/studio-write.ts` | `pnpm studio:upload` (API, api_client), `pnpm studio:review`, `pnpm studio:write <operationId>` (operator_cli, dry-run default, T2 `--apply --confirm`) |
 
 ## Database (schema `studio`)
 
@@ -83,6 +89,10 @@ Tables: `campaign`, `concept`, `asset`, `asset_version`, `asset_rendition`, `cop
 `ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`;
 `media_object`, `worker_run`, `post_observation` (TASK-1893); `ops_run` (TASK-1896, migration `1790409464603_ops-run`,
 staging applied 2026-09-26, production pending).
+TASK-1894: `asset_upload`, `idempotency_record` (migration `1790956839977_asset-ingest-door`); `campaign_brief`,
+`campaign_brief_audience`, `campaign_brief_kpi` + `campaign.source_of_truth/cutover_on/cutover_by` + revisions
+(migration `1790967435017_catalog-write-commands`, staging and production 2026-10-02). Staging sandbox `CMP-900`
+(synthetic, `source_of_truth = 'studio'`); ids `CMP-900`+ are reserved for sandbox/tests.
 Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
 1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
 
@@ -134,6 +144,8 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 `greenhouse-marketing-studio-health-token` (Greenhouse reads it; `studio:health`); not created: `marketing-studio-sentry-auth-token`.
 Created 2026-09-26 (TASK-1893): `marketing-studio-pg-worker-password`, `marketing-studio-pg-staging-worker-password`,
 `marketing-studio-metricool-api-token` (v1, raw `userToken`, worker SA accessor).
+TASK-1894: `marketing-studio-upload-cli-token` / `-staging` (api_client `studio:assets:write`, CLI `studio:upload`),
+`marketing-studio-write-tests-token-staging` (api_client `studio:read` + `studio:write` + `studio:assets:write`, staging canary).
 
 ## Gateway (`efeonce-mcp`)
 

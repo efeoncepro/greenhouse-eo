@@ -3,6 +3,8 @@
 ## Delta 2026-10-02
 
 - `scripts/foto/` sumó en TASK-1940: catálogo del traje y los lentes, `validarTrajeNexa`, claves `acabadoMarca`/`macroEnUso`/`instruccionEnUso` y `foto:isotipo --marca logotipo --tecnica`. Migran con el resto de `foto:*`, junto al kit `ai-generations/2026-10-01_traje-bionico-nexa/` (sellado y publicado en el canon) — cerrado por trabajo en TASK-1940.
+- `scripts/ai/` crecerá con `scripts/ai/inpaint/**` (`pnpm ai:mask`, `pnpm ai:inpaint image|video`). El núcleo nace sin imports `@/`; los adaptadores dependen de `@/lib/ai/*` igual que `ai:image`. El cierre de imports sellados debe contarlo — registrado por TASK-1965.
+- `scripts/foto/expandir.mjs` pasará a delegar su recomposición en `scripts/ai/inpaint/expand.ts` (TASK-1973, Slice 2): al migrar `foto:*` al taller, el núcleo de inpainting viaja con él o queda como dependencia declarada — registrado por TASK-1973.
 
 ## Delta 2026-10-01
 

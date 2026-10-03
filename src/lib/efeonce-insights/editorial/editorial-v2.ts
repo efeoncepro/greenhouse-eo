@@ -29,11 +29,22 @@ const itemLabel = (fact: EvidenceFactV1): string => fact.dimension?.spaceName ??
 
 const fmt = (fact: EvidenceFactV1, locale: string): string => formatFactValue(fact.value, fact.unit, locale)
 
-/** Un conteo que es parte de un total se dice con su total («2 de 6»), como la afirmación del planner v1. */
-const valueText = (fact: EvidenceFactV1, locale: string): string =>
-  fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0
-    ? `${fmt(fact, locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)}`
-    : fmt(fact, locale)
+/**
+ * Un conteo que es parte de un total se dice con su total («2 de 6»), como la afirmación del planner v1. TASK-1957: un
+ * indicador AEO porcentual (tasa de mención, Share of Model, Share of Voice, citas) lleva su base de respuestas
+ * («33,3 % (8 de 24 respuestas)»): el porcentaje solo no dice sobre cuántas respuestas se midió.
+ */
+const valueText = (fact: EvidenceFactV1, locale: string): string => {
+  if (fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0) {
+    return `${fmt(fact, locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)}`
+  }
+
+  if (fact.module === 'aeo' && fact.unit === 'percent' && fact.value !== null && fact.numerator !== null && fact.denominator !== null && fact.denominator > 0) {
+    return `${fmt(fact, locale)} (${formatFactValue(fact.numerator, 'count', locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)} ${fact.metricId.startsWith('sov.') ? GH_INSIGHTS.reading.mentionsNoun : GH_INSIGHTS.reading.answersNoun})`
+  }
+
+  return fmt(fact, locale)
+}
 
 // ─── Familias nuevas ─────────────────────────────────────────────────────────────────────────────
 
@@ -243,7 +254,7 @@ export const humanFactSentence = (fact: EvidenceFactV1, byId: Map<string, Eviden
 }
 
 /** ¿El hecho cambió en lo que el documento IMPRIME? Una variación de 0,0 % no es un hallazgo. */
-const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
+export const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
   const change = changeOf(fact, byId, locale)
 
   return change && fmt(change.previous, locale) !== fmt(fact, locale) ? change : null
@@ -379,8 +390,8 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
 
 /**
  * «La cifra más alta» con el verbo de su familia: un motor que menciona, una dimensión evaluada, o genérico. Un
- * superlativo exige un máximo ÚNICO en lo impreso: con empate se dice el empate («Todos los motores mencionan la marca
- * en 2 de 6.», «Gemini y ChatGPT son los motores que…»), nunca «el que más» (Berel p. 11, 2026-09-25).
+ * superlativo exige un máximo ÚNICO en lo impreso: con empate se dice el empate («La marca aparece en 2 de 6 consultas
+ * en cada motor.» — TASK-1957 —, «Gemini y ChatGPT son los motores que…»), nunca «el que más» (Berel p. 11, 2026-09-25).
  */
 const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: string): string | null => {
   const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
@@ -388,26 +399,27 @@ const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: s
   const value = valueText(highest, locale)
   const all = tied.length === facts.length
 
-  if (highest.metricId.startsWith('presence.')) {
-    const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^Presencia en\s+/i, '')
+  // `presence.*` (conteo, snapshots previos a TASK-1957) y `mention_rate.*` (tasa por motor) hablan de motores.
+  if (highest.metricId.startsWith('presence.') || highest.metricId.startsWith('mention_rate.')) {
+    const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^(Presencia|Mención) en\s+/i, '')
 
     if (tied.length === 1) return firstFitting(L.conclusion, `${engine(highest)} ${R.mostMentions}: ${value}.`)
-    if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value}.`)
+    if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value} ${R.allEnginesMentionTail}.`)
 
-    return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${R.severalEnginesShare}: ${value}.`)
+    return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${listOf(tied.map(engine))} ${R.leadWith} ${value}.`, `${R.severalEnginesShare}: ${value}.`)
   }
 
   if (highest.metricId.startsWith('dimension.')) {
     if (tied.length === 1) return firstFitting(L.conclusion, `${R.bestDimension} ${lowerFirst(highest.label)}: ${value}.`)
     if (all) return firstFitting(L.conclusion, `${R.allDimensions} ${value}.`)
 
-    return firstFitting(L.conclusion, `${R.bestDimensionsTied} ${listOf(tied.map(fact => lowerFirst(fact.label)))}: ${value}.`, `${R.severalDimensionsShare}: ${value}.`)
+    return firstFitting(L.conclusion, `${R.bestDimensionsTied} ${listOf(tied.map(fact => lowerFirst(fact.label)))}: ${value}.`, `${upperFirst(listOf(tied.map(fact => lowerFirst(fact.label))))} ${R.leadWith} ${value}.`, `${R.severalDimensionsShare}: ${value}.`)
   }
 
   if (tied.length === 1) return firstFitting(L.conclusion, `${R.highest} ${subjectOf(highest, context)}: ${value}.`)
   if (all) return firstFitting(L.conclusion, `${R.allEqual} ${value}.`)
 
-  return firstFitting(L.conclusion, `${R.highestTied} ${listOf(tied.map(fact => lowerFirst(subjectOf(fact, context))))}: ${value}.`, `${R.severalShare}: ${value}.`)
+  return firstFitting(L.conclusion, `${R.highestTied} ${listOf(tied.map(fact => lowerFirst(subjectOf(fact, context))))}: ${value}.`, `${upperFirst(listOf(tied.map(fact => lowerFirst(subjectOf(fact, context)))))} ${R.leadWith} ${value}.`, `${R.severalShare}: ${value}.`)
 }
 
 /**
@@ -499,7 +511,10 @@ export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map
 
 /** Conclusiones de un capítulo en orden de peso editorial: metas primero, luego tendencias, luego comparaciones. */
 const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {
-  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : 2)
+  // TASK-1957 — el puntaje por dimensión (`chart.aeo.score`) va al final: un empate de dimensiones no es el hallazgo del
+  // mes frente a una meta, una tendencia o un cambio real (Berel, 2026-10-02: la tesis era «… lideran con 100»).
+  // TASK-1962 — las causas (`.drivers.`) explican el resultado: van detrás de él, nunca son la tesis.
+  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : chartId.endsWith('.score') ? 4 : chartId.includes('.drivers.') ? 3 : 2)
 
   return [...(chapter.readings ?? [])]
     .sort((a, b) => rank(a.chartId) - rank(b.chartId))
@@ -515,7 +530,16 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
   const bullets = chapters.flatMap(chapter => chapter.charts.filter(chart => chart.family === 'bullet' && (chapter.readings ?? []).some(reading => reading.chartId === chart.chartId)))
   const statuses = bullets.map(chart => ({ chart, status: bulletStatus(chart, byId)! })).filter(entry => entry.status)
   const missed = statuses.filter(entry => entry.status.missing.length > 0)
-  const ordered = chapters.flatMap(conclusionsOf).filter(item => !item.claimId.endsWith('.value'))
+
+  // Conclusiones de figuras primero; después los hallazgos de capítulo (TASK-1957: un capítulo sin figura —AEO con
+  // menciones parejas— igual aporta su hallazgo al resumen). Cada candidato recuerda su módulo para que la bajada
+  // hable de OTRO capítulo cuando lo hay.
+  const candidates = chapters.flatMap(chapter => [
+    ...conclusionsOf(chapter).filter(item => !item.claimId.endsWith('.value')),
+    ...chapter.claims.filter(item => item.role === 'finding')
+  ].map(item => ({ item, module: chapter.module })))
+
+  const ordered = candidates.map(entry => entry.item)
   let thesis: PlanClaimV1 | null = null
 
   if (missed.length === 1 && statuses.length > 1 && missed[0]!.status.metricName) {
@@ -533,7 +557,11 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
 
   if (!thesis) return []
 
-  const lead = ordered.find(item => item.factIds[0] !== thesis!.factIds[0] && item.text.length <= L.summaryLead)
+  const thesisModule = candidates.find(entry => entry.item.factIds[0] === thesis!.factIds[0])?.module
+  const fits = (item: PlanClaimV1) => item.factIds[0] !== thesis!.factIds[0] && item.text.length <= L.summaryLead
+
+  const lead =
+    candidates.find(entry => entry.module !== thesisModule && fits(entry.item))?.item ?? ordered.find(fits)
 
   return [thesis, ...(lead ? [{ ...lead, claimId: 'summary.lead' }] : [])]
 }
@@ -544,15 +572,30 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
  * mayor cambio y como meta cumplida). Primero las conclusiones (metas, tendencias, comparaciones); si no alcanzan,
  * cada hecho aún no citado en la misma forma compacta, nunca con la etiqueta interna.
  */
+/**
+ * Qué HALLAZGO dice una frase, no sólo de qué hecho habla: la misma métrica puede decir «cumple la meta» (portada) y
+ * «cayó 5,6 pp» («Lo esencial») sin repetirse (revisión del operador, Sky 2026-10-02). Cambio = cita su período
+ * anterior; referencia = cita otro hecho (una meta); valor = sólo el hecho.
+ */
+const findingKeyOf = (item: PlanClaimV1, byId: Map<string, EvidenceFactV1>): string => {
+  const [first, ...others] = item.factIds
+  const fact = first ? byId.get(first) : undefined
+  const kind = fact?.comparisonFactId && others.includes(fact.comparisonFactId) ? 'change' : others.length > 0 ? 'reference' : 'value'
+
+  return `${first}:${kind}`
+}
+
 export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string, exclude: PlanClaimV1[] = []): PlanClaimV1[] => {
-  const cited = new Set<string>(exclude.flatMap(item => (item.factIds[0] ? [item.factIds[0]] : [])))
+  const cited = new Set<string>(exclude.map(item => findingKeyOf(item, byId)))
 
   const candidates = chapters.map(chapter => {
     const context = contextOf(chapter.charts, byId)
 
-    // Sólo hechos que alguna figura CON PÁGINA dibuja (mismo `hasFigurePage` del render): una esencial cuya cifra no
-    // tiene página no tiene folio que la respalde y el render falla cerrado (Berel CTR, 2026-09-25).
-    const paged = new Set(chapter.charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chartSpecFactIdsOf))
+    // Una esencial necesita dónde respaldarse en el documento. Ya no exige una figura propia: los dos mapeadores del PDF
+    // resuelven su folio a la figura, a la narrativa que la afirma o a la apertura de su capítulo (deck y A4). Exigir
+    // figura dejaba fuera la posición media (nunca va en barras) y el CTR (figura de una métrica, sin página): Berel
+    // quedaba con un solo hallazgo teniendo tres (revisión del operador, 2026-10-02).
+    const paged = new Set(chapter.claims.flatMap(item => item.factIds))
 
     // Sólo HALLAZGOS: un cambio que se imprime (con dirección), nunca un valor suelto ni una variación de 0,0 %. El tope
     // es un techo, no una cuota: menos esenciales es mejor que relleno (revisión de 1846, 2026-09-25).
@@ -576,8 +619,10 @@ export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, Evide
     for (const list of candidates) {
       const item = list[round]
 
-      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || cited.has(item.factIds[0]!)) continue
-      cited.add(item.factIds[0]!)
+      const key = item ? findingKeyOf(item, byId) : ''
+
+      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || cited.has(key)) continue
+      cited.add(key)
       essentials.push({ ...item, claimId: `essential.${item.claimId}` })
     }
   }

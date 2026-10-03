@@ -47,6 +47,8 @@ const main = async (): Promise<void> => {
     `SELECT profile_id, public_id, brand_name, website_url, category, category_node_id
        FROM greenhouse_growth.grader_profiles
       WHERE status = 'active'
+        -- TASK-1962 — una categoría corregida por el operador no se reclasifica (el backfill la pisaba).
+        AND category_source IS DISTINCT FROM 'operator_override'
         AND ($1::text IS NULL OR public_id = $1 OR profile_id = $1)
       ORDER BY created_at ASC`,
     [PROFILE_FILTER]

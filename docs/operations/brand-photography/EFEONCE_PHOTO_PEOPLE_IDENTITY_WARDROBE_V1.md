@@ -1,9 +1,9 @@
 # Personas en la fotografía Efeonce V1 — casting, identidad y vestuario
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.3: el traje biónico y los lentes biónicos de Nexa se piden por catálogo, sólo Nexa y sólo cine, con las marcas armadas en la referencia; la pose y la expresión salen de la escena y de las 12 expresiones fotográficas; anclas de Nexa con la frontal primero, [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo). 1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
+> **Última actualización:** 2026-10-02 por Claude (1.4: casting de un personaje sin pieza aprobada — retrato ancla primero, delta 2026-10-02 casting de campaña. 1.3: el traje biónico y los lentes biónicos de Nexa se piden por catálogo, sólo Nexa y sólo cine, con las marcas armadas en la referencia; la pose y la expresión salen de la escena y de las 12 expresiones fotográficas; anclas de Nexa con la frontal primero, [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo). 1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -854,3 +854,22 @@ En las vistas puestas del kit los **aretes salieron dorados**, como en las ancla
 operador **aprobó las vistas así** **[decisión del operador]**. La escena aprobada `NX7d` declara aretes plateados y
 quita reloj, pulsera y anillo. Si el traje lleva o no el smartwatch y el anillo sigue abierto, igual que en el resto del
 registro cine **[pendiente]**.
+
+## Delta 2026-10-02 — casting de campaña para personajes ficticios
+
+Una persona ficticia protagonista que va a reaparecer (otros formatos u otros contextos de la campaña) tiene **set de
+casting** desde el inicio: rostro frente y tres cuartos, luz neutra, fondo gris, creado por **edición** desde la pieza
+aprobada. La ficha lo declara en `casting` (`{ "<clave>": { "etiqueta", "identity": "IDENTITY (critical): …", "refs":
+[…] } }`) y lo pide en `identidad` igual que a una persona del roster; `foto:prompt` valida que no pise el roster y que
+haya identidad y referencias. La edad sale del casting: nunca pedir «líneas» o «canas» en la escena. Caso fuente:
+CMP-004, la protagonista de S03 envejeció en 9:16 y cambió en 1:1 al regenerar sin ancla; con casting, la misma
+persona en 4:5, 9:16 y 1:1. Método completo: `efeonce-advertising-creative` → `references/paid-format-safe-zones-and-craft.md` §0b.
+
+**Personaje sin pieza aprobada de donde salir (escenario del login, 2026-10-02).** Si el personaje es nuevo, el set no
+puede editarse desde una pieza: primero se genera **un retrato ancla** de pecho con la receta de piel v3 (`pnpm
+ai:image`, `gpt-image-2.5-sunburst` high `1024x1536`, 85 mm f/2, ventana grande con rebote, pared gris oscura, prenda
+lisa sin logo) y la escena lo declara en `casting` como su referencia. Sin ancla, la piel salió «muy IA» y el operador
+la rechazó **[decisión del operador]**; retocar sólo la cara con `pnpm ai:inpaint image` no la arregló **[medido]**.
+Prompts: `ai-generations/2026-10-02_login-escenario/casting/ancla-*.txt`. Detalle y fallas:
+[casebook cine](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
+

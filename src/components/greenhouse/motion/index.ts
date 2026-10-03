@@ -43,3 +43,6 @@ export {
 
 // View Transitions tier (same-document navigation — not GSAP)
 export { default as ViewTransitionLink } from './ViewTransitionLink'
+
+// TASK-1964 — indicador de espera de «La órbita» (la esfera recorre el anillo).
+export { default as OrbitLoader, type OrbitLoaderProps } from './OrbitLoader'

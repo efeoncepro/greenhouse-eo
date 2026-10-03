@@ -122,3 +122,58 @@
 - **`gcloud run deploy --set-env-vars` splits on commas**: a value like `3961547,5105024` needs the `^;^` delimiter.
 - **GCS `customTime` only moves forward** (cannot be cleared or set earlier): tiering sits behind its own flag and a
   reopened campaign is reported (`tiering_reopened`) for a manual class rewrite.
+
+## 2026-10-02 — TASK-1894 Entregable A (ingest door)
+
+- **A freshly created custom IAM role takes ~1 min to propagate.** The bucket binding of
+  `marketingStudioOriginalsDeleter` failed with «does not exist in the resource's hierarchy». Rule: wait and re-run
+  `media-originals.sh --upload-door --apply` (idempotent); do not rename or recreate the role.
+- **`vercel env add NAME preview` in non-interactive mode demands an existing branch.** It would not create the var
+  for all preview branches, so `STUDIO_UPLOADS_ENABLED` lives only on branch `task-1894-upload-door`. Rule: for all
+  preview branches use the interactive CLI or the dashboard; verify with `vercel env ls` which branch it landed on.
+- **Studio previews have no bypass secret.** Rule: canary staging through `vercel curl … --deployment <preview>
+  --scope efeonce-7670142f`; the upload CLI with `--base-url <preview>` cannot get through the protection.
+- **GCS CORS does not support partial wildcards** (`https://*.vercel.app`). The CLI does not need CORS, but browser
+  uploads from previews are unproven. Rule: validate in TASK-1895 before relying on preview browser uploads.
+- **The anonymous actor must be refused before the body is validated.** `aa91ce3` moved the authority check ahead of
+  body validation, so an open-mode anonymous caller always gets 403 `write_not_allowed`, whatever it sends. Rule: in a
+  write route, authority first, then validation.
+- **Flag order is worker first, then web.** With the web signing uploads and the worker not verifying (flag off = no
+  verification and no sweep), confirmations would stay at 202 (inferred from the code, not observed). Rule: `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` before
+  `STUDIO_UPLOADS_ENABLED`; roll back in reverse.
+- **An uploaded version is not the current one.** New versions are `pending_review`; the current version is the highest
+  `version_no` with `review_state` ∈ {imported, approved}. Approving a piece is not media authorization. Rule: never
+  report an uploaded final as "in use" or "approved" until `studio:review approve` ran.
+- **Spec deviation recorded, not hidden.** The spec had the CLI as `operator_cli` impersonating the ingest SA; it was
+  built as an HTTP `api_client` (`studio:assets:write`) so CLI, UI and agents share one door. Rule: when the build
+  departs from the spec, write it in the ledger and the architecture, not only in the commit.
+
+## 2026-10-02 — CMP-004 horizontals 1,91:1 in Studio
+
+- **Loaded and approved ≠ visible: the grid had fixed columns.** `PiecesWorkspace.tsx` drew only 16:9, 1:1, 4:5 and
+  9:16, so the 11 horizontals 1,91:1 were in the database, approved, and absent from the screen. `23e5787` makes the
+  grid add the ratios present in the campaign (widest to tallest). Rule: rows existing is not the surface showing them;
+  after an upload verify the real UI, not only the reader.
+- **Ratios with decimals are stored as integers.** The API demands `aspectRatio` `^\d+x\d+$`, so 1,91:1 is uploaded as
+  `--ratio 191x100`; `ratioLabel('191x100')` labels it «1,91:1» (`apps/web/src/copy.ts`). The worker's ratio check
+  accepts the real file (2048/1072 = 1,9104) within 1 %. Rule: never send `1.91x1`; scale to integers.
+
+## 2026-10-02 — TASK-1894 Entregable B (catalog commands)
+
+- **The gateway federated every manifest tool and called them all with GET.** The assumed safety net
+  (`write_tool_without_scope_class` dropping writes until TASK-1899) did not hold: syncing the API 1.4.0 manifest would
+  have federated the write tools broken. Rule: before any `studio:manifest:sync` of a manifest with write tools, the
+  gateway must filter to reads (`MARKETING_STUDIO_FEDERATED_TOOLS`) and `call()` must reject writes and non-GET. Read
+  the provider's call path; do not trust a guard's name.
+- **A write on a OneDrive-governed campaign would be overwritten by the next import.** Hence every catalog write on a
+  `source_of_truth = 'onedrive'` campaign answers 409 `campaign_not_studio_owned` (except `createCampaign`, the ingest
+  door and version review), and the importer skips whole `studio` campaigns. Rule: never "fix" data of an `onedrive`
+  campaign in Studio; edit it in OneDrive until its dated cutover (Entregable C).
+- **Commands by slice in separate registry files let parallel work avoid conflicts.** The registry was split into
+  `operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts` (+ helper `operations-write.ts`) so slices
+  could be built without colliding in one `operations.ts`. Rule: add new write operations in the slice file that owns
+  them.
+- **Session permission classifier blocks production-shaped actions.** Pushing Studio `main` («Production Deploy») and
+  running the gateway sync («Merge Without Review») were blocked by the classifier (the gateway one even though the
+  operator had authorized PR and merge); the work was left on a pushed branch + preview and a prepared isolated change. Rule: ask for the external-mutation authorization at the
+  start, or plan the hand-off to the operator from the beginning.

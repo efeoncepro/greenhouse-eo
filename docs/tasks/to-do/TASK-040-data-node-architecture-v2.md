@@ -27,7 +27,9 @@ Formalizar la baseline canónica para materializar `Data Node` sobre el runtime 
 
 ## Why This Task Exists
 
-Greenhouse ya tiene la visión correcta del Data Node en `TASK-039`, y ya materializó parte del carril externo mediante sister platforms (`TASK-374`, `TASK-376`, `TASK-377`). Pero todavía falta una baseline única que ordene qué parte del Data Node ya existe, qué parte fue absorbida por otras lanes y qué parte sigue pendiente.
+Greenhouse ya tiene la visión correcta del Data Node en `TASK-039`, y materializó parte del carril externo mediante
+`TASK-374` y `TASK-376`. El follow-on Kortex `TASK-377` fue cancelado al pausar el producto y no forma parte del
+backlog ejecutable. Todavía falta una baseline única que ordene qué existe y qué sigue pendiente.
 
 Sin este baseline, el riesgo es abrir follow-ons inconsistentes:
 
@@ -81,7 +83,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-095-centralized-email-delivery-layer.md`
 - `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md`
 - `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md`
-- `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`
+- `docs/tasks/cancelled/TASK-377-kortex-operational-intelligence-bridge.md` (cancelada al pausar Kortex)
 
 ## Dependencies & Impact
 
@@ -191,7 +193,8 @@ Reglas obligatorias:
 
 ### Slice 5 — Follow-on map
 
-- mapear qué partes del programa ya absorbieron `TASK-374`, `TASK-376` y `TASK-377`
+- mapear qué partes del programa ya absorbieron `TASK-374` y `TASK-376`, registrando `TASK-377` sólo como
+  follow-on Kortex cancelado
 - definir qué follow-ons nuevos deben salir desde `TASK-040`
 - evitar solapamiento entre sister-platform runtime y Data Node general
 

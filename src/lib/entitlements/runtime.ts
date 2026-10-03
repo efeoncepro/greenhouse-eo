@@ -365,6 +365,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1962 — profile.set_category: el operador corrige la categoría canónica de un perfil AEO (mismo set operador).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.profile.set_category',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1290 — prompt_set.manage: el operador autora (draft) + aprueba (draft→active) el set
     // de prompts AEO por marca (define qué se le pregunta a los motores). Mismo set operador que
     // run.operator. El command self-guarda con can() (profileId/setId arbitrario).
@@ -3204,6 +3213,27 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1894 — escritura en Marketing Studio (subir/versionar piezas y crear/editar campañas) con autoridad de
+  // persona. Los roles que operan campañas más diseño, que produce las piezas. La aprobación es aparte (TASK-1899).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.DESIGNER)
+  ) {
+    for (const capability of ['marketing_studio.asset.write', 'marketing_studio.campaign.write'] as const) {
+      for (const action of ['create', 'update'] as const) {
+        addEntitlement(entries, {
+          module: 'marketing_studio',
+          capability,
+          action,
+          scope: 'tenant',
+          source: 'role'
+        })
+      }
+    }
+  }
+
   if (subject.tenantType === 'client') {
     addEntitlement(entries, {
       module: 'insights',
@@ -3333,6 +3363,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+  }
+
+  // TASK-1963 — novedades del login. Las administran quienes operan la relación con clientes y la marca:
+  // administración, cuentas y operaciones de Efeonce. Nunca roles `client_*`.
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'login_announcements',
+        capability: 'login_announcements.manage',
+        action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
   }
 
   // TASK-1120 — Design Handoff Registry. Read is internal-wide because Design

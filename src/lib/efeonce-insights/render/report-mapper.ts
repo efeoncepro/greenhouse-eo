@@ -51,14 +51,23 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, hasPdfFigurePage, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
+/**
+ * TASK-1962 — caracteres de la columna de la entidad que caben en una línea de la tabla A4 (medido con las tablas de
+ * Berel: «Mención en Google AI Overview», 29, ya parte en dos; «Páginas que más cambiaron», 25, no).
+ */
+const TABLE_ENTITY_LINE_CHARS = 26
+
 const CAPACITY = {
-  /** Filas por página de tabla (`tableRows.maxItems`). */
-  tableRows: 16,
+  /**
+   * Filas por página de tabla con una cabecera de una línea de título y dos de bajada (`tableRowsCapacity` descuenta
+   * las líneas extra), contando una fila de etiqueta larga como dos.
+   */
+  tableRows: 15,
   /** Párrafos por página narrativa (`paragraphs.maxItems`). */
   paragraphs: 6,
   /** Límites por página de cierre (`limits.maxItems`). */
@@ -70,6 +79,39 @@ const CAPACITY = {
   /** Entradas de la columna «En este capítulo» de la narrada (`evidence.items.maxItems`). */
   asideItems: 8
 } as const
+
+/**
+ * TASK-1962 — la cabecera de la página de tabla empuja las filas: cada línea de título más allá de la primera y cada
+ * línea de bajada más allá de la segunda le quitan una fila a la página. Sin esto, «De dónde sale lo que dicen los
+ * motores» (2 líneas) con su bajada (3) y 14 filas dejaba la fuente debajo del pie (vista previa Berel, septiembre
+ * 2026): el reparto contaba filas como si la cabecera midiera siempre lo mismo. Caracteres por línea medidos en esa
+ * página y en «Visibilidad en motores de respuesta: todas las cifras» (columna derecha de la cabecera): una línea de
+ * título admite 27 caracteres y una de bajada 50, partiendo por palabras como el navegador. Contar caracteres sin
+ * partir por palabras sobrestimaba el título y dejaba una fila huérfana en la página siguiente.
+ */
+const TABLE_TITLE_LINE_CHARS = 27
+const TABLE_LEAD_LINE_CHARS = 50
+
+const linesOf = (text: string, perLine: number): number => {
+  let lines = 1
+  let current = 0
+
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const next = current === 0 ? word.length : current + 1 + word.length
+
+    if (next > perLine && current > 0) {
+      lines += 1
+      current = word.length
+    } else {
+      current = next
+    }
+  }
+
+  return lines
+}
+
+export const tableRowsCapacity = (title: string, lead: string): number =>
+  CAPACITY.tableRows - Math.max(0, linesOf(title, TABLE_TITLE_LINE_CHARS) - 1) - Math.max(0, linesOf(lead, TABLE_LEAD_LINE_CHARS) - 2)
 
 const BUDGET = {
   assertion: 130,
@@ -163,7 +205,8 @@ const chapterBodyPages = (
   // afirmación del plan que cita los hechos que la figura dibuja.
   const chapterTab = running.runningSection.split(' · ')[0]!
 
-  for (const chart of chapter.charts) {
+  // TASK-1962 — sólo familias con página PDF; las demás viven en la web (`PDF_FIGURE_FAMILIES`).
+  for (const chart of chapter.charts.filter(hasPdfFigurePage)) {
     for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.report)) {
       const where = `${chapter.chapterId}.${chart.chartId}`
 
@@ -269,7 +312,14 @@ const chapterBodyPages = (
     const secondColumn = sharedUnit ? table.columns[2] : L.tableVariation
     const drawnFacts = rowFacts.flatMap(fact => (fact ? [fact.factId] : []))
 
-    chunkByCapacity(table.rows.map((row, index) => ({ row, index })), CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
+    // Una etiqueta que no cabe en una línea de la columna ocupa dos líneas (nunca se recorta). La fila no mide el doble:
+    // su alto es el texto más el mismo relleno que una fila de una línea; medido con las tablas de Berel (septiembre
+    // 2026), ~1,2 filas. Se cuenta 1,5: contarla como 2 dejaba una fila huérfana en una página de continuación.
+    const rowHeight = ({ row }: { row: Array<string | null> }) => (String(row[0] ?? '').length > TABLE_ENTITY_LINE_CHARS ? 1.5 : 1)
+    const lead = table.lead ?? L.tableLeadAll(periodInline, withPrevious)
+    const chunks = chunkByCapacity(table.rows.map((row, index) => ({ row, index })), tableRowsCapacity(table.title, lead), (_r, i) => `${table.tableId}-r${i}`, rowHeight)
+
+    chunks.forEach((rows, i) => {
       pages.push({
         contentsTitle: table.title,
         factIds: drawnFacts,
@@ -280,9 +330,9 @@ const chapterBodyPages = (
             eyebrow: L.tableEyebrow,
             ...hero,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
-            lead: L.tableLeadAll(periodInline, withPrevious),
+            lead,
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
-            ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
+            ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(rows[0]!.index) } : {}),
             boardTitle: rejectIfLonger(`${L.tableDetailBy} ${entityColumn.toLowerCase()}`, 48, `${table.tableId}.boardTitle`),
             // La leyenda describe la barra: sin barras no hay leyenda.
             ...(sharedUnit ? { legend: { label: rejectIfLonger(valueColumn || entityColumn, 24, `${table.tableId}.legend`) } } : {}),

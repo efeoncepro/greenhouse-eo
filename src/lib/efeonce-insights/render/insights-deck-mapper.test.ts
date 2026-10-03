@@ -151,7 +151,7 @@ describe('buildInsightsDeckPlanInput', () => {
     }
   }, 120_000)
 
-  it('renderiza metas, tendencia y columnas por canal en el PDF del deck; una familia sin página se rechaza', async () => {
+  it('renderiza metas, tendencia y columnas por canal en el PDF del deck; una familia sin página se omite (la web la dibuja)', async () => {
     const facts = [
       ['otd', 82, 'percent'], ['otd-target', 90, 'percent'], ['otd-band', 70, 'percent'],
       ['m1', 10, 'count'], ['m2', 30, 'count'], ['m3', 20, 'count'],
@@ -197,9 +197,11 @@ describe('buildInsightsDeckPlanInput', () => {
     const pie = { ...base, chartId: 'chart.pie', family: 'pie', relation: 'composition', title: 'Composición', unit: 'count', dimensionLabels: ['A', 'B'],
       series: [{ seriesId: 's', label: 'Partes', factIds: ['m1', 'm2'], unit: 'count' }] }
 
-    expect(() =>
-      buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }), snapshot: { facts } as never })
-    ).toThrow(InsightsRenderRejectedError)
+    // TASK-1962 — una familia sin página PDF no se dibuja en una plantilla ajena: el mapper la OMITE a propósito
+    // (`PDF_FIGURE_FAMILIES`; la web la dibuja y el PDF conserva su hallazgo y su tabla). Nunca cae en otra plantilla.
+    const withPie = buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }), snapshot: { facts } as never })
+
+    expect(withPie.slides.some(slide => JSON.stringify(slide).includes('chart.pie'))).toBe(false)
   }, 120_000)
 
   it('«Lo esencial» (v2) va en la lámina de resumen, con el número de la lámina que lo respalda', () => {

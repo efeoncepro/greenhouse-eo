@@ -6,6 +6,27 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02
+
+- **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`, manifiesto de 44 tools); Entregable C
+  diferido por el operador. La dependencia de esta task con los commands y el kernel de TASK-1894 está cubierta.
+- **Lo que esta task hereda:** el puerto `ChannelValidator` con un adaptador por defecto que **no valida**
+  (`catalogVersion null`) y el campo `warnings` en el resultado de toda escritura; el Slice 3 de esta task reemplaza
+  ese adaptador por el real. Las claves de canal se guardan hoy como **texto** en brief, derechos de versión, copy,
+  anuncios, líneas de presupuesto y posts: el backfill a `channel_key` parte de esos valores.
+- **Superficie de escritura que el test de paridad ampliado debe cubrir:** 29 rutas de escritura
+  (POST/PATCH/PUT/DELETE) registradas por slice (`operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts`,
+  helper `operations-write.ts`), con `riskTier` leído del registro (T2 = aprobaciones y destructivas).
+- **Brief como entidad ya existe:** tablas `campaign_brief`, `campaign_brief_audience` y `campaign_brief_kpi` (migración
+  `1790967435017_catalog-write-commands.sql`, aplicada en staging y producción) y commands `upsertCampaignBrief` /
+  `approveCampaignBrief`.
+- **Autoridad por campaña:** CMP-001…005 siguen gobernadas por OneDrive y responden `409 campaign_not_studio_owned` a
+  escrituras del catálogo; el «modo `warn` en staging» del Rollout puede usar la sandbox `CMP-900` (ya creada,
+  gobernada por Studio) y el `api_client` de pruebas de escritura de staging (token en Secret Manager
+  `marketing-studio-write-tests-token-staging`).
+- **Federación:** el gateway v1.10.0 no federa escrituras (`MARKETING_STUDIO_FEDERATED_TOOLS` = sólo lecturas) hasta
+  TASK-1899; las tools de catálogo de esta task siguen ese mismo carril.
+
 ## Delta 2026-09-26 — decisiones del operador
 
 - **Quién mantiene el catálogo de canales:** `efeonce_operations` (con `efeonce_admin`), decisión de Julio Reyes,
@@ -130,7 +151,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-campaign-planning/SKILL.md` (consumidor agéntico del catálogo y de las referencias ICP).
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` y la skill `mcp-craft` (nombres, descripciones y anotaciones de tools).
 - `.claude/skills/greenhouse-backend/SKILL.md`.
-- `docs/tasks/to-do/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, forma común de un
+- `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, forma común de un
   command) y `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` (contratos de canje y flujo MCP).
 - `docs/context/11_hubspot-bowtie.md` (internal names de etapas del bow-tie).
 
@@ -196,11 +217,16 @@ Reglas obligatorias:
 - Canje RFC 8693 por capability y federación de lecturas (TASK-1891); mecánica de escritura planificada en TASK-1899.
 - Contexto documental del ICP de Efeonce: `docs/context/13_icp-buyer-personas-jtbd.md`; etapas del bow-tie:
   `docs/context/11_hubspot-bowtie.md`.
+- (2026-10-02, TASK-1894 Entregable B en producción) El registro ya no es sólo `GET`: suma 29 rutas de escritura con
+  `riskTier`; puerto `ChannelValidator` con adaptador por defecto sin validar; `warnings` en el resultado de toda
+  escritura; tablas `campaign_brief`, `campaign_brief_audience` y `campaign_brief_kpi`. La línea de arriba sobre
+  «17 entradas, sólo `GET`» describe el estado previo.
 
 ### Gap
 
 - No existe catálogo de canales, ni validación de límites o formatos, ni versión de especificación por registro.
-- El registro no declara nivel de riesgo y el test de paridad no cubre escrituras ni mutaciones de la UI.
+- El registro no declara nivel de riesgo y el test de paridad no cubre escrituras ni mutaciones de la UI. (2026-10-02:
+  el `riskTier` ya lo declara TASK-1894 en el registro; los detectores ampliados (c)–(e) siguen siendo de esta task.)
 - Las audiencias no tienen ancla en un modelo de cliente; no existe etapa del bow-tie en Studio.
 - No hay capability para gobernar catálogos de Studio ni cliente de canje para ella.
 

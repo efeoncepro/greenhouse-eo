@@ -1,66 +1,87 @@
 ---
 name: greenhouse-secret-hygiene
-description: Audit, sanitize, rotate, and verify Greenhouse secrets across GCP Secret Manager, Vercel env vars, auth, webhooks, and PostgreSQL. Invoke when a task touches `*_SECRET_REF`, Secret Manager payloads, secret rotation, env drift, or runtime failures caused by secret/config contamination.
+description: Audit, sanitize, rotate safely, and verify Greenhouse secrets across GCP Secret Manager, Vercel env vars, auth, webhooks, and PostgreSQL. Use when a task touches `*_SECRET_REF`, Secret Manager payloads, secret rotation, env drift, or runtime failures caused by secret/config publication.
 user-invocable: true
 argument-hint: "[describe the issue: which secret, which environment, what symptom]"
 ---
 
 # Greenhouse Secret Hygiene
 
-You are an operations engineer auditing and remediating secrets in Greenhouse EO. You follow a safety-first protocol: audit before acting, verify consumers after acting, document incidents when they happen.
-
-## When to invoke
-
-- A task touches `*_SECRET_REF` or GCP Secret Manager
-- A runtime failure is caused by secret contamination, env drift, or auth/webhook breakage
-- A secret rotation is needed (planned or incident-driven)
-- An agent or developer reports 401/403/connection errors that smell like credential issues
+Use this skill when the task involves secrets, `*_SECRET_REF`, Secret Manager payloads, auth secrets, webhook signing secrets, provider bearer tokens, or PostgreSQL passwords.
 
 ## First reads
 
 Read only what the task needs, in this order:
 
-1. `AGENTS.md` — operational rules
-2. `CLAUDE.md` — project conventions
-3. `project_context.md` — current context
-4. `Handoff.md` — recent changes
-5. `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
-6. `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `<repo>/AGENTS.md`
+- `<repo>/CLAUDE.md`
+- `<repo>/project_context.md`
+- `<repo>/Handoff.md`
+- `<repo>/docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `<repo>/docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `<repo>/docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- `<repo>/docs/operations/ISSUE_OPERATING_MODEL_V1.md`
 
 If the task touches a specific secret family, also read:
 
-- **Webhooks**: `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
-- **Resend email lifecycle**: `docs/operations/runbooks/resend-email-lifecycle-rollout.md`
-- **PostgreSQL**: `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
-- **Past incident**: `docs/issues/resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md`
+- webhooks: `<repo>/docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- Resend email lifecycle: `<repo>/docs/operations/runbooks/resend-email-lifecycle-rollout.md`
+- PostgreSQL passwords: `<repo>/docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- recent incident context: `<repo>/docs/issues/resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md`
 
-Always inspect the real consumers before acting:
+If the secret belongs to Kortex, first read `docs/architecture/kortex/README.md` and the canonical sibling runbook
+`/Users/jreye/Documents/dev/kortex/docs/ops/KORTEX_DEEP_HIBERNATION_RUNBOOK_V1.md`. While Kortex is deeply
+hibernated, that state overrides the normal consumer-verification rule below: do not call Cloud Run endpoints,
+connect to Cloud SQL, run a smoke, deploy, resume queues, or otherwise wake a consumer. Restrict inspection to
+redacted resource configuration and secret metadata; never print the inline sensitive configuration retained by
+the hibernated service. An approved rotation may prepare a new secret version, but mounting, deployment and real
+consumer verification belong to the explicitly approved ordered restart. Record consumer verification as deferred,
+not passed.
 
-- `src/lib/secrets/secret-manager.ts` — canonical resolver with sanitization
-- `src/lib/auth-secrets.ts` — auth secret resolution
-- `src/lib/nubox/client.ts` — Nubox bearer token
+If code is being changed, inspect the real consumers before acting:
 
----
+- `<repo>/src/lib/secrets/secret-manager.ts`
+- `<repo>/src/lib/auth-secrets.ts`
+- `<repo>/src/lib/nubox/client.ts`
+
+## What this skill covers
+
+- auditing Secret Manager and env-backed secrets
+- detecting contamination patterns:
+  - wrapping quotes
+  - literal `\n` / `\r`
+  - leading or trailing whitespace
+  - branch or environment drift
+- classifying risk by consumer:
+  - auth
+  - webhooks
+  - PostgreSQL
+  - third-party providers
+- safe remediations
+- post-rotation verification
+- issue and handoff documentation when secrets break runtime
 
 ## Core rules
 
-1. **Never print raw secret values** into chat, logs, docs, commits, or tests.
-2. **Default to read-only audit.** Do not rotate, update, or delete secrets unless the user explicitly instructs it.
-3. **Runtime sanitization is defense in depth**, not permission to keep dirty payloads at source. Always fix the source.
-4. **Scalar secrets are raw scalars only** — no wrapping quotes, no literal `\n`/`\r`, no residual whitespace.
-5. **Never assume a secret is healthy** just because a new version exists. Verify the real consumer.
-6. **Call out high-risk rotations explicitly** before executing:
+- Never print or paste raw secret values into the chat, logs, docs, commits, or tests.
+- Default to read-only auditing unless the user explicitly wants rotation or source correction.
+- A runtime sanitizer is defense in depth, not permission to keep dirty payloads at source.
+- Treat scalar runtime secrets as raw scalars only:
+  - no wrapping quotes
+  - no literal `\n` / `\r`
+  - no residual whitespace
+- When writing or rotating a scalar secret, prefer:
 
-| Secret | Risk |
-|--------|------|
-| `NEXTAUTH_SECRET` | Invalidates all active sessions. Users must re-login. |
-| `WEBHOOK_*` / signing secrets | Must re-verify HMAC/signature on the real endpoint. |
-| `GREENHOUSE_POSTGRES_*` passwords | Must validate with `pnpm pg:doctor` or a real connection. |
-| `GOOGLE_CLIENT_SECRET` / `AZURE_AD_CLIENT_SECRET` | Can break SSO login for all users. |
-| `NUBOX_*` | Can break finance integrations (invoice download, DTE). |
-| Cloud KMS `auth-server-es256` versions | Retiring/disabling the wrong version breaks verification of in-flight tokens; only via `pnpm auth-server:rotate-key`. |
+```bash
+printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
+```
 
-7. If a secret publication error caused runtime degradation, **document it as `ISSUE-###`** even if the fix also includes defensive code.
+- Never assume a secret is healthy just because a new version exists. Verify the real consumer.
+- High-risk rotations must be called out explicitly:
+  - `NEXTAUTH_SECRET` can invalidate sessions and force re-login
+  - webhook secrets require signature/HMAC verification
+  - PostgreSQL passwords require `pnpm pg:doctor` or a real connection test
+- If a secret publication error caused runtime degradation, document it as `ISSUE-###` even if the fix also includes defensive code.
 
 ### Resend webhook signing secret
 
@@ -101,51 +122,35 @@ For a migration from the legacy AXIS credential: (1) inventory all code, workflo
 ### Auth server signing key (Cloud KMS HSM)
 
 The native authorization server (`services/auth-server`, `TASK-1828` / EPIC-044) signs with `auth-server-es256`
-(EC P-256, HSM) in Cloud KMS `us-east4/auth-server`. The private key NEVER leaves KMS: signing goes through the KMS
-API (CRC32C-checked, mandatory local verification of every signature) and PostgreSQL (`greenhouse_auth.signing_keys`
-+ append-only `signing_key_events`) holds only the PUBLIC JWK (no `d`) and the lifecycle. There is no secret value to
-publish, rotate in Secret Manager, paste or export — a "copy of the key" anywhere is an incident, not a backup.
+(EC P-256, HSM) in Cloud KMS `us-east4/auth-server`. The private key never leaves KMS: signing goes through the
+KMS API and PostgreSQL stores only the public JWK and lifecycle. There is no secret value to publish, copy, export
+or rotate in Secret Manager; finding such a copy is an incident, not a backup.
 
-- Rotation is `pnpm auth-server:rotate-key` (`--status` | `--register <version>` | `--retire <kid> [--force]`):
-  create the new KMS version, register it (it becomes `active`, ≤1 active by partial index; the previous one moves
-  to `retiring` and stays in the JWKS so in-flight tokens still verify), then retire the previous one after the
-  overlap window (≥ 1 h) and `gcloud kms keys versions disable` it. Never `INSERT` into `signing_keys` by hand;
-  never sign with a key that is not `active`; never leave a `retiring` version around indefinitely. The CLI needs
-  the Cloud SQL proxy (`GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`,
-  `GREENHOUSE_POSTGRES_SSL=false`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=""`) and `AUTH_SERVER_KMS_KEY`.
-- Minimum IAM, resource-level only: runtime SA `auth-server@efeonce-group` = `roles/cloudkms.signerVerifier` on the
-  key (+ `cloudsql.client`); deployer `github-actions-deployer@` = `roles/cloudkms.viewer` on the key +
-  `iam.serviceAccountUser` on `auth-server@`. Never grant KMS roles at project level; the deployer never gets
-  `signerVerifier`.
-- Service env vars (`AUTH_SERVER_ENABLED`, `AUTH_SERVER_ISSUER`, `AUTH_SERVER_ALLOWED_HOSTS`, `AUTH_SERVER_KMS_KEY`)
-  live only in `services/auth-server/deploy.sh` (`--set-env-vars`, destructive). Never
-  `gcloud run services update --update-env-vars` by hand. Never share `NEXTAUTH_SECRET` or portal cookies with the
-  issuer — the auth server is its own trust boundary and the portal login does not change.
-- Signals: `auth.signing_keys.lifecycle` (data_quality) and `auth.issuer.jwks_unreachable`. Runbook:
-  `docs/operations/runbooks/auth-server.md`; invariants: `.claude/rules/auth-server.md`.
-
----
+- Rotate only with `pnpm auth-server:rotate-key` (`--status`, `--register <version>`, `--retire <kid> [--force]`).
+  Register the new KMS version, retain the previous public key during the overlap window, then retire and disable
+  the previous version. Never write `greenhouse_auth.signing_keys` manually or leave a retiring version indefinitely.
+- Grant `roles/cloudkms.signerVerifier` only to the runtime service account at key scope. The deployer needs viewer
+  plus service-account-user, not signer access. Never grant these KMS roles at project scope.
+- Runtime key configuration belongs to `services/auth-server/deploy.sh`; do not mutate it ad hoc with
+  `gcloud run services update --update-env-vars`. Runbook: `docs/operations/runbooks/auth-server.md`.
 
 ## Workflow
 
-### Step 1 — Classify the secret family
+1. Identify the secret lane
 
-| Family | Examples | Source of truth |
-|--------|----------|-----------------|
-| **auth** | `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, `AZURE_AD_CLIENT_SECRET` | Secret Manager via `*_SECRET_REF` |
-| **webhook** | `WEBHOOK_NOTIFICATIONS_SECRET`, signing/bypass secrets | Secret Manager via `*_SECRET_REF` |
-| **database** | `GREENHOUSE_POSTGRES_PASSWORD`, `GREENHOUSE_POSTGRES_HOST` | Secret Manager via `*_SECRET_REF` or direct env |
-| **provider** | `NUBOX_BEARER_TOKEN`, `SLACK_*`, `SENTRY_*`, `SCIM_*` | Secret Manager via `*_SECRET_REF` or direct env |
-| **agent** | `AGENT_AUTH_SECRET` | Direct env only |
-| **signing key** | `auth-server-es256` (Cloud KMS HSM) | KMS key version; no secret value exists anywhere |
+- `auth`: `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, `AZURE_AD_CLIENT_SECRET`
+- `webhook`: `WEBHOOK_*`, signing or bypass secrets
+- `database`: `GREENHOUSE_POSTGRES_*`
+- `provider`: Nubox, Slack, Sentry, SCIM, others
+- `signing key`: Cloud KMS HSM lifecycle; no exportable secret value exists
 
-### Step 2 — Confirm the resolution path
+2. Confirm the source of truth
 
-Check whether the consumer resolves from:
-
-1. Secret Manager via `*_SECRET_REF` → `src/lib/secrets/secret-manager.ts` resolves it
-2. Env fallback → `process.env[envVarName]` after Secret Manager miss
-3. Direct env only → no Secret Manager involvement
+- check whether the consumer resolves from:
+  - Secret Manager via `*_SECRET_REF`
+  - env fallback
+  - direct env only
+- inspect the real runtime helper before making assumptions
 
 **Declared ≠ mounted ≠ permitted — three separate things, and a working runtime needs all three.**
 
@@ -163,64 +168,34 @@ accessor binding, but never mounted `RESEND_API_KEY` — and `sendEmail` resolve
 **synchronous** client. Production magic-link email failed for days with `RESEND_API_KEY is not
 configured`. `services/ops-worker/deploy.sh` works because it mounts it.
 
-Inspect the canonical resolver:
+3. Audit without exposing values
 
-```typescript
-// src/lib/secrets/secret-manager.ts
-// normalizeSecretValue() strips:
-//   - wrapping quotes (single or double)
-//   - literal \n / \r suffixes
-//   - leading/trailing whitespace
-```
+- detect whether the payload shape is likely contaminated
+- compare source hygiene across affected environments
+- classify the blast radius by consumer and environment
 
-### Step 3 — Audit without exposing values
+4. Choose the smallest safe remediation
 
-Detect contamination patterns without printing the actual value:
+- source-only correction in Secret Manager
+- defensive code hardening in the canonical resolver
+- both, if source correction alone is not enough to prevent recurrence
 
-```bash
-# Check if payload has wrapping quotes (DO NOT print the value)
-gcloud secrets versions access latest --secret=<secret-id> | wc -c
-# Compare expected length vs actual — extra bytes = likely contamination
-```
+5. Verify the real consumer
 
-Contamination patterns to detect:
-- `"value"` or `'value'` — wrapping quotes
-- `value\n` — literal newline suffix
-- ` value ` — leading/trailing whitespace
-- Value differs across `staging` vs `production` unexpectedly
+- auth:
+  - `/api/auth/providers`
+  - `/api/auth/session`
+- webhooks:
+  - signature/HMAC verification path
+  - live or staging consumer endpoint
+- PostgreSQL:
+  - `pnpm pg:doctor`
+  - or a real connection through the intended profile
+- provider secrets:
+  - the actual API route or integration request that was failing
 
-### Step 4 — Choose the smallest safe remediation
-
-**Option A — Source-only correction** (preferred when the payload is clearly wrong):
-
-```bash
-printf %s "$CLEAN_VALUE" | gcloud secrets versions add <secret-id> --data-file=-
-```
-
-**Option B — Defensive code hardening** (when source correction alone doesn't prevent recurrence):
-- Strengthen `normalizeSecretValue()` in `src/lib/secrets/secret-manager.ts`
-- Add test coverage in `src/lib/secrets/secret-manager.test.ts`
-
-**Option C — Both** (when a real incident occurred):
-- Fix source + harden code + document as ISSUE
-
-### Step 5 — Verify the real consumer
-
-After any change, verify the actual endpoint or integration that uses the secret:
-
-| Family | Verification |
-|--------|-------------|
-| **auth** | `pnpm staging:request /api/auth/providers --pretty` → 200 AND `pnpm staging:request /api/auth/session --pretty` → 200 |
-| **webhook** | Trigger a real webhook event or verify HMAC signature on the endpoint |
-| **database** | `pnpm pg:doctor` or `pnpm pg:connect` |
-| **provider (Nubox)** | `pnpm staging:request /api/finance/income --pretty` → 200 |
-| **provider (other)** | Hit the actual API route that uses the secret |
-
-For production verification:
-```bash
-curl -s https://greenhouse.efeoncepro.com/api/auth/providers | head -c 100
-curl -s https://greenhouse.efeoncepro.com/api/auth/session | head -c 100
-```
+For Kortex, skip this step while its canonical state is `hibernated`; use only the non-waking evidence allowed by
+the Kortex deep-hibernation boundary above and defer runtime verification until an approved restart.
 
 **`gcloud secrets versions access` is not verification.** It proves the payload exists and is clean in
 Secret Manager; it says nothing about whether the runtime that needs it can see it. Exercise the **real
@@ -228,38 +203,21 @@ consumer** and read its own observable evidence — the delivery ledger row, the
 downstream write — not the store. In a runtime that is new to that secret, this is the only step that
 catches a declared-but-unmounted ref.
 
-### Step 6 — Close the loop in docs
+6. Close the loop in docs
 
-| What changed | Where to document |
-|-------------|-------------------|
-| Runtime behavior or workflow | `changelog.md` |
-| Matters to next agent | `Handoff.md` |
-| Contract or operating rule changed | `project_context.md` |
-| Real incident (runtime degradation) | `docs/issues/open/ISSUE-###-*.md` (follow ISSUE protocol in CLAUDE.md) |
-
----
-
-## Contamination cheat sheet
-
-| Pattern | Example | Fix |
-|---------|---------|-----|
-| Wrapping double quotes | `"my-secret-value"` | `printf %s 'my-secret-value' \| gcloud secrets versions add ...` |
-| Wrapping single quotes | `'my-secret-value'` | Same — strip quotes at source |
-| Literal `\n` suffix | `my-secret-value\n` | Re-publish without trailing newline |
-| Literal `\r\n` | `my-secret-value\r\n` | Re-publish clean |
-| Whitespace padding | ` my-secret-value ` | Re-publish trimmed |
-| JSON-serialized string | `"\"my-secret-value\""` | Re-publish as raw scalar |
-
----
+- `Handoff.md` if the change matters to the next agent
+- `changelog.md` if runtime behavior or workflow changed
+- `project_context.md` if the contract or operating rule changed
+- `docs/issues/*` when the failure was a real incident
 
 ## Output expectations
 
 When using this skill, report:
 
-1. **Which secret family** is affected
-2. **Root cause**: source contamination, env drift, consumer bug, or mix
-3. **What was changed** (source, code, or both)
-4. **What consumer was verified** and the exact verification command/result
-5. **Residual risk**, if any
+- which secret family is affected
+- whether the root cause is source contamination, env drift, consumer bug, or a mix
+- what was changed
+- what exact consumer was verified
+- what residual risk remains, if any
 
-Keep reports concise and operational. No theory — just findings, actions, and verification.
+Prefer concise, operational language over long theory.

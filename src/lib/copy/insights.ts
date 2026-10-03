@@ -24,13 +24,48 @@ export interface InsightModuleCopy {
   readonly title: string
   /** Etiqueta corta, para lámina y marginalia. */
   readonly label: string
+  /** Nombre dentro del título de un informe que junta módulos («Visibilidad orgánica y respuestas de IA»). */
+  readonly inTitle: string
+  /** TASK-1962 — nombre de navegación y filtro del informe web («SEO», «Respuestas de IA»). */
+  readonly navLabel: string
 }
 
 export const GH_INSIGHTS = {
+  /**
+   * Alcance del informe en la portada (chips): servicio o módulo que cubre. Lo elige quien compone el encargo
+   * (`request.scope`); sin elección, se deriva de los módulos. Ícono y línea en `presentation/scope-catalog.ts`.
+   */
+  /** Nombre accesible de cada marca de producto (texto alternativo del lockup oficial). */
+  productMarks: {
+    sv360: 'Efeonce Search Visibility 360',
+    aeo: 'Efeonce AEO',
+    aeo_assessment: 'Efeonce AEO Assessment',
+    ai_visibility_report: 'Efeonce AI Visibility Report',
+    insights: 'Efeonce Insights'
+  } as Readonly<Record<string, string>>,
+
+  scopeChips: {
+    seo: 'SEO',
+    aeo: 'Respuestas de IA',
+    ico: 'Entrega creativa',
+    creative: 'Servicios creativos',
+    design: 'Diseño',
+    content: 'Contenido',
+    performance: 'Performance',
+    paid_social: 'Paid social',
+    social: 'Redes sociales',
+    revenue: 'Revenue',
+    crm: 'CRM',
+    email: 'Email marketing',
+    automation: 'Automatización',
+    web: 'Web',
+    analytics: 'Analítica'
+  } as Readonly<Record<string, string>>,
+
   modules: {
-    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica' },
-    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta' },
-    ico: { title: 'Entrega y cumplimiento', label: 'Entrega' }
+    seo: { title: 'Visibilidad orgánica', label: 'Visibilidad orgánica', inTitle: 'visibilidad orgánica', navLabel: 'SEO' },
+    aeo: { title: 'Visibilidad en motores de respuesta', label: 'Motores de respuesta', inTitle: 'respuestas de IA', navLabel: 'Respuestas de IA' },
+    ico: { title: 'Entrega y cumplimiento', label: 'Entrega', inTitle: 'entrega y cumplimiento', navLabel: 'Entrega' }
   } satisfies Record<InsightModule, InsightModuleCopy>,
 
   /**
@@ -39,6 +74,74 @@ export const GH_INSIGHTS = {
    * Se redactan como hecho, nunca como disculpa ni como error del lector: el límite es información
    * del informe, no una falla que reportar.
    */
+  /**
+   * TASK-1957 — límites EN LENGUAJE DEL LECTOR. Un límite dice qué no trae la edición, sin exponer el diagnóstico del
+   * adapter (que sigue completo en la evidencia sellada) ni sonar a falla: «la fuente no sirve esta ventana» nos dejaba
+   * mal frente al cliente (revisión del operador, 2026-10-02). Una línea por tema; si falta el período actual, la línea
+   * de comparación no se agrega.
+   */
+  /** TASK-1957 — título de la figura por familia de indicador AEO (en vez de «Motores de respuesta · Porcentaje»). */
+  aeoFamilyTitles: {
+    mention_rate: 'Mención por motor (% de respuestas)',
+    sov: 'Share of Voice frente a competidores',
+    single: 'Share of Model y citas a tu sitio',
+    // TASK-1962 — lo que el Grader ya mide y el informe no usaba.
+    cited_source: 'Sitios que más citan los motores',
+    source_type: 'Tipo de fuente que citan los motores',
+    sentiment: 'Cómo hablan de la marca los motores',
+    // TASK-1962 — visitas desde asistentes de IA (GA4), por asistente.
+    ai_source: 'Visitas desde cada asistente de IA',
+    // TASK-1962 — visitas orgánicas al sitio (GA4), en el capítulo de búsqueda.
+    site: 'Visitas orgánicas al sitio'
+  } as Readonly<Record<string, string>>,
+
+  /** TASK-1962 — población de los hechos de GA4 (trazabilidad del snapshot; no se imprime como cifra). */
+  ga4: {
+    organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
+    aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
+    tableTitle: { seo: 'Visitas al sitio desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
+    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.'
+  },
+
+  /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
+  aeoSourceTypes: {
+    news: 'Medios de noticias',
+    earned: 'Menciones ganadas',
+    social: 'Redes sociales',
+    marketplace: 'Marketplaces',
+    directory: 'Directorios',
+    owned: 'Sitios propios',
+    review: 'Sitios de reseñas',
+    forum: 'Foros',
+    unknown: 'Sin clasificar'
+  } as Readonly<Record<string, string>>,
+  aeoSentiments: { positive: 'Positivas', neutral: 'Neutras', negative: 'Negativas', mixed: 'Mixtas' } as Readonly<Record<string, string>>,
+  aeoFindings: {
+    topSource: 'El sitio más citado por los motores es',
+    citations: 'citas',
+    of: 'de',
+    sourceTypeLead: 'Los motores citan más',
+    sourceTypeThan: 'que',
+    sourceTypeOnly: 'Lo que más citan los motores son',
+    sentimentLead: 'De',
+    sentimentEvaluated: 'respuestas evaluadas',
+    sentimentPositive: 'son positivas y',
+    sentimentNegative: 'negativas',
+    sovLeader: 'concentra el',
+    sovOfMentions: 'de las menciones; tu marca, el',
+    sovBrandLeads: 'Tu marca lidera las menciones frente a competidores con el',
+    tableTitle: 'De dónde sale lo que dicen los motores',
+    tableLead: 'Los sitios que más citan los motores, el tipo de fuente y el tono de las respuestas.'
+  },
+
+  readerLimits: {
+    outOfScope: 'no forma parte de esta edición',
+    noComparison: 'sin comparación con el período anterior en esta edición',
+    insufficientData: 'sin datos suficientes en este período',
+    /** TASK-1962 — una fuente que el cliente todavía no conectó (la petición del plan lo pide). */
+    notConnected: 'falta conectar la fuente'
+  },
+
   rejections: {
     unsupported_window: 'la fuente no sirve esta ventana con exactitud',
     method_mismatch: 'la metodología disponible no es comparable',
@@ -56,13 +159,26 @@ export const GH_INSIGHTS = {
    * el límite habla del módulo: un identificador interno (`rank`, `gsc`) nunca llega al documento.
    */
   metrics: {
+    // TASK-1957 — indicadores de visibilidad en motores de respuesta con su nombre estándar (skill seo-aeo §07 y el
+    // informe público del Grader): Share of Model, Share of Voice competitivo y citation share.
+    share_of_model: 'Share of Model',
+    share_of_voice: 'Share of Voice',
+    'sov.brand': 'Tu marca',
+    citation_share: 'Respuestas que citan tu sitio',
     gsc: 'Search Console',
+    ga4: 'Google Analytics 4',
+    'site.organic_sessions': 'Visitas orgánicas al sitio',
+    'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
+    ai_sessions: 'Visitas desde asistentes de IA',
+    'driver.query': 'Consultas que más cambiaron',
+    'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
     organic_etv: 'Tráfico orgánico estimado',
     overall_score: 'Puntaje de visibilidad en IA',
     rpa: 'Rondas de revisión por pieza',
     otd: 'Entregas a tiempo',
-    ftr: 'Primera entrega correcta'
+    ftr: 'Primera entrega correcta',
+    'delivered.completed': 'Piezas entregadas'
   } as Readonly<Record<string, string>>,
 
   /**
@@ -115,7 +231,41 @@ export const GH_INSIGHTS = {
     lineTitle: 'evolución mensual',
     targetLabel: 'Meta',
     previousLabel: 'Período anterior',
-    currentLabel: 'Período'
+    currentLabel: 'Período',
+    /** TASK-1962 — «¿por qué cambió?»: figuras y tablas de las consultas y páginas que más movieron los clics. */
+    driversQueryTitle: 'Consultas que más movieron los clics',
+    driversPageTitle: 'Páginas que más movieron los clics',
+    driversQueryColumn: 'Consulta',
+    driversPageColumn: 'Página',
+    driversTableTitle: 'Consultas y páginas que más movieron los clics',
+    driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
+    driversEntityColumn: 'Consulta o página',
+    driversRestLabel: 'Resto de consultas',
+    driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
+    previousTotal: 'Período anterior',
+    currentTotal: 'Este período',
+    weeklyTitle: 'Clics orgánicos por semana',
+    weeklyLead: 'Los clics por semana',
+    weeklyPrevious: 'En el período anterior, de'
+  },
+
+  /**
+   * TASK-1962 — plan de acción determinista desde la cola SEO (sólo orígenes propios) y peticiones al cliente. Las cifras
+   * que se citan son hechos del snapshot (impresiones y posición medidas, posición objetivo, techo estimado).
+   */
+  plan: {
+    verbs: { optimize: 'Optimizar', create: 'Crear contenido para', consolidate: 'Consolidar las páginas que compiten por', measure: 'Medir' } as Readonly<Record<string, string>>,
+    in: 'en',
+    inHome: 'en la página de inicio',
+    isAt: 'está en',
+    with: 'con',
+    impressions: 'impresiones',
+    atTarget: 'en la posición',
+    wouldAdd: 'sumaría hasta',
+    clicks: 'clics',
+    connectSearchConsole: 'Darnos acceso a Google Search Console del sitio para medir clics, impresiones y posiciones.',
+    connectGa4: 'Darnos acceso de lectura a Google Analytics 4 del sitio para medir las visitas que llegan desde buscadores y asistentes de IA.',
+    connectBoth: 'Darnos acceso a Google Search Console y de lectura a Google Analytics 4 del sitio para medir clics, posiciones y las visitas que llegan desde buscadores y asistentes de IA.'
   },
 
   /**
@@ -123,6 +273,10 @@ export const GH_INSIGHTS = {
    * contra su meta o su período anterior. NUNCA una causa ni una explicación: eso no está en la evidencia.
    */
   reading: {
+    // TASK-1962 — de qué asistente de IA llegan las visitas (GA4). Las cifras las pone el planner desde los hechos.
+    aiTopSourceMost: 'trae la mayoría de las visitas desde asistentes de IA:',
+    aiTopSource: 'es el asistente de IA que más visitas trae:',
+    of: 'de',
     aboveTarget: 'sobre la meta de',
     belowTarget: 'bajo la meta de',
     atTarget: 'en la meta de',
@@ -139,6 +293,13 @@ export const GH_INSIGHTS = {
     highest: 'La cifra más alta es',
     outOf: 'de',
     previousPeriod: 'período anterior',
+    /** TASK-1962 — nota de una figura con una escala por métrica (modelo web 1.3, `chart.note`). */
+    ownScaleNote: 'Cada métrica en su propia escala: compara cada par actual contra anterior, no entre métricas.',
+    /** TASK-1962 — hallazgos de descomposición: dicen DÓNDE cambió, nunca por qué. */
+    driverQueryLead: 'La consulta que más cambió fue',
+    driverPageLead: 'La página que más cambió fue',
+    clicksWord: 'clics',
+    homePage: 'Página de inicio',
     variation: 'variación',
     againstPrevious: 'Contra el período anterior',
     rose: 'subió',
@@ -160,12 +321,24 @@ export const GH_INSIGHTS = {
     changedMany: 'cambiaron',
     and: 'y',
     // Un superlativo exige un máximo ÚNICO; con empate se dice el empate (revisión de 1846, 2026-09-25).
-    allEnginesMention: 'Todos los motores mencionan la marca en',
+    // TASK-1957 — «Todos los motores mencionan la marca en 2 de 6» se leía como contradicción: la proporción es por motor.
+    allEnginesMention: 'La marca aparece en',
+    allEnginesMentionTail: 'consultas en cada motor',
     mostMentionsTied: 'son los motores que más mencionan la marca',
     severalEnginesShare: 'Varios motores comparten la mención más alta',
     allDimensions: 'Todas las dimensiones marcan',
     bestDimensionsTied: 'Las dimensiones mejor evaluadas son',
     severalDimensionsShare: 'Varias dimensiones comparten la mejor evaluación',
+    // TASK-1957 — antes del genérico «Varias… comparten», se nombra a los empatados en corto («Claridad de entidad y
+    // participación frente a competencia lideran con 100.»): un número sin dueño no le dice nada al cliente.
+    leadWith: 'lideran con',
+    // TASK-1957 — base de un indicador AEO porcentual: «33,3 % (8 de 24 respuestas)». Un % sin su base no se puede leer.
+    answersNoun: 'respuestas',
+    /** TASK-1962 — el Share of Voice se mide sobre menciones (marca + competidores), no sobre respuestas. */
+    mentionsNoun: 'menciones',
+    // TASK-1957 — tasa de mención igual en todos los motores: una frase con el porcentaje y su base.
+    allRatesPrefix: 'La marca aparece en el',
+    allRatesTail: 'de las respuestas de cada motor',
     allEqual: 'Todas las cifras de la figura son',
     highestTied: 'Las cifras más altas son',
     severalShare: 'Varias cifras comparten el valor más alto'
@@ -184,10 +357,15 @@ export const GH_INSIGHTS = {
 
   tieSubjects: {
     presence: 'Presencia por motor',
+    mention_rate: 'Mención por motor',
+    sov: 'Share of Voice',
     dimension: 'Dimensiones evaluadas'
   } as Readonly<Record<string, string>>,
 
   metricSubjects: {
+    share_of_model: { subject: 'El Share of Model', plural: false },
+    citation_share: { subject: 'Las respuestas que citan tu sitio', plural: true },
+    'sov.brand': { subject: 'El Share of Voice de tu marca', plural: false },
     clicks: { subject: 'Los clics orgánicos', plural: true },
     impressions: { subject: 'Las impresiones', plural: true },
     ctr: { subject: 'El CTR', plural: false },
@@ -197,7 +375,11 @@ export const GH_INSIGHTS = {
     overall_score: { subject: 'El puntaje de visibilidad en IA', plural: false },
     otd: { subject: 'Las entregas a tiempo', plural: true },
     ftr: { subject: 'La primera entrega correcta', plural: false },
-    rpa: { subject: 'Las rondas de revisión por pieza', plural: true }
+    rpa: { subject: 'Las rondas de revisión por pieza', plural: true },
+    'delivered.completed': { subject: 'Las piezas entregadas', plural: true },
+    'site.organic_sessions': { subject: 'Las visitas orgánicas al sitio', plural: true },
+    'site.organic_engaged_sessions': { subject: 'Las visitas orgánicas con interacción', plural: true },
+    ai_sessions: { subject: 'Las visitas desde asistentes de IA', plural: true }
   } as Readonly<Record<string, { subject: string; plural: boolean }>>,
 
   /**
@@ -206,10 +388,14 @@ export const GH_INSIGHTS = {
    */
   sources: {
     gsc_window_aggregate: 'Google Search Console',
-    dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
-    dataforseo_etv: 'estimación de tráfico orgánico',
-    ai_visibility_grader: 'análisis de visibilidad en motores de respuesta',
-    ico_engine_monthly: 'métricas mensuales de entrega'
+    seo_work_queue: 'cola de trabajo SEO priorizada',
+    gsc_window_movers: 'Google Search Console',
+    dataforseo_serp_rank: 'posiciones en buscadores',
+    dataforseo_etv: 'tráfico orgánico estimado',
+    // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.
+    ai_visibility_grader: 'Efeonce AEO Assessment',
+    ico_engine_monthly: 'métricas mensuales de entrega',
+    ga4_channel_sessions: 'Google Analytics 4'
   } as Readonly<Record<string, string>>,
 
   /** Unidad legible de una figura (por `EvidenceUnit`). La unidad cruda (`count`) nunca llega al documento. */

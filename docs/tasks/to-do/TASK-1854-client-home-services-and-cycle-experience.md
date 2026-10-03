@@ -1,5 +1,11 @@
 # TASK-1854 — Inicio y Mis servicios: resultados, avance y próximos pasos
 
+## Delta 2026-10-02
+
+- **Absorbida por `TASK-1967` como hija G** (decisión del operador del 2026-10-02). Conserva su ID, EPIC-046, sus bloqueos `TASK-1852`/`TASK-1853` y su alcance de «Mis servicios».
+- La dirección visual del 2026-09-09 queda reemplazada por el artboard aprobado `Cliente.dc.html` del canvas https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU: saludo con Spark rig y composer de Nexa que abre la conversación debajo, panel «Rendimiento de tu servicio» que cambia entre creativo (ICO + entregas semanales) y SEO/AEO (citas en IA, tráfico orgánico, posiciones de valor, indexación, presencia por motor de IA), Tu foco hoy del ciclo, entregas recientes, novedades como venta cruzada, tu equipo Efeonce y próximos hitos. Wireframe, flow, motion y visual-direction de esta task deben rehacerse contra ese artboard antes de pasar a `UI ready: yes`.
+- Nuevos bloqueos dentro del programa: `TASK-1968` (seguridad de la Home actual: posible fuga en `loadHomeAiInsightsBento`, enlaces `/admin` del pulse-strip, costo/margen en `account-summary`), `TASK-1969` (chrome + saludo con Elio y composer de Nexa) y `TASK-1970` (API de la Home por rol, incluye los bloques cliente vía client-portal). La mezcla de servicios sale de los módulos asignados (`creative_hub_globe_v1`, `seo_v2`, `ai_visibility_v1`), nunca de `session.businessLines`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,10 +27,10 @@
 - Motion: `docs/ui/motion/TASK-1854-client-home-services-and-cycle-experience-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-046`
-- Status real: `Diseño UI detallado 2026-09-09: dirección, wireframe, flow y motion; pendiente integración, primer fold y GVC; sin implementación ni rollout`
+- Status real: `Absorbida por TASK-1967 como hija G (2026-10-02); dirección visual reemplazada por el canvas aprobado; wireframe, flow y motion por rehacer; sin implementación ni rollout`
 - Rank: `3`
 - Domain: `platform|ui|delivery`
-- Blocked by: `TASK-1852, TASK-1853`
+- Blocked by: `TASK-1852, TASK-1853, TASK-1968, TASK-1969, TASK-1970`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -1,0 +1,65 @@
+{
+  "kind": "ai-inpaint-video",
+  "pipelineVersion": 1,
+  "runId": "8d3283ea473c",
+  "key": "8d3283ea473cbb8fa7da22ccb46a983e0ffa5b3b9a1453f75add3188cd97547f",
+  "status": "completed",
+  "createdAt": "2026-10-02T21:19:20.971Z",
+  "inputs": {
+    "video": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/clip.mp4",
+    "videoSha256": "e6532bb8a30470572411641c1465cab3aabc428d834c6835a71728b3e22ec57e",
+    "probe": {
+      "width": 1280,
+      "height": 852,
+      "fpsFraction": "24/1",
+      "fps": 24,
+      "durationSeconds": 5,
+      "frames": 120,
+      "hasAudio": false,
+      "codec": "h264",
+      "sizeBytes": 26331806
+    },
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/clip-mask.png",
+    "maskFingerprintSha256": "7b31b24deaade4960c92a2eb69ca0c02e891772fe6fc3f15164346669681fbdc",
+    "staticMask": true
+  },
+  "engine": {
+    "id": "flux3-edit",
+    "slug": "blackforestlabs/flux-3/edit-video",
+    "verifiedAt": null
+  },
+  "strategy": "edit-recompose",
+  "request": {
+    "prompt": "Add a small green potted plant in a matte terracotta pot standing on the empty left side of the wooden desk, lit by the soft window light from the right. Keep the camera locked and everything else unchanged.",
+    "frameTime": null
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "5 s × USD 0.03/s · precio publicado"
+  },
+  "frames": {
+    "original": 120,
+    "engine": 121,
+    "reconciled": "dropped-last"
+  },
+  "alignment": {
+    "sampledFrames": 12,
+    "medianProtectedDrift": 11.164,
+    "maxDrift": 12
+  },
+  "verification": {
+    "framesChecked": 120,
+    "protectedMaxDelta": 0,
+    "verdict": "PASS",
+    "worstFrame": null
+  },
+  "temporal": {
+    "flickerIndex": 3.898,
+    "editedMeanDelta": 22.808
+  },
+  "outputs": {
+    "final": "final.mp4",
+    "engineRaw": "engine-raw.mp4",
+    "contactSheet": "contact-sheet.png"
+  }
+}

@@ -54,6 +54,18 @@ const FORMATOS = {
     zonaTexto: ({ muro, tinta }) =>
       `TEXT SPACE (planned, essential): the LEFT 42% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
   },
+  // Horizontal de pauta para IMAGEN (2026-10-02): Meta la recomienda en columna derecha y es la única horizontal en
+  // búsqueda de Facebook; LinkedIn la recomienda a 1200×628. 16:9 sólo es la recomendada de video in-stream. Se genera
+  // a 2048×1072 (1,91:1 exacto con lados múltiplos de 16). SIN VALIDAR: el lecho hereda el 16 % del 16:9.
+  '1.91:1': {
+    size: '2048x1072',
+    declara: 'HORIZONTAL 1.91:1 composition for feed and link ads.',
+    lecho: '16%',
+    limite: 'All people and objects stay entirely inside the RIGHT 54% of the frame.',
+    sinValidar: true,
+    zonaTexto: ({ muro, tinta }) =>
+      `TEXT SPACE (planned, essential): the LEFT 44% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
+  },
   // Gran formato horizontal (letrero caminero 12 × 4 m). SIN VALIDAR: el lecho hereda el 16 % del 16:9
   // hasta medir una ronda nativa 3:1. Doctrina OOH en construcción (2026-09-26).
   '3:1': {
@@ -383,42 +395,43 @@ export const PERSONAS = {
   // cámara a ~2 m a la altura del pecho y 85 mm. Identidades APROBADAS por el operador el 2026-09-29 sobre la ronda
   // piloto `ai-generations/2026-09-29_manzanitas-equipo/` (roster: `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`).
   // Luis salió del equipo (operador, 2026-09-29): ya no está en `PERSONAS`.
+  // Delta 2026-10-02 (operador): la referencia de identidad pasa a ser el AVATAR con la bomber (maestro 1080 publicado,
+  // `avatar-bomber-2026-09.png`); las fotos anteriores (`actual`, `antiguo`) quedan descartadas como referencia. La
+  // ropa sigue saliendo del kit de la línea, no de la referencia.
   andres: {
     etiqueta: 'Andrés',
     identity:
       'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.',
-    // La foto ACTUAL (con el hoodie, carpeta squad) va primera; el retrato antiguo suma detalle del rostro.
-    refs: ['ai-generations/_identidad-equipo/andres/actual.png', 'ai-generations/_identidad-equipo/andres/antiguo.png'],
-    cuerpo: 'ai-generations/_identidad-equipo/andres/actual.png'
+    refs: ['ai-generations/_identidad-equipo/andres/avatar-bomber-2026-09.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/andres/avatar-bomber-2026-09.png'
   },
   daniela: {
     etiqueta: 'Daniela',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.',
-    refs: ['ai-generations/_identidad-equipo/daniela/actual.png', 'ai-generations/_identidad-equipo/daniela/antiguo.png'],
-    cuerpo: 'ai-generations/_identidad-equipo/daniela/actual.png'
+    refs: ['ai-generations/_identidad-equipo/daniela/avatar-bomber-2026-09.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/daniela/avatar-bomber-2026-09.png'
   },
   humberly: {
     etiqueta: 'Humberly',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
-    refs: ['ai-generations/_identidad-equipo/humberly/antiguo.jpg'],
-    cuerpo: 'ai-generations/_identidad-equipo/humberly/antiguo.jpg'
+    refs: ['ai-generations/_identidad-equipo/humberly/avatar-bomber-2026-09.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/humberly/avatar-bomber-2026-09.png'
   },
   melkin: {
     etiqueta: 'Melkin',
-    // Sólo la foto ACTUAL (squad): el retrato antiguo lo muestra con el pelo largo amarrado, que ya no lleva.
     identity:
       'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.',
-    refs: ['ai-generations/_identidad-equipo/melkin/actual.png'],
-    cuerpo: 'ai-generations/_identidad-equipo/melkin/actual.png'
+    refs: ['ai-generations/_identidad-equipo/melkin/avatar-bomber-2026-09.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/melkin/avatar-bomber-2026-09.png'
   },
   valentina: {
     etiqueta: 'Valentina',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
-    refs: ['ai-generations/_identidad-equipo/valentina/actual.png'],
-    cuerpo: 'ai-generations/_identidad-equipo/valentina/actual.png'
+    refs: ['ai-generations/_identidad-equipo/valentina/avatar-bomber-2026-09.png'],
+    cuerpo: 'ai-generations/_identidad-equipo/valentina/avatar-bomber-2026-09.png'
   }
 }
 
@@ -435,6 +448,26 @@ const DIMENSIONES_DE_IDENTIDAD = [
   { campo: 'expresion', mapa: 'expresiones', deCuerpo: null, etiqueta: 'Expresiones' },
   { campo: 'vestuario', mapa: 'vestuario', deCuerpo: 'vestuarioDeCuerpo', etiqueta: 'Vestuarios' }
 ]
+
+// Casting de campaña [operador, 2026-10-02]: un personaje ficticio que aparece en varias piezas o formatos de una
+// campaña se declara en la ficha con su set de casting (rostro y cuerpo de calidad, construidos desde la pieza
+// aprobada) y se pide en `identidad` igual que una persona del roster. Sin esto, cada formato regeneraba la escena sin
+// ancla y el modelo hacía un casting nuevo: en CMP-004 la protagonista de S03 envejeció en 9:16 y cambió en 1:1.
+// Forma: `"casting": { "<clave>": { "etiqueta": "…", "identity": "IDENTITY (critical): …", "refs": ["ruta", …], "cuerpo": "ruta" } }`.
+export function castingDeFicha(ficha, clave) {
+  const c = ficha?.casting?.[clave]
+
+  if (!c) return undefined
+  if (PERSONAS[clave]) throw new Error(`El casting "${clave}" choca con una identidad canónica del roster: usa otra clave.`)
+
+  if (typeof c.identity !== 'string' || !/^IDENTITY \(critical\):/.test(c.identity)) {
+    throw new Error(`El casting "${clave}" necesita \`identity\` que empiece con «IDENTITY (critical):» y describa la cara sin envejecerla.`)
+  }
+
+  if (!Array.isArray(c.refs) || !c.refs.length) throw new Error(`El casting "${clave}" necesita al menos una referencia en \`refs\`.`)
+
+  return { etiqueta: c.etiqueta ?? clave, identity: c.identity, refs: c.refs, ...(c.cuerpo ? { cuerpo: c.cuerpo } : {}) }
+}
 
 function resolverIdentidad(ficha) {
   const pedidas = ficha.identidad ?? []
@@ -462,10 +495,13 @@ function resolverIdentidad(ficha) {
     // Una entrada puede ser "julio" (vista frontal), { persona: 'julio', vista: 'perfil-izq' },
     // { persona: 'nexa', expresion: 'the-read' } o { persona: 'nexa', vestuario: 'speaker-1' }.
     const clave = typeof pedido === 'string' ? pedido : pedido?.persona
-    const persona = PERSONAS[clave]
+    const persona = PERSONAS[clave] ?? castingDeFicha(ficha, clave)
 
     if (!persona) {
-      throw new Error(`Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}.`)
+      throw new Error(
+        `Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}. ` +
+          'Para un personaje ficticio de campaña, declara su set en `casting` de la ficha.'
+      )
     }
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])

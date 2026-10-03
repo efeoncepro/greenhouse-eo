@@ -322,3 +322,82 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
 - **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. `delta-tone` = direction, not judgment.
 - **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
   visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).
+
+
+## Client-fit presentation (TASK-1957 — code complete local 2026-10-02)
+
+- `InsightWebModelV1` **1.2** (aditivo): `InsightWebFactV1.source` = nombre legible (vocabulario común con el PDF;
+  hasta 1.1 viajaba la tabla lectora), `unitLabel`, `asOfLabel`; `InsightWebChartV1.unitLabel`;
+  `InsightWebClaimV1.role` (`finding`|`backing`, sólo en claims de capítulo de planes nuevos).
+- `PlanClaimV1.role` opcional; planes congelados antes de TASK-1957 no lo traen y se renderizan como antes.
+- Límites: `GH_INSIGHTS.readerLimits` (`outOfScope`, `noComparison`, `insufficientData`); `GH_INSIGHTS.rejections`
+  queda como vocabulario de diagnóstico interno y el gate lo trata como prohibido en límites.
+- Gate `clientFitViolations({ model, reportTitle, facts })`: reglas `internal_identifier`, `raw_unit_code`,
+  `raw_iso_date`, `internal_limit_wording`, `duplicated_limit`, `chart_without_information`,
+  `count_without_denominator`, `rank_as_bars_from_zero`, `shared_axis_incomparable` (magnitudes ≥10× en un eje sin
+  `scale.perDimension`). Claves estructurales (ids, `unit`, `asOf`, `spec.data`,
+  `spec.tabularEquivalent`…) no se leen como texto. Emitir una edición cliente con violaciones ⇒ `409 not_ready`
+  con `details.reason = client_fit` y hasta 20 violaciones.
+
+- **AEO evidence v2** (`aeo_report_adapter_v2`, TASK-1957 Slice 6): `mention_rate.<provider>` (percent, num = present,
+  den = resolved, `channelId`), `share_of_model` (percent over all measured engines), `sov.brand` /
+  `sov.competitor.<slug>` (percent of total mentions, `buildCompetitiveBenchmark`, top 5 competitors) and
+  `citation_share` (percent of answers with citations that cite the own site). No competitors ⇒ rejection
+  `share_of_voice`/`insufficient_data`. `presence.*` is only read from snapshots sealed before v2.
+- Planner: AEO percent facts group by family (`mention_rate`, `sov`, `single`); `single` never charts; headline
+  metrics (`share_of_model`, `sov.brand`, `citation_share`) are always `finding`.
+- No competitors and `competitive_sov` scored > 0 ⇒ neither `dimension.competitive_sov` nor `overall_score` is emitted
+  (the Grader weights that dimension 15 % of the global); rejection `overall_score`/`insufficient_data`.
+- `ChartScaleV1.perDimension` (aditivo, 1.2): distinct metrics of one channel, each with its previous period, are ONE
+  `bar_grouped` figure read row by row on its own scale (the PDF «comparison» page already did this; Think must honor
+  it, TASK-1958). Magnitude bands apply only to shared-axis charts; a one-figure band is never a chart. Score readings
+  rank last for the summary thesis and essentials.
+
+## Portada y alcance por servicio (TASK-1957, 2026-10-02)
+
+- `request.scope?: InsightScopeKey[]` (≤4, sin repetir): alcance que muestra la portada, del catálogo
+  `presentation/scope-catalog.ts` (seo, aeo, ico, creative, design, content, performance, paid_social, social, revenue,
+  crm, email, automation, web, analytics). Cada clave trae etiqueta (`GH_INSIGHTS.scopeChips`), glifo Trazo de AXIS y
+  línea de marca. Sin `scope` el hash no cambia y los chips se derivan de `modules`. `get_insights_catalog` lista los
+  alcances. Un alcance nuevo = entrada en el catálogo + etiqueta; el test exige que el glifo exista en AXIS.
+- Cabecera compartida: `header.scopeChips` (Think los dibuja con `/branding/icons/trazo-<glyph>-dark.svg`, exportados
+  con `pnpm insights:think-icons`; nunca a mano).
+- Modelo web 1.2 suma `metricId`, `comparisonFactId` por hecho y `figure {display, direction, kind: change|level}` por
+  frase de resumen/esencial (cambio sólo si la frase lo dice; si no, el valor citado).
+- Portada con UNA fecha (el período); el título por defecto no lleva período (`defaultReportTitle(modules)`).
+- El adapter AEO lee el análisis que TERMINÓ dentro de la ventana, del mercado principal
+  (`readClientGraderReport({ finishedWithin })` → `getLatestClientGraderRunInWindow`).
+- **Submarcas de producto** (`presentation/product-marks.ts`, línea gráfica «La órbita», aprobadas 2026-09-29): cada
+  capítulo con producto trae `chapter.productMark {key, label}` (`seo`→`sv360`, `aeo`→`aeo`; ICO no tiene). Think
+  dibuja el lockup oficial `/branding/products/<clave-con-guion>-lockup-positive.svg` EN LUGAR de la etiqueta del
+  módulo (reemplaza, nunca se suma; una por sección; nunca firma). La fuente de los hechos AEO se nombra
+  «Efeonce AEO Assessment» (`GH_INSIGHTS.sources.ai_visibility_grader`). Los lockups (`positive|negative|white`) se
+  exportan con `pnpm insights:think-icons` desde `@efeoncepro/axis-brand-assets`; nunca se copian ni se arman a mano.
+  Reservado: `ai_visibility_report` (enlazar el entregable cuando exista el vínculo) y portadas PDF/deck.
+
+## Contrato de contenido y su mantenimiento (TASK-1962 — en código local 2026-10-02)
+
+- **Qué dice un informe**: ocho preguntas del cliente en `presentation/content-contract.ts` (resultado, causas,
+  competencia, trabajo entregado, recomendaciones, peticiones, medición, límites), con veredicto por módulo
+  (`producer_now | no_evidence | policy_blocked | needs_input | agent_task`) y su evidencia. Espejo legible en la
+  arquitectura §15.
+- **Agregar un dato** = hecho en el adapter dueño + regla en `CONTENT_METRIC_RULES` + veredicto `producer_now` + productor
+  del planner (+ fila de la matriz de familias si dibuja) + subir `CONTENT_CONTRACT_VERSION`, en el mismo cambio.
+  Gate: `content-contract.test.ts` (consistencia en las dos direcciones) y `expectContentContract` en
+  `adapters/adapters.test.ts` (un hecho emitido sin regla rompe).
+- **Competencia SEO al cliente: `policy_blocked`** (auditoría §7 del módulo SEO). La de IA (Share of Voice) sí va.
+- **Prefijos con sección propia en el planner**: `driver.*` (causas: figura de la misma escala, hallazgo de
+  descomposición, tabla con `lead`) y `opportunity.*` (hechos de PLAN: sólo sostienen acciones). Ninguno compite como
+  hallazgo de resultado ni va a la tabla general.
+- **Modelo web 1.3**: `claim.module`, `claim.evidence`, `essentialsByModule`, `chapter.label`, `chart.note`,
+  `fact.priorLabel`, `action.module`, `table.lead`. Think los consume y no deduce ninguno (la muestra de Think los
+  emula SÓLO en fixtures).
+- **Grader ya medido** (`content_contract_v2`): `cited_source.*` y `source_type.*` responden «¿por qué?» y `sentiment.*`
+  «¿cómo nos fue?»; los dominios citados nunca van en columnas (sólo hallazgo y tabla `table.aeo.sources`).
+- **Peticiones**: `gsc` y/o `ga4` `not_connected` (Search Console o GA4 sin conectar) producen `ask`; lo interno no se
+  le pide al cliente.
+- **GA4** (`content_contract_v4`, `adapters/ga4-site-facts.ts`, sólo v2): SEO `site.organic_sessions` /
+  `site.organic_engaged_sessions` (Organic Search, sin canal `google`, figura `count:site`); AEO `ai_sessions`
+  (hallazgo siempre) y `ai_source.<asistente>` (figura completa o ninguna + hallazgo del asistente que más trae). Flag
+  OFF ⇒ silencio (sin límite); lo leen Vercel y `ops-worker`.
+- **Línea semanal**: la lectura usa sólo bloques completos de 7 días como extremos.

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Secret Hygiene"
+  short_description: "Audit and remediate secrets safely."
+  default_prompt: "Use $greenhouse-secret-hygiene to audit these secrets, classify risk, and propose the safest remediation and verification plan."
+
+policy:
+  allow_implicit_invocation: true

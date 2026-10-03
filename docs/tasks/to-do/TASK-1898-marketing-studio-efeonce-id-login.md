@@ -6,6 +6,25 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02
+
+- **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`); el Entregable C (corte de
+  campañas a Studio) quedó diferido por el operador. La parte de TASK-1894 que bloquea esta task (commands y kernel)
+  ya existe; sigue bloqueada por TASK-1895 y por la foundation OIDC de TASK-1834.
+- **Kernel que hereda esta task:** `T2` (aprobación o destructiva) hoy sólo lo ejecuta `operator_cli`; por API responde
+  `403 confirmation_required` hasta TASK-1899; un `api_client` que aprueba recibe `approval_requires_person`. Según el
+  Delta del Entregable A de TASK-1894, el actor `user` recibe `forbidden` hasta esta task.
+- **Proyección de permisos ya en la API:** `CampaignDetail.permissions` (`writable`, `lockReason`
+  `open_mode | missing_capability | authority_onedrive`, `canApprove`, `sourceOfTruth`, `allowedTransitions`,
+  `revision`). Smoke de producción del 2026-10-02 sobre CMP-004: `writable false`, `lockReason open_mode`. Esta task es
+  la que retira `open_mode` como motivo; después el bloqueo de una persona queda explicado por `missing_capability` o
+  por `authority_onedrive` (campañas aún gobernadas por OneDrive hasta el Entregable C).
+- **Capabilities de escritura en Greenhouse:** `marketing_studio.asset.write` y `marketing_studio.campaign.write`
+  (`actions create/update`, scope `tenant`) con grants a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y
+  `designer`; en `develop` (`9d0d698d4`), migración aplicada en la instancia compartida; **release a producción
+  pendiente** de decisión del operador. `marketing_studio.campaign.approve` sigue siendo de TASK-1899. El reader de
+  acceso que esta task necesita («qué capabilities de `marketing_studio` tiene este sujeto») sigue sin existir.
+
 ## Delta 2026-09-26
 
 - TASK-1896 complete: Sentry, logs con `requestId` y la señal de salud de Studio ya están en producción; se quita de
@@ -178,6 +197,9 @@ Reglas obligatorias:
   y `POST /api/admin/auth-server/oauth-clients` (capability `identity.auth_client.register`).
 - Lane ecosystem de Greenhouse con `runEcosystemReadRoute` y el reader `identity/binding` (TASK-1631/1844), que
   resuelve personas **sólo en contexto MCP** y con capabilities acotadas a growth.
+- (2026-10-02, TASK-1894 Entregable B en producción) Kernel de commands con `riskTier` y `CampaignDetail.permissions`
+  con `lockReason` (`open_mode | missing_capability | authority_onedrive`). En Greenhouse `develop`, capabilities
+  `marketing_studio.asset.write` y `marketing_studio.campaign.write` con grant (sin release a producción).
 
 ### Gap
 

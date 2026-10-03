@@ -25,6 +25,7 @@ import type { EvidenceFactV1, EvidenceUnit } from '../contracts/evidence'
 import type { PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
+import { sourcesLabelOf } from '../presentation/vocabulary'
 
 export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend'
 
@@ -181,6 +182,15 @@ const reject = (chart: ChartSpecV1, reason: string): never => {
   throw new InsightsRenderRejectedError(`La figura ${chart.chartId} no tiene página: ${reason}`)
 }
 
+/**
+ * TASK-1962 — familias con página de figura en los catálogos PDF (informe A4 y deck). Las demás familias que la matriz
+ * familia × evidencia autoriza (waffle, cascada…) se dibujan en la web; en el PDF quedan su hallazgo y su tabla. Los
+ * mappers filtran con este conjunto a propósito: una familia fuera de él nunca llega a `kindOf`, que sigue rechazando.
+ */
+export const PDF_FIGURE_FAMILIES: ReadonlySet<ChartSpecV1['family']> = new Set(['bar', 'bar_grouped', 'line', 'bullet'])
+
+export const hasPdfFigurePage = (chart: Pick<ChartSpecV1, 'family'>): boolean => PDF_FIGURE_FAMILIES.has(chart.family)
+
 const kindOf = (chart: ChartSpecV1): FigureKind => {
   if (chart.family === 'bullet') return 'targets'
   if (chart.family === 'line') return 'trend'
@@ -216,15 +226,13 @@ const closingOf = (reading: PlanFigureReadingV1 | undefined, conclusion: string)
  * Fuente de la figura: las fuentes legibles de los hechos que dibuja (por `method.name`, `GH_INSIGHTS.sources`),
  * sin repetir. El texto genérico queda sólo si ningún hecho declara una fuente conocida.
  */
-export const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, EvidenceFactV1>): string => {
-  const names = [...new Set(factIds.flatMap(id => {
-    const name = GH_INSIGHTS.sources[byId.get(id)?.method?.name ?? '']
+/** TASK-1957 — la fuente legible sale del vocabulario común: la misma que imprime el informe web. */
+export const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, EvidenceFactV1>): string =>
+  sourcesLabelOf(factIds.flatMap(id => {
+    const fact = byId.get(id)
 
-    return name ? [name.charAt(0).toUpperCase() + name.slice(1)] : []
-  }))]
-
-  return names.length > 0 ? names.join(' · ') : GH_INSIGHTS.document.evidenceSource
-}
+    return fact ? [fact] : []
+  }))
 
 export const buildFigureSlides = (
   chart: ChartSpecV1,
@@ -457,6 +465,8 @@ export const buildFigureSlides = (
  * si el render cambia qué dibuja, el planner lo sabe sin copiar la regla.
  */
 export const hasFigurePage = (chart: ChartSpecV1, byId: ReadonlyMap<string, EvidenceFactV1>, locale = 'es-CL'): boolean => {
+  if (!hasPdfFigurePage(chart)) return false
+
   try {
     return buildFigureSlides(chart, byId, undefined, [], locale, FIGURE_CAPACITY.report).length > 0
   } catch {

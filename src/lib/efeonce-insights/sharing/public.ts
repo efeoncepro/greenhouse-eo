@@ -1,3 +1,4 @@
+import { scopeChipsFor } from '../presentation/scope-catalog'
 import 'server-only'
 
 /**
@@ -208,6 +209,7 @@ export const resolveSharedInsightEdition = async (context: SharedInsightRequestC
         timeZone: edition.periodTimeZone,
         issuedAt: edition.issuedAt,
         asOfMax: snapshot.asOfMax,
+        scopeChips: scopeChipsFor(edition.request.scope, edition.request.modules),
         // 1.1 — el logo sellado en la portada del plan, por proxy con el mismo gate del token.
         ...(plan.plan.cover?.logoAssetId && plan.plan.cover.logoVariant
           ? { clientLogo: { href: `/api/public/insights/shared/${context.token}/logo`, variant: plan.plan.cover.logoVariant } }

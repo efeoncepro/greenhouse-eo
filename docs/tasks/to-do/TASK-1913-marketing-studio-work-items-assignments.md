@@ -104,7 +104,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-agent-media-planner/SKILL.md` y `.claude/skills/efeonce-agent-seo-aeo/SKILL.md` (sección
   «Cuando existan work items y escrituras»: lo que el rol hará con estas tools).
 - `.claude/skills/mcp-craft/SKILL.md` (descripciones de tools: cuándo usar, qué NO significa, qué hacer después).
-- `docs/tasks/to-do/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, digest).
+- `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, digest).
 - `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` (canje por capability, `Efeonce-Delegated-Token`).
 
 ## Dependencies & Impact

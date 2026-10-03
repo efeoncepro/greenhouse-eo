@@ -262,33 +262,25 @@
       "rol": "persona:nexa/lifestyle-4",
       "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203"
     },
-    "ai-generations/_identidad-equipo/andres/actual.png": {
+    "ai-generations/_identidad-equipo/andres/avatar-bomber-2026-09.png": {
       "rol": "persona:andres/cuerpo",
-      "sha256": "f0d6b3ac3ef9b64b7e09c474fe51367a00fcfdb8acf37fb6e620c61d5313e829"
+      "sha256": "b7d781cbb9e60f9ef36ca28d96c7826ba187ff5387b04cb0e29f6b52e04a2cf0"
     },
-    "ai-generations/_identidad-equipo/andres/antiguo.png": {
-      "rol": "persona:andres",
-      "sha256": "d3d0eaac4d0062c5d586f0663a1bd88f3bb38b582357da086e18613c0427ca02"
-    },
-    "ai-generations/_identidad-equipo/daniela/actual.png": {
+    "ai-generations/_identidad-equipo/daniela/avatar-bomber-2026-09.png": {
       "rol": "persona:daniela/cuerpo",
-      "sha256": "aec2989c53440e329ba36986c83d7d4143bbcffbd0b19001840b00d3c7244e29"
+      "sha256": "4ab1e0cd60082ff411fadbf2190b67dc9f3e2ba000b315149eacc8baa4c4a922"
     },
-    "ai-generations/_identidad-equipo/daniela/antiguo.png": {
-      "rol": "persona:daniela",
-      "sha256": "50dd595f8e45419d22dd79341dc10ca2280acb80c87eac51876e9453795c41dd"
-    },
-    "ai-generations/_identidad-equipo/humberly/antiguo.jpg": {
+    "ai-generations/_identidad-equipo/humberly/avatar-bomber-2026-09.png": {
       "rol": "persona:humberly/cuerpo",
-      "sha256": "7582bd9e234d44550107eff390b9bcaa45c052fdfc89338a2b29f33ef173fd5d"
+      "sha256": "e81645aa21d8924a7ac349f56b123d06de77fce2028fb1cf6e702c4e94faf1fb"
     },
-    "ai-generations/_identidad-equipo/melkin/actual.png": {
+    "ai-generations/_identidad-equipo/melkin/avatar-bomber-2026-09.png": {
       "rol": "persona:melkin/cuerpo",
-      "sha256": "e307af20687a760f5d10ddf15c21f9838eeffa4e629a902397adf1ddafefcf6d"
+      "sha256": "5e90f4e317b04fc3602716a0ff83a403fd8b9795eb9ea1042b7070f92903ce89"
     },
-    "ai-generations/_identidad-equipo/valentina/actual.png": {
+    "ai-generations/_identidad-equipo/valentina/avatar-bomber-2026-09.png": {
       "rol": "persona:valentina/cuerpo",
-      "sha256": "fc3766c570af188bdc67da6a45ca3cd4037dcbdb136301510e0854499ba17077"
+      "sha256": "6d40946528781cfb9c03a2ae7ad0dfc920840ca7b8805231913b167c768237ae"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",

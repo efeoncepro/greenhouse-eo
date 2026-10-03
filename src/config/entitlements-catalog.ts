@@ -69,7 +69,9 @@ export const ENTITLEMENT_MODULES = [
   // TASK-1921 — render gobernado de piezas de marca de Efeonce (La órbita por superficie y Glitch) en el
   // artifact-worker. Dueño Greenhouse por ahora; nace extraíble hacia Marketing Studio o Globe (decisión del
   // operador, 2026-09-28). Distinto de `design_system` (operar AXIS) y de `marketing_studio` (registrar campañas).
-  'brand_render'
+  'brand_render',
+  // TASK-1963 — novedades del login (carrusel del login V4). Leer lo publicado es público; administrar es esta capability.
+  'login_announcements'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2256,6 +2258,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1962 — profile.set_category: el operador corrige la categoría (nodo de la taxonomía canónica) de un perfil AEO
+  // cuando la clasificación automática se equivocó (Berel como «Manufactura»). Command `overrideProfileCategory`
+  // (historial append-only). Grant = set operador, como set_business_model.
+  {
+    key: 'growth.ai_visibility.profile.set_category',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1290 — prompt_set.manage: autorar (draft) + aprobar (draft→active) el set de prompts AEO
   // por marca. Commands gobernados `createGraderPromptSetDraft`/`approveGraderPromptSet`,
   // consumibles por la UI de review (TASK-1291) + Nexa. Grant = set operador (run.operator).
@@ -2505,9 +2516,30 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1894 — escribir en Marketing Studio por API/MCP con autoridad de persona: subir y versionar piezas
+  // (asset.write) y crear/editar campañas (campaign.write). Separadas de la lectura y de la aprobación (TASK-1899).
+  {
+    key: 'marketing_studio.asset.write',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'marketing_studio.campaign.write',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
   { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
-  { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1963 — crear, editar, publicar y archivar las novedades del login. La lectura de lo publicado no necesita capability.
+  {
+    key: 'login_announcements.manage',
+    module: 'login_announcements',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

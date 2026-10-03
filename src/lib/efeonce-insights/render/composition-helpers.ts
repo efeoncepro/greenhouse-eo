@@ -22,10 +22,12 @@ export const rejectIfLonger = (value: string, max: number, field: string): strin
 }
 
 /** Divide un flujo en páginas usando la capacidad declarada del molde como unidad (primitivo del motor). */
-export const chunkByCapacity = <T>(items: readonly T[], capacity: number, idOf: (item: T, i: number) => string): T[][] => {
+export const chunkByCapacity = <T>(items: readonly T[], capacity: number, idOf: (item: T, i: number) => string, heightOf: (item: T) => number = () => 1): T[][] => {
   if (items.length === 0) return []
 
-  const blocks: FlowBlock[] = items.map((item, i) => ({ blockId: idOf(item, i), heightPx: 1 }))
+  // TASK-1962 — `heightOf` cuenta cuántas líneas ocupa un ítem: una fila con etiqueta larga ocupa dos y una página de
+  // 16 filas con varias así se desbordaba (tabla de IA de Berel, 2026-10-02: «page-17 no cabe en su lienzo»).
+  const blocks: FlowBlock[] = items.map((item, i) => ({ blockId: idOf(item, i), heightPx: heightOf(item) }))
   const pages = paginateFlow(blocks, { contentHeightPx: capacity, guardPx: 0 })
   const byId = new Map(blocks.map((b, i) => [b.blockId, items[i]!]))
 

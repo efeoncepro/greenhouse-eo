@@ -7,6 +7,70 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
+
+- Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
+  compartida), reader `listActiveLoginAnnouncements` (hasta 3 publicadas y vigentes por prioridad), `GET
+  /api/public/login-announcements` y API admin con `login_announcements.manage`. Vigentes: Engine, Brand y Growth.
+- `/login` pasa al V4 premium en develop/staging: formulario sobre papel con Efeonce como marca principal, escenario con
+  fotos producidas, lente reconstruida al canon de AXIS y anclada al sujeto, voz con anillo y esfera, transición «La
+  lente te lleva adentro» y mejoras de contraste en avisos y alertas. No está en producción; `pnpm test` completo pendiente.
+- Canon de foto y skills: la referencia de cara del equipo pasa al avatar con la bomber; personajes de casting con retrato ancla (piel v3) antes de la escena; casebook cine (fallas 14–20, `LG1`/`LG2e` como recetas), registro cine (excepción del login), guía de modelos, regla `brand-photography` y `efeonce-graphic-line` (lecciones, ledger, aplicación §A12) actualizados.
+- Docs: [funcional](docs/documentation/identity/novedades-del-login.md) y [manual](docs/manual-de-uso/identity/administrar-novedades-del-login.md).
+
+## 2026-10-02 — Inpainting de imagen y video en los CLIs (TASK-1965)
+
+- Nuevos `pnpm ai:mask` (máscara canónica con fuentes, operaciones y guardas de cobertura) y `pnpm ai:inpaint image|video`:
+  recorte con contexto, generación por adaptador (OpenAI, `fal:flux-pro-fill`, Seedream edit; video `fal:flux3-edit`),
+  recomposición obligatoria y verificación del archivo en delta máximo 0, dry-run, caché por hash y manifiesto.
+- Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
+  con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
+  no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
+
+## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
+
+- Studio suma escrituras gobernadas del catálogo: máquinas de estado (revisión, creativo, medios, lanzamiento),
+  campaña, brief literal, conceptos, piezas, derechos, copy byte a byte, anuncios, flight, líneas de presupuesto
+  (sólo `proposed`; aprobar crea la `approved`) y posts planificados (Studio nunca publica). Las aprobaciones son T2:
+  sólo una persona por la CLI `pnpm studio:write … --apply --confirm`; por API, 403 `confirmation_required` hasta
+  TASK-1899.
+- Autoridad por campaña (`source_of_truth`): escribir en una campaña de OneDrive responde 409
+  `campaign_not_studio_owned`; el importador salta las campañas `studio`. API 1.4.0, 44 tools, permisos proyectados y
+  `ETag`. Migración `1790967435017` aplicada en staging y producción (aditiva); sandbox `CMP-900` en staging.
+- **No está en producción:** Studio `a8c7886` sin empujar a `main`; Greenhouse `9d0d698d4` (capabilities
+  `marketing_studio.asset.write` y `.campaign.write`) sólo en `develop`; gateway con filtro de sólo lecturas preparado
+  sin sincronizar. Entregable C diferido.
+
+## 2026-10-02 — CMP-004 completa: 44 piezas aprobadas, horizontales 1,91:1 y grilla de Studio corregida
+
+- Las 11 horizontales 1,91:1 (LinkedIn 1200×628 y Meta horizontal) se hacen desde la escena 1:1 aprobada:
+  `pnpm foto:expandir` gana `--lienzo`, `--ancla`, `--fundido` y `--reponer no` (`2ff39fe96`); la escena va a la
+  derecha al 80 % del alto y el modelo extiende sólo la columna de texto. Concepto reducido aprobado por el operador:
+  la bajada va en el titular del anuncio (CDR-012, `ec9e8a00d`). `foto:cta:gate --reproducir` exit 0 en las 11.
+- Entregadas en canvas, OneDrive Finales (`CONTROL-DE-PIEZAS` 44 filas), Marketing Studio y AXIS Lab (`25f1b40`).
+  En Studio se subieron con `--ratio 191x100` (la API exige `^\d+x\d+$`) y se aprobaron: 44 piezas, 0 pendientes.
+- La grilla de piezas de Studio tenía columnas fijas y escondía las 1,91:1 cargadas y aprobadas; ahora muestra las
+  proporciones presentes en la campaña y rotula `191x100` como «1,91:1» (Studio `23e5787`, verificado en el navegador).
+  Commits de este repo sin push.
+
+## 2026-10-02 — Marketing Studio: puerta de ingreso de originales en producción (TASK-1894, Entregable A)
+
+- Studio 1.3.0 recibe finales por una sola puerta: `studio.asset.upload.request` (URL firmada V4 directo al bucket)
+  y `studio.asset.version.create` (confirmación; el worker recalcula sha256, tamaño, tipo y proporción antes de crear
+  la versión en `pending_review`). Kernel de commands con autoridad, `riskTier`, idempotencia y `dryRun`; CLI
+  `pnpm studio:upload` (cliente de API `studio:assets:write`) y CLI de operador `pnpm studio:review`.
+- Migración `1790956839977_asset-ingest-door` aplicada en staging y producción; `STUDIO_UPLOADS_ENABLED` y
+  `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON. 33 piezas de CMP-004 cargadas en producción, pendientes de revisión.
+  Capability en Greenhouse y sync del gateway quedan pendientes.
+  [Task](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md).
+
+## 2026-10-02 — Kortex profundamente hibernado y forecast GCP reconciliado
+
+- Kortex queda reversible y sin compute productivo: Vercel pausado, Cloud Run internal/IAM/min0, Cloud Tasks
+  pausado/vacío y SQL `STOPPED/NEVER`. Septiembre registró CLP 10.480,64 netos; el residual ~CLP 3.500/mes y el
+  forecast consolidado CLP 237.068,14/mes (rango 230k–245k) siguen modelados hasta contar con ventanas completas
+  post-corte. [Estado, método y evidencia](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
 ## 2026-10-02 — CMP-004 reorientada por servicios y voz con el acento de la línea (CDR-012)
 
 CMP-004 pasa de cuatro conceptos a un ad por servicio de Creative Services (S01–S08). Los ocho pilotos 4:5 se regeneraron con geometría nativa de ad (banda oscura continua arriba, objeto negro mate al pie para la firma) y pasan `foto:cta:gate --reproducir`. El compositor de CTA suma `graphicLine`: el anillo y la esfera de la voz toman el acento de la línea desde AXIS (sin el campo, growth, idéntico a antes; regresión 183/184 iguales, mutante `voz-acento-de-linea`). El CTA queda en contorno naranja tras comparar 40 composiciones.
@@ -609,72 +673,3 @@ oficina, merch, eventos, video), el motion del logo, la convergencia con el leng
 decisiones y pendientes del operador, y un contrato de mantenimiento. El manual de la línea suma §9.1 (la foto en la
 línea) y fija «Revenue» como palabra del eslogan de RevOps; el lenguaje fotográfico suma §11 (la línea en la foto). El
 router de CLAUDE.md y AGENTS.md apunta a la skill nueva.
-
-## 2026-09-26 — Marketing Studio: capa de estrategia y operación híbrida con agentes (ADR aceptados)
-
-Quedaron aceptadas tres decisiones de EPIC-049. Studio + un bucket GCP son la fuente única de los archivos de campaña, con
-ingesta por CLI, MCP y agentes sobre un solo command. La capa de estrategia suma catálogo de canales, referencia al ICP
-de la organización, plan de campaña, plan SEO/AEO sobre Search Visibility 360, IA con procedencia y medición de solo
-lectura, todo operable por agentes con niveles de riesgo (T0 lectura, T1 borradores reversibles, T2 aprobar/publicar/
-gastar con confirmación humana). La operación híbrida reparte cada campaña en work items asignables a personas o a roles
-de agente (planificador de medios, SEO/AEO, copywriter, QA creativo, analista), con un despachador en Studio y
-adaptadores Claude y OpenAI detrás de flags. Tasks TASK-1905–1916 en to-do; sin cambios de runtime todavía.
-
-## 2026-09-26 — Firma de correo v3.1 aprobada: zona de partners y contrato `efeonce.email-signature`
-
-El operador aprobó la firma de correo en sus dos versiones (A sobre papel, B tarjeta navy). La línea que termina en la
-esfera va una vez; los partners (HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus)
-abren su propia zona con una regla fina sin esfera, en logos oficiales de un solo tono y el mismo peso óptico. Sin
-«Quedo atento» y todo el texto que no es el nombre en Poppins. AXIS `c7717ef`: tokens
-`efeonceGraphicLine.emailSignature`, contrato `efeonce.email-signature` 0.3.0 (`stable`) con `pnpm signature:resolve`,
-guía para agentes y lámina 4.5 del Lab. Greenhouse: manual §10.2, ADR, documentación funcional, manual de uso y las
-skills `efeonce-brand-studio` y `axis-design-system`. Después: paquetes AXIS publicados (0.3.2 y 0.3.4), imágenes en
-el bucket público `email-signature/v3.1/`, HTML listo para Outlook y **firma de equipo** aprobada (Talent, Finance,
-Commercial: sin foto, la órbita rodea el ícono del área; variante `team`). Pendiente: instalar en Outlook.
-
-## 2026-09-26 — Línea gráfica «La órbita»: AXIS 0.3, recetas fieles al canvas y motion V1.1
-
-AXIS publicó 0.3.0 (tokens, contratos, registro y assets) y el paquete nuevo `@efeoncepro/axis-graphic-line` 0.3.1,
-que pinta la órbita y sus recetas. Cada pieza de formato fijo (lente, foco, deck, firma de correo) quedó medida en el
-canvas y la receta la reproduce; la órbita genérica usa las medidas del canvas (arco centrado, 200°–250°). Reglas nuevas
-de contrato: la lente lleva arco y esfera, el foco siempre su anillo, un solo anillo alrededor del contenido y la esfera
-final es parte del texto (también en la selección colaborativa 0.3.0). Greenhouse adoptó 0.3.0 en develop: el
-compositor de campañas pinta la lente y el deck según el contrato nuevo (suite completa en verde). El motion del logo
-V1.1 (reveal 3,6 s, apertura 2,4 s, sting 1,6 s) quedó aprobado y documentado; sus masters se sirven desde el bucket
-público `gs://efeonce-group-axis-public-media` y el Lab muestra versiones web con su ficha, junto a la animación de la
-órbita sola. El lenguaje de movimiento quedó como norma (`EFEONCE_ORBIT_MOTION_LANGUAGE_V1`) y sus valores en los tokens
-`efeonceGraphicLine.motion` (`axis-tokens` 0.3.3), que el render lee: los 90 cuadros clave y los tres sonidos salen
-idénticos byte a byte. Rollback: fijar de nuevo los paquetes en 0.2.7.
-
-## 2026-09-26 — Marketing Studio: originales en GCS, worker de medios y restauración probada (TASK-1893, TASK-1896)
-
-Studio guarda en GCS una copia verificada (sha256 + crc32c, deduplicada) de los finales aprobados: 30 versiones por
-ambiente; las 24 imágenes de CMP-002 siguen en OneDrive porque el catálogo no trae su huella. Un worker de Cloud Run
-genera miniatura, preview, portada de video y recortes al llegar cada original, repara faltantes con un barrido horario
-y lee de Metricool la evidencia real de publicación. Un cliente autorizado descarga un original por URL firmada de
-10 min, auditada, con su estado de derechos (`STUDIO_ORIGINAL_DOWNLOADS_ENABLED` sólo en production). Studio además
-tiene Sentry propio, uptime check con email, health profundo, registro de corridas y una restauración lógica ensayada
-contra producción (job 49 s) con ensayo mensual programado; Greenhouse lo observa con la señal
-`platform.marketing_studio.health` y avisa a Teams «EO - Admin» en `error`. Release Greenhouse `92002873ced9` (PR #243).
-Pendientes en los Follow-ups de cada task. Rollback: flags a `false` + redeploy, pausar schedulers, `media:ingest
---revert-provider`.
-
-## 2026-09-26 — Efeonce Insights: diseño premium en producción (TASK-1889)
-
-Los informes A4 y los decks de Insights salen con el diseño premium aprobado por el operador: portada blanca o navy
-con el logo del cliente, índice, «Lo esencial», capítulos, páginas de gráfico por familia, tabla de respaldo, límites y
-contraportada; el diseño anterior se retiró del código. Las variaciones muestran la dirección del valor con el triángulo
-y, con el tono, si el cambio es mejor o peor para esa métrica (posición y RpA: menor es mejor). Código en los releases
-`0e87c7a443a2` y `f9257b9c94af`. Verificado en producción con las primeras ediciones internas de Berel (A4 16 páginas +
-deck 15 láminas) y Sky (A4 12 + deck 10), los cuatro PDF al primer intento. Emisión y compartir siguen OFF en
-producción. Rollback: revert del código de catálogos y release.
-
-## 2026-09-26 — Efeonce Insights: contrato editorial v2 encendido en producción (TASK-1888)
-
-Los informes nuevos de Insights salen con el contrato v2: lectura por figura (cifra principal, conclusión, próximo
-paso), «Lo esencial» sólo con hallazgos, líneas de alcance, tabla «<módulo>: todas las cifras» y portada sellada por
-organización (`auto`/navy/blanca; navy sólo con logo apto para fondo oscuro). Superlativos sólo con máximo único (con
-empate se dice el empate). Código en los releases `0e87c7a443a2` y `f9257b9c94af`; gateway efeonce-mcp v1.9.0 con
-`get/set_insight_cover_preference`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el
-`ops-worker`. Verificado con un canary sintético en producción que sella el plan v2. Emisión, sharing y correo siguen
-OFF en producción. Rollback: flag OFF en los dos runtimes.

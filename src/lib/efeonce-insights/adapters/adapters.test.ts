@@ -3,7 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type * as AiVisibilityContracts from '@/lib/growth/ai-visibility/contracts'
 import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
 
+import { questionOfMetric } from '../presentation/content-contract'
 import { resolveInsightWindows } from '../window'
+
+/**
+ * TASK-1962 — gate de mantenimiento del informe: todo hecho que un adapter emite responde a una pregunta del contrato de
+ * contenido (`presentation/content-contract.ts`). Un dato nuevo sin su regla rompe aquí, no en el informe del cliente.
+ */
+const expectContentContract = (facts: ReadonlyArray<{ module: 'seo' | 'aeo' | 'ico'; metricId: string }>) => {
+  const orphans = facts.filter(fact => questionOfMetric(fact.module, fact.metricId) === null).map(fact => `${fact.module}:${fact.metricId}`)
+
+  expect(orphans, 'métricas sin contrato de contenido').toEqual([])
+}
 
 /**
  * TASK-1845 — adapters con readers mockeados: cubren unsupported_window (grano), método/gate
@@ -19,7 +30,10 @@ const seoMocks = vi.hoisted(() => ({
   resolveUnambiguousSeoTarget: vi.fn(),
   readSeoOverviewKpisForWindow: vi.fn(),
   readRankEvolution: vi.fn(),
-  readDomainOverviewForTarget: vi.fn()
+  readDomainOverviewForTarget: vi.fn(),
+  readSeoWindowMovers: vi.fn(),
+  readSeoWorkQueue: vi.fn(),
+  readSeoOverviewConnection: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
@@ -27,6 +41,9 @@ vi.mock('@/lib/growth/seo/resolve-target', () => ({ resolveUnambiguousSeoTarget:
 vi.mock('@/lib/growth/seo/overview/read-overview-kpis', () => ({ readSeoOverviewKpisForWindow: seoMocks.readSeoOverviewKpisForWindow }))
 vi.mock('@/lib/growth/seo/rank-evolution-reader', () => ({ readRankEvolution: seoMocks.readRankEvolution }))
 vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewForTarget: seoMocks.readDomainOverviewForTarget }))
+vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
+vi.mock('@/lib/growth/seo/work-queue/reader', () => ({ readSeoWorkQueue: seoMocks.readSeoWorkQueue }))
+vi.mock('@/lib/growth/seo/overview/read-overview-connection', () => ({ readSeoOverviewConnection: seoMocks.readSeoOverviewConnection }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
 
@@ -71,6 +88,93 @@ describe('SEO adapter', () => {
       { keyword: 'c', points: [{ date: '2026-09-01', position: 1, url: null }] }
     ], provenance: [] })
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
+    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'connected', dataAsOf: '2026-08-31' })
+    seoMocks.readSeoWorkQueue.mockResolvedValue({
+      ok: true,
+      snapshot: { snapshotId: 'seowqs-1', organizationId: 'org', seoTargetId: 'tgt-1', priorityScoreVersion: 'v2', windowDays: 28, itemCount: 40, computedAt: '2026-09-02T13:00:00.000Z', expiresAt: '2026-09-03T13:00:00.000Z' },
+      items: [
+        { itemId: 'i1', rank: 1, origin: 'gsc_striking_distance', keyword: 'barniz para madera', targetUrl: 'https://x.cl/barniz', recommendedVerb: 'optimize', scoreBasis: 'measured_incremental_clicks', scoreBand: 1, priorityScore: 75.88, breakdown: { impressions: 10522, clicks: 17, currentCtr: 0.0016, weightedPosition: 8.36, targetPosition: 5, expectedCtrAtTarget: 0.009, ctrCurveSource: 'org_measured', curveSampleImpressions: 1, curveSampleClicks: 1, windowDays: 28, incrementalClicks: 76, basisReason: 'r' }, evidenceRef: 'e', sourceScoreVersion: null },
+        { itemId: 'i2', rank: 2, origin: 'consolidation', keyword: 'pintura para exteriores', targetUrl: 'https://x.cl/exteriores', recommendedVerb: 'consolidate', scoreBasis: 'measured_without_curve', scoreBand: 2, priorityScore: null, breakdown: { impressions: 3000, clicks: 9, currentCtr: null, weightedPosition: 12.1, targetPosition: 5, expectedCtrAtTarget: null, ctrCurveSource: 'not_applicable', curveSampleImpressions: null, curveSampleClicks: null, windowDays: 28, incrementalClicks: null, basisReason: 'r', competingPages: 3 }, evidenceRef: 'e', sourceScoreVersion: null }
+      ],
+      originHealth: [], priorityScoreVersion: 'v2', asOf: '2026-09-02T13:00:00.000Z', staleness: 'fresh', nextCursor: null, provenance: []
+    })
+    seoMocks.readSeoWindowMovers.mockImplementation(async (_org: string, input: { dimension: 'query' | 'page' }) => ({
+      ok: true,
+      dimension: input.dimension,
+      totalClicks: 500,
+      previousTotalClicks: 400,
+      movers: input.dimension === 'query'
+        ? [{ key: 'pintura 19 litros', clicks: 120, previousClicks: 60, impressions: 900, previousImpressions: 800 }, { key: 'x marca', clicks: 30, previousClicks: 50, impressions: 300, previousImpressions: 310 }]
+        : [{ key: 'https://x.cl/', clicks: 300, previousClicks: 250, impressions: 9000, previousImpressions: 8000 }]
+    }))
+  })
+
+  it('TASK-1962 — con v2 y período anterior, las consultas y páginas que más movieron los clics son hechos con su comparable', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    const { seoReportAdapter, pageLabelOf } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    const top = result.facts.find(fact => fact.factId === 'seo.driver.query.clicks.2026-08-01_2026-09-01.1')!
+
+    expect(top).toMatchObject({ label: 'pintura 19 litros', value: 120, unit: 'count', comparisonFactId: 'seo.driver.query.clicks.2026-07-01_2026-08-01.1', dimension: { query: 'pintura 19 litros', rank: '1' } })
+    expect(result.facts.find(fact => fact.factId === top.comparisonFactId)).toMatchObject({ value: 60, comparisonFactId: null })
+    // La página se rotula con su ruta; la raíz es la página de inicio.
+    expect(result.facts.find(fact => fact.metricId === 'driver.page.clicks' && fact.value === 300)!.label).toBe('Página de inicio')
+    expect(pageLabelOf('https://x.cl/colores/grises/')).toBe('/colores/grises')
+    // Una ruta que no cabe en la columna del informe se nombra por su último tramo (Berel, septiembre 2026).
+    expect(pageLabelOf('https://x.cl/sites/default/files/2025-06/FT_PINTURA%20AUTOENFRIANTE.pdf')).toBe('…/FT_PINTURA AUTOENFRIANTE.pdf')
+    expect(result.sources.some(source => source.reader === 'readSeoWindowMovers')).toBe(true)
+    // Aportes al cambio de clics: cada consulta más el resto suman exactamente el cambio total (500 − 400).
+    const deltas = result.facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.window.start === '2026-08-01')
+
+    expect(deltas.map(fact => [fact.label, fact.value])).toEqual([['pintura 19 litros', 60], ['x marca', -20], ['Resto de consultas', 60]])
+    expect(deltas.reduce((sum, fact) => sum + fact.value!, 0)).toBe(100)
+    // Bloques de 7 días: agosto tiene 5 (1–7 … 29–31), cada uno con su par del período anterior.
+    const weeks = result.facts.filter(fact => fact.metricId.startsWith('clicks_week.') && fact.window.start >= '2026-08-01')
+
+    expect(weeks.map(fact => fact.label)).toEqual(['1–7 ago', '8–14 ago', '15–21 ago', '22–28 ago', '29–31 ago'])
+    expect(weeks[0]!.comparisonFactId).toMatch(/^seo\.clicks_week\.1\.2026-07-01/)
+    expectContentContract(result.facts)
+
+    // Sin período anterior no hay qué descomponer, y sin v2 la evidencia queda igual que antes.
+    const noComparison = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+    const v1 = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [] })
+
+    expect(noComparison.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
+    expect(v1.facts.some(fact => fact.metricId.startsWith('driver.'))).toBe(false)
+  })
+
+  it('TASK-1962 — oportunidades de la cola SEO (sólo orígenes propios) como hechos de plan, y Search Console sin conectar', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    // La cola se pide filtrada a orígenes propios: nunca competidores ni candidatos de descubrimiento.
+    expect(seoMocks.readSeoWorkQueue).toHaveBeenCalledWith('tgt-1', { origins: ['gsc_striking_distance', 'consolidation', 'declared_target'], limit: 5 })
+    expect(result.facts.find(fact => fact.factId === 'seo.opportunity.1.ceiling')).toMatchObject({ value: 76, observation: 'estimated', dimension: { keyword: 'barniz para madera', page: '/barniz', verb: 'optimize', rank: '1' } })
+    expect(result.facts.find(fact => fact.factId === 'seo.opportunity.1.target_position')).toMatchObject({ value: 5, role: 'reference' })
+    // Banda 2: sin techo en clics (nunca un 0 de relleno).
+    expect(result.facts.some(fact => fact.factId === 'seo.opportunity.2.ceiling')).toBe(false)
+    expectContentContract(result.facts)
+
+    // Sin la conexión OAuth, la ausencia de capturas es `not_connected` (una petición), no «sin datos».
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(0, 0, 0, null))
+    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'not_connected', dataAsOf: null })
+    const disconnected = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(disconnected.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'gsc', reason: 'not_connected' })]))
+  })
+
+  it('TASK-1962 — un reader de causas sin datos se declara como límite, no como silencio', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    seoMocks.readSeoWindowMovers.mockResolvedValue({ ok: false, errorCode: 'no_data' })
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    expect(result.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'driver.query', reason: 'insufficient_data' }), expect.objectContaining({ metricId: 'driver.page', reason: 'insufficient_data' })]))
   })
 
   it('produce hechos GSC/rank/ETV con unidad, población, cobertura, asOf, método y comparisonFactId', async () => {
@@ -96,6 +200,7 @@ describe('SEO adapter', () => {
     expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
     // Sin v2, ningún hecho lleva dirección (evidencia v1 idéntica).
     expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
+    expectContentContract(result.facts)
   })
 
   it('SEO con v2: la posición media (y su comparable) lleva lower_is_better; las demás métricas quedan neutras', async () => {
@@ -159,21 +264,73 @@ describe('AEO adapter', () => {
       overallScore: 61,
       dimensions: [{ key: 'presence', label: 'Presencia', score: 70 }],
       providerPresence: [{ provider: 'chatgpt', resolved: 12, present: 5 }],
+      competitiveSov: { brandMentions: 5, competitors: [{ name: 'Pinturas Ñandú', mentions: 10 }, { name: 'Otra Marca', mentions: 5 }] },
+      citationInsight: { ownDomainShare: 25, findingsWithCitations: 8, findingsCitingOwnDomain: 2 },
       provenance: { asOfDate, promptPackVersion: 'pp-3', scoreVersion: 'score-2', providersSampled: ['chatgpt', 'gemini'], promptCount: 12 }
     }
   })
 
   beforeEach(() => vi.clearAllMocks())
 
-  it('un run dentro de la ventana produce score, dimensiones y presencia con numerador/denominador', async () => {
+  it('un run dentro de la ventana produce score, dimensiones e indicadores estándar (tasa de mención, Share of Model, Share of Voice, citas)', async () => {
     aeoMocks.readClientGraderReport.mockResolvedValue(report('2026-08-20', 'ready'))
     const { aeoReportAdapter } = await import('./aeo-adapter')
     const windows = month('2026-08-01', '2026-09-01')
     const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
 
     expect(result.facts.find(fact => fact.metricId === 'overall_score')).toMatchObject({ value: 61, unit: 'score', method: { version: 'score-2/pp-3' }, freshness: { asOf: '2026-08-20' } })
-    expect(result.facts.find(fact => fact.metricId === 'presence.chatgpt')).toMatchObject({ value: 5, numerator: 5, denominator: 12 })
+    // TASK-1957 — la presencia se expresa con los indicadores estándar (skill seo-aeo §07), no como conteo suelto.
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.chatgpt')).toMatchObject({ value: 41.7, unit: 'percent', numerator: 5, denominator: 12 })
+    expect(result.facts.find(fact => fact.metricId === 'share_of_model')).toMatchObject({ value: 41.7, unit: 'percent', numerator: 5, denominator: 12 })
+    expect(result.facts.find(fact => fact.metricId === 'sov.brand')).toMatchObject({ value: 25, unit: 'percent', numerator: 5, denominator: 20 })
+    expect(result.facts.find(fact => fact.metricId === 'sov.competitor.pinturas-nandu')).toMatchObject({ label: 'Pinturas Ñandú', value: 50 })
+    expect(result.facts.find(fact => fact.metricId === 'citation_share')).toMatchObject({ value: 25, numerator: 2, denominator: 8 })
+    expect(result.facts.some(fact => fact.metricId.startsWith('presence.'))).toBe(false)
     expect(result.rejections).toEqual([])
+    expectContentContract(result.facts)
+  })
+
+  it('TASK-1962 — con v2, sitios citados, tipo de fuente y tono del MISMO informe del Grader; sin v2, nada nuevo', async () => {
+    const rich = report('2026-08-20', 'ready')
+
+    Object.assign(rich.report, {
+      citationSourceBreakdown: { reason: null, totalCitations: 246, uniqueDomains: 80, domains: [{ domain: 'chocale.cl', count: 11, engines: ['gemini'], classification: 'third_party' }, { domain: 'trustpilot.com', count: 9, engines: ['openai'], classification: 'third_party' }] },
+      sourceTypeSummary: [{ sourceType: 'news', count: 16 }, { sourceType: 'owned', count: 3 }, { sourceType: 'unknown', count: 21 }],
+      sentimentSummary: { positive: 3, neutral: 9, negative: 3, mixed: 1, evaluated: 16, net: 'neutral' }
+    })
+    aeoMocks.readClientGraderReport.mockResolvedValue(rich)
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const v2 = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(v2.facts.find(fact => fact.metricId === 'cited_source.1')).toMatchObject({ label: 'chocale.cl', value: 11, numerator: 11, denominator: 246, dimension: { domain: 'chocale.cl', rank: '1' } })
+    expect(v2.facts.find(fact => fact.metricId === 'source_type.news')).toMatchObject({ label: 'Medios de noticias', value: 16 })
+    expect(v2.facts.find(fact => fact.metricId === 'sentiment.negative')).toMatchObject({ label: 'Negativas', value: 3, numerator: 3, denominator: 16 })
+    expectContentContract(v2.facts)
+
+    const v1 = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(v1.facts.some(fact => /^(cited_source|source_type|sentiment)\./.test(fact.metricId))).toBe(false)
+  })
+
+  it('sin competidores detectados no entra la participación frente a competencia ni el puntaje global que la pondera', async () => {
+    // Caso real Berel 2026-09-03: competitive_sov = 100 contra nadie (marca / (marca + 0)) y pesa 15 % del global.
+    const base = report('2026-08-20', 'ready')
+
+    aeoMocks.readClientGraderReport.mockResolvedValue({
+      report: {
+        ...base.report,
+        dimensions: [...base.report.dimensions, { key: 'competitive_sov', label: 'Competitive Share of Voice', score: 100 }],
+        competitiveSov: { brandMentions: 5, competitors: [] }
+      }
+    })
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.some(fact => fact.metricId === 'overall_score' || fact.metricId === 'dimension.competitive_sov')).toBe(false)
+    expect(result.facts.find(fact => fact.metricId === 'dimension.presence')).toMatchObject({ value: 70 })
+    expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual(expect.arrayContaining([['overall_score', 'insufficient_data'], ['share_of_voice', 'insufficient_data']]))
   })
 
   it('el último run fuera de la ventana NO se proyecta como histórico: unsupported_window', async () => {
@@ -334,6 +491,9 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
 
     expect(values).toEqual({ otd: direction('otd_pct'), ftr: direction('ftr_pct'), rpa: direction('rpa') })
     expect(values.rpa).toBe('lower_is_better')
+    // TASK-1962 — «¿qué hicimos este mes?»: las piezas completadas del mismo snapshot, con su nombre humano.
+    expect(result.facts.find(fact => fact.metricId === 'delivered.completed')).toMatchObject({ value: 10, unit: 'count', label: 'Piezas entregadas', coverage: { populationSize: 12 } })
+    expectContentContract(result.facts)
   })
 
   it('ICO sin v2 entrega exactamente la evidencia v1 (sin FTR ni metas)', async () => {
@@ -376,7 +536,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
     const windows = month('2026-08-01', '2026-09-01')
     const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
 
-    expect(result.facts.find(fact => fact.metricId === 'presence.openai')!.channelId).toBe('chatgpt')
-    expect(result.facts.find(fact => fact.metricId === 'presence.nuevo_motor')).not.toHaveProperty('channelId')
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.openai')!.channelId).toBe('chatgpt')
+    expect(result.facts.find(fact => fact.metricId === 'mention_rate.nuevo_motor')).not.toHaveProperty('channelId')
   })
 })

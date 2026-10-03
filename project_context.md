@@ -22,12 +22,11 @@ AXIS: consumo privado interno/productivo; PAT temporal hasta identidad de máqui
 `30502476429` y rollback: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección
 colaborativa `0.2.0` sigue `candidate`; Lab es el primer adapter, otros runtimes `pending`.
 
-Globe (`../efeonce-globe`): Tailwind v4 activo, vanilla fallback hasta TASK-1560.
-Hibernación reversible: `draining` obligatorio al apagar/encender; discovery estático permitido, nunca despertar
-para canaries/promoción. [Estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
-[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) gobiernan las skills Globe/fleet
-y el caller externo `ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`): sincronizar pausa source/runtime;
-reactivar SQL/API antes del caller; verificar tenancy fresca antes del uso productivo.
+Globe (`../efeonce-globe`): Tailwind v4; hibernación/encendido en [estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
+y [runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md); caller pausado hasta SQL/API y tenancy fresca.
+
+Kortex (`../dev/kortex`) está hibernado desde `2026-10-02T13:44:27Z`; no despertarlo para verificar. Estado,
+reactivación y FinOps: [runbook](docs/architecture/kortex/operations/runbook.md). Forecast no es ahorro realizado.
 
 Móvil de Globe: native-first con React Native + Expo, web/PWA como fallback. ADR, vertical slice y gates:
 [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).

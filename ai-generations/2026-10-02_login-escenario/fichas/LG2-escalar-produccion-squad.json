@@ -1,0 +1,44 @@
+{
+  "id": "LG2-escalar-produccion-squad",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, high-impact editorial still, freeze-frame at 1/8000 s, a dark digital creative studio at night): a creative director wearing the EFEONCE HOODIE stands on the right side of the frame, framed from the waist up, REALISTIC ADULT PROPORTIONS, camera about two meters away at chest height, 85mm f/2. Her face is at about 62% of the frame width and at about one third of the frame height; her right elbow — the elbow nearest the frame-LEFT edge — is at about 47% of the frame width, and between the frame-left edge and her body there is a wide band of empty darkness. She holds BOTH hands forward at waist height, palms up and open, elbows relaxed, as she has just released ONE master key visual, and at this exact instant it EXPLODES just above her open palms into a fan of about a dozen finished pieces of content: THREE large ones just above her palms, sharp; FOUR mid-size ones halfway to the squad, soft; FIVE small ones near the squad, very blurred — each one the same campaign idea re-cut for its own format (slim 9:16 phone screen, 4:5 and square feed posts, a wide 16:9 video frame, a long web banner, a tall printed street poster; a different crop and layout of one bold key visual built from orange #FF6500, deep navy and white), so they read as one family, never as copies, all FROZEN perfectly still in the air. The fan leaves her palms toward the frame-right and the back of the room BELOW the height of her chest, so the embroidered mark on the hoodie chest stays fully visible, covered by no flying piece and grazed by the orange light only from below. At the root of the burst, just above her palms, burns a hot core of orange light (#FF6500), the only key light on her. A hard cool rim light from behind separates her hair and shoulders from the dark; no coloured panel on any wall. Outside the orange core, the whole frame stays cool and contemporary: deep navy and near-black, nothing amber, golden or tungsten. She looks straight into the lens with her own natural smile, softened: lips parted, upper teeth just visible, calm and confident, head almost frontal. Far behind her frame-right shoulder, small and out of focus in the haze, her squad works at three lit stations; nobody looks at the camera. Everything that tells the story — her face, her open palms, the three nearest pieces and the squad — sits between about 35% and 78% of the frame width; the burst and every flying piece never pass to the frame-left of her right elbow (the elbow nearest the frame-left edge), and her face stays clear of every flying piece. The frame-left part of the picture is calm, deep dark studio space: no lights at all, only the faint texture of the dark studio, no pieces, no people, no objects; the lower-left quarter stays the darkest, quietest area. Rich contrast, punchy color, no readable text on any piece, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a worktable close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the deep dark studio wall and floor far behind her, in shadow",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "publicidad-prueba",
+  "identidad": [
+    {
+      "persona": "daniela"
+    }
+  ],
+  "nota": "Excepción del operador (2026-10-02, chat de TASK-1964): una pieza cine con persona del equipo para el escenario del login de Greenhouse. alcance publicidad-prueba porque no existe un alcance web; no amplía el canon.",
+  "suspendido": "a fan of thin frameless screens and printed pieces in every real format, FROZEN mid-flight at 1/8000 s with not a trace of motion blur; only the three pieces nearest her palms are in sharp focus, every other piece falls into progressively softer focus with distance, at f/2",
+  "llave": {
+    "fuente": "a hot core of orange light (#FF6500) just above her open palms, where the burst begins",
+    "lado": "below her face and slightly to the frame-right, at the height of her waist, so the half of her face toward the frame-left falls into deeper shadow",
+    "distancia": "about 50 cm below her chin"
+  },
+  "primerPlano": "one flying piece seen from its dark, unlit back, very close to the lens at the bottom of the frame just right of the centre, huge, soft and out of focus, cut by the bottom edge, frozen mid-flight",
+  "fondo": "THREE people of her squad, one per station, small and out of focus far behind her frame-right shoulder, between her shoulder and about three quarters of the frame width: ONE designer at a large tablet, ONE video editor at a wide timeline a little farther, ONE motion designer with headphones farthest; no one else; behind them a row of large cold practical lights far away, melted into round bokeh",
+  "fenomeno": {
+    "que": "one master key visual released from her open palms EXPLODES into a frozen fan of formats (9:16, 4:5, square, wide video frame, web banner, a tall street poster), the same campaign idea re-cut for each format, flying from her palms toward the squad at the back frame-right on one hot orange (#FF6500) wave of light",
+    "esServicio": "Escalar producción creativa: una idea maestra se vuelve todos los formatos, sin perder la marca"
+  }
+}

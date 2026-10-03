@@ -61,6 +61,8 @@ export type CanonicalErrorCode =
   // TASK-1631 — External identity binding foundation (commands de operador + lane del gateway).
   | 'external_access_invalid_request'
   | 'external_access_not_found'
+  // TASK-1963 — novedades del login (API admin).
+  | 'login_announcement_not_found'
   | 'external_access_conflict'
   | 'external_access_organization_not_eligible'
   | 'external_access_environment_not_active'
@@ -277,6 +279,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     message: 'Revisa los datos del binding externo: hay un campo inválido o faltante.',
     actionable: true
+  },
+  login_announcement_not_found: {
+    status: 404,
+    message: 'No encontramos la novedad indicada.',
+    actionable: false
   },
   external_access_not_found: {
     status: 404,

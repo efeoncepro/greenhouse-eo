@@ -18,13 +18,22 @@ export interface PlanClaimV1 {
   text: string
   /** Hechos que sostienen la afirmación; una cifra sin factId es una discrepancia. */
   factIds: string[]
+  /**
+   * TASK-1957 — en las afirmaciones de capítulo: `finding` es un hallazgo que el render destaca; `backing` es respaldo que
+   * va a la tabla de todas las cifras. Ausente = plan anterior a TASK-1957 (el render lo trata como hoy).
+   */
+  role?: PlanClaimRole
 }
+
+export type PlanClaimRole = 'finding' | 'backing'
 
 export interface PlanTableV1 {
   tableId: string
   title: string
   columns: string[]
   rows: Array<Array<string | null>>
+  /** TASK-1962 — bajada propia de la tabla (sin cifras); ausente = la bajada general «todo lo que se midió». */
+  lead?: string
 }
 
 /**

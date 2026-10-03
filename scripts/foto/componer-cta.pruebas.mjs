@@ -105,6 +105,19 @@ const canonLegible169 = k => {
   return p
 }
 
+// Bitácora de cada composición fallida y cada gate que no sale con 0 ni con 1, por carpeta del caso. La carpeta de la corrida
+// se borra al terminar: sin esto, un ✗ intermitente (el gate que sale con 3 porque otra sesión editó una dependencia de la
+// huella a mitad de la corrida, una composición que muere) no deja rastro. P10 la imprime cuando falla.
+const ANOMALIAS = []
+
+// La razón, no un aviso ⚠: el primer fallo; si no lo hay, lo que sigue a «NO CERTIFICABLE» (el gate lo imprime al final).
+const primeraLinea = texto => {
+  const lineas = String(texto ?? '').split('\n').map(l => l.trim()).filter(Boolean)
+  const i = lineas.findIndex(l => /NO CERTIFICABLE/.test(l))
+
+  return (lineas.find(l => /^✗|Error/.test(l)) ?? (i >= 0 ? lineas[i + 1] ?? lineas[i] : null) ?? lineas.find(l => !/^⚠/.test(l)) ?? lineas[0] ?? '').slice(0, 160)
+}
+
 async function componer(nombre, piezas, ids = [], env = {}) {
   const dir = path.join(TMP, nombre)
   const planPath = path.join(dir, 'piezas.json')
@@ -121,7 +134,11 @@ async function componer(nombre, piezas, ids = [], env = {}) {
   } catch (e) {
     const texto = String(e.stderr ?? '') + String(e.stdout ?? '')
 
-    return { ok: false, dir, planPath, salida: texto, error: (texto.match(/Error: ([^\n]+)/) ?? [null, String(e.message).split('\n')[0]])[1] }
+    const error = (texto.match(/Error: ([^\n]+)/) ?? [null, String(e.message).split('\n')[0]])[1]
+
+    ANOMALIAS.push({ caso: nombre, que: `compone ${e.code ?? e.signal ?? '?'}`, linea: String(error).slice(0, 160) })
+
+    return { ok: false, dir, planPath, salida: texto, error }
   }
 }
 
@@ -131,7 +148,11 @@ async function gate(planPath, extra = []) {
 
     return { code: 0, salida: r.stdout + r.stderr }
   } catch (e) {
-    return { code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }
+    const salida = String(e.stdout ?? '') + String(e.stderr ?? '')
+
+    if (e.code !== 1) ANOMALIAS.push({ caso: path.basename(path.dirname(planPath)), que: `gate ${e.code ?? e.signal ?? '?'}`, linea: primeraLinea(salida) })
+
+    return { code: e.code ?? 1, salida }
   }
 }
 
@@ -778,7 +799,7 @@ const PRUEBAS = [
         ['ids repetidos', [base(), base()], [], /ids repetidos/],
         ['id pedido inexistente', [base()], ['no-existe'], /no están en el plan: no-existe/],
         ['token de color inexistente', [token], [], /`cta\.surfaceToken` debe ser uno de/],
-        ['final con otra proporción', [final], [], /no tiene la proporción/],
+        ['final con otra proporción', [final], [], /cambia la proporción del plate .* y recortaría/],
         ['pieza muda', [muda], [], /pieza muda/],
         ['plate inexistente', [plate], [], /no existe el plate/],
         ['zona ignorada sin razón', [ignorar], [], /reason/],
@@ -1547,8 +1568,9 @@ const PRUEBAS = [
       Object.assign(c13LosaAprobada.cta, { paddingX: 110, paddingY: 70 })
       // Un botón-losa también pasa el área del titular (`cta-tamano`, tramo 14): la aprobación cubre las dos reglas.
       c13LosaAprobada.excepciones = [{ regla: 'cta-relleno', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2.5 }, { regla: 'cta-tamano', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2 }]
-      // 1,5× el cuerpo del CTA (40 px). El caso de la auditoría —150 px— no cabe en esta escena: el descriptor invade la
-      // protección del sujeto y el compositor aborta antes de llegar al gate.
+      // `descriptorGap` 60 = 1,5× el cuerpo declarado del CTA (40 px); el gate mide desde el borde del botón ya crecido y
+      // registra 1,70× contra el techo de 1,5× (medido 2026-10-02): el margen es de 0,2×. El caso de la auditoría —150 px— no
+      // cabe en esta escena: el descriptor invade la protección del sujeto y el compositor aborta antes de llegar al gate.
       c13Lejos.cta.descriptorGap = 60
       c13CtaChico.afterSize = 48
       c13Tinta.leadFill = '#39ff14'
@@ -1760,6 +1782,20 @@ const PRUEBAS = [
         gC16CantoForjado = await gate(c16Rs[4].planPath)
       }
 
+      // Un ✗ del gate sin evidencia no se puede diagnosticar después: la carpeta de la corrida se borra al terminar. Estos casos
+      // dejan su código de salida y la línea que importa (2026-10-02: «descriptor lejos del botón» falló sin rastro y no se
+      // pudo reproducir en HEAD).
+      const evidencia = { 'rechaza descriptor lejos del botón': gC13Lejos, 'rechaza descriptor que el cursor empuja': gC14DescColab, 'mide el descriptor desde el texto del CTA': gC15Texto }
+
+      const porque = g => {
+        const lineas = String(g.salida ?? '').split('\n').map(l => l.trim()).filter(Boolean)
+
+        // La línea del descriptor si la hay; si no, el primer fallo; si no (el gate aprobó), su veredicto final.
+        const linea = lineas.find(l => /descriptor/.test(l) && /✗|Error/.test(l)) ?? lineas.find(l => /✗|Error/.test(l)) ?? lineas.at(-1) ?? 'sin salida'
+
+        return `gate ${g.code}: ${linea.replace(/·/g, ',').slice(0, 200)}`
+      }
+
       const r = {
         'aprueba el plan bueno': gBueno.code === 0,
         'rechaza texto alternativo reemplazado': gAltCambiado.code === 1 && /no es el texto alternativo que registró la composición/.test(gAltCambiado.salida),
@@ -1876,7 +1912,11 @@ const PRUEBAS = [
         'avisa firma sobre sujeto': /firma queda sobre el sujeto/.test(gFirma.salida)
       }
 
-      return { ok: Object.values(r).every(Boolean), detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ') }
+      const ok = Object.values(r).every(Boolean)
+      // Al fallar, las salidas anómalas de los casos de P10 (las esperadas también: cada una dice su caso).
+      const anomalias = ok ? [] : ANOMALIAS.filter(a => /^P10-/.test(a.caso)).map(a => `${a.caso} ${a.que}: ${a.linea.replace(/·/g, ',')}`)
+
+      return { ok, detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : evidencia[k] ? `✗ (${porque(evidencia[k])})` : '✗'}`).join(' · ') + (anomalias.length ? ` · anomalías de P10 (${anomalias.length}): ${anomalias.slice(0, 40).join(' ‖ ')}` : '') }
     }
   },
   {

@@ -1,6 +1,9 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.0 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.1 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-02 por Claude (1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
+> aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
 > Este documento **no lo reemplaza**: lo vuelve operable. El canon dice qué es el registro; el casebook dice cómo se
 > llega a una foto aprobable sin consultarle a nadie, con las fallas que ya pasaron y su corrección exacta.
@@ -52,7 +55,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -97,6 +100,12 @@ foto cine nueva, se agrega ahí **y** en esta tabla.
 | `PH2` | destacado de Instagram | Nexa | retrato centrado, un color de luz sobre oscuro | `2026-09-30_portadas-sociales/fichas/PH2-aeo.json` |
 | `PS1b` | portada de perfil 3:1 | Nexa (softshell) | reserva izquierda, una sola fuente | `2026-09-30_portadas-sociales/fichas/PS1b-*.json` |
 | `WB1c` | portada Engine, `proposal-cinematic-web` | desarrollador | el polo del kit editado: bordado en el pecho | `2026-09-26_deck-web/fichas/WB1c/` |
+| `LG1` | escenario del login, novedad AI Visibility (`alcance: nexa`) | Nexa (traje) + 1 Spark en el hombro | atrapa UNA tarjeta de respuesta entre miles congeladas en el aire; un haz azul engine; la tarjeta es la llave | `2026-10-02_login-escenario/fichas/LG1-ai-visibility-nexa.json` |
+| `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: publicidad-prueba`, excepción) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
+
+Aprobadas por el operador el 2026-10-02 (TASK-1964). **Pendiente:** sumar `LG1` y `LG2e` a
+`scripts/foto/cine-recetas.json` (lo hace la sesión dueña del índice). `LG3e`, la tercera foto aprobada del login, **no
+es cine** (registro B, puesta en escena): está en [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
 
 ⚠️ Varias de estas (AE2b, CR2b, NX6b, RV1b, BR1b, BR2b, SP2b, SE1) llevan el **isotipo compuesto plano** (falla 8):
 sirven como receta de luz, encuadre y escena, no como receta de bordado. Pendiente: rehacerlas con el método de WB1c.
@@ -179,6 +188,54 @@ prenda de su línea y casting por rol con el código por escena; luces práctica
 (excepción cine); una sección partida por deck la controla el validador del plan. Detalle en el
 [registro cine, delta 2026-10-02 (b)](EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega).
 `foto:prompt` aplica en cine las tres que son de toma (aros, escala, mirada).
+
+## Escenario del login de Greenhouse (2026-10-02) — lo que aprendimos
+
+Tres fotos para el carrusel de novedades del login V4 (TASK-1964), en
+`ai-generations/2026-10-02_login-escenario/` (fichas, prompts compilados, plates, retratos de casting y la revisión al
+100 %). Aprobadas por el operador: `LG1` y `LG2e` (cine, en la tabla de arriba) y `LG3e` (registro B).
+
+**El alcance que no existe [decisión del operador, 2026-10-02 · pendiente de canon].** El login es una superficie de
+producto, no una pieza de campaña. El operador aceptó cine con una persona de **casting** (no del roster) en uniforme
+para ese escenario, como **excepción explícita del login**. Como `ALCANCES_CINE` no tiene un alcance web ni de
+producto, las fichas declaran `alcance: "publicidad-prueba"` y lo explican en `nota`. Con Nexa protagonista (`LG1`) no
+hace falta excepción: es el caso 1. **Propuesta** (no aplicada en código): un alcance propio, por ejemplo
+`producto-escenario`, que diga «superficie de producto con foto de marca» y obligue a declarar la excepción; hasta que
+el operador lo decida, `publicidad-prueba` + `nota` es la forma honesta de escribirlo. Detalle en el
+[registro cine, delta 2026-10-02 (c)](EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse).
+
+**Personajes de casting con retrato ancla (lo que funcionó).** Un personaje nuevo, sin foto de referencia, salió con
+piel «muy IA» y el operador lo rechazó; retocar sólo la cara no alcanzó (fallas 14 y 15). Lo que el operador aprobó:
+
+1. **Primero el retrato ancla**, uno por personaje, con la receta de piel v3 (la de
+   [`.claude/rules/brand-photography.md`](../../../.claude/rules/brand-photography.md), «Realismo NO es castigo»):
+   `pnpm ai:image` con `gpt-image-2.5-sunburst`, `--quality high`, `1024x1536`, de pecho, 85 mm f/2, ventana grande
+   con rebote, pared gris oscura, camiseta lisa sin logo y un bloque `SKIN (critical)` que pide la textura **sólo** de
+   poros irregulares y vello fino, tono parejo, sin rojeces y sin envejecer. Prompts verbatim:
+   `casting/ancla-*.txt`.
+2. **Después la escena**, con el campo `casting` de la ficha apuntando a ese retrato (`refs`) y su bloque
+   `IDENTITY (critical)`, y el personaje pedido en `identidad` por su clave. Es el método de «casting de campaña» del
+   compilador ([personas, delta 2026-10-02](EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--casting-de-campaña-para-personajes-ficticios))
+   aplicado a un personaje que todavía no tiene una pieza aprobada de donde salir.
+
+**Siete fallas nuevas, con su corrección.** Las 17 y 18 son **inferencias del agente `cine-reviewer`**: el texto está
+en el prompt compilado [verificado], el efecto sobre la foto no se aisló [inferido]. No están corregidas en
+`build-prompt.mjs`.
+
+| # | Síntoma | Causa | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 14 | **Piel «muy IA»** en un personaje de casting (rechazo del operador) | Personaje sin ancla fotográfica: el modelo inventa la cara y la piel en la escena | Retrato ancla con la piel v3 y después la escena con `casting` apuntando a él (arriba) | `LG2b`/`LG3d` → `LG2e`/`LG3e` | operador; `cine-reviewer` al 100 % |
+| 15 | **Retocar la piel no cambia la piel** | `pnpm ai:inpaint image` con Sunburst sobre la cara (recorte con contexto): en `LG2b` la zona cambió poco (delta medio 10,4/255, run `e29414c20458`); en `LG3d` reencuadró ≈ 6 px y escaló 0,98 (delta 15,4; `suspectMisaligned`, el pipeline marcó REVISAR, código 3; run `fdd790982b85`) [verificado 2026-10-02] | La piel de un personaje se resuelve en el ancla, no retocando la foto terminada | `piel/inpaint/` | manifiesto de `ai:inpaint` |
+| 16 | **Microtextura craquelada** y punta de nariz más ancha y brillante que el ancla | Plate a **3840×2160**; regenerado a **2560×1440** (el máximo no experimental) salió fino [observado en una corrida; la causalidad es inferencia] | Plates de personas a 2560×1440; mirar la cara al 100 % contra el ancla. Coincide con «más resolución no es más fidelidad» (regla de fotografía) | `LG2d` (3840) → `LG2e` (2560) | ojo al 100 %, `revision/LG2d-vs-LG2e-cara.jpg` |
+| 17 | La piel de la escena contradice la del ancla | El bloque de realismo compartido (`scripts/foto/bloques/bloque-realismo-v3.txt`) pide «fine wrinkles, uneven skin tone», y `AJUSTES_CINE` no lo reemplaza: está en todos los prompts del login, incluido `LG2e` [verificado]; que empuje la piel hacia lo envejecido es inferencia | Hasta que el compilador lo resuelva, el `IDENTITY` del casting manda en la piel; mirar la cara contra el ancla | `prompts/LG2e-*.txt` | pendiente de código |
+| 18 | **Todo nítido** en una escena que pide profundidad de campo | En cine, la plantilla de `suspendido` añade «Every piece is sharp and clearly in flight» (`build-prompt.mjs`, `bloqueSuspendido`, ~l. 1556) [verificado], y contradice el desenfoque por distancia [inferido] | Quitar `suspendido` y declarar el congelado **en la escena**, con qué está nítido y qué se funde (`LG2d`/`LG2e` no lo usan). `LG1` lo usa y fue aprobada porque su `suspendido` ya dice que sólo lo cercano está nítido | `LG2`–`LG2c` → `LG2e` | `cine-reviewer` |
+| 19 | **Congelado y estela a la vez** no se entienden | Freeze a 1/8000 s junto a una larga exposición es incoherente: una toma no puede ser las dos cosas | «a long exposure closed by a rear-curtain flash»: la estela la da la exposición larga; el flash de segunda cortina congela al sujeto al final | borrador de `LG2d`, atrapado por `cine-reviewer` antes de gastar → `LG2d`/`LG2e` | `cine-reviewer` |
+| 20 | **Lámpara práctica encendida y un monitor azul grande de fondo** (también en registro B) | Se describió el «ambiente» con fuentes propias en vez de una sola fuente de la escena | En B, las prácticas van apagadas; en cine, sólo como bokeh frío y lejano (delta (b), decisión 6). El **panel azul de fondo** está prohibido: el portador legítimo del azul era la propia bomber | primera toma de `LG3` (rechazada por canon antes de mostrarla) → `LG3e` | `cine-reviewer` |
+
+**`LG3e`, la foto aprobada que no es cine.** Registro B, puesta en escena: un estratega de contenidos de casting con la bomber
+sobre el polo golpea la mesa y el plan de contenidos queda congelado en el aire; acento teal de growth; una sola fuente LED
+baja dentro del cuadro. En el login lleva la lente; `LG1` y `LG2e` van **sin lente**, porque su luz ya es la órbita de
+la pieza (una órbita por pieza; el operador lo aceptó). Ficha: `fichas/LG3e-contenidos-estratega.json`.
 
 ## Lo que no se automatiza (y por eso existe el revisor)
 

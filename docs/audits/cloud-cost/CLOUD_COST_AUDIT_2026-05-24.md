@@ -1,5 +1,9 @@
 # Cloud Cost Audit — GitHub Actions + GCP + Vercel (2026-05-24)
 
+> **Actualización 2026-10-02:** la oportunidad Kortex descrita en esta auditoría histórica fue ejecutada como
+> hibernación profunda reversible. Estado, costo observado y forecast vigente:
+> [`CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md`](CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
 > **Tipo:** Auditoría técnica/operativa reutilizable
 > **Fecha:** 2026-05-24 · **Autor:** Claude Opus 4.7 (sesión release + diagnóstico de costos)
 > **Alcance:** GitHub Actions, GCP (`efeonce-group`), Vercel (`efeonce-7670142f`)

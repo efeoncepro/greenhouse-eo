@@ -6,6 +6,43 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-02
+
+- **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, `studio.efeonce.org/api/v1/health` → `1.4.0`). El
+  Entregable C (corte de las campañas a Studio y retiro de OneDrive) quedó diferido por el operador. La dependencia
+  de esta task con TASK-1894 (Entregables A y B) está cubierta; `Blocked by` no se toca en este delta.
+- **Lo que esta UI ya puede consumir:** `CampaignDetail.permissions` (`writable`, `lockReason`
+  `open_mode | missing_capability | authority_onedrive`, `canApprove`, `sourceOfTruth`, `allowedTransitions`,
+  `revision`); `revision` en las lecturas de copy, anuncio, post, concepto y plan (`flightId`, `budgetLineId`); `ETag`
+  = revisión en lecturas de entidad; `GET /api/v1/campaigns/{id}/brief` (tool `studio.campaign.brief.get`); 29 rutas
+  de escritura (POST/PATCH/PUT/DELETE) con cuerpo vacío aceptado en DELETE y aprobaciones; `warnings` en el resultado
+  de toda escritura. Errores nuevos: `approval_requires_dedicated_command` 422, `campaign_not_studio_owned` 409,
+  `budget_kind_violation` 422, `confirmation_required` 403, `already_exists` 409.
+- **Para verificar en staging:** campaña sandbox `CMP-900` (creada por `createCampaign`, organización Efeonce, datos
+  sintéticos, gobernada por Studio) y `api_client` «Pruebas de escritura TASK-1894 B (staging)» con `studio:read` +
+  `studio:write` + `studio:assets:write`; su token está en Secret Manager `marketing-studio-write-tests-token-staging`
+  (nunca se imprime).
+- **Supuestos que cambian:**
+  - Las cinco campañas reales (CMP-001…005) siguen gobernadas por su catálogo de OneDrive (`sourceOfTruth onedrive`):
+    toda escritura del catálogo sobre ellas responde `409 campaign_not_studio_owned` (salvo `createCampaign`, la puerta
+    de ingreso y la revisión de versiones). La UI explica el bloqueo con `permissions.lockReason`, nunca lo deduce. Hasta
+    el Entregable C, la edición se prueba en `CMP-900` o en una campaña nacida con `createCampaign`.
+  - En producción hoy `writable false` con `lockReason open_mode` (smoke del 2026-10-02 sobre CMP-004) y ningún
+    `api_client` de producción tiene `studio:write`.
+  - `T2` por API responde `403 confirmation_required` hasta TASK-1899 (el diseño de esta task asumía el `428` de
+    TASK-1899: conciliar al tomarla); un `api_client` que aprueba recibe `approval_requires_person`. Hoy sólo aprueba
+    una persona por la CLI (`operator_cli`, `pnpm studio:write … --apply --confirm`): el `ConfirmDialog` de `T2` no se
+    puede ejercitar de punta a punta antes de TASK-1899.
+  - Aprobar creatividad y autorizar medios son commands dedicados (`approveCreative`, `authorizeMedia`): la transición
+    genérica a un destino aprobatorio responde `422 approval_requires_dedicated_command`.
+  - `setBudgetLine` acepta sólo `proposed`; `approveBudgetLine` crea la línea `approved` con `approvalRef` y conserva
+    la propuesta. Studio planifica posts (`PLANNED`) y los cancela (`CANCELLED`), nunca publica; un post del proveedor
+    no se edita.
+  - El puerto `ChannelValidator` trae un adaptador por defecto que no valida (`catalogVersion null`) hasta TASK-1905.
+- Greenhouse: las capabilities `marketing_studio.asset.write` y `marketing_studio.campaign.write` están en `develop`
+  (`9d0d698d4`); su release a producción está pendiente de decisión del operador. El gateway (v1.10.0) no federa
+  escrituras hasta TASK-1899.
+
 ## Delta 2026-09-26 (capa de estrategia)
 
 - **Decisión nueva:**
@@ -216,13 +253,18 @@ Reglas obligatorias:
 - `apps/web/src/copy.ts` como fuente única de textos; `styles/app.css` + `theme.generated.css` desde AXIS 0.2.5 con `theme:check` en el typecheck; `prefers-reduced-*` global ya anulando transiciones.
 - `apps/web/src/server/runtime.ts`: `accessMode()` (`open`|`efeonce_id`) y `resolveActor()` (actor anónimo en `open`); `packages/contracts` con DTOs (`CampaignDetail.revision`, `BudgetKind`, `CampaignStates`) y catálogo de errores canónico `{ error, code, actionable }`.
 - Canvas de diseño con artboards v2 aprobados (Home, Campaigns, Campaign, Calendar, Plan, Command, Mobile).
+- (2026-10-02, TASK-1894 Entregables A y B en producción, API `1.4.0`) Del lado de la API: commands de revisión,
+  campaña, brief, concepto, pieza, derechos, copy, anuncio, plan de medios, posts y tres estados; `permissions` en
+  `getCampaign`; `revision` y `ETag` en las lecturas; `GET /api/v1/campaigns/{id}/brief`. En staging: sandbox `CMP-900`
+  y `api_client` de pruebas de escritura (ver Delta 2026-10-02).
 
 ### Gap
 
 - No existe ninguna superficie de escritura, ni hoja, ni diálogo de confirmación, ni manejo de 412, ni cliente HTTP con `Idempotency-Key`/`If-Match`.
 - No hay pestaña de resultados ni representación de métricas degradadas o ausentes.
 - El inspector de pieza no muestra versiones, derechos ni descarga de original.
-- La píldora «Solo lectura» no explica por qué; no hay proyección de permisos por acción en la página.
+- La píldora «Solo lectura» no explica por qué; la página no usa la proyección de permisos por acción (la API ya la
+  entrega en `CampaignDetail.permissions` desde 2026-10-02).
 - No hay artboards aprobados para la edición: el canvas v2 cubre sólo lectura.
 - Studio no tiene Playwright ni axe; no hay evidencia visual automatizada.
 

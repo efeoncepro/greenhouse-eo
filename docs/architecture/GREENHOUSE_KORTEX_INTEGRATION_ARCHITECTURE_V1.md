@@ -519,4 +519,4 @@ If implementation appears to require any of the above, the agent must stop and o
 
 ### 17.8 Implementation owner
 
-Implementation is tracked by `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
+Implementation history is preserved in `docs/tasks/cancelled/TASK-948-greenhouse-identity-broker-kortex-sso.md`. The task was cancelled on `2026-10-02` when Kortex was paused; no rollout is authorized.

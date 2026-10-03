@@ -189,8 +189,13 @@ runtime, memory or delegated authority.
 - **Native internal authority is `unsupported`** for Studio tools (`marketing_studio_native_policy_missing`): the
   native v2 grant only delegates `growth.seo.observation.read`; adding Studio needs new consent (D10), not a list edit.
 - Greenhouse capabilities (module `marketing_studio`): `.campaign.read` granted to `efeonce_admin`,
-  `efeonce_account`, `efeonce_operations` (live). `.write` (admin, operations, account, designer) and `.approve`
-  (admin, account, operations — designer writes but never approves) are planned in TASK-1894/1899, not seeded yet.
+  `efeonce_account`, `efeonce_operations` (live). `.asset.write` and `.campaign.write` (`create`/`update`, scope
+  `tenant`; admin, operations, account, designer) are seeded and granted on `develop` (`9d0d698d4`, 2026-10-02) but
+  **not released to production**. `.approve` (admin, account, operations — designer writes but never approves) is
+  planned in TASK-1899. Studio enforces API scopes `studio:assets:write` / `studio:write` for API clients.
+- **Authority per campaign** (Entregable B): `campaign.source_of_truth` `onedrive` (default) | `studio`. Catalog writes
+  on an `onedrive` campaign ⇒ 409 `campaign_not_studio_owned`; T2 (approval/destructive) only for `operator_cli`
+  (`pnpm studio:write … --apply --confirm`), via API 403 `confirmation_required` until TASK-1899.
 
 ## Hard rules
 
@@ -280,17 +285,29 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 - **MCP `forbidden`** → the Greenhouse exchange denied: person lacks `marketing_studio.campaign.read`, or
   `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` lacks `efeonce-mcp-marketing-studio` in that deployment.
 
-## Program status (2026-09-26) and pending
+## Program status (2026-10-02) and pending
 
-- Studio in production; API 1.2.0; 13 tools + 5 exclusions in the Studio manifest; the gateway federates 12 (the
-  `studio.asset.download` federation is a TASK-1893 follow-up).
+- Studio in production; API 1.3.0; 15 tools + 5 exclusions in the Studio manifest (20 operations: 18 reads `T0` + 2
+  writes `T1`); the gateway federates 12 (the `studio.asset.download` federation is a TASK-1893 follow-up, and the
+  manifest with the two write tools is not synced — the parity guard would drop them until TASK-1899).
+- TASK-1894 **Entregable A (ingest door) in production since 2026-10-02**: `studio.asset.upload.request` +
+  `studio.asset.version.create` (scope `studio:assets:write`), CLI `pnpm studio:upload` (HTTP `api_client`) and
+  `pnpm studio:review` (operator only); flags `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` + `STUDIO_UPLOADS_ENABLED` ON; 33
+  CMP-004 finals uploaded and `pending_review`. Greenhouse capability `marketing_studio.asset.write` not seeded (not
+  authorized yet). Entregables B and C pending.
+- TASK-1894 **Entregable B (catalog commands) in production since 2026-10-02** (health 1.4.0, read-only prod smoke):
+  Studio `a8c7886` on `main`, preview of branch `task-1894-entregable-b`; API 1.4.0, 44
+  tools (29 write routes + `studio.campaign.brief.get`), state machines, `CampaignDetail.permissions`, `ETag`, CLI
+  `pnpm studio:write`; migration `1790967435017` applied on staging and prod (5 real campaigns stay `onedrive`);
+  sandbox `CMP-900`. Greenhouse write capabilities on `develop` only. Gateway: synced 2026-10-02 (efeonce-mcp#23, v1.10.0)
+  with the read-only federation filter — **never federate a Studio write before TASK-1899**; deployed (revision 00064). Entregable C deferred by the operator.
 - Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
   Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
 - Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of
   `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
   real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
 - Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
-- Next: TASK-1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
+- Next: TASK-1892 → 1894 (B, C) → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing
 

@@ -1,5 +1,28 @@
 # Handoff activo
 
+**Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
+
+**Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
+
+**Inpainting (02/10):** [TASK-1965](docs/tasks/in-progress/TASK-1965-ai-inpaint-image-video-cli-pipeline.md) code complete local, sin push: `pnpm ai:mask` + `ai:inpaint image|video` (delta 0). Sunburst con máscara = panel negro → edita sin máscara. Faltan canarios Sunburst, boceto y Seedream (autorización de gasto).
+
+**Marketing Studio (02/10, noche):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress. A y B en producción (API 1.4.0, `pnpm studio:write`); gateway v1.10.0 desplegado sin federar escrituras. **Operador:** release de las capabilities de Greenhouse `9d0d698d4`. C diferido. [§7.4](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
+
+**CMP-004 completa (02/10):** 44 piezas aprobadas (4:5, 9:16, 1:1, 1,91:1) en OneDrive, Studio y AXIS Lab; horizontales por `pnpm foto:expandir` desde la 1:1 ([CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md), skill `efeonce-advertising-creative` §0c).
+
+**Kortex hibernado + corte FinOps (02/10):** desde `2026-10-02T13:44:27Z`, Vercel pausado, Cloud Run internal/IAM/min0,
+Cloud Tasks pausado/0 y `kortex-pg-dev` `STOPPED/NEVER`; no ejecutar adapter, smokes ni deploys para despertarlo.
+Backlog Kortex retirado: `TASK-264/377/413/889/948/949` pasaron a `cancelled` por la pausa; ya no queda ninguna
+task explícita de Kortex en `to-do` ni `in-progress`. Una reactivación requiere intake y tasks nuevas.
+Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y total GCP CLP 237.068,14/mes
+(rango 230k–245k) son **modelos**, no ahorro realizado; confirmar con ventanas post-corte. [Runbook](docs/architecture/kortex/operations/runbook.md) · [auditoría](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
+
+**Insights: qué dice el informe (02/10):** [TASK-1962](docs/tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) code complete local, sin push; va en el release de TASK-1957 y Think se empuja después.
+
+**Insights apto para cliente (02/10):** [TASK-1957](docs/tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) code complete local (Slices 1–6, sin push): vocabulario único web/PDF, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit que bloquea emitir a cliente e indicadores AEO estándar (Share of Model, Share of Voice, tasa de mención, citas). Falta `pnpm build` autorizado, release y canary. [TASK-1958](docs/tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) (jerarquía Think/PDF) bloqueada por 1957. Ninguna edición de cliente se emite antes de cerrar ambas.
+
+**Release 02/10 (`6ea157e6e641`, PR #247, run `37003281899`):** develop→main `released` 12:04Z; watchdog ok 6/6; canary prod web Insights 1.1 (crear→leer `modelVersion=1.1`→revocar). Migración TASK-1950 aplicada antes del merge. `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Production + EmailTypes de Insights ON (redeploy `dpl_B1v1vReWS44UYMi7u9LHKqSPpJ7K`); falta canary con sesión humana (lane `app`). `BRAND_RENDER_ENABLED` sigue OFF en prod (canary Proposal pendiente). [Tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
+
 **CMP-004 por servicios (02/10):** [CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md) — 8 pilotos N2 certificados (`graphicLine`, `fde62f05d`); pendientes y artefactos en el CDR §6. Sin push.
 
 **Registro cine sin consultor (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md) delta b en develop (último `00e53ef53`), AXIS en vivo. Dos pruebas ciegas: las sesiones llegan solas usando `cine-reviewer`; barra de luz recalibrada contra las aprobadas. Pendiente: veredicto del operador sobre `ai-generations/2026-10-02_prueba-ciega-cine-2/` y el orquestador idempotente. [Casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).

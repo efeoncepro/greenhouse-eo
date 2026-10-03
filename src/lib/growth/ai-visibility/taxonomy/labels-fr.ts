@@ -23,6 +23,7 @@ export const FRENCH_CATEGORY_LABELS: Record<string, string> = {
   Telecommunications: 'Télécommunications',
   'Consumer goods': 'Biens de consommation',
   'Food and beverage': 'Alimentation et boissons',
+  'Paints and coatings': 'Peintures et revêtements',
   'Passenger airlines': 'Compagnies aériennes de passagers',
   'Supermarkets and grocery': 'Supermarchés et épiceries',
   'Apparel and fashion': 'Habillement et mode',

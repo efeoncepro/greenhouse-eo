@@ -52,14 +52,17 @@ corporativos, y para los servicios creativos sea el hoodie, esto por la "persona
 | Clave | Persona | Referencia de identidad | Estado |
 | --- | --- | --- | --- |
 | `julio` | Julio Reyes | set aprobado del 2026-09-20 (`ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`) | aprobado |
-| `andres` | Andrés Carlosama | `_identidad-equipo/andres/actual.png` (con hoodie) + `antiguo.png` | aprobado |
-| `daniela` | Daniela Ferreira | `_identidad-equipo/daniela/actual.png` (con hoodie) + `antiguo.png` | aprobado |
-| `melkin` | Melkin Hernandez | sólo `_identidad-equipo/melkin/actual.png`: el retrato antiguo lo muestra con el pelo largo amarrado | aprobado |
-| `humberly` | Humberly Henriquez | `_identidad-equipo/humberly/antiguo.jpg` (no hay foto actual) | aprobado · falta foto actual |
-| `valentina` | Valentina Hoyos | `_identidad-equipo/valentina/actual.png` | aprobado |
+| `andres` | Andrés Carlosama | `_identidad-equipo/andres/avatar-bomber-2026-09.png` | aprobado |
+| `daniela` | Daniela Ferreira | `_identidad-equipo/daniela/avatar-bomber-2026-09.png` | aprobado |
+| `melkin` | Melkin Hernandez | `_identidad-equipo/melkin/avatar-bomber-2026-09.png` | aprobado |
+| `humberly` | Humberly Henriquez | `_identidad-equipo/humberly/avatar-bomber-2026-09.png` | aprobado |
+| `valentina` | Valentina Hoyos | `_identidad-equipo/valentina/avatar-bomber-2026-09.png` | aprobado |
 
-`_identidad-equipo/` es `ai-generations/_identidad-equipo/` (con su `LEEME.md`): el hogar de las **fotos reales**. Desde el
-2026-09-29 los avatares del repo son derivados editados (bomber, fondo nuevo) y no sirven de referencia de identidad.
+`_identidad-equipo/` es `ai-generations/_identidad-equipo/` (con su `LEEME.md`): el hogar de las referencias de
+identidad. **Desde el 2026-10-02 la referencia es el avatar oficial con la bomber** (maestro 1080 publicado en
+`team/avatars/v1/1080/`, copiado como `avatar-bomber-2026-09.png`) **[decisión del operador, 2026-10-02: «Es el último,
+descarta los anteriores, es donde salen con la bomber»]**. Las fotos anteriores (`actual`, `antiguo`) quedan en disco
+pero ya no son referencia. Reemplaza la regla del 2026-09-29, que trataba los avatares como derivados no aptos.
 **Luis salió del equipo** (operador, 2026-09-29): ya no está en `PERSONAS` ni en el canon §3.6.
 
 La ropa de la foto de referencia no decide nada: la escena declara la prenda de la línea y el modelo viste con el kit.
