@@ -91,6 +91,8 @@ embroidered emblem on the left chest): use it as his exact garment.
 
 ### 5.4 Bloques IDENTITY (verbatim)
 
+> **Delta 2026-10-03:** el bloque de Julio que usa `foto:prompt` dice hoy *«thirty-seven years old with premature grey: keep his apparent age EXACTLY as in the references»* (Julio tiene 37 con canas prematuras; ganó el A/B del 2026-10-03). El de abajo es el de las rondas del 2026-09-20 y queda como histórico.
+
 Julio:
 
 ```text

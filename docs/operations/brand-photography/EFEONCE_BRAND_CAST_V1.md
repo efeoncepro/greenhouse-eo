@@ -165,16 +165,15 @@ revisan en la hoja de contacto:
 Con dos personas del elenco en cuadro, cada una lleva sus referencias con rol explícito
 («Images 1-2 are Karo… Images 3-4 are Sophia…») y las de una nunca se reutilizan para la otra.
 
-## 6. Julio: la edad del bloque no coincide con la real [pendiente]
+## 6. Julio: 37 con canas prematuras [resuelto 2026-10-03]
 
-El bloque `IDENTITY` de Julio en `PERSONAS` dice *«mid-forties: do not rejuvenate»*, y el bloque histórico de
-[personas §5.4](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) dice *«a Venezuelan man in his mid-forties»*. Julio
-tiene **37** **[decisión del operador, 2026-10-02]**. Las salidas aprobadas el 2026-09-20 («me reflejan
-perfectamente») se generaron con ese texto, y las canas probablemente las sostiene esa palabra.
-
-No se cambia el texto a ciegas. Antes, un A/B de dos escenas ya aprobadas: el bloque actual contra *«late thirties,
-prematurely grey: keep his age exactly as in the references, do not rejuvenate nor age him»*. El operador elige; si
-gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo commit.
+El bloque `IDENTITY` de Julio decía *«mid-forties: do not rejuvenate»*; Julio tiene **37, con canas prematuras**
+**[operador, 2026-10-02 y 2026-10-03]**. Se hizo un A/B sobre la misma escena y las mismas referencias
+(`ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/`, archivado; `pnpm ai-gen:pull` para verlo): la diferencia
+visible es sutil, porque las canas de la barba y de los lados las sostienen sus fotos aprobadas y no la palabra. Ganó
+B y quedó en `PERSONAS` y en el canon §3.6: *«thirty-seven years old with premature grey: keep his apparent age
+EXACTLY as in the references — do not rejuvenate, age, beautify or soften»*. El bloque histórico de personas §5.4 queda
+marcado como tal.
 
 ## 7. Cómo se construye un personaje ficticio
 
@@ -288,7 +287,7 @@ que le tape el pecho (`tapa`). En un grupo, cada prenda declara `persona`. El ki
 
 | Personaje | Estado |
 |---|---|
-| Julio | Aprobado (roster). A/B de edad generado (`2026-10-02_elenco-efeonce/julio-edad-ab/`): espera la elección del operador (§6) |
+| Julio | Aprobado (roster). Edad: 37 con canas prematuras, en el bloque desde el 2026-10-03 (§6) |
 | Hum | **Elenco listo**: set v3, cuerpo extendido, manos y ancla en alta resolución |
 | Karo | **Elenco listo** |
 | Sophia | **Elenco listo** |
