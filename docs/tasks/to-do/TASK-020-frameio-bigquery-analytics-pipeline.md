@@ -1,5 +1,13 @@
 # CODEX TASK -- Frame.io Analytics Pipeline v2: enrichment canonico de delivery e ICO sobre source sync existente
 
+## Delta 2026-10-03 — Efeonce Insights lee los contadores de revisión
+
+- TASK-1994 (EPIC-045) lleva al informe de Insights las versiones y comentarios de revisión (`frame_versions`,
+  `frame_comments` en las filas de tareas, hoy leídos por `src/lib/projects/get-project-detail.ts`), que una
+  automatización copia de Frame.io a propiedades de Notion. Antes de emitirlos confirma y documenta ese origen; si esta
+  task integra Frame.io de forma directa, el reader cambia de fuente sin cambiar el hecho. — por trabajo en TASK-1990…1996
+
+
 ## Delta 2026-05-25 — Requisito: el flujo OAuth de Frame.io DEBE limpiar versiones de secret on-rotate (keep-N)
 
 Heredado de **TASK-933** (Secret Manager cost/security cleanup). El flujo de refresh OAuth de Frame.io acumuló **76 versiones** en cada uno de `frameio-access-token` / `frameio-refresh-token` (152 = 70% de las versiones del proyecto) porque rotaba el token sin destruir las viejas. Los refresh tokens OAuth quedan **muertos al instante** después de rotar (solo el último vale).

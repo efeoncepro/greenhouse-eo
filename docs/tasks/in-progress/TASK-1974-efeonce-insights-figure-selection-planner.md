@@ -1,5 +1,12 @@
 # TASK-1974 — Criterio de figuras en el planificador de Insights
 
+## Delta 2026-10-03 — la tarjeta con canal es otra task
+
+- El operador aprobó las tarjetas con isotipo de canal (canvas `9q7nThMhdphN5j8f3K3cbB`; AXIS `efeonce.insights-stat-card`
+  0.2.0). La extensión del contrato (`channel`, `context`, `metricIcon`, canal del tablero, 19 plataformas, modelo web
+  1.5) vive en TASK-1990, que sale en el mismo release o después de esta. Esta task no cambia de alcance. — por trabajo en TASK-1990…1996
+
+
 ## Delta 2026-10-03
 
 - El operador aprobó el canvas de la tarjeta de cifra (Slice 1 de TASK-1975). Dirección:

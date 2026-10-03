@@ -436,6 +436,10 @@ posee el reparto de experiencia cliente y coordina las dependencias de comunicac
 - `TASK-1811` — [creada 2026-09-02, to-do, backend-critical/integration] **Benchmarking histórico
   masivo de tráfico.** Usa `historical_bulk_traffic_estimation` para cohortes allowlisted y escribe
   mediante el source of truth de domain overview, con dry-run y tope USD.
+- `TASK-1993` — [creada 2026-10-03, to-do, backend-standard/sync] **Referencias del AI Overview en la captura
+  diaria de clientes.** Parsea las `references[]` del bloque AI Overview de la respuesta SERP ya comprada (costo de
+  proveedor cero), las persiste append-only y expone «citado dentro del AI Overview» por ventana. Consumer: TASK-1992
+  (EPIC-045). Pedido del inventario de tarjetas de Insights aprobado por el operador el 2026-10-03.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·

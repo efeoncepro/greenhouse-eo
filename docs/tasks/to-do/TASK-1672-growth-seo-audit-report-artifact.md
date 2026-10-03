@@ -1,5 +1,13 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-10-03 — tarjeta de salud técnica en Efeonce Insights
+
+- TASK-1992 (EPIC-045) agrega al informe mensual de Insights una tarjeta de «Salud técnica del sitio» (puntaje y páginas
+  rotas) leída de `readSiteAuditReport`, con el mismo gate `GROWTH_SEO_SITE_FINDINGS_ENABLED` y la misma frescura que
+  este artefacto. No reemplaza el artefacto ni crea otro motor: cuando esta task publique el artefacto, la tarjeta remite
+  a él. — por trabajo en TASK-1990…1996
+
+
 ## Delta 2026-09-26
 
 - TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON; el código de TASK-1889 salió en el release

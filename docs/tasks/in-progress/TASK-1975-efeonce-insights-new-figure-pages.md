@@ -1,5 +1,13 @@
 # TASK-1975 — Figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — tarjetas con isotipo de canal aprobadas: render en TASK-1996
+
+- El operador aprobó las tarjetas con isotipo de canal y su inventario (tableros `Premium-Cifras-Canal`,
+  `Deck-Cifras-Canal`, `Cifras-Canal-Norma`, `Cifras-Canal-Inventario`). Su render en PDF, deck y Think, la lupa de AI
+  Overview en lugar de la G de Google y el cambio de íconos Tabler a glifos Trazo van en TASK-1996 (bloqueada por esta
+  task, TASK-1990 y la publicación de AXIS), para no retrasar este release. — por trabajo en TASK-1990…1996
+
+
 ## Delta 2026-10-03 — tono de la variación y animación de la tarjeta (aprobados)
 
 - **Tono por fondo:** tras el análisis de saturación en el canvas, el operador eligió la variante A sobre papel (píldora
