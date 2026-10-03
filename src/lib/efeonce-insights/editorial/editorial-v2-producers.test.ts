@@ -564,8 +564,8 @@ describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente
     expect(chapter.charts.some(chart => chart.chartId === 'chart.aeo.count.cited-source')).toBe(false)
     expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('chocale.cl')
     expect(chapter.tables.find(table => table.tableId === 'table.aeo')!.rows.map(row => row[0])).not.toContain('chocale.cl')
-    // Sin página PDF, la figura no lleva lectura de página: lo dice su hallazgo.
-    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.donut.source-type')).toBe(false)
+    // TASK-1975 — la dona ya tiene página PDF: lleva su lectura, como toda figura con página.
+    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.donut.source-type')).toBe(true)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 })

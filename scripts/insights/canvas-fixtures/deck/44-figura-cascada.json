@@ -1,0 +1,80 @@
+{
+  "reference": "Deck-Cascada",
+  "catalog": "deck",
+  "contentType": "insights-figure-waterfall",
+  "slots": {
+    "tabNumber": "01",
+    "section": "Visibilidad orgánica",
+    "period": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "steps",
+      "label": "Qué explica el alza"
+    },
+    "keyFigure": "+182",
+    "keyCaption": "clics más que julio: 205 ganados en tres frentes y 23 perdidos en la home",
+    "conclusion": "Las páginas de servicio explican más de la mitad del alza",
+    "figureTitle": "De 1.102 a 1.284 clics",
+    "source": {
+      "label": "Fuente",
+      "text": "Google Search Console"
+    },
+    "legend": {
+      "prior": "Julio",
+      "added": "Sumó",
+      "removed": "Restó",
+      "current": "Agosto"
+    },
+    "waterfallSteps": [
+      {
+        "label": "Julio",
+        "value": "1.102",
+        "kind": "start"
+      },
+      {
+        "label": "Páginas de servicio",
+        "value": "+96",
+        "kind": "add"
+      },
+      {
+        "label": "Blog",
+        "value": "+71",
+        "kind": "add"
+      },
+      {
+        "label": "Keywords nuevas en top 3",
+        "value": "+38",
+        "kind": "add"
+      },
+      {
+        "label": "Home",
+        "value": "−23",
+        "kind": "remove"
+      },
+      {
+        "label": "Agosto",
+        "value": "1.284",
+        "kind": "end"
+      }
+    ],
+    "note": {
+      "text": "El eje empieza en cero: los pasos se ven en su proporción real sobre el total."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El crecimiento viene de las páginas que trabajamos en julio: se puede repetir."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Revisar la home: perdió 23 clics porque una búsqueda de marca bajó del primer lugar."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "09",
+      "total": "24"
+    }
+  }
+}

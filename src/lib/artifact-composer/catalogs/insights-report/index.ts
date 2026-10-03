@@ -26,6 +26,10 @@ import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { makeColumnsHook, makeLinesHook } from '../insights-shared/figure-hooks'
 import { REPORT_COLUMNS_BOX, REPORT_LINES_BOX } from '../insights-shared/figure-svg'
+import { makeDonutHook, REPORT_DONUT_BOX } from '../insights-shared/figure-donut'
+import { makeStackedHook, REPORT_STACKED_BOX } from '../insights-shared/figure-stacked'
+import { makeWaffleHook, REPORT_WAFFLE_BOX } from '../insights-shared/figure-waffle'
+import { makeWaterfallHook, REPORT_WATERFALL_BOX } from '../insights-shared/figure-waterfall'
 import { chapterNumeralHook, coverSatellitesHook, narrativeDropCapHook } from '../insights-shared/layout-hooks'
 import { insightsReportResolvers } from './resolvers'
 
@@ -42,7 +46,11 @@ export const insightsReportCatalog: ArtifactCatalog = {
     ReportCoverLightPage: coverSatellitesHook,
     ReportNarrativePage: narrativeDropCapHook,
     ReportFigureColumnsPage: makeColumnsHook(REPORT_COLUMNS_BOX),
-    ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX)
+    ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX),
+    ReportFigureWaterfallPage: makeWaterfallHook(REPORT_WATERFALL_BOX),
+    ReportFigureWafflePage: makeWaffleHook(REPORT_WAFFLE_BOX),
+    ReportFigureDonutPage: makeDonutHook(REPORT_DONUT_BOX),
+    ReportFigureStackedPage: makeStackedHook(REPORT_STACKED_BOX)
   },
   brand: {
     packName: 'axis',

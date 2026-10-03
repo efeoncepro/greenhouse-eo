@@ -149,5 +149,9 @@ describe('resolvers de figura', () => {
     expect(deckFigureSizeClass('+3')).toBe('fig-number--lg')
     expect(deckFigureSizeClass('107 %')).toBe('fig-number--md')
     expect(deckFigureSizeClass('+16,5 %')).toBeNull()
+    // TASK-1975 — cuenta el ancho visible (sin espacios ni signo), como componen las hojas del canvas.
+    expect(deckFigureSizeClass('62 %')).toBe('fig-number--lg')
+    expect(deckFigureSizeClass('+182')).toBe('fig-number--lg')
+    expect(deckFigureSizeClass('6 de 8')).toBe('fig-number--md')
   })
 })

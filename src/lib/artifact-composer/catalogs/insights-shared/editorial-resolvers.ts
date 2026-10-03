@@ -81,7 +81,8 @@ export const clientLogoEffects = (value: string): FieldEffect[] | null => {
  * trae el set completo (`.i-<clave>`) y el resolver deja sólo el pedido. Sin clave, el nodo se quita:
  * una métrica sin ícono propio no recibe uno ajeno. Una clave desconocida falla cerrado.
  */
-export const FIGURE_ICON_KEYS = ['bars', 'clicks', 'impressions', 'ctr', 'search', 'target', 'link', 'trend'] as const
+// TASK-1975 — `steps` (cascada), `grid` (waffle), `donut`, `layers` (apiladas) y `numbers` (cifras).
+export const FIGURE_ICON_KEYS = ['bars', 'clicks', 'impressions', 'ctr', 'search', 'target', 'link', 'trend', 'steps', 'grid', 'donut', 'layers', 'numbers'] as const
 
 export const iconEffects = (value: string): FieldEffect[] | null => {
   if (isAbsent(value)) return [{ selector: ':field', remove: true }]
@@ -114,6 +115,9 @@ const DELTA_TONE_CLASS = { better: 'delta--better', worse: 'delta--worse', neutr
 const DELTA_TONE_GROUP = ['delta--better', 'delta--worse', 'delta--plain']
 
 export const deltaToneEffects = (value: string): FieldEffect[] | null => {
+  // TASK-1975 — una cifra sin anterior o sin dato no trae variación: sin `trend` no hay píldora (nunca una inventada).
+  if (isAbsent(value)) return [{ selector: ':field', remove: true }]
+
   const parsed = parseDelta(value)
 
   if (!parsed) return null

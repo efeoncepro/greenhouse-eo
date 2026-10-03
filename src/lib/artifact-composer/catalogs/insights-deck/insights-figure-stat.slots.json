@@ -1,0 +1,348 @@
+{
+  "template": "InsightsFigureStatSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1975 — lámina de cifras (hoja aprobada Deck-Cifras, retícula 3×2 de 2026-10-03). Columna izquierda sin cifra principal: antetítulo, conclusión, filete y lead. Sin hook.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "deck-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend",
+            "steps",
+            "grid",
+            "donut",
+            "layers",
+            "numbers"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      }
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 170,
+        "maxLines": 5,
+        "overflow": "reject"
+      },
+      "notes": "Lead bajo el filete (la hoja Deck-Cifras lo lleva). Sin lead del plan, el nodo se vacía y no ocupa lugar."
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 64,
+          "maxLines": 2
+        }
+      }
+    },
+    "statCount": {
+      "selector": "[data-slot='statCount']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 12,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Lo emite el mapper común (`buildStatSlides`); la lámina no lo imprime (la hoja no lo lleva)."
+    },
+    "statItems": {
+      "selector": "[data-slot='statItems']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 6
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "icon": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-icon",
+            "values": [
+              "bars",
+              "clicks",
+              "impressions",
+              "ctr",
+              "search",
+              "target",
+              "link",
+              "trend",
+              "steps",
+              "grid",
+              "donut",
+              "layers",
+              "numbers"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "maxLines": 2
+          },
+          "estimated": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "prefix": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 3,
+            "maxLines": 1
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "example": "13.606"
+          },
+          "suffix": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 4,
+            "maxLines": 1
+          },
+          "unitLabel": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 20,
+            "maxLines": 1
+          },
+          "trend": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-delta-tone",
+            "values": [
+              "up",
+              "down",
+              "flat",
+              "up:better",
+              "up:worse",
+              "up:neutral",
+              "down:better",
+              "down:worse",
+              "down:neutral",
+              "flat:neutral"
+            ],
+            "requires": [
+              "delta"
+            ]
+          },
+          "delta": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "requires": [
+              "trend"
+            ]
+          },
+          "versus": {
+            "type": "rich-string",
+            "required": false,
+            "maxCharacters": 64,
+            "maxLines": 2,
+            "allowedTags": [
+              "strong"
+            ]
+          },
+          "noData": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 48,
+            "maxLines": 2
+          },
+          "lowerIsBetter": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 24,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Una celda por cifra (`buildStatSlides` → `statItemView`, el mismo modelo que la web): nombre de 3 palabras y 24 caracteres como máximo (más largo, el mapper rechaza; nunca se trunca), marca «Estimado» opcional, valor partido en prefijo («#»), cifra y sufijo («%») por `splitStatValue`, `unitLabel` opcional para una unidad en palabras («de 31 keywords», «piezas»), variación (`trend` = dirección:tono, decide triángulo y color; `delta` = cifra sin signo), «vs {valor} en {período}» con la cifra en negrita, «Sin dato en {período}» con valor «—» (sin píldora, nunca 0) y «Menor es mejor» cuando subir es malo. La retícula decide sus columnas por la cantidad (1 horizontal; 2 o 4 en dos; 3, 5 o 6 en tres)."
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 96,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "deck-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 160,
+            "maxLines": 3
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso (`readings[].meaning` / `nextStep`)."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

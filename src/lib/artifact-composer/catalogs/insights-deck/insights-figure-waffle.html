@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsFigureWaffleSlide — lámina de figura «waffle» del deck 16:9 (TASK-1975, canvas `Deck-Waffle`).
+  Un cuadro por unidad, con la misma geometría que la página A4 (`makeWaffleHook` + `DECK_WAFFLE_BOX`: retícula de
+  246 px, cuadros de 21). Actual en teal, oportunidad en coral, tercera parte en periwinkle, cuarta en el rol de paso
+  y la ausencia rayada al final; la leyenda la pinta el motor desde `waffleParts` y el hook le pone el tono.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  /* Cifra larga («74 de 100»): el hook la baja a 78 px para que entre en la columna de 372 (canvas). */
+  .fig-number--long { font-size: 78px; }
+
+  /* Sin leyenda en la cabecera: el hueco que el canvas deja entre título y figura. */
+  .waffle-figure { margin-top: 24px; display: flex; align-items: center; gap: 36px; }
+
+  .fig-waffle-host { display: block; flex-shrink: 0; }
+
+  .fig-waffle { display: block; }
+
+  .waffle-tone--current.waffle-cell { fill: var(--axis-deck-role-dataCurrentOnNavy); }
+
+  .waffle-tone--opportunity.waffle-cell { fill: var(--axis-deck-role-dataOpportunityOnNavy); }
+
+  .waffle-tone--prior.waffle-cell { fill: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .waffle-tone--step.waffle-cell { fill: var(--axis-deck-role-dataStepOnNavy); }
+
+  .waffle-absence-ground { fill: rgba(var(--axis-deck-role-navyInk-rgb), 0.04); }
+
+  .waffle-absence-line { stroke: rgba(var(--axis-deck-role-dataAbsenceOnNavy-rgb), 0.4); }
+
+  .waffle-legend { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .waffle-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .waffle-row:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .waffle-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+  .waffle-tone--current .waffle-swatch { background: var(--axis-deck-role-dataCurrentOnNavy); }
+
+  .waffle-tone--opportunity .waffle-swatch { background: var(--axis-deck-role-dataOpportunityOnNavy); }
+
+  .waffle-tone--prior .waffle-swatch { background: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .waffle-tone--step .waffle-swatch { background: var(--axis-deck-role-dataStepOnNavy); }
+
+  .waffle-tone--absence .waffle-swatch {
+    background: repeating-linear-gradient(45deg, rgba(var(--axis-deck-role-dataAbsenceOnNavy-rgb), 0.4) 0 2px, rgba(var(--axis-deck-role-navyInk-rgb), 0.04) 2px 5px);
+  }
+
+  .waffle-name {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 15.3px;
+    font-weight: 600;
+    color: var(--axis-deck-role-navyInk);
+  }
+
+  .waffle-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(var(--axis-deck-role-dataOpportunityOnNavy-rgb), 0.2);
+    font-family: var(--axis-deck-type-display);
+    font-size: 9.4px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--axis-deck-role-dataOpportunityOnNavy);
+  }
+
+  .waffle-count {
+    font-family: var(--axis-deck-type-display);
+    font-size: 28.3px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-navyInk);
+  }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="figureHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#figureHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">01</span>
+        <span class="deck-tab-section" data-slot="section">Visibilidad orgánica</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
+    </header>
+
+    <main class="fig-main">
+      <div class="fig-lead-col">
+        <span class="deck-eyebrow" data-slot="eyebrow"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg><svg class="stroke-icon i-steps" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6h-5v5h-5v5h-5v5h-5"></path></svg><svg class="stroke-icon i-grid" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6h-6z"></path><path d="M14 4h6v6h-6z"></path><path d="M4 14h6v6h-6z"></path><path d="M14 14h6v6h-6z"></path></svg><svg class="stroke-icon i-donut" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-3.8a4.1 4.1 0 1 1 -5 -5v-4a.9 .9 0 0 0 -1 -.8"></path><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a9 9 0 0 0 -1 -1v-4.5"></path></svg><svg class="stroke-icon i-layers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg><svg class="stroke-icon i-numbers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l2 -2v8"></path><path d="M9 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path><path d="M17 8h2.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-2.5"></path></svg></span><span data-slot-field="label">Cobertura de keywords</span></span>
+        <span class="fig-number" data-slot="keyFigure">74 de 100</span>
+        <span class="fig-caption" data-slot="keyCaption">keywords del mercado donde el sitio ya aparece en Google</span>
+        <span class="deck-rule"></span>
+        <h1 class="fig-conclusion" data-slot="conclusion">El sitio aparece en tres de cada cuatro búsquedas del mercado que medimos</h1>
+      </div>
+      <section class="fig-panel">
+        <div class="fig-panel-head">
+          <span class="fig-panel-title" data-slot="figureTitle">100 keywords del mercado</span>
+          <span class="fig-source" data-slot="source"><span class="fig-source-label" data-slot-field="label">Fuente</span><span data-slot-field="text">Mediciones de posiciones</span></span>
+        </div>
+        <div class="waffle-figure">
+          <div class="fig-waffle-host"></div>
+          <div class="waffle-legend" data-slot="waffleParts"><div class="waffle-row"><span class="waffle-swatch"></span><span class="waffle-name"><span data-slot-field="label">Primera página (1 a 10)</span><span class="waffle-tag" data-slot-field="tag">Oportunidad</span></span><span class="waffle-count" data-slot-field="count">26</span></div></div>
+        </div>
+      <div class="fig-note" data-slot="note"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Cada cuadro es una unidad.</span></div>
+      </section>
+    </main>
+
+    <div class="fig-closing" data-slot="closing"><div class="fig-closing-block"><span class="fig-closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span><p class="fig-closing-text" data-slot-field="text">Lo que la figura muestra.</p></div></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">12</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

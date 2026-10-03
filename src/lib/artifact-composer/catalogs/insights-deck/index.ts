@@ -22,6 +22,10 @@ import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { makeColumnsHook, makeLinesHook, withDeckFigureSize } from '../insights-shared/figure-hooks'
 import { DECK_COLUMNS_BOX, DECK_LINES_BOX } from '../insights-shared/figure-svg'
+import { DECK_DONUT_BOX, makeDonutHook } from '../insights-shared/figure-donut'
+import { DECK_STACKED_BOX, makeStackedHook } from '../insights-shared/figure-stacked'
+import { DECK_WAFFLE_BOX, makeWaffleHook } from '../insights-shared/figure-waffle'
+import { DECK_WATERFALL_BOX, makeWaterfallHook } from '../insights-shared/figure-waterfall'
 import { makeChapterNumeralHook } from '../insights-shared/layout-hooks'
 import { insightsDeckResolvers } from './resolvers'
 
@@ -38,7 +42,11 @@ export const insightsDeckCatalog: ArtifactCatalog = {
     InsightsFigureComparisonSlide: withDeckFigureSize(),
     InsightsFigureColumnsSlide: withDeckFigureSize(makeColumnsHook(DECK_COLUMNS_BOX)),
     InsightsFigureTargetsSlide: withDeckFigureSize(),
-    InsightsFigureTrendSlide: withDeckFigureSize(makeLinesHook(DECK_LINES_BOX))
+    InsightsFigureTrendSlide: withDeckFigureSize(makeLinesHook(DECK_LINES_BOX)),
+    InsightsFigureWaterfallSlide: withDeckFigureSize(makeWaterfallHook(DECK_WATERFALL_BOX)),
+    InsightsFigureWaffleSlide: withDeckFigureSize(makeWaffleHook(DECK_WAFFLE_BOX)),
+    InsightsFigureDonutSlide: withDeckFigureSize(makeDonutHook(DECK_DONUT_BOX)),
+    InsightsFigureStackedSlide: withDeckFigureSize(makeStackedHook(DECK_STACKED_BOX))
   },
   brand: {
     packName: 'axis',

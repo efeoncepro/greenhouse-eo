@@ -24,7 +24,12 @@
     "report-figure-comparison",
     "report-figure-columns",
     "report-figure-targets",
-    "report-figure-trend"
+    "report-figure-trend",
+    "report-figure-waterfall",
+    "report-figure-waffle",
+    "report-figure-donut",
+    "report-figure-stacked",
+    "report-figure-stat"
   ],
   "templates": [
     {
@@ -221,6 +226,71 @@
       ],
       "prototype": "report-figure-trend.html",
       "slotsRef": "report-figure-trend.slots.json"
+    },
+    {
+      "name": "ReportFigureWaterfallPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-waterfall"
+      ],
+      "prototype": "report-figure-waterfall.html",
+      "slotsRef": "report-figure-waterfall.slots.json"
+    },
+    {
+      "name": "ReportFigureWafflePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-waffle"
+      ],
+      "prototype": "report-figure-waffle.html",
+      "slotsRef": "report-figure-waffle.slots.json"
+    },
+    {
+      "name": "ReportFigureDonutPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-donut"
+      ],
+      "prototype": "report-figure-donut.html",
+      "slotsRef": "report-figure-donut.slots.json"
+    },
+    {
+      "name": "ReportFigureStackedPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-stacked"
+      ],
+      "prototype": "report-figure-stacked.html",
+      "slotsRef": "report-figure-stacked.slots.json"
+    },
+    {
+      "name": "ReportFigureStatPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-stat"
+      ],
+      "prototype": "report-figure-stat.html",
+      "slotsRef": "report-figure-stat.slots.json"
     }
   ],
   "selector": {
@@ -240,7 +310,12 @@
       "report-figure-comparison": "ReportFigureComparisonPage",
       "report-figure-columns": "ReportFigureColumnsPage",
       "report-figure-targets": "ReportFigureTargetsPage",
-      "report-figure-trend": "ReportFigureTrendPage"
+      "report-figure-trend": "ReportFigureTrendPage",
+      "report-figure-waterfall": "ReportFigureWaterfallPage",
+      "report-figure-waffle": "ReportFigureWafflePage",
+      "report-figure-donut": "ReportFigureDonutPage",
+      "report-figure-stacked": "ReportFigureStackedPage",
+      "report-figure-stat": "ReportFigureStatPage"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",
@@ -250,7 +325,12 @@
       "figura contra el período anterior cuyas dimensiones son MÉTRICAS distintas (clics, impresiones, CTR) => ReportFigureComparisonPage: cada métrica en su escala.",
       "figura cuyas dimensiones COMPARTEN escala (tramos, canales) => ReportFigureColumnsPage: columnas sobre un mismo eje.",
       "resultado contra una meta oficial (bullet) => ReportFigureTargetsPage: cada indicador en su escala, con la meta como marca.",
-      "tendencia en el tiempo (line) => ReportFigureTrendPage: hasta tres series distinguibles por rol, sin interpolar huecos."
+      "tendencia en el tiempo (line) => ReportFigureTrendPage: hasta tres series distinguibles por rol, sin interpolar huecos.",
+      "qué explica el cambio entre dos totales (waterfall) => ReportFigureWaterfallPage: del total anterior al actual por aportes con signo; inicial + Σ aportes = final o el mapper rechaza.",
+      "conteo de pocas categorías (waffle, ≤ 4 partes, ≤ 100 unidades) => ReportFigureWafflePage: un cuadro por unidad.",
+      "composición de 2 o 3 partes (donut) => ReportFigureDonutPage: anillo con cuenta y participación por parte.",
+      "subconjunto del total en dos o más períodos (bar_stacked) => ReportFigureStackedPage: segmento base abajo, total sobre la columna.",
+      "cuánto es y cómo cambió (chapter.stats, tarjeta de cifra) => ReportFigureStatPage: retícula de hasta 6 cifras, sin cifra principal en el héroe."
     ],
     "rules": [
       "Una página = un content-type = una plantilla. Si el contenido mezcla dos intenciones, son dos páginas.",

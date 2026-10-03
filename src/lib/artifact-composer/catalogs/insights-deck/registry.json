@@ -21,7 +21,12 @@
     "insights-figure-comparison",
     "insights-figure-columns",
     "insights-figure-targets",
-    "insights-figure-trend"
+    "insights-figure-trend",
+    "insights-figure-waterfall",
+    "insights-figure-waffle",
+    "insights-figure-donut",
+    "insights-figure-stacked",
+    "insights-figure-stat"
   ],
   "templates": [
     {
@@ -179,6 +184,71 @@
       ],
       "prototype": "insights-figure-trend.html",
       "slotsRef": "insights-figure-trend.slots.json"
+    },
+    {
+      "name": "InsightsFigureWaterfallSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-waterfall"
+      ],
+      "prototype": "insights-figure-waterfall.html",
+      "slotsRef": "insights-figure-waterfall.slots.json"
+    },
+    {
+      "name": "InsightsFigureWaffleSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-waffle"
+      ],
+      "prototype": "insights-figure-waffle.html",
+      "slotsRef": "insights-figure-waffle.slots.json"
+    },
+    {
+      "name": "InsightsFigureDonutSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-donut"
+      ],
+      "prototype": "insights-figure-donut.html",
+      "slotsRef": "insights-figure-donut.slots.json"
+    },
+    {
+      "name": "InsightsFigureStackedSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-stacked"
+      ],
+      "prototype": "insights-figure-stacked.html",
+      "slotsRef": "insights-figure-stacked.slots.json"
+    },
+    {
+      "name": "InsightsFigureStatSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-stat"
+      ],
+      "prototype": "insights-figure-stat.html",
+      "slotsRef": "insights-figure-stat.slots.json"
     }
   ],
   "selector": {
@@ -195,11 +265,21 @@
       "insights-figure-comparison": "InsightsFigureComparisonSlide",
       "insights-figure-columns": "InsightsFigureColumnsSlide",
       "insights-figure-targets": "InsightsFigureTargetsSlide",
-      "insights-figure-trend": "InsightsFigureTrendSlide"
+      "insights-figure-trend": "InsightsFigureTrendSlide",
+      "insights-figure-waterfall": "InsightsFigureWaterfallSlide",
+      "insights-figure-waffle": "InsightsFigureWaffleSlide",
+      "insights-figure-donut": "InsightsFigureDonutSlide",
+      "insights-figure-stacked": "InsightsFigureStackedSlide",
+      "insights-figure-stat": "InsightsFigureStatSlide"
     },
     "disambiguation": [
       "un capítulo cuya evidencia no alcanzó para una figura => InsightsNarrativeSlide. NUNCA se omite el capítulo.",
-      "lo que la edición no puede afirmar => InsightsLimitsSlide, y siempre cierra el deck."
+      "lo que la edición no puede afirmar => InsightsLimitsSlide, y siempre cierra el deck.",
+      "qué explica el cambio entre dos totales (waterfall) => InsightsFigureWaterfallSlide: del total anterior al actual por aportes con signo; inicial + Σ aportes = final o el mapper rechaza.",
+      "conteo de pocas categorías (waffle, ≤ 4 partes, ≤ 100 unidades) => InsightsFigureWaffleSlide: un cuadro por unidad.",
+      "composición de 2 o 3 partes (donut) => InsightsFigureDonutSlide: anillo con cuenta y participación por parte.",
+      "subconjunto del total en dos o más períodos (bar_stacked) => InsightsFigureStackedSlide: segmento base abajo, total sobre la columna.",
+      "cuánto es y cómo cambió (chapter.stats, tarjeta de cifra) => InsightsFigureStatSlide: retícula de hasta 6 cifras, sin cifra principal en el héroe."
     ],
     "rules": [
       "Una lámina = un content-type = una plantilla.",

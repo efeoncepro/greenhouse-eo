@@ -1,0 +1,85 @@
+{
+  "reference": "Deck-Cifras",
+  "catalog": "deck",
+  "contentType": "insights-figure-stat",
+  "slots": {
+    "tabNumber": "01",
+    "section": "Visibilidad orgánica",
+    "period": "Septiembre 2026 · contra agosto 2026",
+    "eyebrow": {
+      "icon": "numbers",
+      "label": "Cifras del período"
+    },
+    "conclusion": "El mayor cambio fue en clics orgánicos: de 16.390 a 13.606",
+    "lead": "Las impresiones bajaron de 868.507 a 770.462 y la posición media pasó de #5,7 a #6,9. Las keywords en primera página bajaron de 21 a 15 de 31.",
+    "figureTitle": "Search Console y posiciones · septiembre contra agosto",
+    "source": {
+      "label": "Fuente",
+      "text": "Google Search Console"
+    },
+    "statCount": "6 cifras",
+    "statItems": [
+      {
+        "icon": "clicks",
+        "name": "Clics",
+        "value": "13.606",
+        "trend": "down:worse",
+        "delta": "17,0 %",
+        "versus": "vs <strong>16.390</strong> en agosto"
+      },
+      {
+        "icon": "impressions",
+        "name": "Impresiones",
+        "value": "770.462",
+        "trend": "down:worse",
+        "delta": "11,3 %",
+        "versus": "vs <strong>868.507</strong>"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "value": "1,8",
+        "suffix": "%",
+        "trend": "down:worse",
+        "delta": "0,1 pp",
+        "versus": "vs <strong>1,9 %</strong> en agosto"
+      },
+      {
+        "icon": "search",
+        "name": "Posición media",
+        "prefix": "#",
+        "value": "6,9",
+        "trend": "up:worse",
+        "delta": "1,2 pos.",
+        "versus": "vs <strong>#5,7</strong> en agosto",
+        "lowerIsBetter": "Menor es mejor"
+      },
+      {
+        "icon": "search",
+        "name": "Primera página",
+        "value": "15",
+        "unitLabel": "de 31 keywords",
+        "trend": "down:worse",
+        "delta": "28,6 %",
+        "versus": "vs <strong>21</strong> en agosto"
+      },
+      {
+        "icon": "trend",
+        "name": "Tráfico estimado",
+        "estimated": "Estimado",
+        "value": "130.166",
+        "trend": "down:worse",
+        "delta": "3,6 %",
+        "versus": "vs <strong>135.014</strong>"
+      }
+    ],
+    "note": {
+      "text": "El tráfico estimado se calcula con la posición y el volumen de búsqueda."
+    },
+    "footerEdition": "Insights · Informe de septiembre 2026",
+    "folio": {
+      "page": "05",
+      "total": "24"
+    }
+  }
+}

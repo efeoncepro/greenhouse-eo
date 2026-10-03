@@ -38,7 +38,7 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, hasPdfFigurePage, readingFor } from './figure-slots'
+import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -115,36 +115,40 @@ const chapterSlides = (
 
   // Láminas de figura premium (TASK-1889 Slice 4): la misma figura que la página A4, con su cifra
   // principal y su lectura; lo que ninguna figura tituló se narra después.
-  // TASK-1962 — sólo familias con página PDF; las demás viven en la web (`PDF_FIGURE_FAMILIES`).
-  for (const chart of chapter.charts.filter(hasPdfFigurePage)) {
-    for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.deck)) {
-      const where = `${chapter.chapterId}.${chart.chartId}`
+  // TASK-1962/1975 — la lámina de cifras primero y después los gráficos con página PDF (`PDF_FIGURE_FAMILIES`).
+  for (const { figureId, figure } of chapterFigureSlides(chapter, factsById, locale, FIGURE_CAPACITY.deck)) {
+    const where = `${chapter.chapterId}.${figureId}`
 
-      // Sólo la conclusión se imprime en la lámina (el deck no tiene bajada): el resto se narra después.
-      used.add(figure.conclusion)
+    // Sólo la conclusión se imprime en la lámina (el deck no tiene bajada): el resto se narra después.
+    used.add(figure.conclusion)
 
-      slides.push({
-        contentsTitle: figure.figureTitle,
-        factIds: figure.factIds,
-        conclusion: figure.conclusion,
-        slide: {
-          contentType: FIGURE_CONTENT_TYPE.deck[figure.kind],
-          slots: {
-            ...tab,
-            eyebrow: figure.eyebrow,
-            keyFigure: rejectIfLonger(figure.keyFigure, 9, `${where}.keyFigure`),
-            keyCaption: rejectIfLonger(figure.keyCaption, 96, `${where}.keyCaption`),
-            conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
-            figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
-            source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 64, `${where}.source`) },
-            ...figure.body,
-            ...(figure.closing.length > 0
-              ? { closing: figure.closing.map(block => ({ ...block, text: rejectIfLonger(block.text, 160, `${where}.closing`) })) }
-              : {})
-          } as SlotValues
-        }
-      })
-    }
+    // TASK-1975 — la lámina de cifras sí lleva lead (no tiene cifra principal).
+    const deckLead = figure.kind === 'stat' && figure.lead ? figure.lead : null
+
+    if (deckLead) used.add(deckLead)
+
+    slides.push({
+      contentsTitle: figure.figureTitle,
+      factIds: figure.factIds,
+      conclusion: figure.conclusion,
+      slide: {
+        contentType: FIGURE_CONTENT_TYPE.deck[figure.kind],
+        slots: {
+          ...tab,
+          eyebrow: figure.eyebrow,
+          ...(figure.keyFigure !== null ? { keyFigure: rejectIfLonger(figure.keyFigure, 9, `${where}.keyFigure`) } : {}),
+          ...(figure.keyCaption !== null ? { keyCaption: rejectIfLonger(figure.keyCaption, 96, `${where}.keyCaption`) } : {}),
+          conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
+          ...(deckLead ? { lead: rejectIfLonger(deckLead, 170, `${where}.lead`) } : {}),
+          figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
+          source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 64, `${where}.source`) },
+          ...figure.body,
+          ...(figure.closing.length > 0
+            ? { closing: figure.closing.map(block => ({ ...block, text: rejectIfLonger(block.text, 160, `${where}.closing`) })) }
+            : {})
+        } as SlotValues
+      }
+    })
   }
 
   // Lo que ninguna lámina de evidencia tituló se narra: en el deck no hay tabla que lo sostenga.

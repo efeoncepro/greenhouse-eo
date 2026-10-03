@@ -51,7 +51,7 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, hasPdfFigurePage, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
+import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -205,44 +205,43 @@ const chapterBodyPages = (
   // afirmación del plan que cita los hechos que la figura dibuja.
   const chapterTab = running.runningSection.split(' · ')[0]!
 
-  // TASK-1962 — sólo familias con página PDF; las demás viven en la web (`PDF_FIGURE_FAMILIES`).
-  for (const chart of chapter.charts.filter(hasPdfFigurePage)) {
-    for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.report)) {
-      const where = `${chapter.chapterId}.${chart.chartId}`
+  // TASK-1962/1975 — la página de cifras primero y después los gráficos con página PDF (`PDF_FIGURE_FAMILIES`); las demás
+  // familias viven en la web.
+  for (const { figureId, figure } of chapterFigureSlides(chapter, factsById, locale, FIGURE_CAPACITY.report)) {
+    const where = `${chapter.chapterId}.${figureId}`
 
-      pages.push({
-        contentsTitle: figure.figureTitle,
-        factIds: figure.factIds,
-        conclusion: figure.conclusion,
-        page: {
-          contentType: FIGURE_CONTENT_TYPE.report[figure.kind],
-          slots: {
-            ...running,
-            chapterTab,
-            eyebrow: figure.eyebrow,
-            keyFigure: rejectIfLonger(figure.keyFigure, 12, `${where}.keyFigure`),
-            keyCaption: rejectIfLonger(figure.keyCaption, 110, `${where}.keyCaption`),
-            conclusion: rejectIfLonger(figure.conclusion, 96, `${where}.conclusion`),
-            ...(figure.lead ? { lead: rejectIfLonger(figure.lead, 170, `${where}.lead`) } : {}),
-            figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
-            ...figure.body,
-            provenance: [
-              { label: L.unitCaption, text: rejectIfLonger(figure.unitText, 96, `${where}.unit`) },
-              { label: L.sourceCaption, text: figure.sourceText }
-            ],
-            ...(figure.closing.length > 0
-              ? {
-                  closing: figure.closing.map(block => ({
-                    ...block,
-                    text: rejectIfLonger(block.text, 190, `${where}.closing`),
-                    ...(block.kind === 'action' ? { signature: L.signature } : {})
-                  }))
-                }
-              : {})
-          } as SlotValues
-        }
-      })
-    }
+    pages.push({
+      contentsTitle: figure.figureTitle,
+      factIds: figure.factIds,
+      conclusion: figure.conclusion,
+      page: {
+        contentType: FIGURE_CONTENT_TYPE.report[figure.kind],
+        slots: {
+          ...running,
+          chapterTab,
+          eyebrow: figure.eyebrow,
+          ...(figure.keyFigure !== null ? { keyFigure: rejectIfLonger(figure.keyFigure, 12, `${where}.keyFigure`) } : {}),
+          ...(figure.keyCaption !== null ? { keyCaption: rejectIfLonger(figure.keyCaption, 110, `${where}.keyCaption`) } : {}),
+          conclusion: rejectIfLonger(figure.conclusion, 96, `${where}.conclusion`),
+          ...(figure.lead ? { lead: rejectIfLonger(figure.lead, 170, `${where}.lead`) } : {}),
+          figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
+          ...figure.body,
+          provenance: [
+            { label: L.unitCaption, text: rejectIfLonger(figure.unitText, 96, `${where}.unit`) },
+            { label: L.sourceCaption, text: figure.sourceText }
+          ],
+          ...(figure.closing.length > 0
+            ? {
+                closing: figure.closing.map(block => ({
+                  ...block,
+                  text: rejectIfLonger(block.text, 190, `${where}.closing`),
+                  ...(block.kind === 'action' ? { signature: L.signature } : {})
+                }))
+              }
+            : {})
+        } as SlotValues
+      }
+    })
   }
 
   // Un capítulo SIN figura no se omite: se narra.
