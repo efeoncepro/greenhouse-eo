@@ -178,6 +178,58 @@
       "rol": "persona:nexa/mirada-lateral",
       "sha256": "3ad780587e358a5a16fa090e55e6f410eb78dfb6f5758ea3e7dd5ca1be1a9fa8"
     },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-13-euforia.png": {
+      "rol": "persona:nexa/euforia",
+      "sha256": "2a86b0c3de338a578a820f221dc3d97cd56768e28a3f17404594ed304318ea14"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-14-alivio.png": {
+      "rol": "persona:nexa/alivio",
+      "sha256": "8b7e9b575942cf752651ab8491dba2442996d3627217f5f8cff3a63a52a3ff68"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-15-orgullo-sereno.png": {
+      "rol": "persona:nexa/orgullo-sereno",
+      "sha256": "ff50fb5ae2cfa30a213690910fad6fb71eb87f15eb3f3aadbf4f91d376d0ec0a"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-16-te-lo-dije.png": {
+      "rol": "persona:nexa/te-lo-dije",
+      "sha256": "015b30a6b45373ff94071b07cf77378c7b8ab4d4241813db232f0314e7c5a2a6"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-17-hartazgo.png": {
+      "rol": "persona:nexa/hartazgo",
+      "sha256": "3b1659b4298750a2b64e221c6b035f8d8d347115466dce80c56636ad27354a36"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-18-agobio.png": {
+      "rol": "persona:nexa/agobio",
+      "sha256": "873c211f5651d1779b7352aa0797a57ebd71cd94ea1336495e44e96d8f803d2d"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-19-alarma.png": {
+      "rol": "persona:nexa/alarma",
+      "sha256": "0d49fb9bc70f7f9814ac1fefb82a170d6505d535ad195bb0617aab87d3055c8c"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-20-confusion.png": {
+      "rol": "persona:nexa/confusion",
+      "sha256": "3526cb6a3ed23e5bc891bfac85559fc794e1019c540144de26038054b624d2d0"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-21-concentracion.png": {
+      "rol": "persona:nexa/concentracion",
+      "sha256": "a5a3ae640627fb9e605680a0608aa867c7754eefd72674cb24640e55bc9342a9"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-22-determinacion.png": {
+      "rol": "persona:nexa/determinacion",
+      "sha256": "d6f30d581251b186d4292a5bac91f45f17e2834ae50d862e707a5d04ccd34d55"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-23-explicando.png": {
+      "rol": "persona:nexa/explicando",
+      "sha256": "a5be606715e0ad1f6f6e21adfa3f6b4676f15360f51ec54f1dd0f848530baa01"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-24-bienvenida.png": {
+      "rol": "persona:nexa/bienvenida",
+      "sha256": "75a8f30ca7884e7a291b6df0928b9951295bfbd4f6f8170118db20b3f3f5fe5b"
+    },
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-25-mirada-lateral-izq.png": {
+      "rol": "persona:nexa/mirada-lateral-izq",
+      "sha256": "ac99f093b2744c6b56cad591ff73c6068cc7efa881d890bf6f35735fb4fca01c"
+    },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
       "rol": "persona:nexa/prof-1",
       "sha256": "6476e0bd0ca71f6e4664b8859c2f240ee2ccfa71511d963c6137c8c024478732"

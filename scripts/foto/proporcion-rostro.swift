@@ -14,10 +14,21 @@ for path in CommandLine.arguments.dropFirst() {
   try? VNImageRequestHandler(cgImage: cg).perform([req])
   guard let face = req.results?.first, let lm = face.landmarks,
         let cont = lm.faceContour?.pointsInImage(imageSize: CGSize(width: W, height: H)),
-        let lp = lm.leftPupil?.pointsInImage(imageSize: CGSize(width: W, height: H)).first,
-        let rp = lm.rightPupil?.pointsInImage(imageSize: CGSize(width: W, height: H)).first,
+        let le = lm.leftEye?.pointsInImage(imageSize: CGSize(width: W, height: H)),
+        let re = lm.rightEye?.pointsInImage(imageSize: CGSize(width: W, height: H)),
+        let lips = lm.innerLips?.pointsInImage(imageSize: CGSize(width: W, height: H)),
         let nose = lm.noseCrest?.pointsInImage(imageSize: CGSize(width: W, height: H)) else { print("{\"archivo\":\"\(path)\",\"error\":\"sin rostro\"}"); continue }
+  // El centro del CONTORNO de cada ojo, no la pupila: la mirada (hacia abajo, hacia arriba, ojos cerrados) mueve la
+  // pupila y corría la medida sin que la cara cambiara (medido el 2026-10-03 en concentración, hartazgo y alivio).
+  let centro = { (p: [CGPoint]) -> CGPoint in CGPoint(x: p.map { $0.x }.reduce(0, +) / CGFloat(p.count), y: p.map { $0.y }.reduce(0, +) / CGFloat(p.count)) }
+  let lp = centro(le), rp = centro(re)
   let ipd = hypot(Double(lp.x - rp.x), Double(lp.y - rp.y))
+  // Boca abierta: alto del contorno interior de los labios en unidades de IPD. Abierta, la mandíbula baja y la cara se
+  // alarga de verdad; se informa para no confundirlo con un rostro afinado.
+  let boca = (Double(lips.map { $0.y }.max()!) - Double(lips.map { $0.y }.min()!)) / ipd
+  // Apertura de los ojos (alto medio del contorno / IPD): con los ojos cerrados el contorno baja y la medida se corre.
+  let alto = { (p: [CGPoint]) -> Double in Double(p.map { $0.y }.max()! - p.map { $0.y }.min()!) }
+  let ojos = (alto(le) + alto(re)) / 2 / ipd
   let xs = cont.map { Double($0.x) }, ys = cont.map { Double($0.y) }
   let ancho = (xs.max()! - xs.min()!)
   let ojosY = Double(lp.y + rp.y) / 2
@@ -27,5 +38,5 @@ for path in CommandLine.arguments.dropFirst() {
   let narizX = nose.map { Double($0.x) }.reduce(0, +) / Double(nose.count)
   let giro = (narizX - medioOjos) / ipd
   let nombre = (path as NSString).lastPathComponent
-  print(String(format: "{\"archivo\":\"%@\",\"anchoIPD\":%.3f,\"largoIPD\":%.3f,\"largoAncho\":%.3f,\"giro\":%.3f}", nombre, ancho / ipd, largo / ipd, largo / ancho, giro))
+  print(String(format: "{\"archivo\":\"%@\",\"anchoIPD\":%.3f,\"largoIPD\":%.3f,\"largoAncho\":%.3f,\"giro\":%.3f,\"boca\":%.3f,\"ojos\":%.3f}", nombre, ancho / ipd, largo / ipd, largo / ancho, giro, boca, ojos))
 }

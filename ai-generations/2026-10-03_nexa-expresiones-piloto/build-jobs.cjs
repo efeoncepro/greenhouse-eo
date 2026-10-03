@@ -29,7 +29,24 @@ const CAUSA = {
   '09-escucha-empatica': 'someone is telling her about a problem and she listens with care: attentive, kind eyes, the mouth soft with no smile, a slight nod',
   '10-curiosa': 'something intriguing has just caught her attention: alert eyes, the head tilted a few degrees, the faintest lift at one corner of the mouth',
   '11-complicidad': 'she shares an inside joke with someone just off-camera: a knowing closed-lip smile, a little more on one side',
-  '12-mirada-lateral': 'something to one side, off-camera, catches her eye: her face stays toward the camera while only her eyes glance to the side, lips neutral'
+  '12-mirada-lateral': 'something to one side, off-camera, catches her eye: her face stays toward the camera while only her eyes glance to the side, lips neutral',
+  // Faltantes pedidas por el operador (2026-10-03): «Nexa eufórica celebrando, pone la cabeza hacia atrás celebrando».
+  // Las doce que faltaban (2026-10-03, operador: «hazlas todas, que se vean reales»): el «después», el «antes» del
+  // problema, el foco del oficio y lo social.
+  '14-alivio': 'a long-awaited problem has finally been solved: she exhales in relief, eyes closing for a second, shoulders dropping, a small tired smile — "at last"',
+  '15-orgullo-sereno': 'she looks at work she knows is good: a quiet, proud satisfaction, a calm closed-lip smile, chin slightly up, steady eyes — no euphoria',
+  '16-te-lo-dije': 'what she predicted has just happened: a knowing, slightly playful half-smile to one side, one brow barely lifted, eyes amused — "I told you so"',
+  '17-hartazgo': 'the same problem has come back for the third time this week: a contained, weary exasperation — eyes rolling slightly upward, lips pressed into a flat line, a small exhale through the nose; restrained, the way a professional shows it',
+  '18-agobio': 'too many urgent things land at once: she is overwhelmed, one hand pushing into her hair at the side of her head, brows drawn up, lips parted in a silent "how"; real, not melodramatic',
+  '19-alarma': 'she has just seen something go badly wrong on a screen: a negative surprise — eyes wide, brows up and drawn together, lips parted, the body freezing for an instant',
+  '20-confusion': 'a number she is reading makes no sense: genuine puzzlement — brows knitted, head tilted a few degrees, eyes narrowed slightly, lips pushed a little to one side',
+  '21-concentracion': 'she is absorbed in work on a screen just below the camera: focused eyes lowered slightly toward it, lips closed, brows a little drawn — deep, calm concentration',
+  '22-determinacion': 'she has decided to fix it herself, now: a resolute, steady look into the lens, jaw set, lips firmly closed, a small forward lean — calm determination, no smile',
+  '23-explicando': 'she is in the middle of explaining an idea to someone just behind the camera: mouth caught mid-word, eyebrows lifted with emphasis, one hand rising into the frame in an open explaining gesture',
+  '24-bienvenida': 'a colleague she likes has just walked in: a warm, open welcoming smile showing the teeth, eyes bright, one hand lifting in a small hello',
+  // Primera pasada miró al mismo lado que la 12: la dirección se pide por la posición del IRIS en el cuadro.
+  '25-mirada-lateral-izq': 'something off-camera catches her eye: her face stays toward the camera while only her eyes glance sideways — as seen in the image, both irises sit in the LEFT corners of her eyes, looking toward the LEFT edge of the image (the opposite side from a glance to the right), lips neutral',
+  '13-euforia': 'the result she was waiting for has just come in and she celebrates, euphoric: her head goes BACK with the chin up, eyes squeezed with joy, mouth wide open in a shout of joy, shoulders lifted — a real burst of celebration, caught mid-movement; the face still turns toward the camera, seen slightly from below because of the head tilt'
 }
 
 const jobs = []
@@ -38,9 +55,12 @@ for (const [k, causa] of Object.entries(CAUSA)) {
   fs.writeFileSync(pa,
     'Image 1 is Nexa, a real woman, photographed facing the camera. Keep her identity exactly: her features, proportions, skin, hair, ' +
     `grey t-shirt, the soft window light with fill, the background and the framing. Capture a real moment: ${causa}. Her face stays ` +
-    'turned roughly toward the camera (within about 15 degrees), both eyes visible; the head is free to make the small natural movement ' +
-    `that comes with the expression. Natural, everyday intensity — never theatrical, never exaggerated. ${PIEL} No text.`)
-  if (V2) fs.writeFileSync(pa, fs.readFileSync(pa, 'utf8').replace('Natural, everyday intensity', `${GEOMETRIA} Natural, everyday intensity`))
+    (k === '13-euforia'
+      ? 'turned toward the camera left-to-right, while the head tilts BACK as the celebration demands. Real, full intensity of a genuine celebration — not acted, not a pose. '
+      : 'turned roughly toward the camera (within about 15 degrees), both eyes visible; the head is free to make the small natural movement ' +
+        'that comes with the expression. Natural, everyday intensity — never theatrical, never exaggerated. ') +
+    `${PIEL} No text.`)
+  if (V2) fs.writeFileSync(pa, fs.readFileSync(pa, 'utf8').replace(/(Natural, everyday intensity|Real, full intensity)/, `${GEOMETRIA} $1`))
   jobs.push([ANCLA_A, pa, path.join(D, 'out', `${V2 ? 'A2' : 'A'}-${k}.png`), '2048x2560', ANCLA_A].join('|'))
   const pb = path.join(D, 'prompts', `B-${k}.txt`)
   fs.writeFileSync(pb,

@@ -297,14 +297,16 @@ export const PERSONAS = {
     // 🔴 2026-10-03: la frontal es `-v2`, la aprobada estirada ×1,037 en horizontal (sin modelo). Medida con Vision, la
     // aprobada daba largo/ancho 0,85 contra 0,81–0,83 del ancla de cuerpo y las portadas aprobadas: puesta primera,
     // afinaba la cara de toda la serie [operador: «le alarga o achata la cara al ancho, poniéndola excesivamente fina»].
-    // La v2 mide 0,83. La aprobada sigue en disco como histórico. `rostro` declara la proporción para `pnpm foto:rostro`.
+    // La v2 mide 0,83 (0,816 con el medidor final, que toma la línea de los ojos del contorno y no de la pupila; con él el
+    // canon aprobado —ancla de cuerpo y portadas— mide 0,79–0,82, y la aprobada 0,836). La aprobada sigue en disco como
+    // histórico. `rostro` declara la proporción para `pnpm foto:rostro`.
     refs: [
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
-    rostro: { largoAncho: 0.83, tolerancia: 0.015 },
+    rostro: { largoAncho: 0.81, tolerancia: 0.02 },
     // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
     // la identidad A; no usar `2-angulos/`, que conserva el rostro/ acabado anterior y queda retirado como
     // referencia de identidad. Las vistas que el set no cubre se resuelven con las anclas fotográficas.
@@ -359,7 +361,22 @@ export const PERSONAS = {
       'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-09-escucha-empatica.png',
       curiosa: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-10-curiosa.png',
       complicidad: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-11-complicidad.png',
-      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png'
+      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png',
+      // 2026-10-03: las 13 que faltaban (operador: «hazlas todas, que se vean reales»): éxito, el «antes» del problema,
+      // foco y social. `mirada-lateral` mira a la derecha del cuadro; `mirada-lateral-izq`, a la izquierda.
+      'euforia': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-13-euforia.png',
+      'alivio': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-14-alivio.png',
+      'orgullo-sereno': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-15-orgullo-sereno.png',
+      'te-lo-dije': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-16-te-lo-dije.png',
+      'hartazgo': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-17-hartazgo.png',
+      'agobio': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-18-agobio.png',
+      'alarma': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-19-alarma.png',
+      'confusion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-20-confusion.png',
+      'concentracion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-21-concentracion.png',
+      'determinacion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-22-determinacion.png',
+      'explicando': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-23-explicando.png',
+      'bienvenida': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-24-bienvenida.png',
+      'mirada-lateral-izq': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-25-mirada-lateral-izq.png'
     },
     // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
     // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se

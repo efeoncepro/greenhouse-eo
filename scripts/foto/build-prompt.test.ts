@@ -1944,7 +1944,7 @@ describe('foto:prompt · selección de la vista puesta (2026-10-03)', () => {
 describe('foto:prompt · proporción del rostro de Nexa (2026-10-03)', () => {
   it('la frontal es la v2 corregida y Nexa declara su proporción para foto:rostro', () => {
     expect(PERSONAS.nexa.refs[0]).toMatch(/nexa-ancla-1-rostro-frontal-v2\.png$/)
-    expect(PERSONAS.nexa.rostro).toEqual({ largoAncho: 0.83, tolerancia: 0.015 })
+    expect(PERSONAS.nexa.rostro).toEqual({ largoAncho: 0.81, tolerancia: 0.02 })
     expect(PERSONAS.nexa.identity).toMatch(/about 1\.2 times the distance from the eyes to the chin/)
   })
 
