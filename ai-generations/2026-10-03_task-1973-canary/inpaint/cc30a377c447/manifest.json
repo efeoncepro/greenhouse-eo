@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "cc30a377c447",
+  "key": "cc30a377c4477d681d45221e800ffc71a18b0f42eb7db7eaf266b8e6e837db1d",
+  "status": "completed",
+  "createdAt": "2026-10-03T10:00:20.524Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/erase-masks/cb5e600359b1.png",
+    "maskSha256": "1889cbdbcd50e75b924607df0b36bf26b23cff15ec2198910cf60142fc23aad6",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.",
+    "providerPrompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects."
+  },
+  "mask": {
+    "touchedFraction": 0.05156262715657552,
+    "editable": 54521,
+    "soft": 26580,
+    "protected": 1491763
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 39 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 33.972,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.01,
+        "bestError": 1.01,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1491763,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 54521,
+        "maxDelta": 184,
+        "meanDelta": 46.511,
+        "worst": {
+          "x": 958,
+          "y": 427
+        }
+      },
+      "seam": {
+        "pixels": 26580,
+        "maxDelta": 156,
+        "meanDelta": 8.253,
+        "worst": {
+          "x": 1129,
+          "y": 444
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1491763,
+        "maxDelta": 74,
+        "meanDelta": 2.758,
+        "worst": {
+          "x": 1404,
+          "y": 691
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a10135-731b-73b0-8f74-f1af3e65a176",
+        "account": "FAL_API_KEY_B",
+        "seed": 1388882146
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [
+      "mug"
+    ],
+    "shadow": {
+      "pixels": 10219,
+      "meanDarkening": 49.3
+    },
+    "erasure": [
+      {
+        "changeInCore": 40.58,
+        "corePixels": 54521,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

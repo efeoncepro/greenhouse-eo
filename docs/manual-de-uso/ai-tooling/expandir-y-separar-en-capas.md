@@ -48,8 +48,10 @@ pnpm ai:layers --list ai-generations/<fecha>_<pieza>/layers/<id>/layers.json    
   cuaderno salieron tres capas —mesa, taza, cuaderno— y la base era la pared sola). Por eso `erase`, `move` y `place`
   nunca usan la base sola: el *clean plate* de un elemento es la base **con las demas capas recompuestas encima**.
 - `--prompt "<que separar>"` y `--bbox x0,y0,x1,y1` (fracciones, repetible) apuntan a elementos concretos.
-- **Costo:** se cobra por capa (USD 0,034 hasta 1536², 0,0675 por encima) y el numero de capas lo decide el modelo. El
-  comando estima con una **cota** de 16 capas + base y pide `--yes` sobre el tope; despues registra lo que costo.
+- **Costo:** se cobra por capa (USD 0,034 hasta 1536², 0,0675 por encima) **y la base se cobra como una capa mas**
+  (medido con el saldo de fal: 4 capas + base = USD 0,17). El numero de capas lo decide el modelo y varia entre
+  corridas (la misma foto dio 3 y 4). El comando estima con una **cota** de 16 capas + base y pide `--yes` sobre el
+  tope; despues registra lo que costo.
 - **Las capas son contenido regenerado**: el modelo vuelve a dibujar cada elemento. Por eso se usan solo como
   **mascara** y como **clean plate**; los pixeles que no se editan siempre salen de tu original.
 
@@ -76,7 +78,12 @@ pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model --model g
   toma la sombra de un vecino y nunca pisa otro objeto. `--shadow off` la deja.
 - **Relleno:** `--fill plate` (default con capas: el clean plate sin ese elemento, sin proveedor ni gasto, con
   correccion de color) o `--fill model` (un modelo reconstruye el fondo).
-- Despues de verificar, **mide si el objeto sigue ahi**. Si en ningun candidato cambio, sale con codigo 3 (revisar).
+- Despues de verificar, **mide si el objeto sigue ahi**: que la zona haya cambiado y, con capas, que el resultado se
+  parezca al fondo limpio y no a otro objeto. Si en ningun candidato quedo el fondo, sale con codigo 3 (revisar).
+- **Usa el clean plate.** Con modelo no funciono en el canario del 2026-10-03: Flare dejo media taza y Flux Fill
+  dibujo otra taza en su lugar (un modelo de relleno ve la silueta de la mascara y la llena con lo que sugiere). El
+  detector atrapo los dos casos. `--fill model` queda para fotos sin capas, revisando el resultado al 100 %; el modelo
+  dedicado de borrado (FLUX Erase de BFL) esta pendiente de conectar.
 
 ## Mover o escalar: `pnpm ai:inpaint move`
 

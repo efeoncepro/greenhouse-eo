@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — Técnicas de edición sobre el pipeline de inpainting (TASK-1973)
+
+- Nuevo `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: capas con nombre, máscara por elemento y clean plate
+  = base + las demás capas; la base se cobra como una capa) y `pnpm ai:inpaint erase|move|place|background|expand` +
+  `--zone-resolution`. `place` incorpora un elemento de una foto en otra y el modelo sólo hace el acabado.
+- Canario real (≈ USD 0,90): la sombra proyectada se mide contra el plate y nunca se toma la de un vecino; borrar con
+  el plate es el único método que borró (Flare y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
+  `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
+- Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.
+
 ## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
 
 - Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
@@ -664,13 +674,3 @@ registry y brand-assets 0.3.1, graphic-line 0.3.2) y el Lab reproduce el banner,
 solo anillo y el reverso de la tarjeta con el logo solo. Se aprobaron las 12 reglas de sinergia con la fotografía y se
 resolvieron sus 9 conflictos; lo que necesita código quedó en TASK-1918. Manual v1.8, ADR delta (e), lenguaje
 fotográfico v1.4 y la skill `efeonce-graphic-line` al día.
-
-## 2026-09-26 — Skill viva `efeonce-graphic-line` y la órbita junto a la foto
-
-Nace la skill dueña de la línea gráfica «La órbita» (Claude y Codex, espejo byte-idéntico): el criterio de cada elemento
-(anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), todo lo que existe en AXIS (tokens, contratos y
-recetas de `axis-graphic-line`), cada aplicación (post, story, banner de LinkedIn, deck, informe, firma de correo,
-oficina, merch, eventos, video), el motion del logo, la convergencia con el lenguaje fotográfico, el QA, un registro de
-decisiones y pendientes del operador, y un contrato de mantenimiento. El manual de la línea suma §9.1 (la foto en la
-línea) y fija «Revenue» como palabra del eslogan de RevOps; el lenguaje fotográfico suma §11 (la línea en la foto). El
-router de CLAUDE.md y AGENTS.md apunta a la skill nueva.

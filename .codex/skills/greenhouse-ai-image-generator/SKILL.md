@@ -144,6 +144,8 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    Medido 2026-10-03: la base de Layerize saca también la mesa (el clean plate recompone las demás capas), la sombra
    proyectada se suma sola con capas (`--shadow off` la deja), y para **expandir** el default es Flux Fill (`fal:flux-pro-fill`):
    en el mismo canario Flare achicó la escena y Sunburst copió el relleno en espejo; Flux continuó sin costura. `--zone-resolution` reinterpreta, no escala.
+   **Borrar: usa el clean plate** (gratis); con modelo, Flare dejó media taza y Flux Fill dibujó otra (el detector lo
+   atrapa con código 3).
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.

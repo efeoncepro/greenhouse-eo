@@ -1,6 +1,6 @@
 # Canario real TASK-1973 — capas, borrar, mover, incorporar, fondo, detalle y expandir
 
-> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,47 (0,18 + 0,29 de la comparación de expansión)
+> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,90 (0,18 + 0,29 de la comparación de expansión + 0,43 de la tercera tanda)
 > Foto: `base.png` (copia de `2026-10-02_task-1965-canary/base.png`, 1536×1024: mesa de roble, taza, cuaderno, ventana).
 
 ## Resultado por técnica
@@ -39,7 +39,22 @@
 
 Decisión: Flux Fill es el default de `expand` (`EXPAND_DEFAULT_ADAPTER`); elegir un modelo de OpenAI avisa.
 
+## Tercera tanda: costo de la base y borrado con modelo
+
+| Prueba | Resultado | Costo |
+|---|---|---|
+| `ai:layers --force` con saldo antes/después | 4 capas esta vez (separó el marco de la ventana) + base; el saldo bajó **USD 0,17 = 5 × 0,03375**: **la base se cobra** | 0,17 |
+| `erase --fill model` con Flare | ✗ código 3: dejó la base de la taza como un tazón y pegó un canto de mesa desalineado (reencuadre 2 %) | 0,013 |
+| `erase --fill model --adapter fal:flux-pro-fill` | ✗ dibujó OTRA taza (mitad negra); el detector decía «borrado» → corregido: semejanza a objeto 1,46 vs 0,15 del borrado bueno | 0,10 |
+| Ídem con prompt que describe el fondo | ✗ dibujó otra taza blanca; código 3 | 0,10 |
+| `erase` con clean plate tras la corrección de superficie | ✓ PASS, sombra incluida (10 219 px), sin sombra huérfana | 0 |
+| `move` tras la corrección | ✓ PASS, delta 0 fuera de lo tocado | 0,01 |
+
+Correcciones (commit `920669ef2`): superficie = detrás en `z_index` y sostiene la base (la regla anterior dejaba la
+mesa como «otro objeto» y la sombra cayó a 78 px) · residuo medido contra el fondo limpio · prompt de relleno que
+describe el fondo · costo de Layerize con la base.
+
 ## Pendiente
 
-- `erase --fill model` en vivo (≈ USD 0,01).
+- Borrar con un modelo dedicado (FLUX Erase de BFL) y expandir con FLUX Outpainting: cuenta BFL pendiente.
 - `foto:expandir` delegando en el núcleo (Slice 2): WIP de otra sesión en `scripts/foto/expandir.mjs`.

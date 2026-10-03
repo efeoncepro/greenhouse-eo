@@ -4,7 +4,7 @@
 
 **Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
 
-**Inpainting (03/10):** [TASK-1973](docs/tasks/in-progress/TASK-1973-ai-inpaint-editing-techniques.md) code complete local, canario real PASS salvo `expand` con Flare (reencuadra; probar Flux Fill). Faltan ese canario, `erase --fill model` y Slice 2 (`foto:expandir` con WIP ajeno: CMP-004).
+**Inpainting (03/10):** [TASK-1973](docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md) complete local (sin push). Pendiente: Slice 2 en TASK-1925; BFL FLUX Tools cuando el operador cree la cuenta.
 
 **Marketing Studio (02/10, noche):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress. A y B en producción (API 1.4.0, `pnpm studio:write`); gateway v1.10.0 desplegado sin federar escrituras. **Operador:** release de las capabilities de Greenhouse `9d0d698d4`. C diferido. [§7.4](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 

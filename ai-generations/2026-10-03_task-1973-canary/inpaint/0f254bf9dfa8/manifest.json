@@ -1,0 +1,152 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0f254bf9dfa8",
+  "key": "0f254bf9dfa866a0324c14b2783160c239948a986a0074d64553dc1919fa1d07",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:58:15.185Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/erase-masks/2e974c476cb3.png",
+    "maskSha256": "dca739de1a25ad743c2388f9d517f3f84cc9c0156250f6aa4276870423244be1",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.",
+    "providerPrompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects."
+  },
+  "mask": {
+    "touchedFraction": 0.037976582845052086,
+    "editable": 28808,
+    "soft": 30924,
+    "protected": 1513132
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 759,
+      "top": 218,
+      "width": 592,
+      "height": 556
+    },
+    "target": {
+      "width": 1056,
+      "height": 992
+    },
+    "aspectError": 0.00021800741225210942,
+    "reason": "la zona con contexto ocupa 20.7 % de la imagen: se genera recortada a 1056x992"
+  },
+  "estimate": {
+    "usd": 0.0126,
+    "basis": "1 × salida 1056x992 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 30.832,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -12,
+        "scale": 0.98,
+        "stillError": 7.37,
+        "bestError": 2.91,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1513132,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 28808,
+        "maxDelta": 189,
+        "meanDelta": 60.191,
+        "worst": {
+          "x": 1171,
+          "y": 459
+        }
+      },
+      "seam": {
+        "pixels": 30924,
+        "maxDelta": 126,
+        "meanDelta": 3.482,
+        "worst": {
+          "x": 1161,
+          "y": 524
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1513132,
+        "maxDelta": 201,
+        "meanDelta": 3.01,
+        "worst": {
+          "x": 1210,
+          "y": 734
+        }
+      },
+      "outputUsd": 0.0126,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1079,
+        "input_tokens_details": {
+          "image_tokens": 1023,
+          "text_tokens": 56
+        },
+        "output_tokens": 421,
+        "output_tokens_details": {
+          "image_tokens": 421,
+          "text_tokens": 0
+        },
+        "total_tokens": 1500
+      },
+      "meta": {
+        "size": "1056x992",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [
+      "mug"
+    ],
+    "shadow": {
+      "pixels": 78,
+      "meanDarkening": 19
+    },
+    "erasure": [
+      {
+        "changeInCore": 52.15,
+        "corePixels": 28808,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

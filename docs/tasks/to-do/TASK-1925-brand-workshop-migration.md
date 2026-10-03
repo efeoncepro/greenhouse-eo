@@ -4,7 +4,7 @@
 
 - `scripts/foto/` sumó en TASK-1940: catálogo del traje y los lentes, `validarTrajeNexa`, claves `acabadoMarca`/`macroEnUso`/`instruccionEnUso` y `foto:isotipo --marca logotipo --tecnica`. Migran con el resto de `foto:*`, junto al kit `ai-generations/2026-10-01_traje-bionico-nexa/` (sellado y publicado en el canon) — cerrado por trabajo en TASK-1940.
 - `scripts/ai/` crecerá con `scripts/ai/inpaint/**` (`pnpm ai:mask`, `pnpm ai:inpaint image|video`). El núcleo nace sin imports `@/`; los adaptadores dependen de `@/lib/ai/*` igual que `ai:image`. El cierre de imports sellados debe contarlo — registrado por TASK-1965.
-- `scripts/foto/expandir.mjs` pasará a delegar su recomposición en `scripts/ai/inpaint/expand.ts` (TASK-1973, Slice 2): al migrar `foto:*` al taller, el núcleo de inpainting viaja con él o queda como dependencia declarada — registrado por TASK-1973.
+- `scripts/foto/expandir.mjs` **no** se delegó en el núcleo (`scripts/ai/inpaint/expand.ts`): el Slice 2 de TASK-1973 pasa a esta task. El canario del 2026-10-03 cambió la premisa: el núcleo garantiza la escena en delta 0 y expande por defecto con Flux Fill (Flare reencuadra, Sunburst copia el relleno en espejo), mientras `foto:expandir` usa Sunburst y, en las piezas aprobadas de CMP-004, entrega la salida del modelo sin reponer (`--reponer no`). Delegarlo cambia cómo salen piezas aprobadas: se decide al migrar, con regresión contra dos horizontales de CMP-004 — registrado por TASK-1973.
 
 ## Delta 2026-10-01
 
