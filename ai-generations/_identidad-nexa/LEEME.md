@@ -64,7 +64,8 @@ Julio, no de sus prompts, porque el de perfil se contradice solo y documentarlo 
 > movimiento natural, intensidad cotidiana, piel v3 y la geometría «el ancho entre pómulos ≈ 1,2 × ojos→mentón».
 > Aprobadas por el operador («lo veo bien, la verdad»). Después se sumaron 13 (`13-euforia` a `25-mirada-lateral-izq`):
 > éxito (euforia, alivio, orgullo sereno, «te lo dije»), el «antes» del problema (hartazgo, agobio, alarma, confusión),
-> foco (concentración, determinación, explicando) y social (bienvenida, mirada lateral al otro lado). Son 25. Un intento previo de frente estricto con marcadores musculares
+> foco (concentración, determinación, explicando) y social (bienvenida, mirada lateral al otro lado). Son 25, **todas
+> aprobadas por el operador el 2026-10-03** («aprobadas todas»). Un intento previo de frente estricto con marcadores musculares
 > fue rechazado («se ven muy IA»). Corrida: `2026-10-03_nexa-expresiones-piloto/`.
 >
 > **Delta 2026-10-03 — la pose repetida.** Las 12 comparten el tres cuartos del ancla desde la que se editaron, y cuando
