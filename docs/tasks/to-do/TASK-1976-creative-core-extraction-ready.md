@@ -176,7 +176,7 @@ debe ser mover archivos, no reescribirlos.
 - Cualquier cambio en Globe (hibernado) o en su runtime.
 - Tocar adaptadores de proveedor más allá de los imports que el gate exija.
 - Nuevas técnicas o modelos; canarios con gasto (es un refactor sin cambio de comportamiento).
-- `foto:expandir` y su convergencia (TASK-1925).
+- `foto:expandir` y su convergencia (TASK-1978).
 
 ## Detailed Spec
 

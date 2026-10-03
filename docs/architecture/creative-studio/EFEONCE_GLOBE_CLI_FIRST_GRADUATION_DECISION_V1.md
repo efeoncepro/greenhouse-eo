@@ -160,7 +160,7 @@ orquestación con llamadas al adapter; hay que separar la orquestación pura del
 
 ### Estructurales
 - El carril CLI se diseña como antesala de Globe: manifiestos, códigos de salida y costo son parte del contrato.
-- `foto:expandir` / `ai:inpaint expand` es el caso piloto de convergencia (TASK-1925).
+- `foto:expandir` / `ai:inpaint expand` es el caso piloto de convergencia (TASK-1978).
 
 ## 5. Cuatro pilares
 
@@ -204,7 +204,7 @@ orquestación con llamadas al adapter; hay que separar la orquestación pura del
    verde.
 3. **Task de Globe:** capability semántica de edición (p. ej. editar zona, borrar, expandir) sobre el paquete, con su
    adapter por proveedor, spend fence, golden briefs desde los canarios y su ruta.
-4. **Convergencia de `foto:expandir`** en TASK-1925, como primer caso de dos implementaciones resueltas.
+4. **Convergencia de `foto:expandir`** en TASK-1978 (un solo motor de expansión con lo mejor de los dos), como primer caso de dos implementaciones resueltas.
 
 ## 9. Preguntas abiertas (deliberadamente no decididas)
 

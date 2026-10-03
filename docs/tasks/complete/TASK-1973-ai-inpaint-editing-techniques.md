@@ -346,7 +346,7 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
   USD 0,034/imagen; FLUX 3 Image): adaptador en el mismo pipeline + canario comparativo contra Flux Fill y el clean
   plate. Comparar contra Sunburst (que ya borra limpio) y el clean plate. Bloqueado: el operador crea la cuenta BFL
   y la clave va a Secret Manager (`greenhouse-bfl-api-key`). Decisión del operador 2026-10-03: «dejémoslo para luego».
-- Slice 2 (`foto:expandir` sobre el núcleo): movido a TASK-1925 con la decisión pendiente para CMP-004.
+- Slice 2 (`foto:expandir` sobre el núcleo): movido a TASK-1925 y, el 2026-10-03, a **TASK-1978** (un solo motor de expansión).
 
 ## Open Questions
 
