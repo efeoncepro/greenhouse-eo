@@ -1,0 +1,21 @@
+{
+ "id": "VO-isabella-cruza",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  {
+   "persona": "isabella"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "polo-efeonce",
+   "tapa": "cruza"
+  }
+ ],
+ "escena": "SCENE: Isabella stands by a window in a bright meeting room, chest-up medium close-up, facing the camera with a wide, bright smile, mid-laugh, her right hand holding a plain white coffee cup in front of her left chest so her knuckles and fingers pass in front of her embroidered emblem. She wears the deep navy piqué polo of the kit, with its embroidered emblem on the left chest exactly as in the reference, at its real size and position: only the part not covered by her hand shows. A small azure-blue (#0375DB) notebook lies on the windowsill behind her, out of focus. Soft window light from the left with gentle fill. 85mm lens at f/2, camera at about 2 m at chest height.",
+ "lecho": {
+  "objeto": "the dark near edge of a walnut meeting table in the lower foreground",
+  "tono": "DARK near black"
+ }
+}

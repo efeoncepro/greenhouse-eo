@@ -1,0 +1,20 @@
+{
+ "id": "VO-karo-mano",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce"
+  }
+ ],
+ "escena": "SCENE: Karo stands in a creative studio with a pale plaster wall, chest-up medium close-up, body facing the camera, looking into the lens with a warm, confident half-smile, her right hand rests flat on her chest over her heart in a sincere gesture of thanks, at the instant she laughs at something said off-camera. She wears the Efeonce royal-blue hoodie of the kit, hood down, with its embroidered emblem on the left chest exactly as in the reference, at its real size and position: her hand covers part of it and only the rest shows beside her fingers. A small azure-blue (#0375DB) notebook rests on a shelf behind, out of focus. Soft window light from the left with gentle fill. 85mm lens at f/2, camera at about 2 m at chest height.",
+ "lecho": {
+  "objeto": "the dark near edge of a walnut table in the lower foreground",
+  "tono": "DARK near black"
+ }
+}

@@ -613,6 +613,12 @@ Cinco trampas medidas en esa corrida:
    en EC2: componer una marca más chica al lado de la mano «no sería la vista real»). Por eso la oclusión es una VISTA del
    kit, no una composición sobre la escena.
 
+**Validado en escena (2026-10-03, `ai-generations/2026-10-03_validacion-oclusion/`):** Karo con la mano sobre el pecho
+(`tapa` inferida de la escena) salió con la marca a su tamaño y sólo la parte visible junto a los dedos: el caso de la
+mano queda resuelto desde la referencia. Isabella con una taza (`tapa: "cruza"` declarada) salió con la marca correcta y
+ENTERA: el modelo corrió la taza a un costado. La vista de oclusión evita que la marca se reinvente o se achique; no
+obliga al modelo a tapar con un objeto.
+
 **`pnpm foto:isotipo` (2026-10-03)**, para cuando sí hay que componer: clasifica la caja en tela, marca inventada y
 **oclusor** (piel, pelo, otro material por color, más `--oclusion <máscara de pnpm ai:mask>` para lo que tiene el color de
 la prenda: una manga, separada con `pnpm ai:layers`); limpia sólo la marca inventada y compone la oficial **por detrás**
