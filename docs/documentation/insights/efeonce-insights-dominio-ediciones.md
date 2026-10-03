@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -291,6 +291,74 @@ Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no m
 > `insights-deck/`; página por forma de gráfico en `src/lib/efeonce-insights/render/figure-slots.ts`;
 > task `docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md`.
 
+## Cómo elige el informe sus gráficos
+
+> Estado (2026-10-03): **el criterio está decidido y aprobado por el operador; su implementación está en curso** (una
+> task nueva de EPIC-045, todavía sin número). Lo que sigue describe la regla que van a cumplir los informes; el
+> recuadro «Cómo están hoy los informes» al final de esta sección dice qué sale todavía con la regla anterior.
+
+**El principio: cada gráfico responde una pregunta.** Un gráfico no adorna: es un argumento. Antes de elegir su forma
+se pregunta qué quiere saber el lector sobre ese dato («¿cuánto es?», «¿cómo evolucionó?», «¿cumplimos la meta?») y
+la forma sale de esa pregunta, no de la costumbre. Si una barra explica bien el dato, se queda; si otra figura lo
+explica igual o mejor, se cambia. Nunca se elige un gráfico peor sólo para variar.
+
+**Las tres reglas, en este orden.**
+
+1. **La pregunta decide la figura.** Es la tabla de abajo.
+2. **Un dato no se muestra dos veces.** Un mismo hecho alimenta una sola figura. Si una métrica tiene meta, se muestra
+   contra la meta, y sobra la barra que la compara con el mes anterior.
+3. **La variedad sólo desempata.** Cuando dos figuras explican el dato igual de bien, se elige la que no se usó en la
+   figura anterior del mismo capítulo. La variedad nunca justifica una figura peor.
+
+**Qué quiere saber el lector y qué figura usa.**
+
+| Lo que quiere saber el lector | Figura |
+|---|---|
+| ¿Cuánto es y cómo cambió? (un valor solo, o varias métricas cada una en su escala) | **Tarjeta de cifra** |
+| ¿Cómo evolucionó en el tiempo? (tres puntos o más) | **Línea** |
+| ¿Cumplimos la meta? | **Bullet** (barra contra la meta). Varias metas de un capítulo van juntas en una sola figura |
+| ¿Qué explica el cambio? | **Cascada**: del valor anterior al actual, sumando el aporte de cada parte; tiene que cuadrar |
+| ¿De qué se compone? (2 o 3 partes) | **Dona**. Con más de 3 partes, nunca dona ni torta |
+| ¿De qué se compone? (cosas que se cuentan una a una, hasta 4 categorías) | **Waffle**: cada cuadro es una unidad, por ejemplo una respuesta de un motor de IA |
+| ¿De qué se compone? (más de 4 categorías) | **Barras horizontales ordenadas** |
+| ¿Cuánto del total es una parte, en dos períodos? | **Barras apiladas** (por ejemplo, visitas con y sin interacción, este mes y el anterior) |
+| Comparar elementos ordenados (páginas, consultas, competidores) | **Barras**, horizontales si las etiquetas son largas |
+
+**Qué es una tarjeta de cifra.** Es la forma de mostrar un valor solo, sin dibujar un gráfico: el nombre de la métrica
+en pocas palabras, el valor en grande, su unidad y cuánto cambió. El cambio se indica con flecha, color y texto (nunca
+sólo con color) y siempre dice contra qué se compara («vs agosto»). Cuando subir es malo (por ejemplo, la posición en
+Google o las rondas de revisión), la tarjeta lo dice. Un valor estimado lleva la marca «estimado», y si no hay dato
+muestra «—», nunca un cero.
+
+**Algunas reglas que no cambian.** Las barras siempre parten desde cero; nunca hay gráficos en 3D ni con dos ejes; el
+color nunca es la única forma de distinguir algo. Un embudo sólo se usa si las etapas van en orden y en cada una se
+pierde gente: por eso los clics de Google y las visitas al sitio no forman un embudo (las visitas orgánicas suman todos
+los buscadores y pueden ser más que los clics de Google).
+
+**Un ejemplo con informes reales (septiembre de 2026 contra agosto).**
+
+- **Berel (visibilidad orgánica y en IA):** hoy trae 10 figuras, 6 de ellas de barras agrupadas. Con el criterio, clics,
+  impresiones, palabras clave, CTR y tráfico estimado pasan a tarjetas de cifra; las visitas con interacción pasan a
+  barras apiladas; las visitas desde asistentes de IA, a una tarjeta y una dona (ChatGPT, Gemini y otros); y el tipo
+  de fuente citada, a barras horizontales ordenadas. La línea de clics por semana, la cascada de consultas, las barras
+  de páginas y el waffle del tono de las respuestas se quedan porque ya responden bien su pregunta. El informe pasa de
+  tener 7 de sus 10 figuras en barras a usar seis tipos de gráfico distintos, además de las tarjetas de cifra.
+- **Sky (entrega):** hoy cada métrica aparece dos veces: en barras contra el mes anterior y en bullets contra la meta.
+  Con el criterio quedan una sola figura con las tres metas y una tarjeta con las piezas entregadas: un informe más
+  corto y sin datos repetidos.
+
+> **Cómo están hoy los informes (2026-10-03).** El criterio todavía no está implementado: los informes usan
+> principalmente barras, y el PDF sólo sabe dibujar barras, línea y bullet. Por eso la cascada y los waffles que hoy
+> trae un informe como el de Berel **sólo se ven en la página web**; en el PDF ese capítulo queda contado en palabras y
+> en su tabla. La tarjeta de cifra todavía no existe en ninguno de los formatos. Cuando la implementación termine, el
+> PDF y el deck tendrán página propia para tarjetas, cascadas, waffles, donas y barras apiladas.
+
+> Detalle técnico: [criterio de selección de gráficos](../../architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md)
+> (canon: principio, reglas, tabla pregunta → familia, caso de referencia y lo que exige implementarlo);
+> [arquitectura §15](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md); familias que hoy tienen página en el PDF en
+> `src/lib/efeonce-insights/render/figure-slots.ts`; la elección actual de figuras en
+> `src/lib/efeonce-insights/editorial/deterministic-planner.ts`.
+
 ## Estado de disponibilidad (2026-09-28)
 
 > **Delta 2026-09-25 (TASK-1847 cerrada):** el informe A4 y el deck nuevo están **en producción desde el
@@ -416,7 +484,8 @@ firma de Efeonce.
 - **Presentar** muestra el informe como láminas; **Descargas** entrega los PDF que el enlace permite.
 - Si el período todavía no cerró, un aviso lo dice arriba: las cifras son las del corte y no se actualizan solas.
 - La página sabe dibujar todas las formas de gráfico del contrato; el PDF, sólo cuatro (comparación, columnas, metas y
-  tendencia). Hoy los informes sólo traen esas cuatro, así que en la práctica muestran lo mismo.
+  tendencia). Un informe que trae una cascada o un waffle (como el de Berel) los muestra sólo en la web; en el PDF
+  quedan como frase y tabla (ver «Cómo elige el informe sus gráficos»).
 
 > **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
 > capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a

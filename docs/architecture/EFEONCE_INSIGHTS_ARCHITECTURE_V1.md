@@ -1561,9 +1561,19 @@ transformación de texto que queda en Think es tipográfica (partir el titular e
 **Familias de gráfico (matriz v2).** Con evidencia hoy: barras y barras agrupadas, línea (ICO mensual, ETV mensual y
 clics por bloque de 7 días contra el mismo bloque del período anterior), bullet (metas ICO), cascada (aporte de cada
 consulta al cambio de clics, más el resto) y waffle (tono y tipo de fuente del Grader). Los catálogos PDF tienen página
-sólo para barras, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`): los mappers OMITEN a propósito
+sólo para barras, barras agrupadas, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`): los mappers OMITEN a propósito
 las demás familias (la web las dibuja; el PDF conserva el hallazgo y la tabla), en vez de rechazar el informe entero.
 Una familia nueva en el PDF exige su plantilla en el catálogo y sumarla a ese conjunto.
+
+**Criterio de selección (aprobado 2026-10-03, implementación pendiente).** Qué familia usar para cada dato lo decide
+[`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md); la matriz de
+arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
+
+1. **La pregunta decide la familia** (tabla pregunta → familia del criterio, con la tarjeta de cifra como figura nueva).
+2. **Un dato no se muestra dos veces:** con meta, gana el bullet y sobra la barra contra el período anterior.
+3. **La variedad sólo desempata:** nunca justifica una figura peor.
+
+Hasta que cierre la task de implementación de EPIC-045 (por crear), el planner sigue con la lógica actual.
 
 **Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
 ni la petición (sólo la decisión); Think sí. Página de plan en los PDF y cascada para «qué explica el cambio» quedan

@@ -401,3 +401,49 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   (hallazgo siempre) y `ai_source.<asistente>` (figura completa o ninguna + hallazgo del asistente que más trae). Flag
   OFF ⇒ silencio (sin límite); lo leen Vercel y `ops-worker`.
 - **Línea semanal**: la lectura usa sólo bloques completos de 7 días como extremos.
+
+## Criterio de selección de gráficos (2026-10-03, decidido; implementación pendiente)
+
+Aprobado y canonizado por el operador el 2026-10-03. Canon técnico (fuente única; esto es su resumen operativo):
+`docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`. La implementación vive en una task nueva de
+EPIC-045, **por crear** (sin ID todavía: no inventarlo).
+
+- **Principio**: un gráfico es un argumento que responde UNA pregunta del lector; la familia se elige por la pregunta, no
+  por la forma del dato ni por costumbre. Si la barra explica el dato, se queda; si otra figura lo explica igual o mejor,
+  se cambia. Nunca se elige un gráfico peor para variar.
+- **Tres reglas, en este orden**:
+  1. **La pregunta decide la familia** (tabla de abajo).
+  2. **Un dato no se muestra dos veces.** Si la métrica tiene meta, gana el bullet contra la meta y sobra la barra contra
+     el período anterior de la misma métrica. Un mismo hecho no alimenta dos figuras.
+  3. **La variedad sólo desempata.** Entre dos familias que explican el dato igual de bien, se elige la que NO usó la
+     figura anterior del capítulo. La variedad nunca justifica una figura peor.
+
+| Pregunta del lector | Familia |
+|---|---|
+| ¿Cuánto es y cómo cambió? (un valor, o varias métricas cada una en su escala) | **Tarjeta de cifra** |
+| ¿Cómo evolucionó en el tiempo? (≥ 3 puntos) | Línea |
+| ¿Cumplimos la meta? | Bullet (varias metas del capítulo en UNA figura, small multiples) |
+| ¿Qué explica el cambio? | Cascada (anterior → aporte de cada parte → resto → actual; debe cuadrar) |
+| ¿De qué se compone? 2–3 partes | Dona (más de 3: nunca dona ni torta) |
+| ¿De qué se compone? unidades contables, ≤ 4 categorías | Waffle (cada cuadro, una unidad) |
+| ¿De qué se compone? más de 4 categorías | Barras horizontales ordenadas |
+| ¿Cuánto del total es un subconjunto, en dos períodos? | Barras apiladas (≤ 4 segmentos) |
+| Comparar elementos ordenados (páginas, consultas, competidores) | Barras (horizontales si las etiquetas son largas) |
+
+- **Tarjeta de cifra = tipo de figura NUEVO**, no una de las 15 familias de `contracts/chart-spec.ts`. Anatomía: nombre
+  (≤ 3 palabras), valor grande con cifras tabulares, unidad, variación con flecha + color + texto (nunca sólo color),
+  período de comparación explícito («vs agosto»), dirección declarada cuando subir es malo (posición, rondas de
+  revisión), marca «estimado» si el valor lo es, «—» sin dato (nunca 0).
+- **Reglas duras heredadas** (`dataviz-design`): barras desde 0; nunca torta de más de 3 porciones; nunca 3D; nunca doble
+  eje; nunca el color como única codificación; embudo sólo con etapas estrictamente ordenadas que pierden gente
+  (clics de Search Console → sesiones de GA4 NO lo es: Berel septiembre 2026, 13.606 clics vs 43.949 sesiones).
+- **Estado actual vs objetivo**: hoy el contrato tiene 15 familias, 6 con evidencia (`producer_now` en la matriz v2) y 4 con página PDF; Berel usa 4 (barras agrupadas, línea, cascada, waffle) y Sky 2 (barras agrupadas, bullet); el PDF sólo tiene página para barras, barras
+  agrupadas, línea y bullet (`PDF_FIGURE_FAMILIES`, `render/figure-slots.ts`); cascada, waffle, dona y apiladas quedan
+  sólo en la web. Objetivo: el criterio como regla con pruebas en `editorial/deterministic-planner.ts` (pregunta →
+  familia, deduplicación meta > período anterior, desempate por variedad), matriz `editorial/family-evidence-matrix.ts`
+  ampliada, tarjeta de cifra en el plan + `insights-report` + `insights-deck` + Think, plantillas PDF/deck para cascada,
+  waffle, dona y apiladas, y un gate sobre los fixtures de Berel y Sky: ningún hecho alimenta dos figuras y cada figura
+  declara la pregunta que responde. Nada de esto está hecho.
+- **Mientras no se implemente**, el § Render contract (familia → página) y `ChartScaleV1.perDimension` (§ Client-fit:
+  métricas distintas como UNA `bar_grouped` leída fila por fila) describen el runtime de hoy, no el criterio: el
+  criterio las convierte en tarjetas de cifra. Al implementar, actualizar esas secciones en el mismo cambio.

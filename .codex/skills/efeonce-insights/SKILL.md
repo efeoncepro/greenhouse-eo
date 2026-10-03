@@ -124,6 +124,8 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
 - Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs).
+  Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos +
+  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` (decidido 2026-10-03; implementación pendiente).
   Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
   2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
   and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/delivery/schedules stay OFF in Production, sharing ON

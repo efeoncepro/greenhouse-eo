@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -646,6 +646,60 @@ con este diseño; las primeras ediciones internas de Berel y Sky se generaron en
 `scripts/insights/canvas-fidelity.ts` y `scripts/insights/canvas-fixtures/`; catálogos
 `src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`;
 `services/artifact-worker/classify-failure.ts`.
+
+## Revisar los gráficos de una edición antes de emitirla
+
+Para qué: comprobar que las figuras de una edición cuentan el dato con claridad antes de que la edición se emita.
+Usa el criterio de selección de gráficos aprobado por el operador el 2026-10-03: cada figura responde una pregunta del
+lector, un dato no se muestra dos veces y la variedad sólo desempata.
+
+> **Estado (2026-10-03):** el criterio está decidido, pero su implementación está en curso (una task de EPIC-045
+> todavía sin número). Hoy el planificador elige casi siempre barras, el PDF sólo dibuja barras, línea y bullet, y la
+> tarjeta de cifra todavía no existe. Esta revisión sirve hoy para **detectar** problemas; corregirlos de forma
+> automática llega **cuando esté implementado**. Emitir sigue apagado en producción.
+
+**Antes de empezar.** Ten a mano la edición en `ready_for_review` y su vista previa (`--plan-only` para ver la lista de
+figuras y su lectura, y el PDF de la sección anterior), o el enlace web si la edición ya se compartió internamente.
+
+**Paso a paso.**
+
+1. **Para cada figura, di en voz alta qué pregunta responde.** «¿Cuánto es?», «¿cómo evolucionó?», «¿cumplimos la
+   meta?», «¿qué explica el cambio?», «¿de qué se compone?» o «¿cómo se ordenan?». Si no puedes decirla en una frase,
+   la figura sobra o está en la forma equivocada.
+2. **Busca datos repetidos.** Un mismo hecho no debe aparecer en dos figuras. El caso típico: una métrica con meta que
+   sale en bullet contra la meta y además en barras contra el mes anterior (hoy pasa en las ediciones de entrega,
+   como la de Sky).
+3. **Busca valores solos dibujados como barra.** Un valor solo, o varias métricas cada una en su escala (clics,
+   impresiones, CTR), se lee mejor como cifra con su variación que como barras agrupadas. Hoy salen como barras;
+   **cuando esté implementado**, saldrán como tarjetas de cifra.
+4. **Compara el PDF con la web.** Hoy el PDF omite las cascadas y los waffles: en el PDF ese capítulo queda como frase
+   y tabla, y la figura sólo se ve en la web. Es el comportamiento esperado mientras el PDF no tenga página para esas
+   formas; confirma que la frase y la tabla dicen lo mismo que la figura web.
+5. **Revisa las reglas fijas.** Barras desde cero, sin 3D, sin doble eje, sin tortas de más de 3 porciones, y el color
+   nunca como única forma de distinguir algo. Si ves un embudo, confirma que sus etapas van en orden y que en cada una
+   se pierde gente (clics de Google → visitas al sitio **no** es un embudo).
+
+**Qué hacer si algo no cuadra.**
+
+- **No emitas la edición.** Una figura confusa o un dato repetido no se arreglan después de emitir.
+- **Pide la revisión de la edición** y anota qué figura, qué pregunta debía responder y qué viste. Si la causa está en
+  el encargo (módulos, período, comparación), corrígela con `POST …/editions/<id>/revise`, que genera una versión
+  nueva.
+- **Si el problema es la forma de la figura** (barras donde va una cifra, un dato repetido), hoy una versión nueva sale
+  con las mismas figuras, porque el planificador todavía no aplica el criterio. Anótalo para la task de
+  implementación y avisa al operador; no edites el plan ni la plantilla a mano para esconderlo.
+
+**Qué no hacer.**
+
+- No emitas una edición con figuras que no puedes explicar en una frase.
+- No cambies un gráfico por otro sólo para que el informe se vea más variado.
+- No prometas al cliente tarjetas de cifra, donas o barras apiladas en el PDF hasta que estén implementadas.
+
+**Referencias.** Criterio canónico
+[`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](../../architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md);
+documentación funcional
+[«Cómo elige el informe sus gráficos»](../../documentation/insights/efeonce-insights-dominio-ediciones.md); familias con
+página en el PDF en `src/lib/efeonce-insights/render/figure-slots.ts`.
 
 ## Qué significan los estados
 

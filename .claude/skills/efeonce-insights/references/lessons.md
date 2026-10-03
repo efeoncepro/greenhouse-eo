@@ -1,5 +1,15 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-03 · gráficos · El planificador elegía casi siempre barras agrupadas y repetía datos (Berel: 4 familias en 10 figuras; Sky: 2 en 6; 6 de 15 con evidencia).** Síntoma (medido con el código en
+  producción, septiembre vs agosto 2026): Berel (SEO + AEO) tenía 10 figuras, 6 de barras agrupadas, y el PDF mostraba 7
+  (cascada y los dos waffles eran sólo web); Sky (ICO) tenía 6 figuras, y 3 barras contra el mes anterior REPETÍAN las
+  métricas de los 3 bullets contra la meta. Las barras se elegían por costumbre: clics, impresiones y keywords en barras
+  agrupadas que no las comparan (cada una vive en su escala). Regla: la familia se elige por la pregunta del lector; la
+  variedad sólo desempata entre dos figuras igual de buenas; un dato no se muestra dos veces (la meta gana al período
+  anterior). Con el criterio, Berel pasa a 6 familias distintas y Sky queda más corto y sin repetidos. Criterio en
+  [`contracts.md`](contracts.md) § Criterio de selección de gráficos y en
+  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`; implementación pendiente en una task nueva de
+  EPIC-045.
 - **2026-09-29 · correo de entrega · La pieza aprobada no es la plantilla.** Síntoma: al canonizar el correo de entrega
   aprobado (canvas v21), lo natural era publicarlo entero como «el correo de Efeonce». El operador acotó: se canonizan el
   pie, los CTA y el bloque de marca; el correo de Insights es **una aplicación**. Regla: la cabecera, «Lo esencial del

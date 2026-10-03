@@ -725,3 +725,9 @@ internas, y TASK-1958 para la jerarquía visual (Think todavía imprime `spec.un
   lectura semanal sin bloques cortos. GA4 conectado para Grupo Berel (propiedad 328274754) desde la UI de staging;
   flag + OAuth en Vercel staging/Production y declarado en `ops-worker/deploy.sh` (deploy del worker pendiente). Local,
   sin push.
+- 2026-10-03 · Claude · criterio de selección de gráficos aprobado y canonizado por el operador: la pregunta del lector
+  decide la familia, un dato no se muestra dos veces (la meta gana al período anterior) y la variedad sólo desempata;
+  la tarjeta de cifra entra como tipo de figura nuevo. Canon técnico en
+  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`; resumen en `contracts.md` § Criterio de
+  selección de gráficos. Sólo documentación: la implementación (planificador, tarjeta de cifra, plantillas PDF/deck de
+  cascada, waffle, dona y apiladas, gate sobre fixtures de Berel y Sky) queda en una task nueva de EPIC-045, por crear.
