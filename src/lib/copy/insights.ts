@@ -560,8 +560,26 @@ export const GH_INSIGHTS = {
       comparison: 'Comparación de períodos',
       columns: 'Comparación por dimensión',
       targets: 'Resultado contra la meta',
-      trend: 'Evolución en el tiempo'
+      trend: 'Evolución en el tiempo',
+      // TASK-1975 — figuras del criterio de selección con página PDF.
+      stat: 'Cifras del período',
+      waterfall: 'Qué explica el cambio',
+      waffle: 'Cómo se reparte',
+      donut: 'Cómo se compone',
+      stacked: 'Cuánto del total'
     },
+    /** TASK-1975 — leyenda de la cascada: el paso que suma y el que resta (el signo va además en la cifra). */
+    stepAdded: 'Sumó',
+    stepRemoved: 'Restó',
+    axisFromZeroNote: 'El eje empieza en cero: los pasos se ven en su proporción real sobre el total.',
+    /** Nota del waffle por unidad: qué es un cuadro. */
+    waffleUnitNote: (total: string) => `Cada cuadro es una unidad; el total es ${total}.`,
+    /** Centro de la dona cuando muestra el total de las partes. */
+    donutTotal: 'en total',
+    opportunity: 'Oportunidad',
+    /** Cuántas cifras trae el tablero de la página de cifras. */
+    statCount: (count: number) => (count === 1 ? '1 cifra' : `${count} cifras`),
+    statUnit: 'Cada cifra en su propia unidad; bajo cada una, la variación contra el período anterior.',
     achieved: 'Logrado',
     achievedRow: 'logrado',
     target: 'Meta',

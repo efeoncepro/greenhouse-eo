@@ -635,6 +635,52 @@ export const waffleGeometry = (
   return cells
 }
 
+/** TASK-1975 — techo del waffle por unidad: más de cien cuadros ya no es un conteo que el ojo lea. */
+export const WAFFLE_MAX_UNITS = 100
+
+/** Hasta este total de unidades el waffle va en 5 columnas; desde el siguiente, en 10. */
+export const WAFFLE_NARROW_MAX_UNITS = 30
+
+export interface WaffleUnitGeometry {
+  readonly columns: number
+  readonly rows: number
+  /** Un cuadro por unidad, llenado fila por fila en el orden de las partes. */
+  readonly cells: readonly WaffleCellGeometry[]
+}
+
+/**
+ * Waffle por unidad (criterio de selección §5: «cada cuadro es una unidad»): 8 respuestas son 8 cuadros, no cien
+ * repartidos por participación. Exige conteos enteros no negativos; sin unidades o con más de cien, falla cerrado (la
+ * figura no se emite). Hasta 30 unidades, 5 columnas; de 31 a 100, 10. `waffleGeometry` sigue sirviendo al reparto por
+ * participación.
+ */
+export const waffleUnitGeometry = (parts: readonly { readonly seriesId: string; readonly value: number }[]): WaffleUnitGeometry => {
+  const invalid = parts.find(part => !Number.isInteger(part.value) || part.value < 0)
+
+  if (invalid) {
+    throw new ChartGeometryError('not_countable', `la parte "${invalid.seriesId}" no es un conteo entero (${invalid.value}); un cuadro es una unidad`)
+  }
+
+  const total = parts.reduce((sum, part) => sum + part.value, 0)
+
+  if (total === 0) {
+    throw new ChartGeometryError('no_measurable_values', 'el waffle no tiene unidades que dibujar')
+  }
+
+  if (total > WAFFLE_MAX_UNITS) {
+    throw new ChartGeometryError('too_many_units', `${total} unidades exceden las ${WAFFLE_MAX_UNITS} que un waffle por unidad deja contar`)
+  }
+
+  const columns = total <= WAFFLE_NARROW_MAX_UNITS ? 5 : 10
+  const cells: WaffleCellGeometry[] = []
+
+  for (const part of parts) {
+    for (let i = 0; i < part.value; i += 1) cells.push({ index: cells.length, seriesId: part.seriesId })
+  }
+
+  return { columns, rows: Math.ceil(total / columns), cells }
+}
+
 export interface VennTwoGeometry {
   readonly radiusA: number
   readonly radiusB: number

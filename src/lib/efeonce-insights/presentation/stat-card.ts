@@ -24,6 +24,8 @@ export interface StatItemView {
   change: { display: string; direction: ChangeDirection; tone: ChangeTone } | null
   /** «vs 16.390 en agosto de 2026»; null sin comparable con valor. */
   versus: string | null
+  /** Las piezas de `versus` por separado (el PDF destaca la cifra) y el hecho comparable; null sin comparable. */
+  comparison: { factId: string; display: string; period: string } | null
   /** «Sin dato en septiembre de 2026» cuando el hecho no tiene valor. */
   noData: string | null
   /** «Menor es mejor» sólo cuando subir es malo. */
@@ -52,6 +54,9 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
     // Una variación que no se imprime (0,0 %) es «sin cambio»: triángulo plano y tono neutro.
     change: comparable && tone ? { display: delta ? unsigned(delta) : '0', direction: delta ? tone.direction : 'flat', tone: delta ? tone.tone : 'neutral' } : null,
     versus: comparable ? GH_INSIGHTS.stat.versus(formatFactValue(comparable.value, comparable.unit, locale), windowLabelOf(comparable.window, locale)) : null,
+    comparison: comparable
+      ? { factId: comparable.factId, display: formatFactValue(comparable.value, comparable.unit, locale), period: windowLabelOf(comparable.window, locale) }
+      : null,
     noData: fact.value === null ? GH_INSIGHTS.stat.noDataIn(windowLabelOf(fact.window, locale)) : null,
     lowerIsBetter: item.direction === 'lower_is_better' ? GH_INSIGHTS.stat.lowerIsBetter : null
   }
