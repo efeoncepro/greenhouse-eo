@@ -25,6 +25,10 @@ RUN --mount=type=secret,id=axis_npmrc,target=/root/.npmrc,required=true \
 
 COPY tsconfig.json ./
 COPY src/ ./src/
+# TASK-1938 — el PDF del AI Visibility Report importa su manifest de assets desde `public/branding/pdf/`
+# (`report-pdf-primitives.tsx`); esbuild lo resuelve en build, así que el JSON tiene que estar en este stage. Las
+# imágenes las copia el stage de runtime (`COPY public/branding`).
+COPY public/branding/pdf/ai-visibility-assets.manifest.json ./public/branding/pdf/ai-visibility-assets.manifest.json
 # Copy the whole service directory so new sibling modules are automatically
 # available to esbuild. This avoids Cloud Build regressions whenever ops-worker
 # grows a new local helper/import.
