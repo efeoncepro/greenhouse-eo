@@ -397,7 +397,7 @@ luz con el acento de su línea, sujeto a la derecha mirando al lente (en la secc
 izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista**, en la receta de deck **`proposal-cinematic`**
 (AXIS `cine-requires-nexa-or-proposal`) y, por **excepción aprobada el 2026-09-27**, en las láminas de **sección y
 «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos»: personas en luz dramática; no se
-extiende a social, web, publicidad ni contenido); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
+extiende a social, web, publicidad ni contenido) y, desde el **2026-10-03**, en las **superficies de producto** (escenario del login, hero de producto; `alcance: "producto"`, caso 6: Nexa, roster con la prenda de su línea o casting anclado a su retrato); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
 barra, trampas y comandos en la referencia (§Registros); canon vigente:
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 **Para producir, el [casebook cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)**

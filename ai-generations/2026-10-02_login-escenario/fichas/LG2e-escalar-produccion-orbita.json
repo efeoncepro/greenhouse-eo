@@ -22,8 +22,8 @@
   },
   "registro": "cine",
   "desde": "NX6b",
-  "alcance": "publicidad-prueba",
-  "nota": "Casting (no es del roster), anclado a un retrato con la receta de piel v3. Cine con persona de casting en uniforme para el escenario del login: excepción del operador (2026-10-02); alcance publicidad-prueba porque no existe un alcance web. Parte de NX6b: la órbita de luz que rodea a la persona (cerrada = ella dirige).",
+  "alcance": "producto",
+  "nota": "Casting (no es del roster), anclado a un retrato con la receta de piel v3. Cine en superficie de producto: alcance `producto` (operador, 2026-10-03). Parte de NX6b: la órbita de luz que rodea a la persona (cerrada = ella dirige).",
   "casting": {
     "directora": {
       "etiqueta": "Directora creativa (casting 2)",

@@ -454,7 +454,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   permitido) o en la receta de deck **`proposal-cinematic`** con personas del equipo, que **conservan su uniforme por
   registro**; cámara ~2 m y 85 mm, el bordado del kit verificado con `foto:emblema` (compuesto sólo si difiere; regla del 2026-09-28) y nunca dos personas mirándose de cerca.
   Tercer caso (excepción del 2026-09-27, ya en el contrato AXIS): láminas de sección y «about» del deck, y portadas y
-  contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
+  contraportadas con foto. **Caso 6 (operador, 2026-10-03): superficies de producto** (escenario del login, hero de producto) con `alcance: "producto"`: Nexa, roster con la prenda de su línea o casting anclado a su retrato. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
   **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con
   personas del equipo, no. Receta 9:16: design-studio, `efeonce-photographic-language.md` §Cine.
   **Escenario del login de Greenhouse (2026-10-02):** excepción del operador para cine con una persona de casting en

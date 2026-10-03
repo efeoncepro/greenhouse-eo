@@ -101,7 +101,7 @@ foto cine nueva, se agrega ahí **y** en esta tabla.
 | `PS1b` | portada de perfil 3:1 | Nexa (softshell) | reserva izquierda, una sola fuente | `2026-09-30_portadas-sociales/fichas/PS1b-*.json` |
 | `WB1c` | portada Engine, `proposal-cinematic-web` | desarrollador | el polo del kit editado: bordado en el pecho | `2026-09-26_deck-web/fichas/WB1c/` |
 | `LG1` | escenario del login, novedad AI Visibility (`alcance: nexa`) | Nexa (traje) + 1 Spark en el hombro | atrapa UNA tarjeta de respuesta entre miles congeladas en el aire; un haz azul engine; la tarjeta es la llave | `2026-10-02_login-escenario/fichas/LG1-ai-visibility-nexa.json` |
-| `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: publicidad-prueba`, excepción) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
+| `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: producto`) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
 
 Aprobadas por el operador el 2026-10-02 (TASK-1964). **Pendiente:** sumar `LG1` y `LG2e` a
 `scripts/foto/cine-recetas.json` (lo hace la sesión dueña del índice). `LG3e`, la tercera foto aprobada del login, **no
@@ -195,7 +195,7 @@ Tres fotos para el carrusel de novedades del login V4 (TASK-1964), en
 `ai-generations/2026-10-02_login-escenario/` (fichas, prompts compilados, plates, retratos de casting y la revisión al
 100 %). Aprobadas por el operador: `LG1` y `LG2e` (cine, en la tabla de arriba) y `LG3e` (registro B).
 
-**El alcance que no existe [decisión del operador, 2026-10-02 · pendiente de canon].** El login es una superficie de
+**El alcance de producto [resuelto el 2026-10-03: caso 6, `alcance: "producto"`].** Lo que sigue es cómo se llegó. El login es una superficie de
 producto, no una pieza de campaña. El operador aceptó cine con una persona de **casting** (no del roster) en uniforme
 para ese escenario, como **excepción explícita del login**. Como `ALCANCES_CINE` no tiene un alcance web ni de
 producto, las fichas declaran `alcance: "publicidad-prueba"` y lo explican en `nota`. Con Nexa protagonista (`LG1`) no

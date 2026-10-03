@@ -250,10 +250,10 @@
       "ficha": "ai-generations/2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json",
       "plate": "ai-generations/2026-10-02_login-escenario/plates/LG2e-escalar-produccion-orbita.png",
       "formato": "16:9",
-      "alcance": "publicidad-prueba",
+      "alcance": "producto",
       "protagonista": "Directora de casting (ancla con piel v3) con el hoodie",
       "porque": "UNA órbita naranja cerrada de larga exposición con flash de segunda cortina rodea a la persona («ella dirige»); la esfera sobre la palma es la única llave y seis piezas de una campaña viajan congeladas sobre el anillo. Parte de NX6b.",
-      "ojo": "Excepción del operador para el login (cine con casting). Generada a 2560×1440: a 3840 la piel salió craquelada. La órbita ocupa ~27–93 % del ancho y se corta en 1440."
+      "ojo": "Alcance producto (operador, 2026-10-03). Generada a 2560×1440: a 3840 la piel salió craquelada. La órbita ocupa ~27–93 % del ancho y se corta en 1440."
     }
   ]
 }

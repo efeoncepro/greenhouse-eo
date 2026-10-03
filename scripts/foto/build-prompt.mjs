@@ -516,8 +516,10 @@ export function castingDeFicha(ficha, clave) {
   if (PERSONAS[clave]) throw new Error(`El casting "${clave}" choca con una identidad canónica del roster: usa otra clave.`)
   if (ELENCO[clave]) throw new Error(`El casting "${clave}" choca con un personaje del elenco de marca: pídelo en \`identidad\` sin \`casting\`, o usa otra clave.`)
 
+
   if (typeof c.identity !== 'string' || !/^IDENTITY \(critical\):/.test(c.identity)) {
     throw new Error(`El casting "${clave}" necesita \`identity\` que empiece con «IDENTITY (critical):» y describa la cara sin envejecerla.`)
+
   }
 
   if (!Array.isArray(c.refs) || !c.refs.length) throw new Error(`El casting "${clave}" necesita al menos una referencia en \`refs\`.`)
@@ -2579,7 +2581,11 @@ export const ALCANCES_CINE = [
   'deck-portada',
   'manzanitas',
   'social-nexa',
-  'publicidad-prueba'
+  'publicidad-prueba',
+  // Superficies de producto Efeonce/Greenhouse (escenario del login, hero de producto). Decisión del operador
+  // (2026-10-03: «para producto también es necesario el estilo cine»): Nexa, personas del roster con la prenda de
+  // su línea o un personaje de casting anclado a su retrato; el uniforme por su kit. Caso fuente: el login V4 (TASK-1964).
+  'producto'
 ]
 
 // Objetos que son PERSONAJES (criaturas, mascotas): cada referencia de estudio dice «Reproduce EXACTLY» y el
@@ -2604,6 +2610,8 @@ export const auditarCine = ficha => {
     avisos.push(
       `falta \`alcance\` (${ALCANCES_CINE.join(' · ')}). El cine sólo vive en esos casos; declararlo obliga a mirar el §2 del registro antes de gastar (casebook, falla 10).`
     )
+  } else if (ficha.alcance === 'producto') {
+    avisos.push('`alcance: producto`: cine en una superficie de producto (login, hero de producto). Protagonista: Nexa, alguien del roster con la prenda de su línea o un casting anclado a su retrato; la superficie no dibuja otra órbita encima.')
   } else if (ficha.alcance === 'publicidad-prueba') {
     avisos.push('`alcance: publicidad-prueba`: la publicidad cine con personas del equipo está EN PRUEBA; la pieza no se publica sin aprobación del operador.')
   }

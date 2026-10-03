@@ -413,7 +413,7 @@ vale en toda aplicación:
   con el mismo `lens.x`/`lens.y` hace que el punto de la foto y el del escenario coincidan en cualquier ancho.
 - **Fotos del escenario:** `LG1` (Nexa, cine) y `LG2e` (directora de casting, cine) van **sin lente**, porque su luz ya
   es la órbita de la pieza (una órbita por pieza; el operador lo aceptó); `LG3e` (registro B) lleva la lente. El cine
-  con una persona de casting es una excepción del login (registro cine, delta 2026-10-02 (c)). Fotos y fichas:
+  en superficies de producto es el caso 6 del registro (`alcance: "producto"`, operador 2026-10-03; antes, excepción del login). Fotos y fichas:
   `ai-generations/2026-10-02_login-escenario/`; las fotos de referencia se reemplazan antes de producción (task).
 - **Voz:** anillo y esfera en el acento («El ring y la esfera faltan como manda /efeonce-graphic-line»). La esfera se
   calcula como `answerSphere` de AXIS, replicada desde el token en `orbit-geometry.ts` porque el paquete raíz
