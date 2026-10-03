@@ -125,6 +125,37 @@ describe('pnpm ai:inpaint erase', () => {
     expect(verifyRecomposition(original, final, maskFromRect(W, H, { x0: 0.48, y0: 0.35, x1: 0.69, y1: 0.65 })).verdict).toBe('PASS')
   })
 
+  it('si el modelo dibuja OTRO objeto en vez del fondo, también es residuo (aunque la zona cambie)', async () => {
+    const painter: InpaintImageAdapter = {
+      id: 'painter',
+      provider: 'fal',
+      label: 'painter',
+      defaultModel: 'painter-1',
+      sendsMask: true,
+      maskConvention: 'white-editable',
+      verifiedAt: '2026-10-03',
+      revision: 1,
+      validate: () => undefined,
+      pickSize: () => (aspect, area) => pickGridSize(aspect, area, { step: 16, minArea: 65_536, maxArea: 1_048_576, maxEdge: 2048, maxRatio: 3 }),
+      estimate: async () => ({ usd: 0.01, basis: 'painter' }),
+      // Pinta un objeto negro donde estaba el rojo: cambia mucho, pero no es el fondo.
+      run: async ({ image: input, size }) => {
+        const raw = await sharp(input).resize(size.width, size.height).removeAlpha().raw().toBuffer()
+
+        for (let y = 0; y < size.height; y += 1) for (let x = 0; x < size.width; x += 1) if (x > size.width * 0.3 && x < size.width * 0.7 && y > size.height * 0.3 && y < size.height * 0.7) raw.fill(10, (y * size.width + x) * 3, (y * size.width + x) * 3 + 3)
+
+        return { image: await sharp(raw, { raw: { width: size.width, height: size.height, channels: 3 } }).png().toBuffer(), providerModel: 'painter-1', outputUsd: null, usage: null, meta: {} }
+      }
+    }
+
+    const result = await runErase({ imagePath: image, layersJson, layerSelectors: ['red box'], fill: 'model', modelAdapter: painter, runRoot: join(dir, 'run-painter'), log: () => undefined })
+
+    expect(result.erasure[0].changeInCore).toBeGreaterThan(18)
+    expect(result.erasure[0].objectLikeness).toBeGreaterThan(0.5)
+    expect(result.erasure[0].residueSuspected).toBe(true)
+    expect(result.exitCode).toBe(3)
+  })
+
   it('no borra un logo o una marca con IA (guarda sobre el nombre de la capa)', async () => {
     await expect(runErase({ imagePath: image, layersJson, layerSelectors: ['#2'], runRoot: join(dir, 'run-logo'), log: () => undefined })).rejects.toThrow(/allow-brand/)
   })

@@ -510,7 +510,15 @@ const runEraseCli = async (argv: string[]): Promise<number> => {
 
   process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
 
-  if (result.exitCode === 3) process.stderr.write('  ⚠ REVISAR (código 3): el objeto parece seguir ahí en todos los candidatos.\n')
+  if (result.exitCode === 3) {
+    const residue = result.erasure.length > 0 && result.erasure.every(report => report.residueSuspected)
+
+    process.stderr.write(
+      residue
+        ? '  ⚠ REVISAR (código 3): en ningún candidato quedó el fondo (el objeto sigue ahí o el modelo dibujó otro).\n'
+        : '  ⚠ REVISAR (código 3): todos los candidatos quedaron sospechosos (reencuadre o panel plano): mira el aviso de arriba.\n'
+    )
+  }
 
   return result.exitCode
 }

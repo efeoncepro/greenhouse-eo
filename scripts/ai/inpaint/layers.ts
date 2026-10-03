@@ -191,17 +191,44 @@ export const plateWithoutLayers = async (layersJsonPath: string, doc: LayersDocu
 
 /**
  * Los DEMÁS objetos de la escena —todas las capas no elegidas salvo las superficies sobre las que descansan las
- * elegidas—, como máscara en `target`. Una capa es superficie si su alfa cubre al menos la mitad de lo elegido: la
- * mesa viene completa por detrás de la taza; la taza vecina, no. Lo usa la detección de sombra para no tomar la
- * sombra de otro objeto.
+ * elegidas—, como máscara en `target`. Lo usa la detección de sombra para no tomar la sombra de otro objeto.
+ *
+ * Una capa es SUPERFICIE de lo elegido si está detrás en profundidad (`z_index` menor que todo lo elegido) y sostiene
+ * su BASE: cubre al menos la mitad de la franja inferior de lo elegido, donde el objeto se apoya. Medido en el canario
+ * del 2026-10-03: un criterio por cobertura total («cubre la mitad del objeto») dejaba la mesa como «otro objeto»
+ * —la taza está casi toda contra la pared— y la sombra sobre la mesa quedaba prohibida (18 551 px → 78 px). La taza
+ * vecina del cuaderno no es su superficie aunque esté detrás: no sostiene su base.
  */
 export const otherObjectsMask = async (layersJsonPath: string, doc: LayersDocument, chosen: LayerRecord[], target: { width: number; height: number }): Promise<CanonicalMask> => {
   const skip = new Set(chosen.map(layer => layer.index))
   const chosenMasks = await Promise.all(chosen.map(layer => maskFromLayer(layersJsonPath, layer, doc, target)))
   const selection = chosenMasks.reduce((acc, mask) => union(acc, mask), createMask(target.width, target.height))
-  let selectionPixels = 0
+  const minZ = Math.min(...chosen.map(layer => layer.zIndex))
+  // Franja inferior de lo elegido: el 15 % más bajo de su caja, dilatado hacia abajo para alcanzar el apoyo.
+  let top = target.height
+  let bottom = -1
 
-  for (const value of selection.data) if (value > 127) selectionPixels += 1
+  for (let i = 0; i < selection.data.length; i += 1) {
+    if (selection.data[i] <= 127) continue
+
+    const y = Math.floor(i / target.width)
+
+    if (y < top) top = y
+    if (y > bottom) bottom = y
+  }
+
+  const bandTop = bottom - Math.max(2, Math.round((bottom - top + 1) * 0.15))
+  const bandBottom = Math.min(target.height - 1, bottom + 6)
+  const base: number[] = []
+
+  for (let y = Math.max(0, bandTop); y <= bandBottom; y += 1) {
+    for (let x = 0; x < target.width; x += 1) {
+      const i = y * target.width + x
+
+      // Columnas donde lo elegido está en la franja; las filas bajo el objeto alcanzan el apoyo.
+      if (selection.data[Math.min(bottom, Math.max(bandTop, y)) * target.width + x] > 127) base.push(i)
+    }
+  }
 
   let others = createMask(target.width, target.height)
 
@@ -209,11 +236,14 @@ export const otherObjectsMask = async (layersJsonPath: string, doc: LayersDocume
     if (!layer.box || skip.has(layer.index)) continue
 
     const mask = await maskFromLayer(layersJsonPath, layer, doc, target)
-    let under = 0
 
-    for (let i = 0; i < mask.data.length; i += 1) if (selection.data[i] > 127 && mask.data[i] > 127) under += 1
+    if (layer.zIndex < minZ && base.length) {
+      let held = 0
 
-    if (selectionPixels && under / selectionPixels >= 0.5) continue
+      for (const i of base) if (mask.data[i] > 127) held += 1
+
+      if (held / base.length >= 0.5) continue
+    }
 
     others = union(others, mask)
   }

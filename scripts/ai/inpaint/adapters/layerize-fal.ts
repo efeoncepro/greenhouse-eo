@@ -10,8 +10,9 @@ import { exists, readJson, sha256, stableStringify, writeFileEnsured, writeJson 
 
 /**
  * Corrida de Seedream 5 Pro Layerize para `pnpm ai:layers` (TASK-1973). Precio y slug salen del catálogo
- * `fal-capabilities.ts`; el número de capas lo decide el modelo, así que la estimación es una COTA (16 capas + base,
- * porque si la base se cobra está sin dato) y el costo registrado es por las capas que llegaron.
+ * `fal-capabilities.ts`; el número de capas lo decide el modelo, así que la estimación es una COTA (16 capas + base) y
+ * el costo registrado es por las capas que llegaron MÁS la base. **La base se cobra como una capa**: medido con el saldo
+ * de fal el 2026-10-03 (4 capas + base → USD 0,17 = 5 × 0,03375). La misma foto dio 3 capas en una corrida y 4 en otra.
  */
 export const LAYERIZE_ID = 'seedream5-pro-layerize'
 export const LAYERIZE_MAX_LAYERS = 16
@@ -54,7 +55,7 @@ export const estimateLayerizeUsd = (width: number, height: number): { usd: numbe
 
   const usd = Math.round(perLayer * (LAYERIZE_MAX_LAYERS + 1) * 10_000) / 10_000
 
-  return { usd, perLayer, basis: `cota: hasta ${LAYERIZE_MAX_LAYERS} capas + base × USD ${perLayer} (el modelo decide cuántas; si la base se cobra está sin dato)` }
+  return { usd, perLayer, basis: `cota: hasta ${LAYERIZE_MAX_LAYERS} capas + base × USD ${perLayer} (el modelo decide cuántas; la base se cobra como una capa)` }
 }
 
 export const runLayerize = async (options: LayerizeOptions): Promise<LayerizeResult> => {
@@ -166,8 +167,8 @@ export const runLayerize = async (options: LayerizeOptions): Promise<LayerizeRes
     cost: {
       layerCount: separated,
       perLayerUsd: perLayer,
-      estimatedUsd: perLayer === null ? null : Math.round(perLayer * separated * 10_000) / 10_000,
-      note: 'Por capa separada; si la base también se cobra está sin dato: confirmar con pnpm ai:fal --balance antes y después.'
+      estimatedUsd: perLayer === null ? null : Math.round(perLayer * (separated + 1) * 10_000) / 10_000,
+      note: 'Capas separadas + la base, que se cobra como una capa (medido con el saldo de fal el 2026-10-03).'
     },
     providerMeta: { requestId: result.requestId, account: result.account }
   }

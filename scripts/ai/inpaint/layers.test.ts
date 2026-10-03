@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import sharp from 'sharp'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { bboxTag, describeLayers, layerFileName, maskFromLayers, plateWithoutLayers, readLayersDocument, selectLayers, type LayersDocument } from './layers'
+import { bboxTag, describeLayers, layerFileName, maskFromLayers, otherObjectsMask, plateWithoutLayers, readLayersDocument, selectLayers, type LayersDocument } from './layers'
 import { maskStats } from './mask'
 import { loadRgba } from './raw'
 
@@ -133,6 +133,49 @@ describe('clean plate sin las capas elegidas', () => {
   })
 })
 
+describe('otros objetos vs superficie', () => {
+  it('la mesa detrás que sostiene la base es superficie; el vecino es otro objeto (escena del canario 2026-10-03)', async () => {
+    const sceneDir = await mkdtemp(join(tmpdir(), 'layers-surface-'))
+    const json = join(sceneDir, 'layers.json')
+    const solid = (width: number, height: number) => sharp({ create: { width, height, channels: 4, background: { r: 200, g: 150, b: 90, alpha: 1 } } }).png().toBuffer()
+
+    await writeFile(join(sceneDir, '00-base.png'), await sharp({ create: { width: 300, height: 200, channels: 3, background: '#888' } }).png().toBuffer())
+    await writeFile(join(sceneDir, '01-table.png'), await solid(300, 100))
+    await writeFile(join(sceneDir, '02-mug.png'), await solid(40, 50))
+    await writeFile(join(sceneDir, '03-notebook.png'), await solid(60, 20))
+
+    const doc: LayersDocument = {
+      kind: 'ai-layers',
+      version: 1,
+      source: { image: 'x', sha256: 'x', width: 300, height: 200 },
+      base: { file: '00-base.png', width: 300, height: 200 },
+      layers: [
+        { index: 0, zIndex: 0, name: null, description: null, file: '00-base.png', width: 300, height: 200, box: null, alphaCoverage: null },
+        // La mesa empieza en y=100: la taza (60–110) está casi toda sobre la pared y sólo su base toca la mesa.
+        { index: 1, zIndex: 1, name: 'Table', description: 'table', file: '01-table.png', width: 300, height: 100, box: { left: 0, top: 100, right: 300, bottom: 200 }, alphaCoverage: 1 },
+        { index: 2, zIndex: 2, name: 'Mug', description: 'mug', file: '02-mug.png', width: 40, height: 50, box: { left: 150, top: 60, right: 190, bottom: 110 }, alphaCoverage: 1 },
+        { index: 3, zIndex: 3, name: 'Notebook', description: 'notebook', file: '03-notebook.png', width: 60, height: 20, box: { left: 200, top: 110, right: 260, bottom: 130 }, alphaCoverage: 1 }
+      ],
+      request: { prompt: null, imageSize: 'auto' },
+      cost: { layerCount: 3, perLayerUsd: null, estimatedUsd: null, note: '' },
+      providerMeta: {}
+    }
+
+    await writeFile(json, JSON.stringify(doc))
+
+    const target = { width: 300, height: 200 }
+    const forMug = await otherObjectsMask(json, doc, selectLayers(doc, ['mug']), target)
+    const forNotebook = await otherObjectsMask(json, doc, selectLayers(doc, ['notebook']), target)
+
+    expect(forMug.data[150 * 300 + 50]).toBe(0) // la mesa NO es «otro objeto» para la taza
+    expect(forMug.data[120 * 300 + 230]).toBe(255) // el cuaderno sí
+    expect(forNotebook.data[150 * 300 + 50]).toBe(0) // la mesa tampoco para el cuaderno
+    expect(forNotebook.data[80 * 300 + 170]).toBe(255) // la taza es otro objeto aunque esté detrás
+
+    await rm(sceneDir, { recursive: true, force: true })
+  })
+})
+
 describe('utilidades', () => {
   it('bboxTag convierte fracciones a enteros 0–1000 y acota', () => {
     expect(bboxTag({ x0: 0.1, y0: 0.25, x1: 0.5, y1: 1.2 })).toBe('<bbox>100 250 500 1000</bbox>')
@@ -186,6 +229,7 @@ describe('corrida de Layerize (fal simulado)', () => {
     expect(written.base).toMatchObject({ file: '00-base.png', width: 800, height: 600 })
     expect(written.layers[1]).toMatchObject({ name: 'White mug', file: '01-white-mug.png', box: { left: 500, top: 100, right: 620, bottom: 190 } })
     expect(written.cost.layerCount).toBe(1)
+    expect(written.cost.estimatedUsd).toBeCloseTo(0.03375 * 2, 4) // 1 capa + la base, que se cobra
     expect(JSON.stringify(written)).not.toMatch(/https?:/)
 
     const again = await runLayerize({ imagePath: source, runRoot, maxUsd: 5, log: () => undefined })

@@ -150,26 +150,50 @@ export interface ErasureReport {
   /** Diferencia media (0–255) entre la original y el resultado en el NÚCLEO de la zona: bajo = el objeto sigue ahí. */
   changeInCore: number
   corePixels: number
+  /**
+   * Con clean plate: distancia del resultado al fondo limpio, relativa a la del objeto original (0 = es el fondo,
+   * 1 = tan lejos del fondo como el objeto). Alto = el modelo dibujó OTRA cosa en vez del fondo. null sin plate.
+   */
+  objectLikeness: number | null
   residueSuspected: boolean
 }
+
+/** Sobre esta semejanza a objeto, el modelo dibujó algo en vez de borrar (canario 2026-10-03: Flux Fill puso otra taza). */
+export const ERASE_OBJECT_LIKENESS_THRESHOLD = 0.5
+
+/** Prompt por defecto para borrar con un modelo de RELLENO: describe el fondo vacío; «quita el objeto» no le dice qué dibujar. */
+export const ERASE_FILL_PROMPT =
+  'The empty background continues naturally: the same wall, the same surface, its texture and light, with nothing placed on it. No objects, no cups, no props.'
 
 /** Bajo este cambio medio en el núcleo de la zona, el objeto probablemente no se borró. */
 export const ERASE_RESIDUE_THRESHOLD = 18
 
 /** Mide si el borrado ocurrió: sólo el núcleo de la máscara (255), donde estaba el objeto. */
-export const measureErasure = (base: RgbaImage, final: RgbaImage, mask: CanonicalMask): ErasureReport => {
+export const measureErasure = (base: RgbaImage, final: RgbaImage, mask: CanonicalMask, plate?: RgbaImage): ErasureReport => {
   let sum = 0
+  let toPlate = 0
+  let objectToPlate = 0
   let count = 0
 
   for (let i = 0; i < mask.data.length; i += 1) {
     if (mask.data[i] !== 255) continue
 
-    for (let c = 0; c < 3; c += 1) sum += Math.abs(base.data[i * 4 + c] - final.data[i * 4 + c])
+    for (let c = 0; c < 3; c += 1) {
+      sum += Math.abs(base.data[i * 4 + c] - final.data[i * 4 + c])
+
+      if (plate) {
+        toPlate += Math.abs(final.data[i * 4 + c] - plate.data[i * 4 + c])
+        objectToPlate += Math.abs(base.data[i * 4 + c] - plate.data[i * 4 + c])
+      }
+    }
 
     count += 1
   }
 
   const changeInCore = count ? Math.round((sum / (count * 3)) * 100) / 100 : 0
+  // Cambiar no es borrar: un modelo de relleno puede dibujar otro objeto (cambio alto, objeto presente).
+  const objectLikeness = plate && objectToPlate > 0 ? Math.round((toPlate / objectToPlate) * 100) / 100 : null
+  const residueSuspected = count > 0 && (changeInCore < ERASE_RESIDUE_THRESHOLD || (objectLikeness !== null && objectLikeness > ERASE_OBJECT_LIKENESS_THRESHOLD))
 
-  return { changeInCore, corePixels: count, residueSuspected: count > 0 && changeInCore < ERASE_RESIDUE_THRESHOLD }
+  return { changeInCore, corePixels: count, objectLikeness, residueSuspected }
 }

@@ -9,7 +9,7 @@ import { encodeMaskPng, intersect, invert, loadMask, type MaskConvention } from 
 import { runImageInpaint, type ImageInpaintResult } from './pipeline-image'
 import { loadRgba } from './raw'
 import { readJson, sha256, writeFileEnsured, writeJson } from './run-io'
-import { createPlateAdapter, detectCastShadow, ERASE_DEFAULT_PROMPT, measureErasure, prepareEraseMask, withCastShadow, type ErasureReport } from './techniques'
+import { createPlateAdapter, detectCastShadow, ERASE_DEFAULT_PROMPT, ERASE_FILL_PROMPT, ERASE_RESIDUE_THRESHOLD, measureErasure, prepareEraseMask, withCastShadow, type ErasureReport } from './techniques'
 
 /**
  * `pnpm ai:inpaint erase` (TASK-1973, Slice 4): borra un objeto.
@@ -111,7 +111,8 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
     imagePath: options.imagePath,
     maskPath,
     maskConvention: options.maskConvention,
-    prompt: options.prompt ?? ERASE_DEFAULT_PROMPT,
+    // Un modelo de relleno (fal) dibuja lo que el prompt describe: se le describe el fondo, no la acción de quitar.
+    prompt: options.prompt ?? (adapter.provider === 'fal' ? ERASE_FILL_PROMPT : ERASE_DEFAULT_PROMPT),
     adapter,
     model: fill === 'plate' ? 'clean-plate' : options.model,
     quality: fill === 'plate' ? undefined : options.quality,
@@ -132,13 +133,16 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
 
   const base = await loadRgba(options.imagePath)
   const mask = await loadMask(maskPath, options.maskConvention)
-  const erasure = await Promise.all(result.manifest.candidates.map(async candidate => measureErasure(base, await loadRgba(join(result.runDir, candidate.final)), mask)))
+  const plateImage = platePng ? await loadRgba(platePng) : undefined
+  const erasure = await Promise.all(result.manifest.candidates.map(async candidate => measureErasure(base, await loadRgba(join(result.runDir, candidate.final)), mask, plateImage)))
 
   erasure.forEach((report, index) =>
     log(
-      report.residueSuspected
-        ? `    ⚠ candidato ${index + 1}: la zona casi no cambió (${report.changeInCore}/255): el objeto puede seguir ahí.`
-        : `    · candidato ${index + 1}: borrado (cambio en el núcleo ${report.changeInCore}/255)`
+      !report.residueSuspected
+        ? `    · candidato ${index + 1}: borrado (cambio en el núcleo ${report.changeInCore}/255${report.objectLikeness === null ? '' : ` · parecido al fondo limpio ${(1 - report.objectLikeness).toFixed(2)}`})`
+        : report.changeInCore < ERASE_RESIDUE_THRESHOLD
+          ? `    ⚠ candidato ${index + 1}: la zona casi no cambió (${report.changeInCore}/255): el objeto puede seguir ahí.`
+          : `    ⚠ candidato ${index + 1}: la zona cambió pero no se parece al fondo (semejanza a objeto ${report.objectLikeness}): el modelo dibujó otra cosa en vez de borrar.`
     )
   )
 
