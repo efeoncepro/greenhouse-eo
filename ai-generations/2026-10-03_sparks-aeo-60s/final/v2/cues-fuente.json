@@ -1,0 +1,146 @@
+{
+ "cues": [
+  {
+   "a": 0.25,
+   "b": 3.5,
+   "lines": [
+    "Tus clientes ya no solo buscan:",
+    "le preguntan a la IA."
+   ]
+  },
+  {
+   "a": 6.88,
+   "b": 9.75,
+   "lines": [
+    "Y si la IA no te conoce,",
+    "no te nombra."
+   ]
+  },
+  {
+   "a": 10.44,
+   "b": 15.84,
+   "lines": [
+    "Con Efeonce AEO, nuestro equipo y los Sparks,",
+    "nuestros agentes, se ponen a trabajar contigo."
+   ]
+  },
+  {
+   "a": 15.89,
+   "b": 18.4,
+   "lines": [
+    "Primero, medimos cómo",
+    "te describen las IA:"
+   ]
+  },
+  {
+   "a": 18.45,
+   "b": 21.0,
+   "lines": [
+    "qué fuentes leen y quién",
+    "aparece en tu lugar."
+   ]
+  },
+  {
+   "a": 21.12,
+   "b": 22.75,
+   "lines": [
+    "Después, ordenamos lo que falta:"
+   ]
+  },
+  {
+   "a": 22.8,
+   "b": 26.51,
+   "lines": [
+    "contenido claro, una marca bien definida",
+    "y fuentes que te respalden."
+   ]
+  },
+  {
+   "a": 26.56,
+   "b": 29.68,
+   "lines": [
+    "Lo ves todo en un reporte,",
+    "y tú decides cada paso."
+   ]
+  },
+  {
+   "a": 33.58,
+   "b": 37.31,
+   "lines": [
+    "Ahora, cuando la IA responde,",
+    "tiene con qué nombrarte."
+   ]
+  },
+  {
+   "a": 37.41,
+   "b": 39.93,
+   "lines": [
+    "Mide tu visibilidad en los",
+    "motores de respuesta de IA"
+   ]
+  },
+  {
+   "a": 39.98,
+   "b": 42.1,
+   "lines": [
+    "con nuestro AI Visibility Report."
+   ]
+  },
+  {
+   "a": 44.32,
+   "b": 46.13,
+   "lines": [
+    "Efeonce AEO."
+   ]
+  }
+ ],
+ "ui": [
+  [
+   3.583,
+   6.583
+  ],
+  [
+   33.375,
+   36.958
+  ]
+ ],
+ "total": 46.5,
+ "reveal": 41.916,
+ "sonido": [
+  [
+   3.6830000000000003,
+   5.183,
+   [
+    "[envío y respuesta]"
+   ]
+  ],
+  [
+   8.283,
+   9.383,
+   [
+    "[gorjeo del Spark]"
+   ]
+  ],
+  [
+   30.341,
+   32.641,
+   [
+    "[tecleo y envío]"
+   ]
+  ],
+  [
+   34.375,
+   35.175,
+   [
+    "[logo sonoro de Efeonce]"
+   ]
+  ],
+  [
+   43.516,
+   44.315999999999995,
+   [
+    "[logo sonoro de Efeonce]"
+   ]
+  ]
+ ]
+}

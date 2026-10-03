@@ -250,3 +250,26 @@ generación. Higgsfield: créditos de casting de voz. Total bajo el tope de ~USD
 - El prompt de video debe prohibir texto en pantalla (si no, aparece texto ilegible) y fijar la paleta.
 - Tope de 15 s por request en fal y Higgsfield (verificado): las escenas cortas son límite, no preferencia.
 - Sin ASR local no hay verificación automática del texto dicho; dejar la revisión de oído como paso explícito.
+
+## 12. Corte v2 (2026-10-03, feedback del operador)
+
+**Pedido:** marcas reales en vez de «[Marca ficticia]», zoom de S2 fluido, guion fiel a Efeonce AEO (los Sparks no
+«existen para arreglar el AEO»), todo más ágil y una cama punk con el sonic brand como referencia.
+
+- **S2/S9** (`corte/ui-s2-s9.cjs`): cada cuadro se dibuja desde el vector con escala decimal (el `zoompan` redondeaba
+  a píxeles enteros y saltaba). Competencia inventada: Rodavía, Kilomar, TrazaNorte (sin empresa homónima en la
+  búsqueda del 2026-10-03). La burbuja de la pregunta se ensanchó: el texto se salía.
+- **Guion v2:** Efeonce AEO como la capacidad; los Sparks como los agentes de Efeonce que trabajan con el equipo;
+  el proceso medir → ordenar → reporte; S9 sin promesa de resultado. Voz Andre (`eleven_v4`, etiqueta `[fast]`) +7 %.
+  El llamado a la acción va sobre la placa AEO / AI Visibility Report y «Efeonce AEO.» firma sobre el reveal.
+- **Corte** (`corte/corte-v2.py`): 46,5 s, tomas a 1,25×–1,5× y recortadas; un solo mapa de tiempos re-tima video,
+  voz, efectos y subtítulos. El logo sonoro intermedio (v1, 46 s) salió: chocaba con la voz y el reveal ya lo trae.
+- **Cama punk** (`audio/musica/regrabar-punk.ts`): pieza larga de energía oficial (AXIS sonic v1, sha256 verificado)
+  reordenada a 56 s y acelerada a 160 BPM (42 s), regrabada con Stable Audio 2.5 audio-to-audio a 0,8
+  (USD 0,20 medido por pieza; se hicieron 0,65 y 0,8). Conserva los 160 BPM. Salió cargada de graves (medios 21 %
+  contra ~35 % de la norma): se ecualizó (−4 dB bajo 180 Hz, +2 dB a 2,5 kHz). Corta en seco al entrar el reveal.
+- **Excepciones al canon sonoro, por decisión del operador:** registro de energía debajo de una locución (el canon lo
+  prohíbe) y licencia comercial de Stable Audio aún sin confirmar con legal.
+- **Mezcla** (`audio/mezcla-v2.py`): ducking 8:1 de la cama por la voz; la mezcla queda a 0,2–1,2 dB de la voz sola en
+  todos los tramos con voz. Master −16,0 LUFS / −1,0 dBTP.
+- **Pendiente:** escucha del operador (voz, cama punk y balance). Las tomas t2 de voz están en `audio/vo2/tomas/`.
