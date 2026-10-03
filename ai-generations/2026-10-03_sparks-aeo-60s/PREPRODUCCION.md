@@ -278,3 +278,15 @@ generación. Higgsfield: créditos de casting de voz. Total bajo el tope de ~USD
   escalonados con rebote y flotan al compás; el logo AEO aparece con «Efeonce AEO» y, con «AI Visibility Report», se
   corre y entra el del Report. El reveal del logo con el eslogan queda **sin voz**. Para que quepa: reacción de Tomás
   −0,5 s y la cama +2 compases (repite 33–36 s del coro); la banda corta en seco al entrar el logo. Duración: 49,6 s.
+
+## 13. Carga en Marketing Studio (2026-10-03)
+
+El spot entró a Marketing Studio como **concepto CMP001-08 «Los Sparks»** del always-on CMP-001 («Lo que la IA dice
+de ti»), por la vía vigente de esa campaña (`source_of_truth onedrive`): finales en
+`15. Paid Media/03. Finales/CMP-001 - Lo que la IA dice de ti/`, entradas en `CATALOGO-DATOS.json` →
+`pnpm import:catalog --apply` (concepto +1, piezas +5, versiones +5, copies +2) → `pnpm media:ingest --campaign
+CMP-001 --apply` (5 originales a GCS, renditions del worker). Filas `CMP-001-SP-01…05` en el `ASSETS.md` de la campaña.
+
+- **Orgánico**, destino `think.efeoncepro.com/brand-visibility`; la pauta espera la licencia de la música.
+- Las versiones quedan `imported`: aprobarlas en Studio y programar en Metricool son pasos aparte del operador.
+- Copies `copy-08-instagram-a` / `copy-08-linkedin-a` en estado «propuesta» (texto de `final/redes/COPY-REDES.md`).
