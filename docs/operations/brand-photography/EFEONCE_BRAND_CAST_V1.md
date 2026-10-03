@@ -233,8 +233,11 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    máscara (`ai:image --mask`) y se entrega su salida **sin reponer el original**: reponerlo dejó un recuadro por el gris
    del fondo, el mismo caso que documenta `foto:expandir --reponer no`. Resultado: su cuerpo, su ropa y su pose, ≈ 7,5
    cabezas, cara igual al 100 %. `foto:expandir` no sirve aquí porque siempre apoya la foto abajo; extender hacia abajo
-   queda como mejora de la herramienta. Caso: `realismo-v3/hum/hum-cuerpo-v4.png` (+ `expandir/`). Los cuerpos de Karo,
-   Sophia, Isabella y Antonio salen de retratos de pecho: el modelo inventa su cuerpo igual; se revisan con el mismo ojo.
+   queda como mejora de la herramienta. Caso: `realismo-v3/hum/hum-cuerpo-v4.png` (+ `expandir/`). **Aplicado a los
+   cinco [operador, 2026-10-02: «Corrige todos»]**: Karo, Sophia, Isabella y Antonio con `realismo-v3/expandir-cuerpos.cjs`
+   (retrato de pecho al 36 % del lienzo, para que la cabeza mida ≈ 1/7,5 del alto final). Salen con pose natural que
+   continúa el gesto del retrato y jeans ajustados; en Isabella y Antonio el modelo reencuadra un poco la cabeza, se
+   revisa la cara al 100 % antes de usarlos.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
 5. **Registro.** Hoy un personaje de campaña se declara ficha por ficha en `casting`
