@@ -34,7 +34,7 @@
 - Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19): la regla vive en presentation/stat-card.ts y la usan PDF, deck y modelo web 1.4; faltan el vocabulario de 19 plataformas, channelForDomain y la validación del plan`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1974` (su contrato de tarjeta de cifra está en develop sin release; esta task lo extiende y sale en el mismo release o después)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

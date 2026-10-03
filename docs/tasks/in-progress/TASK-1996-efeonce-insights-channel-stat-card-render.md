@@ -24,7 +24,7 @@
 - Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961; Think 0c5701a): isotipo por celda o en el título en A4, deck y Live; faltan glifos Trazo para las métricas sin uno, los 10 isotipos sin productor y el tamaño adaptativo de la cifra única del deck`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo), publicación de AXIS (push + tag `v0.3.42`, `@efeoncepro/axis-brand-assets` 0.4.15 y glifos D30) con OK del operador
+- Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)
 - Branch: `Greenhouse develop y efeonce-think main; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

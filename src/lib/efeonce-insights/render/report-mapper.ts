@@ -49,7 +49,7 @@ import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
-import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
+import { bindUnitSpaces, chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
 import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
@@ -707,7 +707,7 @@ export const buildInsightReportPlanInput = ({
       if (PAPER_TYPES.has(page.contentType)) Object.assign(slots, footer, { folio: { page: pad2(folio), total: pad2(total) } })
       if (page.contentType === 'report-chapter') slots.pageFolio = pad2(folio)
 
-      return { ...page, slideId: `page-${pad2(folio)}`, slots }
+      return { ...page, slideId: `page-${pad2(folio)}`, slots: bindUnitSpaces(slots) }
     }) as CompositionSlideInput[]
   }
 }

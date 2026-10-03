@@ -1,15 +1,19 @@
 # Revisar una edición de Efeonce Insights antes de compartirla
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-03 por Claude (TASK-1974 / TASK-1975)
-> **Ultima actualizacion:** 2026-10-03 por Claude
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.1: en producción desde el release `36a73e7b7e19`; GA4 en la vista previa local y la parte de dona «<1 %»)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md](../../architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md) · [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [dossier de revisión TASK-1975](../../ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md)
 
-> **Estado (2026-10-03): code complete, rollout pendiente.** Las figuras de este manual (cifras, cascada, waffle, dona y
-> barras apiladas en el PDF y el deck, y la tarjeta animada de la web) funcionan en local y todavía **no están en
-> producción**. Hasta el release, una edición generada en producción sale con las figuras anteriores. La vista previa
-> local de este manual ya muestra las nuevas.
+> **Estado (2026-10-03): en producción** (release `36a73e7b7e19`). Las figuras de este manual (cifras, cascada, waffle,
+> dona y barras apiladas en el PDF y el deck, y la tarjeta animada de la web) salen en toda edición nueva. Las ediciones
+> creadas antes del release conservan sus figuras.
+>
+> **Dona y apiladas de GA4 en la vista previa local:** el lector de GA4 responde `disabled` salvo que corra con
+> `GROWTH_GA4_ENABLED=true` y las credenciales OAuth de GA4 (`GOOGLE_GA4_OAUTH_CLIENT_ID`,
+> `GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF`). Sin ellas esas dos figuras no aparecen en la vista previa; no es un
+> defecto de la edición. Una parte de la dona con valor que redondea a 0 % se lee «<1 %», nunca «0 %».
 
 ## Para qué sirve
 

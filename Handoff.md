@@ -4,7 +4,7 @@
 
 **Marca → escala (03/10):** [dirección aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md), local sin commit/push; [revisión y pendientes](docs/audits/strategy/2026-10-03-brand-decisions-scalable-execution.md).
 
-**Insights: criterio de figuras (03/10):** [TASK-1974](docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) y [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) in-progress (Claude), local en develop, sin push. Slice 1 de 1975 (diseño de la tarjeta, tonos semánticos, tokens y norma) aprobado y versionado en `81e50977b`. Orden: 1974 Slices 1–5 → 1975 Slices 2–6; las dos salen en el mismo release, con Think desplegado antes o junto.
+**Insights: criterio de figuras (03/10):** en producción (release `36a73e7b7e19`). [TASK-1974](docs/tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md) complete; [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) espera la revisión del operador de las ediciones de Berel y Sky. Abierto: color por rol de parte en waffle y dona.
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 

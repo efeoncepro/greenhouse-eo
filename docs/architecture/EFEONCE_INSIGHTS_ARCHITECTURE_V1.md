@@ -7,8 +7,8 @@
 > la vista web compartida en Think está en producción desde el 2026-09-28 (TASK-1875 complete, §14.10) y la UI del portal sigue
 > pendiente (TASK-1849); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
 > 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6); el criterio de
-> selección de figuras, la tarjeta de cifra y las páginas PDF de cascada, waffle, dona y barras apiladas están **code
-> complete, rollout pendiente** (TASK-1974 + TASK-1975, §14.12 y §15). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> selección de figuras, la tarjeta de cifra y las páginas PDF de cascada, waffle, dona y barras apiladas están **en
+> producción desde el 2026-10-03** (TASK-1974 + TASK-1975, release `36a73e7b7e19`, §14.12 y §15). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -1485,7 +1485,7 @@ Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insig
 regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
 producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
 
-### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (code complete, rollout pendiente, 2026-10-03)
+### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (en producción, 2026-10-03)
 
 **Qué hace.** El planner elige la figura por la pregunta del lector
 ([criterio](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md)), abre cada capítulo con la tarjeta de cifra y los catálogos
@@ -1506,21 +1506,22 @@ PDF y deck dibujan cascada, waffle, dona, barras apiladas y la tarjeta. El contr
   `BASELINE_DELTAS.md`); vista previa real de septiembre 2026 con `scripts/insights/preview-edition.ts --editorial-v2`
   (Berel 22 páginas + 18 láminas; Sky 10 + 8). Think: `test:insights` 25/25, `verify:insights`, `audit:insights-a11y`
   AA y `build` verdes.
-- **No verificado con datos reales.** La dona de fuentes IA y las barras apiladas de GA4: GA4 no corre en local; están
-  probadas con fixtures.
+- **Verificado con datos reales de GA4 (2026-10-03).** Vista previa de Berel (`EO-INS-000027`, 26 páginas + 20
+  láminas) con la conexión GA4 activa de la organización: barras apiladas de sesiones con interacción (p. 8) y dona de
+  sesiones desde asistentes de IA (p. 17, ChatGPT 1.648 de 1.686). La revisión destapó dos defectos, corregidos: una
+  parte con valor que redondea a 0 % ahora se lee «<1 %» (`shareLabel` en `figure-slots.ts`, copy
+  `catalog.shareUnderOne`) y la cifra se une a su unidad con espacio duro en los slots del PDF y el deck
+  (`bindUnitSpaces` en `composition-helpers.ts`: «(−17,0 %)» ya no deja el «%» solo en la línea siguiente; es
+  presentación, el plan sellado no cambia). Evidencia en `docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/`.
 
-**Rollout pendiente (nada aplicado; todo es local sin push).**
+**Rollout aplicado.** AXIS `v0.3.42` publicado (paquetes + axis.efeonce.org); Think `0c5701a` en producción; Greenhouse
+en producción con el release `36a73e7b7e19` (orquestador `37158679961`, PR #250, manifest `released`, watchdog OK).
+Ningún flag nuevo: el render ya estaba encendido. Las ediciones internas de Berel y Sky se revisan antes de compartirlas
+(la emisión sigue apagada en producción).
 
-1. AXIS: push a `main` (despliega axis.efeonce.org) y tag `v0.3.42` (publica los paquetes), con OK del operador.
-2. Think: push a `main` (despliega producción) antes o junto con el release de Greenhouse, con OK del operador.
-3. Greenhouse: push de `develop` → staging → release a producción por el control plane (Job `artifact-worker`).
-   TASK-1974 y TASK-1975 salen en el mismo release; las ediciones internas de Berel y Sky se revisan antes de compartir.
-4. Staging: verificar dona y barras apiladas con datos GA4 reales.
-5. Gate de cierre: `pnpm test` completo y `pnpm build` (este, con autorización del operador).
-
-**Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`). Las
-tarjetas con isotipo de canal (AI Overview, ChatGPT, Gemini, Perplexity) son una **propuesta** del canvas, no aprobada
-ni implementada.
+**Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`): en la dona
+real de Berel, Gemini queda pintado con el color del rol «oportunidad». Decisión del operador pendiente. Las tarjetas
+con isotipo de canal se aprobaron el 2026-10-03 y se implementaron en TASK-1990/TASK-1996.
 
 
 ## 15. Contrato de contenido del informe (TASK-1962)

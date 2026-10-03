@@ -64,3 +64,27 @@ abajo): la misma cadencia que el `data-stagger` del informe.
 - Sobre papel (Live, A4): píldora teñida con texto en tono.
 - Sobre navy (deck y secciones oscuras del Live): sin píldora rellena; el tono va sólo en el triángulo y la cifra en
   tinta suave.
+
+## GVC / Micro Evidence
+
+- Capturas de Think en `efeonce-think/.captures/task-1975-slice5/` (fuera del repo: datos de ejemplo del modelo 1.4),
+  escritorio y móvil: el recorrido en tres tiempos (`*-stats-motion-500ms`, `-1400ms`, `-2600ms`), la retícula con 1, 4
+  y 6 cifras, la sección oscura sin píldora rellena y el waffle por unidad.
+- A 500 ms la cifra va a mitad de recorrido, la píldora sigue vacía y el «vs …» está resaltado; al final la variación ya
+  tiene su tono. Con movimiento reducido el primer cuadro es el estado final.
+- Gates de Think corridos de nuevo el 2026-10-03 sobre `0c5701a` (producción): `pnpm test:insights` 25/25,
+  `pnpm verify:insights` verde (sin desborde), `pnpm audit:insights-a11y` AA en 1440 y 390, todas las paradas de
+  teclado con foco visible.
+- Dossier: [`docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md`](../reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md).
+
+## Design Decision Log
+
+- **Recorrido desde el valor anterior, no desde cero** (operador, 2026-10-03): la animación cuenta el cambio del
+  período; contar desde cero inventaría una historia que el dato no tiene.
+- **La variación toma su tono después del recorrido**: el lector ve primero cuánto se movió y después si fue mejor o
+  peor; un color antes del número adelanta el juicio.
+- **Sólo en el Live**: PDF y deck son estáticos y muestran el estado final; impresión y sin JavaScript también.
+- **Rechazado:** rebote o escala de la píldora, parpadeo de color y animación al pasar el cursor (la tarjeta no es
+  interactiva y el movimiento extra compite con la cifra).
+- **Accesibilidad antes que el efecto:** el número que corre es `aria-hidden` y el lector de pantalla recibe el valor
+  final y la frase completa; `prefers-reduced-motion` entrega el estado final desde el primer cuadro.

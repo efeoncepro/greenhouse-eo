@@ -8,6 +8,7 @@ import { PDFDocument } from 'pdf-lib'
 import { composeArtifact } from '@/lib/artifact-composer'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
+import { bindUnitSpaces } from './composition-helpers'
 import { buildInsightReportPlanInput, tableRowsCapacity } from './report-mapper'
 import { formatFactValue } from '../editorial/format'
 import { InsightsRenderRejectedError } from '../errors'
@@ -360,8 +361,8 @@ describe('buildInsightReportPlanInput', () => {
     const slots = figure!.slots as { columnGroups: { label: string; current: string }[]; provenance: { label: string; text: string }[]; keyFigure: string }
 
     // Cada columna se nombra por su dimensión y lleva la cifra del formateador canónico (un nivel no lleva «+»).
-    expect(slots.columnGroups.map(group => [group.label, group.current])).toEqual([['Nuevas', '61,4 %'], ['Optimizadas', '3,1 %']])
-    expect(slots.keyFigure).toBe('61,4 %')
+    expect(slots.columnGroups.map(group => [group.label, group.current])).toEqual([['Nuevas', '61,4\u00a0%'], ['Optimizadas', '3,1\u00a0%']])
+    expect(slots.keyFigure).toBe('61,4\u00a0%')
     expect(slots.provenance[0]).toEqual({ label: 'Unidad', text: 'porcentaje' })
   })
 
@@ -528,7 +529,7 @@ describe('buildInsightReportPlanInput', () => {
       } as never)
     })
 
-    const narrativeIndex = input.slides.findIndex(slide => slide.contentType === 'report-narrative' && ((slide.slots.paragraphs as string[] | undefined) ?? []).includes(ctrClaim.text))
+    const narrativeIndex = input.slides.findIndex(slide => slide.contentType === 'report-narrative' && ((slide.slots.paragraphs as string[] | undefined) ?? []).includes(bindUnitSpaces(ctrClaim.text)))
     const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
 
     expect(narrativeIndex).toBeGreaterThan(0)
@@ -566,14 +567,14 @@ describe('buildInsightReportPlanInput', () => {
     const slots = page!.slots as Record<string, any>
 
     expect(slots.heroFigure).toBe('9.377')
-    expect(slots.heroText).toBe(reading.conclusion.text)
+    expect(slots.heroText).toBe(bindUnitSpaces(reading.conclusion.text))
     expect(slots.barMode).toBe('none')
     expect(slots.barScaleMax).toBeUndefined()
     expect(slots.tableColumns.map((c: { label: string }) => c.label)).toEqual(['#', 'Métrica', 'Período', 'Variación'])
     expect(slots.tableRows.map((r: { valueB: string; trend?: string }) => [r.valueB, r.trend])).toEqual([
       // TASK-1974 — tono por la dirección DECLARADA de la métrica (`METRIC_DIRECTIONS`): clics y CTR bajan = peor; `imp`
       // no tiene dirección declarada = neutro; sin cambio = plano.
-      ['12,1 %', 'down:worse'], ['9,6 %', 'down:neutral'], ['0,1 pp', 'down:worse'], ['sin cambio', 'flat:neutral']
+      ['12,1\u00a0%', 'down:worse'], ['9,6\u00a0%', 'down:neutral'], ['0,1\u00a0pp', 'down:worse'], ['sin cambio', 'flat:neutral']
     ])
     expect(slots.legend).toBeUndefined()
     expect(slots.source.text).toBe('Google Search Console')
@@ -608,8 +609,8 @@ describe('buildInsightReportPlanInput', () => {
 
     expect(figure!.metrics.map(row => [row.name, row.current, row.prior, row.direction, row.delta])).toEqual([
       // Sin dirección declarada para la métrica, el tono es neutro: el triángulo dice que subió, no que mejoró.
-      ['Métrica 1', '1.000', '900', 'up:neutral', '11,1 %'],
-      ['Métrica 2', '2.000', '1.800', 'up:neutral', '11,1 %']
+      ['Métrica 1', '1.000', '900', 'up:neutral', '11,1\u00a0%'],
+      ['Métrica 2', '2.000', '1.800', 'up:neutral', '11,1\u00a0%']
     ])
   })
 

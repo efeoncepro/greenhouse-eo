@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.18
+> **Version:** 1.19
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -653,10 +653,9 @@ Para qué: comprobar que las figuras de una edición cuentan el dato con clarida
 Usa el criterio de selección de gráficos aprobado por el operador el 2026-10-03: cada figura responde una pregunta del
 lector, un dato no se muestra dos veces y la variedad sólo desempata.
 
-> **Estado (2026-10-03, actualizado):** el criterio quedó implementado en local por TASK-1974 y TASK-1975 (code
-> complete, rollout pendiente): el planificador elige la figura por la pregunta y el PDF y el deck tienen página para
-> cifras, cascada, waffle, dona y barras apiladas. **Producción sigue con la versión anterior hasta el release**, así que
-> en una edición generada allá los pasos de abajo siguen siendo para detectar. La revisión de una vista previa con las
+> **Estado (2026-10-03, en producción):** con TASK-1974 y TASK-1975 el planificador elige la figura por la pregunta y
+> el PDF y el deck tienen página para cifras, cascada, waffle, dona y barras apiladas. Las ediciones creadas antes del
+> release conservan sus figuras; los pasos de abajo sirven para detectarlas y, si hace falta, generar una revisión. La revisión de una vista previa con las
 > figuras nuevas, los rechazos con causa y el tono de la variación están en el manual
 > [Revisar una edición antes de compartirla](revisar-una-edicion-antes-de-compartir.md). Emitir sigue apagado en
 > producción.

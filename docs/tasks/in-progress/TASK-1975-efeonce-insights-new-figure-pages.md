@@ -1,5 +1,14 @@
 # TASK-1975 — Figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — contrato final de la tarjeta de cifra (TASK-1974, en producción)
+
+- Plan: `chapter.stats` con `PlanStatFigureV1`/`PlanStatItemV1` (`contracts/plan.ts`): valor y comparable salen de
+  hechos, unidad, dirección (la del hecho; si no, `METRIC_DIRECTIONS`), marca «estimado» y pregunta. Una sola resolución
+  para PDF, deck y web: `presentation/stat-card.ts` (`statItemView`).
+- Modelo web 1.4 (`contracts/web-model.ts`): la tarjeta con `parts`/`count` para el motion de Think, más los campos
+  aditivos de TASK-1990 (`titlePlatforms`, `items[].channel`, `context`). Release `36a73e7b7e19`. — por trabajo en
+  TASK-1974
+
 ## Delta 2026-10-03 — tarjetas con isotipo de canal aprobadas: render en TASK-1996
 
 - El operador aprobó las tarjetas con isotipo de canal y su inventario (tableros `Premium-Cifras-Canal`,
@@ -68,16 +77,16 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1975-efeonce-insights-new-figure-pages.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961, PR #250; Think 0c5701a). Falta verificar dona y apiladas con GA4 real antes de cerrar`
+- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961, PR #250; Think 0c5701a). Dona y apiladas verificadas con GA4 real de Berel. Sólo falta que el operador revise las ediciones reales de Berel y Sky`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1974` (tarjeta de cifra en el contrato del plan y del modelo web; evidencia de dona y barras apiladas)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -510,23 +519,23 @@ estados. Puntos que el agente debe resolver contra el código y el contrato fina
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; el wireframe existe; `UI ready` permanece `no` hasta que la tarjeta esté aprobada y el mapping, el dossier y el scorecard estén completos.
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; el wireframe existe; `UI ready` permanece `no` hasta que la tarjeta esté aprobada y el mapping, el dossier y el scorecard estén completos. Pasó a `yes` el 2026-10-03 con tarjeta aprobada, dossier y scorecard completos.
 - [x] El operador aprobó la tarjeta de cifra en el canvas; sus hojas `Premium-Cifras.png` y `Deck-Cifras.png` existen en `paginas/` y la dirección quedó registrada en `docs/ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md`.
-- [ ] `PDF_FIGURE_FAMILIES` incluye `waterfall`, `waffle`, `donut` y `bar_stacked`, y la tarjeta de cifra tiene página; `hasFigurePage` devuelve `true` para cada una con hechos suficientes (test).
-- [ ] `report-figure-{waterfall,waffle,donut,stacked}` e `insights-figure-{waterfall,waffle,donut,stacked}` quedan a ≤ 1 % de sus ocho hojas aprobadas (o excepción aprobada por el operador, con techo), en color y en gris.
-- [ ] `report-figure-stat` e `insights-figure-stat` quedan a ≤ 1 % de las hojas de cifras aprobadas.
-- [ ] Ninguna plantilla nueva contiene HEX, px de color ni familias tipográficas literales; el rol del paso de cascada vive en `editorial-roles.json`.
-- [ ] Una cascada que no cuadra se rechaza con causa (test con el caso de Berel alterado).
-- [ ] Un waffle de 8 unidades dibuja 8 cuadros en el PDF y en Think (tests en ambos repos).
-- [ ] Una dona con 1 parte o con más de 3 no se emite (test).
-- [ ] Una tarjeta sin dato muestra «—», nunca 0; una estimada lleva «Estimado»; con «menor es mejor», el tono se invierte (tests).
-- [ ] Ninguna cifra ni nombre se trunca: el exceso produce rechazo con causa (test).
-- [ ] El copy visible reusable vive en `src/lib/copy/insights.ts`.
-- [ ] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los diez frames nuevos declarados en `BASELINE_DELTAS.md`.
-- [ ] La vista previa real de septiembre 2026 compone Berel con seis familias distintas más tarjetas y Sky con una figura de bullets de tres metas más la tarjeta de piezas entregadas, sin figuras omitidas del PDF; el operador la revisó.
-- [ ] Think dibuja la tarjeta de cifra y el waffle por unidad; captura desktop y 390 sin scroll horizontal de página; `pnpm audit:insights-a11y` sin hallazgos nuevos.
-- [ ] Dossier con hojas lado a lado en color y en gris, capturas de Think y antes/después; scorecard con promedio ≥ 4,5 y piso ≥ 4.
-- [ ] La arquitectura §15 deja de listar la cascada como pendiente de TASK-1958/TASK-1902 y declara las figuras con página PDF.
+- [x] `PDF_FIGURE_FAMILIES` incluye `waterfall`, `waffle`, `donut` y `bar_stacked`, y la tarjeta de cifra tiene página; `hasFigurePage` devuelve `true` para cada una con hechos suficientes (test). Evidencia: `figure-slots.ts:212`; tests «cascada que cuadra…» y «hasFigurePage: waffle, dona y apiladas…» en `figure-slots.test.ts`; la tarjeta usa `report-figure-stat`/`insights-figure-stat`.
+- [x] `report-figure-{waterfall,waffle,donut,stacked}` e `insights-figure-{waterfall,waffle,donut,stacked}` quedan a ≤ 1 % de sus ocho hojas aprobadas (o excepción aprobada por el operador, con techo), en color y en gris. Evidencia: `pnpm insights:canvas-fidelity` del 2026-10-03, entre 0,008 % y 0,590 % (`docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md`).
+- [x] `report-figure-stat` e `insights-figure-stat` quedan a ≤ 1 % de las hojas de cifras aprobadas. Evidencia: 0,050 % y 0,529 % (misma corrida).
+- [x] Ninguna plantilla nueva contiene HEX, px de color ni familias tipográficas literales; el rol del paso de cascada vive en `editorial-roles.json`. Evidencia: grep sin coincidencias en las diez plantillas (el blanco del disco de canal pasó al rol `channelDisc` el 2026-10-03); `dataStepOnPaper`/`dataStepOnNavy` en `editorial-roles.json`; `pnpm composer:color-ledger` limpio.
+- [x] Una cascada que no cuadra se rechaza con causa (test con el caso de Berel alterado). Evidencia: `figure-slots.test.ts` «una cascada que no cuadra se rechaza con causa (caso Berel alterado)».
+- [x] Un waffle de 8 unidades dibuja 8 cuadros en el PDF y en Think (tests en ambos repos). Evidencia: `insights-figure-waffle.test.ts` y `efeonce-think/tests/insights.test.ts` «waffle por unidad: 8 unidades son 8 cuadros».
+- [x] Una dona con 1 parte o con más de 3 no se emite (test). Evidencia: `figure-slots.test.ts` «una dona con 1 parte o con más de 3 no se emite».
+- [x] Una tarjeta sin dato muestra «—», nunca 0; una estimada lleva «Estimado»; con «menor es mejor», el tono se invierte (tests). Evidencia: `figure-slots.test.ts` «cifras: … «Menor es mejor» invierte el tono; sin dato es «—», nunca 0».
+- [x] Ninguna cifra ni nombre se trunca: el exceso produce rechazo con causa (test). Evidencia: `insights-figure-stat.test.ts` (`item_too_long` y cifra más ancha que su celda rechazada en el encaje).
+- [x] El copy visible reusable vive en `src/lib/copy/insights.ts`. Evidencia: `GH_INSIGHTS.catalog` y `GH_INSIGHTS.stat` (incluye `shareUnderOne`, `channelNames`, `channelContext`).
+- [x] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los diez frames nuevos declarados en `BASELINE_DELTAS.md`. Evidencia: 37 frames a 0 px el 2026-10-03; frames declarados en §(v).
+- [ ] La vista previa real de septiembre 2026 compone Berel con seis familias distintas más tarjetas y Sky con una figura de bullets de tres metas más la tarjeta de piezas entregadas, sin figuras omitidas del PDF; el operador la revisó. Compuesta y verificada (Berel `EO-INS-000027` con GA4 real, Sky `EO-INS-000029`); **falta la revisión del operador**, la única razón por la que la task sigue abierta.
+- [x] Think dibuja la tarjeta de cifra y el waffle por unidad; captura desktop y 390 sin scroll horizontal de página; `pnpm audit:insights-a11y` sin hallazgos nuevos. Evidencia: corrido de nuevo el 2026-10-03 sobre `0c5701a`: `test:insights` 25/25, `verify:insights` verde (overflow 0), `audit:insights-a11y` AA en 1440 y 390.
+- [x] Dossier con hojas lado a lado en color y en gris, capturas de Think y antes/después; scorecard con promedio ≥ 4,5 y piso ≥ 4. Evidencia: `docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md` (hojas en color y gris en la carpeta de fidelidad de TASK-1889); scorecard promedio 4,52, piso 4,3.
+- [x] La arquitectura §15 deja de listar la cascada como pendiente de TASK-1958/TASK-1902 y declara las figuras con página PDF. Evidencia: §15 lista `waterfall`, `waffle`, `donut` y `bar_stacked` con página; §14.12 con el estado en producción.
 
 ## Verification
 
@@ -541,14 +550,14 @@ estados. Puntos que el agente debe resolver contra el código y el contrato fina
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Delta en TASK-1902 y TASK-1958: la cascada en el PDF es de TASK-1975; TASK-1902 coordina `FigureKind`, registry y frames del gate.
-- [ ] Skill `efeonce-insights` (`references/contracts.md`, `references/lessons.md`), documentación funcional `docs/documentation/insights/efeonce-insights-dominio-ediciones.md` y manual `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md` actualizados.
+- [x] Delta en TASK-1902 y TASK-1958: la cascada en el PDF es de TASK-1975; TASK-1902 coordina `FigureKind`, registry y frames del gate.
+- [x] Skill `efeonce-insights` (`references/contracts.md`, `references/lessons.md`), documentación funcional `docs/documentation/insights/efeonce-insights-dominio-ediciones.md` y manual `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md` actualizados. Evidencia: ledger, lecciones y espejo `.codex` (2026-10-03); documentación funcional 1.20; manuales 1.19 y «Revisar una edición antes de compartirla» 1.1.
 
 ## Follow-ups
 

@@ -1,5 +1,5 @@
 {
-  "$comment": "Extensión EDITORIAL del brand pack `axis` (TASK-1889). La consumen sólo los catálogos que la declaran (hoy `insights-report` e `insights-deck`); `deck-axis` no la compila y sus tokens quedan byte-idénticos. Nace del canvas «Gráficos de Efeonce Insights» aprobado el 2026-09-25: los grises de estructura que el canvas usa sin token y los ROLES de dato. Un color de dato no se pide por su tono: se pide por lo que la serie ES (actual, anterior, oportunidad, ausencia) y por el fondo donde se lee (papel o navy). Los colores nuevos son `proposed` hasta que el operador los valide en el Figma `Sistema Axis - PPT`; esa transición no cambia valores. TASK-1975 (aprobado por el operador el 2026-10-03): `dataStep*` pinta el paso «Sumó» de la cascada y la 4.ª parte de waffle y apiladas; `delta{Better,Worse}*` son los tonos semánticos de la variación (verde mejor, rojo peor; neutro sigue en gris).",
+  "$comment": "Extensión EDITORIAL del brand pack `axis` (TASK-1889). La consumen sólo los catálogos que la declaran (hoy `insights-report` e `insights-deck`); `deck-axis` no la compila y sus tokens quedan byte-idénticos. Nace del canvas «Gráficos de Efeonce Insights» aprobado el 2026-09-25: los grises de estructura que el canvas usa sin token y los ROLES de dato. Un color de dato no se pide por su tono: se pide por lo que la serie ES (actual, anterior, oportunidad, ausencia) y por el fondo donde se lee (papel o navy). Los colores nuevos son `proposed` hasta que el operador los valide en el Figma `Sistema Axis - PPT`; esa transición no cambia valores. TASK-1975 (aprobado por el operador el 2026-10-03): `dataStep*` pinta el paso «Sumó» de la cascada y la 4.ª parte de waffle y apiladas; `delta{Better,Worse}*` son los tonos semánticos de la variación (verde mejor, rojo peor; neutro sigue en gris). TASK-1996 (aprobado el 2026-10-03): `channelDisc` es el disco blanco donde va el isotipo oficial de un canal en la tarjeta de cifra (token AXIS `efeonceInsights.statCard.channel.disc.fill`).",
   "colors": {
     "--axis-deck-slate-75": "#eef1f5",
     "--axis-deck-slate-120": "#dfe5ee",
@@ -43,7 +43,8 @@
     "deltaBetterOnPaper": "--axis-ppt-green-900",
     "deltaWorseOnPaper": "--axis-ppt-red-800",
     "deltaBetterOnNavy": "--axis-ppt-green-400",
-    "deltaWorseOnNavy": "--axis-ppt-red-300"
+    "deltaWorseOnNavy": "--axis-ppt-red-300",
+    "channelDisc": "--axis-ppt-neutral-50"
   },
   "contrastPairs": [
     {

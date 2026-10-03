@@ -1,8 +1,7 @@
 # TASK-1975 — Dossier de revisión: páginas de cifras, cascada, waffle, dona y apiladas de Efeonce Insights
 
-> **Estado: code complete, rollout pendiente (2026-10-03).** Todo en local: `develop` de greenhouse-eo sin push,
-> `main` local de efeonce-think sin push (su push es el deploy de producción) y `main` local de axis-design-system sin
-> push ni tag. TASK-1974 (planificador y contrato) y TASK-1975 (render y diseño) salen en el mismo release.
+> **Estado: en producción desde el 2026-10-03** (release `36a73e7b7e19`, orquestador `37158679961`; Think `0c5701a`;
+> AXIS `v0.3.42`). TASK-1974 (planificador y contrato) y TASK-1975 (render y diseño) salieron en el mismo release.
 >
 > Revisado 2026-10-03. Evidencia versionada en esta carpeta: cuatro hojas lado a lado (canvas | render) copiadas de
 > `../TASK-1889-efeonce-insights-premium-catalogs/fidelity/`, donde viven las 31 hojas en color y en gris y la tabla
@@ -134,13 +133,22 @@ caracteres; una nota que imprimía «[object Object]»; fuente del deck de cifra
 propia y con «Sumó» en la leyenda sin pasos que sumen; metas con «menos es mejor» que mostraban «▲ 67 %»; nombre de
 meta de 28 caracteres en el deck.
 
-**No verificado con datos reales:** la dona de fuentes de IA y las barras apiladas de visitas de GA4 (GA4 no corre en
-local). Están probadas con datos de ejemplo; quedan para staging.
+**Verificado con datos reales de GA4 (2026-10-03, después del release).** Vista previa de Berel `EO-INS-000027`
+(26 páginas + 20 láminas) con la conexión GA4 activa de la organización:
+
+- p. 8: barras apiladas de sesiones (35.118 → 29.972) con la parte con interacción. Captura:
+  [`berel-2026-09-a4-apiladas-ga4-real.png`](berel-2026-09-a4-apiladas-ga4-real.png).
+- p. 17: dona de sesiones desde asistentes de IA, ChatGPT 1.648 de 1.686 (98 %). Captura:
+  [`berel-2026-09-a4-dona-ga4-real.png`](berel-2026-09-a4-dona-ga4-real.png).
+
+Defecto que destapó: una parte con valor que redondea a 0 % se leía «0 %». Ahora se lee «<1 %» (`shareLabel` en
+`figure-slots.ts`, commit `8e4fbac7b`). Queda una decisión abierta: el color de las partes de waffle y dona sin rol
+declarado se asigna por orden, y en esta dona Gemini queda pintado con el color de «oportunidad».
 
 **Observaciones de esta revisión, no corregidas:**
 
-- Berel p. 7: el lead «(−17,0 %)» corta la línea entre «17,0» y «%»: el signo de porcentaje queda solo en la línea
-  siguiente.
+- ~~Berel p. 7: el lead «(−17,0 %)» corta la línea entre «17,0» y «%».~~ Corregido el 2026-10-03: los mappers unen la
+  cifra a «%» y «pp» con espacio duro en todos los slots (`bindUnitSpaces`, test en `composition-helpers.test.ts`).
 - Sky p. 1: la portada se titula «Insights ico 2026-08-01–2026-09-01», que es el título crudo del encargo. No es de esta
   task, pero conviene corregirlo en el encargo antes de compartir.
 
@@ -160,8 +168,9 @@ datos de ejemplo del modelo 1.4). Lo que muestran:
 - Más el resto del informe (portada, capítulos, tabla, límites, estados de error del enlace) para comprobar que no hubo
   regresiones.
 
-Gates de Think informados por la implementación: `pnpm test:insights` 25/25, `verify:insights` verde,
-`audit:insights-a11y` AA y `build` correcto. No se volvieron a correr en esta revisión.
+Gates de Think corridos de nuevo el 2026-10-03 sobre `0c5701a` (producción): `pnpm test:insights` 25/25,
+`verify:insights` verde (sin desborde) y `audit:insights-a11y` AA en 1440 y 390 (67 y 64 paradas de teclado, todas con
+foco visible).
 
 ## Decisiones del operador (2026-10-03)
 
@@ -183,12 +192,13 @@ Gates de Think informados por la implementación: `pnpm test:insights` 25/25, `v
 **Pendientes de decisión:** tarjetas con isotipo de canal (AI Overview, ChatGPT, Gemini, Perplexity), propuestas en el
 canvas y no implementadas; color por orden en waffle y dona cuyas partes no declaran papel.
 
-## Qué falta para cerrar
+## Estado del cierre (2026-10-03)
 
-1. Publicar AXIS (push a `main` y tag `v0.3.42`), desplegar Think y hacer el release de Greenhouse, con autorización
-   del operador.
-2. Verificar en staging la dona y las apiladas con datos reales de GA4.
-3. Revisar las ediciones internas de Berel y Sky antes de compartirlas.
-4. Gate de cierre: `pnpm test` completo y `pnpm build` (este último con autorización del operador).
-5. Alinear la cifra de §(v) de `BASELINE_DELTAS.md` con `fidelity.json` y volver a medir la fidelidad tras los últimos
-   commits.
+1. ~~Publicar AXIS, desplegar Think y hacer el release de Greenhouse.~~ Hecho: AXIS `v0.3.42`, Think `0c5701a`, release
+   `36a73e7b7e19`.
+2. ~~Verificar la dona y las apiladas con datos reales de GA4.~~ Hecho (arriba).
+3. **Pendiente del operador:** revisar las ediciones internas de Berel y Sky antes de compartirlas (la emisión sigue
+   apagada en producción).
+4. ~~Gate de cierre.~~ CI y CI Deep del SHA del release verdes (suite completa y build de producción).
+5. ~~Alinear la cifra de §(v) y volver a medir la fidelidad.~~ `pnpm insights:canvas-fidelity` corrido de nuevo el
+   2026-10-03: mismos valores (30 hojas dentro del 1 %, Deck-Agrupadas con su excepción); §(v) corregida a 0,53 %.

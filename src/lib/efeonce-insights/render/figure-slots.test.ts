@@ -311,6 +311,23 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     expect(buildFigureSlides(donut(['a', 'b', 'c', 'd']), facts([['a', 1], ['b', 1], ['c', 1], ['d', 1]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
   })
 
+  it('hasFigurePage: waffle, dona y apiladas con hechos suficientes tienen página; sin hechos, no', async () => {
+    const { hasFigurePage } = await import('./figure-slots')
+
+    const stacked = spec({
+      chartId: 'chart.seo.stacked.site-engagement', family: 'bar_stacked', dimensionLabels: ['agosto de 2026', 'septiembre de 2026'],
+      series: [
+        { seriesId: 'engaged', label: 'Con interacción', factIds: ['e0', 'e1'], unit: 'count' },
+        { seriesId: 'unengaged', label: 'Sin interacción', factIds: ['u0', 'u1'], unit: 'count' }
+      ]
+    })
+
+    expect(hasFigurePage(waffle(['positivas', 'neutras']), facts([['positivas', 5], ['neutras', 3]]))).toBe(true)
+    expect(hasFigurePage(donut(['chatgpt', 'gemini']), facts([['chatgpt', 19], ['gemini', 12]]))).toBe(true)
+    expect(hasFigurePage(stacked, facts([['e0', 530], ['u0', 490], ['e1', 772], ['u1', 512]]))).toBe(true)
+    expect(hasFigurePage(donut(['chatgpt', 'gemini']), facts([]))).toBe(false)
+  })
+
   it('apiladas: segmento base abajo, total por período, participación base y anotación de la variación base', () => {
     const chart = spec({
       chartId: 'chart.seo.stacked.site-engagement', family: 'bar_stacked', dimensionLabels: ['agosto de 2026', 'septiembre de 2026'],

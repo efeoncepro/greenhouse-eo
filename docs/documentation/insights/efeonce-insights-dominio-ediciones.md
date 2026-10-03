@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -89,10 +89,9 @@ dispersión, embudo, cascada, medidor, mapa de calor, waffle, bullet, Venn de do
 (visibilidad y entrega) y bullet (entrega contra su meta). El resto está construido y probado, pero todavía no hay
 quien genere esos datos. No están ofrecidas como disponibles.
 
-> **Cambio en camino (2026-10-03, code complete, rollout pendiente).** Con TASK-1974 y TASK-1975 el sistema también
-> produce tarjetas de cifra, cascada, waffle, dona y barras apiladas, y el PDF y el deck tienen página propia para cada
-> una. Mientras no salgan en un release, producción sigue con las cuatro de arriba. Ver «Cómo elige el informe sus
-> gráficos».
+> **En producción desde el 2026-10-03.** Con TASK-1974 y TASK-1975 el sistema también produce tarjetas de cifra,
+> cascada, waffle, dona y barras apiladas, y el PDF y el deck tienen página propia para cada una. Las ediciones creadas
+> antes de esa fecha conservan sus figuras: sólo las nuevas las traen. Ver «Cómo elige el informe sus gráficos».
 
 **Tres cosas que el sistema se niega a hacer**, porque harían mentir al informe:
 
@@ -267,7 +266,7 @@ sale de la lectura del plan: no se escribe a mano y nunca inventa una causa. Si 
 
 | Forma | Cuándo se usa | Cómo se lee |
 |---|---|---|
-| **Comparación de períodos** | Métricas distintas entre sí (clics, impresiones, CTR) | Cada métrica en su propia escala, período actual contra anterior. La variación lleva un triángulo que indica si subió o bajó. En producción hoy dice sólo la dirección; con TASK-1975 (rollout pendiente) también dice si es mejor o peor, con su color (ver «El tono de la variación») |
+| **Comparación de períodos** | Métricas distintas entre sí (clics, impresiones, CTR) | Cada métrica en su propia escala, período actual contra anterior. La variación lleva un triángulo que indica si subió o bajó. Desde TASK-1975 (en producción desde el 2026-10-03) también dice si es mejor o peor, con su color (ver «El tono de la variación») |
 | **Columnas** | Canales comparables entre sí (por ejemplo, motores de IA) sobre un mismo eje | Una columna por canal. La franja de referencia y la marca de oportunidad aparecen sólo cuando el plan las declara |
 | **Metas** | Entrega contra su meta oficial (entregas a tiempo, primera entrega correcta, rondas por pieza) | Lo logrado contra la meta, marcando la «mayor brecha». La zona de atención aparece sólo si el registro de métricas de entrega trae su límite; nunca se escribe a mano. En métricas donde «menos es mejor» (como las rondas), la lectura se invierte |
 | **Tendencia** | Ventanas de tres meses o más | Hasta tres líneas, distinguibles también en gris. Si falta un mes, la línea se corta: nunca se une el trazo ni se inventa el valor |
@@ -298,11 +297,11 @@ Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no m
 
 ## Cómo elige el informe sus gráficos
 
-> Estado (2026-10-03): **el criterio está aprobado por el operador e implementado en local, code complete y rollout
-> pendiente.** TASK-1974 hace que el planificador elija la figura por la pregunta; TASK-1975 le da página propia en el
-> PDF y el deck a las cinco figuras nuevas y la tarjeta al informe web. Nada de esto está todavía en producción: sale en
-> un mismo release de Greenhouse junto con la página de Think y la publicación de AXIS. El recuadro «Cómo están hoy los
-> informes» al final de esta sección dice qué sale en producción mientras tanto.
+> Estado (2026-10-03): **en producción.** TASK-1974 hace que el planificador elija la figura por la pregunta; TASK-1975
+> le da página propia en el PDF y el deck a las cinco figuras nuevas y la tarjeta al informe web. Salieron juntas en el
+> mismo release de Greenhouse, con la página de Think y la publicación de AXIS. Una tarjeta cuyas cifras salen de una
+> misma plataforma (por ejemplo Search Console) muestra su logo junto al título; si las cifras vienen de motores de IA
+> distintos, cada una lleva el suyo.
 
 **El principio: cada gráfico responde una pregunta.** Un gráfico no adorna: es un argumento. Antes de elegir su forma
 se pregunta qué quiere saber el lector sobre ese dato («¿cuánto es?», «¿cómo evolucionó?», «¿cumplimos la meta?») y
@@ -354,11 +353,9 @@ los buscadores y pueden ser más que los clics de Google).
   Con el criterio quedan una sola figura con las tres metas y una tarjeta con las piezas entregadas: un informe más
   corto y sin datos repetidos.
 
-> **Cómo están hoy los informes en producción (2026-10-03).** Producción sigue con la regla anterior hasta el
-> release: los informes usan principalmente barras, el PDF sólo dibuja barras, línea y bullet, y la cascada y los
-> waffles de un informe como el de Berel **sólo se ven en la página web** (en el PDF ese capítulo queda en palabras y en
-> su tabla). La tarjeta de cifra todavía no existe en producción. Lo que sigue describe lo que ya funciona en local y
-> llega con el release.
+> **Ediciones anteriores al 2026-10-03.** Se armaron con la regla anterior: usan principalmente barras y, en el PDF, la
+> cascada y los waffles quedaban en palabras y en su tabla. No cambian (una edición sellada no se reescribe); para verlas
+> con el criterio nuevo hay que generar una revisión.
 
 ### Qué figura recibe cada dato
 
@@ -596,7 +593,7 @@ firma de Efeonce.
 - Si el período todavía no cerró, un aviso lo dice arriba: las cifras son las del corte y no se actualizan solas.
 - La página sabe dibujar todas las formas de gráfico del contrato; el PDF en producción, sólo cuatro (comparación,
   columnas, metas y tendencia). Un informe que trae una cascada o un waffle (como el de Berel) los muestra sólo en la
-  web; en el PDF quedan como frase y tabla. Con TASK-1975 (rollout pendiente) el PDF y el deck suman cifras, cascada,
+  web; en el PDF quedan como frase y tabla. Desde TASK-1975 (en producción desde el 2026-10-03) el PDF y el deck suman cifras, cascada,
   waffle, dona y apiladas, y la web suma la tarjeta de cifra con su animación (modelo web 1.4; ver «Cómo elige el
   informe sus gráficos»).
 

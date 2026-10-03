@@ -47,7 +47,7 @@ Además, el isotipo de AI Overview pasa de la G de Google a su lupa con el degra
 
 Las cinco figuras del criterio de selección (aprobado el 2026-10-03) tienen página A4 y lámina 16:9; las hojas aprobadas
 del canvas las miden a ≤ 1 % (`pnpm insights:canvas-fidelity`: cascada 0,59 % / 0,54 %, waffle 0,03 % / 0,01 %, dona
-0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,17 %). Los frames nuevos son el probe de cada plantilla (los
+0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,53 %; la cifra del deck decía 0,17 % por error y se corrigió el 2026-10-03 contra `fidelity.json`). Los frames nuevos son el probe de cada plantilla (los
 `example` de su `slots.json`, sacados de la hoja aprobada).
 
 Frames nuevos:

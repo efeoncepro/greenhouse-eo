@@ -21,6 +21,21 @@ export const rejectIfLonger = (value: string, max: number, field: string): strin
   return value
 }
 
+/**
+ * Une la cifra a su unidad con espacio duro: «17,0 %» o «−1,2 pp» nunca se parten en dos líneas (vista previa real de
+ * Berel, 2026-10-03: el lead «(−17,0 %)» dejaba el «%» solo en la línea siguiente). Es presentación, no contenido: se
+ * aplica a los slots ya armados, así el plan sellado y su texto validado no cambian.
+ */
+const UNIT_SPACE = /(\d) (%|pp)(?!\p{L})/gu
+
+export const bindUnitSpaces = <T>(value: T): T => {
+  if (typeof value === 'string') return value.replace(UNIT_SPACE, '$1\u00a0$2') as T
+  if (Array.isArray(value)) return value.map(item => bindUnitSpaces(item)) as T
+  if (value !== null && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, bindUnitSpaces(item)])) as T
+
+  return value
+}
+
 /** Divide un flujo en páginas usando la capacidad declarada del molde como unidad (primitivo del motor). */
 export const chunkByCapacity = <T>(items: readonly T[], capacity: number, idOf: (item: T, i: number) => string, heightOf: (item: T) => number = () => 1): T[][] => {
   if (items.length === 0) return []

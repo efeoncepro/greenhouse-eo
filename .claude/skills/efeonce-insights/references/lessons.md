@@ -1,5 +1,14 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-03 · TASK-1975 · GA4 sólo se ve en local con su flag y su OAuth, y los datos reales destaparon dos fallas
+  de lectura.** Síntoma: la vista previa local devolvía `disabled` y luego `query_failed` para GA4, así que la dona de
+  sesiones desde IA y las apiladas sólo se habían probado con fixtures. El lector exige `GROWTH_GA4_ENABLED=true` más
+  `GOOGLE_GA4_OAUTH_CLIENT_ID` y `GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` (se toman del env de staging de Vercel en un
+  archivo temporal privado que se borra en el acto). Con datos reales de Berel: (1) una parte de 8 sesiones sobre 1.686
+  se leía «0 %», ahora «<1 %» (`shareLabel`); (2) el lead «(−17,0 %)» partía la línea entre la cifra y el «%», ahora los
+  mappers unen cifra y «%»/«pp» con espacio duro en los slots (`bindUnitSpaces`; presentación, el plan sellado no
+  cambia). Regla: una figura alimentada por un productor externo no está verificada hasta verla con SU fuente real, y el
+  porcentaje redondeado nunca puede decir 0 de algo que existe.
 - **2026-10-03 · TASK-1975 · La vista previa con datos reales encontró seis fallas que ninguna prueba vio.** Síntoma
   (`preview-edition.ts --editorial-v2` sobre Berel y Sky, septiembre 2026, con todos los tests verdes): (1) la leyenda de
   las barras de composición medía 36 caracteres (la serie llevaba el título) y el PDF de Berel no componía; (2) la nota
