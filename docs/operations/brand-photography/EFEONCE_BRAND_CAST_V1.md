@@ -24,13 +24,13 @@ gobernadas allí (`PERSONAS` de `scripts/foto/build-prompt.mjs`). Acá sólo se 
 | Clave | Quién | Tipo | Edad | Origen | Línea (`efeonceGraphicLine.lines`) | Rol que interpreta |
 |---|---|---|---|---|---|---|
 | `julio` | Julio Reyes | **real** | 37 | Venezolano | `growth` (Growth Strategy & Measurement) | Él mismo: Managing & GTM Director |
-| `humberly` | Humberly Henriquez («Hum») | **real** | 33 | Venezolana | `growth` (medición y control) | Ella misma: Head of Finance |
+| `hum` | Hum | ficticio (inspirada en la descripción de Humberly, sin su foto) | 33 | Venezolana | `growth` (Growth Strategy & Measurement) | Estratega de crecimiento y medición |
 | `karo` | Karolyne «Karo» | ficticio | 28 | Venezolana | `brand` (Creative Services) | Directora de arte y creadora de contenido |
 | `sophia` | Sophia | ficticio | 31 | Venezolana, hermana mayor de Karo | `engine` (Web, infraestructura, SEO y medición) | Estratega SEO/AEO y analítica web |
 | `isabella` | Isabella | ficticio | 27 | Colombiana (Barranquilla) | `voice` (Media & Distribution) | Especialista de medios pagados y distribución |
 | `antonio` | Antonio | ficticio | 35 | Mexicano (CDMX) | `revenue-hubspot` · `revenue-salesforce` (RevOps & CRM) | Líder de RevOps y CRM; la plataforma la pone la pieza |
 
-**[decisión del operador, 2026-10-02]** «Hum es Humberly». Las nacionalidades y las edades propuestas quedan aceptadas.
+**[decisión del operador, 2026-10-02]** «Hum es Humberly» (después reemplazada: Hum es un personaje ficticio, §3.2). Las nacionalidades y las edades propuestas quedan aceptadas.
 Los roles de los ficticios los asigna Claude por línea de servicio, a pedido del operador («dales tú rol basado en las
 líneas de negocio»). Julio tiene **37 años** (corrección del operador; ver §6).
 
@@ -44,7 +44,7 @@ Lógica del reparto **[propuesta]**: cada línea tiene una cara. Las hermanas cu
 |---|---|
 | Interpretar el rol de su línea en piezas de campaña, social, deck y propuestas (como hoy el casting por rol del registro cine: «la estratega», «la líder de RevOps») | Aparecer como persona del equipo con nombre en la página de equipo, firmas, organigrama, LinkedIn o cualquier superficie que diga «quiénes somos» |
 | Vestir la prenda de su línea cuando interpreta ese rol (§4) | Presentarse como cliente, ni con nombre de empresa ni en un testimonio firmado ([personas §7](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)) |
-| Aparecer junto a Julio, Humberly y Nexa | Llevar el nombre de un personaje en pantalla, salvo una narrativa de campaña que lo declare como ficción |
+| Aparecer junto a Julio y Nexa | Llevar el nombre de un personaje en pantalla, salvo una narrativa de campaña que lo declare como ficción |
 | | Cambiar de rol o de línea de una pieza a otra |
 
 Los nombres de los ficticios son **claves internas** del elenco, no nombres públicos. Las piezas con personas generadas
@@ -61,23 +61,26 @@ ficticio se escribe **desde el candidato elegido**, no desde esta ficha: la fich
 
 Identidad aprobada en el roster (`julio`, set del 2026-09-20). No se construye nada. Pendiente: la edad del bloque (§6).
 
-### 3.2 Humberly «Hum» (real)
+### 3.2 Hum (ficticio · `growth`)
 
-Identidad en el roster (`humberly`, avatar con la bomber). Lo que el operador agrega y el bloque todavía no dice
-**[decisión del operador, 2026-10-02]**:
+**[decisión del operador, 2026-10-02]** Primero «Hum es Humberly». Las vistas de cuerpo derivadas de su avatar fallaron
+dos veces por proporción: la cabeza salía enorme o, corregida, demasiado pequeña. Su única referencia es de medio cuerpo,
+así que el modelo inventa el cuerpo. Entonces: «si da mucho guerra reimagina una persona como Hum pero desde cero y no
+poniéndola a ella como referencia». Hum pasa a ser un **personaje ficticio** generado sólo desde texto. **Humberly sigue
+en el roster del equipo real** y no cambia nada de su identidad.
 
-| Rasgo | Dato del operador | Bloque actual |
-|---|---|---|
-| Edad | 33 | «a young adult as in the reference» |
-| Altura | ≈ 1,70 m | no lo dice |
-| Ojos | ligeramente almendrados | «dark brown» (sin forma) |
-| Cuerpo | complexión media: ni voluptuosa ni plana | no lo dice (la referencia es de medio cuerpo, así que el modelo inventa la silueta) |
-| Piel | blanca | «fair skin with a warm undertone» (coincide) |
+| Rasgo | Ficha |
+|---|---|
+| Rostro | Óvalo redondeado, mejillas suaves, mentón redondeado |
+| Ojos y cejas | Ligeramente almendrados, café oscuro; cejas oscuras de arco suave |
+| Piel | Blanca con subtono cálido y rubor natural |
+| Pelo | Negro hasta el pecho, raya al lado, capas que enmarcan la cara y ondas sueltas en las puntas |
+| Cuerpo | 1,70 m, complexión media: ni voluptuosa ni plana |
+| Firma propia | *Piercing* pequeño plateado en la nariz |
 
-**Construirla** = derivar por edición desde su avatar las vistas que faltan (cuerpo entero frontal, 45° y perfil), con
-la altura y la complexión declaradas, y agregar al bloque los ojos, la altura y el cuerpo. El bloque cambia en `PERSONAS`
-y en el canon §3.6 a la vez (el gate exige que sean iguales), y sólo después de que el operador apruebe las vistas
-**[pendiente]**.
+Candidatas en `ai-generations/2026-10-02_elenco-efeonce/hum/`, encuadre de tres cuartos (cabeza a medio muslo) para
+juzgar cara y proporción a la vez. Prompts verbatim en `hum/*.txt`. Las vistas de Humberly
+(`humberly/`) quedan como evidencia de la falla.
 
 ### 3.3 Karo (ficticio · `brand`)
 
@@ -141,7 +144,7 @@ Rige la [regla por línea del roster](./EFEONCE_TEAM_ROSTER_V1.md#el-vestuario-l
 | Personaje | Línea | Prenda en rol |
 |---|---|---|
 | Karo | `brand` | hoodie Efeonce |
-| Julio, Humberly, Sophia, Isabella, Antonio | `growth`, `engine`, `voice`, `revenue-*` | bomber o softshell del uniforme corporativo (con el polo debajo si se quiere; el polo nunca solo) |
+| Julio, Hum, Sophia, Isabella, Antonio | `growth`, `engine`, `voice`, `revenue-*` | bomber o softshell del uniforme corporativo (con el polo debajo si se quiere; el polo nunca solo) |
 
 Fuera de rol (una pieza sin línea) cada uno viste su ropa propia (§3). La escena declara siempre el vestuario en
 palabras: si calla, lo decide la referencia.
@@ -154,7 +157,8 @@ revisan en la hoja de contacto:
 | Pareja | Riesgo | Separadores |
 |---|---|---|
 | Karo ↔ Sophia | Hermanas: el modelo las vuelve una | Largo del pelo, lentes, gesto (pícara vs contenida) |
-| Humberly ↔ Nexa | Treintañeras de pelo oscuro | Rostro **óvalo redondeado** de Humberly vs mandíbula suave y mentón redondeado de Nexa; *piercing* en la nariz de Humberly; delineado alado y anillo de plata de Nexa |
+| Hum ↔ Nexa | Treintañeras de pelo oscuro | Rostro **óvalo redondeado** de Hum vs mandíbula suave de Nexa; *piercing* en la nariz de Hum; delineado alado y anillo de plata de Nexa |
+| Hum ↔ Humberly | Personaje inspirado en una persona real | Hum nunca se presenta como Humberly ni con su cargo; en piezas con el equipo real, Humberly sale con su identidad del roster |
 | Antonio ↔ Julio | Latinos con barba, 35 y 37 | Lentes, canas, barba larga y pelo rizado de Julio; Antonio sin lentes, pelo liso negro, barba corta |
 | Isabella ↔ Karo | Rizos | Textura (4A vs 3A), color de pelo y piel |
 
@@ -214,7 +218,7 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Personaje | Estado |
 |---|---|
 | Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
-| Humberly | Aprobada (roster). Pendiente: vistas derivadas y bloque ampliado (§3.2) |
+| Hum | Cuatro candidatas desde cero en `hum/`; espera elección. Humberly sigue en el roster sin cambios |
 | Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Siguen la marca de carácter y su set de vistas |
 | Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia |
 | Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Sigue su set de vistas |
