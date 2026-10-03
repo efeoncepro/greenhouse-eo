@@ -72,25 +72,25 @@
    ]
   },
   {
-   "a": 37.41,
-   "b": 39.93,
+   "a": 38.61,
+   "b": 40.37,
+   "lines": [
+    "Efeonce AEO."
+   ]
+  },
+  {
+   "a": 40.42,
+   "b": 42.94,
    "lines": [
     "Mide tu visibilidad en los",
     "motores de respuesta de IA"
    ]
   },
   {
-   "a": 39.98,
-   "b": 42.1,
+   "a": 42.99,
+   "b": 44.96,
    "lines": [
     "con nuestro AI Visibility Report."
-   ]
-  },
-  {
-   "a": 44.32,
-   "b": 46.13,
-   "lines": [
-    "Efeonce AEO."
    ]
   }
  ],
@@ -104,8 +104,8 @@
    36.958
   ]
  ],
- "total": 46.5,
- "reveal": 41.916,
+ "total": 49.583,
+ "reveal": 45.0,
  "sonido": [
   [
    3.6830000000000003,
@@ -136,8 +136,8 @@
    ]
   ],
   [
-   43.516,
-   44.315999999999995,
+   46.6,
+   47.6,
    [
     "[logo sonoro de Efeonce]"
    ]

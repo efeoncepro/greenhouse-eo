@@ -273,3 +273,8 @@ generación. Higgsfield: créditos de casting de voz. Total bajo el tope de ~USD
 - **Mezcla** (`audio/mezcla-v2.py`): ducking 8:1 de la cama por la voz; la mezcla queda a 0,2–1,2 dB de la voz sola en
   todos los tramos con voz. Master −16,0 LUFS / −1,0 dBTP.
 - **Pendiente:** escucha del operador (voz, cama punk y balance). Las tomas t2 de voz están en `audio/vo2/tomas/`.
+- **Cierre (ajuste del operador, mismo día):** la frase completa «Efeonce AEO. Mide tu visibilidad… con nuestro AI
+  Visibility Report.» va sobre una **placa animada** (`corte/placa-cierre.cjs`, 6,54 s): los Sparks entran
+  escalonados con rebote y flotan al compás; el logo AEO aparece con «Efeonce AEO» y, con «AI Visibility Report», se
+  corre y entra el del Report. El reveal del logo con el eslogan queda **sin voz**. Para que quepa: reacción de Tomás
+  −0,5 s y la cama +2 compases (repite 33–36 s del coro); la banda corta en seco al entrar el logo. Duración: 49,6 s.

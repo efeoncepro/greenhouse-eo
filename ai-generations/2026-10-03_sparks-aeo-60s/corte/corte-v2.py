@@ -12,7 +12,7 @@ ff = lambda *a: subprocess.run(['ffmpeg', '-v', 'error', '-y', *a], check=True)
 SHOTS = [
     ('01', 0.000, 1.25, 3.60), ('02', 5.000, 1.00, 3.00), ('03', 10.000, 1.35, 3.70), ('04', 15.000, 1.00, 5.00),
     ('05', 20.000, 1.40, 5.36), ('06', 27.500, 1.35, 5.56), ('07', 35.000, 1.30, 3.85), ('08', 40.000, 1.50, 3.33),
-    ('09a', 45.000, 1.00, 3.60), ('09b', 50.000, 1.25, 1.96), ('10a', 52.458, 0.97, 3.00), ('10b', 55.375, 1.00, 4.583),
+    ('09a', 45.000, 1.00, 3.60), ('09b', 50.000, 1.25, 1.50), ('p10a', 52.458, 1.00, 157 / 24), ('10b', 55.375, 1.00, 4.583),
 ]
 UI = {'02': 72, '09a': 86}
 starts, t = [], 0.0
@@ -32,8 +32,11 @@ def remap(t_old):
 if __name__ == '__main__':
     env = dict(os.environ, UI_OUT=f'{OUT}/seg', UI_FRAMES=json.dumps({f'{k}.mp4': v for k, v in UI.items()}))
     subprocess.run(['node', f'{R}/corte/ui-s2-s9.cjs'], check=True, env=env, stderr=subprocess.DEVNULL)
+    # Placa de cierre animada (157 cuadros = 6,54 s): la frase completa del cierre va sobre ella.
+    subprocess.run(['node', f'{R}/corte/placa-cierre.cjs', f'{OUT}/seg/p10a.mp4'], check=True,
+                   env=dict(os.environ, PLACA_N='157', PLACA_AEO='0.15', PLACA_AVR='4.45'), stderr=subprocess.DEVNULL)
     for seg, _, sp, keep in SHOTS:
-        if seg in UI: continue
+        if seg in UI or seg == 'p10a': continue
         ff('-i', f'{V1}/{seg}.mp4', '-vf', f'setpts=PTS/{sp},fps=24,trim=0:{keep},setpts=PTS-STARTPTS',
            '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
            '-video_track_timescale', '12288', f'{OUT}/seg/{seg}.mp4')

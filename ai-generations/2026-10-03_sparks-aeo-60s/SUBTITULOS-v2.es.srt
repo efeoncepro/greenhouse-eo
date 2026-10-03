@@ -43,14 +43,14 @@ Ahora, cuando la IA responde,
 tiene con qué nombrarte.
 
 10
-00:00:37,410 --> 00:00:39,930
+00:00:38,610 --> 00:00:40,370
+Efeonce AEO.
+
+11
+00:00:40,420 --> 00:00:42,940
 Mide tu visibilidad en los
 motores de respuesta de IA
 
-11
-00:00:39,980 --> 00:00:42,100
-con nuestro AI Visibility Report.
-
 12
-00:00:44,320 --> 00:00:46,130
-Efeonce AEO.
+00:00:42,990 --> 00:00:44,960
+con nuestro AI Visibility Report.

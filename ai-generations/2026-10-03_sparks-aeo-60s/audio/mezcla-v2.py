@@ -24,8 +24,9 @@ VO = [
     ('S6-t1', 0.00, 5.64, '06', 0.45, [(0.00, ['Después, ordenamos lo que falta:']), (1.80, ['contenido claro, una marca bien definida', 'y fuentes que te respalden.'])]),
     ('S7-t1', 0.00, 3.18, '07', 0.35, [(0.00, ['Lo ves todo en un reporte,', 'y tú decides cada paso.'])]),
     ('S9-t1', 0.00, 3.84, '09a', 0.20, [(0.00, ['Ahora, cuando la IA responde,', 'tiene con qué nombrarte.'])]),
-    ('S10-t1', 2.10, 6.96, '09b', 0.45, [(0.00, ['Mide tu visibilidad en los', 'motores de respuesta de IA']), (2.75, ['con nuestro AI Visibility Report.'])]),
-    ('S10-t1', 0.00, 1.78, '10b', 2.40, [(0.00, ['Efeonce AEO.'])]),
+    # Cierre completo sobre la placa animada; el reveal del logo queda sin voz.
+    ('S10-t1', 0.00, 1.78, 'p10a', 0.15, [(0.00, ['Efeonce AEO.'])]),
+    ('S10-t1', 2.10, 6.96, 'p10a', 1.96, [(0.00, ['Mide tu visibilidad en los', 'motores de respuesta de IA']), (2.75, ['con nuestro AI Visibility Report.'])]),
 ]
 inp, ch, cues = [], [], []
 for i, (tk, a, b, seg, off, subs) in enumerate(VO):
@@ -52,7 +53,8 @@ ff(*cmd, '-filter_complex', ';'.join(parts), '-map', '[a]', '-ar', '48000', f'{A
 # Mezcla.
 fc = ';'.join([
     '[0:a]volume=7dB,asplit=3[vo][k1][k2]',
-    f'[1:a]aresample=48000,equalizer=f=180:t=h:w=200:g=-4,equalizer=f=2500:t=q:w=1:g=2,volume=-6dB,atrim=0:{REVEAL},'
+    f'[1:a]aresample=48000,asplit=3[c1][c2][c3];[c1]atrim=0:39,asetpts=PTS-STARTPTS[x1];[c2]atrim=33:36,asetpts=PTS-STARTPTS[x2];'
+    f'[c3]atrim=39:42,asetpts=PTS-STARTPTS[x3];[x1][x2][x3]concat=n=3:v=0:a=1,equalizer=f=180:t=h:w=200:g=-4,equalizer=f=2500:t=q:w=1:g=2,volume=-6dB,atrim=0:{REVEAL},'
     f'afade=t=out:st={REVEAL - 0.12:.3f}:d=0.12,apad=whole_dur={TOTAL}[m0]',
     '[m0][k1]sidechaincompress=threshold=0.02:ratio=8:attack=20:release=300[mus]',
     f'[3:a]aresample=48000,volume=-2dB,adelay={int(REVEAL * 1000)}|{int(REVEAL * 1000)},apad=whole_dur={TOTAL}[r0]',
@@ -67,9 +69,10 @@ j = json.loads(m[m.rindex('{'):m.rindex('}') + 1])
 ff('-i', pre, '-af', f"loudnorm=I=-16:TP=-1:LRA=11:measured_I={j['input_i']}:measured_TP={j['input_tp']}:measured_LRA={j['input_lra']}:"
    f"measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true,aresample=48000", '-c:a', 'pcm_s24le', f'{A}/master-v2.wav')
 for k in range(len(cues) - 1): cues[k]['b'] = min(cues[k]['b'], round(cues[k + 1]['a'] - 0.05, 2))
+cues[-1]['b'] = min(cues[-1]['b'], round(REVEAL - 0.04, 2)) if cues[-1]['a'] < REVEAL else cues[-1]['b']
 ui = [(real['02'], real['03']), (real['09a'], real['09b'])]
 json.dump({'cues': cues, 'ui': ui, 'total': TOTAL, 'reveal': REVEAL, 'sonido': [
     [real['02'] + 0.1, real['02'] + 1.6, ['[envío y respuesta]']], [real['03'] + 1.7, real['03'] + 2.8, ['[gorjeo del Spark]']],
     [real['08'] + 0.3, real['08'] + 2.6, ['[tecleo y envío]']], [real['09a'] + 1.0, real['09a'] + 1.8, ['[logo sonoro de Efeonce]']],
-    [REVEAL + 1.6, REVEAL + 2.4, ['[logo sonoro de Efeonce]']]]}, open(f'{OUT}/cues-fuente.json', 'w'), indent=1, ensure_ascii=False)
+    [REVEAL + 1.6, REVEAL + 2.6, ['[logo sonoro de Efeonce]']]]}, open(f'{OUT}/cues-fuente.json', 'w'), indent=1, ensure_ascii=False)
 print('total', TOTAL, 'reveal', REVEAL, 'eventos', len(ev), 'premaster', j['input_i'])
