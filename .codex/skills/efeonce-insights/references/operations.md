@@ -48,6 +48,47 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
   pieces and real PDFs → one internal edition in production before sharing with a client.
 - **Rollback**: revert the release; sealed plans are unaffected (render reads the frozen plan).
 
+## TASK-1974 / TASK-1975 — figuras del criterio: cómo verificarlas y cómo sacarlas (code complete local, 2026-10-03)
+
+Sin flag propio: el criterio corre sólo en planes con `INSIGHTS_EDITORIAL_V2_ENABLED` (ya ON en staging, Production y
+`ops-worker`), así que entra en cuanto el código llega al runtime. Ediciones selladas no cambian (el render compone el
+plan congelado); sólo las ediciones NUEVAS traen tarjetas y páginas nuevas.
+
+- **Vista previa real (local, antes de cualquier push)** — levantar el proxy con `pnpm pg:connect` y correr:
+
+  ```bash
+  GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+  pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+    --edition=<insed-…> --org=<org-…> --editorial-v2 \
+    --start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD --output=both
+  ```
+
+  Vuelve a recolectar la evidencia con el código del árbol (es lo que daría una edición NUEVA), deja los PDF en
+  `.captures/insights-preview/<código>-<target>/` y no escribe en la base (salvo la bitácora de acceso del logo).
+  `--plan-only` imprime el plan sin componer. Referencia 2026-10-03 (septiembre 2026): Berel 22 páginas + 18 láminas,
+  Sky 10 + 8, sin figuras omitidas. **Abrir el PDF página por página**: las seis fallas de esta vista previa no las vio
+  ninguna prueba (ver [`lessons.md`](lessons.md)). GA4 no corre en local: la dona de fuentes IA y las apiladas no
+  aparecen ahí; se verifican en staging.
+- **Fidelidad**: `pnpm insights:canvas-fidelity` (`--only=<nombre>`, `--gray`). Estado: 31 hojas dentro del umbral
+  (nuevas 0,01–0,59 %); `Deck-Agrupadas` sigue con su excepción aprobada (2,2 %, techo 2,5 %). Fixtures de las figuras
+  nuevas: `scripts/insights/canvas-fixtures/{report,deck}/44–48-figura-*.json`.
+- **Gate visual scoped**: `pnpm composer:visual-gate --catalog=insights` → 37 frames a 0 px (10 nuevos + 8 que cambian,
+  sección (v) de `BASELINE_DELTAS.md`, sellada con `--freeze` en scope insights). Nunca re-congelar `deck-axis` ni SKY.
+  El probe compone con los `example` de cada `slots.json`: un ejemplo que no cuadra con su geometría rompe el frame.
+- **Rollout conjunto, en este orden (cada paso con OK explícito del operador; nada hecho):**
+  1. **AXIS** — push a `main` (despliega `axis.efeonce.org`, Lab con la tarjeta) + tag `v0.3.42` (publica
+     `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` 0.3.42). Ningún consumer lo instala todavía: Think copia
+     los tokens.
+  2. **Think** — push a `main` = deploy de producción. ANTES o junto con el release de Greenhouse: Think 1.4 lee las
+     tarjetas; un Greenhouse 1.4 con un Think anterior no rompe (1.x ignora `stats`), pero el Live pierde la tarjeta.
+  3. **Greenhouse** — push de `develop` → staging → release por el control plane (`greenhouse-production-release`). El
+     Job `artifact-worker` es UNO para staging y producción: el release cambia los dos. Ediciones internas de Berel y Sky
+     revisadas antes de compartir con el cliente.
+  4. **Staging**: verificar dona y apiladas con datos GA4 reales (nunca vistas con datos reales).
+  5. Gate de cierre: `pnpm test` completo + `pnpm build` (este último con autorización del operador).
+- **Rollback**: revertir el release de Greenhouse (los planes sellados no se tocan). Think 1.4 sigue aceptando un modelo
+  anterior; AXIS publicado no se despublica (sólo se deja de consumir).
+
 ## Flags (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 
 | Flag | Gates | Read in | Current state |

@@ -1,0 +1,89 @@
+{
+  "task": "TASK-1975",
+  "surface": "efeonce-insights.catalogs.insights-report+insights-deck (cifras, cascada, waffle, dona, apiladas) + think.insights.stat-card",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-10-03",
+  "reviewer": "claude-opus-5-5 (frames mirados: hojas lado a lado canvas | render de las diez plantillas nuevas, ediciones reales Berel EO-INS-000027 (22 + 18) y Sky EO-INS-000029 (10 + 8) página por página, y capturas de Think task-1975-slice5 en escritorio y móvil; gate visual corrido de nuevo: 37 frames a 0 px)",
+  "evidence": {
+    "dossier": "docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/README.md",
+    "fidelity": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/fidelity.json",
+    "desktop": "docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/Premium-Cifras.png",
+    "mobile": "docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/Deck-Cifras.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Las cifras son la figura: antetítulo, conclusión y lead a ancho completo sin repetir ninguna cifra en grande; después la retícula en orden de lectura. Cada celda: nombre corto → valor grande → variación → «vs …». Verificado en Berel p. 5 (6 cifras) y Sky p. 5 (1 cifra a todo el ancho).",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Premium-Cifras.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Las diez plantillas nuevas difieren de su hoja aprobada entre 0,008 % y 0,590 %; retícula de 3 columnas en A4 y 3 × 2 en deck como en el canvas.",
+      "evidence": "TASK-1889-efeonce-insights-premium-catalogs/fidelity/fidelity.json"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "La anatomía de figura de TASK-1889 se conserva (cabecera, conclusión, figura, procedencia, cierre); las páginas nuevas se intercalan con las existentes sin saltos en Berel y Sky. Orden del capítulo cifras → metas → evolución → explicación → composición → comparación cumplido en ambas ediciones.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/README.md §Ediciones reales"
+    },
+    "density": {
+      "score": 4.3,
+      "rationale": "Correcta con 4–6 cifras y en cascada, waffle y columnas. Deuda honesta: con una sola cifra (Sky p. 5, piezas entregadas) la página A4 queda con más de la mitad vacía bajo la retícula; no se rellena con contenido inventado.",
+      "evidence": "EO-INS-000029 p. 5 (local, no versionado: datos de cliente)",
+      "nextAction": "Evaluar con el operador si una página de una sola cifra se compone junto a la figura siguiente del capítulo o en una variante compacta, cuando haya más ediciones ICO reales; no inventar contenido para llenarla."
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Plano como el resto del catálogo: filetes finos entre celdas, sin borde de tarjeta ni fondo gris, sin card-on-card. En el deck, un solo panel para la figura.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Deck-Cifras.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Una figura y una superficie de énfasis por página; la variación es la única superficie teñida y en navy desaparece la píldora rellena (variante C).",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Deck-Cifras.png"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "Momento dominante claro en cada figura: la retícula de cifras grandes, la cascada con el aporte principal como cifra de cabecera (Berel p. 7, −622), el waffle de unidades contables. En Think la cifra recorre su cambio.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Premium-Cascada.png"
+    },
+    "typography": {
+      "score": 4.4,
+      "rationale": "Poppins/Geist del font pack con cifras tabulares; valor con unidad pequeña desde `parts`; nombres de cifra acotados a 3 palabras/24 caracteres con rechazo. Defecto visto: en Berel p. 7 el lead «(−17,0 %)» corta la línea entre la cifra y «%».",
+      "evidence": "EO-INS-000027 p. 7 (local, no versionado: datos de cliente)",
+      "nextAction": "Unir la cifra y su signo de porcentaje con espacio no separable en el texto del lead (formateo compartido de cifras) y verificarlo en la vista previa de Berel."
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Tonos semánticos verde/rojo/gris con dirección declarada por métrica; nunca solos (triángulo + cifra + «Menor es mejor»). Variante C en navy por el choque del rojo con el coral de oportunidad. Roles AXIS nuevos (dataStep, deltaBetter/Worse On Paper/Navy). Pendiente: color por orden en waffle/dona sin papel declarado.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Deck-Waffle.png"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Íconos de trazo por métrica en la tarjeta y glifos de sección nuevos (steps, grid, donut, layers, numbers); triángulo de puntas redondeadas en todas las superficies. Isotipos de canal en tarjetas: propuestos, no aprobados ni implementados.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Premium-Cifras.png"
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "PDF y deck son lienzos fijos (A4 794×1123, 16:9 1280×720). En Think la retícula pasa a una columna en móvil y el waffle por unidad se mantiene legible (capturas task-1975-slice5, fuera del repo).",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/README.md §Página web en Think"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Contrato aprobado: la cifra recorre del valor anterior al actual y luego la variación toma su tono; estado final con movimiento reducido, sin JavaScript e impresión; aria con el valor final. Visto en capturas a 500/1400/2600 ms. Los gates de Think no se volvieron a correr en esta revisión.",
+      "evidence": "docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "31 hojas dentro del umbral; las diez nuevas entre 0,008 % y 0,590 %; gate visual 37 frames a 0 px corrido de nuevo. Se descuenta porque la fidelidad no se volvió a medir después de los últimos tres commits y §(v) de BASELINE_DELTAS cita 0,17 % para las cifras del deck frente a 0,529 % en fidelity.json.",
+      "evidence": "TASK-1889-efeonce-insights-premium-catalogs/fidelity/fidelity.json"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Anatomía Efeonce propia (pestaña de capítulo, conclusión, procedencia, cierre) y reglas que un dashboard genérico no tiene: cascada que debe cuadrar, waffle por unidad, dona con centro sin cifra duplicada, una sola figura de metas.",
+      "evidence": "TASK-1975-efeonce-insights-new-figure-pages/Premium-Cascada.png"
+    }
+  },
+  "average": 4.52,
+  "notes": "Code complete, rollout pendiente: nada de esto está en producción. Verificado con datos reales salvo la dona de fuentes de IA y las barras apiladas de GA4 (sólo fixtures; quedan para staging). El documento no tiene viewports responsive: «desktop» es la hoja A4 y «mobile» la lámina 16:9; la vista móvil real es la de Think, fuera del repo."
+}

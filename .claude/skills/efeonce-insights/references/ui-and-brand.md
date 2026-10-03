@@ -1,6 +1,6 @@
 # Efeonce Insights — marca, informe y UI (cómo se ve y dónde vive)
 
-> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`, y el 2026-09-30 para las láminas del deck SEO/AEO de §7.8; efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
+> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`; las piezas de TASK-1974/1975 —tarjeta de cifra, cinco páginas nuevas, tono por fondo, AXIS como casa del sistema de diseño— el 2026-10-03, todas **locales sin desplegar** en los tres repos; y el 2026-09-30 para las láminas del deck SEO/AEO de §7.8; efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
 > Este archivo describe lo que EXISTE. Donde algo falta, está en §7 «Gaps» y no se decide aquí: esas decisiones son del
 > operador.
 
@@ -14,7 +14,7 @@
   para agentes `…/insights.json.ts`, guía `docs/agent-composition/insights.md`. **El ejemplo vivo del producto es la
   muestra `https://think.efeoncepro.com/insights/muestra`.**
 - Es una página de **referencia**: muestra la marca, sus aplicaciones aprobadas, las secciones del informe y la UI del
-  informe live como documentación con datos de muestra. **No** publica componentes ni contratos nuevos.
+  informe live como documentación con datos de muestra. **No** publica componentes ni contratos nuevos. (Cambió el 2026-10-03, ver §1: la sección de la tarjeta de cifra existe en AXIS local, sin publicar.)
 - Antes de ella, el Lab sólo tenía las láminas 7.1 «Insights: informe» y 7.2 «Insights: plan, cierre, deck y correo»
   dentro de `/references/graphic-line/` (capítulo 9 «Pruebas en producto», datos en
   `apps/lab/src/data/graphic-line-elements.json`), marcadas «prueba de diseño, cifras de muestra». Siguen siendo
@@ -24,24 +24,31 @@
 
 ## 1. Frontera con AXIS (vinculante)
 
-- AXIS publica valores, significado y activos de marca; **la UI de producto vive en sus consumidores** (Greenhouse,
-  Think) hasta que un segundo consumidor real justifique extraerla (`axis-design-system/docs/ARCHITECTURE.md:3-5`;
-  `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md` §Adapters: «AXIS publishes values and meaning, not
-  painted components»; Lab `apps/lab/src/content/docs/index.mdx` §Boundary: el Lab no importa código, API ni adapters
-  de Greenhouse o Globe). Precedente más cercano: Glitch (página de referencia con piezas aprobadas).
-- Por eso Insights entra a AXIS como (a) activos de marca en `@efeoncepro/axis-brand-assets` 0.4.0 y (b) la página de
-  referencia de §0 (publicada el 2026-09-28, AXIS main `3dfbf0e`). Nada más.
-- **Candidatos reales a extraer** (ya hay DOS consumidores con copias a mano) — follow-up, no implementado:
+- **Cambió el 2026-10-03 (decisión del operador): AXIS es la casa del sistema de diseño de Insights** — la marca
+  (`@efeoncepro/axis-brand-assets`, `insights-*`), los tokens de color de datos (`efeonceInsights`), los contratos y la
+  referencia del Lab `/references/insights/`. Greenhouse (PDF A4 y deck) y Think (informe live) son sus consumidores.
+  Se retiró la regla anterior «AXIS no publica UI ni contratos de Insights» (AXIS `c272c20`: Lab, JSON, guía, README de
+  composición y `docs/ARCHITECTURE.md` § Efeonce Insights).
+- **Estado: local, sin publicar.** AXIS `main` local (`e7f1653`, `c272c20`, `a141aaf`, `b4b699a` + un commit de motion
+  en curso), sin push ni tag: tokens `efeonceInsights` en `@efeoncepro/axis-tokens` 0.3.42 y contrato
+  `efeonce.insights-stat-card` 0.1.0 `candidate` en `@efeoncepro/axis-ui-contracts` 0.3.42. Publicar = push a `main`
+  (despliega axis.efeonce.org) + tag `v0.3.42`, con OK del operador. Mientras tanto la página publicada es la del
+  2026-09-28 (§0), sin la tarjeta.
+- Lo que sigue siendo de los consumidores: las plantillas y su geometría de dibujo (Greenhouse
+  `catalogs/insights-*`, Think `src/components/insights/*`). Las hojas aprobadas con cifras reales de un cliente se
+  quedan en Greenhouse como evidencia y **no** se copian al Lab público.
+- **Copias que quedan** (aún no consumen el paquete):
   1. **Roles de color de datos**: `greenhouse-eo/src/lib/artifact-composer/brand-packs/axis/editorial-roles.json`
-     (roles `dataCurrent/Prior/Opportunity/Absence{OnPaper,OnNavy}`, `dataHighlightOnNavy`) copiados en
-     `efeonce-think/src/lib/insights-tokens.ts` (`dataRoles`). La copia llegó a divergir (el dato «anterior» sobre
-     papel era `#0e8c82` en Think); **resuelto 2026-09-28** (efeonce-think `b3c5820`, en producción): Think usa
-     `#1f9e94` (`--axis-deck-role-dataPriorOnPaper` / teal-650), igual que los PDF; 3,3:1 como relleno sobre blanco.
-     Ese desvío es justamente el riesgo de tener dos copias sin fuente común.
+     (roles `dataCurrent/Prior/Opportunity/Absence{OnPaper,OnNavy}`, `dataHighlightOnNavy` y, desde TASK-1975,
+     `dataStepOnPaper/OnNavy`, `deltaBetter/WorseOnPaper/OnNavy`, que apuntan a variables `--axis-ppt-*` /
+     `--axis-deck-*`). Think copia los tokens de AXIS `efeonceInsights` a mano (`efeonce-think/src/lib/insights-tokens.ts`).
+     Ya divergieron una vez (el dato «anterior» sobre papel era `#0e8c82` en Think; **resuelto 2026-09-28**, Think
+     `b3c5820`: `#1f9e94`, igual que los PDF). Adoptar el paquete en los dos consumidores es el siguiente paso.
   2. **Geometría de las 15 familias**: `greenhouse-eo/src/lib/artifact-composer/chart-geometry.ts` +
-     `catalogs/insights-shared/figure-svg.ts` frente a `efeonce-think/src/lib/insights-chart-geometry.ts` +
-     `src/components/insights/ChartFigure.astro`. Regla vigente mientras no se extraiga: la geometría de la web nunca
-     diverge de la de los PDF (lessons.md, waffle 2026-09-28).
+     `catalogs/insights-shared/figure-*.ts` frente a `efeonce-think/src/lib/insights-chart-geometry.ts` +
+     `ChartFigure.astro`. Próxima extracción a AXIS según su Lab («En AXIS y lo próximo»), sin implementar. Regla
+     vigente: la geometría de la web nunca diverge de la de los PDF (el waffle por unidad, `waffleUnitGeometry`, se
+     replicó en Think en el mismo cambio).
 
 ## 2. Marca de producto
 
@@ -109,7 +116,8 @@ ya trae los archivos de Insights (ninguna de estas superficies los usa todavía)
 
 ## 3. Informe PDF (Artifact Composer; en producción, emisión OFF)
 
-**A4 `insights-report`** — 794 × 1123 px (`catalogs/insights-report/registry.json`), 15 plantillas `built`:
+**A4 `insights-report`** — 794 × 1123 px (`catalogs/insights-report/registry.json`), 15 plantillas `built` + 5 de
+TASK-1975 (locales, sin desplegar; al final de la tabla) = 20:
 
 | Plantilla | contentType | Para qué |
 | --- | --- | --- |
@@ -128,14 +136,25 @@ ya trae los archivos de Insights (ninguna de estas superficies los usa todavía)
 | `ReportFigureColumnsPage` | `report-figure-columns` | columnas agrupadas sobre un eje compartido |
 | `ReportFigureTargetsPage` | `report-figure-targets` | resultado contra la meta (bullet) |
 | `ReportFigureTrendPage` | `report-figure-trend` | tendencia en líneas por rol |
+| `ReportFigureStatPage` | `report-figure-stat` | **tarjeta de cifra** (TASK-1975): retícula de hasta 6 cifras, sin cifra principal en el héroe |
+| `ReportFigureWaterfallPage` | `report-figure-waterfall` | cascada «qué explica el cambio»: barras desde 0, signo siempre impreso |
+| `ReportFigureWafflePage` | `report-figure-waffle` | waffle de un cuadro por unidad (≤ 4 partes, ≤ 100 unidades) |
+| `ReportFigureDonutPage` | `report-figure-donut` | dona de 2–3 partes con cuenta y participación |
+| `ReportFigureStackedPage` | `report-figure-stacked` | barras apiladas por período, segmento base abajo |
 
 **Deck `insights-deck`** — 1280 × 720, 12 plantillas: `InsightsCoverSlide` (siempre navy), `Summary`, `Chapter`,
-`Narrative`, `Reading`, `Plan`, `Limits`, `BackCover` y las cuatro `InsightsFigure{Comparison,Columns,Targets,Trend}Slide`.
+`Narrative`, `Reading`, `Plan`, `Limits`, `BackCover` y las cuatro `InsightsFigure{Comparison,Columns,Targets,Trend}Slide`;
+TASK-1975 suma (local) `InsightsFigure{Stat,Waterfall,Waffle,Donut,Stacked}Slide` (cifras 3×2, todas en navy) = 17.
 **Sin** portada clara (`render/insights-deck-mapper.ts:185`, `light: null`), sin índice y sin tabla.
 
 **Compartidos** `catalogs/insights-shared/`: `figure-svg.ts` (geometría pura de columnas y líneas), `figure-hooks.ts`,
 `editorial-resolvers.ts`, `channels.ts`, `layout-hooks.ts`. Roles de color: `brand-packs/axis/editorial-roles.json`
 (un color de dato se pide por lo que la serie ES —actual, anterior, oportunidad, ausencia— y por el fondo).
+
+> **TASK-1975 (local, sin desplegar)** amplía este párrafo: `waterfall`, `waffle`, `donut` y `bar_stacked` tienen página
+> (`PDF_FIGURE_FAMILIES`), la tarjeta de cifra (`chapter.stats`) abre el capítulo, y el orden de páginas es el del
+> criterio (`chapterFigureSlides`). Reglas y rechazos en [`contracts.md`](contracts.md) § Contrato de render de las
+> figuras nuevas. El texto de abajo describe el runtime desplegado hoy.
 
 **Familias → página** (`src/lib/efeonce-insights/render/figure-slots.ts`): `bar_grouped` con dimensiones que son
 métricas → Comparison; `bar` o `bar_grouped` con canales → Columns; `bullet` → Targets; `line` → Trend. Las otras 11
@@ -152,7 +171,20 @@ mapa de calor), ambas `to-do`.
 `<dirección>[:<tono>]`. La **dirección** (`up`/`down`/`flat`) es la del valor y decide el triángulo; el **tono**
 (`better`/`worse`/`neutral`) dice si el cambio es bueno para esa métrica y decide el color: `better` pinta
 `delta--better`, todo lo demás `delta--plain`. Sin tono se lee subir = mejor. Así «▼ 7,6 %» de RpA puede ir en el tono
-bueno.
+bueno. **Desde TASK-1975 (local):** `worse` pinta `delta--worse` (rojo, ya no gris), con la dirección por métrica de
+`METRIC_DIRECTIONS`; triángulo de puntas redondeadas en toda variación; **tono por fondo** — papel (A4 y Live) =
+variante A, píldora teñida con texto en tono; navy (deck y secciones oscuras del Live) = variante C, sin píldora
+rellena, tono sólo en el triángulo y la cifra en `navyLead`. Motivo: sobre navy el rojo de «empeoró» era el mismo coral
+de «oportunidad» (`#ff7063`).
+
+**Tarjeta de cifra (TASK-1975, aprobada 2026-10-03; local).** Responde «¿cuánto es y cómo cambió?». Anatomía: nombre
+(≤ 3 palabras, ≤ 24 caracteres, nunca truncado), ícono, «Estimado» si aplica, cifra grande con cifras tabulares y su
+unidad pequeña (`parts`), variación con triángulo + tono + texto, «vs {valor} en {período}» con la cifra destacada,
+«Menor es mejor» cuando subir es malo, «Primer período medido» sin comparable, «—» y «Sin dato en …» sin valor (nunca 0).
+Retícula: hasta 6 cifras por página/lámina, mismas columnas en A4, deck y web (AXIS `a141aaf`). Dirección
+`docs/ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md`, canvas
+<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>, hojas `paginas/{Premium,Deck}-Cifras.png`. Las cinco figuras nuevas
+miden ≤ 1 % contra sus hojas (31 hojas en total dentro del umbral) y el gate visual de Insights queda en 37 frames.
 
 **Portada por cliente o encargo** (`contracts/cover.ts`, `render/cover.ts`): encargo (≠ auto) > organización (≠ auto)
 > auto; auto = navy sólo si la organización tiene logo apto para fondo oscuro (`logo_on_dark_asset_id`), si no blanca.
@@ -187,6 +219,14 @@ igual las respuestas reales y los fixtures de desarrollo.
   llama a Greenhouse** (el flag no la afecta). Organización «Marca de ejemplo», chip «Muestra con datos de ejemplo»,
   aviso en el pie, CTA «Conversemos» → `mailto:sales@efeoncepro.com?subject=Efeonce Insights`, título «Muestra ·
   Efeonce Insights». Muestra además un código ficticio `EO-INS-000123 · versión 2`.
+
+**Tarjeta de cifra en el Live (TASK-1975; Think `main` local `cd8cda5` + `0fb8254`, sin push).**
+`src/components/insights/StatCard.astro`: `<dl>`, retícula por cantidad, una columna a 390 px, consume el modelo 1.4 sin
+calcular nada (`chapter.stats`, `parts`, `count`, `comparison`, `firstPeriod`). **Motion aprobado sólo en el Live**
+(`docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`): la cifra recorre del valor anterior al actual
+(150–1.250 ms, curva enfatizada), luego la variación toma su tono y el triángulo entra en su dirección; 70 ms entre
+tarjetas; nunca cuenta desde cero; número que corre `aria-hidden`; movimiento reducido, sin JS e impresión = estado
+final. PDF y deck son estáticos. Waffle por unidad en `insights-chart-geometry.ts`.
 
 **Código.** `src/components/insights/{InsightReport,ModuleScene,ChartFigure,FactMark}.astro`,
 `src/lib/insights-{view,copy,tokens,chart-geometry,fixtures,accept}.ts` + `insights.ts` (cliente server-side),
@@ -300,7 +340,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 
 ## 6. Qué no hacer
 
-- Nunca crear en AXIS componentes o contratos de la UI de Insights mientras la frontera de §1 no cambie por decisión.
+- La frontera de §1 cambió el 2026-10-03: los contratos y tokens de Insights nacen en AXIS. Nunca crear uno nuevo
+  allí sin decisión del operador, ni publicarlo (push/tag) sin su OK; nunca copiar a mano un valor nuevo a un consumer.
 - Nunca copiar a mano otro SVG de la marca a un consumidor: sale de `@efeoncepro/axis-brand-assets` (Think ya tiene
   copias manuales; es deuda, no patrón).
 - Nunca armar el lockup con los dos logos, ni poner «by efeonce», ni firmar una pieza con Insights.
@@ -317,7 +358,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 2. *(Cerrado: al 2026-09-29 Greenhouse fija `axis-brand-assets` 0.4.5, que ya trae los archivos de Insights; que
    una superficie los use sigue siendo el gap 1.)*
 3. Roles de datos y geometría de gráficos duplicados en dos consumidores; ya produjeron una divergencia de color
-   (resuelta en Think `b3c5820`, §1).
+   (resuelta en Think `b3c5820`, §1). Con TASK-1975 los roles viven como token `efeonceInsights` en AXIS (local, sin
+   publicar), pero Think todavía los copia y Greenhouse los resuelve con su `editorial-roles.json`.
 4. Drift en AXIS: la tabla del README raíz y `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») no
    reflejan `axis-brand-assets` 0.4.0 (25 SVG).
 5. *(Cerrado el 2026-09-28: la página del Lab `/references/insights/` se publicó, AXIS main `3dfbf0e`. Se conserva el
@@ -342,3 +384,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    láminas van tal cual, sin «próximamente» («Deja esos datos... No marques nada en el deck como provisional, asumo la
    responsabilidad»); el estado de arriba queda como registro. Si cambia el estado de un formato (por ejemplo, se
    enciende el correo), actualízalo aquí y en la norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
+9. **Propuesta pendiente de aprobación — tarjetas de cifra con isotipo de canal** (AI Overview, ChatGPT, Gemini,
+   Perplexity): tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y `Cifras-Canal-Norma` en el canvas de TASK-1975
+   (<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>). **No implementada**; no la construyas sin la decisión.
+10. **Color por rol de parte en waffle y dona.** Hoy el color va por orden de las partes; el plan aún no declara `role`
+    de parte. Decisión pendiente del operador.

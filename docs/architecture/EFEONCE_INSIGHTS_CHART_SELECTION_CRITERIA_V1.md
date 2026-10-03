@@ -1,8 +1,9 @@
 # Efeonce Insights — criterio de selección de gráficos V1
 
-- Status: **Accepted** — criterio aprobado y canonizado por el operador el 2026-10-03; **implementación pendiente**
-  (task de implementación de EPIC-045, por crear). Hasta que esa task cierre, el runtime sigue eligiendo figuras con
-  la lógica actual (ver §2).
+- Status: **Accepted** — criterio aprobado y canonizado por el operador el 2026-10-03; **code complete, rollout
+  pendiente** en [TASK-1974](../tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) (planner,
+  contrato y modelo web) y [TASK-1975](../tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) (render y
+  diseño). Hasta el release, producción sigue eligiendo figuras con la lógica anterior (ver §2 y arquitectura §14.12).
 - Date: 2026-10-03
 - Owner: Platform / Architecture + Client Experience; Julio Reyes como autoridad de producto.
 - Scope: planificador editorial de Insights (contrato editorial v2), matriz familia × evidencia, catálogos PDF
@@ -10,7 +11,8 @@
 - Reversibility: two-way; cambia cómo se planifican las ediciones nuevas. Las ediciones ya emitidas son snapshots
   congelados y no se reescriben.
 - Validated as of: 2026-10-03 — caso de referencia medido con el código en producción (septiembre 2026 contra agosto,
-  Berel y Sky). El criterio en sí no tiene código todavía.
+  Berel y Sky) y vista previa real con el criterio implementado en local (`scripts/insights/preview-edition.ts
+  --editorial-v2`).
 - Program: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 - Technical contract: [arquitectura](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §15 («Familias de gráfico (matriz v2)») ·
   [ADR del dominio](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md).
@@ -28,13 +30,13 @@ No reemplaza la matriz familia × evidencia (`editorial/family-evidence-matrix.t
 puede dibujar** un productor con la evidencia que existe; este criterio dice **cuál de ellas conviene** para la
 pregunta que responde el dato.
 
-## 2. Estado actual del runtime vs. estado objetivo
+## 2. Producción vs. código del criterio
 
-| Aspecto | Estado actual (código en producción, 2026-10-03) | Estado objetivo (este criterio) |
+| Aspecto | En producción (2026-10-03) | Código del criterio (TASK-1974 + TASK-1975, local, rollout pendiente) |
 |---|---|---|
-| Contrato de familias | 15 familias en `CHART_FAMILIES` (`contracts/chart-spec.ts`) | Igual; se suma la **tarjeta de cifra** como tipo de figura nuevo, que no es una familia de gráfico |
-| Familias con evidencia | Matriz `family_evidence_matrix_v2`: barras, barras agrupadas, línea, bullet, cascada y waffle | Se amplía para habilitar las familias que el criterio pide y hoy figuran sin evidencia (dona, barras apiladas), cada una con su evidencia en el adapter dueño |
-| Familias con página PDF | 4: barras, barras agrupadas, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`); las demás se omiten del PDF y quedan sólo en la web | Plantillas PDF y deck también para cascada, waffle, dona y barras apiladas, más la tarjeta de cifra |
+| Contrato de familias | 15 familias en `CHART_FAMILIES` (`contracts/chart-spec.ts`) | Igual, más `ChartSpecV1.question` y la **tarjeta de cifra** (`PlanStatFigureV1`, `chapter.stats`), que es figura y no familia de gráfico |
+| Familias con evidencia | Matriz `family_evidence_matrix_v2`: barras, barras agrupadas, línea, bullet, cascada y waffle | `family_evidence_matrix_v3`: suma dona (visitas desde IA por asistente de GA4) y barras apiladas (visitas orgánicas con y sin interacción de GA4) como `producer_now` |
+| Figuras con página PDF | 4: barras, barras agrupadas, línea y bullet (`PDF_FIGURE_FAMILIES`) | 8 familias (`bar`, `bar_grouped`, `line`, `bullet`, `waterfall`, `waffle`, `donut`, `bar_stacked`) más la tarjeta de cifra, en A4 y deck |
 | Cómo se elige la figura | Por la forma del dato; una métrica con meta puede aparecer a la vez contra la meta y contra el período anterior | Por la pregunta del lector (§4), sin duplicar hechos y con la variedad sólo como desempate |
 
 ## 3. El principio
@@ -82,7 +84,12 @@ El orden importa: la regla 3 nunca pasa por encima de la 1 ni de la 2.
 - La variación usa **tonos semánticos**: verde si el cambio es mejor, rojo si es peor y gris si es neutro (sin
   dirección declarada o sin cambio). El triángulo sigue al valor y el tono sigue a la dirección de la métrica. La
   píldora es la misma en la tarjeta, bajo las columnas y en las tablas.
-- El período se escribe con el valor anterior: «vs {valor} en {período}».
+- El período se escribe con el valor anterior: «vs {valor} en {período}». Con valor y sin período anterior, la tarjeta
+  dice **«Primer período medido»** en vez de una variación.
+- **Tono por fondo** (aprobado 2026-10-03, tras medir la saturación): sobre **papel** (variante A) la variación va en
+  píldora teñida; sobre **navy** (variante C) no hay píldora rellena: el tono va sólo en el triángulo y la cifra en
+  tinta suave (`navyLead`). Razón: en navy el rojo de «empeoró» era el mismo coral de la serie «oportunidad» (#ff7063).
+- **Triángulo de puntas redondeadas** en todas las superficies (PDF A4, deck y web).
 - Dirección visual aprobada (2026-10-03):
   [`TASK-1975-efeonce-insights-stat-card-direction.md`](../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md).
 
@@ -90,8 +97,10 @@ El orden importa: la regla 3 nunca pasa por encima de la 1 ni de la 2.
 
 Aprobado por el operador el 2026-10-03, junto con la tarjeta de cifra.
 
-1. **Orden del capítulo:** cifras → evolución → explicación → composición → comparación. La familia que no aplica se
-   salta; el orden no se invierte.
+1. **Orden del capítulo:** cifras → metas → evolución → explicación → composición → comparación (el subconjunto de
+   las barras apiladas va entre composición y comparación). La familia que no aplica se salta; el orden no se invierte.
+   En código es el orden de `FIGURE_QUESTIONS` (`value_change`, `target`, `evolution`, `explain_change`,
+   `composition`, `subset`, `compare`).
 2. **Una sola página de cifras por capítulo**, al inicio: hasta 6 cifras en A4 y en deck (3×2). Con más, páginas
    equilibradas una tras otra, nunca separadas por gráficos.
 3. **Una métrica con meta va sólo en bullet, sin tarjeta** (regla 2 de §4).
@@ -139,7 +148,7 @@ Medido el 2026-10-03 con el código en producción, septiembre 2026 contra agost
 | Tráfico orgánico estimado (barras) | Valor y cambio | Tarjeta con marca «estimado» | Valor solo |
 | Visitas orgánicas al sitio y con interacción (barras) | ¿Cuántas y cuántas interactuaron? | Barras apiladas | Subconjunto dentro del total |
 | Clics por semana (línea) | Evolución | Línea (se queda) | Correcta |
-| Qué consultas explican el cambio (cascada) | Qué explica | Cascada (se queda; falta su página PDF) | Correcta |
+| Qué consultas explican el cambio (cascada) | Qué explica | Cascada (se queda; con página PDF desde TASK-1975) | Correcta |
 | Páginas que más movieron los clics (barras) | Comparar ordenados | Barras horizontales (se queda) | Correcta |
 | Visitas desde asistentes de IA (barras) | Cuántas y de dónde | Tarjeta + dona (ChatGPT, Gemini, otros) | Valor + composición de 3 partes |
 | Tono de las respuestas (waffle) | Cómo hablan de la marca | Waffle (se queda) | 8 respuestas, cada cuadro una |
@@ -149,38 +158,55 @@ Medido el 2026-10-03 con el código en producción, septiembre 2026 contra agost
 **Resultado esperado:** Berel pasa de 7 de 10 figuras en barras a 6 familias distintas; Sky queda más corto y sin
 datos repetidos.
 
-## 8. Lo que exige implementarlo
+## 8. Estado de implementación: dónde vive cada regla
 
-Nada de esto está hecho. Es el alcance de la task de implementación de EPIC-045, por crear.
+Code complete en local (TASK-1974 + TASK-1975); rollout pendiente (arquitectura §14.12). Rutas bajo
+`src/lib/efeonce-insights/` salvo que se indique otra.
 
-1. **Tarjeta de cifra** como tipo de figura nuevo en el contrato del plan editorial. No es una de las 15 familias de
-   gráfico: es una figura de cifra. Necesita su página o slot en el informe PDF (`insights-report`), su versión en el
-   deck (`insights-deck`) y su render en Think (`efeonce-think`).
-2. **Plantillas PDF y deck** para cascada, waffle, dona y barras apiladas. Hoy `PDF_FIGURE_FAMILIES`
-   (`src/lib/efeonce-insights/render/figure-slots.ts`) contiene barras, barras agrupadas, línea y bullet; las demás se
-   omiten del PDF y quedan en la web. Sumar una familia al PDF sigue la regla de §15 de la arquitectura: plantilla en
-   el catálogo y alta en ese conjunto.
-3. **El criterio en el planificador** (`src/lib/efeonce-insights/editorial/deterministic-planner.ts`) como regla con
-   pruebas: pregunta → familia, deduplicación (la meta gana al período anterior) y desempate por variedad.
-4. **Ampliar la matriz familia × evidencia** (`src/lib/efeonce-insights/editorial/family-evidence-matrix.ts`, hermana
-   del contrato de contenido `src/lib/efeonce-insights/presentation/content-contract.ts`). Hoy dona y barras apiladas
-   figuran como `no_evidence`; habilitarlas exige el procedimiento que la propia matriz declara: evidencia en el
-   adapter dueño, productor, test y subir `FAMILY_EVIDENCE_MATRIX_VERSION`.
+| Regla del criterio | Dónde vive en el código |
+|---|---|
+| Pregunta → familia (§5) | `contracts/chart-spec.ts`: `FIGURE_QUESTIONS`, `QUESTION_FAMILIES` y `ChartSpecV1.question` (un spec con pregunta y familia incoherentes no valida, `question_family`); `editorial/figure-selection.ts`: `familiesForQuestion`, `chooseFigureFamily` (desempate por variedad, regla 3) y los límites `DONUT_MAX_PARTS`, `WAFFLE_MAX_PARTS`, `WAFFLE_MAX_UNITS`, `STACKED_MAX_SEGMENTS`, `EVOLUTION_MIN_POINTS` |
+| Orden del capítulo (§5.2.1) | `orderByQuestion` en `editorial/figure-selection.ts`; en el PDF, `chapterFigureSlides` en `render/figure-slots.ts` (cifras primero, compartido por los dos mappers) |
+| Un dato, una figura (regla 2) | `duplicatedFigureFacts` y `chartFactUse` en `editorial/figure-selection.ts`; `plan-validation.ts` rechaza con `duplicated_fact` (los totales de la cascada son la excepción de ancla) |
+| Tarjeta de cifra (§5.1) | Contrato `PlanStatFigureV1` / `PlanStatItemV1` en `contracts/plan.ts` (nombre de 3 palabras / 24 caracteres); productor `statFigureFor` en `editorial/criterion-figures.ts` (una métrica con meta no va en tarjeta); resolución única `statItemView` en `presentation/stat-card.ts` para PDF, deck y web; páginas en `render/figure-slots.ts` (`buildStatSlides`) |
+| Dirección y tono de la variación (§5.1) | `METRIC_DIRECTIONS`, `metricDirectionOf` y `changeToneOf` en `editorial/figure-selection.ts`; roles `deltaBetter*`/`deltaWorse*` en `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` |
+| Composición y subconjunto | `compositionChartsFor` (dona, waffle o barras) y `subsetChartsFor` (barras apiladas) en `editorial/criterion-figures.ts`; `withQuestion` declara la pregunta de los gráficos que ya producía el planner |
+| Orquestación | `editorial/deterministic-planner.ts`: arma la tarjeta, la figura de bullets con todas las metas del capítulo (dirección por fila), composiciones y subconjunto, y ordena por pregunta, todo bajo el contrato editorial v2 |
+| Evidencia de las familias nuevas | `editorial/family-evidence-matrix.ts` (`family_evidence_matrix_v3`: dona y barras apiladas `producer_now`, desde el adapter GA4) |
+| Reglas de dibujo (cascada que cuadra, waffle por unidad, centro de la dona, suma de las apiladas, nombre de la cifra) | `render/figure-slots.ts` (`buildFigureSlides`, `buildStatSlides`, `FIGURE_CAPACITY`, `PDF_FIGURE_FAMILIES`); geometría del waffle `waffleUnitGeometry` en `src/lib/artifact-composer/chart-geometry.ts` |
+
+Reglas del render y modelo web 1.4: arquitectura §15.
 
 ## 9. Gate de pruebas
 
-Un test que compruebe, sobre un plan real (fixtures de Berel y Sky), que:
-
-- **ningún hecho alimenta dos figuras**, y
-- **cada figura declara la pregunta que responde**.
-
-El gate se suma a los existentes del dominio (consistencia del contrato de contenido y de la matriz familia ×
-evidencia); no los reemplaza.
+`editorial/editorial-v2-producers.test.ts` («gate del criterio») comprueba, sobre los planes de los fixtures de ICO y
+AEO, que **ningún hecho del período alimenta dos figuras**, que **cada gráfico declara su pregunta** y que el capítulo
+respeta el orden. `editorial/figure-selection.test.ts` cubre la tabla de §5, el desempate, el orden, la dirección por
+métrica y los casos de Sky (OTD en barras y en bullet es duplicado) y de la cascada (sus totales conviven con la tarjeta
+de clics). El gate se suma a los existentes del dominio (consistencia del contrato de contenido y de la matriz familia
+× evidencia); no los reemplaza.
 
 ## 10. Dónde vive
 
 - **Canon técnico:** este documento + puntero en [`EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md)
   §15 + fila en [`DECISIONS_INDEX.md`](DECISIONS_INDEX.md).
+- **Sistema de diseño:** AXIS es su casa (decisión del operador, 2026-10-03): tokens `efeonceInsights`
+  (`@efeoncepro/axis-tokens`), contrato `efeonce.insights-stat-card` (`@efeoncepro/axis-ui-contracts`) y la referencia
+  del Lab `/references/insights/`. Versión 0.3.42, local sin publicar (arquitectura §6.4 y §14.12).
+- **Dirección visual y motion de la tarjeta:**
+  [`TASK-1975-efeonce-insights-stat-card-direction.md`](../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md)
+  y [`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md)
+  (sólo el Live anima; PDF y deck son estáticos).
 - **Skill `efeonce-insights`:** `references/contracts.md`, `references/lessons.md` y el router en `SKILL.md`.
 - **Documentación funcional:** `docs/documentation/insights/efeonce-insights-dominio-ediciones.md`.
 - **Manual de uso:** `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`.
+
+## 11. Propuesta pendiente: tarjetas con isotipo de canal
+
+**Propuesta, no vigente ni implementada.** Tarjetas de cifra que llevan el isotipo del canal medido (AI Overview,
+ChatGPT, Gemini, Perplexity), dibujadas en los tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y
+`Cifras-Canal-Norma` del canvas de la tarjeta. Espera aprobación del operador; hasta entonces la tarjeta de §5.1 no lleva
+isotipo de canal.
+
+También pendiente de decisión: el color por orden de las partes en waffle y dona cuando la parte no declara rol (el plan
+aún no declara `role`).

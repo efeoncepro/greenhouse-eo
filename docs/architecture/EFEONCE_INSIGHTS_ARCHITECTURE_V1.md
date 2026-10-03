@@ -6,7 +6,9 @@
 > y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
 > la vista web compartida en Think está en producción desde el 2026-09-28 (TASK-1875 complete, §14.10) y la UI del portal sigue
 > pendiente (TASK-1849); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
-> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6); el criterio de
+> selección de figuras, la tarjeta de cifra y las páginas PDF de cascada, waffle, dona y barras apiladas están **code
+> complete, rollout pendiente** (TASK-1974 + TASK-1975, §14.12 y §15). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -386,10 +388,13 @@ con proporciones propias (logo Efeonce 32 px, aire 16, filete 1 × 24 al 26 %). 
 (junto a Efeonce, Insights baja su brillo; sólo la esfera conserva el acento) y con «el acento nunca en texto
 < 24 px». Pendiente de decisión del operador; cambiarlo toca el contrato de fidelidad de TASK-1889.
 
-### 6.4 Candidatos a AXIS (follow-up, no implementado)
+### 6.4 AXIS como casa del sistema de diseño de Insights
 
-Frontera vigente: AXIS publica valores, significado y activos; la UI de producto vive en sus consumidores hasta que un
-segundo consumidor real justifique extraerla. Insights ya tiene **dos consumidores con copias a mano**:
+**Decisión del operador (2026-10-03):** AXIS es la casa del sistema de diseño de Insights; se retiró la regla de que
+AXIS no publicaba UI ni contratos de Insights. Lo primero en llegar (AXIS local, sin push ni tag; §14.12): los tokens
+`efeonceInsights` en `@efeoncepro/axis-tokens` 0.3.42, el contrato `efeonce.insights-stat-card` 0.1.0 `candidate` en
+`@efeoncepro/axis-ui-contracts` 0.3.42 y la tarjeta con sus roles en el Lab `/references/insights/`. Greenhouse
+(catálogos PDF y deck) y Think (web) son sus dos consumidores. Lo que sigue con copias a mano:
 
 - **Roles de color de datos:** `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` (PDF) copiados en
   `efeonce-think/src/lib/insights-tokens.ts` («valores copiados 1:1 de AXIS … mientras Think no consuma los paquetes
@@ -401,10 +406,11 @@ segundo consumidor real justifique extraerla. Insights ya tiene **dos consumidor
   (PDF) frente a `efeonce-think/src/lib/insights-chart-geometry.ts` + `ChartFigure.astro` (web), que declara seguir
   «las mismas convenciones».
 
-Hoy la deriva se evita a mano. Extraerlos a AXIS (tokens de roles de datos y una geometría compartida) es **pendiente de
-decisión** del operador y de una task propia; mientras tanto, AXIS sólo publica una página de referencia en el Lab
-(`apps/lab/src/pages/references/insights.astro`, publicada el 2026-09-28, AXIS main `3dfbf0e`), no componentes ni
-contratos nuevos.
+Los roles de color ya tienen su fuente en AXIS (`efeonceInsights`), pero Think todavía los **copia** de ese token porque
+no consume los paquetes privados, y el brand pack de los catálogos sigue en `editorial-roles.json`. La geometría
+compartida sigue duplicada (incluido el waffle por unidad: `waffleUnitGeometry` en `chart-geometry.ts` y su par en
+`insights-chart-geometry.ts` de Think). Que los consumidores lean el paquete en vez de copiarlo, y extraer la
+geometría, quedan para una task propia; mientras tanto la deriva se evita a mano.
 
 ## 7. API, MCP y autorización
 
@@ -1479,6 +1485,43 @@ Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insig
 regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
 producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
 
+### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (code complete, rollout pendiente, 2026-10-03)
+
+**Qué hace.** El planner elige la figura por la pregunta del lector
+([criterio](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md)), abre cada capítulo con la tarjeta de cifra y los catálogos
+PDF y deck dibujan cascada, waffle, dona, barras apiladas y la tarjeta. El contrato vigente está en §15.
+
+- **TASK-1974 (planner, contrato y modelo web).** `ChartSpecV1.question` (`FIGURE_QUESTIONS`, `QUESTION_FAMILIES`);
+  `editorial/figure-selection.ts` y `editorial/criterion-figures.ts`; `PlanStatFigureV1` (`chapter.stats`) y la regla
+  `duplicated_fact` en `plan-validation.ts`; `presentation/stat-card.ts` (`statItemView`, una sola resolución para PDF,
+  deck y web); matriz `family_evidence_matrix_v3` (dona y barras apiladas `producer_now`); modelo web **1.4**. Una sola
+  figura de bullets con todas las metas del capítulo (dirección por fila); lectura propia de la cascada.
+- **TASK-1975 (render y diseño).** Diez plantillas (`report-figure-{stat,waterfall,waffle,donut,stacked}` en
+  `insights-report`, `insights-figure-{…}` en `insights-deck`), geometría en `insights-shared/figure-*.ts`,
+  `waffleUnitGeometry` en `chart-geometry.ts`, roles AXIS nuevos en `brand-packs/axis/editorial-roles.json` y
+  `chapterFigureSlides` (cifras primero) compartido por los dos mappers. Think (`efeonce-think`): `StatCard.astro`, waffle
+  por unidad, tipos 1.4 y el motion aprobado.
+- **Verificado en local.** `pnpm insights:canvas-fidelity`: 31 hojas dentro del umbral (Deck-Agrupadas con su excepción
+  aprobada, 2,2 % con techo 2,5 %); `pnpm composer:visual-gate --catalog=insights`: 37 frames a 0 px (sección (v) de
+  `BASELINE_DELTAS.md`); vista previa real de septiembre 2026 con `scripts/insights/preview-edition.ts --editorial-v2`
+  (Berel 22 páginas + 18 láminas; Sky 10 + 8). Think: `test:insights` 25/25, `verify:insights`, `audit:insights-a11y`
+  AA y `build` verdes.
+- **No verificado con datos reales.** La dona de fuentes IA y las barras apiladas de GA4: GA4 no corre en local; están
+  probadas con fixtures.
+
+**Rollout pendiente (nada aplicado; todo es local sin push).**
+
+1. AXIS: push a `main` (despliega axis.efeonce.org) y tag `v0.3.42` (publica los paquetes), con OK del operador.
+2. Think: push a `main` (despliega producción) antes o junto con el release de Greenhouse, con OK del operador.
+3. Greenhouse: push de `develop` → staging → release a producción por el control plane (Job `artifact-worker`).
+   TASK-1974 y TASK-1975 salen en el mismo release; las ediciones internas de Berel y Sky se revisan antes de compartir.
+4. Staging: verificar dona y barras apiladas con datos GA4 reales.
+5. Gate de cierre: `pnpm test` completo y `pnpm build` (este, con autorización del operador).
+
+**Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`). Las
+tarjetas con isotipo de canal (AI Overview, ChatGPT, Gemini, Perplexity) son una **propuesta** del canvas, no aprobada
+ni implementada.
+
 
 ## 15. Contrato de contenido del informe (TASK-1962)
 
@@ -1558,23 +1601,65 @@ corto (`GH_INSIGHTS.modules[*].navLabel`), cada figura su `note`, cada hecho su 
 cada acción su `module` y cada tabla su `lead`. Think resuelve referencias y dibuja; no deduce. La única
 transformación de texto que queda en Think es tipográfica (partir el titular en negrita y resto, TASK-1958).
 
-**Familias de gráfico (matriz v2).** Con evidencia hoy: barras y barras agrupadas, línea (ICO mensual, ETV mensual y
-clics por bloque de 7 días contra el mismo bloque del período anterior), bullet (metas ICO), cascada (aporte de cada
-consulta al cambio de clics, más el resto) y waffle (tono y tipo de fuente del Grader). Los catálogos PDF tienen página
-sólo para barras, barras agrupadas, línea y bullet (`PDF_FIGURE_FAMILIES` en `render/figure-slots.ts`): los mappers OMITEN a propósito
-las demás familias (la web las dibuja; el PDF conserva el hallazgo y la tabla), en vez de rechazar el informe entero.
-Una familia nueva en el PDF exige su plantilla en el catálogo y sumarla a ese conjunto.
+**Familias de gráfico (matriz v3, `family_evidence_matrix_v3`).** Con evidencia hoy: barras y barras agrupadas, línea
+(ICO mensual, ETV mensual y clics por bloque de 7 días contra el mismo bloque del período anterior), bullet (metas ICO,
+todas las del capítulo en una figura con dirección por fila), cascada (aporte de cada consulta al cambio de clics, más
+el resto), waffle (tono de las respuestas del Grader), dona (visitas desde IA por asistente de GA4: los dos que más traen
++ «Otros asistentes») y barras apiladas (visitas orgánicas con y sin interacción de GA4, este período y el anterior).
 
-**Criterio de selección (aprobado 2026-10-03, implementación pendiente).** Qué familia usar para cada dato lo decide
+**Figuras con página PDF.** `PDF_FIGURE_FAMILIES` (`render/figure-slots.ts`) contiene `bar`, `bar_grouped`, `line`,
+`bullet`, `waterfall`, `waffle`, `donut` y `bar_stacked`; además, la **tarjeta de cifra** (`chapter.stats`) tiene su
+página (`report-figure-stat` en `insights-report`, `insights-figure-stat` en `insights-deck`). `chapterFigureSlides`,
+compartido por los dos mappers, pone la página de cifras primero y después los gráficos en el orden de su pregunta. Una
+familia fuera del conjunto se OMITE a propósito del PDF (la web la dibuja; el PDF conserva el hallazgo y la tabla), en
+vez de rechazar el informe entero; sumar una exige su plantilla en los dos catálogos y el alta en ese conjunto. Reglas
+del render, que rechazan con causa (`InsightsRenderRejectedError`) en vez de dibujar algo que mienta:
+
+- **Cascada:** del total anterior al actual; si inicial + Σ aportes ≠ final, «no cuadra» y se rechaza.
+- **Waffle por unidad:** cada cuadro es una unidad contable (`waffleUnitGeometry`: 5 columnas hasta 30 unidades, 10
+  hasta 100); hasta 4 partes y conteos enteros que suman entre 1 y 100 (fuera de eso no tiene página); si las partes no
+  suman el total medido, se rechaza.
+- **Dona:** 2–3 partes; la participación se reparte por restos mayores; el centro muestra la participación de la parte
+  principal si la métrica total ya tiene tarjeta, y el total si no.
+- **Barras apiladas:** el total del período es la suma de sus segmentos (hasta 4).
+- **Tarjeta:** hasta 6 cifras por página en A4 y deck (`FIGURE_CAPACITY`), con más en páginas equilibradas seguidas;
+  un nombre de más de 3 palabras o 24 caracteres se rechaza. La cifra principal del deck se mide por ancho visible
+  (sin espacios ni signo).
+
+**Tono semántico de la variación, por fondo.** Verde si el cambio es mejor, rojo si es peor y gris si es neutro, con la
+dirección declarada por métrica (`METRIC_DIRECTIONS` en `editorial/figure-selection.ts`; «Menor es mejor» se imprime
+sólo cuando subir es malo). Sobre **papel** (variante A) la variación va en píldora teñida; sobre **navy** (variante C)
+no hay píldora rellena: el tono va sólo en el triángulo y la cifra en tinta suave (`navyLead`), porque en navy el rojo de
+«empeoró» coincidía con el coral de «oportunidad». El triángulo tiene las puntas redondeadas en todas las superficies.
+Roles en `brand-packs/axis/editorial-roles.json`: `deltaBetterOnPaper`/`deltaWorseOnPaper`, `deltaBetterOnNavy`/
+`deltaWorseOnNavy` y `dataStepOnPaper`/`dataStepOnNavy` (paso «Sumó» de la cascada y 4.ª parte de waffle y apiladas). La
+fuente de esos valores es AXIS (`efeonceInsights`, §6.4). Las series nunca se pintan de verde o rojo por subir o bajar:
+usan roles de dato.
+
+**Modelo web 1.4 (aditivo, TASK-1974).** Cada capítulo trae `stats` (tarjetas de cifra, `question: 'value_change'`,
+antes de los gráficos) y sus gráficos ordenados por `spec.question`. Cada cifra (`InsightWebStatItemV1`) llega resuelta:
+`display`, `estimated`, `direction`, `change {display, direction, tone}` (variación sin signo), `versus` («vs 16.390 en
+agosto de 2026») y sus piezas `comparison {display, period}`, `firstPeriod` («Primer período medido»), `noData`,
+`lowerIsBetter`, `parts` (cifra grande y unidad pequeña) y `count {from, to, decimals}`. Think imprime esos textos tal
+cual; nunca calcula la variación, su tono ni el período. La resolución es `statItemView` (`presentation/stat-card.ts`),
+la misma para PDF, deck y web.
+
+**Motion de la tarjeta, sólo en el Live.** En Think la cifra recorre del valor anterior al actual (`count`) y después la
+variación pasa de gris a su tono y el triángulo entra en su dirección; con `prefers-reduced-motion` se muestra el estado
+final. El PDF A4 y el deck son estáticos. Contrato:
+[`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md).
+
+**Criterio de selección (aprobado 2026-10-03; code complete en TASK-1974 + TASK-1975, rollout pendiente, §14.12).** Qué
+familia usar para cada dato lo decide
 [`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md); la matriz de
 arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
 
-1. **La pregunta decide la familia** (tabla pregunta → familia del criterio, con la tarjeta de cifra como figura nueva).
-2. **Un dato no se muestra dos veces:** con meta, gana el bullet y sobra la barra contra el período anterior.
+1. **La pregunta decide la familia** (`QUESTION_FAMILIES`; la tarjeta de cifra responde «¿cuánto es y cómo cambió?»).
+2. **Un dato no se muestra dos veces:** con meta, gana el bullet y la métrica no lleva tarjeta; `plan-validation.ts`
+   rechaza el plan con `duplicated_fact` (los totales de la cascada son la excepción de ancla).
 3. **La variedad sólo desempata:** nunca justifica una figura peor.
 
-Hasta que cierre la task de implementación de EPIC-045 (por crear), el planner sigue con la lógica actual.
+Orden del capítulo: cifras → metas → evolución → explicación → composición → subconjunto → comparación.
 
 **Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
-ni la petición (sólo la decisión); Think sí. Página de plan en los PDF y cascada para «qué explica el cambio» quedan
-como follow-up de UI (TASK-1958/TASK-1902).
+ni la petición (sólo la decisión); Think sí. La página de plan en los PDF queda como follow-up de UI.

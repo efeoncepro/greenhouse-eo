@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975, code complete local 2026-10-03, not deployed), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -25,7 +25,7 @@ it without repeating what already cost a day*. It grows with every task: see the
    rollback, deploy traps.
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
 7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
-   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates, family → page,
+   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates in production; 20 + 17 locally with TASK-1975 — stat card, waterfall, waffle, donut, stacked —, family → page,
    variation rule, data roles, cover), the live Think report (anatomy, 1.0 vs 1.1, presentation mode, states, motion,
    print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: the AXIS Lab
    page `https://axis.efeonce.org/references/insights/`, published 2026-09-28 (AXIS main `3dfbf0e`; agent data at
@@ -82,6 +82,12 @@ it without repeating what already cost a day*. It grows with every task: see the
   caption the common name, never the first tied fact); essentials and the thesis cite only findings (target met or
   missed, a change that prints, a unique superlative or a tie), never a bare value nor a 0,0 % change; the first
   reading of every chapter is its main finding. Sealed editions are immutable, so a fix applies to new editions only.
+- **Figure selection (TASK-1974, code complete local; applies only to plans built with editorial v2)**: the reader's
+  question picks the family (`ChartSpecV1.question` + `QUESTION_FAMILIES`; an incoherent pair does not validate), one
+  current-period fact feeds ONE figure of the chapter (`duplicated_fact`; only waterfall totals are anchors), and the
+  stat card lives in `chapter.stats`, outside the 15 families. A stat name has ≤ 3 words and ≤ 24 characters: the
+  validator and the render REJECT a longer one, never truncate it. Value, change, tone and «vs» of a card come only from
+  `presentation/stat-card.ts` (`statItemView`) for PDF, deck and web. Plans sealed before the criterion are not re-judged.
 - **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
   returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
   recovered. Only ISSUED client editions; TTL 1–90 days (default 30); max 20 active links per edition (429
@@ -124,8 +130,11 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
 - Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs).
-  Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos +
-  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` (decidido 2026-10-03; implementación pendiente).
+  Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos (+
+  § Pregunta de la figura, § Tarjeta de cifra, § Modelo web 1.4, § Contrato de render de las figuras nuevas) +
+  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` (decidido 2026-10-03; implementado por TASK-1974
+  planner/contrato/modelo web y TASK-1975 páginas/tarjeta/diseño, **code complete local, sin desplegar**: rollout
+  AXIS → Think → Greenhouse en `references/operations.md` § TASK-1974 / TASK-1975).
   Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
   2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
   and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/delivery/schedules stay OFF in Production, sharing ON
@@ -159,10 +168,12 @@ it without repeating what already cost a day*. It grows with every task: see the
   (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
 - Product mark, report look, live-report UI, AXIS Lab page → [`references/ui-and-brand.md`](references/ui-and-brand.md)
   + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
-  `axis-design-system`. Boundary (binding): AXIS publishes the brand files (`insights-{logo,isotype,lockup}-*`,
-  `axis-brand-assets` 0.4.0) and a reference page, **never** Insights UI components or contracts; the UI lives in its
-  consumers (Greenhouse catalogs, Think). Data-color roles and chart geometry are duplicated in both consumers and are
-  a documented extraction follow-up, not something to fix inline. The PDF/deck covers and chapter openings show a TYPE
+  `axis-design-system`. Boundary (binding, **changed by the operator on 2026-10-03**): AXIS is the home of the Insights
+  design system — brand files (`insights-{logo,isotype,lockup}-*`, `axis-brand-assets`), data-color tokens
+  `efeonceInsights`, contracts (`efeonce.insights-stat-card` 0.1.0 `candidate`) and the Lab reference; Greenhouse
+  catalogs and Think are its consumers and keep the templates. That AXIS work is LOCAL (AXIS `main` unpushed, tag
+  `v0.3.42` pending). Think still copies the tokens and chart geometry is still duplicated: adopt the package / extract,
+  never fix a copy inline. The PDF/deck covers and chapter openings show a TYPE
   version (Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking —spaced capitals, not true small caps—,
   `.brand-product` / `.product`), not the official `insights-lockup-*` file; on the navy covers that word is painted in
   the accent, an open operator decision (`ui-and-brand.md` §7.7). Email/favicon/portal/MCP carry no mark; Greenhouse
