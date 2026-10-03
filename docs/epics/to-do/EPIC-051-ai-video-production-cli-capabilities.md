@@ -70,7 +70,16 @@ puente quede con costo, manifiesto y, donde aplique, la verificación del pipeli
 - `docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md` (método, estados y gates)
 - `.claude/rules/brand-photography.md` (cast, Nexa, Sparks, mascotas de partner, uniforme, firma)
 
+## Arquitectura
+
+Los pasos de cada pieza se orquestan con el runner de [ADR-025 (Proposed)](../../architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md):
+plan declarativo por toma, ejecutores (`cli`, `puente`, `humano`, `local`), compuertas automática, humana y de gasto, y
+ledger append-only. Las demás tasks del epic son **ejecutores** de ese runner: devuelven manifiesto y código 0/2/3/1.
+
 ## Child Tasks
+
+- `TASK-1989` — Runner de producción de video (`pnpm video:plan|run|approve|budget|status`): núcleo del plan, ledger con
+  retome e invalidación, compuertas y tres recetas (ADR-025). **Espina del programa.**
 
 - `TASK-1979` — Borrar y seguir objetos en video: SAM 2 (máscara por cuadro) + Wan VACE (borrado) sobre
   `pnpm ai:inpaint video`, con detector de residuo y deriva por banda. **Primera candidata.**
@@ -89,7 +98,7 @@ puente quede con costo, manifiesto y, donde aplique, la verificación del pipeli
 - `TASK-1986` — Puente de la CLI de Higgsfield como motor de nuestros CLIs: costo en créditos, manifiesto, retome por
   job, reconciliación crédito→USD y canario de humo C11 de las capacidades puente más usadas.
 
-**Orden:** TASK-1986 temprano (habilita a las demás a comparar contra el puente de Higgsfield desde el banco);
+**Orden:** TASK-1989 Slices 1–3 primero o en paralelo (la espina: sin gasto); TASK-1986 temprano (habilita a las demás a comparar contra el puente de Higgsfield desde el banco);
 TASK-1979 y TASK-1980 en paralelo (son las de más uso y la primera candidata conocida); TASK-1981 en
 paralelo desde el inicio (0 créditos, no compite por presupuesto); TASK-1982 y TASK-1983 usan el banco de TASK-1980;
 TASK-1984 espera a TASK-1977; TASK-1985 al final.
@@ -136,7 +145,7 @@ USD 0,00 · cuenta B USD 11,46: alcanza para C1 + C6 (o C1 + C2 parcial); el res
 
 ## Exit Criteria
 
-- [ ] Las diez tasks hijas quedaron `complete` o explícitamente descartadas con razón.
+- [ ] Las once tasks hijas quedaron `complete` o explícitamente descartadas con razón.
 - [ ] Cada operación de producción y post de la taxonomía §3.5 tiene, en la guía §4.3, un motor con canario de
       garantía o una fila de hueco con razón y fecha.
 - [ ] Cada canario del plan tiene README en `ai-generations/<fecha>_<task>-canary/` con costo estimado y costo real
