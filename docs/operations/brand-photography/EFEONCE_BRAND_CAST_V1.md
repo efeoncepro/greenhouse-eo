@@ -226,6 +226,15 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    anclas de **Antonio e Isabella** la frente sale con una **textura craquelada inventada** al 100 %, el riesgo que el
    LEEME de Nexa anota para la alta resolución: antes de usarlas en un primer plano se miran al 100 % y, si molesta, se
    rehacen o se usa la v3 de 1024 como ancla.
+   **El cuerpo entero se EXTIENDE desde la foto elegida, no se regenera [operador, 2026-10-02: «Hum en la foto de
+   cuerpo entero no se ve bien»].** Regenerado desde un retrato, el cuerpo de Hum salió con otra silueta (recta, sin sus
+   curvas), jeans rectos holgados (los pedía el prompt), pose de maniquí y ≈ 8 cabezas de alto. La v4 pone la elegida
+   (cabeza a medio muslo) arriba en un lienzo 1024×1536 al 57 %, el modelo rellena **sólo** piernas, pies y fondo con
+   máscara (`ai:image --mask`) y se entrega su salida **sin reponer el original**: reponerlo dejó un recuadro por el gris
+   del fondo, el mismo caso que documenta `foto:expandir --reponer no`. Resultado: su cuerpo, su ropa y su pose, ≈ 7,5
+   cabezas, cara igual al 100 %. `foto:expandir` no sirve aquí porque siempre apoya la foto abajo; extender hacia abajo
+   queda como mejora de la herramienta. Caso: `realismo-v3/hum/hum-cuerpo-v4.png` (+ `expandir/`). Los cuerpos de Karo,
+   Sophia, Isabella y Antonio salen de retratos de pecho: el modelo inventa su cuerpo igual; se revisan con el mismo ojo.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
 5. **Registro.** Hoy un personaje de campaña se declara ficha por ficha en `casting`
