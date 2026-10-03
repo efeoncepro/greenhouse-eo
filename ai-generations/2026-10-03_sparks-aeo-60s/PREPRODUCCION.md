@@ -59,10 +59,14 @@ contexto, con una persona que decide.
 
 ## 3. Guion con locución (VO) [propuesta]
 
-Voz **[decisión del operador, 2026-10-03]**: narrador cercano y sereno, **acento chileno** (por ahora), tuteo, sin tono
-publicitario ni modismos marcados; **ElevenLabs, idealmente v4** **[pendiente: verificar que exista la v4; si no, la
-versión más nueva disponible]**, voz de librería con licencia comercial registrada. **≈ 95 palabras**, ritmo
-≈ 2,2 palabras por segundo, con silencios planificados (S2 y S8 respiran sin voz).
+Voz **[decisión del operador, 2026-10-03, revisada]**: **narrador de caricatura**, «como un narrador de Nickelodeon
+en español»: energía alta, cálido, con la sonrisa en la voz, énfasis marcados y pausas con intención cómica, en
+**español neutro latinoamericano de doblaje** (reemplaza el acento chileno de la primera versión). Lúdico sin
+infantilizar: el público es B2B y los claims siguen el cuidado de abajo. **No imita a ningún locutor ni personaje
+real**: se describe el estilo, nunca una voz identificable. **ElevenLabs** (voz diseñada o de librería con licencia
+comercial registrada; la versión de modelo más nueva disponible, **[pendiente: verificar]**). **≈ 95 palabras**, ritmo
+≈ 2,2 palabras por segundo (el estilo animado tiende a acelerar: medir la toma real contra la grilla), con silencios
+planificados (S2 y S8 respiran sin voz).
 
 | Toma | Tiempo | VO | Texto en pantalla (compuesto) |
 |---|---|---|---|
@@ -189,7 +193,12 @@ el montaje.
 - Prioridad: VO > logo sonoro > SFX de historia > música > ambiente.
 - Loudness: **-16 LUFS integrados, -1 dBTP** (web y LinkedIn); versión a -14 LUFS si va a YouTube [pendiente: destino].
 - Stems: VO · música · SFX · ambiente; versión **M&E** (sin VO) para otros idiomas.
-- Subtítulos en español (SRT y quemados para redes).
+- **Subtítulos [decisión del operador, 2026-10-03]**: en español, **quemados** en la versión para redes y **SRT** aparte
+  para YouTube, LinkedIn y el sitio. Borrador con tiempos provisorios en [`SUBTITULOS.es.srt`](SUBTITULOS.es.srt): se
+  re-sincroniza contra la toma real de la voz. Reglas: máximo 2 líneas y ~42 caracteres por línea; cada subtítulo
+  ≥ 1 s en pantalla; nunca sobre la interfaz legible de S2 y S9 (ahí, arriba o se omite porque la pantalla ya lo dice);
+  tipografía Poppins Medium blanca sobre caja navy al 80 %, en el tercio inferior y dentro de las zonas seguras. En el
+  SRT accesible se agregan descriptores mínimos de sonido (`[gorjeos de los Sparks]`, `[música]`); en los quemados, no.
 - Escucha perceptual separada de la medición (regla del método).
 
 ## 9. Presupuesto de audio y preproducción (estimado, a confirmar con cada herramienta)
