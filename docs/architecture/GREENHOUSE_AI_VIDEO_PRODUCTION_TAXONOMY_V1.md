@@ -132,7 +132,7 @@ un brief por tipo. Etiquetas: `[verificado]` corrida nuestra · `[tercero]` rank
 | `fotorrealista` | hiperrealista live-action: personas, lugares, objetos reales | que parezca filmado | piel, manos, ojos, física, luz creíble, identidad estable | generativo; post propio (grade, overlay, reframe) | Veo 3.1 y Kling 3.0 [contrato, CLI de Higgsfield]; Seedance 2.5 [tercero: #1 OpenArt]; H3 Max [tercero: #1 AA imagen a video con audio]; Wan 3.0 [tercero: #1 AA texto a video] | alto | alto | valle inquietante; deriva de identidad; **personas reales: los motores ByteDance las rechazan y cobran** |
 | `cine` | registro cine de marca: look cinematográfico, luz con carácter, Nexa protagonista | que se sienta película, no stock | composición, cámara y lente, luz como fenómeno de la escena, canon del registro cine | still aprobado primero (`foto:*`), después i2v; isotipo compuesto | Cinema Studio 3.0/4.0 (cámara, lente, era, rig de luz) [contrato]; Seedance 2.5 [tercero]; Veo 3.1 [contrato] | alto | alto | frontera del registro cine (sólo Nexa protagonista); el plate se regenera, no se relumina |
 | `producto` | producto o packshot en movimiento (real o 3D) | el objeto es la verdad | forma, material, color y marca **exactos** en todos los cuadros | still aprobado con kits → i2v o cámara sobre escena quieta; marca compuesta; variantes de producto por reemplazo | Seedance 2.x (retuvo el set desde un KV [verificado, Glitch]); `h3max-camera` (escena congelada, órbita) [verificado]; Flux 3 primer/último cuadro y keyframes [verificado]; Genjutsu reemplazo de objeto [contrato] | medio | medio | la marca no se anima dentro del plano generado; filtro ByteDance con marcas |
-| `ugc` | estilo creador: cámara en mano, auténtico, «grabado con el teléfono» | que parezca orgánico | naturalidad, actuación, ritmo de plataforma; el pulido bajo es intencional | generativo; subtítulos y cortes propios | Omni i2v (microescenas UGC publicadas, modelo anterior) [verificado]; Marketing Studio video [contrato]; Seedance 2.5, Kling 3.0, Veo 3.1 [contrato] | medio | bajo | persona real o voz real exige consentimiento; disclosure IA |
+| `ugc` | estilo creador: cámara en mano, auténtico, «grabado con el teléfono» | que parezca orgánico | naturalidad, **acción del sujeto** («vivo no es mover la cámara», caso Social Wall), ritmo de plataforma; el pulido bajo es intencional | generativo; subtítulos y cortes propios | Omni i2v (microescenas UGC publicadas, modelo anterior) [verificado]; Marketing Studio video [contrato]; Seedance 2.5, Kling 3.0, Veo 3.1 [contrato] | medio | bajo | persona real o voz real exige consentimiento; disclosure IA |
 | `personaje-3d` | personaje animado 3D: Nexa, Sparks, mascotas de partner, estilo clay | que el personaje sea siempre el mismo | identidad (proporción, emblema, vestuario) entre tomas y piezas; actuación | hoja de identidad (`pre.cast-sheet`) → r2v o i2v desde pose; previs en Blender si la cámara importa | Seedance 2.5 r2v (las mascotas de partner no se rechazaron [operador]); Wan 3.0 r2v y H3 r2v [verificado, contrato del endpoint]; Kling `elements` [contrato] | medio | alto | deriva de identidad; una mascota de partner en cuadro contamina el emblema del uniforme |
 | `animacion-2d` | ilustración o dibujo animado, estilo plano | que respete un estilo dibujado | consistencia del trazo y la paleta cuadro a cuadro | **propio primero**: animar las ilustraciones propias (HyperFrames, After Effects por handoff); IA sólo si el estilo tolera reinterpretación | `wan2_6` («estilizado»), `draw_to_video` [contrato]; [sin dato] sobre estilo propio | bajo a medio | medio | la IA redibuja el estilo; las ilustraciones de Efeonce son obra propia, no stock |
 | `motion-graphics` | tipografía kinética, formas, datos animados, logo, UI abstracta | el diseño se mueve con intención | texto y marca **exactos**, timing, legibilidad, safe zones | **determinístico**: HyperFrames, `tools/brand-motion` y `tools/glitch-motion` (repo taller), After Effects por handoff; IA sólo para texturas o fondos | ninguno para el texto; texturas: cualquier motor de banda baja | 0 (más diseño) | medio a alto en diseño | todo texto generado es concept-only; el motion de marca vive en el taller |
@@ -265,7 +265,7 @@ Aquí se gasta poco y se decide casi todo. Las salidas de pre son **entradas con
 | `pre.storyboard` | guion visual por beats | G o D | cuadros clave por beat | criterio observable por beat | imagen (`pnpm ai:image`, `pnpm ai:fal` Seedream) o dibujo |
 | `pre.animatic` | storyboard con tiempos y sonido temporal | D | animatic con duración real | ritmo aprobado antes de generar | montaje determinístico |
 | `pre.previs3d` | blocking y cámara en 3D | D | playblast exportado (referencia de movimiento) | cámara y timing espaciales fijados | Blender (puente MCP local) o handoff |
-| `pre.keyframe-still` | stills de entrada: primer/último cuadro, keyframes | G | imágenes aprobadas con kits | aprobadas al 100 % **antes** de animarlas (la marca va resuelta en el still) | `pnpm foto:*`, `pnpm ai:image`, `pnpm ai:fal` Seedream, `pnpm ai:inpaint` |
+| `pre.keyframe-still` | stills de entrada: primer/último cuadro, keyframes | G | imágenes aprobadas con kits | aprobadas al 100 % **antes** de animarlas (la marca va resuelta en el still) **y coincidentes con el primer cuadro del contrato de fidelidad** (caso Glitch, §4.3) | `pnpm foto:*`, `pnpm ai:image`, `pnpm ai:fal` Seedream, `pnpm ai:inpaint` |
 | `pre.reference-build` | construir piezas: objetos aislados, vistas del sujeto, fondos, logo/vector | G o D | manifiesto de referencias con rol, hash y derechos | cada asset aprobado por separado | kits de marca + generadores de imagen |
 | `pre.cast-sheet` | hoja de identidad del cast (ángulos, expresiones, vestuario) | G | anclas de identidad | proporción y emblema medidos en foto (`foto:rostro`, `foto:emblema`) | canon de fotografía de marca |
 | `pre.coverage` | cobertura de cámaras y shot list | D | mapa de cobertura y continuidad | entradas, salidas y reservas previstas | método (companion de preproducción) |
@@ -388,7 +388,7 @@ Cupos por motor y si el video de referencia «guía» o «se edita»: guía §3 
 
 | Componente | Regla | Dueño |
 |---|---|---|
-| nativo del motor | **provisional**; se reemplaza si la pieza tiene diseño sonoro | `audio-studio` |
+| nativo del motor | **provisional**; se reemplaza si la pieza tiene diseño sonoro. Si la pieza no admite voz, **generar sin audio** (`--no-audio`; H3 no lo permite) y quitar del prompt lo que induce habla en vez de reforzar la prohibición (casos SKY y CMP-001, §4.3) | `audio-studio` |
 | voz / TTS | dicción aprobada por escucha; voz real exige consentimiento | `audio-studio` |
 | música | nunca síntesis pura para marca; medir balance antes de mostrar (guía §5.9) | `audio-studio` |
 | efectos y foley | por causa y peso; siguen el corte final | `audio-studio` |
@@ -539,6 +539,42 @@ presupuesto = Σ pilotos (costo del piloto)
   la reserva baja a lo medido.
 - **Intentos esperables:** los de la banda de dificultad (§3.14), `[criterio]` hasta calibrarlos con el banco.
 
+
+### 4.3 Casos reales clasificados (ejemplos resueltos)
+
+Piezas que Efeonce ya produjo, clasificadas con esta taxonomía. Los hechos salen de sus documentos (columna «Fuente»);
+la **dificultad la puntué yo después** sobre lo documentado y es `[criterio]`. La columna «Qué habría dicho la
+taxonomía» es la prueba: si la clasificación hubiera anticipado lo que pasó, sirve para decidir; si no, se corrige.
+
+| Caso | Clasificación | Dificultad (R I F C D E P) | Qué se hizo y qué costó | Resultado | Qué habría dicho la taxonomía |
+|---|---|---|---|---|---|
+| **SKY CMP-003, película V17** (2026-09) | `brand-film` · `hibrido/mundo-mas-ui` + avión real como `producto` · look `cine` | 0 · 0 · 1 · 2 · **3** · **3** · 0 = 9 (media) por toma, con dos ejes en 3 | H3 Max, Seedance 2.5 (por Higgsfield y por fal) y Omni; V17 = montaje de cuatro fuentes + cierre local; cartelas en código; Topaz 2×; música aportada y SFX. **> USD 150** reportados sin ledger; V9 USD 40,99; V11 USD 34,16 facturados contra 23,88 estimados | cartelas aprobadas; V17 con aprobación final y escucha pendientes | **E = 3** (UI de búsqueda y chat diegética): componer la UI (`demo-ui/render`, workflow `hybrid-world-plus-ui`) en vez de generarla dentro del cuadro. **D = 3**: tomas cortas con handles planificados. Seedance 2.5 a 1080p es banda alta: ≈ 30 s de contenido final × ≈ USD 1,1/s × 3–5 intentos × 1,43 de reserva ≈ **USD 140–235** `[cálculo]`; el gasto reportado (> USD 150) cae dentro: la fórmula lo anticipaba |
+| **CMP-001 «No fuiste tú»** (2026-09-22) | `ad-paid` · `personaje-3d/mascota-partner` (Codex) · look `corporativo-minimal` sobre negro | 1 · 0 · 0 · 0 · 2 · **3** · 2 = 8 (media) | 4 referencias; Seedance 2.5 2 tomas (USD 12,48) → `h3max-r2v` 9 tomas (USD 9,96) a 1080P, 15 s; 4:5 recortado desde 3:4; 1:1 recompuesto. **≈ USD 25,39** | aprobado (no equivale a autorizado a pautar) | **E = 3**: titular y CTA generados dentro del video; la regla es componerlos, y en el crudo 3:4 apareció un logo dibujado por el modelo. Media → **piloto barato primero**: la lección del caso fue justamente esa (H3 a USD 0,08/s contra Seedance 2.5 a USD 1,164/s). 4:5 desde 3:4: la regla de §3.10 |
+| **Glitch, intro del micrófono** (2026-07-11) | intro · `fotorrealista/persona-accion` (dedo que toca un micrófono) · look `cine` | **3** · 2 · 1 · 0 · 0 · **3** · 0 = 9 (media), con dos ejes en 3 | tomas A–Z: Omni (bloqueos y un adapter que difumina el letrero), Seedance 2.0 i2v/r2v, Veo 3.1, Kling O3 edit, finish determinístico, blocking en Blender. T–Z **≈ USD 10,44** + tokens de Seedance | **sin master; producción detenida** | Dos ejes en 3 → **piloto y bajar ejes antes de generar**: partir en dos tomas (acercarse y tocar) y componer el letrero `ON AIR` (E). Y el gate de preproducción: el **still de entrada no coincidía con el primer cuadro del contrato** (abría con contacto; el contrato pedía hover). Ningún motor arregla eso: la causa estaba en pre |
+| **Social Wall** (2026-07-08) | muestra en web · `ugc` (creador, mano con teléfono, trend) + VFX · look `documental` | 2 · 2 · 1 · 1 · 0 · 0 · 0 = 6 (media baja) | 8 stills con `gpt-image-2` → Omni i2v, masters de 10 s recortados a beats de 4 s, publicados sin audio | validado, en producción | El tipo `ugc` se juzga por **acción del sujeto**; la primera pasada movía los stills con pan y zoom y el operador la marcó como falsa: «vivo no es mover la cámara». Un `time.retime` o un movimiento de cámara determinístico no reemplaza `gen.i2v` con acción |
+| **Fiestas Patrias, reel de comida** (2026-09-13) | `organico-social` · `fotorrealista/comida` + capa de UI compuesta (`hibrido`) · look `publicitario` | 0 · 0 · 2 · 0 · 1 · 2 · 0 = 5 (baja) | keyframe con ImageGen → Seedance 2.5 por Higgsfield, cámara fija (90 créditos por toma); 216 overlays de UI determinísticos; 4:5 y luego **toma nativa nueva** para 9:16 (otros 90 créditos) | aprobado; programado (no publicado aún) | Baja → directo al motor; **E resuelto por composición** (la UI nunca se generó). Formato: cuando el encuadre cambia de verdad, el 9:16 es toma nueva, no recorte; no prometer adaptación nativa si sólo se recortó |
+| Día de Muertos, Campaña de alta frecuencia, Spot AEO Grader | ver los workflows `seasonality-visual-metaphor-to-video`, `single-shot-to-deterministic-campaign-hero` y `hybrid-world-plus-ui` | — | — | pendiente · validado · validado | Se clasificarán con el mismo formato cuando se revisen sus fuentes |
+
+**Lo que los casos enseñan a la taxonomía (ya incorporado):**
+
+1. **El eje E (exactitud) aparece en 3 en cuatro de cinco casos** y en todos la salida correcta era componer
+   (UI, letrero, titular, logo). Es el eje que más se subestima: por eso el árbol (§4.1) lo resuelve en el paso 2,
+   antes de mirar motores.
+2. **Una falla de contrato hace que los intentos no converjan** (Glitch: más de veinte tomas sin master). El gate
+   `pre.keyframe-still` exige que el still de entrada sea el primer cuadro del contrato de fidelidad (§3.5.1).
+3. **La fórmula de presupuesto con reserva anticipaba SKY**; CMP-001 confirma que el piloto barato ahorra la mayor parte
+   del gasto. Los intentos esperables de §3.14 son coherentes con los casos (CMP-001: 11 tomas en dos motores;
+   Fiestas Patrias: 1–2), salvo cuando el contrato está mal (Glitch).
+4. **Audio:** generar **sin audio** cuando la pieza no admite voz (SKY V7/V8 trajeron voz narrada pese a la
+   prohibición) y quitar del prompt lo que induce habla en vez de reforzar la prohibición (CMP-001: trece palabras que
+   inducían habla contra dos prohibiciones) (§3.9).
+
+**Fuentes:** `docs/operations/social/2026-09-24-sky-retrospectiva-produccion-v17.md`,
+`docs/campaigns/decisions/CDR-008-cmp003-cartelas-postproduccion-y-audio-separado.md`,
+`docs/operations/social/2026-09-22-primer-motion-ad-vocero-no-autorizado-production-method.md`,
+`ai-generations/2026-07-11_glitch-microphone-intro/` (README, `pilot-retrospective.md`, revisión U–Z),
+`ai-generations/2026-07-08_social-wall-assets/README.md`,
+`docs/operations/social/2026-09-13-fiestas-patrias-production-method.md` y los workflows de `motion-design-studio`.
 
 ## 5. Huecos: lo que la taxonomía pide y nada resuelve con garantía (as-of 2026-10-03)
 
