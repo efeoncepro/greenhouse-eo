@@ -514,6 +514,29 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
 }
 
 /**
+ * TASK-1974 — barras apiladas: la lectura es el segmento BASE (el subconjunto que importa, p. ej. visitas con
+ * interacción) contra su período anterior, con la frase de ese hecho; la cifra principal es ese segmento, nunca el total.
+ */
+const subsetReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): PlanFigureReadingV1 | null => {
+  const base = chart.series[0]
+  const fact = base ? byId.get(base.factIds.at(-1) ?? '') : undefined
+
+  if (!base || !fact || fact.value === null) return null
+
+  const change = printedChange(fact, byId, locale)
+  const conclusionText = firstFitting(L.conclusion, change ? humanFactSentence(fact, byId, locale, context) : null, `${subjectOf(fact, context)}: ${valueText(fact, locale)}.`)
+
+  if (!conclusionText) return null
+
+  return {
+    chartId: chart.chartId,
+    keyFigure: { factId: fact.factId, value: fmt(fact, locale), caption: claim(`${chart.chartId}.key`, `${base.label}.`, [fact.factId]) },
+    conclusion: claim(`${chart.chartId}.${change ? 'conclusion' : 'value'}`, conclusionText, change ? [fact.factId, change.previous.factId] : [fact.factId]),
+    nextStep: null
+  }
+}
+
+/**
  * Lectura de cada figura QUE TIENE PÁGINA. `hasFigurePage` es el predicado del render (TASK-1889: ejecuta el mismo
  * `buildFigureSlides`), así que planner y render no pueden divergir: una figura sin página no recibe lectura, y
  * «Lo esencial» nunca cita una conclusión que no se imprime (Berel CTR, 2026-09-25).
@@ -522,7 +545,7 @@ export const readingsFor = (charts: ChartSpecV1[], byId: Map<string, EvidenceFac
   const context = contextOf(charts, byId)
 
   const readings = charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chart => {
-    const reading = chart.family === 'bullet' ? bulletReading(chart, byId, locale, context) : chart.family === 'line' ? lineReading(chart, byId, locale, context) : barReading(chart, byId, locale, context)
+    const reading = chart.family === 'bullet' ? bulletReading(chart, byId, locale, context) : chart.family === 'line' ? lineReading(chart, byId, locale, context) : chart.family === 'bar_stacked' ? subsetReading(chart, byId, locale, context) : barReading(chart, byId, locale, context)
 
     return reading ? [{ chart, reading }] : []
   })

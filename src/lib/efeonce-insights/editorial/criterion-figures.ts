@@ -15,6 +15,7 @@ import type { ChartSpecV1, FigureQuestion } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { InsightModule } from '../contracts/request'
 import { PLAN_TEXT_LIMITS, STAT_LABEL_MAX_CHARS, STAT_LABEL_MAX_WORDS, type PlanFigureReadingV1, type PlanStatFigureV1, type PlanStatItemV1 } from '../contracts/plan'
+import { windowLabelOf } from '../presentation/vocabulary'
 import { contextOfFacts, humanFactSentence, printedChange } from './editorial-v2'
 import { canProduceFamily } from './family-evidence-matrix'
 import { familiesForQuestion, metricDirectionOf, type FigureFamily } from './figure-selection'
@@ -166,6 +167,25 @@ export const compositionChartsFor = (moduleKey: InsightModule, facts: EvidenceFa
   const charts: ChartSpecV1[] = []
   let previous = previousFamily
 
+  // Visitas desde IA por asistente (GA4): partes de un total que NO son pocas unidades contables (1.686 visitas) → dona
+  // con 2–3 partes (el adapter suma «otros» desde la tercera); con más, barras ordenadas. Es la figura de composición del
+  // total que la tarjeta de cifra ya dice (regla (d): el centro de la dona no repite ese total).
+  const sources = facts.filter(fact => fact.metricId.startsWith('ai_source.') && fact.value !== null && fact.value > 0)
+  const total = facts.find(fact => fact.metricId === 'ai_sessions' && fact.value !== null)
+  const sourceSum = sources.reduce((sum, fact) => sum + fact.value!, 0)
+  const sourceFamily = familiesForQuestion({ question: 'composition', parts: sources.length, units: null }).find(family => (family === 'donut' || family === 'bar') && canProduceFamily(family, moduleKey))
+
+  // Una dona exige que las partes SUMEN el total: si no (snapshot anterior al adapter v2), barras ordenadas.
+  const aiFamily = sourceFamily === 'donut' && total && sourceSum !== total.value ? (canProduceFamily('bar', moduleKey) ? 'bar' : undefined) : sourceFamily
+
+  if (aiFamily === 'donut' || aiFamily === 'bar') {
+    const ordered = [...sources].sort((a, b) => (a.metricId === 'ai_source.other' ? 1 : 0) - (b.metricId === 'ai_source.other' ? 1 : 0) || b.value! - a.value!)
+    const spec = compositionSpec(`chart.aeo.${aiFamily === 'bar' ? 'parts' : aiFamily}.ai-source`, aiFamily, GH_INSIGHTS.aeoFamilyTitles.ai_source ?? GH_INSIGHTS.metrics.ai_sessions!, ordered)
+
+    charts.push(ordered.some(fact => fact.channelId) && ordered.length > 1 ? { ...spec, dimensionChannelIds: ordered.map(fact => fact.channelId ?? null) } : spec)
+    previous = aiFamily
+  }
+
   for (const { prefix, key } of AEO_COMPOSITIONS) {
     const parts = facts.filter(fact => fact.metricId.startsWith(prefix) && fact.value !== null && fact.value > 0)
     const units = parts.reduce((sum, fact) => sum + fact.value!, 0)
@@ -190,6 +210,55 @@ export const compositionChartsFor = (moduleKey: InsightModule, facts: EvidenceFa
   }
 
   return charts
+}
+
+/**
+ * «¿Cuánto del total es un subconjunto, en dos períodos?» (criterio §5): visitas orgánicas con interacción (la base) y
+ * sin interacción, este período y el anterior, en barras apiladas. Los segmentos llegan como hechos no superpuestos de
+ * la fuente; el total de la pila es la suma (cifra derivada declarada). Devuelve también los hechos que la figura toma,
+ * para que la tarjeta no los repita (regla 2).
+ */
+export const subsetChartsFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): { charts: ChartSpecV1[]; taken: Set<string> } => {
+  const empty = { charts: [], taken: new Set<string>() }
+
+  if (moduleKey !== 'seo' || !canProduceFamily('bar_stacked', moduleKey)) return empty
+
+  const base = facts.find(fact => fact.metricId === 'site.organic_engaged_sessions')
+  const rest = facts.find(fact => fact.metricId === 'site.organic_unengaged_sessions')
+  const total = facts.find(fact => fact.metricId === 'site.organic_sessions')
+  const basePrev = base?.comparisonFactId ? byId.get(base.comparisonFactId) : undefined
+  const restPrev = rest?.comparisonFactId ? byId.get(rest.comparisonFactId) : undefined
+
+  if (!base || !rest || !basePrev || !restPrev || [base, rest, basePrev, restPrev].some(fact => fact.value === null)) return empty
+
+  // Los segmentos deben sumar el total que mide la fuente; si no, la pila mentiría: no se emite.
+  if (total && total.value !== null && base.value! + rest.value! !== total.value) return empty
+
+  const S = GH_INSIGHTS.stat
+  const chartId = 'chart.seo.stacked.site-engagement'
+
+  const chart: ChartSpecV1 = {
+    specVersion: 'chart_spec_v1',
+    chartId,
+    family: 'bar_stacked',
+    relation: 'composition',
+    question: 'subset',
+    title: S.engagementTitle,
+    series: [
+      { seriesId: 'engaged', label: S.engagedSegment, factIds: [basePrev.factId, base.factId], unit: 'count' },
+      { seriesId: 'unengaged', label: S.unengagedSegment, factIds: [restPrev.factId, rest.factId], unit: 'count' }
+    ],
+    dimensionLabels: [windowLabelOf(basePrev.window, locale), windowLabelOf(base.window, locale)],
+    unit: 'count',
+    scale: { kind: 'linear', baseline: 0 },
+    references: [],
+    tabularEquivalent: {
+      columns: ['Período', S.engagedSegment, S.unengagedSegment],
+      rows: [[null, basePrev.factId, restPrev.factId], [null, base.factId, rest.factId]]
+    }
+  }
+
+  return { charts: [chart], taken: new Set([base.factId, rest.factId, ...(total ? [total.factId] : [])]) }
 }
 
 /** Pregunta de un gráfico por su familia, cuando el productor no la declaró. */

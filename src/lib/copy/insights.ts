@@ -100,7 +100,9 @@ export const GH_INSIGHTS = {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
     aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
     tableTitle: { seo: 'Visitas al sitio desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
-    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.'
+    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.',
+    /** TASK-1974 — la porción que suma a los asistentes fuera de los 2 que más traen. */
+    otherAssistants: 'Otros asistentes'
   },
 
   /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
@@ -169,6 +171,7 @@ export const GH_INSIGHTS = {
     ga4: 'Google Analytics 4',
     'site.organic_sessions': 'Visitas orgánicas al sitio',
     'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
+    'site.organic_unengaged_sessions': 'Visitas orgánicas sin interacción',
     ai_sessions: 'Visitas desde asistentes de IA',
     'driver.query': 'Consultas que más cambiaron',
     'driver.page': 'Páginas que más cambiaron',
@@ -292,6 +295,10 @@ export const GH_INSIGHTS = {
     } as Readonly<Record<string, string>>,
     estimated: 'Estimado',
     lowerIsBetter: 'Menor es mejor',
+    /** TASK-1974 — barras apiladas de visitas orgánicas (subconjunto en dos períodos). */
+    engagementTitle: 'Visitas orgánicas al sitio, con y sin interacción',
+    engagedSegment: 'Con interacción',
+    unengagedSegment: 'Sin interacción',
     labels: {
       clicks: 'Clics',
       impressions: 'Impresiones',

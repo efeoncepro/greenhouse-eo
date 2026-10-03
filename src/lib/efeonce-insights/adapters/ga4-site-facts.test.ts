@@ -39,7 +39,9 @@ describe('ga4-site-facts', () => {
 
     expect(rejections).toEqual([])
     expect(source?.reader).toBe('readGa4Analytics')
-    expect(facts.map(fact => [fact.metricId, fact.value])).toEqual([['site.organic_sessions', 43575], ['site.organic_engaged_sessions', 29636]])
+    // TASK-1974 — el complemento «sin interacción» llega como hecho (suma por fila), nunca como resta en el render.
+    expect(facts.map(fact => [fact.metricId, fact.value])).toEqual([['site.organic_sessions', 43575], ['site.organic_engaged_sessions', 29636], ['site.organic_unengaged_sessions', 13939]])
+    expect(facts[1]!.value! + facts[2]!.value!).toBe(facts[0]!.value)
     expect(facts[0]!.comparisonFactId).toBe('seo.site.organic_sessions.prev')
     expect(facts.every(fact => fact.channelId === undefined)).toBe(true)
     expect(facts.every(fact => questionOfMetric('seo', fact.metricId) === 'outcome')).toBe(true)
@@ -57,6 +59,18 @@ describe('ga4-site-facts', () => {
     // Partes del total de visitas desde IA: «1.200 de 1.687».
     expect(facts[1]).toMatchObject({ numerator: 1200, denominator: 1687 })
     expect(facts.every(fact => questionOfMetric('aeo', fact.metricId) === 'outcome')).toBe(true)
+  })
+
+  it('con más de 3 asistentes: los 2 que más traen y el resto SUMADO como «otros» (partes de una dona, TASK-1974)', () => {
+    const many = { ...ok, rows: [...ok.rows, row('AI Assistant', 'perplexity.ai / referral', 40, 30)] }
+    const { facts } = ga4AiFacts('org-1', window, many, {}, true)
+
+    expect(facts.slice(1).map(fact => [fact.metricId, fact.label, fact.value])).toEqual([
+      ['ai_source.chatgpt', 'ChatGPT', 1200],
+      ['ai_source.gemini', 'Gemini', 300],
+      ['ai_source.other', 'Otros asistentes', 227]
+    ])
+    expect(facts.slice(1).reduce((sum, fact) => sum + fact.value!, 0)).toBe(facts[0]!.value)
   })
 
   it('sin contrato v2 o sin visitas desde IA no hay desglose por asistente', () => {

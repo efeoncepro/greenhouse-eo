@@ -4,7 +4,7 @@ import type { EvidenceFactV1, EvidenceSnapshotContentV1 } from '../contracts/evi
 import { authorPlanWithBoundedAi, INSIGHTS_AUTHORING_PROMPT_VERSION_V2 } from './ai-authoring'
 import { buildDeterministicPlan } from './deterministic-planner'
 import { assertChartsAllowed } from './editorial-v2'
-import { FAMILY_EVIDENCE_MATRIX, canProduceFamily } from './family-evidence-matrix'
+import { FAMILY_EVIDENCE_MATRIX, FAMILY_EVIDENCE_MATRIX_VERSION, canProduceFamily } from './family-evidence-matrix'
 import { validateEditorialPlan } from './plan-validation'
 
 vi.mock('server-only', () => ({}))
@@ -242,8 +242,10 @@ describe('TASK-1888 — canales y matriz', () => {
     }
 
     expect(FAMILY_EVIDENCE_MATRIX).toHaveLength(15)
-    // TASK-1962 — cascada (SEO) y waffle (AEO) pasaron a tener evidencia; se dibujan en la web (sin página PDF).
-    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet', 'waterfall', 'waffle'])
+    // TASK-1962 — cascada (SEO) y waffle (AEO). TASK-1974 (matriz v3) — barras apiladas (SEO: visitas con y sin
+    // interacción) y dona (AEO: visitas por asistente), cada una con su evidencia en el adapter dueño.
+    expect(FAMILY_EVIDENCE_MATRIX_VERSION).toBe('family_evidence_matrix_v3')
+    expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'bar_stacked', 'line', 'donut', 'bullet', 'waterfall', 'waffle'])
     expect(() => assertChartsAllowed('ico', [{ ...v2(icoSnapshot, ['ico']).chapters[0]!.charts[0]!, family: 'donut' }])).toThrow(/matriz/)
   })
 })
@@ -548,11 +550,12 @@ describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente
     ]))
     // La cifra suelta del Share of Voice de la marca ya no es un hallazgo aparte, y lleva «menciones», no «respuestas».
     expect(chapter.claims.find(claim => claim.claimId === 'claim.aeo.sov.brand.w')).toMatchObject({ role: 'backing', text: 'Tu marca: 25,0 % (10 de 40 menciones).' })
-    // Tono y tipo de fuente son partes de un todo: waffle con TODAS las categorías (incluida «sin clasificar»), que
-    // suman el total; nunca columnas.
-    const types = chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.source-type')!
+    // Tono y tipo de fuente son partes de un todo, con TODAS las categorías (incluida «sin clasificar»). Con 3 partes
+    // contables, waffle y dona son igual de válidos: el tono va en waffle y la variedad da la dona al tipo de fuente
+    // (criterio §4, regla 3 — TASK-1974).
+    const types = chapter.charts.find(chart => chart.chartId === 'chart.aeo.donut.source-type')!
 
-    expect(types).toMatchObject({ family: 'waffle', relation: 'composition', series: [] })
+    expect(types).toMatchObject({ family: 'donut', relation: 'composition', question: 'composition' })
     expect(types.dimensionLabels).toEqual(['Sin clasificar', 'Medios de noticias', 'Sitios propios'])
     expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.waffle.sentiment')!.dimensionLabels).toEqual(['Positivas', 'Neutras', 'Negativas'])
     expect(chapter.charts.some(chart => chart.family === 'bar' && chart.unit === 'count')).toBe(false)
@@ -561,8 +564,8 @@ describe('TASK-1962 — lo que el Grader ya mide: sitios citados, tipo de fuente
     expect(chapter.charts.some(chart => chart.chartId === 'chart.aeo.count.cited-source')).toBe(false)
     expect(chapter.tables.find(table => table.tableId === 'table.aeo.sources')!.rows.map(row => row[0])).toContain('chocale.cl')
     expect(chapter.tables.find(table => table.tableId === 'table.aeo')!.rows.map(row => row[0])).not.toContain('chocale.cl')
-    // Sin página PDF, el waffle no lleva lectura de página: lo dice su hallazgo.
-    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.waffle.source-type')).toBe(false)
+    // Sin página PDF, la figura no lleva lectura de página: lo dice su hallazgo.
+    expect(chapter.readings!.some(reading => reading.chartId === 'chart.aeo.donut.source-type')).toBe(false)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 })
@@ -653,7 +656,7 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     rejections: []
   }
 
-  it('las visitas desde IA son hallazgo y se reparten por asistente en su propia figura, con isotipo', () => {
+  it('las visitas desde IA son hallazgo y se reparten por asistente en una dona (TASK-1974), con isotipo', () => {
     const plan = v2(snapshot, ['seo', 'aeo'])
     const chapter = plan.chapters.find(item => item.module === 'aeo')!
     const finding = chapter.claims.find(claim => claim.factIds.includes('aeo.ai_sessions.w'))!
@@ -665,8 +668,11 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
       ['finding', 'ChatGPT trae la mayoría de las visitas desde asistentes de IA: 1.200 de 1.687.']
     ])
 
-    const byAssistant = chapter.charts.find(chart => chart.chartId.startsWith('chart.aeo.count.ai-source'))!
+    // TASK-1974 — 3 partes que suman el total: «¿de qué se compone?» con 2–3 partes es una dona; el total va en la tarjeta.
+    const byAssistant = chapter.charts.find(chart => chart.chartId === 'chart.aeo.donut.ai-source')!
 
+    expect(byAssistant).toMatchObject({ family: 'donut', question: 'composition' })
+    expect(chapter.stats![0]!.items.map(item => item.factId)).toContain('aeo.ai_sessions.w')
     expect(byAssistant.title).toBe('Visitas desde cada asistente de IA')
     expect(byAssistant.dimensionLabels).toEqual(['ChatGPT', 'Gemini', 'Copilot'])
     expect(byAssistant.dimensionChannelIds).toEqual(['chatgpt', 'gemini', null])
@@ -674,17 +680,49 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 
-  it('si un asistente deja a los demás sin escala no hay figura parcial: quedan el hallazgo y la tabla', () => {
+  it('si las partes no suman el total (snapshot anterior al adapter v2) no hay dona: barras ordenadas completas, nunca una figura parcial', () => {
     const skewed = { ...snapshot, facts: snapshot.facts.map(fact => (fact.factId === 'aeo.ai_source.gemini.w' ? { ...fact, value: 30, numerator: 30 } : fact.factId === 'aeo.ai_source.copilot.w' ? { ...fact, value: 2, numerator: 2 } : fact)) }
     const chapter = v2(skewed, ['aeo']).chapters[0]!
+    const parts = chapter.charts.find(chart => chart.chartId.includes('ai-source'))!
 
-    expect(chapter.charts.some(chart => chart.chartId.includes('ai-source'))).toBe(false)
+    expect(parts).toMatchObject({ family: 'bar', chartId: 'chart.aeo.parts.ai-source' })
+    expect(parts.dimensionLabels).toEqual(['ChatGPT', 'Gemini', 'Copilot'])
     // GA4 va en su propia tabla (otra fuente), no en la de los indicadores del Grader.
     const ga4Table = chapter.tables.find(table => table.tableId === 'table.aeo.ga4')!
 
     expect(ga4Table.title).toBe('Visitas desde asistentes de IA')
     expect(ga4Table.rows.map(row => row[0])).toEqual(['Visitas desde asistentes de IA', 'ChatGPT', 'Gemini', 'Copilot'])
     expect(chapter.tables.some(table => table.tableId === 'table.aeo')).toBe(false)
+  })
+
+  it('con el complemento «sin interacción», las visitas orgánicas van en barras apiladas y no se repiten en la tarjeta (TASK-1974)', () => {
+    const withRest = {
+      ...snapshot,
+      facts: [
+        ...snapshot.facts,
+        base('seo.site.organic_unengaged_sessions.w', 'seo', 'site.organic_unengaged_sessions', 'Visitas orgánicas sin interacción', 13939, { comparisonFactId: 'seo.site.organic_unengaged_sessions.prev' }),
+        base('seo.site.organic_unengaged_sessions.prev', 'seo', 'site.organic_unengaged_sessions', 'Visitas orgánicas sin interacción', 13900)
+      ]
+    }
+
+    const plan = v2(withRest, ['seo'])
+    const chapter = plan.chapters[0]!
+    const stacked = chapter.charts.find(chart => chart.family === 'bar_stacked')!
+
+    // Segmento base = con interacción; las dimensiones son los dos períodos.
+    expect(stacked).toMatchObject({ chartId: 'chart.seo.stacked.site-engagement', question: 'subset', relation: 'composition' })
+    expect(stacked.series.map(series => series.factIds)).toEqual([
+      ['seo.site.organic_engaged_sessions.prev', 'seo.site.organic_engaged_sessions.w'],
+      ['seo.site.organic_unengaged_sessions.prev', 'seo.site.organic_unengaged_sessions.w']
+    ])
+    // Un dato, una figura: ni los segmentos ni el total entran a la tarjeta.
+    expect(chapter.stats![0]!.items.map(item => item.factId).some(id => id.startsWith('seo.site.'))).toBe(false)
+    expect(validateEditorialPlan(plan, withRest)).toEqual([])
+
+    // Si los segmentos no suman el total que mide la fuente, la pila mentiría: no se emite.
+    const broken = { ...withRest, facts: withRest.facts.map(fact => (fact.factId === 'seo.site.organic_unengaged_sessions.w' ? { ...fact, value: 1 } : fact)) }
+
+    expect(v2(broken, ['seo']).chapters[0]!.charts.some(chart => chart.family === 'bar_stacked')).toBe(false)
   })
 
   it('las visitas orgánicas al sitio nunca comparten eje con los clics de Search Console: sin el complemento, van en la tarjeta', () => {

@@ -24,7 +24,7 @@ import type { InsightModule } from '../contracts/request'
 import type { ResolvedInsightWindow } from '../window'
 import { evidenceWindow, factId } from './contract'
 
-export const GA4_ADAPTER_VERSION = 'ga4_site_facts_v1'
+export const GA4_ADAPTER_VERSION = 'ga4_site_facts_v2'
 
 const GA4_METHOD = { name: 'ga4_channel_sessions', version: 'ga4_default_channel_group_v1' }
 
@@ -32,8 +32,13 @@ const GA4_METHOD = { name: 'ga4_channel_sessions', version: 'ga4_default_channel
 const ORGANIC_SEARCH = 'Organic Search'
 const AI_ASSISTANT = 'AI Assistant'
 
-/** Asistentes con más visitas que se nombran; el resto queda en el total de visitas desde IA. */
-const AI_SOURCE_LIMIT = 5
+/**
+ * TASK-1974 — partes de las visitas desde IA: hasta 3 asistentes por su nombre; con más, los 2 que más traen y el resto
+ * SUMADO como «otros asistentes» (suma de filas de GA4, no una resta de cifras impresas). Así las partes son un todo de
+ * 2–3 porciones que suman el total: la dona del criterio (§5, «más de 3 partes: nunca dona»).
+ */
+const AI_SOURCE_PARTS_MAX = 3
+const AI_SOURCE_OTHER_KEY = 'other'
 
 /**
  * Fuente de GA4 (`sessionSource`, p. ej. `chatgpt.com`) → canal del documento (isotipo). Un host desconocido queda sin
@@ -133,10 +138,15 @@ export const ga4OrganicFacts = (organizationId: string, window: ResolvedInsightW
   const sessions = sumWhere(result.rows, ORGANIC_SEARCH, 'sessions')
   const engaged = sumWhere(result.rows, ORGANIC_SEARCH, 'engagedSessions')
   const base = baseFor('seo', organizationId, result.propertyId, window, GH_INSIGHTS.ga4.organicPopulation)
+  // TASK-1974 — sesiones SIN interacción (GA4: sesiones que no cumplen la definición de interacción), fila por fila. Es
+  // el complemento de las con interacción dentro del total: el segmento superior de las barras apiladas, que llega como
+  // hecho de la fuente y nunca como una resta en el render.
+  const unengaged = result.rows.filter(row => row.dimensions.sessionDefaultChannelGroup === ORGANIC_SEARCH).reduce((sum, row) => sum + Math.max(0, (row.metrics.sessions ?? 0) - (row.metrics.engagedSessions ?? 0)), 0)
 
   const facts: EvidenceFactV1[] = [
     { ...base, factId: factId('seo', 'site.organic_sessions', window), metricId: 'site.organic_sessions', label: GH_INSIGHTS.metrics['site.organic_sessions']!, value: sessions, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_sessions'] ?? null },
-    { ...base, factId: factId('seo', 'site.organic_engaged_sessions', window), metricId: 'site.organic_engaged_sessions', label: GH_INSIGHTS.metrics['site.organic_engaged_sessions']!, value: engaged, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_engaged_sessions'] ?? null }
+    { ...base, factId: factId('seo', 'site.organic_engaged_sessions', window), metricId: 'site.organic_engaged_sessions', label: GH_INSIGHTS.metrics['site.organic_engaged_sessions']!, value: engaged, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_engaged_sessions'] ?? null },
+    { ...base, factId: factId('seo', 'site.organic_unengaged_sessions', window), metricId: 'site.organic_unengaged_sessions', label: GH_INSIGHTS.metrics['site.organic_unengaged_sessions']!, value: unengaged, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_unengaged_sessions'] ?? null }
   ]
 
   return { facts, rejections: [], source: sourceFor('seo', window, base.freshness.asOf) }
@@ -170,15 +180,18 @@ export const ga4AiFacts = (organizationId: string, window: ResolvedInsightWindow
       bySource.set(source.key, entry)
     }
 
-    ;[...bySource.entries()]
-      .filter(([, entry]) => entry.sessions > 0)
-      .sort((a, b) => b[1].sessions - a[1].sessions || (a[0] < b[0] ? -1 : 1))
-      .slice(0, AI_SOURCE_LIMIT)
-      .forEach(([key, entry]) => {
-        const metricId = `ai_source.${key}`
+    const ranked = [...bySource.entries()].filter(([, entry]) => entry.sessions > 0).sort((a, b) => b[1].sessions - a[1].sessions || (a[0] < b[0] ? -1 : 1))
 
-        facts.push({ ...base, factId: factId('aeo', metricId, window), metricId, label: entry.label, value: entry.sessions, unit: 'count', numerator: entry.sessions, denominator: total, comparisonFactId: comparisonIds[metricId] ?? null, dimension: { assistant: entry.label }, ...(entry.channelId ? { channelId: entry.channelId } : {}) })
-      })
+    const parts: Array<[string, { label: string; channelId?: InsightChannelId; sessions: number }]> =
+      ranked.length <= AI_SOURCE_PARTS_MAX
+        ? ranked
+        : [...ranked.slice(0, AI_SOURCE_PARTS_MAX - 1), [AI_SOURCE_OTHER_KEY, { label: GH_INSIGHTS.ga4.otherAssistants, sessions: ranked.slice(AI_SOURCE_PARTS_MAX - 1).reduce((sum, [, entry]) => sum + entry.sessions, 0) }]]
+
+    parts.forEach(([key, entry]) => {
+      const metricId = `ai_source.${key}`
+
+      facts.push({ ...base, factId: factId('aeo', metricId, window), metricId, label: entry.label, value: entry.sessions, unit: 'count', numerator: entry.sessions, denominator: total, comparisonFactId: comparisonIds[metricId] ?? null, dimension: { assistant: entry.label }, ...(entry.channelId ? { channelId: entry.channelId } : {}) })
+    })
   }
 
   return { facts, rejections: [], source: sourceFor('aeo', window, base.freshness.asOf) }
