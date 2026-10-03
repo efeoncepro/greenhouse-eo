@@ -74,6 +74,12 @@ La taza pegada sobre la pared verde con sol entre hojas (`place/bb0ae0c3bb2d/com
 | `fal:image-apps-relighting` (estilo `natural`) | PASS mecánico, ✗ **cambió el color del producto** (blanca → lila) y dejó una banda borrosa en la pared (`…/3ba6bf834dae/`) | 0,04 |
 | `fal:iclight-v2` | PASS mecánico, ✗ luz más dramática pero **deformó la taza** e **inventó una ventana** en el halo; tardó > 120 s (el primer intento expiró en el cliente: posible cobro de ≈ 0,20 sin resultado) (`…/0b2aa657339e/`) | 0,10 |
 
+**Prueba de concepto — transferencia de luz (USD 0, reutiliza la salida de IC-Light):** la luz y el tono de IC-Light,
+suavizados (σ 6 y 14) dentro de la silueta, aplicados sobre los píxeles ORIGINALES de la taza: forma, asa y pie exactos,
+rebote cálido en la base, delta 0 fuera de la taza + 60 px. Defectos: altas luces que saturan y una banda donde la
+silueta de IC-Light no calza. Script `relight/light-transfer-poc.ts.txt`; salidas `relight/light-transfer-s6.png` y
+`-s14.png`. Sigue en TASK-1977.
+
 Decisión: para un objeto exacto, Sunburst por instrucción. IC-Light y el relighting por estilos quedan conectados y
 verificados, pero no se recomiendan sobre producto, logo ni texto. Pendiente: probarlos para reiluminar una escena
 entera, donde la forma del objeto importa menos.
