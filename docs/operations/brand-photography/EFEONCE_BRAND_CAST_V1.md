@@ -240,6 +240,16 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    revisa la cara al 100 % antes de usarlos.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
+   **La proporción se MIDE, no se mira [operador, 2026-10-02: «la foto entera de Karo se ve con la cabeza
+   gigantesca, estás descuidando que pasa eso»].** La v4 fijó la escala del retrato a ojo (36 % del lienzo) y se
+   aprobó mirando miniaturas: medida después, Karo tenía **5,9 cabezas** de alto y Sophia 6,1. Control:
+   `node ai-generations/2026-10-02_elenco-efeonce/realismo-v3/medir-cabezas.cjs <medidas.jsonl>` sobre la salida de
+   `swift ai-generations/2026-09-29_avatares-equipo/medir-rostro.swift <png…>` (Vision): cabeza ≈ 2 × (ojos → mentón),
+   alto = coronilla estimada → suela. **Piso 7,2 cabezas**, calibrado con la ancla de cuerpo aprobada de Nexa (7,2).
+   La v5 calcula la escala desde esa medida (`expandir-cuerpos-v5.cjs`, ojos → mentón = 86 px en un lienzo de 1536;
+   con 94 px quedaban en 7,0–7,3 porque el modelo cierra los pies al 90 % del cuadro). Resultado medido: Hum 7,4 ·
+   Karo 7,6 · Sophia 7,5 · Isabella 7,9 · Antonio 7,3, con la cara igual a la elegida. Todo cuerpo entero nuevo pasa
+   esta medición antes de mostrarse.
 5. **Registro [hecho, 2026-10-02].** Catálogo `ELENCO` en `scripts/foto/build-prompt.mjs`, separado de `PERSONAS`
    (commit `3a05ec0db`). Una ficha lo pide en `identidad` igual que al roster —`["karo"]` o
    `[{ "persona": "isabella", "vista": "perfil-izq" }]`— y recibe su bloque `IDENTITY`, sus referencias (frente, elegida,

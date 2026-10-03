@@ -292,7 +292,7 @@
     },
     "ai-generations/_identidad-elenco/hum/hum-cuerpo.png": {
       "rol": "elenco:hum/cuerpo",
-      "sha256": "dd85526cc3ba446e603f565f8eda660d85ed63fc2c8bd2602805cf47cd49e3c9"
+      "sha256": "a7e9b8b1471b1d0f735219e6f59b125caf1f8375374d34854015316958fb8377"
     },
     "ai-generations/_identidad-elenco/hum/hum-45-izq.png": {
       "rol": "elenco:hum/45-izq",
@@ -320,7 +320,7 @@
     },
     "ai-generations/_identidad-elenco/karo/karo-cuerpo.png": {
       "rol": "elenco:karo/cuerpo",
-      "sha256": "1c3203d363c2afa9f614c7feda005d748db175deeecab6d99132486c0abbbfb4"
+      "sha256": "66423b7b969ecca9c27ff44855c58d573b95d37b5a16e04d03af7f11500f7376"
     },
     "ai-generations/_identidad-elenco/karo/karo-45-izq.png": {
       "rol": "elenco:karo/45-izq",
@@ -348,7 +348,7 @@
     },
     "ai-generations/_identidad-elenco/sophia/sophia-cuerpo.png": {
       "rol": "elenco:sophia/cuerpo",
-      "sha256": "60aa5b11f42fb0c14bba6dd59fc8367fc1785e8723637cb9161c6542894880b3"
+      "sha256": "96158cea289beda0de1f25b9773e1daad36ff0f56c82e2734322a97f4a75526d"
     },
     "ai-generations/_identidad-elenco/sophia/sophia-45-izq.png": {
       "rol": "elenco:sophia/45-izq",
@@ -376,7 +376,7 @@
     },
     "ai-generations/_identidad-elenco/isabella/isabella-cuerpo.png": {
       "rol": "elenco:isabella/cuerpo",
-      "sha256": "39ee61bc3d85426645f9e2ae1de7325b09199bd1a64e23e69357ac5dbf1855aa"
+      "sha256": "fff4022f4cd0f84c269a66f9b841c84ede3a236409a334609d927827131f0a14"
     },
     "ai-generations/_identidad-elenco/isabella/isabella-45-izq.png": {
       "rol": "elenco:isabella/45-izq",
@@ -404,7 +404,7 @@
     },
     "ai-generations/_identidad-elenco/antonio/antonio-cuerpo.png": {
       "rol": "elenco:antonio/cuerpo",
-      "sha256": "ddb6d73b036d661ba339337d598af3938b56c95947a225cf346afb20a62f6210"
+      "sha256": "6b89768ff7cea4bc8c876bbd626979bd5a5c8382eee82fa1f0a0c482eab57963"
     },
     "ai-generations/_identidad-elenco/antonio/antonio-45-izq.png": {
       "rol": "elenco:antonio/45-izq",
