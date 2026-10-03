@@ -76,7 +76,10 @@ afterEach(async () => {
 
 const base = (adapter: InpaintImageAdapter) => ({ imagePath: image, maskPath: mask, prompt: 'a red cup on the table', adapter, runRoot: join(dir, 'pieza'), log: () => undefined })
 
-describe('pnpm ai:inpaint image — pipeline', () => {
+// El pipeline procesa imágenes reales con sharp (máscara, recorte, recomposición, verificación por píxel). Local tarda
+// 1–2 s por caso, pero con cobertura v8 y el runner cargado de CI Deep superó los 15 s globales (release #248,
+// 2026-10-03): un timeout acá es carga, no un defecto. Tope propio holgado; las aserciones no cambian.
+describe('pnpm ai:inpaint image — pipeline', { timeout: 60_000 }, () => {
   it('dry-run: escribe máscara, recorte y manifiesto sin llamar al proveedor', async () => {
     const { adapter, run } = fakeAdapter()
     const result = await runImageInpaint({ ...base(adapter), dryRun: true })
