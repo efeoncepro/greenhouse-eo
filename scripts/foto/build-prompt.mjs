@@ -343,8 +343,8 @@ export const PERSONAS = {
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
       'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
-      // 🔴 2026-10-03: apuntan a `5-expresiones-frente/`, las 12 casi de frente aprobadas por el operador («lo veo bien,
-      // la verdad»). Método A2: el ancla frontal v2 + la CAUSA de la expresión (no músculos), la cabeza libre de hacer su
+      // 🔴 2026-10-03: apuntan a `5-expresiones-frente/`, las 25 casi de frente («lo veo bien, la verdad»; «aprobadas
+      // todas»). Método A2: el ancla frontal v2 + la CAUSA de la expresión (no músculos), la cabeza libre de hacer su
       // movimiento natural, intensidad cotidiana, la receta de piel v3 y la geometría del rostro. Un primer intento de
       // frente estricto con marcadores musculares fue rechazado («se ven muy IA»). Las de `5-expresiones/` (tres cuartos,
       // todas con el mismo giro) quedan en disco como histórico. La expresión va DETRÁS del ancla (`resolverIdentidad`).
@@ -627,8 +627,8 @@ function resolverIdentidad(ficha) {
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])
 
-    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de Nexa comparten el mismo
-    // tres cuartos del ancla, así que con una sola ranura la expresión arrastraba siempre ese ángulo. Con una persona
+    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de entonces compartían el mismo
+    // tres cuartos del ancla (hoy son 25 casi de frente), así que con una sola ranura la expresión arrastraba ese ángulo. Con una persona
     // sola en la toma se admite el par: la vista va primera y manda en el ángulo; la expresión, segunda, sólo en el
     // gesto. Con dos personas el cupo no alcanza, y `vestuario` sigue sin combinarse.
     const parAngulo = pedidas.length === 2 && pedidas.every(d => d.campo === 'vista' || d.campo === 'expresion')
@@ -758,8 +758,8 @@ function resolverIdentidad(ficha) {
   // Las referencias dicen QUIÉN es la persona, no CÓMO está: sin esta frase el modelo copiaba también el giro, la
   // inclinación y el gesto de la primera imagen (Nexa salió con la misma pose en NX5b, NX7d y la vista del traje,
   // 2026-10-02). La imagen que la ficha pide como ángulo manda en el ángulo; la de expresión, SÓLO en el gesto: las 12
-  // expresiones de `5-expresiones/` comparten el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
-  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02).
+  // expresiones de `5-expresiones/` compartían el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
+  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02). Hoy son las 25 casi de frente y van detrás.
   const queManda = tramos.flatMap(t =>
     t.marcas
       .filter(m => m.campo === 'vista' || m.campo === 'expresion')
@@ -2797,11 +2797,27 @@ const VESTUARIO =
 
 // La pose repetida de Nexa (2026-10-02): sin una expresión declarada cae en el gesto por defecto de la escena
 // («confident half-smile») y todas las piezas salen con la misma cara. Aviso, no error: la neutra es legítima.
-export const auditarExpresion = identidad =>
-  (identidad ?? []).some(p => (typeof p === 'string' ? p : p?.persona) === 'nexa' && !(typeof p === 'object' && (p.expresion || p.vista)))
-    ? 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
-      '{ "persona": "nexa", "expresion": "conviccion" } (12 fotográficas en _identidad-nexa/5-expresiones/).'
-    : null
+// Con dos o más personas la expresión pedida NO viaja como imagen (2026-10-03): en dupla el cupo baja a dos referencias y
+// el cuerpo entero toma esa ranura (sin cuerpo el modelo inventa la silueta); en grupo hay una referencia por persona. El
+// gesto lo da la escena, y el comando lo dice en vez de soltarla en silencio.
+export const auditarExpresion = identidad => {
+  const lista = identidad ?? []
+  const nexa = lista.find(p => (typeof p === 'string' ? p : p?.persona) === 'nexa')
+
+  if (!nexa) return null
+
+  if (!(typeof nexa === 'object' && (nexa.expresion || nexa.vista))) {
+    return 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
+      '{ "persona": "nexa", "expresion": "conviccion" } (25 fotográficas casi de frente en _identidad-nexa/5-expresiones-frente/).'
+  }
+
+  if (lista.length > 1 && nexa.expresion && !nexa.vista) {
+    return `pide la expresión «${nexa.expresion}» para Nexa con ${lista.length} personas en la toma: con más de una persona la ` +
+      'expresión no viaja como imagen (el cupo de referencias es para la cara y el cuerpo). Describe ese gesto en la escena.'
+  }
+
+  return null
+}
 
 export const auditarVestuario = (escena, identidad) =>
   identidad?.length && !VESTUARIO.test(escena)

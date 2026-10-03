@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.1 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-02 por Claude (1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.2 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-03 por Claude (1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -55,7 +55,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -252,6 +252,17 @@ Prueba cinemática del elenco de marca (`EFEONCE_BRAND_CAST_V1.md`), los cinco j
 | 26 | **Prenda de hombre en una mujer, de frente en una persona a 45°** | Sin `puesta`, la prenda viajaba siempre con su vista frontal masculina | `foto:prompt` elige la vista puesta por silueta, giro, cámara y oclusión (`elegirPuesta`) e imprime las demás opciones; en grupo, `persona` en cada prenda | prueba de uniforme del elenco | la línea `·` de `foto:prompt` |
 | 27 | **Marca rotada en el plano en un giro profundo** | Sin una referencia en esa perspectiva, el modelo dibuja la marca a mano y la inclina (hasta ~35° a 70°) | El kit trae vistas puestas a 45° y 70°, de frente y de espaldas; se pidieron con la órbita horizontal y partiendo del frente | `2026-10-03_uniforme-vistas` | esfera arriba y ventanas horizontales, al 100 % |
 | 28 | **Una mano tapa la marca y se compone una marca más chica al lado** | La composición acomodó la marca al espacio libre | La vista real es la marca a su tamaño con sólo la parte visible: se pide la vista de oclusión del kit (`tapa`), no se compone encima. `foto:isotipo` ya compone por detrás de los oclusores, pero no decide el tamaño | EC2-c (descartada) → validado en `VO-karo-mano` (2026-10-03) | el operador, sobre la mano de Karo |
+| 29 | **El modelo esquiva la oclusión**: baja la tablet, sube la taza o la corre a un costado | Al pedir un objeto delante de la marca, el modelo prefiere dejar la marca entera y libre | Anclar el objeto a la marca en la frase («los nudillos delante de la marca») y pedir la vista de oclusión del kit (`tapa`). Si igual corre el objeto, revisar la marca: en la validación con taza salió correcta y entera | vistas de oclusión de `2026-10-03_uniforme-vistas`; validación en escena con taza | la línea `·` de `foto:prompt` + `foto:emblema` al 100 % |
+
+## Nexa: pose y proporción (2026-10-03) — lo que aprendimos
+
+Dos fallas de identidad de Nexa que ninguna frase del prompt corregía, porque las causaba una **imagen**. Detalle y
+validación en la [ficha de Nexa, delta 2026-10-03](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-03--25-expresiones-casi-de-frente-ancla-frontal-v2-y-proporción-del-rostro).
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 30 | **Nexa sale siempre con la misma pose, volteando la cara** (operador) | Las 12 expresiones de `5-expresiones/` se editaron desde el ancla en tres cuartos, todas con el mismo giro, y entraban **primeras** cuando la ficha pedía `expresion` (casi siempre, porque `foto:prompt` avisa si falta). La primera imagen manda en la pose más que cualquier frase | El ancla frontal va siempre primera y la expresión detrás, sólo para el gesto; en dupla y en grupo la expresión no viaja. 25 expresiones nuevas casi de frente (método A2) | `VP1` gira a la derecha cuando la escena lo pide; `VP2` de frente | orden de `--image` que imprime `foto:prompt` |
+| 31 | **La cara de Nexa sale afinada o alargada** (operador: «le alarga o achata la cara al ancho, poniéndola excesivamente fina») | El ancla frontal aprobada era 4–5 % más estrecha que el resto del canon (medido con Vision) | Ancla frontal v2: la aprobada estirada ×1,037 en horizontal, sin modelo; geometría del rostro en el IDENTITY (pómulos ≈ 1,2 veces ojos → mentón) y canon `rostro` 0,81 ± 0,02 | ancla vieja 0,836 → v2 0,816; canon aprobado 0,79–0,82 | `pnpm foto:rostro <png> --persona nexa` |
 
 ## Lo que no se automatiza (y por eso existe el revisor)
 

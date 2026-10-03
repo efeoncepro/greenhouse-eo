@@ -28,6 +28,7 @@ nadie lo notara.
 | `3-poses/` | 8 poses expresivas | 1152×2048 | sintético (deuda) |
 | `4-vestuario/` | 17 en 4 contextos | 1152×2048 | sintético (deuda) |
 | `5-expresiones/` | 12 registros de rostro | 2048×2560 | **fotográfico** · todas con el **mismo tres cuartos** del ancla: en `foto:prompt` copian sólo el gesto (2026-10-02) |
+| `5-expresiones-frente/` | **25 · las expresiones vigentes** (2026-10-03) | — | **fotográfico** · casi de frente, aprobadas; índice abajo |
 
 **Traje biónico (2026-10-01, TASK-1940):** el traje de ficción de Nexa ya no se describe en la ficha: se pide por
 catálogo (`traje-bionico-nexa` + `lentes-bionicos-nexa`, sólo con `"registro": "cine"`). Kit y vistas puestas en Nexa A
@@ -53,6 +54,58 @@ Julio, no de sus prompts, porque el de perfil se contradice solo y documentarlo 
 |---|---|---|---|
 | `45-izq` / `perfil-izq` | a su izquierda | el lado **derecho** | a la **derecha** del cuadro |
 | `45-der` / `perfil-der` | a su derecha | el lado **izquierdo** | a la **izquierda** del cuadro |
+
+### `5-expresiones-frente/` — índice de las 25 expresiones vigentes (2026-10-03)
+
+Se piden con `{ "persona": "nexa", "expresion": "<clave>" }`. El ancla frontal v2 va siempre primero y la expresión
+detrás, sólo para el gesto; en un grupo la expresión no viaja y el gesto lo da la escena. La lista de «faltan todavía»
+de la sección siguiente quedó cerrada con las 13 nuevas. Las 8 del Character Bible (`the-spark`, `the-read`,
+`mic-drop`…, en `3-poses/`, sintéticas) siguen disponibles con la misma clave `expresion`.
+
+| # | Clave para la ficha | Archivo | Uso |
+|---|---|---|---|
+| 01 | `carcajada` | `nexa-expr-01-carcajada.png` | risa abierta, celebración espontánea |
+| 02 | `risa-elegante` | `nexa-expr-02-risa-elegante.png` | risa contenida, social |
+| 03 | `sorprendida` | `nexa-expr-03-sorprendida.png` | sorpresa positiva, descubrimiento |
+| 04 | `esceptica` | `nexa-expr-04-esceptica.png` | duda ante una promesa o un dato |
+| 05 | `pensativa` | `nexa-expr-05-pensativa.png` | reflexión, análisis |
+| 06 | `neutra` | `nexa-expr-06-neutra-reposo.png` | reposo; retrato sin gesto marcado |
+| 07 | `preocupada` | `nexa-expr-07-preocupada.png` | riesgo, error, algo no anda |
+| 08 | `conviccion` | `nexa-expr-08-conviccion.png` | afirmar una idea con seguridad |
+| 09 | `escucha-empatica` | `nexa-expr-09-escucha-empatica.png` | escucha a otra persona |
+| 10 | `curiosa` | `nexa-expr-10-curiosa.png` | interés, pregunta |
+| 11 | `complicidad` | `nexa-expr-11-complicidad.png` | complicidad con quien mira |
+| 12 | `mirada-lateral` | `nexa-expr-12-mirada-lateral.png` | mira a la **derecha** del cuadro (hacia algo o alguien) |
+| 13 | `euforia` | `nexa-expr-13-euforia.png` | éxito: cabeza atrás, puños arriba |
+| 14 | `alivio` | `nexa-expr-14-alivio.png` | éxito: el problema se resolvió |
+| 15 | `orgullo-sereno` | `nexa-expr-15-orgullo-sereno.png` | éxito: logro tranquilo |
+| 16 | `te-lo-dije` | `nexa-expr-16-te-lo-dije.png` | éxito: el dato le dio la razón |
+| 17 | `hartazgo` | `nexa-expr-17-hartazgo.png` | el «antes» del problema; trendjacking (ojos en blanco: `foto:rostro` mide ≈ +0,03, se mira a ojo) |
+| 18 | `agobio` | `nexa-expr-18-agobio.png` | el «antes»: sobrecarga |
+| 19 | `alarma` | `nexa-expr-19-alarma.png` | el «antes»: sorpresa negativa |
+| 20 | `confusion` | `nexa-expr-20-confusion.png` | el «antes»: no se entiende qué pasa |
+| 21 | `concentracion` | `nexa-expr-21-concentracion.png` | foco en el trabajo |
+| 22 | `determinacion` | `nexa-expr-22-determinacion.png` | foco: decisión tomada |
+| 23 | `explicando` | `nexa-expr-23-explicando.png` | foco: explica o presenta |
+| 24 | `bienvenida` | `nexa-expr-24-bienvenida.png` | social: recibe, saluda |
+| 25 | `mirada-lateral-izq` | `nexa-expr-25-mirada-lateral-izq.png` | mira a la **izquierda** del cuadro |
+
+Grupos de uso: **éxito** (13–16) · **el «antes» del problema** (17–20; con las de éxito arman el «antes/después» de
+un anuncio) · **foco** (21–23) · **social** (24, 12 y 25). La columna «Uso» orienta; la escena dirige la pose.
+
+**Proporción.** `PERSONAS.nexa.rostro = { largoAncho: 0.81, tolerancia: 0.02 }`, recalibrado con el medidor final de
+`pnpm foto:rostro` (mide desde el contorno del ojo, no la pupila): ancla de cuerpo y portadas aprobadas 0,79–0,82, ancla
+frontal vieja 0,836, v2 0,816. No compara caras giradas, con boca abierta ni con ojos cerrados.
+
+**Sumar una expresión (procedimiento C):**
+
+1. Generarla con el método A2: ancla frontal v2 + la **causa** de la expresión (no músculos), cabeza libre de su
+   movimiento natural, intensidad cotidiana, piel v3 y la geometría del rostro.
+2. Medirla: `pnpm foto:rostro <png> --persona nexa` (sale 1 si una frontal queda fuera del canon).
+3. Copiarla a `5-expresiones-frente/nexa-expr-NN-<clave>.png` y agregar la entrada en `expresiones` de
+   `PERSONAS.nexa` (`scripts/foto/build-prompt.mjs`).
+4. `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto`.
+5. Archivar la exploración con `pnpm ai-gen:archive apply --folder <carpeta>` y sumarla a la tabla de arriba.
 
 ### `5-expresiones/` — qué funcionó y qué no **[medido]**
 

@@ -154,6 +154,17 @@ primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos
 `ai-generations/2026-09-20_identidad-julio-nexa/` (si faltan en disco, `pnpm ai-gen:pull` antes de componer). Consultar el manifiesto y resolver vistas con `foto:prompt`;
 no usar `julio-ap-02` como ancla —es una pieza compuesta— ni mezclar las fotos fuente/descartes con el set aprobado.
 Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+Julio tiene 37 años con canas prematuras: su edad aparente es la de las referencias, sin rejuvenecer ni envejecer.
+
+**Elenco de marca (2026-10-02/03):** cinco personajes **ficticios** —`hum`, `karo`, `sophia`, `isabella`, `antonio`—, uno
+por línea, que se piden en `identidad` igual que el roster (`{ "persona": "karo", "vista": "45-der" }`). Sirven para
+**variar las personas en fotos de varios o de equipo**; no son obligatorios en ninguna pieza. Un grupo de 3 a 5 es
+cualquier combinación de elenco, Nexa y Julio. Nunca como equipo real, cliente ni testimonio. **Nexa** tiene 25
+expresiones casi de frente (la expresión viaja detrás del ancla frontal, sólo para el gesto) y su proporción de rostro
+se mide con `pnpm foto:rostro`. **La prenda puesta** la elige `pnpm foto:prompt` por silueta, giro, cámara baja y
+oclusión. Detalle en [`references/efeonce-photographic-language.md`](references/efeonce-photographic-language.md) §11;
+canon en [`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) y
+[`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md).
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.

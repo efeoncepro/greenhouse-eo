@@ -625,3 +625,37 @@ la prenda: una manga, separada con `pnpm ai:layers`); limpia sólo la marca inve
 de lo que está delante. `--pliegues` (default 1) tiñe la marca con la luz local de la tela y `--relieve` la desplaza con
 el gradiente del pliegue; `--escorzo` la comprime en horizontal. Sigue valiendo la regla: si la marca no se puede
 componer limpia, se rehace la toma.
+
+### Cómo se pide en la ficha, cómo se nombra y cómo se suma una vista (2026-10-03)
+
+**En la ficha.** Basta con nombrar la prenda y, si hace falta, a quién la viste; el resto lo infiere el comando:
+
+```json
+"objetos": [
+  { "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" },
+  { "objeto": "chaqueta-bomber-efeonce", "persona": "karo", "giro": "espalda-45-izq", "camara": "baja" }
+]
+```
+
+Valores de `giro`: `frente | 45-izq | 45-der | 70-izq | 70-der | espalda | espalda-45-izq | espalda-45-der |
+espalda-70-izq | espalda-70-der`. De espaldas `giro` es obligatorio: la identidad no tiene esa vista. En un grupo sin
+`persona`, la prenda va de frente y el comando lo avisa; con una sola persona, `tapa` se infiere de la escena. La línea
+`·` de la salida dice «fuerza otra con "puesta"» junto a todas las alternativas del kit.
+
+**Nombres y numeración.** `<prefijo>-NN-puesto-<clave>-<tam>-v01-fondo-estudio.png` en el `final/` del kit, con `<clave>` =
+la de `usoPorVista` (`<giro>[-<tapa>|-bajo][-mujer]`). Rangos de la corrida: bomber 18–46, softshell 18–46, polo navy
+17–45, hoodie 23–51 y gorra `v2-10` a `v2-19`. El frente de hombre de cada prenda es su `assetDeUso` (vista 13, 14 o 15 de
+la primera corrida). Cada vista nueva entra al manifiesto del kit con `cuando_usarla` y su prompt a `brief/`.
+
+**`pnpm foto:isotipo`** deja procedencia `efeonce.foto.isotipo.v2`, con `oclusion` y `pliegues` registrados.
+
+**Sumar una vista a un kit (procedimiento A):**
+
+1. Generarla **editando** una vista puesta aprobada, con el macro del bordado como segunda imagen (desde el frente si es
+   un giro: un 45° de base arrastra su rotación).
+2. Revisarla al 100 %: `pnpm foto:emblema`; esfera arriba, ventanas horizontales, letras exactas.
+3. Copiarla a `final/` con la convención de nombre y declararla en `usoPorVista` del catálogo
+   (`scripts/foto/build-prompt.mjs`) con su clave.
+4. Agregarla al manifiesto (`cuando_usarla`) y su prompt a `brief/`.
+5. `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto`.
+6. Archivar la exploración con `pnpm ai-gen:archive apply --folder <carpeta>` y documentarla en el LEEME del kit.

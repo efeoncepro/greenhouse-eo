@@ -491,8 +491,16 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.
 - 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: las
   referencias dicen quién es; el giro, la inclinación y el gesto los da la escena. Declara `{ "persona": "nexa",
-  "expresion": "…" }` (12 fotográficas casi de frente en `5-expresiones-frente/`, detrás del ancla frontal y sólo para el gesto; en grupo no viajan — 2026-10-03: las de tres cuartos, puestas primeras, volteaban la cara de toda la serie, y el ancla frontal vieja la afinaba. Mide la proporción con `pnpm foto:rostro <plate> --persona nexa`) y no
+  "expresion": "…" }` (25 fotográficas casi de frente, aprobadas, en `5-expresiones-frente/`; claves en su LEEME, detrás del ancla frontal y sólo para el gesto; en grupo no viajan — 2026-10-03: las de tres cuartos, puestas primeras, volteaban la cara de toda la serie, y el ancla frontal vieja la afinaba. Mide la proporción con `pnpm foto:rostro <plate> --persona nexa`) y no
   copies «confident half-smile» de ficha en ficha: `foto:prompt` avisa si falta. Detalle: bloques de prompt, delta 2026-10-02.
+- 🔴 **El elenco de marca: cinco personajes FICTICIOS** **[2026-10-02/03]** — `hum`, `karo`, `sophia`, `isabella`,
+  `antonio`, uno por línea, con referencias en `ai-generations/_identidad-elenco/<clave>/`. Se piden en `identidad`
+  igual que el roster (`{ "persona": "karo", "vista": "45-der" }`). Sirven para variar personas en fotos de varios o de
+  equipo; **no hay cuota**: *«no para tener reglas explícitas de que al menos uno del elenco deba estar»*. Grupo de 3 a
+  5 = cualquier combinación de elenco, Nexa y Julio (con otras personas del roster, tope dos); la misma persona dos
+  veces es error. **NUNCA** como equipo real (página de equipo, firmas, LinkedIn), cliente o testimonio, ni con su
+  nombre en pantalla salvo ficción declarada. Canon: `EFEONCE_BRAND_CAST_V1.md`; manda el catálogo `ELENCO` de
+  `scripts/foto/build-prompt.mjs` (es lo que recibe el modelo).
 - 🔴 **La cabeza casi no gira: giran los ojos.** Pedir «gira la cabeza hacia el hombro» es pedir un **tres cuartos
   marcado**, y **pedir un ángulo que el set de referencias no cubre hace que el modelo reconstruya el rostro**. En la
   pieza aprobada la cabeza está casi frontal y **sólo los ojos** van hacia la mascota. Marcadores del casi-frontal:
@@ -663,7 +671,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 Los renders de referencia y los kits pesan **640 MB** y están en `.gitignore`. Viven en la máquina y en OneDrive
 (`5. Contenidos/13- Branding/` y `14. Mascotas de partners/`). Lo que **sí** está versionado es
-`scripts/foto/assets.lock.json`: la huella SHA-256 de los **54** assets que el catálogo declara.
+`scripts/foto/assets.lock.json`: la huella SHA-256 de los assets que el catálogo declara (54 al nacer; **550** al 2026-10-03).
 
 ```bash
 pnpm foto:assets:check   # ¿el catálogo y el lock coinciden?
@@ -678,6 +686,18 @@ Para qué sirve:
   referencia que el equipo nunca aprobó, y nada lo delata.
 
 **Si agregas un kit o una vista al catálogo, resella el lock y commitéalo**, o el test lo marca como faltante.
+
+**Canon-sync (2026-10-03).** Lo sellado (550 assets al 2026-10-03) está publicado en `gs://efeonce-creative-canon`
+con la misma ruta. `pnpm foto:prompt` y `pnpm foto:generar` bajan solos la referencia que falta o cuyo sha256 no es el
+del lock, y **apartan** la copia local distinta como `<archivo>.local-<sha8>.<ext>` (nunca la pisan: puede ser trabajo
+nuevo). `FOTO_SIN_CANON=1` lo apaga. La exploración y los descartes van al bucket de archivo con
+`pnpm ai-gen:archive apply --folder <carpeta>` (recuperable con `pnpm ai-gen:pull`); archivar ≠ borrar. Una carpeta
+citada en `src/`/`scripts/` queda protegida: no cites rutas de corridas en comentarios de código.
+
+**Al sumar algo nuevo** (vista de un kit, personaje del elenco, expresión de Nexa): declararlo en el catálogo →
+`pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto` → archivar la
+exploración → documentarlo en el LEEME de la carpeta, donde vive el procedimiento (A kits · B `_identidad-elenco` ·
+C `_identidad-nexa`).
 
 ## 🔴 Un validador que pasa NO valida el concepto **[medido 2026-09-21]**
 

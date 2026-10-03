@@ -73,11 +73,12 @@ medido en `NX7j`). Con dos personas, una sola:
 
 | Quieres fijar… | Campo | Valores |
 |---|---|---|
-| El gesto de la cara | `expresion` | 12 fotográficas: `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral`. También las ocho del Bible (`the-spark`, `the-read`, `the-point`…) |
+| El gesto de la cara | `expresion` | 25 fotográficas casi de frente (2026-10-03): `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral` (derecha), `euforia`, `alivio`, `orgullo-sereno`, `te-lo-dije`, `hartazgo`, `agobio`, `alarma`, `confusion`, `concentracion`, `determinacion`, `explicando`, `bienvenida`, `mirada-lateral-izq`. También las ocho del Bible (`the-spark`, `the-read`, `the-point`…) |
 | El ángulo de la cabeza | `vista` | Las vistas de Nexa (`45-izq`, `perfil-der`, `espalda`…); la lista sale en el error si pides una que no existe |
 
-Las 12 expresiones comparten el **mismo tres cuartos**: aportan sólo ojos, cejas y boca, no el giro. **La pose la
-describe la escena** («her head almost frontal, both eyes visible, looking straight into the lens…»). No copies
+Desde el 2026-10-03 las expresiones son **casi de frente** y entran **detrás** del ancla frontal: aportan sólo ojos,
+cejas y boca, no el giro (antes compartían un mismo tres cuartos y, puestas primeras, volteaban la cara de toda la
+serie). **La pose la describe la escena** («her head almost frontal, both eyes visible, looking straight into the lens…»). No copies
 «confident half-smile» de una ficha a otra: es lo que hacía que todas las fotos salieran con la misma cara.
 
 ### Paso 3 · Escribe la escena sin describir el traje
@@ -203,8 +204,8 @@ almacenamiento de referencias del equipo.
 | Síntoma | Causa | Qué hacer |
 |---|---|---|
 | La escena salió sin el isotipo en el pecho | La referencia o el macro no viajaron, o la escena pidió la pechera lisa | Revisa que la ficha declare `traje-bionico-nexa` sin `vista` y que la escena no niegue la marca; si igual falta, `foto:isotipo` (Paso 6) |
-| Nexa sale siempre con la misma cara ladeada | La ficha no declara expresión y la escena repite «half-smile» | Declara `expresion` y describe la pose en la escena |
-| Pedí una expresión y el ángulo no cambió | Las 12 expresiones comparten el mismo tres cuartos y aportan sólo el gesto | El ángulo se pide con `vista`, no con `expresion` |
+| Nexa sale siempre con la misma cara ladeada | La escena repite «half-smile» o no describe la pose (antes del 2026-10-03, además, la expresión en tres cuartos entraba primera) | Declara `expresion` y describe la pose en la escena |
+| Pedí una expresión y el ángulo no cambió | La expresión aporta sólo el gesto: va detrás del ancla frontal | El ángulo se pide con `vista` o se describe en la escena, no con `expresion` |
 | Los aretes salen dorados | Las vistas puestas del kit y las anclas los traen dorados | El operador aprobó las vistas del kit así. En la escena puedes pedirlos de plata (como hace la ficha de `NX7d`) y revisar al 100 %; si el smartwatch y el anillo van con el traje sigue sin decidir |
 | Salió un Spark de más | La escena pidió «three more» sin el total | Declara «EXACTLY THREE more (FIVE in total, never more)» |
 | Los Sparks del fondo se ven nítidos y del mismo tamaño | Llevan referencia propia | Deja referencia sólo a los dos del plano cercano |

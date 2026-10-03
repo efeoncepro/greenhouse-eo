@@ -1,9 +1,10 @@
 # Selección de referencias de marca para generación — V1
 
 > **Tipo de documento:** Contrato operativo de producción
-> **Versión:** 1.1 · **Creado:** 2026-09-21 por Claude, dictado por el operador (Julio Reyes)
-> **Última actualización:** 2026-09-21 — deltas de la corrida `copiloto` (Nexa + Clawd) y de la corrida de **Gigi**
-> (Google Gemini, tercera mascota de partner), al final del documento
+> **Versión:** 1.2 · **Creado:** 2026-09-21 por Claude, dictado por el operador (Julio Reyes)
+> **Última actualización:** 2026-10-03 — la vista PUESTA de cada prenda la elige `foto:prompt` (§3.1), cobertura del
+> kit de 126 vistas puestas (§1 y §3.1), macro con la prenda puesta y regla de oclusión (§4 ter). Antes (2026-09-21):
+> deltas de la corrida `copiloto` (Nexa + Clawd) y de la corrida de **Gigi** (Google Gemini), al final del documento
 > **Aplica a:** toda pieza generada donde aparezca un asset de marca Efeonce — ropa corporativa, lanyard,
 > merch, logo 3D, isotipo 3D, nave, mascotas de partners
 > **Relacionado:** [guía de kits](social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [kit de prendas](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md) · [lenguaje fotográfico](brand-photography/README.md) · [caso fuente](../../ai-generations/2026-09-21_lanyard-deterministico/LEEME.md)
@@ -40,6 +41,12 @@ inventar una vista: casi siempre ya está.
 | `2026-10-01_traje-bionico-nexa` (traje biónico + lentes de Nexa, sólo cine) | 18 en `final/` (10 vistas, 7 transparentes, manifiesto) | 10 | sí | **`13-puesto-frente`, `14-puesto-espalda`** (Nexa) |
 | `2026-09-17_efeonce-logo-3d` | 414 archivos en `kit/`, por **escala × color** | — | LEEME | `prueba/` |
 
+> **Delta 2026-10-03 — 126 vistas puestas más.** Los conteos de chaqueta, polo, hoodie y gorra de la tabla son del
+> 2026-09-21. La corrida `2026-10-03_uniforme-vistas` sumó a esos `final/` **126 vistas de la prenda puesta**,
+> selladas y publicadas al canon: 29 para la bomber (18–46), 29 para la softshell (18–46, mismo kit
+> `chaqueta-efeonce`), 29 para el polo navy (17–45), 29 para el hoodie (23–51) y 10 para la gorra navy con logotipo
+> (v2-10 a v2-19). Qué vistas son y cómo se eligen: §3.1.
+
 Los kits 3D traen **ocho poses o ángulos** cada uno —frente héroe, tres cuartos izquierda y derecha,
 perfil, contrapicado, cenital, espalda, y una de acción— **cada una con fondo de estudio y
 transparente**. **Gigi es la excepción y entró el mismo día, después de esa medición** —el total de 279 no la
@@ -48,7 +55,7 @@ búsqueda y AEO** que ninguna otra mascota tiene (ver delta al final). El logo 3
 resuelto por **escala** (pequeña, mediana, grande, monumental) **y color** (blanco, navy), porque una
 pieza monumental y una de sobremesa no se iluminan igual.
 
-> **Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](AI_GENERATIONS_STORAGE_V1.md)). Los kits sellados en `scripts/foto/assets.lock.json` también están en el canon; una copia en canon no autoriza borrar el original local.
+> **Dónde viven los archivos de `ai-generations/`:** las rutas `ai-generations/...` son lógicas; si una falta en disco, `pnpm ai-gen:where <ruta>` + `pnpm ai-gen:pull <carpeta>` antes de componer, nunca regenerarla ni sustituirla ([contrato](AI_GENERATIONS_STORAGE_V1.md)). Los kits sellados en `scripts/foto/assets.lock.json` también están en el canon, y desde el 2026-10-03 `pnpm foto:prompt`/`foto:generar` traen solos del canon la referencia sellada que falta o no es la versión del lock ([contrato §3.1](AI_GENERATIONS_STORAGE_V1.md)); aun así, una copia en canon no autoriza borrar el original local.
 
 ## 2. Las tres clases de asset, y para qué sirve cada una
 
@@ -105,6 +112,47 @@ LEEME decía que ahí «el logotipo se mantiene legible y el emblema conserva su
 > entero»*. Pasar tres retratos es exactamente lo que hace al modelo **construir el cuerpo desde la
 > cara** y sacar la cabeza más grande que el cuerpo. Se estaba incumpliendo sin darse cuenta.
 
+### 3.1 La vista PUESTA la elige `foto:prompt` **[2026-10-03]**
+
+Para la ropa corporativa (bomber, softshell, polo, hoodie, gorra), la pregunta 2 —«¿desde qué ángulo se ve?»— ya no
+la contesta el agente a ojo: **`pnpm foto:prompt` elige la vista puesta** (función `elegirPuesta` en
+`scripts/foto/build-prompt.mjs`) con cuatro datos de la ficha:
+
+| Dato | De dónde sale |
+|---|---|
+| **Silueta** de quien la viste (`hombre` / `mujer`) | `silueta` declarada en cada persona de `PERSONAS` y del `ELENCO` (el casting de la ficha puede declararla) |
+| **Quién** la viste | `persona` en el objeto, o la única persona de `identidad`. En un grupo **sin** `persona`, la prenda va de frente y el comando avisa |
+| **Giro** | De la vista de identidad pedida (`45-*` → 45°, `perfil-*` → 70°, `espalda`/`trasero` → espalda) o de `giro` en el objeto (**obligatorio de espaldas**): `frente \| 45-izq \| 45-der \| 70-izq \| 70-der \| espalda \| espalda-45-izq \| espalda-45-der \| espalda-70-izq \| espalda-70-der` |
+| **Cámara baja** | `camara: "baja"` → la vista desde abajo |
+| **Oclusión** | `tapa: "mano" \| "cruza" \| "objeto" \| "brazos"` → la vista con el pecho tapado. Con UNA persona se infiere de la escena (`tapaEnEscena`); con varias hay que declarar `tapa` y `persona` en el objeto, y el comando lo avisa |
+
+**Cadena de respaldo** cuando la vista exacta no existe: oclusión → cámara baja → giro → 45° del mismo lado → familia
+(frente o espalda). En cada paso se busca primero la de la silueta. **El ángulo pesa más que la silueta**: mejor la
+vista de hombre al 70° que la de mujer de frente para una mujer de perfil.
+
+**La salida lo dice**: una línea `·` por prenda con la vista elegida, el motivo y **todas** las alternativas, más
+«fuerza otra con "puesta"». Si no existe la vista exacta, avisa. **`puesta` en el objeto sigue forzando** una vista
+concreta y gana sobre la elección automática.
+
+```json
+"objetos": [
+  { "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" },
+  { "objeto": "chaqueta-bomber-efeonce", "persona": "karo", "giro": "espalda-45-izq", "camara": "baja" }
+]
+```
+
+**Cobertura del kit** (corrida `2026-10-03_uniforme-vistas`, 126 vistas):
+
+| Prenda | Vistas puestas, hombre y mujer |
+|---|---|
+| Bomber, softshell, polo navy, hoodie (29 c/u) | frente · 45° y 70° a cada lado · frente con cámara baja · espalda a 45° y 70° a cada lado · espalda con cámara baja · oclusión con la mano, con un antebrazo que cruza y una taza (`cruza`), con una tablet (`objeto`) y con brazos cruzados |
+| Gorra navy con logotipo (10) | frente, 45° y 70° a cada lado, encuadre de la copa a las cejas, sin rostro |
+
+**Convención de clave en `usoPorVista`:** `<giro>[-<tapa>|-bajo][-mujer]`. El lado (`-izq` / `-der`) dice hacia qué
+borde **del cuadro** apunta la nariz de la persona, de frente o de espaldas. El archivo sigue
+`<prefijo>-NN-puesto-<clave>-<tam>-v01-fondo-estudio.png` en el `final/` del kit, y el manifiesto declara
+`cuando_usarla` por vista. Sumar una vista nueva: [almacenamiento, §8](AI_GENERATIONS_STORAGE_V1.md).
+
 ### Y el registro manda sobre la variedad visual
 
 Para ropa corporativa, la prenda dice el **registro** de la escena **[operador, 2026-09-20]**: polera
@@ -155,6 +203,32 @@ para evitar.
 
 **La pregunta que hay que hacerse antes de armar nada: ¿lo que lleva esta pieza cambia según quién la
 use o la ocasión? Si la respuesta es no, abre el kit.**
+
+## 4 ter. Marca chica en la prenda puesta: macro por defecto y oclusión como vista **[2026-10-03]**
+
+**El macro del bordado viaja también con la prenda puesta.** Es el default de toda prenda desde el 2026-10-03: en la
+prueba de uniforme del elenco la marca del pecho, a escala de escena, salió reinventada en polo y hoodie con sólo la
+vista puesta. Una prenda puede apagarlo con `macroEnUso: false`. **La gorra NO lleva macro**: empujaba al modelo a
+redibujar el logotipo (medido 2026-09-20).
+
+**Oclusión: la vista real es la marca a su tamaño con sólo la parte visible.** Cuando una mano, una taza, una tablet o
+unos brazos tapan el pecho, lo correcto no es una marca entera más chica corrida al lado: es la marca **a su tamaño
+real**, mostrando sólo lo que el objeto no tapa. El operador, sobre la mano de Karo: «la vista real sería que se viera
+solo la parte de logo que no tapa la mano … hay que dar la vista en la ropa que permita esos casos». Por eso la
+oclusión es **una vista del kit** que se pide con `tapa` (§3.1), no una composición sobre la escena.
+
+| Haz | No hagas |
+|---|---|
+| Pedir la vista de oclusión con `tapa` (o dejar que se infiera con una sola persona) | Componer una marca más chica al lado de la mano |
+| Si la toma salió con una marca inventada y hay que componer, `pnpm foto:isotipo` compone la oficial **por detrás** del oclusor | Componer la marca encima de la vista de kit (24 descartadas: la empeora) |
+| Si no se compone limpio, rehacer la toma | Intervenir la escena una y otra vez |
+
+Trampas medidas al construir las vistas (detalle en
+[`garment-reference-kit`](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md)
+§Delta 2026-10-03): en el giro el modelo **rota la marca en el plano** (hasta ~35° a 70°), así que se parte del frente
+y se pide la órbita horizontal; y el modelo **esquiva la oclusión** (baja la tablet, sube la taza), así que el objeto
+se ancla a la marca («los nudillos delante de la marca»). Validado en escena: con la mano, correcto (Karo); con la
+taza, el modelo la corrió a un costado, pero la marca salió correcta y entera.
 
 ## 5. Las proporciones se calculan del objeto real
 

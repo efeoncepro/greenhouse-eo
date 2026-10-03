@@ -681,6 +681,8 @@ el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la c
   reglas más tres propias: lo **plano se compone, no se genera**; la vista que debe salir **sin arte se genera sin
   referencias**; y la pieza se **nombra con precisión** (portacarnet de marco rígido ≠ portacredencial) o vuelve la
   genérica: [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
+  **Desde el 2026-10-03 la vista puesta la elige `pnpm foto:prompt`** (silueta, giro, espalda, cámara baja y oclusión;
+  126 vistas puestas en los kits): ver §Personas, prenda puesta y referencias.
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 
@@ -742,6 +744,27 @@ diagnostica sin costo.
   costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
 - **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
   directorio (corregido 2026-09-19, §Brechas conocidas).
+
+### Personas, prenda puesta y referencias — lo que el compilador ya hace (2026-10-03)
+
+Índice de capacidades; el detalle vive en el puntero de cada línea. Antes de describir algo a mano en el prompt,
+revisa si el comando ya lo resuelve.
+
+| Capacidad | Qué hace | Detalle |
+|---|---|---|
+| **Elenco de marca** | Cinco personajes ficticios (`hum`, `karo`, `sophia`, `isabella`, `antonio`) que se piden en `identidad` igual que el roster: `{ "persona": "karo", "vista": "45-der" }`. Sirven para variar personas en fotos de varios o de equipo; no son obligatorios. Grupo de 3 a 5 = cualquier combinación de elenco + Nexa + Julio; con otras personas del roster el tope sigue en dos. La misma persona dos veces es error. | [`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) · `ai-generations/_identidad-elenco/LEEME.md` |
+| **Selección automática de la vista puesta** | `pnpm foto:prompt` (`elegirPuesta`) elige la vista PUESTA de bomber, softshell, polo, hoodie y gorra por la `silueta` de quien la viste, el giro de su vista (o `giro` en el objeto, obligatorio de espaldas), `camara: "baja"` y `tapa: "mano" \| "cruza" \| "objeto" \| "brazos"` (con una persona se infiere de la escena). Imprime una línea `·` con la elegida, el motivo y las alternativas; `puesta` sigue forzando una vista. | [`references/garment-reference-kit.md`](references/garment-reference-kit.md) §Delta 2026-10-03 |
+| **Kit de 126 vistas puestas** | Bomber, softshell, polo navy y hoodie (29 vistas cada uno, hombre y mujer: frente, 45° y 70°, cámara baja, espalda a 45°/70° y baja, oclusión mano/taza/tablet/brazos) + gorra navy (10, de la copa a las cejas). | `ai-generations/2026-10-03_uniforme-vistas/LEEME.md` + LEEME de cada kit |
+| **`pnpm foto:isotipo` con oclusión** | Para cuando sí hay que componer: separa tela, marca inventada y oclusor (piel, pelo, otro material; `--oclusion <máscara de pnpm ai:mask>` para lo del color de la prenda) y compone la marca oficial POR DETRÁS. `--pliegues 0–1`, `--relieve 0–2`, `--escorzo 0,15–1`. Si no se compone limpio, se rehace la toma. | garment-reference-kit §Delta 2026-10-03 |
+| **`pnpm foto:rostro`** | Mide largo/ancho del rostro con Vision (macOS) y sale 1 si una frontal queda fuera del canon de la persona (`rostro: { largoAncho, tolerancia }`; Nexa 0,81 ± 0,02). No mide caras giradas, con boca abierta ni ojos cerrados. | `ai-generations/_identidad-nexa/LEEME.md` |
+| **Expresiones de Nexa** | 25 casi de frente, aprobadas, en `_identidad-nexa/5-expresiones-frente/`: `{ "persona": "nexa", "expresion": "hartazgo" }`. El ancla frontal va siempre primero y la expresión detrás, sólo para el gesto; en un grupo no viaja. | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md) · LEEME de `_identidad-nexa` |
+| **Canon-sync** | `foto:prompt` y `foto:generar` bajan del bucket canon la referencia sellada que falte o cuyo sha256 no sea el del lock; la copia local distinta se aparta como `<archivo>.local-<sha8>.<ext>`, nunca se pisa. `FOTO_SIN_CANON=1` lo apaga. | §Dónde viven los archivos de `ai-generations/` |
+
+**Al sumar algo nuevo** (vista de kit, personaje, expresión de Nexa): se declara en el catálogo de
+`scripts/foto/build-prompt.mjs`, `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` →
+`pnpm exec vitest run scripts/foto` → se archiva la exploración con `pnpm ai-gen:archive` → se documenta en el LEEME de
+la carpeta. El procedimiento paso a paso de cada caso vive en ese LEEME (A: kit de prenda · B: `_identidad-elenco` ·
+C: `_identidad-nexa`).
 
 ### Registro cine: placas, emblema y tamaños
 
@@ -1046,6 +1069,7 @@ Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables 
 - **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
 - **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
 - Una ruta `ai-generations/…` usada como `--image`, máscara o guía es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` (verifica sha256) **antes** de generar o componer.
+- **Canon-sync (2026-10-03):** `pnpm foto:prompt` y `pnpm foto:generar` lo hacen solos para lo **sellado** (`scripts/foto/canon-sync.mjs`): si la referencia falta o su sha256 no es el del lock, la bajan del canon (`.part` + verificación + rename); una copia local distinta se aparta como `<archivo>.local-<sha8>.<ext>`. Los bytes pasan por la máquina como caché, no como copia permanente. `FOTO_SIN_CANON=1` lo apaga. Para exploración archivada sigue valiendo `pnpm ai-gen:pull`.
 - **NUNCA** regenerar, sustituir ni aproximar una referencia aprobada porque falta (es justo la deriva de identidad que el kit evita); **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Las salidas nuevas siguen en `ai-generations/<AAAA-MM-DD>_<slug>/`.
 - SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 

@@ -1954,3 +1954,11 @@ describe('foto:prompt · proporción del rostro de Nexa (2026-10-03)', () => {
     }
   })
 })
+
+describe('foto:prompt · la expresión de Nexa con más de una persona (2026-10-03)', () => {
+  it('avisa que en dupla o grupo la expresión no viaja como imagen', () => {
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'alivio' }, 'julio'])).toMatch(/no viaja como imagen/)
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'alivio' }])).toBeNull()
+    expect(auditarExpresion(['nexa'])).toMatch(/25 fotográficas casi de frente/)
+  })
+})

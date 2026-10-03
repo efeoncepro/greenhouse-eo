@@ -292,6 +292,10 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
   distractores coherentes, antes/después) está pendiente; NUNCA presentarlo como brand equity.
 - **Regla dura:** NUNCA anclar la serie en la categoría de un cliente real ni insinuar trabajo con un cliente (la
   pintura se leyó como Berel: «nosotros NO somos Berel»). Variar industrias; nunca etiquetar con nombre de cliente.
+- **Personas (2026-10-03):** el **elenco de marca** —cinco personajes ficticios, uno por línea— sirve para variar personas
+  en fotos de varios o de equipo, sin cuota; nunca se presenta como equipo real, cliente ni testimonio
+  ([`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)). Nexa suma 25
+  expresiones aprobadas y la ropa de marca puesta la elige `pnpm foto:prompt`; la dirección vive en `design-studio` §11.
 - Fuente: [lenguaje fotográfico V1](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
   [índice](../../../docs/operations/brand-photography/README.md) ·
   [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive

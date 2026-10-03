@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude — 1.6: el registro cine en `foto:prompt` — `AJUSTES_CINE`, el bloque `CINEMATIC CRAFT` y sus inyecciones, `foto:cine:nueva`, `foto:validar:cine` y `regresion-prompt.mjs` como gate de no-regresión ([delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)). 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
+> **Última actualización:** 2026-10-03 por Claude — 1.7: referencias desde el bucket canon (`canon-sync`), la vista puesta elegida por quien la viste (`persona`, `giro`, `camara`, `tapa`), el macro con la prenda puesta por defecto, `pnpm foto:rostro`, las banderas nuevas de `foto:isotipo`, el orden de referencias con la expresión detrás del ancla y los grupos de 3 a 5 ([delta 2026-10-03](#delta-2026-10-03--referencias-desde-el-canon-vista-puesta-automática-y-fotorostro)). 1.6: el registro cine en `foto:prompt` — `AJUSTES_CINE`, el bloque `CINEMATIC CRAFT` y sus inyecciones, `foto:cine:nueva`, `foto:validar:cine` y `regresion-prompt.mjs` como gate de no-regresión ([delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-en-fotoprompt)). 1.5: §3.7.1 lista el traje y los lentes biónicos de Nexa entre los kits y las tres claves de kit que estrenaron (`instruccionEnUso`, `acabadoMarca`, `macroEnUso`). 1.4: las referencias de identidad dicen QUIÉN es, no CÓMO está ([delta 2026-10-02](#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está)). Antes, 2026-09-26: conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -16,6 +16,118 @@ verbatim en `rondas/<ronda>/batch*.json` y `*.txt` (versionados); las imágenes 
 Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
 
 ---
+
+## Delta 2026-10-03 — referencias desde el canon, vista puesta automática y `foto:rostro`
+
+Fuente: la sesión del elenco y el uniforme (commits `2b544bfe0` a `ba563fdbe` en `develop`). Lo de identidad y
+vestuario —grupos, silueta, proporción del rostro— se explica en
+[personas, delta 2026-10-03](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro);
+aquí, los campos, los comandos y lo que imprimen.
+
+**1. Las referencias se traen del canon (`scripts/foto/canon-sync.mjs`).** Operador: *«al ser tantas imágenes es una
+locura el peso»* y *«¿necesitas sí o sí que estén en local?»*. Los bytes de cada referencia pasan por la máquina al
+generar, pero **como caché**, no como copia permanente del repo. Lo sellado en `scripts/foto/assets.lock.json` está
+publicado en el bucket canon `gs://efeonce-creative-canon` (misma ruta de objeto que la local; definido en
+`scripts/creative-workbench/control.json`; `pnpm creative:assets:publish` → «550 declarados · 550 al día · 0 a
+subir»). `pnpm foto:prompt` y `pnpm foto:generar` llaman `activarCanon()` y, antes de usar una referencia sellada:
+
+| Estado en disco | Qué hace |
+|---|---|
+| Falta | La baja del canon (con `gcloud`) |
+| Está, pero su sha256 no es el del lock (hay una versión más nueva aprobada) | La baja y reemplaza; la copia local distinta se **aparta** como `<archivo>.local-<sha8>.<ext>` y nunca se pisa (puede ser trabajo nuevo sin sellar) |
+| Está y coincide | La usa |
+
+Siempre verifica el sha256 de lo bajado contra el lock antes de dejarlo en su lugar (`.part` + rename).
+`FOTO_SIN_CANON=1` lo apaga (sin red, o para trabajar con copias locales a propósito); las pruebas no tocan la red.
+Probado real: se apartó una vista del disco y `foto:prompt` la bajó sola con la huella exacta. La exploración y los
+descartes **no** van al canon: van al bucket de archivo con `pnpm ai-gen:archive apply --folder <carpeta>
+[--min-age-days 0]` (sube, verifica tamaño, hash del servidor y sha256, inventaría en `artifacts.remote.json` y recién
+entonces borra lo local; nunca borra en el bucket) y se recuperan con `pnpm ai-gen:pull <carpeta>`. Archivar no es
+borrar. Una carpeta citada en `src/` o `scripts/` queda protegida: no citar rutas de corridas en comentarios de código.
+
+**2. La vista puesta de cada prenda la elige `foto:prompt` (`elegirPuesta`).** Campos nuevos del objeto en `objetos`
+(bomber, softshell, polo, hoodie y gorra):
+
+| Campo | Valores | Para qué |
+|---|---|---|
+| `persona` | una clave de `identidad` | Quién la viste. Sin él, la única persona de `identidad`; en un grupo sin `persona`, la prenda va de frente y avisa |
+| `giro` | `frente` · `45-izq` · `45-der` · `70-izq` · `70-der` · `espalda` · `espalda-45-izq` · `espalda-45-der` · `espalda-70-izq` · `espalda-70-der` | El giro de quien la viste. Si no viene, sale de su `vista` de identidad (`45-*` → 45°, `perfil-*` → 70°, `espalda`/`trasero` → espalda). **Obligatorio de espaldas** |
+| `camara` | `"baja"` | Vista desde abajo |
+| `tapa` | `"mano"` · `"cruza"` (taza) · `"objeto"` (tablet) · `"brazos"` | Vista de oclusión. Con una persona sola se infiere de la escena (`tapaEnEscena`) |
+
+```json
+"objetos": [
+  { "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" },
+  { "objeto": "chaqueta-bomber-efeonce", "persona": "karo", "giro": "espalda-45-izq", "camara": "baja" }
+]
+```
+
+Además usa la `silueta` de la persona (`hombre` | `mujer`). Cadena de respaldo: oclusión → cámara baja → giro → 45° del
+mismo lado → familia (frente o espalda); en cada paso, primero la de la silueta; el ángulo pesa más que la silueta.
+`puesta` sigue forzando una vista. Por cada prenda imprime una línea `·` con la elegida, el motivo y **todas** las
+alternativas:
+
+```text
+  · <ficha>: "<objeto>" para <persona> → vista puesta «<elegida>» (<motivo>). Otras: <alternativas>; fuerza otra con "puesta".
+```
+
+y avisa si la vista exacta no existe. Convención de las claves en `usoPorVista`: `<giro>[-<tapa>|-bajo][-mujer]`; el
+lado dice hacia qué borde **del cuadro** apunta la nariz.
+
+**3. El kit: 126 vistas puestas** (`ai-generations/2026-10-03_uniforme-vistas/LEEME.md`). Por prenda (bomber 18–46,
+softshell 18–46, polo navy 17–45, hoodie 23–51), hombre y mujer: frente · 45° y 70° a cada lado · frente con cámara baja
+· espalda a 45° y 70° a cada lado · espalda con cámara baja · oclusión mano / cruza (taza) / objeto (tablet) / brazos
+cruzados. Gorra navy (v2-10 a v2-19): frente, 45° y 70° a cada lado, hombre y mujer, de la copa a las cejas, sin rostro.
+Nombre: `<prefijo>-NN-puesto-<clave>-<tam>-v01-fondo-estudio.png` en el `final/` del kit; cada kit tiene manifiesto con
+`cuando_usarla` y su brief en `brief/`. Método: **editar** la vista puesta aprobada con el macro como segunda imagen;
+entradas 3:4 padeadas a 2:3 espejando el pie. Trampas medidas:
+
+1. En el giro el modelo **rota la marca en el plano** (hasta ~35° a 70°): se pidió la órbita horizontal y se partió del
+   **frente** (desde un 45° ya rotado arrastra la rotación).
+2. El modelo **esquiva la oclusión** (baja la tablet, sube la taza): se ancla el objeto a la marca («los nudillos
+   delante de la marca»).
+3. Componer la marca encima de la vista de kit la empeora (24 descartadas).
+4. En oclusión, la vista real es la marca a su tamaño con sólo la parte visible.
+
+**Sumar una vista nueva a un kit:** generarla editando una vista puesta aprobada (+ macro), revisarla al 100 % con `pnpm
+foto:emblema` (esfera arriba, ventanas horizontales, letras exactas), copiarla a `final/` con la convención de nombre,
+declararla en `usoPorVista` con su clave, agregarla al manifiesto (`cuando_usarla`) y su prompt a `brief/`, y cerrar con
+`pnpm foto:assets:lock`, `pnpm creative:assets:publish apply`, `pnpm exec vitest run scripts/foto`, `pnpm ai-gen:archive`
+de la exploración y una nota en el `LEEME` del kit.
+
+**4. El macro del bordado viaja también con la prenda puesta**, por defecto en toda prenda (`macroEnUso: false` lo
+apaga en un kit). La **gorra no lleva macro**: empujaba al modelo a redibujar el logotipo (medido 2026-09-20).
+
+**5. `pnpm foto:isotipo`, para cuando sí hay que componer.** Clasifica la caja en tela, marca inventada y **oclusor**
+(piel, pelo u otro material, por color), limpia sólo la marca inventada y compone la oficial **por detrás** del oclusor.
+Banderas nuevas:
+
+| Bandera | Qué hace |
+|---|---|
+| `--oclusion <png>` | Máscara canónica de `pnpm ai:mask` (blanco = delante) para lo que tiene el color de la prenda, p. ej. una manga separada con `pnpm ai:layers` |
+| `--pliegues 0–1` (default 1) | Tiñe la marca con la luz local de la tela |
+| `--relieve 0–2` (default 1) | La desplaza con el gradiente del pliegue |
+| `--escorzo 0,15–1` | La comprime en horizontal |
+
+La procedencia queda como `efeonce.foto.isotipo.v2`, con `oclusion` y `pliegues`. La regla no cambia: si no se compone
+limpio, se rehace la toma; nunca componer una marca más chica al lado de una mano.
+
+**6. `pnpm foto:rostro`** (`scripts/foto/rostro.mjs` + `scripts/foto/proporcion-rostro.swift`, Vision, sólo macOS):
+
+```bash
+pnpm foto:rostro <png…> [--persona nexa] [--canon 0.81] [--tolerancia 0.02]
+```
+
+Mide largo/ancho = (ojos → mentón) / ancho del contorno de la mandíbula, con la línea de los ojos tomada del contorno del
+ojo y no de la pupila. El canon sale de `rostro` en la persona del catálogo o de `--canon`. No compara caras con giro
+(|giro| > 0,15), boca abierta ni ojos cerrados; sale con 1 si una frontal queda fuera y con 2 si no puede medir. Límite
+conocido: ojos en blanco miden ≈ +0,03 sin estar afinados; se mira a ojo. Canon de Nexa: **0,81 ± 0,02**.
+
+**7. Identidad en el compilador.** La expresión ya no va primera (ancla frontal → expresión → cuerpo; con `vista` +
+`expresion`, vista → expresión → ancla frontal → cuerpo; en dupla y en grupo la expresión no viaja); los grupos de 3 a 5
+aceptan cualquier combinación del `ELENCO`, Nexa y Julio (`EN_GRUPO`); una persona repetida en `identidad` es error;
+`silueta` y `rostro` son claves de persona sin archivo (`CLAVES_SIN_ARCHIVO`). Gates: `pnpm exec vitest run scripts/foto`,
+`pnpm foto:assets:check`, lint y typecheck.
 
 ## Delta 2026-10-02 (b) — el registro cine en `foto:prompt`
 
@@ -108,7 +220,7 @@ lente y media sonrisa—:
 | REFERENCES agrega: *«The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: the head turn, tilt, chin angle, gaze and facial expression come from the SCENE»*. La imagen pedida como `vista` manda en el ángulo; la de `expresion`, **sólo** en el gesto (*«copy only its facial expression… NOT its head angle or tilt»*) | todas las personas |
 | IDENTITY de Nexa: *«her features, not the moment they caught»* | bloque `nexa` |
 | Anclas de Nexa en orden **frontal → tres cuartos → cuerpo** | bloque `nexa` |
-| Las 12 expresiones fotográficas entran al catálogo: `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral` | `expresiones` de `nexa` |
+| Las 12 expresiones fotográficas entran al catálogo: `carcajada`, `risa-elegante`, `sorprendida`, `esceptica`, `pensativa`, `neutra`, `preocupada`, `conviccion`, `escucha-empatica`, `curiosa`, `complicidad`, `mirada-lateral` *(desde el 2026-10-03 apuntan a `5-expresiones-frente/`, casi de frente, y suman 13 más: 25 en total; ver la [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-03--25-expresiones-casi-de-frente-ancla-frontal-v2-y-proporción-del-rostro))* | `expresiones` de `nexa` |
 | Aviso cuando la ficha trae a Nexa sin `expresion` ni `vista` (`auditarExpresion`) | `foto:prompt` |
 | El traje pasa a la escena **sin rostro** (vista 13 recortada bajo el mentón), como pide el método de kits | `traje-bionico-nexa` |
 
@@ -118,7 +230,7 @@ lente y media sonrisa—:
 intacta (delineado con rabillo, lunar). El giro hacia el lado pedido **no** se cumplió: el ángulo se pide con `vista`,
 que trae su propia imagen. **Cerrado el mismo día:** `vista` + `expresion` se combinan con una persona sola (orden de
 imágenes: vista → expresión → ancla frontal → cuerpo) y en `NX7j` (`45-izq` + `curiosa`) la cabeza tomó el giro de la vista
-con la identidad intacta. Con el traje, además, Nexa no lleva reloj ni anillo (`ajustarParaTraje`). **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
+con la identidad intacta. Con el traje, además, Nexa no lleva reloj ni anillo (`ajustarParaTraje`). **Cerrado del todo el 2026-10-03:** la pose seguía repitiéndose porque la expresión sola entraba primera; ahora va detrás del ancla frontal ([delta 2026-10-03](#delta-2026-10-03--referencias-desde-el-canon-vista-puesta-automática-y-fotorostro), punto 7). **Para variar de verdad, la ficha declara la expresión y la escena describe la pose; la
 frase fija «confident half-smile» deja de copiarse entre fichas.** Plates en
 `ai-generations/2026-10-01_traje-bionico-nexa/plates/NX7{d,e,f,g}-nexa-despliega-squad.png`.
 
@@ -378,7 +490,7 @@ Rutas de referencia:
 | Julio (rostro) | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`; **11 referencias aprobadas**, `julio-ap-04` primera opción. Ver `refs-aprobadas/MANIFIESTO.json` y resolver con `foto:prompt` |
 | Julio (cuerpo) | El mismo set aprobado; `julio-ap-11` es primera opción. No usar el set de 2026-09-17 como ancla |
 | Julio (ángulo) | `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`; seis vistas editadas desde `julio-ap-08`, resueltas por `foto:prompt`. `julio-ap-02` es una pieza compuesta y está excluida; fuentes y descartes viven aparte |
-| Nexa | `ai-generations/_identidad-nexa/1-anclas/`; `foto:prompt` selecciona según la vista (`nexa-ancla-2-rostro-tresquartos` es primera opción, `nexa-ancla-5-cuerpo-frontal` para cuerpo). 🔴 Las rutas anteriores quedan retiradas [2026-09-21]: `nexa-the-point` y `nexa-the-listen` **son identidad B** |
+| Nexa | `ai-generations/_identidad-nexa/1-anclas/`; `foto:prompt` selecciona según la vista (desde el 2026-10-03 `nexa-ancla-1-rostro-frontal-v2` es la primera opción, `nexa-ancla-2-rostro-tresquartos` la segunda y `nexa-ancla-5-cuerpo-frontal` para cuerpo). 🔴 Las rutas anteriores quedan retiradas [2026-09-21]: `nexa-the-point` y `nexa-the-listen` **son identidad B** |
 | Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
 
 ### 3.7.1 Objetos de marca con kit 3D — `objetos` en la ficha **[2026-09-20]**
@@ -409,11 +521,13 @@ Kits en el catálogo, por tipo:
 **El traje de Nexa estrenó tres claves de kit (2026-10-02, TASK-1940)**, disponibles para cualquier prenda:
 `instruccionEnUso` (la instrucción propia de la pieza puesta, en vez de la genérica), `acabadoMarca` (cómo está
 aplicada la marca; reemplaza el «satin-stitch embroidery» por defecto, porque el isotipo del traje va incrustado y no
-bordado) y `macroEnUso` (el macro de la marca viaja también con la pieza puesta, no sólo al construir). La guarda
+bordado) y `macroEnUso` (el macro de la marca viaja también con la pieza puesta, no sólo al construir; desde el 2026-10-03 es el default de toda prenda salvo la gorra, y `macroEnUso: false` lo apaga). La guarda
 `validarTrajeNexa` aborta si el traje o los lentes se piden para otra persona, sin Nexa o sin `"registro": "cine"`.
 Uso paso a paso: [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md).
 
-**La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda.
+**La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda. Desde el
+2026-10-03 la elige `foto:prompt` por silueta, giro, cámara y oclusión de quien la viste (`persona`, `giro`, `camara`,
+`tapa`; [delta 2026-10-03](#delta-2026-10-03--referencias-desde-el-canon-vista-puesta-automática-y-fotorostro)).
 Agregar un kit nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
 Un test recorre **todas** las vistas de **todos** los kits y falla si alguna ruta no existe en disco, así que un
 kit mal escrito o una corrida renombrada se detectan antes de gastar en una tanda.
@@ -1154,7 +1268,7 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | `xhigh`, 1152×1440 | ≈ USD 0,09 | [medido] |
 | Edición con `--image` / `--mask` | ≈ USD 0,07–0,10 (suma tokens de entrada) | [medido] |
 | Sesión completa del 2026-09-19 | ≈ USD 6–7 en ~95 imágenes | [medido] |
-| `medir.mjs`, `metricas.cjs`, `componer.mjs` | USD 0 (local) | — |
+| `medir.mjs`, `metricas.cjs`, `componer.mjs`, `foto:rostro` | USD 0 (local) | — |
 
 ---
 
@@ -1172,6 +1286,8 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | JSON de prompts a mano | Comillas rotas y valores de formato duplicados | `pnpm foto:prompt <ficha.json> --batch <out.json>` (§4.2) |
 | `componer.mjs` sin `LOGO` | Logo al 20 % del lado corto | Default alineado con la decisión del operador de 2026-09-20; `LOGO=0.20` lo hace explícito |
 | Medir la pieza firmada | El logo contamina las métricas | Medir el plate |
+| Referencia local distinta de la sellada | `foto:prompt` deja un `<archivo>.local-<sha8>.<ext>` junto a la referencia | No es un error: había una versión aprobada más nueva en el canon y la copia local se apartó. Si era trabajo nuevo, revisarla y sellarla; `FOTO_SIN_CANON=1` para trabajar sin red |
+| Expresión de Nexa en una dupla | La toma sale con el gesto de la escena, no con el de la expresión pedida | En dupla el cuerpo ocupa la segunda ranura y la expresión no viaja; el gesto se describe en la escena |
 
 ---
 
@@ -1191,6 +1307,8 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | `validar-cine.mjs` (`pnpm foto:validar:cine`) | `scripts/foto/` | Vigente desde 2026-10-02: gates de sombra y techo oscuro del registro cine |
 | `regresion-prompt.mjs` | `scripts/foto/` | Vigente desde 2026-10-02: gate de no-regresión, correrlo antes y después de tocar `build-prompt.mjs` |
 | Orquestador `pnpm foto:cine` | — | **[pendiente]**: resto de TASK-1926 |
+| `canon-sync.mjs` | `scripts/foto/` | Vigente desde 2026-10-03: `foto:prompt` y `foto:generar` traen del canon lo que falta o está viejo ([delta 2026-10-03](#delta-2026-10-03--referencias-desde-el-canon-vista-puesta-automática-y-fotorostro)) |
+| `rostro.mjs` + `proporcion-rostro.swift` (`pnpm foto:rostro`) | `scripts/foto/` | Vigente desde 2026-10-03: proporción del rostro con Vision (macOS) |
 
 ## Ads: proporción del lecho y continuidad
 

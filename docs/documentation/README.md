@@ -70,6 +70,12 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   eslogan, la contraportada «A a escala» con una sola conversión, los nueve gráficos (qué pregunta responde cada uno y
   cuándo elegirlo) y las tres láminas de texto denso. Aprobado el 2026-09-28 en el canvas; todavía no está en AXIS
   (plan por una task aparte).
+- [Elenco y referencias de fotografía](creative/elenco-y-referencias-de-fotografia.md) — quién sale en las fotos de
+  marca propia y cómo se ve igual cada vez: el elenco de cinco personajes ficticios (Hum, Karo, Sophia, Isabella y
+  Antonio), su línea, su rol y qué pueden y no pueden representar; Julio y Nexa; grupos de 3 a 5 personas; cómo el
+  sistema elige solo la prenda puesta según quién la viste, cómo está parada y si una mano tapa el logo; las 25
+  expresiones de Nexa; dónde viven las imágenes (canon que se baja solo y archivo recuperable) y qué se hace al sumar
+  algo nuevo. Vigente desde el 2026-10-03.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

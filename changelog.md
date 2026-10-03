@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
+
+- Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa
+  y Julio (sin elenco obligatorio). Julio: 37 con canas prematuras en su bloque.
+- `foto:prompt` elige la vista puesta por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión, e imprime
+  las alternativas; 126 vistas puestas nuevas en bomber, softshell, polo, hoodie y gorra; el macro viaja con la prenda.
+- `foto:isotipo` compone por detrás de los oclusores, con pliegues y escorzo; `canon-sync` baja del canon GCP lo
+  sellado que falta o está viejo; `pnpm foto:rostro` mide la proporción del rostro.
+- Nexa: la expresión va detrás del ancla frontal (la pose sale de la escena), ancla v2 con la proporción del canon y 25
+  expresiones casi de frente aprobadas. Exploración archivada (> 1,3 GB liberados).
+
 ## 2026-10-03 — Técnicas de edición sobre el pipeline de inpainting (TASK-1973)
 
 - Nuevo `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: capas con nombre, máscara por elemento y clean plate
@@ -648,29 +659,3 @@ prueba de reconocimiento sin logo y reemplazo del sonido de los masters V1.1 (Gl
 [`EFEONCE_SONIC_IDENTITY_V1.md`](docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md), ADR Proposed, doc funcional,
 manual, regla `.claude/rules/brand-sonic.md` y skills `audio-studio`, `efeonce-graphic-line`, `axis-design-system`,
 `motion-design-studio` y `efeonce-brand-studio`. Producción: `ai-generations/2026-09-26_branding-sonoro/`.
-
-## 2026-09-26 — Iconografía de La órbita canónica: Trazo y Plastilina (AXIS v0.3.6)
-
-El operador canonizó la iconografía de la línea (D16–D22) en dos voces de una familia: **Trazo** (lo que se mide;
-Growth, Engine, Revenue) y **Plastilina** (lo que se crea; Brand), con la esfera como estado (reposo o respuesta, en el
-acento de la línea de la pieza), fondo `#001a33` en todas las líneas y la órbita sesgada como firma de Plastilina.
-AXIS publicó con el tag `v0.3.6` los tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y
-`@efeoncepro/axis-graphic-line` 0.4.0 con el subpath `/icons` (30 glifos; `resolveIcon`, `auditIconGroup`,
-`skewedOrbitHeroSvg`), los comandos `pnpm icons:export|check|vectorize` para dar de alta glifos nuevos y la página
-`/references/iconography/` del Lab (PR efeoncepro/axis-design-system#3). Dos pruebas a ciegas con agentes sin contexto
-validaron la documentación; lo que tuvieron que adivinar se corrigió (gesto en tinta, medición real en `icons:check`).
-Greenhouse todavía no consume `/icons`. Skill `efeonce-graphic-line`, ADR delta (f), manual §14 y las skills y docs
-vecinas al día. Pendientes del operador: voz de Voice, aire del Trazo a 20 px, opacidad del anillo sesgado y el
-reemplazo de Tabler en las firmas.
-
-## 2026-09-26 — Línea gráfica: decisiones del operador sobre contraste, halo, logo y fotografía (AXIS 0.3.5)
-
-El operador aprobó las recomendaciones pendientes de la línea «La órbita». El acento pide 3:1 contra su fondo como
-gráfico o en texto de 24 px o más y nunca va en texto menor (Engine y Voice conservan su color); el magenta de
-Revenue-HubSpot queda aprobado; la burbuja URL pide 4,5:1; el halo sobre papel va a la mitad; el anillo propio de la
-esfera significa «en vivo»; el logo va dentro de la órbita sólo en los cierres de marca; «Growth» va en el acento en
-el cierre del deck. AXIS publicó el juego `v0.3.5` (tokens y contracts 0.3.5 con el contrato de la órbita 0.3.1,
-registry y brand-assets 0.3.1, graphic-line 0.3.2) y el Lab reproduce el banner, la story y el fondo de Teams con un
-solo anillo y el reverso de la tarjeta con el logo solo. Se aprobaron las 12 reglas de sinergia con la fotografía y se
-resolvieron sus 9 conflictos; lo que necesita código quedó en TASK-1918. Manual v1.8, ADR delta (e), lenguaje
-fotográfico v1.4 y la skill `efeonce-graphic-line` al día.

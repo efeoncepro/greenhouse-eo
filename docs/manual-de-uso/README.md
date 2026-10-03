@@ -42,7 +42,7 @@ La diferencia con otras capas de documentacion:
   contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
 - [Usar el traje biónico de Nexa en fotos](creative/usar-traje-bionico-de-nexa-en-fotos.md) — vestir a Nexa con su
   traje y sus lentes biónicos desde el catálogo de `foto:prompt` (sólo Nexa y sólo con `"registro": "cine"`), elegir
-  una de sus 12 expresiones fotográficas o un ángulo (nunca los dos), escribir la escena sin describir el traje, la
+  una de sus 25 expresiones fotográficas casi de frente o un ángulo, escribir la escena sin describir el traje, la
   receta de una escena con Sparks (dos con referencia como máximo, como `NX7d`), revisar las marcas con
   `pnpm foto:emblema` y recomponerlas con `pnpm foto:isotipo` (incluido el logo de la espalda con `--marca logotipo
   --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
@@ -118,7 +118,10 @@ La diferencia con otras capas de documentacion:
   estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
-  lenguaje fotográfico aprobado el 2026-09-19.
+  lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a
+  Nexa, grupos de 3 a 5, la ropa que se elige sola (línea `·`, con `persona`, `giro`, `camara`, `tapa` y `puesta`), las
+  25 expresiones de Nexa, `pnpm foto:rostro`, referencias que se bajan solas del canon (`⇣`/`↺`, `FOTO_SIN_CANON=1`) y
+  qué hacer al sumar algo nuevo. Explicación funcional: [Elenco y referencias de fotografía](../documentation/creative/elenco-y-referencias-de-fotografia.md).
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,

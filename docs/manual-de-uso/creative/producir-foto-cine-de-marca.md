@@ -1,13 +1,13 @@
 # Producir una foto de marca en registro cine — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-02 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude (1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code; 1.2: cambiar de formato con `foto:expandir`)
+> **Ultima actualizacion:** 2026-10-02 por Claude (1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code; 1.2: cambiar de formato con `foto:expandir`; 1.3, 2026-10-03: grupos de 3 a 5 con el elenco, Nexa y Julio, y la expresión de Nexa en grupo)
 > **Modulo:** Creative · marca propia de Efeonce (fotografía de marca, registro cine)
 > **Ruta en portal:** no aplica — se usa desde la terminal con `pnpm foto:*` y el agente `cine-reviewer`
 > **Estado:** comandos y revisor disponibles desde el 2026-10-02 (TASK-1926, delta b). Dos pruebas ciegas hechas; falta el veredicto del operador sobre los plates de la segunda y el orquestador `pnpm foto:cine`
-> **Documentacion relacionada:** [Casebook del registro cine](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) · [Registro cine (canon)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) · [Fotografía de marca](../marketing/fotografia-de-marca-efeonce.md) · [Usar el traje biónico de Nexa](usar-traje-bionico-de-nexa-en-fotos.md) · [Usar los Sparks](usar-sparks-en-fotos-de-marca.md)
+> **Documentacion relacionada:** [Casebook del registro cine](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) · [Registro cine (canon)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) · [Fotografía de marca](../marketing/fotografia-de-marca-efeonce.md) · [Usar el traje biónico de Nexa](usar-traje-bionico-de-nexa-en-fotos.md) · [Usar los Sparks](usar-sparks-en-fotos-de-marca.md) · [Elenco de marca](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 ## Para qué sirve
 
@@ -107,6 +107,21 @@ cambiaron y no reciben nada de esto.
    al sujeto por geografía para que no se corra a la reserva del texto (en 1:1 con el brazo levantado, el ancla por
    porcentaje puede ser imposible).
 
+   **Grupos de 3 a 5 personas.** Un grupo puede ser cualquier combinación de personajes del elenco (`hum`, `karo`,
+   `sophia`, `isabella`, `antonio`), Nexa y Julio; con otras personas del roster el tope sigue en dos. Se validó con los
+   cinco del elenco juntos y con Julio + Nexa + Karo (2026-10-03). Qué cambia en la ficha:
+
+   | Qué | Cómo |
+   |---|---|
+   | Referencias | El comando pasa **una referencia frontal por persona**; no pidas vistas extra |
+   | Luz | La luz de las referencias **se corta**: toda la luz la pone la ficha (`llave`, `fondo`, `fenomeno`). Escríbela completa |
+   | Ropa | Pon `persona` en **cada prenda** de `objetos`: sin ella, la prenda va de frente y el comando avisa |
+   | Nexa | Su `expresion` **no viaja** en grupo: escribe su gesto y su pose en la escena |
+   | Repetidos | La misma persona dos veces da error («aparece dos veces») |
+
+   No confundas este grupo con el aviso `⚠ … más de 2 personajes con referencia`: ese aviso cuenta los personajes de
+   `objetos` (los Sparks y otros con imagen propia), no las personas de `identidad`.
+
    **Las siete decisiones del operador que cambian cómo escribes la ficha** (2026-10-02):
 
    | # | Decisión | Qué haces en la ficha |
@@ -173,7 +188,8 @@ La composición de la horizontal (bajada al titular del anuncio, firma a la izqu
 | Señal | Qué significa | Qué haces |
 |---|---|---|
 | `⚠ … cine — falta llave` (y similares) | a la ficha le falta un campo del oficio | complétalo; el aviso dice la falla que previene |
-| `⚠ … más de 2 personajes con referencia` | la foto va a salir con «stickers» | deja dos con referencia; el resto, sin imagen, lejos y desenfocados |
+| `⚠ … más de 2 personajes con referencia` | la foto va a salir con «stickers» (cuenta los personajes de `objetos`, no las personas de `identidad`) | deja dos con referencia; el resto, sin imagen, lejos y desenfocados |
+| aviso de prenda sin `persona` en un grupo | la prenda va de frente aunque la persona esté girada | agrega `persona` a esa prenda |
 | aviso de `__completar` o `__revisar` en `foto:prompt` | quedan campos sin llenar o herencia de la receta sin mirar | completa o revisa cada campo y borra la clave |
 | `✗ … la escena todavía es la de la receta` | `foto:generar` se niega a gastar | reescribe la escena |
 | error de `alcance` | el alcance no existe | usa uno de la lista |
@@ -206,6 +222,7 @@ La composición de la horizontal (bajada al titular del anuncio, firma a la izqu
 - **La llave de color tiñe o aplana el emblema:** pon la llave de lado, no de frente al pecho.
 - **Salieron menos o más figuras de las pedidas, o el sujeto se corrió a la reserva:** ubica cada figura y al sujeto por
   geografía en la escena, no sólo por número o porcentaje.
+- **En un grupo, Nexa salió con un gesto que no pediste:** en grupo su `expresion` no viaja; descríbelo en la escena.
 - **Cambiaste el formato y faltan las reservas:** es lo esperado con `--formato`; vuelve a declararlas.
 - **Trabajas en Codex y no encuentras `cine-reviewer`:** el agente existe sólo en Claude Code; aplica su rúbrica leyendo
   el archivo.
