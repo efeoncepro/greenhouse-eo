@@ -1,0 +1,90 @@
+{
+  "kind": "ai-layers",
+  "version": 1,
+  "source": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "width": 1536,
+    "height": 1024
+  },
+  "base": {
+    "file": "00-base.png",
+    "width": 1536,
+    "height": 1024
+  },
+  "layers": [
+    {
+      "index": 0,
+      "zIndex": 0,
+      "name": null,
+      "description": null,
+      "file": "00-base.png",
+      "width": 1536,
+      "height": 1024,
+      "box": null,
+      "alphaCoverage": null
+    },
+    {
+      "index": 1,
+      "zIndex": 1,
+      "name": "Light oak solid wood table",
+      "description": "A solid wood table with distinct oak grain, including a flat tabletop, table edge and right-side table leg, serving as the furniture that holds the items on its surface. Exclude upper items placed on the table such as the mug and notebook during extraction.",
+      "file": "01-light-oak-solid-wood-table.png",
+      "width": 1536,
+      "height": 499,
+      "box": {
+        "left": 0,
+        "top": 525,
+        "right": 1536,
+        "bottom": 1024
+      },
+      "alphaCoverage": 0.796
+    },
+    {
+      "index": 2,
+      "zIndex": 2,
+      "name": "White ceramic mug",
+      "description": "A plain white empty ceramic mug with a handle, placed on the table. Exclude unrelated surrounding elements such as the table surface and notebook during extraction.",
+      "file": "02-white-ceramic-mug.png",
+      "width": 782,
+      "height": 673,
+      "box": {
+        "left": 937,
+        "top": 394,
+        "right": 1174,
+        "bottom": 598
+      },
+      "alphaCoverage": 0.723
+    },
+    {
+      "index": 3,
+      "zIndex": 3,
+      "name": "Grey hardcover notebook",
+      "description": "A closed hardcover notebook with a grey fabric cover, with white pages visible along the side, placed alone on the table. Exclude unrelated surrounding elements such as the table surface and mug during extraction.",
+      "file": "03-grey-hardcover-notebook.png",
+      "width": 1076,
+      "height": 385,
+      "box": {
+        "left": 969,
+        "top": 568,
+        "right": 1450,
+        "bottom": 740
+      },
+      "alphaCoverage": 0.588
+    }
+  ],
+  "request": {
+    "prompt": null,
+    "imageSize": "auto"
+  },
+  "cost": {
+    "layerCount": 3,
+    "perLayerUsd": 0.03375,
+    "estimatedUsd": 0.1013,
+    "note": "Por capa separada; si la base también se cobra está sin dato: confirmar con pnpm ai:fal --balance antes y después."
+  },
+  "providerMeta": {
+    "requestId": "01a1010b-cc59-7053-85e0-8b1487861c9c",
+    "account": "FAL_API_KEY_B"
+  }
+}

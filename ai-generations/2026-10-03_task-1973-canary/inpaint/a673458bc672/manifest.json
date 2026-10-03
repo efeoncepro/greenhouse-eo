@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a673458bc672",
+  "key": "a673458bc672952302ee1d854dca39636defe1f75732e24933fd745ea8141eb5",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:27:14.882Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/background-masks/457fdcec7513.png",
+    "maskSha256": "efd267b2a8c5861d4db24dff19134e2349d2fbde51dd90374fb187c8ac49847a",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "a deep green painted wall with soft morning light, an indoor plant shadow on the wall, no window",
+    "providerPrompt": "a deep green painted wall with soft morning light, an indoor plant shadow on the wall, no window Replace only the background behind the subject. Keep the subject exactly as it is; match the light direction and color temperature of the new background on the subject edges."
+  },
+  "mask": {
+    "touchedFraction": 0.6083335876464844,
+    "editable": 941253,
+    "soft": 15573,
+    "protected": 616038
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 80.184,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.32,
+        "bestError": 5.32,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 616038,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 941253,
+        "maxDelta": 231,
+        "meanDelta": 81.336,
+        "worst": {
+          "x": 1535,
+          "y": 1
+        }
+      },
+      "seam": {
+        "pixels": 15573,
+        "maxDelta": 134,
+        "meanDelta": 10.581,
+        "worst": {
+          "x": 1139,
+          "y": 437
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 616038,
+        "maxDelta": 99,
+        "meanDelta": 17.904,
+        "worst": {
+          "x": 1099,
+          "y": 413
+        }
+      },
+      "outputUsd": 0.0103,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1604,
+        "input_tokens_details": {
+          "image_tokens": 1536,
+          "text_tokens": 68
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "image_tokens": 343,
+          "text_tokens": 0
+        },
+        "total_tokens": 1947
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ]
+}

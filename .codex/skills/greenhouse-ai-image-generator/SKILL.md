@@ -137,9 +137,13 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    como imagen 2 de guía y la máscara sale del trazo) y `--reference` (el objeto, imágenes 3..N). En la API no hay
    parámetro de boceto: es una imagen más con su rol numerado (guía de prompting 2.5, leída 2026-10-02).
    **¿Expandir a otro formato, separar en capas, borrar, mover, cambiar fondo o rehacer un detalle?** →
-   `pnpm ai:inpaint expand|erase|move|background`, `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: máscara
-   por elemento con `ai:mask --from-layer` y clean plate) y `--zone-resolution` (TASK-1973). Las capas son contenido
-   regenerado: sólo máscara y clean plate; lo no editado sale de la original en delta 0.
+   `pnpm ai:inpaint expand|erase|move|place|background`, `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen:
+   máscara por elemento con `ai:mask --from-layer` y clean plate) y `--zone-resolution` (TASK-1973). Las capas son
+   contenido regenerado: sólo máscara y clean plate; lo no editado sale de la original en delta 0. **Incorporar un
+   objeto de otra foto** → `place` (recorte con el alfa de su capa + el modelo sólo termina sombra, reflejo y borde).
+   Medido 2026-10-03: la base de Layerize saca también la mesa (el clean plate recompone las demás capas), la sombra
+   proyectada se suma sola con capas (`--shadow off` la deja), y **Flare reencuadra al expandir** (código 3): para
+   `expand` usa `--adapter fal:flux-pro-fill`. `--zone-resolution` reinterpreta, no escala.
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.

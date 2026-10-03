@@ -1,11 +1,11 @@
 # Expandir, separar en capas, borrar, mover, cambiar fondo y rehacer detalle
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-03 por Claude (TASK-1973)
-> **Ultima actualizacion:** 2026-10-03 por Claude
+> **Ultima actualizacion:** 2026-10-03 por Claude (canario real: clean plate con las demas capas, sombra proyectada, `place`)
 > **Modulo:** AI Tooling / Asset Generation
-> **Comandos:** `pnpm ai:layers`, `pnpm ai:mask --from-layer`, `pnpm ai:inpaint expand|erase|move|background`, `pnpm ai:inpaint image --zone-resolution`
+> **Comandos:** `pnpm ai:layers`, `pnpm ai:mask --from-layer`, `pnpm ai:inpaint expand|erase|move|place|background`, `pnpm ai:inpaint image --zone-resolution`
 > **Documentacion relacionada:** [editar una zona de una imagen](editar-una-zona-de-una-imagen.md), [editar una zona de un video](editar-una-zona-de-un-video.md), [guia de seleccion de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md), [generador visual](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 ## Para que sirve
@@ -21,6 +21,7 @@ cambio fuera de lo que se debia tocar, sale con codigo 2.
 | La mascara de un elemento concreto (la taza, el sujeto) | `pnpm ai:mask --from-layer` |
 | Borrar un objeto | `pnpm ai:inpaint erase` |
 | Mover o escalar un objeto | `pnpm ai:inpaint move` |
+| Incorporar un objeto de una foto en OTRA | `pnpm ai:inpaint place` |
 | Cambiar el fondo dejando al sujeto intacto | `pnpm ai:inpaint background` |
 | Rehacer un detalle a mas resolucion (manos, una textura) | `pnpm ai:inpaint image --zone-resolution 2048` |
 
@@ -42,8 +43,10 @@ pnpm ai:layers --list ai-generations/<fecha>_<pieza>/layers/<id>/layers.json    
 ```
 
 - Funciona con **cualquier imagen**, no solo con las que genero Seedream.
-- Devuelve la **imagen base** (la escena sin los elementos: un *clean plate*) y hasta 16 capas, cada una con nombre,
-  descripcion, alfa y caja. Todo queda en `layers.json`.
+- Devuelve la **imagen base** y hasta 16 capas, cada una con nombre, descripcion, alfa y caja. Todo queda en
+  `layers.json`. **Ojo: la base saca TODO, tambien las superficies** (medido 2026-10-03: en una foto de mesa con taza y
+  cuaderno salieron tres capas —mesa, taza, cuaderno— y la base era la pared sola). Por eso `erase`, `move` y `place`
+  nunca usan la base sola: el *clean plate* de un elemento es la base **con las demas capas recompuestas encima**.
 - `--prompt "<que separar>"` y `--bbox x0,y0,x1,y1` (fracciones, repetible) apuntan a elementos concretos.
 - **Costo:** se cobra por capa (USD 0,034 hasta 1536², 0,0675 por encima) y el numero de capas lo decide el modelo. El
   comando estima con una **cota** de 16 capas + base y pide `--yes` sobre el tope; despues registra lo que costo.
@@ -67,9 +70,12 @@ pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model --model g
 ```
 
 - **Zona:** `--mask` (explicita: nunca se altera) o `--layers` + `--layer`, que se agranda `--grow` px (default 16)
-  para llevarse el borde y la sombra de contacto.
-- **Relleno:** `--fill plate` (default con capas: la base de Layerize, sin proveedor ni gasto, con correccion de color)
-  o `--fill model` (un modelo reconstruye el fondo).
+  para llevarse el borde.
+- **Sombra proyectada** (`--shadow auto`, default con capas): la capa de la superficie viene sin sombras, asi que la
+  sombra del objeto se mide comparando la foto con el clean plate y se suma a la zona. Crece desde el objeto, nunca
+  toma la sombra de un vecino y nunca pisa otro objeto. `--shadow off` la deja.
+- **Relleno:** `--fill plate` (default con capas: el clean plate sin ese elemento, sin proveedor ni gasto, con
+  correccion de color) o `--fill model` (un modelo reconstruye el fondo).
 - Despues de verificar, **mide si el objeto sigue ahi**. Si en ningun candidato cambio, sale con codigo 3 (revisar).
 
 ## Mover o escalar: `pnpm ai:inpaint move`
@@ -78,12 +84,30 @@ pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model --model g
 pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40 --scale 0.9
 ```
 
-1. El hueco que deja el elemento se rellena con el clean plate.
+1. El hueco que deja el elemento —con su sombra, salvo `--shadow off`— se rellena con el clean plate sin ese elemento.
+   El hueco nunca pisa a otro objeto.
 2. El elemento se **recorta de tu original** con el alfa de su capa y se pega en la posicion nueva (la escala es
    alrededor de su centro).
 3. `--harmonize auto` (default) hace una pasada **solo de sombra de contacto y reflejo** en un halo alrededor; `off`
    deja el compuesto sin IA ni gasto.
 4. Verifica que todo lo demas quede identico a la original y lo deja en `move.json`.
+
+## Incorporar en otra imagen: `pnpm ai:inpaint place`
+
+```bash
+pnpm ai:layers --image origen.png --run ai-generations/<fecha>_<pieza>
+pnpm ai:inpaint place --image destino.png --from origen.png --layers <layers.json> --layer "mug" --at 0.22,0.47 --width 0.17
+```
+
+1. El elemento se **recorta de la imagen de origen** con el alfa de su capa.
+2. Se pega en el destino con su centro en `--at` (fracciones x,y) y el ancho `--width` (fraccion del ancho del
+   destino; sin `--width`, el mismo tamano en pixeles).
+3. El modelo lo **termina**: `--finish halo` (default) pone solo sombra de contacto, reflejo y borde alrededor;
+   `element` ademas lo relumina para que tome la luz de la escena (su forma puede variar: miralo al 100 %); `off` deja
+   el pegado sin IA ni gasto.
+4. Verifica que el destino quede identico fuera de lo pegado y de su acabado, y lo deja en `place.json`.
+
+La escala y la perspectiva las decides tu: el comando no sabe que tan grande deberia verse el objeto en otra escena.
 
 ## Expandir a otro formato: `pnpm ai:inpaint expand`
 
@@ -98,6 +122,10 @@ pnpm ai:inpaint expand --image escena-1x1.png --canvas 2048x1072 --scale 0.8 --a
   los bordes que dan al area nueva. El interior de la escena queda en delta 0.
 - El area nueva se rellena antes con **espejo de los bordes** (`--prefill mirror`); un relleno solido invita al modelo a
   inventar un panel.
+- **Flare reencuadra al expandir** (medido 2026-10-03, 9:16 y 1,91:1): achica la escena (escala 0,88–0,90) en vez de
+  continuarla, y al pegar la original queda una costura. El comando lo detecta y sale con codigo 3: **no uses ese
+  resultado**. La alternativa es un modelo de relleno puro, que sale al tamano de la entrada y respeta la mascara:
+  `--adapter fal:flux-pro-fill` (≈ USD 0,05 por megapixel; su canario en expansion esta pendiente).
 - `pnpm foto:expandir` sigue existiendo para el flujo de marca de CMP-004; su migracion a este nucleo esta pendiente
   (TASK-1973, Slice 2).
 
@@ -119,6 +147,8 @@ pnpm ai:inpaint image --image foto.png --mask manos.png --zone-resolution 2048 -
 ```
 
 Genera la zona recortada a ese lado largo (512–4096) y la devuelve a su lugar. Avisa si el proveedor topa mas abajo.
+**Es una reinterpretacion, no un escalado**: en el canario, Flare redibujo una taza y le quito el pie aunque el prompt
+pedia la misma forma. Para conservar la forma exacta, usa un escalador; esto sirve para rehacer (manos, una textura).
 
 ## Que significan las senales
 
@@ -129,6 +159,8 @@ Genera la zona recortada a ese lado largo (512–4096) y la devuelve a su lugar.
 | `"X" coincide con varias capas` | Elige por indice (`#3`): evita editar la capa equivocada |
 | `⚠ … el objeto puede seguir ahi` / codigo 3 | `erase` no vio cambio en el nucleo de la zona |
 | `· costura en el borde del sujeto…` | `background`: cuanto cambio la franja del borde; revisala al 100 % |
+| `◐ sombra proyectada incluida: N px` | `erase`/`move` sumaron la sombra del objeto a la zona |
+| `⚠ el modelo REENCUADRO` / codigo 3 | La escena generada no calza con la original: no uses el resultado (al expandir, prueba Flux Fill) |
 | `✗ FAIL` (codigo 2) | Algo fuera de lo que se debia tocar cambio: no uses el resultado |
 
 ## Que no hacer
@@ -142,11 +174,16 @@ Genera la zona recortada a ese lado largo (512–4096) y la devuelve a su lugar.
 
 - **Layerize no separo el objeto que querias:** repite con `--prompt` describiendolo o con `--bbox` sobre su region.
 - **El clean plate deja una mancha:** usa `erase --fill model` sobre la misma mascara.
+- **Queda la sombra del objeto borrado:** sube `--grow` o revisa que corriste con capas (la sombra solo se mide con
+  `--layers`); con una mascara explicita, dibujala incluyendo la sombra.
+- **Al borrar o mover se llevo parte de otro objeto:** no deberia pasar; si pasa, corre con `--shadow off` y reporta
+  el `manifest.json`.
 - **Al expandir aparece un panel liso:** prueba `--prefill mirror` (default) y un prompt que describa que hay alrededor.
 
 ## Referencias tecnicas
 
 - Codigo: `scripts/ai/inpaint/layers.ts`, `adapters/layerize-fal.ts`, `layers-cli.ts`, `erase.ts`, `techniques.ts`,
-  `move.ts`, `expand.ts`, `expand-run.ts`, `background.ts`.
+  `move.ts`, `place.ts`, `expand.ts`, `expand-run.ts`, `background.ts`.
+- Canario real: `ai-generations/2026-10-03_task-1973-canary/README.md`.
 - Contrato de Layerize: OpenAPI de fal leido el 2026-10-03 (`bounding_box.absolute` en pixeles de la base).
 - Spec: [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) §Pipeline de inpainting.

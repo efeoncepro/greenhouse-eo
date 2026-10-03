@@ -1,0 +1,155 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "12969d9f3f7e",
+  "key": "12969d9f3f7e640a54f08a1f85c28cf836a69d7f81bbfbfae8622987455c8fca",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:25:56.227Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/f67e0cde1fc7-canvas.png",
+    "imageSha256": "8dd0567d3dc5833f6bb277216ee5df56cb307b57ff6e36cc19d51d30735712a7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/f67e0cde1fc7-mask.png",
+    "maskSha256": "ebbc77caebfee03fd91b22ff448ae41d7c84d3273fbfef844767be314e926736",
+    "maskConvention": "white-editable",
+    "width": 1956,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "the same quiet room continues: the grey plaster wall, the window light from the right, the oak table and its legs, a plain floor",
+    "providerPrompt": "the same quiet room continues: the grey plaster wall, the window light from the right, the oak table and its legs, a plain floor Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.2392638036809816,
+    "editable": 432128,
+    "soft": 47104,
+    "protected": 1523712
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1956,
+      "height": 1024
+    },
+    "target": {
+      "width": 1952,
+      "height": 1024
+    },
+    "aspectError": 0.0020491803278688526,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0094,
+    "basis": "1 × salida 1952x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 47.103,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -81,
+        "dy": -143,
+        "scale": 0.88,
+        "stillError": 13.19,
+        "bestError": 9.96,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1523712,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 432128,
+        "maxDelta": 205,
+        "meanDelta": 49.372,
+        "worst": {
+          "x": 1753,
+          "y": 652
+        }
+      },
+      "seam": {
+        "pixels": 47104,
+        "maxDelta": 186,
+        "meanDelta": 26.292,
+        "worst": {
+          "x": 1744,
+          "y": 651
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1523712,
+        "maxDelta": 215,
+        "meanDelta": 44.28,
+        "worst": {
+          "x": 1301,
+          "y": 567
+        }
+      },
+      "outputUsd": 0.0094,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1588,
+        "input_tokens_details": {
+          "image_tokens": 1512,
+          "text_tokens": 76
+        },
+        "output_tokens": 312,
+        "output_tokens_details": {
+          "image_tokens": 312,
+          "text_tokens": 0
+        },
+        "total_tokens": 1900
+      },
+      "meta": {
+        "size": "1952x1024",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sourceSha256": "69afa01a78f40b7f4997b07449e4bfd5487877c6abb71f301d6e87f5a81defa7",
+    "to": "1.91:1",
+    "plan": {
+      "canvas": {
+        "width": 1956,
+        "height": 1024
+      },
+      "scene": {
+        "left": 210,
+        "top": 0,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 24
+  }
+}

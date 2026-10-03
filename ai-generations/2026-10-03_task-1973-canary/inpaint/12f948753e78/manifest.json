@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "12f948753e78",
+  "key": "12f948753e78b85403788f649c00eb2b22a5fc5bfe464e14f2ca673bc56177a5",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:27:37.598Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/mascara-taza.png",
+    "maskSha256": "504af2bd36dc9cc3024b222997bf658e556674d1f8a3e5faf4b8d6b6a3d919ea",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "the same white ceramic mug, identical shape and position, with crisp glaze detail and a soft natural highlight",
+    "providerPrompt": "the same white ceramic mug, identical shape and position, with crisp glaze detail and a soft natural highlight"
+  },
+  "mask": {
+    "touchedFraction": 0.02909533182779948,
+    "editable": 35710,
+    "soft": 10053,
+    "protected": 1527101
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 797,
+      "top": 254,
+      "width": 517,
+      "height": 484
+    },
+    "target": {
+      "width": 1984,
+      "height": 1856
+    },
+    "aspectError": 0.0007331378299120013,
+    "reason": "la zona con contexto ocupa 15.8 % de la imagen: se genera recortada a 1984x1856"
+  },
+  "estimate": {
+    "usd": 0.0225,
+    "basis": "1 × salida 1984x1856 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 40.213,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.81,
+        "bestError": 1.81,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1527101,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 35710,
+        "maxDelta": 170,
+        "meanDelta": 48.777,
+        "worst": {
+          "x": 1082,
+          "y": 586
+        }
+      },
+      "seam": {
+        "pixels": 10053,
+        "maxDelta": 161,
+        "meanDelta": 9.79,
+        "worst": {
+          "x": 1149,
+          "y": 425
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1527101,
+        "maxDelta": 67,
+        "meanDelta": 0.984,
+        "worst": {
+          "x": 1313,
+          "y": 722
+        }
+      },
+      "outputUsd": 0.0225,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1516,
+        "input_tokens_details": {
+          "image_tokens": 1480,
+          "text_tokens": 36
+        },
+        "output_tokens": 751,
+        "output_tokens_details": {
+          "image_tokens": 751,
+          "text_tokens": 0
+        },
+        "total_tokens": 2267
+      },
+      "meta": {
+        "size": "1984x1856",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete local 2026-10-03 para Slices 1, 3–8 (commits fd7e17c4b…0e469024d en develop, sin push; 99 pruebas del pipeline, dry-runs reales de ai:layers y expand). Pendiente: canarios reales (autorización de gasto) y Slice 2 (foto:expandir tiene WIP de otra sesión: coordinar con CMP-004)`
+- Status real: `Code complete local 2026-10-03 (Slices 1, 3–8 + place; commits fd7e17c4b…8fb2a9efe en develop, sin push; 106 pruebas). Canario real 2026-10-03 (≈ USD 0,18): capas, borrar, mover, place, fondo y detalle PASS; expand con Flare reencuadra (código 3). Pendiente: expand con Flux Fill y erase --fill model (gasto aparte), Slice 2 (WIP ajeno en foto:expandir)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -307,15 +307,15 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 
 ## Acceptance Criteria
 
-- [ ] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1. — implementado y probado con adaptador simulado (`expand.test.ts`, escena intacta) y dry-run real 9:16; **falta el canario real** (autorización de gasto).
+- [ ] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1. — la escena queda en delta 0 (PASS en los dos formatos), pero **Flare reencuadró** (escala 0,88–0,90) y el detector sale con código 3: el resultado no es usable. Falta repetir con un modelo de relleno puro (`--adapter fal:flux-pro-fill`, ≈ USD 0,35 los dos formatos), que requiere autorización de gasto aparte.
 - [ ] `pnpm foto:expandir` conserva flags y salidas; su recomposición vive en el núcleo y la regresión contra dos horizontales aprobadas de CMP-004 está documentada. — **pendiente**: `scripts/foto/expandir.mjs` tiene WIP sin commitear de otra sesión (2026-10-03); requiere coordinación con CMP-004.
-- [ ] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real. — implementado y probado con fal simulado (`layers.test.ts`: capas, cajas, costo, caché, tope) y dry-run real; **falta la corrida real**.
+- [x] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real. — canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): 3 capas + base, USD 0,101 registrado en `layers.json`; pruebas simuladas en `layers.test.ts`.
 - [x] `pnpm ai:mask --from-layer` produce una máscara canónica desde una capa con nombre, y la edición resultante deja el resto de la ORIGINAL en delta 0. — `layers.test.ts` (alfa ubicado con su caja y reescalado de base 400×200 a original 800×400, unión de capas) + `erase.test.ts`/`move.test.ts` (resto en delta 0).
-- [ ] Layerize está medido sobre fotografía y sobre un KV plano: capas obtenidas, calidad del clean plate y si la base se cobra, en la guía de selección. — **falta el canario real** (KV medido el 2026-09-16; fotografía sin dato).
-- [ ] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real. — implementado; `erase.test.ts` cubre clean plate (sin proveedor, delta 0), residuo → código 3 y guarda de marca por nombre de capa; **falta el canario real**.
-- [x] `background` cambia el fondo con el sujeto en delta 0 y reporta la costura en la franja de borde. — `background-detail.test.ts` (sujeto intacto, fondo nuevo, costura impresa); canario real pendiente como validación visual.
-- [x] `detail` rehace una zona a la resolución pedida y vuelve a su lugar en delta 0 fuera de la zona. — `background-detail.test.ts` (zona generada a ≥ 2000 px de lado largo, PASS, rango 512–4096 validado).
-- [ ] Mover una capa sobre el clean plate + halo de integración produce una pieza con el resto en delta 0. — `move.test.ts` cubre el compuesto sin halo (elemento con píxeles de la ORIGINAL, hueco con plate, resto en delta 0); **la pasada de halo con modelo falta en canario real**.
+- [ ] Layerize está medido sobre fotografía y sobre un KV plano: capas obtenidas, calidad del clean plate y si la base se cobra, en la guía de selección. — fotografía medida en el canario del 2026-10-03 (3 capas; la base saca también la superficie: el clean plate recompone las demás capas) y KV el 2026-09-16, ambos en la guía. **Sin tildar: si la base se cobra sigue sin dato** (hace falta `pnpm ai:fal --balance` antes y después de una corrida).
+- [ ] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real. — clean plate verificado en canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): taza y su sombra fuera, mesa y cuaderno intactos, USD 0. `erase.test.ts` cubre residuo → código 3, sombra propia vs del vecino y guarda de marca. **Sin tildar: falta el canario real de `--fill model`.**
+- [x] `background` cambia el fondo con el sujeto en delta 0 y reporta la costura en la franja de borde. — `background-detail.test.ts` + canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): pared verde, mesa/taza/cuaderno intactos, costura media 10,6/255.
+- [x] `detail` rehace una zona a la resolución pedida y vuelve a su lugar en delta 0 fuera de la zona. — `background-detail.test.ts` + canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`) (1984×1856, PASS). Hallazgo: reinterpreta la forma (Flare quitó el pie de la taza): documentado en el manual.
+- [x] Mover una capa sobre el clean plate + halo de integración produce una pieza con el resto en delta 0. — canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): cuaderno movido con sombra de contacto, delta 0 fuera de lo tocado, USD 0,010; la taza vecina conserva su base y su sombra tras la corrección de pertenencia de sombra (`8fb2a9efe`). Además `place` incorpora en otra imagen (canario, PASS).
 - [x] Ningún archivo de `src/app/**` ni del runtime de `src/lib/**` importa los módulos nuevos. — `grep -rlE "inpaint/(layers|erase|move|expand|background|techniques)" src` vacío (2026-10-03).
 - [x] Manuales, spec, guía y skills (+ espejos) describen los modos nuevos. — commit `0e469024d`; `skills:mirrors` y `models:inventory` verdes.
 
@@ -335,8 +335,8 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Delta registrado en `TASK-1925` por la dependencia nueva de `foto:expandir`
-- [ ] Evidencia de cada canario (manifiestos y hallazgos) en `ai-generations/<fecha>_task-1973-canary/README.md`
+- [x] Delta registrado en `TASK-1925` por la dependencia nueva de `foto:expandir` — `docs/tasks/to-do/TASK-1925-brand-workshop-migration.md`
+- [x] Evidencia de cada canario (manifiestos y hallazgos) en `ai-generations/<fecha>_task-1973-canary/README.md` — `ai-generations/2026-10-03_task-1973-canary/README.md`
 
 ## Follow-ups
 
