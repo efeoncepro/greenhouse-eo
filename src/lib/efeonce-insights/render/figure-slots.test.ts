@@ -299,6 +299,13 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     expect((carded!.body as { donutCenter: unknown }).donutCenter).toEqual({ value: '38 %', label: 'chatgpt' })
   })
 
+  it('dona: una parte con valor que redondea a 0 se lee «<1 %», nunca «0 %» (caso real Berel 2026-09)', () => {
+    const byId = facts([['chatgpt', 1648], ['gemini', 30], ['otros', 8]])
+    const [slide] = buildFigureSlides(donut(['chatgpt', 'gemini', 'otros']), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect((slide!.body as { donutParts: Array<{ share: string }> }).donutParts.map(part => part.share)).toEqual(['98 %', '2 %', '<1 %'])
+  })
+
   it('una dona con 1 parte o con más de 3 no se emite', () => {
     expect(buildFigureSlides(donut(['a']), facts([['a', 3]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
     expect(buildFigureSlides(donut(['a', 'b', 'c', 'd']), facts([['a', 1], ['b', 1], ['c', 1], ['d', 1]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
@@ -361,3 +368,4 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     expect(() => buildStatSlides(stat, byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toThrow(/4 palabras/)
   })
 })
+

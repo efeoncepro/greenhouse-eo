@@ -523,6 +523,8 @@ export const GH_INSIGHTS = {
    * edita (acuerdo entre sesiones del 2026-09-25).
    */
   catalog: {
+    /** Participación de una parte con valor que redondea a 0: nunca «0 %». */
+    shareUnderOne: '<1 %',
     product: 'Insights',
     editionKind: 'Informe mensual',
     readingEyebrow: 'Lectura de Efeonce',

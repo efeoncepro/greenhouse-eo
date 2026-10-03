@@ -288,6 +288,12 @@ export const sharesOf = (values: readonly number[]): number[] => {
 
 const percentLabel = (share: number): string => `${share} %`
 
+/**
+ * Participación impresa de una parte: una parte con valor que redondea a 0 se lee «<1 %», nunca «0 %» (un dato real no
+ * se presenta como cero; caso real Berel 2026-09: 8 de 1.686 visitas desde asistentes de IA).
+ */
+const shareLabel = (share: number, value: number): string => (share === 0 && value > 0 ? GH_INSIGHTS.catalog.shareUnderOne : percentLabel(share))
+
 /** Contexto del capítulo que una figura necesita para decidir qué imprime (TASK-1975: el centro de la dona). */
 export interface FigureContext {
   /** Hechos que ya tienen tarjeta de cifra en el capítulo: no se repiten como cifra en otra figura. */
@@ -647,7 +653,7 @@ export const buildFigureSlides = (
       ...base(
         parts.map(entry => entry.fact!.factId),
         {
-          donutParts: parts.map((entry, index) => ({ label: entry.label, count: fmt(entry.fact!, locale), share: percentLabel(shares[index]!) })),
+          donutParts: parts.map((entry, index) => ({ label: entry.label, count: fmt(entry.fact!, locale), share: shareLabel(shares[index]!, values[index]!) })),
           donutCenter: totalHasCard
             ? { value: percentLabel(shares[main]!), label: parts[main]!.label }
             : { value: formatFactValue(total, unit, locale), label: L.donutTotal }
