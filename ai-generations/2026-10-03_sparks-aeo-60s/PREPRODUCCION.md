@@ -73,7 +73,7 @@ versión más nueva disponible]**, voz de librería con licencia comercial regis
 | S7 | 35–40 | «Y tú decides cada paso.» | — |
 | S8 | 40–45 | *(silencio de voz: Karo vuelve a preguntar)* | la misma pregunta |
 | S9 | 45–52,5 | «Ahora, cuando preguntan, la IA ya sabe quién eres.» | respuesta que menciona Andina Cargo, con su fuente |
-| S10 | 52,5–60 | «Efeonce AEO. Mide tu visibilidad en IA con el AI Visibility Report.» | «Efeonce AEO» · «AI Visibility Report» · URL [pendiente] · logo Efeonce |
+| S10 | 52,5–60 | «Efeonce AEO. Mide tu visibilidad en los motores de respuesta de IA con nuestro AI Visibility Report.» **[operador, 2026-10-03]** (17 palabras ≈ 7 s: la voz entra a los 51 s, sobre el final de S9, y el reveal sin voz entra bajo las últimas palabras, 57,5 s) | «Efeonce AEO» · «AI Visibility Report» · URL [pendiente] · logo Efeonce |
 
 **Cuidado de claims [decisión]:** el modelo comercial AEO sigue en borrador; el guion no promete posiciones, rankings
 ni plazos. «La IA ya sabe quién eres» describe el caso ficticio, no garantiza un resultado. El copy final lo revisa
@@ -138,7 +138,7 @@ desenlace.
 | S9 | 46,0 | **la IA nombra a la marca: las tres notas se vuelven una** | logo sonoro | el mayor gesto de la mezcla |
 | S9 | 48–51 | los Sparks celebran: gorjeos en acorde mayor | voz de Spark | debajo de la VO |
 | S10 | 52,5–57 | los Sparks forman la órbita alrededor del logo | SFX | brillos en el pulso |
-| S10 | 57,0 | **reveal sin voz** del kit, timbre FM | logo sonoro | cola hasta 60 s |
+| S10 | 57,5 | **reveal sin voz** del kit, timbre FM | logo sonoro | bajo las últimas palabras; cola hasta 60 s |
 
 **Producción de SFX [propuesta]:** gorjeos sintetizados con la identidad sonora como fuente (no síntesis genérica);
 SFX puntuales con ElevenLabs SFX; foley de librería. Todo con licencia registrada.
