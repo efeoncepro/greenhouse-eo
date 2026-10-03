@@ -286,9 +286,12 @@ describe('registro de capacidades fal', () => {
 
   // Leído del OpenAPI de las 55 capacidades el 2026-09-16.
   it('declara seed sólo donde el OpenAPI lo declara', () => {
-    // 20 = las 19 medidas el 2026-09-16 + flux-pro-fill, cuyo OpenAPI declara `seed` (verificado 2026-10-02, TASK-1965).
-    expect(FAL_CAPABILITIES.filter(c => c.acceptsSeed).length).toBe(20)
+    // 21 = las 19 medidas el 2026-09-16 + flux-pro-fill (OpenAPI verificado 2026-10-02, TASK-1965) + iclight-v2
+    // (OpenAPI leído 2026-10-03: `seed` opcional). El relighting por estilos NO declara semilla.
+    expect(FAL_CAPABILITIES.filter(c => c.acceptsSeed).length).toBe(21)
     expect(findFalCapability('flux-pro-fill')?.acceptsSeed).toBe(true)
+    expect(findFalCapability('iclight-v2')?.acceptsSeed).toBe(true)
+    expect(findFalCapability('image-apps-relighting')?.acceptsSeed).toBeFalsy()
     expect(findFalCapability('seedream5-pro')?.acceptsSeed).toBeFalsy()
     expect(findFalCapability('seedance20-r2v')?.acceptsSeed).toBeFalsy()
     expect(findFalCapability('flux3-t2v')?.acceptsSeed).toBeFalsy()

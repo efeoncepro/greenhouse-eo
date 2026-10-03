@@ -68,6 +68,11 @@ export interface InpaintImageAdapter {
   validate(params: ImageAdapterParams): void
   /** Si la máscara viajará con estos parámetros (default: `sendsMask`). Decide la guía automática de zona. */
   willSendMask?(params: ImageAdapterParams): boolean
+  /**
+   * Imágenes extra (boceto, guía de zona, referencias) que acepta además de la base. `0` = una sola imagen: el pipeline
+   * no le manda la guía de zona en magenta (IC-Light y el relighting por estilos aceptan una). Default: sin tope.
+   */
+  maxExtraImages?: number
   /** Avisos medidos sobre la combinación pedida (no bloquean): se imprimen antes de gastar. */
   advisories?(params: ImageAdapterParams): string[]
   pickSize(model: string): PickTargetSize

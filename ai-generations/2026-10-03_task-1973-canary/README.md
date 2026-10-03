@@ -1,6 +1,6 @@
 # Canario real TASK-1973 — capas, borrar, mover, incorporar, fondo, detalle y expandir
 
-> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,98 (0,18 + 0,29 de la comparación de expansión + 0,43 de la tercera tanda + 0,08 de borrado por instrucción)
+> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,98 (0,18 + 0,29 de la comparación de expansión + 0,43 de la tercera tanda + 0,08 de borrado por instrucción + ≈ 0,15–0,35 de relight)
 > Foto: `base.png` (copia de `2026-10-02_task-1965-canary/base.png`, 1536×1024: mesa de roble, taza, cuaderno, ventana).
 
 ## Resultado por técnica
@@ -63,6 +63,20 @@ describe el fondo · costo de Layerize con la base.
 
 Decisión: con `--fill model` y OpenAI, el default es Sunburst (`ERASE_OPENAI_MODEL`). El prompt que describe el fondo
 queda sólo para modelos de relleno con máscara (Flux Fill).
+
+## Quinta tanda: relight de un compuesto (`place --finish element`)
+
+La taza pegada sobre la pared verde con sol entre hojas (`place/bb0ae0c3bb2d/composed.png`); zona = taza + halo.
+
+| Modelo | Resultado | Costo |
+|---|---|---|
+| **Sunburst** por instrucción | ✓ PASS; la taza intacta, sombra de contacto y asentada; relight sutil (zona 8,9/255) (`relight/…/0fde0812b198/`) | 0,010 |
+| `fal:image-apps-relighting` (estilo `natural`) | PASS mecánico, ✗ **cambió el color del producto** (blanca → lila) y dejó una banda borrosa en la pared (`…/3ba6bf834dae/`) | 0,04 |
+| `fal:iclight-v2` | PASS mecánico, ✗ luz más dramática pero **deformó la taza** e **inventó una ventana** en el halo; tardó > 120 s (el primer intento expiró en el cliente: posible cobro de ≈ 0,20 sin resultado) (`…/0b2aa657339e/`) | 0,10 |
+
+Decisión: para un objeto exacto, Sunburst por instrucción. IC-Light y el relighting por estilos quedan conectados y
+verificados, pero no se recomiendan sobre producto, logo ni texto. Pendiente: probarlos para reiluminar una escena
+entera, donde la forma del objeto importa menos.
 
 ## Pendiente
 

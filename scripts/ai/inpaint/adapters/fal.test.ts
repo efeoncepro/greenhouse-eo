@@ -36,6 +36,20 @@ describe('adaptadores fal de ai:inpaint', () => {
     expect(createFalInpaintAdapter('seedream5-pro-edit').sendsMask).toBe(false)
   })
 
+  it('IC-Light: prompt, image_size y la dirección de la luz leída del prompt; una sola imagen (sin guía de zona)', () => {
+    const input = buildFalInpaintInput(findFalCapability('iclight-v2')!, { prompt: 'a mug, soft sunlight from the left', imageUrl: 'u1', maskUrl: null, size: { width: 1024, height: 680 }, seed: 3 })
+
+    expect(input).toEqual({ prompt: 'a mug, soft sunlight from the left', num_images: 1, image_size: { width: 1024, height: 680 }, initial_latent: 'Left', image_url: 'u1', output_format: 'png', seed: 3 })
+    expect(buildFalInpaintInput(findFalCapability('iclight-v2')!, { prompt: 'a mug', imageUrl: 'u1', maskUrl: null, size: { width: 512, height: 512 } }).initial_latent).toBe('None')
+    expect(createFalInpaintAdapter('iclight-v2').maxExtraImages).toBe(0)
+    expect(createFalInpaintAdapter('seedream5-pro-edit').maxExtraImages).toBeUndefined()
+  })
+
+  it('Relighting por estilos: el prompt es un estilo de la lista cerrada', () => {
+    expect(buildFalInpaintInput(findFalCapability('image-apps-relighting')!, { prompt: 'Side_Light', imageUrl: 'u1', maskUrl: null, size: { width: 1024, height: 1024 } })).toEqual({ image_url: 'u1', lighting_style: 'side_light' })
+    expect(() => buildFalInpaintInput(findFalCapability('image-apps-relighting')!, { prompt: 'warm light please', imageUrl: 'u1', maskUrl: null, size: { width: 1024, height: 1024 } })).toThrow(/estilo de luz/)
+  })
+
   it('Seedream recibe boceto y referencias después de la imagen; Fill los rechaza', async () => {
     const input = buildFalInpaintInput(findFalCapability('seedream5-pro-edit')!, { prompt: 'p', imageUrl: 'u1', extraUrls: ['u2', 'u3'], maskUrl: null, size: { width: 1024, height: 1024 } })
 

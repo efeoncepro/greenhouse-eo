@@ -24,7 +24,7 @@ Herramienta **out-of-band** (`scripts/ai/inpaint/**`): nunca la importa `src/app
 | El plate entero está mal (luz, lecho, composición, «se ve IA») | ❌ corrige la ficha y **regenera** (canon cine: casebook de brand-photography) |
 | Retocar la piel de una cara | ❌ medido 2026-10-02: no la arregla; la piel se resuelve en el **retrato ancla** |
 | Generar, borrar, mover o reconstruir un **logo o marca** | ❌ nunca con IA: la guarda de marca lo bloquea; el logo es el vector compuesto después. `--allow-brand` sólo si el prompt nombra la marca y la edición toca el **contexto** |
-| Reiluminar una foto o un video | ❌ no hay relight conectado (§7) |
+| Reiluminar un objeto pegado | `place --finish element --model gpt-image-2.5-sunburst` (único que conservó el objeto, 2026-10-03); `fal:iclight-v2` y `fal:image-apps-relighting` conectados pero deforman o recolorean (§7) |
 
 ## 1. La garantía y cómo leer el resultado
 
@@ -136,7 +136,7 @@ propuesta sin re-medir.
 
 ## 7. Reiluminar — estado 2026-10-03
 
-**No hay relight dedicado conectado ni probado.** Lo único interno que toca la luz: `place --finish element` y
+**Canario 2026-10-03 (tarde):** `fal:iclight-v2` (USD 0,10/MP, tarda > 120 s) y `fal:image-apps-relighting` (USD 0,04, `--prompt` = estilo de una lista cerrada) quedaron conectados como adaptadores de `ai:inpaint`; sobre un compuesto, IC-Light **deformó la taza e inventó una ventana** y el de estilos **cambió el color del producto**. Sunburst por instrucción la conservó: es el default para objetos exactos. Lo demás interno que toca la luz: `place --finish element` y
 `pnpm foto:isotipo --acabado`. Candidatos estudiados, **todos sin verificar en vivo**:
 
 - **Magnific:** MCP oficial conectado en las sesiones Claude con la cuenta Efeonce; expone `images_relight` y

@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9e400e1877a1",
+  "key": "9e400e1877a18757f7fff52357067d5b39d7b33193bbe4a3df3a1272c788585a",
+  "status": "failed",
+  "createdAt": "2026-10-03T11:54:49.684Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/composed.png",
+    "imageSha256": "245181e31f41c5c0b655e2bd036e6b0a8cfb4bee60d04c2d67388b9d91629dee",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/finish-mask.png",
+    "maskSha256": "d01d201618d3557f8965e54590431d9254de534ce0aa1dca7f2ff69f3b5ca0c3",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:iclight-v2",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": null
+  },
+  "request": {
+    "model": "fal-ai/iclight-v2",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "a white ceramic mug on a light oak table, lit by warm morning sunlight from the left filtering through leaves, with soft green bounce light from the green wall",
+    "providerPrompt": "a white ceramic mug on a light oak table, lit by warm morning sunlight from the left filtering through leaves, with soft green bounce light from the green wall"
+  },
+  "mask": {
+    "touchedFraction": 0.06631787618001302,
+    "editable": 81306,
+    "soft": 23003,
+    "protected": 1468555
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1248,
+      "height": 840
+    },
+    "aspectError": 0.009615384615384581,
+    "reason": "la zona con contexto ocupa 33 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.2,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.1/MP"
+  },
+  "candidates": [],
+  "error": "fal fal-ai/iclight-v2 falló (HTTP 408): fal.ai no completó el trabajo dentro de 120000 ms."
+}

@@ -267,7 +267,8 @@ Otro formato ........... expand --to 9:16|4:5|1:1|1.91:1|16:9|3:4|2:3|3:2 (o --c
                          default fal:flux-pro-fill. NUNCA GPT Image (Flare reescala 0,88–0,90; Sunburst copia el espejo)
 Cambiar fondo .......... background [--layers … --layer …] --prompt "<fondo nuevo>"   (sin capas: matting local)
 Rehacer un detalle ..... image --mask zona.png --zone-resolution 2048 --model gpt-image-2.5-sunburst   (reinterpreta)
-Reiluminar ............. no hay relight conectado; place --finish element relumina solo el elemento pegado
+Reiluminar ............. place --finish element --model gpt-image-2.5-sunburst (el unico que conservo el objeto, 2026-10-03);
+                         fal:iclight-v2 y fal:image-apps-relighting estan conectados pero deforman o recolorean el objeto
 ```
 
 ### Lineas de comando

@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0fde0812b198",
+  "key": "0fde0812b198863e82b4a67e8f24141430c7748a36cdd68a43a43859123e4146",
+  "status": "completed",
+  "createdAt": "2026-10-03T11:54:49.851Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/composed.png",
+    "imageSha256": "245181e31f41c5c0b655e2bd036e6b0a8cfb4bee60d04c2d67388b9d91629dee",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/finish-mask.png",
+    "maskSha256": "d01d201618d3557f8965e54590431d9254de534ce0aa1dca7f2ff69f3b5ca0c3",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Integrate the pasted object into the scene: match its lighting, color temperature and shadows to the scene light, add a soft contact shadow and subtle reflection, and blend its edges. Keep the object shape, proportions, colors, materials and any text exactly the same.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nIntegrate the pasted object into the scene: match its lighting, color temperature and shadows to the scene light, add a soft contact shadow and subtle reflection, and blend its edges. Keep the object shape, proportions, colors, materials and any text exactly the same.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.06631787618001302,
+    "editable": 81306,
+    "soft": 23003,
+    "protected": 1468555
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 33 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 8.863,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.32,
+        "bestError": 1.32,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.13,
+        -1.75,
+        -0.72
+      ],
+      "protected": {
+        "pixels": 1468555,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 81306,
+        "maxDelta": 221,
+        "meanDelta": 10.616,
+        "worst": {
+          "x": 452,
+          "y": 417
+        }
+      },
+      "seam": {
+        "pixels": 23003,
+        "maxDelta": 49,
+        "meanDelta": 2.665,
+        "worst": {
+          "x": 183,
+          "y": 571
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1468555,
+        "maxDelta": 140,
+        "meanDelta": 2.829,
+        "worst": {
+          "x": 1105,
+          "y": 521
+        }
+      },
+      "outputUsd": 0.0103,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3248,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 176
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "image_tokens": 343,
+          "text_tokens": 0
+        },
+        "total_tokens": 3591
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ]
+}

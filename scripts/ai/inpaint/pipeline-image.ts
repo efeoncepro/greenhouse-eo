@@ -219,7 +219,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (references.length) log(`  ⧉ ${references.length} referencia(s) del objeto`)
 
   const maskWillTravel = adapter.willSendMask?.(params) ?? adapter.sendsMask
-  const zoneGuide = !sketch && !maskWillTravel && (options.guide ?? 'auto') === 'auto'
+  // La guía es una imagen más: sólo va a un adaptador que acepta imágenes extra.
+  const zoneGuide = !sketch && !maskWillTravel && (options.guide ?? 'auto') === 'auto' && adapter.maxExtraImages !== 0
 
   if (zoneGuide) log('  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)')
 

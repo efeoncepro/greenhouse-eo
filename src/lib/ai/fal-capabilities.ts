@@ -24,6 +24,7 @@ export type FalOperation =
   | 'edit'
   | 'inpaint'
   | 'layerize'
+  | 'relight'
   | 'text-to-video'
   | 'image-to-video'
   | 'reference-to-video'
@@ -459,6 +460,43 @@ const BASE_FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'images',
     verifiedAt: '2026-09-16'
+  },
+
+  // ── Relight de imagen (estudio de mercado 2026-10-03) ─────────────────────────────────────────────
+  {
+    id: 'iclight-v2',
+    slug: 'fal-ai/iclight-v2',
+    kind: 'image',
+    operation: 'relight',
+    label: 'IC-Light v2 — reiluminar una imagen por prompt',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'images',
+    // Canario real 2026-10-03 (place --finish element, USD 0,10): luz más dramática, pero DEFORMÓ el objeto e inventó
+    // una ventana en el halo. No sirve para un objeto que debe quedar exacto. Tarda > 120 s.
+    verifiedAt: '2026-10-03',
+    notes:
+      'OpenAPI leído 2026-10-03: prompt + image_url obligatorios; image_size, initial_latent (None/Left/Right/Top/' +
+      'Bottom: dirección de la luz), mask_image_url opcional, seed, output_format. Precio API: USD 0,10/MP (redondea ' +
+      'hacia arriba). Regenera la imagen entera: se opera con pnpm ai:inpaint (recompone sólo la zona).'
+  },
+  {
+    id: 'image-apps-relighting',
+    slug: 'fal-ai/image-apps-v2/relighting',
+    kind: 'image',
+    operation: 'relight',
+    label: 'Relighting por estilo de luz (image-apps v2)',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: false,
+    outputKey: 'images',
+    // Canario real 2026-10-03 (estilo natural, USD 0,04): cambió el COLOR del producto (taza blanca → lila) y dejó una
+    // banda borrosa en la pared. No sirve para un objeto que debe quedar exacto.
+    verifiedAt: '2026-10-03',
+    notes:
+      'OpenAPI leído 2026-10-03: image_url obligatorio; lighting_style de una lista cerrada (natural, studio, ' +
+      'golden_hour, side_light, rim_light…); sin prompt libre. Precio API: USD 0,04/imagen. Modelo base no publicado.'
   },
 
   // ── FLUX.1 Pro Fill — inpainting con máscara (TASK-1965) ──────────────────────────────────────────
@@ -1200,6 +1238,7 @@ const BASE_FAL_CAPABILITIES: readonly FalCapability[] = [
  */
 export const FAL_SEED_CAPABILITY_IDS: readonly string[] = [
   'flux-pro-fill',
+  'iclight-v2',
   'seedance25-r2v',
   'h3-t2v', 'h3-i2v', 'h3-r2v', 'h3-t2v-lora', 'h3-i2v-lora', 'h3-r2v-lora',
   'h3max-t2v', 'h3max-i2v', 'h3max-r2v', 'h3max-camera', 'h3turbo-t2v', 'h3turbo-i2v',
@@ -1216,7 +1255,9 @@ const FAL_IMAGE_RULES: Readonly<Record<string, Pick<FalCapability, 'imageOutput'
   'seedream5-pro-layerize': { imageOutput: { formats: [], defaultFormat: 'png' } },
   'seedream5-lite': { imageOutput: SEEDREAM_LITE_OUTPUT },
   'seedream5-lite-edit': { imageOutput: SEEDREAM_LITE_OUTPUT, maxInputImages: 10 },
-  'flux-pro-fill': { imageOutput: { formats: ['jpeg', 'png'], defaultFormat: 'jpeg' } }
+  'flux-pro-fill': { imageOutput: { formats: ['jpeg', 'png'], defaultFormat: 'jpeg' } },
+  'iclight-v2': { imageOutput: { formats: ['jpeg', 'png'], defaultFormat: 'jpeg' } },
+  'image-apps-relighting': { imageOutput: { formats: [], defaultFormat: 'png' } }
 }
 
 const SEEDANCE_TOKENS: FalPricingRule = { unit: 'token_1k', defaultResolution: '720p' }
@@ -1242,6 +1283,9 @@ export const FAL_PRICING_RULES: Readonly<Record<string, FalPricingRule>> = {
   'seedream5-lite-edit': { unit: 'image', publishedUsdPerUnit: 0.035 },
   // API de precios de fal 2026-10-02: USD 0,05 por megapíxel de salida.
   'flux-pro-fill': { unit: 'megapixel', publishedUsdPerUnit: 0.05 },
+  // API de precios de fal 2026-10-03.
+  'iclight-v2': { unit: 'megapixel', publishedUsdPerUnit: 0.1 },
+  'image-apps-relighting': { unit: 'image', publishedUsdPerUnit: 0.04 },
   ...Object.fromEntries(
     ['seedance25-t2v', 'seedance25-i2v', 'seedance25-r2v', 'seedance20-t2v', 'seedance20-i2v', 'seedance20-r2v']
       .concat(['fast', 'mini', 'us'].flatMap(v => ['t2v', 'i2v', 'r2v'].map(m => `seedance20-${v}-${m}`)))
