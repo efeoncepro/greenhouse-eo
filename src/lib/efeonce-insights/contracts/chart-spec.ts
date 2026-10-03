@@ -126,7 +126,16 @@ export interface ChartBulletItemV1 {
    */
   bandFactId?: string
   channelId?: InsightChannelId
+  /**
+   * TASK-1974 — dirección PROPIA del ítem, cuando la figura junta metas de métricas distintas (criterio §5: varias metas
+   * de un capítulo van en UNA figura). RpA mejora al bajar junto a OTD y FTR que mejoran al subir. Ausente = la de la
+   * figura.
+   */
+  direction?: 'higher_is_better' | 'lower_is_better'
 }
+
+/** Dirección efectiva de un ítem de bullet: la suya o la de la figura. */
+export const bulletItemDirection = (data: ChartBulletDataV1, item: ChartBulletItemV1): 'higher_is_better' | 'lower_is_better' => item.direction ?? data.direction
 
 export interface ChartBulletDataV1 {
   kind: 'bullet'
@@ -296,6 +305,7 @@ const dataShapeViolations = (data: ChartFamilyDataV1, push: (rule: string, detai
   switch (data.kind) {
     case 'bullet':
       if (data.items.length === 0) push('bullet_items_required', 'un bullet necesita al menos un ítem con valor y meta')
+      if (data.items.some(item => item.direction !== undefined && item.direction !== 'higher_is_better' && item.direction !== 'lower_is_better')) push('bullet_item_direction', 'la dirección de un ítem es higher_is_better o lower_is_better')
       break
     case 'gauge':
       if (!(data.max > data.min)) push('gauge_range', `el rango del medidor es inválido (min=${data.min}, max=${data.max})`)

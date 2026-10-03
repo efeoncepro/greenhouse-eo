@@ -86,61 +86,57 @@ const aeoSnapshot: EvidenceSnapshotContentV1 = {
 const v2 = (snapshot: EvidenceSnapshotContentV1, modules: Array<'seo' | 'aeo' | 'ico'>) => buildDeterministicPlan(snapshot, { modules, locale: 'es-CL', editorialV2: true })
 
 describe('TASK-1888 — productores v2 (ICO)', () => {
-  it('emite bullet por métrica contra la meta del registro y línea mensual con ≥ 3 meses; el plan valida', () => {
+  it('emite bullet por métrica contra la meta del registro; con meta no hay barra ni línea del mismo hecho (TASK-1974); el plan valida', () => {
     const plan = v2(icoSnapshot, ['ico'])
     const chapter = plan.chapters[0]!
 
-    expect(chapter.charts.map(chart => chart.family).sort()).toEqual(['bar', 'bar', 'bullet', 'bullet', 'bullet', 'line', 'line', 'line'])
+    // La meta gana (criterio §4, regla 2): OTD, FTR y RpA van UNA vez, en bullet. Antes salían también en barras y en
+    // línea mensual, con el hecho del mes actual repetido en tres figuras.
+    // Y en UNA figura (criterio §5: varias metas de un capítulo van juntas, no una figura por meta).
+    expect(chapter.charts.map(chart => chart.family)).toEqual(['bullet'])
+    expect(chapter.charts[0]!.question).toBe('target')
     expect(validateEditorialPlan(plan, icoSnapshot)).toEqual([])
 
-    const otd = chapter.charts.find(chart => chart.chartId === 'chart.ico.bullet.otd')!
+    const targets = chapter.charts[0]!
 
-    expect(otd.data).toEqual({
-      kind: 'bullet',
-      direction: 'higher_is_better',
-      items: [{ itemId: 'chart.ico.bullet.otd.ico.otd.w.sp-1.2026-08', label: 'Sky Airline', valueFactId: 'ico.otd.w.sp-1.2026-08', targetFactId: 'ico.target.otd.w' }]
-    })
-    expect(chapter.charts.find(chart => chart.chartId === 'chart.ico.bullet.rpa')!.data).toMatchObject({ direction: 'lower_is_better' })
+    expect(targets.chartId).toBe('chart.ico.bullet.targets')
+    expect(targets.data).toMatchObject({ kind: 'bullet', direction: 'higher_is_better' })
+    // Cada fila con su dirección: OTD mejora al subir, RpA al bajar.
+    expect((targets.data as { items: object[] }).items).toEqual([
+      { itemId: 'chart.ico.bullet.targets.ico.otd.w.sp-1.2026-08', label: 'Entregas a tiempo', valueFactId: 'ico.otd.w.sp-1.2026-08', targetFactId: 'ico.target.otd.w', direction: 'higher_is_better' },
+      expect.objectContaining({ label: 'Primera entrega correcta', direction: 'higher_is_better' }),
+      expect.objectContaining({ label: 'Rondas de revisión por pieza', direction: 'lower_is_better' })
+    ])
   })
 
   it('con banda del registro, cada ítem del bullet la cita; sin banda, el bullet sigue válido', () => {
     const band = { ...target('otd', 70, 'percent', 'higher_is_better'), factId: 'ico.band.otd.w', metricId: 'band.otd', label: 'Umbral otd' }
     const withBand = { ...icoSnapshot, facts: [...icoSnapshot.facts, band] }
     const plan = v2(withBand, ['ico'])
-    const otd = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.otd')!
+    const targets = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.targets')!
 
-    expect(otd.data).toMatchObject({ items: [{ bandFactId: 'ico.band.otd.w', targetFactId: 'ico.target.otd.w' }] })
+    expect((targets.data as { items: object[] }).items[0]).toMatchObject({ bandFactId: 'ico.band.otd.w', targetFactId: 'ico.target.otd.w' })
     expect(validateEditorialPlan(plan, withBand)).toEqual([])
-    expect(plan.chapters[0]!.charts.filter(chart => chart.family === 'bullet')).toHaveLength(3)
-    expect((v2(icoSnapshot, ['ico']).chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.otd')!.data as { items: object[] }).items[0]).not.toHaveProperty('bandFactId')
+    expect(plan.chapters[0]!.charts.filter(chart => chart.family === 'bullet')).toHaveLength(1)
+    expect((v2(icoSnapshot, ['ico']).chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.targets')!.data as { items: object[] }).items[0]).not.toHaveProperty('bandFactId')
   })
 
   it('la lectura es factual: posición contra la meta y un próximo paso SÓLO si hay brecha', () => {
     const chapter = v2(icoSnapshot, ['ico']).chapters[0]!
-    const reading = (chartId: string) => chapter.readings!.find(item => item.chartId === chartId)!
+    const reading = chapter.readings!.find(item => item.chartId === 'chart.ico.bullet.targets')!
 
-    // Conclusión = el hecho contra su META (no la comparación de períodos); con un solo space no hay «Lo que significa»
-    // porque repetiría la conclusión (hallazgo de 1846 en los PDF reales de Sky y Berel).
-    // Un solo space: el encabezado ya lo nombra, así que la frase no lo repite como sujeto.
-    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('No alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
-    // Sin comparable en este fixture (los meses son hechos independientes), no hay «Lo que significa».
-    expect(reading('chart.ico.bullet.otd').meaning).toBeUndefined()
-    expect(reading('chart.ico.bullet.otd').keyFigure!.caption.text).toBe('Entregas a tiempo.')
-    expect(reading('chart.ico.bullet.otd').keyFigure).toMatchObject({ factId: 'ico.otd.w.sp-1.2026-08', value: '81,9 %' })
-    // «Revisar primero X» sólo con dos o más spaces: con uno no hay entre qué elegir.
-    expect(reading('chart.ico.bullet.otd').nextStep).toBeNull()
-    // FTR 86 sobre la meta de 80 y RpA 1,33 bajo el techo de 1,5: alcanzadas ⇒ sin próximo paso inventado.
-    expect(reading('chart.ico.bullet.ftr').nextStep).toBeNull()
-    // RpA mejora al bajar: 1,33 bajo el techo de 1,5 CUMPLE la meta.
-    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Cumple la meta de rondas de revisión por pieza: 1,33 (meta 1,50).')
-    expect(reading('chart.ico.bullet.rpa').nextStep).toBeNull()
-    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Entregas a tiempo: de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
-    expect(reading('chart.ico.line.rpa').conclusion!.text).toBe('Rondas de revisión por pieza: de 1,50 en 2026-06 a 1,33 en 2026-08.')
-    expect(reading('chart.ico.line.otd').meaning).toBeUndefined()
-    // Barras sin período anterior: el hallazgo es la cifra más alta de la figura (selección, sin cifras nuevas).
-    // Nombre humano de la métrica; como la ventana tiene tres meses, el mes se dice.
-    expect(reading('chart.ico.percent').conclusion!.text).toBe('La cifra más alta es Primera entrega correcta (2026-08): 86,0 %.')
-    expect(reading('chart.ico.percent').meaning).toBeUndefined()
+    // Conclusión = la meta más lejos de cumplirse (brecha RELATIVA, comparable entre unidades). Con un solo space la
+    // frase no repite el space. Las tres metas juntas: «Lo que significa» las lista (TASK-1974).
+    expect(reading.conclusion!.text).toBe('No alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
+    expect(reading.meaning!.text).toBe('Entregas a tiempo: 81,9 % (meta 90,0 %); Primera entrega correcta: 86,0 % (meta 80,0 %); Rondas de revisión por pieza: 1,33 (meta 1,50).')
+    expect(reading.keyFigure!.caption.text).toBe('Entregas a tiempo.')
+    expect(reading.keyFigure).toMatchObject({ factId: 'ico.otd.w.sp-1.2026-08', value: '81,9 %' })
+    // «Revisar primero X» sólo entre spaces de UNA métrica: entre métricas distintas no hay qué priorizar así.
+    expect(reading.nextStep).toBeNull()
+    // RpA 1,33 bajo el techo de 1,5 CUMPLE (mejora al bajar): no es la meta que falla.
+    expect(reading.conclusion!.text).not.toMatch(/rondas/i)
+    // TASK-1974 — sin línea ni barras de las métricas con meta: sus lecturas no existen.
+    expect(chapter.readings!.some(item => item.chartId.startsWith('chart.ico.line.') || item.chartId === 'chart.ico.percent')).toBe(false)
 
     for (const item of chapter.readings!) expect(item.meaning?.text).not.toBe(item.conclusion?.text)
     expect(chapter.opening!.factIds).toEqual([])
@@ -155,7 +151,7 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     expect(plan.references.some(reference => reference.referenceId.includes('target'))).toBe(false)
   })
 
-  it('con período anterior: la barra afirma el MAYOR CAMBIO y el bullet sitúa el dato contra el período (caso Sky)', () => {
+  it('con período anterior: el bullet sitúa el dato contra el período y no hay barra que lo repita (caso Sky, TASK-1974)', () => {
     const cur = (metricId: string, value: number, unit: EvidenceFactV1['unit']) => ico(metricId, '2026-08', value, unit, { factId: `ico.${metricId}.cur`, comparisonFactId: `ico.${metricId}.prev` })
     const prev = (metricId: string, value: number, unit: EvidenceFactV1['unit']) => ico(metricId, '2026-07', value, unit, { factId: `ico.${metricId}.prev` })
     const snapshot = { facts: [cur('otd', 81.9, 'percent'), prev('otd', 80.1, 'percent'), cur('ftr', 90.9, 'percent'), prev('ftr', 96.5, 'percent'), target('otd', 90, 'percent', 'higher_is_better'), target('ftr', 80, 'percent', 'higher_is_better')], sources: [], rejections: [] }
@@ -163,22 +159,24 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     const reading = (chartId: string) => plan.chapters[0]!.readings!.find(item => item.chartId === chartId)!
 
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
-    // FTR -5,6 pp pesa más que OTD +1,8 pp: el mayor cambio es FTR.
-    expect(reading('chart.ico.percent').conclusion!.text).toBe('El mayor cambio fue en primera entrega correcta: de 96,5 % a 90,9 % (-5,6 pp).')
-    expect(reading('chart.ico.bullet.ftr').conclusion!.text).toBe('Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).')
-    expect(reading('chart.ico.bullet.ftr').meaning!.text).toBe('Contra el período anterior: de 96,5 % a 90,9 % (-5,6 pp).')
-    // Tesis = la única meta sin cumplir (selección, sin cifra nueva); la bajada, el siguiente hallazgo sobre OTRO hecho.
+    // Sky mostraba OTD y FTR en barras contra el mes anterior Y en bullets: ahora sólo en bullets.
+    expect(plan.chapters[0]!.charts.map(chart => chart.family)).toEqual(['bullet'])
+    // Una figura con las dos metas: la que falla manda y «Lo que significa» las dice juntas.
+    expect(reading('chart.ico.bullet.targets').conclusion!.text).toBe('No alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
+    expect(reading('chart.ico.bullet.targets').meaning!.text).toBe('Entregas a tiempo: 81,9 % (meta 90,0 %); Primera entrega correcta: 90,9 % (meta 80,0 %).')
+    // Tesis = la única meta sin cumplir (selección, sin cifra nueva); la bajada, el siguiente hallazgo sobre OTRO hecho:
+    // el cambio de FTR contra el mes anterior (antes lo decía la barra que repetía el dato).
     expect(plan.executiveSummary.map(item => item.text)).toEqual([
       'Entregas a tiempo es la única meta sin cumplir: 81,9 % (meta 90,0 %).',
-      'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).'
+      'La primera entrega correcta bajó de 96,5 % a 90,9 % (-5,6 pp).'
     ])
-    // Un HALLAZGO, una esencial (revisión del operador 2026-10-02): la portada dijo las metas de OTD y FTR; «Lo esencial»
-    // puede decir sus CAMBIOS (citan su período anterior), nunca repetir la meta, y nunca el mismo hallazgo dos veces.
+    // Un HALLAZGO, una esencial (revisión del operador 2026-10-02): «Lo esencial» dice CAMBIOS (citan su período anterior),
+    // nunca repite la meta ni lo que ya dijo la portada.
     const findings = plan.essentials!.map(item => `${item.factIds[0]}:${item.factIds.some(id => id.endsWith('.prev')) ? 'change' : 'other'}`)
 
     expect(findings).not.toContain('ico.otd.cur:other')
     expect(findings).not.toContain('ico.ftr.cur:other')
-    expect(findings).toContain('ico.ftr.cur:change')
+    expect(findings).toContain('ico.otd.cur:change')
     expect(new Set(findings).size).toBe(findings.length)
   })
 
@@ -225,7 +223,8 @@ describe('TASK-1888 — canales y matriz', () => {
   it('si todo el gráfico mide UN canal (SEO: todo es Google), el canal va en la serie, no en cada dimensión', () => {
     const seo = (metricId: string, value: number): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}.w`, module: 'seo', metricId, label: metricId, numerator: null, denominator: null, dimension: undefined, channelId: 'google' })
     // Magnitudes comparables (TASK-1957 separa por banda las que no lo son: 9.377 junto a 512.113 no se leía).
-    const snapshot = { facts: [seo('clicks', 9377), seo('sessions', 12480)], sources: [], rejections: [] }
+    // Métricas sin nombre de tarjeta (las que lo tienen van en la tarjeta de cifra desde TASK-1974).
+    const snapshot = { facts: [seo('visits', 9377), seo('sessions', 12480)], sources: [], rejections: [] }
     const chart = v2(snapshot, ['seo']).chapters[0]!.charts[0]!
 
     expect(chart.dimensionChannelIds).toBeUndefined()
@@ -253,10 +252,11 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
   it('con dos spaces: el sujeto es el space con mayor brecha y hay próximo paso', () => {
     const second = (metricId: string, value: number) => ({ ...ico(metricId, '2026-08', value, 'percent'), factId: `ico.${metricId}.w.sp-2.2026-08`, label: `${metricId.toUpperCase()} · Sky Cargo · 2026-08`, dimension: { spaceId: 'sp-2', spaceName: 'Sky Cargo', month: '2026-08' } })
     const snapshot = { facts: [ico('otd', '2026-08', 92, 'percent'), second('otd', 71), target('otd', 90, 'percent', 'higher_is_better')], sources: [], rejections: [] }
-    const reading = v2(snapshot, ['ico']).chapters[0]!.readings!.find(item => item.chartId === 'chart.ico.bullet.otd')!
+    const reading = v2(snapshot, ['ico']).chapters[0]!.readings!.find(item => item.chartId === 'chart.ico.bullet.targets')!
 
     expect(reading.conclusion!.text).toBe('Sky Cargo no alcanza la meta de entregas a tiempo: 71,0 % (meta 90,0 %).')
-    expect(reading.meaning!.text).toBe('Sky Airline: 92,0 % (meta 90,0 %); Sky Cargo: 71,0 % (meta 90,0 %).')
+    // Con varios spaces cada fila dice métrica y space (la figura junta todas las metas del capítulo).
+    expect(reading.meaning!.text).toBe('Entregas a tiempo · Sky Airline: 92,0 % (meta 90,0 %); Entregas a tiempo · Sky Cargo: 71,0 % (meta 90,0 %).')
     expect(reading.nextStep!.text).toBe('Revisar primero Sky Cargo: es donde la distancia con la meta es mayor.')
   })
 
@@ -287,9 +287,9 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
 
     const plan = v2(snapshot, ['seo'])
 
-    expect(plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.percent')).toBeDefined()
-    // El CTR (figura de una métrica, sin página) entra a «Lo esencial» como CAMBIO, con su período anterior citado;
-    // los dos mapeadores del PDF le resuelven folio por narrativa o capítulo (sus tests cubren el render).
+    // TASK-1974 — el CTR va en la tarjeta de cifra (antes, figura de una métrica sin página).
+    expect(plan.chapters[0]!.stats![0]!.items.map(item => item.factId)).toContain('seo.ctr')
+    // Entra a «Lo esencial» como CAMBIO, con su período anterior citado; los mapeadores del PDF le resuelven folio.
     expect(plan.essentials!.find(item => item.factIds[0] === 'seo.ctr')?.factIds).toEqual(['seo.ctr', 'seo.ctr.prev'])
   })
 
@@ -687,14 +687,14 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     expect(chapter.tables.some(table => table.tableId === 'table.aeo')).toBe(false)
   })
 
-  it('las visitas orgánicas al sitio son figura propia, sin compartir eje con los clics de Search Console', () => {
+  it('las visitas orgánicas al sitio nunca comparten eje con los clics de Search Console: sin el complemento, van en la tarjeta', () => {
     const plan = v2(snapshot, ['seo'])
     const chapter = plan.chapters[0]!
-    const site = chapter.charts.find(chart => chart.chartId === 'chart.seo.count.site')!
+    const items = chapter.stats![0]!.items
 
-    expect(site.title).toBe('Visitas orgánicas al sitio')
-    expect(site.dimensionLabels).toEqual(['Visitas orgánicas al sitio', 'Visitas orgánicas con interacción'])
-    expect(chapter.charts.find(chart => chart.chartId === 'chart.seo.count')?.dimensionLabels ?? []).not.toContain('Visitas orgánicas al sitio')
+    // TASK-1974 — sin el hecho «sin interacción» no hay barras apiladas: cada cifra va en la tarjeta, en su escala.
+    expect(items.map(item => item.label)).toEqual(expect.arrayContaining(['Visitas orgánicas', 'Visitas con interacción']))
+    expect(chapter.charts.some(chart => chart.series.some(series => series.factIds.some(id => id.startsWith('seo.site.'))))).toBe(false)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 
@@ -716,5 +716,34 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     expect(v2({ ...snapshot, rejections: [ga4] }, ['seo']).ask).toBeUndefined()
     // Del período anterior no se pide nada.
     expect(v2({ ...snapshot, rejections: [{ ...ga4, scope: 'comparison' }] }, ['aeo']).ask).toBeUndefined()
+  })
+})
+
+describe('TASK-1974 — gate del criterio: un dato, una figura y cada figura con su pregunta', () => {
+  it('en los planes de ICO y AEO ningún hecho del período alimenta dos figuras, y cada gráfico declara su pregunta', () => {
+    for (const [snapshot, modules] of [[icoSnapshot, ['ico']], [aeoSnapshot, ['aeo']]] as const) {
+      const plan = v2(snapshot, [...modules])
+
+      expect(validateEditorialPlan(plan, snapshot).filter(violation => violation.rule === 'duplicated_fact')).toEqual([])
+
+      for (const chapter of plan.chapters) {
+        expect(chapter.charts.every(chart => chart.question !== undefined)).toBe(true)
+        // Orden del capítulo (§5.2): las preguntas nunca retroceden.
+        const ranks = chapter.charts.map(chart => ['value_change', 'target', 'evolution', 'explain_change', 'composition', 'subset', 'compare'].indexOf(chart.question!))
+
+        expect(ranks).toEqual([...ranks].sort((a, b) => a - b))
+      }
+    }
+  })
+
+  it('la tarjeta abre el capítulo con su lectura, y las cifras con meta nunca entran a la tarjeta', () => {
+    const delivered = ico('delivered.completed', '2026-08', 157, 'count', { factId: 'ico.delivered.cur', label: 'Piezas entregadas · Sky · 2026-08' })
+    const snapshot = { ...icoSnapshot, facts: [...icoSnapshot.facts, delivered] }
+    const chapter = v2(snapshot, ['ico']).chapters[0]!
+
+    expect(chapter.stats).toHaveLength(1)
+    expect(chapter.stats![0]!.items.map(item => item.label)).toEqual(['Piezas entregadas'])
+    expect(chapter.readings![0]!.chartId === chapter.stats![0]!.figureId || chapter.readings!.some(reading => reading.chartId === chapter.stats![0]!.figureId)).toBe(true)
+    expect(validateEditorialPlan(v2(snapshot, ['ico']), snapshot)).toEqual([])
   })
 })

@@ -135,6 +135,14 @@ describe('resolvers de figura', () => {
     expect(rpa).toContainEqual({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
     expect(rpa).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '90.9%' })
     expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--better', toneGroup: ['delta--better', 'delta--plain'] })
+
+    // TASK-1974 — una figura con todas las metas: cada fila con SU dirección. RpA (menor es mejor) junto a OTD (mayor es
+    // mejor) bajo la dirección de la figura: RpA 1,33 bajo 1,5 cumple; OTD 81,9 bajo 90 es la brecha.
+    const mixed = { bulletRows: [{ value: '81,9', target: '90', direction: 'higher_is_better' }, { value: '1,33', target: '1,5', direction: 'lower_is_better' }], bulletDirection: 'higher_is_better' }
+
+    expect(bulletRowEffects(mixed.bulletRows[1]!, mixed)).toContainEqual({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
+    expect(bulletRowEffects(mixed.bulletRows[1]!, mixed)?.some(effect => effect.toneClass === 'bullet--gap')).toBe(false)
+    expect(bulletRowEffects(mixed.bulletRows[0]!, mixed)).toContainEqual({ selector: ':self', toneClass: 'bullet--gap', toneGroup: ['bullet--gap'] })
   })
 
   it('el cuerpo de la cifra del deck sale de su largo', () => {

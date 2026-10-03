@@ -201,6 +201,16 @@
               "trend"
             ]
           },
+          "direction": {
+            "type": "enum",
+            "required": false,
+            "consumer": "validation-only",
+            "values": [
+              "higher_is_better",
+              "lower_is_better"
+            ],
+            "notes": "TASK-1974 — dirección propia de la fila cuando la figura junta metas que mejoran al subir y al bajar; sin ella, `bulletDirection`."
+          },
           "name": {
             "type": "string",
             "required": true,

@@ -20,7 +20,7 @@
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
-import type { ChartSpecV1 } from '../contracts/chart-spec'
+import { bulletItemDirection, type ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1, EvidenceUnit } from '../contracts/evidence'
 import type { PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { InsightsRenderRejectedError } from '../errors'
@@ -371,9 +371,13 @@ export const buildFigureSlides = (
   if (kind === 'targets') {
     if (chart.data?.kind !== 'bullet') return reject(chart, 'una figura de metas trae sus datos en `data` (bullet).')
 
-    const lowerIsBetter = chart.data.direction === 'lower_is_better'
+    const data = chart.data
 
-    const rows = chart.data.items.flatMap(item => {
+    const rows = data.items.flatMap(item => {
+      // TASK-1974 — cada fila con SU dirección: una figura junta metas que mejoran al subir (OTD) y al bajar (RpA).
+      const direction = bulletItemDirection(data, item)
+      const lowerIsBetter = direction === 'lower_is_better'
+
       const value = measured(byId, item.valueFactId)
       const target = measured(byId, item.targetFactId)
       // Límite de atención del registro dueño (hecho de referencia, aditivo de TASK-1888). Sin él, sin zona.
@@ -389,6 +393,7 @@ export const buildFigureSlides = (
         row: {
           ...(iconOf(value) ? { icon: iconOf(value) } : {}),
           name: item.label,
+          direction,
           unit: unitWordOf(value.unit),
           value: fmt(value, locale),
           achievedLabel: L.achievedRow,
@@ -413,7 +418,7 @@ export const buildFigureSlides = (
         page.flatMap(entry => entry.ids),
         {
           legend: { achieved: L.achieved, target: L.target, ...(page.some(entry => !entry.met) ? { gap: L.largestGap } : {}) },
-          bulletDirection: chart.data!.kind === 'bullet' ? chart.data!.direction : 'higher_is_better',
+          bulletDirection: data.direction,
           bulletRows: page.map(entry => entry.row)
         },
         unitWordOf(chart.unit),

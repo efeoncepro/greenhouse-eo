@@ -157,7 +157,10 @@ export const pairBarsEffects = (item: Record<string, unknown>): FieldEffect[] =>
  * de la píldora sale de si se alcanzó.
  */
 export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<string, unknown>): FieldEffect[] | null => {
-  const lowerIsBetter = slots.bulletDirection === 'lower_is_better'
+  // TASK-1974 — cada fila puede declarar su dirección (una figura junta metas que mejoran al subir y al bajar); sin ella,
+  // la de la figura.
+  const directionOf = (row: Record<string, unknown>) => (row.direction === 'lower_is_better' || row.direction === 'higher_is_better' ? row.direction : slots.bulletDirection)
+  const lowerIsBetter = directionOf(item) === 'lower_is_better'
   const value = parsePrintedNumber(item.value)
   const target = parsePrintedNumber(item.target)
 
@@ -169,8 +172,8 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
 
     if (v === null || t === null || t <= 0) return null
 
-    // Brecha normalizada: > 1 = no alcanzó (en la dirección que empeora).
-    return lowerIsBetter ? v / t : t / Math.max(v, 1e-9)
+    // Brecha normalizada: > 1 = no alcanzó (en la dirección que empeora de ESA fila).
+    return directionOf(row) === 'lower_is_better' ? v / t : t / Math.max(v, 1e-9)
   }
 
   const rows = Array.isArray(slots.bulletRows) ? (slots.bulletRows as Record<string, unknown>[]) : []

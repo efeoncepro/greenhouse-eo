@@ -228,6 +228,8 @@ export const GH_INSIGHTS = {
   /** TASK-1888 — títulos de figura por familia (sin cifras: la cifra va en la página, desde su hecho). */
   figures: {
     bulletTitle: 'contra la meta',
+    /** TASK-1974 — figura única con todas las metas del capítulo. */
+    targetsTitle: 'Resultado contra la meta',
     lineTitle: 'evolución mensual',
     targetLabel: 'Meta',
     previousLabel: 'Período anterior',
@@ -278,6 +280,16 @@ export const GH_INSIGHTS = {
    */
   stat: {
     figureTitle: 'Cifras del período',
+    /** Título del tablero de cifras por capítulo. */
+    boardTitle: {
+      seo: 'Search Console y posiciones',
+      aeo: 'Visibilidad en motores de respuesta',
+      ico: 'Producción creativa'
+    } as Readonly<Partial<Record<InsightModule, string>>>,
+    /** Nota del tablero cuando una cifra lo necesita para leerse bien (sin cifras propias). */
+    notes: {
+      organic_etv: 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.'
+    } as Readonly<Record<string, string>>,
     estimated: 'Estimado',
     lowerIsBetter: 'Menor es mejor',
     labels: {

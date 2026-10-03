@@ -67,7 +67,9 @@ export const familiesForQuestion = (shape: FigureShape): FigureFamily[] => {
       const countable = shape.units !== null && shape.units !== undefined && shape.units > 0 && shape.units <= WAFFLE_MAX_UNITS
 
       if (parts < 2) return []
-      if (parts <= DONUT_MAX_PARTS) return countable ? ['donut', 'waffle'] : ['donut']
+      // Unidades contables y pocas: el waffle es la regla MÁS específica (cada cuadro es una unidad); la dona queda como
+      // alternativa igual de válida para la variedad.
+      if (parts <= DONUT_MAX_PARTS) return countable ? ['waffle', 'donut'] : ['donut']
       if (parts <= WAFFLE_MAX_PARTS && countable) return ['waffle']
 
       return ['bar']

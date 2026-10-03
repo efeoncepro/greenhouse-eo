@@ -23,9 +23,9 @@ describe('familiesForQuestion — tabla pregunta → familia', () => {
     expect(familiesForQuestion({ question: 'explain_change' })).toEqual(['waterfall'])
   })
 
-  it('composición de 2–3 partes → dona (y waffle si son pocas unidades contables)', () => {
+  it('composición de 2–3 partes → dona; con pocas unidades contables, waffle primero (regla más específica) y dona como alternativa', () => {
     expect(familiesForQuestion({ question: 'composition', parts: 3, units: 1686 })).toEqual(['donut'])
-    expect(familiesForQuestion({ question: 'composition', parts: 2, units: 8 })).toEqual(['donut', 'waffle'])
+    expect(familiesForQuestion({ question: 'composition', parts: 2, units: 8 })).toEqual(['waffle', 'donut'])
   })
 
   it('composición contable de 4 categorías → waffle; más de 4 → barras ordenadas', () => {
@@ -52,8 +52,8 @@ describe('familiesForQuestion — tabla pregunta → familia', () => {
 
 describe('chooseFigureFamily — la variedad sólo desempata', () => {
   it('entre dos familias igual de válidas elige la que no usó la figura anterior', () => {
-    expect(chooseFigureFamily({ question: 'composition', parts: 2, units: 8 }, 'donut')).toBe('waffle')
-    expect(chooseFigureFamily({ question: 'composition', parts: 2, units: 8 }, null)).toBe('donut')
+    expect(chooseFigureFamily({ question: 'composition', parts: 2, units: 8 }, 'waffle')).toBe('donut')
+    expect(chooseFigureFamily({ question: 'composition', parts: 2, units: 8 }, null)).toBe('waffle')
   })
 
   it('con una sola familia válida, la variedad NO la cambia aunque se repita', () => {
