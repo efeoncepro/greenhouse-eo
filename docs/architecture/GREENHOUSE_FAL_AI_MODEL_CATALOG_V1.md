@@ -1,7 +1,7 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.10 · **Creado:** 2026-07-06 por Claude
-> **Ultima actualizacion:** 2026-09-24 por Claude — (1.10) Recraft: la CLI `higgsfield` volvió a tener sesión (1.1.26,
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.11 · **Creado:** 2026-07-06 por Claude
+> **Ultima actualizacion:** 2026-10-03 por Claude — (1.11, TASK-1965 + TASK-1973) `flux-pro-fill` descrito como relleno con máscara (default de `pnpm ai:inpaint expand`, falla al borrar porque rellena la silueta), Layerize con la base cobrada como una capa y su uso como segmentador y clean plate, Seedream edit como editor por instrucción dentro de `pnpm ai:inpaint`, y lista de candidatos de relight no conectados (§Candidatos evaluados). Antes (1.10, 2026-09-24) Recraft: la CLI `higgsfield` volvió a tener sesión (1.1.26,
 > workspace fijado) y el SVG real sigue sin corrida (§Recraft). Antes (1.9) brechas del CLI corregidas en el commit `17196ead1`:
 > estimación de costo antes de encolar con confirmación `--yes` sobre el tope, resolución más barata por defecto en
 > video, formato real de salida, `--seed` sólo donde el OpenAPI lo declara, tope de 10 `--image` en Seedream edit,
@@ -195,7 +195,8 @@ estimador en `src/lib/ai/fal-pricing.ts`, tablas en `FAL_PRICING_RULES` y `FAL_S
     (escalón más bajo). Extend cobra los segundos nuevos de `--duration`; edit mide con `ffprobe` la duración del
     video de origen local.
   - Seedream: por imagen según área (Pro ≤ 1536² 0,0675 · mayor 0,135; + 0,0045 por referencia extra en edit; Lite
-    0,035). Layerize: precio por capa sin total (el número de capas lo decide el modelo).
+    0,035). Layerize: precio por capa sin total (el número de capas lo decide el modelo); `pnpm ai:layers` sí estima
+    una cota (16 capas + base) y la compara con el tope.
   - Entrenadores H3: steps × precio, con mínimo facturable de 100 steps.
   - **Confirmación:** si la estimación supera el tope (default USD 1; env `FAL_COST_CONFIRM_USD`; flag
     `--max-usd <n>`), el CLI se detiene antes de encolar y pide `--yes`. Sin estimación posible (slug fuera del
@@ -207,7 +208,8 @@ Lo que sigue abierto o sin dato:
 - `--size` y `--count` de imagen no se validan contra el contrato (sí los de video). Tampoco hay flag para
   `max_images` ni `enhance_prompt_mode` de Seedream (usar `--input`).
 - Efecto real de `--seed` si se forzara por `--input` en un endpoint que no lo declara: sin dato.
-- Layerize: número de capas y si la base se cobra: sin dato.
+- Layerize: el número de capas lo decide el modelo y varía entre corridas (la misma foto dio 3 y 4). **La base se
+  cobra como una capa**: medido con el saldo de fal el 2026-10-03 (4 capas + base → USD 0,17 = 5 × 0,03375).
 - Flux 3: por qué la API de pricing devuelve la mitad del precio publicado: sin dato (la estimación usa el publicado).
 - Las tablas de escalones son de las páginas de fal y los fabricantes al 2026-09-16: pueden cambiar. Toda
   estimación es orientativa; la medida real es `pnpm ai:fal --balance` antes y después.
@@ -221,6 +223,7 @@ Capacidades registradas al 2026-09-16:
 | `seedream5-pro-layerize` | `bytedance/seedream/v5/pro/layerize` | separación por capas | ✅ 2026-09-16 (83,2 s) |
 | `seedream5-lite` | `bytedance/seedream/v5/lite/text-to-image` | texto a imagen | ✅ 2026-09-16 (43,8 s) |
 | `seedream5-lite-edit` | `bytedance/seedream/v5/lite/edit` | edición por referencia | ✅ 2026-09-16 (53,5 s) |
+| `flux-pro-fill` (agregado 2026-10-02) | `fal-ai/flux-pro/v1/fill` | inpainting con máscara (se opera con `pnpm ai:inpaint`) | ✅ 2026-10-02 |
 | `seedance25-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.5/{text,image,reference}-to-video` | video | t2v ✅ · i2v ✅ · r2v ✅ 2026-09-16 (`reference`, `editing`, `extension`) |
 | `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v ✅ · r2v ✅ 2026-09-16 |
 | `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | 9 ✅ 2026-09-16 |
@@ -252,7 +255,17 @@ Contrato adicional de layerize [oficial, OpenAPI y ficha de fal, 2026-09-16]: `i
 `auto|auto_1K|auto_1.5K|auto_2K`; el prompt opcional acepta etiquetas `<bbox>left top right bottom</bbox>`
 normalizadas 0–1000; entrada 512²–6000² px, ≤ 30 MB, aspecto 1/16–16. **Se cobra por capa generada:** USD 0,03375
 por capa si el área (según la capa base) es ≤ 1536², USD 0,0675 por capa si es mayor. Una pieza de 8 capas a 2K
-rondaría USD 0,54 (inferencia; si la base se cobra como capa: sin dato).
+ronda USD 0,61 = 9 × 0,0675, porque **la base se cobra como una capa** (medido con el saldo de fal el 2026-10-03:
+4 capas + base → USD 0,17 = 5 × 0,03375).
+
+**Layerize como segmentador y clean plate** (`pnpm ai:layers`, TASK-1973; verificado 2026-10-03 sobre una foto de
+mesa de 1536×1024, que dio 3 capas —mesa, taza y cuaderno— y, en otra corrida, 4). Funciona con cualquier imagen,
+no sólo con las de Seedream. La caja de cada capa (`bounding_box.absolute`) está en píxeles de la BASE, que puede no
+medir lo mismo que la entrada. **La base saca TODO, también las superficies** (la mesa es una capa): usada sola como
+clean plate deja pared donde había mesa; el clean plate de un elemento es la base + las demás capas recompuestas por
+`z_index`. Las capas son contenido regenerado: sirven sólo de **máscara** y de **clean plate**, nunca de píxeles
+finales. Layerize describe cada capa citando a las demás, así que la selección por nombre gana sobre la descripción.
+Contrato completo: `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §Pipeline de inpainting.
 
 **Seedream 5.0 Pro vs Lite en fal** [oficial, OpenAPI y fichas de fal, 2026-09-16]:
 
@@ -266,7 +279,11 @@ rondaría USD 0,54 (inferencia; si la base se cobra como capa: sin dato).
 | Uso interno | materialidad, atmósfera, look, multirreferencia, layerize | divergencia barata y lotes rápidos |
 
 Ninguno acepta máscara en fal (Pro edit es edición semántica por lenguaje) ni seed de entrada: no prometer
-reproducción exacta.
+reproducción exacta. Dentro de `pnpm ai:inpaint` (`--adapter fal:seedream5-pro-edit` o `fal:seedream5-lite-edit`)
+funcionan como **editores por instrucción**: la máscara no viaja y el pipeline recompone sólo la zona. Medido: Lite
+Edit dejó una costura visible en la pared e ignoró `image_size` (entregó 2880×1920) [2026-10-02]; Pro Edit, al
+borrar una taza, pasó la verificación pero dejó un **fantasma tenue del asa** que el detector de residuo no ve, USD
+0,068 [2026-10-03].
 
 **Contratos Seedance por endpoint** (verificados en el OpenAPI de cada uno, 2026-09-16):
 
@@ -599,6 +616,24 @@ real ni está en el registro.** Precios volátiles.
 `fal-capabilities.ts`, su contrato leído del OpenAPI, validación local en el CLI y una corrida real antes de marcar
 `verifiedAt`.
 
+#### Candidatos no conectados — relight (estudio de mercado 2026-10-03)
+
+Ninguno está en el registro ni tiene corrida real: todos **sin conectar**. Precios del estudio de mercado del
+2026-10-03, sin leer todavía el OpenAPI de cada endpoint. Comparación completa (incluidos Magnific, Photoroom, Beeble,
+Runway y Higgsfield) en la [guía de selección de modelos §10.3](GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+
+| Candidato | Slug | Medio | Precio | Estado |
+|---|---|---|---|---|
+| IC-Light v2 | `fal-ai/iclight-v2` | imagen | USD 0,10/MP | sin conectar |
+| Relighting (image apps) | `fal-ai/image-apps-v2/relighting` | imagen | USD 0,04 | sin conectar |
+| Qwen-Image-Edit lighting-restoration | slug sin leer en el OpenAPI | imagen | USD 0,035/MP | sin conectar |
+| ID-V2V Relight | `fal-ai/id-v2v/relight` | video (propaga un cuadro reiluminado) | USD 0,20/s | sin conectar |
+| LightX Relight | `fal-ai/lightx/relight` | video | USD 0,10/s | sin conectar |
+
+Lo más cercano que ya existe es `pnpm ai:inpaint place --finish element` (un editor por instrucción relumina el
+elemento pegado). Para video, Higgsfield Cinema Studio 4.0 con `mode: video_edit` y rig de luz existe sólo en el MCP de
+Higgsfield, no en nuestro catálogo de su API.
+
 ### Modelo de pricing (resumen)
 
 Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar en la página del modelo):
@@ -681,13 +716,13 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | GPT Image 2 Edit | `openai/gpt-image-2/edit` ✅ | edición image-to-image |
 | FLUX.2 [pro] Edit | `fal-ai/flux-2-pro/edit` ✅ | |
 | FLUX.1 Kontext [pro] | `fal-ai/flux-pro/kontext` ✅ | edición contextual / reference |
-| FLUX.1 [pro] Fill | `fal-ai/flux-pro/v1/fill` ✅ | **inpainting con máscara** (`mask_url`, blanco = editable, mismas dimensiones que la imagen; sale al tamaño de la entrada); USD 0,05/MP (API de precios, 2026-10-02). Se opera con `pnpm ai:inpaint image --adapter fal:flux-pro-fill` (TASK-1965), que recompone y verifica la zona protegida; `pnpm ai:fal` lo deriva a ese comando. Canario 2026-10-02: objeto puesto, delta 0 |
+| FLUX.1 [pro] Fill | `fal-ai/flux-pro/v1/fill` ✅ | **inpainting con máscara**, relleno puro (`mask_url`, blanco = editable, mismas dimensiones que la imagen; sale al tamaño de la entrada); USD 0,05/MP (API de precios, 2026-10-02; la estimación redondea los megapíxeles hacia arriba). Registro `flux-pro-fill` (operación `inpaint`, campo `mask`). Se opera con `pnpm ai:inpaint … --adapter fal:flux-pro-fill`, que recompone y verifica la zona protegida; `pnpm ai:fal` lo deriva a ese comando. **Default de `pnpm ai:inpaint expand`** (`EXPAND_DEFAULT_ADAPTER`): continuó la escena sin costura en 1,91:1 (USD 0,10) y 9:16 (USD 0,15; lienzo generado a 1088×1904 y escalado, inventó una banca) [2026-10-03]. **No sirve para borrar**: rellena la silueta con lo que sugiere —dibujó OTRA taza dos veces, USD 0,10 c/u, también con un prompt que describe el fondo— [2026-10-03]. Canario TASK-1965 2026-10-02: objeto puesto, delta 0 |
 | Wan VACE 14B Inpainting | `fal-ai/wan-vace-14b/inpainting` 🔎 | video con máscara (`mask_video_url`); esquema leído 2026-10-02, sin conectar (follow-up de TASK-1965) |
 | SAM 2 Video | `fal-ai/sam2/video` 🔎 | segmentación con seguimiento por prompt o caja; esquema leído 2026-10-02, sin conectar (follow-up de TASK-1965) |
 | Seedream 4.5 Edit | `fal-ai/bytedance/seedream/v4.5/edit` ✅ | **CON** prefijo (corregido 2026-09-16) |
-| Seedream 5.0 Lite Edit | `bytedance/seedream/v5/lite/edit` ✅ | |
-| Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look; hasta 10 referencias |
-| Seedream 5.0 Pro Layerize | `bytedance/seedream/v5/pro/layerize` ✅ | descompone una imagen en base + hasta 16 capas con alfa y bounding box; sin prompt (ver §Carril operativo) |
+| Seedream 5.0 Lite Edit | `bytedance/seedream/v5/lite/edit` ✅ | editor por instrucción, sin máscara; en `pnpm ai:inpaint` dejó costura en la pared e ignoró `image_size` [2026-10-02] |
+| Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición por instrucción de alta fidelidad para desarrollo de look; hasta 10 referencias; sin máscara. En `pnpm ai:inpaint` (sólo recompone): al borrar dejó un fantasma del asa que el detector no ve [2026-10-03] |
+| Seedream 5.0 Pro Layerize | `bytedance/seedream/v5/pro/layerize` ✅ | descompone una imagen en base + hasta 16 capas con alfa y bounding box; prompt opcional; USD 0,03375/capa hasta 1536² y 0,0675 por encima, **más la base, que se cobra como una capa** [2026-10-03]; segmentador y clean plate de `pnpm ai:layers` (ver §Carril operativo) |
 | Grok Imagine Image Edit | `xai/grok-imagine-image/edit` · `xai/grok-imagine-image/quality/edit` ✅ | |
 | ControlNet / IP-Adapter (FLUX/SD) | `fal-ai/flux-controlnet-*` 🔎 | control estructural (pose, depth, canny) |
 

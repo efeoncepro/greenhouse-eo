@@ -1,10 +1,10 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.26
+> **Version:** 1.27
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-10-02 por Claude (1.26, TASK-1965: pipeline de inpainting `pnpm ai:mask` + `pnpm ai:inpaint image|video` — recompone y verifica delta 0; Sunburst con máscara devuelve un panel negro y edita sin máscara con corrección de color; ver §Pipeline de inpainting)
-> **Antes:** 2026-09-27 por Claude (1.25: **Plastilina en volumen, D24** — el volumen de un ícono de marca se genera editando su vector aprobado con GPT Image 2.5 Sunburst y se recorta por color; `pnpm ai:image:rmbg` rellena los calados y no se usa para esto; ver invariantes §AI Visual Asset Generator) · (1.24: **los íconos de la marca propia Efeonce no se generan sueltos** — la iconografía canónica Trazo/Plastilina vive en AXIS `v0.3.6`; un Plastilina nuevo sigue el método de AXIS con su referencia de estilo y su prompt; ver invariantes §AI Visual Asset Generator) · (1.23: la CLI `higgsfield` volvió a tener sesión —1.1.26, workspace `Private` fijado— y el primer SVG real de Recraft V4.1 sigue sin corrida; ver runbook Higgsfield §CLI) · (1.22: **la máscara tampoco sirve para mover material que ya está en la foto** — sobre la franja de primer plano desenfocado de una story, GPT Image 2.5 Sunburst llenó toda la zona transparente con un panel plano de borde recto y borró un objeto; ver la guía de selección de modelos §5.1 y el manual `editar-una-zona-de-una-imagen.md`) · (1.21: **la máscara no preserva píxeles** — GPT Image 2.5 redibuja la imagen entera aunque reciba `--mask` (delta máximo **221/255** en zona protegida con media 4,85, corrida «¿Claude o Codex?»); la preservación es un contrato de composición del agente —salida con el alfa invertido de la misma máscara sobre la base, delta máximo 0— y no del proveedor; el criterio de «zona protegida intacta» por diferencia media del halo queda corregido. Antes, 1.20: **cuando la pieza real ya existe, su foto es la fuente de construcción** — el paso de «diseñar la base según marca» sólo aplica si no hay pieza; existiendo, esa foto es la única fuente de forma y las variantes se piden como cambio de color o de aplicación, nunca como diseño nuevo descrito en palabras—, y **el calce de un accesorio puesto se declara** porque la referencia de producto se escala de más (se describe el ajuste, no el objeto), más declarar lo que la pieza **no** lleva; kit de la gorra de Efeonce. Antes, 1.19: **merch con arte impreso** — la vista que debe salir **sin** el arte se genera **sin referencias** (la referencia impone el arte, así que donde el arte no va, la referencia sobra), **contraste mínimo del texto de marca sobre sustrato oscuro impreso** (el gris de marca `#848484` da 2,98:1 sobre navy `#023c70` y no resuelve en serigrafía ni sublimado; en impresión sobre oscuro va gris claro `#C8CEDA` a 7,06:1 con «Growth» en blanco a 11,15:1, como excepción declarada y no como cambio del color de marca) y **las piezas planas se componen, no se generan** (el carnet CR80), más nombrar la pieza exacta en el prompt —portacarnet ≠ portacredencial—; kit del lanyard de Efeonce. Antes, 1.18: **emblema de marca sobre una prenda** — pasar el isotipo oficial rasterizado como referencia adicional y describir su orientación en el prompt, porque sin eso el emblema se **espeja** (6 de 21 vistas del polo piqué), y verificar **cada vista al 100 %** con recorte sobre el emblema, porque el espejado **no se ve en la hoja de contacto**; kit del polo piqué de Efeonce. Antes, 1.17: la misma frontera aplicada a una **prenda de marca** — el **texto y los emblemas** se componen determinísticamente desde el SVG oficial y el contrato de pesos de `src/config/efeonce-brand.ts` y entran como imagen 2, la **prenda la genera el modelo** desde una vista del kit de prenda; proporciones declaradas y medidas (emblema del pecho al tamaño del asset oficial, que no se reduce; estampa de espalda al 38 % del ancho de la espalda), **contrato de realismo obligatorio en el prompt** y rehacer la serie completa si el contrato cambia; kit del hoodie de Efeonce. Antes, 1.16: regla corregida al aplicar una forma exacta de marca con un modelo de imagen — el render entra como referencia de **forma** y la **intención** (material, montaje, escena, atmósfera) va en el prompt; la **pasada directa es el camino por defecto** y el halo enmascarado queda como **única excepción** (material exacto del kit + logo chico o detalle fino); criterios nuevos de cambio de material y de atmósfera fuerte, elección de la referencia por luminancia (blanco para materiales claros, navy para oscuros o color de marca) y caso de recepción en acero sobre travertino aprobado en una pasada, USD 0,14. Antes, 1.15: la aplicación del render 3D es **generativa en dos variantes** —A pasada directa para logo grande en cuadro; B pegar y repintar sólo un halo de ≈ 140 px con `--mask` protegiendo logo y escena, para detalle fino—, con umbrales medidos (4,4/255 protegido vs 39,6 halo; IoU 0,72 sin máscara de escena), composición determinística rechazada por el operador como default, y trampa de sharp `toColourspace('b-w')` al construir máscaras de 1 canal. Antes, 1.14: patrón forma exacta de marca = render 3D determinístico en Blender como imagen 1 del modelo, que sólo integra la escena; kit del logo completo de Efeonce por escala y cámara, QA letra por letra. Antes, 1.13: `pnpm ai:image:rmbg --key-background [umbral] [minPx]` cierra el gap de huecos opacos de objeto claro sobre fondo oscuro. Antes, 1.12: gap abierto del recorte de objeto claro sobre fondo oscuro —huecos opacos— con arreglo temporal de corrida; patrones recolorear desde el aprobado y guía de perspectiva. Antes, 1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.27, TASK-1965 + TASK-1973: §Pipeline de inpainting reescrita como referencia técnica completa — flujo, mapa de módulos, contrato de verificación y detectores, códigos de salida, caché/tope/dry-run, guarda de marca, convenciones de máscara, flags y defaults de `pnpm ai:mask`, `pnpm ai:layers` y `pnpm ai:inpaint image|erase|expand|background|move|place|video`, campos de `manifest.json`/`layers.json`/`move.json`/`place.json`, adaptadores, hallazgos medidos, invariantes y pendientes)
+> **Antes:** 2026-10-02 por Claude (1.26, TASK-1965: pipeline de inpainting `pnpm ai:mask` + `pnpm ai:inpaint image|video` — recompone y verifica delta 0; Sunburst con máscara devuelve un panel negro y edita sin máscara con corrección de color) · 2026-09-27 por Claude (1.25: **Plastilina en volumen, D24** — el volumen de un ícono de marca se genera editando su vector aprobado con GPT Image 2.5 Sunburst y se recorta por color; `pnpm ai:image:rmbg` rellena los calados y no se usa para esto; ver invariantes §AI Visual Asset Generator) · (1.24: **los íconos de la marca propia Efeonce no se generan sueltos** — la iconografía canónica Trazo/Plastilina vive en AXIS `v0.3.6`; un Plastilina nuevo sigue el método de AXIS con su referencia de estilo y su prompt; ver invariantes §AI Visual Asset Generator) · (1.23: la CLI `higgsfield` volvió a tener sesión —1.1.26, workspace `Private` fijado— y el primer SVG real de Recraft V4.1 sigue sin corrida; ver runbook Higgsfield §CLI) · (1.22: **la máscara tampoco sirve para mover material que ya está en la foto** — sobre la franja de primer plano desenfocado de una story, GPT Image 2.5 Sunburst llenó toda la zona transparente con un panel plano de borde recto y borró un objeto; ver la guía de selección de modelos §5.1 y el manual `editar-una-zona-de-una-imagen.md`) · (1.21: **la máscara no preserva píxeles** — GPT Image 2.5 redibuja la imagen entera aunque reciba `--mask` (delta máximo **221/255** en zona protegida con media 4,85, corrida «¿Claude o Codex?»); la preservación es un contrato de composición del agente —salida con el alfa invertido de la misma máscara sobre la base, delta máximo 0— y no del proveedor; el criterio de «zona protegida intacta» por diferencia media del halo queda corregido. Antes, 1.20: **cuando la pieza real ya existe, su foto es la fuente de construcción** — el paso de «diseñar la base según marca» sólo aplica si no hay pieza; existiendo, esa foto es la única fuente de forma y las variantes se piden como cambio de color o de aplicación, nunca como diseño nuevo descrito en palabras—, y **el calce de un accesorio puesto se declara** porque la referencia de producto se escala de más (se describe el ajuste, no el objeto), más declarar lo que la pieza **no** lleva; kit de la gorra de Efeonce. Antes, 1.19: **merch con arte impreso** — la vista que debe salir **sin** el arte se genera **sin referencias** (la referencia impone el arte, así que donde el arte no va, la referencia sobra), **contraste mínimo del texto de marca sobre sustrato oscuro impreso** (el gris de marca `#848484` da 2,98:1 sobre navy `#023c70` y no resuelve en serigrafía ni sublimado; en impresión sobre oscuro va gris claro `#C8CEDA` a 7,06:1 con «Growth» en blanco a 11,15:1, como excepción declarada y no como cambio del color de marca) y **las piezas planas se componen, no se generan** (el carnet CR80), más nombrar la pieza exacta en el prompt —portacarnet ≠ portacredencial—; kit del lanyard de Efeonce. Antes, 1.18: **emblema de marca sobre una prenda** — pasar el isotipo oficial rasterizado como referencia adicional y describir su orientación en el prompt, porque sin eso el emblema se **espeja** (6 de 21 vistas del polo piqué), y verificar **cada vista al 100 %** con recorte sobre el emblema, porque el espejado **no se ve en la hoja de contacto**; kit del polo piqué de Efeonce. Antes, 1.17: la misma frontera aplicada a una **prenda de marca** — el **texto y los emblemas** se componen determinísticamente desde el SVG oficial y el contrato de pesos de `src/config/efeonce-brand.ts` y entran como imagen 2, la **prenda la genera el modelo** desde una vista del kit de prenda; proporciones declaradas y medidas (emblema del pecho al tamaño del asset oficial, que no se reduce; estampa de espalda al 38 % del ancho de la espalda), **contrato de realismo obligatorio en el prompt** y rehacer la serie completa si el contrato cambia; kit del hoodie de Efeonce. Antes, 1.16: regla corregida al aplicar una forma exacta de marca con un modelo de imagen — el render entra como referencia de **forma** y la **intención** (material, montaje, escena, atmósfera) va en el prompt; la **pasada directa es el camino por defecto** y el halo enmascarado queda como **única excepción** (material exacto del kit + logo chico o detalle fino); criterios nuevos de cambio de material y de atmósfera fuerte, elección de la referencia por luminancia (blanco para materiales claros, navy para oscuros o color de marca) y caso de recepción en acero sobre travertino aprobado en una pasada, USD 0,14. Antes, 1.15: la aplicación del render 3D es **generativa en dos variantes** —A pasada directa para logo grande en cuadro; B pegar y repintar sólo un halo de ≈ 140 px con `--mask` protegiendo logo y escena, para detalle fino—, con umbrales medidos (4,4/255 protegido vs 39,6 halo; IoU 0,72 sin máscara de escena), composición determinística rechazada por el operador como default, y trampa de sharp `toColourspace('b-w')` al construir máscaras de 1 canal. Antes, 1.14: patrón forma exacta de marca = render 3D determinístico en Blender como imagen 1 del modelo, que sólo integra la escena; kit del logo completo de Efeonce por escala y cámara, QA letra por letra. Antes, 1.13: `pnpm ai:image:rmbg --key-background [umbral] [minPx]` cierra el gap de huecos opacos de objeto claro sobre fondo oscuro. Antes, 1.12: gap abierto del recorte de objeto claro sobre fondo oscuro —huecos opacos— con arreglo temporal de corrida; patrones recolorear desde el aprobado y guía de perspectiva. Antes, 1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -461,55 +461,423 @@ Las animaciones SVG generadas por Gemini siguen estas reglas (enforced via syste
 - Loops seamless para animaciones ciclicas
 
 
-## Pipeline de inpainting — `pnpm ai:mask` y `pnpm ai:inpaint` (TASK-1965)
+## Pipeline de inpainting — `pnpm ai:mask`, `pnpm ai:layers` y `pnpm ai:inpaint` (TASK-1965, TASK-1973)
 
 Herramienta de terminal, **out-of-band**: nunca la importa `src/app/**` ni un módulo runtime de `src/lib/**`, y no
-crea `src/lib/media/**` (el ADR Media Foundry quedó reemplazado por Creative Studio). Vive en `scripts/ai/inpaint/**`;
-el núcleo no importa `@/` para poder moverse solo (candidato: el taller de TASK-1925). La edición regional del
-producto es de Globe (TASK-1497/1572), en su repo.
+crea `src/lib/media/**` (el ADR Media Foundry quedó reemplazado por Creative Studio). Vive en `scripts/ai/inpaint/**`.
+El núcleo no importa `@/` para poder moverse solo (candidato: el taller de TASK-1925); sólo los adaptadores
+(`adapters/openai.ts`, `adapters/fal.ts`, `adapters/layerize-fal.ts`, `adapters/video-fal.ts`) usan los clientes
+canónicos `@/lib/ai/openai-image`, `@/lib/ai/fal`, `@/lib/ai/fal-capabilities` y `@/lib/ai/fal-pricing`. La edición
+regional del producto es de Globe (TASK-1497/1572), en su repo.
 
-**Principio: el modelo no es la frontera de seguridad, el pipeline sí.** Ningún proveedor preserva lo que está fuera
-de la máscara (GPT Image 2.5: hasta 179/255 en la zona protegida, medido 2026-09-17 y 2026-10-02), así que recomponer
-y verificar es obligatorio y lo hace el pipeline, nunca el adaptador:
+Scripts de `package.json`: `ai:inpaint` (`scripts/ai/inpaint/cli.ts`) y `ai:layers` (`layers-cli.ts`) corren con
+`tsx --require ./scripts/lib/server-only-shim.cjs`; `ai:mask` (`mask-cli.ts`) no lo necesita. Cada subcomando tiene
+`--help`, que es el contrato de flags. Tasks: `docs/tasks/complete/TASK-1965-ai-inpaint-image-video-cli-pipeline.md`
+y `docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md`.
+
+### Principio y flujo
+
+**El modelo no es la frontera de seguridad, el pipeline sí.** Ningún proveedor preserva lo que está fuera de la
+máscara (GPT Image 2.5: hasta 179/255 en la zona protegida, medido 2026-09-17 y 2026-10-02), así que recomponer y
+verificar es obligatorio y lo hace el pipeline, nunca el adaptador (el contrato `InpaintImageAdapter` sólo traduce
+al proveedor y devuelve la salida CRUDA; ningún proveedor nuevo puede saltarse la garantía).
 
 ```
-máscara canónica → recorte con contexto → adaptador (salida cruda) → recomposición → verificación del ARCHIVO → manifiesto
+máscara canónica (1 canal, 255 = editable)
+  → recorte con contexto (--crop auto: sólo si la caja con contexto ocupa < 25 % del área)
+  → adaptador: convierte la máscara a la convención del proveedor y devuelve la salida CRUDA
+  → corrección de color en un anillo de 14 px (--color-match auto: sólo si la máscara no viajó)
+  → recomposición sobre la imagen ORIGINAL
+  → verificación del ARCHIVO ESCRITO (delta máximo 0/255 fuera de la zona)
+  → manifest.json
 ```
 
-| Pieza | Archivo | Contrato |
+Las técnicas de TASK-1973 (`erase`, `expand`, `background`, `move`, `place`) no tienen pipeline propio: arman una
+máscara y una imagen de entrada y delegan la generación en `runImageInpaint`. `move` y `place` hacen además pasos
+determinísticos (hueco con clean plate, pegado del elemento recortado de la original) y los verifican con su propia
+medición contra la original o el destino.
+
+### Mapa de módulos
+
+| Archivo | Responsabilidad |
+|---|---|
+| `raw.ts` | Lectura raw con número de canales exigido (`readRaw`). Trampa de sharp: `blur`/`resize` y el PNG de un plano de 1 canal devuelven 3 canales; las operaciones de 1 canal se cierran con `.toColourspace('b-w')` |
+| `mask.ts` | Máscara canónica (1 canal, 255 = editable). Fuentes: rect, polígono, alfa, luminancia, sujeto (matting local de IMG.LY), máscara existente. Operaciones `invert` → `erode` → `dilate` → `feather` por distancia euclidiana; `feather` repone el núcleo en 255 (el blur lo dejaba en 253). Rechaza 0 % y 100 % editable. La conversión a la convención del proveedor vive sólo en `toProviderMaskPng` |
+| `crop.ts` | Plan de recorte: caja de la zona + contexto (0,5 del lado mayor de la zona por defecto) al aspecto de un tamaño válido del proveedor; en `auto`, recorta sólo si ocupa < 25 % del área |
+| `recompose.ts` | Recomposición con peso 0 = byte original (aritmética entera); `measureZones`/`verifyRecomposition` (zonas protegida, editable y costura); `matchColorInRing` (desplazamiento medio por canal en un anillo protegido de 14 px); `renderDiff` |
+| `alignment.ts` | Detector de reencuadre por BORDES (desplazamiento y escala que mejor alinean gradientes en la zona protegida); la diferencia media no lo ve en superficies lisas (8,5/255 en el canario 2026-10-02). Guía de zona en magenta (`renderZoneGuide`) |
+| `sketch.ts` | `--sketch` (overlay transparente o foto anotada) como imagen 2 de guía; sin `--mask`, máscara = caja del trazo + `--sketch-margin` (40 px); `growMaskToObject` hace crecer la máscara DERIVADA hasta el objeto dibujado; preámbulo con el rol numerado de cada imagen |
+| `brand.ts` | Guarda de marca `assertBrandSafePrompt` |
+| `run-io.ts` | Hash estable, carpeta de corrida (`<run>/inpaint/<12 hex>/`), JSON, hoja de contacto, `INPAINT_PIPELINE_VERSION` (hoy 1) |
+| `pipeline-image.ts` | `runImageInpaint`: validación, recorte, estimación, caché, tope de costo, pedido, recomposición, verificación del archivo releído, detectores de sospecha, `manifest.json`, `exitCodeFor` |
+| `pipeline-video.ts`, `video-mask.ts`, `ffmpeg.ts` | `runVideoInpaint`: máscara fija o por keyframes interpolados (rect o polígono), normalización de la salida del motor a resolución, fps y duración, alineación, recomposición cuadro a cuadro, verificación sobre la secuencia PNG, parpadeo, H.264 CRF 12 yuv420p con el audio del original |
+| `layers.ts` | `LayersDocument`, selección de capas (`selectLayers`), máscara de capa en el tamaño de la original (`maskFromLayer`/`maskFromLayers`), `plateWithoutLayers`, `otherObjectsMask`, `bboxTag` |
+| `adapters/layerize-fal.ts`, `layers-cli.ts` | `runLayerize` y `pnpm ai:layers` sobre Seedream 5 Pro Layerize |
+| `techniques.ts` | Prompts y umbrales de borrado, `detectCastShadow`, `withCastShadow`, adaptador local `plate`, `measureErasure` |
+| `erase.ts` | `pnpm ai:inpaint erase` |
+| `move.ts` | `pnpm ai:inpaint move`; exporta `cutElement`, `pasteElement`, `integrationHalo` y `HARMONIZE_PROMPT` que reutiliza `place` |
+| `place.ts` | `pnpm ai:inpaint place` (`RELIGHT_PROMPT` para `--finish element`) |
+| `expand.ts`, `expand-run.ts` | Plan del lienzo (`planExpansion`), relleno previo en espejo o neutro, máscara del área nueva + franja de fundido; `EXPAND_DEFAULT_ADAPTER` |
+| `background.ts` | Máscara = inverso del sujeto erosionado `--edge` px y difuminado |
+| `adapters/types.ts`, `adapters/index.ts` | Contrato `InpaintImageAdapter` y registro de ids (`openai`, `fal:<capability>`) |
+| `adapters/openai.ts`, `adapters/fal.ts`, `adapters/video-fal.ts` | Adaptadores de imagen OpenAI y fal, y motores de video fal |
+| `cli.ts`, `mask-cli.ts` | Parseo de flags, textos de `--help` y códigos de salida |
+
+### Contrato de garantía y verificación
+
+- **Veredicto PASS = delta MÁXIMO 0** (en cualquier canal) en la zona protegida (máscara = 0). La media no es
+  criterio. Se mide releyendo el archivo escrito, no el buffer en memoria, para que una conversión al guardar
+  también quede medida.
+- **La verificación prueba lo que NO se toca, no que el pedido se cumplió.** Por eso cada candidato lleva detectores
+  de sospecha (no cambian el veredicto, cambian el código de salida):
+
+| Detector | Regla | Constante |
 |---|---|---|
-| Lectura raw | `raw.ts` | `readRaw` exige el número de canales: sharp devuelve 3 tras `blur`/`resize` y escribe PNG de 3 canales desde un plano de 1 (las dos trampas, reproducidas en pruebas) |
-| Máscara | `mask.ts` | 1 canal, 255 = editable. Fuentes: rect, polígono, alfa, luminancia, sujeto (IMG.LY local). Operaciones por distancia euclidiana O(n). `feather` repone el núcleo en 255 (el blur lo dejaba en 253). Rechaza 0 % y 100 % editable. Convenciones de proveedor sólo en `toProviderMaskPng` |
-| Recomposición | `recompose.ts` | Peso 0 = byte original por aritmética entera; veredicto = **delta MÁXIMO 0** en la zona protegida (la media no es criterio) |
-| Recorte | `crop.ts` | Caja + contexto al aspecto del tamaño válido del proveedor; en `auto`, sólo si ocupa < 25 % |
-| Imagen | `pipeline-image.ts` | `--dry-run`, caché por hash (entrada + `adapter.revision`), tope de costo, guarda de marca, hoja de contacto, `manifest.json` sin secretos. Avisos: zona casi sin cambio, `suspectFlatPanel`, encuadre corrido (deriva media > 12) |
-| Boceto y referencias | `sketch.ts` | `--sketch` (overlay transparente o foto anotada, como el Markup de ChatGPT) viaja como imagen 2 de guía; sin `--mask`, la máscara de recomposición es la caja del trazo + 40 px. `--reference` = imágenes 3..N. Preámbulo con el rol numerado de cada imagen (guía de prompting 2.5). En la API no hay parámetro de boceto [oficial 2026-10-02]. La máscara derivada **crece hasta el objeto dibujado** (`growMaskToObject`; el boceto no fija el tamaño). Verificado en vivo con Sunburst 2026-10-02 |
-| Capas (TASK-1973) | `layers.ts`, `adapters/layerize-fal.ts`, `layers-cli.ts` | `pnpm ai:layers` con Seedream 5 Pro Layerize sobre cualquier imagen: base + hasta 16 capas con alfa y caja en píxeles de la BASE (se reescala a la original), cota de costo 16 + base, caché. La base saca también las superficies (canario 2026-10-03: la mesa es una capa): el clean plate de un elemento es `plateWithoutLayers` = base + las demás capas por `z_index`. Las capas son contenido regenerado: sólo máscara (`ai:mask --from-layer`) y clean plate, nunca píxeles finales. Selección: el nombre gana sobre la descripción |
-| Técnicas (TASK-1973) | `erase.ts`, `move.ts`, `place.ts`, `expand.ts`/`expand-run.ts`, `background.ts`, `techniques.ts` | `erase` (clean plate vía adaptador local sin gasto, o modelo; residuo → código 3), sombra proyectada (`detectCastShadow`: original vs plate, crece desde el objeto, nunca la de un vecino ni encima de otro objeto; `--shadow off`), `move` (elemento recortado de la ORIGINAL + halo de integración; el hueco nunca pisa otro objeto), `place` (elemento de OTRA imagen + acabado `halo`/`element`/`off`, destino en delta 0), `expand` (área nueva + franja de fundido, relleno previo en espejo), `background` (inverso del sujeto, costura reportada), `--zone-resolution` (reinterpreta, no escala). `expand` usa por defecto `fal:flux-pro-fill` (`EXPAND_DEFAULT_ADAPTER`): canario 2026-10-03, Flux continuó la escena sin costura en 1,91:1 y 9:16; Flare la achicó (escala 0,88–0,90 → código 3) y Sunburst copió el relleno en espejo. `promptSuffix`: la instrucción interna se agrega después de la guarda de marca |
-| Video | `pipeline-video.ts` | Normaliza la salida del motor a resolución/fps/duración (±1 cuadro), **aborta** si la deriva media de la zona protegida supera `--max-drift` (12), recompone cuadro a cuadro, verifica delta 0 sobre PNG, mide parpadeo, H.264 CRF 12 + audio original |
+| `suspectFlatPanel` | Más de la mitad de la zona totalmente editable volvió casi negra y plana (≤ 8/255 en todo canal) en la salida CRUDA | `FLAT_PANEL_THRESHOLD = 0.5` |
+| `suspectMisaligned` | El detector de bordes encontró un desplazamiento o escala mejor que «quieto» | `alignment.ts`; aviso adicional si la deriva media de la zona protegida dentro del recorte supera `MISALIGNED_MEAN_DRIFT = 12` |
+| Zona casi sin cambio | `editedMeanDelta` (núcleo + costura, ponderado por píxeles) < 12 | `LOW_EDIT_MEAN_DELTA = 12` |
+| Residuo de borrado (`erase`) | Cambio medio en el núcleo de la zona < 18, o con capas `objectLikeness` > 0,5 (el resultado se parece más al objeto que al fondo limpio: el modelo dibujó otra cosa) | `ERASE_RESIDUE_THRESHOLD = 18`, `ERASE_OBJECT_LIKENESS_THRESHOLD = 0.5` |
+| Costura (`background`) | Delta medio del borde del sujeto, reportado (no es veredicto): míralo al 100 % | — |
+| Deriva de video | La deriva media de la zona protegida supera `--max-drift` (default 12): el comando ABORTA antes de recomponer (daría ghosting) | `--max-drift` |
 
-Adaptadores (`adapters/`): `openai` (default `gpt-image-2.5-flare` · `medium`, máscara alfa), `fal:flux-pro-fill`
-(máscara blanca, USD 0,05/MP), `fal:seedream5-{pro,lite}-edit` (sin máscara: sólo recompone). Video:
-`fal:flux3-edit` (verificado), `fal:seedance25-edit` (sin canario). Los de fal salen del catálogo `fal-capabilities.ts`
-(campo `mask`, operación `inpaint`, precio `megapixel`); `pnpm ai:fal` deriva las capacidades con máscara a este
-comando.
+- `move` y `place` comparan la original (o el destino) con el final: todo lo que no es hueco, elemento pegado ni halo
+  (o zona de acabado) debe quedar en delta máximo 0.
 
-**Sunburst y la máscara [medido].** `gpt-image-2.5-sunburst` con `mask` devolvió la zona totalmente editable como un
-**panel negro plano** en 3 de 3 pasadas (2026-09-23 y dos el 2026-10-02, con RGB negro y con el RGB de la imagen
-bajo el alfa); Flare, con el mismo prompt y la misma máscara, colocó el objeto. Por eso `--provider-mask auto` hace
-que Sunburst edite **sin máscara** —la imagen entera, por instrucción— y el pipeline recomponga la zona; con `on`
-avisa. En ese modo, `--color-match auto` resta antes de recomponer el desplazamiento medio por canal medido en un anillo
-protegido de 14 px (Sunburst aclara todo lo que edita: −16 niveles en MC1h, 2026-09-28): es el método ya medido de
-`pnpm foto:isotipo --acabado`, que reproduce byte a byte MC1h y MC4g. Canario propio de Sunburst sin máscara en este
-pipeline **verificado 2026-10-02**: sin guía, Sunburst puso el objeto FUERA de la zona (no sabía dónde); con
-`--guide auto` (default cuando la máscara no viaja) recibe la zona en magenta como imagen 2 y lo pone dentro, sin
-reproducir el contorno. `alignment.ts` detecta reencuadres por bordes (la media no los ve sobre superficies lisas) y
-el código de salida 3 marca «todos pasan, ninguno sirve». La CLI recuerda que Sunburst es el más potente cuando se usa
-el default.
+### Códigos de salida
 
-Canario: `ai-generations/2026-10-02_task-1965-canary/README.md`. Manuales:
-[imagen](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
-[video](../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md).
+| Código | `image`, `erase`, `expand`, `background` | `move`, `place` | `video` |
+|---|---|---|---|
+| 0 | PASS y al menos un candidato no sospechoso; también `--dry-run` y una corrida reutilizada de caché que cumple lo mismo | PASS | PASS |
+| 2 | FAIL: algún candidato cambió algo fuera de la zona. **No usar** | FAIL | FAIL |
+| 3 | REVISAR: todos pasan, pero todos son sospechosos (panel plano, reencuadre o zona casi sin cambio; en `erase`, residuo en todos) | — | — |
+| 1 | Error (`FATAL`) o manifiesto `failed` | Error | Error, incluido el aborto por deriva |
+
+### Caché, tope de costo y dry-run
+
+- **Caché por hash de entrada.** La clave es sha256 de un JSON estable con `INPAINT_PIPELINE_VERSION`, la imagen, la
+  máscara, el tamaño, el prompt que viaja al proveedor, boceto, referencias, `adapter.id` + **`adapter.revision`**,
+  modelo, calidad, semilla, `--provider-mask`, `--color-match`, guía, crecimiento de máscara, `--count`, recorte y
+  `--zone-resolution`. Misma entrada = misma carpeta `<run>/inpaint/<12 hex>/`; si la corrida anterior quedó
+  `completed` y sus finales existen, se reutiliza sin pagar. `--force` regenera. Subir `adapter.revision` invalida
+  la caché cuando cambia cómo un adaptador arma el pedido.
+- Otras carpetas: `<run>/layers/<id>/` (clave: imagen, prompt e `--image-size`), `<run>/move/<id>/`,
+  `<run>/place/<id>/`, `<run>/erase-masks/`, `<run>/background-masks/`, `<run>/expand-inputs/`.
+- `--run` por defecto: `ai-generations/<fecha>_inpaint` (`ai:inpaint`) y `ai-generations/<fecha>_layers` (`ai:layers`).
+- **Tope de confirmación:** `--max-usd` > `AI_COST_CONFIRM_USD` > `FAL_COST_CONFIRM_USD` > USD 1. Si la estimación lo
+  supera, el comando se detiene antes de gastar y exige `--yes`. Sin estimación posible no bloquea. En `ai:layers` el
+  tope se compara contra la COTA (16 capas + base).
+- **`--dry-run` es gratis:** escribe `mask-preview.png`, `provider-input.png`, `provider-mask.png`
+  (`provider-sketch.png` si hay guía o boceto) y `manifest.json` con `status: "dry-run"` y la estimación; no llama al
+  proveedor. En `ai:layers` sólo imprime la cota.
+- **Estimación:** OpenAI con la fórmula oficial de tokens de salida (la entrada suma aparte); `fal:flux-pro-fill`
+  USD 0,05 × megapíxeles redondeados hacia arriba; Seedream edit por área del catálogo; `plate` USD 0; `flux3-edit`
+  USD 0,03 por segundo del origen. `--count N` son N pedidos pagados.
+
+### Guarda de marca
+
+`assertBrandSafePrompt` detiene el comando si el prompt del operador nombra logo, logotipo, isotipo, imagotipo,
+wordmark, emblema, marca, brand/branding, Efeonce, Greenhouse o Nexa. Con capas (`erase`, `move`, `place`) también
+revisa el nombre y la descripción de cada capa elegida. Las instrucciones internas de cada modo (`promptSuffix`) se
+agregan **después** de la guarda: la guarda mira sólo lo que escribe el operador. `--allow-brand` se usa sólo cuando
+la edición toca el contexto. Un logo o asset de marca nunca se genera, borra, mueve ni reconstruye con IA: se compone
+el SVG oficial después (`docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`).
+
+### Convenciones de máscara por proveedor
+
+La máscara canónica es un PNG en escala de grises del mismo tamaño que la base: **blanco (255) = editable**, negro =
+protegido, intermedio = costura. El operador nunca convierte; cada adaptador traduce con `toProviderMaskPng`. Para
+leer una máscara ajena: `--convention white-editable` (default) | `alpha-transparent-editable`.
+
+| Adaptador | Convención | ¿La máscara viaja? |
+|---|---|---|
+| `openai` | `alpha-transparent-editable` (transparente = editable) | Sí, salvo Sunburst con `--provider-mask auto` (default): edita sin máscara y el pipeline recompone |
+| `fal:flux-pro-fill` | `white-editable` en `mask_url` | Siempre (no admite `--provider-mask` distinto de `auto`) |
+| `fal:seedream5-pro-edit`, `fal:seedream5-lite-edit` | — | No: edita por instrucción; la máscara sólo recompone |
+| `plate` (local) | — | No: el clean plate ya es la escena sin el objeto |
+| Motores de video | — | No: el motor edita el clip entero; la máscara recompone cuadro a cuadro |
+
+### CLIs — referencia de flags
+
+#### `pnpm ai:mask`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--base <img>` | — | Imagen base (define el tamaño) |
+| `--rect x0,y0,x1,y1` | — | Rectángulo en fracciones (repetible) |
+| `--polygon "x,y;x,y;…"` | — | Polígono en fracciones (repetible) |
+| `--from-alpha <png>` + `--alpha-editable transparent\|opaque` | `transparent` | Alfa de una imagen |
+| `--from-luma <img>` + `--luma-editable light\|dark` + `--threshold 0-255` | `light`, 127 | Luminancia |
+| `--from-subject` + `--subject-editable subject\|background` | `subject` | Sujeto con matting local (gratis) |
+| `--from-mask <png>` + `--convention` | `white-editable` | Máscara existente |
+| `--from-layer <layers.json>` + `--layer <nombre\|#índice>` (repetible) | — | Capas de `pnpm ai:layers` |
+| `--invert`, `--erode <px>`, `--dilate <px>`, `--feather <px>` | 0 | Operaciones, siempre en ese orden |
+| `--out <png>` | — | Obligatorio salvo `--inspect` |
+| `--preview <png>` | `<out>-preview.png` | Vista previa sobre la base |
+| `--allow-empty`, `--allow-full` | apagados | Acepta 0 % o 100 % editable |
+| `--inspect <png>` (+ `--convention`, `--base`) | — | Inspecciona sin escribir nada |
+
+Las fuentes se unen entre sí; hace falta al menos una.
+
+#### `pnpm ai:layers`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <img>` | — | Cualquier imagen de 512² a 6000² px |
+| `--prompt <texto>` | sin prompt | Qué elementos separar |
+| `--bbox x0,y0,x1,y1` (repetible) | — | Región en fracciones; viaja como `<bbox>` 0–1000 dentro del prompt |
+| `--image-size auto\|auto_1K\|auto_1.5K\|auto_2K` | `auto` | Resolución de base y capas |
+| `--run <dir>` | `ai-generations/<fecha>_layers` | Carpeta de la pieza |
+| `--dry-run`, `--force`, `--max-usd <n>`, `--yes` | — | Cota sin llamar · repetir · tope sobre la cota |
+| `--list <layers.json>` | — | Lista índice, nombre, caja y cobertura (gratis) |
+
+#### `pnpm ai:inpaint image`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <img>` | — | Obligatorio |
+| `--mask <png>` + `--convention` | `white-editable` | Zona; obligatoria si no hay `--sketch` |
+| `--sketch <png>` + `--sketch-margin <px>` | 40 | Boceto como imagen 2; sin `--mask`, la máscara sale del trazo |
+| `--grow-mask auto\|off` | `auto` | La máscara DERIVADA del boceto crece hasta el objeto dibujado; una `--mask` explícita nunca crece |
+| `--reference <img>` (repetible) | — | Objeto a incorporar (imágenes siguientes a la guía) |
+| `--prompt <texto>` \| `--prompt-file <txt>` | — | Obligatorio |
+| `--adapter <id>` | `openai` | `openai`, `fal:flux-pro-fill`, `fal:seedream5-pro-edit`, `fal:seedream5-lite-edit` |
+| `--model <id>` | default del adaptador (`gpt-image-2.5-flare`) | La CLI recuerda que `gpt-image-2.5-sunburst` es el más potente |
+| `--quality <q>` | `medium` | OpenAI: `low`, `medium`, `high`, `xhigh`, `max` |
+| `--seed <n>` | — | Sólo adaptadores que la acepten; cada candidato usa `seed + índice` |
+| `--provider-mask auto\|on\|off` | `auto` | Si la máscara viaja (OpenAI) |
+| `--guide auto\|off` | `auto` | Guía de zona en magenta cuando la máscara no viaja y no hay boceto |
+| `--color-match auto\|on\|off` | `auto` | Corrección de color en anillo; `auto` sólo si la máscara no viajó |
+| `--count <n>` | 1 | 1–8 candidatos pagados; con más de uno, `contact-sheet.png` |
+| `--crop auto\|on\|off` | `auto` | Recorte con contexto |
+| `--zone-resolution <px>` | — | Pasada de detalle: genera la zona recortada a ese lado largo (512–4096) y activa el recorte. **Reinterpreta, no escala** |
+| `--run <dir>` | `ai-generations/<fecha>_inpaint` | Carpeta de la pieza |
+| `--dry-run`, `--force`, `--max-usd <n>`, `--yes` | tope USD 1 | Ver §Caché, tope de costo y dry-run |
+| `--allow-brand`, `--allow-full` | apagados | Guarda de marca · máscara 100 % editable |
+
+`erase`, `expand`, `background`, `move` y `place` comparten el parser de `image`: un flag de `image` que la técnica
+no usa se acepta y no tiene efecto. Abajo, sólo los flags que cada técnica usa.
+
+#### `pnpm ai:inpaint erase`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <img>` | — | Obligatorio |
+| `--mask <png>` | — | Zona explícita: **nunca se altera** |
+| `--layers <layers.json>` + `--layer <sel>` (repetible) | — | Zona derivada de capas |
+| `--grow <px>` | 16 | Agrandado de la zona derivada (nunca pisa otro objeto) |
+| `--shadow auto\|off` | `auto` (sólo con capas) | Suma la sombra proyectada medida contra el clean plate |
+| `--fill plate\|model` | `plate` con `--layers`; `model` con `--mask` | Relleno: clean plate local (USD 0) o un modelo |
+| `--adapter`, `--model`, `--quality` | `openai` → `gpt-image-2.5-sunburst` (`ERASE_OPENAI_MODEL`) | Sólo con `--fill model` |
+| `--prompt` | `ERASE_FILL_PROMPT` para un modelo de relleno con máscara (Flux Fill); `ERASE_DEFAULT_PROMPT` para editores por instrucción | Describe el fondo o pide quitar el objeto |
+| `--count`, `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand` | — | Como en `image` |
+
+Con `--fill plate` se fuerzan un solo candidato, recorte `off` y guía de zona apagada.
+
+#### `pnpm ai:inpaint expand`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <img>` | — | Obligatorio |
+| `--to 4:5\|9:16\|1:1\|1.91:1\|16:9\|3:4\|2:3\|3:2` | — | Formato destino (el lienzo crece en un solo eje); o `--canvas WxH` |
+| `--scale <0,3–1>` | 1 | Achica la escena dentro del lienzo (la escena se re-muestrea) |
+| `--anchor center\|left\|right\|top\|bottom` | `center` | Dónde se apoya la escena |
+| `--blend <px>` | 24 | Franja de fundido sobre la escena (80–140 si el borde corta objetos) |
+| `--prefill mirror\|neutral` | `mirror` | Relleno previo del área nueva (un sólido invita a inventar un panel) |
+| `--prompt` | — | Obligatorio: qué hay alrededor; se le agrega `DEFAULT_EXPAND_PROMPT_SUFFIX` |
+| `--adapter` | `fal:flux-pro-fill` (`EXPAND_DEFAULT_ADAPTER`); `openai` si `--model` empieza con `gpt-image` | Elegir OpenAI imprime un aviso |
+| `--model`, `--quality`, `--provider-mask`, `--count`, `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand` | — | Como en `image`; el recorte se fuerza a `off` |
+
+#### `pnpm ai:inpaint background`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <img>`, `--prompt` | — | Obligatorios (`--prompt` describe el fondo nuevo; se le agrega `BACKGROUND_PROMPT_SUFFIX`) |
+| `--layers` + `--layer` | matting local si no se pasan | Sujeto desde capas |
+| `--edge <px>` | 3 | Franja del borde del sujeto que el modelo rehace; su costura se reporta |
+| `--adapter`, `--model`, `--quality`, `--provider-mask`, `--count`, `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand` | `openai` | Como en `image`; recorte `off` |
+
+#### `pnpm ai:inpaint move`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image`, `--layers`, `--layer` | — | Obligatorios |
+| `--dx <px>`, `--dy <px>` | 0 | Desplazamiento |
+| `--scale <n>` | 1 | Mayor que 0,2 y hasta 3, alrededor del centro del elemento. Exige mover o escalar |
+| `--shadow auto\|off` | `auto` | Borra también la sombra del elemento en su lugar original |
+| `--harmonize auto\|off` | `auto` | Pasada SÓLO de sombra de contacto y reflejo en un halo (`HARMONIZE_PROMPT`); `off` = sin IA ni gasto |
+| `--adapter`, `--model`, `--quality`, `--provider-mask` | `openai` | Modelo del halo |
+| `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand` | — | Como en `image` |
+
+#### `pnpm ai:inpaint place`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--image <destino>`, `--from <origen>`, `--layers`, `--layer`, `--at x,y` | — | Obligatorios; `--at` = centro del elemento en fracciones 0–1 del destino |
+| `--width <frac>` | mismo tamaño en píxeles | Ancho del elemento como fracción (0–1] del ancho del destino |
+| `--finish halo\|element\|off` | `halo` | `halo`: sombra de contacto, reflejo y borde (`HARMONIZE_PROMPT`) · `element`: además relumina el elemento (`RELIGHT_PROMPT`; su forma puede variar) · `off`: sin IA ni gasto |
+| `--prompt` | según `--finish` | Reemplaza el prompt del acabado |
+| `--adapter`, `--model`, `--quality`, `--provider-mask`, `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand` | `openai` | Como en `image` |
+
+#### `pnpm ai:inpaint video`
+
+| Flag | Default | Qué hace |
+|---|---|---|
+| `--video <mp4>` | — | Obligatorio |
+| `--mask <png>` (+ `--convention`) \| `--mask-keyframes <json>` | — | Uno de los dos: fija (cámara quieta) o por keyframes `{ "keyframes": [{ "t", "rect" \| "polygon" }], "dilate", "feather" }` |
+| `--prompt` \| `--prompt-file` | — | Obligatorio |
+| `--engine <id>` | `fal:flux3-edit` | `fal:flux3-edit`, `fal:seedance25-edit` |
+| `--strategy edit-recompose\|first-frame` | `edit-recompose` | `first-frame` edita un cuadro con el pipeline de imagen y lo pasa de referencia (sólo motores que aceptan imágenes) |
+| `--frame-time <s>` | 0 | Cuadro de referencia de `first-frame` |
+| `--image-adapter`, `--image-model`, `--image-quality` | — | Para el cuadro de `first-frame` |
+| `--max-drift <n>` | 12 | Deriva media aceptada de la zona protegida (0–255) |
+| `--keep-frames` | apagado | Conserva las secuencias PNG |
+| `--run`, `--dry-run`, `--force`, `--max-usd`/`--yes`, `--allow-brand`, `--allow-full` | — | Como en `image` |
+
+Exige `ffmpeg` (`assertFfmpeg`).
+
+### Artefactos
+
+**Carpeta de una corrida de imagen** (`<run>/inpaint/<id>/`): `mask-preview.png`, `provider-input.png`,
+`provider-mask.png`, `provider-sketch.png` (si hubo guía o boceto), y por candidato `candidate-N-raw.png` (salida
+cruda del proveedor), `candidate-N.png` (final recompuesto), `candidate-N-diff.png` y `candidate-N-mask.png` (si la
+máscara derivada creció); `contact-sheet.png` con más de un candidato; `manifest.json`. El manifiesto no guarda
+secretos ni URLs firmadas.
+
+**`manifest.json` (`kind: "ai-inpaint-image"`, `ImageInpaintManifest`):**
+
+| Campo | Contenido |
+|---|---|
+| `pipelineVersion`, `runId` (12 hex), `key` (sha256), `status` (`dry-run` \| `completed` \| `failed`), `createdAt`, `error?` | Identidad y estado |
+| `inputs` | `image`, `imageSha256`, `mask`, `maskSha256`, `maskConvention`, `width`, `height`, `sketch` (`path`, `sha256`, `form: overlay\|annotated`) y `references[]` (`path`, `sha256`) |
+| `adapter` | `id`, `provider`, `sendsMask`, `verifiedAt` |
+| `request` | `model`, `quality`, `seed`, `count`, `prompt` (del operador), `providerPrompt` (lo que viajó) |
+| `mask` | `touchedFraction`, `editable`, `soft`, `protected` |
+| `crop` | `mode` (`crop` \| `full`), `box`, `target`, `aspectError`, `reason` |
+| `estimate` | `usd`, `basis` |
+| `candidates[]` | `index`, `raw`, `final`, `diff`, `verdict`, `reason`, `editedMeanDelta`, `suspectFlatPanel`, `suspectMisaligned`, `maskGrownPixels`, `alignment` (`dx`, `dy`, `scale`, `stillError`, `bestError`, `misaligned`), `providerMaskSent`, `colorShift`, `protected`/`editable`/`seam`/`modelDriftInProtected` (`pixels`, `maxDelta`, `meanDelta`, `worst`), `outputUsd`, `providerModel`, `usage`, `meta` |
+
+Extensiones que agregan las técnicas al mismo manifiesto: `erase` → `{ fill, layers, shadow: { pixels,
+meanDarkening } | null, erasure: [{ changeInCore, corePixels, objectLikeness, residueSuspected }] }`; `expand` →
+`{ source, sourceSha256, to, plan: { canvas, scene, scale }, fill, blend }`.
+
+**`manifest.json` de video (`kind: "ai-inpaint-video"`):** `inputs` (`video`, `videoSha256`, `probe`, `mask`,
+`maskFingerprintSha256`, `staticMask`), `engine` (`id`, `slug`, `verifiedAt`), `strategy`, `request` (`prompt`,
+`frameTime`), `estimate`, `firstFrameRun?`, `alignment` (`sampledFrames`, `medianProtectedDrift`, `maxDrift`),
+`frames` (`original`, `engine`, `reconciled: exact|padded-last|dropped-last`), `verification` (`framesChecked`,
+`protectedMaxDelta`, `verdict`, `worstFrame`), `temporal` (`flickerIndex`, `editedMeanDelta`), `outputs` (`final`,
+`engineRaw`, `contactSheet`).
+
+**`layers.json` (`kind: "ai-layers"`, `version: 1`, `LayersDocument`)** junto a `00-base.png` y `NN-<slug>.png`:
+
+| Campo | Contenido |
+|---|---|
+| `source` | `image`, `sha256`, `width`, `height` |
+| `base` | `file` (`00-base.png`), `width`, `height` (puede no medir lo mismo que la fuente) |
+| `layers[]` | `index`, `zIndex`, `name`, `description`, `file` (relativo a la carpeta), `width`, `height`, `box` (`left`, `top`, `right`, `bottom` en píxeles de la BASE, de `bounding_box.absolute`; `null` en la base), `alphaCoverage` (fracción con alfa > 127; `null` en la base) |
+| `request` | `prompt`, `imageSize` |
+| `cost` | `layerCount` (capas separadas, sin la base), `perLayerUsd`, `estimatedUsd` = capas + base, `note` |
+| `providerMeta` | `requestId`, `account` (sin URLs) |
+
+**`move.json` (`kind: "ai-inpaint-move"`)** en `<run>/move/<id>/`: `source`, `layers`, `dx`, `dy`, `scale`,
+`harmonized`, `shadowPixels`, `final`, `untouched` (`pixels`, `maxDelta`, `meanDelta`, `worst`), `verdict`,
+`harmonizeRun` (`runId`, `verdict`) | `null`. Junto a `composed.png` y `halo-mask.png`.
+
+**`place.json` (`kind: "ai-inpaint-place"`)** en `<run>/place/<id>/`: `target`, `source`, `layers`, `box` (`left`,
+`top`, `width`, `height` en el destino), `finish`, `finished`, `final`, `untouched`, `verdict`, `finishRun` (`runId`,
+`verdict`) | `null`. Junto a `composed.png` y `finish-mask.png`.
+
+### Adaptadores y endpoints
+
+| Id | Proveedor / endpoint | Máscara | Default y notas | Verificado |
+|---|---|---|---|---|
+| `openai` | OpenAI `/v1/images/edits` vía `editOpenAIImage`; modelos `gpt-image-2.5-flare` (default, `medium`) y `gpt-image-2.5-sunburst` (el más potente) | Flare: sí (alfa). Sunburst: **no** — con máscara devolvió un panel negro plano 3 de 3; edita sin máscara + guía de zona en magenta + corrección de color en anillo de 14 px + detector de reencuadre | Sin semilla. Con o sin máscara redibuja toda la imagen (hasta 179/255 medido): recomponer no es opcional | 2026-10-02 (Flare) |
+| `fal:flux-pro-fill` | `fal-ai/flux-pro/v1/fill` (FLUX.1 Fill), USD 0,05/MP | Sí, `mask_url` blanca | Relleno puro; sale al tamaño de la entrada; tamaño acotado a ~2 MP (máx. 1440², borde 2048). Default de `expand` | 2026-10-02 |
+| `fal:seedream5-pro-edit` | `bytedance/seedream/v5/pro/edit` | No | Editor por instrucción, hasta 10 imágenes; tamaño 1024²–1536² | catálogo 2026-09-16; en este pipeline, canario de borrado 2026-10-03 |
+| `fal:seedream5-lite-edit` | `bytedance/seedream/v5/lite/edit` | No | Editor por instrucción; dejó costura en la pared e ignoró `image_size` (2880×1920) | catálogo 2026-09-16; canario TASK-1965 2026-10-02 |
+| `plate` (local) | Sin proveedor | — | Clean plate de Layerize (`plateWithoutLayers`), USD 0; sólo sobre la imagen completa (`--crop off`) | 2026-10-03 |
+| Layerize (`ai:layers`) | `bytedance/seedream/v5/pro/layerize` (`seedream5-pro-layerize`) | — | USD 0,03375 por capa hasta 1536², 0,0675 por encima; **la base se cobra como una capa**; cota 16 + base; espera hasta 10 min | 2026-10-03 |
+| `fal:flux3-edit` (video) | `blackforestlabs/flux-3/edit-video` | No | Default de `video`; MP4 < 50 MB y < 15 s; USD 0,03/s del origen; sin imágenes de referencia | 2026-10-02 |
+| `fal:seedance25-edit` (video) | `seedance25-r2v` con `task: editing`, 720p | No | Hasta 30 s; acepta imagen de referencia (`first-frame`) | sin canario propio (contrato) |
+
+Los adaptadores fal salen del catálogo `src/lib/ai/fal-capabilities.ts` (slug, campo y convención de `mask`,
+semilla, precio): `pnpm ai:fal` deriva las capacidades con máscara a este comando.
+
+### Hallazgos medidos y defaults elegidos por evidencia
+
+Canarios: `ai-generations/2026-10-02_task-1965-canary/README.md` (≈ USD 0,40) y
+`ai-generations/2026-10-03_task-1973-canary/README.md` (≈ USD 0,98). Foto de prueba: mesa de roble, taza, cuaderno y
+ventana, 1536×1024.
+
+| Técnica | Resultado | Costo (USD) |
+|---|---|---|
+| Editar una zona (TASK-1965) | Flare, Flux Fill, Sunburst sin máscara + guía, boceto + referencia con crecimiento de máscara y Seedream Lite: PASS, delta 0 | ≈ 0,40 en total |
+| Separar en capas | 3 capas (mesa, taza, cuaderno); en otra corrida 4 + base (el saldo bajó 0,17 = 5 × 0,03375) | ≈ 0,10 · 0,17 |
+| Borrar con clean plate | ✓ PASS, sombra incluida (10 219 px) | 0 |
+| Borrar con Sunburst sin máscara + guía | ✓ PASS, taza y sombra fuera | 0,010 |
+| Borrar con Seedream 5 Pro Edit | PASS, pero fantasma tenue del asa que el detector **no** ve | 0,068 |
+| Borrar con Flare con máscara | ✗ código 3: dejó media taza y un canto de mesa desalineado | 0,013 |
+| Borrar con Flux Fill | ✗ dibujó OTRA taza, dos veces (semejanza a objeto 1,46 vs 0,15 del borrado bueno) | 0,10 c/u |
+| Expandir 1,91:1 | Flux ✓ sin costura · Sunburst `high` ✗ copió el espejo · Flare ✗ escala 0,88 | 0,10 · 0,036 · 0,009 |
+| Expandir 9:16 | Flux ✓ (generado a 1088×1904 y escalado; inventó una banca) · Flare ✗ escala 0,90 | 0,15 · 0,014 |
+| Mover | ✓ PASS, delta 0 fuera de lo tocado | 0,01 |
+| Incorporar en otra imagen | ✓ PASS sin acabado y con halo | 0 · 0,01 |
+| Cambiar fondo | ✓ PASS, costura media 10,6/255 | 0,01 |
+| Pasada de detalle (`--zone-resolution 2048`) | ✓ PASS mecánico; Flare redibujó la taza (perdió el pie) | 0,022 |
+
+Defaults que fijó la evidencia:
+
+- **Editar una zona:** Flare `medium` con máscara (default). Para la pieza final, Sunburst **sin máscara** con guía de
+  zona (`--provider-mask auto`). **Sunburst nunca con máscara.**
+- **Borrar:** clean plate de Layerize cuando hay capas (`--fill plate`, USD 0); con `--mask`, Sunburst por instrucción
+  (`ERASE_OPENAI_MODEL`). Los modelos que llenan una máscara (Flare con máscara, Flux Fill) rellenan la silueta con
+  otro objeto.
+- **Expandir:** Flux Fill (`EXPAND_DEFAULT_ADAPTER = 'fal:flux-pro-fill'`); GPT Image avisa (Flare reencuadra,
+  Sunburst copia el espejo).
+- **Capas:** el clean plate de un elemento es la base + las demás capas por `z_index`; la base sola deja pared donde
+  había mesa (Layerize separa también las superficies). El nombre de la capa gana sobre la descripción al elegir
+  (`--layer "mug"` coincidía con las tres capas por descripción).
+- **Sombra proyectada:** se mide original contra plate (la capa de superficie viene sin sombras: la original 50–100
+  niveles más oscura bajo la sombra, ±2 en el resto), crece desde el objeto, pertenece al objeto más cercano y nunca
+  se toma encima de otro objeto (superficie = `z_index` menor que lo elegido Y sostiene al menos la mitad de su
+  franja inferior).
+- **Pasada de detalle:** `--zone-resolution` reinterpreta la zona; no es un upscale.
+
+### Invariantes para agentes
+
+- **NUNCA** importar `scripts/ai/inpaint/**` desde `src/app/**` ni desde un módulo runtime de `src/lib/**`: es una
+  herramienta out-of-band. La edición regional del producto vive en Globe.
+- **NUNCA** entregar un candidato con código 2, ni uno con código 3 sin mirarlo al 100 %: PASS prueba lo que no se
+  tocó, no que la edición ocurrió.
+- **NUNCA** recomponer o verificar dentro de un adaptador: el adaptador traduce y devuelve la salida cruda; un
+  proveedor nuevo es un adaptador más en `adapters/index.ts` y sube su `revision` cuando cambia el pedido.
+- **NUNCA** mandar máscara a `gpt-image-2.5-sunburst` (`--provider-mask on`): devuelve un panel negro plano.
+- **NUNCA** usar los píxeles de una capa de Layerize como píxeles finales: las capas son contenido regenerado y sólo
+  sirven de **máscara** y de **clean plate**; los píxeles que no se editan salen siempre de la imagen original (en
+  `move` y `place`, el elemento se recorta de la ORIGINAL con el alfa de su capa).
+- **NUNCA** usar la base de Layerize sola como clean plate: saca también las superficies. Usar `plateWithoutLayers`.
+- **NUNCA** presupuestar Layerize sin la base: **la base se cobra como una capa**, y el número de capas varía entre
+  corridas (presupuestar 16 + base como techo).
+- **NUNCA** generar, borrar, mover ni reconstruir un logo o asset de marca con IA; `--allow-brand` sólo cuando la
+  edición toca el contexto.
+- **NUNCA** cerrar una máscara de 1 canal de sharp sin `.toColourspace('b-w')` antes de `.raw()`.
+- **SIEMPRE** correr `--dry-run` antes de una corrida cara y respetar el tope; `--yes` sólo con gasto autorizado.
+- **SIEMPRE** dejar las salidas en `ai-generations/`; los binarios se archivan con `pnpm ai-gen:archive`.
+
+### Pendientes
+
+| Pendiente | Estado | Condición de cierre |
+|---|---|---|
+| **BFL FLUX Tools** | No están en fal; API propia de BFL: `https://api.bfl.ai/v1/flux-tools/outpainting-v1` (hasta 4 MP, desde USD 0,10/MP) y `.../erase-v1` (desde USD 0,034 por imagen), más FLUX 3 Image. Requiere cuenta BFL del operador y el secreto `greenhouse-bfl-api-key` | Adaptador + canario comparativo de borrar y expandir contra plate, Sunburst y Flux Fill |
+| **`foto:expandir` delegando en el núcleo (Slice 2)** | No se delegó: contrato distinto (CMP-004, Sunburst, `--reponer no`, redibuja). Movido a TASK-1925 | Delegador sin cambiar la interfaz ni las salidas aprobadas |
+| **Video con máscara real: Wan VACE + SAM 2** | Esquemas leídos (`fal-ai/wan-vace-14b/inpainting`, `fal-ai/sam2/video`), sin conectar | Task aparte con canario |
+| **`--batch`** | Sin implementar | Lote declarativo con la misma garantía por pieza |
+| **Reiluminar (relight)** | Sin modelo dedicado conectado; lo cercano es `place --finish element`. Estudio de mercado en la guía de selección de modelos §10.3 | Canario de un candidato contra el híbrido actual |
+
+Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
+[editar una zona de un video](../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md) ·
+[expandir y separar en capas](../manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md). Documentación funcional:
+`docs/documentation/ai-tooling/generador-visual-assets.md`. Selección de modelo por técnica:
+[GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) §2.2 (árbol), §6.17 (receta) y §10.3 (relight).
 
 ## Security
 

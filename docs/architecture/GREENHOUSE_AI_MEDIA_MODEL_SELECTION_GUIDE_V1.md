@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
+> **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
 > **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
 > **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
 > 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
@@ -75,7 +76,14 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
-| **Inpainting: editar una zona y dejar el resto idéntico** | `pnpm ai:inpaint image` (TASK-1965) con **GPT Image 2.5 Flare** `medium` + máscara, o `fal:flux-pro-fill` | El pipeline recompone y verifica el archivo en **delta máximo 0** fuera de la zona [verificado 2026-10-02, 5 corridas]; Flare y Flux Fill colocaron el objeto [verificado 2026-10-02]. 🔴 **Sunburst CON máscara devuelve la zona como panel negro plano** (3 de 3: 2026-09-23 y dos el 2026-10-02) [verificado]; con `--provider-mask auto` Sunburst edita sin máscara, recibe la zona en magenta como guía y el pipeline recompone [verificado 2026-10-02: objeto dentro de la zona; sin la guía lo puso fuera] | Sunburst sin máscara cuando la pieza pide su calidad | Seedream Pro Edit sin máscara (la máscara sólo recompone) |
+| **Editar una zona y dejar el resto idéntico** (inpainting) | `pnpm ai:inpaint image` (TASK-1965) con **GPT Image 2.5 Flare** `medium` + máscara (default); para la pieza final, **Sunburst SIN máscara** con guía de zona (`--model gpt-image-2.5-sunburst`; `--provider-mask auto` es el default) | El pipeline recompone y verifica el archivo en **delta máximo 0** fuera de la zona [verificado 2026-10-02]; Flare, Flux Fill, Sunburst sin máscara + guía en magenta y boceto + referencia colocaron el objeto, ≈ USD 0,40 la jornada [verificado 2026-10-02]. Sin la guía, Sunburst puso el objeto FUERA de la zona [verificado 2026-10-02] | `fal:flux-pro-fill` (relleno con máscara blanca, USD 0,05/MP) [verificado 2026-10-02] | 🔴 **Sunburst CON máscara**: devuelve la zona como panel negro plano, 3 de 3 [verificado 2026-09-23 y 2026-10-02]; `fal:seedream5-lite-edit`: costura en la pared e ignoró `image_size` [verificado 2026-10-02]; retocar la piel de una cara con Sunburst (§5.1) [verificado 2026-10-02] |
+| **Borrar un objeto** | `pnpm ai:inpaint erase --layers <layers.json> --layer <sel>` (TASK-1973): rellena con el clean plate de Layerize, USD 0, e incluye la sombra proyectada | PASS: taza y sombra fuera, la mesa continúa, sin gasto [verificado 2026-10-03] | Con `--mask` y sin capas: **Sunburst por instrucción** (default de `--fill model`), PASS, USD 0,010 [verificado 2026-10-03] | Flare con máscara (dejó media taza, código 3, USD 0,013) y **Flux Fill** (dibujó OTRA taza dos veces, USD 0,10 c/u): un modelo que llena una máscara rellena la silueta con otro objeto [verificado 2026-10-03]; Seedream 5 Pro Edit dejó un fantasma del asa que el detector no ve (USD 0,068) [verificado 2026-10-03]; FLUX Erase de BFL: no conectado [sin dato] |
+| **Mover o escalar un objeto dentro de la misma foto** | `pnpm ai:inpaint move --layers <layers.json> --layer <sel> --dx <px> --dy <px> [--scale]` | Hueco con clean plate, elemento recortado de la ORIGINAL y halo de sombra de contacto y reflejo: PASS, delta 0 fuera de lo tocado, USD 0,01 [verificado 2026-10-03] | `--harmonize off` (sin IA ni gasto) [contrato] | Inpainting generativo con `--mask` para desplazar material de la foto: Sunburst llenó la zona con un panel plano [verificado 2026-09-23]; usar los píxeles regenerados de la capa en vez de los de la original [contrato] |
+| **Incorporar un objeto de otra imagen** | `pnpm ai:inpaint place --image <destino> --from <origen> --layers <layers.json> --layer <sel> --at x,y [--width]` con `--finish halo` (default) | Destino en delta 0 fuera de lo pegado y su acabado: PASS sin acabado (USD 0) y con halo (USD 0,01) [verificado 2026-10-03] | `pnpm ai:inpaint image --reference <objeto> --sketch <trazo>` con Sunburst: objeto de la referencia en la posición del boceto, con la máscara derivada que crece hasta el objeto [verificado 2026-10-02]. `--finish element` también relumina el elemento, pero su forma puede variar [contrato]; sin canario de ese modo [sin dato] | Incorporar un logo o asset de marca: la guarda lo detiene [contrato] |
+| **Expandir a otro formato** (outpaint) | `pnpm ai:inpaint expand --to <formato>` con **Flux Fill** (`fal:flux-pro-fill`, default) | 1,91:1 sin costura, USD 0,10; 9:16 coherente, USD 0,15 [verificado 2026-10-03]. Los lienzos grandes se generan a menor resolución y el área nueva se escala (9:16 de 1536×2730 → 1088×1904), y puede inventar elementos (una banca en el 9:16) [verificado 2026-10-03] | BFL FLUX Outpainting (API propia de BFL, hasta 4 MP): no conectado [sin dato]. `pnpm foto:expandir` es otro contrato (redibuja con Sunburst) y no delega en este núcleo [contrato] | GPT Image: Flare reencuadró la escena (escala 0,88–0,90, código 3) y Sunburst `high` copió el relleno en espejo como contenido [verificado 2026-10-03] |
+| **Cambiar el fondo y dejar el sujeto intacto** | `pnpm ai:inpaint background --prompt "<fondo nuevo>"` (sujeto por matting local, o `--layers` + `--layer`) con el adaptador default (`openai`, Flare) | Sujeto en delta 0, costura media 10,6/255, USD 0,01 [verificado 2026-10-03] | Sujeto desde capas cuando el matting no separa bien lo que debe quedar [contrato] | Dar por buena la costura sin mirar pelo y transparencias al 100 % [contrato]; injertar caras de personas reales del equipo (reglas de identidad de brand-photography) [decisión] |
+| **Rehacer un detalle** (manos, una textura, un objeto chico) | `pnpm ai:inpaint image --mask <zona> --zone-resolution <px>` (512–4096) | Genera la zona recortada a ese lado largo y la devuelve a su lugar: PASS mecánico, USD 0,022 [verificado 2026-10-03] | — | Esperar un upscale: **reinterpreta** — Flare redibujó la taza y le quitó el pie pese a pedir la misma forma [verificado 2026-10-03]; la piel de una cara con Sunburst (§5.1) [verificado 2026-10-02] |
+| **Reiluminar** (relight) una imagen o un objeto pegado | Nada dedicado conectado; lo más cercano es `place --finish element` | Estudio de mercado en §10.3: todo **sin verificar en vivo** | Magnific Image Relight (API y MCP) [sin verificar en vivo] | Reiluminar un plate del registro cine: el canon lo regenera, no lo corrige [decisión] |
 | **Generación cotidiana de calidad, rápida** | GPT Image 2.5 **Flare** `medium`/`high` | Mismo costo que Sunburst; en `high` 18,7 s vs 29,1 s, en `max` 46,0 s vs 80,6 s a 1024² [verificado 2026-09-16] | Sunburst si la pieza es de edición | Dejar el default del CLI (`gpt-image-2` `high` 1536×1024 ≈ USD 0,165): cuesta lo mismo que 2.5 `max` [cálculo] |
 | **Máxima calidad OpenAI sin importar latencia** | 2.5 Sunburst `max` | `max` ≈ tokens de GPT Image 2 `high` [cálculo sobre fórmula oficial] | 2.5 Flare `max` (#1 AA texto a imagen, 1189) [tercero] | `xhigh`/`max` con `gpt-image-2`: el CLI lo rechaza antes de la red [contrato] |
 | **Mínimo costo por pieza en OpenAI** | 2.5 `low` (≈ 0,006 a 1024²) o `medium` (≈ 0,013) | [cálculo] fórmula oficial | Seedream Lite (0,035 por imagen) si buscas divergencia | Esperar calidad final en `low` |
@@ -84,7 +92,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | **Divergencia barata de territorios / series relacionadas** | Seedream 5 **Lite** (`seedream5-lite`, `max_images` vía `--input`) | USD 0,035 por imagen efectiva [oficial]; series relacionadas [contrato] | 2.5 `medium` | Seedream Pro para explorar (0,0675–0,135) |
 | **Materialidad, atmósfera, desarrollo de look** | Seedream 5 **Pro** (`seedream5-pro`) | Mayor riqueza de color, material y luz [verificado 2026-07-18]; realismo y textura declarados [oficial] | GPT Image 2.5 si hay texto o layout | Pedirle más de 2048² de área (§5.2) |
 | **Fusión de varias referencias orientada a material** | `seedream5-pro-edit` (hasta 10 refs) | Retuvo mejor carácter [verificado 2026-07-18] | `seedream5-lite-edit` | Pasar más de 10 `--image`: fal usa las **últimas** 10 sin aviso [oficial] |
-| **Separar una pieza en capas editables** (o una foto en elementos con máscara y clean plate: `pnpm ai:layers`, TASK-1973) | `seedream5-pro-layerize` | Base + hasta 16 capas PNG con alfa, nombre, z_index y bounding box [oficial]; 8 capas limpias en un KV [verificado 2026-09-16]; foto de mesa 1536×1024 → 3 capas (mesa, taza, cuaderno), ≈ USD 0,10, y **la base saca también la superficie** [verificado 2026-10-03]; **la base se cobra como una capa** (saldo de fal: 4 capas + base = USD 0,17) [verificado 2026-10-03] | Ninguna conectada | Usar la base sola como clean plate (deja pared donde había mesa: `pnpm ai:layers` recompone las demás capas); esperar que reconstruya fielmente texto pequeño: [sin dato] |
+| **Separar una pieza en capas editables** (o una foto en elementos con máscara y clean plate: `pnpm ai:layers`, TASK-1973) | `seedream5-pro-layerize` | Base + hasta 16 capas PNG con alfa, nombre, z_index y bounding box [oficial]; 8 capas limpias en un KV [verificado 2026-09-16]; foto de mesa 1536×1024 → 3 capas (mesa, taza, cuaderno), ≈ USD 0,10, y **la base saca también la superficie** [verificado 2026-10-03]; **la base se cobra como una capa** (saldo de fal: 4 capas + base = USD 0,17) [verificado 2026-10-03]; el número de capas varía entre corridas (misma foto: 3 y 4) [verificado 2026-10-03]; se elige una capa por `#índice` o por nombre, y el nombre gana sobre la descripción [contrato] | Ninguna conectada | Usar la base sola como clean plate (deja pared donde había mesa: el clean plate de un elemento es la base + las demás capas por `z_index`); usar las capas como píxeles finales: son contenido regenerado, sólo máscara y clean plate [contrato]; esperar que reconstruya fielmente texto pequeño: [sin dato] |
 | **Resolución nativa mayor a 2K** | GPT Image 2/2.5 hasta 3840×2160 (experimental > 2560×1440) o Seedream Lite (`auto_3K`/`auto_4K`) | [oficial]; área Lite hasta 4096² según schema, ficha dice 3072² [oficial, drift] | — | Seedream **Pro** en fal: tope 2048² de área [contrato] |
 | **Formatos extremos (más de 3:1)** | Seedream Pro (aspecto 1/16–16) | [oficial] | GPT Image 2 resolvió 3:1 en un pase [verificado 2026-07-18] | GPT Image más allá de 3:1: tope 1:3–3:1 [oficial] |
 | **Texto multilingüe dentro de la imagen (concepto)** | Seedream 5 Pro | Texto denso multilingüe declarado, 16 idiomas de prompt incluido español [oficial] | GPT Image 2 escribió bien una frase corta en español [verificado 2026-07-18] | Entregar ese texto como final; OpenAI no declara nada multilingüe para 2.5 [oficial, ausencia] |
@@ -119,6 +127,7 @@ El video se opera con `pnpm ai:fal` para fal/Higgsfield y `pnpm ai:omni` para Ge
 | **Prompt exacto, sin reinterpretación** | `wan3-* --no-prompt-expansion` o H3 base `--prompt-expansion disabled` | [contrato] | — | H3 Max/Turbo: expansión obligatoria (el CLI envía `balanced`) [contrato] |
 | **Video sin audio** | `--no-audio` en Seedance, Flux 3 y Wan | [contrato] | Quitar la pista en post | H3: **no tiene toggle y siempre entrega audio** [contrato] |
 | 🔴 **Una pieza social en 4:5** (el formato principal de los estáticos aprobados de Efeonce) | Generar en **`3:4`** (1080×1440) con el motor que pida la toma y **recortar a 1080×1350** en post | **Ningún motor de video del carril soporta 4:5** — medido en los cinco: Seedance 2.5, Seedance 2.0, Wan 3.0, Flux 3 y H3; todos ofrecen `3:4` como lo más cercano [verificado 2026-09-22] | Entregar sólo 9:16 y 1:1 y declarar el 4:5 fuera del set, si el brief lo permite | Recortar sin medir antes que las franjas sacrificadas estén vacías; y subir un 3:4 donde la plataforma espera 4:5: **ella** recorta y decide dónde |
+| **Reiluminar un video** | Ninguno conectado | Estudio de mercado en §10.3: todo **sin verificar en vivo** | ID-V2V Relight (reilumina un cuadro y lo propaga) o Beeble SwitchX [sin verificar en vivo] | Prometer relight de video con Seedance por prompt sin probarlo (filtro de personas y marcas) [verificado 2026-09-16 para el filtro] |
 | **Stream en tiempo real dirigido** | Ninguno operable | `h3max-director` exige cliente realtime AsyncAPI, no cola [contrato] [oficial] | — | Intentarlo con el CLI (se detiene) [contrato] |
 
 **Audio generado = provisional.** Seedance, Wan, Flux 3 y H3 generan audio; si la pieza tiene diseño sonoro, reemplázalo en post. [decisión]
@@ -352,6 +361,8 @@ pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --size auto_2K --
 ```
 
 **Trampas.** Pro cobra 0,0045 por cada `--image` adicional en edit; `--size`/`--count` no validados contra el contrato de imagen; sin flags para `max_images`, `enhance_prompt_mode` ni `enable_safety_checker` (usar `--input`) [contrato]. Slug sin prefijo `fal-ai/`: con prefijo equivocado responde 200 y el resultado da 404 [verificado]. Resuelto en el CLI el 2026-09-16 (commit `17196ead1`): Pro deriva `output_format` de la extensión de `--out` (`.png` → png, `.jpg`/`.jpeg` → jpeg, otra → error local) y, al descargar, detecta el formato por los bytes y corrige la extensión con aviso; `--format` en Lite se rechaza (Lite entrega PNG); `--seed` se rechaza en todo Seedream; más de 10 `--image` se rechaza en local [contrato]. El registro dice "Hasta 4K según el proveedor" para Pro era **incorrecta**: el tope es 2048²; la nota del registro se corrigió el 2026-09-16 [contrato].
+
+**Como editor dentro de `pnpm ai:inpaint`** (sin máscara: edita por instrucción y el pipeline recompone). Lite Edit dejó una costura visible en la pared (re-renderiza la superficie con otro tono) e ignoró `image_size` (entregó 2880×1920) [verificado 2026-10-02]. Pro Edit, al borrar una taza, pasó la verificación pero dejó un **fantasma tenue del asa** que el detector de residuo no ve, USD 0,068 [verificado 2026-10-03]. Para borrar, usa el clean plate o Sunburst (§2.2).
 
 **Estado.** Las 5 verificadas 2026-09-16 (una corrida cada una); laboratorio híbrido 2026-07-18 [verificado].
 **Fuentes.** B1–B9 (§12).
@@ -797,7 +808,9 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.13 Capas editables
 
-`seedream5-pro-layerize` sobre un KV 2K con 8 capas ≈ **0,54** (0,0675 × 8); bajo 1536² ≈ 0,27. Entrega `NN-<nombre>.png` + `layers.json`.
+`seedream5-pro-layerize` sobre un KV 2K con 8 capas ≈ **0,61** (0,0675 × 9: las 8 capas **más la base, que se cobra como una capa** [verificado 2026-10-03]); bajo 1536² ≈ 0,30 [cálculo]. Entrega `NN-<nombre>.png` + `layers.json`.
+
+Para separar una foto en elementos con máscara y clean plate (no para editar las capas): `pnpm ai:layers --image foto.png [--prompt …] [--bbox x0,y0,x1,y1]` escribe `00-base.png`, `NN-<slug>.png` y `layers.json` con la caja de cada capa en píxeles de la base; `--dry-run` imprime la cota (16 capas + base) y `--list <layers.json>` lista las capas gratis [contrato]. Foto de mesa 1536×1024: 3 capas ≈ 0,10 y, en otra corrida, 4 + base = 0,17 medido con el saldo [verificado 2026-10-03].
 
 ### 6.14 Vectores
 
@@ -815,6 +828,39 @@ Concepto: `seedream5-pro` (texto denso multilingüe declarado) o `gpt-image-2.5-
 4. Adaptaciones de formato extremo: `seedream5-pro-edit` con el ancla = 0,135 + 0,0045 por referencia adicional.
 5. Video: exploración `h3turbo-i2v` y final en el motor que pida el contrato de fidelidad de cada toma.
 Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `seedream-5-gpt-image-2-hybrid-production.md` [decisión].
+
+### 6.17 Editar una foto que ya existe (zona, borrar, mover, incorporar, expandir, fondo, detalle)
+
+Todo pasa por `pnpm ai:inpaint`, que recompone sobre la original y verifica el archivo en delta máximo 0 fuera de lo
+tocado; código 0 = usar, 2 = no usar, 3 = revisar al 100 % [contrato]. Contrato completo:
+[GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md §Pipeline de inpainting](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
+Costos del canario del 2026-10-03 sobre una foto de 1536×1024 [verificado 2026-10-03]:
+
+```bash
+# 0. Capas (sólo si vas a borrar, mover, incorporar o cambiar el fondo por elemento): ≈ 0,10–0,17
+pnpm ai:layers --image foto.png --run ai-generations/<fecha>_<pieza>
+# Editar una zona (Flare medium por defecto; --dry-run primero)
+pnpm ai:mask --base foto.png --rect 0.33,0.42,0.67,0.72 --feather 24 --out mascara.png
+pnpm ai:inpaint image --image foto.png --mask mascara.png --prompt "<qué va en la zona>" --dry-run
+# Borrar con el clean plate: 0
+pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"
+# Borrar sin capas (Sunburst por instrucción): ≈ 0,01
+pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model
+# Mover: ≈ 0,01 con el halo · 0 con --harmonize off
+pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40
+# Incorporar en otra imagen: 0 con --finish off · ≈ 0,01 con halo
+pnpm ai:inpaint place --image destino.png --from foto.png --layers <layers.json> --layer "mug" --at 0.3,0.62 --width 0.12
+# Expandir (Flux Fill por defecto): ≈ 0,10 (1,91:1) · ≈ 0,15 (9:16)
+pnpm ai:inpaint expand --image foto.png --to 9:16 --prompt "<qué hay alrededor>"
+# Cambiar el fondo: ≈ 0,01
+pnpm ai:inpaint background --image foto.png --prompt "<fondo nuevo>"
+# Rehacer un detalle (reinterpreta, no escala): ≈ 0,022
+pnpm ai:inpaint image --image foto.png --mask detalle.png --zone-resolution 2048 --prompt "<el detalle>"
+```
+
+Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
+[expandir y separar en capas](../manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md) ·
+[editar una zona de un video](../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md).
 
 ---
 
@@ -946,6 +992,9 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 | Calidad y latencia Wan base vs Prime | Sin medir | Misma toma en ambos, comparar |
 | `wan3-r2v --file` | Sin corrida real | Una corrida con documento |
 | Nitidez de Seedance 2.5 a 1080p | Sin verificar | 5 s a 1080p revisado cuadro a cuadro |
+| **BFL FLUX Tools** (Erase, Outpainting) | No están en fal; API propia de BFL (`https://api.bfl.ai/v1/flux-tools/outpainting-v1` hasta 4 MP, desde USD 0,10/MP; `.../erase-v1` desde USD 0,034 por imagen). Requiere cuenta BFL del operador y el secreto `greenhouse-bfl-api-key` | Adaptador en `pnpm ai:inpaint` + canario comparativo contra clean plate, Sunburst y Flux Fill |
+| **Relight dedicado** | Ninguno conectado; estudio de mercado del 2026-10-03 sin verificar en vivo (§10.3) | Canario de un candidato contra `place --finish element` sobre el mismo composite |
+| **Video con máscara real** (Wan VACE + SAM 2) | Esquemas leídos, sin conectar | Task aparte con canario |
 
 ---
 
@@ -1016,6 +1065,70 @@ Precios de la API de pricing de fal (2026-09-16), escalón más bajo, **no verif
 | **Wan 3.0 directo en Alibaba** | Edición (incluye cambiar diálogo), extensión adelante/atrás, multi-shot 4–6 s por plano | Prime 720P 0,127199/s [oficial] | Funciones que fal no expone |
 
 Conectar cualquiera exige: slug + contrato en `fal-capabilities.ts`, corrida real, y actualizar esta guía (§11). Mientras tanto, `pnpm ai:fal --model <slug> --input '<json>'` corre un slug fuera del registro **sin validación** [contrato]: úsalo sólo para evaluar, no para producción.
+
+### 10.3 Reiluminar (relight) — estudio de mercado 2026-10-03
+
+**Estado: no hay ningún modelo de relight dedicado conectado.** Esta sección resume un estudio de mercado del
+2026-10-03 (cuatro investigaciones). **Nada de lo que sigue se conectó ni se probó en un canario: todo está sin
+verificar en vivo.** Donde el estudio no distinguió si el dato venía del fabricante o de un tercero, la fila se marca
+[tercero] hasta leer la página del proveedor; nunca lo uses como [oficial].
+
+**Lo que ya tenemos (lo más cercano):**
+
+- `pnpm ai:inpaint place --finish element`: además de la sombra de contacto y el reflejo, deja que el modelo relumine
+  el elemento pegado (`RELIGHT_PROMPT`: igualar luz, temperatura de color y sombras a la escena, conservando forma,
+  proporciones, colores, materiales y texto) en una zona = el elemento + 48 px; la forma del elemento puede variar
+  [contrato]. Ese modo no tiene canario propio [sin dato].
+- `pnpm foto:isotipo --acabado`: el acabado del isotipo compuesto sobre un plate [contrato].
+
+**Restricciones del canon que mandan sobre cualquier herramienta** [decisión]:
+
+- El plate del registro cine se genera **sin relight ni upscale**: si la luz no sirve, se corrige la ficha y se
+  regenera, no se reilumina la foto ([casebook cine](../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)).
+  Sin scrim; luz con carácter.
+- Colorimetría: luz de día neutro-cálida (~5200 K) y sombras neutras, b* entre −3 y +3
+  ([EFEONCE_PHOTO_COLORIMETRY_V1.md](../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md)).
+- Por eso el relight sirve para **composites** (un objeto pegado que no toma la luz de la escena), no para arreglar un
+  plate.
+
+**Imagen**
+
+| Herramienta | Acceso | Tipo de control | Precio | ¿Preserva el detalle? | Estado |
+|---|---|---|---|---|---|
+| **Magnific Image Relight** (ex Freepik; `docs.freepik.com` → `docs.magnific.com`) | API `POST /v1/ai/image-relight` asíncrona (+ `GET` por task-id); MCP oficial `https://mcp.magnific.com` (OAuth) con `images_relight` (`creationIdentifier` + `lights`, máximo 4 luces); app con luces posicionables en vista 3D (versión 2026-03-24) | `prompt`, imagen de referencia (`transfer_light_from_reference_image`), lightmap en grises (`transfer_light_from_lightmap`), `light_transfer_strength` 0–100, `interpolate_from_original`, `change_background` (default `true`), `style` (`standard`, `darker_but_realistic`, `clean`, `smooth`, `brighter`, `contrasted_n_hdr`, `just_composition`), avanzados (whites, blacks, brightness, contrast, saturation, `engine`, `fixed_generation`) [oficial] | €0,10 por operación [oficial] | `preserve_details` (default `true`) [oficial], pero re-renderiza (generativo), con riesgo en caras pequeñas; el modelo es propio y no está publicado [tercero] | MCP conectado en las sesiones Claude con la cuenta de Efeonce (`account_profile` responde) [verificado 2026-10-03]; sus esquemas no cargaron en la sesión: **sin invocación verificada**. No conectado a nuestros CLIs |
+| **IC-Light v2** (`fal-ai/iclight-v2`) | fal | [sin dato] | USD 0,10/MP [tercero] | [sin dato] | Sin conectar |
+| **fal `image-apps-v2/relighting`** (`fal-ai/image-apps-v2/relighting`) | fal | [sin dato] | USD 0,04 [tercero] | [sin dato] | Sin conectar |
+| **Qwen-Image-Edit lighting-restoration** | fal | Restauración de luz | USD 0,035/MP [tercero] | [sin dato] | Sin conectar |
+| **Photoroom AI Relight** | API de Photoroom | Corrección de luz, 3 modos, hasta 3500 px [tercero] | [sin dato] | [sin dato] | Sin conectar |
+| **Nano Banana Pro** por instrucción | Google directo (Vertex), nunca por fal [decisión] | Instrucción | USD 0,134–0,24 [tercero] | [sin dato] | Disponible en Vertex sin superficie (§10.1) |
+| **GPT Image 2.5** por instrucción | `pnpm ai:image` / `pnpm ai:inpaint` (conectado) | Instrucción; es el modelo de `place --finish element` | Fórmula oficial de tokens (§5.1) | Redibuja: se recompone y se vuelve a pegar el objeto | Conectado; relight sin medir [sin dato] |
+| **Kontext LoRA relight** | LoRA sobre FLUX Kontext | [sin dato] | [sin dato] | [sin dato] | Experimental; revisar licencia antes de usar [tercero] |
+| **Higgsfield Relight** | Función de la app de Higgsfield | — | [sin dato] | [sin dato] | **No está en la API**: ni en nuestro catálogo (`higgsfield-capabilities.ts`), ni en sus páginas públicas, ni en el MCP (`models_explore` con «relight» → 0 resultados) [verificado 2026-10-03] |
+| **ByteDance (Dreamina)** | App | Relight de fotos con Seedream 5.0 **por prompt**; agente de hasta 40 imágenes con luz consistente [oficial, marketing] | [sin dato] | [sin dato] | Sin modelo dedicado. Seedream edit por prompt sí está conectado (`seedream5-pro-edit`), relight sin medir [sin dato]. Investigación: DreamLight (Tsinghua + ByteDance, arXiv 2506.14549, sin pesos) [tercero] |
+
+**Video**
+
+| Herramienta | Acceso | Tipo de control | Precio | ¿Preserva el detalle? | Estado |
+|---|---|---|---|---|---|
+| **ID-V2V Relight** (`fal-ai/id-v2v/relight`) | fal | Propaga un cuadro reiluminado al clip | USD 0,20/s [tercero] | [sin dato] | Sin conectar |
+| **LightX** (`fal-ai/lightx/relight`) | fal | [sin dato] | USD 0,10/s [tercero] | [sin dato] | Sin conectar |
+| **Beeble SwitchX** | API de Beeble | [sin dato] | USD 0,10–0,30 por 30 cuadros; compra mínima USD 50 [tercero] | [sin dato] | Sin conectar |
+| **Runway Aleph 2.0** | API de Runway | [sin dato] | USD 0,28/s [tercero] | [sin dato] | Sin conectar |
+| **LTX-2.3 Relight IC-LoRA** | Pesos abiertos | Relight, orientado a exteriores | [sin dato] | [sin dato] | Sin conectar [tercero] |
+| **Higgsfield Cinema Studio 4.0** (`cinematic_studio_video_4_0`) | **Sólo el MCP** de Higgsfield | `mode: video_edit` edita un video de referencia (cobrado por su duración); luz `light: preset\|custom\|user`, `light_id`, `light_custom` (rig ordenado: la primera fuente es la llave), además de cámara, lente, apertura, era, género y paleta [verificado 2026-10-03, listado del MCP] | [sin dato] | [sin dato] | **No está en nuestro catálogo de la API** (0 coincidencias) [verificado 2026-10-03]. Candidato a relight de video por rig, sin invocación |
+| **Magnific video relight** | MCP `video_relight` (`video_url` + `first_frame_url` o una creación; `lights` o `light_transfer_image`); app | Luces o imagen de transferencia | [sin dato] | [sin dato] | Sin invocación verificada (esquemas no cargaron) |
+| **Seedance 2.0 / 2.5** por prompt | `seedance25-r2v --task editing` (conectado) | Edición de video por instrucción; en Runware, `duration=auto` y la palabra «relight» en el prompt [tercero] | Tokens de Seedance (§4.2) | [sin dato] | Relight sin medir; filtro de personas y marcas cobrado [verificado 2026-09-16] |
+| **CapCut AI Relight** | App | Relight de video; no nombra el modelo [tercero] | [sin dato] | [sin dato] | Sin API conocida |
+
+**Recomendación del estudio — NO medida todavía:**
+
+- **Composites (objeto pegado):** Magnific con `preserve_details=true`, `change_background=false`, fuerza de
+  transferencia moderada y la escena como imagen de referencia; o un editor por instrucción. En los dos casos,
+  **volver a pegar después el objeto exacto** encima: el híbrido es lo que ya hace el pipeline (`place` toma el
+  elemento de la imagen ORIGINAL y sólo deja al modelo el acabado).
+- **Video:** Beeble SwitchX o ID-V2V (reiluminar un cuadro y propagarlo).
+- **Antes de adoptar cualquiera:** canario contra `place --finish element` sobre el mismo composite, mirando al 100 %
+  forma, texto y materiales del objeto. Conectar un candidato sigue la regla de §11.
 
 ---
 
