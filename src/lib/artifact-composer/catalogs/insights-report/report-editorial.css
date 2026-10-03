@@ -375,21 +375,24 @@ body { background: var(--axis-report-role-navy); }
   white-space: nowrap;
 }
 
-.delta-pill svg { display: block; flex-shrink: 0; }
+.delta-pill svg { display: block; flex-shrink: 0; overflow: visible; }
+
+/* Triángulo de puntas redondeadas (aprobado 2026-10-03): el trazo del mismo color redondea las esquinas. */
+.delta-mark { stroke-width: 1.4px; stroke-linejoin: round; }
 
 /* TASK-1975 — tonos semánticos aprobados el 2026-10-03: verde mejor, rojo peor, gris neutro (sin dirección o sin
    cambio). Siempre con el triángulo y la cifra: el color nunca es la única codificación. */
 .delta--better { background: rgba(var(--axis-report-role-deltaBetterOnPaper-rgb), 0.12); color: var(--axis-report-role-deltaBetterOnPaper); }
 
-.delta--better .delta-mark { fill: var(--axis-report-role-deltaBetterOnPaper); }
+.delta--better .delta-mark { fill: var(--axis-report-role-deltaBetterOnPaper); stroke: var(--axis-report-role-deltaBetterOnPaper); }
 
 .delta--worse { background: rgba(var(--axis-report-role-deltaWorseOnPaper-rgb), 0.1); color: var(--axis-report-role-deltaWorseOnPaper); }
 
-.delta--worse .delta-mark { fill: var(--axis-report-role-deltaWorseOnPaper); }
+.delta--worse .delta-mark { fill: var(--axis-report-role-deltaWorseOnPaper); stroke: var(--axis-report-role-deltaWorseOnPaper); }
 
 .delta--plain { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
 
-.delta--plain .delta-mark { fill: var(--axis-report-role-paperInk); }
+.delta--plain .delta-mark { fill: var(--axis-report-role-paperInk); stroke: var(--axis-report-role-paperInk); }
 
 /* Panel de cierre de una figura: una o dos columnas según traiga «Próximo paso». */
 .closing--figure { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
@@ -437,6 +440,15 @@ body { background: var(--axis-report-role-navy); }
 .fig-delta--better { fill: var(--axis-report-role-deltaBetterOnPaper); }
 
 .fig-delta--worse { fill: var(--axis-report-role-deltaWorseOnPaper); }
+
+/* Triángulo de la variación en las figuras SVG: mismo trazo redondeado que la píldora (hereda el color del texto). */
+.fig-delta-mark { stroke-width: 1.2px; stroke-linejoin: round; stroke: var(--axis-report-role-paperAccent); }
+
+.fig-delta--plain .fig-delta-mark { stroke: var(--axis-report-role-labelMuted); }
+
+.fig-delta--better .fig-delta-mark { stroke: var(--axis-report-role-deltaBetterOnPaper); }
+
+.fig-delta--worse .fig-delta-mark { stroke: var(--axis-report-role-deltaWorseOnPaper); }
 
 /* Leyenda de columnas: muestra cuadrada y la de oportunidad con su borde discontinuo. */
 .figure-legend--columns .figure-legend-swatch { width: 10px; height: 10px; }

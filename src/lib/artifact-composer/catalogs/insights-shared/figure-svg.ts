@@ -270,7 +270,9 @@ export const groupedColumnsSvg = (
     )
 
     if (group.delta) {
-      const mark = group.direction === 'up' ? '▲ ' : group.direction === 'down' ? '▼ ' : ''
+      // El triángulo va en su propio tspan: el catálogo lo redondea con un trazo y, sobre navy, le da el tono.
+      const glyph = group.direction === 'up' ? '▲' : group.direction === 'down' ? '▼' : ''
+      const mark = glyph ? `<tspan class="fig-delta-mark">${glyph}</tspan> ` : ''
 
       // TASK-1975 — tono semántico declarado: verde mejor, rojo peor, gris neutro. Sin tono (canvas de TASK-1889):
       // subir en el acento, bajar en gris.
