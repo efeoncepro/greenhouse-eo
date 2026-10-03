@@ -82,6 +82,7 @@ por plataforma) y `deliver.export` (masters y derivados con hash). Cierra el hue
 ### Depends on
 
 - `ffmpeg`/`ffprobe` instalados (ya requeridos por `pnpm ai:inpaint video`).
+- **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
 
 ### Blocks / Impacts
 

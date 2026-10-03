@@ -77,6 +77,7 @@ H8 de la taxonomía; motor neutral: compara Seedance 2.5, Flux 3, Gemini Omni y 
 - TASK-1980 (banco y núcleo de métricas de video).
 - TASK-1981 para el cierre determinístico (crossfade/palíndromo) si ya existe; si no, el loop determinístico se
   implementa acá con los helpers de ffmpeg y TASK-1981 lo absorbe.
+- **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
 
 ### Blocks / Impacts
 

@@ -86,6 +86,8 @@ trabaja dentro de la máscara, el pipeline recompone el original afuera y verifi
 - TASK-1965 (complete): `pipeline-video.ts`, `video-mask.ts`, `ffmpeg.ts`, adaptadores de video.
 - Preferible después de TASK-1976 (frontera del núcleo y su gate); si no, el código nuevo nace igual dentro de esa
   frontera y TASK-1976 lo absorbe.
+- **Secuencia con TASK-1976 (acordado con la sesión del pipeline, 2026-10-03):** TASK-1976 separa lógica e I/O en `video-mask.ts`, `pipeline-video.ts` y `adapters/video-fal.ts`, los mismos archivos que toca esta task. Nunca en paralelo: la que se tome segunda rebasa sobre la que cerró primero.
+- **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
 
 ### Blocks / Impacts
 

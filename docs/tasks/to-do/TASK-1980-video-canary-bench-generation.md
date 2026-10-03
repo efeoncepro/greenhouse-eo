@@ -86,6 +86,7 @@ garantía** las operaciones de producción más usadas: `gen.i2v`, `gen.r2v` (ca
 - `pnpm ai:fal` (fal + Higgsfield API) y `pnpm ai:omni` con `--estimate`, `--detach`, `--request-id`.
 - `pnpm foto:rostro` y `pnpm foto:emblema` como detectores de identidad sobre cuadros extraídos [verificar que acepten
   un PNG arbitrario en Discovery].
+- **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
 
 ### Blocks / Impacts
 
