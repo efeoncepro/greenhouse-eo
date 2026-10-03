@@ -846,5 +846,8 @@ paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan 
   usa la lupa para AI Overview.
 - **Evidencia real:** Berel A4 (Search Console y Google en el título del capítulo SEO) y Sky deck (Greenhouse en el
   título del capítulo ICO), en `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/`.
+- **En producción desde 2026-10-03:** release `36a73e7b7e19-1131bf79-869b-4bf8-9bda-1928c8afda39` (run `37158679961`,
+  PR #250, junto con TASK-1974/1975); Think `0c5701a` antes. Watchdog `ok` 6/6.
 - **Pendiente:** glifos Trazo para clics, impresiones, CTR y posición (para retirar Tabler), los 10 isotipos sin
-  productor (entran con TASK-1991/1992), `channelForDomain` y la validación del plan (TASK-1990), y el release.
+  productor (entran con TASK-1991/1992), `channelForDomain` y la validación del plan (TASK-1990), y el tamaño adaptativo
+  de la cifra única del deck (7+ caracteres se rechazan en el encaje).

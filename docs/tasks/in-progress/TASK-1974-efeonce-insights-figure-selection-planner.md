@@ -52,7 +52,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Implementación en curso (Slice 1)`
+- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961, PR #250; Think 0c5701a). Falta verificar dona y apiladas con GA4 real antes de cerrar`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -402,18 +402,18 @@ Mapeo esperado con los datos de septiembre 2026 (criterio §7):
 
 ## Acceptance Criteria
 
-- [ ] `figure-selection.ts` implementa la tabla pregunta → familia del criterio, con un test por fila.
+- [x] `figure-selection.ts` implementa la tabla pregunta → familia del criterio, con un test por fila. Evidencia: `editorial/figure-selection.ts` (`QUESTION_FAMILIES`, `familiesForQuestion`) con `figure-selection.test.ts`; commit 38d78fa93.
 - [ ] El desempate por variedad sólo actúa entre familias igual de válidas (test con un caso donde la variedad NO cambia
   la familia).
-- [ ] El plan tiene un tipo de figura de cifra con valor, comparable, unidad, dirección, marca «estimado» y pregunta, y
+- [x] El plan tiene un tipo de figura de cifra con valor, comparable, unidad, dirección, marca «estimado» y pregunta, y Evidencia: `PlanStatFigureV1`/`PlanStatItemV1` en `contracts/plan.ts` (commit 4b825e3d3).
   el validador del plan exige que sus cifras salgan de hechos.
-- [ ] El modelo web sube a 1.4 y proyecta la tarjeta de cifra y la pregunta de cada figura.
-- [ ] En el plan de Sky de septiembre 2026 OTD, FTR y RpA aparecen una sola vez (en una figura de bullets).
+- [x] El modelo web sube a 1.4 y proyecta la tarjeta de cifra y la pregunta de cada figura. Evidencia: `INSIGHT_WEB_MODEL_VERSION = '1.4'` en `contracts/web-model.ts`; consumido por Think (`StatCard.astro`).
+- [x] En el plan de Sky de septiembre 2026 OTD, FTR y RpA aparecen una sola vez (en una figura de bullets). Evidencia: vista previa real de Sky septiembre 2026 (`EO-INS-000029`): una figura de bullets con las 3 metas.
 - [ ] En el plan de Berel de septiembre 2026 aparecen tarjetas, barras apiladas, línea, cascada, barras, dona y waffle, y
-  tipo de fuente va en barras horizontales ordenadas.
-- [ ] Ningún hecho del período actual alimenta dos figuras en los planes de Berel y Sky (gate en test).
-- [ ] La matriz de familias sube a v3 con dona y barras apiladas `producer_now` y su evidencia.
-- [ ] El criterio canónico, §15 de la arquitectura y la skill `efeonce-insights` (espejo `.codex`) quedan actualizados.
+  tipo de fuente va en barras horizontales ordenadas. Pendiente: la dona de fuentes IA y las barras apiladas de GA4 sólo se probaron con fixtures; GA4 no corre en local y falta verlas con datos reales.
+- [x] Ningún hecho del período actual alimenta dos figuras en los planes de Berel y Sky (gate en test). Evidencia: regla `duplicated_fact` en `plan-validation.ts` y vistas previas reales de Berel y Sky con 0 violaciones.
+- [x] La matriz de familias sube a v3 con dona y barras apiladas `producer_now` y su evidencia. Evidencia: matriz familia × evidencia v3 (commit 908ebff1e).
+- [x] El criterio canónico, §15 de la arquitectura y la skill `efeonce-insights` (espejo `.codex`) quedan actualizados. Evidencia: commit 28889cbdc (criterio, arquitectura §15, skill espejada).
 
 ## Verification
 
@@ -424,15 +424,15 @@ Mapeo esperado con los datos de septiembre 2026 (criterio §7):
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] TASK-1975 recibe un `## Delta` con el contrato final de la tarjeta de cifra y el modelo web 1.4.
-- [ ] Skill `efeonce-insights` actualizada y espejada a `.codex/`.
+- [x] Skill `efeonce-insights` actualizada y espejada a `.codex/`. Evidencia: `.claude/skills/efeonce-insights/` y espejo `.codex/` (2026-10-03).
 
 ## Follow-ups
 

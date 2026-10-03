@@ -74,7 +74,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseño aprobado (Slice 1); implementación pendiente`
+- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961, PR #250; Think 0c5701a). Falta verificar dona y apiladas con GA4 real antes de cerrar`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1974` (tarjeta de cifra en el contrato del plan y del modelo web; evidencia de dona y barras apiladas)
