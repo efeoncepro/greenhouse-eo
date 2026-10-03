@@ -50,6 +50,18 @@ export const isDataChartFamily = (family: ChartFamily): family is DataChartFamil
 export const CHART_RELATIONS = ['comparison', 'trend', 'composition', 'distribution', 'correlation', 'target', 'decomposition', 'conversion', 'overlap'] as const
 export type ChartRelation = (typeof CHART_RELATIONS)[number]
 
+/**
+ * TASK-1974 — la pregunta del lector que responde una figura (criterio canónico de selección, §5). La familia sale de
+ * la pregunta, no de la forma del dato: `value_change` («¿cuánto es y cómo cambió?») es la tarjeta de cifra;
+ * `evolution` la línea; `target` el bullet; `explain_change` la cascada; `composition` dona, waffle o barras según las
+ * partes; `subset` las barras apiladas; `compare` las barras. El orden de la lista es el orden del capítulo (§5.2):
+ * cifras → metas → evolución → explicación → composición → comparación.
+ */
+export const FIGURE_QUESTIONS = ['value_change', 'target', 'evolution', 'explain_change', 'composition', 'subset', 'compare'] as const
+export type FigureQuestion = (typeof FIGURE_QUESTIONS)[number]
+
+export const isFigureQuestion = (value: unknown): value is FigureQuestion => typeof value === 'string' && (FIGURE_QUESTIONS as readonly string[]).includes(value)
+
 export interface ChartSeriesV1 {
   seriesId: string
   label: string
@@ -190,6 +202,11 @@ export interface ChartSpecV1 {
   tabularEquivalent: ChartTabularEquivalentV1
   /** TASK-1888 — obligatorio en familias de datos propios, con `data.kind === family`; ausente en las de series. */
   data?: ChartFamilyDataV1
+  /**
+   * TASK-1974 — la pregunta que responde la figura. Aditivo: un plan sellado antes del criterio no la trae y sigue
+   * validando igual; su presencia es la señal de que el plan se armó con el criterio (deduplicación incluida).
+   */
+  question?: FigureQuestion
 }
 
 const FAMILY_RELATIONS: Readonly<Record<ChartFamily, readonly ChartRelation[]>> = {
