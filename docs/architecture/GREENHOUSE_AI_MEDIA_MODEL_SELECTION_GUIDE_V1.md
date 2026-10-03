@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
+> **Antes (v1.13):** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
 > **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
 > **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
 > **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
@@ -284,8 +285,8 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | `finish.grade` | ffmpeg `lut3d` (determinístico) · Magnific `video_color_grade` / `video_color_transfer` | D sin CLI · [mcp] | no | 0 · créditos | TASK-1981 |
 | `finish.reframe` | ffmpeg `crop` con medición manual de franjas (4:5 desde 3:4) · Aleph 2 `targetAspectRatio` vía Magnific | D manual · [mcp] | no | 0 | TASK-1981 |
 | `finish.upscale` | Flux 3 · `flux3-enhance` (sólo su propio draft) · H3 base 2K/4K (reescalado interno) · Magnific `video_upscale` (Topaz, Magnific) | [verificado 2026-09-16] · [mcp] | no | enhance [sin dato] · créditos | detalle nativo sin detector; TASK-1983 |
-| `audio.voice`, `audio.sfx` | ElevenLabs (MCP de sesión); motor de sonido de Glitch (taller) | [mcp] · D | no | [sin dato] | TASK-1985 |
-| `audio.music` | Stable Audio 2.5 / ElevenLabs Music v2.5 vía fal, fuera de `ai:fal` (§5.9) | [verificado 2026-09-27] (Glitch) | no | §5.9 | |
+| `audio.voice`, `audio.sfx` | ElevenLabs (MCP de sesión): locución con `eleven_v4` vía el conector **ElevenLabs Creative** (`creative_generate_speech`, etiquetas `[excited]` `[curious]` `[warmly]` `[dramatically]` `[fast]`; usado 2026-10-03 en el spot «Sparks × Efeonce AEO»); motor de sonido de Glitch (taller) | [mcp] · D | no | `estimate_only` 71 créditos por toma corta (~USD 0,016); el run reportó 0 créditos [mcp 2026-10-03] | TASK-1985 |
+| `audio.music` | Stable Audio 2.5 / ElevenLabs Music v2.5 vía fal, fuera de `ai:fal` (§5.9) | [verificado 2026-09-27] (Glitch) · [verificado 2026-10-03] cambio de estilo audio-to-audio (spot Sparks) | no | §5.9 | |
 | `audio.lipsync` | Seedance 2.x / Flux 3 (diálogo declarado [oficial]); Wan 3.0 (débil [tercero]); Higgsfield LipSync [mcp] | [sin dato] en español | no | según familia | TASK-1985 |
 | `audio.mix` | ffmpeg `loudnorm` | D sin CLI de manifiesto | no | 0 | TASK-1981 |
 | `deliver.export` | ffmpeg + hash | D manual | no | 0 | TASK-1981 |
@@ -678,8 +679,17 @@ pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 100 --
 ```
 
 **Trampas.** `h3max-r2v` sin `--aspect` —o con `--aspect adaptive`— entrega horizontal aunque todo lo que le pases sea vertical [verificado 2026-09-22]; resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; clips cortos descartados en silencio [oficial]. Sin `--resolution`, el CLI ya no hereda el 2K del proveedor en H3 base: envía el escalón más barato y lo avisa; para entrega pasa `--resolution` explícito [contrato].
-**Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
-**Fuentes.** V7–V14, V47–V53 (§12).
+**Uso real: spot animado 2D «Sparks × Efeonce AEO» [verificado 2026-10-03].** Personajes 2D cel-shaded (elenco 2D) y Sparks compuestos desde SVG, image-to-video con cuadro inicial y final, `h3-i2v` a 768P (1344×768, USD 0,06/s publicado); total de video medido en fal USD 4,38 para todas las tomas, pilotos incluidos. Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §3, `PREPRODUCCION.md` §11–12).
+- **H3 base con `--prompt-expansion disabled` fue más fiel que H3 Max:** Max **giró los Sparks en 3D** y rompió el 2D. Para personajes o marca 2D compuestos, base con prompt literal.
+- **Cuadro inicial y final con el mismo eje de cámara:** si no lo comparten, la toma salta de trayectoria.
+- **Prohibir texto en pantalla en el prompt:** sin esa prohibición escribió texto ilegible; dos tomas se rehicieron. Refuerza la regla de §0: el texto se compone fuera.
+- **Fijar la paleta en el prompt:** una toma derivó al verde y se rehízo.
+- **Resoluciones por sondeo de flags:** `h3-i2v` acepta 480P/768P/2K/4K (**no hay 1080P**); `h3max-i2v` **no tiene 2K**. Para entregar a 1080 desde 768P se reescaló en post: `scale=1920:1097:flags=lanczos,crop=1920:1080,unsharp=5:5:0.35`.
+- **Tope de 15 s por request** en fal y en Higgsfield (verificado en documentación y en vivo): las escenas cortas son el límite real, no una preferencia.
+- **`--estimate` colgó subiendo un PNG de 3,5 MB:** usar JPG como entrada y calcular con el precio publicado.
+
+**Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); `h3-i2v` y `h3max-i2v` usadas en producción 2026-10-03 (arriba); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
+**Fuentes.** V7–V14, V47–V53 (§12); corrida del spot «Sparks × Efeonce AEO» (2026-10-03).
 
 ---
 
@@ -870,6 +880,8 @@ pnpm ai:higgsfield:sync-schemas
 | **ElevenLabs Music v2.5** desde texto (`--route el-bed`, `composition_plan` de un tramo, **sin referencia de audio**) | Dio la cama aprobada con instrumentos reales y tempo exacto (150,00 BPM medido), 38 % de medios [verificado 2026-09-27]. Con un plan con referencia de audio (rondas del rock de Efeonce) **no respetó cortes ni el golpe final** [verificado 2026-09-26] | Camas y tracks libres desde texto; los cortes y golpes se aplican después, editando el audio |
 | **Stable Audio 2.5 text-to-audio** (`--route sa-bed`) | Camas con cuerpo (36–37 % de medios), no elegidas [verificado 2026-09-27] | Alternativa para camas desde texto |
 
+**Cambiar de estilo una pieza aprobada (audio-to-audio) [verificado 2026-10-03].** En el spot «Sparks × Efeonce AEO» se pasó la pieza larga de energía del kit sonoro (rock, 120 BPM) a una cama punk: se reordenó la fuente (56 s), se **aceleró** con `atempo=1.3333` a 160 BPM y 42 s exactos (duración entera), y se regrabó con Stable Audio 2.5 audio-to-audio (`ai-generations/2026-10-03_sparks-aeo-60s/audio/musica/regrabar-punk.ts`, USD 0,20 medido por pieza; strength 0,65 y 0,8, elegida **0,8**). **Conservó el tempo acelerado** (autocorrelación fuerte a 80 = medio compás de 160): para cambiar tempo, se acelera la referencia, no se le pide al modelo. **Salió cargada de graves** (medios 21 % contra ~35 % de la regla de abajo) y se corrigió con EQ (−4 dB bajo 180 Hz, +2 dB a 2,5 kHz). Usarla bajo locución fue una excepción del operador a la norma sonora (`docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`, «Excepciones registradas»).
+
 **Cuándo SÍ.** Música de marca con instrumentos reales: regrabar una maqueta (tempo exacto) o una cama desde texto con los instrumentos descritos y negativos explícitos (`chiptune`, `video game`, `8-bit`, `synthwave`, `arcade`, `lead synth`…) [verificado 2026-09-27].
 
 **Cuándo NO.** 🔴 **Nunca síntesis pura para música de marca:** tres rondas de síntesis de Glitch se rechazaron por sonar «arcade» (a videojuego); lo medido fue falta de cuerpo en los medios (cama rechazada 13 % de su energía entre 300 Hz y 3 kHz contra 45 % de la intro aprobada) [verificado 2026-09-27]. Una **maqueta sintetizada delgada contagia la regrabación** [verificado 2026-09-27]. No pedirle al modelo cortes al cuadro, tartamudeos ni silencio en seco: difumina la falla; se aplican después sobre la grabación [decisión]. No regenerar una pieza aprobada: otra corrida es otra toma; la fuente de verdad es el archivo aprobado (URL + sha256) [decisión].
@@ -878,7 +890,7 @@ pnpm ai:higgsfield:sync-schemas
 
 **Trampas.** Stable Audio 2.5 redondea la duración a segundos enteros: arma maquetas de duración entera [verificado]. La licencia comercial de cada modelo **vía fal** sigue por confirmar con legal (`audio-studio` → `SOURCES.md`) [sin dato].
 
-**Fuentes.** Corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
+**Fuentes.** Corrida del spot Sparks en `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §5); corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
 
 ---
 

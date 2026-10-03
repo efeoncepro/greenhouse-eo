@@ -80,6 +80,11 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   sistema elige solo la prenda puesta según quién la viste, cómo está parada y si una mano tapa el logo; las 25
   expresiones de Nexa; dónde viven las imágenes (canon que se baja solo y archivo recuperable) y qué se hace al sumar
   algo nuevo. Vigente desde el 2026-10-03.
+- [Spot animado 2D de Efeonce](creative/spot-animado-2d.md) — qué es un spot animado 2D de marca propia (dibujo
+  animado con sombras planas + video desde cuadros clave + gráficos vectoriales + composición), qué se compone y qué
+  genera la IA, quién aparece (elenco 2D como cliente; nunca el elenco fotográfico), etapas y quién aprueba qué,
+  límites y pendientes. Caso fuente «Sparks × Efeonce AEO», aprobado el 2026-10-03;
+  [manual](../manual-de-uso/creative/producir-spot-animado.md).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

@@ -1,6 +1,6 @@
 # Producción y posproducción de video: aprendizajes y modos de falla
 
-**Corte de evidencia: 2026-09-24.** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
+**Corte de evidencia: 2026-09-24; delta 2026-10-03 (§11, spot animado 2D «Sparks × Efeonce AEO»).** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
 
 **Estado del caso:** V17 exportado y revisado visual/técnicamente; aprobación final del operador y escucha perceptual del agente no acreditadas. Punch-v3 sí tiene aprobación registrada. El pedido de documentar el proceso no convierte todo el video en aprobado. No se hicieron nuevas llamadas pagadas para esta sistematización.
 
@@ -312,3 +312,88 @@ Rutas relativas a la raíz del repositorio, salvo OneDrive. Son evidencia histó
 - [Sonido sin voz](../../audio-studio/efeonce/NO_VOICE_MUSIC_SFX.md) y [continuidad musical](../../audio-studio/efeonce/APPROVED_MUSIC_CONTINUITY.md): contratos de fuente limpia, mezcla, aprobación y escucha.
 
 Antes de una producción nueva se deben reverificar capacidades, rutas y tarifas actuales. Este companion conserva el aprendizaje de decisiones y pruebas; no declara inmutables los modelos, precios, controles ni herramientas disponibles.
+
+## 11. Delta 2026-10-03 — spot animado 2D «Sparks × Efeonce AEO»
+
+**Estado del caso:** v2 exportada y **aprobada por el operador** (49,6 s; «Quedó genial… Muy bueno»); su escucha fue
+la aprobación sonora. Licencia comercial de la música generada [pendiente]; publicación no realizada. Hechos:
+`ai-generations/2026-10-03_sparks-aeo-60s/INVENTARIO-DE-HECHOS.md`; receta en
+[el workflow del spot animado 2D](../workflows/animated-2d-spot-composed-brand-assets.md); historia en la
+[retrospectiva](../../../../docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md).
+
+### Aciertos
+
+| Acierto observado | Por qué ayudó | Cómo mejorarlo | Prueba |
+| --- | --- | --- | --- |
+| Preproducción en papel y storyboard en canvas aprobado por escena antes de cualquier toma | El operador corrigió elenco, mirada y copy sobre láminas, no sobre video pagado | Convertirlo en orden transversal ([preproducción §12](video-preproduction-and-production.md#12-preproducción-transversal-orden-y-gates)) | Ninguna toma generada sin su lámina aprobada |
+| Mascotas compuestas desde SVG oficial con la mirada del rig emulada | Identidad exacta sin pedírsela al modelo | Variantes de mirada versionadas por personaje y dirección | Comparar contra el SVG; sin espejo ni formas nuevas |
+| Acabado de luz mezclado por zonas con salida de error | Lo exacto queda demostrablemente intacto | Usar el mismo gate en cualquier retoque generativo sobre una composición | 0 px cambiados fuera de zonas+margen [medido] |
+| Piloto comparativo de dos variantes del mismo motor | Eligió por fidelidad observada, no por nombre comercial | Una hipótesis por piloto, mismos cuadros | Cuadros extraídos lado a lado a tamaño real |
+| Corte mudo con placas provisorias | Permitió juzgar ritmo antes de producir audio | Mantenerlo como paso fijo | Corte reproducible antes de la VO |
+| Un solo mapa de tiempos para la v2 | Re-timó video, voz, SFX y subtítulos sin deriva | Escribirlo desde el primer corte | Cues y eventos coinciden tras el re-timing |
+| Placa de cierre animada al compás y logo final sin voz | El cierre respira y cada logo entra con su palabra | Diseñar la placa previa como portadora del llamado a la acción | Aprobación del operador |
+| Cama derivada del kit oficial (audio-to-audio) | Conservó identidad y tempo pedido | Medir bandas antes de mostrar | Tempo conservado (autocorrelación) y balance corregido |
+| Declarar lo no verificado | Sin ASR ni escucha propia, la escucha del operador fue el control explícito | Mantener la frase en cada entrega | El reporte separa medición de escucha |
+
+### F21 — Elenco en el papel equivocado
+
+- **Síntoma:** el borrador ponía a una persona del elenco fotográfico (que representa al equipo Efeonce) como cliente.
+- **Capa responsable:** preproducción/casting. Detectado antes de generar.
+- **Prevención:** regla de quién puede aparecer en el paso 4 del orden transversal; elenco 2D ficticio para clientes.
+- **Detenerse si:** la ficción exige que alguien del equipo actúe de cliente: volver al operador.
+
+### F22 — Premisa de la oferta equivocada en la VO
+
+- **Síntoma:** el guion v1 decía que los Sparks «existen para arreglar el AEO»; el operador lo corrigió.
+- **Causa confirmada:** la VO se escribió sin cargar la skill dueña de la práctica ni el canon del personaje.
+- **Prevención:** cargar `seo-aeo-practice` (o la skill dueña que corresponda) y el canon antes de escribir; nunca
+  prometer resultados que la práctica prohíbe.
+- **Recuperación:** reescritura completa de la VO y nueva locución (v2).
+
+### F23 — Ritmo estirado para cumplir la duración del brief
+
+- **Síntoma:** «va muy lento… querías cumplir el minuto».
+- **Causa confirmada:** las tomas se alargaron para llegar a 60 s.
+- **Prevención:** la historia decide la duración; avisar al operador cuando difiere del brief.
+- **Recuperación:** re-timing 1,0–1,5× desde un solo mapa; v2 aprobada a 49,6 s.
+
+### F24 — El modelo de video reinterpreta lo que debía quedarse quieto
+
+- **Síntoma:** texto ilegible en pantalla (S1, S8), escena virada al verde (S6), mascotas giradas en 3D (variante Max
+  del piloto), salto de trayectoria cuando los cuadros no comparten eje.
+- **Causa confirmada:** el prompt no prohibía texto ni fijaba paleta; la variante elegida en piloto era menos fiel.
+- **Prevención:** prohibir texto, fijar paleta, mismo eje inicio/fin, variante elegida por piloto.
+- **Recuperación:** rehacer sólo la toma afectada; conservar el descarte como evidencia.
+
+### F25 — Movimiento de vectores con saltos
+
+- **Síntoma:** el zoom de las pantallas de chat avanzaba a tirones.
+- **Causa confirmada:** `zoompan` redondea el encuadre a píxeles enteros.
+- **Prevención y recuperación:** dibujar cada cuadro desde el vector con escala decimal.
+
+### F26 — Sonido absoluto que choca con la voz tras re-timar
+
+- **Síntoma:** el logo sonoro intermedio cayó sobre una línea de VO en la v2.
+- **Causa confirmada:** el evento conservó su tiempo absoluto mientras el resto se remapeaba.
+- **Prevención:** todo evento de audio pasa por el mismo mapa; revisar choques con la voz tras re-timar.
+- **Recuperación:** se retiró (el reveal ya cerraba con el logo sonoro).
+
+### F27 — Placeholders y desbordes que llegan a la entrega
+
+- **Síntoma:** «[Marca ficticia A/B/C]» visibles en la v1 entregada; la pregunta se salía de su burbuja desde la v1.
+- **Capa responsable:** QA visual. La revisión no miró esos cuadros al 100 %.
+- **Prevención:** cuadros al 100 % en cada pantalla con texto; búsqueda de placeholders antes de exportar.
+- **Recuperación:** marcas inventadas verificadas sin homónimo (búsqueda web 2026-10-03) y burbuja ensanchada.
+
+### F28 — Herramientas que alargan o desajustan sin avisar
+
+- **Síntoma:** el ensamble salió de 49,2 s en vez de 46,5 s; la cama regrabada salió cargada de graves (medios 21 %
+  contra ~35 %); el master v2 quedó a −16 LUFS cuando la norma para video y redes pide −14 LUFS.
+- **Causa confirmada:** `overlay` sin `shortest=1` ni `-t`; el modelo de música no conserva el balance; el nivel se
+  fijó sin declarar el destino.
+- **Prevención:** `shortest=1` + `-t`; medir bandas de toda música generada; masterizar por destino (redes se
+  re-masterizan a −14 LUFS desde el premaster).
+- **Detenerse si:** se entregaría un archivo cuya duración o nivel no se midió sobre el export final.
+
+Excepciones del caso (no reglas): registro de energía bajo locución, contra el canon sonoro, por decisión del
+operador; licencia de la música generada sin confirmar con legal.

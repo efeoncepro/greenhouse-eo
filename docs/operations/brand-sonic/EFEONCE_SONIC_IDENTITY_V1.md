@@ -1,9 +1,9 @@
 # Identidad sonora de Efeonce V1
 
 > **Tipo de documento:** Norma de marca (sonido) · canon operativo
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-26 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (v1.4: la música de Glitch ya está publicada en AXIS, `/references/glitch/#musica`, y enlazada desde «La familia: Glitch»; sólo de Glitch. v1.3: puntero a la música propia de Glitch, §13.12 de su norma; sólo de Glitch. v1.2: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
+> **Última actualización:** 2026-10-03 por Claude (v1.5: [excepciones registradas](#excepciones-registradas-por-decisión-del-operador) del spot «Sparks × Efeonce AEO» —energía bajo locución y cama punk regrabada desde la pieza de energía—; las reglas no cambian. v1.4: la música de Glitch ya está publicada en AXIS, `/references/glitch/#musica`, y enlazada desde «La familia: Glitch»; sólo de Glitch. v1.3: puntero a la música propia de Glitch, §13.12 de su norma; sólo de Glitch. v1.2: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
 > **Estado:** **Recomendada, no canon.** El operador aceptó la recomendación el 2026-09-26 («vamos con tu
 > recomendación»); la canonización queda pendiente (ver [Pendientes para canonizar](#pendientes-para-canonizar)).
 > **Glitch (podcast):** no forma parte de esta norma. Glitch tiene su diseño sonoro propio, **aprobado (versión B,
@@ -246,8 +246,50 @@ contrato algo que todavía es recomendación.
 - **`runFalModel` espera 120 s por defecto.** Para música, pasar un `pollTimeoutMs` mayor; un trabajo vencido se
   recupera sin volver a pagar con `awaitFalRequest` (`recuperar.ts`).
 - **El conector MCP de ElevenLabs tiene mal la credencial:** se cargó el ID de la clave, no la clave `sk_…` (error
-  `api_key_id_used_as_api_key`). Mientras tanto, ElevenLabs va por fal.
+  `api_key_id_used_as_api_key`). Mientras tanto, ElevenLabs va por fal. El 2026-10-03 seguía igual (no se tocó); la locución
+  del spot «Sparks × Efeonce AEO» salió por el conector **ElevenLabs Creative (MCP)**, que sí funciona (detalle en la
+  skill `audio-studio`, `efeonce/STUDIO_TOOLING.md`).
 - **Normalizar por pico da niveles dispares:** por pico, la cortina quedó a −8,8 LUFS y la intro a −17,9 LUFS.
+
+## Excepciones registradas por decisión del operador
+
+Una excepción **no cambia las reglas**: queda fechada, con su evidencia, para que la próxima pieza no la tome como
+precedente sin volver a decidirla.
+
+### 2026-10-03 · Spot «Sparks × Efeonce AEO» (v2, 49,6 s, aprobada por el operador)
+
+Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §5; `PREPRODUCCION.md` §12).
+
+| Excepción | Qué dice la norma | Qué se hizo | Estado |
+|---|---|---|---|
+| Energía bajo locución | «Nunca: poner la pieza de energía debajo de una locución» | cama punk derivada del registro de **energía** bajo la voz de todo el spot, por pedido del operador («ponle un ritmo más punk, pásale el sonic brand como referencia») | **[decisión del operador]** sólo para esta pieza |
+| Licencia de Stable Audio | la re-grabación depende de la pregunta abierta a legal (ver [Trampas](#trampas-de-proveedores-medidas)) | se usó Stable Audio 2.5 audio-to-audio para la cama | **[pendiente]** confirmar con legal antes de pautar |
+
+**Método de la cama punk [medido]:**
+
+1. **Fuente:** la pieza larga de **energía** oficial del kit (`masters/04-piezas-largas`, 120 BPM; SHA-256 verificado
+   contra el [JSON de AXIS](https://axis.efeonce.org/references/sonic-brand.json), empieza por `1b23b0a1…`).
+2. **Reorden:** intro · verso · verso 2 · coro · verso · verso 2 · coro · puente (56 s).
+3. **Acelerar:** `atempo=1.3333` → **160 BPM** y **42 s exactos** (duración entera, porque Stable Audio redondea a segundos).
+4. **Regrabar:** Stable Audio 2.5 audio-to-audio (`audio/musica/regrabar-punk.ts`, USD 0,20 por pieza); se probaron
+   intensidades 0,65 y 0,8 y se eligió **0,8**. Conservó el tempo (autocorrelación fuerte a 80 BPM = medio compás de 160).
+5. **Corregir graves:** salió con **medios 21 %** contra ~35 % de la norma → EQ −4 dB bajo 180 Hz y +2 dB a 2,5 kHz.
+6. **Ajustar al montaje:** +2 compases (repite 33–36 s del coro) para llegar al reveal; la cama **corta en seco** al
+   entrar el logo, y el reveal con eslogan va **sin voz**.
+7. **Mezcla:** voz +7 dB con compresión suave; la cama con **ducking por sidechain 8:1** (umbral 0,02) bajo la voz; el
+   reveal con sidechain 5:1. Con voz, la mezcla queda a 0,2–1,2 dB de la voz sola. Master en dos pasadas a
+   **−16 LUFS / −1 dBTP**.
+
+**Aprendizajes [criterio]:**
+
+- Cuando el operador pide otro estilo «con el sonic brand de referencia», derivarlo **de la pieza oficial del kit**
+  (reordenada y acelerada) deja la estructura y el tempo en manos de la fuente (el tempo se midió conservado); el modelo
+  cambia el estilo. Es el mismo principio del
+  [Método de producción](#método-de-producción): la estructura la fija la fuente, no el modelo.
+- Energía bajo voz sólo se sostiene con **ducking fuerte** (8:1) y verificando el balance por tramo; aun así, la
+  norma no cambia.
+- **[pendiente]** El master quedó a −16 LUFS; la norma pide −14 LUFS para video y redes. La decisión del operador no
+  cubrió ese punto: revisar el nivel antes de subir la pieza a redes.
 
 ## Qué no hacer
 

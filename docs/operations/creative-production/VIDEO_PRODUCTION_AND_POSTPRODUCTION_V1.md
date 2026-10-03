@@ -1,9 +1,27 @@
 # Producción y posproducción de video: método de principio a fin
 
+## Delta 2026-10-03 — preproducción transversal y spot animado 2D
+
+- **Fuente:** spot animado 2D «Sparks × Efeonce AEO», v2 aprobada por el operador el 2026-10-03 (49,6 s, 16:9,
+  1920×1080, 24 fps). Hechos en `ai-generations/2026-10-03_sparks-aeo-60s/INVENTARIO-DE-HECHOS.md` y `PREPRODUCCION.md`
+  §11–12; historia del caso en la
+  [retrospectiva](../social/2026-10-03-sparks-aeo-spot-animado-production-method.md).
+- **Qué cambia:** el operador pidió documentar la preproducción como común a todo video («la metodología de
+  preproducción siento que va a ser similar en todos los videos que hagamos»). Se fija el orden transversal (sección
+  [Preproducción transversal](#preproducción-transversal-común-a-todo-video)), se agregan reglas de producción y
+  posproducción aprendidas en animación 2D y una receta ejecutable propia.
+- **Dueños:** [companion de preproducción §12](../../../.claude/skills/motion-design-studio/companions/video-preproduction-and-production.md),
+  [companion de posproducción §15](../../../.claude/skills/motion-design-studio/companions/video-postproduction-and-delivery.md),
+  [companion de lecciones §11](../../../.claude/skills/motion-design-studio/companions/video-lessons-and-failure-modes.md)
+  y [workflow del spot animado 2D](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md).
+  Espejo `.codex` pendiente de sincronizar.
+- **Dato posterior:** la norma sonora pide −14 LUFS para video y redes; el master v2 quedó a −16 LUFS y las
+  entregas para redes se re-masterizan a −14 LUFS.
+
 ## Decisión operativa
 
 - **Status:** Accepted — método documental solicitado por el operador el 2026-09-24; no implementación de plataforma.
-- **Date / Validated as of:** 2026-09-24.
+- **Date / Validated as of:** 2026-09-24; delta 2026-10-03 (preproducción transversal, spot animado 2D).
 - **Owner:** Creative Studio / Motion Design Studio; Audio Studio posee el oficio sonoro.
 - **Scope:** ejecución por agentes de video generado, filmado, animado o híbrido; preproducción, producción, posproducción y entrega.
 - **Reversibility:** alta; companions versionados, fuentes y entregas preservadas.
@@ -53,6 +71,7 @@ Capas documentales: [descripción funcional](../../documentation/creative-produc
 | Cerrar una versión | [Plantilla de revisión de posproducción](../../../.codex/skills/motion-design-studio/templates/video-postproduction-review.md) |
 | Consultar herramientas/endpoints | [STUDIO_TOOLING](../../../.codex/skills/motion-design-studio/efeonce/STUDIO_TOOLING.md), con verificación vigente antes de usarlos |
 | Película generativa con cartelas locales | [Receta específica](../../../.codex/skills/motion-design-studio/workflows/generative-film-with-approved-title-overlays.md) |
+| Spot animado 2D con mascotas/logos compuestos | [Receta específica](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) |
 
 ## Unidad de trabajo y estados
 
@@ -91,6 +110,45 @@ El diseño sonoro comienza en el guion, pero su generación/mezcla final sigue e
 la imagen, invalida los cues afectados y revisa la sincronía; no reutilices ciegamente el reporte anterior.
 Un rodaje con playback o una pieza coreografiada a música aprobada debe declarar esa dependencia desde el
 brief: cambia el orden de decisiones, no elimina la revisión conjunta final.
+
+## Preproducción transversal (común a todo video)
+
+Vale para video generado, filmado, animado o híbrido. Se ejecuta en este orden; ningún paso que gaste en el modelo
+empieza antes de que su escena esté aprobada en el storyboard. El detalle y la evidencia por paso viven en el
+companion de preproducción §12.
+
+1. **Brief** — formato, duración objetivo, motor previsto, qué debe sentir y hacer el espectador, orden de trabajo.
+2. **Historia y diseño en papel** — historia en actos, guion VO por toma, música por sección, voz de personajes,
+   SFX, VFX por toma (generación o post), plan de tomas y empalmes, mezcla y entrega, presupuesto, pendientes. Si la
+   pieza vende una capacidad, el copy se escribe **después** de cargar la skill dueña de la práctica y el canon de
+   los personajes (en el caso: `seo-aeo`, `seo-aeo-practice`, Sparks V1; la VO v1 se reescribió por premisa errónea).
+3. **Storyboard en canvas, aprobado por escena** — lámina general, una por toma, línea de tiempo; el operador
+   comenta y aprueba cada lámina.
+4. **Elenco y regla de quién puede aparecer** — el elenco fotográfico representa al equipo Efeonce y no hace de
+   cliente; para un cliente en la ficción se usa el elenco 2D ficticio. Personajes nuevos, aprobados antes de seguir.
+5. **Contrato de fidelidad** — qué genera el modelo, qué es referencia y qué se compone. Lo de marca (logos,
+   mascotas, texto, interfaz) se compone; el modelo pone mundo, luz y movimiento.
+6. **Cuadros clave o referencias** — con gate de integridad de lo compuesto.
+7. **Piloto** — la toma de mayor riesgo, autorización de gasto aparte.
+8. **Producción** → 9. **Corte mudo** (ritmo con placas provisorias) → 10. **Post de imagen** → 11. **Audio** sobre el
+   corte real → 12. **Entrega**.
+
+Dos reglas se deciden aquí y no en post: **el ritmo lo pone la historia, no la duración del brief** (la v1 de 60 s
+se sintió lenta; la v2 aprobada dura 49,6 s), y **la duración por toma la fija el tope verificado del motor** (15 s
+por solicitud en fal y Higgsfield, verificado 2026-10-03).
+
+## Producción y posproducción: reglas agregadas el 2026-10-03
+
+| Etapa | Regla | Evidencia del caso |
+| --- | --- | --- |
+| Cuadros clave | Mascotas y logos se componen desde el vector oficial, sin espejar; la mirada se emula con la lógica del rig; un acabado generativo sólo de luz se mezcla por zonas y el script falla si cambia un píxel fuera | 0 px cambiados fuera de zonas [medido] |
+| Tomas | Cuadro inicial y final con el mismo eje de cámara; prompt que prohíbe texto y fija la paleta; variante del motor elegida por piloto | H3 base más fiel que Max; S1/S8 rehechas por texto, S6 por color |
+| Interfaz y placas | Todo elemento exacto que escala se dibuja cuadro a cuadro con escala decimal; `zoompan` salta | S2/S9 rehechas en v2 |
+| Montaje | Un solo mapa de tiempos re-tima video, voz, SFX y subtítulos; tras re-timar, revisar sonidos absolutos contra la voz | Logo sonoro intermedio retirado |
+| Cierre | El llamado a la acción va sobre una placa animada previa; el reveal del logo con eslogan queda sin voz | Decisión del operador |
+| Subtítulos | Cues desde la voz real; sin libass, cada cue como PNG transparente superpuesto; SRT y SDH aparte | `corte/subtitulos-v2.cjs` |
+| Audio | Música derivada del kit oficial con balance por bandas medido antes de mostrarla; mezcla con sidechain; nivel por destino (−14 LUFS video/redes) | Medios 21 % contra ~35 % → EQ; master v2 a −16, redes re-masterizadas a −14 |
+| Revisión | Cuadros al 100 % en cada pantalla con texto; cero placeholders; declarar lo no verificado (sin ASR ni escucha propia) | Placeholders y texto fuera de burbuja llegaron a la v1 |
 
 ## Gates proporcionales y recuperación
 

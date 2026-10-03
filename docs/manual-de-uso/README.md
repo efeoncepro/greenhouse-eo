@@ -66,6 +66,10 @@ La diferencia con otras capas de documentacion:
   pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
   sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa
   este kit: tiene su sonido y su música propios, sólo de Glitch.
+- [Producir un spot animado 2D](creative/producir-spot-animado.md) — de la preproducción a la entrega: storyboard en
+  canvas, elenco, cuadros clave con los Sparks compuestos, piloto y tomas con MiniMax H3, corte, audio, subtítulos,
+  entrega y variantes por red; autorizaciones de gasto, qué no hacer y problemas comunes. Caso fuente «Sparks × Efeonce
+  AEO», aprobado el 2026-10-03.
 - [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
   motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las recetas aprobadas con
   plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;

@@ -28,6 +28,14 @@
   Flash v2.5 (**real-time** ~75ms, 32 idiomas) · cloning **IVC** (sub-minuto) / **PVC** (3-6h) · **dubbing**
   que preserva la voz cross-idioma · **voice design** (crear voz custom). Precios bajaron ~55% (may-2026).
 - **Música:** **ElevenLabs Music** = **licencia comercial desde día 1** → el default para jingles/cliente.
+- **Conector ElevenLabs Creative (MCP de sesión) con `eleven_v4` [verificado 2026-10-03, spot «Sparks × Efeonce
+  AEO»]:** más expresivo que v3 para narración. Flujo: `creative_list_voices` → voz por **ID** (la elegida fue «Andre –
+  Clear Studio Voiceover Narration», `K7vlllngMGapgRQRDsqK`, es-latam, de la biblioteca; **no es** la «Andre» preset de
+  Higgsfield) → `creative_generate_speech` con `eleven_v4` dentro de un flow (`creative_*`). Etiquetas de interpretación
+  usadas: `[excited]` `[curious]` `[warmly]` `[dramatically]` `[fast]`. `generations_count` viene en 4 por defecto:
+  pedir **2** tomas por línea. `estimate_only` dio 71 créditos por toma corta (~USD 0,016), pero el run **reportó 0
+  créditos**: anotar los dos números y no prometer el costo. Sin ASR local, el texto dicho no se verifica solo: la
+  escucha del operador es el control. Es out-of-band (sin presupuesto gobernado ni manifiesto).
 
 ## Higgsfield audio (MCP conectado)
 
@@ -58,12 +66,14 @@ que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_br
 | STT | `fal-ai/elevenlabs/speech-to-text` | devuelve `words` con `start`/`end`: sirve para caer la esfera sobre una palabra | `transcribir.ts` |
 | Música | `elevenlabs/music/v2.5` (sin prefijo `fal-ai`; USD 0,60/min) | acepta `composition_plan.chunks[].audio_reference` (`strength` low\|medium\|high\|xhigh, ventana ≤ 30 s, líneas ≤ 200 caracteres). Suena más producido pero **no respeta la estructura**: con high/xhigh se saltó el corte y el golpe final. **ElevenLabs Music v3 NO está en fal** | `ai-music.ts` |
 | Re-grabación | `fal-ai/stable-audio-25/audio-to-audio` (USD 0,20 por pieza) | **conserva el tiempo al milisegundo** (golpe 32,874 s vs 32,875 de la maqueta); **redondea la duración a segundos enteros** (8,5 → 8): maquetas de duración entera | `ai-music.ts` |
+| Cambio de estilo de una pieza del kit (2026-10-03, spot Sparks) | `fal-ai/stable-audio-25/audio-to-audio` (USD 0,20 por pieza) | rock de energía (120 BPM) → **punk**: reordenar la fuente oficial (56 s) y **acelerarla** con `atempo=1.3333` a 160 BPM y 42 s exactos; strength 0,65 y 0,8, elegida **0,8**. **Conserva el tempo acelerado** (autocorrelación fuerte a 80 = medio compás de 160): el tempo se cambia en la referencia, no en el prompt. **Salió con graves de más** (medios 21 % vs ~35 %) → EQ −4 dB bajo 180 Hz, +2 dB a 2,5 kHz. Licencia comercial vía fal sin confirmar | `ai-generations/2026-10-03_sparks-aeo-60s/audio/musica/regrabar-punk.ts` |
 | Cama desde texto (**sólo Glitch**, 2026-09-27) | `elevenlabs/music/v2.5` (`--route el-bed`) · `fal-ai/stable-audio-25/text-to-audio` (`--route sa-bed`) | sin maqueta, desde estilos + negativos (`--plan <cama>`, `--seconds`, `--seed`). La **cama post-punk aprobada** salió de `--route el-bed --plan cama-postpunk`, seed 7, 32 s (negativos: vocals, singing, chiptune, video game, 8-bit, synthwave, arcade, lead synth, EDM drop): `composition_plan` de un tramo **sin referencia de audio** dio instrumentos reales y tempo exacto (150,00 BPM medido) con 38 % de medios. `--route sa-bed` también dio camas con cuerpo (36–37 % de medios), no elegidas | `ai-music.ts` |
 
 - **Espera y recuperación:** `runFalModel` espera 120 s por defecto; para música usa `pollTimeoutMs` mayor. Un
   trabajo vencido se recupera **sin volver a pagar** con `awaitFalRequest` (`recuperar.ts`). Costo: `precio.ts`.
-- **Conector MCP de ElevenLabs:** credencial mal cargada (se cargó el ID de la clave, no la clave `sk_…`; error
-  `api_key_id_used_as_api_key`). Mientras no se corrija, ElevenLabs va por fal.
+- **Conector MCP de ElevenLabs (local):** credencial mal cargada (se cargó el ID de la clave, no la clave `sk_…`; error
+  `api_key_id_used_as_api_key`). Seguía igual el 2026-10-03 (no se tocó). Mientras no se corrija, ElevenLabs va por fal
+  o por el conector **ElevenLabs Creative** (arriba), que sí funciona.
 - **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
   maqueta determinística propia (`rock.mjs`, `composer.mjs`, `dsp.mjs`); Stable Audio 2.5 audio-to-audio la
   re-graba (intensidad 0,7) conservando el tiempo; la esfera propia (campana La + golpe grave) se monta encima

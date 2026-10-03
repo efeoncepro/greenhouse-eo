@@ -1,7 +1,7 @@
 # Elenco 2D de Efeonce V1 — Tomás, Camila, Renata y Mateo
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-03 por Claude
 > **Última actualización:** 2026-10-03 por Claude
 > **Estado:** personajes, estilo y sello aprobados por el operador (Julio Reyes) el 2026-10-03 («Me encantan, están
@@ -107,9 +107,30 @@ elenco representa al cliente) ni halos como brillo.
   referencia de formato → expresiones desde el giro → visto bueno del operador → hogar canónico → entrada en
   `ELENCO_2D` → `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto`.
 
+### 7.1 Primer uso en video: «Sparks × Efeonce AEO» (2026-10-03)
+
+El spot animado 2D (16:9, 1920×1080, 24 fps; v2 de 49,6 s aprobada por el operador el 2026-10-03) es la primera pieza
+con el elenco. Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md`, `PREPRODUCCION.md` §11–12).
+
+- **Reparto [medido]:** **Tomás** es el protagonista y hace de **cliente en la ficción**: marketer de Andina Cargo (marca
+  ficticia) que pregunta a la IA, da la señal a los cuatro Sparks y aprueba su reporte. Es la regla §6 en acción: él
+  supervisa y los Sparks no deciden solos.
+- **Por qué no el elenco fotográfico [decisión del operador]:** el borrador usaba a Karo; el elenco fotográfico
+  representa al equipo de Efeonce y **no puede hacer de cliente**. De ahí nació este elenco.
+- **Hojas como referencia [medido]:** los cuadros clave salieron de GPT Image 2.5 Sunburst (`pnpm ai:image`, 2048×1152,
+  `high`) con las hojas del elenco como referencia; esos cuadros fueron el inicio/final de las tomas image-to-video
+  (MiniMax H3 vía fal). Los Sparks no los dibujó el modelo: se compusieron después desde el SVG oficial
+  ([Sparks V1](./SPARKS_V1.md)).
+- **Trampa de recorte [medido]:** el quitafondos (rmbg) recortaba el **pantalón navy** de Tomás, que se confunde con el
+  contorno y el fondo navy. Para referencias y composiciones, usar **recortes de cintura arriba**.
+- **Lo que funcionó [medido]:** reparto separado del modelo: el motor de imagen pone al personaje desde su hoja, lo de
+  marca (Sparks, pantallas, logos) se compone encima y el modelo de video sólo pone luz y movimiento. La pieza se aprobó
+  con ese método. Las lecciones de H3 (base > Max, mismo eje, prohibir texto, fijar paleta) viven en la
+  [guía de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+
 ## 8. Pendiente
 
-- **[pendiente]** Publicar el elenco 2D en AXIS (`@efeoncepro/axis-brand-assets`) junto a los Sparks 2D, con decisión
-  del operador (repo aparte).
+- **[pendiente]** Publicar el elenco 2D en AXIS (`@efeoncepro/axis-brand-assets` + Lab) junto a los Sparks 2D: **en
+  curso** desde el 2026-10-03, tras el primer uso en video (repo aparte).
 - **[pendiente]** Prueba de reconocimiento y de silueta a 390 px.
 - **[pendiente]** Revisión de derechos de uso de imágenes generadas para pauta (`greenhouse-ai-creative-rights-governance`).
