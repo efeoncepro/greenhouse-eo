@@ -179,3 +179,46 @@ describe('TASK-1888 — campos v2 del plan bajo la misma regla de cifras', () =>
     expect(rulesOf(v2).sort()).toEqual(['actions:invalid_field', 'actions:invalid_field', 'chapter.ico.reading.chart.nope:invalid_field', 'cover:invalid_field', 'essentials:invalid_field'].sort())
   })
 })
+
+describe('TASK-1974 — tarjeta de cifra y «un dato, una figura»', () => {
+  const statPlan = (items: Array<Record<string, unknown>>, charts: EditorialPlanV1['chapters'][number]['charts'] = []): EditorialPlanV1 => {
+    const plan = v1Plan()
+
+    return {
+      ...plan,
+      chapters: plan.chapters.map(chapter => ({
+        ...chapter,
+        charts,
+        stats: [{ figureId: 'stats.ico', question: 'value_change' as const, title: 'Cifras del período', items: items as never }],
+        readings: [{ chartId: 'stats.ico', conclusion: claim('c', 'Entregas a tiempo: 81,9 %.', ['ico.otd.cur']), nextStep: null }]
+      }))
+    }
+  }
+
+  const item = (overrides: Record<string, unknown> = {}) => ({ itemId: 'otd', label: 'Entregas a tiempo', factId: 'ico.otd.cur', comparisonFactId: 'ico.otd.prev', direction: 'higher_is_better', estimated: false, ...overrides })
+
+  it('una tarjeta bien formada valida, y su lectura apunta a la tarjeta', () => {
+    expect(rulesOf(statPlan([item()]))).toEqual([])
+  })
+
+  it('rechaza un nombre de más de 3 palabras, un comparable ajeno y una marca de estimado que miente', () => {
+    const rules = rulesOf(statPlan([
+      item({ itemId: 'a', label: 'Keywords en primera página' }),
+      item({ itemId: 'b', factId: 'ico.rpa.cur', comparisonFactId: 'ico.otd.prev', label: 'Rondas por pieza' }),
+      item({ itemId: 'c', factId: 'ico.rpa.cur', comparisonFactId: 'ico.rpa.prev', label: 'RpA', estimated: true })
+    ]))
+
+    expect(rules).toEqual(['chapter.ico.stats.ico.a:invalid_field', 'chapter.ico.stats.ico.b:invalid_field', 'chapter.ico.stats.ico.c:invalid_field'])
+  })
+
+  it('el mismo hecho en la tarjeta y en otra figura es un duplicado (Sky: OTD en tarjeta y en bullet)', () => {
+    const plan = v1Plan()
+    const bars = { ...plan.chapters[0]!.charts[0]!, question: 'compare' as const }
+
+    expect(rulesOf(statPlan([item()], [bars]))).toContain('chapter.ico:duplicated_fact')
+  })
+
+  it('un plan sellado antes del criterio (sin tarjetas ni preguntas) no se re-juzga por duplicados', () => {
+    expect(rulesOf(v1Plan())).toEqual([])
+  })
+})

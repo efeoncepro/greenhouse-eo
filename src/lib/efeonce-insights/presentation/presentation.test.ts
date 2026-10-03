@@ -168,7 +168,7 @@ describe('TASK-1957 — empates con dueño', () => {
 
 describe('TASK-1957 — gate client-fit (derivado del payload)', () => {
   const base: InsightWebModelV1 = {
-    modelVersion: '1.3',
+    modelVersion: '1.4',
     locale: 'es-CL',
     executiveSummary: [],
     chapters: [],
@@ -262,7 +262,7 @@ describe('TASK-1957 — indicadores estándar de visibilidad en motores de respu
 
 describe('TASK-1957 — el gate compara la razón del límite entera', () => {
   it('«sin datos suficientes» (lector) no se confunde con «sin datos» (interno); la forma interna exacta sí se marca', () => {
-    const base: InsightWebModelV1 = { modelVersion: '1.3', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {} }
+    const base: InsightWebModelV1 = { modelVersion: '1.4', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {} }
     const rulesOf = (limits: string[]) => clientFitViolations({ model: { ...base, limits }, facts: [] }).map(violation => violation.rule)
 
     expect(rulesOf(['Share of Voice: sin datos suficientes en este período.'])).toEqual([])
@@ -311,7 +311,7 @@ describe('TASK-1962 — dominios citados en el gate client-fit', () => {
     const cited = { factId: 'aeo.cited_source.1.w', module: 'aeo', metricId: 'cited_source.1', label: 'chocale.cl' } as EvidenceFactV1
 
     const model: InsightWebModelV1 = {
-      modelVersion: '1.3', locale: 'es-CL', chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {},
+      modelVersion: '1.4', locale: 'es-CL', chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {},
       executiveSummary: [{ claimId: 'c1', text: 'El sitio más citado por los motores es «chocale.cl»: 11 de 246 citas.', factIds: [] }]
     }
 

@@ -272,6 +272,35 @@ export const GH_INSIGHTS = {
    * TASK-1888 — lectura determinista por figura (fallback sin modelo). Afirma sólo lo que el dato muestra: el valor
    * contra su meta o su período anterior. NUNCA una causa ni una explicación: eso no está en la evidencia.
    */
+  /**
+   * TASK-1974 — tarjeta de cifra (anatomía aprobada el 2026-10-03, criterio §5.1). Nombres de 3 palabras como máximo:
+   * una métrica sin nombre corto no va en tarjeta (el validador rechaza un nombre largo; nunca se trunca).
+   */
+  stat: {
+    figureTitle: 'Cifras del período',
+    estimated: 'Estimado',
+    lowerIsBetter: 'Menor es mejor',
+    labels: {
+      clicks: 'Clics',
+      impressions: 'Impresiones',
+      ctr: 'CTR',
+      position: 'Posición media',
+      page_one_keywords: 'Primera página',
+      organic_etv: 'Tráfico estimado',
+      'site.organic_sessions': 'Visitas orgánicas',
+      'site.organic_engaged_sessions': 'Visitas con interacción',
+      ai_sessions: 'Visitas desde IA',
+      share_of_model: 'Share of Model',
+      citation_share: 'Respuestas con cita',
+      'sov.brand': 'Share of Voice',
+      'delivered.completed': 'Piezas entregadas'
+    } as Readonly<Record<string, string>>,
+    /** «vs 16.390 en agosto de 2026»: el período de comparación siempre explícito, con su valor. */
+    versus: (value: string, period: string) => `vs ${value} en ${period}`,
+    /** Sin dato: «—» en el valor y esta línea en lugar de la variación. Nunca 0. */
+    noDataIn: (period: string) => `Sin dato en ${period}`
+  },
+
   reading: {
     // TASK-1962 — de qué asistente de IA llegan las visitas (GA4). Las cifras las pone el planner desde los hechos.
     aiTopSourceMost: 'trae la mayoría de las visitas desde asistentes de IA:',

@@ -6,15 +6,19 @@
  */
 
 import { validateChartSpec } from '../contracts/chart-spec'
-import type { EvidenceSnapshotContentV1 } from '../contracts/evidence'
-import { INSIGHT_COVER_THEMES, PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanClaimV1, type PlanCoverV1 } from '../contracts/plan'
+import { isReferenceFact, type EvidenceSnapshotContentV1 } from '../contracts/evidence'
+import { INSIGHT_COVER_THEMES, PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS, STAT_LABEL_MAX_CHARS, STAT_LABEL_MAX_WORDS, type EditorialPlanV1, type PlanActionV1, type PlanClaimV1, type PlanCoverV1 } from '../contracts/plan'
 import { validateChartSpecValues } from './chart-values'
+import { chartFactUse, duplicatedFigureFacts } from './figure-selection'
 import { allowedNumbersForFacts, extractNumberTokens, formatFactValue } from './format'
 
 export interface PlanViolation {
   where: string
-  /** `invalid_field`: un campo del contrato editorial v2 (TASK-1888) con forma inválida. */
-  rule: 'unknown_fact' | 'unreferenced_number' | 'chart' | 'empty_claim' | 'invalid_field'
+  /**
+   * `invalid_field`: un campo del contrato editorial v2 (TASK-1888) con forma inválida. `duplicated_fact` (TASK-1974): un
+   * hecho del período actual alimenta dos figuras del capítulo (sólo se juzga en planes armados con el criterio).
+   */
+  rule: 'unknown_fact' | 'unreferenced_number' | 'chart' | 'empty_claim' | 'invalid_field' | 'duplicated_fact'
   detail: string
 }
 
@@ -113,6 +117,7 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
   }
 
   const values = new Map(snapshot.facts.map(fact => [fact.factId, fact.value]))
+  const comparisonIds = new Set(snapshot.facts.map(fact => fact.comparisonFactId).filter((id): id is string => id !== null))
 
   plan.executiveSummary.forEach(claim => checkClaim('executiveSummary', claim))
 
@@ -130,16 +135,85 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
 
     for (const table of chapter.tables) fits(`${chapter.chapterId}.${table.tableId}`, table.title, PLAN_TEXT_LIMITS.tableTitle, 'title')
 
+    // TASK-1974 — tarjetas de cifra: cada cifra sale de un hecho medido, con su comparable y su marca de estimado tal
+    // como los trae el hecho; el nombre cabe sin truncar (3 palabras, 24 caracteres).
+    const figureIds = new Set(chapter.charts.map(chart => chart.chartId))
+
+    for (const stat of chapter.stats ?? []) {
+      const where = `${chapter.chapterId}.${stat.figureId}`
+
+      if (figureIds.has(stat.figureId)) invalid(where, `el id ${stat.figureId} ya es de otra figura del capítulo`)
+      figureIds.add(stat.figureId)
+
+      if (stat.question !== 'value_change') invalid(where, 'una tarjeta de cifra responde «value_change»')
+      if (stat.items.length === 0) invalid(where, 'una tarjeta sin cifras no se emite')
+      fits(where, stat.title, PLAN_TEXT_LIMITS.statTitle, 'title')
+
+      if (stat.note) {
+        checkClaim(where, stat.note)
+        fits(where, stat.note.text, PLAN_TEXT_LIMITS.statNote, 'note')
+      }
+
+      const itemIds = new Set<string>()
+
+      for (const item of stat.items) {
+        const at = `${where}.${item.itemId}`
+        const fact = byId.get(item.factId)
+        const words = item.label.trim().split(/\s+/).filter(Boolean).length
+
+        if (itemIds.has(item.itemId)) invalid(at, 'itemId repetido')
+        itemIds.add(item.itemId)
+
+        if (words === 0 || words > STAT_LABEL_MAX_WORDS || item.label.length > STAT_LABEL_MAX_CHARS) {
+          invalid(at, `el nombre «${item.label}» debe tener hasta ${STAT_LABEL_MAX_WORDS} palabras y ${STAT_LABEL_MAX_CHARS} caracteres`)
+        }
+
+        if (item.direction !== null && item.direction !== 'higher_is_better' && item.direction !== 'lower_is_better') invalid(at, `dirección inválida: ${String(item.direction)}`)
+
+        if (!fact) {
+          violations.push({ where: at, rule: 'unknown_fact', detail: `la cifra referencia ${item.factId}` })
+          continue
+        }
+
+        if (isReferenceFact(fact)) invalid(at, 'una meta o umbral no es una cifra del período')
+
+        if (item.comparisonFactId !== null && (item.comparisonFactId !== fact.comparisonFactId || !knownIds.has(item.comparisonFactId))) {
+          invalid(at, `el comparable ${item.comparisonFactId} no es el período anterior de ${fact.factId}`)
+        }
+
+        if (item.estimated !== (fact.observation === 'estimated')) invalid(at, `«estimado» debe decir lo mismo que el hecho (${fact.observation})`)
+      }
+    }
+
+    // TASK-1974 — un dato, una figura (criterio §4, regla 2). Sólo en planes armados con el criterio (traen tarjetas o
+    // la pregunta de cada figura): un plan sellado antes no se re-juzga.
+    if (chapter.stats || chapter.charts.some(chart => chart.question !== undefined)) {
+      const isCurrent = (id: string) => {
+        const fact = byId.get(id)
+
+        return Boolean(fact) && !isReferenceFact(fact!) && !comparisonIds.has(id)
+      }
+
+      const uses = [
+        ...(chapter.stats ?? []).map(stat => ({ figureId: stat.figureId, family: 'stat' as const, factIds: stat.items.map(item => item.factId) })),
+        ...chapter.charts.map(chart => chartFactUse(chart, isCurrent))
+      ]
+
+      for (const [factId, owners] of duplicatedFigureFacts(uses)) {
+        violations.push({ where: chapter.chapterId, rule: 'duplicated_fact', detail: `${factId} alimenta ${owners.join(' y ')}` })
+      }
+    }
+
     // TASK-1888 — entrada de capítulo y lectura por figura: mismas reglas de cifras que cualquier claim.
     if (chapter.opening) checkClaim(`${chapter.chapterId}.opening`, chapter.opening)
 
-    const chartIds = new Set(chapter.charts.map(chart => chart.chartId))
+    const chartIds = new Set([...chapter.charts.map(chart => chart.chartId), ...(chapter.stats ?? []).map(stat => stat.figureId)])
     const readChartIds = new Set<string>()
 
     for (const reading of chapter.readings ?? []) {
       const where = `${chapter.chapterId}.reading.${reading.chartId}`
 
-      if (!chartIds.has(reading.chartId)) invalid(where, `la lectura apunta a ${reading.chartId}, que no es un gráfico del capítulo`)
+      if (!chartIds.has(reading.chartId)) invalid(where, `la lectura apunta a ${reading.chartId}, que no es una figura del capítulo`)
       if (readChartIds.has(reading.chartId)) invalid(where, 'una sola lectura por gráfico')
       readChartIds.add(reading.chartId)
 

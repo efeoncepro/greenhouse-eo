@@ -62,6 +62,20 @@ export type FigureQuestion = (typeof FIGURE_QUESTIONS)[number]
 
 export const isFigureQuestion = (value: unknown): value is FigureQuestion => typeof value === 'string' && (FIGURE_QUESTIONS as readonly string[]).includes(value)
 
+/**
+ * Familias de gráfico que pueden responder cada pregunta (TASK-1974). `value_change` no tiene gráfico: es la tarjeta de
+ * cifra del plan. Un spec que declara pregunta y familia incoherentes no valida.
+ */
+export const QUESTION_FAMILIES: Readonly<Record<FigureQuestion, readonly string[]>> = {
+  value_change: [],
+  target: ['bullet', 'gauge'],
+  evolution: ['line'],
+  explain_change: ['waterfall'],
+  composition: ['donut', 'pie', 'waffle', 'bar'],
+  subset: ['bar_stacked'],
+  compare: ['bar', 'bar_grouped']
+}
+
 export interface ChartSeriesV1 {
   seriesId: string
   label: string
@@ -339,6 +353,11 @@ export const validateChartSpec = (spec: ChartSpecV1, knownFactIds: ReadonlySet<s
 
   if (!FAMILY_RELATIONS[spec.family].includes(spec.relation)) {
     push('family_relation', `${spec.family} no representa ${spec.relation}`)
+  }
+
+  if (spec.question !== undefined) {
+    if (!isFigureQuestion(spec.question)) push('unknown_question', `pregunta ${String(spec.question)} fuera del contrato`)
+    else if (!QUESTION_FAMILIES[spec.question].includes(spec.family)) push('question_family', `${spec.family} no responde «${spec.question}» (criterio de selección §5)`)
   }
 
   if (spec.family.startsWith('bar') && spec.scale.baseline !== 0) {

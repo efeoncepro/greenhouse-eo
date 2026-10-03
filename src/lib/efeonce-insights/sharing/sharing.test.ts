@@ -151,13 +151,52 @@ describe('buildInsightWebModel', () => {
     expect(buildInsightWebModel({ plan: ownScale, facts: [fact()] }).chapters[0]!.charts[0]!.note).toMatch(/propia escala/)
   })
 
+  it('1.4 — la tarjeta de cifra viaja resuelta: valor, variación sin signo con su tono, «vs» y figura de respaldo (TASK-1974)', async () => {
+    const { buildInsightWebModel } = await import('./web-model')
+    const base = plan()
+
+    const withStats: EditorialPlanV1 = {
+      ...base,
+      chapters: [{
+        ...base.chapters[0]!,
+        charts: [],
+        stats: [{
+          figureId: 'stats.seo',
+          question: 'value_change',
+          title: 'Cifras del período',
+          items: [
+            { itemId: 'clicks', label: 'Clics', factId: 'seo.clicks.current', comparisonFactId: 'seo.clicks.previous', direction: 'higher_is_better', estimated: false },
+            { itemId: 'sin', label: 'Visitas desde IA', factId: 'seo.empty', comparisonFactId: null, direction: 'higher_is_better', estimated: false }
+          ]
+        }]
+      }],
+      essentials: [{ claimId: 'e1', text: 'Los clics bajaron.', factIds: ['seo.clicks.current'] }]
+    }
+
+    const model = buildInsightWebModel({
+      plan: withStats,
+      facts: [fact({ comparisonFactId: 'seo.clicks.previous', value: 13606 }), fact({ factId: 'seo.clicks.previous', value: 16390 }), fact({ factId: 'seo.empty', value: null })]
+    })
+
+    const [clicks, empty] = model.chapters[0]!.stats![0]!.items
+
+    expect(clicks).toMatchObject({ display: '13.606', change: { display: '17,0 %', direction: 'down', tone: 'worse' } })
+    expect(clicks!.versus).toMatch(/^vs 16\.390 en /)
+    // Sin dato: «—» y la línea «Sin dato en …», nunca 0 ni variación.
+    expect(empty).toMatchObject({ display: '—' })
+    expect(empty).not.toHaveProperty('change')
+    expect(empty!.noData).toMatch(/^Sin dato en /)
+    // La frase sobre los clics se respalda en la tarjeta, no en un gráfico.
+    expect(model.essentials![0]).toMatchObject({ evidence: { chapterId: 'chapter.seo', chartId: 'stats.seo' } })
+  })
+
   it('1.1 — un plan v1 no trae campos v2 (aditivo: el consumer 1.0 ve lo mismo)', async () => {
     const { buildInsightWebModel } = await import('./web-model')
     const { INSIGHT_WEB_MODEL_VERSION } = await import('../contracts/web-model')
     const model = buildInsightWebModel({ plan: plan(), facts: [fact(), fact({ factId: 'seo.clicks.previous', value: null })] })
 
-    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.3')
-    expect(model.modelVersion).toBe('1.3')
+    expect(INSIGHT_WEB_MODEL_VERSION).toBe('1.4')
+    expect(model.modelVersion).toBe('1.4')
     expect(model).not.toHaveProperty('essentials')
     expect(model).not.toHaveProperty('decision')
     expect(model.chapters[0]).not.toHaveProperty('readings')

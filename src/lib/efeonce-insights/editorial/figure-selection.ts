@@ -143,6 +143,22 @@ export const metricDirectionOf = (fact: Pick<EvidenceFactV1, 'metricId' | 'unit'
   return fact.unit === 'position' ? 'lower_is_better' : null
 }
 
+export type ChangeDirection = 'up' | 'down' | 'flat'
+export type ChangeTone = 'better' | 'worse' | 'neutral'
+
+/**
+ * Tono semántico de una variación (aprobado el 2026-10-03): el triángulo sigue al valor y el color sigue a la dirección
+ * de la métrica — verde si el cambio es mejor, rojo si es peor, gris si es neutro (sin dirección declarada o sin
+ * cambio). Una sola regla para la tarjeta, las columnas, las metas y las tablas.
+ */
+export const changeToneOf = (current: number, previous: number, direction: MetricDirection | null): { direction: ChangeDirection; tone: ChangeTone } => {
+  const moved: ChangeDirection = current > previous ? 'up' : current < previous ? 'down' : 'flat'
+
+  if (moved === 'flat' || direction === null) return { direction: moved, tone: 'neutral' }
+
+  return { direction: moved, tone: (moved === 'up') === (direction === 'higher_is_better') ? 'better' : 'worse' }
+}
+
 // ─── Un dato, una figura ─────────────────────────────────────────────────────────────────────────
 
 /** Una figura del capítulo reducida a lo que el gate necesita: su id, su familia y los hechos que dibuja. */

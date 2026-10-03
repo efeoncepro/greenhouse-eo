@@ -24,7 +24,7 @@ import type { ChartSpecV1 } from './chart-spec'
 import type { EvidenceObservationKind, EvidenceUnit } from './evidence'
 import type { InsightModule, InsightOutput } from './request'
 
-export const INSIGHT_WEB_MODEL_VERSION = '1.3' as const
+export const INSIGHT_WEB_MODEL_VERSION = '1.4' as const
 
 /** Motivo por el que un hecho no tiene valor. Ausente ≠ cero: Think lo muestra como límite. */
 export type InsightWebAbsentReason = 'no_data'
@@ -111,6 +111,37 @@ export interface InsightWebChartV1 {
   note?: string
 }
 
+/**
+ * 1.4 (TASK-1974) — una cifra de la tarjeta, ya resuelta: el consumer imprime estos textos tal cual, nunca calcula la
+ * variación, su tono ni el período.
+ */
+export interface InsightWebStatItemV1 {
+  itemId: string
+  label: string
+  factId: string
+  /** Valor formateado («13.606», «1,8 %»); «—» sin dato. */
+  display: string
+  estimated: boolean
+  direction: 'higher_is_better' | 'lower_is_better' | null
+  /** Variación SIN signo + dirección del triángulo + tono semántico (verde mejor, rojo peor, gris neutro). */
+  change?: { display: string; direction: 'up' | 'down' | 'flat'; tone: 'better' | 'worse' | 'neutral' }
+  /** «vs 16.390 en agosto de 2026». Ausente sin comparable. */
+  versus?: string
+  /** «Sin dato en septiembre de 2026». Sólo sin valor. */
+  noData?: string
+  /** «Menor es mejor». Sólo cuando subir es malo. */
+  lowerIsBetter?: string
+}
+
+/** 1.4 (TASK-1974) — tarjeta de cifra: la figura de «¿cuánto es y cómo cambió?». Abre el capítulo. */
+export interface InsightWebStatFigureV1 {
+  figureId: string
+  question: 'value_change'
+  title: string
+  items: InsightWebStatItemV1[]
+  note?: InsightWebClaimV1
+}
+
 /** 1.1 — lectura de una figura (TASK-1888): cifra principal, conclusión, lo que significa y el próximo paso. */
 export interface InsightWebReadingV1 {
   chartId: string
@@ -125,6 +156,12 @@ export interface InsightWebChapterV1 {
   module: InsightModule
   title: string
   claims: InsightWebClaimV1[]
+  /**
+   * 1.4 — tarjetas de cifra; van ANTES de los gráficos (criterio §5.2). Un consumer anterior las ignora: el hallazgo y la
+   * tabla del capítulo siguen presentes (degradación declarada, nunca figura en blanco).
+   */
+  stats?: InsightWebStatFigureV1[]
+  /** 1.4 — los gráficos llegan ordenados por su pregunta (`spec.question`). */
   charts: InsightWebChartV1[]
   tables: InsightWebTableV1[]
   limits: string[]
