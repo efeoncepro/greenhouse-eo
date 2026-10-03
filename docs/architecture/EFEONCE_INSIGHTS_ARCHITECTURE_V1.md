@@ -1517,7 +1517,7 @@ PDF y deck dibujan cascada, waffle, dona, barras apiladas y la tarjeta. El contr
 **Rollout aplicado.** AXIS `v0.3.42` publicado (paquetes + axis.efeonce.org); Think `0c5701a` en producción; Greenhouse
 en producción con el release `36a73e7b7e19` (orquestador `37158679961`, PR #250, manifest `released`, watchdog OK).
 Ningún flag nuevo: el render ya estaba encendido. Las ediciones internas de Berel y Sky se revisan antes de compartirlas
-(la emisión sigue apagada en producción).
+(la emisión está encendida en producción desde el 2026-09-28; el gate humano es esa revisión).
 
 **Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`): en la dona
 real de Berel, Gemini queda pintado con el color del rol «oportunidad». Decisión del operador pendiente. Las tarjetas

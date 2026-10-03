@@ -25,9 +25,8 @@ por correo y la recurrencia (TASK-1848: en producción; el enlace compartido est
 correo y la recurrencia siguen apagados) y el informe A4 junto con el deck nuevo
 (TASK-1847, en producción desde el 2026-09-24), y el contrato editorial v2 que ordena qué dice cada informe
 (TASK-1888, encendido en producción desde el 2026-09-26). La vista web ya existe: es la página del enlace en Think,
-en producción desde el 2026-09-28 (TASK-1875), con el enlace compartido encendido. Como la emisión sigue apagada en
-producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`, y por eso todavía no hay informes
-reales de clientes para compartir.
+en producción desde el 2026-09-28 (TASK-1875), con el enlace compartido encendido. La emisión está encendida en producción desde el 2026-09-28: una edición llega
+a `ready_for_review` y un interno la emite después de revisarla.
 
 ## Cómo se comporta
 
@@ -62,10 +61,9 @@ reales de clientes para compartir.
 | Interno (Operations) | Catálogo, pedir, revisar y recuperar; **no emite** | Igual que Admin/Account en lectura |
 | Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
-Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
-cifras visibles: eso es lo esperado hasta que sus archivos estén renderizados y un interno la emita (el render del
-deck y del informe A4 ya corre en staging y producción, pero la emisión sigue apagada en producción; sólo staging la
-tiene encendida, para pruebas).
+Un cliente que pide una edición la verá quedar en `in_review` sin cifras visibles hasta que sus archivos estén
+renderizados y un interno la emita (el render del deck y del informe A4 y la emisión están encendidos en staging y
+producción; la emisión en producción, desde el 2026-09-28).
 
 ## Los dos formatos y sus gráficos (en producción desde el 2026-09-24)
 
@@ -484,12 +482,12 @@ asignado. Lo que está encendido y lo que no:
 | Capacidad | Estado | Nota |
 | --- | --- | --- |
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
-| Emitir una edición | Apagada en producción | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en producción (encendido sólo en staging desde 2026-09-18 para las pruebas de TASK-1848); además exige que todos los outputs pedidos estén renderizados y validados |
+| Emitir una edición | **Encendida** en staging y producción (producción desde 2026-09-28) | Flag `INSIGHTS_ISSUANCE_ENABLED=true` en Vercel; canary humano sobre la organización de prueba con readback `issued`. Exige que todos los outputs pedidos estén renderizados y validados, y un interno que la revise |
 | Contrato editorial v2 (lectura por figura, «Lo esencial», alcance, portada sellada) | **Encendido en staging y producción** (desde 2026-09-26) | Flag `INSIGHTS_EDITORIAL_V2_ENABLED=true` en Vercel (staging y producción) y en el ops-worker (recurrencias). Aplica a ediciones nuevas; las ya creadas no cambian |
 | Redacción asistida por IA | Encendida en producción desde 2026-09-26 | Gemini (flash-lite) reescribe conclusiones y lecturas sin cambiar cifras; si algo no cuadra, queda el texto determinista. Las ediciones de las recurrencias salen sin IA |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
 | Enlace compartido | **Encendido en producción** (desde 2026-09-28) | Se encendió al existir la página del enlace en Think (TASK-1875). Probado en producción con la edición de prueba `EO-INS-000014`: crear el enlace, verlo en Think, descargar el deck, revocar y comprobar que deja de abrir. Sólo se comparten ediciones **emitidas**, y emitir sigue apagado en producción, así que hoy no hay ediciones reales de clientes para compartir |
-| Envío por correo y recurrencia | En producción, pero apagados (2026-09-18) | Encendidos y probados en staging; en producción esperan su propia decisión |
+| Envío por correo y recurrencia | **Encendidos** en staging y producción (producción desde 2026-10-02) | Flags `INSIGHTS_DELIVERY_ENABLED` y `INSIGHTS_SCHEDULES_ENABLED` en Vercel y el ops-worker; los tipos de correo de Insights también encendidos. Una recurrencia nunca emite ni envía: deja la edición en revisión |
 | Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
 | Pantalla pública del enlace | **En producción** (desde 2026-09-28) | `think.efeoncepro.com/insights/r/<enlace>` (TASK-1875) y la muestra `think.efeoncepro.com/insights/muestra`. Ver «La página del enlace y la muestra para clientes» |
 | Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.9.0 (2026-09-26). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura) y la preferencia de portada de un cliente; fijar esa preferencia sólo lo pueden hacer vínculos internos de Efeonce. Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo lo hace una persona interna de Efeonce por la API de la app** (la pantalla del portal llega con TASK-1849), nunca por MCP |

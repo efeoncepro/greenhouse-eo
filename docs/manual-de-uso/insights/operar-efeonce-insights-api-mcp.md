@@ -11,7 +11,7 @@
 Crear y seguir ediciones de Efeonce Insights sin pantalla (la UI llega en TASK-1849): desde el
 portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosystem`) o desde un
 agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging y producción, hasta el deck PDF renderizado;
-emitir sigue apagado en producción (encendido en staging desde 2026-09-18 para el canary de TASK-1848). Las
+emitir está encendido en producción desde el 2026-09-28 (y en staging desde 2026-09-18). Las
 recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) están en su sección: el código está
 **en producción con los flags OFF** (release `bda1cf2cd938`, 2026-09-18) y encendido en staging.
 
@@ -657,8 +657,8 @@ lector, un dato no se muestra dos veces y la variedad sólo desempata.
 > el PDF y el deck tienen página para cifras, cascada, waffle, dona y barras apiladas. Las ediciones creadas antes del
 > release conservan sus figuras; los pasos de abajo sirven para detectarlas y, si hace falta, generar una revisión. La revisión de una vista previa con las
 > figuras nuevas, los rechazos con causa y el tono de la variación están en el manual
-> [Revisar una edición antes de compartirla](revisar-una-edicion-antes-de-compartir.md). Emitir sigue apagado en
-> producción.
+> [Revisar una edición antes de compartirla](revisar-una-edicion-antes-de-compartir.md). Emitir está encendido en
+> producción desde el 2026-09-28: revisar antes de emitir.
 
 **Antes de empezar.** Ten a mano la edición en `ready_for_review` y su vista previa (`--plan-only` para ver la lista de
 figuras y su lectura, y el PDF de la sección anterior), o el enlace web si la edición ya se compartió internamente.

@@ -200,8 +200,8 @@ canvas y no implementadas; color por orden en waffle y dona cuyas partes no decl
 1. ~~Publicar AXIS, desplegar Think y hacer el release de Greenhouse.~~ Hecho: AXIS `v0.3.42`, Think `0c5701a`, release
    `36a73e7b7e19`.
 2. ~~Verificar la dona y las apiladas con datos reales de GA4.~~ Hecho (arriba).
-3. **Pendiente del operador:** revisar las ediciones internas de Berel y Sky antes de compartirlas (la emisión sigue
-   apagada en producción).
+3. **Pendiente del operador:** revisar las ediciones internas de Berel y Sky antes de compartirlas (la emisión está
+   encendida en producción desde el 2026-09-28; esa revisión es el gate humano).
 4. ~~Gate de cierre.~~ CI y CI Deep del SHA del release verdes (suite completa y build de producción).
 5. ~~Alinear la cifra de §(v) y volver a medir la fidelidad.~~ `pnpm insights:canvas-fidelity` corrido de nuevo el
    2026-10-03: mismos valores (30 hojas dentro del 1 %, Deck-Agrupadas con su excepción); §(v) corregida a 0,53 %.

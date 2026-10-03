@@ -9,6 +9,11 @@
   mappers unen cifra y «%»/«pp» con espacio duro en los slots (`bindUnitSpaces`; presentación, el plan sellado no
   cambia). Regla: una figura alimentada por un productor externo no está verificada hasta verla con SU fuente real, y el
   porcentaje redondeado nunca puede decir 0 de algo que existe.
+  **Segunda vuelta (misma noche):** el «<1 %» pasó todos los tests de `figure-slots` y rompió el render: el validador de
+  la dona del compositor parsea la participación impresa y «<1» sumaba 1 («suman 101, no 100»). Un cambio en un texto
+  que el compositor vuelve a leer se prueba componiendo la página, no sólo armando los slots; y el estado de un flag se
+  lee en `FEATURE_FLAG_STATE_LEDGER.md`, no en el texto de esta skill (afirmé «emisión apagada» cuando lleva ON desde el
+  28/09).
 - **2026-10-03 · TASK-1975 · La vista previa con datos reales encontró seis fallas que ninguna prueba vio.** Síntoma
   (`preview-edition.ts --editorial-v2` sobre Berel y Sky, septiembre 2026, con todos los tests verdes): (1) la leyenda de
   las barras de composición medía 36 caracteres (la serie llevaba el título) y el PDF de Berel no componía; (2) la nota
