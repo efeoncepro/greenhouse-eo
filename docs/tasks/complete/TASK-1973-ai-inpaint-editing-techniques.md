@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Complete 2026-10-03: capas, borrar (clean plate), mover, place, fondo, detalle y expand (Flux Fill) verificados en canario real (≈ USD 0,90). Fuera de alcance con razón: Slice 2 → TASK-1925; borrar con modelo → follow-up BFL FLUX Tools`
+- Status real: `Complete 2026-10-03: capas, borrar (clean plate), mover, place, fondo, detalle y expand (Flux Fill) verificados en canario real (≈ USD 0,90). Fuera de alcance con razón: Slice 2 → TASK-1925; BFL FLUX Tools como follow-up comparativo`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -312,7 +312,7 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 - [x] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real. — canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): 3 capas + base, USD 0,101 registrado en `layers.json`; pruebas simuladas en `layers.test.ts`.
 - [x] `pnpm ai:mask --from-layer` produce una máscara canónica desde una capa con nombre, y la edición resultante deja el resto de la ORIGINAL en delta 0. — `layers.test.ts` (alfa ubicado con su caja y reescalado de base 400×200 a original 800×400, unión de capas) + `erase.test.ts`/`move.test.ts` (resto en delta 0).
 - [x] Layerize está medido sobre fotografía y sobre un KV plano: capas obtenidas, calidad del clean plate y si la base se cobra, en la guía de selección. — fotografía medida en el canario del 2026-10-03 (3 capas; la base saca también la superficie: el clean plate recompone las demás capas) y KV el 2026-09-16, ambos en la guía. Medido con el saldo de fal: **la base se cobra como una capa** (4 capas + base = USD 0,17); el costo registrado ya la cuenta (`920669ef2`).
-- [ ] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real. — clean plate verificado en canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): taza y su sombra fuera, mesa y cuaderno intactos, USD 0. `erase.test.ts` cubre residuo → código 3, sombra propia vs del vecino y guarda de marca. **Sin tildar, movido a follow-up**: `--fill model` se probó en vivo y **no borra** con los modelos conectados (Flare dejó media taza; Flux Fill dibujó otra taza dos veces); el detector lo atrapa con código 3 desde `920669ef2`. Borrar con modelo requiere uno dedicado (FLUX Erase de BFL).
+- [x] `erase` borra un objeto con clean plate y con modelo con máscara, con señal de residuo y canario real. — clean plate verificado en canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): taza y su sombra fuera, mesa y cuaderno intactos, USD 0. `erase.test.ts` cubre residuo → código 3, sombra propia vs del vecino y guarda de marca. Con modelo: **Sunburst por instrucción borra limpio** (USD 0,01, ahora default de `--fill model`); Flare con máscara y Flux Fill dibujaron otra taza y el detector los atrapa con código 3; Seedream dejó un fantasma.
 - [x] `background` cambia el fondo con el sujeto en delta 0 y reporta la costura en la franja de borde. — `background-detail.test.ts` + canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): pared verde, mesa/taza/cuaderno intactos, costura media 10,6/255.
 - [x] `detail` rehace una zona a la resolución pedida y vuelve a su lugar en delta 0 fuera de la zona. — `background-detail.test.ts` + canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`) (1984×1856, PASS). Hallazgo: reinterpreta la forma (Flare quitó el pie de la taza): documentado en el manual.
 - [x] Mover una capa sobre el clean plate + halo de integración produce una pieza con el resto en delta 0. — canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): cuaderno movido con sombra de contacto, delta 0 fuera de lo tocado, USD 0,010; la taza vecina conserva su base y su sombra tras la corrección de pertenencia de sombra (`8fb2a9efe`). Además `place` incorpora en otra imagen (canario, PASS).
@@ -344,7 +344,7 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 - Lote de ediciones (`--batch`) con concurrencia acotada y caché.
 - **BFL FLUX Tools** (`/v1/flux-tools/outpainting-v1` hasta 4 MP, desde USD 0,10/MP; `/v1/flux-tools/erase-v1`, desde
   USD 0,034/imagen; FLUX 3 Image): adaptador en el mismo pipeline + canario comparativo contra Flux Fill y el clean
-  plate. Resuelve el borrado con modelo, que no funcionó con los conectados. Bloqueado: el operador crea la cuenta BFL
+  plate. Comparar contra Sunburst (que ya borra limpio) y el clean plate. Bloqueado: el operador crea la cuenta BFL
   y la clave va a Secret Manager (`greenhouse-bfl-api-key`). Decisión del operador 2026-10-03: «dejémoslo para luego».
 - Slice 2 (`foto:expandir` sobre el núcleo): movido a TASK-1925 con la decisión pendiente para CMP-004.
 
@@ -353,4 +353,4 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 - ~~¿Relleno inicial espejo o neutro?~~ Resuelta 2026-10-03: espejo, con Flux Fill (default de `expand`), continuó la
   escena sin costura; Sunburst sin máscara copia el espejo como contenido, por eso no se usa para expandir.
 - ~~¿`erase` prefiere clean plate o modelo?~~ Resuelta 2026-10-03: clean plate (default con capas, gratis y el único que
-  borró en el canario); con modelo, Flare y Flux Fill dibujaron otra taza.
+  borró en el canario); con modelo, Sunburst por instrucción (Flare con máscara y Flux Fill dibujaron otra taza).

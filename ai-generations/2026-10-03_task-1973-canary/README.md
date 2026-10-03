@@ -1,6 +1,6 @@
 # Canario real TASK-1973 — capas, borrar, mover, incorporar, fondo, detalle y expandir
 
-> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,90 (0,18 + 0,29 de la comparación de expansión + 0,43 de la tercera tanda)
+> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,98 (0,18 + 0,29 de la comparación de expansión + 0,43 de la tercera tanda + 0,08 de borrado por instrucción)
 > Foto: `base.png` (copia de `2026-10-02_task-1965-canary/base.png`, 1536×1024: mesa de roble, taza, cuaderno, ventana).
 
 ## Resultado por técnica
@@ -54,7 +54,17 @@ Correcciones (commit `920669ef2`): superficie = detrás en `z_index` y sostiene 
 mesa como «otro objeto» y la sombra cayó a 78 px) · residuo medido contra el fondo limpio · prompt de relleno que
 describe el fondo · costo de Layerize con la base.
 
+## Cuarta tanda: borrar con editores por instrucción
+
+| Modelo | Resultado | Costo |
+|---|---|---|
+| **Sunburst** sin máscara + guía de zona | ✓ PASS, código 0; taza y sombra fuera, sin marcas (`inpaint/85f4594a15b5/`) | 0,010 |
+| Seedream 5 Pro Edit | PASS, código 0, pero **fantasma tenue del asa** en la pared que el detector no ve (`inpaint/f68030c5e445/`) | 0,068 |
+
+Decisión: con `--fill model` y OpenAI, el default es Sunburst (`ERASE_OPENAI_MODEL`). El prompt que describe el fondo
+queda sólo para modelos de relleno con máscara (Flux Fill).
+
 ## Pendiente
 
-- Borrar con un modelo dedicado (FLUX Erase de BFL) y expandir con FLUX Outpainting: cuenta BFL pendiente.
+- Comparar con FLUX Erase y expandir con FLUX Outpainting (BFL): cuenta BFL pendiente.
 - `foto:expandir` delegando en el núcleo (Slice 2): WIP de otra sesión en `scripts/foto/expandir.mjs`.

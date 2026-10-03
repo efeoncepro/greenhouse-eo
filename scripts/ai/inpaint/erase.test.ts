@@ -122,6 +122,8 @@ describe('pnpm ai:inpaint erase', () => {
 
     expect(result.erasure[0].residueSuspected).toBe(true)
     expect(result.exitCode).toBe(3)
+    // Con OpenAI y sin --model, borra Sunburst (edita por instrucción), no el default con máscara del adaptador.
+    expect(result.manifest.request.model).toBe('gpt-image-2.5-sunburst')
     expect(verifyRecomposition(original, final, maskFromRect(W, H, { x0: 0.48, y0: 0.35, x1: 0.69, y1: 0.65 })).verdict).toBe('PASS')
   })
 

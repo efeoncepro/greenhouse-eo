@@ -68,7 +68,7 @@ Repetible para unir varias capas.
 
 ```bash
 pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"                    # clean plate, gratis
-pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model --model gpt-image-2.5-flare
+pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # Sunburst, por instruccion
 ```
 
 - **Zona:** `--mask` (explicita: nunca se altera) o `--layers` + `--layer`, que se agranda `--grow` px (default 16)
@@ -77,13 +77,22 @@ pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model --model g
   sombra del objeto se mide comparando la foto con el clean plate y se suma a la zona. Crece desde el objeto, nunca
   toma la sombra de un vecino y nunca pisa otro objeto. `--shadow off` la deja.
 - **Relleno:** `--fill plate` (default con capas: el clean plate sin ese elemento, sin proveedor ni gasto, con
-  correccion de color) o `--fill model` (un modelo reconstruye el fondo).
+  correccion de color) o `--fill model` (un modelo reconstruye el fondo; por defecto Sunburst).
 - Despues de verificar, **mide si el objeto sigue ahi**: que la zona haya cambiado y, con capas, que el resultado se
   parezca al fondo limpio y no a otro objeto. Si en ningun candidato quedo el fondo, sale con codigo 3 (revisar).
-- **Usa el clean plate.** Con modelo no funciono en el canario del 2026-10-03: Flare dejo media taza y Flux Fill
-  dibujo otra taza en su lugar (un modelo de relleno ve la silueta de la mascara y la llena con lo que sugiere). El
-  detector atrapo los dos casos. `--fill model` queda para fotos sin capas, revisando el resultado al 100 %; el modelo
-  dedicado de borrado (FLUX Erase de BFL) esta pendiente de conectar.
+- **Que modelo borra** (canario del 2026-10-03, la misma taza):
+
+  | Metodo | Resultado | Costo |
+  |---|---|---|
+  | Clean plate (con capas) | ✓ limpio | 0 |
+  | **Sunburst** (default de `--fill model`) | ✓ limpio | ≈ 0,01 |
+  | Seedream 5 Pro Edit | casi: queda un fantasma del asa en la pared | ≈ 0,07 |
+  | Flare con mascara | ✗ dejo media taza | ≈ 0,01 |
+  | Flux Fill | ✗ dibujo otra taza (dos veces) | ≈ 0,10 |
+
+  Los que **llenan una mascara** (Flare con mascara, Flux Fill) ven la silueta del objeto y la rellenan con lo que
+  sugiere: otro objeto. Los que **editan por instruccion** (Sunburst, Seedream) entienden «quita la taza». El detector
+  atrapo los dos fallos con codigo 3; un fantasma tenue como el de Seedream no lo detecta: mira el resultado al 100 %.
 
 ## Mover o escalar: `pnpm ai:inpaint move`
 

@@ -20,6 +20,13 @@ import { createPlateAdapter, detectCastShadow, ERASE_DEFAULT_PROMPT, ERASE_FILL_
  *   máscara reconstruye el fondo).
  * - Después de la verificación del núcleo se mide si el objeto sigue ahí (residuo).
  */
+/**
+ * Modelo de OpenAI por defecto para borrar: Sunburst, que edita por instrucción y entiende «quita el objeto». Canario
+ * real del 2026-10-03 (la taza): Sunburst la borró limpio; Flare con máscara dejó media taza y Flux Fill dibujó otra
+ * (los modelos que llenan una máscara rellenan la silueta con lo que sugiere); Seedream 5 Pro Edit dejó un fantasma.
+ */
+export const ERASE_OPENAI_MODEL = 'gpt-image-2.5-sunburst'
+
 export interface EraseOptions {
   imagePath: string
   maskPath?: string
@@ -111,10 +118,11 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
     imagePath: options.imagePath,
     maskPath,
     maskConvention: options.maskConvention,
-    // Un modelo de relleno (fal) dibuja lo que el prompt describe: se le describe el fondo, no la acción de quitar.
-    prompt: options.prompt ?? (adapter.provider === 'fal' ? ERASE_FILL_PROMPT : ERASE_DEFAULT_PROMPT),
+    // Un modelo de RELLENO con máscara (Flux Fill) dibuja lo que el prompt describe: se le describe el fondo. Un editor
+    // por instrucción (Sunburst, Seedream edit) entiende «quita el objeto».
+    prompt: options.prompt ?? (adapter.provider === 'fal' && adapter.sendsMask ? ERASE_FILL_PROMPT : ERASE_DEFAULT_PROMPT),
     adapter,
-    model: fill === 'plate' ? 'clean-plate' : options.model,
+    model: fill === 'plate' ? 'clean-plate' : (options.model ?? (adapter.provider === 'openai' ? ERASE_OPENAI_MODEL : undefined)),
     quality: fill === 'plate' ? undefined : options.quality,
     count: fill === 'plate' ? 1 : options.count,
     crop: fill === 'plate' ? 'off' : undefined,

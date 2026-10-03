@@ -13,7 +13,7 @@
   = base + las demás capas; la base se cobra como una capa) y `pnpm ai:inpaint erase|move|place|background|expand` +
   `--zone-resolution`. `place` incorpora un elemento de una foto en otra y el modelo sólo hace el acabado.
 - Canario real (≈ USD 0,90): la sombra proyectada se mide contra el plate y nunca se toma la de un vecino; borrar con
-  el plate es el único método que borró (Flare y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
+  el plate y Sunburst por instrucción borran limpio (Flare con máscara y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
   `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
 - Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.
 

@@ -461,14 +461,16 @@ const runVideo = async (argv: string[]): Promise<number> => {
 const ERASE_HELP = `pnpm ai:inpaint erase — borra un objeto y deja el resto idéntico (TASK-1973)
 
   pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"      # clean plate, sin gasto
-  pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # un modelo reconstruye el fondo
+  pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # Sunburst reconstruye el fondo
 
 Zona: --mask (explícita, nunca se altera) o --layers + --layer (repetible; se agranda --grow px, default 16, para
 llevarse el borde). Con capas, --shadow auto (default) suma la sombra proyectada del objeto, medida contra el clean
 plate y conectada al objeto; off la deja. Relleno: --fill plate (default con --layers: la base de Layerize con las
-demás capas recompuestas, así la mesa sigue siendo mesa) o model (default con
---mask; --adapter/--model/--quality como en image). Después de verificar la zona protegida mide si el objeto
-sigue ahí; si en ningún candidato cambió, sale con código 3 (revisar). Un logo o una marca no se borra con IA.
+demás capas recompuestas, así la mesa sigue siendo mesa) o model (default con --mask: gpt-image-2.5-sunburst, que
+edita por instrucción; Flare con máscara y Flux Fill rellenan la silueta con otro objeto, y Seedream dejó un fantasma —
+canario 2026-10-03; --adapter/--model/--quality como en image). Después de verificar la zona protegida mide si el
+objeto sigue ahí (que cambie y, con capas, que se parezca al fondo limpio); si en ningún candidato quedó el fondo,
+sale con código 3 (revisar). Un logo o una marca no se borra con IA.
 Control: --prompt (default: quitar el objeto y su sombra y reconstruir lo de atrás), --count, --run, --dry-run,
 --force, --max-usd/--yes, --allow-brand.
 `

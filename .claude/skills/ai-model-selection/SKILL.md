@@ -130,6 +130,9 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
   estima con la cota de 16 capas + base y registra lo real: presupuesta por la cota, no por las capas que esperas.
   **La base también se cobra** (saldo de fal, 2026-10-03: 4 capas + base = USD 0,17) y el número varía entre corridas
   (misma foto: 3 y 4 capas).
+- 🔴 **Para BORRAR, un editor por instrucción, no un modelo de relleno** (canario 2026-10-03): Sunburst sin máscara
+  borró limpio (USD 0,01); Flare con máscara y Flux Fill dibujaron otro objeto en la silueta; Seedream Pro Edit dejó un
+  fantasma. Con capas, el clean plate es gratis y también limpio.
 - 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
   (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
   (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
