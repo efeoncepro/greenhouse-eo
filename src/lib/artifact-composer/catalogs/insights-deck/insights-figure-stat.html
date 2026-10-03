@@ -199,7 +199,8 @@
 
   .stat-cell:only-child .stat-name .stroke-icon { width: 18px; height: 18px; }
 
-  .stat-cell:only-child .stat-figure { font-size: 128px; line-height: 0.85; letter-spacing: -0.05em; }
+  /* 112 px deja aire a una cifra de 6 caracteres («13.606») en la columna de 1,3fr: a 128 px se pasaba 2 px del borde y en Linux no cabía. */
+  .stat-cell:only-child .stat-figure { font-size: 112px; line-height: 0.85; letter-spacing: -0.05em; }
 
   .stat-cell:only-child .stat-prefix { font-size: 68px; }
 

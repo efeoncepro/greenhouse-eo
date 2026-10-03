@@ -406,6 +406,10 @@ coincidencia, sólo el nombre.
 
 ## Follow-ups
 
+- Cifra única del deck con tamaño adaptativo (2026-10-03): a 112 px cabe una cifra de hasta 6 caracteres («130.166» queda
+  con 7 px); una de 7 o más («770.462») se rechaza en el encaje, con causa. Calcular el tamaño por ancho visible, como
+  `deckFigureSizeClass` hace con la cifra principal, en vez de un tamaño fijo.
+
 - Tarjetas de redes y pauta cuando TASK-1995 defina su fuente.
 
 ## Open Questions

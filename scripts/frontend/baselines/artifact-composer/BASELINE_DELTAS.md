@@ -1,5 +1,16 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-03 (y) — TASK-1996: la cifra única del deck baja de 128 a 112 px
+
+<!-- sealed-by-freeze: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
+
+En el deck, una sola cifra de 6 caracteres («13.606») se pasaba 2 px del borde de su columna a 128 px: justo la tolerancia
+del chequeo de encaje en macOS, y fuera de ella en el Chromium de Linux de CI (`insights-figure-stat.test.ts`, run
+`37153139414`). A 112 px le quedan 44 px. Ninguna hoja aprobada tiene una sola cifra; la de 6 cifras no cambia.
+
+Frames que cambian (existían):
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: la cifra única del probe a 112 px
+
 ## 2026-10-03 (x) — TASK-1996: la línea de contexto va bajo la cifra, como en la hoja aprobada
 
 <!-- sealed-by-freeze: 9b438fe74b0d584526cff8b1609b341a0423d16138158e2eb9e5f95df09cfcea -->
@@ -1216,7 +1227,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 9b438fe74b0d584526cff8b1609b341a0423d16138158e2eb9e5f95df09cfcea -->
+<!-- manifest-digest: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
