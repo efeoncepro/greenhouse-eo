@@ -324,7 +324,22 @@ export const GH_INSIGHTS = {
     /** Sin dato: «—» en el valor y esta línea en lugar de la variación. Nunca 0. */
     noDataIn: (period: string) => `Sin dato en ${period}`,
     /** TASK-1975 — con valor pero sin período anterior (primer mes medido): no hay variación que mostrar. */
-    firstPeriod: 'Primer período medido'
+    firstPeriod: 'Primer período medido',
+    /**
+     * Tarjeta con isotipo de canal (aprobada el 2026-10-03): el nombre de la celda es el del canal, como lo nombra AXIS
+     * (`AXIS_PLATFORM_ASSETS`). Lo que no está acá sale de `channels`.
+     */
+    channelNames: {
+      google_ai_overview: 'AI Overview',
+      google_search_console: 'Search Console',
+      google_analytics: 'Google Analytics',
+      greenhouse: 'Greenhouse'
+    } as Readonly<Record<string, string>>,
+    /** La métrica bajo el nombre del canal, por métrica o por familia (`mention_rate.openai` → `mention_rate`). */
+    channelContext: {
+      mention_rate: 'de las respuestas menciona la marca',
+      ai_sessions: 'visitas desde el asistente'
+    } as Readonly<Record<string, string>>
   },
 
   reading: {

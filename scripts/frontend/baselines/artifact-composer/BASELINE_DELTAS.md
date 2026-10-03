@@ -1,5 +1,23 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-03 (w) — TASK-1996: la tarjeta de cifra con isotipo de canal
+
+<!-- sealed-by-freeze: 0035b899eaafcf9f346623a1319aa115fcc6ac92829305cf45d42e08cb5c3524 -->
+
+Contrato AXIS `efeonce.insights-stat-card` 0.2.0 (aprobado por el operador el 2026-10-03, publicado en `v0.3.42`): el
+isotipo oficial de la plataforma (`AXIS_PLATFORM_ASSETS`, @efeoncepro/axis-brand-assets 0.4.15) en un disco blanco al
+60 % reemplaza al ícono de la métrica. En la celda (30 px A4, 28 px deck) sólo si el tablero mezcla motores de respuesta,
+con el nombre del canal y la métrica en la línea de contexto; si todas las cifras salen de las mismas plataformas, una vez
+junto al título (22 px, Search Console primero). Los campos son opcionales: el probe de cada plantilla los sintetiza.
+Revisión del aspecto real (sin referencia de canvas): `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/derivada-{Cifras-Canal-Celdas,Cifras-Canal-Titulo,Deck-Cifras-Canal-Celdas,Deck-Cifras-Canal-Titulo}.png`.
+
+Frames que cambian (existían):
+- `templates-insights-report/ReportFigureStatPage.png` — cambia: el probe trae la línea de contexto bajo el nombre (el valor sintético del canal no es una plataforma conocida, así que el disco se quita)
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: lo mismo en la lámina navy
+
+Además, el isotipo de AI Overview pasa de la G de Google a su lupa con el degradado de la G
+(`assets/channels/google-ai-overview.svg`); ningún probe lo dibuja: sin efecto de píxel en el gate.
+
 ## 2026-10-03 (v) — TASK-1975: cifras, cascada, waffle, dona y apiladas en Insights; variación con tono semántico
 
 <!-- sealed-by-freeze: 38573c6a55c820f922a46f048474752adaebd9e0f8cb5cae3bf6d6d60ff16463 -->
@@ -1186,7 +1204,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 38573c6a55c820f922a46f048474752adaebd9e0f8cb5cae3bf6d6d60ff16463 -->
+<!-- manifest-digest: 0035b899eaafcf9f346623a1319aa115fcc6ac92829305cf45d42e08cb5c3524 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

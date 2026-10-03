@@ -222,6 +222,18 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
     known: [...Object.keys(CHANNEL_ISOTYPES), '<cualquier otro: nombre sin isotipo>'],
     build: value => channelIsotypeEffects(value)
   },
+  /**
+   * Tarjeta de cifra con isotipo (contrato AXIS efeonce.insights-stat-card 0.2.0): el campo es el disco de la celda;
+   * su `<img>` toma el isotipo de la plataforma. Plataforma sin isotipo conocido: se quita el disco y queda el nombre.
+   */
+  [`${prefix}-stat-channel`]: {
+    known: [...Object.keys(CHANNEL_ISOTYPES), '<cualquier otra: nombre sin isotipo>'],
+    build: value => {
+      const isotype = CHANNEL_ISOTYPES[value]
+
+      return isotype ? [{ selector: '.channel-disc img', attr: 'src', value: isotype }] : [{ selector: '.channel-disc', remove: true }]
+    }
+  },
   /** Ordinal de un ítem (`01`, `02`…): sale de su posición, el autor no lo escribe. */
   [`${prefix}-ordinal`]: {
     known: ['<derivado de la posición del ítem>'],

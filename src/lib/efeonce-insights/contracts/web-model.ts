@@ -143,6 +143,14 @@ export interface InsightWebStatItemV1 {
    * siempre `display`.
    */
   count?: { from: number; to: number; decimals: number }
+  /**
+   * Isotipo de canal en la celda (contrato AXIS `efeonce.insights-stat-card` 0.2.0, aprobado el 2026-10-03): sólo cuando el
+   * tablero mezcla motores de respuesta. `label` ya es el nombre del canal; `platform` es el id de
+   * `platformIsotypeFor()` en @efeoncepro/axis-brand-assets. El isotipo reemplaza al ícono de la métrica.
+   */
+  channel?: { platform: string; name: string }
+  /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
+  context?: string
 }
 
 /** 1.4 (TASK-1974) — tarjeta de cifra: la figura de «¿cuánto es y cómo cambió?». Abre el capítulo. */
@@ -150,6 +158,11 @@ export interface InsightWebStatFigureV1 {
   figureId: string
   question: 'value_change'
   title: string
+  /**
+   * Las plataformas de las que salen TODAS las cifras del tablero, en orden (Search Console primero): su isotipo va una
+   * vez junto al título. Ausente si el tablero mezcla fuentes o lleva el isotipo en cada celda.
+   */
+  titlePlatforms?: string[]
   items: InsightWebStatItemV1[]
   note?: InsightWebClaimV1
 }

@@ -6,6 +6,7 @@
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
+import type { InsightChannelId } from '../contracts/channels'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { PlanStatDirection, PlanStatItemV1 } from '../contracts/plan'
 import { changeToneOf, type ChangeDirection, type ChangeTone } from '../editorial/figure-selection'
@@ -66,11 +67,74 @@ export interface StatItemView {
    * que se imprimen. null sin comparable o sin dato (no hay recorrido que mostrar).
    */
   count: { from: number; to: number; decimals: number } | null
+  /**
+   * Isotipo de canal en la celda (contrato AXIS `efeonce.insights-stat-card` 0.2.0): sólo cuando el tablero mezcla
+   * motores de respuesta. La celda se nombra por su canal (`label`) y la métrica va en `context`. null en otro caso.
+   */
+  channel: { platform: StatPlatform; name: string } | null
+  /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
+  context: string | null
+}
+
+/**
+ * Plataforma de la que sale una cifra: la marca cuyo isotipo la identifica (`AXIS_PLATFORM_ASSETS` de
+ * @efeoncepro/axis-brand-assets). La fuente manda sobre el canal: Search Console y GA4 miden Google pero tienen su
+ * propio isotipo, e ICO lo mide Greenhouse.
+ */
+export type StatPlatform = InsightChannelId | 'google_search_console' | 'google_analytics' | 'greenhouse'
+
+const AI_ANSWER_PLATFORMS: ReadonlySet<StatPlatform> = new Set(['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overview'])
+
+/** Orden de los isotipos en el título: Search Console primero (es la fuente de verdad del tráfico orgánico). */
+const TITLE_ORDER: readonly StatPlatform[] = ['google_search_console', 'google_analytics', 'google', 'greenhouse']
+
+/** Máximo de isotipos en el título de un tablero; con más fuentes no se dibuja ninguno (el título ya las nombra). */
+const TITLE_MAX = 3
+
+export const statPlatformOf = (fact: Pick<EvidenceFactV1, 'source' | 'channelId'>): StatPlatform | null => {
+  if ((fact.source ?? '').startsWith('greenhouse_growth.seo_gsc')) return 'google_search_console'
+  if ((fact.source ?? '').startsWith('ga4:')) return fact.channelId ?? 'google_analytics'
+  if ((fact.source ?? '').startsWith('ico_engine')) return 'greenhouse'
+
+  return fact.channelId ?? null
+}
+
+/** Cómo lleva isotipos un tablero de cifras (regla aprobada el 2026-10-03, una sola para PDF, deck y web). */
+export interface StatBoardChannels {
+  /** Isotipos una vez en el título: todas las cifras salen de estas plataformas (Search Console primero). */
+  title: StatPlatform[]
+  /** El tablero mezcla motores de respuesta: cada celda lleva el isotipo de su canal. */
+  perCell: boolean
+}
+
+export const statBoardChannelsOf = (facts: ReadonlyArray<Pick<EvidenceFactV1, 'source' | 'channelId'>>): StatBoardChannels => {
+  const platforms = facts.map(statPlatformOf)
+
+  if (platforms.length === 0 || platforms.some(platform => platform === null)) return { title: [], perCell: false }
+
+  const distinct = [...new Set(platforms as StatPlatform[])]
+
+  if (distinct.length > 1 && distinct.every(platform => AI_ANSWER_PLATFORMS.has(platform))) return { title: [], perCell: true }
+
+  const rank = (platform: StatPlatform) => (TITLE_ORDER.indexOf(platform) === -1 ? TITLE_ORDER.length : TITLE_ORDER.indexOf(platform))
+  const title = distinct.sort((a, b) => rank(a) - rank(b))
+
+  return { title: title.length <= TITLE_MAX ? title : [], perCell: false }
+}
+
+/** Nombre visible del canal en una celda con isotipo (el de AXIS: «AI Overview», no «Respuestas de Google»). */
+const channelNameOf = (platform: StatPlatform): string => GH_INSIGHTS.stat.channelNames[platform] ?? GH_INSIGHTS.channels[platform] ?? platform
+
+/** La métrica bajo el canal: la frase de su familia («de las respuestas menciona la marca») o su nombre corto. */
+const channelContextOf = (fact: Pick<EvidenceFactV1, 'metricId'>, label: string): string => {
+  const family = fact.metricId.split('.')[0] ?? fact.metricId
+
+  return GH_INSIGHTS.stat.channelContext[fact.metricId] ?? GH_INSIGHTS.stat.channelContext[family] ?? label
 }
 
 const unsigned = (delta: string): string => delta.replace(/^[+\-−]\s*/, '')
 
-export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, EvidenceFactV1>, locale: string): StatItemView | null => {
+export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, EvidenceFactV1>, locale: string, board?: StatBoardChannels): StatItemView | null => {
   const fact = byId.get(item.factId)
 
   if (!fact) return null
@@ -80,9 +144,12 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
   const delta = comparable ? formatDeltaForUnit(fact.value!, comparable.value!, fact.unit, locale) : null
   const tone = comparable ? changeToneOf(fact.value!, comparable.value!, item.direction) : null
 
+  const platform = board?.perCell ? statPlatformOf(fact) : null
+  const channel = platform ? { platform, name: channelNameOf(platform) } : null
+
   return {
     itemId: item.itemId,
-    label: item.label,
+    label: channel ? channel.name : item.label,
     factId: fact.factId,
     display: formatFactValue(fact.value, fact.unit, locale),
     estimated: item.estimated,
@@ -97,6 +164,8 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
     firstPeriod: fact.value !== null && !comparable ? GH_INSIGHTS.stat.firstPeriod : null,
     lowerIsBetter: item.direction === 'lower_is_better' ? GH_INSIGHTS.stat.lowerIsBetter : null,
     parts: splitStatValue(formatFactValue(fact.value, fact.unit, locale)),
-    count: comparable ? { from: comparable.value!, to: fact.value!, decimals: decimalsOf(splitStatValue(formatFactValue(fact.value, fact.unit, locale)).value) } : null
+    count: comparable ? { from: comparable.value!, to: fact.value!, decimals: decimalsOf(splitStatValue(formatFactValue(fact.value, fact.unit, locale)).value) } : null,
+    channel,
+    context: channel ? channelContextOf(fact, item.label) : null
   }
 }

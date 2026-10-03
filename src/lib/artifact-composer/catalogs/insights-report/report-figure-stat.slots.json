@@ -118,6 +118,26 @@
       },
       "notes": "Título de la figura (`chart.title`)."
     },
+    "titleChannels": {
+      "selector": "[data-slot='titleChannels']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "channelId": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-channel-isotype"
+          }
+        }
+      },
+      "notes": "Isotipos una vez junto al título cuando todas las cifras salen de las mismas plataformas (Search Console primero). Canal sin isotipo conocido: se quita su disco."
+    },
     "statCount": {
       "selector": "[data-slot='statCount']",
       "type": "string",
@@ -140,6 +160,12 @@
       "item": {
         "type": "object",
         "shape": {
+          "channel": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-stat-channel",
+            "notes": "Contrato AXIS efeonce.insights-stat-card 0.2.0: el isotipo del canal reemplaza al ícono de la métrica (nunca los dos). Sólo cuando el tablero mezcla motores de respuesta."
+          },
           "icon": {
             "type": "string",
             "required": false,
@@ -165,6 +191,14 @@
             "required": true,
             "maxCharacters": 24,
             "maxLines": 2
+          },
+          "context": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 48,
+            "maxLines": 2,
+            "notes": "La métrica bajo el nombre del canal; sólo con channel.",
+            "example": "de las respuestas menciona la marca"
           },
           "estimated": {
             "type": "string",

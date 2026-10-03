@@ -26,7 +26,7 @@ import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1, PlanStatFigureV1 
 import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { metricDirectionOf } from '../editorial/figure-selection'
-import { statItemView } from '../presentation/stat-card'
+import { statItemView, statBoardChannelsOf } from '../presentation/stat-card'
 import { sourcesLabelOf } from '../presentation/vocabulary'
 
 export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend' | 'stat' | 'waterfall' | 'waffle' | 'donut' | 'stacked'
@@ -771,8 +771,11 @@ export const buildStatSlides = (
 ): FigureSlide[] => {
   const S = GH_INSIGHTS.stat
 
+  // Isotipos del tablero (contrato AXIS 0.2.0): una vez en el título, o en cada celda si mezcla motores de respuesta.
+  const board = statBoardChannelsOf(stat.items.flatMap(item => byId.get(item.factId) ?? []))
+
   const views = stat.items.flatMap(item => {
-    const view = statItemView(item, byId, locale)
+    const view = statItemView(item, byId, locale, board)
 
     return view ? [{ view, fact: byId.get(item.factId)! }] : []
   })
@@ -812,8 +815,10 @@ export const buildStatSlides = (
       body: {
         statCount: L.statCount(page.length),
         statItems: page.map(({ view, fact }) => ({
-          ...(iconOf(fact) ? { icon: iconOf(fact) } : {}),
+          // El isotipo del canal reemplaza al ícono de la métrica: nunca los dos.
+          ...(view.channel ? { channel: view.channel.platform } : iconOf(fact) ? { icon: iconOf(fact) } : {}),
           name: view.label,
+          ...(view.context ? { context: view.context } : {}),
           ...(view.estimated ? { estimated: S.estimated } : {}),
           ...view.parts,
           ...(view.change ? { trend: `${view.change.direction}:${view.change.tone}`, delta: view.change.display } : {}),
@@ -823,7 +828,8 @@ export const buildStatSlides = (
           ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
         })),
         // La nota del tablero es una afirmación del plan (con sus hechos): se imprime su texto.
-        ...(stat.note ? { note: { text: stat.note.text } } : {})
+        ...(stat.note ? { note: { text: stat.note.text } } : {}),
+        ...(board.title.length > 0 ? { titleChannels: board.title.map(platform => ({ channelId: platform })) } : {})
       }
     }
   })
