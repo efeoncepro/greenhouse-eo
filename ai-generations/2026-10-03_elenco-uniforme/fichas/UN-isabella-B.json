@@ -1,0 +1,25 @@
+{
+ "id": "UN-isabella-B",
+ "formato": "4:5",
+ "impacto": true,
+ "piloto": "ai-generations/2026-10-03_elenco-uniforme/plates/UN-isabella-A.png",
+ "identidad": [
+  {
+   "persona": "isabella",
+   "vista": "45-der"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "escena": "SCENE: Isabella walks toward the camera through a bright corridor with a pale concrete wall and large windows, caught mid-stride, body and head turned in a three-quarter view toward the RIGHT edge of the frame, eyes looking just past the camera with a relaxed smile. She wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit OPEN over the deep navy pique polo of the kit, with dark jeans. The open edge of the jacket covers the emblem of the polo, so only ONE emblem is visible on the front: the embroidered one on the left chest of the jacket. LOW ANGLE: the camera sits low at about waist height, 2.5 m away, looking slightly up, 85mm lens at f/2.8, so her figure reads confident and tall without distortion. Hard late-afternoon sun from the left draws one long window shadow across the wall; a single azure-blue (#0375DB) door far behind, out of focus.",
+ "lecho": {
+  "objeto": "a dark matte planter edge in the lower foreground",
+  "tono": "DARK near black"
+ }
+}

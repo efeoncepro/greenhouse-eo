@@ -1,0 +1,76 @@
+{
+  "schema": "efeonce.foto.isotipo.v1",
+  "plate": "EC2-b-2antonio-acabado.png",
+  "salida": "EC2-b-3karo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.10",
+  "archivo": "assets/efeonce-isotype-negative.svg",
+  "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74",
+  "marca": "isotipo",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.5776,
+      0.5672
+    ],
+    "ancho": 0.022,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": {
+    "umbral": 38
+  },
+  "creado": "2026-10-03T08:48:10.481Z",
+  "acabado": {
+    "veredicto": "aprobado",
+    "salida": "EC2-b-3karo-acabado.png",
+    "sha256": "8f9ab9e66c233aa1a6cda534ccd8017b3f75868793686856a6906bcd563e44c4",
+    "recorte": {
+      "archivo": "EC2-b-3karo-acabado-recorte.png",
+      "sha256": "32f1402a2c5a48bab4697a5baa6edff25a9d669a37faa581d61455695293f484",
+      "caja": {
+        "lado": 512,
+        "left": 927,
+        "top": 1196
+      },
+      "ampliadoA": 1024
+    },
+    "edicion": {
+      "archivo": "EC2-b-3karo-acabado-edicion.png",
+      "sha256": "266434eb2034515827b4e858b7726e26168c814e051cf28df7e538b5da137946"
+    },
+    "modelo": {
+      "solicitado": "gpt-image-2.5-sunburst",
+      "devuelto": "gpt-image-2.5-sunburst",
+      "calidad": "high",
+      "tamano": "1024x1024",
+      "uso": {
+        "entrada": 1267,
+        "salida": 1756,
+        "total": 3023
+      },
+      "costoEstimadoUsd": 0.053
+    },
+    "prompt": "This is a crop of a real photograph: the left chest of a royal blue cotton fleece hoodie. A small white Efeonce mark (a rocket with three round windows inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: keep its shape, every part, its proportions, its white colour, its exact size and its exact position — do NOT redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a mark embroidered in white satin stitch — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the image exactly as it is: same framing, same surface, same colours. No text, no extra marks.",
+    "promptSha256": "8dad0b2de2260da7d71b67526fc86c8c80f2eb815984e4195d3fab381c7b8917",
+    "superficie": "the left chest of a royal blue cotton fleece hoodie",
+    "mezcla": {
+      "umbralSilueta": 10,
+      "siluetaPx": 677,
+      "dilatacionPx": 3,
+      "sigmaAlfa": 1.6,
+      "anilloColorPx": 14,
+      "desplazamientoColor": [
+        -8.95,
+        1.63,
+        2.7
+      ]
+    },
+    "verificacion": {
+      "zonaMarcaPx": 8,
+      "cambiadosFueraDeLaMarca": 0,
+      "cambiadosEnLaMarca": 1669
+    },
+    "comparacion": "EC2-b-3karo-acabado-comparar.png",
+    "creado": "2026-10-03T08:48:47.372Z"
+  }
+}

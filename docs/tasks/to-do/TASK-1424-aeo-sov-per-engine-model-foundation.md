@@ -1,5 +1,18 @@
 # TASK-1424 — AEO: Share of Voice per-motor en el ReportArtifactModel (foundation)
 
+## Delta 2026-10-03 — Efeonce Insights pide el desglose por motor completo
+
+- El operador aprobó el 2026-10-03 las tarjetas de cifra con isotipo de motor de Efeonce Insights (canvas
+  `9q7nThMhdphN5j8f3K3cbB`, tablero «Cifras-Canal-Inventario»). Además del Share of Voice, el inventario pide por motor el
+  **lugar de la marca en la respuesta** (`brandRank`), las **citas con enlace al sitio** (`citationDomains`) y el **tono
+  positivo** (`sentimentLabel`). Esta task es la dueña del desglose por motor en el builder del informe: se amplía para
+  derivar los cuatro con el mismo patrón (agrupar `NormalizedFinding` por `provider`, leak-safe, motor sin findings
+  ausente), en vez de abrir otra task sobre la misma superficie.
+- El Share of Voice por motor usa la definición de TASK-1959 (menciones contra menciones, `null` sin competidores).
+- Consumer: TASK-1991 (adapter AEO de Insights), bloqueada por esta task. Prioridad sugerida P1 (hoy P2) porque bloquea
+  el tablero de motores aprobado; decide el operador. — por trabajo en TASK-1990…1996
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -252,6 +265,8 @@ minimiza el blast en consumers tipados existentes.
 - [ ] Motor sin findings degrada honesto (sin porcentajes fabricados).
 - [ ] Consumers existentes sin cambio de comportamiento (`pnpm test` full verde).
 - [ ] `ReportArtifactModel` transporta el campo en `clientPortal` y `adminPreview`.
+- [ ] (Delta 2026-10-03) El informe expone por motor, además del SoV, el lugar promedio de la marca (sólo respuestas rankeadas, con su conteo), el % de respuestas que citan el dominio propio y el % en tono positivo, con el mismo predicado que los totales.
+- [ ] (Delta 2026-10-03) El SoV por motor sigue la definición de TASK-1959 y un motor sin competidores con menciones no produce porcentaje.
 
 ## Verification
 

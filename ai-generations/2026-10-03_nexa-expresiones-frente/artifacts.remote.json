@@ -1,0 +1,89 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T11:14:26.130Z",
+  "run": "ai-generations/2026-10-03_nexa-expresiones-frente",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_nexa-expresiones-frente",
+  "totalBytes": 93196202,
+  "fileCount": 13,
+  "files": [
+    {
+      "path": "hoja-frente.png",
+      "sizeBytes": 2049285,
+      "sha256": "dd4d6a42f4cc3918a0b096de0f0ef8de08cc9682f2b01fbdfb7226ba9dba8968",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/hoja-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-01-carcajada-frente.png",
+      "sizeBytes": 7542232,
+      "sha256": "ef6db7adf66c459bfa38aac914ba44a7c86e1385e8fda8e2e76a660638e02d3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-01-carcajada-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-02-risa-elegante-frente.png",
+      "sizeBytes": 7522628,
+      "sha256": "e990b2e580dab23950e34222f69a51af6b991d80a9dbdd8acdf05ac5fbf5d2b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-02-risa-elegante-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-03-sorprendida-frente.png",
+      "sizeBytes": 7529703,
+      "sha256": "5e42852d137875affd492657e405d73b8918393774f16c96d35f15d83c1bb225",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-03-sorprendida-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-04-esceptica-frente.png",
+      "sizeBytes": 7542399,
+      "sha256": "1d4c24d6da51d22403df4929e1b2e1344f57fb77d814da176c73a193446f1822",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-04-esceptica-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-05-pensativa-frente.png",
+      "sizeBytes": 7460593,
+      "sha256": "9d1bc1c624b58c170acbd3679cad4989f04fc7d07326238da8281d78987ac1a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-05-pensativa-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-06-neutra-reposo-frente.png",
+      "sizeBytes": 7606847,
+      "sha256": "8f95ba55b32adba3e89b9e795af4a502d0852a27e0f0b1524ff19788573040a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-06-neutra-reposo-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-07-preocupada-frente.png",
+      "sizeBytes": 7560865,
+      "sha256": "d70ccdf4c85393d14f4c36a0b5db657482beaec5c06fd4cf71f3a36253e1917e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-07-preocupada-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-08-conviccion-frente.png",
+      "sizeBytes": 7616354,
+      "sha256": "cbfc6859b08787a725c76a194de6689ec0b2f31470dd9f19211f76a18d8a24fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-08-conviccion-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-09-escucha-empatica-frente.png",
+      "sizeBytes": 7727349,
+      "sha256": "30b5c7497f323d89671a4092a05f08613d8ec5b956b26614130ecc222e7d0e89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-09-escucha-empatica-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-10-curiosa-frente.png",
+      "sizeBytes": 7786808,
+      "sha256": "34f4c3debecd94460d518cdfed31d0c3b3de23f7d9c42663fb08df1521e80d58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-10-curiosa-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-11-complicidad-frente.png",
+      "sizeBytes": 7587612,
+      "sha256": "437305c086ebef92688dc0930b008eaa916e80dcf50967dc50b716bed5dbf52f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-11-complicidad-frente.png"
+    },
+    {
+      "path": "out/nexa-expr-12-mirada-lateral-frente.png",
+      "sizeBytes": 7663527,
+      "sha256": "ee9241089cc9155aba1f27a6eeab3f340ccd199e33f05d8f3e064f68069c1302",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_nexa-expresiones-frente/out/nexa-expr-12-mirada-lateral-frente.png"
+    }
+  ]
+}

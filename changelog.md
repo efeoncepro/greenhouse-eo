@@ -7,6 +7,57 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — Elenco 2D de Efeonce canonizado
+
+- [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
+  dibujados, representan al grupo de compra del cliente y supervisan a los Sparks; estilo «vector con volumen» con
+  sello Efeonce (línea de luz azul + objeto azul).
+- Hojas de giro y expresiones en `ai-generations/_identidad-elenco-2d/`, selladas en el lock (catálogo `ELENCO_2D`,
+  rol `ilustracion-2d`, 560 assets) y publicadas en el canon. GPT Image 2.5 Sunburst, ≈ USD 0,78.
+- Primer uso: spot animado Sparks × Efeonce AEO aprobado (49,6 s). Método transversal de video y workflow del spot 2D
+  documentados: [método](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md),
+  [retrospectiva](docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md),
+  [funcional](docs/documentation/creative/spot-animado-2d.md), [manual](docs/manual-de-uso/creative/producir-spot-animado.md);
+  `motion-design-studio`, `audio-studio`, guía de modelos, SPARKS_V1 e identidad sonora al día.
+
+## 2026-10-03 — Video con IA: taxonomía, producto e interfaces y pipelines por plan (EPIC-051)
+
+- [Taxonomía de video](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) por fase, tipo, look,
+  dificultad y fidelidad, neutral de motor y con «propio primero, proveedor como puente»; [anexo de producto e
+  interfaces con personas](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md); matriz operación × motor
+  y presupuestos por toma en la guía (§4.3, §7.4).
+- [ADR-025 aceptada](docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md): plan
+  declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
+- EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.
+
+## 2026-10-03 — Decisiones de marca convertidas en capacidad de ejecución escalable
+
+- [Dirección estratégica aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md): hacer operables, automatizables y escalables
+  decisiones creativas para acelerar salida al mercado preservando calidad, consistencia e identidad; recorrido
+  completo o tramo delimitado. Visión, modelo corporativo, oferta, método y skills/routing enlazados; validación
+  económica/comercial permanece por oferta. Cambio documental local, sin alterar runtime ni publicar.
+
+## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
+
+- Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa
+  y Julio (sin elenco obligatorio). Julio: 37 con canas prematuras en su bloque.
+- `foto:prompt` elige la vista puesta por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión, e imprime
+  las alternativas; 126 vistas puestas nuevas en bomber, softshell, polo, hoodie y gorra; el macro viaja con la prenda.
+- `foto:isotipo` compone por detrás de los oclusores, con pliegues y escorzo; `canon-sync` baja del canon GCP lo
+  sellado que falta o está viejo; `pnpm foto:rostro` mide la proporción del rostro.
+- Nexa: la expresión va detrás del ancla frontal (la pose sale de la escena), ancla v2 con la proporción del canon y 25
+  expresiones casi de frente aprobadas. Exploración archivada (> 1,3 GB liberados).
+
+## 2026-10-03 — Técnicas de edición sobre el pipeline de inpainting (TASK-1973)
+
+- Nuevo `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: capas con nombre, máscara por elemento y clean plate
+  = base + las demás capas; la base se cobra como una capa) y `pnpm ai:inpaint erase|move|place|background|expand` +
+  `--zone-resolution`. `place` incorpora un elemento de una foto en otra y el modelo sólo hace el acabado.
+- Canario real (≈ USD 0,90): la sombra proyectada se mide contra el plate y nunca se toma la de un vecino; borrar con
+  el plate y Sunburst por instrucción borran limpio (Flare con máscara y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
+  `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
+- Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.
+
 ## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
 
 - Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
@@ -26,6 +77,7 @@
 - Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
   con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
   no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
+- Cerrada el 2026-10-03: en producción con el release `fe261ca27`; siguiente paso, TASK-1973 (expandir, capas, borrar, fondo y detalle).
 
 ## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
 
@@ -608,68 +660,3 @@ guía. Manual de la línea §10.0, lenguaje fotográfico v1.6, doc funcional 1.7
 El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface:resolve`, tokens
 `efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
 código en Greenhouse.
-
-## 2026-09-27 — Glitch: diseño sonoro aprobado (versión B), sólo Glitch (AXIS /references/glitch/#sonido)
-
-El operador aprobó la versión B: «La b me encanta más. Sus sonidos están aprobados». Es **sólo de Glitch**: no forma
-parte de la identidad sonora de Efeonce ni se mezcla con su kit. Idea: «el sonido de Efeonce, con un bug». El motivo
-Mi · Mi · Mi → La hace fallar la tercera nota, que se rompe en bytes y se rearma como la manzana, el único golpe grave. Es
-diseño sonoro, no música, amarrado cuadro a cuadro al piloto de motion. Incluye un WAV por cada `.mov` del kit (lower
-third y transición «manzana en bytes» incluidos) y una pista por transición entre escenas, calculada desde la misma
-programación de celdas que la imagen: una lluvia de clics, nunca un whoosh. Motor determinístico
-que ya vive en el taller (`tools/glitch-motion/src/sound.mjs` + `tools/brand-sound`, `2d411b8`): cada render deja su WAV
-junto al `.mov`. Publicado en AXIS (PR efeoncepro/axis-design-system#8): sección `#sonido`, campo `sound` en
-`glitch.json` y 38 archivos en el bucket `glitch/sound/v1`. La página de sonic brand saca a Glitch de su kit. Canon:
-norma de Glitch §13.11, Delta del ADR, doc funcional, manual de edición, reglas y skills `efeonce-graphic-line`,
-`audio-studio` y `motion-design-studio`.
-
-## 2026-09-26 — Identidad sonora de Efeonce recomendada: «Tres puntos que se vuelven uno» (AXIS /references/sonic-brand/)
-
-El operador aprobó como recomendada (no canon) la identidad sonora de la marca: el logo sonoro Mi · Mi · Mi → La traduce
-la gramática de La órbita (el anillo pregunta, tres notas piensan, la esfera responde con el único golpe), con dos
-registros del mismo ADN —fondo (96 BPM, síntesis propia) y energía (120 BPM, rock: maqueta propia re-grabada con Stable
-Audio 2.5 y la esfera propia encima)—, el timbre de la esfera por línea de servicio (Growth campana, Brand marimba, Engine
-FM, Voice eco, Revenue campana grave) y la etiqueta «Empower your <Línea>» con la voz de Brian (ElevenLabs v3). Re-sonoriza
-reveal, apertura y sting V1.1 sin tocar la imagen, en 16:9 y 9:16. Publicado en AXIS (PR efeoncepro/axis-design-system#4):
-página `/references/sonic-brand/`, JSON para agentes con URL y SHA-256 por archivo y guía `docs/agent-composition/sonic-brand.md`;
-65 archivos en el bucket público `sonic/v1`. Valores fuera de `axis-tokens` hasta canonizar. Pendiente: licencias,
-prueba de reconocimiento sin logo y reemplazo del sonido de los masters V1.1 (Glitch tiene su sonido propio: entrada del 27/09). Canon
-[`EFEONCE_SONIC_IDENTITY_V1.md`](docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md), ADR Proposed, doc funcional,
-manual, regla `.claude/rules/brand-sonic.md` y skills `audio-studio`, `efeonce-graphic-line`, `axis-design-system`,
-`motion-design-studio` y `efeonce-brand-studio`. Producción: `ai-generations/2026-09-26_branding-sonoro/`.
-
-## 2026-09-26 — Iconografía de La órbita canónica: Trazo y Plastilina (AXIS v0.3.6)
-
-El operador canonizó la iconografía de la línea (D16–D22) en dos voces de una familia: **Trazo** (lo que se mide;
-Growth, Engine, Revenue) y **Plastilina** (lo que se crea; Brand), con la esfera como estado (reposo o respuesta, en el
-acento de la línea de la pieza), fondo `#001a33` en todas las líneas y la órbita sesgada como firma de Plastilina.
-AXIS publicó con el tag `v0.3.6` los tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y
-`@efeoncepro/axis-graphic-line` 0.4.0 con el subpath `/icons` (30 glifos; `resolveIcon`, `auditIconGroup`,
-`skewedOrbitHeroSvg`), los comandos `pnpm icons:export|check|vectorize` para dar de alta glifos nuevos y la página
-`/references/iconography/` del Lab (PR efeoncepro/axis-design-system#3). Dos pruebas a ciegas con agentes sin contexto
-validaron la documentación; lo que tuvieron que adivinar se corrigió (gesto en tinta, medición real en `icons:check`).
-Greenhouse todavía no consume `/icons`. Skill `efeonce-graphic-line`, ADR delta (f), manual §14 y las skills y docs
-vecinas al día. Pendientes del operador: voz de Voice, aire del Trazo a 20 px, opacidad del anillo sesgado y el
-reemplazo de Tabler en las firmas.
-
-## 2026-09-26 — Línea gráfica: decisiones del operador sobre contraste, halo, logo y fotografía (AXIS 0.3.5)
-
-El operador aprobó las recomendaciones pendientes de la línea «La órbita». El acento pide 3:1 contra su fondo como
-gráfico o en texto de 24 px o más y nunca va en texto menor (Engine y Voice conservan su color); el magenta de
-Revenue-HubSpot queda aprobado; la burbuja URL pide 4,5:1; el halo sobre papel va a la mitad; el anillo propio de la
-esfera significa «en vivo»; el logo va dentro de la órbita sólo en los cierres de marca; «Growth» va en el acento en
-el cierre del deck. AXIS publicó el juego `v0.3.5` (tokens y contracts 0.3.5 con el contrato de la órbita 0.3.1,
-registry y brand-assets 0.3.1, graphic-line 0.3.2) y el Lab reproduce el banner, la story y el fondo de Teams con un
-solo anillo y el reverso de la tarjeta con el logo solo. Se aprobaron las 12 reglas de sinergia con la fotografía y se
-resolvieron sus 9 conflictos; lo que necesita código quedó en TASK-1918. Manual v1.8, ADR delta (e), lenguaje
-fotográfico v1.4 y la skill `efeonce-graphic-line` al día.
-
-## 2026-09-26 — Skill viva `efeonce-graphic-line` y la órbita junto a la foto
-
-Nace la skill dueña de la línea gráfica «La órbita» (Claude y Codex, espejo byte-idéntico): el criterio de cada elemento
-(anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), todo lo que existe en AXIS (tokens, contratos y
-recetas de `axis-graphic-line`), cada aplicación (post, story, banner de LinkedIn, deck, informe, firma de correo,
-oficina, merch, eventos, video), el motion del logo, la convergencia con el lenguaje fotográfico, el QA, un registro de
-decisiones y pendientes del operador, y un contrato de mantenimiento. El manual de la línea suma §9.1 (la foto en la
-línea) y fija «Revenue» como palabra del eslogan de RevOps; el lenguaje fotográfico suma §11 (la línea en la foto). El
-router de CLAUDE.md y AGENTS.md apunta a la skill nueva.

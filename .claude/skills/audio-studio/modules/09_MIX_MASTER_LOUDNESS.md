@@ -74,6 +74,22 @@ Sabe qué hace cada parámetro y por qué lo mueves:
 - **Limiting:** el último en la cadena; sube la loudness al target sin pasar el true-peak ceiling.
   No lo uses para "arreglar" una mezcla desbalanceada — arregla la mezcla antes.
 
+### 4.1 Cama con energía bajo locución — ducking fuerte (caso medido)
+
+Una cama de alta energía (rock, punk) bajo una voz necesita **ducking por sidechain fuerte**, no el suave de una cama
+tranquila. Caso **spot «Sparks × Efeonce AEO», 2026-10-03** (`ai-generations/2026-10-03_sparks-aeo-60s/audio/mezcla-v2.py`):
+
+- Voz +7 dB con compresión suave; cama punk con **sidechain 8:1** (umbral 0,02) disparado por la voz; el reveal de
+  marca con 5:1. En la v1 se había usado 6:1.
+- **Control medido:** en cada tramo con voz, la mezcla quedó a **0,2–1,2 dB de la voz sola** (la música no se come la
+  voz). Medirlo por tramo, no sólo el integrado.
+- Master en **dos pasadas de loudnorm a −16 LUFS / −1 dBTP**. Es el valor del caso, no un target: el destino manda (§5)
+  y la norma sonora de Efeonce pide −14 LUFS para video y redes.
+- **Al re-timar un corte, los sonidos con tiempo absoluto chocan con la voz:** un logo sonoro intermedio cayó encima de
+  una línea y se quitó. Re-timar voz, efectos y subtítulos desde **un solo mapa de tiempos** y revisar cada evento fijo.
+- En una pieza de marca Efeonce, poner el registro de energía bajo locución es **excepción** de la norma sonora: sólo
+  con decisión del operador (`EFEONCE_OVERLAY.md`, norma en `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`).
+
 ---
 
 ## 5. Loudness por destino (2026) — el corazón de la entrega

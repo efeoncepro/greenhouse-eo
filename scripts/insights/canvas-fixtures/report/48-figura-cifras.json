@@ -1,0 +1,99 @@
+{
+  "reference": "Premium-Cifras",
+  "catalog": "report",
+  "contentType": "report-figure-stat",
+  "slots": {
+    "chapterTab": "01",
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Septiembre 2026 · contra agosto 2026",
+    "eyebrow": {
+      "icon": "numbers",
+      "label": "Cifras del período"
+    },
+    "conclusion": "El mayor cambio fue en clics orgánicos: de 16.390 a 13.606",
+    "lead": "Las impresiones bajaron de 868.507 a 770.462 y la posición media pasó de #5,7 a #6,9. Las keywords en primera página de Google bajaron de 21 a 15 de las 31 que medimos.",
+    "figureTitle": "Search Console y posiciones · septiembre contra agosto",
+    "statCount": "6 cifras",
+    "statItems": [
+      {
+        "icon": "clicks",
+        "name": "Clics",
+        "value": "13.606",
+        "trend": "down:worse",
+        "delta": "17,0 %",
+        "versus": "vs <strong>16.390</strong> en agosto 2026"
+      },
+      {
+        "icon": "impressions",
+        "name": "Impresiones",
+        "value": "770.462",
+        "trend": "down:worse",
+        "delta": "11,3 %",
+        "versus": "vs <strong>868.507</strong> en agosto 2026"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "value": "1,8",
+        "suffix": "%",
+        "trend": "down:worse",
+        "delta": "0,1 pp",
+        "versus": "vs <strong>1,9 %</strong> en agosto 2026"
+      },
+      {
+        "icon": "search",
+        "name": "Posición media",
+        "prefix": "#",
+        "value": "6,9",
+        "trend": "up:worse",
+        "delta": "1,2 pos.",
+        "versus": "vs <strong>#5,7</strong> en agosto 2026",
+        "lowerIsBetter": "Menor es mejor"
+      },
+      {
+        "icon": "search",
+        "name": "Primera página",
+        "value": "15",
+        "unitLabel": "de 31 keywords",
+        "trend": "down:worse",
+        "delta": "28,6 %",
+        "versus": "vs <strong>21</strong> en agosto 2026"
+      },
+      {
+        "icon": "trend",
+        "name": "Tráfico estimado",
+        "estimated": "Estimado",
+        "value": "130.166",
+        "trend": "down:worse",
+        "delta": "3,6 %",
+        "versus": "vs <strong>135.014</strong> en agosto 2026"
+      }
+    ],
+    "note": {
+      "text": "El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Cada cifra en su propia unidad; bajo cada una, la variación contra agosto."
+      },
+      {
+        "label": "Fuente",
+        "text": "Google Search Console y mediciones de posiciones en buscadores"
+      },
+      {
+        "label": "Cobertura",
+        "text": "31 keywords medidas en ambos períodos"
+      }
+    ],
+    "footerEdition": "Insights · Informe de septiembre 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "05",
+      "total": "24"
+    }
+  }
+}

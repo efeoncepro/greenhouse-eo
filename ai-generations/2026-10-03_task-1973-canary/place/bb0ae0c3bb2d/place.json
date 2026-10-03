@@ -1,0 +1,25 @@
+{
+  "kind": "ai-inpaint-place",
+  "target": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/destino-pared-verde.png",
+  "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+  "layers": [
+    "mug"
+  ],
+  "box": {
+    "left": 207,
+    "top": 369,
+    "width": 261,
+    "height": 225
+  },
+  "finish": "off",
+  "finished": false,
+  "final": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/place/bb0ae0c3bb2d/composed.png",
+  "untouched": {
+    "pixels": 1528505,
+    "maxDelta": 0,
+    "meanDelta": 0,
+    "worst": null
+  },
+  "verdict": "PASS",
+  "finishRun": null
+}

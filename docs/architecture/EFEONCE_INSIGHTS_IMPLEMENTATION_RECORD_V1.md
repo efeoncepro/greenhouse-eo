@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.7: §8.ac y fila de §10 con TASK-1974 + TASK-1975, code complete y rollout pendiente. 1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -738,6 +738,58 @@ correo, favicon, portal y receta de deck (arquitectura §6.3); acento de «INSIG
 (decisión abierta del operador, arquitectura §6.3); roles de datos y geometría de gráficos duplicados entre Greenhouse y
 Think como candidatos a AXIS (arquitectura §6.4).
 
+### 8.ac Criterio de selección y páginas de figura nuevas — TASK-1974 + TASK-1975 (code complete, rollout pendiente, 2026-10-03)
+
+Fuente: commits de `develop` local sin push — TASK-1974 `38d78fa93`, `4b825e3d3`, `3d8bea818`, `908ebff1e`; TASK-1975
+`81e50977b`, `44a490df5`, `2334d21a8`, `dc2a92f62`, `0b0233de3`, `1ed956d44`, `592fbde4b`, `45fecefe2`, `256547db9` —;
+arquitectura §14.12 y §15; criterio [`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md) §8.
+
+**Dominio `src/lib/efeonce-insights/` (TASK-1974).**
+
+| Archivo | Responsabilidad nueva |
+|---|---|
+| `contracts/chart-spec.ts` | `ChartSpecV1.question` (`FIGURE_QUESTIONS`, `QUESTION_FAMILIES`; valida `question_family`) y la dirección por fila del bullet (`ChartBulletItemV1.direction`) |
+| `contracts/plan.ts` | `PlanStatFigureV1` / `PlanStatItemV1` (`chapter.stats`) y los límites del nombre de la cifra (3 palabras, 24 caracteres) |
+| `contracts/web-model.ts` | Modelo web **1.4** (aditivo): `InsightWebStatFigureV1` / `InsightWebStatItemV1` y gráficos ordenados por pregunta |
+| `editorial/figure-selection.ts` (nuevo) | Pregunta → familia, desempate por variedad, orden del capítulo, `METRIC_DIRECTIONS` y tono de la variación, detección de hechos duplicados |
+| `editorial/criterion-figures.ts` (nuevo) | Productores del criterio: tarjeta de cifra (`statFigureFor`), composición (`compositionChartsFor`), subconjunto (`subsetChartsFor`) y `withQuestion` |
+| `editorial/deterministic-planner.ts` | Orquesta las figuras del capítulo bajo el contrato editorial v2 y las ordena por pregunta; `withDriverReadings` |
+| `editorial/editorial-v2.ts` | Una sola figura de bullets con todas las metas del capítulo, cada fila con su dirección; lectura de las barras apiladas por su segmento base |
+| `editorial/plan-validation.ts` | Reglas de la tarjeta de cifra y `duplicated_fact` |
+| `editorial/family-evidence-matrix.ts` | `family_evidence_matrix_v3`: dona y barras apiladas `producer_now` |
+| `editorial/chart-values.ts` | Valida la banda de cada fila del bullet con su propia dirección (`bulletItemDirection`) |
+| `adapters/ga4-site-facts.ts` | `ga4_site_facts_v2`: `site.organic_unengaged_sessions` y asistentes de IA en los 2 que más traen + «Otros asistentes» |
+| `presentation/stat-card.ts` (nuevo) | `statItemView`: una sola resolución de la cifra (valor, variación, «vs», primer período, sin dato, menor es mejor, piezas, recorrido) para PDF, deck y web |
+| `presentation/client-fit-gate.ts` | Trata los enums de la tarjeta y de la pregunta como datos de render, no como texto |
+| `sharing/web-model.ts` | Proyecta `stats` y el orden por pregunta en el modelo 1.4 |
+| `src/lib/copy/insights.ts` | Copy de la tarjeta, de la figura única de metas, de «Otros asistentes» y de la lectura de la cascada |
+
+**Render y catálogos (TASK-1975).**
+
+| Archivo | Responsabilidad nueva |
+|---|---|
+| `render/figure-slots.ts` | `FigureKind` `stat`/`waterfall`/`waffle`/`donut`/`stacked`, `FIGURE_CAPACITY`, `PDF_FIGURE_FAMILIES` con las 8 familias, `buildStatSlides`, `chapterFigureSlides` y las reglas que rechazan con causa |
+| `render/report-mapper.ts`, `render/insights-deck-mapper.ts` | Página o lámina de cifras primero y después los gráficos con página PDF, vía `chapterFigureSlides` |
+| `artifact-composer/chart-geometry.ts` | `waffleUnitGeometry`: un cuadro por unidad (5 columnas hasta 30, 10 hasta 100) |
+| `artifact-composer/brand-packs/axis/editorial-roles.json` | Roles `dataStepOnPaper`/`OnNavy` y `deltaBetter`/`deltaWorse` `OnPaper`/`OnNavy` |
+| `catalogs/insights-report/report-figure-{stat,waterfall,waffle,donut,stacked}.{html,slots.json}` | Las cinco páginas A4 nuevas |
+| `catalogs/insights-deck/insights-figure-{stat,waterfall,waffle,donut,stacked}.{html,slots.json}` | Las cinco láminas nuevas |
+| `catalogs/insights-shared/figure-{waterfall,waffle,donut,stacked}.ts` | Geometría SVG de cada familia nueva, compartida por los dos catálogos |
+| `catalogs/insights-shared/editorial-resolvers.ts` | Resolvers `steps`, `grid`, `donut`, `layers` y `numbers`; píldora por tono semántico; sin comparable no hay píldora |
+| `catalogs/insights-shared/figure-hooks.ts` | Mide la cifra principal del deck por ancho visible (sin espacios ni signo) |
+| `catalogs/insights-shared/figure-svg.ts` | Variación con tono semántico declarado (clases mejor/peor/neutro) y el triángulo en su propio `tspan`, que el catálogo redondea y, sobre navy, tiñe |
+| `catalogs/insights-{report,deck}/registry.json`, `index.ts`, CSS de tokens y editorial | Alta de las plantillas nuevas y tratamiento por fondo (píldora en papel, sólo triángulo en navy) |
+| `scripts/insights/canvas-fixtures/{report,deck}/44–48-*.json` | Fixtures de fidelidad de cascada, waffle, dona, apiladas y cifras |
+
+**Repos hermanos (locales, sin push).** Think `cd8cda5`, `0fb8254`: `StatCard.astro`, waffle por unidad en
+`insights-chart-geometry.ts`, tipos 1.4 y motion de la tarjeta. AXIS `e7f1653`, `c272c20`, `a141aaf`, `b4b699a`: tokens
+`efeonceInsights` (`axis-tokens` 0.3.42), contrato `efeonce.insights-stat-card` 0.1.0 `candidate` (`axis-ui-contracts`
+0.3.42) y Lab `/references/insights/`; sin tag `v0.3.42`.
+
+**Verificación (local).** `pnpm insights:canvas-fidelity` 31 hojas dentro del umbral; `pnpm composer:visual-gate
+--catalog=insights` 37 frames a 0 px; vista previa real de septiembre 2026 (Berel 22 + 18, Sky 10 + 8). Dona y apiladas
+sin datos GA4 reales. `pnpm test` completo y `pnpm build` **no corridos** (gate de cierre pendiente).
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -783,6 +835,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Vercel Production + Job `artifact-worker` (TASK-1889, 2026-09-26) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **En producción** (releases `0e87c7a443a2` + `f9257b9c94af`); primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`) | §8.z; arquitectura §14.9 |
 | Vercel staging + Production + `ops-worker` (TASK-1888, 2026-09-26) | contrato editorial v2 (release `0e87c7a443a2`, luego `f9257b9c94af`) + `INSIGHTS_EDITORIAL_V2_ENABLED=true` en los dos runtimes lectores; gateway `efeonce-mcp` v1.9.0 | **En producción, flag ON**; canary de producción selló plan v2 (`insed-f5768172…`); emisión, enlaces y envío siguen OFF | §8.aa |
 | Think (`efeonce-think` `main`) + Vercel Production (TASK-1875, 2026-09-28) | informe live `/insights/r/<token>`, muestra `/insights/muestra`, lockup y OG de Insights; `INSIGHTS_SHARING_ENABLED=true` en Production (redeploy `greenhouse-cssemzyzb`); WAF con la excepción `x-efeonce-think-key` | **En producción** (`544ecd4`); canary sobre `EO-INS-000014` verde (crear, leer, descargar, revocar ⇒ 410); producción sirve el modelo 1.0, el 1.1 en staging | §8.ab; arquitectura §14.10 |
+| `develop` local de greenhouse-eo + `main` local de Think y AXIS (TASK-1974 + TASK-1975, 2026-10-03) | criterio de selección, tarjeta de cifra, páginas PDF/deck de cascada, waffle, dona y apiladas, modelo web 1.4, tokens y contrato AXIS 0.3.42 | **Code complete, rollout pendiente**: nada empujado; orden AXIS (push + tag) → Think (push) → Greenhouse (develop → staging → release); dona y apiladas sin verificar con GA4 real | §8.ac; arquitectura §14.12 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---

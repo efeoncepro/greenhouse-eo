@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/humberly/humberly-45-izq.png (edit) …
+  ✓ 1313KB · gpt-image-2.5-sunburst · 1024x1024 · high
+    usage: in 1353 (img 1156 · txt 197) · out 1756 · total 3109
+done

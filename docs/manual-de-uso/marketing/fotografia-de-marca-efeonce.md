@@ -1,10 +1,10 @@
 # Manual: producir una foto de marca Efeonce
 
 > **Tipo de documento:** Manual de uso (operador)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
-> **Documentación relacionada:** [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Lenguaje fotográfico (maestro)](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
+> **Última actualización:** 2026-10-03 por Claude (1.1: elenco de marca y grupos de 3 a 5, ropa elegida según quién la viste y cómo está parada, las 25 expresiones de Nexa, `pnpm foto:rostro`, referencias que se bajan solas del canon y qué hacer al sumar algo nuevo)
+> **Documentación relacionada:** [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Lenguaje fotográfico (maestro)](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Elenco de marca](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) · [Selección de referencias de marca](../../operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · [Almacenamiento de `ai-generations/`](../../operations/AI_GENERATIONS_STORAGE_V1.md) · [Explicación funcional: elenco y referencias](../../documentation/creative/elenco-y-referencias-de-fotografia.md)
 
 ## Lo más corto que funciona
 
@@ -48,6 +48,7 @@ No sirve para piezas de clientes ni para trendjacking que toma prestada una est�
 | Leer 10 minutos | La tabla de principios de [Colorimetría §1](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md#1-principios-en-una-tabla) y el catálogo de tomas |
 | Presupuesto | ≈ USD 0,05 por imagen en `high`; ≈ USD 0,09 en `xhigh`; ediciones ≈ USD 0,07–0,10 |
 | Una idea concreta | Qué servicio se ve trabajando, en qué industria **que no sea de un cliente real** y en qué ciudad |
+| `gcloud` con sesión | Las referencias aprobadas (caras, prendas, expresiones) se bajan solas del bucket canon al armar el prompt; para eso `gcloud storage` tiene que funcionar. No necesitas tenerlas en disco de antemano |
 
 ## Paso a paso
 
@@ -83,6 +84,137 @@ materia y tono del lecho, formato y reservas. Cuando aplique, agrega `identidad`
 `palanca`, `atmosfera` con su haz y `suspendido` con la dosis de la serie. `foto:prompt` incorpora los bloques
 canónicos, el formato, el porcentaje del lecho y el límite de sujetos; **no concatenes bloques a mano**.
 Detalle de cada campo y sus guardas en el [pipeline §4.2](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+### 3b. Si en la foto sale gente: a quién pides y cómo
+
+Las personas se piden en `identidad`. Hay tres fuentes y se piden igual:
+
+| Quién | Clave | Para qué |
+|---|---|---|
+| **Equipo real** (roster) | la de su ficha, p. ej. `julio` | La persona real, en su rol real |
+| **Elenco de marca** (ficticio) | `hum`, `karo`, `sophia`, `isabella`, `antonio` | Interpretar el rol de su línea de servicio en campaña, social, deck y propuestas |
+| **Nexa** | `nexa` | El personaje de marca, con su Character Bible |
+
+```json
+"identidad": [{ "persona": "karo", "vista": "45-der" }]
+```
+
+Las vistas del elenco son `frente`, `elegida`, `cuerpo`, `45-izq`, `45-der`, `perfil-izq`, `perfil-der` y `manos`.
+
+**Quién es quién en el elenco** (detalle en el [Elenco de marca](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)):
+
+| Clave | Personaje | Línea | Rol |
+|---|---|---|---|
+| `hum` | Hum, 33, venezolana | `growth` | Estratega de crecimiento y medición |
+| `karo` | Karolyne «Karo», 28, venezolana | `brand` | Directora de arte y creadora de contenido |
+| `sophia` | Sophia, 31, venezolana (hermana mayor de Karo) | `engine` | Estratega SEO/AEO y analítica web |
+| `isabella` | Isabella, 27, colombiana (Barranquilla) | `voice` | Especialista de medios pagados y distribución |
+| `antonio` | Antonio, 35, mexicano (CDMX) | `revenue-hubspot` / `revenue-salesforce` | Líder de RevOps y CRM |
+
+El elenco se usa **cuando hace falta** (fotos de varias personas o de equipo), no es obligatorio que salga alguien
+del elenco. En palabras del operador: «debe usarse el elenco si es necesaria su inclusión».
+
+**Cuántas personas caben:**
+
+| Caso | Regla |
+|---|---|
+| Una o dos personas | Cualquier combinación |
+| Grupo de **3 a 5** | Cualquier combinación de personajes del elenco, Nexa y Julio. Cada persona lleva una referencia frontal y la luz de las referencias no viaja a la foto: la luz la pone la escena |
+| Tres o más con otra persona del roster | No está medido: el comando lo rechaza. Divide la pieza |
+| La misma persona dos veces | Error («aparece dos veces»): cada persona va una sola vez |
+
+`vista` y `expresion` juntas sólo se combinan con **una persona sola** en la toma.
+
+**Julio** tiene 37 años con canas prematuras. El comando pide conservar su edad aparente exactamente como en las
+referencias, sin rejuvenecerlo ni envejecerlo. Si sale distinto, es una falla de la toma, no algo que se arregle
+describiéndolo en la escena.
+
+### 3c. Nexa: elige la expresión por la escena
+
+Nexa tiene **25 expresiones casi de frente**, aprobadas por el operador el 2026-10-03. Se piden así:
+
+```json
+"identidad": [{ "persona": "nexa", "expresion": "concentracion" }]
+```
+
+| Grupo de uso | Claves |
+|---|---|
+| Éxito | `euforia` (cabeza atrás, puños arriba) · `alivio` · `orgullo-sereno` · `te-lo-dije` |
+| El «antes» del problema | `hartazgo` · `agobio` · `alarma` · `confusion` |
+| Foco | `concentracion` · `determinacion` · `explicando` |
+| Social | `bienvenida` · `mirada-lateral` (mira a la **derecha** del cuadro) · `mirada-lateral-izq` (mira a la **izquierda**) |
+| Base | `carcajada` · `risa-elegante` · `sorprendida` · `esceptica` · `pensativa` · `neutra` · `preocupada` · `conviccion` · `escucha-empatica` · `curiosa` · `complicidad` |
+
+Siguen disponibles las ocho del Character Bible (`the-spark`, `the-read`, `the-point`…).
+
+Qué hace el comando: el **ancla frontal de Nexa va siempre primero** y la expresión detrás, sólo para el gesto. La
+pose y el giro de la cabeza los da la escena: descríbelos ahí. En un **grupo** (una referencia por persona) la
+expresión no viaja: el gesto de Nexa también lo da la escena. `foto:prompt` avisa si traes a Nexa sin `expresion` ni
+`vista`.
+
+Para revisar que la cara no salió afinada, mide con `pnpm foto:rostro` (paso 3f).
+
+### 3d. La ropa corporativa: la vista puesta se elige sola
+
+Cuando alguien viste el bomber, la softshell, el polo, el hoodie o la gorra, declara la prenda en `objetos` y di
+**quién la viste**. `foto:prompt` elige la vista del kit que corresponde según:
+
+- **quién la viste** (hombre o mujer): con `persona` en el objeto o, si hay una sola persona en `identidad`, esa;
+- **cómo está parada**: el giro sale de la vista de identidad (`45-*` → 45°, `perfil-*` → 70°) o de `giro`;
+- **la cámara**: `camara: "baja"` elige la vista desde abajo;
+- **qué tapa la marca**: `tapa: "mano" | "cruza" | "objeto" | "brazos"` elige la vista con esa oclusión. Con una
+  sola persona, el comando lo infiere de la escena.
+
+```json
+"objetos": [
+  { "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" },
+  { "objeto": "chaqueta-bomber-efeonce", "persona": "karo", "giro": "espalda-45-izq", "camara": "baja" }
+]
+```
+
+Valores de `giro`: `frente`, `45-izq`, `45-der`, `70-izq`, `70-der`, `espalda`, `espalda-45-izq`, `espalda-45-der`,
+`espalda-70-izq`, `espalda-70-der`. **De espaldas, `giro` es obligatorio.** El lado dice hacia qué borde del cuadro
+apunta la nariz.
+
+Si no existe la vista exacta, el comando baja por una cadena de respaldo (oclusión → cámara baja → giro → 45° del
+mismo lado → frente o espalda), probando primero la de la silueta, y te avisa. El ángulo pesa más que la silueta.
+Para forzar una vista concreta, usa `puesta` en el objeto.
+
+En un **grupo**, pon `persona` en **cada prenda**: sin ella, la prenda va de frente y el comando avisa.
+
+El kit trae 126 vistas puestas (bomber, softshell, polo y hoodie, hombre y mujer: frente, 45° y 70° a cada lado,
+cámara baja, espalda, y las oclusiones mano, taza, tablet y brazos cruzados; la gorra, frente, 45° y 70°). El
+macro del bordado viaja con la prenda; la gorra no lleva macro.
+
+Si una mano tapa la marca, lo correcto es que se vea **sólo la parte que la mano no tapa**, a su tamaño real. Si la
+toma salió con la marca inventada y hay que componer la oficial, `pnpm foto:isotipo` la pone **por detrás** de la
+mano. Si no queda limpio, se rehace la toma; nunca se compone una marca más chica al lado de la mano.
+
+### 3e. Las referencias se bajan solas del canon
+
+No necesitas tener las imágenes de referencia en disco. Al correr `pnpm foto:prompt` o `pnpm foto:generar`, cada
+referencia aprobada se revisa contra su huella sellada:
+
+- si **falta** en disco, se baja del bucket canon;
+- si está pero **no es la aprobada** (hay una versión más nueva), se baja la aprobada y tu copia queda **aparte** con
+  el nombre `<archivo>.local-<huella>.<ext>`. Nunca se pisa: puede ser trabajo nuevo tuyo.
+
+Los archivos pasan por tu máquina como caché, no como copia permanente del repo. Para trabajar sin red o con copias
+locales a propósito: `FOTO_SIN_CANON=1 pnpm foto:prompt …`.
+
+Lo que no se aprobó (exploración, descartes) no va al canon: se **archiva** con `pnpm ai-gen:archive` y se recupera
+con `pnpm ai-gen:pull <carpeta>`. Archivar no es borrar. Detalle en
+[Recuperar y archivar `ai-generations/`](../creative/recuperar-y-archivar-ai-generations.md).
+
+### 3f. Revisa la proporción de la cara con `pnpm foto:rostro`
+
+```bash
+pnpm foto:rostro <plate.png> --persona nexa
+```
+
+Mide el largo contra el ancho de la cara (de los ojos al mentón, contra el ancho de la mandíbula) y lo compara con el
+canon de la persona (Nexa: 0,81 ± 0,02). Sólo funciona en macOS. No mide caras giradas, con la boca abierta ni con
+los ojos cerrados. Úsalo cuando sospeches que la cara salió afinada o alargada.
 
 ### 4. Genera
 
@@ -176,6 +308,41 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | `dispTono` | Cuántas familias de color hay | ≤ 30° en piezas monocromas; más es normal con piel y azul |
 | `piel` | Luminosidad/saturación de piel | L 44–61, C 18–31 |
 
+### La línea `·` de cada prenda (`foto:prompt`)
+
+Por cada prenda puesta, `foto:prompt` imprime una línea así:
+
+```text
+· A1: "polo-efeonce" para isabella → vista puesta «…» (motivo). Otras: …; fuerza otra con "puesta".
+```
+
+| Parte | Qué te dice |
+|---|---|
+| `para isabella` | De quién tomó la silueta |
+| `vista puesta «…»` | La vista del kit que va a viajar al modelo |
+| `(motivo)` | Por qué la eligió: giro, cámara, oclusión o respaldo |
+| `Otras: …` | Todas las vistas de esa prenda. Si la elegida no te sirve, copia una en `puesta` |
+
+Si avisa que no existe la vista exacta, mira la alternativa que eligió antes de gastar.
+
+### Referencias del canon (`foto:prompt` / `foto:generar`)
+
+| Señal | Qué significa |
+|---|---|
+| `⇣ <ruta> (canon)` | Faltaba en disco y se bajó del canon, con la huella verificada |
+| `↺ <ruta>: la copia local no era la aprobada; quedó aparte en …` | Tenías una versión distinta: se bajó la aprobada y la tuya quedó al lado con `.local-<huella>` |
+| `⚠ <ruta>: no se pudo traer del canon (…)` | Falló la descarga (normalmente `gcloud` sin sesión). Autentícate y vuelve a correr |
+
+### Proporción de la cara (`foto:rostro`)
+
+| Salida | Qué significa |
+|---|---|
+| Sale con 0 | Las caras casi frontales están dentro del canon |
+| Sale con 1 | Alguna cara frontal quedó fuera: afinada o alargada. Regenera |
+| Sale con 2 | No pudo medir (cara girada, boca abierta, ojos cerrados o sin cara) |
+
+Con los ojos en blanco (`hartazgo`) mide un poco más alto sin estar afinada: en ese caso, mira a ojo.
+
 ## Qué no hacer
 
 - **No** apliques filtros, LUT ni «grade»: el color es natural. Si el color falla, regenera.
@@ -190,6 +357,16 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 - **No** publiques una foto con personas generadas como si fueran el equipo real sin decidirlo con el operador: para
   publicar, el equipo real es la base; la IA sirve para explorar, espacios, objetos y 3D.
 - **No** llames «activo distintivo» a este lenguaje todavía: falta la prueba de reconocimiento.
+- **No** uses al elenco como si fuera el equipo real (página de equipo, firmas, LinkedIn), como cliente o testimonio,
+  ni pongas su nombre en pantalla salvo en una narrativa declarada como ficción. Tampoco le cambies el rol ni la línea.
+- **No** obligues a que salga alguien del elenco: se suma cuando la foto lo necesita.
+- **No** pidas a la misma persona dos veces en `identidad`, ni grupos de tres o más con personas del roster que no
+  sean Julio.
+- **No** describas a mano la prenda ni el ángulo de la marca: di quién la viste y cómo está parada; si quieres otra
+  vista, usa `puesta`.
+- **No** compongas una marca más chica al lado de una mano. Si `foto:isotipo` no la deja limpia, rehaz la toma.
+- **No** borres una copia `.local-<huella>` sin mirarla: puede ser trabajo tuyo que nadie selló.
+- **No** borres exploración a mano: archívala con `pnpm ai-gen:archive` para que se pueda recuperar.
 
 ## Problemas comunes
 
@@ -202,13 +379,45 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Noche con negros planos | Sombras sin información | Regla de noche («shadows deep but ALWAYS with visible texture») |
 | Aparece una marca en una cámara o botella | Marca de terceros | «completely unbranded, generic … no brand names, no text, no logos anywhere on the body» + revisar al zoom |
 | La cara de Julio o Nexa cambió | Referencias sin rol o modelo Flare | Sunburst + bloque IDENTITY + «Images 1-3 are Julio (identity only…)» |
-| Nexa sale siempre con la misma pose (cabeza ladeada, media sonrisa) | La ficha no declara expresión y copia «confident half-smile» | Declarar `{ "persona": "nexa", "expresion": "…" }` (12 fotográficas) o una `vista`, y describir la pose en la escena; `foto:prompt` avisa si falta |
+| Nexa sale siempre con la misma pose (cabeza ladeada, media sonrisa) | La ficha no declara expresión y copia «confident half-smile» | Declarar `{ "persona": "nexa", "expresion": "…" }` (una de las 25) o una `vista`, y describir la pose en la escena; `foto:prompt` avisa si falta |
+| Nexa sale con la cara demasiado fina o alargada | Se usaba una referencia frontal más estrecha que el resto | Ya corregido (ancla frontal v2). Si vuelve a pasar, mide con `pnpm foto:rostro --persona nexa` y regenera |
+| Error «aparece dos veces» | La misma persona está dos veces en `identidad` | Déjala una vez; su vista o expresión va en esa entrada |
+| Error «Más de dos personas con identidad … no está medido» | Grupo de tres o más con alguien del roster que no es Julio, o más de cinco | Usa elenco, Nexa y Julio, o divide la pieza |
+| En un grupo, una prenda salió de frente cuando la persona estaba girada | La prenda no dice quién la viste | Agrega `persona` en cada prenda del grupo |
+| La marca salió rotada o cortada en una prenda de espaldas | Falta `giro` o no existe esa vista | Declara `giro`; revisa la línea `·` y fuerza con `puesta` si hace falta |
+| `⚠ … no se pudo traer del canon` | `gcloud` sin sesión o sin red | Autentícate con gcloud y repite; para trabajar sin red, `FOTO_SIN_CANON=1` |
+| Apareció un archivo `.local-<huella>` junto a una referencia | Tu copia local no era la aprobada | Revísala: si era trabajo nuevo, súmalo con el procedimiento de «Al sumar algo nuevo» |
 | `pnpm ai:image` con varias `--image` en una variable falla | zsh no divide la variable | `pnpm ai:image ${=R} …` |
 | Un `cp` con `*` aborta entero | Glob sin coincidencias en zsh | `setopt nullglob` |
 | Las imágenes del lote aparecen en `public/images/generated` | Versión antigua del CLI | Actualizar el repo (arreglado en el commit `5946f14a0`) y pasar `--out <carpeta>` |
 | La edición de pantalla deja una persona «fantasma» | Máscara rectangular | Máscara desde el verde, con `extractChannel(0)` |
 | El logo parece sello o marca de agua | Lecho, posición o doble presencia de marca | Revisa la composición y conserva el ancho aprobado de 20 %; evita firmar si otro emblema ya protagoniza la foto |
 | La foto se ve genérica | Reunión sin obra ni dato | Volver a la ficha: ¿qué oficio se ve trabajando? |
+
+## Al sumar algo nuevo
+
+Lo aprobado sólo cuenta cuando está **sellado y publicado en el canon**. Resumen por caso (detalle en
+[selección de referencias de marca](../../operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md),
+[elenco](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) y el `LEEME.md` de cada carpeta):
+
+| Si sumas… | Pasos |
+|---|---|
+| **A. Una vista nueva de una prenda** | Genera **editando** una vista puesta aprobada (con el macro), revisa al 100 % con `pnpm foto:emblema` (esfera arriba, ventanas horizontales, letras exactas), copia a `final/` con la convención de nombre, declárala en `usoPorVista` con su clave `<giro>[-<tapa>\|-bajo][-mujer]`, agrégala al manifiesto del kit (`cuando_usarla`) y su prompt a `brief/` |
+| **B. Un personaje nuevo del elenco** | Ficha en el elenco, candidatos con piel real, el operador elige, vistas por edición desde la elegida, cuerpo entero a escala medida, carpeta `_identidad-elenco/<clave>/` con los 8 archivos y entrada en `ELENCO` |
+| **C. Una expresión nueva de Nexa** | Método A2 (ancla frontal + la causa de la expresión), medir con `pnpm foto:rostro --persona nexa`, copiar a `_identidad-nexa/5-expresiones-frente/nexa-expr-NN-<clave>.png` y entrada en `expresiones` de Nexa |
+| **D. Una persona nueva con proporción declarada** | Medir con `pnpm foto:rostro` sobre sus imágenes aprobadas casi frontales y declarar `rostro: { largoAncho, tolerancia }` |
+
+Y en todos los casos, al final:
+
+```bash
+pnpm foto:assets:lock                 # sella la huella
+pnpm creative:assets:publish apply    # publica al canon
+pnpm exec vitest run scripts/foto     # pruebas de foto
+pnpm ai-gen:archive apply --folder <carpeta-de-exploración>
+```
+
+Documenta el cambio en el `LEEME.md` de la carpeta. No cites rutas de corridas en comentarios de código: una carpeta
+citada queda protegida y no se puede archivar.
 
 ## Referencias técnicas
 
@@ -220,6 +429,11 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Tomas y lentes | [Catálogo](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
 | Prompts, comandos, scripts, QA, costos | [Pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
 | Julio, Nexa y uniforme | [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
+| Elenco de marca (personajes, fichas, cómo se construyen) | [Elenco](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) |
+| Nexa: identidad, proporción y expresiones | [Ficha del Character Bible](../../operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md) · `ai-generations/_identidad-nexa/LEEME.md` |
+| Vistas puestas del uniforme y elección automática | [Selección de referencias](../../operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `ai-generations/2026-10-03_uniforme-vistas/LEEME.md` · `elegirPuesta` en `scripts/foto/build-prompt.mjs` |
+| Canon y archivo | [Almacenamiento de `ai-generations/`](../../operations/AI_GENERATIONS_STORAGE_V1.md) · `scripts/foto/canon-sync.mjs` |
+| Medidor de proporción de la cara | `scripts/foto/rostro.mjs` (`pnpm foto:rostro`) |
 | Producir una foto cine sin consultar a nadie | [Producir una foto de marca en registro cine](../creative/producir-foto-cine-de-marca.md) · [Casebook](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) |
 | Nexa con su traje biónico y lentes (sólo cine) | [Usar el traje biónico de Nexa en fotos](../creative/usar-traje-bionico-de-nexa-en-fotos.md) |
 | Evidencia (prompts y scripts) | `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` |
@@ -232,7 +446,7 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 pieza dieron cuatro logotipos distintos, y tres prendas dieron tres emblemas de los que ninguno era el
 de Efeonce.
 
-**Hay 279 archivos en 10 kits.** La vista que necesitas casi seguro ya existe; el trabajo es elegirla:
+**Hay 279 archivos en 10 kits (inventario del 2026-09-21; el 2026-10-03 se sumaron 126 vistas puestas).** La vista que necesitas casi seguro ya existe; el trabajo es elegirla:
 
 | Si vas a… | Pásale al modelo |
 |---|---|

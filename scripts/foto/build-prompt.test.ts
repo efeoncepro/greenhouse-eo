@@ -26,11 +26,17 @@ import {
   CLAVES_SIN_ARCHIVO,
   castingDeFicha,
   construirPrompt,
+  cadenaDeGiro,
+  elegirPuesta,
+  giroDeVista,
+  SILUETAS,
+  tapaEnEscena,
   detectarValorDeFormato,
   familiaDeLecho,
   OBJETOS,
   PALANCAS,
   EQUIPO_REAL,
+  ELENCO,
   LINEA_CREATIVA,
   PERSONAS,
   referenciasDeclaradas,
@@ -302,11 +308,22 @@ conAssets('foto:prompt · identidad', () => {
     expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
   })
 
-  it('una expresión pedida va primero y se nombra como la que manda en el gesto', () => {
+  // 🔴 2026-10-03: la expresión ya NO va primera. Puesta primera, la serie salía con la cara girada al mismo lado (las
+  // expresiones se editaron desde un ancla en tres cuartos): la primera imagen manda en la pose más que la frase.
+  it('una expresión pedida va DETRÁS del ancla frontal y se nombra como la que manda sólo en el gesto', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] })
 
-    expect(r.imagenes[0]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
-    expect(r.prompt).toContain("Image 1 is Nexa's EXPRESSION reference: copy only its facial expression")
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[1]).toMatch(/5-expresiones-frente\/nexa-expr-08-conviccion/)
+    expect(r.prompt).toContain("Image 2 is Nexa's EXPRESSION reference: copy only its facial expression")
+  })
+
+  it('en un grupo (una referencia por persona) la expresión no desplaza al ancla frontal', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }, 'karo', 'antonio'] })
+
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes.some(x => x.includes('nexa-expr-08'))).toBe(false)
+    expect(r.prompt).not.toContain("Nexa's EXPRESSION reference")
   })
 
   it('vista + expresión conviven con una persona sola: ángulo primero, gesto segundo, cara y cuerpo después', () => {
@@ -388,8 +405,12 @@ conAssets('foto:prompt · identidad', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['juan'] })).toThrow(/desconocida/)
   })
 
-  it('aborta sobre dos personas: el tope está medido, no supuesto', () => {
-    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'julio'] })).toThrow(/no está medido/)
+  it('aborta sobre dos personas fuera del grupo medido: el tope está medido, no supuesto', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'daniela'] })).toThrow(/no está medido/)
+  })
+
+  it('la misma persona no se pide dos veces', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'julio'] })).toThrow(/aparece dos veces/)
   })
 
   it('exige que `identidad` sea una lista', () => {
@@ -451,10 +472,11 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
   // Las 8 expresiones y los 17 vestuarios existían en disco desde el 2026-09-21 y NO eran direccionables:
   // `vistas` sólo declaraba anclas y ángulos. Los nombres de las expresiones son los del Character Bible
   // §6, que pide usarlos como shorthand de producción.
-  it('antepone la expresión pedida a las referencias frontales', () => {
+  it('suma la expresión pedida detrás del ancla frontal', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'the-read' }] })
 
-    expect(r.imagenes[0]).toContain('nexa-pose-the-read.png')
+    expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
+    expect(r.imagenes[1]).toContain('nexa-pose-the-read.png')
   })
 
   it('antepone el vestuario pedido', () => {
@@ -1543,11 +1565,14 @@ describe('el asset de USO es la prenda puesta, y es el defecto', () => {
   // Contrato EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1: arte plano → producir vistas · prenda aislada
   // → construir · prenda PUESTA → usar en escena. Medido: con la prenda puesta el logotipo sale legible
   // a la primera en las dos personas; con la prenda aislada falló cuatro veces seguidas.
-  itConAssets('sin vista declarada usa la prenda PUESTA, y entonces el macro sobra', () => {
+  // Delta 2026-10-03: el macro viaja TAMBIÉN con la prenda puesta (default de toda prenda; `macroEnUso: false` lo
+  // apaga). En la prueba de uniforme del elenco la marca del pecho salió reinventada con sólo la vista puesta.
+  itConAssets('sin vista declarada usa la prenda PUESTA, con el macro del bordado detrás', () => {
     const { imagenes, prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
 
-    expect(imagenes).toHaveLength(1)
+    expect(imagenes).toHaveLength(2)
     expect(imagenes[0]).toMatch(/puesto-frente/)
+    expect(imagenes[1]).toMatch(/detalle-bordado/)
     expect(prompt).toMatch(/ALREADY WORN/)
   })
 
@@ -1775,5 +1800,165 @@ describe('foto:prompt · casting de campaña (2026-10-02)', () => {
 
   it('una persona desconocida explica cómo declarar el casting', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['nadie'] })).toThrow(/casting/)
+  })
+})
+
+// Elenco de marca (EFEONCE_BRAND_CAST_V1, 2026-10-02): personajes FICTICIOS que reaparecen entre campañas. Viven
+// separados del roster real, interpretan sólo su línea y visten la prenda de esa línea.
+describe('foto:prompt · elenco de marca', () => {
+  it('ningún personaje del elenco comparte clave con el equipo real', () => {
+    for (const clave of Object.keys(ELENCO)) expect(PERSONAS[clave as keyof typeof PERSONAS], clave).toBeUndefined()
+  })
+
+  it('cada personaje declara su línea, su bloque IDENTITY, su cuerpo dentro de refs y cuatro vistas', () => {
+    for (const [clave, p] of Object.entries(ELENCO as Record<string, { linea: string; identity: string; refs: string[]; cuerpo: string; vistas: Record<string, string> }>)) {
+      expect(p.identity, clave).toMatch(/^IDENTITY \(critical\):.*fictional Efeonce campaign character/)
+      expect(p.refs, clave).toContain(p.cuerpo)
+      expect(Object.keys(p.vistas), clave).toEqual(['45-izq', '45-der', 'perfil-izq', 'perfil-der'])
+      expect(['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce'], clave).toContain(p.linea)
+    }
+  })
+
+  it('el lock sella las referencias del elenco', () => {
+    const etiquetas = referenciasDeclaradas().map((r: { etiqueta: string }) => r.etiqueta)
+
+    for (const clave of Object.keys(ELENCO)) expect(etiquetas, clave).toContain(`elenco:${clave}/cuerpo`)
+  })
+
+  it('un casting de ficha no puede tomar la clave de un personaje del elenco', () => {
+    expect(() => castingDeFicha({ casting: { karo: { identity: 'IDENTITY (critical): x', refs: ['a.png'] } } }, 'karo')).toThrow(/elenco de marca/)
+  })
+
+  it('en rol, el elenco viste la prenda de su línea y no interpreta otra línea', () => {
+    const ficha = (persona: string, linea: string, objeto: string) => ({ identidad: [persona], linea, objetos: [{ objeto }] })
+
+    expect(() => validarVestuarioDeLinea(ficha('karo', 'brand', 'hoodie-efeonce'))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(ficha('karo', 'brand', 'chaqueta-bomber-efeonce'))).toThrow(/hoodie Efeonce/)
+    expect(() => validarVestuarioDeLinea(ficha('sophia', 'engine', 'chaqueta-softshell-efeonce'))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(ficha('sophia', 'voice', 'chaqueta-softshell-efeonce'))).toThrow(/no interpreta otra/)
+    expect(() => validarVestuarioDeLinea(ficha('antonio', 'revenue-salesforce', 'chaqueta-bomber-efeonce'))).not.toThrow()
+  })
+
+  // Grupo = cualquier combinación de elenco, Nexa y Julio; el elenco no es obligatorio (operador, 2026-10-03). El resto
+  // del roster sigue con tope dos.
+  it('un grupo de 3 a 5 combina elenco, Nexa y Julio; con otras personas del roster no', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['andres', 'karo', 'hum'] })).toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'andres'] })).toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'karo'] })).not.toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['karo', 'hum', 'sophia', 'isabella', 'antonio', 'julio'] })).toThrow(/no está medido/)
+  })
+
+  itConAssets('Nexa y Julio se suman a un grupo del elenco con su referencia frontal', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'karo', 'antonio'] })
+
+    expect(r.imagenes.slice(0, 4)).toEqual([PERSONAS.julio.refs[0], PERSONAS.nexa.refs[0], ELENCO.karo.refs[0], ELENCO.antonio.refs[0]])
+    expect(r.prompt).toContain('PERSON 2 — NEXA (Image 2): IDENTITY (critical):')
+  })
+
+  itConAssets('el grupo de cinco lleva una referencia frontal por persona, bloques etiquetados y corta la luz de la referencia', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['isabella', 'sophia', 'karo', 'hum', 'antonio'] })
+
+    expect(r.imagenes.slice(0, 5)).toEqual(['isabella', 'sophia', 'karo', 'hum', 'antonio'].map(k => `ai-generations/_identidad-elenco/${k}/${k}-frente.png`))
+    expect(r.prompt).toContain('PERSON 3 — KARO (Image 3): IDENTITY (critical):')
+    expect(r.prompt).toContain('The LIGHT of the identity references does NOT carry over')
+  })
+
+  itConAssets('se pide en `identidad` como el roster, con su vista y su cuerpo', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'isabella', vista: 'perfil-izq' }] })
+
+    expect(r.imagenes[0]).toMatch(/_identidad-elenco\/isabella\/isabella-perfil-izq\.png$/)
+    expect(r.imagenes).toContain('ai-generations/_identidad-elenco/isabella/isabella-cuerpo.png')
+    expect(r.prompt).toContain(ELENCO.isabella.identity)
+  })
+})
+
+
+describe('foto:prompt · selección de la vista puesta (2026-10-03)', () => {
+  const kit = {
+    usoPorVista: {
+      'frente-mujer': 'a', '45-izq': 'b', '45-der': 'c', '45-der-mujer': 'd', '70-der': 'e',
+      espalda: 'f', 'espalda-mujer': 'g', 'frente-mano': 'h', 'frente-mano-mujer': 'i'
+    }
+  }
+
+  it('toda persona del roster y del elenco declara su silueta', () => {
+    for (const [clave, p] of [...Object.entries(PERSONAS), ...Object.entries(ELENCO)]) {
+      expect(SILUETAS, clave).toContain((p as { silueta?: string }).silueta)
+    }
+  })
+
+  it('el giro sale de la vista de identidad: perfil → 70°, tres cuartos → 45°, espalda', () => {
+    expect(giroDeVista(null)).toBe('frente')
+    expect(giroDeVista('45-izq')).toBe('45-izq')
+    expect(giroDeVista('tres-cuartos-der')).toBe('45-der')
+    expect(giroDeVista('perfil-der')).toBe('70-der')
+    expect(giroDeVista('espalda')).toBe('espalda')
+    expect(giroDeVista('trasero')).toBe('espalda')
+  })
+
+  it('elige por silueta y giro, y cae a la más cercana avisándolo', () => {
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: '45-der' })).toMatchObject({ clave: '45-der-mujer', exacta: true })
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: '45-izq' })).toMatchObject({ clave: '45-izq', exacta: false })
+    expect(elegirPuesta(kit, { silueta: 'hombre', vista: 'perfil-der' })).toMatchObject({ clave: '70-der', exacta: true })
+    // El ángulo pesa más que la silueta: lo que se pierde con el ángulo es la marca (operador, 2026-10-03).
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: 'perfil-der' })).toMatchObject({ clave: '70-der', exacta: false })
+    expect(elegirPuesta(kit, { silueta: 'mujer', vista: 'espalda' }).clave).toBe('espalda-mujer')
+    expect(elegirPuesta(kit, { silueta: 'mujer' }).clave).toBe('frente-mujer')
+    expect(elegirPuesta(kit, {}).clave).toBe('frente')
+  })
+
+  it('con algo delante del pecho, gana la vista de oclusión', () => {
+    expect(elegirPuesta(kit, { silueta: 'mujer', tapa: 'mano' }).clave).toBe('frente-mano-mujer')
+    expect(elegirPuesta(kit, { silueta: 'hombre', vista: '45-der', tapa: 'mano' }).clave).toBe('frente-mano')
+    expect(elegirPuesta(kit, { silueta: 'hombre', tapa: 'brazos' })).toMatchObject({ clave: 'frente', exacta: false })
+  })
+
+  it('lista las alternativas para que se pueda forzar otra con `puesta`', () => {
+    const r = elegirPuesta(kit, { silueta: 'mujer', vista: '45-der' })
+
+    expect(r.alternativas).toContain('frente')
+    expect(r.alternativas).toContain('frente-mano-mujer')
+    expect(r.alternativas).not.toContain('45-der-mujer')
+  })
+
+  it('de espaldas: el 70° cae al 45° y éste a la espalda; la cámara baja pide su vista desde abajo', () => {
+    const espalda = { usoPorVista: { espalda: 'a', 'espalda-mujer': 'b', 'espalda-45-izq': 'c', 'espalda-bajo': 'd', 'frente-bajo-mujer': 'e' } }
+
+    expect(cadenaDeGiro('espalda-70-izq')).toEqual(['espalda-70-izq', 'espalda-45-izq', 'espalda'])
+    expect(cadenaDeGiro('70-der')).toEqual(['70-der', '45-der', 'frente'])
+    expect(elegirPuesta(espalda, { silueta: 'hombre', giro: 'espalda-70-izq' }).clave).toBe('espalda-45-izq')
+    expect(elegirPuesta(espalda, { silueta: 'mujer', giro: 'espalda-70-der' }).clave).toBe('espalda-mujer')
+    expect(elegirPuesta(espalda, { silueta: 'hombre', giro: 'espalda', camara: 'baja' }).clave).toBe('espalda-bajo')
+    expect(elegirPuesta(espalda, { silueta: 'mujer', camara: 'baja' }).clave).toBe('frente-bajo-mujer')
+  })
+
+  it('infiere qué tapa la marca desde la escena', () => {
+    expect(tapaEnEscena('She stands with her arms crossed')).toBe('brazos')
+    expect(tapaEnEscena('his right hand rests flat on his chest')).toBe('mano')
+    expect(tapaEnEscena('holding a closed tablet against her chest')).toBe('objeto')
+    expect(tapaEnEscena('he raises a coffee cup near his opposite shoulder')).toBe('cruza')
+    expect(tapaEnEscena('she walks toward the window')).toBeNull()
+  })
+})
+
+describe('foto:prompt · proporción del rostro de Nexa (2026-10-03)', () => {
+  it('la frontal es la v2 corregida y Nexa declara su proporción para foto:rostro', () => {
+    expect(PERSONAS.nexa.refs[0]).toMatch(/nexa-ancla-1-rostro-frontal-v2\.png$/)
+    expect(PERSONAS.nexa.rostro).toEqual({ largoAncho: 0.81, tolerancia: 0.02 })
+    expect(PERSONAS.nexa.identity).toMatch(/about 1\.2 times the distance from the eyes to the chin/)
+  })
+
+  it('las expresiones de Nexa son las casi frontales', () => {
+    for (const ruta of Object.values(PERSONAS.nexa.expresiones as Record<string, string>).filter(r => r.includes('nexa-expr-'))) {
+      expect(ruta).toMatch(/5-expresiones-frente\//)
+    }
+  })
+})
+
+describe('foto:prompt · la expresión de Nexa con más de una persona (2026-10-03)', () => {
+  it('avisa que en dupla o grupo la expresión no viaja como imagen', () => {
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'alivio' }, 'julio'])).toMatch(/no viaja como imagen/)
+    expect(auditarExpresion([{ persona: 'nexa', expresion: 'alivio' }])).toBeNull()
+    expect(auditarExpresion(['nexa'])).toMatch(/25 fotográficas casi de frente/)
   })
 })

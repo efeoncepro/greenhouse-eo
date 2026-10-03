@@ -1,0 +1,101 @@
+{
+  "reference": "Premium-Apiladas",
+  "catalog": "report",
+  "contentType": "report-figure-stacked",
+  "slots": {
+    "chapterTab": "01",
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "layers",
+      "label": "De dónde vienen los clics"
+    },
+    "keyFigure": "60 %",
+    "keyCaption": "de los clics de agosto llegó sin buscar la marca <strong>(772 de 1.284)</strong>",
+    "conclusion": "El alza viene de gente que todavía no conocía la marca",
+    "lead": "Los clics sin marca subieron 28 % contra julio; los de marca se mantuvieron estables, entre 490 y 512.",
+    "figureTitle": "Clics por tipo de búsqueda · junio a agosto",
+    "stackedLegend": [
+      {
+        "label": "Sin marca"
+      },
+      {
+        "label": "Con la marca"
+      }
+    ],
+    "stackedPeriods": [
+      {
+        "label": "Junio",
+        "segments": [
+          "530",
+          "490"
+        ],
+        "total": "1.020",
+        "baseShare": "52 % sin marca"
+      },
+      {
+        "label": "Julio",
+        "segments": [
+          "604",
+          "498"
+        ],
+        "total": "1.102",
+        "baseShare": "55 % sin marca"
+      },
+      {
+        "label": "Agosto",
+        "segments": [
+          "772",
+          "512"
+        ],
+        "total": "1.284",
+        "baseShare": "60 % sin marca"
+      }
+    ],
+    "stackedAnnotation": {
+      "delta": "28 %",
+      "direction": "up",
+      "tone": "better",
+      "label": "sin marca"
+    },
+    "note": {
+      "text": "La base de cada barra es la búsqueda sin marca: su crecimiento se lee sobre la misma escala."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Clics por mes; el total va sobre cada barra."
+      },
+      {
+        "label": "Fuente",
+        "text": "Google Search Console, búsquedas clasificadas por marca"
+      },
+      {
+        "label": "Cobertura",
+        "text": "Tres meses completos: junio a agosto 2026"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio está ganando audiencia nueva, no sólo recibiendo a quienes ya buscan la marca."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Seguir publicando para búsquedas sin marca: traen a clientes que todavía no nos conocen.",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "10",
+      "total": "24"
+    }
+  }
+}

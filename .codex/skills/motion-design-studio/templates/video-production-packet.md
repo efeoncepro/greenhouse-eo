@@ -2,6 +2,21 @@
 
 Completa con [el companion de preproducción y producción](../companions/video-preproduction-and-production.md). Los campos son decisiones verificables, no un prompt monolítico. Usa `no aplica` con razón cuando corresponda.
 
+## 0. Orden de preproducción (transversal)
+
+Marca cada paso con fecha y evidencia ([companion §12](../companions/video-preproduction-and-production.md#12-preproducción-transversal-orden-y-gates)). Ninguna toma pagada antes de que su escena esté aprobada.
+
+- [ ] Brief escrito (formato, duración objetivo, motor previsto, orden de trabajo pedido):
+- [ ] Historia, guion VO, música, voz de personajes, SFX y VFX por toma en papel; historia y VO aprobadas:
+- [ ] Copy de oferta escrito después de cargar la skill dueña de la práctica y el canon de personajes:
+- [ ] Storyboard en canvas con aprobación por escena (enlace y comentarios):
+- [ ] Elenco: quién representa a quién; equipo ≠ cliente; personajes nuevos aprobados:
+- [ ] Contrato de fidelidad (§2): qué se genera, qué es referencia, qué se compone:
+- [ ] Tope por solicitud del motor verificado y plan de tomas ajustado:
+- [ ] Marcas de terceros en la ficción inventadas y verificadas sin homónimo (fecha):
+- [ ] Duración: la que pide la historia; diferencia con el brief avisada al operador:
+- [ ] Destino y nivel de entrega declarados (−14 LUFS video/redes):
+
 ## 1. Identidad y alcance
 
 - Proyecto / versión / fecha / owner:

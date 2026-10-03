@@ -1,0 +1,1487 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T11:14:39.253Z",
+  "run": "ai-generations/2026-10-03_uniforme-vistas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_uniforme-vistas",
+  "totalBytes": 503789254,
+  "fileCount": 246,
+  "files": [
+    {
+      "path": "compuestas-hoja.png",
+      "sizeBytes": 2819237,
+      "sha256": "534f633d4d7b428275d5aa41c7e74117f634c5453f6beed5a6a14e5f97f70f6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/compuestas-hoja.png"
+    },
+    {
+      "path": "cruza-100.png",
+      "sizeBytes": 2041767,
+      "sha256": "bd64b48dcbaee3cdc0a333c37f2b09243e80de029a0bfbf141c4db8b7f5ae7e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/cruza-100.png"
+    },
+    {
+      "path": "cruza-reintento.png",
+      "sizeBytes": 1055465,
+      "sha256": "112b5506f9861411f4aadabd3d3935febe80efe83775b04db59f3321268c00dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/cruza-reintento.png"
+    },
+    {
+      "path": "descartes/cruza-esquiva/bomber-frente-cruza-mujer.png",
+      "sizeBytes": 2023397,
+      "sha256": "158ff6aadaf680fab8c580074d85e91bc8e2e45c4de59088d3b0b7f490d08c39",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/cruza-esquiva/bomber-frente-cruza-mujer.png"
+    },
+    {
+      "path": "descartes/cruza-esquiva/bomber-frente-cruza.png",
+      "sizeBytes": 1989984,
+      "sha256": "454e81b5e16f66ab97dcf75d7c364e00aed95badfa64d1900159353cdba41de1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/cruza-esquiva/bomber-frente-cruza.png"
+    },
+    {
+      "path": "descartes/cruza-esquiva/hoodie-frente-cruza-mujer.png",
+      "sizeBytes": 2278750,
+      "sha256": "802b67199736d88e79539d197abc08ec724b436b34e5e334da95fd96c03db292",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/cruza-esquiva/hoodie-frente-cruza-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-45-der-mujer.png",
+      "sizeBytes": 2530905,
+      "sha256": "8c8242390cf4e2c5de7be42fdbace562ccdde77afa56a5c58abdf44419c50e8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-45-der.png",
+      "sizeBytes": 2530688,
+      "sha256": "48e48b763d38054f3a2a84e9626d12b4704ab2e06f910313db54b6cc290da7b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-45-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-70-der-mujer.png",
+      "sizeBytes": 2355691,
+      "sha256": "d607b4e660fc5949f6650fdb9714d3e5b400ab877c4b28383bc717d8884ba1fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-70-der.png",
+      "sizeBytes": 2316057,
+      "sha256": "c29488c25f7dcbd0c1975aa6371b5bb144246dbfb9efc57cb7abcf76c79bf647",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-70-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-70-izq-mujer.png",
+      "sizeBytes": 2418194,
+      "sha256": "fc0de7998f2116416fdaeb6936e00f652262cac9ab12074bd7cd490477348b53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/bomber-70-izq.png",
+      "sizeBytes": 2234756,
+      "sha256": "ef49e824e322ab289aa4006cfdd066e4a6301e552ba9d0693fe89dc8f89ab5c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/bomber-70-izq.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-45-der-mujer.png",
+      "sizeBytes": 3176595,
+      "sha256": "4406634d7107c6e6f172a5848c84d27562dd3cdbbe1643ba72fac17d9e11a669",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-45-der.png",
+      "sizeBytes": 3150238,
+      "sha256": "f4aea8cfc734ea57558f3d60ebc906fd57f7e17c6417095151a0ff46eec8cd5a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-45-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-70-der-mujer.png",
+      "sizeBytes": 2938158,
+      "sha256": "0d07abd93e3fb3216a23a02aefddfbc5b798e47204b21c575a6c3af1090c5190",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-70-der.png",
+      "sizeBytes": 2896611,
+      "sha256": "f572244aab23b11f92ea5753537c5dfc5469c52758c3516beb6cb49cd7ea96ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-70-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-70-izq-mujer.png",
+      "sizeBytes": 2916081,
+      "sha256": "f65154dfcfdd6b083640a2460f515ae16d07ac41149a8cb49d664aa1fefdc614",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/hoodie-70-izq.png",
+      "sizeBytes": 2791094,
+      "sha256": "1e2872d1b92a1ef87f0d2bedae41917b88e174bd8af358f544d26cdac2cfa250",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/hoodie-70-izq.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-45-der-mujer.png",
+      "sizeBytes": 3058013,
+      "sha256": "d4aaade60c957d2eed32312fa2a537ddf28725ad1c8b959e892f5e6b05797d62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-45-der.png",
+      "sizeBytes": 3301985,
+      "sha256": "f289bf0d4e9e79973fa54b90d9500dae42963f9f9e27686ecb88391e6c21bf52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-45-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-70-der-mujer.png",
+      "sizeBytes": 2822597,
+      "sha256": "3eb765cbf90450fa8a86a9bb0f71b0b207e89ff98b47dd5895255b8834708f90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-70-der.png",
+      "sizeBytes": 2957158,
+      "sha256": "537351ec2536657e5823540aeee91c39a971ac2a73f713ab52b351017f8c88fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-70-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-70-izq-mujer.png",
+      "sizeBytes": 2873335,
+      "sha256": "fb1ecaeacbb2d329989d168fefb73f479d4fa8020bbeb195721dde5b6e1e9422",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/polo-70-izq.png",
+      "sizeBytes": 2906833,
+      "sha256": "36934b69fcf9f6c0e3110cd0dcc3124b11a327da3a5b0f5a3d2c3fb439991393",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/polo-70-izq.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-45-der-mujer.png",
+      "sizeBytes": 2601514,
+      "sha256": "bca44f6bf8f166c2059b6af78e3ffe120b9ae48f7415431908669ef3524da54f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-45-der.png",
+      "sizeBytes": 2640241,
+      "sha256": "e3310282c4df10f5b9b72d153ad9a0d0fd4b1b49caade696fa14a185a11d3c58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-45-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-70-der-mujer.png",
+      "sizeBytes": 2451388,
+      "sha256": "0856f00ded536c594c2b7826e5faa6b54d4287ba10f36376272ec15f18ba9f14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-70-der.png",
+      "sizeBytes": 2454406,
+      "sha256": "17770d3edaf524da1a94803aa85a662a52e13884ea1d0179412530119d860488",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-70-der.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-70-izq-mujer.png",
+      "sizeBytes": 2516002,
+      "sha256": "796ff0623994ca179843f78410196fe22677fbd4c9cae48280354d302ccca4ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/escorzo-compuesto/softshell-70-izq.png",
+      "sizeBytes": 2418764,
+      "sha256": "6574a8d98f7a1dc8d512131935b27c2b399c1362861e8fd4e31ba16e5bde754d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/escorzo-compuesto/softshell-70-izq.png"
+    },
+    {
+      "path": "descartes/gorra-frente-mujer-royal.png",
+      "sizeBytes": 1842685,
+      "sha256": "df13310986bc2eaef11301419484b0e19f7d0c8700d4697382b20a555ec18cf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/gorra-frente-mujer-royal.png"
+    },
+    {
+      "path": "descartes/gorra-frente-royal.png",
+      "sizeBytes": 1950483,
+      "sha256": "bc874418e8639358b0fd1fe37749f8b2492ec5203cd1c738bd0bcc383fd2ef3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/gorra-frente-royal.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/bomber-frente-objeto-mujer.png",
+      "sizeBytes": 2006225,
+      "sha256": "6a5634bfab6df1146665317a9a5b4dc1c8b1f8816727c852086da7a311ba31f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/bomber-frente-objeto-mujer.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/bomber-frente-objeto.png",
+      "sizeBytes": 1963482,
+      "sha256": "5ed19ebc8acd14fd883a2c0e750c6ba6ba3b7d330cbb404e15be1e1bac822fbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/bomber-frente-objeto.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/hoodie-frente-objeto-mujer.png",
+      "sizeBytes": 2267696,
+      "sha256": "597f00883697d4bfe48cdb2958e36f28b5957786ae416e571e3462a792ca30a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/hoodie-frente-objeto-mujer.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/hoodie-frente-objeto.png",
+      "sizeBytes": 2253494,
+      "sha256": "a822ca37d5d32b99a1dd7f5a6eb822916a94245436b2e20060b3d9fd6bce2d72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/hoodie-frente-objeto.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/polo-frente-objeto-mujer.png",
+      "sizeBytes": 2311618,
+      "sha256": "3777704c1d6e304bdc4a8bb58b111b5dee5e26aac470a571653320f2fe584934",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/polo-frente-objeto-mujer.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/polo-frente-objeto.png",
+      "sizeBytes": 2376860,
+      "sha256": "e0c30fab7715fd3ebd81be3fc838cd9c1726e434337b6ec01f3459bef3c426f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/polo-frente-objeto.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/softshell-frente-objeto-mujer.png",
+      "sizeBytes": 1992539,
+      "sha256": "3e3f0b2789e66a96715e3b735816ebaac02f8cf87ebbb9013ad2f88e67077103",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/softshell-frente-objeto-mujer.png"
+    },
+    {
+      "path": "descartes/objeto-esquiva/softshell-frente-objeto.png",
+      "sizeBytes": 2010968,
+      "sha256": "be445b64196a6dc6b36604e51dd2b0c4d4e32f39113f44df7e5c95e9a31117a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/objeto-esquiva/softshell-frente-objeto.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-45-der-mujer.png",
+      "sizeBytes": 2026932,
+      "sha256": "d5a9e240cb2569fc7aefcaf44c4124e28da5a685742fc193cbd3a853a99f8995",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-45-der.png",
+      "sizeBytes": 2016129,
+      "sha256": "1fe1e3c41a48ee3a5b955411fd25bf3835827f353fb62e7941ec85975787ef68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-45-der.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-70-der-mujer.png",
+      "sizeBytes": 1899937,
+      "sha256": "0aba8c974a5eb257c42f317d9fad0526c219f7ce86aa65dd8ff410ee574b4b6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-70-der.png",
+      "sizeBytes": 1827636,
+      "sha256": "7ec7f13791349d63fb9a1df80921178c6d6fa032167895a62f5e99e7d431818f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-70-der.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-70-izq-mujer.png",
+      "sizeBytes": 1939893,
+      "sha256": "32e92efd19e0b2524b999cb378d1bd6b9eb4c00d34251ee8228fb5cf1e29c798",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/bomber-70-izq.png",
+      "sizeBytes": 1847909,
+      "sha256": "a0b91df2eed808c3680dcd922e9a9f91fa948cdc4bb956505f1aee904775369d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/bomber-70-izq.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-45-der-mujer.png",
+      "sizeBytes": 2271295,
+      "sha256": "a365d8424f5cb9eaab597ce8238a5e5531b5d709615fd2ea66cfbc57cfd04b47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-45-der.png",
+      "sizeBytes": 2262055,
+      "sha256": "faef037834416dab614a9ee9a79867a4ddd2132ac307320a82b853e973268136",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-45-der.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-70-der-mujer.png",
+      "sizeBytes": 2101907,
+      "sha256": "6d1468908d04c938a31b7bb8903ce73dbb574d2220f2464c164790348f0eba43",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-70-der.png",
+      "sizeBytes": 2065629,
+      "sha256": "61252055a8dfe7fee933b909c1be4de1e4b6b951fd740320b32e451a638b5a0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-70-der.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-70-izq-mujer.png",
+      "sizeBytes": 2114458,
+      "sha256": "089f000d49f233f36da44a1cda24cd117b64cde8938f782e0ab4b672213f5dca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/hoodie-70-izq.png",
+      "sizeBytes": 2057521,
+      "sha256": "dc00daad962e87cdee77c15c5bd0ff4e8756030f0c0d28a48c41ff8d8b81707d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/hoodie-70-izq.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-45-der-mujer.png",
+      "sizeBytes": 2437055,
+      "sha256": "a2882b89dda2cbaf517d592644c65e05341505359b8135663f1782fcdad4ab06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-45-der.png",
+      "sizeBytes": 2627571,
+      "sha256": "ee7a5e7b52a17e349109e80589bc401866892eed34d8fba1cc60acdc1174c4df",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-45-der.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-70-der-mujer.png",
+      "sizeBytes": 2242138,
+      "sha256": "5db5376d037d95122e75f69114a00142cfc06b8a5a59f7ae34cffbe9ffd46d08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-70-der.png",
+      "sizeBytes": 2315176,
+      "sha256": "586351f2e90bad8d7d65d6dad71077bb4185f72bc39c4d1aea5795c20a8b0c15",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-70-der.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-70-izq-mujer.png",
+      "sizeBytes": 2220288,
+      "sha256": "bdcfcef4110ba66170f04a8bb226ee00a6230f0eecc1dea742db54fbb61cf545",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/polo-70-izq.png",
+      "sizeBytes": 2248014,
+      "sha256": "db901ec5bf7ffeb6852b35d44dbd243188f42b59bd579d4ef6d51cf7f0d1998b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/polo-70-izq.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-45-der-mujer.png",
+      "sizeBytes": 2053493,
+      "sha256": "c89a50a6bc615aa786f0223e12e173360e0995b7e8ec09a2594c263f6cde7604",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-45-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-45-der.png",
+      "sizeBytes": 2063804,
+      "sha256": "d7a2c17c6c0005b5bd623920617711dfbcd36932da05cbe65b2912c935746fd1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-45-der.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-70-der-mujer.png",
+      "sizeBytes": 1925335,
+      "sha256": "a805685652b66e216f9f17117b7c30bce1bef632662ee47f4f42290214577822",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-70-der-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-70-der.png",
+      "sizeBytes": 1909726,
+      "sha256": "5013996ce90594d08bc55a2286de740190a68e32ed739286eeea025a39d76123",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-70-der.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-70-izq-mujer.png",
+      "sizeBytes": 1932626,
+      "sha256": "9dea3d0b945fc924f921ab33e0240cad377b8ca11d7bb7cb72102adad256b3a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-70-izq-mujer.png"
+    },
+    {
+      "path": "descartes/rotadas/softshell-70-izq.png",
+      "sizeBytes": 1883442,
+      "sha256": "355aa60ce6a37de0f812df33c30de178fb3cf1cca65b6dbb89e96e27e0309db5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/descartes/rotadas/softshell-70-izq.png"
+    },
+    {
+      "path": "entrada/efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 3656238,
+      "sha256": "9491668eee82b5cefdd9e32d5b8f0babaec0c5fec54b8675f65745131a038744",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "entrada/efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 3892316,
+      "sha256": "acd2a3cc5ebba8a83ff8503d53abae868bc4cfe6d4772ead966a87b1c55f95ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "entrada/efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 3323982,
+      "sha256": "8d9a860d32768ca1eee0d477e96beccca6cf232f8ccc258de3d58eee43eb81f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "entrada/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 4700257,
+      "sha256": "93472681dac1b28b823638d3fba02771229824fb0d099710fe081a4204ccd174",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "entrada/efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 4458607,
+      "sha256": "3049168afff02127c98b935c3b508ddd5e19f1209dea638bf0d0c9eb11a5476d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "entrada/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png",
+      "sizeBytes": 4820743,
+      "sha256": "7592fbf06a10951ddd6ec3ef138030411b7115a808c11883893d805556ae23af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/entrada/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio-2x3.png"
+    },
+    {
+      "path": "hoja-espaldas.png",
+      "sizeBytes": 3726038,
+      "sha256": "c682f2fc9272f92b0909a87c9fc6d25128bb0ab333376fc5efdb1908db2fb7d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-espaldas.png"
+    },
+    {
+      "path": "hoja-gorra.png",
+      "sizeBytes": 2470656,
+      "sha256": "94af398961239600d8615a4361a53b4505c9fc1413bf0a091510a292fee8e708",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-gorra.png"
+    },
+    {
+      "path": "hoja-gorra1.png",
+      "sizeBytes": 1624834,
+      "sha256": "9aee090fa4f4789f720be818c030877f70c3c549bb95fe91b2524e38cdc8bb6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-gorra1.png"
+    },
+    {
+      "path": "hoja-objeto-cruza.png",
+      "sizeBytes": 2785517,
+      "sha256": "65f11521ae7413c83e7c4c4abfb1ffbbe9a2423fa76745770d9dd07a00b5b3ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-objeto-cruza.png"
+    },
+    {
+      "path": "hoja-oclusion.png",
+      "sizeBytes": 2206480,
+      "sha256": "7eafb5b0a74b2c90e3b39eea89ccf42178e751aec9efa5f44aeea2e0a5766f63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-oclusion.png"
+    },
+    {
+      "path": "hoja-ola1.png",
+      "sizeBytes": 2340708,
+      "sha256": "1a8f1e99edbcfb1e104bd9124b50b052e1945fef76d4d3814381df5a3759afa1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-ola1.png"
+    },
+    {
+      "path": "hoja-ola23.png",
+      "sizeBytes": 2658222,
+      "sha256": "179e7a972953d7bc5360ef2f676b534fa434a6a875cf994782ae8851b1c455d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/hoja-ola23.png"
+    },
+    {
+      "path": "kit-bomber.png",
+      "sizeBytes": 1850015,
+      "sha256": "087b7b07c245007874b07e7d551971332e0b86bd07f76e3bb4e09b7c29acb92a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-bomber.png"
+    },
+    {
+      "path": "kit-gorra.png",
+      "sizeBytes": 442841,
+      "sha256": "a560cc790fd30f64dd98c97b63f3e55cfb7dba0ab58a55a1b9f8560e713bfa7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-gorra.png"
+    },
+    {
+      "path": "kit-hoodie.png",
+      "sizeBytes": 2128277,
+      "sha256": "0ced92cefe159720850e6ecaaa9392354353b0786148805c3b483be720076b29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-hoodie.png"
+    },
+    {
+      "path": "kit-polo.png",
+      "sizeBytes": 2080158,
+      "sha256": "239e29e2378f9790d515f2c7f875c502f320c19e003c48fdbe200ed274b1dd24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-polo.png"
+    },
+    {
+      "path": "kit-softshell.png",
+      "sizeBytes": 1875371,
+      "sha256": "ea6c92beb02ba2017877b3aaaf2618bcd295ea7fe85ad70e81dbf35c0fa7bd51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/kit-softshell.png"
+    },
+    {
+      "path": "letras-espaldas.png",
+      "sizeBytes": 4786686,
+      "sha256": "dfcfde57e2ca2c8f4d50783e8263ca9608206d58216c1df4d9e6e53a453a06d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/letras-espaldas.png"
+    },
+    {
+      "path": "letras-gorra.png",
+      "sizeBytes": 2616325,
+      "sha256": "885d15a3bf6fb00635333af31e3d38388f79c96b33d1b82ea03ec01de9413e85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/letras-gorra.png"
+    },
+    {
+      "path": "mano-100.png",
+      "sizeBytes": 2351725,
+      "sha256": "9d13ab7c9de19fb62402177a83cee974d208a3415e6c1fd4ba9cd8accde8b9c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mano-100.png"
+    },
+    {
+      "path": "marcas-bomber-23.png",
+      "sizeBytes": 682503,
+      "sha256": "b5259cfbf4ebfbedb62f1395f2877592876ea0eae5bc95275a1132af358fde6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-bomber-23.png"
+    },
+    {
+      "path": "marcas-bomber-4.png",
+      "sizeBytes": 796997,
+      "sha256": "ae02a1337411d998ea1c3a88267f02ac723d81d21dd2bf071051b264ea13f656",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-bomber-4.png"
+    },
+    {
+      "path": "marcas-hoodie-23.png",
+      "sizeBytes": 1247547,
+      "sha256": "eb1740c2bf8ea9bfd1552746be0ca5df19e91727b758d94a34f9a3f5e1ab2a68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-hoodie-23.png"
+    },
+    {
+      "path": "marcas-hoodie-4.png",
+      "sizeBytes": 1278377,
+      "sha256": "1298cb3c14f643974ab808b18d110f08ca9ce0bbaf60219970f138b12014e810",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-hoodie-4.png"
+    },
+    {
+      "path": "marcas-ola1.png",
+      "sizeBytes": 2456220,
+      "sha256": "cf8d0ad5e799df8b51108b49b4f7558e149afbf938e984a77d04fd25aa5e0199",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-ola1.png"
+    },
+    {
+      "path": "marcas-ola23.png",
+      "sizeBytes": 3943341,
+      "sha256": "198365a02e71d43d5dee7c5091b8e4149982bb1015d8b7751b417c52f55e0b00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-ola23.png"
+    },
+    {
+      "path": "marcas-ola4.png",
+      "sizeBytes": 4216867,
+      "sha256": "d4f19301ff6bd84a73b14ac23b5002c31c4c602897fe30b0353b05d381a73219",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-ola4.png"
+    },
+    {
+      "path": "marcas-polo-23.png",
+      "sizeBytes": 1070159,
+      "sha256": "60b25989a2f6b05dca152366f9c39c2304a96db9d69d51a0e13e63f6ecce9741",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-polo-23.png"
+    },
+    {
+      "path": "marcas-polo-4.png",
+      "sizeBytes": 1267815,
+      "sha256": "b46cae09d0e4d3b99cf91441a95ab3241c9212ed534d02d2f21cde9cf5dc5907",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-polo-4.png"
+    },
+    {
+      "path": "marcas-softshell-23.png",
+      "sizeBytes": 908242,
+      "sha256": "d4f3a07465fe59ade79ccf7dfe2de77f01dc23440fa40b9ec5b5ce4806b4255e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-softshell-23.png"
+    },
+    {
+      "path": "marcas-softshell-4.png",
+      "sizeBytes": 873338,
+      "sha256": "e69be4904df1d4c934b8a176f2b9c28dfb2ca902bd2d7b342eefaafed38a31d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/marcas-softshell-4.png"
+    },
+    {
+      "path": "mascaras/bomber-45-der-fondo.png",
+      "sizeBytes": 18723,
+      "sha256": "becf70dc390111a78d74417be3be9c9dfb36c16cccdc5acf621be258cfba15e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-45-der-fondo.png"
+    },
+    {
+      "path": "mascaras/bomber-45-der-mujer-fondo.png",
+      "sizeBytes": 18928,
+      "sha256": "73f92670353f99aa0470ff2336f695b1df08a7bc9e04e9f5735c6ed5784f163e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-45-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/bomber-70-der-fondo.png",
+      "sizeBytes": 17669,
+      "sha256": "737e0309c300959854e538c5785861ad0cbc043b8807e6a0fabcfb007b7047b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-70-der-fondo.png"
+    },
+    {
+      "path": "mascaras/bomber-70-der-mujer-fondo.png",
+      "sizeBytes": 18462,
+      "sha256": "bfa9cd196f5423f8b6a44c9caf1e0bf23209eef2a94987f1c88c65276a8eaa06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-70-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/bomber-70-izq-fondo.png",
+      "sizeBytes": 16967,
+      "sha256": "95bd4a7a4a9230297f9d15b7434be40fa789de51c369a63d81f209f9996e9165",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-70-izq-fondo.png"
+    },
+    {
+      "path": "mascaras/bomber-70-izq-mujer-fondo.png",
+      "sizeBytes": 17499,
+      "sha256": "769d0c7c2d02946f1d7daf77d60312a46b88edb66d7671c9094c9c2124602e62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/bomber-70-izq-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-45-der-fondo.png",
+      "sizeBytes": 19731,
+      "sha256": "4108fa99de736e644a93f9bc737c516ce9f910da7ca3273094914ae9d68876cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-45-der-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-45-der-mujer-fondo.png",
+      "sizeBytes": 18556,
+      "sha256": "af15e2550effc119738dd07f1b335a5cb80c9eedbae5534e681ae330a0365242",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-45-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-70-der-fondo.png",
+      "sizeBytes": 18112,
+      "sha256": "633dd9e1831d846b3cfa3fe77b4e222d40d4a282b22980e067deee0a3b929fe5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-70-der-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-70-der-mujer-fondo.png",
+      "sizeBytes": 17680,
+      "sha256": "0571920c815824ca788cb8ffd9b9a5f545fea4fe302dc8cb99a53a16b7f9a731",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-70-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-70-izq-fondo.png",
+      "sizeBytes": 17651,
+      "sha256": "78ee4674152b77a10dacae5ea177ea05865fd894b12bb98a665bb6de3ed431ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-70-izq-fondo.png"
+    },
+    {
+      "path": "mascaras/hoodie-70-izq-mujer-fondo.png",
+      "sizeBytes": 17161,
+      "sha256": "89780ccea628affc70ab5a223d7b62d48f2c0fd42a0c4d74cb0b582f66d04182",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/hoodie-70-izq-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-45-der-fondo.png",
+      "sizeBytes": 18032,
+      "sha256": "7e4f31711c54c72a0ef5d0302e38e4fa20379eb45669f2fee4748dc192aebcf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-45-der-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-45-der-mujer-fondo.png",
+      "sizeBytes": 18693,
+      "sha256": "04a452ac354438cfb72c265aa0e37b7fe5afaaf25860bd9687f8636ec00d67b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-45-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-70-der-fondo.png",
+      "sizeBytes": 17089,
+      "sha256": "1be8a3733604d734bb601c4386cbb2e39f408076cb4b60f946f86932661c130f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-70-der-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-70-der-mujer-fondo.png",
+      "sizeBytes": 18048,
+      "sha256": "33b29570b22d79be1d105f3693fe35f2383f8e538fed4a233d08a6dd91b112a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-70-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-70-izq-fondo.png",
+      "sizeBytes": 16922,
+      "sha256": "3029d909a187b285eecb6fba2f8198765d259ffec0343ef0b93ca2410e75c3fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-70-izq-fondo.png"
+    },
+    {
+      "path": "mascaras/polo-70-izq-mujer-fondo.png",
+      "sizeBytes": 17012,
+      "sha256": "c5dddfd339d18a262d550b89f054ce5a647c44cf1fca878cf19e3d5ea976e576",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/polo-70-izq-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-45-der-fondo.png",
+      "sizeBytes": 19838,
+      "sha256": "ff0749d1f6fa5e92bef4a6435ce1478cd720c26ea134a144c0d70ed3242ebcb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-45-der-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-45-der-mujer-fondo.png",
+      "sizeBytes": 18525,
+      "sha256": "acb496ddc586cfe1eb687e5c3e79347cc9e066c89ae293af027cfa1effec91a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-45-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-70-der-fondo.png",
+      "sizeBytes": 17475,
+      "sha256": "69ef63c10bf7690cc06708cf3bc8ea8599d3f8ae5eaa2f6d5c844dc57193c453",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-70-der-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-70-der-mujer-fondo.png",
+      "sizeBytes": 17496,
+      "sha256": "64fcb92f187f643a9b421d3ca5289d5e6501a008353cc2566a4558fef9bc7060",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-70-der-mujer-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-70-izq-fondo.png",
+      "sizeBytes": 16967,
+      "sha256": "781667d15bb2e9209ee5200697b64cee617d3235cba8cb9f8c5e04a0b13e52cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-70-izq-fondo.png"
+    },
+    {
+      "path": "mascaras/softshell-70-izq-mujer-fondo.png",
+      "sizeBytes": 17375,
+      "sha256": "24a9f73cf2b55f50aab58c9c8d8e160ec4dcc739625709c07a8a9bb476475a6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/mascaras/softshell-70-izq-mujer-fondo.png"
+    },
+    {
+      "path": "out/bomber-45-der-mujer.png",
+      "sizeBytes": 2027532,
+      "sha256": "8a44eda229c8e978a757882fc3d8b56d87254847b68e86b94fb5b3f2a8ec9a5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-45-der-mujer.png"
+    },
+    {
+      "path": "out/bomber-45-der.png",
+      "sizeBytes": 2037623,
+      "sha256": "7000bad98c3aac9cda690ddb8b913ed369e23f7e3501224d1987e4ede2a881bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-45-der.png"
+    },
+    {
+      "path": "out/bomber-45-izq-mujer.png",
+      "sizeBytes": 2030950,
+      "sha256": "1396023fa040bdcaebe61343c81248591915e7031a53c5675698a112e9463523",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-45-izq-mujer.png"
+    },
+    {
+      "path": "out/bomber-45-izq.png",
+      "sizeBytes": 2005193,
+      "sha256": "c8f38b318de9dd0df83e2bedf8b6870d34655be511fef1d7be5fb45400cf2208",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-45-izq.png"
+    },
+    {
+      "path": "out/bomber-70-der-mujer.png",
+      "sizeBytes": 1960052,
+      "sha256": "b0b706b782f5fccf74e5d7fbe2bed3404138cdc98f02e4ef073de80d566c50f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-70-der-mujer.png"
+    },
+    {
+      "path": "out/bomber-70-der.png",
+      "sizeBytes": 1950847,
+      "sha256": "26730d40063e418c4e50ab695bb7fb000e7b5fdb083057c76c6314abde5d4a9d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-70-der.png"
+    },
+    {
+      "path": "out/bomber-70-izq-mujer.png",
+      "sizeBytes": 1898609,
+      "sha256": "7435a1ffbebbfc4d4e50d131c1d8e676b71aefd1420a54e358e97a0d3c4623c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-70-izq-mujer.png"
+    },
+    {
+      "path": "out/bomber-70-izq.png",
+      "sizeBytes": 1952715,
+      "sha256": "94d4999626edde4ed9a4fee68a692b654b4085e38ea232c8bdb1c3b483a6b764",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-70-izq.png"
+    },
+    {
+      "path": "out/bomber-espalda-45-der-mujer.png",
+      "sizeBytes": 2112475,
+      "sha256": "3ca6abf81976e4ef905e747f70729305638d2ed5c833a0a4bff2f1973dac9178",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-45-der-mujer.png"
+    },
+    {
+      "path": "out/bomber-espalda-45-der.png",
+      "sizeBytes": 2021003,
+      "sha256": "e32cbbe9d3f51b2eb54c95156483c723e4d2dd2a5290a50c259392d6af102501",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-45-der.png"
+    },
+    {
+      "path": "out/bomber-espalda-45-izq-mujer.png",
+      "sizeBytes": 2122360,
+      "sha256": "ffe4bdc2e49585743cc98b8bd695ec47c599b1a8944604c1d2fcfb160867c419",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-45-izq-mujer.png"
+    },
+    {
+      "path": "out/bomber-espalda-45-izq.png",
+      "sizeBytes": 2015787,
+      "sha256": "b332853a982081aa5b734ae0dd24c416f05ba810c6489ae9661f46b8eed5f546",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-45-izq.png"
+    },
+    {
+      "path": "out/bomber-espalda-70-der-mujer.png",
+      "sizeBytes": 2099437,
+      "sha256": "2f889a22ca516da921d2a8b6067afa23485bb57130854e7d67cd915e696c1a51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-70-der-mujer.png"
+    },
+    {
+      "path": "out/bomber-espalda-70-der.png",
+      "sizeBytes": 1978140,
+      "sha256": "40d2719eb20f1ce52a05cd098b2d65ca20f91030a7c7e1ce3aab68001dc93ba4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-70-der.png"
+    },
+    {
+      "path": "out/bomber-espalda-70-izq-mujer.png",
+      "sizeBytes": 2117655,
+      "sha256": "5279faacc706fee07cedb30703b16a0479c3027a08d62df0041f1d3834d61999",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-70-izq-mujer.png"
+    },
+    {
+      "path": "out/bomber-espalda-70-izq.png",
+      "sizeBytes": 2000587,
+      "sha256": "691f17dc4a9d21d09e284eb0163cc32a5353c5ffadaeb67631d52bcae741bd40",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-70-izq.png"
+    },
+    {
+      "path": "out/bomber-espalda-bajo-mujer.png",
+      "sizeBytes": 2231629,
+      "sha256": "b1085d695bf9764e44b9f4f293b7f9697aab289fa63c0277ba5d84f056fbefe4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-bajo-mujer.png"
+    },
+    {
+      "path": "out/bomber-espalda-bajo.png",
+      "sizeBytes": 2160078,
+      "sha256": "fe089cfcd1df4f098d4e8e1edb24216470e6cfe737eb68164478a99b70f5d5d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-espalda-bajo.png"
+    },
+    {
+      "path": "out/bomber-frente-bajo-mujer.png",
+      "sizeBytes": 2169740,
+      "sha256": "0a224f7fe6ba0e7b38af676414d33cf3265ceb51e8b6b178dedc011294064272",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-bajo-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-bajo.png",
+      "sizeBytes": 2178416,
+      "sha256": "b5428993822c5c5dea385384a5b130be9b8535d880c739cf014875e0dca44a67",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-bajo.png"
+    },
+    {
+      "path": "out/bomber-frente-brazos-mujer.png",
+      "sizeBytes": 1993299,
+      "sha256": "1dd1f73fa5977f2a8670248c6c6ac981997296acd6c10e2a58c01ae6168a0c83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-brazos-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-brazos.png",
+      "sizeBytes": 1999740,
+      "sha256": "5ba7e87f94091a70cd514d0635537782080a6e6bcdf77e07baaef7424d889d8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-brazos.png"
+    },
+    {
+      "path": "out/bomber-frente-cruza-mujer.png",
+      "sizeBytes": 1994347,
+      "sha256": "861193110068807e66e0673350809ab95010134d43bb7d87a43a387453cb8b44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-cruza-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-cruza.png",
+      "sizeBytes": 2021871,
+      "sha256": "d7d0d54fe9c31d1db9f10be5ed498cf285c1715a234cedf4a8a5125381386b76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-cruza.png"
+    },
+    {
+      "path": "out/bomber-frente-mano-mujer.png",
+      "sizeBytes": 2010084,
+      "sha256": "1ac31d6977a1257cc9f5f28c540c41228b6afc98a072586d0194eb4729c42ba8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-mano-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-mano.png",
+      "sizeBytes": 2019283,
+      "sha256": "a108ff4df24eda6cc82addfc6966f941003b414e69facb1b7267bcd0ba99fd57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-mano.png"
+    },
+    {
+      "path": "out/bomber-frente-mujer.png",
+      "sizeBytes": 2113911,
+      "sha256": "4e17fdff7ecced3bbf116b3b784f78c7832940f7a0277497f59329836ba22301",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-objeto-mujer.png",
+      "sizeBytes": 1955263,
+      "sha256": "8464903588454036a3dfa18d0c0e14a1ba937bf72cc2f2e90c369ea16dd37967",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-objeto-mujer.png"
+    },
+    {
+      "path": "out/bomber-frente-objeto.png",
+      "sizeBytes": 1961619,
+      "sha256": "66044bdbe2f3f581bce9af8328bee0efdce28b69c3c457409a9ec0bf4696be76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/bomber-frente-objeto.png"
+    },
+    {
+      "path": "out/gorra-45-der-mujer.png",
+      "sizeBytes": 1844318,
+      "sha256": "8fe4f34520a14ae25ef41cddcef0c9b589c1b757579a0c11d764cf244460fc76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-45-der-mujer.png"
+    },
+    {
+      "path": "out/gorra-45-der.png",
+      "sizeBytes": 1795148,
+      "sha256": "ccd05002e4e0ebea889fd8b5d64cc4b1bf4fa01ed55fa1c27091d38be7ab98a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-45-der.png"
+    },
+    {
+      "path": "out/gorra-45-izq-mujer.png",
+      "sizeBytes": 1774952,
+      "sha256": "a76c35b621e371fdca5d3167fbc3305d8bd32740afb6c11c05a9dbae94758588",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-45-izq-mujer.png"
+    },
+    {
+      "path": "out/gorra-45-izq.png",
+      "sizeBytes": 1796949,
+      "sha256": "35a0f1646380761c71e90dc918d6aedb4522bcc91623fc906fa827584bf0a8a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-45-izq.png"
+    },
+    {
+      "path": "out/gorra-70-der-mujer.png",
+      "sizeBytes": 1857757,
+      "sha256": "495633c0e25282de2c614606a47080589db68892912fbaa2661304ffba999be5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-70-der-mujer.png"
+    },
+    {
+      "path": "out/gorra-70-der.png",
+      "sizeBytes": 1800490,
+      "sha256": "2083e6d839e0c50e24e2e6ff2fea6dee7200b5067b02e9ddaeee5477f283ff4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-70-der.png"
+    },
+    {
+      "path": "out/gorra-70-izq-mujer.png",
+      "sizeBytes": 1761673,
+      "sha256": "511d3c20452bac5be0d74d370a803dc980a21ac7af0a57f50d29c4f78721df7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-70-izq-mujer.png"
+    },
+    {
+      "path": "out/gorra-70-izq.png",
+      "sizeBytes": 1762742,
+      "sha256": "dccc1c550ca1a99908fc992570edb479dc5e1b88a27dd7e44241af83f5b64fe2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-70-izq.png"
+    },
+    {
+      "path": "out/gorra-frente-mujer.png",
+      "sizeBytes": 1810852,
+      "sha256": "9cccce9f02068bb03fc8dc70d1dc1bcad8469c28211b04669396c5ce24c3e644",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-frente-mujer.png"
+    },
+    {
+      "path": "out/gorra-frente.png",
+      "sizeBytes": 1908525,
+      "sha256": "9c7cdb52bf8f40bda03182571bfe8192d1e424218c4e72b2fea58929c753eb89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/gorra-frente.png"
+    },
+    {
+      "path": "out/hoodie-45-der-mujer.png",
+      "sizeBytes": 2255270,
+      "sha256": "89a7d5cc86c1482a50c4dc26c0ec84c9f150583f415453cdf6bb918bf0a3413f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-45-der-mujer.png"
+    },
+    {
+      "path": "out/hoodie-45-der.png",
+      "sizeBytes": 2346973,
+      "sha256": "a765e8e4374fffc189ecb6d953d7d8701e7188ef663dabf1e37517ac1cd3d4f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-45-der.png"
+    },
+    {
+      "path": "out/hoodie-45-izq-mujer.png",
+      "sizeBytes": 2295916,
+      "sha256": "ddca975746a32a84a7216a02df60b0c744536a6fbd87a29f511725ae8268c550",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-45-izq-mujer.png"
+    },
+    {
+      "path": "out/hoodie-45-izq.png",
+      "sizeBytes": 2315603,
+      "sha256": "d329b04ac617bec07e92a569169e87c8d1002d5f382ca03fbf5b6397dc5db033",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-45-izq.png"
+    },
+    {
+      "path": "out/hoodie-70-der-mujer.png",
+      "sizeBytes": 2171793,
+      "sha256": "a424a4d31b102b006b7c9afbf46ec7e9ee28c3b65e0d5390eb201c63decc4dcb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-70-der-mujer.png"
+    },
+    {
+      "path": "out/hoodie-70-der.png",
+      "sizeBytes": 2210031,
+      "sha256": "81664c306ab2172b591848cb06c44278ad1e53b46d71608b607435710edd7128",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-70-der.png"
+    },
+    {
+      "path": "out/hoodie-70-izq-mujer.png",
+      "sizeBytes": 2115868,
+      "sha256": "d6fd86b0b837b010931a12aa973e7426a15d8d0f1901b75126738f4a96ce4f04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-70-izq-mujer.png"
+    },
+    {
+      "path": "out/hoodie-70-izq.png",
+      "sizeBytes": 2139787,
+      "sha256": "c8d55c45bbae47379d61f8752b9199f4b4148c39baddd082e974672bf1881131",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-70-izq.png"
+    },
+    {
+      "path": "out/hoodie-espalda-45-der-mujer.png",
+      "sizeBytes": 2397290,
+      "sha256": "5d620d4a8c9a3a3149209b9f8b3b1f8752692d427801d9d38448092c9a13c723",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-45-der-mujer.png"
+    },
+    {
+      "path": "out/hoodie-espalda-45-der.png",
+      "sizeBytes": 2264925,
+      "sha256": "461eb8157fca2969009fb175eed71bf6188bd698485a40a25c8fb9c10a0c99bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-45-der.png"
+    },
+    {
+      "path": "out/hoodie-espalda-45-izq-mujer.png",
+      "sizeBytes": 2412711,
+      "sha256": "8f9c8b74bf8255b40fc04b6ebe529763a0ddff9d455c9f842c8209197124c0fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-45-izq-mujer.png"
+    },
+    {
+      "path": "out/hoodie-espalda-45-izq.png",
+      "sizeBytes": 2231098,
+      "sha256": "95e95b9e879a80c1be0dc5b765d2af8a658b3d6e9f82c889cb92c34484db5126",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-45-izq.png"
+    },
+    {
+      "path": "out/hoodie-espalda-70-der-mujer.png",
+      "sizeBytes": 2272467,
+      "sha256": "e96bbd290cece621d9e2e38b15e9f807e7d829351f40fc53f41c3809ccb9d1b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-70-der-mujer.png"
+    },
+    {
+      "path": "out/hoodie-espalda-70-der.png",
+      "sizeBytes": 2270477,
+      "sha256": "b00431bd4d71193a05d2c5f6701764602ae0b71422ed39db7c8028ad9678377e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-70-der.png"
+    },
+    {
+      "path": "out/hoodie-espalda-70-izq-mujer.png",
+      "sizeBytes": 2364430,
+      "sha256": "0624d15b68f7a2920d2ef9eff48c6d41f7ec33f2a3299f8443ae3480adf6e5f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-70-izq-mujer.png"
+    },
+    {
+      "path": "out/hoodie-espalda-70-izq.png",
+      "sizeBytes": 2274586,
+      "sha256": "aeef30837d769f98ecae2f2cd3b9fded684e8cdaf5557ad76def5e6aec6742d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-70-izq.png"
+    },
+    {
+      "path": "out/hoodie-espalda-bajo-mujer.png",
+      "sizeBytes": 2472617,
+      "sha256": "3dcfd7360d81f98943ee3ccbd9ecd251aff10a8e2076221be524547e5e3d0c5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-bajo-mujer.png"
+    },
+    {
+      "path": "out/hoodie-espalda-bajo.png",
+      "sizeBytes": 2410526,
+      "sha256": "47eee842da4bbc7b593ad52d3f78e3736fd673e65439b749b88e03274ce50e08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-espalda-bajo.png"
+    },
+    {
+      "path": "out/hoodie-frente-bajo-mujer.png",
+      "sizeBytes": 2373660,
+      "sha256": "0e993c8b57fa5776398e36c2e5ffd3cdf5e9e407895c0ab238f86d1344693767",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-bajo-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-bajo.png",
+      "sizeBytes": 2426244,
+      "sha256": "9cf8815e7882330c78bdeb7875a7ba92043727d466e6169b09e0d5b6e6dafc17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-bajo.png"
+    },
+    {
+      "path": "out/hoodie-frente-brazos-mujer.png",
+      "sizeBytes": 2300130,
+      "sha256": "344ff58ca78d1ce3e9c8e3488059b1a33d474f8eb6e2186cd819f4f2c68a5e48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-brazos-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-brazos.png",
+      "sizeBytes": 2259460,
+      "sha256": "c1bdfe5fe7bc16f550d20f0e8a5fbf73da834f7ae2c25ec62100b6d8c7a1c650",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-brazos.png"
+    },
+    {
+      "path": "out/hoodie-frente-cruza-mujer.png",
+      "sizeBytes": 2290740,
+      "sha256": "21f7c369d093e800ca7804fa8b7f07af4e5580c4e3c3ac3aaf73f8bb008f5c53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-cruza-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-cruza.png",
+      "sizeBytes": 2295017,
+      "sha256": "12d2a9f7ed02ce5cd54f63617df943c2f833c4c472c68ef21df0eb7c94445c80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-cruza.png"
+    },
+    {
+      "path": "out/hoodie-frente-mano-mujer.png",
+      "sizeBytes": 2358060,
+      "sha256": "0651f05f2d49135b52a1f924e0d521b588d913d99d223a3c56a4acc887dd9e99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-mano-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-mano.png",
+      "sizeBytes": 2289082,
+      "sha256": "a24a6d22fc6219751c71c5563f4b9f587221037f91c490be498bc144984b15b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-mano.png"
+    },
+    {
+      "path": "out/hoodie-frente-mujer.png",
+      "sizeBytes": 2432198,
+      "sha256": "22f12da904307b967e3436697edc4930f7ee515a7424e66b957a70608157985e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-objeto-mujer.png",
+      "sizeBytes": 2193103,
+      "sha256": "63e850c397fbae8fd1d19c3c532536fc7e5f4cd626ec280423894d7de4eb36d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-objeto-mujer.png"
+    },
+    {
+      "path": "out/hoodie-frente-objeto.png",
+      "sizeBytes": 2214974,
+      "sha256": "999063a63b38f7d358096823771348fe6ff4aade4e70a5e6017468abf92419f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/hoodie-frente-objeto.png"
+    },
+    {
+      "path": "out/polo-45-der-mujer.png",
+      "sizeBytes": 2434076,
+      "sha256": "ed3814b90cb5e564182ac1a76dd00ca20facbc06f48a6d4cf54b8a616cf50f86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-45-der-mujer.png"
+    },
+    {
+      "path": "out/polo-45-der.png",
+      "sizeBytes": 2581817,
+      "sha256": "1dca852683914074b0748b25b0062d02279fe7e3df1a6e0b1b899b064142cb81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-45-der.png"
+    },
+    {
+      "path": "out/polo-45-izq-mujer.png",
+      "sizeBytes": 2443916,
+      "sha256": "d388d8cdff938a01e990bf4e0dfc2f5ebfe47d151d28b4548f4cb5124b2e3d3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-45-izq-mujer.png"
+    },
+    {
+      "path": "out/polo-45-izq.png",
+      "sizeBytes": 2591859,
+      "sha256": "5157b93d0952b16921991ac13de958fb12e1fdd6ee507e03117155238a3c30d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-45-izq.png"
+    },
+    {
+      "path": "out/polo-70-der-mujer.png",
+      "sizeBytes": 2344925,
+      "sha256": "9b4c837f7440b7fd6ef2bb66338c5c41d05a20605149aa82edcbec762e28c2e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-70-der-mujer.png"
+    },
+    {
+      "path": "out/polo-70-der.png",
+      "sizeBytes": 2431324,
+      "sha256": "3b29662f611d8ab5237ebac4125c331b10bbfeeb444c59e2f49fc27bafe7515b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-70-der.png"
+    },
+    {
+      "path": "out/polo-70-izq-mujer.png",
+      "sizeBytes": 2266456,
+      "sha256": "33cd6b5392660d3e2675905b0bd2c7d9e73af8dc5b0b4a92f68291fbafce5f8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-70-izq-mujer.png"
+    },
+    {
+      "path": "out/polo-70-izq.png",
+      "sizeBytes": 2356397,
+      "sha256": "1c69b437862ad349fb7c091e03760980939a4372660444ee34706c099729b3c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-70-izq.png"
+    },
+    {
+      "path": "out/polo-espalda-45-der-mujer.png",
+      "sizeBytes": 2512958,
+      "sha256": "14f6ddcf3a1c1627267848b1a91f8d53cc60594ea6ad2049febc9d3f85be58e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-45-der-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-45-der.png",
+      "sizeBytes": 2534511,
+      "sha256": "16c3fa050968c1adfe79b4e78f4bd2156469ca8edfe027e234ff897da5ff85cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-45-der.png"
+    },
+    {
+      "path": "out/polo-espalda-45-izq-mujer.png",
+      "sizeBytes": 2519714,
+      "sha256": "93c437e4e2f7a35267e548476fe8baf1faff699e03cb5e4625aa3659f7d6cea9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-45-izq-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-45-izq.png",
+      "sizeBytes": 2594416,
+      "sha256": "ffeb15988fc348b8aae9c3f50b211c92817c29f7a7749fb6a5e705612255115f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-45-izq.png"
+    },
+    {
+      "path": "out/polo-espalda-70-der-mujer.png",
+      "sizeBytes": 2417743,
+      "sha256": "412f616276adbf363215e39dfee99d636322680f60052c469e37436a59394e14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-70-der-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-70-der.png",
+      "sizeBytes": 2456545,
+      "sha256": "1969ba5c53c1634908e53f2048a5f037f2c02f7c5a0f57df0c940346c977204d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-70-der.png"
+    },
+    {
+      "path": "out/polo-espalda-70-izq-mujer.png",
+      "sizeBytes": 2423975,
+      "sha256": "e2d3dd0a77f987d7f6a05a7461943bd9dcc20ccf18bffaf894ee33e2a222b3c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-70-izq-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-70-izq.png",
+      "sizeBytes": 2492265,
+      "sha256": "9b60573092ddfaa06719d214465db998153465be065f986feffa1b272edc28b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-70-izq.png"
+    },
+    {
+      "path": "out/polo-espalda-bajo-mujer.png",
+      "sizeBytes": 2647404,
+      "sha256": "ba59c2eb2ab799b65c0745ab706265549b7faa622c5e6ed9e4fc2068c8951fa1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-bajo-mujer.png"
+    },
+    {
+      "path": "out/polo-espalda-bajo.png",
+      "sizeBytes": 2680862,
+      "sha256": "e42d5a3944347da09fd38ebd4620fc29ad6b2db6c2958978edd416a2143f570d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-espalda-bajo.png"
+    },
+    {
+      "path": "out/polo-frente-bajo-mujer.png",
+      "sizeBytes": 2686618,
+      "sha256": "2397ddb4f97a61e49ab4f5d1929505c04c4d57688a4664bd8c800386afc1175f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-bajo-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-bajo.png",
+      "sizeBytes": 2766231,
+      "sha256": "e2db060674f91e2703cbfd222b7e3af57f6914bc245d9e72049d5aca0a3453b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-bajo.png"
+    },
+    {
+      "path": "out/polo-frente-brazos-mujer.png",
+      "sizeBytes": 2407660,
+      "sha256": "42ce048592ccf71396d15a34741264a4bb9d97102022779149d261c81ec72a84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-brazos-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-brazos.png",
+      "sizeBytes": 2451755,
+      "sha256": "12c3de18885caf9b0d18a7fa30d62c124b323975e8701abc40c7f33363912a7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-brazos.png"
+    },
+    {
+      "path": "out/polo-frente-cruza-mujer.png",
+      "sizeBytes": 2404507,
+      "sha256": "604f344fb526deb4a5f34bbb0806dcb04e5263a98ed293646b03b9667b91cc08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-cruza-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-cruza.png",
+      "sizeBytes": 2460620,
+      "sha256": "e4afe6a6839e0c3a5b9c96aae5e7626ab3f248796f8d0e2d1db08efd61f3c3e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-cruza.png"
+    },
+    {
+      "path": "out/polo-frente-mano-mujer.png",
+      "sizeBytes": 2456451,
+      "sha256": "f1fba3f0f1186887f135ca5fd98e4e3e2a455eb2e66c0f2c46649a7b11e2cae1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-mano-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-mano.png",
+      "sizeBytes": 2540719,
+      "sha256": "c1d0ebe0e783b17efa62687b02085052771373c0f81be6cc0c512880742e5c62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-mano.png"
+    },
+    {
+      "path": "out/polo-frente-mujer.png",
+      "sizeBytes": 2634876,
+      "sha256": "15e0d53741a22bff74c253dca032d1092edfa4af171c0ed628efe89b32740f10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-objeto-mujer.png",
+      "sizeBytes": 2341142,
+      "sha256": "e799eea366aea4c30ae31a594f9ab026226671ad4c41f50cb4fcf5ef639008ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-objeto-mujer.png"
+    },
+    {
+      "path": "out/polo-frente-objeto.png",
+      "sizeBytes": 2409734,
+      "sha256": "70f84c3221f2dfb89f67731f719ce3a58728c2da33b6cf1b495ccac6e339ac5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/polo-frente-objeto.png"
+    },
+    {
+      "path": "out/softshell-45-der-mujer.png",
+      "sizeBytes": 2038106,
+      "sha256": "b9e362e9840cdb104a2743cf4feaeeff64c932bc80edb2b145b18965094e741c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-45-der-mujer.png"
+    },
+    {
+      "path": "out/softshell-45-der.png",
+      "sizeBytes": 2002297,
+      "sha256": "36c1ada1123bf6fba9724ef0f4b528687568acbec8523de2eb836fd50f9b0839",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-45-der.png"
+    },
+    {
+      "path": "out/softshell-45-izq-mujer.png",
+      "sizeBytes": 2065056,
+      "sha256": "636c34778791a82acb7ab09c7eafaae26e3119150f17ff449852ac49e64d9975",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-45-izq-mujer.png"
+    },
+    {
+      "path": "out/softshell-45-izq.png",
+      "sizeBytes": 2071083,
+      "sha256": "84c621f496bcb9af7973ab7b5451a9957f598afae1d806283f830fec14b793e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-45-izq.png"
+    },
+    {
+      "path": "out/softshell-70-der-mujer.png",
+      "sizeBytes": 1937060,
+      "sha256": "d703b30b0019d5d10dace3f1e9de27fc901b467038cc719c974bfd5a49018e96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-70-der-mujer.png"
+    },
+    {
+      "path": "out/softshell-70-der.png",
+      "sizeBytes": 1949518,
+      "sha256": "07f4e8f14f9a92f15a9cca8d063631428871c3416a659d6d6a975b19fb4d896a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-70-der.png"
+    },
+    {
+      "path": "out/softshell-70-izq-mujer.png",
+      "sizeBytes": 1955475,
+      "sha256": "d883a919205293144c473172ec9cf97023fd6a203e276de630875da81cc0b05d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-70-izq-mujer.png"
+    },
+    {
+      "path": "out/softshell-70-izq.png",
+      "sizeBytes": 2032987,
+      "sha256": "b560e82ce0ede3a5c2a44a0a98fcc6ca1d27e230e1c56c65857eaac524a4c69e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-70-izq.png"
+    },
+    {
+      "path": "out/softshell-espalda-45-der-mujer.png",
+      "sizeBytes": 2060505,
+      "sha256": "d824c3e118633f0d50c35e3229f685414373e5322f9896d11a1def36a1e62f7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-45-der-mujer.png"
+    },
+    {
+      "path": "out/softshell-espalda-45-der.png",
+      "sizeBytes": 2026307,
+      "sha256": "7cc55fe6095f112083e4c95626144528cabf4d21e08ed27e3b67032456580385",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-45-der.png"
+    },
+    {
+      "path": "out/softshell-espalda-45-izq-mujer.png",
+      "sizeBytes": 2043568,
+      "sha256": "55f01461cbb010233deb1eef94bbcc6411cda088375c2562b4c29e947aae1ccf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-45-izq-mujer.png"
+    },
+    {
+      "path": "out/softshell-espalda-45-izq.png",
+      "sizeBytes": 2017423,
+      "sha256": "b448e21cdfa54ff786e0cfb0973e429c14d2d434b6944f3786dc5301b7a495cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-45-izq.png"
+    },
+    {
+      "path": "out/softshell-espalda-70-der-mujer.png",
+      "sizeBytes": 2016026,
+      "sha256": "af13abe314cc5b2b8d03df28ac0569b58abd67bdf148542712569b4d204de008",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-70-der-mujer.png"
+    },
+    {
+      "path": "out/softshell-espalda-70-der.png",
+      "sizeBytes": 2001697,
+      "sha256": "24fa522b257d5250058e3bb24abc0e3d811530c749f934e59c5d446f704dee2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-70-der.png"
+    },
+    {
+      "path": "out/softshell-espalda-70-izq-mujer.png",
+      "sizeBytes": 2011146,
+      "sha256": "8778397c2b3ba64c2e3b4b8686414c2abfbaa0385958ae9d94b9bc2bc65af442",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-70-izq-mujer.png"
+    },
+    {
+      "path": "out/softshell-espalda-70-izq.png",
+      "sizeBytes": 2019276,
+      "sha256": "f2c0c706071884806339599a32652a3a3e12896270c0ec617ff9309d5462f3a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-70-izq.png"
+    },
+    {
+      "path": "out/softshell-espalda-bajo-mujer.png",
+      "sizeBytes": 2127152,
+      "sha256": "644e996bfd398b87b4d1e462ccd7632602a3027d974c1019629266827d8339c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-bajo-mujer.png"
+    },
+    {
+      "path": "out/softshell-espalda-bajo.png",
+      "sizeBytes": 2124018,
+      "sha256": "a42b69a97af0d5459f4804542b71b7c7ae2b6a78c4be314b273b79dad39f5d9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-espalda-bajo.png"
+    },
+    {
+      "path": "out/softshell-frente-bajo-mujer.png",
+      "sizeBytes": 2098643,
+      "sha256": "d12df5ff466f8e7ecaacd3bb27a64e698b68e41ff4600d14df8698fa6b339bd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-bajo-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-bajo.png",
+      "sizeBytes": 2190561,
+      "sha256": "a4eda574215dfb7ce1afce0fc9d07b1d56c530925e71c4e192972a32c4867b63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-bajo.png"
+    },
+    {
+      "path": "out/softshell-frente-brazos-mujer.png",
+      "sizeBytes": 1987398,
+      "sha256": "5c2543e4e811c59447e2a10c884b17323cb4ef81320d3a6165b007144a655790",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-brazos-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-brazos.png",
+      "sizeBytes": 2002882,
+      "sha256": "a4abc88ab0823485acbca6c6f663d412d8fb6b45a50254f95c39ee0d0453dad1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-brazos.png"
+    },
+    {
+      "path": "out/softshell-frente-cruza-mujer.png",
+      "sizeBytes": 1978113,
+      "sha256": "73f033ac0bf5917b0cdf4b1f77cb12483cd1dfa1f35ce36dee3ca2990f1c7d42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-cruza-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-cruza.png",
+      "sizeBytes": 2024361,
+      "sha256": "f47c68304c813e35dd23e995021c3fc39a3b41ef21b77bdb1ca2004025ca9d1e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-cruza.png"
+    },
+    {
+      "path": "out/softshell-frente-mano-mujer.png",
+      "sizeBytes": 2014775,
+      "sha256": "52c0adbfc9aac19962995d5765c14778294d433ddb8edf1f1cbae69e069cce5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-mano-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-mano.png",
+      "sizeBytes": 2068438,
+      "sha256": "de3360e49c280d167b705dbe35c7b5abdb51158696c423cdb25f4cdb0304bdca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-mano.png"
+    },
+    {
+      "path": "out/softshell-frente-mujer.png",
+      "sizeBytes": 2106071,
+      "sha256": "460f60b4f49b6d0779d1f1f0b677e3a159d0fdb5be3deef3fd1c187eb1a54358",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-objeto-mujer.png",
+      "sizeBytes": 1944878,
+      "sha256": "2346609bf1aac05767a882c4c2b9581d25dcdb1c8fc675da026fca02e1ba14f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-objeto-mujer.png"
+    },
+    {
+      "path": "out/softshell-frente-objeto.png",
+      "sizeBytes": 1974335,
+      "sha256": "fb69af7a5c7b6041a8670c1fda363e6dca811a38ac77267a4c4f9c5fc0048352",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_uniforme-vistas/out/softshell-frente-objeto.png"
+    }
+  ]
+}

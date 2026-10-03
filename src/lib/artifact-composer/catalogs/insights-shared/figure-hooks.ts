@@ -64,14 +64,16 @@ export const makeLinesHook = (box: LinesBox): CatalogLayoutHook => async (page, 
 }
 
 /**
- * Cuerpo de la cifra principal de la lámina 16:9 según su largo (canvas `Deck-*`): hasta 3 caracteres
- * 132 px («+3», «46»), hasta 5 112 px («107 %»), más largo 104 px («+16,5 %»). Así la cifra llena su
+ * Cuerpo de la cifra principal de la lámina 16:9 según su largo visible (canvas `Deck-*`, sin espacios ni signo): hasta
+ * 3 caracteres 132 px («+3», «46», «62 %»), 4 caracteres 112 px («107 %»), más largo 104 px («+16,5 %»). Así la cifra llena su
  * columna sin que nadie elija el tamaño; en ningún caso se recorta.
  */
 export const deckFigureSizeClass = (text: string): string | null => {
-  const length = [...text.trim()].length
+  // TASK-1975 — cuenta lo que ocupa ancho: sin espacios ni signo inicial («62 %», «+182», «60 %» van a 132 px como en
+  // las hojas `Deck-Donut`, `Deck-Cascada` y `Deck-Apiladas`; «107 %» y «6 de 8», a 112).
+  const length = [...text.replace(/\s/g, '').replace(/^[+\-−]/, '')].length
 
-  return length <= 3 ? 'fig-number--lg' : length <= 5 ? 'fig-number--md' : null
+  return length <= 3 ? 'fig-number--lg' : length <= 4 ? 'fig-number--md' : null
 }
 
 export const withDeckFigureSize = (inner?: CatalogLayoutHook): CatalogLayoutHook => async (page, slide, deckPlan) => {

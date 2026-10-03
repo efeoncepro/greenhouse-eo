@@ -97,6 +97,32 @@
         "staging"
       ],
       "port": 4332
+    },
+    {
+      "name": "insights-mock-reader",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".captures/insights-live-preview/mock-reader.mjs"
+      ],
+      "port": 4799
+    },
+    {
+      "name": "think-insights-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../efeonce-think",
+        "exec",
+        "env",
+        "GREENHOUSE_API_BASE=http://127.0.0.1:4799",
+        "astro",
+        "dev",
+        "--port",
+        "4330",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 4330
     }
   ]
 }

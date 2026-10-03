@@ -8,9 +8,12 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
 import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
+import { compositionChartsFor, statFigureFor, statReading, subsetChartsFor, withQuestion } from './criterion-figures'
 import { canProduceFamily } from './family-evidence-matrix'
+import { orderByQuestion } from './figure-selection'
 import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, LINE_MIN_POINTS, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
+import { hasFigurePage } from '../render/figure-slots'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -460,43 +463,6 @@ const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
 }
 
 /**
- * TASK-1962 — composición del Grader en waffle (familia de parte de un todo contable): el tono de las respuestas y el
- * tipo de fuente citada. Las partes son conteos que suman el total (todas las categorías del Grader, incluida «sin
- * clasificar»). Sin página PDF: en el informe A4 quedan el hallazgo y la tabla.
- */
-const AEO_WAFFLE_FAMILIES = [
-  { prefix: 'sentiment.', key: 'sentiment' },
-  { prefix: 'source_type.', key: 'source_type' }
-] as const
-
-const aeoWaffleCharts = (moduleKey: InsightModule, facts: EvidenceFactV1[]): ChartSpecV1[] => {
-  if (moduleKey !== 'aeo' || !canProduceFamily('waffle', moduleKey)) return []
-
-  return AEO_WAFFLE_FAMILIES.flatMap(({ prefix, key }) => {
-    const parts = facts.filter(fact => fact.metricId.startsWith(prefix) && fact.value !== null && fact.value > 0)
-
-    if (parts.length < 2) return []
-
-    const chartId = `chart.aeo.waffle.${key.replace(/_/g, '-')}`
-
-    return [{
-      specVersion: 'chart_spec_v1' as const,
-      chartId,
-      family: 'waffle' as const,
-      relation: 'composition' as const,
-      title: GH_INSIGHTS.aeoFamilyTitles[key] ?? key,
-      series: [],
-      dimensionLabels: parts.map(fact => fact.label),
-      unit: 'count',
-      scale: { kind: 'linear' as const, baseline: 0 },
-      references: [],
-      data: { kind: 'waffle' as const, parts: parts.map(fact => ({ partId: fact.metricId, label: fact.label, factId: fact.factId })), totalFactId: null },
-      tabularEquivalent: { columns: ['Parte', 'Cantidad'], rows: parts.map(fact => [null, fact.factId]) }
-    }]
-  })
-}
-
-/**
  * TASK-1962 — lo que el Grader ya mide y el informe no usaba: sitios citados y tipo de fuente («¿por qué?»: de dónde sale
  * lo que dicen los motores) y tono. Cada familia es su figura (`chartGroupKeyOf`) y un hallazgo propio con sus cifras;
  * no producen una frase por cifra («chocale.cl: 11» no es un hallazgo).
@@ -514,10 +480,24 @@ const AEO_READING_CHARTS: Record<string, string> = {
   'chart.aeo.percent.sov': 'claim.aeo.sov'
 }
 
+/** TASK-1974 — la figura de composición lleva el hallazgo de su familia, sea dona, waffle o barras ordenadas. */
+const aeoReadingClaimId = (chartId: string, claims: PlanClaimV1[]): string | undefined => {
+  // Visitas por asistente: su hallazgo es «<asistente> trae … de …» (`aiSourceFinding`).
+  if (/^chart\.aeo\.(?:parts|donut)\.ai-source$/.test(chartId)) return claims.find(item => item.claimId.startsWith('claim.aeo.ai_source.') && item.claimId.endsWith('.top'))?.claimId
+
+  const composition = /^chart\.aeo\.(?:parts|waffle|donut)\.(source-type|sentiment)$/.exec(chartId)
+
+  if (composition) return composition[1] === 'source-type' ? 'claim.aeo.sources.type' : 'claim.aeo.sentiment'
+
+  return AEO_READING_CHARTS[chartId]
+}
+
 const aeoReadings = (charts: ChartSpecV1[], claims: PlanClaimV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1[] =>
-  charts.flatMap(chart => {
-    const claim = claims.find(item => item.claimId === AEO_READING_CHARTS[chart.chartId])
-    const lead = claim ? byId.get(claim.factIds[0] ?? '') : undefined
+  // Sólo figuras con página: una lectura sin página dejaría a «Lo esencial» citando algo que no se imprime.
+  charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chart => {
+    const claim = claims.find(item => item.claimId === aeoReadingClaimId(chart.chartId, claims))
+    // La cifra principal de una composición es su parte principal, nunca el total que ya dice la tarjeta (regla (d)).
+    const lead = claim ? byId.get((chart.family === 'donut' || chart.chartId.endsWith('.ai-source') ? claim.factIds[1] : undefined) ?? claim.factIds[0] ?? '') : undefined
 
     if (!claim || !lead || claim.text.length > PLAN_TEXT_LIMITS.conclusion) return []
 
@@ -728,6 +708,36 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
       const ordered = [...deltas].sort((a, b) => (a.dimension?.rank === 'rest' ? 1 : b.dimension?.rank === 'rest' ? -1 : Number(a.dimension?.rank) - Number(b.dimension?.rank)))
       const chartId = `chart.${moduleKey}.drivers.${dimension}`
 
+      // TASK-1975 — la cascada tiene su propia lectura (sin ella, la página repetía la conclusión de las cifras): la cifra
+      // principal es el aporte de la consulta que más cambió (un hecho medido) y la conclusión la nombra, sin cifras nuevas.
+      const named = ordered.filter(fact => fact.dimension?.rank !== 'rest')
+      const top = [...named].sort((a, b) => Math.abs(b.value!) - Math.abs(a.value!))[0]
+
+      if (top) {
+        const gained = top.value! > 0
+        const period = windowLabelOf(previousTotal.window, locale)
+        const F = GH_INSIGHTS.figures
+
+        readings.push({
+          chartId,
+          keyFigure: {
+            factId: top.factId,
+            value: fmtCount(top.value),
+            caption: {
+              claimId: `caption.${chartId}`,
+              text: [F.waterfallCaption(gained, top.label, period), F.waterfallCaptionShort(gained, period)].find(text => text.length <= PLAN_TEXT_LIMITS.keyFigureCaption)!,
+              factIds: [top.factId]
+            }
+          },
+          conclusion: {
+            claimId: `conclusion.${chartId}`,
+            text: [F.waterfallConclusion(gained, top.label), F.waterfallConclusionShort(gained)].find(text => text.length <= PLAN_TEXT_LIMITS.conclusion)!,
+            factIds: [top.factId]
+          },
+          nextStep: null
+        })
+      }
+
       charts.push({
         specVersion: 'chart_spec_v1',
         chartId,
@@ -804,11 +814,16 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
   return { charts, claims, tables, readings }
 }
 
-/** Reemplaza la lectura genérica de cada figura de causas por la del productor de causas (mismo criterio que el hallazgo). */
+/**
+ * Reemplaza la lectura genérica de cada figura de causas por la del productor de causas (mismo criterio que el hallazgo).
+ * Una figura SIN lectura genérica (la cascada: TASK-1975) recibe la del productor; antes se perdía y la página repetía la
+ * conclusión de las cifras.
+ */
 const withDriverReadings = (readings: PlanFigureReadingV1[], driverReadings: PlanFigureReadingV1[]): PlanFigureReadingV1[] => {
   const byChart = new Map(driverReadings.map(reading => [reading.chartId, reading]))
+  const present = new Set(readings.map(reading => reading.chartId))
 
-  return readings.map(reading => byChart.get(reading.chartId) ?? reading)
+  return [...readings.map(reading => byChart.get(reading.chartId) ?? reading), ...driverReadings.filter(reading => !present.has(reading.chartId))]
 }
 
 export interface DeterministicPlanInput {
@@ -839,6 +854,14 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const v2Context = editorialV2 ? contextOfFacts(facts) : null
 
+    // TASK-1974 — criterio de selección (sólo v2): una métrica con meta va en bullet y en ninguna otra figura; las cifras
+    // con nombre corto van en la tarjeta del capítulo; un hecho alimenta una sola figura.
+    const targetMetrics = new Set(editorialV2 ? referenceFacts.filter(fact => fact.metricId.startsWith('target.')).map(fact => fact.metricId.slice('target.'.length)) : [])
+    // Las barras apiladas toman sus segmentos y el total: la tarjeta no los repite.
+    const subset = editorialV2 ? subsetChartsFor(moduleKey, facts, byId, input.locale) : { charts: [], taken: new Set<string>() }
+    const stat = editorialV2 ? statFigureFor({ moduleKey, facts, byId, targetMetrics, takenFactIds: subset.taken }) : null
+    const inStat = new Set([...(stat?.items.map(item => item.factId) ?? []), ...subset.taken])
+
     // TASK-1957 — las dimensiones internas del Grader (claridad de entidad, dominio de categoría…) son lecturas del
     // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
     const factClaims = facts
@@ -860,8 +883,11 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       // TASK-1962 — «sin clasificar» es la parte que el Grader no pudo tipificar: va a la tabla, no encabeza la figura.
       // Los sitios citados tampoco van en columnas: un dominio es una sola palabra («greatplacetowork.com.mx») que la
       // figura no puede partir y el render falla cerrado (Berel, 2026-10-02). Van en su hallazgo y en la tabla.
-      // El tono y el tipo de fuente son partes de un todo: van en waffle (`aeoWaffleCharts`), no en columnas.
+      // El tono y el tipo de fuente son partes de un todo: van en su figura de composición (`compositionChartsFor`, TASK-1974).
       if (fact.metricId.startsWith('source_type.') || fact.metricId.startsWith('sentiment.') || fact.metricId.startsWith('cited_source.')) continue
+      if (inStat.has(fact.factId) || targetMetrics.has(fact.metricId)) continue
+      // Con v2 las visitas por asistente son la figura de composición de su total (`compositionChartsFor`).
+      if (editorialV2 && fact.metricId.startsWith('ai_source.')) continue
 
       const key = chartGroupKeyOf(moduleKey, fact)
 
@@ -890,12 +916,18 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — roles: hallazgos materiales arriba, el resto respaldo. Las frases de figuras descartadas abren la lista.
     const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? [])]
 
-    charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? aeoWaffleCharts(moduleKey, facts) : []))
+    charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? [...compositionChartsFor(moduleKey, facts, null), ...subset.charts] : []))
 
     if (editorialV2) {
-      charts.push(...bulletCharts(moduleKey, facts, referenceFacts), ...lineCharts(moduleKey, facts))
+      // TASK-1974 — una métrica con meta va SÓLO en bullet (la meta gana, regla 2): su línea mensual repetiría el hecho
+      // del mes actual. La evolución queda para las métricas sin meta.
+      charts.push(...bulletCharts(moduleKey, facts, referenceFacts), ...lineCharts(moduleKey, facts.filter(fact => !targetMetrics.has(fact.metricId))))
       assertChartsAllowed(moduleKey, charts)
     }
+
+    // TASK-1974 — cada figura declara su pregunta y el capítulo sigue el orden del criterio (§5.2).
+    const ordered = editorialV2 ? orderByQuestion(charts.map(withQuestion)) : charts
+    const statReadings = stat ? ((reading => (reading ? [reading] : []))(statReading(stat, byId, input.locale))) : []
 
     if (claims[0]) summary.push({ ...claims[0], claimId: `summary.${claims[0].claimId}` })
 
@@ -904,7 +936,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       module: moduleKey,
       title: MODULE_TITLES[moduleKey],
       claims,
-      charts,
+      ...(stat ? { stats: [stat] } : {}),
+      charts: ordered,
       // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
       tables: [
         ...((main => (main.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, main, byId, input.locale)] : []))(facts.filter(fact => !isAeoSourceFact(fact) && !isGa4Fact(fact)))),
@@ -915,7 +948,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
         ...(drivers?.tables ?? [])
       ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: withDriverReadings(readingsFor(charts, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(charts, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))]) } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: [...statReadings, ...withDriverReadings(readingsFor(ordered, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(ordered, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))])] } : {})
     })
   }
 

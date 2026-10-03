@@ -29,6 +29,7 @@
 lee el companion de [preproducción](../companions/video-preproduction-and-production.md),
 [posproducción](../companions/video-postproduction-and-delivery.md) o
 [lecciones/fallas](../companions/video-lessons-and-failure-modes.md) según el punto de trabajo.
+El orden de preproducción común a todo video está en el [companion de preproducción §12](../companions/video-preproduction-and-production.md#12-preproducción-transversal-orden-y-gates).
 Las recetas siguientes son aplicaciones con límites propios; no todas están aprobadas de principio a fin.
 
 ## Índice de workflows
@@ -45,6 +46,7 @@ Las recetas siguientes son aplicaciones con límites propios; no todas están ap
 | **Clean shot → deterministic 15/10/6 family** | convertir un shot 5–10 s + stills exactos en masters 15/10/6 con arco propio, format wall y audio medido | **validado** 2026-07-18 | `single-shot-to-deterministic-campaign-hero.md` |
 
 | **Key visual estático → loop de social** ⭐ | llevar una pieza estática aprobada a movimiento sin inventar un lenguaje paralelo: referencias, arco entrada→sostén→fade, sonido por sustracción y QA del loop | **validado** 2026-09-22 | `static-key-visual-to-looping-social-motion.md` |
+| **Spot animado 2D con assets de marca compuestos** | explainer/spot 2D cel-shaded: elenco 2D + mascotas desde SVG con mirada del rig, cuadros clave GPT Image, H3 i2v inicio/fin, placas vectoriales, cierre animado sin voz en el logo, audio y subtítulos PNG | **validado** 2026-10-03 (v2 aprobada) | `animated-2d-spot-composed-brand-assets.md` |
 
 ## Estructura estándar de un workflow
 

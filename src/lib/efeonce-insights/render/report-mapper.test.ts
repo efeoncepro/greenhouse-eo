@@ -571,7 +571,9 @@ describe('buildInsightReportPlanInput', () => {
     expect(slots.barScaleMax).toBeUndefined()
     expect(slots.tableColumns.map((c: { label: string }) => c.label)).toEqual(['#', 'Métrica', 'Período', 'Variación'])
     expect(slots.tableRows.map((r: { valueB: string; trend?: string }) => [r.valueB, r.trend])).toEqual([
-      ['12,1 %', 'down:neutral'], ['9,6 %', 'down:neutral'], ['0,1 pp', 'down:neutral'], ['sin cambio', 'flat:neutral']
+      // TASK-1974 — tono por la dirección DECLARADA de la métrica (`METRIC_DIRECTIONS`): clics y CTR bajan = peor; `imp`
+      // no tiene dirección declarada = neutro; sin cambio = plano.
+      ['12,1 %', 'down:worse'], ['9,6 %', 'down:neutral'], ['0,1 pp', 'down:worse'], ['sin cambio', 'flat:neutral']
     ])
     expect(slots.legend).toBeUndefined()
     expect(slots.source.text).toBe('Google Search Console')

@@ -9,6 +9,7 @@ import {
   upsetGeometry,
   vennTwoGeometry,
   waffleGeometry,
+  waffleUnitGeometry,
   waterfallGeometry,
   WAFFLE_CELLS
 } from '../chart-geometry'
@@ -255,5 +256,26 @@ describe('upsetGeometry', () => {
 
     expect(upsetGeometry(...args)).toEqual(upsetGeometry(...args))
     expect(upsetGeometry(...args).intersections.map(i => i.setIds[0])).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('waffleUnitGeometry — un cuadro por unidad (TASK-1975)', () => {
+  it('8 respuestas son 8 cuadros en 5 columnas, en el orden de las partes', () => {
+    const geometry = waffleUnitGeometry([{ seriesId: 'positivo', value: 5 }, { seriesId: 'neutro', value: 3 }])
+
+    expect(geometry.cells).toHaveLength(8)
+    expect(geometry.columns).toBe(5)
+    expect(geometry.rows).toBe(2)
+    expect(geometry.cells.map(cell => cell.seriesId)).toEqual(['positivo', 'positivo', 'positivo', 'positivo', 'positivo', 'neutro', 'neutro', 'neutro'])
+  })
+
+  it('de 31 a 100 unidades usa 10 columnas', () => {
+    expect(waffleUnitGeometry([{ seriesId: 'a', value: 74 }, { seriesId: 'b', value: 26 }]).columns).toBe(10)
+  })
+
+  it('más de 100 unidades, un conteo no entero o ninguna unidad fallan cerrado', () => {
+    expect(() => waffleUnitGeometry([{ seriesId: 'a', value: 101 }])).toThrow(ChartGeometryError)
+    expect(() => waffleUnitGeometry([{ seriesId: 'a', value: 2.5 }])).toThrow(ChartGeometryError)
+    expect(() => waffleUnitGeometry([{ seriesId: 'a', value: 0 }])).toThrow(ChartGeometryError)
   })
 })

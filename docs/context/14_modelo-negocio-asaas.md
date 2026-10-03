@@ -60,6 +60,25 @@ El doc ASaaS original asumía que Greenhouse era un MVP temprano por construir. 
 > la doctrina ASaaS y el mapa necesario para orientar producto; no es un tarifario ni el source of truth de
 > unit economics.
 
+### Decisiones de marca como capacidad acumulativa
+
+La [dirección estratégica aceptada el 2026-10-03](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+aplica ASaaS a una promesa concreta: **convertimos las decisiones de marca en una capacidad de producción
+consistente, medible y escalable**. El valor incluye hacer las decisiones operables y automatizables, acelerar su
+salida al mercado y conservar identidad, calidad y consistencia entre aplicaciones y ciclos. La memoria, las
+reglas, los componentes y los workflows validados permiten acumular capacidad; el volumen de piezas por sí solo
+no demuestra escala ni mejora económica.
+
+**Recorrido completo** —desde definición y posicionamiento hasta despliegue— y **tramo razonable de la cadena**
+son alcances de responsabilidad. Se combinan con la taxonomía comercial vigente; no son nuevos delivery models,
+engagements u operating modes. Cada alcance acuerda entradas, salidas, interfaces y accountability, incluso cuando
+las decisiones de marca vienen del cliente u otra agencia.
+
+Los modelos de oferta deben distinguir el valor y costo de construir esa capacidad, operarla, mantenerla y
+expandirla. Pricing, margen y compromisos de calidad o velocidad requieren validación por alcance; esta dirección
+no fija tarifas ni garantiza volúmenes o resultados aún no medidos. Los economics permanecen en
+`docs/business-models/`, con los gates comerciales, legales y de delivery aplicables.
+
 ### Taxonomía comercial vigente
 
 La relación no cabe en un solo enum. Se separa en tres preguntas:

@@ -193,6 +193,7 @@ pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección
 pnpm foto:componer:cta <plan.json>  # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
 pnpm foto:cta:gate <plan.json>      # la certifica: 0 certificado · 1 falla · 2 uso · 3 NO certificable (no es pase)
 pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
+pnpm foto:rostro <plate.png> --persona nexa   # proporción del rostro contra el canon: avisa si el modelo lo afinó
 pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado   # compone el isotipo OFICIAL si foto:emblema muestra otro, y el modelo lo termina
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
@@ -334,6 +335,13 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   (`foto:isotipo --marca logotipo`). Escena con Sparks que sí es cine: **dos Sparks con referencia como máximo**, el resto
   lejos y desenfocado (registro cine, delta 2026-10-02). **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
   sirve, a 520 px un bordado no se lee y pasa por bueno.
+- 🔴 **La vista puesta la ELIGE `foto:prompt` por quien la viste** **[operador, 2026-10-03]**: silueta (`hombre`/`mujer`
+  en roster y elenco), giro (de la vista de identidad, o `giro` en el objeto si va de espaldas), `camara: "baja"` y
+  `tapa` (`mano`/`cruza`/`objeto`/`brazos`; con una persona se infiere de la escena). Imprime la elegida y **las demás
+  opciones**; en un grupo, declara `persona` en cada prenda. El macro viaja también con la prenda puesta. **Una marca
+  tapada por una mano se pide con su vista de oclusión, nunca componiendo una marca más chica al lado** («la vista real
+  sería que se viera sólo la parte del logo que no tapa la mano»). Kit, trampas y `foto:isotipo --oclusion/--pliegues/
+  --escorzo`: `garment-reference-kit.md` §Delta 2026-10-03.
 - 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: «*cuando compones el isotipo no
   siempre queda bien; pásalo al modelo pidiéndole que haga el acabado sin alterar lo que está bien*». Compuesto
   solo, se ve pegado encima. **Comando (desde el 2026-09-29): `pnpm foto:isotipo <plate.png> --centro x,y --ancho w
@@ -454,7 +462,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   permitido) o en la receta de deck **`proposal-cinematic`** con personas del equipo, que **conservan su uniforme por
   registro**; cámara ~2 m y 85 mm, el bordado del kit verificado con `foto:emblema` (compuesto sólo si difiere; regla del 2026-09-28) y nunca dos personas mirándose de cerca.
   Tercer caso (excepción del 2026-09-27, ya en el contrato AXIS): láminas de sección y «about» del deck, y portadas y
-  contraportadas con foto. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
+  contraportadas con foto. **Caso 6 (operador, 2026-10-03): superficies de producto** (escenario del login, hero de producto) con `alcance: "producto"`: Nexa, roster con la prenda de su línea o casting anclado a su retrato. Fuera de esos casos no se usa. Canon vigente: `EFEONCE_PHOTO_REGISTER_CINE_V1.md` §2.
   **Portadas de perfil y destacados de Instagram de Efeonce con Nexa protagonista: aprobados (2026-10-01)**; con
   personas del equipo, no. Receta 9:16: design-studio, `efeonce-photographic-language.md` §Cine.
   **Escenario del login de Greenhouse (2026-10-02):** excepción del operador para cine con una persona de casting en
@@ -483,8 +491,16 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.
 - 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: las
   referencias dicen quién es; el giro, la inclinación y el gesto los da la escena. Declara `{ "persona": "nexa",
-  "expresion": "…" }` (12 fotográficas en `5-expresiones/`, todas con el mismo tres cuartos: copian sólo el gesto) y no
+  "expresion": "…" }` (25 fotográficas casi de frente, aprobadas, en `5-expresiones-frente/`; claves en su LEEME, detrás del ancla frontal y sólo para el gesto; en grupo no viajan — 2026-10-03: las de tres cuartos, puestas primeras, volteaban la cara de toda la serie, y el ancla frontal vieja la afinaba. Mide la proporción con `pnpm foto:rostro <plate> --persona nexa`) y no
   copies «confident half-smile» de ficha en ficha: `foto:prompt` avisa si falta. Detalle: bloques de prompt, delta 2026-10-02.
+- 🔴 **El elenco de marca: cinco personajes FICTICIOS** **[2026-10-02/03]** — `hum`, `karo`, `sophia`, `isabella`,
+  `antonio`, uno por línea, con referencias en `ai-generations/_identidad-elenco/<clave>/`. Se piden en `identidad`
+  igual que el roster (`{ "persona": "karo", "vista": "45-der" }`). Sirven para variar personas en fotos de varios o de
+  equipo; **no hay cuota**: *«no para tener reglas explícitas de que al menos uno del elenco deba estar»*. Grupo de 3 a
+  5 = cualquier combinación de elenco, Nexa y Julio (con otras personas del roster, tope dos); la misma persona dos
+  veces es error. **NUNCA** como equipo real (página de equipo, firmas, LinkedIn), cliente o testimonio, ni con su
+  nombre en pantalla salvo ficción declarada. Canon: `EFEONCE_BRAND_CAST_V1.md`; manda el catálogo `ELENCO` de
+  `scripts/foto/build-prompt.mjs` (es lo que recibe el modelo).
 - 🔴 **La cabeza casi no gira: giran los ojos.** Pedir «gira la cabeza hacia el hombro» es pedir un **tres cuartos
   marcado**, y **pedir un ángulo que el set de referencias no cubre hace que el modelo reconstruya el rostro**. En la
   pieza aprobada la cabeza está casi frontal y **sólo los ojos** van hacia la mascota. Marcadores del casi-frontal:
@@ -602,7 +618,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   oscurece nada, mueve la materia de la propia foto. La firma no se movió y pasó de 6,53 a 11,58:1. Script:
   `ai-generations/2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs` (el halo del apoyabrazos y los rangos de
   búsqueda están medidos para ese plate de 941×1672: en otro se vuelven a medir). **Lo que NO funcionó, y por qué:**
-  **inpainting con máscara sobre la franja** (GPT Image 2.5 Sunburst, `--mask`) — los dos candidatos llenaron TODA la
+  **inpainting con máscara sobre la franja** (GPT Image 2.5 Sunburst, `--mask`; desde 2026-10-02 la vía canónica para
+  editar una zona es `pnpm ai:inpaint`, que nunca manda máscara a Sunburst y verifica lo protegido en delta 0) — los dos candidatos llenaron TODA la
   zona editable con un panel oscuro plano, de borde superior recto justo en el límite de la máscara, y borraron el
   apoyabrazos: el modelo rellena la zona transparente entera con «el objeto» aunque el prompt pida conservar lo que
   queda sobre el nuevo borde, y se lee como un velo · **levantar sólo el centro del lecho** (deformación con caída +
@@ -654,7 +671,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 Los renders de referencia y los kits pesan **640 MB** y están en `.gitignore`. Viven en la máquina y en OneDrive
 (`5. Contenidos/13- Branding/` y `14. Mascotas de partners/`). Lo que **sí** está versionado es
-`scripts/foto/assets.lock.json`: la huella SHA-256 de los **54** assets que el catálogo declara.
+`scripts/foto/assets.lock.json`: la huella SHA-256 de los assets que el catálogo declara (54 al nacer; **550** al 2026-10-03).
 
 ```bash
 pnpm foto:assets:check   # ¿el catálogo y el lock coinciden?
@@ -669,6 +686,18 @@ Para qué sirve:
   referencia que el equipo nunca aprobó, y nada lo delata.
 
 **Si agregas un kit o una vista al catálogo, resella el lock y commitéalo**, o el test lo marca como faltante.
+
+**Canon-sync (2026-10-03).** Lo sellado (550 assets al 2026-10-03) está publicado en `gs://efeonce-creative-canon`
+con la misma ruta. `pnpm foto:prompt` y `pnpm foto:generar` bajan solos la referencia que falta o cuyo sha256 no es el
+del lock, y **apartan** la copia local distinta como `<archivo>.local-<sha8>.<ext>` (nunca la pisan: puede ser trabajo
+nuevo). `FOTO_SIN_CANON=1` lo apaga. La exploración y los descartes van al bucket de archivo con
+`pnpm ai-gen:archive apply --folder <carpeta>` (recuperable con `pnpm ai-gen:pull`); archivar ≠ borrar. Una carpeta
+citada en `src/`/`scripts/` queda protegida: no cites rutas de corridas en comentarios de código.
+
+**Al sumar algo nuevo** (vista de un kit, personaje del elenco, expresión de Nexa): declararlo en el catálogo →
+`pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto` → archivar la
+exploración → documentarlo en el LEEME de la carpeta, donde vive el procedimiento (A kits · B `_identidad-elenco` ·
+C `_identidad-nexa`).
 
 ## 🔴 Un validador que pasa NO valida el concepto **[medido 2026-09-21]**
 

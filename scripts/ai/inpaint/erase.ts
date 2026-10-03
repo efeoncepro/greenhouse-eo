@@ -1,0 +1,165 @@
+import { join } from 'node:path'
+
+import sharp from 'sharp'
+
+import type { InpaintImageAdapter } from './adapters/types'
+import { assertBrandSafePrompt } from './brand'
+import { maskFromLayers, otherObjectsMask, plateWithoutLayers, readLayersDocument, selectLayers } from './layers'
+import { encodeMaskPng, intersect, invert, loadMask, type MaskConvention } from './mask'
+import { runImageInpaint, type ImageInpaintResult } from './pipeline-image'
+import { loadRgba } from './raw'
+import { readJson, sha256, writeFileEnsured, writeJson } from './run-io'
+import { createPlateAdapter, detectCastShadow, ERASE_DEFAULT_PROMPT, ERASE_FILL_PROMPT, ERASE_RESIDUE_THRESHOLD, measureErasure, prepareEraseMask, withCastShadow, type ErasureReport } from './techniques'
+
+/**
+ * `pnpm ai:inpaint erase` (TASK-1973, Slice 4): borra un objeto.
+ *
+ * - Zona: `--mask` explícita (nunca se altera) o derivada de capas (`--layers` + `--layer`), que se agranda para
+ *   llevarse borde y sombra.
+ * - Relleno: `plate` (la base de Layerize: la escena sin el objeto, sin proveedor ni gasto) o `model` (un modelo con
+ *   máscara reconstruye el fondo).
+ * - Después de la verificación del núcleo se mide si el objeto sigue ahí (residuo).
+ */
+/**
+ * Modelo de OpenAI por defecto para borrar: Sunburst, que edita por instrucción y entiende «quita el objeto». Canario
+ * real del 2026-10-03 (la taza): Sunburst la borró limpio; Flare con máscara dejó media taza y Flux Fill dibujó otra
+ * (los modelos que llenan una máscara rellenan la silueta con lo que sugiere); Seedream 5 Pro Edit dejó un fantasma.
+ */
+export const ERASE_OPENAI_MODEL = 'gpt-image-2.5-sunburst'
+
+export interface EraseOptions {
+  imagePath: string
+  maskPath?: string
+  maskConvention?: MaskConvention
+  layersJson?: string
+  layerSelectors?: string[]
+  fill?: 'plate' | 'model'
+  growPx?: number
+  /** Incluir la sombra proyectada medida contra el clean plate (sólo con capas). Default `auto`. */
+  shadow?: 'auto' | 'off'
+  modelAdapter?: InpaintImageAdapter
+  model?: string
+  quality?: string
+  prompt?: string
+  count?: number
+  runRoot: string
+  dryRun?: boolean
+  force?: boolean
+  maxUsd?: number
+  yes?: boolean
+  allowBrand?: boolean
+  log?: (line: string) => void
+}
+
+export interface EraseResult extends ImageInpaintResult {
+  erasure: ErasureReport[]
+}
+
+export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
+  const log = options.log ?? (line => process.stdout.write(`${line}\n`))
+  const meta = await sharp(options.imagePath).metadata()
+
+  if (!meta.width || !meta.height) throw new Error('No se pudo leer el tamaño de la imagen.')
+  if (!options.maskPath && !options.layersJson) throw new Error('Indica la zona: --mask, o --layers <layers.json> con --layer.')
+
+  const fill = options.fill ?? (options.layersJson ? 'plate' : 'model')
+
+  if (fill === 'plate' && !options.layersJson) throw new Error('--fill plate necesita --layers (el clean plate sale de pnpm ai:layers).')
+
+  let maskPath = options.maskPath
+  let shadowReport: { pixels: number; meanDarkening: number } | null = null
+  const doc = options.layersJson ? await readLayersDocument(options.layersJson) : null
+  const selectors = options.layerSelectors ?? []
+  const erased = doc ? selectLayers(doc, selectors) : []
+  // La escena sin los elementos borrados: base + las demás capas. Sirve de relleno y de referencia para medir la sombra.
+  const platePng = doc ? await plateWithoutLayers(options.layersJson!, doc, erased, { width: meta.width, height: meta.height }) : null
+
+  if (!maskPath) {
+    if (!selectors.length) throw new Error('--layers necesita al menos un --layer <nombre|#índice>.')
+
+    // Un logo o una marca no se borra ni se reconstruye con IA.
+    for (const layer of erased) assertBrandSafePrompt(`${layer.name ?? ''} ${layer.description ?? ''}`, Boolean(options.allowBrand))
+
+    let objectMask = await maskFromLayers(options.layersJson!, selectors, { width: meta.width, height: meta.height })
+    const others = await otherObjectsMask(options.layersJson!, doc!, erased, { width: meta.width, height: meta.height })
+
+    if ((options.shadow ?? 'auto') === 'auto') {
+      const shadow = detectCastShadow(await loadRgba(options.imagePath), await loadRgba(platePng!), objectMask, { others })
+
+      shadowReport = { pixels: shadow.pixels, meanDarkening: shadow.meanDarkening }
+      objectMask = withCastShadow(objectMask, shadow)
+      log(
+        shadow.pixels
+          ? `  ◐ sombra proyectada incluida: ${shadow.pixels} px, ${shadow.meanDarkening} niveles más oscura que el plate (--shadow off para dejarla)`
+          : '  · sin sombra proyectada medible junto al objeto'
+      )
+    }
+
+    // El agrandado nunca pisa a otro objeto de la escena.
+    const derived = intersect(await prepareEraseMask(objectMask, options.growPx ?? 16), invert(others))
+    const png = await encodeMaskPng(derived)
+
+    maskPath = join(options.runRoot, 'erase-masks', `${sha256(png).slice(0, 12)}.png`)
+    await writeFileEnsured(maskPath, png)
+    log(`  ✎ máscara de borrado desde ${selectors.length} capa(s), agrandada ${options.growPx ?? 16} px: ${maskPath.replace(process.cwd(), '.')}`)
+  }
+
+  let adapter: InpaintImageAdapter
+
+  if (fill === 'plate') {
+    adapter = createPlateAdapter({ png: platePng!, width: meta.width, height: meta.height, source: `${doc!.base.file} + capas restantes` })
+    log(`  ◫ relleno: clean plate de Layerize sin ${erased.map(layer => `#${layer.index}`).join(', ') || 'ninguna capa'} (base + las demás capas; sin proveedor, sin gasto)`)
+  } else {
+    if (!options.modelAdapter) throw new Error('--fill model necesita un adaptador de imagen.')
+    adapter = options.modelAdapter
+  }
+
+  const result = await runImageInpaint({
+    imagePath: options.imagePath,
+    maskPath,
+    maskConvention: options.maskConvention,
+    // Un modelo de RELLENO con máscara (Flux Fill) dibuja lo que el prompt describe: se le describe el fondo. Un editor
+    // por instrucción (Sunburst, Seedream edit) entiende «quita el objeto».
+    prompt: options.prompt ?? (adapter.provider === 'fal' && adapter.sendsMask ? ERASE_FILL_PROMPT : ERASE_DEFAULT_PROMPT),
+    adapter,
+    model: fill === 'plate' ? 'clean-plate' : (options.model ?? (adapter.provider === 'openai' ? ERASE_OPENAI_MODEL : undefined)),
+    quality: fill === 'plate' ? undefined : options.quality,
+    count: fill === 'plate' ? 1 : options.count,
+    crop: fill === 'plate' ? 'off' : undefined,
+    // El plate ya es la escena sin el objeto: sin guía de zona.
+    guide: fill === 'plate' ? 'off' : undefined,
+    runRoot: options.runRoot,
+    dryRun: options.dryRun,
+    force: options.force,
+    maxUsd: options.maxUsd,
+    yes: options.yes,
+    allowBrand: options.allowBrand,
+    log
+  })
+
+  if (result.manifest.status !== 'completed') return { ...result, erasure: [] }
+
+  const base = await loadRgba(options.imagePath)
+  const mask = await loadMask(maskPath, options.maskConvention)
+  const plateImage = platePng ? await loadRgba(platePng) : undefined
+  const erasure = await Promise.all(result.manifest.candidates.map(async candidate => measureErasure(base, await loadRgba(join(result.runDir, candidate.final)), mask, plateImage)))
+
+  erasure.forEach((report, index) =>
+    log(
+      !report.residueSuspected
+        ? `    · candidato ${index + 1}: borrado (cambio en el núcleo ${report.changeInCore}/255${report.objectLikeness === null ? '' : ` · parecido al fondo limpio ${(1 - report.objectLikeness).toFixed(2)}`})`
+        : report.changeInCore < ERASE_RESIDUE_THRESHOLD
+          ? `    ⚠ candidato ${index + 1}: la zona casi no cambió (${report.changeInCore}/255): el objeto puede seguir ahí.`
+          : `    ⚠ candidato ${index + 1}: la zona cambió pero no se parece al fondo (semejanza a objeto ${report.objectLikeness}): el modelo dibujó otra cosa en vez de borrar.`
+    )
+  )
+
+  const manifestPath = join(result.runDir, 'manifest.json')
+  const manifest = await readJson<Record<string, unknown>>(manifestPath)
+
+  if (manifest) await writeJson(manifestPath, { ...manifest, erase: { fill, layers: options.layerSelectors ?? null, shadow: shadowReport, erasure } })
+
+  const exitCode = result.exitCode === 0 && erasure.length && erasure.every(report => report.residueSuspected) ? 3 : result.exitCode
+
+  return { ...result, exitCode, erasure }
+}

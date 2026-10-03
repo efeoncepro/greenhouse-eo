@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsFigureStackedSlide — lámina de figura «barras apiladas» del deck 16:9 (TASK-1975, canvas
+  `Deck-Apiladas`). Hasta cuatro períodos; el SVG lo dibuja el hook con la misma geometría que la página
+  A4 (`DECK_STACKED_BOX`: mismos ejes, cuerpos mayores). Base en el color del período actual sobre navy,
+  el segmento superior en el del anterior.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .fig-stk-legend .fig-legend-item { gap: 6px; }
+
+  .fig-stk-legend .fig-swatch { width: 11px; }
+
+  /* El color de cada ítem es el de su posición en la columna (base primero). */
+  .fig-stk-legend .fig-legend-item:nth-child(1) .fig-swatch { background: var(--axis-deck-role-dataCurrentOnNavy); }
+
+  .fig-stk-legend .fig-legend-item:nth-child(2) .fig-swatch { background: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .fig-stk-legend .fig-legend-item:nth-child(3) .fig-swatch { background: var(--axis-deck-role-dataOpportunityOnNavy); }
+
+  .fig-stk-legend .fig-legend-item:nth-child(4) .fig-swatch { background: var(--axis-deck-role-dataStepOnNavy); }
+
+  .fig-stacked-host { display: block; }
+
+  .fig-stacked { display: block; overflow: visible; font-family: var(--axis-deck-type-text); font-variant-numeric: tabular-nums; }
+
+  .fig-stk-seg--0 { fill: var(--axis-deck-role-dataCurrentOnNavy); }
+
+  .fig-stk-seg--1 { fill: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .fig-stk-seg--2 { fill: var(--axis-deck-role-dataOpportunityOnNavy); }
+
+  .fig-stk-seg--3 { fill: var(--axis-deck-role-dataStepOnNavy); }
+
+  .fig-stk-value { font-weight: 600; fill: var(--axis-deck-role-navy); }
+
+  .fig-stk-value--0 { font-family: var(--axis-deck-type-display); font-weight: 700; }
+
+  .fig-stk-value--3 { fill: var(--axis-deck-role-navyInk); }
+
+  /* Fuera del segmento la cifra queda sobre el navy: tinta clara, nunca el color del segmento. */
+  .fig-stk-value--out { fill: var(--axis-deck-role-navyInk); }
+
+  .fig-stk-total { font-family: var(--axis-deck-type-display); font-weight: 700; fill: var(--axis-deck-role-navyInk); }
+
+  .fig-stk-period { font-weight: 600; fill: var(--axis-deck-role-navyInk); }
+
+  .fig-stk-share { font-family: var(--axis-deck-type-display); font-weight: 600; fill: var(--axis-deck-role-navyMuted); }
+
+  .fig-stk-connector { fill: none; stroke: var(--axis-deck-role-navyInk); stroke-opacity: 0.45; stroke-dasharray: 3 3; }
+
+  .fig-stk-delta { font-family: var(--axis-deck-type-display); font-weight: 600; fill: var(--axis-deck-role-navyInk); }
+
+  .fig-stk-delta--better { fill: var(--axis-deck-role-deltaBetterOnNavy); }
+
+  .fig-stk-delta--worse { fill: var(--axis-deck-role-deltaWorseOnNavy); }
+
+  .fig-stk-delta-label { fill: var(--axis-deck-role-navyMuted); }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="figureHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#figureHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">00</span>
+        <span class="deck-tab-section" data-slot="section">Resumen ejecutivo</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
+    </header>
+
+    <main class="fig-main">
+      <div class="fig-lead-col">
+        <span class="deck-eyebrow" data-slot="eyebrow"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg><svg class="stroke-icon i-steps" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6h-5v5h-5v5h-5v5h-5"></path></svg><svg class="stroke-icon i-grid" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6h-6z"></path><path d="M14 4h6v6h-6z"></path><path d="M4 14h6v6h-6z"></path><path d="M14 14h6v6h-6z"></path></svg><svg class="stroke-icon i-donut" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-3.8a4.1 4.1 0 1 1 -5 -5v-4a.9 .9 0 0 0 -1 -.8"></path><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a9 9 0 0 0 -1 -1v-4.5"></path></svg><svg class="stroke-icon i-layers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg><svg class="stroke-icon i-numbers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l2 -2v8"></path><path d="M9 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path><path d="M17 8h2.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-2.5"></path></svg></span><span data-slot-field="label">Cuánto del total</span></span>
+        <span class="fig-number" data-slot="keyFigure">60 %</span>
+        <span class="fig-caption" data-slot="keyCaption">de los clics del período llegó sin buscar la marca <strong>(772 de 1.284)</strong></span>
+        <span class="deck-rule"></span>
+        <h1 class="fig-conclusion" data-slot="conclusion">Conclusión de la figura</h1>
+      </div>
+      <section class="fig-panel">
+        <div class="fig-panel-head">
+          <span class="fig-panel-title" data-slot="figureTitle">Título de la figura</span>
+          <span class="fig-source" data-slot="source"><span class="fig-source-label" data-slot-field="label">Fuente</span><span data-slot-field="text">Fuente de la figura</span></span>
+        </div>
+        <div class="fig-legend fig-stk-legend" data-slot="stackedLegend"><span class="fig-legend-item"><span class="fig-swatch"></span><span data-slot-field="label">Segmento base</span></span></div>
+        <div class="fig-stacked-host"></div>
+      <div class="fig-note" data-slot="note"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Nota de lectura.</span></div>
+      </section>
+    </main>
+
+    <div class="fig-closing" data-slot="closing"><div class="fig-closing-block"><span class="fig-closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span><p class="fig-closing-text" data-slot-field="text">Lo que la figura muestra.</p></div></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">03</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

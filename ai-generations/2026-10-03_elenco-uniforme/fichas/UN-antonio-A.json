@@ -1,0 +1,23 @@
+{
+ "id": "UN-antonio-A",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  {
+   "persona": "antonio"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "escena": "SCENE: Antonio stands in a meeting room with a pale oak wall, three-quarter length from the head to mid-thigh, body turned slightly, looking into the camera with a confident, natural expression, at the moment his hand straightens the open collar of his jacket. He wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, OPEN, over the deep navy pique polo of the kit, both with their embroidered emblem on the left chest exactly as in the references, with dark jeans. A small azure-blue (#0375DB) notebook rests on a shelf behind, out of focus. Soft window light from the left with gentle fill. 85mm lens at f/2.8, camera at about 2.5 m at chest height.",
+ "lecho": {
+  "objeto": "the dark near edge of a walnut table in the lower foreground",
+  "tono": "DARK near black"
+ }
+}

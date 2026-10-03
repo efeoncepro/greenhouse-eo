@@ -67,6 +67,11 @@ pilotos y SOW gobernados, no venta self-serve ni aprobación comercial definitiv
 
 ## Creative Services offer architecture
 
+- [Decisiones de marca → ejecución escalable — decisión V1](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+  — dirección estratégica aceptada el 2026-10-03: una misma capacidad puede cubrir el recorrido completo o un tramo
+  delimitado. Instalar → operar → expandir son etapas de la relación; no crean nuevas líneas de cobro ni sustituyen
+  la taxonomía vigente. Calidad y reducción de tiempos se verifican con criterios y baseline; la aceptación
+  estratégica conserva los estados de validación comercial y los gates de cada modelo.
 - [`Creative Services — Offer Architecture V2`](../services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md)
 - [`Creative Services — Operating Model V1`](../services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md)
 - [`Creative Services Offer Architecture Decision V1`](../architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md)

@@ -21,7 +21,7 @@ import {
   waterfallGeometry
 } from '@/lib/artifact-composer/pure'
 
-import type { ChartSpecV1, ChartSpecViolation } from '../contracts/chart-spec'
+import { bulletItemDirection, type ChartSpecV1, type ChartSpecViolation } from '../contracts/chart-spec'
 
 /** Valor de un hecho por id; `undefined` = hecho desconocido (ya reportado como `unknown_fact`). */
 export type ChartFactValues = ReadonlyMap<string, number | null>
@@ -83,10 +83,11 @@ const valueViolations = (spec: ChartSpecV1, values: ChartFactValues, push: (rule
         // ella si menor es mejor. Una banda del lado equivocado dibujaría como «casi» un valor que ya la superó.
         if (item.bandFactId) {
           const band = value(item.bandFactId)
-          const wrongSide = band !== null && (data.direction === 'higher_is_better' ? band >= target : band <= target)
+          const direction = bulletItemDirection(data, item)
+          const wrongSide = band !== null && (direction === 'higher_is_better' ? band >= target : band <= target)
 
           if (band === null || band <= 0 || wrongSide) {
-            push('bullet_band_side', `la banda del ítem ${item.itemId} debe ser positiva y quedar ${data.direction === 'higher_is_better' ? 'bajo' : 'sobre'} la meta`)
+            push('bullet_band_side', `la banda del ítem ${item.itemId} debe ser positiva y quedar ${direction === 'higher_is_better' ? 'bajo' : 'sobre'} la meta`)
           }
         }
       }

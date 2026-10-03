@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.1 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-02 por Claude (1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.2 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-03 por Claude (1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -55,7 +55,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -101,7 +101,7 @@ foto cine nueva, se agrega ahí **y** en esta tabla.
 | `PS1b` | portada de perfil 3:1 | Nexa (softshell) | reserva izquierda, una sola fuente | `2026-09-30_portadas-sociales/fichas/PS1b-*.json` |
 | `WB1c` | portada Engine, `proposal-cinematic-web` | desarrollador | el polo del kit editado: bordado en el pecho | `2026-09-26_deck-web/fichas/WB1c/` |
 | `LG1` | escenario del login, novedad AI Visibility (`alcance: nexa`) | Nexa (traje) + 1 Spark en el hombro | atrapa UNA tarjeta de respuesta entre miles congeladas en el aire; un haz azul engine; la tarjeta es la llave | `2026-10-02_login-escenario/fichas/LG1-ai-visibility-nexa.json` |
-| `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: publicidad-prueba`, excepción) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
+| `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: producto`) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
 
 Aprobadas por el operador el 2026-10-02 (TASK-1964). **Pendiente:** sumar `LG1` y `LG2e` a
 `scripts/foto/cine-recetas.json` (lo hace la sesión dueña del índice). `LG3e`, la tercera foto aprobada del login, **no
@@ -195,7 +195,7 @@ Tres fotos para el carrusel de novedades del login V4 (TASK-1964), en
 `ai-generations/2026-10-02_login-escenario/` (fichas, prompts compilados, plates, retratos de casting y la revisión al
 100 %). Aprobadas por el operador: `LG1` y `LG2e` (cine, en la tabla de arriba) y `LG3e` (registro B).
 
-**El alcance que no existe [decisión del operador, 2026-10-02 · pendiente de canon].** El login es una superficie de
+**El alcance de producto [resuelto el 2026-10-03: caso 6, `alcance: "producto"`].** Lo que sigue es cómo se llegó. El login es una superficie de
 producto, no una pieza de campaña. El operador aceptó cine con una persona de **casting** (no del roster) en uniforme
 para ese escenario, como **excepción explícita del login**. Como `ALCANCES_CINE` no tiene un alcance web ni de
 producto, las fichas declaran `alcance: "publicidad-prueba"` y lo explican en `nota`. Con Nexa protagonista (`LG1`) no
@@ -236,6 +236,33 @@ en el prompt compilado [verificado], el efecto sobre la foto no se aisló [infer
 sobre el polo golpea la mesa y el plan de contenidos queda congelado en el aire; acento teal de growth; una sola fuente LED
 baja dentro del cuadro. En el login lleva la lente; `LG1` y `LG2e` van **sin lente**, porque su luz ya es la órbita de
 la pieza (una órbita por pieza; el operador lo aceptó). Ficha: `fichas/LG3e-contenidos-estratega.json`.
+
+## Elenco en grupo (2026-10-03) — lo que aprendimos
+
+Prueba cinemática del elenco de marca (`EFEONCE_BRAND_CAST_V1.md`), los cinco juntos, desde C4S07, con dos pasadas del
+`cine-reviewer`. Fichas y plates: `ai-generations/2026-10-03_elenco-cine/` (`EC1`, `EC2`).
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 21 | **Identidad prometida en texto**: tres personajes nombrados salen como otras personas | El tope era de dos personas ancladas; el resto iba sólo descrito | Grupo de 3 a 5 entre el `ELENCO`, Nexa y Julio, en cualquier combinación (2026-10-03): una referencia frontal por persona. Medido: con dos anclados, tres caras cambian; con los cinco, sostienen su identidad (hermanas incluidas) | EC1 → brazo 2 → EC2 | `foto:prompt` (`REFS_POR_PERSONA`) |
+| 22 | **Bloques IDENTITY sin nombre** con varias mujeres de pelo oscuro | El bloque decía «the woman…» sin decir cuál | En grupo, cada bloque empieza `PERSON n — NOMBRE (Image k):` y la escena nombra la imagen de cada persona | EC1 | `foto:prompt` lo inyecta en grupo |
+| 23 | **Caras con luz de estudio** pegadas en una escena oscura | Con cinco anclas, la luz de las referencias se impone a la de la escena | La escena declara la luz en cada cara («a soft teal glow from BELOW…; the light of the identity references does NOT carry over»); en grupo el bloque REFERENCES lo repite | brazo 2 → EC2 | `cine-reviewer` |
+| 24 | **Bordado reinventado** en todas las prendas del grupo | A 40–90 px por pecho el modelo no copia la marca aunque tenga la prenda puesta como referencia | `foto:isotipo --acabado` pecho por pecho; si una mano tapa la marca, se pide la vista de oclusión del kit (fila 28) | EC2-b (Hum y Antonio sí; Karo no) | `foto:emblema` al 100 % |
+| 25 | **`primerPlano` igual al `lecho`** | El compilador agrega «a separate object from the bed», y el modelo recibe dos objetos o uno contradictorio | Si el primer plano es el lecho, se omite `primerPlano` | EC1 | `cine-reviewer` |
+| 26 | **Prenda de hombre en una mujer, de frente en una persona a 45°** | Sin `puesta`, la prenda viajaba siempre con su vista frontal masculina | `foto:prompt` elige la vista puesta por silueta, giro, cámara y oclusión (`elegirPuesta`) e imprime las demás opciones; en grupo, `persona` en cada prenda | prueba de uniforme del elenco | la línea `·` de `foto:prompt` |
+| 27 | **Marca rotada en el plano en un giro profundo** | Sin una referencia en esa perspectiva, el modelo dibuja la marca a mano y la inclina (hasta ~35° a 70°) | El kit trae vistas puestas a 45° y 70°, de frente y de espaldas; se pidieron con la órbita horizontal y partiendo del frente | `2026-10-03_uniforme-vistas` | esfera arriba y ventanas horizontales, al 100 % |
+| 28 | **Una mano tapa la marca y se compone una marca más chica al lado** | La composición acomodó la marca al espacio libre | La vista real es la marca a su tamaño con sólo la parte visible: se pide la vista de oclusión del kit (`tapa`), no se compone encima. `foto:isotipo` ya compone por detrás de los oclusores, pero no decide el tamaño | EC2-c (descartada) → validado en `VO-karo-mano` (2026-10-03) | el operador, sobre la mano de Karo |
+| 29 | **El modelo esquiva la oclusión**: baja la tablet, sube la taza o la corre a un costado | Al pedir un objeto delante de la marca, el modelo prefiere dejar la marca entera y libre | Anclar el objeto a la marca en la frase («los nudillos delante de la marca») y pedir la vista de oclusión del kit (`tapa`). Si igual corre el objeto, revisar la marca: en la validación con taza salió correcta y entera | vistas de oclusión de `2026-10-03_uniforme-vistas`; validación en escena con taza | la línea `·` de `foto:prompt` + `foto:emblema` al 100 % |
+
+## Nexa: pose y proporción (2026-10-03) — lo que aprendimos
+
+Dos fallas de identidad de Nexa que ninguna frase del prompt corregía, porque las causaba una **imagen**. Detalle y
+validación en la [ficha de Nexa, delta 2026-10-03](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-03--25-expresiones-casi-de-frente-ancla-frontal-v2-y-proporción-del-rostro).
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 30 | **Nexa sale siempre con la misma pose, volteando la cara** (operador) | Las 12 expresiones de `5-expresiones/` se editaron desde el ancla en tres cuartos, todas con el mismo giro, y entraban **primeras** cuando la ficha pedía `expresion` (casi siempre, porque `foto:prompt` avisa si falta). La primera imagen manda en la pose más que cualquier frase | El ancla frontal va siempre primera y la expresión detrás, sólo para el gesto; en dupla y en grupo la expresión no viaja. 25 expresiones nuevas casi de frente (método A2) | `VP1` gira a la derecha cuando la escena lo pide; `VP2` de frente | orden de `--image` que imprime `foto:prompt` |
+| 31 | **La cara de Nexa sale afinada o alargada** (operador: «le alarga o achata la cara al ancho, poniéndola excesivamente fina») | El ancla frontal aprobada era 4–5 % más estrecha que el resto del canon (medido con Vision) | Ancla frontal v2: la aprobada estirada ×1,037 en horizontal, sin modelo; geometría del rostro en el IDENTITY (pómulos ≈ 1,2 veces ojos → mentón) y canon `rostro` 0,81 ± 0,02 | ancla vieja 0,836 → v2 0,816; canon aprobado 0,79–0,82 | `pnpm foto:rostro <png> --persona nexa` |
 
 ## Lo que no se automatiza (y por eso existe el revisor)
 

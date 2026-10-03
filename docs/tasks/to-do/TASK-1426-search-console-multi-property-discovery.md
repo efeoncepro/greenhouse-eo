@@ -1,5 +1,16 @@
 # TASK-1426 — Search Console Multi-Property Analytics, URL Inspection & Post-Publish Discovery
 
+## Delta 2026-10-03 — Search Console de imágenes, video, noticias y Discover para la propiedad web
+
+- El inventario de tarjetas de Efeonce Insights aprobado el 2026-10-03 (canvas `9q7nThMhdphN5j8f3K3cbB`) marca
+  «Search Console: imágenes, video, noticias, Discover» como **falta capturarlo**: la materialización diaria
+  (`src/lib/growth/seo/gsc-daily-materializer.ts`, `dimensions: ['query', 'page']`) y el cliente
+  (`src/lib/growth/search-console/api-client.ts`) sólo piden `searchType=web`. Esta task ya es la dueña de los tipos de
+  búsqueda oficiales de Search Analytics; se amplía para que la **propiedad web** también materialice por día los tipos
+  `image`, `video`, `news` y `discover`, con `searchType` como dimensión que nunca se suma con `web`.
+- Consumer posterior: el adapter SEO de Insights (follow-up de TASK-1992). — por trabajo en TASK-1990…1996
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -384,6 +395,7 @@ Slice 0 → Slice 1 → Slice 2. Slice 3 puede empezar tras Slice 1. Slice 4 req
 - [ ] TASK-1302 recibe contrato/documentación para adoptar binding y surface type sin duplicar el cliente GSC.
 - [ ] Signals de compatibility/discovery lag no contienen tokens, queries crudas ni PII.
 - [ ] `pnpm task:lint --task TASK-1426`, `pnpm ops:lint --changed`, gates focales, QA release y docs closure pasan sin findings bloqueantes.
+- [ ] (Delta 2026-10-03) La propiedad web materializa por día clics e impresiones de `image`, `video`, `news` y `discover`, con `searchType` explícito, sin sumarse a `web` y con cobertura declarada cuando Google no devuelve datos.
 
 ## Verification
 

@@ -185,7 +185,7 @@ describe('foto:isotipo --acabado', () => {
     // Procedencia en el .json que foto:isotipo ya produce.
     const json = JSON.parse(readFileSync(r.out.replace(/\.png$/, '.json'), 'utf8'))
 
-    expect(json.schema).toBe('efeonce.foto.isotipo.v1')
+    expect(json.schema).toBe('efeonce.foto.isotipo.v2')
     expect(json.acabado).toMatchObject({
       veredicto: 'aprobado',
       salida: path.basename(`${base}.png`),

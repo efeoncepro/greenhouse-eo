@@ -68,6 +68,11 @@ referencias aprobadas y los seis ángulos de `ai-generations/2026-09-20_identida
 `refs-aprobadas/MANIFIESTO.json` y seleccionar por `foto:prompt`. No usar el archivo excluido `julio-ap-02.png`
 ni fotos fuente/descartes como anclas. Canon:
 [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+Desde 2026-10-03: para variar personas en piezas con varios o de equipo existe el **elenco de marca** (cinco personajes
+ficticios, no obligatorios; nunca como equipo real, cliente ni testimonio:
+[`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)); Nexa tiene 25
+expresiones aprobadas (el «antes» del problema y el éxito, entre otras) y la ropa de marca puesta la elige
+`pnpm foto:prompt`. Detalle en `design-studio` → lenguaje fotográfico §11.
 
 **Registro cine (2026-09-27): fuera de social salvo con Nexa protagonista.** El registro cine de la fotografía
 Efeonce —el servicio como fenómeno de luz, ficción declarada— sólo está aprobado con **Nexa protagonista**, en la

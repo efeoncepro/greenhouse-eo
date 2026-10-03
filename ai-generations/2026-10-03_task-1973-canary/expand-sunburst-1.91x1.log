@@ -1,0 +1,12 @@
+  ⤢ lienzo 1956x1024 · escena 1536x1024 en (210, 0) · relleno previo mirror · fundido 24 px
+  ⚠ Sunburst edita sin máscara (por instrucción, la imagen entera); el pipeline recompone sólo la zona. Pide en el prompt que no cambie el encuadre.
+  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)
+  · openai edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ imagen completa → 1952x1024 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.036 · 1 × salida 1952x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    · color corregido en el anillo (28672 px): desplazamiento RGB +4.5 / +5.1 / +7.2
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 183/255 · salida USD 0.0360
+    ⚠ la zona editable casi no cambió (delta medio 9.1/255): mira si el modelo cumplió el pedido.
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/333fe6146ca2/manifest.json
+sunburst exit=3

@@ -287,7 +287,7 @@ Antes de generar cualquier pieza donde aparezca un asset de marca Efeonce —rop
 merch, logo 3D, isotipo, nave o mascotas de partners— carga
 [`docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`](docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).
 
-Hay **279 archivos en 10 kits** y ninguna vista hay que inventarla: el trabajo es **elegir la
+Hay **279 archivos en 10 kits** (inventario del 2026-09-21; el 2026-10-03 se sumaron 126 vistas puestas) y ninguna vista hay que inventarla: el trabajo es **elegir la
 correcta**. Tres reglas duras:
 
 1. **Arte plano → PRODUCIR vistas del kit · pieza aislada → CONSTRUIR · pieza en uso / producto
@@ -298,4 +298,4 @@ correcta**. Tres reglas duras:
 3. **Las proporciones se calculan del objeto real, nunca a ojo.**
 
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: declaran `cuando_usarla` por vista,
-y si hay **prueba en persona**, ésa es el punto de partida. Comando: `pnpm foto:lanyard`.
+y si hay **prueba en persona**, ésa es el punto de partida. Comando: `pnpm foto:lanyard`. La vista **puesta** de la ropa la elige `foto:prompt` (silueta, giro, cámara baja, oclusión) e imprime las alternativas; lo sellado se baja solo del canon GCP (`FOTO_SIN_CANON=1` lo apaga); elenco ficticio (Hum, Karo, Sophia, Isabella, Antonio) + Nexa + Julio en grupos de 3 a 5 → `EFEONCE_BRAND_CAST_V1.md`; 25 expresiones de Nexa; proporción del rostro con `pnpm foto:rostro`.

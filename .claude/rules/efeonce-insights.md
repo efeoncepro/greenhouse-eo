@@ -45,6 +45,13 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   producción desde 2026-09-26. Compara `=== 'true'`: cargarlo con `printf %s true`, redeploy DESPUÉS de la var y
   verificar con una canary (plan con `scopeLines`/`cover`), no con el listado de vars. Rollback = OFF en los dos
   runtimes. Registrar todo flip en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Selección de figuras (TASK-1974/1975, plan editorial v2)**: la pregunta del lector elige la familia
+  (`ChartSpecV1.question` + `QUESTION_FAMILIES`); un hecho del período alimenta UNA figura del capítulo (`duplicated_fact`;
+  sólo los totales de la cascada son ancla); la tarjeta de cifra vive en `chapter.stats`, fuera de las 15 familias. Valor,
+  variación, tono y «vs» de una cifra salen SÓLO de `presentation/stat-card.ts` (`statItemView`) para PDF, deck y web.
+  **NUNCA** truncar el nombre de una cifra (≤ 3 palabras, ≤ 24 caracteres: se rechaza) ni dibujar una cascada que no
+  cuadra, un waffle de más de 100 unidades o una dona fuera de 2–3 partes: el render rechaza con causa o no emite la figura.
+  Tono de la variación por fondo: papel = píldora teñida; navy = sólo el triángulo redondeado en tono.
 - **Sharing / correo / recurrencia (TASK-1848, `sharing/`, `delivery/`, `schedules/`)**: del token `isg_` sólo se
   persiste su sha256 — **NUNCA** el bearer (ni cifrado); un reintento de correo revoca el grant y emite otro. El reader
   público (`/api/public/insights/shared/**`) responde 404 desconocido/expirado, 410 revocado/retirado, 429 y SIEMPRE

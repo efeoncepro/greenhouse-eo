@@ -1,0 +1,22 @@
+{
+ "canvas": {
+  "width": 2048,
+  "height": 1152,
+  "line": "engine",
+  "surface": "dark",
+  "channel": "social"
+ },
+ "elements": [
+  {
+   "kind": "voice",
+   "id": "voice",
+   "questionId": "question",
+   "answerId": "answer",
+   "answerText": "Mídelo"
+  },
+  {
+   "kind": "signature",
+   "id": "firma"
+  }
+ ]
+}

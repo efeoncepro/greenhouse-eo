@@ -1,9 +1,9 @@
 # Sparks V1 — los agentes de Efeonce
 
 > **Tipo de documento:** Especificación canónica de marca (personajes)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-10-01 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.6: §5, dos Sparks con referencia como máximo en una toma cine; §6, `NX7d` como escena de referencia con Nexa en su traje biónico)
+> **Última actualización:** 2026-10-03 por Claude (1.7: §8.2, los Sparks en animación 2D, primer uso en el spot «Sparks × Efeonce AEO»; 1.6: §5, dos Sparks con referencia como máximo en una toma cine; §6, `NX7d` como escena de referencia con Nexa en su traje biónico)
 > **Estado:** nombre, plantel y relato aprobados por el operador (Julio Reyes) el 2026-09-29; diseño elegido y Spark
 > base aprobado el 2026-10-01 («Me encanta»). Kit producido (Spark base v02 y plantel v01, aprobado el 2026-10-01: «Aprobados») y catálogo de `foto:prompt`
 > con guarda contra robots. Sin publicar en AXIS; sin prueba de reconocimiento.
@@ -16,6 +16,7 @@
 > [Marca de agencia](../../context/09_marca-agencia.md) ·
 > [Mascotas de partners](../social/PARTNER_MASCOT_POSE_LIBRARIES.md) ·
 > [Manual de uso](../../manual-de-uso/creative/usar-sparks-en-fotos-de-marca.md) ·
+> [Elenco 2D (supervisa a los Sparks en 2D)](./EFEONCE_2D_CAST_V1.md) ·
 > [Corrida y kit](../../../ai-generations/2026-10-01_sparks/LEEME.md)
 > **Dónde viven los archivos del kit:** sellado en `scripts/foto/assets.lock.json` (su respaldo es el canon, vía `pnpm creative:assets:publish`); si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull` ([contrato](../AI_GENERATIONS_STORAGE_V1.md)).
 
@@ -240,6 +241,32 @@ datos en `/references/sparks.json` → `rig`).
   (`ai-generations/2026-10-01_sparks/3d/`).
 - Producción y receta en `ai-generations/2026-10-01_sparks/rig/LEEME.md`.
 
+### 8.2 Los Sparks en animación 2D **[primer uso: spot «Sparks × Efeonce AEO», v2 aprobada por el operador el 2026-10-03]**
+
+El spot (2D cel-shaded, 16:9, 24 fps, 49,6 s) lleva **cuatro Sparks** que Tomás, del
+[elenco 2D](./EFEONCE_2D_CAST_V1.md), pone a trabajar y supervisa. Corrida y scripts:
+`ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md`; `PREPRODUCCION.md` §11–12).
+
+- **Nunca los dibuja el modelo [medido]:** en cada cuadro clave se **componen desde el SVG oficial** (`sparks-2d` de
+  `@efeoncepro/axis-brand-assets`), **sin espejar** (el anillo se invierte, §3), con un halo radial en modo *screen*
+  (`cuadros/compose-sparks.cjs`). El motor de imagen pone escena y personajes; el modelo de video, luz y movimiento.
+- **La mirada emula el `lookAt` del rig (§8.1) [medido]:** la cara de LED (lo que hay entre el reflejo del visor y los
+  botones) se traslada **dentro del clip del visor** —elipse `cx 200 · cy 196 · rx 96 · ry 48`— en `x·0,3·96` y
+  `y·0,28·48`, y el cuerpo gira `rotate(x·5)` sobre `(200, 215)` (`cuadros/spark-mirada.cjs`; `x`, `y` = dirección de
+  la mirada). El operador pidió que el Spark mirara a Tomás y lo aprobó: **con un personaje en cuadro, el Spark lo mira**
+  **[criterio, desde ese pedido]**.
+- **Pasada de acabado, sólo de luz [medido]:** se permitió una pasada que integra la luz sobre los Sparks, y se fusionó
+  con `cuadros/merge-zonas.cjs`: máscara elíptica difuminada por zona y salida con código 1 si cambia **un solo píxel
+  fuera** de las zonas más su margen. Resultado: **0 píxeles cambiados fuera**. La forma, el color y la cara quedan del SVG.
+- **Video con MiniMax H3 [medido]:** usar **H3 base** (`--prompt-expansion disabled`); **H3 Max gira los Sparks en 3D** y
+  rompe el 2D. Detalle y demás hallazgos en la
+  [guía de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+- **Placa de cierre animada [medido]:** los **cuatro Sparks** entran escalonados con *ease-out-back* y flotan con un
+  período de un compás (1,5 s a 160 BPM, el tempo de la cama) bajo los logos de Efeonce AEO y del AI Visibility Report
+  (`corte/placa-cierre.cjs`, 157 cuadros = 6,54 s). Se dibuja cuadro a cuadro desde el vector, no con el modelo.
+- **Trampas [medido]:** con SVG a alta densidad, sharp exige `limitInputPixels: false`; `removeAlpha` al final del
+  pipeline perdía el `joinChannel`, por eso la mezcla se hizo a mano.
+
 ## 9. El nombre: revisión de colisión
 
 Búsqueda web del 2026-10-01 **[medido]**:
@@ -272,6 +299,7 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 - **No llamarlo «Sparks» a secas en público** ni usar el nombre como producto.
 - **No presentarlo como un agente real** del cliente ni como promesa de autonomía: es un personaje.
 - **No espejar una vista** para obtener el lado contrario: el anillo se invierte.
+- **No dejar que un modelo dibuje o anime la forma del Spark** en una pieza 2D: se compone desde el SVG oficial y el modelo sólo pone luz y movimiento (§8.2).
 
 ## 11. Pendiente
 

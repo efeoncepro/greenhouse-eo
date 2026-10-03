@@ -22,4 +22,9 @@ lo protegido (derivado del lock, las recetas del deck y las citas en `src/**`/`s
 3. **NUNCA** archivar a mano (`gcloud storage cp/rm`) ni borrar carpetas de `ai-generations/` fuera de
    `pnpm ai-gen:archive` (extiende `media:archive-ai-generation`); lo archivado nunca se borra.
 4. Promover exploración a canónica = sellarla en el lock o citarla en la receta (eso la protege) **y** publicarla con
-   `pnpm creative:assets:publish apply`. Citarla en un doc no basta.
+   `pnpm creative:assets:publish apply`. Citarla en un doc no basta. Al sumar una referencia: QA al 100 % → hogar
+   canónico + catálogo → `foto:assets:lock` → `creative:assets:publish apply` → `vitest run scripts/foto` →
+   `ai-gen:archive apply --folder <exploración>` (SSOT §8). Archivar ≠ borrar: es lo que se hace con lo no aprobado.
+5. `foto:prompt`/`foto:generar` traen solas del canon la referencia sellada que falta o no calza con el lock
+   (`⇣ … (canon)`; la copia local distinta queda aparte como `.local-<sha8>`); `FOTO_SIN_CANON=1` lo apaga. No citar
+   rutas de corridas en comentarios de `src/**`/`scripts/**`: eso las protege del archivo.

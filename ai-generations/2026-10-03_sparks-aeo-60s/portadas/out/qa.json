@@ -1,0 +1,106 @@
+[
+  {
+    "id": "ig-a",
+    "dominante": [
+      "¿Te nombra?"
+    ],
+    "ratioDominanteEntrada": 3.8,
+    "contraste": {
+      "entrada": 12.84,
+      "dominante": 7.1,
+      "cierre-frase": 1.13,
+      "logo": 10.15
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 28,
+        "ratioDominante": 0.122
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 23,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "ig-b",
+    "dominante": [
+      "¿Te nombra?"
+    ],
+    "ratioDominanteEntrada": 3.8,
+    "contraste": {
+      "entrada": 15.46,
+      "dominante": 15.7,
+      "cierre-frase": 16.56,
+      "logo": 13.58
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 28,
+        "ratioDominante": 0.122
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 23,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "li-a",
+    "dominante": [
+      "¿Te nombra?"
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 11.79,
+      "dominante": 7.67,
+      "cierre-frase": 6.84,
+      "logo": 19.12
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 24,
+        "ratioDominante": 0.12
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 20,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "li-b",
+    "dominante": [
+      "¿Te nombra?"
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 14.86,
+      "dominante": 9.49,
+      "cierre-frase": 10.08,
+      "logo": 14.01
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 24,
+        "ratioDominante": 0.12
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 20,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null
+  }
+]

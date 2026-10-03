@@ -10,7 +10,7 @@
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
-import type { ChartSpecV1 } from '../contracts/chart-spec'
+import { bulletItemDirection, type ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS } from '../contracts/plan'
@@ -49,46 +49,67 @@ const valueText = (fact: EvidenceFactV1, locale: string): string => {
 // ─── Familias nuevas ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Bullet ICO: una figura por métrica con meta oficial (hecho de referencia del registro), un ítem por space en el
- * ÚLTIMO mes medido de la ventana.
+ * Bullet ICO: UNA figura con todas las metas del capítulo (criterio §5, TASK-1974: «varias metas del mismo capítulo van
+ * en una figura, no una figura por meta»), un ítem por métrica × space en el ÚLTIMO mes medido de la ventana. Cada ítem
+ * declara su dirección (RpA mejora al bajar, OTD y FTR al subir) y su banda del registro dueño, si existe.
  */
 export const bulletCharts = (moduleKey: InsightModule, facts: EvidenceFactV1[], references: EvidenceFactV1[]): ChartSpecV1[] => {
   if (!canProduceFamily('bullet', moduleKey)) return []
 
-  return references.filter(reference => reference.metricId.startsWith('target.')).flatMap(target => {
+  const chartId = `chart.${moduleKey}.bullet.targets`
+
+  const entries = references.filter(reference => reference.metricId.startsWith('target.') && reference.value !== null && reference.value > 0).flatMap(target => {
     const metricId = target.metricId.replace(/^target\./, '')
     // Banda «cerca de la meta» del mismo registro, si el adapter la entregó (TASK-1888, pedido de TASK-1889).
     const band = references.find(reference => reference.metricId === `band.${metricId}` && reference.value !== null)
     const measured = facts.filter(fact => fact.metricId === metricId && fact.value !== null)
     const lastMonth = measured.map(monthOf).filter((month): month is string => month !== null).sort().at(-1) ?? null
     const items = lastMonth ? measured.filter(fact => monthOf(fact) === lastMonth) : measured
+    const direction = target.dimension?.direction === 'lower_is_better' ? ('lower_is_better' as const) : ('higher_is_better' as const)
 
-    if (items.length === 0 || target.value === null || target.value <= 0) return []
-
-    const chartId = `chart.${moduleKey}.bullet.${metricId}`
-
-    return [{
-      specVersion: 'chart_spec_v1' as const,
-      chartId,
-      family: 'bullet' as const,
-      relation: 'target' as const,
-      title: `${GH_INSIGHTS.metrics[metricId] ?? metricId} · ${GH_INSIGHTS.figures.bulletTitle}`,
-      series: [],
-      dimensionLabels: items.map(itemLabel),
-      unit: target.unit,
-      scale: { kind: 'linear' as const, baseline: 0 as const },
-      references: [],
-      tabularEquivalent: {
-        columns: ['Espacio', GH_INSIGHTS.figures.currentLabel, GH_INSIGHTS.figures.targetLabel],
-        rows: items.map(item => [null, item.factId, target.factId])
-      },
-      data: {
-        kind: 'bullet' as const,
-        direction: target.dimension?.direction === 'lower_is_better' ? ('lower_is_better' as const) : ('higher_is_better' as const),
-        items: items.map(item => ({ itemId: `${chartId}.${item.factId}`, label: itemLabel(item), valueFactId: item.factId, targetFactId: target.factId, ...(band ? { bandFactId: band.factId } : {}) }))
-      }
-    }]
+    return items.map(item => ({ item, target, band, metricId, direction }))
   })
+
+  if (entries.length === 0) return []
+
+  // Con un solo space la fila es la métrica; con varios, métrica y space.
+  const multiSpace = new Set(entries.map(entry => entry.item.dimension?.spaceId).filter(Boolean)).size > 1
+
+  const labelOf = (entry: (typeof entries)[number]) => {
+    const metric = GH_INSIGHTS.metrics[entry.metricId] ?? entry.metricId
+
+    return multiSpace ? `${metric} · ${itemLabel(entry.item)}` : metric
+  }
+
+  return [{
+    specVersion: 'chart_spec_v1' as const,
+    chartId,
+    family: 'bullet' as const,
+    relation: 'target' as const,
+    question: 'target' as const,
+    title: GH_INSIGHTS.figures.targetsTitle,
+    series: [],
+    dimensionLabels: entries.map(labelOf),
+    unit: entries[0]!.target.unit,
+    scale: { kind: 'linear' as const, baseline: 0 as const },
+    references: [],
+    tabularEquivalent: {
+      columns: ['Indicador', GH_INSIGHTS.figures.currentLabel, GH_INSIGHTS.figures.targetLabel],
+      rows: entries.map(entry => [null, entry.item.factId, entry.target.factId])
+    },
+    data: {
+      kind: 'bullet' as const,
+      direction: entries[0]!.direction,
+      items: entries.map(entry => ({
+        itemId: `${chartId}.${entry.item.factId}`,
+        label: labelOf(entry),
+        valueFactId: entry.item.factId,
+        targetFactId: entry.target.factId,
+        direction: entry.direction,
+        ...(entry.band ? { bandFactId: entry.band.factId } : {})
+      }))
+    }
+  }]
 }
 
 /**
@@ -289,24 +310,35 @@ const fromTo = (fact: EvidenceFactV1, change: NonNullable<ReturnType<typeof chan
   return before === after ? `${R.held} ${R.heldAt} ${after}` : `${R.from} ${before} ${R.lineTo} ${after} (${change.text})`
 }
 
-/** Estado de un bullet contra su meta: el ítem con mayor brecha manda. Lo usan la lectura y la tesis del resumen. */
+/**
+ * Estado de un bullet contra su meta: el ítem más lejos de su meta manda. Lo usan la lectura y la tesis del resumen.
+ * Cada ítem se juzga con SU dirección (TASK-1974: una figura junta metas que mejoran al subir y al bajar) y la brecha es
+ * relativa a su meta, para comparar métricas de unidades distintas.
+ */
 const bulletStatus = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>) => {
   if (chart.data?.kind !== 'bullet') return null
 
-  const lowerIsBetter = chart.data.direction === 'lower_is_better'
+  const data = chart.data
 
-  const items = chart.data.items
+  const items = data.items
     .map(item => ({ item, value: byId.get(item.valueFactId), target: byId.get(item.targetFactId) }))
-    .filter((entry): entry is { item: (typeof entry)['item']; value: EvidenceFactV1; target: EvidenceFactV1 } => Boolean(entry.value && entry.target && entry.value.value !== null && entry.target.value !== null))
+    .filter((entry): entry is { item: (typeof entry)['item']; value: EvidenceFactV1; target: EvidenceFactV1 } => Boolean(entry.value && entry.target && entry.value.value !== null && entry.target.value !== null && entry.target.value > 0))
 
   if (items.length === 0) return null
 
-  // Brecha en la dirección que empeora: positiva = no alcanzó la meta.
-  const gap = (entry: (typeof items)[number]) => (lowerIsBetter ? entry.value.value! - entry.target.value! : entry.target.value! - entry.value.value!)
-  const lead = [...items].sort((a, b) => gap(b) - gap(a))[0]!
-  const metricId = chart.chartId.split('.').at(-1) ?? ''
+  // Brecha relativa en la dirección que empeora: positiva = no alcanzó la meta.
+  const gap = (entry: (typeof items)[number]) => {
+    const lower = bulletItemDirection(data, entry.item) === 'lower_is_better'
 
-  return { items, gap, lead, missing: items.filter(entry => gap(entry) > 0), metricName: GH_INSIGHTS.metrics[metricId] }
+    return (lower ? entry.value.value! - entry.target.value! : entry.target.value! - entry.value.value!) / entry.target.value!
+  }
+
+  const lead = [...items].sort((a, b) => gap(b) - gap(a))[0]!
+  const nameOf = (entry: (typeof items)[number]) => GH_INSIGHTS.metrics[entry.value.metricId]
+  // Todas las filas son la MISMA métrica (varios spaces): el próximo paso «revisar primero X» tiene sentido.
+  const sameMetric = new Set(items.map(entry => entry.value.metricId)).size === 1
+
+  return { items, gap, lead, missing: items.filter(entry => gap(entry) > 0), metricName: nameOf(lead), nameOf, sameMetric }
 }
 
 const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): PlanFigureReadingV1 | null => {
@@ -314,16 +346,17 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
 
   if (!status) return null
 
-  const { items, gap, lead, missing, metricName } = status
+  const { items, gap, lead, missing, metricName, sameMetric } = status
   const verdict = gap(lead) > 0 ? R.missesTarget : R.meetsTarget
   const target = `${fmt(lead.value, locale)} (${R.targetShort} ${fmt(lead.target, locale)})`
+  const space = itemLabel(lead.value)
 
   // Conclusión = el hecho contra su META, con la métrica nombrada (también se lee en «Lo esencial»). Con un solo space
   // el sujeto es la frase («No alcanza la meta de…»); con varios, el space con mayor brecha.
   const conclusionText = firstFitting(
     L.conclusion,
-    `${context.multiSpace ? `${lead.item.label} ${verdict}` : upperFirst(verdict)}${metricName ? ` ${R.metricOf} ${lowerFirst(metricName)}` : ''}: ${target}.`,
-    `${context.multiSpace ? `${lead.item.label} ${verdict}` : upperFirst(verdict)}: ${target}.`
+    `${context.multiSpace ? `${space} ${verdict}` : upperFirst(verdict)}${metricName ? ` ${R.metricOf} ${lowerFirst(metricName)}` : ''}: ${target}.`,
+    `${context.multiSpace ? `${space} ${verdict}` : upperFirst(verdict)}: ${target}.`
   )
 
   const leadChange = changeOf(lead.value, byId, locale)
@@ -340,15 +373,15 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
     keyFigure: {
       factId: lead.value.factId,
       value: fmt(lead.value, locale),
-      caption: claim(`${chart.chartId}.key`, context.multiSpace ? `${metricName ?? chart.title} · ${lead.item.label}.` : `${metricName ?? chart.title}.`, [lead.value.factId])
+      caption: claim(`${chart.chartId}.key`, context.multiSpace ? `${metricName ?? chart.title} · ${space}.` : `${metricName ?? chart.title}.`, [lead.value.factId])
     },
     ...(conclusionText ? { conclusion: claim(`${chart.chartId}.conclusion`, conclusionText, [lead.value.factId, lead.target.factId]) } : {}),
     ...(meaningText ? { meaning: claim(`${chart.chartId}.meaning`, meaningText, items.length > 1 ? items.flatMap(entry => [entry.value.factId, entry.target.factId]) : [lead.value.factId, leadChange!.previous.factId]) } : {}),
     // «Revisar primero X» sólo tiene sentido cuando hay entre qué elegir: dos o más spaces, uno con brecha.
     // «Primero» exige una brecha mayor ÚNICA: con empate no hay por dónde empezar.
     nextStep:
-      items.length > 1 && missing.length > 0 && items.filter(entry => gap(entry) === gap(lead)).length === 1
-        ? claim(`${chart.chartId}.next`, `${R.nextStepGap} ${lead.item.label}: ${R.nextStepGapReason}`, [lead.value.factId])
+      sameMetric && items.length > 1 && missing.length > 0 && items.filter(entry => gap(entry) === gap(lead)).length === 1
+        ? claim(`${chart.chartId}.next`, `${R.nextStepGap} ${space}: ${R.nextStepGapReason}`, [lead.value.factId])
         : null
   }
 }
@@ -481,6 +514,29 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
 }
 
 /**
+ * TASK-1974 — barras apiladas: la lectura es el segmento BASE (el subconjunto que importa, p. ej. visitas con
+ * interacción) contra su período anterior, con la frase de ese hecho; la cifra principal es ese segmento, nunca el total.
+ */
+const subsetReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): PlanFigureReadingV1 | null => {
+  const base = chart.series[0]
+  const fact = base ? byId.get(base.factIds.at(-1) ?? '') : undefined
+
+  if (!base || !fact || fact.value === null) return null
+
+  const change = printedChange(fact, byId, locale)
+  const conclusionText = firstFitting(L.conclusion, change ? humanFactSentence(fact, byId, locale, context) : null, `${subjectOf(fact, context)}: ${valueText(fact, locale)}.`)
+
+  if (!conclusionText) return null
+
+  return {
+    chartId: chart.chartId,
+    keyFigure: { factId: fact.factId, value: fmt(fact, locale), caption: claim(`${chart.chartId}.key`, `${base.label}.`, [fact.factId]) },
+    conclusion: claim(`${chart.chartId}.${change ? 'conclusion' : 'value'}`, conclusionText, change ? [fact.factId, change.previous.factId] : [fact.factId]),
+    nextStep: null
+  }
+}
+
+/**
  * Lectura de cada figura QUE TIENE PÁGINA. `hasFigurePage` es el predicado del render (TASK-1889: ejecuta el mismo
  * `buildFigureSlides`), así que planner y render no pueden divergir: una figura sin página no recibe lectura, y
  * «Lo esencial» nunca cita una conclusión que no se imprime (Berel CTR, 2026-09-25).
@@ -489,7 +545,7 @@ export const readingsFor = (charts: ChartSpecV1[], byId: Map<string, EvidenceFac
   const context = contextOf(charts, byId)
 
   const readings = charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chart => {
-    const reading = chart.family === 'bullet' ? bulletReading(chart, byId, locale, context) : chart.family === 'line' ? lineReading(chart, byId, locale, context) : barReading(chart, byId, locale, context)
+    const reading = chart.family === 'bullet' ? bulletReading(chart, byId, locale, context) : chart.family === 'line' ? lineReading(chart, byId, locale, context) : chart.family === 'bar_stacked' ? subsetReading(chart, byId, locale, context) : barReading(chart, byId, locale, context)
 
     return reading ? [{ chart, reading }] : []
   })
@@ -529,7 +585,9 @@ const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {
 export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1[] => {
   const bullets = chapters.flatMap(chapter => chapter.charts.filter(chart => chart.family === 'bullet' && (chapter.readings ?? []).some(reading => reading.chartId === chart.chartId)))
   const statuses = bullets.map(chart => ({ chart, status: bulletStatus(chart, byId)! })).filter(entry => entry.status)
-  const missed = statuses.filter(entry => entry.status.missing.length > 0)
+  // Cada meta es un ítem (TASK-1974: una figura junta todas las metas del capítulo).
+  const goals = statuses.flatMap(entry => entry.status.items.map(item => ({ item, status: entry.status })))
+  const missedGoals = goals.filter(goal => goal.status.gap(goal.item) > 0)
 
   // Conclusiones de figuras primero; después los hallazgos de capítulo (TASK-1957: un capítulo sin figura —AEO con
   // menciones parejas— igual aporta su hallazgo al resumen). Cada candidato recuerda su módulo para que la bajada
@@ -542,11 +600,13 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
   const ordered = candidates.map(entry => entry.item)
   let thesis: PlanClaimV1 | null = null
 
-  if (missed.length === 1 && statuses.length > 1 && missed[0]!.status.metricName) {
-    const { status } = missed[0]!
-    const text = firstFitting(L.summaryThesis, `${status.metricName} ${R.onlyMissed}: ${fmt(status.lead.value, locale)} (${R.targetShort} ${fmt(status.lead.target, locale)}).`)
+  const onlyMissed = missedGoals.length === 1 ? missedGoals[0]! : null
+  const onlyName = onlyMissed ? onlyMissed.status.nameOf(onlyMissed.item) : undefined
 
-    if (text) thesis = claim('summary.thesis', text, [status.lead.value.factId, status.lead.target.factId])
+  if (onlyMissed && goals.length > 1 && onlyName) {
+    const text = firstFitting(L.summaryThesis, `${onlyName} ${R.onlyMissed}: ${fmt(onlyMissed.item.value, locale)} (${R.targetShort} ${fmt(onlyMissed.item.target, locale)}).`)
+
+    if (text) thesis = claim('summary.thesis', text, [onlyMissed.item.value.factId, onlyMissed.item.target.factId])
   }
 
   thesis ??= (() => {

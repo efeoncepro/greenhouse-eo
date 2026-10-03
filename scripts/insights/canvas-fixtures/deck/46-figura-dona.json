@@ -1,0 +1,57 @@
+{
+  "reference": "Deck-Donut",
+  "catalog": "deck",
+  "contentType": "insights-figure-donut",
+  "slots": {
+    "tabNumber": "02",
+    "section": "Motores de respuesta",
+    "period": "Agosto 2026 · 50 consultas",
+    "eyebrow": {
+      "icon": "donut",
+      "label": "Presencia en respuestas de IA"
+    },
+    "keyFigure": "62 %",
+    "keyCaption": "de las respuestas de IA nombra la marca <strong>(31 de 50)</strong>",
+    "conclusion": "La marca aparece en 31 de 50 respuestas, pero solo 19 enlazan al sitio",
+    "figureTitle": "Cómo aparece la marca en 50 respuestas",
+    "source": {
+      "label": "Fuente",
+      "text": "Motores de respuesta"
+    },
+    "donutChannels": {
+      "label": "Motores medidos",
+      "channels": [
+        { "name": "ChatGPT", "channelId": "chatgpt" },
+        { "name": "Gemini", "channelId": "gemini" },
+        { "name": "Claude", "channelId": "claude" },
+        { "name": "Perplexity", "channelId": "perplexity" }
+      ]
+    },
+    "donutParts": [
+      { "label": "Cita con enlace", "count": "19", "share": "38 %", "icon": "link" },
+      { "label": "Menciona sin enlace", "count": "12", "share": "24 %", "tag": "Oportunidad", "role": "opportunity", "icon": "quote" },
+      { "label": "No la menciona", "count": "19", "share": "38 %", "role": "absence", "icon": "eye-off" }
+    ],
+    "donutCenter": {
+      "value": "62 %",
+      "label": "nombra la marca"
+    },
+    "note": {
+      "text": "Cada respuesta cuenta en una sola categoría: si cita con enlace, no se cuenta como mención."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "Los motores de IA ya conocen la marca, pero en 12 de sus 31 menciones la nombran sin llevar tráfico al sitio."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Publicar contenido citable en los temas de esas 12 menciones: datos propios y respuestas que un motor pueda enlazar."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": { "page": "16", "total": "24" }
+  }
+}

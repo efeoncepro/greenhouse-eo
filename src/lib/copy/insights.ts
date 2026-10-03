@@ -100,7 +100,9 @@ export const GH_INSIGHTS = {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
     aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
     tableTitle: { seo: 'Visitas al sitio desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
-    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.'
+    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.',
+    /** TASK-1974 — la porción que suma a los asistentes fuera de los 2 que más traen. */
+    otherAssistants: 'Otros asistentes'
   },
 
   /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
@@ -169,6 +171,7 @@ export const GH_INSIGHTS = {
     ga4: 'Google Analytics 4',
     'site.organic_sessions': 'Visitas orgánicas al sitio',
     'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
+    'site.organic_unengaged_sessions': 'Visitas orgánicas sin interacción',
     ai_sessions: 'Visitas desde asistentes de IA',
     'driver.query': 'Consultas que más cambiaron',
     'driver.page': 'Páginas que más cambiaron',
@@ -228,6 +231,8 @@ export const GH_INSIGHTS = {
   /** TASK-1888 — títulos de figura por familia (sin cifras: la cifra va en la página, desde su hecho). */
   figures: {
     bulletTitle: 'contra la meta',
+    /** TASK-1974 — figura única con todas las metas del capítulo. */
+    targetsTitle: 'Resultado contra la meta',
     lineTitle: 'evolución mensual',
     targetLabel: 'Meta',
     previousLabel: 'Período anterior',
@@ -242,6 +247,11 @@ export const GH_INSIGHTS = {
     driversEntityColumn: 'Consulta o página',
     driversRestLabel: 'Resto de consultas',
     driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
+    /** TASK-1975 — lectura de la cascada: la cifra es el aporte de la consulta que más cambió (un hecho, no una resta). */
+    waterfallCaption: (gained: boolean, label: string, period: string) => `clics ${gained ? 'más' : 'menos'} en «${label}» que en ${period}`,
+    waterfallCaptionShort: (gained: boolean, period: string) => `clics ${gained ? 'más' : 'menos'} que en ${period} en la consulta que más cambió`,
+    waterfallConclusion: (gained: boolean, label: string) => `«${label}» es la consulta que más ${gained ? 'sumó' : 'restó'} en el cambio de clics.`,
+    waterfallConclusionShort: (gained: boolean) => `Una consulta lidera lo que ${gained ? 'sumó' : 'restó'} en el cambio de clics.`,
     previousTotal: 'Período anterior',
     currentTotal: 'Este período',
     weeklyTitle: 'Clics orgánicos por semana',
@@ -272,6 +282,66 @@ export const GH_INSIGHTS = {
    * TASK-1888 — lectura determinista por figura (fallback sin modelo). Afirma sólo lo que el dato muestra: el valor
    * contra su meta o su período anterior. NUNCA una causa ni una explicación: eso no está en la evidencia.
    */
+  /**
+   * TASK-1974 — tarjeta de cifra (anatomía aprobada el 2026-10-03, criterio §5.1). Nombres de 3 palabras como máximo:
+   * una métrica sin nombre corto no va en tarjeta (el validador rechaza un nombre largo; nunca se trunca).
+   */
+  stat: {
+    figureTitle: 'Cifras del período',
+    /** Título del tablero de cifras por capítulo. */
+    boardTitle: {
+      seo: 'Search Console y posiciones',
+      aeo: 'Visibilidad en motores de respuesta',
+      ico: 'Producción creativa'
+    } as Readonly<Partial<Record<InsightModule, string>>>,
+    /** Nota del tablero cuando una cifra lo necesita para leerse bien (sin cifras propias). */
+    notes: {
+      organic_etv: 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.'
+    } as Readonly<Record<string, string>>,
+    estimated: 'Estimado',
+    lowerIsBetter: 'Menor es mejor',
+    /** TASK-1974 — barras apiladas de visitas orgánicas (subconjunto en dos períodos). */
+    engagementTitle: 'Visitas orgánicas al sitio, con y sin interacción',
+    engagedSegment: 'Con interacción',
+    unengagedSegment: 'Sin interacción',
+    labels: {
+      clicks: 'Clics',
+      impressions: 'Impresiones',
+      ctr: 'CTR',
+      position: 'Posición media',
+      page_one_keywords: 'Primera página',
+      organic_etv: 'Tráfico estimado',
+      'site.organic_sessions': 'Visitas orgánicas',
+      'site.organic_engaged_sessions': 'Visitas con interacción',
+      ai_sessions: 'Visitas desde IA',
+      share_of_model: 'Share of Model',
+      citation_share: 'Respuestas con cita',
+      'sov.brand': 'Share of Voice',
+      'delivered.completed': 'Piezas entregadas'
+    } as Readonly<Record<string, string>>,
+    /** «vs 16.390 en agosto de 2026»: el período de comparación siempre explícito, con su valor. */
+    versus: (value: string, period: string) => `vs ${value} en ${period}`,
+    /** Sin dato: «—» en el valor y esta línea en lugar de la variación. Nunca 0. */
+    noDataIn: (period: string) => `Sin dato en ${period}`,
+    /** TASK-1975 — con valor pero sin período anterior (primer mes medido): no hay variación que mostrar. */
+    firstPeriod: 'Primer período medido',
+    /**
+     * Tarjeta con isotipo de canal (aprobada el 2026-10-03): el nombre de la celda es el del canal, como lo nombra AXIS
+     * (`AXIS_PLATFORM_ASSETS`). Lo que no está acá sale de `channels`.
+     */
+    channelNames: {
+      google_ai_overview: 'AI Overview',
+      google_search_console: 'Search Console',
+      google_analytics: 'Google Analytics',
+      greenhouse: 'Greenhouse'
+    } as Readonly<Record<string, string>>,
+    /** La métrica bajo el nombre del canal, por métrica o por familia (`mention_rate.openai` → `mention_rate`). */
+    channelContext: {
+      mention_rate: 'de las respuestas menciona la marca',
+      ai_sessions: 'visitas desde el asistente'
+    } as Readonly<Record<string, string>>
+  },
+
   reading: {
     // TASK-1962 — de qué asistente de IA llegan las visitas (GA4). Las cifras las pone el planner desde los hechos.
     aiTopSourceMost: 'trae la mayoría de las visitas desde asistentes de IA:',
@@ -512,8 +582,26 @@ export const GH_INSIGHTS = {
       comparison: 'Comparación de períodos',
       columns: 'Comparación por dimensión',
       targets: 'Resultado contra la meta',
-      trend: 'Evolución en el tiempo'
+      trend: 'Evolución en el tiempo',
+      // TASK-1975 — figuras del criterio de selección con página PDF.
+      stat: 'Cifras del período',
+      waterfall: 'Qué explica el cambio',
+      waffle: 'Cómo se reparte',
+      donut: 'Cómo se compone',
+      stacked: 'Cuánto del total'
     },
+    /** TASK-1975 — leyenda de la cascada: el paso que suma y el que resta (el signo va además en la cifra). */
+    stepAdded: 'Sumó',
+    stepRemoved: 'Restó',
+    axisFromZeroNote: 'El eje empieza en cero: los pasos se ven en su proporción real sobre el total.',
+    /** Nota del waffle por unidad: qué es un cuadro. */
+    waffleUnitNote: (total: string) => `Cada cuadro es una unidad; el total es ${total}.`,
+    /** Centro de la dona cuando muestra el total de las partes. */
+    donutTotal: 'en total',
+    opportunity: 'Oportunidad',
+    /** Cuántas cifras trae el tablero de la página de cifras. */
+    statCount: (count: number) => (count === 1 ? '1 cifra' : `${count} cifras`),
+    statUnit: 'Cada cifra en su propia unidad; bajo cada una, la variación contra el período anterior.',
     achieved: 'Logrado',
     achievedRow: 'logrado',
     target: 'Meta',

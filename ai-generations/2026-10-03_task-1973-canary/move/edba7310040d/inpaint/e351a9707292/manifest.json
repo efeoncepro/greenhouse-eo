@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e351a9707292",
+  "key": "e351a9707292c949ef7fd426f5a95f1673ea6c0b533536516273d48d1c7304e2",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:22:17.933Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/move/edba7310040d/composed.png",
+    "imageSha256": "71d8dded54e8f1b73a67e6089d064560595d5ab41fe571703f2a233ac5be615f",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/move/edba7310040d/halo-mask.png",
+    "maskSha256": "5248136fb2fd6a83513c9ad72a74abd78f45ae7601bed22e4576e59ed7fbb51b",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Add only a soft contact shadow and subtle reflection under and around the object, matching the light direction of the scene, and blend its edges. Keep the object and everything else exactly the same.",
+    "providerPrompt": "Add only a soft contact shadow and subtle reflection under and around the object, matching the light direction of the scene, and blend its edges. Keep the object and everything else exactly the same."
+  },
+  "mask": {
+    "touchedFraction": 0.05488713582356771,
+    "editable": 36843,
+    "soft": 49487,
+    "protected": 1486534
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 56 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 12.768,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.78,
+        "bestError": 1.78,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1486534,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 36843,
+        "maxDelta": 123,
+        "meanDelta": 17.691,
+        "worst": {
+          "x": 609,
+          "y": 794
+        }
+      },
+      "seam": {
+        "pixels": 49487,
+        "maxDelta": 124,
+        "meanDelta": 9.102,
+        "worst": {
+          "x": 615,
+          "y": 793
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1486534,
+        "maxDelta": 161,
+        "meanDelta": 6.774,
+        "worst": {
+          "x": 961,
+          "y": 586
+        }
+      },
+      "outputUsd": 0.0103,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1590,
+        "input_tokens_details": {
+          "image_tokens": 1536,
+          "text_tokens": 54
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "image_tokens": 343,
+          "text_tokens": 0
+        },
+        "total_tokens": 1933
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ]
+}

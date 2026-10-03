@@ -1,0 +1,127 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0b2aa657339e",
+  "key": "0b2aa657339ee2f1df8ec1b10ac87da518ed9acb3d75265f25c696248444618a",
+  "status": "completed",
+  "createdAt": "2026-10-03T11:58:50.032Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/composed.png",
+    "imageSha256": "245181e31f41c5c0b655e2bd036e6b0a8cfb4bee60d04c2d67388b9d91629dee",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/finish-mask.png",
+    "maskSha256": "d01d201618d3557f8965e54590431d9254de534ce0aa1dca7f2ff69f3b5ca0c3",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:iclight-v2",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": null
+  },
+  "request": {
+    "model": "fal-ai/iclight-v2",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "a white ceramic mug on a light oak table, lit by warm morning sunlight from the left filtering through leaves, with soft green bounce light from the green wall",
+    "providerPrompt": "a white ceramic mug on a light oak table, lit by warm morning sunlight from the left filtering through leaves, with soft green bounce light from the green wall"
+  },
+  "mask": {
+    "touchedFraction": 0.06631787618001302,
+    "editable": 81306,
+    "soft": 23003,
+    "protected": 1468555
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1224,
+      "height": 816
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 33 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 1 MP (redondeado arriba) × USD 0.1/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 49.981,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 12.57,
+        "bestError": 12.57,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        75.24,
+        79.64,
+        91.59
+      ],
+      "protected": {
+        "pixels": 1468555,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 81306,
+        "maxDelta": 175,
+        "meanDelta": 56.906,
+        "worst": {
+          "x": 203,
+          "y": 529
+        }
+      },
+      "seam": {
+        "pixels": 23003,
+        "maxDelta": 154,
+        "meanDelta": 25.505,
+        "worst": {
+          "x": 177,
+          "y": 544
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1468555,
+        "maxDelta": 233,
+        "meanDelta": 72.217,
+        "worst": {
+          "x": 5,
+          "y": 527
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/iclight-v2",
+      "usage": null,
+      "meta": {
+        "requestId": "01a101a1-acbe-7e33-ad3e-b5c333072f27",
+        "account": "FAL_API_KEY_B",
+        "seed": 79242073
+      }
+    }
+  ]
+}

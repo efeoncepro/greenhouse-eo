@@ -1,0 +1,3 @@
+  ⚠ EC1: cine — `alcance: publicidad-prueba`: la publicidad cine con personas del equipo está EN PRUEBA; la pieza no se publica sin aprobación del operador.
+  ⚠ EC1: cine — falta `primerPlano`: sin algo real junto al lente, todo cae en un solo plano y no se siente cine (casebook, falla 3).
+  ⚠ EC1: cine — casebook: docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md · revisión antes de gastar: agente `cine-reviewer`.

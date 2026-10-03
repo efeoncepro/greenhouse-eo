@@ -1,0 +1,359 @@
+{
+  "template": "InsightsFigureStackedSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1975 — barras apiladas: subconjunto del total en dos o más períodos (canvas Deck-Apiladas).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "deck-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend",
+            "steps",
+            "grid",
+            "donut",
+            "layers",
+            "numbers"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      },
+      "notes": "Antetítulo de la figura con su ícono (`layers` para las apiladas)."
+    },
+    "keyFigure": {
+      "selector": "[data-slot='keyFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 9,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cifra principal (`readings[].keyFigure.value`). El hook elige su cuerpo por el largo: 132, 112 o 104 px."
+    },
+    "keyCaption": {
+      "selector": "[data-slot='keyCaption']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 96,
+        "maxLines": 3,
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "Bajada de la cifra (`keyFigure.caption`)."
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Título de la figura (`chart.title`)."
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 64,
+          "maxLines": 2
+        }
+      }
+    },
+    "stackedLegend": {
+      "selector": "[data-slot='stackedLegend']",
+      "type": "array",
+      "required": true,
+      "itemSelector": ".fig-legend-item",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 4
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Un ítem por segmento (`series[].label`), el de la base primero; el color sale de su posición en la columna (base = período actual, luego anterior, oportunidad y paso). Mismo orden que `stackedPeriods[].segments`."
+    },
+    "stackedPeriods": {
+      "selector": "[data-slot='stackedPeriods']",
+      "type": "array",
+      "required": true,
+      "consumer": "validation-only",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 4
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "maxLines": 2
+          },
+          "segments": {
+            "type": "array",
+            "required": true,
+            "constraints": {
+              "minItems": 2,
+              "maxItems": 4
+            }
+          },
+          "total": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "baseShare": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 32,
+            "maxLines": 2
+          }
+        }
+      },
+      "notes": "Una columna por período (lo dibuja el hook). `segments` = cifra impresa de cada segmento en el orden de la leyenda (base = índice 0); `total` = su suma (el hook la verifica y falla cerrado si no cuadra); `baseShare` = participación del segmento base («52 % sin marca»), también verificada. Rótulo del período: hasta dos líneas en el ancho de su columna; más, la figura no se emite.",
+      "example": [
+        {
+          "label": "Junio",
+          "segments": [
+            "530",
+            "490"
+          ],
+          "total": "1.020",
+          "baseShare": "52 % sin marca"
+        },
+        {
+          "label": "Julio",
+          "segments": [
+            "604",
+            "498"
+          ],
+          "total": "1.102",
+          "baseShare": "55 % sin marca"
+        }
+      ]
+    },
+    "stackedAnnotation": {
+      "selector": "[data-slot='stackedAnnotation']",
+      "type": "object",
+      "required": false,
+      "consumer": "validation-only",
+      "shape": {
+        "delta": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 10,
+          "maxLines": 1
+        },
+        "direction": {
+          "type": "enum",
+          "required": true,
+          "values": [
+            "up",
+            "down",
+            "flat"
+          ]
+        },
+        "tone": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "better",
+            "worse",
+            "neutral"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 2
+        }
+      },
+      "notes": "Variación del segmento base entre los dos últimos períodos (sin signo: el signo lo pone la dirección). Conector punteado entre las cimas del segmento base y el texto a la derecha de la última columna; la dirección se verifica contra los segmentos. Sólo si el plan la trae.",
+      "example": {
+        "delta": "14 %",
+        "direction": "up",
+        "tone": "better",
+        "label": "sin marca"
+      }
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 96,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "deck-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 160,
+            "maxLines": 3
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso (`readings[].meaning` / `nextStep`)."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsFigureStatSlide — lámina de cifras del deck 16:9 (TASK-1975, hoja aprobada `Deck-Cifras`, dirección
+  «retícula de cifras» del 2026-10-03). Columna izquierda SIN cifra principal: antetítulo, conclusión grande,
+  filete teal y lead; panel con la retícula de hasta 6 cifras (3×2), valor de 38 px en teal sobre navy.
+
+  Sin hook: las cifras son texto con slots del motor (`statItems`), igual que la página A4. La retícula decide
+  sus columnas por la cantidad de cifras (CSS `:has()`): 1 cifra en horizontal a todo el panel, 2 o 4 en dos
+  columnas, 3, 5 o 6 en tres. `statCount` llega del mapper y se valida, pero la lámina no lo imprime (la hoja
+  no lo lleva: el panel ya muestra «Fuente»).
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .stat-lead-col .fig-conclusion { font-size: 34px; line-height: 1.16; letter-spacing: -0.015em; }
+
+  .stat-lead-col .deck-rule { margin-top: 26px; }
+
+  .stat-lead { margin: 22px 0 0; font-size: 15px; line-height: 1.5; color: var(--axis-deck-role-navyMuted); }
+
+  .stat-lead:empty { display: none; }
+
+  /* El panel recorta: si la retícula no cabe, el chequeo de encaje rechaza la lámina (nunca se encoge). */
+  .stat-panel { overflow: clip; }
+
+  .stat-grid {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.22);
+  }
+
+  .stat-cell {
+    min-width: 0;
+    padding: 15px 14px 15px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  }
+
+  .stat-cell:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
+
+  .stat-cell:nth-child(3n) { padding-right: 0; }
+
+  .stat-cell:nth-child(n + 4) { padding-bottom: 4px; border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  /* 2 o 4 cifras: dos columnas. */
+  .stat-grid:has(> .stat-cell:last-child:nth-child(2)),
+  .stat-grid:has(> .stat-cell:last-child:nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .stat-grid:has(> .stat-cell:last-child:nth-child(2)) > .stat-cell,
+  .stat-grid:has(> .stat-cell:last-child:nth-child(4)) > .stat-cell {
+    padding: 15px 14px 15px 18px;
+    border-left: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+    border-top: 0;
+  }
+
+  .stat-grid:has(> .stat-cell:last-child:nth-child(2)) > .stat-cell:nth-child(2n + 1),
+  .stat-grid:has(> .stat-cell:last-child:nth-child(4)) > .stat-cell:nth-child(2n + 1) { padding-left: 0; border-left: 0; }
+
+  .stat-grid:has(> .stat-cell:last-child:nth-child(2)) > .stat-cell:nth-child(2n),
+  .stat-grid:has(> .stat-cell:last-child:nth-child(4)) > .stat-cell:nth-child(2n) { padding-right: 0; }
+
+  .stat-grid:has(> .stat-cell:last-child:nth-child(4)) > .stat-cell:nth-child(n + 3) {
+    padding-bottom: 4px;
+    border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  }
+
+  .stat-main { display: contents; }
+
+  .stat-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axis-deck-role-navyInk);
+  }
+
+  /* Tarjeta con isotipo de canal (contrato AXIS efeonce.insights-stat-card 0.2.0, aprobada el 2026-10-03): sobre navy el
+     disco blanco va sin filete, 28 px con el isotipo al 60 %. Reemplaza al ícono de la métrica; en la celda sólo si el
+     tablero mezcla motores de respuesta, si no, una vez junto al título. */
+  .stat-name .channel-disc {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stat-name .channel-disc img { width: 17px; height: 17px; display: block; object-fit: contain; }
+
+  .stat-context { display: block; margin-top: 6px; font-size: 12px; line-height: 1.35; color: var(--axis-deck-role-navyLead); }
+
+  /* Sin isotipos el grupo no existe para el layout: el título queda exactamente donde lo aprobó la hoja. */
+  .board-title-group { display: contents; }
+
+  .board-title-group:has(.title-channel) { display: inline-flex; align-items: center; gap: 8px; }
+
+  .title-channels:not(:has(.title-channel)) { display: none; }
+
+  .title-channels { display: inline-flex; align-items: center; gap: 4px; }
+
+  .title-channel { display: inline-flex; }
+
+  .title-channels .channel-disc {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title-channels .channel-disc img { width: 13px; height: 13px; display: block; object-fit: contain; }
+
+  .stat-chip {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--axis-deck-role-navyLead);
+  }
+
+  .stat-figure {
+    display: flex;
+    align-items: baseline;
+    overflow-x: clip;
+    font-family: var(--axis-deck-type-display);
+    font-size: 38px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    color: var(--axis-deck-role-navyAccent);
+  }
+
+  .stat-prefix { margin-right: 2px; font-size: 22px; letter-spacing: 0; }
+
+  .stat-suffix { margin-left: 4px; font-size: 20px; letter-spacing: 0; }
+
+  .stat-unit { margin-left: 7px; font-family: var(--axis-deck-type-text); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--axis-deck-role-navyLead); }
+
+  .stat-change { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; }
+
+  .stat-change:not(:has([data-slot-field])) { display: none; }
+
+  .stat-cell .delta-pill { display: inline-flex; gap: 6px; padding: 4px 0; font-size: 12px; }
+
+  .stat-versus,
+  .stat-nodata { font-size: 12px; color: var(--axis-deck-role-navyMuted); }
+
+  .stat-versus strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-deck-role-navyInk); }
+
+  .stat-lower {
+    flex-basis: 100%;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-deck-role-navyMuted);
+  }
+
+  .stat-lower .stroke-icon { stroke: var(--axis-deck-role-navyMuted); stroke-width: 2.4; }
+
+  .stat-lower:not(:has([data-slot-field])) { display: none; }
+
+  /* Una sola cifra: ocupa el panel, valor a la izquierda y variación a la derecha. */
+  .stat-grid:has(> .stat-cell:only-child) {
+    flex-grow: 1;
+    grid-template-columns: minmax(0, 1fr);
+    border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.22);
+  }
+
+  .stat-cell:only-child { padding: 0; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+
+  .stat-cell:only-child .stat-main { padding: 0; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+
+  .stat-cell:only-child .stat-name { gap: 9px; font-size: 15px; }
+
+  .stat-cell:only-child .stat-name .stroke-icon { width: 18px; height: 18px; }
+
+  /* 112 px deja aire a una cifra de 6 caracteres («13.606») en la columna de 1,3fr: a 128 px se pasaba 2 px del borde y en Linux no cabía. */
+  .stat-cell:only-child .stat-figure { font-size: 112px; line-height: 0.85; letter-spacing: -0.05em; }
+
+  .stat-cell:only-child .stat-prefix { font-size: 68px; }
+
+  .stat-cell:only-child .stat-suffix { font-size: 56px; }
+
+  .stat-cell:only-child .stat-unit { margin-left: 14px; font-size: 17px; }
+
+  .stat-cell:only-child .stat-change {
+    padding: 0 0 0 28px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    border-left: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  }
+
+  .stat-cell:only-child .delta-pill { gap: 8px; padding: 7px 0; font-size: 18px; }
+
+  .stat-cell:only-child .delta-pill svg { width: 12px; height: 11px; }
+
+  .stat-cell:only-child .stat-versus,
+  .stat-cell:only-child .stat-nodata { font-size: 15px; line-height: 1.45; }
+
+  .stat-cell:only-child .stat-lower { flex-basis: auto; }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="figureHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#figureHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">00</span>
+        <span class="deck-tab-section" data-slot="section">Resumen ejecutivo</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
+    </header>
+
+    <main class="fig-main">
+      <div class="fig-lead-col stat-lead-col">
+        <span class="deck-eyebrow" data-slot="eyebrow"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg><svg class="stroke-icon i-steps" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6h-5v5h-5v5h-5v5h-5"></path></svg><svg class="stroke-icon i-grid" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6h-6z"></path><path d="M14 4h6v6h-6z"></path><path d="M4 14h6v6h-6z"></path><path d="M14 14h6v6h-6z"></path></svg><svg class="stroke-icon i-donut" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-3.8a4.1 4.1 0 1 1 -5 -5v-4a.9 .9 0 0 0 -1 -.8"></path><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a9 9 0 0 0 -1 -1v-4.5"></path></svg><svg class="stroke-icon i-layers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg><svg class="stroke-icon i-numbers" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l2 -2v8"></path><path d="M9 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path><path d="M17 8h2.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-2.5"></path></svg></span><span data-slot-field="label">Cifras del período</span></span>
+        <h1 class="fig-conclusion" data-slot="conclusion">El mayor cambio fue en clics orgánicos: de 16.390 a 13.606</h1>
+        <span class="deck-rule"></span>
+        <p class="stat-lead" data-slot="lead">Las impresiones bajaron de 868.507 a 770.462.</p>
+      </div>
+      <section class="fig-panel stat-panel">
+        <div class="fig-panel-head">
+          <span class="board-title-group"><span class="title-channels" data-slot="titleChannels"><span class="title-channel"><span class="channel-disc"><img data-slot-field="channelId" src="assets/channels/search-console.svg" alt="" /></span></span></span><span class="fig-panel-title" data-slot="figureTitle">Search Console y posiciones · septiembre contra agosto</span></span>
+          <span class="fig-source" data-slot="source"><span class="fig-source-label" data-slot-field="label">Fuente</span><span data-slot-field="text">Google Search Console</span></span>
+        </div>
+        <span class="stat-count" data-slot="statCount" hidden></span>
+        <div class="stat-grid" data-slot="statItems"><div class="stat-cell"><div class="stat-main"><span class="stat-name"><span class="channel-disc" data-slot-field="channel"><img src="assets/channels/chatgpt.svg" alt="" /></span><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg><svg class="stroke-icon i-steps" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6h-5v5h-5v5h-5v5h-5"></path></svg><svg class="stroke-icon i-grid" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6h-6z"></path><path d="M14 4h6v6h-6z"></path><path d="M4 14h6v6h-6z"></path><path d="M14 14h6v6h-6z"></path></svg><svg class="stroke-icon i-donut" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-3.8a4.1 4.1 0 1 1 -5 -5v-4a.9 .9 0 0 0 -1 -.8"></path><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a9 9 0 0 0 -1 -1v-4.5"></path></svg><svg class="stroke-icon i-layers" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg><svg class="stroke-icon i-numbers" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l2 -2v8"></path><path d="M9 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path><path d="M17 8h2.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-2.5"></path></svg></span><span class="stat-name-text" data-slot-field="name">Clics</span><span class="stat-chip" data-slot-field="estimated">Estimado</span></span><span class="stat-figure num"><span class="stat-prefix" data-slot-field="prefix">#</span><span class="stat-value" data-slot-field="value">13.606</span><span class="stat-suffix" data-slot-field="suffix">%</span><span class="stat-unit" data-slot-field="unitLabel">de 31 keywords</span></span><span class="stat-context" data-slot-field="context">de las respuestas menciona la marca</span></div><div class="stat-change"><span class="delta-pill" data-slot-field="trend"><svg class="delta-mark-up" width="9" height="8" viewBox="0 0 10 9" aria-hidden="true"><path class="delta-mark" d="M5 0.5 L9.5 8.5 H0.5 Z"></path></svg><svg class="delta-mark-down" width="9" height="8" viewBox="0 0 10 9" aria-hidden="true"><path class="delta-mark" d="M5 8.5 L9.5 0.5 H0.5 Z"></path></svg><span data-slot-field="delta">17,0 %</span></span><span class="stat-versus" data-slot-field="versus">vs <strong>16.390</strong> en agosto 2026</span><span class="stat-nodata" data-slot-field="noData">Sin dato en septiembre de 2026</span><span class="stat-lower"><svg class="stroke-icon stat-lower-mark" width="10" height="10" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5l0 14"></path><path d="M18 13l-6 6"></path><path d="M6 13l6 6"></path></svg><span data-slot-field="lowerIsBetter">Menor es mejor</span></span></div></div></div>
+        <div class="fig-note" data-slot="note"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Nota de lectura.</span></div>
+      </section>
+    </main>
+
+    <div class="fig-closing" data-slot="closing"><div class="fig-closing-block"><span class="fig-closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span><p class="fig-closing-text" data-slot-field="text">Lo que la figura muestra.</p></div></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">03</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

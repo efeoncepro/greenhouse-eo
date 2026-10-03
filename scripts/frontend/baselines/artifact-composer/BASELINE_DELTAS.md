@@ -1,5 +1,83 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-03 (y) — TASK-1996: la cifra única del deck baja de 128 a 112 px
+
+<!-- sealed-by-freeze: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
+
+En el deck, una sola cifra de 6 caracteres («13.606») se pasaba 2 px del borde de su columna a 128 px: justo la tolerancia
+del chequeo de encaje en macOS, y fuera de ella en el Chromium de Linux de CI (`insights-figure-stat.test.ts`, run
+`37153139414`). A 112 px le quedan 44 px. Ninguna hoja aprobada tiene una sola cifra; la de 6 cifras no cambia.
+
+Frames que cambian (existían):
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: la cifra única del probe a 112 px
+
+## 2026-10-03 (x) — TASK-1996: la línea de contexto va bajo la cifra, como en la hoja aprobada
+
+<!-- sealed-by-freeze: 9b438fe74b0d584526cff8b1609b341a0423d16138158e2eb9e5f95df09cfcea -->
+
+Las hojas `Premium-Cifras-Canal` y `Deck-Cifras-Canal` (exportadas a
+`docs/ui/visual-directions/TASK-1996-efeonce-insights-channel-stat-card/paginas/`) ponen la métrica bajo la cifra, en 12 px
+y en tinta (navy en papel, `navyLead` en el deck). La sección (w) la había dejado bajo el nombre, en 10 px y gris.
+
+Frames que cambian (existían):
+- `templates-insights-report/ReportFigureStatPage.png` — cambia: la línea de contexto del probe baja bajo la cifra
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: lo mismo en la lámina navy
+
+## 2026-10-03 (w) — TASK-1996: la tarjeta de cifra con isotipo de canal
+
+<!-- sealed-by-freeze: 0035b899eaafcf9f346623a1319aa115fcc6ac92829305cf45d42e08cb5c3524 -->
+
+Contrato AXIS `efeonce.insights-stat-card` 0.2.0 (aprobado por el operador el 2026-10-03, publicado en `v0.3.42`): el
+isotipo oficial de la plataforma (`AXIS_PLATFORM_ASSETS`, @efeoncepro/axis-brand-assets 0.4.15) en un disco blanco al
+60 % reemplaza al ícono de la métrica. En la celda (30 px A4, 28 px deck) sólo si el tablero mezcla motores de respuesta,
+con el nombre del canal y la métrica en la línea de contexto; si todas las cifras salen de las mismas plataformas, una vez
+junto al título (22 px, Search Console primero). Los campos son opcionales: el probe de cada plantilla los sintetiza.
+Revisión del aspecto real (sin referencia de canvas): `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/derivada-{Cifras-Canal-Celdas,Cifras-Canal-Titulo,Deck-Cifras-Canal-Celdas,Deck-Cifras-Canal-Titulo}.png`.
+
+Frames que cambian (existían):
+- `templates-insights-report/ReportFigureStatPage.png` — cambia: el probe trae la línea de contexto bajo el nombre (el valor sintético del canal no es una plataforma conocida, así que el disco se quita)
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: lo mismo en la lámina navy
+
+Además, el isotipo de AI Overview pasa de la G de Google a su lupa con el degradado de la G
+(`assets/channels/google-ai-overview.svg`); ningún probe lo dibuja: sin efecto de píxel en el gate.
+
+## 2026-10-03 (v) — TASK-1975: cifras, cascada, waffle, dona y apiladas en Insights; variación con tono semántico
+
+<!-- sealed-by-freeze: 38573c6a55c820f922a46f048474752adaebd9e0f8cb5cae3bf6d6d60ff16463 -->
+
+Las cinco figuras del criterio de selección (aprobado el 2026-10-03) tienen página A4 y lámina 16:9; las hojas aprobadas
+del canvas las miden a ≤ 1 % (`pnpm insights:canvas-fidelity`: cascada 0,59 % / 0,54 %, waffle 0,03 % / 0,01 %, dona
+0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,17 %). Los frames nuevos son el probe de cada plantilla (los
+`example` de su `slots.json`, sacados de la hoja aprobada).
+
+Frames nuevos:
+- `templates-insights-report/ReportFigureStatPage.png` — 🆕 página de cifras (retícula de hasta 6 cifras, sin cifra principal)
+- `templates-insights-report/ReportFigureWaterfallPage.png` — 🆕 cascada («qué explica el cambio»), barras desde 0, signo siempre impreso
+- `templates-insights-report/ReportFigureWafflePage.png` — 🆕 waffle de un cuadro por unidad
+- `templates-insights-report/ReportFigureDonutPage.png` — 🆕 dona de 2 o 3 partes con cuenta y participación
+- `templates-insights-report/ReportFigureStackedPage.png` — 🆕 barras apiladas por período, segmento base abajo
+- `templates-insights-deck/InsightsFigureStatSlide.png` — 🆕 lámina de cifras 3×2
+- `templates-insights-deck/InsightsFigureWaterfallSlide.png` — 🆕 cascada en navy
+- `templates-insights-deck/InsightsFigureWaffleSlide.png` — 🆕 waffle en navy
+- `templates-insights-deck/InsightsFigureDonutSlide.png` — 🆕 dona en navy
+- `templates-insights-deck/InsightsFigureStackedSlide.png` — 🆕 apiladas en navy
+
+Frames que cambian (existían), todos por decisiones del operador del 2026-10-03 (canvas de TASK-1975, análisis de
+saturación del tono): triángulo de puntas redondeadas en toda variación; sobre papel la píldora teñida con tono semántico
+(peor en rojo, ya no en gris); sobre navy la variante C (sin píldora rellena, tono sólo en el triángulo, cifra en tinta
+suave); y la cifra principal del deck se mide por su ancho visible, sin espacios ni signo (como componen las hojas).
+- `templates-insights-report/ReportFigureComparisonPage.png` — cambia: tono semántico y triángulo redondeado en la píldora
+- `templates-insights-report/ReportFigureColumnsPage.png` — cambia: triángulo redondeado bajo las columnas (36 px)
+- `templates-insights-report/ReportFigureTargetsPage.png` — cambia: triángulo redondeado en la insignia de la meta
+- `templates-insights-report/ReportTablePage.png` — cambia: triángulo redondeado en la columna de variación (5 px)
+- `templates-insights-deck/InsightsFigureComparisonSlide.png` — cambia: cifra principal por ancho visible + variante C
+- `templates-insights-deck/InsightsFigureColumnsSlide.png` — cambia: cifra principal por ancho visible + variante C bajo las columnas
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — cambia: cifra principal por ancho visible + triángulo redondeado
+- `templates-insights-deck/InsightsFigureTrendSlide.png` — cambia: cifra principal por ancho visible
+
+Las plantillas existentes además traen los íconos `steps`, `grid`, `donut`, `layers` y `numbers` (el resolver los quita:
+sin efecto de píxel).
+
 ## 2026-09-30 (u) — TASK-1949: las seis láminas nativas del deck SEO/AEO y el lockup de submarca
 
 <!-- sealed-by-freeze: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
@@ -1149,7 +1227,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
+<!-- manifest-digest: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

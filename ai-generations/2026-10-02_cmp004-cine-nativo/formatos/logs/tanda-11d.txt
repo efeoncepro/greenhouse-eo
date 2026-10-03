@@ -1,0 +1,2 @@
+S07-11-squad-criterio-d exit=0
+S08-11-ia-memoria-d exit=0

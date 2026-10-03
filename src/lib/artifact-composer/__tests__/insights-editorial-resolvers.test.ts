@@ -56,7 +56,8 @@ describe('resolvers editoriales de Insights (TASK-1889)', () => {
 
   it('un canal conocido toma su isotipo del catálogo; uno desconocido queda con su nombre, sin disco', () => {
     expect(channelIsotypeEffects('chatgpt')).toEqual([{ selector: ':field', attr: 'src', value: 'assets/channels/chatgpt.svg' }])
-    expect(CHANNEL_ISOTYPES.google_ai_overview).toBe(CHANNEL_ISOTYPES.google)
+    // AI Overview lleva su lupa con el degradado de la G (aprobada el 2026-10-03), no la G de Google.
+    expect(CHANNEL_ISOTYPES.google_ai_overview).toBe('assets/channels/google-ai-overview.svg')
     expect(channelIsotypeEffects('bing')).toEqual([{ selector: '.channel-disc', remove: true }])
   })
 

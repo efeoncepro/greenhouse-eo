@@ -50,6 +50,32 @@ export const isDataChartFamily = (family: ChartFamily): family is DataChartFamil
 export const CHART_RELATIONS = ['comparison', 'trend', 'composition', 'distribution', 'correlation', 'target', 'decomposition', 'conversion', 'overlap'] as const
 export type ChartRelation = (typeof CHART_RELATIONS)[number]
 
+/**
+ * TASK-1974 — la pregunta del lector que responde una figura (criterio canónico de selección, §5). La familia sale de
+ * la pregunta, no de la forma del dato: `value_change` («¿cuánto es y cómo cambió?») es la tarjeta de cifra;
+ * `evolution` la línea; `target` el bullet; `explain_change` la cascada; `composition` dona, waffle o barras según las
+ * partes; `subset` las barras apiladas; `compare` las barras. El orden de la lista es el orden del capítulo (§5.2):
+ * cifras → metas → evolución → explicación → composición → comparación.
+ */
+export const FIGURE_QUESTIONS = ['value_change', 'target', 'evolution', 'explain_change', 'composition', 'subset', 'compare'] as const
+export type FigureQuestion = (typeof FIGURE_QUESTIONS)[number]
+
+export const isFigureQuestion = (value: unknown): value is FigureQuestion => typeof value === 'string' && (FIGURE_QUESTIONS as readonly string[]).includes(value)
+
+/**
+ * Familias de gráfico que pueden responder cada pregunta (TASK-1974). `value_change` no tiene gráfico: es la tarjeta de
+ * cifra del plan. Un spec que declara pregunta y familia incoherentes no valida.
+ */
+export const QUESTION_FAMILIES: Readonly<Record<FigureQuestion, readonly string[]>> = {
+  value_change: [],
+  target: ['bullet', 'gauge'],
+  evolution: ['line'],
+  explain_change: ['waterfall'],
+  composition: ['donut', 'pie', 'waffle', 'bar'],
+  subset: ['bar_stacked'],
+  compare: ['bar', 'bar_grouped']
+}
+
 export interface ChartSeriesV1 {
   seriesId: string
   label: string
@@ -100,7 +126,16 @@ export interface ChartBulletItemV1 {
    */
   bandFactId?: string
   channelId?: InsightChannelId
+  /**
+   * TASK-1974 — dirección PROPIA del ítem, cuando la figura junta metas de métricas distintas (criterio §5: varias metas
+   * de un capítulo van en UNA figura). RpA mejora al bajar junto a OTD y FTR que mejoran al subir. Ausente = la de la
+   * figura.
+   */
+  direction?: 'higher_is_better' | 'lower_is_better'
 }
+
+/** Dirección efectiva de un ítem de bullet: la suya o la de la figura. */
+export const bulletItemDirection = (data: ChartBulletDataV1, item: ChartBulletItemV1): 'higher_is_better' | 'lower_is_better' => item.direction ?? data.direction
 
 export interface ChartBulletDataV1 {
   kind: 'bullet'
@@ -190,6 +225,11 @@ export interface ChartSpecV1 {
   tabularEquivalent: ChartTabularEquivalentV1
   /** TASK-1888 — obligatorio en familias de datos propios, con `data.kind === family`; ausente en las de series. */
   data?: ChartFamilyDataV1
+  /**
+   * TASK-1974 — la pregunta que responde la figura. Aditivo: un plan sellado antes del criterio no la trae y sigue
+   * validando igual; su presencia es la señal de que el plan se armó con el criterio (deduplicación incluida).
+   */
+  question?: FigureQuestion
 }
 
 const FAMILY_RELATIONS: Readonly<Record<ChartFamily, readonly ChartRelation[]>> = {
@@ -265,6 +305,7 @@ const dataShapeViolations = (data: ChartFamilyDataV1, push: (rule: string, detai
   switch (data.kind) {
     case 'bullet':
       if (data.items.length === 0) push('bullet_items_required', 'un bullet necesita al menos un ítem con valor y meta')
+      if (data.items.some(item => item.direction !== undefined && item.direction !== 'higher_is_better' && item.direction !== 'lower_is_better')) push('bullet_item_direction', 'la dirección de un ítem es higher_is_better o lower_is_better')
       break
     case 'gauge':
       if (!(data.max > data.min)) push('gauge_range', `el rango del medidor es inválido (min=${data.min}, max=${data.max})`)
@@ -322,6 +363,11 @@ export const validateChartSpec = (spec: ChartSpecV1, knownFactIds: ReadonlySet<s
 
   if (!FAMILY_RELATIONS[spec.family].includes(spec.relation)) {
     push('family_relation', `${spec.family} no representa ${spec.relation}`)
+  }
+
+  if (spec.question !== undefined) {
+    if (!isFigureQuestion(spec.question)) push('unknown_question', `pregunta ${String(spec.question)} fuera del contrato`)
+    else if (!QUESTION_FAMILIES[spec.question].includes(spec.family)) push('question_family', `${spec.family} no responde «${spec.question}» (criterio de selección §5)`)
   }
 
   if (spec.family.startsWith('bar') && spec.scale.baseline !== 0) {

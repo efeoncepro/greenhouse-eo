@@ -1,5 +1,47 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-03 · TASK-1975 · La vista previa con datos reales encontró seis fallas que ninguna prueba vio.** Síntoma
+  (`preview-edition.ts --editorial-v2` sobre Berel y Sky, septiembre 2026, con todos los tests verdes): (1) la leyenda de
+  las barras de composición medía 36 caracteres (la serie llevaba el título) y el PDF de Berel no componía; (2) la nota
+  del tablero de cifras imprimía «[object Object]» (era un claim, no texto); (3) la fuente del deck de cifras medía 76
+  caracteres («Search Console · posiciones · tráfico estimado») y no cabía en una línea; (4) la cascada no tenía lectura
+  propia (repetía la conclusión de las cifras) y decía «Sumó» sin pasos que sumen; (5) metas con «menos es mejor»
+  mostraban «▲ 67 %» en rondas de revisión, que sugería lo contrario; (6) el nombre de meta «Rondas de revisión por pieza»
+  (28 caracteres) no cabía en el deck. Corregido en `592fbde4b`. Regla: una figura nueva no está lista hasta pasar por la
+  vista previa real de los dos clientes y abrir cada página; fixtures y probes no traen nombres ni fuentes reales.
+- **2026-10-03 · TASK-1975 · En navy, el rojo de «empeoró» era el mismo coral de «oportunidad» (`#ff7063`).** Síntoma:
+  el análisis de saturación de la tarjeta mostró que, sobre navy, el tono «peor» y el rol de dato «oportunidad» eran el
+  mismo color. Regla (decisión del operador): tono por fondo — papel = variante A (píldora teñida), navy = variante C (sin
+  píldora rellena, tono sólo en el triángulo, cifra en `navyLead`); triángulo de puntas redondeadas en todas las
+  superficies. Antes de dar color semántico a un rol nuevo, compararlo contra los roles de datos que ya existen en ESE
+  fondo.
+- **2026-10-03 · TASK-1975 · `parsePrintedNumber` pierde el signo «−» (U+2212).** Trampa: el parser
+  descarta todo lo que no sea `[\d.,-]` y el menos tipográfico no es el guion ASCII, así que un paso que resta, leído
+  desde su texto impreso, sale positivo. Regla: en la cascada el signo se toma del `kind` del paso (`add`/`remove`), nunca del texto; el texto igual DEBE
+  llevar el signo impreso (`figure-waterfall.ts` rechaza un paso sin él: el color nunca es la única codificación). No
+  «arreglar» el parser compartido sin revisar a sus otros consumidores (resolvers del A4, `report-mapper.ts`).
+- **2026-10-03 · TASK-1975 · La regla de tamaño de la cifra del deck contaba espacios y signo.** Síntoma: la regla heredada
+  contaba el texto con espacios y signo (≤ 3 → 132 px, ≤ 5 → 112), así que «62 %», «+182» y «60 %» caían a 112 px cuando las hojas aprobadas (`Deck-Donut`, `Deck-Cascada`, `Deck-Apiladas`) las componen a
+  132 px. Regla: se mide el ancho visible (`deckFigureSizeClass`: sin espacios ni signo inicial, ≤ 3 → 132 px, 4 → 112,
+  más → 104). Cambió 4 frames del deck existentes (declarados en la sección (v) de `BASELINE_DELTAS.md`).
+- **2026-10-03 · TASK-1975 · La lectura de un productor se perdía si la figura no tenía lectura genérica.** Síntoma: la
+  cascada salía con la conclusión de las cifras: `withDriverReadings` sólo REEMPLAZABA lecturas existentes, y la cascada
+  no tenía. Regla: el combinador de lecturas agrega las del productor para figuras sin lectura genérica; toda figura
+  nueva verifica que su página trae SU lectura, no la del vecino.
+- **2026-10-03 · TASK-1975 · Los `example` de un `slots.json` deben cuadrar entre sí.** Síntoma: el ejemplo del contrato
+  de apiladas decía «28 %» de variación del segmento base mientras sus segmentos daban +14 %: el gate visual compone el
+  probe con esos ejemplos tal cual (`synthesize.ts`) y la geometría lo contradecía. Regla: un ejemplo es dato coherente
+  (sumas, variaciones y totales consistentes), sacado de la hoja aprobada; al cambiarlo, el frame se mueve y se declara.
+- **2026-10-03 · gráficos · El planificador elegía casi siempre barras agrupadas y repetía datos (Berel: 4 familias en 10 figuras; Sky: 2 en 6; 6 de 15 con evidencia).** Síntoma (medido con el código en
+  producción, septiembre vs agosto 2026): Berel (SEO + AEO) tenía 10 figuras, 6 de barras agrupadas, y el PDF mostraba 7
+  (cascada y los dos waffles eran sólo web); Sky (ICO) tenía 6 figuras, y 3 barras contra el mes anterior REPETÍAN las
+  métricas de los 3 bullets contra la meta. Las barras se elegían por costumbre: clics, impresiones y keywords en barras
+  agrupadas que no las comparan (cada una vive en su escala). Regla: la familia se elige por la pregunta del lector; la
+  variedad sólo desempata entre dos figuras igual de buenas; un dato no se muestra dos veces (la meta gana al período
+  anterior). Con el criterio, Berel pasa a 6 familias distintas y Sky queda más corto y sin repetidos. Criterio en
+  [`contracts.md`](contracts.md) § Criterio de selección de gráficos y en
+  `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`; implementado por TASK-1974 + TASK-1975 (code
+  complete local el mismo día; ver las lecciones de arriba).
 - **2026-09-29 · correo de entrega · La pieza aprobada no es la plantilla.** Síntoma: al canonizar el correo de entrega
   aprobado (canvas v21), lo natural era publicarlo entero como «el correo de Efeonce». El operador acotó: se canonizan el
   pie, los CTA y el bloque de marca; el correo de Insights es **una aplicación**. Regla: la cabecera, «Lo esencial del
@@ -492,3 +534,12 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
   estaba en «Manufactura» y sus sets curados nunca se aprobaron: las corridas usaban el paquete genérico. Antes de leer un
   resultado del Grader, mirar `prompt_set_id` de la corrida.
 - **Los PDF no dibujan el plan de acción**: Think sí. Al revisar «qué falta» en un formato, mirar el mapper, no el plan.
+
+- **2026-10-03 — Un slot opcional ausente se VACÍA, no se quita (TASK-1996).** El contenedor `titleChannels` quedaba vacío
+  en el DOM y un `:has(.title-channels)` lo daba por presente: movió el título 8 px y la fidelidad de `Premium-Cifras` subió
+  de 0,05 % a 1,4 %. Regla: estilar por el ÍTEM (`:has(.title-channel)`) y ocultar el contenedor sin ítems.
+- **2026-10-03 — El sintetizador del gate no arma objetos dentro de un ítem de arreglo.** Un campo `channel: { channelId }`
+  en `statItems` salió como el texto «channel» en el probe. Un dato por ítem va como campo string con su propio resolver
+  (`<prefijo>-stat-channel`), que apunta al `<img>` interno.
+- **2026-10-03 — Mirar la hoja aprobada antes de ubicar un elemento nuevo.** Puse la línea de contexto bajo el nombre;
+  la hoja la tenía bajo la cifra, en 12 px y en tinta. Exportar el tablero del canvas al repo primero lo habría evitado.

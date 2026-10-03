@@ -94,6 +94,8 @@ describe('registro cine en la ficha', () => {
   it('un alcance que no existe aborta', () => {
     expect(() => construirPrompt({ ...completa, alcance: 'instagram-equipo' })).toThrow(/alcance/)
     expect(ALCANCES_CINE).toContain('proposal-cinematic')
+    // Decisión del operador 2026-10-03: el cine también vale en superficies de producto (login).
+    expect(ALCANCES_CINE).toContain('producto')
   })
 
   it('reconoce a los personajes del catálogo, no a las prendas', () => {

@@ -1,0 +1,22 @@
+{
+  "id": "BF2-45-squad-refuerzos",
+  "formato": "4:5",
+  "registro": "cine",
+  "alcance": "publicidad-prueba",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    { "objeto": "hoodie-efeonce" },
+    { "objeto": "spark-contenido", "vista": "cine" },
+    { "objeto": "spark-reportes", "vista": "cine" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "llave": { "fuente": "the huge hangar door behind them, wide open onto a blazing warm orange light", "lado": "from directly behind, as a strong backlight", "distancia": "about twelve meters", "tamano": "the whole door" },
+  "primerPlano": "a near-black matte stage riser right in front of the lens, out of focus",
+  "fondo": "the open hangar door flooding the haze with warm orange light, only between 44% and 76% of the frame height",
+  "fenomeno": { "que": "a creative squad and its Sparks walking out of a blazing open hangar door, the light pouring around them", "esServicio": "the reinforcements are the squad and its agents arriving: the light behind them is the extra capacity coming in for the season" },
+  "escena": "SCENE (cinematic, ensemble movie poster still, the hero walk of the reinforcements arriving, a vast dark hangar at night, the native layout of a vertical feed ad). GEOGRAPHY, the most important instruction: the UPPER 40% of the frame is the deep, evenly dark, navy-black matte ceiling of the hangar with fine visible texture: no light falls on it, no glow, no bokeh, no lamps and no objects; it is calm from edge to edge. Everything lit lives between 42% and 80% of the frame height. The LOWEST 20% of the frame is a near-black matte stage riser right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: far behind them, a huge hangar door stands wide open onto a blazing warm orange (#FF6500) light that floods the haze, its top edge at about 44% of the frame height. Out of that light, a creative squad of EXACTLY FOUR Latin American people in their late twenties to early forties, two women and two men with varied hair, all wearing the Efeonce hoodie exactly as in its reference, walk toward the camera mid-stride in ONE line shoulder to shoulder, framed from the waist up, the TOP of all four heads at about 50% of the frame height and all four heads in the same band between 50% and 60%, the riser cutting them at the waist; they all look straight into the lens with calm, determined expressions. THE SPARKS, copied EXACTLY from their two references, each smaller than a head, above the waist: the Content Spark flies just beside the shoulder of the woman second from the left, sharp; the Reports Spark flies beside the shoulder of the man on the right, sharp. Behind the squad, in the orange haze of the door, EXACTLY THREE more Sparks (FIVE in total, never more), the same figures as the two references, small and clearly OUT OF FOCUS. LIGHT: the open door is the only key light: a strong warm orange backlight that rims their hair, shoulders and hoodies and throws long shadows toward the camera; their faces are lit only by a soft, low cool azure (#0375DB) bounce from the front, faces readable but dark; NO other fill. Thin haze catches the door's light, only below 42%. Nobody looks at anybody else. Camera low at chest height about five meters in front of them, 85mm, realistic adult proportions, nothing foreshortened. Fine dust, real sensor grain, genuine depth of field. Real faces with natural skin, irregular pores, no retouching. Rich contrast, deep navy blacks, awe-inspiring. No readable text, no letters, no logos of any other brand.",
+  "lecho": { "objeto": "a near-black matte stage riser right in front of the lens, crossing the whole width of the lowest 20% of the frame, completely out of focus, non-reflective, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the deep, evenly dark, navy-black matte ceiling of the hangar with fine visible texture", "tinta": "blanca" } }
+}

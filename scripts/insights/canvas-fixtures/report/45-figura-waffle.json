@@ -1,0 +1,79 @@
+{
+  "reference": "Premium-Waffle",
+  "catalog": "report",
+  "contentType": "report-figure-waffle",
+  "slots": {
+    "chapterTab": "01",
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "grid",
+      "label": "Cobertura de keywords"
+    },
+    "keyFigure": "74 de 100",
+    "keyCaption": "keywords del mercado donde el sitio ya aparece en Google",
+    "conclusion": "El sitio aparece en tres de cada cuatro búsquedas del mercado que medimos",
+    "lead": "26 keywords están en la primera página y 21 más, a un paso (posiciones 11 a 20). En 26 el sitio todavía no aparece.",
+    "figureTitle": "100 keywords del mercado según la posición del sitio",
+    "waffleParts": [
+      {
+        "label": "Primera página (1 a 10)",
+        "count": "26"
+      },
+      {
+        "label": "A un paso (11 a 20)",
+        "count": "21",
+        "role": "opportunity",
+        "tag": "Oportunidad"
+      },
+      {
+        "label": "Posiciones 21 a 50",
+        "count": "27"
+      },
+      {
+        "label": "Sin posición",
+        "count": "26",
+        "role": "absence"
+      }
+    ],
+    "note": {
+      "text": "Cada cuadro es una keyword del conjunto de 100 que medimos para el mercado."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Keywords; cada cuadro es una."
+      },
+      {
+        "label": "Fuente",
+        "text": "Mediciones de posiciones en buscadores"
+      },
+      {
+        "label": "Cobertura",
+        "text": "100 keywords del mercado, fijas entre meses"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "La base existe: el sitio ya compite en la mayoría de las búsquedas. El salto está en llevar las 21 cercanas a la primera página."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Crear contenido para las 26 keywords donde el sitio no aparece, empezando por las de mayor volumen.",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "12",
+      "total": "24"
+    }
+  }
+}

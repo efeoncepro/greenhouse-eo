@@ -263,12 +263,14 @@ body { background: var(--axis-deck-role-navy); }
 
 .fig-note:empty { display: none; }
 
-/* Variación: la dirección se dice con forma (triángulo); el tono sólo distingue si subió. */
+/* Variación sobre navy (TASK-1975, variante C aprobada el 2026-10-03): sin píldora rellena; la dirección la dice el
+   triángulo de puntas redondeadas y el tono (verde mejor, rojo peor, neutro) va SÓLO en el triángulo. La cifra va en tinta
+   suave, para que no compita con la cifra principal en teal. Sobre papel se conserva la píldora teñida (variante A). */
 .delta-pill {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 13px;
+  padding: 6px 0;
   border-radius: 999px;
   font-family: var(--axis-deck-type-display);
   font-size: 14px;
@@ -277,15 +279,21 @@ body { background: var(--axis-deck-role-navy); }
   white-space: nowrap;
 }
 
-.delta-pill svg { display: block; flex-shrink: 0; }
+.delta-pill svg { display: block; flex-shrink: 0; overflow: visible; }
 
-.delta--better { background: rgba(var(--axis-deck-role-navyAccent-rgb), 0.16); color: var(--axis-deck-role-navyAccent); }
+.delta-mark { stroke-width: 1.4px; stroke-linejoin: round; }
 
-.delta--better .delta-mark { fill: var(--axis-deck-role-navyAccent); }
+.delta--better { color: var(--axis-deck-role-navyLead); }
 
-.delta--plain { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.12); color: var(--axis-deck-role-navyInk); }
+.delta--better .delta-mark { fill: var(--axis-deck-role-deltaBetterOnNavy); stroke: var(--axis-deck-role-deltaBetterOnNavy); }
 
-.delta--plain .delta-mark { fill: var(--axis-deck-role-navyInk); }
+.delta--worse { color: var(--axis-deck-role-navyLead); }
+
+.delta--worse .delta-mark { fill: var(--axis-deck-role-deltaWorseOnNavy); stroke: var(--axis-deck-role-deltaWorseOnNavy); }
+
+.delta--plain { color: var(--axis-deck-role-navyLead); }
+
+.delta--plain .delta-mark { fill: var(--axis-deck-role-navyMuted); stroke: var(--axis-deck-role-navyMuted); }
 
 /* Cierre en dos columnas sobre el pie: «Lo que significa» y «Próximo paso». */
 .fig-closing {
@@ -357,6 +365,19 @@ body { background: var(--axis-deck-role-navy); }
 .fig-delta { font-family: var(--axis-deck-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-deck-role-navyAccent); }
 
 .fig-delta--plain { fill: var(--axis-deck-role-dataPriorOnNavy); }
+
+.fig-delta--better { fill: var(--axis-deck-role-navyLead); }
+
+.fig-delta--worse { fill: var(--axis-deck-role-navyLead); }
+
+/* Variante C también en las figuras SVG: tono sólo en el triángulo redondeado. */
+.fig-delta-mark { stroke-width: 1.2px; stroke-linejoin: round; stroke: var(--axis-deck-role-navyAccent); }
+
+.fig-delta--plain .fig-delta-mark { stroke: var(--axis-deck-role-dataPriorOnNavy); }
+
+.fig-delta--better .fig-delta-mark { fill: var(--axis-deck-role-deltaBetterOnNavy); stroke: var(--axis-deck-role-deltaBetterOnNavy); }
+
+.fig-delta--worse .fig-delta-mark { fill: var(--axis-deck-role-deltaWorseOnNavy); stroke: var(--axis-deck-role-deltaWorseOnNavy); }
 
 .fig-swatch--opportunity { width: 13px; box-sizing: border-box; border-radius: 3px; border: 1.3px dashed var(--axis-deck-role-dataOpportunityOnNavy); background: rgba(var(--axis-deck-role-dataOpportunityOnNavy-rgb), 0.14); }
 

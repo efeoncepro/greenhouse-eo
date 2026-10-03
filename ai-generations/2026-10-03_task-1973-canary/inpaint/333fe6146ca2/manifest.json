@@ -1,0 +1,159 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "333fe6146ca2",
+  "key": "333fe6146ca2e38f603fa0ee4139ca82f7c18bff2994cfd8bc23adbebdb62d3a",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:43:11.325Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/f67e0cde1fc7-canvas.png",
+    "imageSha256": "8dd0567d3dc5833f6bb277216ee5df56cb307b57ff6e36cc19d51d30735712a7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/f67e0cde1fc7-mask.png",
+    "maskSha256": "ebbc77caebfee03fd91b22ff448ae41d7c84d3273fbfef844767be314e926736",
+    "maskConvention": "white-editable",
+    "width": 1956,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same quiet room continues: the grey plaster wall, the window light from the right, the oak table and its legs, a plain floor",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nthe same quiet room continues: the grey plaster wall, the window light from the right, the oak table and its legs, a plain floor Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.2392638036809816,
+    "editable": 432128,
+    "soft": 47104,
+    "protected": 1523712
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1956,
+      "height": 1024
+    },
+    "target": {
+      "width": 1952,
+      "height": 1024
+    },
+    "aspectError": 0.0020491803278688526,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.036,
+    "basis": "1 × salida 1952x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 9.108,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.85,
+        "bestError": 1.85,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        4.48,
+        5.14,
+        7.21
+      ],
+      "protected": {
+        "pixels": 1523712,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 432128,
+        "maxDelta": 198,
+        "meanDelta": 9.469,
+        "worst": {
+          "x": 1868,
+          "y": 698
+        }
+      },
+      "seam": {
+        "pixels": 47104,
+        "maxDelta": 172,
+        "meanDelta": 5.797,
+        "worst": {
+          "x": 1744,
+          "y": 554
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1523712,
+        "maxDelta": 183,
+        "meanDelta": 5.195,
+        "worst": {
+          "x": 1717,
+          "y": 603
+        }
+      },
+      "outputUsd": 0.036,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3207,
+        "input_tokens_details": {
+          "image_tokens": 3024,
+          "text_tokens": 183
+        },
+        "output_tokens": 1200,
+        "output_tokens_details": {
+          "image_tokens": 1200,
+          "text_tokens": 0
+        },
+        "total_tokens": 4407
+      },
+      "meta": {
+        "size": "1952x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sourceSha256": "69afa01a78f40b7f4997b07449e4bfd5487877c6abb71f301d6e87f5a81defa7",
+    "to": "1.91:1",
+    "plan": {
+      "canvas": {
+        "width": 1956,
+        "height": 1024
+      },
+      "scene": {
+        "left": 210,
+        "top": 0,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 24
+  }
+}

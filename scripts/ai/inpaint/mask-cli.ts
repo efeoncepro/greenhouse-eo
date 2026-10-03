@@ -27,6 +27,7 @@ import {
   type MaskConvention,
   type MaskStats
 } from './mask'
+import { maskFromLayers } from './layers'
 import { loadRgba } from './raw'
 
 const HELP = `pnpm ai:mask — construye, opera e inspecciona máscaras de inpainting (TASK-1965)
@@ -50,6 +51,7 @@ Fuentes (se unen entre sí; al menos una):
   --from-luma <img>             Luminancia; --luma-editable light (default) | dark; --threshold 0-255 (default 127)
   --from-subject                Sujeto de la base con matting local (gratis); --subject-editable subject (default) | background
   --from-mask <png>             Máscara existente; --convention white-editable (default) | alpha-transparent-editable
+  --from-layer <layers.json>    Capas de pnpm ai:layers; --layer <nombre|#índice> (repetible) elige cuáles
 
 Operaciones (siempre en este orden): --invert → --erode <px> → --dilate <px> → --feather <px>
 
@@ -72,6 +74,8 @@ interface MaskCliArgs {
   fromSubject: boolean
   subjectEditable: 'subject' | 'background'
   fromMask?: string
+  fromLayer?: string
+  layers: string[]
   convention: MaskConvention
   invert: boolean
   erode: number
@@ -104,6 +108,7 @@ export const parseMaskArgs = (argv: string[]): MaskCliArgs => {
   const args: MaskCliArgs = {
     rects: [],
     polygons: [],
+    layers: [],
     alphaEditable: 'transparent',
     lumaEditable: 'light',
     fromSubject: false,
@@ -144,6 +149,8 @@ export const parseMaskArgs = (argv: string[]): MaskCliArgs => {
       case '--from-subject': args.fromSubject = true; break
       case '--subject-editable': args.subjectEditable = pick(next(), ['subject', 'background'] as const, flag); break
       case '--from-mask': args.fromMask = next(); break
+      case '--from-layer': args.fromLayer = next(); break
+      case '--layer': args.layers.push(next()); break
       case '--convention': args.convention = pick(next(), MASK_CONVENTIONS, flag); break
       case '--invert': args.invert = true; break
       case '--erode': args.erode = parseNonNegative(next(), flag); break
@@ -184,7 +191,13 @@ export const buildMaskFromSources = async (args: MaskCliArgs, width: number, hei
   if (args.fromSubject) parts.push(await maskFromSubject(resolvePath(args.base!), { editable: args.subjectEditable }))
   if (args.fromMask) parts.push(await loadMask(resolvePath(args.fromMask), args.convention))
 
-  if (!parts.length) throw new Error('Indica al menos una fuente: --rect, --polygon, --from-alpha, --from-luma, --from-subject o --from-mask.')
+  if (args.fromLayer) {
+    if (!args.layers.length) throw new Error('--from-layer necesita al menos un --layer <nombre|#índice> (pnpm ai:layers --list <layers.json> los muestra).')
+
+    parts.push(await maskFromLayers(resolvePath(args.fromLayer), args.layers, { width, height }))
+  }
+
+  if (!parts.length) throw new Error('Indica al menos una fuente: --rect, --polygon, --from-alpha, --from-luma, --from-subject, --from-mask o --from-layer.')
 
   for (const part of parts) {
     if (part.width !== width || part.height !== height) {

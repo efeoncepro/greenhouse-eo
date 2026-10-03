@@ -1,0 +1,6 @@
+  ⚠ --mask indica dónde editar, pero este comando NO recompone ni verifica la zona protegida. Para una pieza final usa pnpm ai:inpaint image (garantiza delta 0 fuera de la máscara).
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/realismo-v3/isabella/expandir-v5/isabella-cuerpo-v5-a.png (edit) …
+  ✓ 1762KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 1878 (img 1536 · txt 342) · out 1372 · total 3250
+done

@@ -39,7 +39,7 @@
 ```
 
 - **Menú**: navegación real de `GH_MY_NAV`: Mi Greenhouse (activo); Mi trabajo (Mis Asignaciones, Mi Delivery, Mi Desempeño, Mis Objetivos, Mis Evaluaciones); Mi ficha (Mis Permisos, Mi Nómina, Mi Perfil, Mi Organización); Recursos (Knowledge, Configuración).
-- **Mi desempeño**: misma superficie que Performance del equipo con scope persona: cuatro KPIs con estado y meta, «Mis piezas entregadas» por semana con cycle time y una frase que dice qué falta para la meta («Te falta subir 2 puntos de FTR»), franja con piezas en curso, en revisión del cliente y utilización (banda del código: 35–85 % equilibrada).
+- **Mi desempeño**: misma superficie que Performance del equipo con scope persona: cuatro KPIs con estado y meta, «Mis piezas entregadas» por semana con cycle time en el mismo patrón de dos paneles de la Home interna (barras arriba, franja de cycle time con escala y meta abajo, semana en curso marcada como parcial) y una frase que dice qué falta para la meta («Te falta subir 2 puntos de FTR»), franja con piezas en curso, en revisión del cliente y utilización (banda del código: 35–85 % equilibrada).
 - **Tu foco hoy**: anillo con el avance de las tareas del día, chip «2 entregas vencen hoy», acciones «Abrir mis tareas» y «Ver calendario», y fila «2 piezas volvieron con feedback».
 - **Mis tareas**: lista por fecha de entrega con badge (HOY en rojo, R2 en azul, MAÑ en navy), pieza · cliente · proyecto, estado y acción.
 - **Mis asignaciones**: clientes con su dedicación en FTE y total; sin costos por hora ni tarifas.

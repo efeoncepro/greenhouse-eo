@@ -1,0 +1,25 @@
+{
+  "id": "S05-191-runandgun-jornada",
+  "formato": "1.91:1",
+  "impacto": true,
+  "linea": "brand",
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, a real long-exposure photograph of one full shooting day, taken on a tripod in a vast dark warehouse turned into a studio, the native layout of a horizontal feed and link ad). GEOGRAPHY, the most important instruction: the LEFT 44% of the frame, from the top edge to the bottom edge, is the deep, evenly dark, navy-black matte ceiling and upper wall of the warehouse with fine visible texture: no light falls on it, no glow, no bokeh, no lamps, no trail and no objects; it is calm from edge to edge. Everything lit lives in the RIGHT 54% of the frame, between 14% and 84% of the frame height. The LOWEST 16% of the frame is the near-black matte top of a rolling equipment case right in front of the lens, crossing the whole width, completely out of focus, non-reflective, outside every light. THE MOMENT: across the depth of the warehouse stand FIVE small, simple sets in a row, each barely lit: two chairs for an interview, a kitchen counter, a product table, a sofa, a backdrop. During the day a handheld gimbal camera moved from set to set, and its small orange (#FF6500) tally light traced ONE single continuous, smooth light trail that weaves through all five sets, from the deep left background to the foreground, between 18% and 77% of the frame height, a whole day of capture drawn in one line. In the foreground, in the RIGHT half of the frame, centered at about 70% of the width, a Latin American camera operator in his early thirties, short dark hair, wearing the Efeonce hoodie exactly as in its reference, stands perfectly still and SHARP, framed from the waist up, the top of his head at about 21% of the frame height, the equipment case cutting him at the waist, holding the compact gimbal camera at his chest with both hands, both arms fully visible; head almost frontal, he looks straight into the lens with a calm, satisfied half-smile. LIGHT: the trail is the brightest element; where it ends, near his camera, it paints his hands and the near side of his face warm orange; NO fill light, the far side of his face in shadow. A cool azure (#0375DB) rim light from behind outlines his head and shoulders. Thin haze catches the trail, only in the RIGHT half of the frame. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm, nothing foreshortened. Real long-exposure physics, real sensor grain, slight chromatic aberration on the brightest edges. Enormous contrast, deep navy blacks. No circles, no spheres. No readable text, no letters, no logos of any brand. HORIZONTAL LIMIT (essential, checked): every person, creature, light trail, projected shape, screen, mural and prop sits entirely to the RIGHT of the vertical line at 56% of the frame width; the LEFT half of the frame shows only the dark calm surface, with nothing in it. The main subject is a little smaller in the frame so the whole scene fits in the right part.",
+  "lecho": {
+    "objeto": "the near-black matte top of a rolling equipment case right in front of the lens, crossing the whole width of the lowest 16% of the frame, completely out of focus, non-reflective, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the deep, evenly dark, navy-black matte ceiling and upper wall of the warehouse with fine visible texture",
+      "tinta": "blanca"
+    }
+  },
+  "piloto": "../../composicion/plates/N05-45-runandgun-jornada.png"
+}

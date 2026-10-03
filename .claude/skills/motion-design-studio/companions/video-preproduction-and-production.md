@@ -1,6 +1,6 @@
 # Companion · Preproducción y producción de video dirigido
 
-**Versión:** 2026-09-24. **Origen:** producción SKY CMP-003 hasta V17, incluido el trabajo previo del operador con Claude: pieza por pieza, selección de vistas, diseño de cámaras y primeras pruebas. **Alcance:** del brief al metraje seleccionado y al contrato de postproducción. Usa [el paquete de producción](../templates/video-production-packet.md) para ejecutar el método.
+**Versión:** 2026-09-24; delta 2026-10-03 (§12). **Origen:** producción SKY CMP-003 hasta V17, incluido el trabajo previo del operador con Claude: pieza por pieza, selección de vistas, diseño de cámaras y primeras pruebas; y el spot animado 2D «Sparks × Efeonce AEO» (v2 aprobada 2026-10-03), que fijó el orden de preproducción común a todo video. **Alcance:** del brief al metraje seleccionado y al contrato de postproducción. Usa [el paquete de producción](../templates/video-production-packet.md) para ejecutar el método.
 
 Esta guía convierte la experiencia en decisiones comprobables. Los comportamientos observados de un modelo pertenecen a aquellas solicitudes; no certifican su catálogo actual. Precio, parámetros, límites, resolución y disponibilidad se consultan en la ruta concreta antes de operar. La [retrospectiva SKY](../../../../docs/operations/social/2026-09-24-sky-retrospectiva-produccion-v17.md) conserva historia y evidencia; este companion conserva el método reutilizable.
 
@@ -13,6 +13,8 @@ Ese trabajo permitió separar tres preguntas que deben resolverse antes de gasta
 1. **Qué debe suceder:** relato, orden causal y momento principal de marca.
 2. **Qué debe permanecer idéntico:** identidad, geometría, copy, tipografía, formato y elementos ya aprobados.
 3. **Qué puede interpretar el modelo:** mundo, materiales, luz, acción y cámara, dentro de las libertades autorizadas.
+
+**El orden completo de preproducción, común a todo video (generado, filmado, animado o híbrido), está en [§12](#12-preproducción-transversal-orden-y-gates).** Este apartado y los siguientes desarrollan sus piezas.
 
 No atribuyas cada archivo histórico a un autor si no hay registro. En SKY, la participación previa con Claude está declarada por el operador; la existencia de piezas, manifiestos y planes se verifica en repo/OneDrive. Una reconstrucción posterior de la intención no prueba que un parámetro se haya enviado.
 
@@ -300,3 +302,69 @@ La versión final todavía necesita conform, sonido, acabado, exportación y QA 
 - [Retrospectiva hasta V17](../../../../docs/operations/social/2026-09-24-sky-retrospectiva-produccion-v17.md): cronología, recursos efectivamente usados, límites de audio, evidencia final y costos sin total inventado.
 
 No se ejecutaron generaciones, restauraciones ni cambios audiovisuales para escribir este companion. Los gates propuestos son mejoras del método; no deben presentarse como controles que necesariamente existieron desde el primer intento de SKY.
+
+## 12. Preproducción transversal: orden y gates
+
+**Origen:** SKY (2026-09-24) y el spot animado 2D «Sparks × Efeonce AEO» (2026-10-03, v2 aprobada). El operador
+pidió fijar esta secuencia como común a todos los videos: *«la metodología de preproducción siento que va a ser
+similar en todos los videos que hagamos»*. Los pasos son transversales; lo que cambia por tipo de producción está al
+final. Evidencia del caso 2026-10-03: `ai-generations/2026-10-03_sparks-aeo-60s/INVENTARIO-DE-HECHOS.md` y
+`PREPRODUCCION.md` del mismo run; historia en la
+[retrospectiva](../../../../docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md); receta
+ejecutable en [el workflow del spot animado 2D](../workflows/animated-2d-spot-composed-brand-assets.md).
+
+### Orden
+
+| # | Paso | Qué cierra | Evidencia para avanzar |
+| --- | --- | --- | --- |
+| 1 | **Brief** | Formato, duración objetivo, motor previsto, qué debe sentir y hacer el espectador, orden de trabajo pedido | Brief escrito con las decisiones del operador citadas |
+| 2 | **Historia y diseño en papel** | Historia en actos; guion VO por toma; música por sección; voz de personajes; SFX; VFX por toma (qué va en generación y qué en post); plan de tomas y empalmes; mezcla y entrega; presupuesto; decisiones pendientes | Documento de preproducción (en el caso, `PREPRODUCCION.md` §1–10) aprobado en historia y VO |
+| 3 | **Storyboard en canvas, aprobado por escena** | Lámina general, una por toma y una línea de tiempo; después, láminas de elenco y de cuadros clave | Artifact con los comentarios del operador; cada escena aprobada antes de producir su toma |
+| 4 | **Elenco y regla de quién puede aparecer** | Qué personaje representa a quién (equipo, cliente, tercero) | Personajes del canon o creados y aprobados (hojas de giro y expresiones) **antes** de los cuadros clave |
+| 5 | **Contrato de fidelidad** | Qué genera el modelo, qué es sólo referencia y qué se compone (§3) | Matriz por elemento; lo de marca (logos, mascotas, texto, interfaz) se compone |
+| 6 | **Cuadros clave o referencias** | Inicio y fin por toma, o el paquete de referencias (§6) | Cuadros aprobados; gate de integridad de lo compuesto |
+| 7 | **Piloto** | La toma que concentra el riesgo, con las variantes a comparar | Comparación a tamaño real; autorización de gasto separada (§7) |
+| 8 | **Producción** | El resto de las tomas | Cada toma revisada contra su contrato; ID de solicitud y gasto registrados |
+| 9 | **Corte mudo** | Ritmo con placas provisorias, antes de producir el audio final | Corte reproducible; el ritmo lo decide la historia |
+| 10 | **Post de imagen** | Placas finales, interfaz, cierre, re-timing | [Companion de post](video-postproduction-and-delivery.md) |
+| 11 | **Audio** | VO final, SFX, música, mezcla, subtítulos sobre el corte real | Medición más escucha del operador |
+| 12 | **Entrega** | Master con y sin subtítulos, SRT, stems | Cuadros revisados al 100 %; estados de aprobación separados |
+
+El audio se **diseña** en el paso 2 y se **produce** sobre el corte (pasos 9–11); en el caso, la locución se generó
+después del corte mudo [medido por el orden de commits del run]. Si una pieza se coreografía a una música o a una VO
+ya aprobada, declarar en el brief cuál manda.
+
+### Reglas que se deciden en preproducción
+
+- **El ritmo lo pone la historia, no la duración del brief.** La v1 del caso estiraba tomas para llenar 60 s y el
+  operador la encontró lenta («va muy lento… querías cumplir el minuto»); la v2 aprobada duró 49,6 s. Tratar la
+  duración del brief como objetivo, y avisar cuando la historia pide otra.
+- **Copy de oferta validado con la skill dueña antes de escribir la VO.** Cuando la pieza vende una capacidad,
+  cargar la skill de la práctica (en el caso, `seo-aeo` y `seo-aeo-practice`) y el canon de los personajes antes de
+  redactar. La premisa v1 («los Sparks existen para arreglar el AEO») contradecía la oferta y se reescribió; la
+  regla de la práctica prohíbe prometer aparición o citación en IA.
+- **Quién aparece importa.** El elenco fotográfico representa al equipo Efeonce y no puede hacer de cliente; para
+  un cliente en la ficción se usa el elenco 2D ficticio (`docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md`).
+  Se revisa en el storyboard, no al ver la toma.
+- **La duración por toma la fija el motor.** Verificar en docs y en vivo el tope por solicitud antes de planificar
+  (caso: 15 s por request en fal y Higgsfield); las escenas cortas son límite y control, no preferencia.
+- **Marcas de terceros en la ficción:** inventadas y verificadas sin homónimo real (búsqueda fechada) desde el
+  guion; un placeholder en el storyboard es una deuda que debe cerrarse antes del primer corte entregable.
+- **Voz:** describir el estilo sin imitar a una persona real; elegir por ID de voz y en la superficie que se usará
+  (los nombres se repiten entre plataformas); si la herramienta de primera elección no está operativa, registrarlo y
+  no repararla de paso.
+
+### Qué es transversal y qué depende del tipo de producción
+
+| Ámbito | Transversal (todo video) | Específico del spot animado 2D (caso 2026-10-03) |
+| --- | --- | --- |
+| Papel | Brief → historia/VO/música/SFX/VFX → storyboard aprobado por escena antes de gastar | Estilo de animación elegido y aprobado con láminas de elenco |
+| Elenco | Regla de quién representa a quién | Elenco 2D con hojas de giro/expresiones y sello Efeonce sutil |
+| Fidelidad | Lo de marca se compone; el modelo pone mundo, luz y movimiento | Mascotas desde SVG oficial con mirada emulada del rig; gate de 0 px cambiados fuera de zonas |
+| Referencias | Rol, autoridad y exclusiones por insumo | Cuadro inicial + final por toma con el **mismo eje de cámara** |
+| Piloto | Una toma de riesgo antes de producir | Comparación de variantes del mismo motor (H3 base contra Max) |
+| Texto | Nunca generado | Prompt de video prohíbe texto y fija paleta |
+
+Para filmado y video generado sin cuadros clave, los mismos pasos 1–5 y 9–12 aplican; el paso 6 se convierte en
+plan de rodaje o paquete de referencias y el 7 en prueba de cámara o de motor [criterio: no medido en estos dos
+casos].

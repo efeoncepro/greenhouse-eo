@@ -13,10 +13,19 @@
 
 import type { FieldEffect } from '../../resolver-contract'
 
-/** channelId → isotipo relativo al catálogo. `google_ai_overview` es Google: mismo isotipo. */
+/**
+ * Plataforma → isotipo relativo al catálogo. Cada archivo es una copia de `AXIS_PLATFORM_ASSETS`
+ * (@efeoncepro/axis-brand-assets 0.4.15, `platforms/<id>-isotype.svg`), verificada por
+ * `insights-shared/channels.test.ts`: nunca se edita a mano. AI Overview lleva su lupa con el degradado de la G (aprobada
+ * el 2026-10-03), no la G de Google. Search Console, Google Analytics y Greenhouse son plataformas de la FUENTE de una
+ * cifra (tarjeta de cifra, contrato AXIS `efeonce.insights-stat-card` 0.2.0), no `channelId`.
+ */
 export const CHANNEL_ISOTYPES: Readonly<Record<string, string>> = {
   google: 'assets/channels/google.svg',
-  google_ai_overview: 'assets/channels/google.svg',
+  google_ai_overview: 'assets/channels/google-ai-overview.svg',
+  google_search_console: 'assets/channels/search-console.svg',
+  google_analytics: 'assets/channels/google-analytics.svg',
+  greenhouse: 'assets/channels/greenhouse.svg',
   chatgpt: 'assets/channels/chatgpt.svg',
   gemini: 'assets/channels/gemini.svg',
   claude: 'assets/channels/claude.svg',

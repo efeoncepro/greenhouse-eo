@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportFigureWafflePage — página de figura «waffle» del informe A4 (TASK-1975, canvas `Premium-Waffle`).
+  Para un conteo de pocas categorías (2 a 4 partes, hasta 100 unidades): UN CUADRO POR UNIDAD.
+
+  La retícula la dibuja el hook del catálogo (`makeWaffleHook`, `figure-waffle.ts`) con `waffleUnitGeometry` del
+  motor y las cuentas IMPRESAS del slot `waffleParts`: hasta 30 unidades, 5 columnas; de 31 a 100, 10; llenado fila
+  por fila en el orden de las partes. La leyenda (nombre, marca opcional y cuenta) la pinta el motor desde el mismo
+  slot; el hook sólo le pone a cada fila su tono. El tono sale del rol declarado (oportunidad, ausencia rayada y al
+  final) o, sin rol, del orden actual → oportunidad → anterior → paso. Colores: roles del brand pack, nunca HEX.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .figure-eyebrow { margin-top: 38px; }
+
+  /* El cuerpo de la cifra lo decide el hook por su largo: «74 de 100» no entra a 76 px en la columna de 290. */
+  .figure-number { white-space: nowrap; }
+
+  .figure-number--long { font-size: 64px; }
+
+  .figure-board { margin-top: 36px; display: flex; flex-direction: column; }
+
+  .figure-board .figure-caption-row { padding-bottom: 14px; }
+
+  .figure-board .figure-note { margin-top: 14px; }
+
+  .figure-provenance { margin-top: 22px; }
+
+  .waffle-figure { display: flex; align-items: center; gap: 40px; }
+
+  .fig-waffle-host { display: block; flex-shrink: 0; }
+
+  .fig-waffle { display: block; }
+
+  /* Retícula: el tono de cada cuadro es su parte; la ausencia lleva el patrón rayado (atributo `fill` del hook). */
+  .waffle-tone--current.waffle-cell { fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+  .waffle-tone--opportunity.waffle-cell { fill: var(--axis-report-role-dataOpportunityOnPaper); }
+
+  .waffle-tone--prior.waffle-cell { fill: var(--axis-report-role-dataPriorOnPaper); fill-opacity: 0.72; }
+
+  .waffle-tone--step.waffle-cell { fill: var(--axis-report-role-dataStepOnPaper); }
+
+  .waffle-absence-ground { fill: var(--axis-report-role-dataAbsenceFillOnPaper); }
+
+  .waffle-absence-line { stroke: var(--axis-report-role-dataAbsenceOnPaper); }
+
+  /* Leyenda: filas separadas por filete; muestra, nombre (con su marca debajo) y la cuenta, que es el hecho. */
+  .waffle-legend { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .waffle-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--axis-report-role-rule); }
+
+  .waffle-row:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  .waffle-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+  .waffle-tone--current .waffle-swatch { background: var(--axis-report-role-dataCurrentOnPaper); }
+
+  .waffle-tone--opportunity .waffle-swatch { background: var(--axis-report-role-dataOpportunityOnPaper); }
+
+  .waffle-tone--prior .waffle-swatch { background: var(--axis-report-role-dataPriorOnPaper); opacity: 0.72; }
+
+  .waffle-tone--step .waffle-swatch { background: var(--axis-report-role-dataStepOnPaper); }
+
+  .waffle-tone--absence .waffle-swatch {
+    background: repeating-linear-gradient(45deg, var(--axis-report-role-dataAbsenceOnPaper) 0 2px, var(--axis-report-role-dataAbsenceFillOnPaper) 2px 5px);
+  }
+
+  .waffle-name {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .waffle-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(var(--axis-report-role-dataOpportunityOnPaper-rgb), 0.16);
+    font-family: var(--axis-report-type-display);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .waffle-count {
+    font-family: var(--axis-report-type-display);
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperInk);
+  }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <span class="chapter-tab" data-slot="chapterTab">01</span>
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">01 · Visibilidad orgánica</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow figure-eyebrow" data-slot="eyebrow">
+      <span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg><svg class="stroke-icon i-steps" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6h-5v5h-5v5h-5v5h-5"></path></svg><svg class="stroke-icon i-grid" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6h-6z"></path><path d="M14 4h6v6h-6z"></path><path d="M4 14h6v6h-6z"></path><path d="M14 14h6v6h-6z"></path></svg><svg class="stroke-icon i-donut" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-3.8a4.1 4.1 0 1 1 -5 -5v-4a.9 .9 0 0 0 -1 -.8"></path><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a9 9 0 0 0 -1 -1v-4.5"></path></svg><svg class="stroke-icon i-layers" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg><svg class="stroke-icon i-numbers" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l2 -2v8"></path><path d="M9 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3"></path><path d="M17 8h2.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1 -1.5 1.5h-2.5"></path></svg></span><span data-slot-field="label">Cobertura de keywords</span>
+    </span>
+
+    <div class="figure-hero">
+      <div class="figure-count">
+        <span class="figure-number" data-slot="keyFigure">74 de 100</span>
+        <span class="figure-caption" data-slot="keyCaption">keywords del mercado donde el sitio ya aparece en Google</span>
+      </div>
+      <div class="figure-heading">
+        <h1 class="figure-title" data-slot="conclusion">El sitio aparece en tres de cada cuatro búsquedas del mercado que medimos</h1>
+        <p class="figure-lead" data-slot="lead">26 keywords están en la primera página y 21 más, a un paso.</p>
+      </div>
+    </div>
+
+    <section class="figure-board">
+      <div class="figure-caption-row">
+        <span class="figure-board-title" data-slot="figureTitle">100 keywords del mercado según la posición del sitio</span>
+      </div>
+      <div class="waffle-figure">
+        <div class="fig-waffle-host"></div>
+        <div class="waffle-legend" data-slot="waffleParts"><div class="waffle-row"><span class="waffle-swatch"></span><span class="waffle-name"><span data-slot-field="label">Primera página (1 a 10)</span><span class="waffle-tag" data-slot-field="tag">Oportunidad</span></span><span class="waffle-count" data-slot-field="count">26</span></div></div>
+      </div>
+      <div class="figure-note" data-slot="note"><svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Cada cuadro es una unidad.</span></div>
+    </section>
+
+    <div class="figure-provenance" data-slot="provenance">
+      <div class="figure-provenance-item"><span class="figure-provenance-label" data-slot-field="label">Unidad</span><span data-slot-field="text">Unidad de la figura.</span></div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing closing--figure" data-slot="closing"><div class="closing-block">
+        <span class="closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span>
+        <p class="closing-text" data-slot-field="text">Lo que la figura muestra.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
+
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">12</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,9 +1,9 @@
 # Equipo en la fotografía de marca — roster V1
 
 > **Tipo de documento:** Norma operativa (fotografía de marca)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-29 por Claude (decisión del operador `cine-team-people-social`)
-> **Ultima actualizacion:** 2026-10-01 por Claude (1.4: portadas de LinkedIn personales en la página del kit y aviso 1:1 del 2026-10-01. Antes, 2026-09-29: avatares oficiales con bomber y halo; firmas del equipo; Luis sale del equipo)
+> **Ultima actualizacion:** 2026-10-03 por Claude (1.5: `silueta` por persona, Julio con 37 años y canas prematuras, Nexa y Julio en grupos de 3 a 5 con el elenco, roster real ≠ elenco ficticio. 1.4, 2026-10-01: portadas de LinkedIn personales en la página del kit y aviso 1:1 del 2026-10-01. Antes, 2026-09-29: avatares oficiales con bomber y halo; firmas del equipo; Luis sale del equipo)
 > **Documentacion tecnica:** [`PERSONAS` de `scripts/foto/build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs) ·
 > [bloques de identidad del canon §3.6](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · token AXIS
 > `manzanitasRegister.teamPeople` (`rosterSource: 'greenhouse-team-roster'`)
@@ -49,14 +49,26 @@ corporativos, y para los servicios creativos sea el hoodie, esto por la "persona
 
 ## Quién está y de qué foto sale
 
-| Clave | Persona | Referencia de identidad | Estado |
-| --- | --- | --- | --- |
-| `julio` | Julio Reyes | set aprobado del 2026-09-20 (`ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`) | aprobado |
-| `andres` | Andrés Carlosama | `_identidad-equipo/andres/avatar-bomber-2026-09.png` | aprobado |
-| `daniela` | Daniela Ferreira | `_identidad-equipo/daniela/avatar-bomber-2026-09.png` | aprobado |
-| `melkin` | Melkin Hernandez | `_identidad-equipo/melkin/avatar-bomber-2026-09.png` | aprobado |
-| `humberly` | Humberly Henriquez | `_identidad-equipo/humberly/avatar-bomber-2026-09.png` | aprobado |
-| `valentina` | Valentina Hoyos | `_identidad-equipo/valentina/avatar-bomber-2026-09.png` | aprobado |
+| Clave | Persona | Silueta | Referencia de identidad | Estado |
+| --- | --- | --- | --- | --- |
+| `julio` | Julio Reyes | `hombre` | set aprobado del 2026-09-20 (`ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`) | aprobado |
+| `nexa` | Nexa (AI Specialist de Efeonce; identidad propia, no es una persona del equipo) | `mujer` | anclas de `ai-generations/_identidad-nexa/` (ver abajo) | aprobado |
+| `andres` | Andrés Carlosama | `hombre` | `_identidad-equipo/andres/avatar-bomber-2026-09.png` | aprobado |
+| `daniela` | Daniela Ferreira | `mujer` | `_identidad-equipo/daniela/avatar-bomber-2026-09.png` | aprobado |
+| `melkin` | Melkin Hernandez | `hombre` | `_identidad-equipo/melkin/avatar-bomber-2026-09.png` | aprobado |
+| `humberly` | Humberly Henriquez | `mujer` | `_identidad-equipo/humberly/avatar-bomber-2026-09.png` | aprobado |
+| `valentina` | Valentina Hoyos | `mujer` | `_identidad-equipo/valentina/avatar-bomber-2026-09.png` | aprobado |
+
+**`silueta`** (2026-10-03) es una clave de cada persona en `PERSONAS`: decide qué vista **puesta** de la prenda del
+uniforme le toca (de hombre o de mujer). `pnpm foto:prompt` elige esa vista por la silueta, el giro de la vista de
+identidad, la cámara baja y lo que tape el pecho; en una toma con varias personas, cada prenda declara `persona`.
+Detalle: [elenco §7c](./EFEONCE_BRAND_CAST_V1.md) y el kit de prendas
+(`.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md`, §Delta 2026-10-03).
+
+**Julio tiene 37 años, con canas prematuras** **[operador, 2026-10-02 y 2026-10-03]**. Su bloque `IDENTITY` dice desde
+el 2026-10-03 *«thirty-seven years old with premature grey: keep his apparent age EXACTLY as in the references — do not
+rejuvenate, age, beautify or soften»* (antes decía *«mid-forties»*). Ganó la B de un A/B sobre la misma escena
+([elenco §6](./EFEONCE_BRAND_CAST_V1.md)).
 
 `_identidad-equipo/` es `ai-generations/_identidad-equipo/` (con su `LEEME.md`): el hogar de las referencias de
 identidad. **Desde el 2026-10-02 la referencia es el avatar oficial con la bomber** (maestro 1080 publicado en
@@ -67,7 +79,26 @@ pero ya no son referencia. Reemplaza la regla del 2026-09-29, que trataba los av
 
 La ropa de la foto de referencia no decide nada: la escena declara la prenda de la línea y el modelo viste con el kit.
 
-Nexa sigue con su propia identidad (anclas de `ai-generations/_identidad-nexa/`).
+Nexa sigue con su propia identidad (anclas de `ai-generations/_identidad-nexa/`; la referencia frontal es
+`1-anclas/nexa-ancla-1-rostro-frontal-v2.png` y sus 25 expresiones casi de frente viven en `5-expresiones-frente/`, ver
+el `LEEME.md` de esa carpeta).
+
+## Roster real y elenco ficticio
+
+Este roster es la lista de **identidades fijas** de `PERSONAS`: las personas reales del equipo con su identidad real, más
+Nexa con la suya. El [elenco de marca](./EFEONCE_BRAND_CAST_V1.md) son **personajes ficticios** —Hum, Karo, Sophia, Isabella y Antonio—,
+modelos de campaña ligados a una línea de servicio (`ELENCO`, mismo archivo), que sirven para variar las caras de una
+foto de varias personas o de equipo. Un personaje del elenco nunca se presenta como persona del equipo; una persona del
+roster nunca interpreta un rol que no es el suyo.
+
+| Con quién | Tope de personas con identidad en una toma |
+| --- | --- |
+| **Nexa** y **Julio** | Entran en **grupos de 3 a 5** con cualquier combinación de personajes del elenco y entre ellos (`EN_GRUPO = ['nexa', 'julio']`); validado en `VP3` (Julio + Nexa + Karo) |
+| El resto del roster (Andrés, Daniela, Melkin, Humberly, Valentina) | **Dos**: con ellos el grupo no está medido |
+| Cualquiera | La misma persona dos veces en `identidad` es error |
+
+El elenco se suma cuando la escena lo necesita, no es obligatorio en una pieza **[operador, 2026-10-03: «debe usarse el
+elenco si es necesaria su inclusión»]**. Reglas de grupo y fichas: [elenco §7b](./EFEONCE_BRAND_CAST_V1.md).
 
 ## Avatares oficiales del equipo (2026-09-29)
 

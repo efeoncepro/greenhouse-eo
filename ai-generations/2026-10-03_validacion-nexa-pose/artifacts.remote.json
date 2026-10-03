@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T11:14:50.941Z",
+  "run": "ai-generations/2026-10-03_validacion-nexa-pose",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_validacion-nexa-pose",
+  "totalBytes": 11957666,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "descartes/VP1-nexa-gira-derecha.png",
+      "sizeBytes": 1775143,
+      "sha256": "3e001d741357bdf6dd515f3c80376e58c4620ed96d0be3fc34a8c44e51d7288a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/descartes/VP1-nexa-gira-derecha.png"
+    },
+    {
+      "path": "descartes/VP2-nexa-frente.png",
+      "sizeBytes": 1903616,
+      "sha256": "261c669d540ac8b9c1e910a67e103f30018b6980bafe576b5142cd548deff5f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/descartes/VP2-nexa-frente.png"
+    },
+    {
+      "path": "plates/validacion-pose.png",
+      "sizeBytes": 2725777,
+      "sha256": "64077a5e4b2b8d7fcc0643371015afeabe40362b3b0eab63fbc34de45328f4b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/plates/validacion-pose.png"
+    },
+    {
+      "path": "plates/VP1-nexa-gira-derecha.png",
+      "sizeBytes": 1764074,
+      "sha256": "155fb13e531e10d33532faa9f384ebc8c48ce39f5b7f1489f65e88997e07e44d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/plates/VP1-nexa-gira-derecha.png"
+    },
+    {
+      "path": "plates/VP2-nexa-frente.png",
+      "sizeBytes": 1864121,
+      "sha256": "d1d387dddb52c8ed6518274b1bf00ef21b6d183621e4aea36573895bfdadc06e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/plates/VP2-nexa-frente.png"
+    },
+    {
+      "path": "plates/VP3-grupo-julio-nexa-karo.png",
+      "sizeBytes": 1924935,
+      "sha256": "be1efdcd2204632d5d9f30a146a5cca243257e71c6c0686525f40417ad276abb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_validacion-nexa-pose/plates/VP3-grupo-julio-nexa-karo.png"
+    }
+  ]
+}

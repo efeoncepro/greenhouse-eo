@@ -1,254 +1,516 @@
 {
-  "prenda": "Hoodie Efeonce",
-  "fuente": "ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png (asset oficial del sitio público)",
-  "invariantes": {
-    "tela": "azul royal del asset oficial; medido en las vistas navy entre (10,54,155) y (25,76,186), Δ máximo 38 en primeros planos",
-    "emblema_pecho": "isotipo blanco en el pecho izquierdo, del mismo tamaño y posición que el asset oficial; NUNCA se reduce",
-    "estampa_espalda": "logo completo + eslogan «Empower your Growth» centrado y más chico, al 38 % del ancho de la espalda; se compone de forma determinística con estampa-espalda.mjs, nunca se le pide el texto al modelo",
-    "eslogan": "Poppins ExtraBold Italic / ExtraBold / Black Italic, contrato de src/config/efeonce-brand.ts; blanco sobre navy, navy #023c70 sobre blanco o gris",
-    "construccion": "cordones planos tono sobre tono, bolsillo canguro, puños y ruedo acanalados, capucha de doble capa, sin cierre ni etiquetas visibles"
+ "prenda": "Hoodie Efeonce",
+ "fuente": "ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png (asset oficial del sitio público)",
+ "invariantes": {
+  "tela": "azul royal del asset oficial; medido en las vistas navy entre (10,54,155) y (25,76,186), Δ máximo 38 en primeros planos",
+  "emblema_pecho": "isotipo blanco en el pecho izquierdo, del mismo tamaño y posición que el asset oficial; NUNCA se reduce",
+  "estampa_espalda": "logo completo + eslogan «Empower your Growth» centrado y más chico, al 38 % del ancho de la espalda; se compone de forma determinística con estampa-espalda.mjs, nunca se le pide el texto al modelo",
+  "eslogan": "Poppins ExtraBold Italic / ExtraBold / Black Italic, contrato de src/config/efeonce-brand.ts; blanco sobre navy, navy #023c70 sobre blanco o gris",
+  "construccion": "cordones planos tono sobre tono, bolsillo canguro, puños y ruedo acanalados, capucha de doble capa, sin cierre ni etiquetas visibles"
+ },
+ "como_usarla": "Elegir la vista por el ÁNGULO DE LA TOMA, no por costumbre: si el sujeto se ve de espaldas, la referencia es la espalda. Se pasa junto con las referencias de rostro y cuerpo de la persona; la prenda la fija esta referencia y la escena la fija el prompt.",
+ "vistas": [
+  {
+   "id": "01-frente",
+   "descripcion": "Prenda sola, frente (maniquí invisible)",
+   "cuando_usarla": "tomas frontales; referencia por defecto del pecho",
+   "archivo_fondo_estudio": "efeonce-hoodie-01-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-01-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
   },
-  "como_usarla": "Elegir la vista por el ÁNGULO DE LA TOMA, no por costumbre: si el sujeto se ve de espaldas, la referencia es la espalda. Se pasa junto con las referencias de rostro y cuerpo de la persona; la prenda la fija esta referencia y la escena la fija el prompt.",
-  "vistas": [
-    {
-      "id": "01-frente",
-      "descripcion": "Prenda sola, frente (maniquí invisible)",
-      "cuando_usarla": "tomas frontales; referencia por defecto del pecho",
-      "archivo_fondo_estudio": "efeonce-hoodie-01-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-01-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "02-espalda",
-      "descripcion": "Prenda sola, espalda con la estampa canónica",
-      "cuando_usarla": "cualquier toma de espaldas",
-      "archivo_fondo_estudio": "efeonce-hoodie-02-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-02-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "03-tres-cuartos-izquierda",
-      "descripcion": "Prenda sola, tres cuartos izquierda",
-      "cuando_usarla": "sujeto girado hacia su derecha",
-      "archivo_fondo_estudio": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "04-tres-cuartos-derecha",
-      "descripcion": "Prenda sola, tres cuartos derecha",
-      "cuando_usarla": "sujeto girado hacia su izquierda",
-      "archivo_fondo_estudio": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "05-lateral",
-      "descripcion": "Prenda sola, lateral",
-      "cuando_usarla": "perfiles y tomas de costado",
-      "archivo_fondo_estudio": "efeonce-hoodie-05-lateral-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-05-lateral-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "06-capucha-puesta",
-      "descripcion": "Capucha puesta, frente",
-      "cuando_usarla": "piezas con la capucha arriba",
-      "archivo_fondo_estudio": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "07-doblado",
-      "descripcion": "Doblada sobre superficie",
-      "cuando_usarla": "bodegón, merch, escritorio",
-      "archivo_fondo_estudio": "efeonce-hoodie-07-doblado-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-07-doblado-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "08-percha",
-      "descripcion": "En percha",
-      "cuando_usarla": "vestuario, backstage, tienda",
-      "archivo_fondo_estudio": "efeonce-hoodie-08-percha-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-08-percha-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "09-detalle-pecho",
-      "descripcion": "Detalle del emblema del pecho",
-      "cuando_usarla": "primeros planos y verificación del emblema",
-      "archivo_fondo_estudio": "efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "10-detalle-puno-cordon",
-      "descripcion": "Detalle de puño y cordón",
-      "cuando_usarla": "primeros planos de textura",
-      "archivo_fondo_estudio": "efeonce-hoodie-10-detalle-puno-cordon-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "11-interior-capucha",
-      "descripcion": "Interior de la capucha",
-      "cuando_usarla": "capucha abierta o vista desde atrás",
-      "archivo_fondo_estudio": "efeonce-hoodie-11-interior-capucha-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "12-cuello-interior",
-      "descripcion": "Cuello por dentro",
-      "cuando_usarla": "detalle de cuello; sin etiqueta de marca",
-      "archivo_fondo_estudio": "efeonce-hoodie-12-cuello-interior-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "13-plano-frente",
-      "descripcion": "Plano cenital, frente",
-      "cuando_usarla": "mockups y flat lay",
-      "archivo_fondo_estudio": "efeonce-hoodie-13-plano-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-13-plano-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "14-plano-espalda",
-      "descripcion": "Plano cenital, espalda con estampa",
-      "cuando_usarla": "mockups y flat lay de espalda",
-      "archivo_fondo_estudio": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "15-puesto-frente",
-      "descripcion": "Puesta, frente, cuerpo neutro sin rostro",
-      "cuando_usarla": "caída de la tela en un cuerpo",
-      "archivo_fondo_estudio": "efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "id": "16-puesto-espalda",
-      "descripcion": "Puesta, espalda, cuerpo neutro sin rostro",
-      "cuando_usarla": "caída de la estampa sobre el cuerpo",
-      "archivo_fondo_estudio": "efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "id": "17-puesto-frente-cuerpo-b",
-      "descripcion": "Puesta, frente, otro cuerpo y tono de piel",
-      "cuando_usarla": "evitar que la referencia empuje a un solo tipo de modelo",
-      "archivo_fondo_estudio": "efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
-      "archivo_transparente": null,
-      "resolucion": [
-        1200,
-        1600
-      ]
-    },
-    {
-      "id": "18-blanco-frente",
-      "descripcion": "Variante blanco hueso, frente, tinta navy",
-      "cuando_usarla": "fondos oscuros o piezas de verano",
-      "archivo_fondo_estudio": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "19-blanco-espalda",
-      "descripcion": "Variante blanco hueso, espalda, tinta navy",
-      "cuando_usarla": "fondos oscuros, toma de espaldas",
-      "archivo_fondo_estudio": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "20-gris-frente",
-      "descripcion": "Variante gris jaspeado, frente, tinta navy",
-      "cuando_usarla": "piezas neutras o de oficina",
-      "archivo_fondo_estudio": "efeonce-hoodie-20-gris-frente-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-20-gris-frente-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "21-gris-espalda",
-      "descripcion": "Variante gris jaspeado, espalda, tinta navy",
-      "cuando_usarla": "piezas neutras, toma de espaldas",
-      "archivo_fondo_estudio": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-fondo-estudio.png",
-      "archivo_transparente": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-transparente.png",
-      "resolucion": [
-        1600,
-        1600
-      ]
-    },
-    {
-      "id": "22-puesto-espalda-mujer",
-      "descripcion": "El hoodie puesto, vista de espalda, en cuerpo femenino, sin rostro.",
-      "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el hoodie. Es la referencia de USO: la vista 16 es la misma toma en cuerpo masculino.",
-      "archivo_fondo": "final/efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
-      "resolucion": "1024x1536",
-      "brief": "brief/hoodie-puesto-espalda-mujer.prompt.txt"
-    }
-  ],
-  "delta_2026_09_21": "Se agregan las vistas PUESTAS DE ESPALDA EN CUERPO FEMENINO. El kit sólo tenía la espalda puesta en cuerpo masculino, así que para una pieza con una mujer había que elegir entre una vista del ángulo correcto pero del cuerpo equivocado, o ninguna. Generadas con el método del kit: mismo bloque base, mismo contrato de realismo, mismo cierre de estudio, y la estampa canónica como imagen 2 — el texto nunca se le pide al modelo. Detectado por el operador el 2026-09-21."
+  {
+   "id": "02-espalda",
+   "descripcion": "Prenda sola, espalda con la estampa canónica",
+   "cuando_usarla": "cualquier toma de espaldas",
+   "archivo_fondo_estudio": "efeonce-hoodie-02-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-02-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "03-tres-cuartos-izquierda",
+   "descripcion": "Prenda sola, tres cuartos izquierda",
+   "cuando_usarla": "sujeto girado hacia su derecha",
+   "archivo_fondo_estudio": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "04-tres-cuartos-derecha",
+   "descripcion": "Prenda sola, tres cuartos derecha",
+   "cuando_usarla": "sujeto girado hacia su izquierda",
+   "archivo_fondo_estudio": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "05-lateral",
+   "descripcion": "Prenda sola, lateral",
+   "cuando_usarla": "perfiles y tomas de costado",
+   "archivo_fondo_estudio": "efeonce-hoodie-05-lateral-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-05-lateral-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "06-capucha-puesta",
+   "descripcion": "Capucha puesta, frente",
+   "cuando_usarla": "piezas con la capucha arriba",
+   "archivo_fondo_estudio": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "07-doblado",
+   "descripcion": "Doblada sobre superficie",
+   "cuando_usarla": "bodegón, merch, escritorio",
+   "archivo_fondo_estudio": "efeonce-hoodie-07-doblado-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-07-doblado-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "08-percha",
+   "descripcion": "En percha",
+   "cuando_usarla": "vestuario, backstage, tienda",
+   "archivo_fondo_estudio": "efeonce-hoodie-08-percha-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-08-percha-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "09-detalle-pecho",
+   "descripcion": "Detalle del emblema del pecho",
+   "cuando_usarla": "primeros planos y verificación del emblema",
+   "archivo_fondo_estudio": "efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "10-detalle-puno-cordon",
+   "descripcion": "Detalle de puño y cordón",
+   "cuando_usarla": "primeros planos de textura",
+   "archivo_fondo_estudio": "efeonce-hoodie-10-detalle-puno-cordon-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "11-interior-capucha",
+   "descripcion": "Interior de la capucha",
+   "cuando_usarla": "capucha abierta o vista desde atrás",
+   "archivo_fondo_estudio": "efeonce-hoodie-11-interior-capucha-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "12-cuello-interior",
+   "descripcion": "Cuello por dentro",
+   "cuando_usarla": "detalle de cuello; sin etiqueta de marca",
+   "archivo_fondo_estudio": "efeonce-hoodie-12-cuello-interior-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "13-plano-frente",
+   "descripcion": "Plano cenital, frente",
+   "cuando_usarla": "mockups y flat lay",
+   "archivo_fondo_estudio": "efeonce-hoodie-13-plano-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-13-plano-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "14-plano-espalda",
+   "descripcion": "Plano cenital, espalda con estampa",
+   "cuando_usarla": "mockups y flat lay de espalda",
+   "archivo_fondo_estudio": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "15-puesto-frente",
+   "descripcion": "Puesta, frente, cuerpo neutro sin rostro",
+   "cuando_usarla": "caída de la tela en un cuerpo",
+   "archivo_fondo_estudio": "efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "id": "16-puesto-espalda",
+   "descripcion": "Puesta, espalda, cuerpo neutro sin rostro",
+   "cuando_usarla": "caída de la estampa sobre el cuerpo",
+   "archivo_fondo_estudio": "efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "id": "17-puesto-frente-cuerpo-b",
+   "descripcion": "Puesta, frente, otro cuerpo y tono de piel",
+   "cuando_usarla": "evitar que la referencia empuje a un solo tipo de modelo",
+   "archivo_fondo_estudio": "efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
+   "archivo_transparente": null,
+   "resolucion": [
+    1200,
+    1600
+   ]
+  },
+  {
+   "id": "18-blanco-frente",
+   "descripcion": "Variante blanco hueso, frente, tinta navy",
+   "cuando_usarla": "fondos oscuros o piezas de verano",
+   "archivo_fondo_estudio": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "19-blanco-espalda",
+   "descripcion": "Variante blanco hueso, espalda, tinta navy",
+   "cuando_usarla": "fondos oscuros, toma de espaldas",
+   "archivo_fondo_estudio": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "20-gris-frente",
+   "descripcion": "Variante gris jaspeado, frente, tinta navy",
+   "cuando_usarla": "piezas neutras o de oficina",
+   "archivo_fondo_estudio": "efeonce-hoodie-20-gris-frente-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-20-gris-frente-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "21-gris-espalda",
+   "descripcion": "Variante gris jaspeado, espalda, tinta navy",
+   "cuando_usarla": "piezas neutras, toma de espaldas",
+   "archivo_fondo_estudio": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-fondo-estudio.png",
+   "archivo_transparente": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-transparente.png",
+   "resolucion": [
+    1600,
+    1600
+   ]
+  },
+  {
+   "id": "22-puesto-espalda-mujer",
+   "descripcion": "El hoodie puesto, vista de espalda, en cuerpo femenino, sin rostro.",
+   "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el hoodie. Es la referencia de USO: la vista 16 es la misma toma en cuerpo masculino.",
+   "archivo_fondo": "final/efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-puesto-espalda-mujer.prompt.txt"
+  },
+  {
+   "id": "hoodie-23-puesto-frente-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente.",
+   "cuando_usarla": "Asset de USO con una persona mujer de frente. Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-23-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-23-puesto-frente-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-24-puesto-45-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-24-puesto-45-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-24-puesto-45-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-25-puesto-45-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-25-puesto-45-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-25-puesto-45-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-26-puesto-70-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-26-puesto-70-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-26-puesto-70-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-27-puesto-70-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona hombre en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-27-puesto-70-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-27-puesto-70-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-28-puesto-45-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde IZQUIERDO del cuadro (la marca del lado cercano). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-28-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-28-puesto-45-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-29-puesto-45-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer girada 45° con el frente hacia el borde DERECHO del cuadro (la marca en el lado lejano, escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-29-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-29-puesto-45-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-30-puesto-70-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la IZQUIERDA (la marca de cara a cámara, comprimida). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-30-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-30-puesto-70-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-31-puesto-70-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada).",
+   "cuando_usarla": "Asset de USO con una persona mujer en giro profundo (~70°) con el frente hacia la DERECHA (la marca en la curva lejana, muy escorzada). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-31-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-31-puesto-70-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-32-puesto-frente-mano",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: la mano del portador sobre el pecho tapa la mitad de la marca; el resto se ve a su tamaño real.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (mano). Lo pide `tapa: \"mano\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-32-puesto-frente-mano-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-32-puesto-frente-mano.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-33-puesto-frente-mano-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: la mano del portador sobre el pecho tapa la mitad de la marca; el resto se ve a su tamaño real.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (mano). Lo pide `tapa: \"mano\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-33-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-33-puesto-frente-mano-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-34-puesto-frente-brazos",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: brazos cruzados; el antebrazo queda bajo la marca, que se ve entera.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (brazos). Lo pide `tapa: \"brazos\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-34-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-34-puesto-frente-brazos.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-35-puesto-frente-brazos-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: brazos cruzados; el antebrazo queda bajo la marca, que se ve entera.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (brazos). Lo pide `tapa: \"brazos\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-35-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-35-puesto-frente-brazos-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-36-puesto-frente-objeto",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: una tablet sostenida contra el pecho tapa la mitad inferior de la marca.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (objeto). Lo pide `tapa: \"objeto\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-36-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-36-puesto-frente-objeto.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-37-puesto-frente-objeto-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: una tablet sostenida contra el pecho tapa la mitad inferior de la marca.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (objeto). Lo pide `tapa: \"objeto\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-37-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-37-puesto-frente-objeto-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-38-puesto-frente-cruza",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente: un antebrazo con una taza pasa por delante de la marca y tapa su parte inferior izquierda.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (cruza). Lo pide `tapa: \"cruza\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-38-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-38-puesto-frente-cruza.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-39-puesto-frente-cruza-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente: un antebrazo con una taza pasa por delante de la marca y tapa su parte inferior izquierda.",
+   "cuando_usarla": "Asset de USO cuando la escena tapa el pecho (cruza). Lo pide `tapa: \"cruza\"` o lo infiere foto:prompt desde la escena.",
+   "archivo_fondo": "final/efeonce-hoodie-39-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-39-puesto-frente-cruza-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-40-puesto-frente-bajo",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona hombre de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-40-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-40-puesto-frente-bajo.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-41-puesto-frente-bajo-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona mujer de frente con cámara baja mirando hacia arriba (la marca en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-41-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-41-puesto-frente-bajo-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-42-puesto-espalda-45-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-42-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-42-puesto-espalda-45-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-43-puesto-espalda-45-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-43-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-43-puesto-espalda-45-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-44-puesto-espalda-70-izq",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-44-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-44-puesto-espalda-70-izq.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-45-puesto-espalda-70-der",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-45-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-45-puesto-espalda-70-der.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-46-puesto-espalda-bajo",
+   "descripcion": "Puesta, sin rostro, cuerpo masculino, de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona hombre de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-46-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-46-puesto-espalda-bajo.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-47-puesto-espalda-45-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas a tres cuartos, la nariz hacia el borde IZQUIERDO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-47-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-47-puesto-espalda-45-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-48-puesto-espalda-45-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas a tres cuartos, la nariz hacia el borde DERECHO del cuadro (el logotipo trasero escorzado). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-48-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-48-puesto-espalda-45-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-49-puesto-espalda-70-izq-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas en giro profundo, la nariz hacia la IZQUIERDA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-49-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-49-puesto-espalda-70-izq-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-50-puesto-espalda-70-der-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas en giro profundo, la nariz hacia la DERECHA (el logotipo se curva con la espalda). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-50-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-50-puesto-espalda-70-der-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  },
+  {
+   "id": "hoodie-51-puesto-espalda-bajo-mujer",
+   "descripcion": "Puesta, sin rostro, cuerpo femenino, de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo).",
+   "cuando_usarla": "Asset de USO con una persona mujer de espaldas con cámara baja mirando hacia arriba (el logotipo trasero en perspectiva desde abajo). Lo elige foto:prompt por la silueta y la vista de quien la viste.",
+   "archivo_fondo": "final/efeonce-hoodie-51-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png",
+   "resolucion": "1024x1536",
+   "brief": "brief/hoodie-51-puesto-espalda-bajo-mujer.prompt.txt",
+   "corrida": "ai-generations/2026-10-03_uniforme-vistas/"
+  }
+ ],
+ "delta_2026_09_21": "Se agregan las vistas PUESTAS DE ESPALDA EN CUERPO FEMENINO. El kit sólo tenía la espalda puesta en cuerpo masculino, así que para una pieza con una mujer había que elegir entre una vista del ángulo correcto pero del cuerpo equivocado, o ninguna. Generadas con el método del kit: mismo bloque base, mismo contrato de realismo, mismo cierre de estudio, y la estampa canónica como imagen 2 — el texto nunca se le pide al modelo. Detectado por el operador el 2026-09-21.",
+ "delta_2026_10_03": "Vistas puestas por silueta, giro (45° y 70°) y oclusión (mano, brazos, objeto, antebrazo), editadas desde la vista puesta de frente aprobada con el macro del bordado. foto:prompt las elige solo (`elegirPuesta`) e imprime las alternativas. Corrida: ai-generations/2026-10-03_uniforme-vistas/LEEME.md."
 }

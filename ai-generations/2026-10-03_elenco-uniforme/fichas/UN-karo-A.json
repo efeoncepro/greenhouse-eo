@@ -1,0 +1,23 @@
+{
+ "id": "UN-karo-A",
+ "formato": "4:5",
+ "impacto": true,
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "escena": "SCENE: Karo stands in a creative studio with a pale plaster wall, three-quarter length from the head to mid-thigh, body turned slightly, looking into the camera with a confident, natural expression, at the moment her hand straightens the open collar of her jacket. She wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, OPEN, over the deep navy pique polo of the kit, both with their embroidered emblem on the left chest exactly as in the references, with dark jeans. A small azure-blue (#0375DB) notebook rests on a shelf behind, out of focus. Soft window light from the left with gentle fill. 85mm lens at f/2.8, camera at about 2.5 m at chest height.",
+ "lecho": {
+  "objeto": "the dark near edge of a walnut table in the lower foreground",
+  "tono": "DARK near black"
+ }
+}

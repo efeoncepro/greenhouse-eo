@@ -1,0 +1,10 @@
+S01-11-marca-sombra-b exit=0
+S06-11-contenido-scroll-b exit=0
+S03-11-campana-escala-b exit=0
+S04-11-seis-segundos-b exit=0
+S07-11-squad-criterio-b exit=0
+S05-11-runandgun-jornada-b exit=0
+BF3-11-escala-temporada-b exit=0
+BF2-11-squad-refuerzos-b exit=0
+BF1-11-sparks-refuerzos-b exit=0
+S08-11-ia-memoria-b exit=0

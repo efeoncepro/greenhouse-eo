@@ -1,0 +1,11 @@
+  ◐ sombra proyectada incluida: 78 px, 19 niveles más oscura que el plate (--shadow off para dejarla)
+  ✎ máscara de borrado desde 1 capa(s), agrandada 16 px: ./ai-generations/2026-10-03_task-1973-canary/erase-masks/2e974c476cb3.png
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+  ✂ recorte 592x556 en (759, 218) → 1056x992 · la zona con contexto ocupa 20.7 % de la imagen: se genera recortada a 1056x992
+  $ costo estimado ≈ USD 0.013 · 1 × salida 1056x992 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 201/255 · salida USD 0.0126
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, -12 px, escala 0.98): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+    · candidato 1: borrado (cambio en el núcleo 52.15/255)
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/0f254bf9dfa8/manifest.json
+  ⚠ REVISAR (código 3): el objeto parece seguir ahí en todos los candidatos.

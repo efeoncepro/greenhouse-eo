@@ -1,0 +1,126 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "3ba6bf834dae",
+  "key": "3ba6bf834dae3fb5ef332a8a2bb8afe44c648f507c0860e3b7f2bccf0c2c5172",
+  "status": "completed",
+  "createdAt": "2026-10-03T11:54:49.723Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/composed.png",
+    "imageSha256": "245181e31f41c5c0b655e2bd036e6b0a8cfb4bee60d04c2d67388b9d91629dee",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/finish-mask.png",
+    "maskSha256": "d01d201618d3557f8965e54590431d9254de534ce0aa1dca7f2ff69f3b5ca0c3",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:image-apps-relighting",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": null
+  },
+  "request": {
+    "model": "fal-ai/image-apps-v2/relighting",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "natural",
+    "providerPrompt": "natural"
+  },
+  "mask": {
+    "touchedFraction": 0.06631787618001302,
+    "editable": 81306,
+    "soft": 23003,
+    "protected": 1468555
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 33 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.04,
+    "basis": "1 × 1 imagen(es) × USD 0.04"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 31.51,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 8.48,
+        "bestError": 8.48,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        64.69,
+        60.16,
+        35.47
+      ],
+      "protected": {
+        "pixels": 1468555,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 81306,
+        "maxDelta": 183,
+        "meanDelta": 35.927,
+        "worst": {
+          "x": 256,
+          "y": 590
+        }
+      },
+      "seam": {
+        "pixels": 23003,
+        "maxDelta": 75,
+        "meanDelta": 15.897,
+        "worst": {
+          "x": 215,
+          "y": 339
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1468555,
+        "maxDelta": 220,
+        "meanDelta": 42.466,
+        "worst": {
+          "x": 1524,
+          "y": 619
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/image-apps-v2/relighting",
+      "usage": null,
+      "meta": {
+        "requestId": "01a1019e-146c-7aa2-9978-3dee33822f93",
+        "account": "FAL_API_KEY_B"
+      }
+    }
+  ]
+}

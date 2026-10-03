@@ -1009,6 +1009,23 @@ packages/provider-contract + apps/creative-runner → el borde de providers
 
 El **transporte HTTP es una sola surface del servidor**: SDK, MCP y CLI son clientes de él, así que el dispatch por HTTP siempre usa la surface `'http'`; el coverage por-surface (`sdk`/`mcp`/…) se declara en el manifest, no se re-deriva de quién llama.
 
+## Antes de construir una capability creativa en Globe: ¿ya pasó por el CLI? (ADR-024, 2026-10-03)
+
+Regla de secuencia ([ADR-024](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_CLI_FIRST_GRADUATION_DECISION_V1.md)):
+una capacidad creativa se prueba primero en el carril CLI de Greenhouse (`scripts/ai/**`, `scripts/foto/**`), donde
+equivocarse cuesta centavos, y llega a Globe sólo con **cinco requisitos**: canario real documentado, contrato estable
+(flags + manifiesto JSON), defaults elegidos por medición, modos de falla con detector y modelo de costo.
+
+- Se gradúa el **núcleo determinístico** como paquete `@efeoncepro/axis-creative-core` en el repo de AXIS (hogar decidido por el operador el 2026-10-03; sólo Node, `sharp` como peerDependency) que
+  consumen el CLI y Globe. **NUNCA** copies código del CLI a Globe.
+- Los **adapters de proveedor no se gradúan**: Globe acuña el suyo por proveedor (G8, ADR-013) con secreto propio. El
+  adapter del CLI es evidencia del contrato del proveedor (campos, convención de máscara, precios medidos).
+- La evidencia del CLI alimenta golden briefs y rúbricas del Evaluation Harness; **no reemplaza** la evaluación ni la
+  atestación de derechos (ADR-010).
+- Primer candidato: el pipeline de inpainting (`pnpm ai:mask|ai:layers|ai:inpaint`, TASK-1965/1973). Su extracción
+  requiere task bajo EPIC-026/027.
+- Excepción: lo que sólo existe en Globe (tenencia por workspace, entrega y aprobación del cliente, promoción) nace en Globe.
+
 ## Cómo agregar una capability (el flujo que repiten TASK-1457…1480)
 
 Este es el camino exacto. Seguilo; no inventes uno paralelo.

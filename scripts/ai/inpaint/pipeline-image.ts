@@ -31,6 +31,8 @@ export interface ImageInpaintOptions {
   /** Referencias del objeto o elemento a incorporar (imágenes 2..N, después del boceto). */
   referencePaths?: string[]
   prompt: string
+  /** Instrucción interna del modo (expand, erase…) que se agrega DESPUÉS de la guarda de marca: la guarda mira sólo lo que escribe el operador. */
+  promptSuffix?: string
   adapter: InpaintImageAdapter
   model?: string
   quality?: string
@@ -47,6 +49,11 @@ export interface ImageInpaintOptions {
   colorMatch?: 'auto' | 'on' | 'off'
   count?: number
   crop?: CropMode
+  /**
+   * Pasada de detalle: lado largo (px) al que se pide generar la zona recortada. El recorte con contexto la genera a esa
+   * resolución (hasta el tope del proveedor) y la recomposición la devuelve a su lugar.
+   */
+  zoneResolution?: number
   /** Carpeta de la pieza (p. ej. `ai-generations/2026-10-02_mi-pieza`); la corrida vive en `<runRoot>/inpaint/<id>/`. */
   runRoot: string
   dryRun?: boolean
@@ -212,11 +219,13 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (references.length) log(`  ⧉ ${references.length} referencia(s) del objeto`)
 
   const maskWillTravel = adapter.willSendMask?.(params) ?? adapter.sendsMask
-  const zoneGuide = !sketch && !maskWillTravel && (options.guide ?? 'auto') === 'auto'
+  // La guía es una imagen más: sólo va a un adaptador que acepta imágenes extra.
+  const zoneGuide = !sketch && !maskWillTravel && (options.guide ?? 'auto') === 'auto' && adapter.maxExtraImages !== 0
 
   if (zoneGuide) log('  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)')
 
-  const providerPrompt = buildRolePrompt({ prompt: options.prompt, hasSketch: Boolean(sketch), referenceCount: references.length, zoneGuide })
+  const operatorPrompt = options.promptSuffix ? `${options.prompt.trim()} ${options.promptSuffix}` : options.prompt
+  const providerPrompt = buildRolePrompt({ prompt: operatorPrompt, hasSketch: Boolean(sketch), referenceCount: references.length, zoneGuide })
 
   if (mask.width !== base.width || mask.height !== base.height) {
     throw new Error(`La máscara mide ${mask.width}x${mask.height} y la base ${base.width}x${base.height}: deben medir lo mismo (pnpm ai:mask --base).`)
@@ -226,9 +235,24 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
   if (baseMeta.icc) log('  ⚠ la base trae perfil ICC: la salida queda en sRGB (la verificación compara en sRGB).')
   if (!adapter.verifiedAt) log(`  ⚠ ${adapter.id}: contrato verificado, generación real SIN verificar todavía.`)
-  if (!adapter.sendsMask) log(`  · ${adapter.id} edita por instrucción: la máscara no viaja, sólo recompone.`)
+  if (!maskWillTravel) log(`  · ${adapter.id} edita por instrucción: la máscara no viaja, sólo recompone.`)
 
-  const plan = planCrop({ imageWidth: base.width, imageHeight: base.height, maskBox: stats.bbox!, pick: adapter.pickSize(model), mode: options.crop })
+  if (options.zoneResolution !== undefined && !(options.zoneResolution >= 512 && options.zoneResolution <= 4096)) {
+    throw new Error('--zone-resolution debe estar entre 512 y 4096 px.')
+  }
+
+  const plan = planCrop({
+    imageWidth: base.width,
+    imageHeight: base.height,
+    maskBox: stats.bbox!,
+    pick: adapter.pickSize(model),
+    mode: options.zoneResolution ? 'on' : options.crop,
+    ...(options.zoneResolution ? { minTargetArea: options.zoneResolution * options.zoneResolution } : {})
+  })
+
+  if (options.zoneResolution && Math.max(plan.target.width, plan.target.height) < options.zoneResolution * 0.9) {
+    log(`  ⚠ el proveedor topa la zona en ${plan.target.width}x${plan.target.height}, bajo los ${options.zoneResolution} px pedidos.`)
+  }
 
   log(`  ✂ ${plan.mode === 'crop' ? `recorte ${plan.box.width}x${plan.box.height} en (${plan.box.left}, ${plan.box.top})` : 'imagen completa'} → ${plan.target.width}x${plan.target.height} · ${plan.reason}`)
 
@@ -255,7 +279,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       guide: zoneGuide,
       growMask: !options.maskPath && sketch ? options.growMask ?? 'auto' : null,
       count,
-      crop: { box: plan.box, target: plan.target }
+      crop: { box: plan.box, target: plan.target },
+      zoneResolution: options.zoneResolution ?? null
     })
   )
 

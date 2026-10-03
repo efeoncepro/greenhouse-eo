@@ -1,0 +1,138 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "766c2c81017a",
+  "key": "766c2c81017a38c7940d7d4c5961c0d8dd788feacffce33ffff1175d5922031a",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:19:33.820Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/erase-masks/16517e2114d0.png",
+    "maskSha256": "a10d2fbe912511aa0de9612e79d5e9e69d68baa3a2bfe946b9b3f2f6c70ef443",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "plate",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": null
+  },
+  "request": {
+    "model": "clean-plate",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.",
+    "providerPrompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects."
+  },
+  "mask": {
+    "touchedFraction": 0.03792635599772135,
+    "editable": 40385,
+    "soft": 19268,
+    "protected": 1513211
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0,
+    "basis": "clean plate local (00-base.png + capas restantes); sin proveedor"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 43.924,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.66,
+        "bestError": 2.66,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        8.8,
+        8.24,
+        9.3
+      ],
+      "protected": {
+        "pixels": 1513211,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 40385,
+        "maxDelta": 190,
+        "meanDelta": 61.566,
+        "worst": {
+          "x": 964,
+          "y": 587
+        }
+      },
+      "seam": {
+        "pixels": 19268,
+        "maxDelta": 154,
+        "meanDelta": 6.948,
+        "worst": {
+          "x": 956,
+          "y": 587
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1513211,
+        "maxDelta": 217,
+        "meanDelta": 9.194,
+        "worst": {
+          "x": 1211,
+          "y": 734
+        }
+      },
+      "outputUsd": 0,
+      "providerModel": "clean-plate",
+      "usage": null,
+      "meta": {
+        "source": "00-base.png + capas restantes"
+      }
+    }
+  ],
+  "erase": {
+    "fill": "plate",
+    "layers": [
+      "mug"
+    ],
+    "erasure": [
+      {
+        "changeInCore": 51.08,
+        "corePixels": 40385,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

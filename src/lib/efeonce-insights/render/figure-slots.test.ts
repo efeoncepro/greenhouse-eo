@@ -213,7 +213,151 @@ describe('una sola regla de variación: triángulo = valor, tono = mejor o peor'
   it('sin dirección declarada, tono neutro (nunca adivinado); sin cambio, plano', async () => {
     const { trendOf } = await import('./figure-slots')
 
-    expect(trendOf(9377, 10662, f({ metricId: 'clicks', unit: 'count' }), []).value).toBe('down:neutral')
+    expect(trendOf(9377, 10662, f({ metricId: 'delivered.completed', unit: 'count' }), []).value).toBe('down:neutral')
+    // Con dirección declarada por métrica (TASK-1974), los clics que bajan son peor.
+    expect(trendOf(9377, 10662, f({ metricId: 'clicks', unit: 'count' }), []).value).toBe('down:worse')
     expect(trendOf(3, 3, f({}), []).value).toBe('flat:neutral')
+  })
+})
+
+// ─── TASK-1975 — figuras del criterio con página PDF ─────────────────────────────────────────────
+
+describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
+  const spec = (overrides: Record<string, unknown>) => ({
+    specVersion: 'chart_spec_v1', chartId: 'chart.x', relation: 'composition', title: 'Figura', unit: 'count', series: [],
+    dimensionLabels: [], references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+    ...overrides
+  }) as never
+
+  const facts = (entries: Array<[string, number | null, string?]>) =>
+    new Map(entries.map(([factId, value, unit]) => [factId, { factId, value, unit: unit ?? 'count', label: factId, metricId: factId, module: 'seo', evidenceRef: 'e' }])) as never
+
+  const waterfall = (steps: Array<[string, boolean]>) =>
+    spec({ chartId: 'chart.seo.drivers.query', family: 'waterfall', relation: 'decomposition', data: { kind: 'waterfall', steps: steps.map(([factId, isTotal]) => ({ stepId: factId, label: factId, factId, isTotal })) } })
+
+  it('cascada que cuadra: totales, pasos con signo y leyenda con «Restó» sólo si algo restó', async () => {
+    const { hasFigurePage } = await import('./figure-slots')
+    const chart = waterfall([['julio', true], ['servicios', false], ['home', false], ['agosto', true]])
+    const byId = facts([['julio', 1102], ['servicios', 96], ['home', -23], ['agosto', 1175]])
+    const [slide] = buildFigureSlides(chart, byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.kind).toBe('waterfall')
+    expect(slide!.keyFigure).toBe('+73')
+    expect((slide!.body as { waterfallSteps: unknown[] }).waterfallSteps).toEqual([
+      { label: 'julio', value: '1.102', kind: 'start' },
+      { label: 'servicios', value: '+96', kind: 'add' },
+      { label: 'home', value: '−23', kind: 'remove' },
+      { label: 'agosto', value: '1.175', kind: 'end' }
+    ])
+    expect((slide!.body as { legend: { removed?: string } }).legend.removed).toBe('Restó')
+    expect(hasFigurePage(chart, byId)).toBe(true)
+  })
+
+  it('una cascada que no cuadra se rechaza con causa (caso Berel alterado)', () => {
+    const chart = waterfall([['julio', true], ['servicios', false], ['home', false], ['agosto', true]])
+
+    expect(() => buildFigureSlides(chart, facts([['julio', 1102], ['servicios', 96], ['home', -23], ['agosto', 1290]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report))
+      .toThrow(/no cuadra: 1\.102 \+ 96 − 23 ≠ 1\.290/)
+  })
+
+  it('una cascada con más pasos que la capacidad no se emite (nunca se pagina)', () => {
+    const steps: Array<[string, boolean]> = [['a', true], ...Array.from({ length: 7 }, (_, i) => [`s${i}`, false] as [string, boolean]), ['z', true]]
+    const byId = facts([['a', 10], ...Array.from({ length: 7 }, (_, i) => [`s${i}`, 1] as [string, number]), ['z', 17]])
+
+    expect(buildFigureSlides(waterfall(steps), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toHaveLength(1)
+    expect(buildFigureSlides(waterfall(steps), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.deck)).toEqual([])
+  })
+
+  const waffle = (ids: string[], totalFactId: string | null = null) =>
+    spec({ chartId: 'chart.aeo.waffle.sentiment', family: 'waffle', data: { kind: 'waffle', parts: ids.map(id => ({ partId: id, label: id, factId: id })), totalFactId } })
+
+  it('waffle de 8 respuestas: cuentas por parte y nota de qué es un cuadro', () => {
+    const [slide] = buildFigureSlides(waffle(['positivas', 'neutras']), facts([['positivas', 5], ['neutras', 3]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.body).toMatchObject({ waffleParts: [{ label: 'positivas', count: '5' }, { label: 'neutras', count: '3' }], note: { text: 'Cada cuadro es una unidad; el total es 8.' } })
+  })
+
+  it('waffle de más de 100 unidades, con conteos no enteros o con más de 4 partes no se emite; total declarado que no cuadra se rechaza', () => {
+    expect(buildFigureSlides(waffle(['a', 'b']), facts([['a', 80], ['b', 21]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+    expect(buildFigureSlides(waffle(['a', 'b']), facts([['a', 1.5], ['b', 2]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+    expect(buildFigureSlides(waffle(['a', 'b', 'c', 'd', 'e']), facts([['a', 1], ['b', 1], ['c', 1], ['d', 1], ['e', 1]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+    expect(() => buildFigureSlides(waffle(['a', 'b'], 't'), facts([['a', 5], ['b', 3], ['t', 9]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toThrow(/no suma su total/)
+  })
+
+  const donut = (ids: string[]) =>
+    spec({ chartId: 'chart.aeo.donut.ai-source', family: 'donut', dimensionLabels: ids, series: [{ seriesId: 'parts', label: 'p', factIds: ids, unit: 'count' }] })
+
+  it('dona: participación por restos mayores que suma 100; centro = total sin tarjeta, parte principal con tarjeta', () => {
+    const byId = facts([['chatgpt', 19], ['gemini', 12], ['otros', 19], ['ai_sessions', 50]])
+    const [plain] = buildFigureSlides(donut(['chatgpt', 'gemini', 'otros']), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect((plain!.body as { donutParts: Array<{ share: string }> }).donutParts.map(part => part.share)).toEqual(['38 %', '24 %', '38 %'])
+    expect((plain!.body as { donutCenter: unknown }).donutCenter).toEqual({ value: '50', label: 'en total' })
+
+    const [carded] = buildFigureSlides(donut(['chatgpt', 'gemini', 'otros']), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report, { statFactIds: new Set(['ai_sessions']) })
+
+    expect((carded!.body as { donutCenter: unknown }).donutCenter).toEqual({ value: '38 %', label: 'chatgpt' })
+  })
+
+  it('una dona con 1 parte o con más de 3 no se emite', () => {
+    expect(buildFigureSlides(donut(['a']), facts([['a', 3]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+    expect(buildFigureSlides(donut(['a', 'b', 'c', 'd']), facts([['a', 1], ['b', 1], ['c', 1], ['d', 1]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+  })
+
+  it('apiladas: segmento base abajo, total por período, participación base y anotación de la variación base', () => {
+    const chart = spec({
+      chartId: 'chart.seo.stacked.site-engagement', family: 'bar_stacked', dimensionLabels: ['agosto de 2026', 'septiembre de 2026'],
+      series: [
+        { seriesId: 'engaged', label: 'Con interacción', factIds: ['e0', 'e1'], unit: 'count' },
+        { seriesId: 'unengaged', label: 'Sin interacción', factIds: ['u0', 'u1'], unit: 'count' }
+      ]
+    })
+
+    const [slide] = buildFigureSlides(chart, facts([['e0', 530], ['u0', 490], ['e1', 772], ['u1', 512]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.keyFigure).toBe('772')
+    expect((slide!.body as { stackedPeriods: unknown }).stackedPeriods).toEqual([
+      { label: 'agosto de 2026', segments: ['530', '490'], total: '1.020', baseShare: '52 % con interacción' },
+      { label: 'septiembre de 2026', segments: ['772', '512'], total: '1.284', baseShare: '60 % con interacción' }
+    ])
+    expect((slide!.body as { stackedAnnotation: { direction: string } }).stackedAnnotation.direction).toBe('up')
+  })
+
+  it('cifras: sin cifra principal; valor, prefijo y sufijo separados; «Menor es mejor» invierte el tono; sin dato es «—», nunca 0', async () => {
+    const { buildStatSlides } = await import('./figure-slots')
+
+    const byId = new Map([
+      ['pos', { factId: 'pos', value: 6.9, unit: 'position', label: 'Posición', metricId: 'position', module: 'seo', evidenceRef: 'e', comparisonFactId: 'pos.prev', window: { start: '2026-09-01', endExclusive: '2026-10-01' } }],
+      ['pos.prev', { factId: 'pos.prev', value: 5.7, unit: 'position', label: 'Posición', metricId: 'position', module: 'seo', evidenceRef: 'e', window: { start: '2026-08-01', endExclusive: '2026-09-01' } }],
+      ['etv', { factId: 'etv', value: null, unit: 'count', label: 'Tráfico', metricId: 'organic_etv', module: 'seo', evidenceRef: 'e', window: { start: '2026-09-01', endExclusive: '2026-10-01' } }]
+    ]) as never
+
+    const stat = {
+      figureId: 'stats.seo', question: 'value_change', title: 'Cifras del período',
+      note: { claimId: 'n', text: 'El tráfico estimado se calcula con la posición y el volumen.', factIds: [] },
+      items: [
+        { itemId: 'pos', label: 'Posición media', factId: 'pos', comparisonFactId: 'pos.prev', direction: 'lower_is_better', estimated: false },
+        { itemId: 'etv', label: 'Tráfico estimado', factId: 'etv', comparisonFactId: null, direction: 'higher_is_better', estimated: true }
+      ]
+    } as never
+
+    const [slide] = buildStatSlides(stat, byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+    const items = (slide!.body as { statItems: Array<Record<string, string>> }).statItems
+
+    expect(slide!.keyFigure).toBeNull()
+    // La nota es una afirmación del plan: se imprime su texto, nunca el objeto.
+    expect((slide!.body as { note: { text: string } }).note.text).toBe('El tráfico estimado se calcula con la posición y el volumen.')
+    expect(items[0]).toMatchObject({ name: 'Posición media', prefix: '#', value: '6,9', trend: 'up:worse', lowerIsBetter: 'Menor es mejor' })
+    expect(items[0]!.versus).toMatch(/^vs <strong>#5,7<\/strong> en /)
+    expect(items[1]).toMatchObject({ name: 'Tráfico estimado', estimated: 'Estimado', value: '—' })
+    expect(items[1]!.noData).toMatch(/^Sin dato en /)
+  })
+
+  it('un nombre de cifra de más de 3 palabras se rechaza con causa, nunca se trunca', async () => {
+    const { buildStatSlides } = await import('./figure-slots')
+    const byId = new Map([['c', { factId: 'c', value: 3, unit: 'count', label: 'c', metricId: 'clicks', module: 'seo', evidenceRef: 'e' }]]) as never
+    const stat = { figureId: 's', question: 'value_change', title: 't', items: [{ itemId: 'c', label: 'Tráfico orgánico estimado mensual', factId: 'c', comparisonFactId: null, direction: null, estimated: false }] } as never
+
+    expect(() => buildStatSlides(stat, byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toThrow(/4 palabras/)
   })
 })

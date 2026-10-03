@@ -2,6 +2,8 @@
 
 ## Estado vigente para agentes
 
+Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
+
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Actualización documental reciente
@@ -197,7 +199,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo crear o auditar publicidad/social con texto o selección colaborativa | `docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md` + [Creative Typography Workbench público](https://axis.efeonce.org/references/creative-typography/) + skill espejo `efeonce-advertising-creative`; AXIS `0.2.5` posee `axisAdvertising`/`efeonce.advertising-typography` (`trial`) y `efeonce.collaboration-selection` (`candidate`) + manifest agent-facing. Versión fijada; `pnpm creative:layout`: tagline, `headline|support|hook|lockup` y URL Bubble con blend raster `luminosity`; sin adapter: `pending adapter`. CTA color: `docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md` §20. Para social compone con `social-media-studio`; producir/revisar no autoriza publicar. MCP no sirve este manual mientras no exista una tool creativa federada real. |
 | Qué tipografías y firma de marca usan las seasonalities Efeonce | UI: `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; guía de publicidad/social: `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md`; casos auditados y límites de peso/interlineado: `.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md`; seasonalities: Bricolage display + Poppins apoyo, con Guttery sólo como gesto breve y con atribución oficial o activo distintivo validado; assets y skills: `src/assets/fonts/BricolageGrotesque-Variable.ttf` + `BricolageGrotesque-SOURCE.md` + `efeonce-advertising-creative`/`social-media-studio`/`design-studio`/`greenhouse-ai-image-generator` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
-| Video | Motion/Audio: companions; CDR-008 |
+| Video | Motion/Audio: companions; CDR-008; ADR-025 |
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera aparte con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto; validar modelado, filtros, browser, permisos y sharing en sus references |
 | Modelos Efeonce: Group, Media, Growth, AEO y Search Visibility 360 | [ADR AEO](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) + `docs/business-models/README.md` |

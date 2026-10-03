@@ -40,8 +40,9 @@ aprobadas como deuda sintética quedan superadas por esta confirmación.
   línea de luz en el borde superior; los ojos se ven a través. **Sólo ella y sólo en cine**: `foto:prompt` aborta en
   cualquier otro caso. Es un sexto contexto de vestuario, pero va por `objetos` y no por `vestuario`, igual que la
   ropa con marca (§1).
-- **Las 12 expresiones fotográficas entran al catálogo** (tabla en §1). Existían en disco y ninguna ficha podía
-  pedirlas, así que casi todas caían en el gesto por defecto.
+- **Las 12 expresiones fotográficas entran al catálogo**. Existían en disco y ninguna ficha podía pedirlas, así que
+  casi todas caían en el gesto por defecto. *(Superado el 2026-10-03: esas 12, de tres cuartos, quedan como histórico;
+  el catálogo apunta a 25 casi de frente —ver el delta siguiente y la tabla de §1—.)*
 - **La pose sale de la escena, no de la referencia** **[medido, A/B `NX7d`→`NX7g`]**. Las 12 comparten el **mismo
   tres cuartos** del ancla (se editaron desde ella): copiadas enteras arrastraban también el giro (`NX7f`, con
   `conviccion`, no cambió nada). Hoy la referencia de expresión aporta sólo ojos, cejas y boca; el ángulo se pide con
@@ -50,6 +51,42 @@ aprobadas como deuda sintética quedan superadas por esta confirmación.
 - **Aretes dorados en el traje, aprobados** **[decisión del operador, 2026-10-02]**: en las vistas puestas del kit los
   aretes salieron dorados, como en las anclas, aunque §5.1 los pide de plata. El operador aprobó las vistas así. No
   cambia §5.1 ni el bloque `accesorios`; es la misma brecha de las anclas que registra §2.
+
+## Delta 2026-10-03 — 25 expresiones casi de frente, ancla frontal v2 y proporción del rostro
+
+**La pose repetida, cerrada de raíz** **[medido · operador, 2026-10-03]**. Aun con la corrección del 2026-10-02 Nexa
+seguía saliendo *«con la misma pose de nuevo, volteando la cara»*. Causa: las 12 expresiones de `5-expresiones/` se
+editaron desde el ancla en tres cuartos (todas con el mismo giro) y entraban **primeras** cuando la ficha pedía
+`expresion`; como `foto:prompt` avisa si falta, casi todas la pedían. Arreglo en `foto:prompt`: el **ancla frontal va
+siempre primera** y la expresión detrás, sólo para el gesto (con `vista` + `expresion`, la vista primero y después la
+expresión y el ancla frontal); en dupla y en grupo la expresión no viaja y el gesto lo da la escena. Validado: `VP1` gira a
+la derecha cuando la escena lo pide; `VP2` sale de frente. Orden completo en
+[personas, delta 2026-10-03](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro).
+
+**La cara afinada: ancla frontal v2** **[medido con Vision]**. Operador: *«le alarga o achata la cara al ancho,
+poniéndola excesivamente fina»*. El ancla frontal aprobada era **4–5 % más estrecha** que el resto del canon. La
+referencia frontal pasa a ser `1-anclas/nexa-ancla-1-rostro-frontal-v2.png`: la aprobada **estirada ×1,037 en
+horizontal, sin modelo** (nada se regeneró: no hay riesgo de deriva de identidad). La aprobada queda en disco como
+histórico.
+
+**Geometría del rostro en el bloque IDENTITY** (verbatim): *«Her face is a SOFT OVAL, a little wider than it is long from
+the eyes down: the width across the cheekbones is about 1.2 times the distance from the eyes to the chin — never a
+narrow, elongated or slimmed face, never a sharpened jaw.»* Y el canon medible: `PERSONAS.nexa.rostro = { largoAncho:
+0.81, tolerancia: 0.02 }`, donde largo/ancho = (ojos → mentón) / ancho del contorno de la mandíbula. Calibrado con el
+medidor final (`pnpm foto:rostro`): el ancla de cuerpo y las portadas aprobadas miden 0,79–0,82; el ancla vieja, 0,836; la
+v2, 0,816.
+
+**25 expresiones casi de frente, aprobadas por el operador** (*«aprobadas todas»*), en
+`_identidad-nexa/5-expresiones-frente/` (tabla en §1). **Método A2**: el ancla frontal v2 + la **causa** de la expresión
+(qué le pasa, no qué músculos mueve), la cabeza libre de hacer su movimiento natural, intensidad cotidiana, la receta de
+piel v3 y la geometría del rostro. **Intento rechazado**: frente estricto con marcadores musculares; operador: *«se ven muy
+IA, rasgos muy ficticios; Nexa debe tener sí o sí rasgos reales»*. Las de tres cuartos de `5-expresiones/` quedan en disco
+como histórico; las ocho del Bible (`3-poses/`) siguen vigentes.
+
+**Sumar una expresión nueva:** método A2 → medirla con `pnpm foto:rostro <png> --persona nexa` → copiarla a
+`_identidad-nexa/5-expresiones-frente/nexa-expr-NN-<clave>.png` → entrada en `expresiones` de `PERSONAS.nexa`
+(`scripts/foto/build-prompt.mjs`) → `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run
+scripts/foto` → nota en el `LEEME` de `_identidad-nexa`.
 
 ## 1. Mapeo — nombre del Bible → referencia del repo
 
@@ -67,8 +104,9 @@ pnpm foto:prompt <ficha.json>
 { "identidad": [{ "persona": "nexa", "vista": "perfil-izq" }] }
 ```
 
-Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone— así que pedir dos aborta, **salvo**
-`vista` + `expresion` con una persona sola (desde el 2026-10-02 conviven: con una persona sola en la toma, `vista` + `expresion` juntas — el ángulo de la vista y el gesto de la expresión; medido en `NX7j`).
+Las tres dimensiones ocupan **la misma ranura** así que pedir dos aborta, **salvo** `vista` + `expresion` con una persona
+sola (el ángulo de la vista y el gesto de la expresión; medido en `NX7j`). Desde el 2026-10-03 la expresión nunca va
+primera: entra detrás del ancla frontal v2 y, en dupla o en grupo, no viaja.
 
 ### Las ocho expresiones canónicas (Bible §6)
 
@@ -85,29 +123,46 @@ Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone
 
 Las ocho son **planos medios**: ninguna es de cuerpo entero.
 
-### Las 12 expresiones fotográficas (desde 2026-10-02)
+### Las 25 expresiones fotográficas casi de frente (desde 2026-10-03)
 
-Viven en `ai-generations/_identidad-nexa/5-expresiones/` con el acabado de las anclas (no el sintético de `3-poses/`)
-y se piden igual, con `expresion`.
+Viven en `ai-generations/_identidad-nexa/5-expresiones-frente/` con el acabado de las anclas (no el sintético de
+`3-poses/`) y se piden con `expresion`: `{ "persona": "nexa", "expresion": "<clave>" }`. Archivo:
+`5-expresiones-frente/nexa-expr-NN-<clave>.png` (la 06 es `nexa-expr-06-neutra-reposo.png`). Las 12 primeras reemplazan
+a las de tres cuartos del 2026-10-02 con las mismas claves; las 13 siguientes se sumaron el mismo día. Las cuatro
+familias de uso son las de la sesión; la columna «cuándo» de las doce de base glosa su nombre.
 
-| `expresion` | Archivo |
-|---|---|
-| `carcajada` | `5-expresiones/nexa-expr-01-carcajada.png` |
-| `risa-elegante` | `5-expresiones/nexa-expr-02-risa-elegante.png` |
-| `sorprendida` | `5-expresiones/nexa-expr-03-sorprendida.png` |
-| `esceptica` | `5-expresiones/nexa-expr-04-esceptica.png` |
-| `pensativa` | `5-expresiones/nexa-expr-05-pensativa.png` |
-| `neutra` | `5-expresiones/nexa-expr-06-neutra-reposo.png` |
-| `preocupada` | `5-expresiones/nexa-expr-07-preocupada.png` |
-| `conviccion` | `5-expresiones/nexa-expr-08-conviccion.png` |
-| `escucha-empatica` | `5-expresiones/nexa-expr-09-escucha-empatica.png` |
-| `curiosa` | `5-expresiones/nexa-expr-10-curiosa.png` |
-| `complicidad` | `5-expresiones/nexa-expr-11-complicidad.png` |
-| `mirada-lateral` | `5-expresiones/nexa-expr-12-mirada-lateral.png` |
+| NN | `expresion` | Familia | Cuándo usarla |
+|---|---|---|---|
+| 01 | `carcajada` | base | risa abierta, el momento más suelto |
+| 02 | `risa-elegante` | base | risa contenida, en un registro más formal |
+| 03 | `sorprendida` | base | descubrir algo inesperado |
+| 04 | `esceptica` | base | dudar de una afirmación o de un dato |
+| 05 | `pensativa` | base | evaluar antes de decidir |
+| 06 | `neutra` | base | reposo, sin gesto marcado |
+| 07 | `preocupada` | base | inquietud ante un riesgo |
+| 08 | `conviccion` | base | sostener una idea con seguridad |
+| 09 | `escucha-empatica` | base | escuchar a otra persona |
+| 10 | `curiosa` | base | interés por algo nuevo |
+| 11 | `complicidad` | base | gesto compartido con quien mira |
+| 12 | `mirada-lateral` | social | mira a la **derecha** del cuadro |
+| 13 | `euforia` | éxito | cabeza atrás, puños arriba |
+| 14 | `alivio` | éxito | el problema quedó resuelto |
+| 15 | `orgullo-sereno` | éxito | logro sin estridencia |
+| 16 | `te-lo-dije` | éxito | se confirmó lo que anticipó |
+| 17 | `hartazgo` | el «antes» del problema | ojos en blanco; `foto:rostro` la mide ≈ +0,03 sin estar afinada: mirarla a ojo |
+| 18 | `agobio` | el «antes» del problema | sobrecarga |
+| 19 | `alarma` | el «antes» del problema | algo salió mal |
+| 20 | `confusion` | el «antes» del problema | no entiende lo que ve |
+| 21 | `concentracion` | foco | trabajo profundo |
+| 22 | `determinacion` | foco | decidida a resolver |
+| 23 | `explicando` | foco | explica a otros |
+| 24 | `bienvenida` | social | recibe a alguien |
+| 25 | `mirada-lateral-izq` | social | mira a la **izquierda** del cuadro |
 
-🔴 **Las 12 comparten el mismo tres cuartos del ancla.** `foto:prompt` les pide al modelo copiar sólo el gesto (ojos,
-cejas y boca), nunca el giro ni la inclinación; la pose la describe la escena y el ángulo se pide con `vista`. Si una
-ficha trae a Nexa sin `expresion` ni `vista`, el comando avisa: sale con el gesto por defecto y la serie se repite.
+🔴 **La expresión aporta sólo el gesto** (ojos, cejas y boca): `foto:prompt` le pide al modelo no copiar su giro ni su
+inclinación; la pose la describe la escena y el ángulo se pide con `vista`. Si una ficha trae a Nexa sin `expresion` ni
+`vista`, el comando avisa: sale con el gesto por defecto y la serie se repite. Las 12 de tres cuartos de
+`5-expresiones/` quedan en disco como histórico y no se piden.
 
 ### Los cinco contextos de vestuario (Bible §5.3)
 
@@ -255,7 +310,8 @@ set fotorrealista de polera gris aprobado por el operador. La tabla de pendiente
 poses y vestuario; no debe usarse para sustituir la identidad fotográfica confirmada.
 
 ```bash
-pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 149 assets al escribir esto; 378 al 2026-10-02
+pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 149 assets al escribir esto; 378 al 2026-10-02; 550 al 2026-10-03
+pnpm foto:rostro ai-generations/_identidad-nexa/5-expresiones-frente/*.png --persona nexa   # proporción contra 0,81 ± 0,02
 pnpm vitest run scripts/foto/build-prompt.test.ts
 ```
 

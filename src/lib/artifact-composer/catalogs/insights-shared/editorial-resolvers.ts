@@ -81,7 +81,8 @@ export const clientLogoEffects = (value: string): FieldEffect[] | null => {
  * trae el set completo (`.i-<clave>`) y el resolver deja sólo el pedido. Sin clave, el nodo se quita:
  * una métrica sin ícono propio no recibe uno ajeno. Una clave desconocida falla cerrado.
  */
-export const FIGURE_ICON_KEYS = ['bars', 'clicks', 'impressions', 'ctr', 'search', 'target', 'link', 'trend'] as const
+// TASK-1975 — `steps` (cascada), `grid` (waffle), `donut`, `layers` (apiladas) y `numbers` (cifras).
+export const FIGURE_ICON_KEYS = ['bars', 'clicks', 'impressions', 'ctr', 'search', 'target', 'link', 'trend', 'steps', 'grid', 'donut', 'layers', 'numbers'] as const
 
 export const iconEffects = (value: string): FieldEffect[] | null => {
   if (isAbsent(value)) return [{ selector: ':field', remove: true }]
@@ -99,21 +100,30 @@ export const iconEffects = (value: string): FieldEffect[] | null => {
  */
 export const DELTA_VALUES = ['up', 'down', 'flat', 'up:better', 'up:worse', 'up:neutral', 'down:better', 'down:worse', 'down:neutral', 'flat:neutral'] as const
 
-export const parseDelta = (value: string): { direction: 'up' | 'down' | 'flat'; better: boolean } | null => {
+export const parseDelta = (value: string): { direction: 'up' | 'down' | 'flat'; better: boolean; tone: 'better' | 'worse' | 'neutral' } | null => {
   if (!(DELTA_VALUES as readonly string[]).includes(value)) return null
 
-  const [direction, tone] = value.split(':') as ['up' | 'down' | 'flat', string | undefined]
+  const [direction, declared] = value.split(':') as ['up' | 'down' | 'flat', 'better' | 'worse' | 'neutral' | undefined]
+  // Sin tono declarado se lee como el canvas de TASK-1889: subir es mejor; bajar, neutro (nunca rojo adivinado).
+  const tone = declared ?? (direction === 'up' ? 'better' : 'neutral')
 
-  return { direction, better: tone ? tone === 'better' : direction === 'up' }
+  return { direction, better: tone === 'better', tone }
 }
 
+/** TASK-1975 — clase de la píldora por tono semántico: verde mejor, rojo peor, gris neutro. */
+const DELTA_TONE_CLASS = { better: 'delta--better', worse: 'delta--worse', neutral: 'delta--plain' } as const
+const DELTA_TONE_GROUP = ['delta--better', 'delta--worse', 'delta--plain']
+
 export const deltaToneEffects = (value: string): FieldEffect[] | null => {
+  // TASK-1975 — una cifra sin anterior o sin dato no trae variación: sin `trend` no hay píldora (nunca una inventada).
+  if (isAbsent(value)) return [{ selector: ':field', remove: true }]
+
   const parsed = parseDelta(value)
 
   if (!parsed) return null
 
   const effects: FieldEffect[] = [
-    { selector: ':field', toneClass: parsed.better ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] }
+    { selector: ':field', toneClass: DELTA_TONE_CLASS[parsed.tone], toneGroup: DELTA_TONE_GROUP }
   ]
 
   if (parsed.direction !== 'up') effects.push({ selector: '.delta-mark-up', remove: true })
@@ -157,7 +167,10 @@ export const pairBarsEffects = (item: Record<string, unknown>): FieldEffect[] =>
  * de la píldora sale de si se alcanzó.
  */
 export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<string, unknown>): FieldEffect[] | null => {
-  const lowerIsBetter = slots.bulletDirection === 'lower_is_better'
+  // TASK-1974 — cada fila puede declarar su dirección (una figura junta metas que mejoran al subir y al bajar); sin ella,
+  // la de la figura.
+  const directionOf = (row: Record<string, unknown>) => (row.direction === 'lower_is_better' || row.direction === 'higher_is_better' ? row.direction : slots.bulletDirection)
+  const lowerIsBetter = directionOf(item) === 'lower_is_better'
   const value = parsePrintedNumber(item.value)
   const target = parsePrintedNumber(item.target)
 
@@ -169,8 +182,8 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
 
     if (v === null || t === null || t <= 0) return null
 
-    // Brecha normalizada: > 1 = no alcanzó (en la dirección que empeora).
-    return lowerIsBetter ? v / t : t / Math.max(v, 1e-9)
+    // Brecha normalizada: > 1 = no alcanzó (en la dirección que empeora de ESA fila).
+    return directionOf(row) === 'lower_is_better' ? v / t : t / Math.max(v, 1e-9)
   }
 
   const rows = Array.isArray(slots.bulletRows) ? (slots.bulletRows as Record<string, unknown>[]) : []
@@ -188,8 +201,11 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
     { selector: ':self', styleProp: '--achieved', styleValue: `${((value / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--target', styleValue: `${((target / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--zone', styleValue: band === null ? '0%' : `${((band / scale) * 100).toFixed(1)}%` },
-    { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] },
-    { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
+    // Meta alcanzada = mejor (verde); no alcanzada = peor (rojo) — tonos semánticos de TASK-1975.
+    { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--worse', toneGroup: DELTA_TONE_GROUP },
+    // El triángulo dice dónde quedó el valor respecto de la meta (▲ sobre, ▼ bajo); el tono, si eso es bueno. Con «menos
+    // es mejor» (RpA, rondas) cumplir es quedar BAJO la meta: ▼ en verde, nunca un ▲ que sugiera lo contrario.
+    { selector: value >= target ? '.delta-mark-down' : '.delta-mark-up', remove: true }
   ]
 
   // Más oscuro = peor (Few): con «menos es mejor» la zona crítica queda SOBRE el límite, no bajo él.
@@ -205,6 +221,18 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
   [`${prefix}-channel-isotype`]: {
     known: [...Object.keys(CHANNEL_ISOTYPES), '<cualquier otro: nombre sin isotipo>'],
     build: value => channelIsotypeEffects(value)
+  },
+  /**
+   * Tarjeta de cifra con isotipo (contrato AXIS efeonce.insights-stat-card 0.2.0): el campo es el disco de la celda;
+   * su `<img>` toma el isotipo de la plataforma. Plataforma sin isotipo conocido: se quita el disco y queda el nombre.
+   */
+  [`${prefix}-stat-channel`]: {
+    known: [...Object.keys(CHANNEL_ISOTYPES), '<cualquier otra: nombre sin isotipo>'],
+    build: value => {
+      const isotype = CHANNEL_ISOTYPES[value]
+
+      return isotype ? [{ selector: '.channel-disc img', attr: 'src', value: isotype }] : [{ selector: '.channel-disc', remove: true }]
+    }
   },
   /** Ordinal de un ítem (`01`, `02`…): sale de su posición, el autor no lo escribe. */
   [`${prefix}-ordinal`]: {

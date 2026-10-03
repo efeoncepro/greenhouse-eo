@@ -1,0 +1,9 @@
+  ✎ fondo = inverso del sujeto (capas), borde rehecho 3 px
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+  ✂ imagen completa → 1536x1024 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.010 · 1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 99/255 · salida USD 0.0103
+    ⚠ el modelo movió la zona protegida en promedio 17.9/255: mira la unión al 100 %.
+    · costura en el borde del sujeto: delta medio 10.581/255 en 15573 px (míralo al 100 %)
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/a673458bc672/manifest.json

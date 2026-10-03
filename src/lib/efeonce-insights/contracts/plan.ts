@@ -64,11 +64,52 @@ export interface PlanFigureReadingV1 {
   nextStep: PlanClaimV1 | null
 }
 
+/** TASK-1974 — de qué lado está «mejor» en una métrica; null = desconocido (la variación se pinta neutra). */
+export type PlanStatDirection = 'higher_is_better' | 'lower_is_better'
+
+/** TASK-1974 — nombre de una cifra: 3 palabras y 24 caracteres como máximo (anatomía aprobada, criterio §5.1). */
+export const STAT_LABEL_MAX_WORDS = 3
+export const STAT_LABEL_MAX_CHARS = 24
+
+/**
+ * TASK-1974 — una cifra de la tarjeta (criterio §5.1). El valor y su unidad salen del hecho (`formatFactValue`); la
+ * variación, de su comparable. Nada se escribe a mano: el validador exige que `comparisonFactId` sea el del hecho y que
+ * `estimated` diga lo mismo que su observación.
+ */
+export interface PlanStatItemV1 {
+  itemId: string
+  /** Nombre corto de la métrica («Clics», «Tráfico estimado»). Nunca se trunca: si no cabe, el plan no es válido. */
+  label: string
+  factId: string
+  /** Comparable del hecho (período anterior); null = la tarjeta va sin variación ni «vs». */
+  comparisonFactId: string | null
+  direction: PlanStatDirection | null
+  /** El hecho es estimado por la fuente («Estimado» junto al nombre). */
+  estimated: boolean
+}
+
+/**
+ * TASK-1974 — la tarjeta de cifra: la figura de la pregunta «¿cuánto es y cómo cambió?». NO es una de las 15 familias
+ * de gráfico (`ChartSpecV1`): vive aparte, en `chapter.stats`, y abre el capítulo (criterio §5.2). Su lectura usa
+ * `readings[].chartId === figureId`. Un consumidor que aún no la dibuja la ignora: el hallazgo y la tabla siguen ahí.
+ */
+export interface PlanStatFigureV1 {
+  figureId: string
+  question: 'value_change'
+  /** Título del tablero («Search Console y posiciones · septiembre contra agosto»). */
+  title: string
+  items: PlanStatItemV1[]
+  /** Nota del tablero (p. ej. cómo se estima un valor). Sin cifras propias. */
+  note?: PlanClaimV1
+}
+
 export interface PlanChapterV1 {
   chapterId: string
   module: InsightModule
   title: string
   claims: PlanClaimV1[]
+  /** TASK-1974 — tarjetas de cifra del capítulo; ausente = plan anterior al criterio de selección. */
+  stats?: PlanStatFigureV1[]
   charts: ChartSpecV1[]
   tables: PlanTableV1[]
   /** Ausencias/incomparabilidades visibles del capítulo (texto derivado de rejections). */
@@ -117,7 +158,10 @@ export const PLAN_TEXT_LIMITS = {
   decision: 140,
   essential: 170,
   /** Título de la tabla de respaldo (presupuesto del informe A4; el deck no dibuja tablas). */
-  tableTitle: 80
+  tableTitle: 80,
+  /** TASK-1974 — título del tablero de cifras (el molde de figura más estrecho). */
+  statTitle: 56,
+  statNote: 120
 } as const
 
 /** @deprecated alias de `PLAN_TEXT_LIMITS.conclusion` (acuerdo con TASK-1889). */

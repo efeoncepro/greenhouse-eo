@@ -38,6 +38,10 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    y sus seis ángulos en `set-identidad/angulos/`; consulta `refs-aprobadas/MANIFIESTO.json` y resuelve la vista
    con `foto:prompt`. No uses `julio-ap-02.png` (composición publicitaria) ni mezcles fuentes y descartes con
    el set aprobado. Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+   **Desde 2026-10-03:** para variar personas en piezas con varios o con equipo existe el **elenco de marca** (cinco
+   personajes ficticios; nunca como equipo real, cliente ni testimonio): [`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md).
+   Nexa tiene 25 expresiones aprobadas, útiles para el «antes/después» de un anuncio (`hartazgo`, `agobio`, `alarma`
+   frente a `euforia`, `alivio`), y la ropa de marca puesta la elige `pnpm foto:prompt`; detalle en `design-studio` §11.
 5. Usa [brief y gate de calidad](references/creative-brief-and-qa.md) para registrar la decisión y revisar
    el archivo final.
 6. **Para paid media, scroll-stop, hook/hold, cinematic ads o híbridos**, carga primero

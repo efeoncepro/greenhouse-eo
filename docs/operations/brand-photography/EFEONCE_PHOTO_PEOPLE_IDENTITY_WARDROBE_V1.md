@@ -1,9 +1,9 @@
 # Personas en la fotografía Efeonce V1 — casting, identidad y vestuario
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.4: casting de un personaje sin pieza aprobada — retrato ancla primero, delta 2026-10-02 casting de campaña. 1.3: el traje biónico y los lentes biónicos de Nexa se piden por catálogo, sólo Nexa y sólo cine, con las marcas armadas en la referencia; la pose y la expresión salen de la escena y de las 12 expresiones fotográficas; anclas de Nexa con la frontal primero, [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo). 1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
+> **Última actualización:** 2026-10-03 por Claude (1.5: grupos de 3 a 5 entre el elenco, Nexa y Julio; orden de referencias con el ancla frontal primero y la expresión sólo para el gesto; `silueta` y la selección automática de la vista puesta de cada prenda; proporción del rostro con `rostro` y `pnpm foto:rostro`; ancla frontal v2 de Nexa — [delta 2026-10-03](#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro). 1.4: casting de un personaje sin pieza aprobada — retrato ancla primero, delta 2026-10-02 casting de campaña. 1.3: el traje biónico y los lentes biónicos de Nexa se piden por catálogo, sólo Nexa y sólo cine, con las marcas armadas en la referencia; la pose y la expresión salen de la escena y de las 12 expresiones fotográficas; anclas de Nexa con la frontal primero, [delta 2026-10-02](#delta-2026-10-02--el-traje-biónico-y-los-lentes-biónicos-de-nexa-por-catálogo). 1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -55,7 +55,7 @@ Requisito del operador: el sistema funciona en los tres **[decisión del operado
 |---|---|---|
 | Julio | Rostro | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (`julio-ap-04` primero; vista resuelta por `foto:prompt`) |
 | Julio | Cuerpo | El mismo set aprobado (`julio-ap-11` primero) |
-| Nexa | Rostro | `ai-generations/_identidad-nexa/1-anclas/` (desde el 2026-10-02, `nexa-ancla-1-rostro-frontal` primero y el tres cuartos después: con el tres cuartos primero el modelo copiaba su giro y su gesto; vista resuelta por `foto:prompt`) |
+| Nexa | Rostro | `ai-generations/_identidad-nexa/1-anclas/` (desde el 2026-10-03, `nexa-ancla-1-rostro-frontal-v2` primero —la aprobada estirada ×1,037 en horizontal, porque la anterior era 4–5 % más estrecha que el resto del canon—, el tres cuartos después: con el tres cuartos primero el modelo copiaba su giro y su gesto; vista resuelta por `foto:prompt`; orden completo en el [delta 2026-10-03](#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro)) |
 | Nexa | Cuerpo | El mismo home (`nexa-ancla-5-cuerpo-frontal` primero) |
 
 🔴 **Las rutas anteriores de Nexa quedan RETIRADAS** **[2026-09-21]**. Esta tabla mandaba a
@@ -91,6 +91,8 @@ embroidered emblem on the left chest): use it as his exact garment.
 
 ### 5.4 Bloques IDENTITY (verbatim)
 
+> **Delta 2026-10-03:** el bloque de Julio que usa `foto:prompt` dice hoy *«thirty-seven years old with premature grey: keep his apparent age EXACTLY as in the references»* (Julio tiene 37 con canas prematuras; ganó el A/B del 2026-10-03). El de abajo es el de las rondas del 2026-09-20 y queda como histórico.
+
 Julio:
 
 ```text
@@ -103,7 +105,7 @@ and setting change. Do not beautify or change his age.
 Nexa:
 
 ```text
-IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
+IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Her face is a SOFT OVAL, a little wider than it is long from the eyes down: the width across the cheekbones is about 1.2 times the distance from the eyes to the chin — never a narrow, elongated or slimmed face, never a sharpened jaw. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
 ```
 
 ```text
@@ -156,6 +158,7 @@ En zsh, una variable con varios `--image` debe expandirse con `${=R}`; sin eso, 
 | La ropa no es la firma de color | «la colorimetría no es vestir de navy» **[decisión del operador]** |
 | Azul en ropa | Sólo como acento pequeño (3–10%) o nada. Prendas azules grandes quedan en un intermedio que no funciona: camisa azul en Miami 16%, hoodie del contrapicado 17% del cuadro **[medido]** |
 | Firma | Si el emblema bordado se lee a tamaño de consumo, **sin logo compuesto**: una sola marca protagonista. Las grillas de exploración muestran esas piezas firmadas; la versión publicable va sin firma |
+| Vista puesta | Desde el 2026-10-03 la elige `foto:prompt` por silueta, giro, cámara y oclusión de quien la viste, entre 126 vistas puestas; ver el [delta 2026-10-03](#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro) |
 | Otras prendas | Hoodie, chaqueta, gorra y lanyard tienen kits propios (`docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md`); no probados en esta corrida |
 
 ## 7. Equipo real vs IA
@@ -840,11 +843,13 @@ Nexa salía casi siempre con la misma cabeza en tres cuartos, ladeada y con medi
 
 - Las referencias de identidad dicen **quién** es, no **cómo** está: el giro, la inclinación, la mirada y el gesto los
   pone la escena. Por eso la vista puesta del traje que va a escena es la **13 sin rostro**, recortada bajo el mentón.
-- Una ficha con Nexa declara **una** de dos cosas: `expresion` (una de las 12 fotográficas de
-  `_identidad-nexa/5-expresiones/` o de las ocho del Bible) **o** `vista` (el ángulo), o las dos juntas si Nexa está sola
-  en la toma (desde el 2026-10-02 conviven: con una persona sola en la toma, `vista` + `expresion` juntas — el ángulo de la vista y el gesto de la expresión; medido en `NX7j`). Las 12 comparten el mismo tres cuartos del ancla y por eso aportan **sólo el gesto**: el
-  ángulo se pide con `vista`. Si Nexa llega sin ninguna, `foto:prompt` avisa.
-- Las anclas van con la **frontal primero** (ver §5.1). Lista y nombres en la
+- Una ficha con Nexa declara `expresion` (una de las **25 casi de frente** de `_identidad-nexa/5-expresiones-frente/`,
+  aprobadas el 2026-10-03, o de las ocho del Bible), `vista` (el ángulo), o las dos juntas si Nexa está sola en la toma
+  (medido en `NX7j`). La expresión aporta **sólo el gesto**; el ángulo se pide con `vista`. Si Nexa llega sin ninguna,
+  `foto:prompt` avisa. *(Las 12 de tres cuartos de `5-expresiones/` que este delta citaba quedaron como histórico el
+  2026-10-03: puestas primeras, arrastraban su giro a toda la serie.)*
+- Las anclas van con la **frontal primero** y la expresión detrás (§5.1 y el
+  [delta 2026-10-03](#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro)). Lista y nombres en la
   [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md#delta-2026-10-02--traje-biónico-12-expresiones-fotográficas-y-la-pose);
   causa y bloques en [prompts y pipeline, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está).
 
@@ -873,3 +878,89 @@ la rechazó **[decisión del operador]**; retocar sólo la cara con `pnpm ai:inp
 Prompts: `ai-generations/2026-10-02_login-escenario/casting/ancla-*.txt`. Detalle y fallas:
 [casebook cine](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos).
 
+## Delta 2026-10-03 — grupos del elenco, orden de referencias, vista puesta automática y proporción del rostro
+
+Fuente: la sesión del elenco y el uniforme (commits `2b544bfe0` a `ba563fdbe` en `develop`). El elenco de marca
+—Hum, Karo, Sophia, Isabella y Antonio, personajes **ficticios** que reaparecen entre campañas— tiene su canon en
+[`EFEONCE_BRAND_CAST_V1.md`](./EFEONCE_BRAND_CAST_V1.md) (reparto, qué puede representar, fichas) y su catálogo en
+`ELENCO` de `scripts/foto/build-prompt.mjs`; se pide en `identidad` igual que el roster:
+`"identidad": [{ "persona": "karo", "vista": "45-der" }]`. Aquí queda lo que cambia para **toda** persona.
+
+### Orden de las referencias: el ancla frontal primero, la expresión detrás **[medido · operador, 2026-10-03]**
+
+La primera imagen manda en la pose más que cualquier frase. Las 12 expresiones de Nexa de `5-expresiones/` se habían
+editado desde el ancla en tres cuartos y entraban **primeras** cuando la ficha pedía `expresion` —casi siempre, porque
+`foto:prompt` avisa si falta—: *«sale con la misma pose de nuevo, volteando la cara»*. Desde el 2026-10-03
+(`resolverIdentidad` en `build-prompt.mjs`):
+
+| La ficha pide | Orden de las imágenes de esa persona |
+|---|---|
+| Nada | anclas en su orden (en Nexa: frontal v2 → tres cuartos → cuerpo) |
+| `expresion` | **ancla frontal → expresión → cuerpo**. La expresión nunca va primera |
+| `vista` | vista → anclas, con el cuerpo como última si la vista no lo es |
+| `vista` + `expresion` (sólo con una persona en la toma) | vista → expresión → ancla frontal → cuerpo: la vista manda en el ángulo y la expresión, **sólo** en el gesto |
+| En dupla, con `expresion` | ancla frontal → cuerpo: el cuerpo ocupa la segunda ranura y la expresión **no viaja** (verificado con `foto:prompt` el 2026-10-03; el comando no avisa). El gesto lo da la escena |
+| En un grupo de 3 a 5 | **una** referencia por persona: la frontal (o la de su `vista`). La expresión **no viaja**: el gesto lo da la escena |
+
+El bloque REFERENCES sigue diciendo que las referencias definen **quién** es cada persona y que el giro, la
+inclinación, la mirada y la expresión salen de la escena. Validado: `VP1` gira a la derecha cuando la escena lo pide;
+`VP2` sale de frente.
+
+### Grupos de 3 a 5: el elenco, Nexa y Julio, en cualquier combinación **[decisión del operador, 2026-10-03]**
+
+*«El elenco se hizo para variar los personajes para fotos de varias personas o de equipo, pero no para tener reglas
+explícitas de que al menos uno del elenco deba estar. Debe usarse el elenco si es necesaria su inclusión»*. Un grupo de
+3 a 5 es **cualquier** combinación de personajes del elenco, Nexa y Julio (`EN_GRUPO = ['nexa', 'julio']`); no exige
+que haya alguien del elenco. Con otras personas del roster el tope sigue en **dos**, y en dupla vale cualquier
+combinación.
+
+- En grupo: una referencia frontal por persona (`REFS_POR_PERSONA`: 3 sola, 2 en dupla, 1 desde tres), cada bloque
+  IDENTITY empieza `PERSON n — NOMBRE (Image k):` y la luz de las referencias se corta: *«The LIGHT of the identity
+  references does NOT carry over»*.
+- La misma persona dos veces en `identidad` → error («aparece dos veces»): su vista o expresión se declara en su
+  única entrada.
+- Validado en `EC2` (los cinco del elenco) y `VP3` (Julio + Nexa + Karo). Las fallas que lo motivaron, en el
+  [casebook cine, filas 21–23](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#elenco-en-grupo-2026-10-03--lo-que-aprendimos).
+
+### `silueta` y la vista puesta de la prenda, elegida por quien la viste **[2026-10-03]**
+
+Sin `puesta`, la prenda viajaba siempre con su vista frontal masculina: prenda de hombre en una mujer, de frente en una
+persona a 45°. Ahora cada persona de `PERSONAS` y `ELENCO` declara `silueta` (`hombre` | `mujer`; el `casting` de la
+ficha puede declararla) y `foto:prompt` (`elegirPuesta`) escoge la vista puesta de bomber, softshell, polo, hoodie y
+gorra entre **126 vistas** (corrida `ai-generations/2026-10-03_uniforme-vistas/`, con su `LEEME.md`) según:
+
+| Criterio | De dónde sale |
+|---|---|
+| Quién la viste | `persona` en el objeto, o la única persona de `identidad`. En un grupo **sin** `persona`, la prenda va de frente y avisa |
+| Silueta | `silueta` de esa persona |
+| Giro | De su `vista` de identidad (`45-*` → 45°, `perfil-*` → 70°, `espalda`/`trasero` → espalda) o de `giro` en el objeto, **obligatorio de espaldas**: `frente`, `45-izq`, `45-der`, `70-izq`, `70-der`, `espalda`, `espalda-45-izq`, `espalda-45-der`, `espalda-70-izq`, `espalda-70-der` |
+| Cámara | `camara: "baja"` → vista desde abajo |
+| Oclusión | `tapa: "mano" \| "cruza" \| "objeto" \| "brazos"` → la vista donde algo tapa la marca; con una persona sola se infiere de la escena |
+
+Cadena de respaldo: oclusión → cámara baja → giro → 45° del mismo lado → familia (frente o espalda); en cada paso,
+primero la de la silueta. **El ángulo pesa más que la silueta.** `puesta` en el objeto sigue forzando una vista. Ejemplos:
+`{ "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" }` y
+`{ "objeto": "chaqueta-bomber-efeonce", "persona": "karo", "giro": "espalda-45-izq", "camara": "baja" }`. La línea `·`
+que imprime `foto:prompt` y el método de las vistas están en
+[prompts y pipeline, delta 2026-10-03](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-03--referencias-desde-el-canon-vista-puesta-automática-y-fotorostro).
+
+**En oclusión, la vista real es la marca a su tamaño con sólo la parte visible** (operador, sobre la mano de Karo:
+*«la vista real sería que se viera solo la parte de logo que no tapa la mano … hay que dar la vista en la ropa que
+permita esos casos»*). Se pide la vista de oclusión del kit, nunca una marca más chica compuesta al lado de la mano.
+Validado: mano ✓ (Karo); con taza el modelo corrió la taza a un costado, pero la marca salió correcta y entera.
+
+### Proporción del rostro: `rostro` y `pnpm foto:rostro` **[medido, 2026-10-03]**
+
+Operador sobre Nexa: *«le alarga o achata la cara al ancho, poniéndola excesivamente fina»*. Causa: el ancla frontal
+aprobada era **4–5 % más estrecha** que el resto del canon (medido con Vision). La v2
+(`1-anclas/nexa-ancla-1-rostro-frontal-v2.png`) es la aprobada estirada ×1,037 en horizontal, sin modelo; la aprobada
+queda como histórico. El bloque IDENTITY de Nexa suma la geometría (óvalo suave, pómulos ≈ 1,2 veces la distancia de
+los ojos al mentón; ver §5.4) y la persona declara su canon: `rostro: { largoAncho: 0.81, tolerancia: 0.02 }`.
+
+`pnpm foto:rostro <png…> [--persona nexa] [--canon 0.81] [--tolerancia 0.02]` mide largo/ancho = (ojos → mentón) /
+ancho del contorno de la mandíbula, con la línea de los ojos tomada del **contorno** del ojo y no de la pupila (la
+mirada corría la medida). No compara caras con giro (|giro| > 0,15), con boca abierta ni con ojos cerrados; sale con 1
+si una frontal queda fuera del canon y con 2 si no puede medir. Límite: los ojos en blanco (`hartazgo`) miden ≈ +0,03 sin
+estar afinados; ahí se mira a ojo. **Una persona nueva con proporción declarada** mide su `rostro` sobre sus imágenes
+aprobadas casi frontales con este comando. `silueta` y `rostro` son claves sin archivo (`CLAVES_SIN_ARCHIVO`): el
+sellador no las busca en disco.

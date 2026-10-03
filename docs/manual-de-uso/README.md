@@ -16,6 +16,9 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de
+  clasificación, camino propio o puente, dificultad por toma, referencias aprobadas antes de generar, motor y
+  presupuesto con reserva; complemento del [manual de producción de video](creative-production/video-production.md).
 - [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,
   ejecución, readback, governance, puentes MCP locales (Blender, Illustrator y Photoshop instalados y conectados
   desde el 2026-09-24; After Effects requiere la app) y CLI `higgsfield` con sesión.
@@ -42,7 +45,7 @@ La diferencia con otras capas de documentacion:
   contra robots, qué no hacer y problemas comunes. Kit aprobado el 2026-10-01 (TASK-1941).
 - [Usar el traje biónico de Nexa en fotos](creative/usar-traje-bionico-de-nexa-en-fotos.md) — vestir a Nexa con su
   traje y sus lentes biónicos desde el catálogo de `foto:prompt` (sólo Nexa y sólo con `"registro": "cine"`), elegir
-  una de sus 12 expresiones fotográficas o un ángulo (nunca los dos), escribir la escena sin describir el traje, la
+  una de sus 25 expresiones fotográficas casi de frente o un ángulo, escribir la escena sin describir el traje, la
   receta de una escena con Sparks (dos con referencia como máximo, como `NX7d`), revisar las marcas con
   `pnpm foto:emblema` y recomponerlas con `pnpm foto:isotipo` (incluido el logo de la espalda con `--marca logotipo
   --tecnica`), reproducir el kit y sellarlo y publicarlo al canon. Errores, avisos y problemas comunes. Kit aprobado el
@@ -63,6 +66,10 @@ La diferencia con otras capas de documentacion:
   pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
   sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa
   este kit: tiene su sonido y su música propios, sólo de Glitch.
+- [Producir un spot animado 2D](creative/producir-spot-animado.md) — de la preproducción a la entrega: storyboard en
+  canvas, elenco, cuadros clave con los Sparks compuestos, piloto y tomas con MiniMax H3, corte, audio, subtítulos,
+  entrega y variantes por red; autorizaciones de gasto, qué no hacer y problemas comunes. Caso fuente «Sparks × Efeonce
+  AEO», aprobado el 2026-10-03.
 - [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
   motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las recetas aprobadas con
   plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;
@@ -118,7 +125,10 @@ La diferencia con otras capas de documentacion:
   estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
-  lenguaje fotográfico aprobado el 2026-09-19.
+  lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a
+  Nexa, grupos de 3 a 5, la ropa que se elige sola (línea `·`, con `persona`, `giro`, `camara`, `tapa` y `puesta`), las
+  25 expresiones de Nexa, `pnpm foto:rostro`, referencias que se bajan solas del canon (`⇣`/`↺`, `FOTO_SIN_CANON=1`) y
+  qué hacer al sumar algo nuevo. Explicación funcional: [Elenco y referencias de fotografía](../documentation/creative/elenco-y-referencias-de-fotografia.md).
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,
@@ -167,6 +177,7 @@ La diferencia con otras capas de documentacion:
 ### Efeonce Insights
 
 - [Operar Efeonce Insights por API y MCP](insights/operar-efeonce-insights-api-mcp.md) — crear y seguir ediciones sin pantalla: flags y módulo `insights_v1` como prerrequisitos, el encargo (módulos, período `[inicio, fin)` en zona IANA, comparación, idempotencia), lectura de evidencia sellada y plan congelado, estados por audiencia, códigos de rechazo, cómo se ve cada respuesta (`202`/replay idempotente/`409`/`404`/`503 generation_disabled`/`not_ready`), qué ve un cliente vs un interno, la receta del canary por lane ecosystem, la asignación del módulo con `scripts/insights/assign-insights-module.ts`, la trampa de Vercel (env var nuevo exige redeploy) qué está bloqueado a propósito (emitir sin salidas validadas, emitir por MCP, `create_insight_edition` por el gateway hasta un grant del scope), y las recetas de enlaces compartidos, envío por correo (reconciliar ambiguos, reintentar, cancelar), schedules, flags por runtime y rollback por lane (TASK-1848, sin deploy). TASK-1845/1846/1848.
+- [Revisar una edición de Efeonce Insights antes de compartirla](insights/revisar-una-edicion-antes-de-compartir.md) — para quien revisa el PDF y el deck antes de compartir o emitir: correr la vista previa real (`scripts/insights/preview-edition.ts --editorial-v2`), qué mirar en la página de cifras (tono verde/rojo/gris, «vs …», «Menor es mejor», «Primer período medido», «—» sin dato) y en cada figura nueva (cascada, waffle por unidad, dona, barras apiladas, una sola figura de metas), qué significa cada rechazo con causa (cascada que no cuadra, nombre de cifra largo, waffle que no suma) y por qué una figura fuera de su capacidad no se dibuja. Code complete, rollout pendiente. TASK-1974/1975.
 
 ### Growth
 
@@ -302,8 +313,9 @@ La diferencia con otras capas de documentacion:
 ### Herramientas IA
 
 - [Operar AI Tooling, Content y Assets](ai-tooling/operar-ai-tooling-content-assets.md) — administrar catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de imagenes/animaciones sin confundirlo con facturacion ni publicacion del Public Site.
-- [Editar solo una zona de una imagen](ai-tooling/editar-una-zona-de-una-imagen.md) — desde v2.0 (TASK-1965): `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, recompone y verifica la zona protegida en delta 0 (codigo 2 si cambio); Flare por defecto, Sunburst sin mascara (con mascara devuelve un panel negro), Flux Pro Fill y Seedream edit. Historia: inpainting con mascara desde `pnpm ai:image`: como crear la mascara, como leer el `usage` que imprime el comando y por que editar NO sale mas barato que generar de nuevo. Desde v1.1: como elegir entre GPT Image 2, 2.5 Sunburst y 2.5 Flare (con enlace a la guia canonica de seleccion), costo de 2.5 estimable antes de gastar y brechas conocidas del comando.
-- [Editar solo una zona de un video](ai-tooling/editar-una-zona-de-un-video.md) — `pnpm ai:inpaint video` (TASK-1965): mascara fija o por keyframes, motor de edicion de fal, control de alineacion que aborta si el motor corrio el encuadre, recomposicion cuadro a cuadro con delta 0, parpadeo medido y audio original.
+- [Editar solo una zona de una imagen](ai-tooling/editar-una-zona-de-una-imagen.md) — `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, recompone y verifica la zona protegida en delta 0 (codigo 2 si cambio, 3 si hay que revisar); Flare por defecto, Sunburst (el mas potente) sin mascara con guia de zona, Flux Pro Fill, boceto + referencias y `--zone-resolution`; desde v2.1 seccion «Para agentes» (arbol de decision por intencion, codigos de salida, tope de costo, checklist al 100 %). TASK-1965/1973.
+- [Expandir, separar en capas, borrar, mover, incorporar, cambiar fondo y rehacer detalle](ai-tooling/expandir-y-separar-en-capas.md) — `pnpm ai:layers` (Layerize sobre cualquier imagen; la base se cobra como una capa), `ai:mask --from-layer`, `ai:inpaint erase|move|place|expand|background` y `--zone-resolution`, con lo no editado en delta 0 verificado; ganadores medidos (borrar: clean plate o Sunburst; expandir: Flux Fill, nunca GPT Image) y seccion «Para agentes». TASK-1973.
+- [Editar solo una zona de un video](ai-tooling/editar-una-zona-de-un-video.md) — `pnpm ai:inpaint video` (TASK-1965): mascara fija o por keyframes, motor `fal:flux3-edit` (USD 0,03/s), aborto si el motor corre el encuadre, recomposicion cuadro a cuadro en delta 0, parpadeo medido, audio original y seccion «Para agentes» (codigos 0/2/1, tope de costo, checklist).
 - [Operar Gemini Omni 1.1 desde la CLI de video](ai-tooling/gemini-omni-1-1-cli.md) — `pnpm ai:omni`: generación desde texto, imagen, cuadros o referencias; edición y extensión desde video; autenticación ADC, staging GCS privado, costos nominales, consulta de estado, recuperación y evidencia de seis modos probados a 360p/16:9.
 - [Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0](ai-tooling/operar-cli-fal-seedream-seedance.md) — `pnpm ai:fal`: imagenes y edicion con Seedream 5, separacion de una pieza plana en capas con alfa + `layers.json`, video Seedance y Minimax H3 (Turbo barato, control de camara, LoRAs y entrenamiento), video Flux 3 (borrador → mejora, primer/ultimo cuadro, keyframes, editar y extender un clip) y video a video con Seedance 2.5 (`--task editing|extension`, verificado; su filtro rechaza marcas y personas reales y cobra el intento), video Wan 3.0 y Prime (largo `auto`, referencias, basado en una web o un documento con `--thinking`, `--seed`, default 1080p), con limites validados antes de cobrar; dos cuentas de fal con cambio automatico ante bloqueo por saldo y `--balance`; encolar sin esperar con `--detach` y consultar con `--status`; como retomar un trabajo vencido con `--request-id` sin volver a pagar, que esta verificado (47 de 55), por que no informa costo y por que Gemini Omni y Nano Banana Pro no pasan por fal. Desde v1.7: paso previo para elegir el modelo con la guia canonica de seleccion, costos por escalon de resolucion (Wan 3.0 sale en 1080p y H3 base en 2K por defecto; Wan 3.0 Prime cuesta mas; Flux 3 publicado al doble; formula de tokens de Seedance), minimo de 100 pasos al entrenar LoRA y brechas conocidas del comando.
 - [Operar pilotos de Creative Workflow](ai-tooling/operar-pilotos-creative-workflow.md) — seleccionar motor por contrato de fidelidad, ejecutar una prueba controlada y revisar evidencia; incluye la condición para probar previs 3D exportada como referencia de video, sin tratarla como un render 3D.

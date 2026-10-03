@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_cmp004-cine-nativo/casting/s03-directora/casting-frente.png (edit) …
+  ✓ 1409KB · gpt-image-2.5-sunburst · 1024x1024 · high
+    usage: in 1159 (img 960 · txt 199) · out 1756 · total 2915
+done

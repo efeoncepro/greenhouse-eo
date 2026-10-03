@@ -105,6 +105,14 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
 | U13 | [TASK-1961](../../tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md) | visibilidad en IA por país: un run por mercado en la ventana, lectura por país sin promedio (Sky: siete mercados) | TASK-1863 |
 | U14 | [TASK-1962](../../tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) | contrato de contenido del informe (8 preguntas, gate de mantenimiento), causas SEO, lo que el Grader ya mide, plan de acción y petición, más familias de gráfico y GA4 en el Search Visibility 360 | TASK-1957 |
+| U15 | [TASK-1974](../../tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador (canon `EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`) | TASK-1962 |
+| U16 | [TASK-1975](../../tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas | TASK-1974 |
+| U17 | [TASK-1990](../../tasks/to-do/TASK-1990-efeonce-insights-channel-stat-card-contract.md) | contrato de la tarjeta de cifra con canal: 19 plataformas, dominio → plataforma, canal o glifo Trazo por cifra, canal del tablero, modelo web 1.5 — inventario aprobado 2026-10-03 | TASK-1974 |
+| U18 | [TASK-1991](../../tasks/to-do/TASK-1991-efeonce-insights-aeo-per-engine-facts.md) | visibilidad en IA por motor: lugar, cita, tono, Share of Voice y plataforma citada | TASK-1424, TASK-1961, TASK-1990 |
+| U19 | [TASK-1992](../../tasks/to-do/TASK-1992-efeonce-insights-seo-visibility-360-facts.md) | hechos nuevos del Search Visibility 360 (SERP, plataformas, movimiento, pagado, enlaces, salud técnica, URL; competidores con gate de política) | TASK-1990 (Slice 2: TASK-1993, de EPIC-022) |
+| U20 | [TASK-1994](../../tasks/to-do/TASK-1994-efeonce-insights-ico-production-facts.md) | indicadores de producción ICO: ciclo, throughput, velocidad, trabadas, atrasos, SLO y revisiones | TASK-1990 |
+| U21 | [TASK-1995](../../tasks/to-do/TASK-1995-efeonce-insights-missing-sources-decision.md) | policy: fuentes que faltan (Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta) | — |
+| U22 | [TASK-1996](../../tasks/to-do/TASK-1996-efeonce-insights-channel-stat-card-render.md) | tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think | TASK-1975, TASK-1990, publicación de AXIS |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
@@ -159,6 +167,8 @@ operador; se abren como task cuando la decisión exista):
   mano entre Greenhouse (PDF) y Think (web); candidatos a extraer a AXIS (arquitectura §6.4).
 
 **Delta 2026-10-02 — release `6ea157e6e641` y estándar apto para cliente.** Producción sirve el modelo web 1.1 (canary verde) y `INSIGHTS_DELIVERY_ENABLED`/`INSIGHTS_SCHEDULES_ENABLED` quedaron ON en Vercel Production con los EmailTypes de Insights encendidos. La revisión del operador de las ediciones internas reales de Berel (`EO-INS-000027`) y Sky (`EO-INS-000029`) renderizadas en local encontró identificadores internos visibles, recital de cifras, límites con lenguaje interno, gráficos sin información y falta de jerarquía. Se abren `TASK-1957` (contrato, backend-data) y `TASK-1958` (UI, bloqueada por 1957). **Ninguna edición de cliente se emite antes de cerrar ambas.**
+
+**Delta 2026-10-03 — tarjetas con isotipo de canal: inventario aprobado y tasks.** El operador aprobó las tarjetas de cifra con isotipo de canal y su inventario (canvas `9q7nThMhdphN5j8f3K3cbB`, tablero «Cifras-Canal-Inventario»; AXIS `beb7f25` contrato `efeonce.insights-stat-card` 0.2.0, `4f6f2db` isotipos de plataformas 0.4.15 y `a7d874a` glifos Trazo D30, sin publicar). Lo que Greenhouse ya mide y no llega a Insights se reparte en TASK-1990 (contrato), TASK-1991 (AEO por motor), TASK-1992 (SEO), TASK-1994 (ICO) y TASK-1996 (render); la captura que falta del AI Overview es TASK-1993 (EPIC-022) y Search Console por tipo de búsqueda va en TASK-1426 (delta); las fuentes inexistentes las decide TASK-1995. La comparativa competitiva SEO sigue `policy_blocked` hasta una decisión explícita del operador.
 
 ## Existing Related Work
 

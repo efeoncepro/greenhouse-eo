@@ -16,6 +16,22 @@ de delivery.
 La creatividad es el requisito de entrada. El producto diferencial es la capacidad de cumplir, aprender y escalar
 sin perder criterio ni control.
 
+### Dirección estratégica aceptada — 2026-10-03
+
+> **Convertimos las decisiones de marca en una capacidad de producción consistente, medible y escalable.**
+
+La [decisión de ejecución escalable](../../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+orienta esta oferta hacia hacer operables, automatizables y escalables las decisiones creativas de marca, para
+acelerar su despliegue preservando calidad, consistencia e identidad. La misma capacidad puede cubrir el recorrido
+desde posicionamiento y definición hasta la aplicación final, o un tramo delimitado de una cadena dirigida por el
+cliente u otros partners. Recibir decisiones de otra agencia no exige asumir su definición ni desplazar su autoridad.
+
+Una aplicación singular y una producción de muchas variantes requieren alcance, capacidad y controles propios:
+la dirección de escala no promete piezas ilimitadas ni volumen demostrado. La responsabilidad sobre calidad se
+concreta en criterios de aceptación, QA y corrección dentro del tramo controlado; las mejoras de tiempo se prueban
+con baseline comparable. La dirección aceptada conserva el estado comercial `Approved for validation` de esta
+arquitectura y los gates de las ofertas que la componen.
+
 ## 2. Cómo se presenta la oferta
 
 La presentación comercial es híbrida. No se debe elegir entre catálogo y rutas: cada capa resuelve una decisión

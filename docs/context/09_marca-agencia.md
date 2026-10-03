@@ -97,6 +97,22 @@ Product Service productizado y AI-native, sin confundir AI-native con autónomo,
 
 Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
 
+### Decisiones de marca convertidas en capacidad operativa
+
+> **Convertimos las decisiones de marca en una capacidad de producción consistente, medible y escalable.**
+
+Dirección estratégica aceptada el 2026-10-03: hacer operables, automatizables y escalables las decisiones creativas
+de marca para acelerar su salida al mercado preservando calidad, consistencia e identidad. La capacidad puede
+abarcar desde definición y posicionamiento hasta una aplicación final, o instalarse en un tramo razonable de una
+cadena existente, conservando la autoridad de quienes definen la marca. Una o miles de piezas expresan la ambición
+de escala; cada compromiso requiere alcance, capacidad y criterios de aceptación verificables.
+
+Esta tesis concreta el mecanismo creativo dentro de **Integrated Growth Partner / ASaaS / Growth Operating
+System**; no reemplaza el posicionamiento corporativo ni convierte todo el portfolio en producción creativa.
+El [canon de decisiones de marca y ejecución escalable](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+gobierna los alcances, la responsabilidad, la calidad y los límites de evidencia. No introduce un tagline ni
+aprueba por sí solo ofertas, pricing o promesas comerciales.
+
 ### Operating Code interno
 
 La cultura interna que hace real este Why vive en `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. No es un set de valores decorativos: gobierna hiring, onboarding, performance, rituales y delivery.

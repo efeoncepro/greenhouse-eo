@@ -96,6 +96,21 @@ Fuentes: [mix-v17.py](../../../../ai-generations/2026-09-23_cmp003-sky-video/see
 [README V17](../../../../ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/README.md) y
 [companion de posproducción](../../motion-design-studio/companions/video-postproduction-and-delivery.md).
 
+## Derivar otro estilo desde una pieza aprobada del kit
+
+**Caso spot «Sparks × Efeonce AEO», 2026-10-03.** El operador pidió «un ritmo más punk» con el sonic brand de
+referencia. La fuente fue la pieza larga de **energía** oficial (AXIS sonic v1, SHA-256 verificado contra
+`https://axis.efeonce.org/references/sonic-brand.json`); se reordenó, se aceleró a 160 BPM y se regrabó con Stable
+Audio 2.5 audio-to-audio (receta en `STUDIO_TOOLING.md`, fila «Cambio de estilo»).
+
+- Clasificación (paso 2 de arriba): **`tempo cambiado` + `pista nueva` derivada**. No es «la música del kit»: la
+  aprobación de la fuente no se hereda; la cama derivada se aprueba aparte (aquí, con la v2 del spot).
+- Conservar la procedencia: fuente oficial + hash, orden de secciones, factor de tempo, strength elegido y EQ
+  correctiva. La licencia comercial del modelo vía fal queda **pendiente** con legal.
+- Para extender la cama al montaje se **repiten compases enteros** (aquí +2 compases del coro) y se corta en seco donde
+  entra el reveal; no se estira el tempo por tramos.
+- Usarla bajo locución es una excepción de la norma sonora decidida por el operador, no un precedente.
+
 ## Estados y autorizaciones independientes
 
 Aprobación del **carácter musical**, aprobación de **pista**, aprobación de **mezcla sincronizada** y

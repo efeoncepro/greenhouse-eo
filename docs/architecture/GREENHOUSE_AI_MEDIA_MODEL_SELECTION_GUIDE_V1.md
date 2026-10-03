@@ -1,9 +1,12 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.11
+> **Version:** 1.14
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
+> **Antes (v1.13):** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
+> **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
+> **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
 > **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
 > **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
 > 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
@@ -75,7 +78,14 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
-| **Inpainting: editar una zona y dejar el resto idéntico** | `pnpm ai:inpaint image` (TASK-1965) con **GPT Image 2.5 Flare** `medium` + máscara, o `fal:flux-pro-fill` | El pipeline recompone y verifica el archivo en **delta máximo 0** fuera de la zona [verificado 2026-10-02, 5 corridas]; Flare y Flux Fill colocaron el objeto [verificado 2026-10-02]. 🔴 **Sunburst CON máscara devuelve la zona como panel negro plano** (3 de 3: 2026-09-23 y dos el 2026-10-02) [verificado]; con `--provider-mask auto` Sunburst edita sin máscara, recibe la zona en magenta como guía y el pipeline recompone [verificado 2026-10-02: objeto dentro de la zona; sin la guía lo puso fuera] | Sunburst sin máscara cuando la pieza pide su calidad | Seedream Pro Edit sin máscara (la máscara sólo recompone) |
+| **Editar una zona y dejar el resto idéntico** (inpainting) | `pnpm ai:inpaint image` (TASK-1965) con **GPT Image 2.5 Flare** `medium` + máscara (default); para la pieza final, **Sunburst SIN máscara** con guía de zona (`--model gpt-image-2.5-sunburst`; `--provider-mask auto` es el default) | El pipeline recompone y verifica el archivo en **delta máximo 0** fuera de la zona [verificado 2026-10-02]; Flare, Flux Fill, Sunburst sin máscara + guía en magenta y boceto + referencia colocaron el objeto, ≈ USD 0,40 la jornada [verificado 2026-10-02]. Sin la guía, Sunburst puso el objeto FUERA de la zona [verificado 2026-10-02] | `fal:flux-pro-fill` (relleno con máscara blanca, USD 0,05/MP) [verificado 2026-10-02] | 🔴 **Sunburst CON máscara**: devuelve la zona como panel negro plano, 3 de 3 [verificado 2026-09-23 y 2026-10-02]; `fal:seedream5-lite-edit`: costura en la pared e ignoró `image_size` [verificado 2026-10-02]; retocar la piel de una cara con Sunburst (§5.1) [verificado 2026-10-02] |
+| **Borrar un objeto** | `pnpm ai:inpaint erase --layers <layers.json> --layer <sel>` (TASK-1973): rellena con el clean plate de Layerize, USD 0, e incluye la sombra proyectada | PASS: taza y sombra fuera, la mesa continúa, sin gasto [verificado 2026-10-03] | Con `--mask` y sin capas: **Sunburst por instrucción** (default de `--fill model`), PASS, USD 0,010 [verificado 2026-10-03] | Flare con máscara (dejó media taza, código 3, USD 0,013) y **Flux Fill** (dibujó OTRA taza dos veces, USD 0,10 c/u): un modelo que llena una máscara rellena la silueta con otro objeto [verificado 2026-10-03]; Seedream 5 Pro Edit dejó un fantasma del asa que el detector no ve (USD 0,068) [verificado 2026-10-03]; FLUX Erase de BFL: no conectado [sin dato] |
+| **Mover o escalar un objeto dentro de la misma foto** | `pnpm ai:inpaint move --layers <layers.json> --layer <sel> --dx <px> --dy <px> [--scale]` | Hueco con clean plate, elemento recortado de la ORIGINAL y halo de sombra de contacto y reflejo: PASS, delta 0 fuera de lo tocado, USD 0,01 [verificado 2026-10-03] | `--harmonize off` (sin IA ni gasto) [contrato] | Inpainting generativo con `--mask` para desplazar material de la foto: Sunburst llenó la zona con un panel plano [verificado 2026-09-23]; usar los píxeles regenerados de la capa en vez de los de la original [contrato] |
+| **Incorporar un objeto de otra imagen** | `pnpm ai:inpaint place --image <destino> --from <origen> --layers <layers.json> --layer <sel> --at x,y [--width]` con `--finish halo` (default) | Destino en delta 0 fuera de lo pegado y su acabado: PASS sin acabado (USD 0) y con halo (USD 0,01) [verificado 2026-10-03] | `pnpm ai:inpaint image --reference <objeto> --sketch <trazo>` con Sunburst: objeto de la referencia en la posición del boceto, con la máscara derivada que crece hasta el objeto [verificado 2026-10-02]. `--finish element` también relumina el elemento, pero su forma puede variar [contrato]; sin canario de ese modo [sin dato] | Incorporar un logo o asset de marca: la guarda lo detiene [contrato] |
+| **Expandir a otro formato** (outpaint) | `pnpm ai:inpaint expand --to <formato>` con **Flux Fill** (`fal:flux-pro-fill`, default) | 1,91:1 sin costura, USD 0,10; 9:16 coherente, USD 0,15 [verificado 2026-10-03]. Los lienzos grandes se generan a menor resolución y el área nueva se escala (9:16 de 1536×2730 → 1088×1904), y puede inventar elementos (una banca en el 9:16) [verificado 2026-10-03] | BFL FLUX Outpainting (API propia de BFL, hasta 4 MP): no conectado [sin dato]. `pnpm foto:expandir` es otro contrato (redibuja con Sunburst) y no delega en este núcleo [contrato] | GPT Image: Flare reencuadró la escena (escala 0,88–0,90, código 3) y Sunburst `high` copió el relleno en espejo como contenido [verificado 2026-10-03] |
+| **Cambiar el fondo y dejar el sujeto intacto** | `pnpm ai:inpaint background --prompt "<fondo nuevo>"` (sujeto por matting local, o `--layers` + `--layer`) con el adaptador default (`openai`, Flare) | Sujeto en delta 0, costura media 10,6/255, USD 0,01 [verificado 2026-10-03] | Sujeto desde capas cuando el matting no separa bien lo que debe quedar [contrato] | Dar por buena la costura sin mirar pelo y transparencias al 100 % [contrato]; injertar caras de personas reales del equipo (reglas de identidad de brand-photography) [decisión] |
+| **Rehacer un detalle** (manos, una textura, un objeto chico) | `pnpm ai:inpaint image --mask <zona> --zone-resolution <px>` (512–4096) | Genera la zona recortada a ese lado largo y la devuelve a su lugar: PASS mecánico, USD 0,022 [verificado 2026-10-03] | — | Esperar un upscale: **reinterpreta** — Flare redibujó la taza y le quitó el pie pese a pedir la misma forma [verificado 2026-10-03]; la piel de una cara con Sunburst (§5.1) [verificado 2026-10-02] |
+| **Reiluminar** (relight) un objeto pegado que debe quedar exacto | `place --finish element --model gpt-image-2.5-sunburst`: objeto intacto, sombra de contacto, relight sutil [verificado 2026-10-03] | Canario §10.3 | Magnific Image Relight (API y MCP) [sin verificar en vivo] | `fal:iclight-v2` (deformó el objeto e inventó una ventana) y `fal:image-apps-relighting` (cambió el color del producto) [verificado 2026-10-03]; reiluminar un plate del registro cine: el canon lo regenera [decisión] |
 | **Generación cotidiana de calidad, rápida** | GPT Image 2.5 **Flare** `medium`/`high` | Mismo costo que Sunburst; en `high` 18,7 s vs 29,1 s, en `max` 46,0 s vs 80,6 s a 1024² [verificado 2026-09-16] | Sunburst si la pieza es de edición | Dejar el default del CLI (`gpt-image-2` `high` 1536×1024 ≈ USD 0,165): cuesta lo mismo que 2.5 `max` [cálculo] |
 | **Máxima calidad OpenAI sin importar latencia** | 2.5 Sunburst `max` | `max` ≈ tokens de GPT Image 2 `high` [cálculo sobre fórmula oficial] | 2.5 Flare `max` (#1 AA texto a imagen, 1189) [tercero] | `xhigh`/`max` con `gpt-image-2`: el CLI lo rechaza antes de la red [contrato] |
 | **Mínimo costo por pieza en OpenAI** | 2.5 `low` (≈ 0,006 a 1024²) o `medium` (≈ 0,013) | [cálculo] fórmula oficial | Seedream Lite (0,035 por imagen) si buscas divergencia | Esperar calidad final en `low` |
@@ -84,7 +94,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | **Divergencia barata de territorios / series relacionadas** | Seedream 5 **Lite** (`seedream5-lite`, `max_images` vía `--input`) | USD 0,035 por imagen efectiva [oficial]; series relacionadas [contrato] | 2.5 `medium` | Seedream Pro para explorar (0,0675–0,135) |
 | **Materialidad, atmósfera, desarrollo de look** | Seedream 5 **Pro** (`seedream5-pro`) | Mayor riqueza de color, material y luz [verificado 2026-07-18]; realismo y textura declarados [oficial] | GPT Image 2.5 si hay texto o layout | Pedirle más de 2048² de área (§5.2) |
 | **Fusión de varias referencias orientada a material** | `seedream5-pro-edit` (hasta 10 refs) | Retuvo mejor carácter [verificado 2026-07-18] | `seedream5-lite-edit` | Pasar más de 10 `--image`: fal usa las **últimas** 10 sin aviso [oficial] |
-| **Separar una pieza en capas editables** | `seedream5-pro-layerize` | Base + hasta 16 capas PNG con alfa, nombre, z_index y bounding box [oficial]; 8 capas limpias [verificado 2026-09-16] | Ninguna conectada | Esperar que reconstruya fielmente texto pequeño: [sin dato] |
+| **Separar una pieza en capas editables** (o una foto en elementos con máscara y clean plate: `pnpm ai:layers`, TASK-1973) | `seedream5-pro-layerize` | Base + hasta 16 capas PNG con alfa, nombre, z_index y bounding box [oficial]; 8 capas limpias en un KV [verificado 2026-09-16]; foto de mesa 1536×1024 → 3 capas (mesa, taza, cuaderno), ≈ USD 0,10, y **la base saca también la superficie** [verificado 2026-10-03]; **la base se cobra como una capa** (saldo de fal: 4 capas + base = USD 0,17) [verificado 2026-10-03]; el número de capas varía entre corridas (misma foto: 3 y 4) [verificado 2026-10-03]; se elige una capa por `#índice` o por nombre, y el nombre gana sobre la descripción [contrato] | Ninguna conectada | Usar la base sola como clean plate (deja pared donde había mesa: el clean plate de un elemento es la base + las demás capas por `z_index`); usar las capas como píxeles finales: son contenido regenerado, sólo máscara y clean plate [contrato]; esperar que reconstruya fielmente texto pequeño: [sin dato] |
 | **Resolución nativa mayor a 2K** | GPT Image 2/2.5 hasta 3840×2160 (experimental > 2560×1440) o Seedream Lite (`auto_3K`/`auto_4K`) | [oficial]; área Lite hasta 4096² según schema, ficha dice 3072² [oficial, drift] | — | Seedream **Pro** en fal: tope 2048² de área [contrato] |
 | **Formatos extremos (más de 3:1)** | Seedream Pro (aspecto 1/16–16) | [oficial] | GPT Image 2 resolvió 3:1 en un pase [verificado 2026-07-18] | GPT Image más allá de 3:1: tope 1:3–3:1 [oficial] |
 | **Texto multilingüe dentro de la imagen (concepto)** | Seedream 5 Pro | Texto denso multilingüe declarado, 16 idiomas de prompt incluido español [oficial] | GPT Image 2 escribió bien una frase corta en español [verificado 2026-07-18] | Entregar ese texto como final; OpenAI no declara nada multilingüe para 2.5 [oficial, ausencia] |
@@ -119,6 +129,7 @@ El video se opera con `pnpm ai:fal` para fal/Higgsfield y `pnpm ai:omni` para Ge
 | **Prompt exacto, sin reinterpretación** | `wan3-* --no-prompt-expansion` o H3 base `--prompt-expansion disabled` | [contrato] | — | H3 Max/Turbo: expansión obligatoria (el CLI envía `balanced`) [contrato] |
 | **Video sin audio** | `--no-audio` en Seedance, Flux 3 y Wan | [contrato] | Quitar la pista en post | H3: **no tiene toggle y siempre entrega audio** [contrato] |
 | 🔴 **Una pieza social en 4:5** (el formato principal de los estáticos aprobados de Efeonce) | Generar en **`3:4`** (1080×1440) con el motor que pida la toma y **recortar a 1080×1350** en post | **Ningún motor de video del carril soporta 4:5** — medido en los cinco: Seedance 2.5, Seedance 2.0, Wan 3.0, Flux 3 y H3; todos ofrecen `3:4` como lo más cercano [verificado 2026-09-22] | Entregar sólo 9:16 y 1:1 y declarar el 4:5 fuera del set, si el brief lo permite | Recortar sin medir antes que las franjas sacrificadas estén vacías; y subir un 3:4 donde la plataforma espera 4:5: **ella** recorta y decide dónde |
+| **Reiluminar un video** | Ninguno conectado | Estudio de mercado en §10.3: todo **sin verificar en vivo** | ID-V2V Relight (reilumina un cuadro y lo propaga) o Beeble SwitchX [sin verificar en vivo] | Prometer relight de video con Seedance por prompt sin probarlo (filtro de personas y marcas) [verificado 2026-09-16 para el filtro] |
 | **Stream en tiempo real dirigido** | Ninguno operable | `h3max-director` exige cliente realtime AsyncAPI, no cola [contrato] [oficial] | — | Intentarlo con el CLI (se detiene) [contrato] |
 
 **Audio generado = provisional.** Seedance, Wan, Flux 3 y H3 generan audio; si la pieza tiene diseño sonoro, reemplázalo en post. [decisión]
@@ -142,7 +153,7 @@ ffmpeg -i toma-3x4.mp4 -vf "crop=1080:1350:0:45" -c:v libx264 -preset slow -crf 
 | GPT Image 2 `gpt-image-2` (+ `-2026-04-21`) | OpenAI · `ai:image` (**default del CLI**) | Igual; `input_fidelity` se omite [oficial] | Igual [oficial] | Preview [oficial] | Calidad `low/medium/high/auto`; único con Batch API [oficial] | 1536×1024 `high` ≈ 0,165; `medium` ≈ 0,041 [oficial] | `medium` 34–58 s por job [verificado 2026-07-18]; `high` puede superar 125 s [contrato] | Conectado; "Earlier GPT Image models" [oficial] | Arena T2I #3; OpenArt #2 [tercero] |
 | Seedream 5.0 Pro `seedream5-pro` | fal · `ai:fal` | Prompt (recomendado ≤ 600 palabras inglés [oficial]) | Área 1024²–2048² (`auto_1K`, `auto_2K`, WxH); aspecto 1/16–16 [contrato] | No expuesta en fal [contrato] | `--format jpeg|png` (default **jpeg**); `--count` 1–6; sin seed [contrato] | 0,0675 (≤ 1536²) · 0,135 (1536²–2048²) [oficial, "tentative"] | 56,8 s [verificado 2026-09-16] | Verificada 2026-09-16 | OpenArt #1; Arena T2I #10; AA T2I #15 [tercero] |
 | Seedream 5.0 Pro Edit `seedream5-pro-edit` | fal · `ai:fal` | Prompt + hasta 10 `--image` (≤ 30 MB) [oficial] | Igual que Pro [contrato] | No [contrato] | Sin máscara; edición sólo por lenguaje [contrato] | 0,0675/0,135 por salida + 0,0045 por referencia adicional (la primera gratis) [oficial] | 116,2 s [verificado 2026-09-16] | Verificada 2026-09-16 | Arena edit #8; AA edit #9 [tercero] |
-| Seedream 5.0 Pro Layerize `seedream5-pro-layerize` | fal · `ai:fal` | 1 imagen png/jpeg 512²–6000², ≤ 30 MB; prompt opcional con `<bbox>` [contrato] | Base + hasta 16 capas PNG con alfa + `layers.json` [contrato] | Sí, por capa [verificado] | `image_size` `auto|auto_1K|auto_1.5K|auto_2K`; `enhance_prompt_mode` vía `--input` [contrato] | 0,03375/capa (área < 1536²) · 0,0675/capa (> 1536²) [oficial]; si la base cuenta como capa [sin dato] | 83,2 s [verificado 2026-09-16] | Verificada 2026-09-16 | — |
+| Seedream 5.0 Pro Layerize `seedream5-pro-layerize` | fal · `ai:fal` | 1 imagen png/jpeg 512²–6000², ≤ 30 MB; prompt opcional con `<bbox>` [contrato] | Base + hasta 16 capas PNG con alfa + `layers.json` [contrato] | Sí, por capa [verificado] | `image_size` `auto|auto_1K|auto_1.5K|auto_2K`; `enhance_prompt_mode` vía `--input` [contrato] | 0,03375/capa (área < 1536²) · 0,0675/capa (> 1536²) [oficial]; la base se cobra como una capa [verificado 2026-10-03] | 83,2 s [verificado 2026-09-16] | Verificada 2026-09-16 | — |
 | Seedream 5.0 Lite `seedream5-lite` | fal · `ai:fal` | Prompt | Área 2560×1440–4096² según schema; ficha dice 3072² [oficial, drift] | No [contrato] | `max_images` 1–6 vía `--input`; PNG; devuelve seed [contrato] | 0,035 por imagen efectiva [oficial] | 43,8 s [verificado 2026-09-16] | Verificada 2026-09-16 | Arena T2I #37; AA T2I #43 [tercero] |
 | Seedream 5.0 Lite Edit `seedream5-lite-edit` | fal · `ai:fal` | Prompt + hasta 10 refs en fal [contrato] | Igual que Lite [contrato] | No | `max_images` vía `--input` [contrato] | 0,035 por imagen [oficial] | 53,5 s [verificado 2026-09-16] | Verificada 2026-09-16 | Arena edit #26; AA edit #20 [tercero] |
 
@@ -174,6 +185,158 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **Wan 3.0 Prime** · `wan3prime-t2v`, `-i2v`, `-r2v` | Igual que base [contrato] | 1080p [contrato] | Igual | 30 | Igual | Igual | Igual; "versión acelerada" [oficial] | 0,05/s registro → 480p 0,068 · 720p 0,14 · **1080p 0,28** (más cara que base) [oficial] | Más rápida [oficial]; "hasta 7×" [tercero]; sin medir | Verificadas 2026-09-16 | No figura [tercero] |
 
 🔴 **Ninguna familia de esta matriz ofrece `4:5`** — medido en los cinco motores fal [verificado 2026-09-22]; Gemini Omni 1.1 Cloud publica sólo `16:9`/`9:16` [oficial]. En fal, el aspecto más cercano es `3:4`, y el camino a 4:5 es generar en 3:4 y recortar: ver la fila de 4:5 en §3.
+
+### 4.3 Video por operación y fase (operación × motor)
+
+Organiza §4.2 por **operación** según la [taxonomía de producción de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)
+(§3.5: preproducción, producción, posproducción). **Ningún motor es el default**: cada fila lista todos los que hacen
+la operación; se elige por contrato de fidelidad (§0) y por esta evidencia. Leído y armado el 2026-10-03.
+
+**Estado:** `[verificado AAAA-MM-DD]` = generación real nuestra que verificó el **contrato del endpoint** (resolución,
+duración, audio, que el CLI arma bien el pedido), según la leyenda de §1 · `[contrato]` = conectado, nunca corrido ·
+`[sin dato]` = no medido · `[hf-cli]` = CLI de la app de Higgsfield (bloque al final de esta sección) · `[mcp]` = sólo en un MCP de sesión de Claude (out-of-band, sin presupuesto gobernado ni
+manifiesto: no es carril de producción). **Canario** = corrida real con **garantía medida** y README de evidencia
+(ADR-024 req. 1); hoy hay **uno** en video. Precio: USD por segundo **publicado** a 720p · 1080p (§4.2 manda; donde
+el escalón difiere se indica). Los costos por canario están en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md).
+
+**Bandas de costo** (las cita la [taxonomía](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) §3.1b por tipo de video;
+USD por segundo de salida **publicado**, a la resolución de entrega, 2026-10-03):
+
+| Banda | USD/s | Ejemplos (de esta guía) |
+|---|---|---|
+| **0** | sin generación | post determinístico (ffmpeg, HyperFrames, `pnpm ai:inpaint` sin motor) |
+| **bajo** | ≤ 0,10 | Wan 3.0 480p/720p · H3 Max 768P/1080P · H3 Max Turbo · Seedance 2.0 mini 480p · `flux3-edit` · Flux 3 draft |
+| **medio** | 0,10 – 0,30 | Flux 3 720p/1080p · Seedance 2.0 base/fast 720p · Seedance 2.0 mini 720p · Omni 720p/1080p · Wan 3.0 Prime 1080p · Wan 3.0 1080p |
+| **alto** | > 0,30 | Seedance 2.5 720p/1080p · Seedance 2.0 1080p/4K · `flux3-extend` |
+
+Los modelos de la CLI de Higgsfield (Veo 3.1, Cinema Studio, Kling 3.0) cobran en **créditos** y entran en una banda
+cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan entre sí en créditos.
+
+#### Preproducción
+
+| Operación | Herramienta | Estado | Nota |
+|---|---|---|---|
+| `pre.storyboard`, `pre.keyframe-still`, `pre.reference-build`, `pre.cast-sheet` | modelos de imagen (§2, §4.1): GPT Image 2.5, Seedream 5.0; `pnpm foto:*` para piezas de marca; `pnpm ai:inpaint` para corregir un still | ver §4.1 | El still de entrada se aprueba al 100 % antes de animarlo; la marca va resuelta ahí |
+| `pre.previs3d` | Blender vía puente MCP local `higgsfield-use-blender` | conectado 2026-09-24 (skill `higgsfield-provider`); playblast → referencia de movimiento **[sin dato]** como receta | Previs exportado → r2v: capacidad investigada, no receta validada (workflow de selección) |
+| `pre.pilot` | el motor más barato que conserve lo que se juzga: `h3turbo-*` 480P/768P, `flux3-*-draft`, `seedance20-mini-*` 480p, `wan3-*` 480p, Omni 360p | [verificado 2026-09-16] (Omni 2026-09-24) | §7.2 |
+| `pre.estimate` | `--estimate` (`ai:fal`, `ai:omni`), `--dry-run` (`ai:inpaint`); MCP Magnific `simulate_cost` [mcp] | [contrato] | La estimación no es techo de factura (§7.3, caso SKY V11) |
+
+#### Producción
+
+| Operación | Motor · id | Estado | Canario | USD/s 720p · 1080p | Nota |
+|---|---|---|---|---|---|
+| `gen.t2v` | Seedance 2.5 · `seedance25-t2v` | [verificado 2026-09-16] | no | 0,473 · 1,164 (el CLI estima 1,04 a 1080p) | hasta 30 s |
+| | Seedance 2.0 base/fast/mini/us · `seedance20-*-t2v` | [verificado 2026-09-16] | no | base 0,302 · ≈0,685; fast 0,242 · —; mini 0,155 · — | único 4K nativo-o-reescalado entregado (base) |
+| | Flux 3 · `flux3-t2v` (+ `-draft`) | [verificado 2026-09-16] | no | 0,17 · 0,29 (draft 0,06) | ≤ 20 s |
+| | Wan 3.0 / Prime · `wan3-t2v`, `wan3prime-t2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 (Prime 0,14 · 0,28) | 30 fps; ≤ 30 s, puede cortar entre encuadres |
+| | MiniMax H3 base/Max/Turbo · `h3-t2v`, `h3max-t2v`, `h3turbo-t2v` | [verificado 2026-09-16] | no | base 0,06 (768P) · 0,13 (2K reesc.); Max 0,04 · 0,08; Turbo 0,02 · 0,04 | audio siempre, sin toggle |
+| | Gemini Omni 1.1 · `ai:omni` modo texto | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 (output nominal) | 3–10 s; 16:9/9:16 |
+| | Higgsfield API · Kling 3.0 std/pro/4K/Turbo, Kling 2.6, LTX 2.5, PixVerse 6, Happy Horse, Hailuo 2.3, Wan 2.6/2.7, H3 2K | [contrato] (sólo `--estimate`) | no | por `--estimate` (§5.8) | ninguna capacidad de video corrida en salida |
+| `gen.i2v` | Seedance 2.5 · `seedance25-i2v` | [verificado 2026-09-16]; 1080×1920 entregado 2026-09-22 | no | 0,473 · 1,164 | filtro de personas reales y marcas, cobrado |
+| | Seedance 2.0 · `seedance20-*-i2v` | [verificado 2026-09-16] | no | ídem t2v | ídem filtro |
+| | Flux 3 · `flux3-i2v` (+ draft → `flux3-enhance`) | [verificado 2026-09-16] | no | 0,17 · 0,29 | enhance publicado [sin dato] |
+| | Wan 3.0 / Prime · `wan3-i2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 | prompt opcional |
+| | H3 base/Max/Turbo · `h3-i2v`, `h3max-i2v`, `h3turbo-i2v` | [verificado 2026-09-16] | no | ídem t2v | Max #1 AA imagen a video con audio [tercero] |
+| | Gemini Omni 1.1 · modo imagen | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | Social Wall publicado con el modelo anterior |
+| | Higgsfield API · `hf-kling3-*-i2v`, `hf-kling25turbo-i2v`, `hf-seedance*-i2v`, `hf-wan3-i2v` | [contrato] | no | `--estimate` | |
+| `gen.r2v` | Seedance 2.5 · `seedance25-r2v` (30 img · 10 video · 10 audio) | [verificado 2026-09-16]; 1080p 2026-09-22 | no | 0,473 · 1,164 (menos con video de referencia, §4.2) | el que más referencias acepta |
+| | Seedance 2.0 · `seedance20-*-r2v` (9/3/3, video sólo guía) | [verificado 2026-09-16] | no | ídem | |
+| | Wan 3.0 / Prime · `wan3-r2v` (10/5/5) | [verificado 2026-09-16] | no | 0,10 · 0,20 | sin filtro de personas reales observado |
+| | H3 base/Max · `h3-r2v`, `h3max-r2v` (9/3/3) | [verificado 2026-09-16]; CMP-001 2026-09-22 | no | ídem t2v | sin `--aspect` sale 1920×1080 horizontal |
+| | Gemini Omni 1.1 · modo referencias (10 img · 3 video) | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | |
+| | Higgsfield API · `hf-seedance*-r2v`, `hf-wan3-r2v`, `hf-grok-video15-r2v`; Kling `elements` vía `--input` | [contrato] | no | `--estimate` | `elements` = candidato a consistencia de cast |
+| `gen.flf` | Flux 3 · `flux3-flf` (ambos cuadros obligatorios) | [verificado 2026-09-16] | no | 0,17 · 0,29 | sin `auto` |
+| | Wan · `wan3-i2v --end-image`; Seedance 2.5/2.0 · `-i2v --end-image`; H3 · `h3*-i2v --end-image` | [verificado 2026-09-16] (generación; el último cuadro no se midió) | no | según familia | |
+| | Gemini Omni 1.1 · modo cuadros | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | |
+| | Higgsfield API · `hf-kling-o3-flf`, `hf-kling-omni-flf` | [contrato] | no | `--estimate` | |
+| `gen.keyframes` | Flux 3 · `flux3-keyframes` (1–10, `img@cuadro`) | [verificado 2026-09-16] | no | 0,17 · 0,29 (draft 0,06) | único con keyframes |
+| `gen.camera` | H3 Max · `h3max-camera` (≤ 12 keyframes de trayectoria) | [verificado 2026-09-16] | no | registro 0,025; escalones [sin dato] | escena congelada |
+| | Higgsfield Cinema Studio 4.0 (cámara, lente, rig de luz) | [mcp], fuera del catálogo de API | no | [sin dato] | |
+| `gen.source-doc` | Wan 3.0 · `wan3-r2v --thinking --web-url` / `--file` | web [verificado 2026-09-16]; `--file` [sin dato] | no | 0,10 · 0,20 | exige guion en el prompt |
+| `gen.multishot` | Seedance 2.0 (multi-shot declarado [oficial]); Wan 3.0 (puede cortar en 30 s [tercero]); Kling 3 `multi_prompt` vía Higgsfield [contrato] | [sin dato] como operación medida | no | según familia | |
+| `time.extend` | Seedance 2.5 · `seedance25-r2v --task extension` | [verificado 2026-09-16] | no | 0,473 · 1,164 (+ entrada) | sin personas ni marcas |
+| | Flux 3 · `flux3-extend` (+ draft) | [verificado 2026-09-16] | no | 0,41 · 0,53 | origen con audio; entrega sólo la continuación |
+| | Gemini Omni 1.1 · modo extender | [verificado 2026-09-24, 360p → 6 s] | no | 0,101 · 0,152 | aspecto heredado |
+| | Higgsfield API · `hf-seedance25-extend` | [contrato] | no | `--estimate` | |
+| `audio.native` | Seedance, Wan, Flux 3 (`--no-audio`), H3 (siempre), Omni (AAC) | [verificado] por familia | no | incluido | provisional por regla |
+| `cast.train` | H3 · `h3-train-*` + `h3-*-lora` | [contrato]; postergado [decisión] | no | piso 100 steps (§5.5) | |
+| | Higgsfield Soul ID | [mcp] / app | no | [sin dato] | |
+
+#### Posproducción
+
+| Operación | Motor · id | Estado | Canario | USD/s 720p · 1080p | Nota |
+|---|---|---|---|---|---|
+| `edit.zone` | `pnpm ai:inpaint video` + Flux 3 · `fal:flux3-edit` (máscara fija o cajas por keyframes) | [verificado 2026-09-16] | ✅ **sí**, 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`): 5 s cámara quieta, 120 cuadros PASS, deriva 11,16/255 (umbral 12) | 0,03 (720p) | único canario de video; cámara quieta |
+| | `pnpm ai:inpaint video` + `fal:seedance25-edit` (+ estrategia `first-frame`) | [contrato] (`verifiedAt: null` en el adaptador) | no | tokens de Seedance | nunca corrido |
+| `edit.global` | Flux 3 · `flux3-edit` | [verificado 2026-09-16] | no (sólo dentro de `edit.zone`) | 0,03 (720p) | sale a 720p |
+| | Seedance 2.5 · `seedance25-r2v --task editing` | [verificado 2026-09-16] | no | ≈ 0,284 con video de referencia (720p) | filtro cobrado |
+| | Gemini Omni 1.1 · modo editar | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | cadena stateful sin probar |
+| | Higgsfield API · `hf-seedance25-edit` | [contrato] | no | `--estimate` | |
+| | Magnific `video_modify` (Aleph 2, Seedance 2/2.5, Omni, H3, Grok) | [mcp] | no | créditos Magnific [sin dato USD] | |
+| `edit.erase` | — **ningún motor conectado** · candidato Wan VACE 14B inpainting (`fal-ai/wan-vace-14b/inpainting`, `mask_video_url`) | esquema leído (TASK-1965), sin conectar | no | [sin dato] | TASK-1979 |
+| `edit.track` | — · candidato SAM 2 video (`fal-ai/sam2/video`); hoy sólo cajas interpoladas en `ai:inpaint video` | esquema leído, sin conectar | no | [sin dato] | TASK-1979 |
+| `edit.background` | — en el CLI · Magnific `video_remove_background` (alfa en webm, ≤ 20 s) | [mcp] | no | créditos | TASK-1983 |
+| `edit.relight` | — en el CLI · Magnific `video_relight` (Beeble SwitchLight, ≤ 240 cuadros); Higgsfield Cinema Studio `video_edit`; candidatos fal ID-V2V y LightX (§10.3) | [mcp] / sin conectar | no | ID-V2V 0,20 · LightX 0,10 [tercero] | TASK-1984 |
+| `time.loop` | `gen.flf` con el mismo cuadro al inicio y al final (Flux 3, Wan, Seedance, H3); crossfade o palíndromo determinístico | [sin dato] como loop medido | no | según familia · 0 | TASK-1982 |
+| `time.retime` | ffmpeg (constante, local) · Magnific `video_speed` (constante gratis, rampas con créditos) | D sin CLI de manifiesto · [mcp] | no | 0 | TASK-1981 |
+| `time.interpolate` | — en el CLI · Topaz vía Magnific `video_upscale` (`frameInterpolation`) | [mcp] | no | créditos | follow-up |
+| `assemble.cut`, `assemble.edit` | ffmpeg / HyperFrames (determinístico); Magnific `video_cut`, `video_concatenate` | D sin CLI genérico · [mcp] | no | 0 | TASK-1981 |
+| `finish.overlay`, `finish.captions` | HyperFrames, ffmpeg, motor de Glitch (taller) | D por pieza | no | 0 | TASK-1981 |
+| `finish.grade` | ffmpeg `lut3d` (determinístico) · Magnific `video_color_grade` / `video_color_transfer` | D sin CLI · [mcp] | no | 0 · créditos | TASK-1981 |
+| `finish.reframe` | ffmpeg `crop` con medición manual de franjas (4:5 desde 3:4) · Aleph 2 `targetAspectRatio` vía Magnific | D manual · [mcp] | no | 0 | TASK-1981 |
+| `finish.upscale` | Flux 3 · `flux3-enhance` (sólo su propio draft) · H3 base 2K/4K (reescalado interno) · Magnific `video_upscale` (Topaz, Magnific) | [verificado 2026-09-16] · [mcp] | no | enhance [sin dato] · créditos | detalle nativo sin detector; TASK-1983 |
+| `audio.voice`, `audio.sfx` | ElevenLabs (MCP de sesión): locución con `eleven_v4` vía el conector **ElevenLabs Creative** (`creative_generate_speech`, etiquetas `[excited]` `[curious]` `[warmly]` `[dramatically]` `[fast]`; usado 2026-10-03 en el spot «Sparks × Efeonce AEO»); motor de sonido de Glitch (taller) | [mcp] · D | no | `estimate_only` 71 créditos por toma corta (~USD 0,016); el run reportó 0 créditos [mcp 2026-10-03] | TASK-1985 |
+| `audio.music` | Stable Audio 2.5 / ElevenLabs Music v2.5 vía fal, fuera de `ai:fal` (§5.9) | [verificado 2026-09-27] (Glitch) · [verificado 2026-10-03] cambio de estilo audio-to-audio (spot Sparks) | no | §5.9 | |
+| `audio.lipsync` | Seedance 2.x / Flux 3 (diálogo declarado [oficial]); Wan 3.0 (débil [tercero]); Higgsfield LipSync [mcp] | [sin dato] en español | no | según familia | TASK-1985 |
+| `audio.mix` | ffmpeg `loudnorm` | D sin CLI de manifiesto | no | 0 | TASK-1981 |
+| `deliver.export` | ffmpeg + hash | D manual | no | 0 | TASK-1981 |
+
+#### Puente Higgsfield: CLI de la app (`higgsfield`) y su MCP
+
+Regla de uso: **propio primero, proveedor como puente** (taxonomía §1 y §3.13). Este bloque es el puente más amplio
+disponible hoy. **No es la API de Higgsfield** (`hf-*` de §5.8): es la CLI de la app, con sesión de usuario
+(mkt@efeoncepro.com, plan Ultra, **4.118 créditos** el 2026-10-03) y el catálogo de la app. Inventario leído el
+2026-10-03: **39 modelos de video** en `higgsfield model list --video` más los workflows de video (`higgsfield workflow
+list`); el MCP de la misma cuenta lista 54. `higgsfield generate cost` estima **gratis** sin encolar; para las
+operaciones sobre un video existente la estimación exige subir antes la fuente (`higgsfield upload`), que no se hizo.
+**Ninguna corrida real**: todo es `[contrato]` (catálogo y validación de parámetros).
+
+| Operación | `job_type` / workflow | Estado | Créditos estimados (`generate cost`, 2026-10-03) |
+|---|---|---|---|
+| `gen.t2v` / `gen.i2v` | `veo3_1`, `veo3_1_lite`, `veo3` (**Veo, que la API nos rechaza**) | [contrato] | Veo 3.1 8 s: 32 · Veo 3.1 lite 8 s: 12 |
+| | `kling3_0` (std/pro/4K), `kling3_0_turbo`, `kling2_6` | [contrato] | Kling 3.0 5 s: 8,75 · Turbo 720p 5 s: 7,5 |
+| | `seedance_2_5` (t2v, omni-reference, edición, extensión), `seedance_2_0`, `seedance_2_0_mini`, `seedance1_5` | [contrato] | Seedance 2.5 5 s: 720p 35 · 1080p 60 |
+| | `wan3_0`, `wan3_0_prime`, `wan2_7`, `wan2_6` | [contrato] | Wan 3.0 720p 5 s: 8,75 |
+| | `minimax_h3`, `minimax_h3_max`, `minimax_hailuo` | [contrato] | H3 Max 5 s: 12,5 |
+| | `flux_3_video`, `gemini_omni`, `gemini_omni_flash_1_1`, `grok_video_v15`, `happy_horse_video` | [contrato] | [sin dato] (requieren parámetros adicionales) |
+| | workflows Cinema Studio `cinematic_studio_video_v2`, `_3_0` (hasta 4K, género, rampas de velocidad, multi-shot), `_3_5`, `cinematic_studio_video_4_0` (cámara, lente, era, paleta, rig de luz) | [contrato] | [sin dato] |
+| `gen.motion-transfer` | `hf_mult_motion_control` (Genjutsu), workflow `kling3_0_motion_control` | [contrato] | requiere fuente |
+| `time.extend` | `seedance_2_5` modo extensión; Cinema Studio 4.0 `video_extension` (adelante y atrás) | [contrato] | requiere fuente |
+| `time.interpolate` | `fps_boost` (ByteDance o Topaz) | [contrato] | requiere fuente |
+| `edit.global` | `kling_video_edit`, `flux_3_video_edit`, Seedance 2.5 `video_edit`, Cinema Studio 4.0 `video_edit` | [contrato] | requiere fuente |
+| `edit.replace` | `hf_mult_replace_object` (Genjutsu) | [contrato] | requiere fuente |
+| `edit.track` | `sam_3_video` (SAM 3, `apply_mask`) | [contrato] | requiere fuente |
+| `edit.depth` | `depth_anything_video` | [contrato] | requiere fuente |
+| `edit.background` | `video_background_remover` | [contrato] | requiere fuente |
+| `edit.relight` | Cinema Studio 4.0 (`light: preset\|custom\|user`, rig ordenado) | [contrato] | requiere fuente |
+| `finish.reframe` | workflow `reframe` (expansión generativa a 16:9, 9:16, 4:3, 3:4, 1:1, 21:9; **sin 4:5**) | [contrato] | requiere fuente |
+| `finish.upscale` | `topaz_video` (1080p/2160p, interpolación), `bytedance_video_upscale` (1080p/2K/4K), `video_upscale` | [contrato] | requiere fuente |
+| `finish.deflicker` | `video_deflicker` | [contrato] | requiere fuente |
+| `finish.hdr` | `topaz_hyperion_2_5` | [contrato] | requiere fuente |
+| `assemble.auto-clips` | `clipify` (desde YouTube, subtítulos, recorte que sigue la cara) | [contrato] | [sin dato] |
+| `audio.voice` | workflow `voice_change` | [contrato] | requiere fuente |
+| `audio.lipsync` | workflow `dubbing` (18 idiomas, incluye `spa`); **sólo en el MCP:** `sync_so` (lipsync con audio propio) | [contrato] | requiere fuente |
+| `pre.reference-analysis` | **sólo en el MCP:** `video_analysis_create` (escena por escena) | [contrato] | [sin dato] |
+
+**Créditos ≠ USD.** El valor del crédito de la suscripción es **[sin dato]**. Comparando el mismo modelo en los dos
+carriles, Wan 3.0 720p 5 s cuesta USD 0,50 en fal y 8,75 créditos aquí, y Seedance 2.5 720p 5 s USD 2,31 y 35 créditos:
+eso da ≈ USD 0,057–0,066 por crédito **[cálculo indirecto, no medido]**. La cifra real sale de `higgsfield account
+transactions` después de la primera corrida (TASK-1986).
+
+🔴 **Lo que la matriz deja a la vista:** de 41 operaciones de producción y post, **una** tiene canario de garantía
+(`edit.zone` con cámara quieta). El resto está verificado como mucho a nivel de contrato del endpoint. Las operaciones
+de post sin camino propio tienen casi todas un **puente** en el CLI de Higgsfield, pero ninguno corrido. El plan para
+cerrarlo es EPIC-051.
 
 ---
 
@@ -324,7 +487,7 @@ Todo [contrato] (OpenAPI de fal 2026-09-16), salvo la ficha de Lite [oficial]. M
 |---|---|---|
 | Pro T2I | 0,0675 por imagen con área ≤ 1536² · 0,135 entre 1536² y 2048² ("tentative pricing") | `imágenes × tarifa del área`; `auto_2K` cae en el escalón alto [cálculo] |
 | Pro Edit | igual por salida + 0,0045 por referencia adicional (la primera gratis) | `salidas × tarifa + (refs − 1) × 0,0045` |
-| Pro Layerize | 0,03375 por capa (área < 1536²) · 0,0675 por capa (> 1536²) | 8 capas a 2K ≈ 0,54 [cálculo]; si la base cuenta como capa [sin dato] |
+| Pro Layerize | 0,03375 por capa (área < 1536²) · 0,0675 por capa (> 1536²) | 8 capas + base a 2K ≈ 0,61 [cálculo]; la base se cobra como una capa [verificado 2026-10-03] |
 | Lite T2I / Edit | 0,035 por imagen | `num_images × max_images efectivas × 0,035` |
 
 fal no devuelve `usage` y el CLI no reporta costo [contrato]. Referencia directa ModelArk: Pro ≈ 0,045/0,09 [tercero, sin fecha verificada] → fal ≈ 1,5× [cálculo].
@@ -352,6 +515,8 @@ pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --size auto_2K --
 ```
 
 **Trampas.** Pro cobra 0,0045 por cada `--image` adicional en edit; `--size`/`--count` no validados contra el contrato de imagen; sin flags para `max_images`, `enhance_prompt_mode` ni `enable_safety_checker` (usar `--input`) [contrato]. Slug sin prefijo `fal-ai/`: con prefijo equivocado responde 200 y el resultado da 404 [verificado]. Resuelto en el CLI el 2026-09-16 (commit `17196ead1`): Pro deriva `output_format` de la extensión de `--out` (`.png` → png, `.jpg`/`.jpeg` → jpeg, otra → error local) y, al descargar, detecta el formato por los bytes y corrige la extensión con aviso; `--format` en Lite se rechaza (Lite entrega PNG); `--seed` se rechaza en todo Seedream; más de 10 `--image` se rechaza en local [contrato]. El registro dice "Hasta 4K según el proveedor" para Pro era **incorrecta**: el tope es 2048²; la nota del registro se corrigió el 2026-09-16 [contrato].
+
+**Como editor dentro de `pnpm ai:inpaint`** (sin máscara: edita por instrucción y el pipeline recompone). Lite Edit dejó una costura visible en la pared (re-renderiza la superficie con otro tono) e ignoró `image_size` (entregó 2880×1920) [verificado 2026-10-02]. Pro Edit, al borrar una taza, pasó la verificación pero dejó un **fantasma tenue del asa** que el detector de residuo no ve, USD 0,068 [verificado 2026-10-03]. Para borrar, usa el clean plate o Sunburst (§2.2).
 
 **Estado.** Las 5 verificadas 2026-09-16 (una corrida cada una); laboratorio híbrido 2026-07-18 [verificado].
 **Fuentes.** B1–B9 (§12).
@@ -514,8 +679,17 @@ pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 100 --
 ```
 
 **Trampas.** `h3max-r2v` sin `--aspect` —o con `--aspect adaptive`— entrega horizontal aunque todo lo que le pases sea vertical [verificado 2026-09-22]; resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; clips cortos descartados en silencio [oficial]. Sin `--resolution`, el CLI ya no hereda el 2K del proveedor en H3 base: envía el escalón más barato y lo avisa; para entrega pasa `--resolution` explícito [contrato].
-**Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
-**Fuentes.** V7–V14, V47–V53 (§12).
+**Uso real: spot animado 2D «Sparks × Efeonce AEO» [verificado 2026-10-03].** Personajes 2D cel-shaded (elenco 2D) y Sparks compuestos desde SVG, image-to-video con cuadro inicial y final, `h3-i2v` a 768P (1344×768, USD 0,06/s publicado); total de video medido en fal USD 4,38 para todas las tomas, pilotos incluidos. Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §3, `PREPRODUCCION.md` §11–12).
+- **H3 base con `--prompt-expansion disabled` fue más fiel que H3 Max:** Max **giró los Sparks en 3D** y rompió el 2D. Para personajes o marca 2D compuestos, base con prompt literal.
+- **Cuadro inicial y final con el mismo eje de cámara:** si no lo comparten, la toma salta de trayectoria.
+- **Prohibir texto en pantalla en el prompt:** sin esa prohibición escribió texto ilegible; dos tomas se rehicieron. Refuerza la regla de §0: el texto se compone fuera.
+- **Fijar la paleta en el prompt:** una toma derivó al verde y se rehízo.
+- **Resoluciones por sondeo de flags:** `h3-i2v` acepta 480P/768P/2K/4K (**no hay 1080P**); `h3max-i2v` **no tiene 2K**. Para entregar a 1080 desde 768P se reescaló en post: `scale=1920:1097:flags=lanczos,crop=1920:1080,unsharp=5:5:0.35`.
+- **Tope de 15 s por request** en fal y en Higgsfield (verificado en documentación y en vivo): las escenas cortas son el límite real, no una preferencia.
+- **`--estimate` colgó subiendo un PNG de 3,5 MB:** usar JPG como entrada y calcular con el precio publicado.
+
+**Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); `h3-i2v` y `h3max-i2v` usadas en producción 2026-10-03 (arriba); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
+**Fuentes.** V7–V14, V47–V53 (§12); corrida del spot «Sparks × Efeonce AEO» (2026-10-03).
 
 ---
 
@@ -668,7 +842,7 @@ pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolu
 
 **Cuándo SÍ.** Modelos que fal no expone (SOUL, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image, LTX 2.5, PixVerse 6, Happy Horse, Kling Omni/O3); comparar precio exacto antes de gastar [contrato].
 
-**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]; Nano Banana y Gemini Omni siempre directo por Google [decisión].
+**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]. **Ojo:** eso vale para la **API**; la **CLI de la app** (`higgsfield`, otra cuenta y otro catálogo) sí lista Veo 3.1, Veo 3.1 lite y Veo 3 [contrato, 2026-10-03] — ver §4.3, bloque «Puente Higgsfield»; Nano Banana y Gemini Omni siempre directo por Google [decisión].
 
 **Vectores (Recraft).** La API rechaza `output_format: svg` (400: sólo `jpg`/`png`/`webp`) [verificado 2026-09-16]. La app de Higgsfield ofrece Recraft V4.1 con `model_type` `vector` y `utility_vector` (logos, íconos, ilustración tipo SVG) [verificado con el conector de la app 2026-09-16]. La API no documenta `model_type` y su estimación acepta cualquier campo (`foo`, `model_type: "banana"` → 200), así que no prueba nada: **si `--input '{"model_type":"vector"}'` entrega SVG por la API está sin confirmar** hasta una generación real (USD 0,035). La CLI deja pasar ese campo para poder probarlo.
 
@@ -706,6 +880,8 @@ pnpm ai:higgsfield:sync-schemas
 | **ElevenLabs Music v2.5** desde texto (`--route el-bed`, `composition_plan` de un tramo, **sin referencia de audio**) | Dio la cama aprobada con instrumentos reales y tempo exacto (150,00 BPM medido), 38 % de medios [verificado 2026-09-27]. Con un plan con referencia de audio (rondas del rock de Efeonce) **no respetó cortes ni el golpe final** [verificado 2026-09-26] | Camas y tracks libres desde texto; los cortes y golpes se aplican después, editando el audio |
 | **Stable Audio 2.5 text-to-audio** (`--route sa-bed`) | Camas con cuerpo (36–37 % de medios), no elegidas [verificado 2026-09-27] | Alternativa para camas desde texto |
 
+**Cambiar de estilo una pieza aprobada (audio-to-audio) [verificado 2026-10-03].** En el spot «Sparks × Efeonce AEO» se pasó la pieza larga de energía del kit sonoro (rock, 120 BPM) a una cama punk: se reordenó la fuente (56 s), se **aceleró** con `atempo=1.3333` a 160 BPM y 42 s exactos (duración entera), y se regrabó con Stable Audio 2.5 audio-to-audio (`ai-generations/2026-10-03_sparks-aeo-60s/audio/musica/regrabar-punk.ts`, USD 0,20 medido por pieza; strength 0,65 y 0,8, elegida **0,8**). **Conservó el tempo acelerado** (autocorrelación fuerte a 80 = medio compás de 160): para cambiar tempo, se acelera la referencia, no se le pide al modelo. **Salió cargada de graves** (medios 21 % contra ~35 % de la regla de abajo) y se corrigió con EQ (−4 dB bajo 180 Hz, +2 dB a 2,5 kHz). Usarla bajo locución fue una excepción del operador a la norma sonora (`docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`, «Excepciones registradas»).
+
 **Cuándo SÍ.** Música de marca con instrumentos reales: regrabar una maqueta (tempo exacto) o una cama desde texto con los instrumentos descritos y negativos explícitos (`chiptune`, `video game`, `8-bit`, `synthwave`, `arcade`, `lead synth`…) [verificado 2026-09-27].
 
 **Cuándo NO.** 🔴 **Nunca síntesis pura para música de marca:** tres rondas de síntesis de Glitch se rechazaron por sonar «arcade» (a videojuego); lo medido fue falta de cuerpo en los medios (cama rechazada 13 % de su energía entre 300 Hz y 3 kHz contra 45 % de la intro aprobada) [verificado 2026-09-27]. Una **maqueta sintetizada delgada contagia la regrabación** [verificado 2026-09-27]. No pedirle al modelo cortes al cuadro, tartamudeos ni silencio en seco: difumina la falla; se aplican después sobre la grabación [decisión]. No regenerar una pieza aprobada: otra corrida es otra toma; la fuente de verdad es el archivo aprobado (URL + sha256) [decisión].
@@ -714,7 +890,7 @@ pnpm ai:higgsfield:sync-schemas
 
 **Trampas.** Stable Audio 2.5 redondea la duración a segundos enteros: arma maquetas de duración entera [verificado]. La licencia comercial de cada modelo **vía fal** sigue por confirmar con legal (`audio-studio` → `SOURCES.md`) [sin dato].
 
-**Fuentes.** Corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
+**Fuentes.** Corrida del spot Sparks en `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §5); corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
 
 ---
 
@@ -797,7 +973,9 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.13 Capas editables
 
-`seedream5-pro-layerize` sobre un KV 2K con 8 capas ≈ **0,54** (0,0675 × 8); bajo 1536² ≈ 0,27. Entrega `NN-<nombre>.png` + `layers.json`.
+`seedream5-pro-layerize` sobre un KV 2K con 8 capas ≈ **0,61** (0,0675 × 9: las 8 capas **más la base, que se cobra como una capa** [verificado 2026-10-03]); bajo 1536² ≈ 0,30 [cálculo]. Entrega `NN-<nombre>.png` + `layers.json`.
+
+Para separar una foto en elementos con máscara y clean plate (no para editar las capas): `pnpm ai:layers --image foto.png [--prompt …] [--bbox x0,y0,x1,y1]` escribe `00-base.png`, `NN-<slug>.png` y `layers.json` con la caja de cada capa en píxeles de la base; `--dry-run` imprime la cota (16 capas + base) y `--list <layers.json>` lista las capas gratis [contrato]. Foto de mesa 1536×1024: 3 capas ≈ 0,10 y, en otra corrida, 4 + base = 0,17 medido con el saldo [verificado 2026-10-03].
 
 ### 6.14 Vectores
 
@@ -815,6 +993,39 @@ Concepto: `seedream5-pro` (texto denso multilingüe declarado) o `gpt-image-2.5-
 4. Adaptaciones de formato extremo: `seedream5-pro-edit` con el ancla = 0,135 + 0,0045 por referencia adicional.
 5. Video: exploración `h3turbo-i2v` y final en el motor que pida el contrato de fidelidad de cada toma.
 Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `seedream-5-gpt-image-2-hybrid-production.md` [decisión].
+
+### 6.17 Editar una foto que ya existe (zona, borrar, mover, incorporar, expandir, fondo, detalle)
+
+Todo pasa por `pnpm ai:inpaint`, que recompone sobre la original y verifica el archivo en delta máximo 0 fuera de lo
+tocado; código 0 = usar, 2 = no usar, 3 = revisar al 100 % [contrato]. Contrato completo:
+[GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md §Pipeline de inpainting](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
+Costos del canario del 2026-10-03 sobre una foto de 1536×1024 [verificado 2026-10-03]:
+
+```bash
+# 0. Capas (sólo si vas a borrar, mover, incorporar o cambiar el fondo por elemento): ≈ 0,10–0,17
+pnpm ai:layers --image foto.png --run ai-generations/<fecha>_<pieza>
+# Editar una zona (Flare medium por defecto; --dry-run primero)
+pnpm ai:mask --base foto.png --rect 0.33,0.42,0.67,0.72 --feather 24 --out mascara.png
+pnpm ai:inpaint image --image foto.png --mask mascara.png --prompt "<qué va en la zona>" --dry-run
+# Borrar con el clean plate: 0
+pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"
+# Borrar sin capas (Sunburst por instrucción): ≈ 0,01
+pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model
+# Mover: ≈ 0,01 con el halo · 0 con --harmonize off
+pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40
+# Incorporar en otra imagen: 0 con --finish off · ≈ 0,01 con halo
+pnpm ai:inpaint place --image destino.png --from foto.png --layers <layers.json> --layer "mug" --at 0.3,0.62 --width 0.12
+# Expandir (Flux Fill por defecto): ≈ 0,10 (1,91:1) · ≈ 0,15 (9:16)
+pnpm ai:inpaint expand --image foto.png --to 9:16 --prompt "<qué hay alrededor>"
+# Cambiar el fondo: ≈ 0,01
+pnpm ai:inpaint background --image foto.png --prompt "<fondo nuevo>"
+# Rehacer un detalle (reinterpreta, no escala): ≈ 0,022
+pnpm ai:inpaint image --image foto.png --mask detalle.png --zone-resolution 2048 --prompt "<el detalle>"
+```
+
+Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
+[expandir y separar en capas](../manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md) ·
+[editar una zona de un video](../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md).
 
 ---
 
@@ -888,6 +1099,35 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
   pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p --yes --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
   ```
 
+### 7.4 Presupuesto por toma según tipo y dificultad (ejemplos)
+
+Aplica la fórmula de la [taxonomía §4.2](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md): pilotos + intentos
+esperables × tarifa a la resolución de entrega + entradas cobradas, **× 1,43 de reserva** mientras la diferencia
+medida estimación/factura siga siendo la de SKY V11. Tarifas: `pnpm ai:fal --estimate` del 2026-10-03 [contrato] o
+publicadas (§4.2) [oficial]; tomas de 5 s, 9:16. **Son ejemplos para presupuestar, no recomendaciones de motor**: el
+motor sale del banco de TASK-1980.
+
+| Tipo / subtipo · dificultad | Nivel | Pilotos | Final (intentos × costo) | Subtotal | Con reserva |
+|---|---|---|---|---|---|
+| `atmosfera/loop-fondo` · baja (≈ 2) | final 720p | — | Wan 3.0 720p: 1,5 × 0,50 | 0,75 | ≈ 1,1 |
+| | | — | H3 Max Turbo 768P: 2 × 0,10 | 0,20 | ≈ 0,3 |
+| `producto/estudio` · media (≈ 7: C 2, E 2, D 0…) | final 1080p | `h3max-camera` 768P: 0,20 | Wan 3.0 1080p: 2,5 × 1,00 | 2,70 | ≈ 3,9 |
+| | | | Flux 3 1080p: 2,5 × 1,45 | 3,83 | ≈ 5,5 |
+| `fotorrealista/persona-accion` · alta (≈ 13) | final 1080p | 2 × H3 Max Turbo 768P: 0,20 | H3 Max 1080P: 4 × 0,40 | 1,80 | ≈ 2,6 |
+| | | | Wan 3.0 1080p: 4 × 1,00 | 4,20 | ≈ 6,0 |
+| | | | Seedance 2.5 1080p: 4 × 5,20 (sin personas reales) | 21,00 | ≈ 30,0 |
+| `personaje-3d/nexa` · alta, **3 tomas** con la misma ancla | final 720p | 1 × Seedance 2.0 mini 480p: 0,35 | Wan 3.0 r2v 720p: 3 tomas × 4 × 0,50 | 6,35 | ≈ 9,1 |
+| | | | Seedance 2.5 r2v 720p: 3 × 4 × 2,31 | 28,07 | ≈ 40,1 |
+| **Feature spotlight 15 s** (`demo-ui/con-persona`, [anexo](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) §3.6): P2 5 s media · P5 4 s alta · P6 5 s propio · cierre | final 720p | 2 × H3 Max Turbo 768P: 0,20 | Wan 3.0 720p: P2 2,5 × 0,50 + P5 4 × 0,40 · P6 y cierre 0 | 3,05 | ≈ 4,4 |
+| | | | Seedance 2.5 720p (mínimo 4 s): P2 2,5 × 2,31 + P5 4 × 1,85 | 13,37 | ≈ 19,1 |
+| `motion-graphics/tipografia-kinetica` · cualquiera | final | — | camino propio (HyperFrames / taller) | 0 | 0 (créditos); el costo es tiempo de diseño |
+| `demo-ui/captura` · cualquiera | final | — | captura real + `pnpm video:finish` (TASK-1981) | 0 | 0 |
+
+**Lecturas que da la tabla:** en dificultad alta la diferencia entre motores es de hasta **≈ 12×** por toma (H3 Max contra
+Seedance 2.5 a 1080p), así que el banco por tipo (C1) se paga solo antes de la primera pieza premium; y los tipos con
+camino propio no compiten por presupuesto de IA. Los motores de la CLI de Higgsfield se presupuestan en créditos con
+`higgsfield generate cost` (§4.3) hasta conocer el valor del crédito.
+
 ---
 
 ## 8. Brechas, fallas conocidas y pendientes
@@ -913,7 +1153,7 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 | `--size`/`--count` sin validar en imagen | Lite reescala solo | Usa el enum |
 | Sin flags para `max_images`, `enhance_prompt_mode`, `enable_safety_checker` | Sólo vía `--input` | `--input '{"campo":valor}'` |
 | `--seed` forzado por `--input` en un endpoint que no lo declara | Efecto [sin dato] | No lo fuerces |
-| Layerize: número de capas y si la base se cobra | [sin dato]; la estimación muestra precio por capa sin total | Presupuesta 16 capas como techo |
+| Layerize: número de capas | Lo decide el modelo y varía entre corridas (misma foto: 3 y 4); la base se cobra como una capa [verificado 2026-10-03] | Presupuesta 16 capas + base como techo |
 | Flux 3: la API de pricing devuelve la mitad del precio publicado | Causa [sin dato]; la estimación usa el publicado | Mide con `--balance` |
 | Estimación orientativa | Tablas de escalones al 2026-09-16, pueden cambiar; las subidas locales ocurren antes de estimar (no cobran) | `--balance` antes y después |
 | Registro con precio del escalón más bajo | Subestima Wan, H3 base/Max/Turbo y Flux 3 | Usa el publicado (§4.2) |
@@ -946,6 +1186,9 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 | Calidad y latencia Wan base vs Prime | Sin medir | Misma toma en ambos, comparar |
 | `wan3-r2v --file` | Sin corrida real | Una corrida con documento |
 | Nitidez de Seedance 2.5 a 1080p | Sin verificar | 5 s a 1080p revisado cuadro a cuadro |
+| **BFL FLUX Tools** (Erase, Outpainting) | No están en fal; API propia de BFL (`https://api.bfl.ai/v1/flux-tools/outpainting-v1` hasta 4 MP, desde USD 0,10/MP; `.../erase-v1` desde USD 0,034 por imagen). Requiere cuenta BFL del operador y el secreto `greenhouse-bfl-api-key` | Adaptador en `pnpm ai:inpaint` + canario comparativo contra clean plate, Sunburst y Flux Fill |
+| **Relight dedicado** | Ninguno conectado; estudio de mercado del 2026-10-03 sin verificar en vivo (§10.3) | Canario de un candidato contra `place --finish element` sobre el mismo composite |
+| **Video con máscara real** (Wan VACE + SAM 2) | Esquemas leídos, sin conectar | TASK-1979 (EPIC-051) con canario; resto del programa de video en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md) |
 
 ---
 
@@ -1017,18 +1260,83 @@ Precios de la API de pricing de fal (2026-09-16), escalón más bajo, **no verif
 
 Conectar cualquiera exige: slug + contrato en `fal-capabilities.ts`, corrida real, y actualizar esta guía (§11). Mientras tanto, `pnpm ai:fal --model <slug> --input '<json>'` corre un slug fuera del registro **sin validación** [contrato]: úsalo sólo para evaluar, no para producción.
 
+### 10.3 Reiluminar (relight) — estudio de mercado 2026-10-03
+
+**Estado (canario del 2026-10-03, tarde):** IC-Light v2 y el relighting por estilos de fal quedaron **conectados y
+probados** como adaptadores de `pnpm ai:inpaint`, y **ninguno conserva un objeto exacto**: IC-Light deformó la taza e
+inventó una ventana; el de estilos le cambió el color. Para un compuesto, el ganador medido es Sunburst por instrucción
+(`place --finish element`). El resto de esta sección es el estudio de mercado: **sin verificar en vivo** salvo esas filas. Donde el estudio no distinguió si el dato venía del fabricante o de un tercero, la fila se marca
+[tercero] hasta leer la página del proveedor; nunca lo uses como [oficial].
+
+**Lo que ya tenemos (lo más cercano):**
+
+- `pnpm ai:inpaint place --finish element`: además de la sombra de contacto y el reflejo, deja que el modelo relumine
+  el elemento pegado (`RELIGHT_PROMPT`: igualar luz, temperatura de color y sombras a la escena, conservando forma,
+  proporciones, colores, materiales y texto) en una zona = el elemento + 48 px; la forma del elemento puede variar
+  [contrato]. Ese modo no tiene canario propio [sin dato].
+- `pnpm foto:isotipo --acabado`: el acabado del isotipo compuesto sobre un plate [contrato].
+
+**Restricciones del canon que mandan sobre cualquier herramienta** [decisión]:
+
+- El plate del registro cine se genera **sin relight ni upscale**: si la luz no sirve, se corrige la ficha y se
+  regenera, no se reilumina la foto ([casebook cine](../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md)).
+  Sin scrim; luz con carácter.
+- Colorimetría: luz de día neutro-cálida (~5200 K) y sombras neutras, b* entre −3 y +3
+  ([EFEONCE_PHOTO_COLORIMETRY_V1.md](../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md)).
+- Por eso el relight sirve para **composites** (un objeto pegado que no toma la luz de la escena), no para arreglar un
+  plate.
+
+**Imagen**
+
+| Herramienta | Acceso | Tipo de control | Precio | ¿Preserva el detalle? | Estado |
+|---|---|---|---|---|---|
+| **Magnific Image Relight** (ex Freepik; `docs.freepik.com` → `docs.magnific.com`) | API `POST /v1/ai/image-relight` asíncrona (+ `GET` por task-id); MCP oficial `https://mcp.magnific.com` (OAuth) con `images_relight` (`creationIdentifier` + `lights`, máximo 4 luces); app con luces posicionables en vista 3D (versión 2026-03-24) | `prompt`, imagen de referencia (`transfer_light_from_reference_image`), lightmap en grises (`transfer_light_from_lightmap`), `light_transfer_strength` 0–100, `interpolate_from_original`, `change_background` (default `true`), `style` (`standard`, `darker_but_realistic`, `clean`, `smooth`, `brighter`, `contrasted_n_hdr`, `just_composition`), avanzados (whites, blacks, brightness, contrast, saturation, `engine`, `fixed_generation`) [oficial] | €0,10 por operación [oficial] | `preserve_details` (default `true`) [oficial], pero re-renderiza (generativo), con riesgo en caras pequeñas; el modelo es propio y no está publicado [tercero] | MCP conectado en las sesiones Claude con la cuenta de Efeonce (`account_profile` responde) [verificado 2026-10-03]; sus esquemas no cargaron en la sesión: **sin invocación verificada**. No conectado a nuestros CLIs |
+| **IC-Light v2** (`fal-ai/iclight-v2`) | fal | Prompt + dirección (`initial_latent`) [oficial] | USD 0,10/MP, redondea hacia arriba [oficial API 2026-10-03] | **No**: deformó la taza e inventó una ventana; tarda > 120 s [verificado 2026-10-03] | **Conectado** (`--adapter fal:iclight-v2`) |
+| **fal `image-apps-v2/relighting`** (`fal-ai/image-apps-v2/relighting`) | fal | Estilo de una lista cerrada (`--prompt natural`, `side_light`…) [oficial] | USD 0,04/imagen [oficial API 2026-10-03] | **No**: cambió el color del producto (blanca → lila) [verificado 2026-10-03] | **Conectado** (`--adapter fal:image-apps-relighting`) |
+| **Qwen-Image-Edit lighting-restoration** | fal | Restauración de luz | USD 0,035/MP [tercero] | [sin dato] | Sin conectar |
+| **Photoroom AI Relight** | API de Photoroom | Corrección de luz, 3 modos, hasta 3500 px [tercero] | [sin dato] | [sin dato] | Sin conectar |
+| **Nano Banana Pro** por instrucción | Google directo (Vertex), nunca por fal [decisión] | Instrucción | USD 0,134–0,24 [tercero] | [sin dato] | Disponible en Vertex sin superficie (§10.1) |
+| **GPT Image 2.5** por instrucción | `pnpm ai:image` / `pnpm ai:inpaint` (conectado) | Instrucción; es el modelo de `place --finish element` | Fórmula oficial de tokens (§5.1) | Redibuja: se recompone y se vuelve a pegar el objeto | Conectado; relight sin medir [sin dato] |
+| **Kontext LoRA relight** | LoRA sobre FLUX Kontext | [sin dato] | [sin dato] | [sin dato] | Experimental; revisar licencia antes de usar [tercero] |
+| **Higgsfield Relight** | Función de la app de Higgsfield | — | [sin dato] | [sin dato] | **No está en la API**: ni en nuestro catálogo (`higgsfield-capabilities.ts`), ni en sus páginas públicas, ni en el MCP (`models_explore` con «relight» → 0 resultados) [verificado 2026-10-03] |
+| **ByteDance (Dreamina)** | App | Relight de fotos con Seedream 5.0 **por prompt**; agente de hasta 40 imágenes con luz consistente [oficial, marketing] | [sin dato] | [sin dato] | Sin modelo dedicado. Seedream edit por prompt sí está conectado (`seedream5-pro-edit`), relight sin medir [sin dato]. Investigación: DreamLight (Tsinghua + ByteDance, arXiv 2506.14549, sin pesos) [tercero] |
+
+**Video**
+
+| Herramienta | Acceso | Tipo de control | Precio | ¿Preserva el detalle? | Estado |
+|---|---|---|---|---|---|
+| **ID-V2V Relight** (`fal-ai/id-v2v/relight`) | fal | Propaga un cuadro reiluminado al clip | USD 0,20/s [tercero] | [sin dato] | Sin conectar |
+| **LightX** (`fal-ai/lightx/relight`) | fal | [sin dato] | USD 0,10/s [tercero] | [sin dato] | Sin conectar |
+| **Beeble SwitchX** | API de Beeble | [sin dato] | USD 0,10–0,30 por 30 cuadros; compra mínima USD 50 [tercero] | [sin dato] | Sin conectar |
+| **Runway Aleph 2.0** | API de Runway | [sin dato] | USD 0,28/s [tercero] | [sin dato] | Sin conectar |
+| **LTX-2.3 Relight IC-LoRA** | Pesos abiertos | Relight, orientado a exteriores | [sin dato] | [sin dato] | Sin conectar [tercero] |
+| **Higgsfield Cinema Studio 4.0** (`cinematic_studio_video_4_0`) | **Sólo el MCP** de Higgsfield | `mode: video_edit` edita un video de referencia (cobrado por su duración); luz `light: preset\|custom\|user`, `light_id`, `light_custom` (rig ordenado: la primera fuente es la llave), además de cámara, lente, apertura, era, género y paleta [verificado 2026-10-03, listado del MCP] | [sin dato] | [sin dato] | **No está en nuestro catálogo de la API** (0 coincidencias) [verificado 2026-10-03]. Candidato a relight de video por rig, sin invocación |
+| **Magnific video relight** | MCP `video_relight` (`video_url` + `first_frame_url` o una creación; `lights` o `light_transfer_image`); app | Luces o imagen de transferencia | [sin dato] | [sin dato] | Sin invocación verificada (esquemas no cargaron) |
+| **Seedance 2.0 / 2.5** por prompt | `seedance25-r2v --task editing` (conectado) | Edición de video por instrucción; en Runware, `duration=auto` y la palabra «relight» en el prompt [tercero] | Tokens de Seedance (§4.2) | [sin dato] | Relight sin medir; filtro de personas y marcas cobrado [verificado 2026-09-16] |
+| **CapCut AI Relight** | App | Relight de video; no nombra el modelo [tercero] | [sin dato] | [sin dato] | Sin API conocida |
+
+**Recomendación del estudio — NO medida todavía:**
+
+- **Composites (objeto pegado):** Magnific con `preserve_details=true`, `change_background=false`, fuerza de
+  transferencia moderada y la escena como imagen de referencia; o un editor por instrucción. En los dos casos,
+  **volver a pegar después el objeto exacto** encima: el híbrido es lo que ya hace el pipeline (`place` toma el
+  elemento de la imagen ORIGINAL y sólo deja al modelo el acabado).
+- **Video:** Beeble SwitchX o ID-V2V (reiluminar un cuadro y propagarlo).
+- **Antes de adoptar cualquiera:** canario contra `place --finish element` sobre el mismo composite, mirando al 100 %
+  forma, texto y materiales del objeto. Conectar un candidato sigue la regla de §11.
+
 ---
 
 <!-- INVENTARIO-GENERADO:INICIO -->
 <!-- NO EDITAR A MANO: lo regenera `pnpm models:inventory --write` desde los contratos de código. -->
 
-> **Inventario generado el 2026-10-02** desde `src/lib/ai/fal-capabilities.ts` y
+> **Inventario generado el 2026-10-03** desde `src/lib/ai/fal-capabilities.ts` y
 > `src/lib/ai/higgsfield-capabilities.ts`. Es la lista COMPLETA de lo que `pnpm ai:fal` puede ejecutar
 > —y por tanto de lo que puede **gastar**—. Si un id aparece acá y no tiene ficha en §5, la ficha es la que
 > falta. La columna «verificado» es la fecha de una generación real nuestra; `—` significa que **nadie la
 > ha corrido**, no que no funcione.
 
-**Carril fal · 56 capacidades** (51 con corrida real)
+**Carril fal · 58 capacidades** (53 con corrida real)
 
 | id | slug | tipo | operación | verificado |
 |---|---|---|---|---|
@@ -1062,6 +1370,8 @@ Conectar cualquiera exige: slug + contrato en `fal-capabilities.ts`, corrida rea
 | `h3max-t2v` | `minimax/h3-max/text-to-video` | video | text-to-video | 2026-09-16 |
 | `h3turbo-i2v` | `minimax/h3-max-turbo/image-to-video` | video | image-to-video | 2026-09-16 |
 | `h3turbo-t2v` | `minimax/h3-max-turbo/text-to-video` | video | text-to-video | 2026-09-16 |
+| `iclight-v2` | `fal-ai/iclight-v2` | image | relight | 2026-10-03 |
+| `image-apps-relighting` | `fal-ai/image-apps-v2/relighting` | image | relight | 2026-10-03 |
 | `seedance20-fast-i2v` | `bytedance/seedance-2.0/fast/image-to-video` | video | image-to-video | 2026-09-16 |
 | `seedance20-fast-r2v` | `bytedance/seedance-2.0/fast/reference-to-video` | video | reference-to-video | 2026-09-16 |
 | `seedance20-fast-t2v` | `bytedance/seedance-2.0/fast/text-to-video` | video | text-to-video | 2026-09-16 |

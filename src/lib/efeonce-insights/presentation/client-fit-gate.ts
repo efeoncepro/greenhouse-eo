@@ -35,7 +35,11 @@ export interface ClientFitViolation {
 const STRUCTURAL_KEYS = new Set([
   'module', 'unit', 'asOf', 'observation', 'absentReason', 'family', 'relation', 'kind', 'specVersion', 'modelVersion',
   'locale', 'href', 'variant', 'periodStart', 'periodEndExclusive', 'timeZone', 'issuedAt', 'asOfMax', 'expiresAt',
-  'output', 'status', 'channelId', 'value'
+  'output', 'status', 'channelId', 'value',
+  // TASK-1974 — enums de la tarjeta de cifra y de la pregunta de cada figura: datos para el render, no texto.
+  'question', 'direction', 'tone',
+  // Tarjeta con isotipo de canal (contrato AXIS 0.2.0): ids de plataforma que el consumer traduce a su isotipo.
+  'platform', 'titlePlatforms'
 ])
 
 const isStructuralKey = (key: string): boolean => STRUCTURAL_KEYS.has(key) || /Ids?$/.test(key)

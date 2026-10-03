@@ -682,10 +682,16 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
 - 🔴 **La pose y la expresión de Nexa salen de la escena, no de las referencias** **[operador, 2026-10-02]**: *«Nexa
   en casi todas las fotos sale con la misma pose de cara de un lado teniendo tantas poses»*. Las referencias dicen
-  quién es; el giro, la inclinación y el gesto los dirige la ficha: declara **una** dimensión, `"expresion"` (12
-  fotográficas de `_identidad-nexa/5-expresiones/`, de `carcajada` a `mirada-lateral`) **o** `"vista"` (el ángulo),
-  o las dos juntas con una persona sola (la vista da el ángulo, la expresión el gesto; `NX7j`). Las 12 comparten el tres cuartos del ancla y sólo mandan en el gesto: si la toma necesita otro
-  ángulo, pídelo con `vista`. Describe la pose en la escena y no copies «confident half-smile» de ficha en ficha;
+  quién es; el giro, la inclinación y el gesto los dirige la ficha: declara **una** dimensión, `"expresion"` **o**
+  `"vista"` (el ángulo), o las dos juntas con una persona sola (la vista da el ángulo, la expresión el gesto; `NX7j`).
+  **Desde el 2026-10-03 son 25 expresiones casi de frente, aprobadas** (`_identidad-nexa/5-expresiones-frente/`; índice
+  de claves en su LEEME): la causa de «la misma pose» era que las 12 viejas compartían el tres cuartos del ancla y
+  entraban primeras. Ahora el **ancla frontal va siempre primero y la expresión detrás, sólo para el gesto**; en un
+  grupo la expresión no viaja y el gesto lo da la escena. Útiles por grupo: éxito (`euforia`, `alivio`,
+  `orgullo-sereno`, `te-lo-dije`), el «antes» del problema (`hartazgo`, `agobio`, `alarma`, `confusion`), foco
+  (`concentracion`, `determinacion`, `explicando`) y social (`bienvenida`, `mirada-lateral`, `mirada-lateral-izq`).
+  El rostro de Nexa es un **óvalo suave**, nunca afinado: el ancla frontal es la v2 (`nexa-ancla-1-rostro-frontal-v2.png`)
+  y `pnpm foto:rostro --persona nexa` mide la proporción (canon 0,81). Describe la pose en la escena y no copies «confident half-smile» de ficha en ficha;
   `foto:prompt` avisa si Nexa llega sin ninguna. A/B y causa:
   [bloques y pipeline, delta 2026-10-02](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
@@ -709,6 +715,26 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png` (maestro 1080 de `team/avatars/v1/1080/`);
   `actual` y `antiguo` ya no son referencia. Lo resuelve `foto:prompt` desde `PERSONAS`; la prenda la sigue decidiendo
   la línea de la pieza, no la bomber de la referencia. Canon: [roster](../../../../docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md).
+- **Julio tiene 37 años con canas prematuras** (2026-10-03): su bloque IDENTITY pide conservar la edad aparente de las
+  referencias, sin rejuvenecer ni envejecer; reemplazó al «mid-forties» anterior tras un A/B sobre la misma escena.
+- 🔴 **El elenco de marca: cinco personajes ficticios que reaparecen entre campañas** **[2026-10-02/03]**. `hum` (Hum,
+  estratega de crecimiento, `growth`), `karo` (Karo, directora de arte y creadora de contenido, `brand`), `sophia`
+  (Sophia, estratega SEO/AEO, `engine`), `isabella` (Isabella, medios pagados y distribución, `voice`) y `antonio`
+  (Antonio, RevOps y CRM, `revenue-hubspot`/`revenue-salesforce`). Se piden en `identidad` igual que el roster:
+  `{ "persona": "karo", "vista": "45-der" }`. **Cuándo usarlo:** para variar las personas en fotos de varios o de equipo,
+  no como cuota: el operador lo dijo así, *«no para tener reglas explícitas de que al menos uno del elenco deba estar»*.
+  **Grupos:** de 3 a 5, cualquier combinación de elenco, Nexa y Julio; con otras personas del roster el tope sigue en
+  dos. En grupo va una referencia frontal por persona y la luz de las referencias no se arrastra; la misma persona dos
+  veces es error. Validado con los cinco del elenco (`EC2`) y con Julio + Nexa + Karo (`VP3`). **Qué no:** aparecer como
+  equipo real (página de equipo, firmas, LinkedIn), como cliente o testimonio, con su nombre en pantalla salvo ficción
+  declarada, ni cambiar de rol o línea; lo publicado pasa por `greenhouse-ai-creative-rights-governance`. Canon:
+  [`EFEONCE_BRAND_CAST_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md).
+- **La prenda puesta la elige el comando** **[2026-10-03]**: `pnpm foto:prompt` toma de cada kit la vista puesta según
+  la silueta de quien la viste, su giro (o `giro` en el objeto, obligatorio de espaldas), `camara: "baja"` y lo que
+  tapa la marca (`tapa`: mano, taza, tablet, brazos cruzados; con una persona se infiere de la escena). Imprime la
+  elegida y las alternativas; `puesta` fuerza otra. En la oclusión la marca conserva su tamaño y sólo se ve lo que no
+  tapa la mano: nunca una marca más chica al lado. Detalle:
+  [garment-reference-kit §Delta 2026-10-03](../../greenhouse-ai-image-generator/references/garment-reference-kit.md).
 - 🔴 **Personaje de casting nuevo (fuera del roster): primero su retrato ancla** **[operador, 2026-10-02, escenario
   del login]**. Sin ancla, la piel salió «muy IA»; retocar sólo la cara después (`pnpm ai:inpaint image`) no la
   arregló **[medido]**. Lo aprobado: un retrato de pecho con la piel v3 (`pnpm ai:image`, `gpt-image-2.5-sunburst`
@@ -763,6 +789,14 @@ origen, lecho + tono, formato) → prompt = bloque realismo + bloque impacto + c
 contacto → medir lecho → regenerar si falla → curar pantallas → componer firma (`LOGO=0.20`) → métricas → QA al zoom.
 Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloques de prompt y scripts:
 [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+**Corrección local de un plate YA aprobado *(2026-10-03)*:** quitar un distractor, mover o escalar un objeto, traer
+uno de otra foto o extender el lienzo se hace con `pnpm ai:inpaint erase|move|place|expand` (+ `pnpm ai:layers` para la
+máscara y el clean plate): todo lo que no se toca queda en **delta 0 verificado** sobre el archivo. Es cirugía sobre
+una foto buena, no un atajo para una mala: si fallan luz, lecho, color, identidad o «se siente IA», **se corrige la
+ficha y se regenera** (canon cine: «sin relight ni upscale»), la piel de una cara no se arregla retocándola (§ casting,
+retrato ancla), un logo nunca se edita con IA, y **no hay relight conectado**: la luz se dirige en la ficha.
+Playbook: `greenhouse-ai-image-generator` → `references/inpainting-and-editing.md`.
 
 ## 13. Checklist QA (antes de mostrar o entregar)
 

@@ -1,0 +1,4 @@
+Reproduciendo 3 pieza(s) con el comando vigente y segmentación nueva…
+✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:
+✓ 3 pieza(s) con CTA certificadas por reproducción: lo entregado es idéntico a lo que produce el comando del repo · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥4.5:1 · superficie ≥3:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.
+  Política cromática verificada en 3 pieza(s); armonía, jerarquía del conjunto y aprobación creativa requieren revisión visual.

@@ -29,6 +29,7 @@
 | Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña; partnership/licensing desde el registry |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
+| Conectar decisiones de marca con producción, automatización, escala o salida al mercado | `09_marca-agencia` + `14_modelo-negocio-asaas` + [`Decisiones de marca y ejecución escalable`](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md) |
 | Entender el panorama competitivo, el benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 | Impregnar cultura interna, hiring, onboarding, performance o rituales de equipo | `09_marca-agencia` + `docs/operations/EFEONCE_OPERATING_CODE_V1.md` |
 
@@ -63,6 +64,13 @@ Todo lo que mostramos debe poder conectarse —directa o indirectamente— con i
 
 Directriz corporativa: para 2028 todos los servicios client-facing deben ser Product Services productizados y
 AI-native. El contrato y los gates viven en [`Efeonce 2028 — Productized AI-Native Services`](../strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md).
+
+**Aplicación estratégica 2026-10-03:** *convertimos las decisiones de marca en una capacidad de producción
+consistente, medible y escalable*. Hacer esas decisiones operables, automatizables y escalables conecta la
+infraestructura con menor tiempo de salida al mercado y preservación de identidad, calidad y consistencia.
+El [canon de la decisión](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md) distingue
+recorrido completo y tramo de cadena como alcances de responsabilidad, y conserva el posicionamiento corporativo
+y los gates comerciales vigentes.
 
 **Cultura operativa:** el Why se impregna en el equipo mediante el **Efeonce Operating Code**: `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Regla cultural: *en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.*
 

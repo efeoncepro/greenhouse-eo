@@ -1,4 +1,4 @@
-# Efeonce Insights — contracts (verified against code 2026-09-28)
+# Efeonce Insights — contracts (verified against code 2026-09-28; secciones TASK-1974/1975 verificadas 2026-10-03)
 
 ## `InsightRequestV1` (`contracts/request.ts`, validated by `commands/validate-request.ts`)
 
@@ -298,7 +298,8 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
 
 - **Catalogs v2 only** — `insights-report` (A4 794×1123) and `insights-deck` (1280×720). No legacy template may exist
   (`__tests__/insights-catalogs-v2-only.test.ts`). A v1 plan still composes on the v2 templates.
-- **Family → page** (`render/figure-slots.ts`, shared by both mappers). `bar_grouped` whose dimensions are METRICS →
+- **Family → page** (`render/figure-slots.ts`, shared by both mappers). TASK-1975 adds five kinds (stat card,
+  waterfall, waffle, donut, stacked): see § Contrato de render de las figuras nuevas. `bar_grouped` whose dimensions are METRICS →
   comparison (each metric on its own scale); `bar`, or `bar_grouped` whose dimensions are DISTINCT CHANNELS
   (`dimensionChannelIds` all non-null and distinct) → columns on one axis; `bullet` → targets; `line` → trend (≤ 3 series
   by role `primary`/`reference`/`detail`). contentType → template: `report-figure-{comparison,columns,targets,trend}` →
@@ -319,7 +320,9 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   ref `asset-ref:org-logo:<id>` (`render/cover.ts` `orgLogoRef`); bytes arrive through `ComposeOptions.externalAssets`.
   The worker reads them with `readOrganizationLogoForRender` (only the attached logo of THAT org, image, ≤ 2 MB, access
   log). No bytes ⇒ fail closed; non-embeddable logo ⇒ `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
-- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. `delta-tone` = direction, not judgment.
+- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. Since TASK-1975 (local, 2026-10-03) the
+  variation value is `<direction>[:<tone>]` with a SEMANTIC tone (`better` green, `worse` red, `neutral` gray; see
+  § Contrato de render de las figuras nuevas); before it, `worse` painted gray.
 - **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
   visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).
 
@@ -401,3 +404,134 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   (hallazgo siempre) y `ai_source.<asistente>` (figura completa o ninguna + hallazgo del asistente que más trae). Flag
   OFF ⇒ silencio (sin límite); lo leen Vercel y `ops-worker`.
 - **Línea semanal**: la lectura usa sólo bloques completos de 7 días como extremos.
+
+## Criterio de selección de gráficos (2026-10-03, decidido; implementado por TASK-1974 + TASK-1975, code complete local)
+
+Aprobado y canonizado por el operador el 2026-10-03. Canon técnico (fuente única; esto es su resumen operativo):
+`docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`. Implementado por **TASK-1974** (planner, contrato,
+modelo web) y **TASK-1975** (páginas, tarjeta, diseño), ambas code complete local el 2026-10-03, sin desplegar.
+
+- **Principio**: un gráfico es un argumento que responde UNA pregunta del lector; la familia se elige por la pregunta, no
+  por la forma del dato ni por costumbre. Si la barra explica el dato, se queda; si otra figura lo explica igual o mejor,
+  se cambia. Nunca se elige un gráfico peor para variar.
+- **Tres reglas, en este orden**:
+  1. **La pregunta decide la familia** (tabla de abajo).
+  2. **Un dato no se muestra dos veces.** Si la métrica tiene meta, gana el bullet contra la meta y sobra la barra contra
+     el período anterior de la misma métrica. Un mismo hecho no alimenta dos figuras.
+  3. **La variedad sólo desempata.** Entre dos familias que explican el dato igual de bien, se elige la que NO usó la
+     figura anterior del capítulo. La variedad nunca justifica una figura peor.
+
+| Pregunta del lector | Familia |
+|---|---|
+| ¿Cuánto es y cómo cambió? (un valor, o varias métricas cada una en su escala) | **Tarjeta de cifra** |
+| ¿Cómo evolucionó en el tiempo? (≥ 3 puntos) | Línea |
+| ¿Cumplimos la meta? | Bullet (varias metas del capítulo en UNA figura, small multiples) |
+| ¿Qué explica el cambio? | Cascada (anterior → aporte de cada parte → resto → actual; debe cuadrar) |
+| ¿De qué se compone? 2–3 partes | Dona (más de 3: nunca dona ni torta) |
+| ¿De qué se compone? unidades contables, ≤ 4 categorías | Waffle (cada cuadro, una unidad) |
+| ¿De qué se compone? más de 4 categorías | Barras horizontales ordenadas |
+| ¿Cuánto del total es un subconjunto, en dos períodos? | Barras apiladas (≤ 4 segmentos) |
+| Comparar elementos ordenados (páginas, consultas, competidores) | Barras (horizontales si las etiquetas son largas) |
+
+- **Tarjeta de cifra = tipo de figura NUEVO**, no una de las 15 familias de `contracts/chart-spec.ts`. Anatomía: nombre
+  (≤ 3 palabras), valor grande con cifras tabulares, unidad, variación con flecha + color + texto (nunca sólo color),
+  período de comparación explícito («vs agosto»), dirección declarada cuando subir es malo (posición, rondas de
+  revisión), marca «estimado» si el valor lo es, «—» sin dato (nunca 0).
+- **Reglas duras heredadas** (`dataviz-design`): barras desde 0; nunca torta de más de 3 porciones; nunca 3D; nunca doble
+  eje; nunca el color como única codificación; embudo sólo con etapas estrictamente ordenadas que pierden gente
+  (clics de Search Console → sesiones de GA4 NO lo es: Berel septiembre 2026, 13.606 clics vs 43.949 sesiones).
+- **Implementado (local, 2026-10-03)** — el criterio es regla con pruebas, SÓLO en planes con editorial v2:
+  `ChartSpecV1.question` + `QUESTION_FAMILIES` (§ abajo), selección en `editorial/figure-selection.ts`, productores en
+  `editorial/criterion-figures.ts`, deduplicación `duplicated_fact`, matriz `family_evidence_matrix_v3` (dona y
+  apiladas con evidencia GA4), tarjeta de cifra en el plan + modelo web 1.4 + `insights-report` + `insights-deck` + Think,
+  y página PDF/lámina para cascada, waffle, dona y apiladas. Orden del capítulo: cifras → metas → evolución → explicación
+  → composición → comparación (`FIGURE_QUESTIONS` en ese orden; `orderByQuestion`).
+- **Sin verificar con datos reales**: dona de fuentes IA y apiladas de GA4 (GA4 no corre en local; probadas con fixtures).
+- **Plan sellado antes del criterio** no trae `question` ni `stats`: valida igual y sigue con la regla de hoy (§ Render
+  contract y `ChartScaleV1.perDimension` en § Client-fit). Una edición sellada nunca cambia de figuras.
+
+### Pregunta de la figura (TASK-1974)
+
+- `FIGURE_QUESTIONS = ['value_change', 'target', 'evolution', 'explain_change', 'composition', 'subset', 'compare']`
+  (el orden ES el orden del capítulo). `ChartSpecV1.question?` es aditivo: su presencia dice que el plan se armó con el
+  criterio. `QUESTION_FAMILIES`: `value_change` → ninguna familia (es la tarjeta), `target` → `bullet`/`gauge`,
+  `evolution` → `line`, `explain_change` → `waterfall`, `composition` → `donut`/`pie`/`waffle`/`bar`, `subset` →
+  `bar_stacked`, `compare` → `bar`/`bar_grouped`. Pregunta desconocida ⇒ `unknown_question`; familia que no responde la
+  pregunta ⇒ `question_family`.
+- `ChartBulletItemV1.direction?` (`higher_is_better | lower_is_better`): dirección PROPIA de la fila cuando una figura
+  junta metas de métricas distintas; `bulletItemDirection(data, item)` = la del ítem o la de la figura. Inválida ⇒
+  `bullet_item_direction`.
+- Límites de forma (`figure-selection.ts`): dona 2–3 partes; waffle ≤ 4 partes y ≤ 100 unidades; apiladas ≤ 4 segmentos;
+  línea ≥ 3 puntos.
+
+### Tarjeta de cifra — `PlanStatFigureV1` (TASK-1974)
+
+- Vive en `PlanChapterV1.stats?` (ausente = plan anterior al criterio), **fuera** de las 15 familias de `ChartSpecV1`.
+  `{ figureId, question: 'value_change', title, items: PlanStatItemV1[], note?: PlanClaimV1 }`. Su lectura es
+  `readings[].chartId === figureId`.
+- `PlanStatItemV1 = { itemId, label, factId, comparisonFactId: string | null, direction: PlanStatDirection | null,
+  estimated }`. Valor, unidad y variación salen del hecho; nada se escribe a mano.
+- **Validación** (`plan-validation.ts`, regla `invalid_field` salvo donde se dice): `figureId` único entre figuras del
+  capítulo; `question` debe ser `value_change`; sin cifras no se emite; `title` y `note` dentro de
+  `PLAN_TEXT_LIMITS.statTitle`/`statNote`; `note` cumple las reglas de cifras de cualquier claim; `itemId` único; nombre
+  de la cifra con **≤ 3 palabras y ≤ 24 caracteres** (`STAT_LABEL_MAX_WORDS`/`STAT_LABEL_MAX_CHARS`; nunca se trunca);
+  dirección `null` o uno de los dos valores; `factId` desconocido ⇒ `unknown_fact`; una meta o umbral no es cifra del
+  período; `comparisonFactId` debe ser EL comparable del hecho; `estimated` debe coincidir con
+  `fact.observation === 'estimated'`.
+- **`duplicated_fact`** (regla nueva de `PlanViolation.rule`): un hecho del período actual alimenta dos figuras del
+  capítulo (tarjetas + gráficos, vía `duplicatedFigureFacts`/`chartFactUse`). Excepción: los totales de una cascada son
+  ANCLA (`anchorFactIds`) y pueden repetir la cifra de una tarjeta. Los comparables y las metas no cuentan. Sólo se juzga
+  en planes armados con el criterio (traen `stats` o algún `question`).
+- **Dirección por métrica** (`METRIC_DIRECTIONS` + `metricDirectionOf`): gana `fact.dimension.direction` (ICO desde su
+  registro); si no, la declarada por métrica (clicks, impresiones, CTR, keywords en página 1, ETV, sesiones orgánicas,
+  sesiones desde IA, Share of Model, citas, SoV de marca, `mention_rate.*` → mayor es mejor; `position` → menor es
+  mejor); si no, toda unidad `position` es menor es mejor; si no, `null` (variación neutra). `changeToneOf` da
+  `{direction: up|down|flat, tone: better|worse|neutral}`.
+
+### `statItemView` — una resolución para todos (`presentation/stat-card.ts`)
+
+`display` (formato del hecho; «—» sin dato), `change {display SIN signo, direction, tone} | null` (una variación que no
+se imprime es `flat` + `neutral`), `versus` («vs 16.390 en agosto de 2026»), `comparison {factId, display, period}`,
+`noData` («Sin dato en …», sólo sin valor), `firstPeriod` («Primer período medido», valor sin comparable), `lowerIsBetter`
+(«Menor es mejor», sólo `lower_is_better`), `parts {prefix?, value, suffix?, unitLabel?}` (`splitStatValue`: «#» antes;
+«%»/«‰»/«pp» pegado; una palabra como unidad) y `count {from, to, decimals} | null` (recorrido del Live). Ningún consumer
+calcula variación, tono ni período por su cuenta.
+
+### Modelo web 1.4 (aditivo; TASK-1974/1975)
+
+`INSIGHT_WEB_MODEL_VERSION = '1.4'`. `chapter.stats?: InsightWebStatFigureV1[]` (`{figureId, question, title, items,
+note?}`) va ANTES de los gráficos; `InsightWebStatItemV1` trae ya resueltos `display`, `estimated`, `direction`,
+`change?`, `versus?`, `comparison? {display, period}`, `firstPeriod?`, `noData?`, `lowerIsBetter?`, `parts?` y
+`count? {from, to, decimals}` (las cifras intermedias son movimiento, no contenido: el final es siempre `display`). Los
+gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `stats` (el hallazgo y la tabla siguen ahí).
+
+### Contrato de render de las figuras nuevas (TASK-1975)
+
+- `FigureKind` suma `stat`, `waterfall`, `waffle`, `donut`, `stacked`; contentType `report-figure-<kind>` (A4) e
+  `insights-figure-<kind>` (deck). `PDF_FIGURE_FAMILIES` = `bar`, `bar_grouped`, `line`, `bullet`, `waterfall`,
+  `waffle`, `donut`, `bar_stacked`; el resto de las 15 familias sigue sin página (`reject` con causa).
+- **Capacidades** (`FIGURE_CAPACITY`): A4 `stats 6, waterfallSteps 8, waffleParts 4, donutParts 3, stackedPeriods 6,
+  stackedSegments 4`; deck `stats 6, waterfallSteps 6, waffleParts 4, donutParts 3, stackedPeriods 4,
+  stackedSegments 4` (más las de TASK-1889).
+- **Orden**: `chapterFigureSlides` (único para los dos mappers) pone primero las páginas de cifras y después los
+  gráficos con página, en el orden del plan.
+- **Cifras** (`buildStatSlides`): sin cifra principal en el héroe (las cifras SON la figura); conclusión del `reading` o
+  del primer claim que las cita; hasta `capacity.stats` por página, en páginas equilibradas. Nombre de > 3 palabras o >
+  24 caracteres ⇒ `InsightsRenderRejectedError` con causa, nunca truncado. La línea gris bajo la cifra dice «Sin dato
+  en …» o «Primer período medido».
+- **Cascada**: `data.kind === 'waterfall'` o rechazo; primer y último paso totales, los del medio aportes, o rechazo; un
+  hecho faltante o más pasos que la capacidad ⇒ no se emite (no se pagina); inicial + Σ aportes ≠ final ⇒ rechazo «no
+  cuadra» con la suma impresa. El signo del paso se lee de su `kind`; el texto DEBE llevarlo impreso («+96», «−23»).
+- **Waffle**: `data.kind === 'waffle'` o rechazo; 2–4 partes de conteos enteros ≥ 0 y total 1–100, si no no se emite;
+  total declarado que no coincide con la suma ⇒ rechazo. Un cuadro = una unidad (`waffleUnitGeometry`: 5 columnas hasta
+  30 unidades, 10 hasta 100).
+- **Dona**: una sola serie o rechazo; 2–3 partes no negativas con total > 0, si no no se emite. Participación por
+  **restos mayores** (`sharesOf`, suma 100; cifra derivada declarada, impresa junto a su cuenta). Centro: si el total ya
+  tiene tarjeta en el capítulo, la participación de la parte principal; si no, el total. Nunca la misma cifra dos veces.
+- **Apiladas**: 2–4 segmentos y 2–capacidad períodos, valores ≥ 0, si no no se emite; el total de cada período es la
+  suma de sus segmentos; anotación con la variación del segmento base entre los dos últimos períodos.
+- **Deck — tamaño de la cifra principal** (`deckFigureSizeClass`): se cuenta el ancho visible, sin espacios ni signo
+  inicial: ≤ 3 caracteres 132 px, 4 caracteres 112 px, más 104 px.
+- **Tono por fondo**: papel (A4, Live) = píldora teñida con texto en tono (variante A); navy (deck) = sin píldora
+  rellena, tono sólo en el triángulo y la cifra en `navyLead` (variante C). Triángulo de puntas redondeadas en todas las
+  superficies. Roles `deltaBetter/WorseOnPaper`, `deltaBetter/WorseOnNavy`, `dataStepOnPaper/OnNavy`.

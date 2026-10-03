@@ -1,0 +1,12 @@
+  ⇢ elemento pegado en (207, 369) a 261x225 px · píxeles tomados de la imagen de ORIGEN
+  ⚠ fal:iclight-v2: contrato verificado, generación real SIN verificar todavía.
+  · fal:iclight-v2 edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ imagen completa → 1224x816 · la zona con contexto ocupa 33 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.100 · 1 × 1 imagen(es) × 1 MP (redondeado arriba) × USD 0.1/MP
+  → candidato 1/1 …
+    · fal encolado: fal-ai/iclight-v2 · request 01a101a1-acbe-7e33-ad3e-b5c333072f27
+    · color corregido en el anillo (16880 px): desplazamiento RGB +75.2 / +79.6 / +91.6
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 233/255
+    ⚠ el modelo movió la zona protegida en promedio 72.2/255: mira la unión al 100 %.
+    ✓ PASS · destino fuera de lo pegado y su acabado: delta máximo 0/255 · ./ai-generations/2026-10-03_task-1973-canary/relight/place/7106910349f1/inpaint/0b2aa657339e/candidate-1.png
+exit=0

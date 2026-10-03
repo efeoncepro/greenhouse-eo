@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.050 (1 × 1669 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/julio-edad-ab/julio-A-a.png (edit) …
+  ✓ 2322KB · gpt-image-2.5-sunburst · 1152x1440 · high
+    usage: in 5960 (img 4550 · txt 1410) · out 1669 · total 7629
+done

@@ -116,29 +116,35 @@ describe('TASK-1957 — plan apto para cliente', () => {
   })
 
   it('el gate rechaza magnitudes incomparables en un eje compartido', () => {
+    // Desde TASK-1974 el planner ya no arma barras de métricas sueltas (van en la tarjeta de cifra): el gate se prueba con
+    // un gráfico construido a propósito, clics junto a keywords en UN eje.
+    const seoIndex = model.chapters.findIndex(chapter => chapter.module === 'seo')
+
+    const sharedChart = {
+      spec: { specVersion: 'chart_spec_v1' as const, chartId: 'chart.shared', family: 'bar' as const, relation: 'comparison' as const, title: 'Clics y keywords', series: [{ seriesId: 'cur', label: 'Actual', factIds: ['seo.clicks', 'seo.keywords_tracked'], unit: 'count' }], dimensionLabels: ['Clics', 'Keywords'], unit: 'count', scale: { kind: 'linear' as const, baseline: 0 as const }, references: [], tabularEquivalent: { columns: [], rows: [] } },
+      table: { columns: [], rows: [] }
+    }
+
     const shared: InsightWebModelV1 = {
       ...model,
-      chapters: model.chapters.map(chapter => ({
-        ...chapter,
-        charts: chapter.charts.map(chart => ({ ...chart, spec: { ...chart.spec, scale: { kind: 'linear' as const, baseline: 0 as const } } }))
-      }))
+      chapters: model.chapters.map((chapter, index) => (index === seoIndex ? { ...chapter, charts: [...chapter.charts, sharedChart] } : chapter))
     }
 
     expect(clientFitViolations({ model: shared, facts: berelLike.facts }).map(violation => violation.rule)).toContain('shared_axis_incomparable')
   })
 
-  it('compara cada métrica en su escala, descarta la posición en barras y dice el empate de presencia en una frase', () => {
+  it('las métricas sueltas van en la tarjeta de cifra (cada una en su escala), la posición nunca en barras y el empate de presencia en una frase', () => {
     const seo = plan.chapters.find(chapter => chapter.module === 'seo')!
     const aeo = plan.chapters.find(chapter => chapter.module === 'aeo')!
-    const counts = seo.charts.find(chart => chart.unit === 'count')!
+    const stat = seo.stats![0]!
 
+    // TASK-1974 — «¿cuánto es y cómo cambió?» es una tarjeta: clics, impresiones y posición, cada cifra en su escala.
+    // Las keywords medidas no tienen nombre corto: quedan en el hallazgo y la tabla, sin figura de una barra.
+    expect(stat.items.map(item => item.factId)).toEqual(expect.arrayContaining(['seo.clicks', 'seo.impressions']))
+    expect(stat.items.map(item => item.factId)).not.toContain('seo.keywords_tracked')
     expect(seo.charts.every(chart => chart.unit !== 'position')).toBe(true)
-    // Una sola figura: clics, impresiones y keywords contra su período anterior, cada fila en su escala. Partirlas por
-    // magnitud dejaba figuras de una barra sin página y el capítulo sin conclusiones (vista previa Berel, 2026-10-02).
-    expect(seo.charts.filter(chart => chart.unit === 'count')).toHaveLength(1)
-    expect(counts.series.at(-1)!.factIds).toEqual(['seo.clicks', 'seo.impressions', 'seo.keywords_tracked'])
-    expect(counts.scale.perDimension).toBe(true)
-    expect(seo.readings?.some(reading => reading.chartId === counts.chartId)).toBe(true)
+    expect(seo.charts.filter(chart => chart.family === 'bar' || chart.family === 'bar_grouped')).toEqual([])
+    expect(seo.readings?.[0]?.chartId).toBe(stat.figureId)
     expect(aeo.charts).toEqual([])
     expect(aeo.claims[0]).toMatchObject({ text: 'La marca aparece en 2 de 6 consultas en cada motor.', role: 'finding' })
     expect(seo.limits).toEqual(['Tráfico orgánico estimado: no forma parte de esta edición.'])
@@ -168,7 +174,7 @@ describe('TASK-1957 — empates con dueño', () => {
 
 describe('TASK-1957 — gate client-fit (derivado del payload)', () => {
   const base: InsightWebModelV1 = {
-    modelVersion: '1.3',
+    modelVersion: '1.4',
     locale: 'es-CL',
     executiveSummary: [],
     chapters: [],
@@ -262,7 +268,7 @@ describe('TASK-1957 — indicadores estándar de visibilidad en motores de respu
 
 describe('TASK-1957 — el gate compara la razón del límite entera', () => {
   it('«sin datos suficientes» (lector) no se confunde con «sin datos» (interno); la forma interna exacta sí se marca', () => {
-    const base: InsightWebModelV1 = { modelVersion: '1.3', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {} }
+    const base: InsightWebModelV1 = { modelVersion: '1.4', locale: 'es-CL', executiveSummary: [], chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {} }
     const rulesOf = (limits: string[]) => clientFitViolations({ model: { ...base, limits }, facts: [] }).map(violation => violation.rule)
 
     expect(rulesOf(['Share of Voice: sin datos suficientes en este período.'])).toEqual([])
@@ -311,7 +317,7 @@ describe('TASK-1962 — dominios citados en el gate client-fit', () => {
     const cited = { factId: 'aeo.cited_source.1.w', module: 'aeo', metricId: 'cited_source.1', label: 'chocale.cl' } as EvidenceFactV1
 
     const model: InsightWebModelV1 = {
-      modelVersion: '1.3', locale: 'es-CL', chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {},
+      modelVersion: '1.4', locale: 'es-CL', chapters: [], actions: [], limits: [], methodology: [], references: [], facts: {},
       executiveSummary: [{ claimId: 'c1', text: 'El sitio más citado por los motores es «chocale.cl»: 11 de 246 citas.', factIds: [] }]
     }
 

@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
 > **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.10 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.10: el escenario del login de Greenhouse — excepción del operador para cine con una persona de casting en uniforme en una superficie de producto, y el alcance que falta; [delta 2026-10-02 (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse). 1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Última actualización:** 2026-10-03 por Claude (1.11: el cine pasa a valer en superficies de producto — caso 6, alcance `producto`, [delta 2026-10-03](#delta-2026-10-03--el-cine-también-vale-en-superficies-de-producto). 1.10: el escenario del login de Greenhouse — excepción del operador para cine con una persona de casting en uniforme en una superficie de producto, y el alcance que falta; [delta 2026-10-02 (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse). 1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -36,6 +36,17 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 
 ---
 
+## Delta 2026-10-03 — el cine también vale en superficies de producto
+
+**[decisión del operador, 2026-10-03]** «Para producto también es necesario el estilo cine». El registro cine pasa a valer
+en las **superficies de producto** de Efeonce y Greenhouse (el escenario de novedades del login, un hero de producto):
+es el **caso 6** de §2, con `alcance: "producto"` en la ficha (`ALCANCES_CINE` de `scripts/foto/build-prompt.mjs`).
+Protagonista: Nexa, una persona del roster con la prenda de su línea, o un personaje de **casting** anclado a su retrato
+(receta de piel v3); el uniforme sale de su kit. La superficie no dibuja otra órbita encima de la foto: en el login, las
+novedades cine se muestran sin la Lente. `LG2e` pasó de `publicidad-prueba` a `producto`. **[pendiente]** llevar el caso
+al contrato de AXIS (`efeonceGraphicLine.surfaces.photo.cine`, issue `cine-requires-nexa-or-proposal`): hoy la regla vive
+en el compilador de Greenhouse, y una pieza compuesta por superficie con persona no-Nexa seguiría rechazada por AXIS.
+
 ## Delta 2026-10-02 (c) — el escenario del login de Greenhouse
 
 **[decisión del operador, 2026-10-02]** El carrusel de novedades del login V4 (TASK-1964) usa fotos de marca en un
@@ -48,7 +59,7 @@ pantallas del producto: §2 sigue diciendo que un hero web va en A, B o C.
   producto, y la ficha declara `alcance: "publicidad-prueba"` con la excepción escrita en `nota` **[medido en las
   fichas]**. **[pendiente]** que el operador decida si el login (o «superficie de producto con foto de marca») pasa a
   ser un caso de §2 con su alcance propio; el [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos)
-  propone `producto-escenario`. Hasta entonces, nadie extiende esta excepción a otra pantalla.
+  propone `producto-escenario`. **Resuelto el 2026-10-03:** caso 6 con `alcance: "producto"` ([delta 2026-10-03](#delta-2026-10-03--el-cine-también-vale-en-superficies-de-producto)).
 - **El personaje de casting nace de un retrato ancla** con la receta de piel v3, y la escena lo pide por el campo
   `casting`: sin ancla, la piel salió «muy IA» y el operador la rechazó **[decisión del operador]**; retocar la cara
   después no la arregló **[medido]**. Método y fallas 14–20: casebook.
@@ -263,7 +274,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 ## 2. Cuándo se usa — y cuándo no
 
-**Permitido en cinco casos, y sólo en esos [decisión del operador, 2026-09-27; el cuarto, 2026-09-29; el quinto, 2026-10-01]:**
+**Permitido en seis casos, y sólo en esos [decisión del operador, 2026-09-27; el cuarto, 2026-09-29; el quinto, 2026-10-01; el sexto, 2026-10-03]:**
 
 | Caso | Quién protagoniza | Vestuario | Dónde vive la regla |
 |---|---|---|---|
@@ -272,6 +283,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 | **3 · Láminas de sección y «about» del deck** (excepción, 2026-09-27) | Personas del equipo (o del cliente, en la sección con el panel a la derecha), con o sin Nexa | Equipo: uniforme por registro de escena; cliente: su propia ropa, sin marca Efeonce | [Delta (c) de arriba](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) + [superficie §3, regla 5](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) |
 | **4 · Fotos de Marketing con Manzanitas** (decisión del operador, 2026-09-29, `cine-team-people-social`) | **Personas reales del equipo actual**, con su identidad (`identidad` en la ficha), desde el [roster del equipo](./EFEONCE_TEAM_ROSTER_V1.md) | La de la **línea de la pieza** (`linea` en la ficha): **hoodie** Efeonce en Servicios creativos (`brand`); **bomber o softshell** del uniforme corporativo, con el polo debajo si se quiere, en las líneas de negocio. Para todo el equipo, Julio y Valentina incluidos; `foto:prompt` lo exige | [Roster](./EFEONCE_TEAM_ROSTER_V1.md) · token AXIS `manzanitasRegister.teamPeople` |
 | **5 · Portadas de perfil social y destacados de Instagram de Efeonce** (decisión del operador, 2026-10-01) | Nexa protagonista; en los destacados, la mezcla aprobada (su ojo, sus Sparks y objetos del oficio) | Nexa: traje de ficción o uniforme, como en el caso 1. **Nunca** personas fuera del roster | [Delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram) · [línea gráfica §10.1.1](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) |
+| **6 · Superficies de producto Efeonce/Greenhouse** (decisión del operador, 2026-10-03; `alcance: "producto"`) | Nexa, una persona del roster o un personaje de **casting** anclado a su retrato (piel v3) | Nexa: traje de ficción o uniforme; personas: la prenda de su línea, por su kit. La superficie no dibuja otra órbita encima | [Delta 2026-10-03](#delta-2026-10-03--el-cine-también-vale-en-superficies-de-producto) · casos `LG1`, `LG2e` (login V4) |
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta
@@ -286,8 +298,8 @@ cinematográficas». Las portadas del brochure llevan a Nexa como protagonista (
 **Cuándo NO [decisión del operador, 2026-09-27]:** una pieza social, un hero web o una lámina de contenido con
 personas del equipo **siguen en A, B o C** (las portadas de perfil y los destacados del caso 5 llevan a Nexa, no al
 equipo). La publicidad con personas del equipo en cine **no está aprobada**: queda
-en prueba (§11). **Excepción del login de Greenhouse (2026-10-02):** cine con una persona de casting en el escenario de
-novedades del login, sólo ahí; [delta (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse).
+en prueba (§11). **Superficies de producto (caso 6, 2026-10-03):** el escenario del login y los heroes de producto sí admiten cine;
+un hero web de campaña o una pieza de contenido siguen en A, B o C.
 
 ⚠️ **No todo lo aprobado esa noche es cine [medido en archivos]:** «BEX escalera» es la receta
 `method-staircase` —**sin foto**, la escalera es la imagen ([superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck))—,
@@ -458,10 +470,10 @@ el kit del hoodie declara la tela en **azul royal** (`ai-generations/2026-09-17_
 
 | Tema | Regla | Fuente |
 |---|---|---|
-| Identidad | **Siempre la A**, anclas de `ai-generations/_identidad-nexa/1-anclas/` (los logs del brochure muestran `nexa-ancla-2-rostro-tresquartos`, `nexa-ancla-5-cuerpo-frontal`, `nexa-ancla-1-rostro-frontal`; desde el 2026-10-02 el orden es **frontal → tres cuartos → cuerpo**) | Maestro · regla auto-load **[medido en logs]** · [prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) |
+| Identidad | **Siempre la A**, anclas de `ai-generations/_identidad-nexa/1-anclas/` (los logs del brochure muestran `nexa-ancla-2-rostro-tresquartos`, `nexa-ancla-5-cuerpo-frontal`, `nexa-ancla-1-rostro-frontal`; desde el 2026-10-02 el orden es **frontal → tres cuartos → cuerpo**, y desde el 2026-10-03 la frontal es `nexa-ancla-1-rostro-frontal-v2`) | Maestro · regla auto-load **[medido en logs]** · [prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) |
 | Vestuario | **Traje de ficción permitido sólo a ella** (traje biónico) o el uniforme Efeonce (la softshell en `NX6`, `BR1`–`BR3`) | Delta 2026-09-26 noche **[decisión del operador]** |
 | 🔴 Traje y lentes **por catálogo** (desde 2026-10-02) | La ficha declara `"registro": "cine"`, `"identidad": [{ "persona": "nexa", "expresion": "…" }]` y `"objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]`; la escena sólo dice que lo lleva *«exactly as in its reference»*. Las marcas (isotipo incrustado en la pechera, logo serigrafiado en la espalda) llegan **armadas en la referencia**, con el macro de la placa en escena; de espaldas, `{ "objeto": "traje-bionico-nexa", "puesta": "espalda" }`. `foto:prompt` aborta con otra persona, sin Nexa o sin `"registro": "cine"` (`validarTrajeNexa`) | TASK-1940 · kit `ai-generations/2026-10-01_traje-bionico-nexa/` **[decisión del operador]** · [manual](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md) |
-| Pose y expresión (desde 2026-10-02) | Una `expresion` (12 fotográficas u 8 del Bible), una `vista` o las dos juntas con una persona sola (la vista manda en el ángulo y la expresión sólo en el gesto, `NX7j`); la pose la describe la escena. Sin ninguna, `foto:prompt` avisa. No copiar «confident half-smile» de ficha en ficha | [Prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) **[medido]** |
+| Pose y expresión (desde 2026-10-02) | Una `expresion` (25 fotográficas casi de frente desde el 2026-10-03, u 8 del Bible), una `vista` o las dos juntas con una persona sola (la vista manda en el ángulo y la expresión sólo en el gesto, `NX7j`); la expresión entra detrás del ancla frontal y en dupla o grupo no viaja; la pose la describe la escena. Sin ninguna, `foto:prompt` avisa. No copiar «confident half-smile» de ficha en ficha | [Prompts, delta 2026-10-02](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#delta-2026-10-02--las-referencias-dicen-quién-es-no-cómo-está) **[medido]** |
 | El traje biónico | *«a sleek, form-fitting BIONIC SUIT in deep navy with matte white armored plates on the shoulders, chest and forearms, thin glowing azure-blue (#0375DB) light seams along the plates»* | `NX5` **[medido]** · **superado el 2026-10-02**: ya no se describe, se pide por catálogo |
 | La pechera | 🔴 *«the chest plate is plain, smooth white with NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*. Sin esa frase salió un **cohete genérico**; con ella, lisa | Maestro, `NX3` → `NX5` **[medido]** · **superado el 2026-10-02**: la pechera lisa dejó a `NX7` y `NX7b` sin logo; la marca viaja armada en la referencia |
 | Lentes | *«sleek futuristic wraparound glasses with CLEAR TRANSPARENT lenses lightly tinted azure blue, a thin frameless edge and a fine glowing azure line along the top of the lenses; her eyes are clearly visible through the transparent lenses, no mirror reflection covers her eyes»*. Conservaron ojos e identidad | `NX4`/`NX5` **[medido]** · **superado el 2026-10-02**: `lentes-bionicos-nexa` del catálogo |
@@ -789,7 +801,7 @@ mano: ver el delta de §8 arriba; el resto de esta plantilla sigue valiendo):
 | `formato` | `16:9` | La receta del deck es sólo 16:9 (token `formats: ['16x9']`). Vertical: §11 |
 | `impacto` | `true` | Bloque de impacto: luz con carácter, momento decisivo, tres planos. En cine siempre |
 | `registro` | ausente | Obligatorio como `"cine"` cuando la ficha pide el traje o los lentes de Nexa: sin él `foto:prompt` aborta |
-| `identidad` | ausente | Casting por rol. Con Nexa: `["nexa"]` (trae anclas y bloque `IDENTITY`); desde el 2026-10-02, mejor `[{ "persona": "nexa", "expresion": "…" }]` o con `vista`, nunca las dos |
+| `identidad` | ausente | Casting por rol. Con Nexa: `["nexa"]` (trae anclas y bloque `IDENTITY`); desde el 2026-10-02, mejor `[{ "persona": "nexa", "expresion": "…" }]` o con `vista`; las dos juntas sólo con Nexa sola en la toma. Grupos de 3 a 5: cualquier combinación del elenco, Nexa y Julio ([personas, delta 2026-10-03](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-03--grupos-del-elenco-orden-de-referencias-vista-puesta-automática-y-proporción-del-rostro)) |
 | `objetos` | la prenda del registro de escena | Referencia de forma del kit: es lo que sostiene el emblema y el corte. Chaqueta = instancia importante |
 | `palanca` | `luz-motivada` | La única de encuadre del registro (§5) |
 | `atmosfera` | `bruma` | Exige haz declarado: aquí el moño y el rim |
@@ -814,7 +826,7 @@ verbatim de §7.1, y eso dejó las escenas sin logo), la ficha agrega tres cosas
 "objetos": [{ "objeto": "traje-bionico-nexa" }, { "objeto": "lentes-bionicos-nexa" }]
 ```
 
-`expresion` es una de las 12 fotográficas o de las ocho del Bible (o, en su lugar, una `vista` para el ángulo); sin
+`expresion` es una de las 25 fotográficas casi de frente o de las ocho del Bible (o, en su lugar, una `vista` para el ángulo); sin
 ella `foto:prompt` avisa. Con Sparks en escena, dos con referencia como máximo
 ([delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks)). Ficha aprobada
 de referencia: `ai-generations/2026-10-01_traje-bionico-nexa/fichas/NX7d-nexa-despliega-squad.json` (anterior a la

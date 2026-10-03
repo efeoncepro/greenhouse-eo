@@ -20,6 +20,8 @@ import { fileURLToPath } from 'node:url'
 
 import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 
+import { activarCanon, asegurarReferencia } from './canon-sync.mjs'
+
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 // Los bloques viven AL LADO del comando, no en una carpeta de corrida fechada. La copia de
 // `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/` queda como evidencia histórica de
@@ -205,12 +207,13 @@ const INCOMPATIBLES = {
 export const PERSONAS = {
   julio: {
     etiqueta: 'Julio',
+    silueta: 'hombre',
     // Geometría, no adjetivos. Cuatro iteraciones el 2026-09-20 probaron que «cara delgada» no
     // significa nada para el modelo y «óvalo 1,5 veces más alto que ancho, frente con entradas,
     // mejillas planas, barba por debajo del mentón» sí. Lo mismo vale para el pelo: los laterales
     // cortos con el gris concentrado son lo que lo hace reconocible, no «pelo entrecano».
     identity:
-      'IDENTITY (critical): the man is the SAME real person shown in the reference images. His face is LONG AND LEAN: measured from hairline to the bottom of the beard it is roughly 1.5 times TALLER than it is WIDE at the cheekbones — a long vertical oval, NOT round, NOT square, NOT chubby. If in doubt make it longer and narrower, never wider. FOREHEAD tall and open, with a RECEDING HAIRLINE pulling back at both temples into bare corners. CHEEKS flat and slightly hollow under the cheekbones. BEARD full and LONG, extending well BELOW the jawline past the chin, with heavy grey in the moustache, chin and lower beard, darker at the sideburns and a clean cheek line — never a short beard hugging the jaw. JAW narrowing to the chin, separated from a visible slim neck; no double chin, no jowls. GLASSES rectangular metal-rim with a THICK brushed-silver bar across the TOP of both lenses and wide flat temple arms — never rimless, thin-wire, round or plastic. HAIR cut SHORT and close at the sides and around the ears, almost faded, and the GREY IS CONCENTRATED THERE so the sides read clearly lighter than the top; on top, defined curls of MODERATE volume, dominant tone dark with scattered grey — never a tall voluminous hairstyle and never uniformly grey. BROWS thick and fairly straight. EXPRESSION a slight closed-mouth smile, eyes engaged. Warm brown skin with visible pores, mid-forties: do not rejuvenate, beautify or soften. Broad-shouldered and solid in the body, while the FACE stays long and lean.',
+      'IDENTITY (critical): the man is the SAME real person shown in the reference images. His face is LONG AND LEAN: measured from hairline to the bottom of the beard it is roughly 1.5 times TALLER than it is WIDE at the cheekbones — a long vertical oval, NOT round, NOT square, NOT chubby. If in doubt make it longer and narrower, never wider. FOREHEAD tall and open, with a RECEDING HAIRLINE pulling back at both temples into bare corners. CHEEKS flat and slightly hollow under the cheekbones. BEARD full and LONG, extending well BELOW the jawline past the chin, with heavy grey in the moustache, chin and lower beard, darker at the sideburns and a clean cheek line — never a short beard hugging the jaw. JAW narrowing to the chin, separated from a visible slim neck; no double chin, no jowls. GLASSES rectangular metal-rim with a THICK brushed-silver bar across the TOP of both lenses and wide flat temple arms — never rimless, thin-wire, round or plastic. HAIR cut SHORT and close at the sides and around the ears, almost faded, and the GREY IS CONCENTRATED THERE so the sides read clearly lighter than the top; on top, defined curls of MODERATE volume, dominant tone dark with scattered grey — never a tall voluminous hairstyle and never uniformly grey. BROWS thick and fairly straight. EXPRESSION a slight closed-mouth smile, eyes engaged. Warm brown skin with visible pores, thirty-seven years old with premature grey: keep his apparent age EXACTLY as in the references — do not rejuvenate, age, beautify or soften. Broad-shouldered and solid in the body, while the FACE stays long and lean.',
     // Set aprobado por el operador el 2026-09-20 (hoja de contacto). Reemplaza al set de
     // `2026-09-17_equipo-vestuario/refs/`, que idealizaba el rostro y arrastraba deriva.
     refs: [
@@ -235,6 +238,7 @@ export const PERSONAS = {
   },
   nexa: {
     etiqueta: 'Nexa',
+    silueta: 'mujer',
     // Los marcadores salen del Character Bible §3.1-3.4 (ficha en
     // `docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md`). El bloque anterior decía
     // «long dark wavy hair, fair olive skin, dark eyes and defined brows», que describe a CUALQUIERA y no
@@ -245,7 +249,7 @@ export const PERSONAS = {
     // que separa la identidad canónica de la descartada («el más rápido de verificar es el delineado»).
     // Entra como marcador de continuidad con el material aprobado.
     identity:
-      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Her face is a SOFT OVAL, a little wider than it is long from the eyes down: the width across the cheekbones is about 1.2 times the distance from the eyes to the chin — never a narrow, elongated or slimmed face, never a sharpened jaw. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
     // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
     // 🔴 El reloj dejó de ser analógico: es un SMARTWATCH **[decisión del operador, 2026-09-21]**. Nexa es
     // tecnológica y sus objetos lo dicen; un reloj de agujas la contradice. Ecosistema completo de props en
@@ -290,12 +294,19 @@ export const PERSONAS = {
     // lado»]: con el rostro en TRES CUARTOS primero, el modelo copiaba también su giro, su inclinación y su media
     // sonrisa (medido en NX5b, NX7d y la vista puesta del traje). La frontal neutra va primero; un ángulo o una
     // expresión pedidos en la ficha se anteponen igual que antes.
+    // 🔴 2026-10-03: la frontal es `-v2`, la aprobada estirada ×1,037 en horizontal (sin modelo). Medida con Vision, la
+    // aprobada daba largo/ancho 0,85 contra 0,81–0,83 del ancla de cuerpo y las portadas aprobadas: puesta primera,
+    // afinaba la cara de toda la serie [operador: «le alarga o achata la cara al ancho, poniéndola excesivamente fina»].
+    // La v2 mide 0,83 (0,816 con el medidor final, que toma la línea de los ojos del contorno y no de la pupila; con él el
+    // canon aprobado —ancla de cuerpo y portadas— mide 0,79–0,82, y la aprobada 0,836). La aprobada sigue en disco como
+    // histórico. `rostro` declara la proporción para `pnpm foto:rostro`.
     refs: [
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png',
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
+    rostro: { largoAncho: 0.81, tolerancia: 0.02 },
     // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
     // la identidad A; no usar `2-angulos/`, que conserva el rostro/ acabado anterior y queda retirado como
     // referencia de identidad. Las vistas que el set no cubre se resuelven con las anclas fotográficas.
@@ -332,20 +343,40 @@ export const PERSONAS = {
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
       'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
+      // 🔴 2026-10-03: apuntan a `5-expresiones-frente/`, las 25 casi de frente («lo veo bien, la verdad»; «aprobadas
+      // todas»). Método A2: el ancla frontal v2 + la CAUSA de la expresión (no músculos), la cabeza libre de hacer su
+      // movimiento natural, intensidad cotidiana, la receta de piel v3 y la geometría del rostro. Un primer intento de
+      // frente estricto con marcadores musculares fue rechazado («se ven muy IA»). Las de `5-expresiones/` (tres cuartos,
+      // todas con el mismo giro) quedan en disco como histórico. La expresión va DETRÁS del ancla (`resolverIdentidad`).
       // Las 12 expresiones FOTOGRÁFICAS de `5-expresiones/` (acabado de las anclas, no sintético). Existían en disco y
       // el catálogo no las conocía: por eso casi toda ficha caía en el gesto por defecto (2026-10-02).
-      carcajada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png',
-      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png',
-      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png',
-      esceptica: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png',
-      pensativa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png',
-      neutra: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png',
-      preocupada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png',
-      conviccion: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png',
-      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png',
-      curiosa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png',
-      complicidad: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png',
-      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png'
+      carcajada: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-01-carcajada.png',
+      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-02-risa-elegante.png',
+      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-03-sorprendida.png',
+      esceptica: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-04-esceptica.png',
+      pensativa: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-05-pensativa.png',
+      neutra: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-06-neutra-reposo.png',
+      preocupada: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-07-preocupada.png',
+      conviccion: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-08-conviccion.png',
+      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-09-escucha-empatica.png',
+      curiosa: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-10-curiosa.png',
+      complicidad: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-11-complicidad.png',
+      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png',
+      // 2026-10-03: las 13 que faltaban (operador: «hazlas todas, que se vean reales»): éxito, el «antes» del problema,
+      // foco y social. `mirada-lateral` mira a la derecha del cuadro; `mirada-lateral-izq`, a la izquierda.
+      'euforia': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-13-euforia.png',
+      'alivio': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-14-alivio.png',
+      'orgullo-sereno': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-15-orgullo-sereno.png',
+      'te-lo-dije': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-16-te-lo-dije.png',
+      'hartazgo': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-17-hartazgo.png',
+      'agobio': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-18-agobio.png',
+      'alarma': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-19-alarma.png',
+      'confusion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-20-confusion.png',
+      'concentracion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-21-concentracion.png',
+      'determinacion': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-22-determinacion.png',
+      'explicando': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-23-explicando.png',
+      'bienvenida': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-24-bienvenida.png',
+      'mirada-lateral-izq': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-25-mirada-lateral-izq.png'
     },
     // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
     // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se
@@ -400,6 +431,7 @@ export const PERSONAS = {
   // ropa sigue saliendo del kit de la línea, no de la referencia.
   andres: {
     etiqueta: 'Andrés',
+    silueta: 'hombre',
     identity:
       'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is a SHORT, SOFT OVAL, slightly wider at the cheekbones and narrowing to a small chin — never long, never square. HAIR black, thick and slightly wavy, TOUSLED on top with a loose, messy fringe falling toward the forehead, shorter at the sides. GLASSES rectangular frames in RED-BURGUNDY acetate of medium thickness — never metal, never rimless, never black. FACIAL HAIR a light moustache and a small, sparse goatee on the chin; the cheeks are clean-shaven. EXPRESSION a wide, warm smile showing the upper teeth, eyes crinkling behind the glasses. Light-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or smooth him.',
     refs: ['ai-generations/_identidad-equipo/andres/avatar-bomber-2026-09.png'],
@@ -407,6 +439,7 @@ export const PERSONAS = {
   },
   daniela: {
     etiqueta: 'Daniela',
+    silueta: 'mujer',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a LONG OVAL with high, rounded cheekbones, narrowing to a soft pointed chin — never round, never square. HAIR black, very long and straight, parted slightly off-centre, falling well past the shoulders with a long side-swept section over one side of the forehead. EYES dark brown and almond-shaped; BROWS dark, softly arched. EXPRESSION a WIDE, BRIGHT SMILE showing the upper teeth, her natural expression. Warm medium-brown skin with visible pores, a young adult as in the reference: do not age, beautify, slim or lighten her.',
     refs: ['ai-generations/_identidad-equipo/daniela/avatar-bomber-2026-09.png'],
@@ -414,6 +447,7 @@ export const PERSONAS = {
   },
   humberly: {
     etiqueta: 'Humberly',
+    silueta: 'mujer',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a ROUNDED OVAL with full cheeks and a soft, rounded chin — never long, never angular. HAIR black, reaching the upper chest, parted to one side, with face-framing layers and soft loose waves at the ends. EYES dark brown; BROWS dark and softly arched; a tiny nose stud on one nostril. EXPRESSION a soft, calm, closed-mouth smile. Fair skin with a warm undertone, natural blush and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
     refs: ['ai-generations/_identidad-equipo/humberly/avatar-bomber-2026-09.png'],
@@ -421,6 +455,7 @@ export const PERSONAS = {
   },
   melkin: {
     etiqueta: 'Melkin',
+    silueta: 'hombre',
     identity:
       'IDENTITY (critical): the man is the SAME real person shown in the reference image. His face is LONG AND NARROW, a lean vertical oval with defined cheekbones and a narrow jaw — never round, never wide. HAIR black, medium-short, swept to one side from a side part, with loose strands falling across the forehead — never long, never tied back, never slicked flat. BROWS thick, dark and straight. FACIAL HAIR only a thin moustache and a narrow pointed goatee on the chin; the cheeks and jaw are clean-shaven. EXPRESSION calm, a slight closed-mouth smile. Light-brown skin with visible pores, an adult as in the reference: do not age, beautify or widen his face.',
     refs: ['ai-generations/_identidad-equipo/melkin/avatar-bomber-2026-09.png'],
@@ -428,6 +463,7 @@ export const PERSONAS = {
   },
   valentina: {
     etiqueta: 'Valentina',
+    silueta: 'mujer',
     identity:
       'IDENTITY (critical): the woman is the SAME real person shown in the reference image. Her face is a SOFT, ROUNDED OVAL with full cheeks and a small rounded chin — never long, never angular. HAIR black, very long and straight, falling well past the shoulders, with a thick straight FRINGE cut just above the eyebrows. EYES dark brown and almond-shaped; BROWS fine and straight under the fringe. NOSE small with a soft rounded tip. EXPRESSION calm and serene, closed mouth, a very slight smile. Light warm-beige skin with a natural blush on the cheeks and visible pores, a young adult as in the reference: do not age, beautify or slim her face.',
     refs: ['ai-generations/_identidad-equipo/valentina/avatar-bomber-2026-09.png'],
@@ -435,9 +471,95 @@ export const PERSONAS = {
   }
 }
 
+// ── Elenco de marca: personajes FICTICIOS que reaparecen entre campañas [operador, 2026-10-02] ──
+// Canon: docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md. Separado de PERSONAS a propósito: nadie debe
+// confundir un personaje con alguien del equipo real, y el gate del canon §3.6 vale para el roster, no para el elenco.
+// Cada uno interpreta el rol de SU línea de servicio (`linea`) y viste la prenda de esa línea (`validarVestuarioDeLinea`).
+// Las referencias viven en `ai-generations/_identidad-elenco/<clave>/`: realismo v3 de Nexa (poros y vello fino, tono
+// parejo), vistas por EDICIÓN desde la foto elegida y cuerpo entero EXTENDIDO desde ella (regenerarlo inventaba otra
+// silueta). Orden de `refs`: frente (rostro), elegida y cuerpo.
+const ELENCO_BASE = 'ai-generations/_identidad-elenco'
+
+const refsElenco = clave => ({
+  refs: [`${ELENCO_BASE}/${clave}/${clave}-frente.png`, `${ELENCO_BASE}/${clave}/${clave}-elegida.png`, `${ELENCO_BASE}/${clave}/${clave}-cuerpo.png`],
+  cuerpo: `${ELENCO_BASE}/${clave}/${clave}-cuerpo.png`,
+  // El nombre de la vista dice hacia qué lado del CUADRO mira la persona (así se construyeron: pedirlo por el lado de
+  // la persona devolvió las dos vistas de 45° hacia el mismo lado).
+  vistas: Object.fromEntries(['45-izq', '45-der', 'perfil-izq', 'perfil-der'].map(v => [v, `${ELENCO_BASE}/${clave}/${clave}-${v}.png`]))
+})
+
+export const ELENCO = {
+  hum: {
+    etiqueta: 'Hum',
+    silueta: 'mujer',
+    linea: 'growth',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Venezuelan, 33. Her face is a SOFT OVAL, slightly full at the cheeks, with a softly rounded chin — never long, never angular. EYES dark brown and slightly almond-shaped; BROWS dark, full and softly arched. NOSE straight with a softly rounded tip, with a tiny silver stud on one nostril. LIPS medium-full in a natural rosy-nude tone. HAIR very dark brown, long past the shoulders, parted slightly to one side, with soft loose waves and natural glossy highlights. Fair skin with a warm undertone and a natural blush; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Medium build with natural moderate curves, about 1.70 m. Preserve her face and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('hum')
+  },
+  karo: {
+    etiqueta: 'Karo',
+    silueta: 'mujer',
+    linea: 'brand',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Venezuelan, 28. Her face is HEART-SHAPED: wide at the high cheekbones and narrowing to a fine, slightly pointed chin. NOSE small and slightly upturned. EYES light brown; BROWS medium, softly arched. LIPS full, with rosy-pink lipstick. HAIR long, voluminous and CURLY, defined 3A-3B ringlets in a rich copper-brown, falling past the shoulders. Fair skin with a natural rosy flush and a few faint freckles; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Medium gold hoop earrings. Slim build with narrow shoulders, about 1.63 m. Her signature expression is a playful half-smile. Preserve her face and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('karo')
+  },
+  sophia: {
+    etiqueta: 'Sophia',
+    silueta: 'mujer',
+    linea: 'engine',
+    identity:
+      "IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character and Karo's older sister. Venezuelan, 31. She shares the family face: HEART-SHAPED, high cheekbones narrowing to a fine chin, a small slightly upturned nose and light brown eyes. HAIR DARK espresso-brown and CURLY, cut in a SHORT curly bob at jaw length — never long, never copper. GLASSES with thin metal frames in fine gold wire and rectangular lenses, always worn. Small simple stud earrings; no lipstick, natural make-up. Fair skin with a natural rosy flush; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Slim build, about 1.65 m. Her signature expression is calm and analytical, a contained closed-mouth smile. Preserve her face, hair and glasses EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.",
+    ...refsElenco('sophia')
+  },
+  isabella: {
+    etiqueta: 'Isabella',
+    silueta: 'mujer',
+    linea: 'voice',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Colombian from Barranquilla, 27. Deep brown skin with a warm golden undertone and a soft scattering of small freckles across the bridge of the nose and the upper cheekbones; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy glow. EYES large and dark brown; BROWS full and defined; high cheekbones; LIPS full. Her smile is wide and bright with straight, even teeth. HAIR big, voluminous, natural CURLY 3C-4A coils, dark brown-black. Small gold stud earrings. Slim and long-limbed, about 1.68 m. Preserve her face, freckles and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('isabella')
+  },
+  antonio: {
+    etiqueta: 'Antonio',
+    silueta: 'hombre',
+    linea: 'revenue-hubspot',
+    identity:
+      'IDENTITY (critical): the man is the SAME person shown in the reference images, a fictional Efeonce campaign character. Mexican, 35. Tan olive skin with a warm undertone; the texture comes only from fine irregular pores, with an even, healthy tone. Strong SQUARE jaw, straight nose, thick straight dark BROWS, dark brown eyes. HAIR straight and BLACK with no grey, short on the sides and longer on top, combed back with a natural loose wave of movement. A short, well-groomed BEARD of 3 to 5 mm with real individual hairs, full coverage and soft natural lines on the cheeks and neck — never painted, never long. NO glasses. Athletic build with broad shoulders, about 1.78 m. Preserve his face, hair and beard EXACTLY as in the references — his features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or change his build.',
+    ...refsElenco('antonio')
+  }
+}
+
+// Elenco 2D (operador, 2026-10-03: «Me encantan, están aprobados todos. Canonízalos»): cuatro personajes FICTICIOS
+// dibujados que representan al grupo de compra del cliente. Catálogo SÓLO DE SELLADO: no es identidad fotográfica y
+// `identidad` no lo resuelve; existe para que sus hojas entren al lock y al canon como cualquier referencia aprobada.
+// Canon: docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md.
+const ELENCO_2D_BASE = 'ai-generations/_identidad-elenco-2d'
+
+export const ELENCO_2D = Object.fromEntries(
+  ['tomas', 'camila', 'renata', 'mateo'].map(clave => [
+    clave,
+    { refs: [`${ELENCO_2D_BASE}/${clave}/${clave}-giro.png`, `${ELENCO_2D_BASE}/${clave}/${clave}-expresiones.png`] }
+  ])
+)
+
+/** Referencias del elenco 2D que no son de un personaje: el ancla del estilo y la escala del grupo. */
+export const ELENCO_2D_COMUNES = {
+  estilo: `${ELENCO_2D_BASE}/_estilo/estilo-a-sello-efeonce.png`,
+  grupo: `${ELENCO_2D_BASE}/elenco-2d-grupo.png`
+}
+
 // Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
 // personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
-const REFS_POR_PERSONA = { 1: 3, 2: 2 }
+// Grupos de 3 a 5 [medido 2026-10-03, EC1-brazo2]: sólo personajes del ELENCO, UNA referencia frontal cada uno. A
+// 2048×2560 las cinco caras sostuvieron su identidad (las hermanas Karo y Sophia sin mezclarse); con sólo dos anclados,
+// las otras tres salieron como otras personas. Costo medido: las caras traen la luz de estudio de su referencia, por eso
+// el bloque REFERENCES de un grupo prohíbe que esa luz pase a la escena.
+const REFS_POR_PERSONA = { 1: 3, 2: 2, 3: 1, 4: 1, 5: 1 }
+
+// Personas del roster que entran en un grupo de 3 a 5 (una referencia frontal cada una, como el elenco).
+export const EN_GRUPO = ['nexa', 'julio']
 
 // Las tres dimensiones de una persona resuelven a la MISMA ranura —la referencia que se antepone a las
 // frontales— así que una ficha puede pedir UNA, no dos. `vista` es el ángulo, `expresion` una de las ocho
@@ -459,14 +581,19 @@ export function castingDeFicha(ficha, clave) {
 
   if (!c) return undefined
   if (PERSONAS[clave]) throw new Error(`El casting "${clave}" choca con una identidad canónica del roster: usa otra clave.`)
+  if (ELENCO[clave]) throw new Error(`El casting "${clave}" choca con un personaje del elenco de marca: pídelo en \`identidad\` sin \`casting\`, o usa otra clave.`)
+
 
   if (typeof c.identity !== 'string' || !/^IDENTITY \(critical\):/.test(c.identity)) {
     throw new Error(`El casting "${clave}" necesita \`identity\` que empiece con «IDENTITY (critical):» y describa la cara sin envejecerla.`)
+
   }
 
   if (!Array.isArray(c.refs) || !c.refs.length) throw new Error(`El casting "${clave}" necesita al menos una referencia en \`refs\`.`)
 
-  return { etiqueta: c.etiqueta ?? clave, identity: c.identity, refs: c.refs, ...(c.cuerpo ? { cuerpo: c.cuerpo } : {}) }
+  if (c.silueta !== undefined && !SILUETAS.includes(c.silueta)) throw new Error(`El casting "${clave}" declara \`silueta\` "${c.silueta}": usa ${SILUETAS.join(' o ')}.`)
+
+  return { etiqueta: c.etiqueta ?? clave, identity: c.identity, refs: c.refs, ...(c.cuerpo ? { cuerpo: c.cuerpo } : {}), ...(c.silueta ? { silueta: c.silueta } : {}) }
 }
 
 function resolverIdentidad(ficha) {
@@ -480,10 +607,22 @@ function resolverIdentidad(ficha) {
 
   if (!pedidas.length) return null
 
-  if (pedidas.length > 2) {
+  const claveDe = p => (typeof p === 'string' ? p : p?.persona)
+
+  // Un grupo de 3 a 5 es CUALQUIER combinación de personajes del ELENCO, Nexa y Julio (`EN_GRUPO`). El elenco existe
+  // para variar las personas de una foto de equipo o de varias personas, y se suma cuando hace falta: no es una regla
+  // que alguno deba estar [operador, 2026-10-03: «debe usarse el elenco si es necesaria su inclusión»]. Otras personas
+  // del roster siguen con tope dos: con ellas el grupo no está medido.
+  const enGrupo = p => ELENCO[claveDe(p)] || EN_GRUPO.includes(claveDe(p))
+  const repetida = pedidas.map(claveDe).find((k, i, todas) => todas.indexOf(k) !== i)
+
+  if (repetida) throw new Error(`"${repetida}" aparece dos veces en \`identidad\`: cada persona va una sola vez (su vista o expresión se declara en su entrada).`)
+
+  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(enGrupo))) {
     throw new Error(
-      'Más de dos personas con identidad en una toma no está medido: la ronda de personas llegó a dos personas ' +
-        '(más dos mascotas con su propio bloque). Divide la pieza o documenta la medición antes de subir el tope.'
+      `Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 entre el ELENCO, ${EN_GRUPO.join(' y ')} ` +
+        '(EC1-brazo2 y VP3, 2026-10-03). Con otras personas del roster la ronda llegó a dos (más dos mascotas con su propio ' +
+        'bloque): divide la pieza o documenta la medición antes de subir el tope.'
     )
   }
 
@@ -495,19 +634,20 @@ function resolverIdentidad(ficha) {
     // Una entrada puede ser "julio" (vista frontal), { persona: 'julio', vista: 'perfil-izq' },
     // { persona: 'nexa', expresion: 'the-read' } o { persona: 'nexa', vestuario: 'speaker-1' }.
     const clave = typeof pedido === 'string' ? pedido : pedido?.persona
-    const persona = PERSONAS[clave] ?? castingDeFicha(ficha, clave)
+    const persona = PERSONAS[clave] ?? ELENCO[clave] ?? castingDeFicha(ficha, clave)
 
     if (!persona) {
       throw new Error(
         `Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}. ` +
+          `Elenco de marca (ficticio): ${Object.keys(ELENCO).join(', ')}. ` +
           'Para un personaje ficticio de campaña, declara su set en `casting` de la ficha.'
       )
     }
 
     const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])
 
-    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de Nexa comparten el mismo
-    // tres cuartos del ancla, así que con una sola ranura la expresión arrastraba siempre ese ángulo. Con una persona
+    // `vista` + `expresion` juntas [operador, 2026-10-02]: las 12 expresiones fotográficas de entonces compartían el mismo
+    // tres cuartos del ancla (hoy son 25 casi de frente), así que con una sola ranura la expresión arrastraba ese ángulo. Con una persona
     // sola en la toma se admite el par: la vista va primera y manda en el ángulo; la expresión, segunda, sólo en el
     // gesto. Con dos personas el cupo no alcanza, y `vestuario` sigue sin combinarse.
     const parAngulo = pedidas.length === 2 && pedidas.every(d => d.campo === 'vista' || d.campo === 'expresion')
@@ -574,7 +714,14 @@ function resolverIdentidad(ficha) {
       refs = parAngulo
         ? // vista + expresión + el ancla frontal (la cara); el cuerpo se suma abajo como cuarta si la vista no lo es.
           [disponibles[pedidaEnDimension], persona[ordenadas[1].mapa][pedido[ordenadas[1].campo]], persona.refs[0]]
-        : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+        : dimension.campo === 'expresion'
+          ? // 🔴 La expresión NUNCA va primera [operador, 2026-10-03: «sale con la misma pose de nuevo, volteando la cara»].
+            // La primera imagen manda en la pose más que cualquier frase, y las expresiones de Nexa se editaron desde un
+            // ancla en tres cuartos: puesta primera, la serie entera salía con la cara girada al mismo lado. Va el ancla
+            // frontal primero y la expresión detrás; en un grupo (una referencia por persona) la expresión no cabe y el
+            // gesto lo da la escena.
+            (cupo >= 2 ? [persona.refs[0], disponibles[pedidaEnDimension], ...persona.refs.slice(1, Math.max(1, cupo - 1))] : [persona.refs[0]])
+          : [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
     }
 
     // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
@@ -594,7 +741,7 @@ function resolverIdentidad(ficha) {
     }
 
     for (const ref of refs) {
-      if (!existsSync(path.join(raiz, ref))) {
+      if (!asegurarReferencia(ref)) {
         throw new Error(
           `La referencia de ${persona.etiqueta} no existe en disco: ${ref}. ` +
             'Sin ella el modelo inventa la cara y la corrida se paga igual.'
@@ -606,8 +753,14 @@ function resolverIdentidad(ficha) {
     const hasta = imagenes.length + refs.length
 
     imagenes.push(...refs)
+
     // Qué imagen manda en qué: la primera (o las dos primeras, con el par) son la vista y/o la expresión pedidas.
-    tramos.push({ persona, desde, hasta, marcas: ordenadas.map((d, i) => ({ campo: d.campo, imagen: desde + i })) })
+    // Cada marca apunta a la imagen REAL de su dimensión (la expresión ya no va siempre primera, y en grupo puede no viajar).
+    const marcas = ordenadas
+      .map(d => ({ campo: d.campo, imagen: desde + refs.indexOf(persona[d.mapa][pedido[d.campo]]) }))
+      .filter(m => m.imagen >= desde)
+
+    tramos.push({ persona, desde, hasta, marcas })
   }
 
   // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran
@@ -624,17 +777,24 @@ function resolverIdentidad(ficha) {
   // Las referencias dicen QUIÉN es la persona, no CÓMO está: sin esta frase el modelo copiaba también el giro, la
   // inclinación y el gesto de la primera imagen (Nexa salió con la misma pose en NX5b, NX7d y la vista del traje,
   // 2026-10-02). La imagen que la ficha pide como ángulo manda en el ángulo; la de expresión, SÓLO en el gesto: las 12
-  // expresiones de `5-expresiones/` comparten el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
-  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02).
+  // expresiones de `5-expresiones/` compartían el mismo tres cuartos del ancla (se editaron desde ella), así que copiarlas
+  // enteras arrastraba también la pose (medido en el A/B NX7f, 2026-10-02). Hoy son las 25 casi de frente y van detrás.
   const queManda = tramos.flatMap(t =>
     t.marcas
       .filter(m => m.campo === 'vista' || m.campo === 'expresion')
       .map(m => `Image ${m.imagen} is ${t.persona.etiqueta}'s ${m.campo === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
   )
 
+  // Grupo de 3 a 5 (sólo ELENCO): cada bloque IDENTITY lleva su persona y su imagen, porque con varias mujeres de pelo
+  // oscuro un bloque sin nombre se cruza (cine-reviewer, EC1); y la luz de estudio de las referencias se queda fuera.
+  const grupo = tramos.length > 2
+
   const pose =
     ' The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: ' +
     'the head turn, tilt, chin angle, gaze and facial expression come from the SCENE, not from any reference.' +
+    (grupo
+      ? ' Each person matches ONLY their own reference image; never blend features between people. The LIGHT of the identity references does NOT carry over: every face is lit only by the light the scene declares.'
+      : '') +
     (queManda.length ? ` ${queManda.join(' ')}` : '')
 
   // Los accesorios van como BLOQUE APARTE, separados por \n\n, no pegados al IDENTITY. Si se unieran con
@@ -642,7 +802,10 @@ function resolverIdentidad(ficha) {
   // fallaría — y, peor, IDENTITY dejaría de ser citable como unidad.
   return {
     identity: tramos
-      .flatMap(t => [t.persona.identity, t.persona.accesorios].filter(Boolean))
+      .flatMap((t, i) => [
+        grupo ? `PERSON ${i + 1} — ${t.persona.etiqueta.toUpperCase()} (${rango(t)}): ${t.persona.identity}` : t.persona.identity,
+        t.persona.accesorios
+      ].filter(Boolean))
       .join('\n\n'),
     references: references + pose,
     imagenes
@@ -960,7 +1123,38 @@ export const OBJETOS = {
     usoPorVista: {
       espalda: 'efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png',
       'espalda-mujer': 'efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
-      'frente-cuerpo-b': 'efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+      'frente-cuerpo-b': 'efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png',
+      // 2026-10-03 · vistas por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión; las elige
+      // `elegirPuesta`. Método y trampas: garment-reference-kit.md §Delta 2026-10-03.
+      'frente-mujer': 'efeonce-chaqueta-softshell-18-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-izq': 'efeonce-chaqueta-softshell-19-puesto-45-izq-1024x1536-v01-fondo-estudio.png',
+      '45-der': 'efeonce-chaqueta-softshell-20-puesto-45-der-1024x1536-v01-fondo-estudio.png',
+      '70-izq': 'efeonce-chaqueta-softshell-21-puesto-70-izq-1024x1536-v01-fondo-estudio.png',
+      '70-der': 'efeonce-chaqueta-softshell-22-puesto-70-der-1024x1536-v01-fondo-estudio.png',
+      '45-izq-mujer': 'efeonce-chaqueta-softshell-23-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-der-mujer': 'efeonce-chaqueta-softshell-24-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-izq-mujer': 'efeonce-chaqueta-softshell-25-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-der-mujer': 'efeonce-chaqueta-softshell-26-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-mano': 'efeonce-chaqueta-softshell-27-puesto-frente-mano-1024x1536-v01-fondo-estudio.png',
+      'frente-mano-mujer': 'efeonce-chaqueta-softshell-28-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos': 'efeonce-chaqueta-softshell-29-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos-mujer': 'efeonce-chaqueta-softshell-30-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto': 'efeonce-chaqueta-softshell-31-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto-mujer': 'efeonce-chaqueta-softshell-32-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza': 'efeonce-chaqueta-softshell-33-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza-mujer': 'efeonce-chaqueta-softshell-34-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo': 'efeonce-chaqueta-softshell-35-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo-mujer': 'efeonce-chaqueta-softshell-36-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq': 'efeonce-chaqueta-softshell-37-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der': 'efeonce-chaqueta-softshell-38-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq': 'efeonce-chaqueta-softshell-39-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der': 'efeonce-chaqueta-softshell-40-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo': 'efeonce-chaqueta-softshell-41-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq-mujer': 'efeonce-chaqueta-softshell-42-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der-mujer': 'efeonce-chaqueta-softshell-43-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq-mujer': 'efeonce-chaqueta-softshell-44-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der-mujer': 'efeonce-chaqueta-softshell-45-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo-mujer': 'efeonce-chaqueta-softshell-46-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png'
     },
     macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
@@ -983,7 +1177,38 @@ export const OBJETOS = {
     usoPorVista: {
       espalda: 'efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png',
       'espalda-mujer': 'efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
-      'frente-cuerpo-b': 'efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png'
+      'frente-cuerpo-b': 'efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png',
+      // 2026-10-03 · vistas por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión; las elige
+      // `elegirPuesta`. Método y trampas: garment-reference-kit.md §Delta 2026-10-03.
+      'frente-mujer': 'efeonce-chaqueta-bomber-18-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-izq': 'efeonce-chaqueta-bomber-19-puesto-45-izq-1024x1536-v01-fondo-estudio.png',
+      '45-der': 'efeonce-chaqueta-bomber-20-puesto-45-der-1024x1536-v01-fondo-estudio.png',
+      '70-izq': 'efeonce-chaqueta-bomber-21-puesto-70-izq-1024x1536-v01-fondo-estudio.png',
+      '70-der': 'efeonce-chaqueta-bomber-22-puesto-70-der-1024x1536-v01-fondo-estudio.png',
+      '45-izq-mujer': 'efeonce-chaqueta-bomber-23-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-der-mujer': 'efeonce-chaqueta-bomber-24-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-izq-mujer': 'efeonce-chaqueta-bomber-25-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-der-mujer': 'efeonce-chaqueta-bomber-26-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-mano': 'efeonce-chaqueta-bomber-27-puesto-frente-mano-1024x1536-v01-fondo-estudio.png',
+      'frente-mano-mujer': 'efeonce-chaqueta-bomber-28-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos': 'efeonce-chaqueta-bomber-29-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos-mujer': 'efeonce-chaqueta-bomber-30-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto': 'efeonce-chaqueta-bomber-31-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto-mujer': 'efeonce-chaqueta-bomber-32-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza': 'efeonce-chaqueta-bomber-33-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza-mujer': 'efeonce-chaqueta-bomber-34-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo': 'efeonce-chaqueta-bomber-35-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo-mujer': 'efeonce-chaqueta-bomber-36-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq': 'efeonce-chaqueta-bomber-37-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der': 'efeonce-chaqueta-bomber-38-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq': 'efeonce-chaqueta-bomber-39-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der': 'efeonce-chaqueta-bomber-40-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo': 'efeonce-chaqueta-bomber-41-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq-mujer': 'efeonce-chaqueta-bomber-42-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der-mujer': 'efeonce-chaqueta-bomber-43-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq-mujer': 'efeonce-chaqueta-bomber-44-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der-mujer': 'efeonce-chaqueta-bomber-45-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo-mujer': 'efeonce-chaqueta-bomber-46-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png'
     },
     macroEmblema: 'efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
@@ -1010,6 +1235,21 @@ export const OBJETOS = {
     vistaDefecto: 'frente',
     // El asset de uso de la gorra es POR PERSONA (el kit trae la prueba con Julio y con Nexa), así que
     // no se resuelve solo: se declara en la ficha con `usoDe: 'julio' | 'nexa'`.
+    // Gorra PUESTA genérica (2026-10-03): encuadre de la copa a las cejas, sin rostro, navy con el logotipo. Va cuando la
+    // persona no tiene prueba en persona; las vistas por giro y silueta las elige `elegirPuesta`.
+    assetDeUso: 'efeonce-gorra-v2-10-puesto-frente-1024x1024-v01-fondo-estudio.png',
+    usoPorVista: {
+      'frente-mujer': 'efeonce-gorra-v2-11-puesto-frente-mujer-1024x1024-v01-fondo-estudio.png',
+      '45-izq': 'efeonce-gorra-v2-12-puesto-45-izq-1024x1024-v01-fondo-estudio.png',
+      '45-der': 'efeonce-gorra-v2-13-puesto-45-der-1024x1024-v01-fondo-estudio.png',
+      '70-izq': 'efeonce-gorra-v2-14-puesto-70-izq-1024x1024-v01-fondo-estudio.png',
+      '70-der': 'efeonce-gorra-v2-15-puesto-70-der-1024x1024-v01-fondo-estudio.png',
+      '45-izq-mujer': 'efeonce-gorra-v2-16-puesto-45-izq-mujer-1024x1024-v01-fondo-estudio.png',
+      '45-der-mujer': 'efeonce-gorra-v2-17-puesto-45-der-mujer-1024x1024-v01-fondo-estudio.png',
+      '70-izq-mujer': 'efeonce-gorra-v2-18-puesto-70-izq-mujer-1024x1024-v01-fondo-estudio.png',
+      '70-der-mujer': 'efeonce-gorra-v2-19-puesto-70-der-mujer-1024x1024-v01-fondo-estudio.png'
+    },
+    // Sin macro a propósito: su logotipo ya se lee grande y el macro lo empujaba a redibujarlo (medido 2026-09-20).
     usoPorPersona: {
       julio: '../out/prueba-julio.png',
       nexa: '../out/prueba-nexa.png'
@@ -1093,7 +1333,38 @@ export const OBJETOS = {
     usoPorVista: {
       espalda: 'efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png',
       'espalda-mujer': 'efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png',
-      'frente-cuerpo-b': 'efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+      'frente-cuerpo-b': 'efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png',
+      // 2026-10-03 · vistas por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión; las elige
+      // `elegirPuesta`. Método y trampas: garment-reference-kit.md §Delta 2026-10-03.
+      'frente-mujer': 'efeonce-polo-navy-17-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-izq': 'efeonce-polo-navy-18-puesto-45-izq-1024x1536-v01-fondo-estudio.png',
+      '45-der': 'efeonce-polo-navy-19-puesto-45-der-1024x1536-v01-fondo-estudio.png',
+      '70-izq': 'efeonce-polo-navy-20-puesto-70-izq-1024x1536-v01-fondo-estudio.png',
+      '70-der': 'efeonce-polo-navy-21-puesto-70-der-1024x1536-v01-fondo-estudio.png',
+      '45-izq-mujer': 'efeonce-polo-navy-22-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-der-mujer': 'efeonce-polo-navy-23-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-izq-mujer': 'efeonce-polo-navy-24-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-der-mujer': 'efeonce-polo-navy-25-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-mano': 'efeonce-polo-navy-26-puesto-frente-mano-1024x1536-v01-fondo-estudio.png',
+      'frente-mano-mujer': 'efeonce-polo-navy-27-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos': 'efeonce-polo-navy-28-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos-mujer': 'efeonce-polo-navy-29-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto': 'efeonce-polo-navy-30-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto-mujer': 'efeonce-polo-navy-31-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza': 'efeonce-polo-navy-32-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza-mujer': 'efeonce-polo-navy-33-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo': 'efeonce-polo-navy-34-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo-mujer': 'efeonce-polo-navy-35-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq': 'efeonce-polo-navy-36-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der': 'efeonce-polo-navy-37-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq': 'efeonce-polo-navy-38-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der': 'efeonce-polo-navy-39-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo': 'efeonce-polo-navy-40-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq-mujer': 'efeonce-polo-navy-41-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der-mujer': 'efeonce-polo-navy-42-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq-mujer': 'efeonce-polo-navy-43-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der-mujer': 'efeonce-polo-navy-44-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo-mujer': 'efeonce-polo-navy-45-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png'
     },
     macroEmblema: 'efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
@@ -1116,7 +1387,38 @@ export const OBJETOS = {
     usoPorVista: {
       espalda: 'efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png',
       'espalda-mujer': 'efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
-      'frente-cuerpo-b': 'efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+      'frente-cuerpo-b': 'efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png',
+      // 2026-10-03 · vistas por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión; las elige
+      // `elegirPuesta`. Método y trampas: garment-reference-kit.md §Delta 2026-10-03.
+      'frente-mujer': 'efeonce-hoodie-23-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-izq': 'efeonce-hoodie-24-puesto-45-izq-1024x1536-v01-fondo-estudio.png',
+      '45-der': 'efeonce-hoodie-25-puesto-45-der-1024x1536-v01-fondo-estudio.png',
+      '70-izq': 'efeonce-hoodie-26-puesto-70-izq-1024x1536-v01-fondo-estudio.png',
+      '70-der': 'efeonce-hoodie-27-puesto-70-der-1024x1536-v01-fondo-estudio.png',
+      '45-izq-mujer': 'efeonce-hoodie-28-puesto-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '45-der-mujer': 'efeonce-hoodie-29-puesto-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-izq-mujer': 'efeonce-hoodie-30-puesto-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      '70-der-mujer': 'efeonce-hoodie-31-puesto-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-mano': 'efeonce-hoodie-32-puesto-frente-mano-1024x1536-v01-fondo-estudio.png',
+      'frente-mano-mujer': 'efeonce-hoodie-33-puesto-frente-mano-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos': 'efeonce-hoodie-34-puesto-frente-brazos-1024x1536-v01-fondo-estudio.png',
+      'frente-brazos-mujer': 'efeonce-hoodie-35-puesto-frente-brazos-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto': 'efeonce-hoodie-36-puesto-frente-objeto-1024x1536-v01-fondo-estudio.png',
+      'frente-objeto-mujer': 'efeonce-hoodie-37-puesto-frente-objeto-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza': 'efeonce-hoodie-38-puesto-frente-cruza-1024x1536-v01-fondo-estudio.png',
+      'frente-cruza-mujer': 'efeonce-hoodie-39-puesto-frente-cruza-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo': 'efeonce-hoodie-40-puesto-frente-bajo-1024x1536-v01-fondo-estudio.png',
+      'frente-bajo-mujer': 'efeonce-hoodie-41-puesto-frente-bajo-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq': 'efeonce-hoodie-42-puesto-espalda-45-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der': 'efeonce-hoodie-43-puesto-espalda-45-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq': 'efeonce-hoodie-44-puesto-espalda-70-izq-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der': 'efeonce-hoodie-45-puesto-espalda-70-der-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo': 'efeonce-hoodie-46-puesto-espalda-bajo-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-izq-mujer': 'efeonce-hoodie-47-puesto-espalda-45-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-45-der-mujer': 'efeonce-hoodie-48-puesto-espalda-45-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-izq-mujer': 'efeonce-hoodie-49-puesto-espalda-70-izq-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-70-der-mujer': 'efeonce-hoodie-50-puesto-espalda-70-der-mujer-1024x1536-v01-fondo-estudio.png',
+      'espalda-bajo-mujer': 'efeonce-hoodie-51-puesto-espalda-bajo-mujer-1024x1536-v01-fondo-estudio.png'
     },
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
@@ -1229,7 +1531,8 @@ export const ROLES_DE_REFERENCIA = {
   identidad: 'Copia la CARA; ignora la ropa y el fondo. Entra en el bloque REFERENCES.',
   'objeto-forma': 'Copia la FORMA de la pieza aislada; ignora su fondo de estudio.',
   'prenda-puesta': 'Copia la PRENDA tal como cae en un cuerpo; ignora a la persona que la lleva.',
-  'macro-marca': 'El emblema en grande, para que el modelo no lo reinvente cuando mide pocos píxeles.'
+  'macro-marca': 'El emblema en grande, para que el modelo no lo reinvente cuando mide pocos píxeles.',
+  'ilustracion-2d': 'Copia el PERSONAJE DIBUJADO (diseño, proporciones, estilo); ignora su fondo. Sólo producción 2D, nunca identidad fotográfica.'
 }
 
 /** Clave del catálogo → rol de las referencias que declara. */
@@ -1252,7 +1555,7 @@ export const CLAVES_DE_REFERENCIA = {
 // sufijos que se combinan con `patron`, no rutas. Si aparece una clave que no está ni aquí ni arriba,
 // el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
 export const CLAVES_SIN_ARCHIVO = {
-  persona: ['etiqueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
+  persona: ['etiqueta', 'silueta', 'rostro', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
   objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'acabadoMarca', 'macroEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
 }
 
@@ -1267,16 +1570,24 @@ export function referenciasDeclaradas() {
   const out = []
   const push = (ruta, rol, etiqueta) => out.push({ ruta: path.normalize(ruta), rol, etiqueta })
 
-  for (const [clave, persona] of Object.entries(PERSONAS)) {
-    for (const ref of persona.refs) push(ref, 'identidad', `persona:${clave}`)
-    if (persona.cuerpo) push(persona.cuerpo, 'identidad', `persona:${clave}/cuerpo`)
+  for (const [prefijo, catalogo] of [['persona', PERSONAS], ['elenco', ELENCO]]) {
+    for (const [clave, persona] of Object.entries(catalogo)) {
+      for (const ref of persona.refs) push(ref, 'identidad', `${prefijo}:${clave}`)
+      if (persona.cuerpo) push(persona.cuerpo, 'identidad', `${prefijo}:${clave}/cuerpo`)
 
-    for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
-      for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) {
-        push(ref, 'identidad', `persona:${clave}/${nombre}`)
+      for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
+        for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) {
+          push(ref, 'identidad', `${prefijo}:${clave}/${nombre}`)
+        }
       }
     }
   }
+
+  for (const [clave, personaje] of Object.entries(ELENCO_2D)) {
+    for (const ref of personaje.refs) push(ref, 'ilustracion-2d', `elenco2d:${clave}`)
+  }
+
+  for (const [nombre, ref] of Object.entries(ELENCO_2D_COMUNES)) push(ref, 'ilustracion-2d', `elenco2d:${nombre}`)
 
   for (const [clave, objeto] of Object.entries(OBJETOS)) {
     // `patron` y `patronPorColor` GENERAN rutas combinándose con los sufijos de `vistas`.
@@ -1312,6 +1623,101 @@ export function referenciasDeclaradas() {
   return out
 }
 
+// ── Selección de la vista PUESTA [operador, 2026-10-03] ─────────────────────────────────────────
+// «Dale a los comandos la capacidad de elegir la más adecuada para que sepan que tienen opciones». Antes, sin
+// `puesta`, la prenda viajaba SIEMPRE con su asset frontal de hombre: Karo, Sophia, Isabella y Hum recibían una
+// referencia de pecho masculino de frente aunque la escena las pusiera a 45°, y el modelo reconstruía la caída de la
+// tela y el bordado a ojo. Ahora el comando elige por la SILUETA de quien la viste y por el GIRO de su vista, imprime
+// lo que eligió con sus alternativas, y `puesta` en la ficha sigue ganando siempre.
+// Convención de nombres de `usoPorVista`: `<giro>[-<tapa>|-bajo][-mujer]`, con giro `frente | 45-izq | 45-der | 70-izq |
+// 70-der | espalda | espalda-45-izq | espalda-45-der | espalda-70-izq | espalda-70-der` — el lado dice hacia qué borde
+// del CUADRO apunta la nariz de la persona (de frente o de espaldas), igual que las vistas del elenco. El 70°
+// existe porque en el giro profundo la marca se escorza y el modelo, sin una referencia en esa perspectiva, la dibuja
+// a mano [operador, 2026-10-03]; si falta, la cadena cae al 45° del mismo lado y después al frente.
+export const SILUETAS = ['hombre', 'mujer']
+export const GIROS = ['frente', '45-izq', '45-der', '70-izq', '70-der', 'espalda', 'espalda-45-izq', 'espalda-45-der', 'espalda-70-izq', 'espalda-70-der']
+
+/** Giro de la prenda que corresponde a la vista de identidad de quien la viste. */
+export const giroDeVista = vista => {
+  if (!vista) return 'frente'
+  if (/espalda|trasero/.test(vista)) return 'espalda'
+  if (/(perfil|70)-izq/.test(vista)) return '70-izq'
+  if (/(perfil|70)-der/.test(vista)) return '70-der'
+  if (/(45|tres-cuartos)-izq/.test(vista)) return '45-izq'
+  if (/(45|tres-cuartos)-der/.test(vista)) return '45-der'
+
+  return 'frente'
+}
+
+// Qué puede tapar la marca del pecho: las vistas puestas de oclusión del kit (`frente-<tapa>[-mujer]`). En todas la
+// marca conserva su tamaño y su sitio y sólo se ve la parte que lo de delante no tapa [operador, 2026-10-03: «la vista
+// real sería que se viera sólo la parte del logo que no tapa la mano»]. `mano` = la mano sobre el pecho · `cruza` = un
+// antebrazo que pasa por delante (taza, teléfono) · `objeto` = algo sostenido contra el pecho (tablet, carpeta) ·
+// `brazos` = brazos cruzados (el antebrazo queda BAJO la marca, que se ve entera: también es la vista correcta, y es
+// la que el modelo hace sola cuando se le pide taparla). Con una persona en cuadro la escena lo dice y el comando lo
+// infiere; en un grupo la escena no dice de quién es la mano, así que se declara `tapa` en el objeto.
+export const TAPAS = ['mano', 'cruza', 'objeto', 'brazos']
+
+const TAPA_EN_ESCENA = {
+  mano: /\bhand (?:rests?|resting|is|lies|laid|placed|pressed)?\s*(?:flat\s+)?(?:on|over|against) (?:her|his|their|the) (?:own )?(?:chest|heart)\b|\bhand on (?:her|his|their|the) chest\b/i,
+  cruza: /\bforearm (?:crosses|across|passes)\b|\b(?:holds?|holding|raises?|raising|sips?|sipping)\b[^.]{0,50}\b(?:cup|mug|coffee|phone)\b[^.]{0,40}\b(?:near|by|at|to) (?:her|his|their|the) (?:opposite )?(?:shoulder|chin|mouth|lips)\b/i,
+  brazos: /\barms? (?:are )?(?:crossed|folded)\b|\b(?:crossed|folded) arms\b/i,
+  objeto: /\b(?:holds?|holding|hugs?|hugging|clutch(?:es|ing)?|presses|pressing)\b[^.]{0,60}\b(?:against|to|in front of) (?:her|his|their|the) chest\b/i
+}
+
+export const tapaEnEscena = escena => Object.keys(TAPA_EN_ESCENA).find(t => TAPA_EN_ESCENA[t].test(escena ?? '')) ?? null
+
+/** Silueta y vista de una persona pedida en `identidad` (roster, elenco o casting de la ficha). */
+const portadorDe = (ficha, clave) => {
+  if (!clave) return null
+  const pedido = (ficha.identidad ?? []).find(p => (typeof p === 'string' ? p : p?.persona) === clave)
+  const def = PERSONAS[clave] ?? ELENCO[clave] ?? ficha.casting?.[clave]
+
+  return { clave, silueta: def?.silueta ?? null, vista: typeof pedido === 'string' ? null : (pedido?.vista ?? null) }
+}
+
+/** Cadena de respaldo de un giro: el 70° cae al 45° del mismo lado y éste a su familia (frente o espalda). */
+export const cadenaDeGiro = giro => {
+  const familia = giro.startsWith('espalda') ? 'espalda' : 'frente'
+  const cadena = [giro]
+
+  if (/70-(izq|der)$/.test(giro)) cadena.push(giro.replace('70', '45'))
+  if (giro !== familia) cadena.push(familia)
+
+  return cadena
+}
+
+/**
+ * Elige la vista puesta de una prenda para quien la viste. Devuelve `{ clave, motivo, alternativas, exacta }`
+ * (`clave` es una de `usoPorVista` o `frente`, el asset de uso por defecto). `exacta: false` = no existe la vista del
+ * giro y la silueta pedidos y se cayó a la más cercana: el comando lo avisa.
+ * @param {{ usoPorVista?: Record<string, string> }} objeto
+ * @param {{ silueta?: string | null, vista?: string | null, tapa?: string | null, giro?: string | null, camara?: string | null }} [opciones]
+ */
+export function elegirPuesta(objeto, { silueta = null, vista = null, tapa = null, giro: giroPedido = null, camara = null } = {}) {
+  const disponibles = ['frente', ...Object.keys(objeto.usoPorVista ?? {}).filter(k => k !== 'frente')]
+  const giro = giroPedido ?? giroDeVista(vista)
+
+  // Con algo DELANTE del pecho, primero la vista de oclusión: la marca a su tamaño real con sólo la parte visible. Con
+  // cámara baja, primero la vista desde abajo del mismo giro (existe para frente y espalda).
+  const giros = [
+    ...(tapa ? [`${giro}-${tapa}`, ...(giro === 'frente' ? [] : [`frente-${tapa}`])] : []),
+    ...(camara === 'baja' ? [`${giro}-bajo`] : []),
+    ...cadenaDeGiro(giro)
+  ]
+
+  const candidatos = silueta === 'mujer' ? giros.flatMap(g => [`${g}-mujer`, g]) : giros
+  const clave = candidatos.find(c => disponibles.includes(c))
+  const exacta = clave === candidatos[0]
+
+  return {
+    clave,
+    exacta,
+    motivo: `${silueta ?? 'silueta sin declarar'}, ${giroPedido ? `giro declarado ${giro}` : `vista ${vista ?? 'frente'} → giro ${giro}`}${camara === 'baja' ? ', cámara baja' : ''}${tapa ? `, la marca tapada por ${tapa}` : ''}`,
+    alternativas: disponibles.filter(k => k !== clave)
+  }
+}
+
 function resolverObjetos(ficha, desde) {
   const pedidos = ficha.objetos ?? []
 
@@ -1321,6 +1727,7 @@ function resolverObjetos(ficha, desde) {
   const imagenes = []
   const bloques = []
   const avisos = []
+  const selecciones = []
 
   for (const pedido of pedidos) {
     const clave = typeof pedido === 'string' ? pedido : pedido?.objeto
@@ -1382,11 +1789,62 @@ function resolverObjetos(ficha, desde) {
       )
     }
 
-    const enUso = puestaPedida
-      ? objeto.usoPorVista[puestaPedida]
+    // Quién la viste: `persona` en el pedido, o la única persona de `identidad`. Con varias y sin `persona`, la
+    // prenda no sabe a quién va y se queda con su frente por defecto (y lo avisa).
+    const identidades = (ficha.identidad ?? []).map(p => (typeof p === 'string' ? p : p?.persona))
+    const paraPedido = typeof pedido === 'string' ? null : pedido?.persona
+
+    if (paraPedido && !identidades.includes(paraPedido)) {
+      throw new Error(`"${clave}" se pide para "${paraPedido}", que no está en \`identidad\`. Personas de la ficha: ${identidades.join(', ') || '(ninguna)'}.`)
+    }
+
+    const portador = portadorDe(ficha, paraPedido ?? (identidades.length === 1 ? identidades[0] : null))
+    const pruebaEnPersona = objeto.usoPorPersona?.[usoDe ?? (objeto.tipo === 'prenda' ? portador?.clave : undefined)]
+    // La vista puesta sólo existe en el color por defecto del kit (la blanca del polo tiene sólo su frente).
+    const colorDelKit = !objeto.colorDefecto || color === objeto.colorDefecto
+    const tapaPedida = typeof pedido === 'string' ? null : pedido?.tapa
+    // `giro` declara el ángulo de la PRENDA cuando la identidad no lo trae (una persona de espaldas: su identidad no
+    // tiene esa vista) y `camara: "baja"` pide la vista desde abajo.
+    const giroPedido = typeof pedido === 'string' ? null : (pedido?.giro ?? null)
+    const camara = typeof pedido === 'string' ? null : (pedido?.camara ?? null)
+
+    if (giroPedido && !GIROS.includes(giroPedido)) throw new Error(`"${clave}": \`giro\` "${giroPedido}" no existe. Usa ${GIROS.join(', ')}.`)
+    if (camara && camara !== 'baja') throw new Error(`"${clave}": \`camara\` sólo admite "baja".`)
+
+    if (tapaPedida && !TAPAS.includes(tapaPedida)) throw new Error(`"${clave}": \`tapa\` "${tapaPedida}" no existe. Usa ${TAPAS.join(', ')}.`)
+
+    // Inferida sólo con UNA persona: en un grupo la escena no dice de quién es la mano.
+    const tapaInferida = !tapaPedida && identidades.length === 1 ? tapaEnEscena(ficha.escena) : null
+    const tapa = tapaPedida ?? tapaInferida
+
+    const auto = !puestaPedida && !vistaPedida && !pruebaEnPersona && colorDelKit && objeto.tipo === 'prenda' &&
+      Object.keys(objeto.usoPorVista ?? {}).length
+      ? elegirPuesta(objeto, { ...(portador ?? {}), tapa, giro: giroPedido, camara })
+      : null
+
+    if (!tapaPedida && identidades.length > 1 && tapaEnEscena(ficha.escena) && objeto.tipo === 'prenda') {
+      avisos.push(`"${clave}": la escena tapa un pecho (${tapaEnEscena(ficha.escena)}) y hay ${identidades.length} personas; declara \`tapa\` y \`persona\` en el objeto de quien lo tiene tapado para que viaje su vista de oclusión.`)
+    }
+
+    if (auto) {
+      selecciones.push({ objeto: clave, persona: portador?.clave ?? null, elegida: auto.clave, motivo: auto.motivo + (tapaInferida ? ' (inferido de la escena)' : ''), alternativas: auto.alternativas, exacta: auto.exacta })
+
+      if (!portador && identidades.length > 1) {
+        avisos.push(`"${clave}": hay ${identidades.length} personas y ninguna declarada como portadora; va su vista puesta de frente. Declara "persona" en el objeto para que el comando elija por su silueta y su vista.`)
+      } else if (portador && !portador.silueta) {
+        avisos.push(`"${clave}": ${portador.clave} no declara \`silueta\`, así que la prenda no puede elegirse por cuerpo.`)
+      } else if (portador && !auto.exacta) {
+        avisos.push(`"${clave}" para ${portador.clave}: no existe la vista puesta exacta (${auto.motivo}); va «${auto.clave}», la más cercana.`)
+      }
+    }
+
+    const puestaElegida = puestaPedida ?? (auto && auto.clave !== 'frente' ? auto.clave : null)
+
+    const enUso = puestaElegida
+      ? objeto.usoPorVista[puestaElegida]
       : vistaPedida
         ? null
-        : (objeto.usoPorPersona?.[usoDe] ?? objeto.usoPorColor?.[color] ?? objeto.assetDeUso)
+        : (pruebaEnPersona ?? objeto.usoPorColor?.[color] ?? objeto.assetDeUso)
 
     if (objeto.usoPorPersona && usoDe && !objeto.usoPorPersona[usoDe]) {
       throw new Error(
@@ -1408,7 +1866,7 @@ function resolverObjetos(ficha, desde) {
         ? path.normalize(objeto.base + porNombre)
         : objeto.base + patron.replace('<V>', sufijo)
 
-    if (!existsSync(path.join(raiz, ref))) {
+    if (!asegurarReferencia(ref)) {
       throw new Error(
         `El kit de "${clave}" no tiene la vista "${vista}" en disco: ${ref}. ` +
           'Sin el render, el modelo dibuja la marca de memoria y sale deformada.'
@@ -1457,11 +1915,16 @@ function resolverObjetos(ficha, desde) {
     // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
     // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
     // `macroEnUso`: la pieza puesta tampoco sostiene una marca chica sola (el traje de Nexa, TASK-1940), así que
-    // el macro viaja también con ella.
-    if (objeto.macroEmblema && (!enUso || objeto.macroEnUso)) {
+    // el macro viaja también con ella. Desde el 2026-10-03 es el DEFAULT de toda prenda: en la prueba de uniforme del
+    // elenco la marca del pecho, a escala de escena, salió reinventada en polo y hoodie con sólo la vista puesta. Una
+    // prenda puede apagarlo con `macroEnUso: false`.
+    const macroAplica = objeto.macroEmblema &&
+      (!enUso || objeto.macroEnUso === true || (objeto.tipo === 'prenda' && objeto.macroEnUso !== false))
+
+    if (macroAplica) {
       const macro = objeto.base + (objeto.macroPorColor?.[color] ?? objeto.macroEmblema)
 
-      if (!existsSync(path.join(raiz, macro))) {
+      if (!asegurarReferencia(macro)) {
         throw new Error(
           `El kit de "${clave}" declara macro del bordado pero no está en disco: ${macro}. ` +
             'Sin el emblema en grande, el modelo lo inventa.'
@@ -1484,7 +1947,7 @@ function resolverObjetos(ficha, desde) {
     if (objeto.nota) avisos.push(`"${clave}": ${objeto.nota}`)
   }
 
-  return { imagenes, bloque: bloques.join('\n\n'), avisos }
+  return { imagenes, bloque: bloques.join('\n\n'), avisos, selecciones }
 }
 
 // ── Atmósfera y acción suspendida ───────────────────────────────────────────────────────────────
@@ -2360,11 +2823,27 @@ const VESTUARIO =
 
 // La pose repetida de Nexa (2026-10-02): sin una expresión declarada cae en el gesto por defecto de la escena
 // («confident half-smile») y todas las piezas salen con la misma cara. Aviso, no error: la neutra es legítima.
-export const auditarExpresion = identidad =>
-  (identidad ?? []).some(p => (typeof p === 'string' ? p : p?.persona) === 'nexa' && !(typeof p === 'object' && (p.expresion || p.vista)))
-    ? 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
-      '{ "persona": "nexa", "expresion": "conviccion" } (12 fotográficas en _identidad-nexa/5-expresiones/).'
-    : null
+// Con dos o más personas la expresión pedida NO viaja como imagen (2026-10-03): en dupla el cupo baja a dos referencias y
+// el cuerpo entero toma esa ranura (sin cuerpo el modelo inventa la silueta); en grupo hay una referencia por persona. El
+// gesto lo da la escena, y el comando lo dice en vez de soltarla en silencio.
+export const auditarExpresion = identidad => {
+  const lista = identidad ?? []
+  const nexa = lista.find(p => (typeof p === 'string' ? p : p?.persona) === 'nexa')
+
+  if (!nexa) return null
+
+  if (!(typeof nexa === 'object' && (nexa.expresion || nexa.vista))) {
+    return 'trae a Nexa sin `expresion` ni `vista`: sale con el gesto por defecto y la serie se repite. Declárala, por ejemplo ' +
+      '{ "persona": "nexa", "expresion": "conviccion" } (25 fotográficas casi de frente en _identidad-nexa/5-expresiones-frente/).'
+  }
+
+  if (lista.length > 1 && nexa.expresion && !nexa.vista) {
+    return `pide la expresión «${nexa.expresion}» para Nexa con ${lista.length} personas en la toma: con más de una persona la ` +
+      'expresión no viaja como imagen (el cupo de referencias es para la cara y el cuerpo). Describe ese gesto en la escena.'
+  }
+
+  return null
+}
 
 export const auditarVestuario = (escena, identidad) =>
   identidad?.length && !VESTUARIO.test(escena)
@@ -2385,7 +2864,8 @@ export const VESTUARIO_POR_LINEA = {
 
 export const validarVestuarioDeLinea = ficha => {
   const personas = (Array.isArray(ficha.identidad) ? ficha.identidad : []).map(p => (typeof p === 'string' ? p : p?.persona))
-  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p))
+  // El elenco de marca interpreta el rol de su línea: viste igual que el equipo (EFEONCE_BRAND_CAST_V1 §4).
+  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p) || ELENCO[p])
 
   if (delEquipo.length === 0 || ficha.linea === undefined) return
 
@@ -2393,6 +2873,18 @@ export const validarVestuarioDeLinea = ficha => {
 
   if (!lineas.includes(ficha.linea)) {
     throw new Error(`La línea "${ficha.linea}" no existe. Usa una de efeonceGraphicLine.lines: ${lineas.join(', ')}.`)
+  }
+
+  // Un personaje del elenco no cambia de línea entre piezas (Revenue admite las dos plataformas: HubSpot y Salesforce).
+  const familiaDe = linea => (linea.startsWith('revenue-') ? 'revenue' : linea)
+
+  for (const clave of delEquipo.filter(p => ELENCO[p])) {
+    if (familiaDe(ELENCO[clave].linea) !== familiaDe(ficha.linea)) {
+      throw new Error(
+        `${ELENCO[clave].etiqueta} es el personaje de la línea ${ELENCO[clave].linea} y no interpreta otra (pediste ${ficha.linea}). ` +
+          'Usa al personaje de esa línea o casting por rol (EFEONCE_BRAND_CAST_V1 §1).'
+      )
+    }
   }
 
   const familia = ficha.linea === LINEA_CREATIVA ? 'creativa' : 'negocio'
@@ -2507,7 +2999,11 @@ export const ALCANCES_CINE = [
   'deck-portada',
   'manzanitas',
   'social-nexa',
-  'publicidad-prueba'
+  'publicidad-prueba',
+  // Superficies de producto Efeonce/Greenhouse (escenario del login, hero de producto). Decisión del operador
+  // (2026-10-03: «para producto también es necesario el estilo cine»): Nexa, personas del roster con la prenda de
+  // su línea o un personaje de casting anclado a su retrato; el uniforme por su kit. Caso fuente: el login V4 (TASK-1964).
+  'producto'
 ]
 
 // Objetos que son PERSONAJES (criaturas, mascotas): cada referencia de estudio dice «Reproduce EXACTLY» y el
@@ -2532,6 +3028,8 @@ export const auditarCine = ficha => {
     avisos.push(
       `falta \`alcance\` (${ALCANCES_CINE.join(' · ')}). El cine sólo vive en esos casos; declararlo obliga a mirar el §2 del registro antes de gastar (casebook, falla 10).`
     )
+  } else if (ficha.alcance === 'producto') {
+    avisos.push('`alcance: producto`: cine en una superficie de producto (login, hero de producto). Protagonista: Nexa, alguien del roster con la prenda de su línea o un casting anclado a su retrato; la superficie no dibuja otra órbita encima.')
   } else if (ficha.alcance === 'publicidad-prueba') {
     avisos.push('`alcance: publicidad-prueba`: la publicidad cine con personas del equipo está EN PRUEBA; la pieza no se publica sin aprobación del operador.')
   }
@@ -2819,6 +3317,7 @@ export const construirPrompt = ficha => {
       sinValidar: Boolean(fmt.sinValidar),
       imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
       avisosObjeto: objetos?.avisos ?? [],
+      seleccionesObjeto: objetos?.selecciones ?? [],
       llevaSuspendido: Boolean(suspendido),
       sinMomento: Boolean(palanca?.sinMomento),
       avisoCaso: caso?.aviso ?? null,
@@ -2842,6 +3341,7 @@ export const construirPrompt = ficha => {
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
     avisosObjeto: objetos?.avisos ?? [],
+    seleccionesObjeto: objetos?.selecciones ?? [],
     llevaSuspendido: Boolean(suspendido),
     sinMomento: Boolean(palanca?.sinMomento),
     avisoCaso: caso?.aviso ?? null
@@ -2851,6 +3351,9 @@ export const construirPrompt = ficha => {
 // ── CLI ──────────────────────────────────────────────────────────────────────────────────────────
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
   const args = process.argv.slice(2)
+
+  // Las referencias selladas que falten o estén viejas se traen del bucket canon (`FOTO_SIN_CANON=1` lo apaga).
+  activarCanon()
 
   if (args.includes('--ficha-ejemplo')) {
     console.log(JSON.stringify(FICHA_EJEMPLO, null, 2))
@@ -2935,7 +3438,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     if (avisoCaso) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${avisoCaso}`)
   }
 
-  for (const { ficha, avisosObjeto, sinMomento } of resueltas) {
+  for (const { ficha, avisosObjeto, seleccionesObjeto, sinMomento } of resueltas) {
     // Una larga exposición no tiene momento decisivo y pedirle ambos es contradictorio: la palanca
     // apaga ese aviso concreto, no todos.
     const avisos = auditarEscena(ficha.escena).filter(a => !(sinMomento && a.includes('MOMENTO')))
@@ -2958,6 +3461,12 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
 
     // El aviso de derechos viaja con el kit, no con la memoria de quien lo usa.
     for (const a of avisosObjeto ?? []) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${a}`)
+
+    // Lo que el comando ELIGIÓ por quien viste cada prenda, con las demás opciones del kit: sin esto la selección
+    // era invisible y nadie sabía que había otras vistas puestas para pedir.
+    for (const s of seleccionesObjeto ?? []) {
+      console.error(`  · ${ficha.id ?? 'ficha'}: "${s.objeto}"${s.persona ? ` para ${s.persona}` : ''} → vista puesta «${s.elegida}» (${s.motivo}). Otras: ${s.alternativas.join(', ') || '(ninguna)'}; fuerza otra con "puesta".`)
+    }
 
     // Registro cine: los campos del oficio (casebook). Sólo con `registro: "cine"`.
     for (const a of auditarCine(ficha)) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: cine — ${a}`)

@@ -1,0 +1,430 @@
+{
+  "template": "ReportFigureStatPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1975 — página de cifras (hoja aprobada Premium-Cifras, retícula de cifras 2026-10-03). Sin cifra principal en el héroe: las cifras son la figura. Sin hook: texto con slots del motor.",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "chapterTab": {
+      "selector": "[data-slot='chapterTab']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número del capítulo en el canto («01»). Sin capítulo, la pestaña no se dibuja."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "report-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend",
+            "steps",
+            "grid",
+            "donut",
+            "layers",
+            "numbers"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      },
+      "notes": "Antetítulo con ícono: «Cifras del período» con el ícono `numbers`."
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 96,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "notes": "Conclusión de la página: `readings[].conclusion` o la afirmación del plan que cita la figura."
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 170,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Título de la figura (`chart.title`)."
+    },
+    "titleChannels": {
+      "selector": "[data-slot='titleChannels']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "channelId": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-channel-isotype"
+          }
+        }
+      },
+      "notes": "Isotipos una vez junto al título cuando todas las cifras salen de las mismas plataformas (Search Console primero). Canal sin isotipo conocido: se quita su disco."
+    },
+    "statCount": {
+      "selector": "[data-slot='statCount']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 12,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cantidad de cifras de la página («6 cifras»), a la derecha del título del tablero."
+    },
+    "statItems": {
+      "selector": "[data-slot='statItems']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 6
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "channel": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-stat-channel",
+            "notes": "Contrato AXIS efeonce.insights-stat-card 0.2.0: el isotipo del canal reemplaza al ícono de la métrica (nunca los dos). Sólo cuando el tablero mezcla motores de respuesta."
+          },
+          "icon": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-icon",
+            "values": [
+              "bars",
+              "clicks",
+              "impressions",
+              "ctr",
+              "search",
+              "target",
+              "link",
+              "trend",
+              "steps",
+              "grid",
+              "donut",
+              "layers",
+              "numbers"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "maxLines": 2
+          },
+          "context": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 48,
+            "maxLines": 2,
+            "notes": "La métrica bajo el nombre del canal; sólo con channel.",
+            "example": "de las respuestas menciona la marca"
+          },
+          "estimated": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "prefix": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 3,
+            "maxLines": 1
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "example": "13.606"
+          },
+          "suffix": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 4,
+            "maxLines": 1
+          },
+          "unitLabel": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 20,
+            "maxLines": 1
+          },
+          "trend": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-delta-tone",
+            "values": [
+              "up",
+              "down",
+              "flat",
+              "up:better",
+              "up:worse",
+              "up:neutral",
+              "down:better",
+              "down:worse",
+              "down:neutral",
+              "flat:neutral"
+            ],
+            "requires": [
+              "delta"
+            ]
+          },
+          "delta": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "requires": [
+              "trend"
+            ]
+          },
+          "versus": {
+            "type": "rich-string",
+            "required": false,
+            "maxCharacters": 64,
+            "maxLines": 2,
+            "allowedTags": [
+              "strong"
+            ]
+          },
+          "noData": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 48,
+            "maxLines": 2
+          },
+          "lowerIsBetter": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 24,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Una celda por cifra (`buildStatSlides` → `statItemView`, el mismo modelo que la web): nombre de 3 palabras y 24 caracteres como máximo (más largo, el mapper rechaza; nunca se trunca), marca «Estimado» opcional, valor partido en prefijo («#»), cifra y sufijo («%») por `splitStatValue`, `unitLabel` opcional para una unidad en palabras («de 31 keywords», «piezas»), variación (`trend` = dirección:tono, decide triángulo y color; `delta` = cifra sin signo), «vs {valor} en {período}» con la cifra en negrita, «Sin dato en {período}» con valor «—» (sin píldora, nunca 0) y «Menor es mejor» cuando subir es malo. La retícula decide sus columnas por la cantidad (1 horizontal; 2 o 4 en dos; 3, 5 o 6 en tres)."
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 120,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura. Sin nota del plan, no se dibuja."
+    },
+    "provenance": {
+      "selector": "[data-slot='provenance']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 96,
+            "maxLines": 2
+          }
+        }
+      },
+      "notes": "Unidad, fuente y cobertura de la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 190,
+            "maxLines": 4
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso: `readings[].meaning` y `nextStep` del plan. Sin próximo paso, el panel lleva una sola columna."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

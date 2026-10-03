@@ -73,6 +73,26 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+**Clasificar antes de producir:** toda pieza de video se clasifica primero con la
+[taxonomía de producción de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md):
+pieza, **tipo de video** (hiperrealista, cine, producto, UGC, personaje 3D, 2D, motion graphics, demo de UI,
+atmósfera, híbrido: decide camino, costo y esfuerzo), nivel, contrato de fidelidad, operaciones por fase
+(preproducción, producción, posproducción) con la regla **propio primero, proveedor como puente**, cast,
+referencias, texto, audio, formato y derechos. Es **neutral de motor**: cada operación la resuelven varios
+motores (Seedance, Flux 3, Wan, H3, Omni, Kling vía Higgsfield…) y la
+[guía §4.3](../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) dice cuáles y con qué
+evidencia (sólo `edit.zone` tiene canario de garantía al 2026-10-03). Programa de capacidades: EPIC-051.
+**Producto y personas usando producto digital** (el género más frecuente) tiene su
+[anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md): gramática de planos P1–P10, verbos de
+interacción, guion de interfaz con corte en la acción, formatos narrativos y la regla de pantallas del operador
+(la pantalla en escena la renderiza el modelo; la UI exacta va en inserto o flotante).
+**Personajes 2D:** el [elenco 2D](../../../docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md) y los Sparks 2D
+son las referencias aprobadas para animación 2D; los Sparks se componen desde el SVG o el rig oficial.
+**Orquestación de una pieza** (ADR-025, aceptada 2026-10-03; runner en TASK-1989): plan declarativo por toma, ejecutores
+(nuestro CLI, puente de proveedor, persona), compuertas automática/humana/de gasto y ledger con retome; **ningún paso
+generativo corre con una referencia sin aprobación creativa** →
+[arquitectura](../../../docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md).
+
 Para producción de principio a fin, empieza por el
 [método operativo](../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md).
 Carga sólo la etapa necesaria: [preproducción y producción](companions/video-preproduction-and-production.md),
@@ -80,6 +100,8 @@ Carga sólo la etapa necesaria: [preproducción y producción](companions/video-
 [lecciones y modos de falla](companions/video-lessons-and-failure-modes.md).
 Incluye construcción de piezas, vistas del sujeto y cobertura de cámaras antes de generar; conserva las
 aprobaciones y fuentes de otros agentes. Tres cámaras y el montaje SKY son un caso, no un preset universal.
+El **orden de preproducción común a todo video** está en el companion de preproducción §12; para un **spot animado 2D**
+con mascotas/logos compuestos, usa `workflows/animated-2d-spot-composed-brand-assets.md`.
 
 
 Para **cinematic ads, video de performance o híbridos foto-video**, carga

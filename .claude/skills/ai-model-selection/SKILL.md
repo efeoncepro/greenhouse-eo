@@ -14,7 +14,8 @@ description: >-
   greenhouse-globe-model-fleet—. Triggers: «qué modelo uso», «con qué genero», «cuál es mejor
   para», «cuánto cuesta generar», «cuántas referencias acepta», «llega a 4K», «tiene audio
   nativo», «soporta transparencia», «qué modelos tenemos», «capacidades de», «elegir motor»,
-  «presupuesto de generación», «model selection», «qué modelo de video/imagen/audio».
+  «presupuesto de generación», «model selection», «qué modelo de video/imagen/audio», «con qué
+  edito/borro/expando», «reiluminar», «relight».
 ---
 
 # AI Model Selection — qué modelo, con qué evidencia, a qué costo
@@ -114,7 +115,7 @@ stateful `previous_interaction_id`, 720p/1080p/4K, 9:16, fidelidad temporal, C2P
 siguen sin verificar. Para operar, lee el manual antes del POST y usa el interaction ID con
 `--status`/`--wait` si necesitas retomar: no hagas un segundo envío por timeout.
 
-### Cuatro trampas que ya costaron dinero
+### Trampas que ya costaron dinero (o lo harían)
 
 - 🔴 **El precio del registro es el escalón MÁS BARATO, no el de tu resolución.** Sin `--resolution`
   el CLI envía el escalón más barato y lo avisa. Presupuesta por la que vas a pedir.
@@ -125,7 +126,57 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **El mejor modelo para generar puede ser el peor para editar con máscara.** GPT Image 2.5 Sunburst
   —el de las piezas más impactantes— devuelve la zona enmascarada como **panel negro plano** (3 de 3
   pasadas, 2026-09-23 y 2026-10-02); Flare y Flux Pro Fill sí la editan. Para editar una zona usa
-  `pnpm ai:inpaint image` (TASK-1965), que elige el modo por modelo y recompone con verificación.
+  `pnpm ai:inpaint image` (TASK-1965): **Flare con máscara es su default**, y si eliges Sunburst lo hace editar sin
+  máscara con guía de zona y recompone con verificación.
+- 🔴 **Layerize cobra por capa y el número lo decide el modelo** (USD 0,034–0,0675 por capa). `pnpm ai:layers`
+  estima con la cota de 16 capas + base y registra lo real: presupuesta por la cota, no por las capas que esperas.
+  **La base también se cobra** (saldo de fal, 2026-10-03: 4 capas + base = USD 0,17) y el número varía entre corridas
+  (misma foto: 3 y 4 capas).
+- 🔴 **Para BORRAR, un editor por instrucción, no un modelo de relleno** (canario 2026-10-03): Sunburst sin máscara
+  borró limpio (USD 0,01); Flare con máscara y Flux Fill dibujaron otro objeto en la silueta; Seedream Pro Edit dejó un
+  fantasma. Con capas, el clean plate es gratis y también limpio.
+- 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
+  (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
+  (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
+
+### Video: clasificar por operación y fase
+
+Para video, la pregunta no es «¿qué modelo?» sino «¿qué operación de qué fase?»: la
+[taxonomía de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) fija el vocabulario
+(pre, producción, post) y la guía §4.3 cruza cada operación con todos los motores que la hacen, separando
+`[verificado]` (contrato del endpoint) de **canario de garantía** (medido). No hay motor por defecto. Para producto y
+interfaces con personas, el [anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) decide qué
+planos son nuestros (0 créditos) y cuáles generativos antes de elegir motor.
+
+### Editar lo que ya existe: otra pregunta, otro árbol
+
+«¿Con qué genero?» y «¿con qué edito sin tocar el resto?» **no tienen la misma respuesta**: el ranking de edición no
+dice qué modelo deja la escena intacta. Para editar, la pregunta de fidelidad la responde el **pipeline**, no el
+modelo: `pnpm ai:inpaint image|erase|expand|background|move|place|video` recompone sobre la original y verifica el
+archivo en **delta 0** fuera de la zona (salida `0` PASS · `2` FAIL · `3` REVISAR · `1` error). El modelo sólo decide
+qué tan bien queda **dentro** de la zona, y ahí los defaults están medidos (canarios 2026-10-02/03): zona con máscara
+→ Flare · borrar → clean plate de `pnpm ai:layers` o Sunburst por instrucción · expandir → Flux Fill · video →
+`flux3-edit`. Las capas de Layerize son **sólo** máscara y clean plate, nunca píxeles finales; `--zone-resolution`
+reinterpreta la zona, no la escala. Playbook: `greenhouse-ai-image-generator` →
+`references/inpainting-and-editing.md`; contrato: `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §Pipeline de
+inpainting; manuales `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`,
+`editar-una-zona-de-un-video.md` y `expandir-y-separar-en-capas.md`.
+
+### Reiluminar: no hay modelo conectado (estudio 2026-10-03)
+
+🔴 **No afirmes que podemos reiluminar.** Ningún relight dedicado está conectado ni probado en canario; todo lo que
+sigue es **[sin verificar en vivo]**:
+
+- **Magnific:** el MCP oficial está conectado en sesiones Claude con la cuenta Efeonce y lista `images_relight` y
+  `video_relight`, pero sin esquema cargado ni invocación verificada. Su API de relight re-renderiza (riesgo en caras).
+- **Higgsfield:** sin relight por API; su MCP lista Cinema Studio 4.0 con `video_edit` y rig de luz, **fuera de
+  nuestro catálogo** (`higgsfield-provider`).
+- Mercado por API (imagen y video): candidatos, precios y etiquetas en la guía canónica; el oficio de video en
+  `motion-design-studio`.
+
+Método si se conecta uno: reiluminar y **volver a pegar el objeto exacto** (el híbrido del pipeline de inpainting) y
+mirarlo al 100 %. Lo más cercano hoy es `pnpm ai:inpaint place --finish element` (puede cambiar la forma). El canon
+de fotografía de marca no cambia: el plate cine se **regenera**, no se relumina.
 
 ## 3. Quién decide qué (boundaries)
 

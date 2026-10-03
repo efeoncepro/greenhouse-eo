@@ -127,6 +127,33 @@ El moat no es opacidad ni dependencia. Es:
 capacidad más confiable + cliente más capaz + memoria acumulada + evidence visible
 ```
 
+### 4.5 Aplicación de la dirección estratégica — 2026-10-03
+
+La [decisión de ejecución escalable](../../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+conecta las decisiones creativas de marca con una capacidad operable, automatizable y escalable. El compromiso
+puede abarcar el recorrido completo o un tramo con entradas, salidas, dependencias y owner de aceptación explícitos.
+En composiciones con Product Design, Web Experience o producción física, cada práctica conserva su contrato y
+accountability; el alcance creativo no habilita por sí solo ejecución o cobertura de otra disciplina.
+
+El ciclo de la relación puede avanzar por estas etapas:
+
+| Etapa | Capacidad que deja instalada | Evidencia para avanzar |
+| --- | --- | --- |
+| **Instalar** | contexto y reglas aprobadas, componentes, workflow, roles y criterios de aceptación | primera aplicación útil aceptada y handoff operativo |
+| **Operar** | producción, QA, aprobaciones, excepciones, mantenimiento y aprendizaje dentro de capacidad definida | delivery y calidad observables sobre demanda comparable |
+| **Expandir** | nuevas lanes, formatos, mercados o equipos con alcance y capacidad acordados | adopción, necesidad real, calidad sostenida y economía viable |
+
+Estas son etapas de adopción y delivery; no crean nuevas líneas de cobro ni sustituyen delivery model, engagement u
+operating mode. La instalación puede consumir Implementation/IP; la operación, capacidad y gobierno; la expansión
+ajusta las líneas existentes según alcance y costos, evitando cobrar dos veces el mismo trabajo.
+
+La verificación registra tiempo a primera aplicación útil y a paquete aprobado, variantes útiles aceptadas,
+cumplimiento de criterios de marca, FTR, retrabajo y defectos posteriores. Separa tiempo productivo de esperas por
+aprobación, proveedor o publicación. Para afirmar mejora usa baseline, denominador y complejidad comparables;
+el tiempo de entrega lista para uso y el tiempo de salida al mercado se distinguen cuando la activación depende de
+otro owner. El SOW declara criterios, gate de salida y corrección; targets o SLA requieren evidencia y aprobación
+específica. La dirección estratégica aceptada mantiene este modelo `Approved for validation`.
+
 ## 5. Customer model
 
 ### ICP primario

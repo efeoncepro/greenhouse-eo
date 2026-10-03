@@ -1,0 +1,7 @@
+  ◐ la sombra del elemento en su lugar original también se borra: 13067 px (--shadow off para dejarla)
+  ⇢ elemento movido (-560, 70) px · escala 1 · hueco con clean plate · píxeles del elemento tomados de la ORIGINAL
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+  ✂ imagen completa → 1536x1024 · la zona con contexto ocupa 56 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.010 · 1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  ↺ misma entrada ya generada: se reutiliza ./ai-generations/2026-10-03_task-1973-canary/move/be99f29165b0/inpaint/14d181f96428 sin pagar (usa --force para regenerar)
+    ✓ PASS · fuera de lo tocado: delta máximo 0/255 · ./ai-generations/2026-10-03_task-1973-canary/move/be99f29165b0/inpaint/14d181f96428/candidate-1.png

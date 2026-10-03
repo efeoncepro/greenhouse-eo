@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -58,6 +58,8 @@ Read only what the task needs:
   uses GPT Image, transparency, editing, masks, flexible sizes, streaming, pricing or model selection
 - `references/seedream-5-gpt-image-2-hybrid-production.md` when the task uses Seedream 5,
   fal.ai still-image generation, multiple image models or campaign profusion
+- `references/inpainting-and-editing.md` whenever the task edits an existing image or video locally (zone edit,
+  erase, move, place, background, expand, layers, detail pass) or asks about relighting
 - `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` when stills hand off to Gemini Omni,
   or the campaign includes motion, print/OOH or explicit branded/brand-light/neutral/client modes
 - `../design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md` when static campaign pieces need controlled
@@ -126,16 +128,20 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
 3. **¿Edición donde la precisión manda o entregable final?** → `gpt-image-2.5-sunburst` en `xhigh`/`max`, #1 en
    edición en Arena y Artificial Analysis [tercero, 2026-09-07/16]. **¿Editar SÓLO una zona y dejar el resto
-   idéntico?** → **`pnpm ai:inpaint image`** (TASK-1965), nunca `ai:image --mask` a mano: arma la máscara con
-   `pnpm ai:mask`, recorta, genera, recompone y verifica el ARCHIVO en delta máximo 0 (código 2 si no). 🔴 **Sunburst
-   CON máscara devuelve la zona como PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos el 2026-10-02]: el
-   pipeline usa Flare con máscara por defecto y, si eliges Sunburst, lo hace editar **sin máscara** (`--provider-mask
-   auto`), le manda la zona en magenta como imagen 2 de guía (sin ella puso el objeto FUERA de la zona, medido
-   2026-10-02), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
-   recompone — el mismo método de `pnpm foto:isotipo --acabado`. Verificado 2026-10-02. Código 3 = revisar. Alternativa con máscara: `fal:flux-pro-fill`.
-   **¿Incorporar un objeto o guiar con un dibujo, como el Markup de ChatGPT?** → `--sketch` (trazo sobre la foto; viaja
-   como imagen 2 de guía y la máscara sale del trazo) y `--reference` (el objeto, imágenes 3..N). En la API no hay
-   parámetro de boceto: es una imagen más con su rol numerado (guía de prompting 2.5, leída 2026-10-02).
+   idéntico?** → **`pnpm ai:inpaint`** (TASK-1965 + TASK-1973), nunca `ai:image --mask` a mano. **Playbook completo
+   (intención → comando → modelo → flags → qué mirar al 100 % → costos): [`references/inpainting-and-editing.md`](references/inpainting-and-editing.md).**
+   Lo mínimo: máscara con `pnpm ai:mask` (blanco = editable) → el comando recorta, genera, recompone sobre la
+   original y verifica el ARCHIVO en **delta máximo 0** fuera de la zona. Salida `0` PASS · `2` FAIL (no usar) ·
+   `3` REVISAR (panel plano, reencuadre, residuo, zona sin cambio) · `1` error. `--dry-run` gratis; tope `--max-usd`.
+   Subcomandos: `image` (zona; `--sketch`/`--reference` como el Markup de ChatGPT; `--zone-resolution` reinterpreta,
+   no escala) · `erase` · `move` · `place` (objeto de otra foto) · `background` · `expand` · `video` (`flux3-edit`
+   [verificado]). `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen) da máscara por elemento
+   (`ai:mask --from-layer`) y clean plate; **las capas nunca son píxeles finales** y **la base se cobra como una capa**.
+   Defaults medidos [verificado 2026-10-02/03]: zona con máscara → **Flare** · 🔴 **Sunburst NUNCA con máscara**
+   (panel negro 3 de 3: el pipeline lo hace editar sin máscara + guía de zona + corrección de color) · **borrar** →
+   clean plate con capas (gratis) o **Sunburst por instrucción** (Flare con máscara y Flux Fill dibujan otro objeto;
+   Seedream deja fantasma) · **expandir** → **Flux Fill** (`fal:flux-pro-fill`), nunca GPT Image (Flare achica la
+   escena, Sunburst copia el espejo). **Reiluminar:** no hay relight conectado (estado en el playbook §7).
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
@@ -148,7 +154,8 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 7. **¿Materialidad, atmósfera, color, look development, fusión multirreferencia orientada a material, cambio
    regional sin máscara?** → `seedream5-pro` / `seedream5-pro-edit` (edit hasta 10 referencias).
 8. **¿Separar una pieza aprobada en capas editables?** → `seedream5-pro-layerize` (hasta 16 capas PNG con alfa +
-   `layers.json`, sin prompt). No regeneres.
+   `layers.json`; prompt y `--bbox` opcionales). No regeneres. Para editar con esas capas (máscara, clean plate,
+   borrar, mover), entra por `pnpm ai:layers`, que guarda la caja en píxeles de la base y alimenta `ai:inpaint`.
 9. **¿Resolución nativa sobre 2K?** → `seedream5-lite` (área hasta 4096² según schema; la ficha dice 3072²) o GPT
    Image (hasta 3840×2160; sobre 2560×1440 es experimental). 🔴 **Seedream 5 Pro en fal NO es 4K**: área máxima
    2048×2048 (la nota "Hasta 4K" del registro era incorrecta).
@@ -249,7 +256,9 @@ rechaza marcas y personas reales **después de cobrar**.
   (`scripts/ai/resolve-output-dir.ts`, con 7 tests).
 - **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
   por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
-  `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
+  `--count` de imagen sin validar; layerize: el número de capas lo decide el modelo y varía entre corridas, y **la
+  base se cobra como una capa** (medido 2026-10-03 con el saldo de fal; `pnpm ai:layers` estima con la cota 16 +
+  base); la API de pricing
   devuelve la mitad del precio publicado de Flux 3 (sin dato por qué); tablas de escalones al 2026-09-16, pueden
   cambiar. Toda estimación es orientativa: `pnpm ai:fal --balance` antes y después.
 
@@ -513,8 +522,11 @@ tuvo delta máximo **221/255** (los ojos del sujeto, **147/255**) con una media 
 criterio. Desde el 2026-10-02 la recomposición y la verificación las hace **`pnpm ai:inpaint image`** (TASK-1965):
 no escribas el pegado a mano. Además marca `suspectFlatPanel` (salida cruda negra: la trampa de Sunburst con
 máscara), avisa si la zona abierta casi no cambió (un `PASS` sin el objeto pedido es posible) y si el modelo corrió
-el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la cámara). Manual:
-[editar una zona de una imagen](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md).
+el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la cámara). Manuales:
+[editar una zona de una imagen](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
+[de un video](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md) ·
+[expandir y separar en capas](../../../docs/manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md); playbook:
+[`references/inpainting-and-editing.md`](references/inpainting-and-editing.md).
 
 - El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
@@ -669,6 +681,8 @@ el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la c
   reglas más tres propias: lo **plano se compone, no se genera**; la vista que debe salir **sin arte se genera sin
   referencias**; y la pieza se **nombra con precisión** (portacarnet de marco rígido ≠ portacredencial) o vuelve la
   genérica: [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
+  **Desde el 2026-10-03 la vista puesta la elige `pnpm foto:prompt`** (silueta, giro, espalda, cámara baja y oclusión;
+  126 vistas puestas en los kits): ver §Personas, prenda puesta y referencias.
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 
@@ -730,6 +744,27 @@ diagnostica sin costo.
   costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
 - **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
   directorio (corregido 2026-09-19, §Brechas conocidas).
+
+### Personas, prenda puesta y referencias — lo que el compilador ya hace (2026-10-03)
+
+Índice de capacidades; el detalle vive en el puntero de cada línea. Antes de describir algo a mano en el prompt,
+revisa si el comando ya lo resuelve.
+
+| Capacidad | Qué hace | Detalle |
+|---|---|---|
+| **Elenco de marca** | Cinco personajes ficticios (`hum`, `karo`, `sophia`, `isabella`, `antonio`) que se piden en `identidad` igual que el roster: `{ "persona": "karo", "vista": "45-der" }`. Sirven para variar personas en fotos de varios o de equipo; no son obligatorios. Grupo de 3 a 5 = cualquier combinación de elenco + Nexa + Julio; con otras personas del roster el tope sigue en dos. La misma persona dos veces es error. | [`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) · `ai-generations/_identidad-elenco/LEEME.md` |
+| **Selección automática de la vista puesta** | `pnpm foto:prompt` (`elegirPuesta`) elige la vista PUESTA de bomber, softshell, polo, hoodie y gorra por la `silueta` de quien la viste, el giro de su vista (o `giro` en el objeto, obligatorio de espaldas), `camara: "baja"` y `tapa: "mano" \| "cruza" \| "objeto" \| "brazos"` (con una persona se infiere de la escena). Imprime una línea `·` con la elegida, el motivo y las alternativas; `puesta` sigue forzando una vista. | [`references/garment-reference-kit.md`](references/garment-reference-kit.md) §Delta 2026-10-03 |
+| **Kit de 126 vistas puestas** | Bomber, softshell, polo navy y hoodie (29 vistas cada uno, hombre y mujer: frente, 45° y 70°, cámara baja, espalda a 45°/70° y baja, oclusión mano/taza/tablet/brazos) + gorra navy (10, de la copa a las cejas). | `ai-generations/2026-10-03_uniforme-vistas/LEEME.md` + LEEME de cada kit |
+| **`pnpm foto:isotipo` con oclusión** | Para cuando sí hay que componer: separa tela, marca inventada y oclusor (piel, pelo, otro material; `--oclusion <máscara de pnpm ai:mask>` para lo del color de la prenda) y compone la marca oficial POR DETRÁS. `--pliegues 0–1`, `--relieve 0–2`, `--escorzo 0,15–1`. Si no se compone limpio, se rehace la toma. | garment-reference-kit §Delta 2026-10-03 |
+| **`pnpm foto:rostro`** | Mide largo/ancho del rostro con Vision (macOS) y sale 1 si una frontal queda fuera del canon de la persona (`rostro: { largoAncho, tolerancia }`; Nexa 0,81 ± 0,02). No mide caras giradas, con boca abierta ni ojos cerrados. | `ai-generations/_identidad-nexa/LEEME.md` |
+| **Expresiones de Nexa** | 25 casi de frente, aprobadas, en `_identidad-nexa/5-expresiones-frente/`: `{ "persona": "nexa", "expresion": "hartazgo" }`. El ancla frontal va siempre primero y la expresión detrás, sólo para el gesto; en un grupo no viaja. | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md) · LEEME de `_identidad-nexa` |
+| **Canon-sync** | `foto:prompt` y `foto:generar` bajan del bucket canon la referencia sellada que falte o cuyo sha256 no sea el del lock; la copia local distinta se aparta como `<archivo>.local-<sha8>.<ext>`, nunca se pisa. `FOTO_SIN_CANON=1` lo apaga. | §Dónde viven los archivos de `ai-generations/` |
+
+**Al sumar algo nuevo** (vista de kit, personaje, expresión de Nexa): se declara en el catálogo de
+`scripts/foto/build-prompt.mjs`, `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` →
+`pnpm exec vitest run scripts/foto` → se archiva la exploración con `pnpm ai-gen:archive` → se documenta en el LEEME de
+la carpeta. El procedimiento paso a paso de cada caso vive en ese LEEME (A: kit de prenda · B: `_identidad-elenco` ·
+C: `_identidad-nexa`).
 
 ### Registro cine: placas, emblema y tamaños
 
@@ -978,7 +1013,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   No existe Seedream 5.1 al 2026-09-16.
 - **Layerize** recibe UNA imagen, sin prompt obligatorio, y devuelve la base + hasta 16 capas por `z_index`
   (nombre, descripción, bounding box y recorte con **alfa real**, reconstruyendo lo ocluido). El CLI guarda
-  `NN-<nombre>.png` + `layers.json`. Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
+  `NN-<nombre>.png` + `layers.json` (para editar, `pnpm ai:layers` hace lo mismo con caja en píxeles de la base,
+  `--prompt`/`--bbox` y caché; la base saca también las superficies y se cobra como una capa). Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
   fondo) para recomponer, retocar o animar por separado **sin volver a generar**. No reemplaza la composición
   determinística: el logo oficial y el copy final siguen saliendo del vector y del compositor.
 
@@ -1033,6 +1069,7 @@ Do not publish `1 credit = money`, vendor→credit conversion, per-piece tables 
 - **Canon** `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`): lo sellado (identidades, prendas, logo 3D, mascotas, Sparks); `pnpm creative:assets:publish`.
 - **Archivo** `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>` (sólo operador): exploración, rondas, descartes, historial.
 - Una ruta `ai-generations/…` usada como `--image`, máscara o guía es lógica: si no está en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull <carpeta|ruta>` (verifica sha256) **antes** de generar o componer.
+- **Canon-sync (2026-10-03):** `pnpm foto:prompt` y `pnpm foto:generar` lo hacen solos para lo **sellado** (`scripts/foto/canon-sync.mjs`): si la referencia falta o su sha256 no es el del lock, la bajan del canon (`.part` + verificación + rename); una copia local distinta se aparta como `<archivo>.local-<sha8>.<ext>`. Los bytes pasan por la máquina como caché, no como copia permanente. `FOTO_SIN_CANON=1` lo apaga. Para exploración archivada sigue valiendo `pnpm ai-gen:pull`.
 - **NUNCA** regenerar, sustituir ni aproximar una referencia aprobada porque falta (es justo la deriva de identidad que el kit evita); **NUNCA** resellar el lock para taparlo; **NUNCA** archivar ni borrar a mano. Promover exploración = sellarla o citarla en la receta + publicar a canon. Las salidas nuevas siguen en `ai-generations/<AAAA-MM-DD>_<slug>/`.
 - SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
 
@@ -1088,9 +1125,9 @@ deterministic and are composed after any generative finish.
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
   brand materialization uses official references and the separate identity/material review above.
 - Seedream Pro Edit «region/layer editing» is semantic art direction over one flattened raster, not editable
-  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost, then
-  recompose the protected region from the base (the mask reduces drift, it does not eliminate it: 221/255 max
-  measured 2026-09-17); when
+  layers or pixel-perfect locality. When protected-region drift has operational cost, use `pnpm ai:inpaint`
+  (it recomposes over the original and verifies delta 0 on the written file; the mask alone reduces drift, it does
+  not eliminate it: 221/255 max measured 2026-09-17 — see `references/inpainting-and-editing.md`); when
   you need separable layers of an approved piece, run `seedream5-pro-layerize` instead of regenerating.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
   family in deterministic post; use Seedance (2.5/2.0 via `pnpm ai:fal`) only for a genuinely new shot/action/continuity need,

@@ -1,0 +1,17 @@
+  $ costo estimado ≈ USD 0.107 (1 × 3568 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_cmp004-cine-nativo/formatos/nativas/expandidas/S03-11X-relleno.png (edit) …
+  ✓ 4976KB · gpt-image-2.5-sunburst · 2048x2048 · high
+    usage: in 1680 (img 1521 · txt 159) · out 3568 · total 5248
+done
+/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/is.js:110
+const invalidParameterError = (name, expected, actual) => new Error(
+                                                          ^
+
+Error: Expected number between 3 and 4 for create.channels but received 1 of type number
+    at Object.invalidParameterError (/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/is.js:110:59)
+    at Sharp._createInputDescriptor (/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/input.js:377:22)
+    at new Sharp (/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/constructor.js:407:29)
+    at Sharp (/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/constructor.js:217:12)
+    at file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_cmp004-cine-nativo/formatos/nativas/expandir.mjs:64:20
+
+Node.js v24.17.0

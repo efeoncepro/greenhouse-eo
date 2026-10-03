@@ -1,0 +1,79 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "8467d18bb600",
+  "key": "8467d18bb6008dbe338ea2ec19aa883330a38f7bb882962f09962f2818e95741",
+  "status": "dry-run",
+  "createdAt": "2026-10-03T09:45:55.157Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-canvas.png",
+    "imageSha256": "90854c716fc77959d70ed650ec78bbea6a18c7de19ecce5a28932096c5cf97c2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-mask.png",
+    "maskSha256": "0d00f89dc25b184459f5cfe044b019d314f7f341975776b70f4ed1870add720e",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 2730,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "x",
+    "providerPrompt": "x Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.6424908424908425,
+    "editable": 2623488,
+    "soft": 70656,
+    "protected": 1499136
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 2730
+    },
+    "target": {
+      "width": 1088,
+      "height": 1904
+    },
+    "aspectError": 0.01538461538461533,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sourceSha256": "69afa01a78f40b7f4997b07449e4bfd5487877c6abb71f301d6e87f5a81defa7",
+    "to": "9:16",
+    "plan": {
+      "canvas": {
+        "width": 1536,
+        "height": 2730
+      },
+      "scene": {
+        "left": 0,
+        "top": 853,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 24
+  }
+}

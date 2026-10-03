@@ -18,6 +18,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Clasificación y orquestación de la producción de video con IA](creative-production/clasificacion-y-orquestacion-de-video.md) —
+  cómo se clasifica una pieza (tipo, look, fidelidad, dificultad, operaciones por fase), personas usando producto
+  digital, «propio primero» y el plan con compuertas de ADR-025; complemento del
+  [método de producción de video](creative-production/video-production.md).
 - [Proveedor Higgsfield en Creative Studio](creative-studio/HIGGSFIELD_PROVIDER.md) — superficies de API, SDK,
   CLI, skills, MCP remoto y puentes MCP locales (Blender, Illustrator, Photoshop); estados de adopción y evidencia
   exigida antes de entregar una salida.
@@ -70,6 +74,17 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   eslogan, la contraportada «A a escala» con una sola conversión, los nueve gráficos (qué pregunta responde cada uno y
   cuándo elegirlo) y las tres láminas de texto denso. Aprobado el 2026-09-28 en el canvas; todavía no está en AXIS
   (plan por una task aparte).
+- [Elenco y referencias de fotografía](creative/elenco-y-referencias-de-fotografia.md) — quién sale en las fotos de
+  marca propia y cómo se ve igual cada vez: el elenco de cinco personajes ficticios (Hum, Karo, Sophia, Isabella y
+  Antonio), su línea, su rol y qué pueden y no pueden representar; Julio y Nexa; grupos de 3 a 5 personas; cómo el
+  sistema elige solo la prenda puesta según quién la viste, cómo está parada y si una mano tapa el logo; las 25
+  expresiones de Nexa; dónde viven las imágenes (canon que se baja solo y archivo recuperable) y qué se hace al sumar
+  algo nuevo. Vigente desde el 2026-10-03.
+- [Spot animado 2D de Efeonce](creative/spot-animado-2d.md) — qué es un spot animado 2D de marca propia (dibujo
+  animado con sombras planas + video desde cuadros clave + gráficos vectoriales + composición), qué se compone y qué
+  genera la IA, quién aparece (elenco 2D como cliente; nunca el elenco fotográfico), etapas y quién aprueba qué,
+  límites y pendientes. Caso fuente «Sparks × Efeonce AEO», aprobado el 2026-10-03;
+  [manual](../manual-de-uso/creative/producir-spot-animado.md).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

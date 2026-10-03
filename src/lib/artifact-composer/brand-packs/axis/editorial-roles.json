@@ -1,5 +1,5 @@
 {
-  "$comment": "Extensión EDITORIAL del brand pack `axis` (TASK-1889). La consumen sólo los catálogos que la declaran (hoy `insights-report` e `insights-deck`); `deck-axis` no la compila y sus tokens quedan byte-idénticos. Nace del canvas «Gráficos de Efeonce Insights» aprobado el 2026-09-25: los grises de estructura que el canvas usa sin token y los ROLES de dato. Un color de dato no se pide por su tono: se pide por lo que la serie ES (actual, anterior, oportunidad, ausencia) y por el fondo donde se lee (papel o navy). Los colores nuevos son `proposed` hasta que el operador los valide en el Figma `Sistema Axis - PPT`; esa transición no cambia valores.",
+  "$comment": "Extensión EDITORIAL del brand pack `axis` (TASK-1889). La consumen sólo los catálogos que la declaran (hoy `insights-report` e `insights-deck`); `deck-axis` no la compila y sus tokens quedan byte-idénticos. Nace del canvas «Gráficos de Efeonce Insights» aprobado el 2026-09-25: los grises de estructura que el canvas usa sin token y los ROLES de dato. Un color de dato no se pide por su tono: se pide por lo que la serie ES (actual, anterior, oportunidad, ausencia) y por el fondo donde se lee (papel o navy). Los colores nuevos son `proposed` hasta que el operador los valide en el Figma `Sistema Axis - PPT`; esa transición no cambia valores. TASK-1975 (aprobado por el operador el 2026-10-03): `dataStep*` pinta el paso «Sumó» de la cascada y la 4.ª parte de waffle y apiladas; `delta{Better,Worse}*` son los tonos semánticos de la variación (verde mejor, rojo peor; neutro sigue en gris).",
   "colors": {
     "--axis-deck-slate-75": "#eef1f5",
     "--axis-deck-slate-120": "#dfe5ee",
@@ -37,20 +37,122 @@
     "dataPriorOnNavy": "--axis-deck-blue-310",
     "dataOpportunityOnNavy": "--axis-ppt-red-300",
     "dataAbsenceOnNavy": "--axis-deck-ice-200",
-    "dataHighlightOnNavy": "--axis-deck-cyan-100"
+    "dataHighlightOnNavy": "--axis-deck-cyan-100",
+    "dataStepOnPaper": "--axis-ppt-blue-500",
+    "dataStepOnNavy": "--axis-deck-cyan-700",
+    "deltaBetterOnPaper": "--axis-ppt-green-900",
+    "deltaWorseOnPaper": "--axis-ppt-red-800",
+    "deltaBetterOnNavy": "--axis-ppt-green-400",
+    "deltaWorseOnNavy": "--axis-ppt-red-300"
   },
   "contrastPairs": [
-    { "fg": "paperInk", "bg": "paper", "min": 4.5, "context": "texto de lectura sobre el papel de las páginas interiores" },
-    { "fg": "paperAccent", "bg": "paper", "min": 4.5, "context": "antetítulos y cifra principal navy de marca sobre papel" },
-    { "fg": "navyMuted", "bg": "navy", "min": 4.5, "context": "texto secundario sobre el navy de portada, capítulo y deck" },
-    { "fg": "navyLead", "bg": "navy", "min": 4.5, "context": "entrada de capítulo y nombres de canal sobre navy" },
-    { "fg": "navyAccent", "bg": "navy", "min": 3, "context": "antetítulos y acentos teal sobre navy (texto grande o versalitas)" },
-    { "fg": "dataCurrentOnPaper", "bg": "paper", "min": 3, "context": "serie actual sobre papel (marca gráfica, WCAG 1.4.11)" },
-    { "fg": "dataPriorOnPaper", "bg": "paper", "min": 3, "context": "serie anterior sobre papel (marca gráfica)" },
-    { "fg": "dataOpportunityOnPaper", "bg": "paper", "min": 3, "context": "oportunidad sobre papel (marca gráfica)" },
-    { "fg": "dataCurrentOnNavy", "bg": "navy", "min": 3, "context": "serie actual sobre navy (marca gráfica)" },
-    { "fg": "dataPriorOnNavy", "bg": "navy", "min": 3, "context": "serie anterior sobre navy (marca gráfica)" },
-    { "fg": "dataOpportunityOnNavy", "bg": "navy", "min": 3, "context": "oportunidad sobre navy (marca gráfica)" },
-    { "fg": "labelMuted", "bg": "paper", "min": 3, "context": "etiquetas en versalitas y metadatos grises sobre papel (texto de apoyo, no de lectura)" }
+    {
+      "fg": "paperInk",
+      "bg": "paper",
+      "min": 4.5,
+      "context": "texto de lectura sobre el papel de las páginas interiores"
+    },
+    {
+      "fg": "paperAccent",
+      "bg": "paper",
+      "min": 4.5,
+      "context": "antetítulos y cifra principal navy de marca sobre papel"
+    },
+    {
+      "fg": "navyMuted",
+      "bg": "navy",
+      "min": 4.5,
+      "context": "texto secundario sobre el navy de portada, capítulo y deck"
+    },
+    {
+      "fg": "navyLead",
+      "bg": "navy",
+      "min": 4.5,
+      "context": "entrada de capítulo y nombres de canal sobre navy"
+    },
+    {
+      "fg": "navyAccent",
+      "bg": "navy",
+      "min": 3,
+      "context": "antetítulos y acentos teal sobre navy (texto grande o versalitas)"
+    },
+    {
+      "fg": "dataCurrentOnPaper",
+      "bg": "paper",
+      "min": 3,
+      "context": "serie actual sobre papel (marca gráfica, WCAG 1.4.11)"
+    },
+    {
+      "fg": "dataPriorOnPaper",
+      "bg": "paper",
+      "min": 3,
+      "context": "serie anterior sobre papel (marca gráfica)"
+    },
+    {
+      "fg": "dataOpportunityOnPaper",
+      "bg": "paper",
+      "min": 3,
+      "context": "oportunidad sobre papel (marca gráfica)"
+    },
+    {
+      "fg": "dataCurrentOnNavy",
+      "bg": "navy",
+      "min": 3,
+      "context": "serie actual sobre navy (marca gráfica)"
+    },
+    {
+      "fg": "dataPriorOnNavy",
+      "bg": "navy",
+      "min": 3,
+      "context": "serie anterior sobre navy (marca gráfica)"
+    },
+    {
+      "fg": "dataOpportunityOnNavy",
+      "bg": "navy",
+      "min": 3,
+      "context": "oportunidad sobre navy (marca gráfica)"
+    },
+    {
+      "fg": "labelMuted",
+      "bg": "paper",
+      "min": 3,
+      "context": "etiquetas en versalitas y metadatos grises sobre papel (texto de apoyo, no de lectura)"
+    },
+    {
+      "fg": "dataStepOnPaper",
+      "bg": "paper",
+      "min": 3,
+      "context": "paso «Sumó» de la cascada y 4.ª parte sobre papel (marca gráfica, TASK-1975)"
+    },
+    {
+      "fg": "dataStepOnNavy",
+      "bg": "navy",
+      "min": 3,
+      "context": "paso «Sumó» de la cascada y 4.ª parte sobre navy (marca gráfica, TASK-1975)"
+    },
+    {
+      "fg": "deltaBetterOnPaper",
+      "bg": "paper",
+      "min": 4.5,
+      "context": "variación mejor (verde) sobre papel; la píldora la pinta sobre su tinte al 12 % (TASK-1975)"
+    },
+    {
+      "fg": "deltaWorseOnPaper",
+      "bg": "paper",
+      "min": 4.5,
+      "context": "variación peor (rojo) sobre papel; la píldora la pinta sobre su tinte al 10 % (TASK-1975)"
+    },
+    {
+      "fg": "deltaBetterOnNavy",
+      "bg": "navy",
+      "min": 4.5,
+      "context": "variación mejor (verde) sobre navy (TASK-1975)"
+    },
+    {
+      "fg": "deltaWorseOnNavy",
+      "bg": "navy",
+      "min": 4.5,
+      "context": "variación peor (coral) sobre navy (TASK-1975)"
+    }
   ]
 }

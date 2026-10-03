@@ -67,3 +67,63 @@ anterior.
 **Gotcha, otra vez el del kit.** Las dos vistas puestas volvieron como **díptico frente-y-espalda**, y
 una además con rostro. Se resolvió reponiendo la guarda explícita —una sola fotografía, sólo de
 espaldas, sin rostro—, que se había perdido al editar el brief. Es el mismo fallo ya registrado en §7.
+
+## Vistas puestas por silueta, giro, espalda y oclusión (2026-10-03)
+
+Vistas PUESTAS nuevas de este kit (las de escena, con una persona sin rostro dentro de la prenda), producidas en la
+corrida [`2026-10-03_uniforme-vistas`](../2026-10-03_uniforme-vistas/LEEME.md): declaradas en `usoPorVista` del catálogo
+(`scripts/foto/build-prompt.mjs`), con `cuando_usarla` en el manifiesto del kit, su prompt en `brief/`, selladas en
+`scripts/foto/assets.lock.json` y publicadas al canon. Si faltan en disco, `pnpm foto:prompt` las baja solo.
+
+### Cómo las elige `pnpm foto:prompt`
+
+No se pasan a mano: el comando elige la vista por la `silueta` de quien viste la prenda (`hombre`/`mujer`), por el
+giro de su vista de identidad (`45-*` → 45°, `perfil-*` → 70°) o por `giro` en el objeto (obligatorio de espaldas),
+por `camara: "baja"` y por lo que tapa la marca (`tapa`; con una sola persona se infiere de la escena). Cadena de
+respaldo: oclusión → cámara baja → giro → 45° del mismo lado → frente o espalda; en cada paso, primero la de la
+silueta. Imprime una línea `·` con la elegida, el motivo y las alternativas; `puesta` en el objeto fuerza otra.
+
+El macro del bordado viaja también con la prenda puesta (`macroEnUso: false` lo apaga). Ejemplo de ficha:
+
+```json
+"objetos": [{ "objeto": "polo-efeonce", "persona": "isabella", "tapa": "cruza" }]
+```
+
+### Claves y números
+
+#### Polo navy — `polo-efeonce` (29 vistas, números 17–45)
+
+| Vista (clave base) | Qué muestra | Hombre | Mujer (`-mujer`) |
+|---|---|---|---|
+| `frente` | de frente | 13 (previa, `assetDeUso`) | 17 |
+| `45-izq` | 45°, nariz a la izquierda del cuadro | 18 | 22 |
+| `45-der` | 45°, nariz a la derecha | 19 | 23 |
+| `70-izq` | 70°, izquierda | 20 | 24 |
+| `70-der` | 70°, derecha | 21 | 25 |
+| `frente-bajo` | de frente, cámara baja | 34 | 35 |
+| `espalda-45-izq` | espalda a 45°, izquierda | 36 | 41 |
+| `espalda-45-der` | espalda a 45°, derecha | 37 | 42 |
+| `espalda-70-izq` | espalda a 70°, izquierda | 38 | 43 |
+| `espalda-70-der` | espalda a 70°, derecha | 39 | 44 |
+| `espalda-bajo` | espalda, cámara baja | 40 | 45 |
+| `frente-mano` | oclusión: mano sobre el pecho (`tapa: "mano"`) | 26 | 27 |
+| `frente-cruza` | oclusión: antebrazo con taza (`tapa: "cruza"`) | 32 | 33 |
+| `frente-objeto` | oclusión: tablet contra el pecho (`tapa: "objeto"`) | 30 | 31 |
+| `frente-brazos` | oclusión: brazos cruzados (`tapa: "brazos"`) | 28 | 29 |
+
+Archivo: `efeonce-polo-navy-NN-puesto-<clave>-<tam>-v01-fondo-estudio.png`. Vistas puestas previas del kit: `frente` = 13 (`assetDeUso`), `espalda` = 14 **v02** (bordada), `espalda-mujer` = 16 **v02**, `frente-cuerpo-b` = 15; las de espalda `v01` quedan obsoletas.
+
+### Sumar una vista a este kit (procedimiento A)
+
+1. Generarla **editando** una vista puesta aprobada del kit, con el macro del bordado como segunda imagen; si es un
+   giro, partir del frente (un 45° de base arrastra su rotación). Entradas 3:4 padeadas a 2:3 espejando el pie.
+2. Revisarla al 100 % con `pnpm foto:emblema`: esfera arriba, ventanas horizontales, letras exactas.
+3. Copiarla a `final/` con la convención de nombre y declararla en `usoPorVista` con su clave
+   `<giro>[-<tapa>|-bajo][-mujer]`.
+4. Agregarla al manifiesto del kit (`cuando_usarla`) y su prompt a `brief/`.
+5. `pnpm foto:assets:lock` → `pnpm creative:assets:publish apply` → `pnpm exec vitest run scripts/foto`.
+6. Archivar la exploración con `pnpm ai-gen:archive apply --folder <carpeta>` y sumarla a la tabla de arriba.
+
+Método completo y trampas medidas (marca rotada en el giro, oclusión esquivada, no componer sobre la vista):
+[`garment-reference-kit.md`](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md)
+§Delta 2026-10-03.

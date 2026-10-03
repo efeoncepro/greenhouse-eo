@@ -1,0 +1,63 @@
+{
+  "reference": "Deck-Waffle",
+  "catalog": "deck",
+  "contentType": "insights-figure-waffle",
+  "slots": {
+    "tabNumber": "01",
+    "section": "Visibilidad orgánica",
+    "period": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "grid",
+      "label": "Cobertura de keywords"
+    },
+    "keyFigure": "74 de 100",
+    "keyCaption": "keywords del mercado donde el sitio ya aparece en Google",
+    "conclusion": "El sitio aparece en tres de cada cuatro búsquedas del mercado que medimos",
+    "figureTitle": "100 keywords del mercado",
+    "source": {
+      "label": "Fuente",
+      "text": "Mediciones de posiciones"
+    },
+    "waffleParts": [
+      {
+        "label": "Primera página (1 a 10)",
+        "count": "26"
+      },
+      {
+        "label": "A un paso (11 a 20)",
+        "count": "21",
+        "role": "opportunity",
+        "tag": "Oportunidad"
+      },
+      {
+        "label": "Posiciones 21 a 50",
+        "count": "27"
+      },
+      {
+        "label": "Sin posición",
+        "count": "26",
+        "role": "absence"
+      }
+    ],
+    "note": {
+      "text": "Cada cuadro es una keyword del conjunto de 100 que medimos para el mercado."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio ya compite en la mayoría de las búsquedas; el salto está en las 21 cercanas a la primera página."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Crear contenido para las 26 keywords donde el sitio no aparece."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "12",
+      "total": "24"
+    }
+  }
+}

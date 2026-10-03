@@ -292,6 +292,10 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
   distractores coherentes, antes/después) está pendiente; NUNCA presentarlo como brand equity.
 - **Regla dura:** NUNCA anclar la serie en la categoría de un cliente real ni insinuar trabajo con un cliente (la
   pintura se leyó como Berel: «nosotros NO somos Berel»). Variar industrias; nunca etiquetar con nombre de cliente.
+- **Personas (2026-10-03):** el **elenco de marca** —cinco personajes ficticios, uno por línea— sirve para variar personas
+  en fotos de varios o de equipo, sin cuota; nunca se presenta como equipo real, cliente ni testimonio
+  ([`EFEONCE_BRAND_CAST_V1.md`](../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)). Nexa suma 25
+  expresiones aprobadas y la ropa de marca puesta la elige `pnpm foto:prompt`; la dirección vive en `design-studio` §11.
 - Fuente: [lenguaje fotográfico V1](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
   [índice](../../../docs/operations/brand-photography/README.md) ·
   [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive
@@ -420,6 +424,9 @@ Ops llevan al equipo humano. **Nombre:** «Sparks» sirve como nombre interno de
 y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»; en cine, dos
 con referencia como máximo y el resto lejos y desenfocado, escena `NX7d` aprobada el 2026-10-02). Canon:
 [`SPARKS_V1.md`](../../../docs/operations/brand-characters/SPARKS_V1.md).
+**Elenco 2D** (aprobado 2026-10-03): Tomás, Camila, Renata y Mateo, ficticios y dibujados, son el grupo de compra del
+cliente y supervisan a los Sparks en piezas animadas; estilo «vector con volumen» con sello (línea de luz azul + objeto
+azul). Canon: [`EFEONCE_2D_CAST_V1.md`](../../../docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md).
 
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
 

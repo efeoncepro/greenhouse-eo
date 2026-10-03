@@ -16,6 +16,16 @@ description: >-
 
 # Creative Practice — el negocio, no el oficio
 
+## Dirección estratégica de marca y escala — 2026-10-03
+
+Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+al definir visión, alcance o modelo de producción: convertir decisiones creativas en capacidad operable,
+automatizable y escalable, con calidad, consistencia e identidad verificables y menor tiempo a mercado.
+Recorrido completo y tramo delimitado son alcances, no nuevos delivery models; instalar → operar → expandir
+son etapas, no nuevas líneas de cobro. Conservar autoridad upstream, criterios de aceptación y corrección,
+baseline y costo completo. La dirección aceptada no cambia los estados comerciales ni habilita SLA,
+volumen ilimitado, pricing, publicación o acceso externo.
+
 ## Canon de oferta vigente — 2026-07-30
 
 La arquitectura comercial vigente de Creative Services está en [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md) y su decisión en [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md`](../../../docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md). El benchmark que la fundamenta está en [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md`](../../../docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md).

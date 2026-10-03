@@ -1,6 +1,6 @@
 # Companion — Posproducción, sonido y entrega de video
 
-**Versión:** 2026-09-24. **Dueño:** Motion Design Studio; Audio Studio dirige el oficio sonoro.
+**Versión:** 2026-09-24; delta 2026-10-03 (§15, spot animado 2D). **Dueño:** Motion Design Studio; Audio Studio dirige el oficio sonoro.
 **Entrada:** material generado o filmado, contrato de dirección, referencias y decisiones del operador.
 **Salida:** película revisable, fuentes reproducibles, evidencia y estados separados de entrega/aprobación/publicación.
 
@@ -306,3 +306,67 @@ Fuentes de implementación del caso:
 - [V15: conform desde fuentes](../../../../ai-generations/2026-09-23_cmp003-sky-video/seedance/v15-review/rebuild-picture.py).
 - [V16: mezcla de transformación](../../../../ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/mix-transformation.py).
 - [V17: reproducción y límites](../../../../ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/README.md).
+
+## 15. Delta 2026-10-03 — lo que agregó el spot animado 2D
+
+**Fuente:** spot «Sparks × Efeonce AEO», v2 aprobada por el operador el 2026-10-03 (49,6 s, 1920×1080, 24 fps).
+Hechos en `ai-generations/2026-10-03_sparks-aeo-60s/INVENTARIO-DE-HECHOS.md`; receta en
+[el workflow del spot animado 2D](../workflows/animated-2d-spot-composed-brand-assets.md); historia en la
+[retrospectiva](../../../../docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md).
+Las reglas siguientes son transversales salvo donde se indica; las cifras son del caso, no defaults.
+
+### Imagen
+
+- **Un solo mapa de tiempos** (amplía §8). Cuando el operador pide más ritmo, el re-timing se escribe una vez —por
+  segmento: inicio, velocidad, duración conservada— y una función de remapeo mueve video, voz, eventos del bus de
+  SFX y subtítulos. Tablas sueltas por pista desincronizan. Caso: `corte/corte-v2.py`, velocidades 1,0–1,5×.
+- **Después de re-timar, revisar todo sonido anclado a tiempo absoluto contra la voz.** En el caso, el logo sonoro
+  intermedio cayó encima de una línea de VO y se retiró (el reveal ya cerraba con él).
+- **Zoom o escala sobre vectores: dibujar cada cuadro con escala decimal.** `zoompan` de ffmpeg redondea el encuadre
+  a píxeles enteros y salta. Patrón: SVG → raster crudo (sharp) → ffmpeg por tubería (`corte/ui-s2-s9.cjs`). Aplica
+  a interfaz, placas y cualquier elemento exacto que se mueva.
+- **Placeholders fuera antes de mostrar un corte.** «[Marca ficticia A/B/C]» llegó a la entrega v1 y el operador lo
+  vio; se reemplazó por marcas inventadas verificadas sin homónimo. En la misma revisión apareció un texto que se
+  salía de su burbuja desde la v1 sin que nadie lo detectara. **Gate: mirar cuadros al 100 % (no sólo la hoja de
+  contacto) en cada pantalla con texto antes de entregar.**
+- **Cierre:** el llamado a la acción completo va sobre una **placa animada previa** y el **reveal del logo con
+  eslogan queda sin voz** (decisión del operador: la voz encima le quitaba fuerza). La música puede cortar en seco
+  al entrar el logo. En una placa con personajes de marca, animarlos al compás de la cama (caso: flotación con
+  período de un compás, 1,5 s a 160 BPM) y hacer entrar cada logo con la palabra que lo nombra.
+- **Ensamble con overlays:** `overlay` necesita `shortest=1` y `-t` explícito; sin ellos el video se alargó (49,2 s
+  en vez de 46,5 s en una prueba del caso).
+
+### Subtítulos
+
+- Cuando el ffmpeg disponible no trae libass, renderizar **cada cue como PNG transparente** al tamaño de entrega y
+  superponerlo con `enable=between(t,a,b)`. Caso: Poppins Medium 46 px, blanco sobre navy `#001a33` al 80 %, rx 14
+  (`corte/subtitulos-v2.cjs`).
+- Tomar los tiempos de los cues de la **voz real** de la mezcla, no del guion (caso: la mezcla escribe
+  `final/v2/cues-fuente.json` y los subtítulos lo leen).
+- Sobre pantallas de interfaz, subir el cue para no tapar lo legible (caso: margen 200 px sobre la barra de
+  escritura).
+- Entregar SRT de diálogo y SRT SDH (con descriptores de sonido) además de la versión quemada y la limpia.
+
+### Audio
+
+- **Locución:** elegir tomas por calce de tiempo es medición, no escucha. Sin ASR local, el texto efectivamente
+  dicho no se verificó automáticamente; la escucha del operador fue el control y así se declara (§7, §12).
+- **Música derivada del kit oficial con audio-to-audio:** cuadrar la referencia al tempo y duración objetivo antes
+  (el modelo del caso redondea a segundos enteros), comprobar que el tempo se conserva y **medir el balance por
+  bandas antes de mostrarla** (caso: medios 21 % contra ~35 % de la norma → EQ −4 dB bajo 180 Hz, +2 dB a 2,5 kHz).
+  Para alargar, repetir compases completos.
+- **Mezcla con locución:** sidechain de la cama por la voz y del reveal (caso: 8:1 y 5:1); master en dos pasadas a
+  −16 LUFS / −1 dBTP; registrar el balance medido (caso: la mezcla quedó a 0,2–1,2 dB de la voz sola en todos los
+  tramos con voz).
+- **Nivel por destino:** la norma sonora pide −14 LUFS para video y redes
+  ([`EFEONCE_SONIC_IDENTITY_V1`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md)). El master v2
+  del caso quedó a −16 LUFS / −1 dBTP; las entregas para redes se re-masterizan a −14 LUFS desde el premaster, no
+  subiendo la ganancia del MP4. Declarar el destino antes de masterizar.
+- **Excepciones al canon sonoro se registran como decisión del operador**, con su condición pendiente: en el caso,
+  registro de energía bajo locución (el canon lo prohíbe) y licencia de la herramienta de música sin confirmar con
+  legal.
+
+### Estados al cierre del caso
+
+Producido y entregado: v2 con y sin subtítulos, SRT y SDH. Aprobado: v2 por el operador, cuya escucha fue la
+aprobación sonora. Pendiente: licencia comercial de la música generada; publicación (acto separado).

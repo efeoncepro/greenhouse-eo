@@ -11,6 +11,12 @@ import { resolveVideoEngine, VIDEO_ENGINE_IDS } from './adapters/video-fal'
 import type { CropMode } from './crop'
 import { assertFfmpeg } from './ffmpeg'
 import { MASK_CONVENTIONS, type MaskConvention } from './mask'
+import { runBackground } from './background'
+import { runErase } from './erase'
+import type { ExpandAnchor } from './expand'
+import { EXPAND_DEFAULT_ADAPTER, runExpand } from './expand-run'
+import { runMove } from './move'
+import { runPlace } from './place'
 import { runImageInpaint } from './pipeline-image'
 import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
@@ -53,6 +59,8 @@ Proveedor:
 
 Control:
   --crop auto|on|off         Recorte con contexto (default auto: si la zona ocupa < 25 %)
+  --zone-resolution <px>     Pasada de detalle: genera la zona recortada a ese lado largo (512–4096) y la devuelve
+                             a su lugar (rehacer manos, una textura, un detalle). Activa el recorte
   --run <dir>                Carpeta de la pieza (default ai-generations/<fecha>_inpaint)
   --dry-run                  Máscara, recorte, payload y costo SIN llamar al proveedor
   --force                    Regenera aunque la misma entrada ya exista
@@ -64,6 +72,26 @@ Control:
 interface ImageCliArgs {
   image?: string
   mask?: string
+  layersJson?: string
+  layerSelectors: string[]
+  fill?: 'plate' | 'model'
+  grow?: number
+  to?: string
+  canvas?: { width: number; height: number }
+  scale?: number
+  anchor?: ExpandAnchor
+  prefill?: 'mirror' | 'neutral'
+  blend?: number
+  edge?: number
+  zoneResolution?: number
+  dx?: number
+  dy?: number
+  harmonize?: 'auto' | 'off'
+  shadow?: 'auto' | 'off'
+  from?: string
+  at?: { x: number; y: number }
+  width?: number
+  finish?: 'halo' | 'element' | 'off'
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -101,7 +129,7 @@ const toNumber = (raw: string, flag: string, integer = false): number => {
 }
 
 export const parseImageArgs = (argv: string[]): ImageCliArgs => {
-  const args: ImageCliArgs = { references: [], convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
+  const args: ImageCliArgs = { layerSelectors: [], references: [], convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
 
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i]
@@ -120,6 +148,88 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--image': args.image = next(); break
       case '--mask': args.mask = next(); break
       case '--sketch': args.sketch = next(); break
+      case '--layers': args.layersJson = next(); break
+      case '--layer': args.layerSelectors.push(next()); break
+      case '--grow': args.grow = toNumber(next(), flag, true); break
+      case '--to': args.to = next(); break
+
+      case '--canvas': {
+        const match = /^(\d+)x(\d+)$/.exec(next())
+
+        if (!match) throw new Error('--canvas espera ANCHOxALTO (p. ej. 2048x1072).')
+        args.canvas = { width: Number(match[1]), height: Number(match[2]) }
+        break
+      }
+
+      case '--scale': args.scale = toNumber(next(), flag); break
+      case '--blend': args.blend = toNumber(next(), flag, true); break
+      case '--edge': args.edge = toNumber(next(), flag, true); break
+      case '--dx': args.dx = toNumber(next(), flag, true); break
+      case '--dy': args.dy = toNumber(next(), flag, true); break
+
+      case '--harmonize': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--harmonize espera auto | off.')
+        args.harmonize = value as 'auto' | 'off'
+        break
+      }
+
+      case '--from': args.from = next(); break
+
+      case '--at': {
+        const [x, y] = next().split(',').map(Number)
+
+        if (![x, y].every(value => Number.isFinite(value) && value >= 0 && value <= 1)) throw new Error('--at espera x,y en fracciones 0–1 (ej. 0.3,0.6).')
+        args.at = { x, y }
+        break
+      }
+
+      case '--width': args.width = toNumber(next(), flag); break
+
+      case '--finish': {
+        const value = next()
+
+        if (!['halo', 'element', 'off'].includes(value)) throw new Error('--finish espera halo | element | off.')
+        args.finish = value as 'halo' | 'element' | 'off'
+        break
+      }
+
+      case '--shadow': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--shadow espera auto | off.')
+        args.shadow = value as 'auto' | 'off'
+        break
+      }
+
+      case '--zone-resolution': args.zoneResolution = toNumber(next(), flag, true); break
+
+      case '--anchor': {
+        const value = next()
+
+        if (!['center', 'left', 'right', 'top', 'bottom'].includes(value)) throw new Error('--anchor espera center | left | right | top | bottom.')
+        args.anchor = value as ExpandAnchor
+        break
+      }
+
+      case '--prefill': {
+        const value = next()
+
+        if (!['mirror', 'neutral'].includes(value)) throw new Error('--prefill espera mirror | neutral.')
+        args.prefill = value as 'mirror' | 'neutral'
+        break
+      }
+
+
+      case '--fill': {
+        const value = next()
+
+        if (!['plate', 'model'].includes(value)) throw new Error('--fill espera plate | model.')
+        args.fill = value as 'plate' | 'model'
+        break
+      }
+
       case '--sketch-margin': args.sketchMargin = toNumber(next(), flag, true); break
       case '--reference': args.references.push(next()); break
 
@@ -224,6 +334,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     quality: args.quality,
     seed: args.seed,
     providerMask: args.providerMask,
+    zoneResolution: args.zoneResolution,
     colorMatch: args.colorMatch,
     guide: args.guide,
     growMask: args.growMask,
@@ -347,13 +458,297 @@ const runVideo = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const ERASE_HELP = `pnpm ai:inpaint erase — borra un objeto y deja el resto idéntico (TASK-1973)
+
+  pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"      # clean plate, sin gasto
+  pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # Sunburst reconstruye el fondo
+
+Zona: --mask (explícita, nunca se altera) o --layers + --layer (repetible; se agranda --grow px, default 16, para
+llevarse el borde). Con capas, --shadow auto (default) suma la sombra proyectada del objeto, medida contra el clean
+plate y conectada al objeto; off la deja. Relleno: --fill plate (default con --layers: la base de Layerize con las
+demás capas recompuestas, así la mesa sigue siendo mesa) o model (default con --mask: gpt-image-2.5-sunburst, que
+edita por instrucción; Flare con máscara y Flux Fill rellenan la silueta con otro objeto, y Seedream dejó un fantasma —
+canario 2026-10-03; --adapter/--model/--quality como en image). Después de verificar la zona protegida mide si el
+objeto sigue ahí (que cambie y, con capas, que se parezca al fondo limpio); si en ningún candidato quedó el fondo,
+sale con código 3 (revisar). Un logo o una marca no se borra con IA.
+Control: --prompt (default: quitar el objeto y su sombra y reconstruir lo de atrás), --count, --run, --dry-run,
+--force, --max-usd/--yes, --allow-brand.
+`
+
+const runEraseCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(ERASE_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint erase --help.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  const result = await runErase({
+    imagePath: resolvePath(args.image),
+    maskPath: args.mask ? resolvePath(args.mask) : undefined,
+    maskConvention: args.convention,
+    layersJson: args.layersJson ? resolvePath(args.layersJson) : undefined,
+    layerSelectors: args.layerSelectors,
+    fill: args.fill,
+    growPx: args.grow,
+    shadow: args.shadow,
+    modelAdapter: args.fill === 'plate' || (!args.fill && args.layersJson) ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    prompt: prompt || undefined,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  if (result.exitCode === 3) {
+    const residue = result.erasure.length > 0 && result.erasure.every(report => report.residueSuspected)
+
+    process.stderr.write(
+      residue
+        ? '  ⚠ REVISAR (código 3): en ningún candidato quedó el fondo (el objeto sigue ahí o el modelo dibujó otro).\n'
+        : '  ⚠ REVISAR (código 3): todos los candidatos quedaron sospechosos (reencuadre o panel plano): mira el aviso de arriba.\n'
+    )
+  }
+
+  return result.exitCode
+}
+
+const EXPAND_HELP = `pnpm ai:inpaint expand — lleva una escena a otro formato sin regenerarla (TASK-1973)
+
+  pnpm ai:inpaint expand --image escena-4x5.png --to 9:16 --prompt "<qué hay alrededor>" [opciones]
+  pnpm ai:inpaint expand --image escena-1x1.png --canvas 2048x1072 --scale 0.8 --anchor right --prompt "..."
+
+Agranda el lienzo, ubica la escena y deja editable sólo el área nueva más una franja de fundido sobre el borde que da
+a ella; la escena queda en delta 0 (verificado). El área nueva se rellena antes con espejo de los bordes (--prefill
+mirror, default; neutral = su color medio): un relleno sólido invita al modelo a inventar un panel.
+
+Modelo: Flux Fill (fal:flux-pro-fill) por defecto, ≈ USD 0,05 por megapixel. Es un modelo de relleno puro: sale al
+tamaño de la entrada y continúa la escena. GPT Image NO sirve para expandir (canario 2026-10-03): Flare achica la
+escena (escala 0,88–0,90) y Sunburst copia el relleno en espejo como contenido; los dos dejan costura.
+
+  --to 4:5|9:16|1:1|1.91:1|16:9|3:4|2:3|3:2   Formato destino (el lienzo crece en un solo eje)
+  --canvas WxH               Lienzo explícito (en vez de --to)
+  --scale <0,3–1>            Achica la escena dentro del lienzo (zoom out; la escena se re-muestrea)
+  --anchor center|left|right|top|bottom       Dónde se apoya la escena (default center)
+  --blend <px>               Franja de fundido sobre la escena (default 24; 80–140 si el borde corta objetos)
+  --prefill mirror|neutral   Relleno previo del área nueva: espejo de los bordes (default) o su color medio
+  --adapter / --model / --quality / --provider-mask / --count / --run / --dry-run / --force / --max-usd / --yes
+`
+
+const runExpandCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(EXPAND_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint expand --help.')
+  if (!args.to && !args.canvas) throw new Error('Indica --to <formato> o --canvas WxH.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  if (!prompt) throw new Error('Falta --prompt: describe qué hay alrededor de la escena.')
+
+  const result = await runExpand({
+    imagePath: resolvePath(args.image),
+    to: args.to,
+    canvas: args.canvas,
+    scale: args.scale,
+    anchor: args.anchor,
+    fill: args.prefill,
+    blend: args.blend,
+    prompt,
+    adapter: resolveImageAdapter(args.adapter ?? (args.model?.startsWith('gpt-image') ? 'openai' : EXPAND_DEFAULT_ADAPTER)),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  return result.exitCode
+}
+
+const BACKGROUND_HELP = `pnpm ai:inpaint background — cambia el fondo y deja el sujeto intacto (TASK-1973)
+
+  pnpm ai:inpaint background --image foto.png --prompt "<fondo nuevo>"                         # sujeto por matting local
+  pnpm ai:inpaint background --image foto.png --layers <layers.json> --layer "person" --prompt "..."
+
+El sujeto queda en delta 0 (verificado); el fondo es el inverso del sujeto. --edge <px> (default 3) es la franja del
+borde que el modelo rehace contra el fondo nuevo: el comando reporta su costura; míralo al 100 % (pelo, transparencias).
+Personas reales del equipo: sigue las reglas de identidad de brand-photography (no injertar caras).
+  --adapter / --model / --quality / --provider-mask / --count / --run / --dry-run / --force / --max-usd / --yes
+`
+
+const runBackgroundCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(BACKGROUND_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint background --help.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  if (!prompt) throw new Error('Falta --prompt: describe el fondo nuevo.')
+
+  const result = await runBackground({
+    imagePath: resolvePath(args.image),
+    layersJson: args.layersJson ? resolvePath(args.layersJson) : undefined,
+    layerSelectors: args.layerSelectors,
+    edgePx: args.edge,
+    prompt,
+    adapter: resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  return result.exitCode
+}
+
+const MOVE_HELP = `pnpm ai:inpaint move — mueve o escala un elemento usando sus capas (TASK-1973)
+
+  pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40 [--scale 0.9]
+
+1) el hueco —con la sombra proyectada del elemento, salvo --shadow off— se rellena con el clean plate sin ese
+elemento (corregido de color); 2) el elemento se recorta de la imagen ORIGINAL con
+el alfa de su capa y se pega en la posición nueva (escala alrededor de su centro); 3) --harmonize auto (default) hace
+una pasada SÓLO de sombra de contacto y reflejo en un halo alrededor (con --adapter/--model; off = sin IA ni gasto).
+Verifica que todo lo que no es hueco, elemento ni halo quede idéntico a la original. Un logo no se mueve con IA.
+`
+
+const runMoveCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(MOVE_HELP)
+
+    return 0
+  }
+
+  if (!args.image || !args.layersJson || !args.layerSelectors.length) throw new Error('--image, --layers y --layer son obligatorios. Ver pnpm ai:inpaint move --help.')
+
+  const result = await runMove({
+    imagePath: resolvePath(args.image),
+    layersJson: resolvePath(args.layersJson),
+    layerSelectors: args.layerSelectors,
+    dx: args.dx,
+    dy: args.dy,
+    scale: args.scale,
+    harmonize: args.harmonize,
+    shadow: args.shadow,
+    adapter: args.harmonize === 'off' ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  return result.exitCode
+}
+
+const PLACE_HELP = `pnpm ai:inpaint place — incorpora un elemento separado con ai:layers en OTRA imagen (TASK-1973)
+
+  pnpm ai:inpaint place --image destino.png --from origen.png --layers <layers.json> --layer "mug" --at 0.3,0.62 [--width 0.12]
+
+1) el elemento se recorta de la imagen de ORIGEN con el alfa de su capa (nunca los píxeles regenerados de la capa);
+2) se pega en el destino con su centro en --at (fracciones x,y) y el ancho --width (fracción del ancho del destino;
+default: el mismo tamaño en píxeles); 3) el modelo lo termina: --finish halo (default: sólo sombra de contacto,
+reflejo y borde alrededor) · element (además relumina el elemento para que tome la luz de la escena: su forma puede
+variar, míralo al 100 %) · off (sin IA ni gasto). Verifica que el destino quede idéntico fuera de lo pegado y de su
+acabado. Modelo: --adapter/--model/--quality como en image. Un logo o una marca no se incorpora con IA.
+`
+
+const runPlaceCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(PLACE_HELP)
+
+    return 0
+  }
+
+  if (!args.image || !args.from || !args.layersJson || !args.layerSelectors.length || !args.at) {
+    throw new Error('--image, --from, --layers, --layer y --at son obligatorios. Ver pnpm ai:inpaint place --help.')
+  }
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  const result = await runPlace({
+    imagePath: resolvePath(args.image),
+    sourceImagePath: resolvePath(args.from),
+    layersJson: resolvePath(args.layersJson),
+    layerSelectors: args.layerSelectors,
+    at: args.at,
+    width: args.width,
+    finish: args.finish,
+    adapter: args.finish === 'off' ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    prompt: prompt || undefined,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
   if (command === 'image') return runImage(rest)
+  if (command === 'erase') return runEraseCli(rest)
+  if (command === 'expand') return runExpandCli(rest)
+  if (command === 'background') return runBackgroundCli(rest)
+  if (command === 'move') return runMoveCli(rest)
+  if (command === 'place') return runPlaceCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|move|place|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }

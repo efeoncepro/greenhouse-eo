@@ -1,0 +1,6 @@
+  ★ usando gpt-image-2.5-flare (default, verificado con máscara). Para la pieza final: --model gpt-image-2.5-sunburst, el más potente de OpenAI, el de las piezas de mayor impacto (#1 en edición en Arena y Artificial Analysis).
+  ✂ recorte 517x484 en (797, 254) → 1984x1856 · la zona con contexto ocupa 15.8 % de la imagen: se genera recortada a 1984x1856
+  $ costo estimado ≈ USD 0.022 · 1 × salida 1984x1856 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 67/255 · salida USD 0.0225
+  ✎ ./ai-generations/2026-10-03_task-1973-canary/inpaint/12f948753e78/manifest.json

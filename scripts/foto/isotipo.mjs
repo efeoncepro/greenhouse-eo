@@ -73,6 +73,15 @@ pnpm foto:isotipo <plate.png> --centro x,y --ancho w [opciones]
   --superficie t   (con --acabado) qué superficie lleva la marca, en inglés, para el prompt. P. ej.
                    "a white armored chest plate of a futuristic suit". Default: la superficie al centro del recorte
   --lado px        (con --acabado) lado del recorte que ve el modelo. Default: 512
+  --oclusion m.png máscara de lo que está DELANTE de la marca (formato canónico de pnpm ai:mask: blanco = delante).
+                   La piel, el pelo y otros materiales se detectan solos por color; esta máscara es para lo que tiene
+                   el color de la prenda (la manga de la misma chaqueta cruzando el pecho): sepáralo con pnpm ai:layers
+                   y pnpm ai:mask --from-layer. La marca pasa por detrás y lo de delante no se limpia
+  --pliegues n     0–1: cuánto tiñe la luz local de la tela a la marca (la sombra de un pliegue la oscurece). Default 1;
+                   0 la compone plana como antes
+  --relieve n      0–2: cuánto se desplaza la marca con el gradiente del pliegue. Default 1
+  --escorzo f      0,15–1: compresión horizontal de la marca en un giro del torso (1 = de frente; ≈ 0,75 a 45°,
+                   ≈ 0,5 a 70° del lado cercano, ≈ 0,3 del lejano). --ancho sigue siendo el ancho SIN escorzo
   --out archivo    salida. Default: <plate>-isotipo.png junto al plate
 
 Antes: las referencias del kit en la ficha y pnpm foto:emblema. Después: pnpm foto:emblema <salida> para mirarlo al 100 %.
@@ -87,8 +96,11 @@ export class IsotipoError extends Error {
   }
 }
 
-const validar = ({ centro, ancho, prenda, rotacion, brillo, umbral, acabado = false, superficie = null, lado = LADO_RECORTE, marca = 'isotipo', tecnica = null }) => {
+const validar = ({ centro, ancho, prenda, rotacion, brillo, umbral, acabado = false, superficie = null, lado = LADO_RECORTE, marca = 'isotipo', tecnica = null, pliegues = 1, relieve = 1, escorzo = 1 }) => {
   if (!['isotipo', 'logotipo'].includes(marca)) throw new IsotipoError('--marca es isotipo o logotipo.')
+  if (!(pliegues >= 0 && pliegues <= 1)) throw new IsotipoError('--pliegues va entre 0 (apagado) y 1.')
+  if (!(relieve >= 0 && relieve <= 2)) throw new IsotipoError('--relieve va entre 0 y 2.')
+  if (!(escorzo >= 0.15 && escorzo <= 1)) throw new IsotipoError('--escorzo va entre 0,15 y 1 (1 = de frente).')
   if (!acabado && tecnica !== null) throw new IsotipoError('--tecnica sólo aplica con --acabado.')
 
   if (tecnica !== null && (typeof tecnica !== 'string' || tecnica.trim().length < 3 || tecnica.length > 300 || /[\r\n]/.test(tecnica))) {
@@ -147,6 +159,10 @@ export const parseArgs = argv => {
     marca: opt('marca', 'isotipo'),
     tecnica: opt('tecnica', null),
     lado: Number(opt('lado', String(LADO_RECORTE))),
+    oclusion: opt('oclusion', null),
+    pliegues: Number(opt('pliegues', '1')),
+    relieve: Number(opt('relieve', '1')),
+    escorzo: Number(opt('escorzo', '1')),
     out: opt('out', plate.replace(/\.png$/i, '') + '-isotipo.png')
   }
 
@@ -168,11 +184,24 @@ export const isotipoOficial = async (prenda, marca = 'isotipo') => {
   return { svg, variante, marca, vbW, vbH, paquete: `${pkg.name}@${pkg.version}`, sha256: createHash('sha256').update(svg).digest('hex') }
 }
 
-/**
- * Tono de la tela: mediana del anillo de 4 px que rodea la caja. Los píxeles de la caja que se apartan de
- * ese tono (el emblema inventado) se rellenan con la tela suavizada; la trama del resto queda intacta.
- */
-const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
+// ─── Zona de la marca: tela, marca inventada y OCLUSORES [2026-10-03] ─────────────────────────────────────
+//
+// Antes la limpieza rellenaba con la tela TODO píxel que se apartara de su tono: una mano, un brazo o un objeto
+// que tapara el pecho quedaban pintados de tela (EC2, la mano de Karo: un rectángulo navy sobre los dedos), y el
+// isotipo se componía ENCIMA de lo que estuviera delante. Ahora cada píxel de la caja se clasifica:
+//   · TELA: el tono del anillo, o el mismo matiz con otra luz (la sombra y el brillo de un pliegue). Se conserva:
+//     antes la limpieza aplanaba también los pliegues que pasaban por la caja.
+//   · MARCA INVENTADA: hilo — más claro que una tela oscura y casi neutro, o más oscuro que una tela clara y azul —.
+//     Es lo único que se limpia.
+//   · OCLUSOR: todo lo demás (piel, pelo, otro material) más lo que diga `--oclusion` (máscara canónica de
+//     `pnpm ai:mask`, blanco = lo que está DELANTE: un brazo separado con `pnpm ai:layers` cuando tiene el mismo
+//     color de la prenda y el color no alcanza). No se limpia y la marca pasa POR DETRÁS.
+// La SUPERFICIE (tela + marca inventada) es donde puede ir la marca oficial.
+
+const lumDe = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+/** Clase de cada píxel de la caja: 0 tela · 1 marca inventada · 2 oclusor. Exportada para las pruebas. */
+export const clasificarZona = (raw, { W, H, ch, box, umbral, prenda = 'oscura', oclusion = null }) => {
   const anillo = []
   const ring = 4
 
@@ -182,6 +211,8 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
       const dentro = x >= box.left && x < box.left + box.width && y >= box.top && y < box.top + box.height
 
       if (dentro) continue
+      // Un oclusor declarado que cruza el anillo no es tela: no entra a la mediana.
+      if (oclusion && oclusion[y * W + x]) continue
       const i = (y * W + x) * ch
 
       anillo.push([raw[i], raw[i + 1], raw[i + 2]])
@@ -191,24 +222,134 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
   const med = k => {
     const v = anillo.map(p => p[k]).sort((a, b) => a - b)
 
-    return v[Math.floor(v.length / 2)]
+    return v[Math.floor(v.length / 2)] ?? 0
   }
 
   const tela = [med(0), med(1), med(2)]
-  const lum = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b
-  const telaLum = lum(...tela)
+  const telaLum = lumDe(...tela)
+  const sumaTela = Math.max(1, tela[0] + tela[1] + tela[2])
+  const cromaTela = tela.map(v => v / sumaTela)
+  const clase = new Uint8Array(box.width * box.height)
 
-  const mask = new Uint8Array(box.width * box.height)
+  for (let y = 0; y < box.height; y++) {
+    for (let x = 0; x < box.width; x++) {
+      const p = (box.top + y) * W + (box.left + x)
+      const i = p * ch
+      const r = raw[i]
+      const g = raw[i + 1]
+      const b = raw[i + 2]
+      const j = y * box.width + x
+
+      if (oclusion && oclusion[p]) {
+        clase[j] = 2
+        continue
+      }
+
+      const l = lumDe(r, g, b)
+
+      if (Math.abs(l - telaLum) <= umbral) continue // tela
+
+      const suma = r + g + b
+      const cd = suma ? Math.hypot(r / suma - cromaTela[0], g / suma - cromaTela[1], b / suma - cromaTela[2]) : 0
+
+      // El mismo matiz con otra luz es tela: la sombra o el brillo de un pliegue. Lo muy oscuro también (el matiz
+      // ahí es ruido) — un pelo negro sobre una prenda navy no se distingue por color: para eso está `--oclusion`.
+      if (cd < 0.06 || suma < 75) continue
+
+      const max = Math.max(r, g, b)
+      const sat = max ? (max - Math.min(r, g, b)) / max : 0
+      const calido = r > b + 12 && r >= g
+      // Hilo blanco sobre tela oscura = una MEZCLA de los dos: su croma cae sobre la recta que va de la tela al
+      // neutro (el borde antialiasado de un trazo blanco sobre navy es azul claro, con saturación alta). La piel,
+      // aunque esté igual de clara, cae fuera de esa recta.
+      const c = suma ? [r / suma, g / suma, b / suma] : cromaTela
+      const eje = [1 / 3 - cromaTela[0], 1 / 3 - cromaTela[1], 1 / 3 - cromaTela[2]]
+      const largo = Math.hypot(...eje) || 1
+      const t = ((c[0] - cromaTela[0]) * eje[0] + (c[1] - cromaTela[1]) * eje[1] + (c[2] - cromaTela[2]) * eje[2]) / (largo * largo)
+      const resto = Math.hypot(c[0] - cromaTela[0] - t * eje[0], c[1] - cromaTela[1] - t * eje[1], c[2] - cromaTela[2] - t * eje[2])
+      const mezcla = t > 0 && t < 1.25 && resto < 0.035
+
+      const hilo = prenda === 'clara'
+        ? l < telaLum && b >= r && !calido
+        : l > telaLum && (sat < 0.35 || mezcla) && !calido
+
+      clase[j] = hilo ? 1 : 2
+    }
+  }
+
+  // El oclusor CRECE hacia lo que se clasificó como hilo pero es más oscuro que el hilo: el borde en sombra de una mano
+  // bajo luz fría queda gris azulado y pasa el test de color (EC2, la mano de Karo). El hilo real es lo más claro de
+  // la caja; el umbral es el 55 % del camino entre la tela y el percentil 90 de lo clasificado como hilo.
+  const lumsHilo = []
+
+  for (let j = 0; j < clase.length; j++) {
+    if (clase[j] !== 1) continue
+    const i = ((box.top + Math.floor(j / box.width)) * W + box.left + (j % box.width)) * ch
+
+    lumsHilo.push(lumDe(raw[i], raw[i + 1], raw[i + 2]))
+  }
+
+  if (lumsHilo.length && clase.includes(2)) {
+    lumsHilo.sort((a, b) => a - b)
+    const p90 = lumsHilo[Math.floor(lumsHilo.length * 0.9)]
+    const nivel = prenda === 'clara' ? telaLum - 0.55 * (telaLum - lumsHilo[Math.floor(lumsHilo.length * 0.1)]) : telaLum + 0.55 * (p90 - telaLum)
+    const pila = []
+
+    for (let j = 0; j < clase.length; j++) if (clase[j] === 2) pila.push(j)
+
+    while (pila.length) {
+      const j = pila.pop()
+      const x = j % box.width
+      const y = (j - x) / box.width
+
+      for (const [ddx, ddy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) {
+        const xx = x + ddx
+        const yy = y + ddy
+
+        if (xx < 0 || yy < 0 || xx >= box.width || yy >= box.height) continue
+        const k = yy * box.width + xx
+
+        if (clase[k] !== 1) continue
+        const i = ((box.top + yy) * W + box.left + xx) * ch
+        const l = lumDe(raw[i], raw[i + 1], raw[i + 2])
+
+        if (prenda === 'clara' ? l > nivel : l < nivel) {
+          clase[k] = 2
+          pila.push(k)
+        }
+      }
+    }
+  }
+
+  return { clase, tela, telaLum }
+}
+
+/** Máscara de oclusión desde un PNG canónico de `ai:mask` (blanco = delante), al tamaño del plate. */
+export const leerOclusion = async (ruta, W, H) => {
+  if (!existsSync(ruta)) throw new IsotipoError(`no existe la máscara de oclusión ${ruta}.`)
+  const { data } = await sharp(ruta).flatten({ background: '#000000' }).resize(W, H, { fit: 'fill' }).greyscale().raw().toBuffer({ resolveWithObject: true })
+  const m = new Uint8Array(W * H)
+  let n = 0
+
+  for (let p = 0; p < W * H; p++) if (data[p] > 127) { m[p] = 1; n++ }
+
+  return { mascara: m, pixeles: n, sha256: createHash('sha256').update(await readFile(ruta)).digest('hex') }
+}
+
+/**
+ * Limpia SÓLO la marca inventada: la rellena con la tela suavizada (la trama, los pliegues y los oclusores quedan
+ * intactos). Devuelve la placa limpia y la clasificación de la caja.
+ */
+const limpiarZona = async (raw, { W, H, ch, box, umbral, embW, prenda, oclusion }) => {
+  const { clase, tela } = clasificarZona(raw, { W, H, ch, box, umbral, prenda, oclusion })
   const relleno = Buffer.alloc(box.width * box.height * 3)
 
   for (let y = 0; y < box.height; y++) {
     for (let x = 0; x < box.width; x++) {
       const i = ((box.top + y) * W + (box.left + x)) * ch
       const j = y * box.width + x
-      const d = Math.abs(lum(raw[i], raw[i + 1], raw[i + 2]) - telaLum)
-
-      mask[j] = d > umbral ? 1 : 0
-      const src = mask[j] ? tela : [raw[i], raw[i + 1], raw[i + 2]]
+      // El relleno se difumina desde la tela y la sombra vecinas; un oclusor no debe teñirlo.
+      const src = clase[j] === 0 ? [raw[i], raw[i + 1], raw[i + 2]] : tela
 
       relleno[j * 3] = src[0]
       relleno[j * 3 + 1] = src[1]
@@ -216,19 +357,19 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
     }
   }
 
-  // Dilata la máscara 2 px: el borde antialiasado del emblema inventado también se va.
-  const dil = new Uint8Array(mask)
+  // Dilata la marca inventada 2 px (su borde antialiasado también se va), sin entrar nunca en un oclusor.
+  const dil = new Uint8Array(clase.length)
 
   for (let y = 0; y < box.height; y++) {
     for (let x = 0; x < box.width; x++) {
-      if (!mask[y * box.width + x]) continue
+      if (clase[y * box.width + x] !== 1) continue
 
       for (let dy = -2; dy <= 2; dy++) {
         for (let dx = -2; dx <= 2; dx++) {
           const yy = y + dy
           const xx = x + dx
 
-          if (yy >= 0 && xx >= 0 && yy < box.height && xx < box.width) dil[yy * box.width + xx] = 1
+          if (yy >= 0 && xx >= 0 && yy < box.height && xx < box.width && clase[yy * box.width + xx] !== 2) dil[yy * box.width + xx] = 1
         }
       }
     }
@@ -256,7 +397,115 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
     }
   }
 
-  return limpio
+  return { limpio, clase }
+}
+
+/**
+ * Pliegues: la marca oficial se tiñe con la luz LOCAL de la tela (la sombra de un pliegue la oscurece, su brillo la
+ * aclara) y se desplaza con el gradiente de esa luz, como se curva un bordado sobre una arruga. La luz local es la
+ * luminancia de la placa limpia, suavizada para quedarse con la forma del pliegue y no con la trama.
+ * Devuelve, por píxel de la caja, el factor de luz y el desplazamiento en px.
+ */
+export const campoDePliegues = async (limpio, { W, ch, box, telaLum, embW, intensidad = 1, relieve = 1 }) => {
+  const lumBox = Buffer.alloc(box.width * box.height)
+
+  for (let y = 0; y < box.height; y++) {
+    for (let x = 0; x < box.width; x++) {
+      const i = ((box.top + y) * W + (box.left + x)) * ch
+
+      lumBox[y * box.width + x] = Math.round(lumDe(limpio[i], limpio[i + 1], limpio[i + 2]))
+    }
+  }
+
+  const sigma = Math.max(1.2, embW * 0.05)
+  // sharp devuelve 3 canales al desenfocar un buffer de 1: sin `extractChannel(0)` el índice se desalinea.
+  const suave = await sharp(lumBox, { raw: { width: box.width, height: box.height, channels: 1 } }).blur(sigma).extractChannel(0).raw().toBuffer()
+  const base = Math.max(8, telaLum)
+  const luz = new Float32Array(box.width * box.height)
+  const dx = new Float32Array(box.width * box.height)
+  const dy = new Float32Array(box.width * box.height)
+  const maxD = embW * 0.06 * relieve
+  const k = embW * 0.35 * relieve
+
+  for (let y = 0; y < box.height; y++) {
+    for (let x = 0; x < box.width; x++) {
+      const j = y * box.width + x
+      const f = suave[j] / base
+
+      luz[j] = 1 + (Math.min(1.35, Math.max(0.55, f)) - 1) * intensidad
+      const gx = (suave[y * box.width + Math.min(box.width - 1, x + 1)] - suave[y * box.width + Math.max(0, x - 1)]) / (2 * base)
+      const gy = (suave[Math.min(box.height - 1, y + 1) * box.width + x] - suave[Math.max(0, y - 1) * box.width + x]) / (2 * base)
+
+      dx[j] = Math.max(-maxD, Math.min(maxD, gx * k))
+      dy[j] = Math.max(-maxD, Math.min(maxD, gy * k))
+    }
+  }
+
+  return { luz, dx, dy }
+}
+
+/** Muestra bilineal RGBA de un buffer `w`×`h`. */
+const muestrear = (buf, w, h, x, y) => {
+  if (x < 0 || y < 0 || x > w - 1 || y > h - 1) return [0, 0, 0, 0]
+  const x0 = Math.floor(x)
+  const y0 = Math.floor(y)
+  const x1 = Math.min(w - 1, x0 + 1)
+  const y1 = Math.min(h - 1, y0 + 1)
+  const fx = x - x0
+  const fy = y - y0
+  const out = [0, 0, 0, 0]
+
+  for (let c = 0; c < 4; c++) {
+    const a = buf[(y0 * w + x0) * 4 + c] * (1 - fx) + buf[(y0 * w + x1) * 4 + c] * fx
+    const b = buf[(y1 * w + x0) * 4 + c] * (1 - fx) + buf[(y1 * w + x1) * 4 + c] * fx
+
+    out[c] = a * (1 - fy) + b * fy
+  }
+
+  return out
+}
+
+/**
+ * Compone la marca oficial sobre la placa: sólo sobre la SUPERFICIE (los oclusores quedan delante, con su borde
+ * suavizado 1 px) y, con pliegues, teñida y desplazada por el campo de la tela.
+ */
+export const componerSobreSuperficie = async (limpio, { W, H, ch, box, clase, emb, ew, eh, left, top, pliegues = null }) => {
+  // Superficie suavizada: el borde del oclusor no deja un escalón en la marca.
+  const sup = Buffer.alloc(box.width * box.height)
+
+  for (let j = 0; j < sup.length; j++) sup[j] = clase[j] === 2 ? 0 : 255
+  const supSuave = await sharp(sup, { raw: { width: box.width, height: box.height, channels: 1 } }).blur(0.8).extractChannel(0).raw().toBuffer()
+
+  const salida = Buffer.from(limpio)
+  let tapados = 0
+
+  for (let y = Math.max(0, top); y < Math.min(H, top + eh); y++) {
+    for (let x = Math.max(0, left); x < Math.min(W, left + ew); x++) {
+      const bx = x - box.left
+      const by = y - box.top
+      const enCaja = bx >= 0 && by >= 0 && bx < box.width && by < box.height
+      const j = enCaja ? by * box.width + bx : -1
+      const ddx = pliegues && enCaja ? pliegues.dx[j] : 0
+      const ddy = pliegues && enCaja ? pliegues.dy[j] : 0
+      const [r, g, b, a0] = muestrear(emb, ew, eh, x - left - ddx, y - top - ddy)
+
+      if (a0 <= 0) continue
+      const s = enCaja ? supSuave[j] / 255 : 1
+
+      if (s < 1 && a0 > 127) tapados++
+      const a = (a0 / 255) * s
+
+      if (a <= 0) continue
+      const luz = pliegues && enCaja ? pliegues.luz[j] : 1
+      const i = (y * W + x) * ch
+
+      salida[i] = Math.round(salida[i] * (1 - a) + Math.min(255, r * luz) * a)
+      salida[i + 1] = Math.round(salida[i + 1] * (1 - a) + Math.min(255, g * luz) * a)
+      salida[i + 2] = Math.round(salida[i + 2] * (1 - a) + Math.min(255, b * luz) * a)
+    }
+  }
+
+  return { salida, tapados }
 }
 
 /**
@@ -274,8 +523,12 @@ const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
  * @returns {Promise<{ out: string, procedencia: object, embW: number, variante: string, acabado?: Acabado }>}
  */
 export const componerIsotipo = async opciones => {
-  const { plate, centro, ancho, prenda, rotacion, umbral, brillo, limpiar, out, acabado, superficie, lado, editar, zonaMarcaPx, marca, tecnica } = {
+  const { plate, centro, ancho, prenda, rotacion, umbral, brillo, limpiar, out, acabado, superficie, lado, editar, zonaMarcaPx, marca, tecnica, oclusion, pliegues, relieve, escorzo } = {
     prenda: 'oscura',
+    oclusion: null,
+    pliegues: 1,
+    relieve: 1,
+    escorzo: 1,
     rotacion: 0,
     umbral: 38,
     brillo: 0.85,
@@ -288,7 +541,7 @@ export const componerIsotipo = async opciones => {
     ...opciones
   }
 
-  validar({ centro, ancho, prenda, rotacion, brillo, umbral, acabado, superficie, lado, marca, tecnica })
+  validar({ centro, ancho, prenda, rotacion, brillo, umbral, acabado, superficie, lado, marca, tecnica, pliegues, relieve, escorzo })
 
   if (!plate || !existsSync(plate)) throw new IsotipoError(`no existe el plate ${plate ?? '(vacío)'}.`)
 
@@ -320,11 +573,27 @@ export const componerIsotipo = async opciones => {
   box.width = Math.min(W - box.left, embW + pad * 2)
   box.height = Math.min(H - box.top, embH + pad * 2)
 
-  const limpio = limpiar ? await limpiarZona(raw, { W, H, ch, box, umbral, embW }) : raw
+  const oclusionLeida = oclusion ? await leerOclusion(oclusion, W, H) : null
+
+  const zona = limpiar
+    ? await limpiarZona(raw, { W, H, ch, box, umbral, embW, prenda, oclusion: oclusionLeida?.mascara ?? null })
+    : { limpio: raw, clase: clasificarZona(raw, { W, H, ch, box, umbral, prenda, oclusion: oclusionLeida?.mascara ?? null }).clase }
+
+  const limpio = zona.limpio
+  const telaLum = clasificarZona(limpio, { W, H, ch, box, umbral, prenda, oclusion: oclusionLeida?.mascara ?? null }).telaLum
 
   let emblema = sharp(oficial.svg, { density: 72 * Math.max(1, (embW * 2) / oficial.vbW) })
     .resize({ width: embW })
     .png()
+
+  // ESCORZO [operador, 2026-10-03]: en un giro del torso la marca se COMPRIME en horizontal — no se rota en el
+  // plano. Sin una referencia en esa perspectiva el modelo la rota (medido: hasta ~35° en las vistas puestas a 70°),
+  // así que en un giro profundo la marca se compone con su escorzo y el modelo sólo la termina.
+  if (escorzo < 1) {
+    emblema = sharp(await emblema.toBuffer())
+      .resize({ width: Math.max(4, Math.round(embW * escorzo)), height: embH, fit: 'fill' })
+      .png()
+  }
 
   if (rotacion) emblema = emblema.rotate(rotacion, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
 
@@ -336,22 +605,31 @@ export const componerIsotipo = async opciones => {
     .png()
     .toBuffer()
 
-  const embMeta = await sharp(embBuf).metadata()
+  const { data: emb, info: embInfo } = await sharp(embBuf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  const campo = pliegues > 0 ? await campoDePliegues(limpio, { W, ch, box, telaLum, embW, intensidad: pliegues, relieve }) : null
 
-  await sharp(limpio, { raw: { width: W, height: H, channels: ch } })
-    .composite([
-      {
-        input: embBuf,
-        left: Math.round(cx - embMeta.width / 2),
-        top: Math.round(cy - embMeta.height / 2),
-        blend: 'over'
-      }
-    ])
-    .png()
-    .toFile(destino)
+  const { salida: compuesta, tapados } = await componerSobreSuperficie(limpio, {
+    W,
+    H,
+    ch,
+    box,
+    clase: zona.clase,
+    emb,
+    ew: embInfo.width,
+    eh: embInfo.height,
+    left: Math.round(cx - embInfo.width / 2),
+    top: Math.round(cy - embInfo.height / 2),
+    pliegues: campo
+  })
+
+  await sharp(compuesta, { raw: { width: W, height: H, channels: ch } }).png().toFile(destino)
+
+  let oclusores = 0
+
+  for (const c of zona.clase) if (c === 2) oclusores++
 
   const procedencia = {
-    schema: 'efeonce.foto.isotipo.v1',
+    schema: 'efeonce.foto.isotipo.v2',
     plate: path.basename(plate),
     salida: path.basename(destino),
     paquete: oficial.paquete,
@@ -359,9 +637,16 @@ export const componerIsotipo = async opciones => {
     sha256: oficial.sha256,
     marca: oficial.marca,
     prenda,
-    caja: { centro, ancho, rotacion },
+    caja: { centro, ancho, rotacion, ...(escorzo < 1 ? { escorzo } : {}) },
     brillo,
     limpieza: limpiar ? { umbral } : null,
+    // Lo que quedó DELANTE de la marca: detectado por color en la caja y, si se declaró, la máscara de `--oclusion`.
+    oclusion: {
+      pixelesEnCaja: oclusores,
+      pixelesDeMarcaTapados: tapados,
+      ...(oclusionLeida ? { mascara: path.basename(oclusion), sha256: oclusionLeida.sha256, pixeles: oclusionLeida.pixeles } : {})
+    },
+    pliegues: pliegues > 0 ? { intensidad: pliegues, relieve } : null,
     creado: new Date().toISOString()
   }
 

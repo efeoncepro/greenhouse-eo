@@ -1,0 +1,242 @@
+{
+  "graphicVoice": {
+    "contract": "efeonce.graphic-line-orbit",
+    "questionWeight": 300,
+    "answerWeight": 760,
+    "line": "brand",
+    "accent": "#ff6500",
+    "questionRing": {
+      "left": 89.088,
+      "right": 103.89364102564103,
+      "top": 80.28,
+      "bottom": 95.08564102564104
+    },
+    "answerText": {
+      "left": 89.088,
+      "right": 725.1956507936509,
+      "top": 128.973,
+      "bottom": 209.49300000000002
+    },
+    "answerSphere": {
+      "left": 728.4956507936508,
+      "right": 750.4956507936508,
+      "top": 185.95300000000003,
+      "bottom": 207.95300000000003
+    },
+    "answerSize": 110,
+    "sphereCssPx": 8.37890625,
+    "answerGroup": {
+      "left": 89.088,
+      "right": 750.4956507936508,
+      "top": 128.973,
+      "bottom": 209.49300000000002
+    }
+  },
+  "canvas": {
+    "width": 1024,
+    "height": 1280
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 114.04364102564102,
+        "right": 399.751641025641,
+        "top": 76.80000000000001,
+        "bottom": 103.97300000000001
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 89.088,
+        "right": 725.1956507936509,
+        "top": 128.973,
+        "bottom": 209.49300000000002
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 89.088,
+        "right": 786.2009999999998,
+        "top": 234.49300000000002,
+        "bottom": 296.53900000000004
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 111.088,
+        "right": 589.4340000000001,
+        "top": 329.53900000000004,
+        "bottom": 366.939
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 89.088,
+        "right": 307.98199999999997,
+        "top": 399.107,
+        "bottom": 425.913
+      }
+    },
+    {
+      "id": "logo",
+      "box": {
+        "left": 410,
+        "right": 615,
+        "top": 1155,
+        "bottom": 1203
+      }
+    }
+  ],
+  "typography": {
+    "lead": 29,
+    "dominant": 110,
+    "closure": 27,
+    "cta": 34,
+    "descriptor": 26
+  },
+  "selection": {
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursores": [
+      {
+        "id": "criterio"
+      }
+    ]
+  },
+  "maquetacion": {
+    "elementos": [
+      {
+        "id": "entrada",
+        "tipo": "texto",
+        "box": {
+          "left": 114.04364102564102,
+          "right": 399.751641025641,
+          "top": 76.80000000000001,
+          "bottom": 103.97300000000001
+        }
+      },
+      {
+        "id": "dominante",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 725.1956507936509,
+          "top": 128.973,
+          "bottom": 209.49300000000002
+        }
+      },
+      {
+        "id": "cierre-frase",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 786.2009999999998,
+          "top": 234.49300000000002,
+          "bottom": 296.53900000000004
+        }
+      },
+      {
+        "id": "cta",
+        "tipo": "texto",
+        "box": {
+          "left": 111.088,
+          "right": 589.4340000000001,
+          "top": 329.53900000000004,
+          "bottom": 366.939
+        },
+        "dentroDe": "cta-boton"
+      },
+      {
+        "id": "descriptor",
+        "tipo": "texto",
+        "box": {
+          "left": 89.088,
+          "right": 307.98199999999997,
+          "top": 399.107,
+          "bottom": 425.913
+        }
+      },
+      {
+        "id": "cta-boton",
+        "tipo": "cta",
+        "box": {
+          "left": 89.088,
+          "top": 320.53900000000004,
+          "right": 611.4340000000001,
+          "bottom": 375.939
+        }
+      },
+      {
+        "id": "logo",
+        "tipo": "firma",
+        "box": {
+          "left": 410,
+          "right": 615,
+          "top": 1155,
+          "bottom": 1203
+        }
+      },
+      {
+        "id": "cursor «criterio»",
+        "tipo": "seleccion",
+        "box": {
+          "left": 757.152,
+          "top": 167.697,
+          "right": 814.58,
+          "bottom": 226.824
+        },
+        "destino": "dominante"
+      },
+      {
+        "id": "cursor «usuario» del CTA",
+        "tipo": "seleccion",
+        "box": {
+          "left": 618.09,
+          "top": 346.703,
+          "right": 648.34,
+          "bottom": 377.802
+        },
+        "destino": "cta-boton"
+      },
+      {
+        "id": "marco de la selección del titular",
+        "tipo": "seleccion",
+        "box": {
+          "left": 76.8,
+          "top": 117.709,
+          "right": 762.784,
+          "bottom": 220.757
+        },
+        "destino": "dominante"
+      }
+    ]
+  },
+  "columna": 89.088,
+  "ctaMarco": {
+    "left": 80.896,
+    "top": 313.371,
+    "right": 619.626,
+    "bottom": 383.107
+  },
+  "zonaSegura": {
+    "perfil": "feed",
+    "x0": 0.075,
+    "y0": 0.06,
+    "x1": 0.925,
+    "y1": 0.94
+  }
+}

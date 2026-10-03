@@ -4,18 +4,50 @@
     {
       "reference": "Deck-Agrupadas",
       "template": "InsightsFigureColumnsSlide",
-      "changed": 20503,
+      "changed": 20520,
       "total": 921600,
-      "ratio": 0.022247178819444446,
+      "ratio": 0.022265625,
       "pass": true,
       "exception": "operador 2026-09-25: Corrimiento de 3 px del propio canvas; la plantilla queda alineada con las otras tres láminas de figura."
     },
     {
+      "reference": "Deck-Apiladas",
+      "template": "InsightsFigureStackedSlide",
+      "changed": 1430,
+      "total": 921600,
+      "ratio": 0.0015516493055555555,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Cascada",
+      "template": "InsightsFigureWaterfallSlide",
+      "changed": 4969,
+      "total": 921600,
+      "ratio": 0.005391710069444444,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Cifras",
+      "template": "InsightsFigureStatSlide",
+      "changed": 4875,
+      "total": 921600,
+      "ratio": 0.005289713541666667,
+      "pass": true
+    },
+    {
       "reference": "Deck-Comparacion",
       "template": "InsightsFigureComparisonSlide",
-      "changed": 58,
+      "changed": 862,
       "total": 921600,
-      "ratio": 0.00006293402777777778,
+      "ratio": 0.0009353298611111111,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Donut",
+      "template": "InsightsFigureDonutSlide",
+      "changed": 153,
+      "total": 921600,
+      "ratio": 0.000166015625,
       "pass": true
     },
     {
@@ -37,9 +69,9 @@
     {
       "reference": "Deck-Metas",
       "template": "InsightsFigureTargetsSlide",
-      "changed": 1485,
+      "changed": 1769,
       "total": 921600,
-      "ratio": 0.001611328125,
+      "ratio": 0.0019194878472222222,
       "pass": true
     },
     {
@@ -59,11 +91,27 @@
       "pass": true
     },
     {
+      "reference": "Deck-Waffle",
+      "template": "InsightsFigureWaffleSlide",
+      "changed": 70,
+      "total": 921600,
+      "ratio": 0.00007595486111111111,
+      "pass": true
+    },
+    {
       "reference": "Premium-Agrupadas",
       "template": "ReportFigureColumnsPage",
-      "changed": 254,
+      "changed": 320,
       "total": 891662,
-      "ratio": 0.0002848613039470113,
+      "ratio": 0.00035888038292536856,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Apiladas",
+      "template": "ReportFigureStackedPage",
+      "changed": 809,
+      "total": 891662,
+      "ratio": 0.0009072944680831974,
       "pass": true
     },
     {
@@ -91,6 +139,22 @@
       "pass": true
     },
     {
+      "reference": "Premium-Cascada",
+      "template": "ReportFigureWaterfallPage",
+      "changed": 5261,
+      "total": 891662,
+      "ratio": 0.0059002177955323875,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Cifras",
+      "template": "ReportFigureStatPage",
+      "changed": 449,
+      "total": 891662,
+      "ratio": 0.0005035540372921578,
+      "pass": true
+    },
+    {
       "reference": "Premium-Contraportada",
       "template": "ReportBackCoverPage",
       "changed": 0,
@@ -99,11 +163,19 @@
       "pass": true
     },
     {
+      "reference": "Premium-Donut",
+      "template": "ReportFigureDonutPage",
+      "changed": 1008,
+      "total": 891662,
+      "ratio": 0.001130473206214911,
+      "pass": true
+    },
+    {
       "reference": "Premium-Evidencia",
       "template": "ReportFigureComparisonPage",
-      "changed": 333,
+      "changed": 3918,
       "total": 891662,
-      "ratio": 0.0003734598984817117,
+      "ratio": 0.004394041688442481,
       "pass": true
     },
     {
@@ -125,9 +197,9 @@
     {
       "reference": "Premium-Metas",
       "template": "ReportFigureTargetsPage",
-      "changed": 1174,
+      "changed": 2993,
       "total": 891662,
-      "ratio": 0.001316642404857446,
+      "ratio": 0.003356653081548838,
       "pass": true
     },
     {
@@ -168,6 +240,14 @@
       "changed": 262,
       "total": 891662,
       "ratio": 0.0002938333135201455,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Waffle",
+      "template": "ReportFigureWafflePage",
+      "changed": 283,
+      "total": 891662,
+      "ratio": 0.0003173848386496228,
       "pass": true
     }
   ]

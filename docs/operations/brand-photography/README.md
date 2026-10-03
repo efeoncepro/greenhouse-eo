@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.10
+> **Versión:** 1.11
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-02 por Claude (1.10: el registro cine se opera sin consultor — casebook, `foto:cine:nueva`, `foto:validar:cine`, agente `cine-reviewer` y manual, [delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-se-opera-sin-consultor). 1.9: el traje biónico y los lentes biónicos de Nexa tienen kit y se piden por catálogo, sólo Nexa y sólo cine; las referencias de identidad dicen quién es, no cómo está, y las 12 expresiones fotográficas de Nexa entran al catálogo; la escena cine `NX7d` queda como referencia, [delta 2026-10-02](#delta-2026-10-02--traje-biónico-de-nexa-pose-y-expresiones). Antes, el 2026-09-28: portada de Creative Services con plate propio `CR4` y el caso de cambiar el plate de una pieza aprobada sin perder su concepto, [registro cine §16.7](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto); antes, el 2026-09-27: excepción del registro cine para las láminas de sección y «about» del deck, [delta (c)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck); antes, el mismo día: plates para portada y contraportada del registro cine, [§16](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27); antes, el mismo día: el registro cine tiene documento propio, [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md); antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
+> **Última actualización:** 2026-10-03 por Claude (1.11: elenco de marca completo con grupos de Nexa y Julio, la vista puesta de la prenda elegida por quien la viste, las referencias selladas traídas del canon en GCP, `pnpm foto:rostro` y las 25 expresiones de Nexa casi de frente, [delta 2026-10-03](#delta-2026-10-03--elenco-prenda-por-silueta-canon-y-expresiones-de-nexa). 1.10, 2026-10-02: el registro cine se opera sin consultor — casebook, `foto:cine:nueva`, `foto:validar:cine`, agente `cine-reviewer` y manual, [delta 2026-10-02 (b)](#delta-2026-10-02-b--el-registro-cine-se-opera-sin-consultor). 1.9: el traje biónico y los lentes biónicos de Nexa tienen kit y se piden por catálogo, sólo Nexa y sólo cine; las referencias de identidad dicen quién es, no cómo está, y las 12 expresiones fotográficas de Nexa entran al catálogo; la escena cine `NX7d` queda como referencia, [delta 2026-10-02](#delta-2026-10-02--traje-biónico-de-nexa-pose-y-expresiones). Antes, el 2026-09-28: portada de Creative Services con plate propio `CR4` y el caso de cambiar el plate de una pieza aprobada sin perder su concepto, [registro cine §16.7](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto); antes, el 2026-09-27: excepción del registro cine para las láminas de sección y «about» del deck, [delta (c)](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck); antes, el mismo día: plates para portada y contraportada del registro cine, [§16](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27); antes, el mismo día: el registro cine tiene documento propio, [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md); antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -25,6 +25,7 @@ pnpm foto:validar <plate.png>             # valida las seis reservas sobre el pl
 pnpm foto:cine:nueva --listar             # registro cine: recetas aprobadas desde donde partir
 pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta>   # ficha cine nueva copiada de una aprobada
 pnpm foto:validar:cine <plate.png>        # registro cine: sombra y, en vertical, techo oscuro (aparte de foto:validar)
+pnpm foto:rostro <plate.png> --persona nexa   # proporción del rostro contra el canon: avisa si el modelo lo afinó
 pnpm foto:componer <piezas.json>          # pieza SIN CTA; compositor general de voz/firma
 pnpm foto:componer:cta <plan.json>        # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
 pnpm foto:cta:gate <plan.json>            # la certifica: sólo la salida 0 certifica; 3 = no certificable, no es pase
@@ -57,9 +58,9 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 9 | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) | **Nexa, el Bible aplicado a producción**: qué referencia del repo corresponde a cada nombre del documento de marca (las 8 expresiones, los 5 contextos), la auditoría medida de qué cumple el material, el veredicto A/B contra la ficha y lo que queda abierto | Claude |
 | 10 | [`NEXA_TECH_PROPS_V1.md`](./NEXA_TECH_PROPS_V1.md) | **Nexa, props y ecosistema tecnológico**: qué dispositivos lleva y usa —smartwatch, iPhone, iPad, MacBook, DJI, Rode, Shure, Sony/Canon—, cómo entran en la escena y qué NO es Nexa. La regla es la familia vigente, nunca un modelo descontinuado | Claude |
 | 11 | [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) | **Registro cine · la marca en su película**: cuándo se usa (Nexa protagonista, la receta de deck `proposal-cinematic` y, por excepción aprobada el 2026-09-27, las láminas de sección y «about» del deck), la idea (el servicio en acción, la línea como luz), cámara a ≈ 2 m y 85 mm, luz y bruma, color por línea desde tokens, vestuario y emblema compuesto, mini robots agentes, reservas y capa gráfica, plantilla de ficha comentada, trampas medidas, barra de juicio, evidencia y formatos publicitarios en prueba; **plates para portada y contraportada** de brochure y propuesta, aprobados el 2026-09-27 ([§16](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27): receta de toma, plates por uso, ficha `LN4` y la regla de que el texto nunca cruza; desde el 2026-09-28, la portada de Creative Services con su plate propio `CR4` y cómo cambiar el plate de una pieza aprobada sin perder su concepto, [§16.7](./EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) | Claude |
-| 12 | [`EFEONCE_TEAM_ROSTER_V1.md`](./EFEONCE_TEAM_ROSTER_V1.md) | **El equipo en la fotografía de marca**: quién del equipo actual puede aparecer con su identidad real, de qué foto sale y con qué ropa (la de la línea de la pieza: hoodie en Servicios creativos, bomber o softshell en las líneas de negocio; `foto:prompt` lo exige); decisiones del operador del 2026-09-29 | Claude |
+| 12 | [`EFEONCE_TEAM_ROSTER_V1.md`](./EFEONCE_TEAM_ROSTER_V1.md) | **El equipo en la fotografía de marca**: quién del equipo actual puede aparecer con su identidad real, de qué foto sale, su `silueta` y con qué ropa (la de la línea de la pieza: hoodie en Servicios creativos, bomber o softshell en las líneas de negocio; `foto:prompt` lo exige); Nexa y Julio entran en grupos de 3 a 5 con el elenco, el resto del roster con tope dos; decisiones del operador del 2026-09-29 | Claude |
 | 13 | [`EFEONCE_PHOTO_CINE_CASEBOOK_V1.md`](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) | **Registro cine · el casebook**: cómo se llega a una foto cine aprobable sin consultar a nadie — flujo en seis pasos, campos cine de la ficha, 13 fallas con síntoma, causa, corrección, caso y chequeo, fotos aprobadas desde donde partir, el medidor y sus límites, dos pruebas ciegas y las decisiones del operador. Guía operativa: el canon sigue siendo el documento 11 | Claude |
-| 14 | [`EFEONCE_BRAND_CAST_V1.md`](./EFEONCE_BRAND_CAST_V1.md) | **Elenco de marca**: Julio y Humberly (reales, en su rol) y cuatro personajes ficticios con línea de servicio fija (Karo · `brand`, Sophia · `engine`, Isabella · `voice`, Antonio · `revenue-*`); fichas, qué puede representar un ficticio, vestuario por línea, separadores contra el colapso de identidades y cómo se construye cada set (2026-10-02) | Claude |
+| 14 | [`EFEONCE_BRAND_CAST_V1.md`](./EFEONCE_BRAND_CAST_V1.md) | **Elenco de marca, la biblia**: Julio (real, en su rol) y cinco personajes ficticios con línea de servicio fija (Hum · `growth`, Karo · `brand`, Sophia · `engine`, Isabella · `voice`, Antonio · `revenue-*`), con edad, origen, silueta y carácter; qué puede y qué no puede representar un ficticio; cómo se pide (`identidad`); grupos de 3 a 5 con cualquier combinación de elenco, Nexa y Julio (el elenco se suma cuando hace falta); prenda elegida por quien la viste; separadores contra el colapso de identidades; cómo se construye y cómo se suma un personaje (2026-10-02/03) | Claude |
 
 ## Registros y evidencia
 
@@ -77,7 +78,9 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Revisor del registro cine | [`.claude/agents/cine-reviewer.md`](../../../.claude/agents/cine-reviewer.md) | Agente de Claude Code que revisa la ficha y su prompt antes de gastar, y el plate después; veredicto APROBABLE / CORREGIR / FUERA DE ALCANCE con la frase a cambiar. Codex aplica la rúbrica leyendo el archivo |
 | Pruebas ciegas del registro cine | `ai-generations/2026-10-02_prueba-ciega-cine/`, `ai-generations/2026-10-02_prueba-ciega-cine-2/`, `ai-generations/2026-10-02_experimento-luz-cine/` | Las dos rondas de sesiones nuevas sin consultor y el experimento de luz; lectura en el [casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#prueba-ciega-del-2026-10-02--lo-que-aprendimos) |
 | Kit del traje biónico de Nexa | [`ai-generations/2026-10-01_traje-bionico-nexa/`](../../../ai-generations/2026-10-01_traje-bionico-nexa/LEEME.md) | El traje y los lentes biónicos como objeto (TASK-1940): 10 vistas en `final/` (fuera de git, selladas en el lock y publicadas en el canon), manifiesto con `cuando_usarla` y la técnica de cada marca, fichas y plates de la escena `NX7`–`NX7g`. Sólo Nexa, sólo registro cine. Manual: [usar el traje biónico de Nexa en fotos](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md) |
-| Expresiones fotográficas de Nexa | [`ai-generations/_identidad-nexa/5-expresiones/`](../../../ai-generations/_identidad-nexa/LEEME.md) | Las 12 expresiones de rostro con el acabado de las anclas, pedidas con `expresion` desde el 2026-10-02. Todas comparten el mismo tres cuartos: aportan sólo el gesto |
+| Expresiones fotográficas de Nexa | [`ai-generations/_identidad-nexa/5-expresiones-frente/`](../../../ai-generations/_identidad-nexa/LEEME.md) | **25 expresiones casi de frente, aprobadas por el operador el 2026-10-03**, pedidas con `{ "persona": "nexa", "expresion": "<clave>" }`. Viajan detrás del ancla frontal v2 y sólo dan el gesto; en un grupo no viajan. Claves y grupos de uso en el LEEME. Las 12 de tres cuartos de `5-expresiones/` quedan como histórico |
+| Referencias del elenco | [`ai-generations/_identidad-elenco/`](../../../ai-generations/_identidad-elenco/LEEME.md) | Una carpeta por personaje (frente, elegida, cuerpo, 45° y perfil a cada lado, manos y ancla en alta resolución), selladas en el lock y publicadas en el canon. Fichas en la [biblia del elenco](./EFEONCE_BRAND_CAST_V1.md) |
+| Vistas puestas del uniforme | [`ai-generations/2026-10-03_uniforme-vistas/`](../../../ai-generations/2026-10-03_uniforme-vistas/LEEME.md) | 126 vistas puestas de bomber, softshell, polo, hoodie y gorra, de hombre y de mujer (giro, espalda, cámara baja, oclusión), selladas y en el canon. Las elige `foto:prompt` |
 
 ## Orden de lectura recomendado
 
@@ -85,7 +88,8 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 |---|---|
 | Quien decide o revisa la marca | 1 → 2 → bitácora |
 | Quien produce una foto con IA | Manual → 5 → **7** → 2 → 3 → 4 → 6 |
-| Quien produce una foto con personas reales o con Julio/Nexa | 6 → 2 → 4 → **7** |
+| Quien produce una foto con personas reales o con Julio/Nexa | 6 → **12** → 2 → 4 → **7** |
+| Quien produce una foto con varias personas o con el **elenco** | **14** → **12** → 6 → [kit de prendas](../../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md) (§Delta 2026-10-03) |
 | Quien produce una pieza **con Nexa** | **9** → **10** → 6 → 2 → **7** (con el traje biónico: **11** y el [manual del traje](../../manual-de-uso/creative/usar-traje-bionico-de-nexa-en-fotos.md)) |
 | Quien produce una foto en **registro cine** | [Manual cine](../../manual-de-uso/creative/producir-foto-cine-de-marca.md) → **13** → **11** (por sección) → 5 |
 | Quien quiere entender por qué es así | Bitácora → 1 |
@@ -93,6 +97,11 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 ## Dónde viven los archivos de `ai-generations/`
 
 Las rutas `ai-generations/...` de este documento son **rutas lógicas**: el binario puede estar en disco, en el canon (`gs://efeonce-creative-canon`) o en el archivo (`gs://efeonce-group-greenhouse-private-assets-prod`, inventario en su `artifacts.remote.json`). Si falta en disco, `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>` antes de componer; nunca regenerar, sustituir ni resellar el lock para tapar el faltante. Contrato: [`AI_GENERATIONS_STORAGE_V1.md`](../AI_GENERATIONS_STORAGE_V1.md).
+
+Las **referencias selladas** en `scripts/foto/assets.lock.json` no necesitan estar en disco: desde el 2026-10-03
+`pnpm foto:prompt` y `pnpm foto:generar` las bajan del canon si faltan, o si la copia local no tiene la huella del lock
+(la copia distinta se aparta como `<archivo>.local-<sha8>.<ext>`, nunca se pisa). `FOTO_SIN_CANON=1` lo apaga
+(`scripts/foto/canon-sync.mjs`). La exploración y los descartes van al archivo con `pnpm ai-gen:archive`, no se borran.
 
 ## Reglas de la carpeta
 
@@ -119,6 +128,25 @@ Resultados: `MARGIN FIELD` pasa en 4:5 y en 16:9 nativo con **banda continua has
 aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con padding de 0,02 del lienzo** (3,29:1);
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
+
+## Delta 2026-10-03 — elenco, prenda por silueta, canon y expresiones de Nexa
+
+- **El elenco está completo** ([biblia, documento 14](./EFEONCE_BRAND_CAST_V1.md)): cinco personajes ficticios con
+  carácter y silueta, pedidos en `identidad` como el roster. Un grupo de 3 a 5 es cualquier combinación de elenco, Nexa
+  y Julio; el resto del roster sigue con tope dos y una persona repetida es error. El elenco se suma cuando hace falta
+  **[operador, 2026-10-03: «debe usarse el elenco si es necesaria su inclusión»]**. Julio tiene 37 años con canas
+  prematuras en su bloque.
+- **La vista puesta de la prenda la elige `foto:prompt`** por la silueta de quien la viste, el giro, la cámara baja y lo
+  que tapa el pecho, e imprime las alternativas. Dueños: [kit de prendas, §Delta 2026-10-03](../../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md)
+  y [elenco §7c](./EFEONCE_BRAND_CAST_V1.md).
+- **Referencias desde el canon en GCP** (`gs://efeonce-creative-canon`): `canon-sync` baja lo sellado que falte o haya
+  cambiado; `FOTO_SIN_CANON=1` lo apaga. Ver [dónde viven los archivos](#dónde-viven-los-archivos-de-ai-generations) y el
+  [contrato de almacenamiento](../AI_GENERATIONS_STORAGE_V1.md).
+- **`pnpm foto:rostro`** mide la proporción del rostro (ojos → mentón contra el ancho de la mandíbula, con Vision) y
+  sale 1 si una frontal queda fuera del canon; Nexa tiene `rostro: { largoAncho: 0.81, tolerancia: 0.02 }` y su ancla
+  frontal v2 corrige la cara afinada. Código: `scripts/foto/rostro.mjs`.
+- **Las 25 expresiones de Nexa casi de frente**, aprobadas: `ai-generations/_identidad-nexa/5-expresiones-frente/`
+  (claves en su [LEEME](../../../ai-generations/_identidad-nexa/LEEME.md) y en la [ficha de Nexa](./NEXA_CHARACTER_BIBLE_FICHA_V1.md)).
 
 ## Delta 2026-10-02 (b) — el registro cine se opera sin consultor
 

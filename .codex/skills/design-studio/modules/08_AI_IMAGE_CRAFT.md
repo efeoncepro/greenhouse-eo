@@ -166,6 +166,11 @@ Cuando la generación está casi, **edita el pixel** en vez de rifar de nuevo:
 **Regla:** un fallo local no invalida una imagen buena. Inpaint > regenerar. Cada regeneración
 completa es dinero y azar; la edición es cirugía barata.
 
+**En Greenhouse, inpaint/outpaint/layerize = `pnpm ai:inpaint image|erase|move|place|background|expand`** + `pnpm ai:mask`
+y `pnpm ai:layers`: recompone sobre la original y verifica delta 0 fuera de la zona. La regla tiene un límite: si el
+fallo es de luz, lecho, identidad o look IA, no es local — se regenera (no hay relight conectado). Playbook:
+`greenhouse-ai-image-generator` → `references/inpainting-and-editing.md`.
+
 ## 5. Iteración por seeds y variaciones
 
 - **Seed fija** = reproducibilidad. Congela la seed y cambia *una* variable (luz, paleta,

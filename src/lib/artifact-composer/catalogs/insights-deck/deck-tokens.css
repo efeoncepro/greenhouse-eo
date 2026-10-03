@@ -324,6 +324,18 @@
   --axis-deck-role-dataPriorOnNavy-rgb: var(--axis-deck-blue-310-rgb);
   --axis-deck-role-dataPriorOnPaper: var(--axis-deck-teal-650);
   --axis-deck-role-dataPriorOnPaper-rgb: var(--axis-deck-teal-650-rgb);
+  --axis-deck-role-dataStepOnNavy: var(--axis-deck-cyan-700);
+  --axis-deck-role-dataStepOnNavy-rgb: var(--axis-deck-cyan-700-rgb);
+  --axis-deck-role-dataStepOnPaper: var(--axis-ppt-blue-500);
+  --axis-deck-role-dataStepOnPaper-rgb: var(--axis-ppt-blue-500-rgb);
+  --axis-deck-role-deltaBetterOnNavy: var(--axis-ppt-green-400);
+  --axis-deck-role-deltaBetterOnNavy-rgb: var(--axis-ppt-green-400-rgb);
+  --axis-deck-role-deltaBetterOnPaper: var(--axis-ppt-green-900);
+  --axis-deck-role-deltaBetterOnPaper-rgb: var(--axis-ppt-green-900-rgb);
+  --axis-deck-role-deltaWorseOnNavy: var(--axis-ppt-red-300);
+  --axis-deck-role-deltaWorseOnNavy-rgb: var(--axis-ppt-red-300-rgb);
+  --axis-deck-role-deltaWorseOnPaper: var(--axis-ppt-red-800);
+  --axis-deck-role-deltaWorseOnPaper-rgb: var(--axis-ppt-red-800-rgb);
   --axis-deck-role-field: var(--axis-deck-navy-920);
   --axis-deck-role-field-rgb: var(--axis-deck-navy-920-rgb);
   --axis-deck-role-fieldDeep: var(--axis-deck-navy-980);

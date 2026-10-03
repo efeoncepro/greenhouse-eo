@@ -20,9 +20,11 @@ import {
   type InsightWebClaimV1,
   type InsightWebFactV1,
   type InsightWebModelV1,
-  type InsightWebReadingV1
+  type InsightWebReadingV1,
+  type InsightWebStatFigureV1
 } from '../contracts/web-model'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
+import { statBoardChannelsOf, statItemView } from '../presentation/stat-card'
 import { asOfLabelOf, sourceLabelOf, unitLabelOf } from '../presentation/vocabulary'
 
 const projectFact = (fact: EvidenceFactV1, locale: string): InsightWebFactV1 => ({
@@ -140,7 +142,12 @@ const claimContext = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV
       chapter.charts.filter(spec => chartSpecFactIds(spec).some(id => claim.factIds.includes(id))).map(spec => ({ chapterId: chapter.chapterId, chartId: spec.chartId }))
     )[0]
 
-    const evidence = byKeyFigure ?? byDrawing
+    // TASK-1974 — una cifra de tarjeta es la figura de su hecho (la cascada sólo lo usa como ancla).
+    const byStat = chapters.flatMap(chapter =>
+      (chapter.stats ?? []).filter(stat => stat.items.some(item => claim.factIds.includes(item.factId))).map(stat => ({ chapterId: chapter.chapterId, chartId: stat.figureId }))
+    )[0]
+
+    const evidence = byKeyFigure ?? byStat ?? byDrawing
 
     return { module: cited.module, ...(evidence ? { evidence } : {}) }
   }
@@ -185,6 +192,46 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
     module: chapter.module,
     title: chapter.title,
     claims: chapter.claims.map(projectClaim),
+    ...(chapter.stats?.length
+      ? {
+          stats: chapter.stats.map((stat): InsightWebStatFigureV1 => {
+            // Misma regla de isotipos que el PDF y el deck (contrato AXIS efeonce.insights-stat-card 0.2.0).
+            const board = statBoardChannelsOf(stat.items.flatMap(item => sealedById.get(item.factId) ?? []))
+
+            return {
+            figureId: stat.figureId,
+            question: stat.question,
+            title: stat.title,
+            ...(board.title.length > 0 ? { titlePlatforms: board.title } : {}),
+            items: stat.items.flatMap(item => {
+              const view = statItemView(item, sealedById, locale, board)
+
+              if (!view) return []
+
+              return [{
+                itemId: view.itemId,
+                label: view.label,
+                factId: view.factId,
+                display: view.display,
+                estimated: view.estimated,
+                direction: view.direction,
+                ...(view.change ? { change: view.change } : {}),
+                ...(view.versus ? { versus: view.versus } : {}),
+                ...(view.noData ? { noData: view.noData } : {}),
+                ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {}),
+                parts: view.parts,
+                ...(view.comparison ? { comparison: { display: view.comparison.display, period: view.comparison.period } } : {}),
+                ...(view.firstPeriod ? { firstPeriod: view.firstPeriod } : {}),
+                ...(view.count ? { count: view.count } : {}),
+                ...(view.channel ? { channel: view.channel } : {}),
+                ...(view.context ? { context: view.context } : {})
+              }]
+            }),
+            ...(stat.note ? { note: projectClaim(stat.note) } : {})
+            }
+          })
+        }
+      : {}),
     charts: chapter.charts.map((spec): InsightWebChartV1 => {
       const derived = deriveChart(spec, factMap, locale)
 

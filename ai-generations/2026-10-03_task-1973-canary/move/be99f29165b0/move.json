@@ -1,0 +1,24 @@
+{
+  "kind": "ai-inpaint-move",
+  "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+  "layers": [
+    "notebook"
+  ],
+  "dx": -560,
+  "dy": 70,
+  "scale": 1,
+  "harmonized": true,
+  "shadowPixels": 13067,
+  "final": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/move/be99f29165b0/inpaint/14d181f96428/candidate-1.png",
+  "untouched": {
+    "pixels": 1357141,
+    "maxDelta": 0,
+    "meanDelta": 0,
+    "worst": null
+  },
+  "verdict": "PASS",
+  "harmonizeRun": {
+    "runId": "14d181f96428",
+    "verdict": "PASS"
+  }
+}

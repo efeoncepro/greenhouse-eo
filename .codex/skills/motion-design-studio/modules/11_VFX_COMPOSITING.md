@@ -97,12 +97,38 @@ post** (matchmove) + el move animado en el compositor. El VFX resuelve lo que el
 | **Mocha Pro** (Boris FX) | **planar tracking** (Academy Award), roto, object removal, screen insert | el estándar de tracking planar |
 | **Wonder Dynamics / Autodesk Flow Studio** | **mocap markerless** desde 1 cámara → mapea a rig CG (cara/cuerpo/manos) | outputs FBX/USD/EXR/PNG para Blender/Unreal/Maya/Nuke |
 | **Runway** | roto/masking automático, remove-bg, estilización | acelera temp keys y mattes |
-| **Beeble** | **relighting** IA de video (SwitchLight) | recuperar/cambiar luz en post |
+| **Beeble** | **relighting** IA de video (SwitchLight; API SwitchX) | recuperar/cambiar luz en post. *as-of 2026-10-03:* API SwitchX publicada a USD 0,10–0,30 por 30 cuadros con compra mínima de USD 50; **no conectada ni probada** (§6b) |
 | **Houdini / C4D / Blender** | simulaciones/dynamics procedurales | Blender gratis; Houdini cuando el FX lo justifica |
 
 **Regla de encaje:** compositing serio → Nuke; all-in-one gratis → Fusion (Resolve); mograph +
 roto rápido → After Effects; tracking planar → Mocha; mocap sin traje → Wonder/Flow Studio; roto/
 matte express → Runway; relighting → Beeble; sim propia → Houdini (o stock elements si alcanza).
+
+## 6b. Editar una zona y reiluminar — lo que está conectado *(as-of 2026-10-03)*
+
+**Editar sólo una zona de un clip y dejar el resto idéntico cuadro a cuadro → `pnpm ai:inpaint video`** (TASK-1965),
+sobre `fal:flux3-edit` **[verificado]** (`fal:seedance25-edit`: sólo contrato, sin canario). Normaliza la salida del
+motor a resolución/fps/duración del original, **aborta** si el motor corrió el encuadre (`--max-drift`, 12/255),
+recompone cada cuadro con la máscara (`--mask` fija con cámara quieta o `--mask-keyframes`), verifica delta 0 sobre la
+secuencia PNG, mide el parpadeo y copia el audio original. Salida `0` PASS · `2` FAIL · `3` REVISAR. Es cleanup local
+con garantía; no reemplaza un roto/track serio con cámara en movimiento. Manual:
+[editar una zona de un video](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md); elección de
+motor: `workflows/engine-selection-by-fidelity-contract.md`.
+
+**Reiluminar video: NINGÚN motor conectado.** Candidatos del estudio 2026-10-03, todos **[sin verificar en vivo]**:
+
+| Candidato | Superficie | Nota |
+|---|---|---|
+| ID-V2V Relight | fal (`fal-ai/id-v2v/relight`) | propaga un cuadro reiluminado al clip |
+| lightx | fal (`fal-ai/lightx/relight`) | relight de video por API |
+| Beeble SwitchX | API propia | compra mínima; ver fila de §6 |
+| Runway Aleph 2.0 | API propia | edición de video por instrucción |
+| Higgsfield Cinema Studio 4.0 | MCP de Higgsfield (`video_edit` + rig de luz) | **no está en nuestro catálogo de API** (`higgsfield-provider`) |
+| Magnific `video_relight` | MCP oficial, conectado con la cuenta Efeonce | herramienta listada; esquema no cargado, sin invocación verificada |
+
+Precios y etiquetas: guía canónica `GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Método recomendado cuando se
+conecte uno: reiluminar un cuadro y propagar, y recomponer encima lo que debe quedar exacto (logo, producto, título).
+Mientras tanto, la luz se dirige en la toma (módulo 03) y se ajusta en el grade (módulo 08); no prometas relight.
 
 ## 7. Borde y handoff
 

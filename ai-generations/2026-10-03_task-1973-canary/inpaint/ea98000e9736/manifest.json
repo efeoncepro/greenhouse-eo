@@ -1,0 +1,141 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ea98000e9736",
+  "key": "ea98000e9736ba4c075883c0aa29abd32e33d5246ae90109dc7f2ef89242cc29",
+  "status": "completed",
+  "createdAt": "2026-10-03T10:03:27.085Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/erase-masks/cb5e600359b1.png",
+    "maskSha256": "1889cbdbcd50e75b924607df0b36bf26b23cff15ec2198910cf60142fc23aad6",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "The empty background continues naturally: the same wall, the same surface, its texture and light, with nothing placed on it. No objects, no cups, no props.",
+    "providerPrompt": "The empty background continues naturally: the same wall, the same surface, its texture and light, with nothing placed on it. No objects, no cups, no props."
+  },
+  "mask": {
+    "touchedFraction": 0.05156262715657552,
+    "editable": 54521,
+    "soft": 26580,
+    "protected": 1491763
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 39 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 16.284,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.01,
+        "bestError": 1.01,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1491763,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 54521,
+        "maxDelta": 184,
+        "meanDelta": 21.549,
+        "worst": {
+          "x": 1172,
+          "y": 454
+        }
+      },
+      "seam": {
+        "pixels": 26580,
+        "maxDelta": 163,
+        "meanDelta": 5.483,
+        "worst": {
+          "x": 1177,
+          "y": 498
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1491763,
+        "maxDelta": 74,
+        "meanDelta": 2.759,
+        "worst": {
+          "x": 1404,
+          "y": 691
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a10138-13d6-77c1-bd67-539f0b151026",
+        "account": "FAL_API_KEY_B",
+        "seed": 1224087003
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [
+      "mug"
+    ],
+    "shadow": {
+      "pixels": 10219,
+      "meanDarkening": 49.3
+    },
+    "erasure": [
+      {
+        "changeInCore": 17.8,
+        "corePixels": 54521,
+        "objectLikeness": 1.06,
+        "residueSuspected": true
+      }
+    ]
+  }
+}

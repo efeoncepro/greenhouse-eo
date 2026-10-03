@@ -1,5 +1,12 @@
 # TASK-1961 — Efeonce Insights: visibilidad en IA por país (informe multimercado sin promedios)
 
+## Delta 2026-10-03 — hechos por motor encima de los hechos por país
+
+- TASK-1991 (visibilidad en IA por motor: lugar, cita, tono, Share of Voice y plataforma citada) está bloqueada por esta
+  task porque edita el mismo `aeo-adapter.ts`: los hechos por motor nacen con la dimensión de mercado que deja el adapter
+  v3. Al diseñar el Slice 2, dejar la dimensión de mercado componible con `provider`/`channelId`. — por trabajo en TASK-1990…1996
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

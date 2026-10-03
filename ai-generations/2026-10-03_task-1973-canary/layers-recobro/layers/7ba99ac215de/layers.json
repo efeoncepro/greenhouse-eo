@@ -1,0 +1,106 @@
+{
+  "kind": "ai-layers",
+  "version": 1,
+  "source": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "width": 1536,
+    "height": 1024
+  },
+  "base": {
+    "file": "00-base.png",
+    "width": 1536,
+    "height": 1024
+  },
+  "layers": [
+    {
+      "index": 0,
+      "zIndex": 0,
+      "name": null,
+      "description": null,
+      "file": "00-base.png",
+      "width": 1536,
+      "height": 1024,
+      "box": null,
+      "alphaCoverage": null
+    },
+    {
+      "index": 1,
+      "zIndex": 1,
+      "name": "Right window frame and sill",
+      "description": "Window side architectural structure with a white window frame and light-colored windowsill. Exclude the surrounding wall during extraction.",
+      "file": "01-right-window-frame-and-sill.png",
+      "width": 373,
+      "height": 1168,
+      "box": {
+        "left": 1366,
+        "top": 0,
+        "right": 1536,
+        "bottom": 534
+      },
+      "alphaCoverage": 0.83
+    },
+    {
+      "index": 2,
+      "zIndex": 2,
+      "name": "Solid oak table",
+      "description": "Solid wood table with light oak grain, including the full tabletop, table edge and right table leg. Exclude the mug and notebook on the tabletop during extraction.",
+      "file": "02-solid-oak-table.png",
+      "width": 1536,
+      "height": 499,
+      "box": {
+        "left": 0,
+        "top": 525,
+        "right": 1536,
+        "bottom": 1024
+      },
+      "alphaCoverage": 0.798
+    },
+    {
+      "index": 3,
+      "zIndex": 3,
+      "name": "White ceramic mug",
+      "description": "Plain white patterned-free ceramic mug with a handle, placed alone on the table. Exclude the surrounding tabletop and notebook during extraction.",
+      "file": "03-white-ceramic-mug.png",
+      "width": 759,
+      "height": 653,
+      "box": {
+        "left": 937,
+        "top": 394,
+        "right": 1174,
+        "bottom": 598
+      },
+      "alphaCoverage": 0.724
+    },
+    {
+      "index": 4,
+      "zIndex": 4,
+      "name": "Gray hardcover notebook",
+      "description": "Hardcover notebook with a gray fabric cover, showing the side edge of exposed white pages, placed alone on the table. Exclude the surrounding tabletop and mug during extraction.",
+      "file": "04-gray-hardcover-notebook.png",
+      "width": 1087,
+      "height": 391,
+      "box": {
+        "left": 968,
+        "top": 568,
+        "right": 1450,
+        "bottom": 741
+      },
+      "alphaCoverage": 0.587
+    }
+  ],
+  "request": {
+    "prompt": null,
+    "imageSize": "auto"
+  },
+  "cost": {
+    "layerCount": 4,
+    "perLayerUsd": 0.03375,
+    "estimatedUsd": 0.135,
+    "note": "Por capa separada; si la base también se cobra está sin dato: confirmar con pnpm ai:fal --balance antes y después."
+  },
+  "providerMeta": {
+    "requestId": "01a10130-bbcd-7f91-8286-eef734a3e147",
+    "account": "FAL_API_KEY_B"
+  }
+}

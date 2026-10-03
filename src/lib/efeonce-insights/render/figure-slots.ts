@@ -20,14 +20,16 @@
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
-import type { ChartSpecV1 } from '../contracts/chart-spec'
+import { bulletItemDirection, type ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1, EvidenceUnit } from '../contracts/evidence'
-import type { PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
+import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1, PlanStatFigureV1 } from '../contracts/plan'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
+import { metricDirectionOf } from '../editorial/figure-selection'
+import { statItemView, statBoardChannelsOf } from '../presentation/stat-card'
 import { sourcesLabelOf } from '../presentation/vocabulary'
 
-export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend'
+export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend' | 'stat' | 'waterfall' | 'waffle' | 'donut' | 'stacked'
 
 type Slots = Record<string, unknown>
 
@@ -37,8 +39,9 @@ export interface FigureSlide {
   factIds: string[]
   /** Piezas comunes; cada mapper las nombra según su plantilla. */
   eyebrow: { icon?: string; label: string }
-  keyFigure: string
-  keyCaption: string
+  /** Cifra principal y su bajada; `null` en la página de cifras (las cifras SON la figura: TASK-1975). */
+  keyFigure: string | null
+  keyCaption: string | null
   conclusion: string
   lead: string | null
   figureTitle: string
@@ -53,14 +56,21 @@ export interface FigureCapacity {
   metrics: number
   groups: number
   bulletRows: number
+  /** TASK-1975 — cifras por página, pasos intermedios de una cascada, partes de waffle y dona, períodos y segmentos. */
+  stats: number
+  waterfallSteps: number
+  waffleParts: number
+  donutParts: number
+  stackedPeriods: number
+  stackedSegments: number
 }
 
 const L = GH_INSIGHTS.catalog
 
 /** Capacidad de cada plantilla de figura (`*.slots.json`): métricas, grupos y filas por página. */
 export const FIGURE_CAPACITY: Readonly<Record<'report' | 'deck', FigureCapacity>> = {
-  report: { metrics: 5, groups: 6, bulletRows: 6 },
-  deck: { metrics: 4, groups: 4, bulletRows: 5 }
+  report: { metrics: 5, groups: 6, bulletRows: 6, stats: 6, waterfallSteps: 8, waffleParts: 4, donutParts: 3, stackedPeriods: 6, stackedSegments: 4 },
+  deck: { metrics: 4, groups: 4, bulletRows: 5, stats: 6, waterfallSteps: 6, waffleParts: 4, donutParts: 3, stackedPeriods: 4, stackedSegments: 4 }
 }
 
 /** El contentType de cada página de figura, por catálogo. */
@@ -69,13 +79,23 @@ export const FIGURE_CONTENT_TYPE = {
     comparison: 'report-figure-comparison',
     columns: 'report-figure-columns',
     targets: 'report-figure-targets',
-    trend: 'report-figure-trend'
+    trend: 'report-figure-trend',
+    stat: 'report-figure-stat',
+    waterfall: 'report-figure-waterfall',
+    waffle: 'report-figure-waffle',
+    donut: 'report-figure-donut',
+    stacked: 'report-figure-stacked'
   },
   deck: {
     comparison: 'insights-figure-comparison',
     columns: 'insights-figure-columns',
     targets: 'insights-figure-targets',
-    trend: 'insights-figure-trend'
+    trend: 'insights-figure-trend',
+    stat: 'insights-figure-stat',
+    waterfall: 'insights-figure-waterfall',
+    waffle: 'insights-figure-waffle',
+    donut: 'insights-figure-donut',
+    stacked: 'insights-figure-stacked'
   }
 } as const satisfies Record<'report' | 'deck', Record<FigureKind, string>>
 
@@ -87,7 +107,8 @@ const METRIC_ICON: Readonly<Record<string, string>> = {
   position: 'search',
   rank: 'search',
   page_one_keywords: 'search',
-  keywords_tracked: 'search'
+  keywords_tracked: 'search',
+  organic_etv: 'trend'
 }
 
 const iconOf = (fact: EvidenceFactV1 | undefined): string | undefined => (fact ? METRIC_ICON[fact.metricId] : undefined)
@@ -114,10 +135,10 @@ const directionValue = (direction: string | undefined): boolean | null =>
   direction === 'higher_is_better' ? true : direction === 'lower_is_better' ? false : null
 
 export const higherIsBetterOf = (fact: EvidenceFactV1, facts: Iterable<EvidenceFactV1>): boolean | null => {
-  const own = directionValue(fact.dimension?.direction)
+  // TASK-1974/1975 — la dirección del propio hecho, la declarada por métrica (`METRIC_DIRECTIONS`) o la de la posición.
+  const declared = metricDirectionOf(fact)
 
-  if (own !== null) return own
-  if (fact.unit === 'position') return false
+  if (declared) return declared === 'higher_is_better'
 
   for (const other of facts) {
     if (other === fact || other.module !== fact.module) continue
@@ -183,17 +204,22 @@ const reject = (chart: ChartSpecV1, reason: string): never => {
 }
 
 /**
- * TASK-1962 — familias con página de figura en los catálogos PDF (informe A4 y deck). Las demás familias que la matriz
- * familia × evidencia autoriza (waffle, cascada…) se dibujan en la web; en el PDF quedan su hallazgo y su tabla. Los
- * mappers filtran con este conjunto a propósito: una familia fuera de él nunca llega a `kindOf`, que sigue rechazando.
+ * TASK-1962/1975 — familias con página de figura en los catálogos PDF (informe A4 y deck). Las demás familias que la
+ * matriz familia × evidencia autoriza (medidor, mapa de calor…) se dibujan en la web; en el PDF quedan su hallazgo y su
+ * tabla. Los mappers filtran con este conjunto a propósito: una familia fuera de él nunca llega a `kindOf`, que sigue
+ * rechazando. La tarjeta de cifra no es una familia: viaja en `chapter.stats` (`buildStatSlides`).
  */
-export const PDF_FIGURE_FAMILIES: ReadonlySet<ChartSpecV1['family']> = new Set(['bar', 'bar_grouped', 'line', 'bullet'])
+export const PDF_FIGURE_FAMILIES: ReadonlySet<ChartSpecV1['family']> = new Set(['bar', 'bar_grouped', 'line', 'bullet', 'waterfall', 'waffle', 'donut', 'bar_stacked'])
 
 export const hasPdfFigurePage = (chart: Pick<ChartSpecV1, 'family'>): boolean => PDF_FIGURE_FAMILIES.has(chart.family)
 
 const kindOf = (chart: ChartSpecV1): FigureKind => {
   if (chart.family === 'bullet') return 'targets'
   if (chart.family === 'line') return 'trend'
+  if (chart.family === 'waterfall') return 'waterfall'
+  if (chart.family === 'waffle') return 'waffle'
+  if (chart.family === 'donut') return 'donut'
+  if (chart.family === 'bar_stacked') return 'stacked'
 
   if (chart.family === 'bar' || chart.family === 'bar_grouped') {
     // Columnas sólo cuando las dimensiones son CANALES distintos (comparables en un mismo eje). Todas las
@@ -234,25 +260,76 @@ export const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, 
     return fact ? [fact] : []
   }))
 
+/** Cifra con signo explícito («+182», «−23»): el signo es obligatorio en un paso de cascada (nunca sólo color). */
+const signedOf = (delta: number, unit: EvidenceUnit, locale: string): string =>
+  `${delta >= 0 ? '+' : '−'}${formatFactValue(Math.abs(delta), unit, locale)}`
+
+/**
+ * Participaciones enteras que suman 100 (restos mayores; empate por orden de entrada). Cifra derivada DECLARADA
+ * (TASK-1975: parte ÷ suma), impresa junto a su cuenta: nunca reemplaza al hecho.
+ */
+export const sharesOf = (values: readonly number[]): number[] => {
+  const total = values.reduce((sum, value) => sum + value, 0)
+
+  if (total <= 0) return values.map(() => 0)
+
+  const exact = values.map(value => (value / total) * 100)
+  const shares = exact.map(Math.floor)
+  let remaining = 100 - shares.reduce((sum, share) => sum + share, 0)
+
+  for (const index of exact.map((value, i) => ({ i, rest: value - Math.floor(value) })).sort((a, b) => b.rest - a.rest).map(entry => entry.i)) {
+    if (remaining <= 0) break
+    shares[index]! += 1
+    remaining -= 1
+  }
+
+  return shares
+}
+
+const percentLabel = (share: number): string => `${share} %`
+
+/** Contexto del capítulo que una figura necesita para decidir qué imprime (TASK-1975: el centro de la dona). */
+export interface FigureContext {
+  /** Hechos que ya tienen tarjeta de cifra en el capítulo: no se repiten como cifra en otra figura. */
+  statFactIds?: ReadonlySet<string>
+}
+
 export const buildFigureSlides = (
   chart: ChartSpecV1,
   byId: ReadonlyMap<string, EvidenceFactV1>,
   reading: PlanFigureReadingV1 | undefined,
   claims: readonly PlanClaimV1[],
   locale: string,
-  capacity: FigureCapacity
+  capacity: FigureCapacity,
+  context: FigureContext = {}
 ): FigureSlide[] => {
   const kind = kindOf(chart)
   const current = chart.series.at(-1)
   const previous = chart.series.length > 1 ? chart.series[0] : undefined
 
-  // Cifra principal: la de la lectura del plan; sin lectura (plan v1), el primer hecho de la figura.
+  // Cifra principal: la de la lectura del plan; sin lectura (plan v1), el primer hecho que la figura dibuja. En la
+  // cascada, el cambio entre sus dos totales; en las apiladas, el segmento base del último período.
   const fallbackFact =
-    kind === 'targets' && chart.data?.kind === 'bullet'
+    chart.data?.kind === 'bullet'
       ? measured(byId, chart.data.items[0]?.valueFactId)
-      : measured(byId, current?.factIds[0])
+      : chart.data?.kind === 'waffle'
+        ? measured(byId, chart.data.parts[0]?.factId)
+        : kind === 'stacked'
+          ? measured(byId, chart.series[0]?.factIds.at(-1))
+          : kind === 'waterfall'
+            ? null
+            : measured(byId, current?.factIds[0])
 
-  const keyFigure = reading?.keyFigure?.value ?? (fallbackFact ? fmt(fallbackFact, locale) : null)
+  const waterfallChange = (() => {
+    if (chart.data?.kind !== 'waterfall') return null
+
+    const first = measured(byId, chart.data.steps[0]?.factId)
+    const last = measured(byId, chart.data.steps.at(-1)?.factId)
+
+    return first && last ? signedOf(last.value! - first.value!, last.unit, locale) : null
+  })()
+
+  const keyFigure = reading?.keyFigure?.value ?? waterfallChange ?? (fallbackFact ? fmt(fallbackFact, locale) : null)
 
   if (!keyFigure) return []
 
@@ -371,9 +448,13 @@ export const buildFigureSlides = (
   if (kind === 'targets') {
     if (chart.data?.kind !== 'bullet') return reject(chart, 'una figura de metas trae sus datos en `data` (bullet).')
 
-    const lowerIsBetter = chart.data.direction === 'lower_is_better'
+    const data = chart.data
 
-    const rows = chart.data.items.flatMap(item => {
+    const rows = data.items.flatMap(item => {
+      // TASK-1974 — cada fila con SU dirección: una figura junta metas que mejoran al subir (OTD) y al bajar (RpA).
+      const direction = bulletItemDirection(data, item)
+      const lowerIsBetter = direction === 'lower_is_better'
+
       const value = measured(byId, item.valueFactId)
       const target = measured(byId, item.targetFactId)
       // Límite de atención del registro dueño (hecho de referencia, aditivo de TASK-1888). Sin él, sin zona.
@@ -389,6 +470,7 @@ export const buildFigureSlides = (
         row: {
           ...(iconOf(value) ? { icon: iconOf(value) } : {}),
           name: item.label,
+          direction,
           unit: unitWordOf(value.unit),
           value: fmt(value, locale),
           achievedLabel: L.achievedRow,
@@ -397,10 +479,14 @@ export const buildFigureSlides = (
           ...(band ? { band: fmt(band, locale) } : {}),
           // Una métrica en % se lee contra la meta en puntos porcentuales («10,9 pp»): «114 %» de un porcentaje se
           // confunde con una variación. Las cantidades conservan el «% de la meta» del canvas («107 %»).
+          // Con «menos es mejor» se imprime la distancia a la meta en su unidad («0,50»): «67 % de la meta» se leería como
+          // que faltó. El triángulo (resolver) dice si quedó sobre o bajo la meta.
           pct:
             value.unit === 'percent'
               ? unsigned(formatDeltaForUnit(value.value!, target.value!, 'percent', locale) ?? '0 pp')
-              : `${Math.round((value.value! / target.value!) * 100)} %`
+              : lowerIsBetter
+                ? formatFactValue(Math.abs(value.value! - target.value!), value.unit, locale)
+                : `${Math.round((value.value! / target.value!) * 100)} %`
         }
       }]
     })
@@ -413,13 +499,212 @@ export const buildFigureSlides = (
         page.flatMap(entry => entry.ids),
         {
           legend: { achieved: L.achieved, target: L.target, ...(page.some(entry => !entry.met) ? { gap: L.largestGap } : {}) },
-          bulletDirection: chart.data!.kind === 'bullet' ? chart.data!.direction : 'higher_is_better',
+          bulletDirection: data.direction,
           bulletRows: page.map(entry => entry.row)
         },
         unitWordOf(chart.unit),
         'target'
       )
     }))
+  }
+
+  if (kind === 'waterfall') {
+    if (chart.data?.kind !== 'waterfall') return reject(chart, 'una cascada trae sus pasos en `data` (waterfall).')
+
+    const steps = chart.data.steps.map(step => ({ step, fact: measured(byId, step.factId) }))
+
+    if (steps.some(entry => !entry.fact)) return []
+
+    const [start, ...tail] = steps
+    const end = tail.pop()
+    const middle = tail
+
+    if (!start || !end || !start.step.isTotal || !end.step.isTotal || middle.some(entry => entry.step.isTotal)) {
+      return reject(chart, 'una cascada va de un total a otro: el primer y el último paso son totales y los del medio, aportes.')
+    }
+
+    // Una cascada no se pagina: partida no explica el cambio. Con más pasos que la capacidad no se emite y el planner
+    // lo sabe por `hasFigurePage`.
+    if (middle.length < 1 || middle.length > capacity.waterfallSteps) return []
+
+    const startValue = start.fact!.value!
+    const endValue = end.fact!.value!
+    const sum = middle.reduce((total, entry) => total + entry.fact!.value!, 0)
+
+    // Lo que la figura dibuja debe cuadrar: inicial + Σ aportes = final. Si no, mentiría sobre el cambio.
+    if (Math.abs(startValue + sum - endValue) > 1e-6) {
+      const unit = end.fact!.unit
+      const parts = middle.map(entry => signedOf(entry.fact!.value!, unit, locale).replace(/^([+−])/, '$1 ')).join(' ')
+
+      throw new InsightsRenderRejectedError(
+        `La cascada ${chart.chartId} no cuadra: ${fmt(start.fact!, locale)} ${parts} ≠ ${fmt(end.fact!, locale)}.`
+      )
+    }
+
+    const unit = end.fact!.unit
+    const removes = middle.some(entry => entry.fact!.value! < 0)
+    const adds = middle.some(entry => entry.fact!.value! >= 0)
+
+    return [{
+      kind,
+      ...base(
+        steps.map(entry => entry.fact!.factId),
+        {
+          legend: {
+            prior: start.step.label,
+            // La leyenda sólo nombra lo que la figura dibuja: sin pasos que sumen, no hay «Sumó».
+            ...(adds ? { added: L.stepAdded } : {}),
+            ...(removes ? { removed: L.stepRemoved } : {}),
+            current: end.step.label
+          },
+          waterfallSteps: [
+            { label: start.step.label, value: fmt(start.fact!, locale), kind: 'start' },
+            ...middle.map(entry => ({
+              label: entry.step.label,
+              value: signedOf(entry.fact!.value!, unit, locale),
+              kind: entry.fact!.value! < 0 ? 'remove' : 'add'
+            })),
+            { label: end.step.label, value: fmt(end.fact!, locale), kind: 'end' }
+          ],
+          note: { text: L.axisFromZeroNote }
+        },
+        unitWordOf(chart.unit),
+        'steps'
+      )
+    }]
+  }
+
+  if (kind === 'waffle') {
+    if (chart.data?.kind !== 'waffle') return reject(chart, 'un waffle trae sus partes en `data` (waffle).')
+
+    const data = chart.data
+    const parts = data.parts.map(part => ({ part, fact: measured(byId, part.factId) }))
+
+    if (parts.some(entry => !entry.fact) || parts.length < 2 || parts.length > capacity.waffleParts) return []
+
+    // Un cuadro es una unidad: sólo conteos enteros, hasta cien (más no es un conteo legible).
+    const counts = parts.map(entry => entry.fact!.value!)
+
+    if (counts.some(count => !Number.isInteger(count) || count < 0)) return []
+
+    const total = counts.reduce((sum, count) => sum + count, 0)
+
+    if (total < 1 || total > 100) return []
+
+    const declared = data.totalFactId ? measured(byId, data.totalFactId) : null
+
+    if (declared && declared.value !== total) {
+      throw new InsightsRenderRejectedError(
+        `El waffle ${chart.chartId} no suma su total: las partes dan ${total} y el total medido es ${fmt(declared, locale)}.`
+      )
+    }
+
+    return [{
+      kind,
+      ...base(
+        [...parts.map(entry => entry.fact!.factId), ...(declared ? [declared.factId] : [])],
+        {
+          waffleParts: parts.map(entry => ({ label: entry.part.label, count: fmt(entry.fact!, locale) })),
+          note: { text: L.waffleUnitNote(formatFactValue(total, 'count', locale)) }
+        },
+        unitWordOf(chart.unit),
+        'grid'
+      )
+    }]
+  }
+
+  if (kind === 'donut') {
+    const series = chart.series[0]
+
+    if (!series || chart.series.length !== 1) return reject(chart, 'una dona es una sola serie de partes.')
+
+    const parts = series.factIds.map((id, index) => ({ label: chart.dimensionLabels[index] ?? byId.get(id)?.label ?? '', fact: measured(byId, id) }))
+
+    // Nunca torta ni dona con más de tres porciones, ni con una sola: con eso no hay composición que leer.
+    if (parts.some(entry => !entry.fact) || parts.length < 2 || parts.length > capacity.donutParts) return []
+    if (parts.some(entry => entry.fact!.value! < 0)) return []
+
+    const values = parts.map(entry => entry.fact!.value!)
+    const total = values.reduce((sum, value) => sum + value, 0)
+
+    if (total <= 0) return []
+
+    const shares = sharesOf(values)
+    const unit = parts[0]!.fact!.unit
+
+    // Centro (aprobado 2026-10-03): si el total ya tiene tarjeta de cifra en el capítulo, el centro dice la
+    // participación de la parte principal; si no, el total de las partes. Nunca la misma cifra dos veces.
+    const totalHasCard = [...(context.statFactIds ?? [])].some(id => {
+      const fact = byId.get(id)
+
+      return fact !== undefined && fact.value === total && fact.unit === unit && fact.module === parts[0]!.fact!.module
+    })
+
+    const main = shares.indexOf(Math.max(...shares))
+
+    return [{
+      kind,
+      ...base(
+        parts.map(entry => entry.fact!.factId),
+        {
+          donutParts: parts.map((entry, index) => ({ label: entry.label, count: fmt(entry.fact!, locale), share: percentLabel(shares[index]!) })),
+          donutCenter: totalHasCard
+            ? { value: percentLabel(shares[main]!), label: parts[main]!.label }
+            : { value: formatFactValue(total, unit, locale), label: L.donutTotal }
+        },
+        unitWordOf(chart.unit),
+        'donut'
+      )
+    }]
+  }
+
+  if (kind === 'stacked') {
+    const segments = chart.series
+    const periods = chart.dimensionLabels
+
+    if (segments.length < 2 || segments.length > capacity.stackedSegments || periods.length < 2 || periods.length > capacity.stackedPeriods) return []
+
+    const grid = periods.map((_, p) => segments.map(segment => measured(byId, segment.factIds[p])))
+
+    if (grid.some(row => row.some(fact => !fact || fact.value! < 0))) return []
+
+    const base0 = segments[0]!.label.toLocaleLowerCase(locale)
+
+    const rows = grid.map((row, p) => {
+      const values = row.map(fact => fact!.value!)
+      const total = values.reduce((sum, value) => sum + value, 0)
+      const unit = row[0]!.unit
+
+      return {
+        label: periods[p]!,
+        segments: row.map(fact => fmt(fact!, locale)),
+        total: formatFactValue(total, unit, locale),
+        // Participación del segmento base: cifra derivada declarada (base ÷ total), redondeada.
+        baseShare: `${percentLabel(total > 0 ? Math.round((values[0]! / total) * 100) : 0)} ${base0}`
+      }
+    })
+
+    const lastBase = grid.at(-1)![0]!
+    const prevBase = grid.at(-2)![0]!
+    const baseDelta = formatDeltaForUnit(lastBase.value!, prevBase.value!, lastBase.unit, locale)
+
+    return [{
+      kind,
+      ...base(
+        grid.flat().map(fact => fact!.factId),
+        {
+          stackedLegend: segments.map(segment => ({ label: segment.label })),
+          stackedPeriods: rows,
+          ...(baseDelta
+            ? (({ direction, tone }) => ({ stackedAnnotation: { delta: unsigned(baseDelta), direction, tone, label: base0 } }))(
+                trendOf(lastBase.value!, prevBase.value!, lastBase, byId.values())
+              )
+            : {})
+        },
+        unitWordOf(chart.unit),
+        'layers'
+      )
+    }]
   }
 
   // trend
@@ -457,6 +742,133 @@ export const buildFigureSlides = (
       iconOf(first ?? undefined) ?? 'trend'
     )
   }]
+}
+
+// ─── Tarjeta de cifra (TASK-1975) ────────────────────────────────────────────────────────────────
+
+const STAT_NAME_MAX_WORDS = 3
+const STAT_NAME_MAX_CHARS = 24
+
+/** La división de la cifra vive con la tarjeta (`presentation/stat-card.ts`): la usan el PDF, el deck y la web. */
+export { splitStatValue } from '../presentation/stat-card'
+
+const escapeHtml = (text: string): string => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+/**
+ * Página de cifras: la figura de la pregunta `value_change` (`chapter.stats`). Sin cifra principal en el héroe —las
+ * cifras SON la figura y repetir una mostraría el mismo dato dos veces—; conclusión y lead del plan arriba; hasta
+ * `capacity.stats` cifras por página, repartidas en páginas equilibradas. El nombre de cada cifra tiene 3 palabras y
+ * 24 caracteres como máximo: más largo se rechaza con causa, nunca se trunca. Variación, tono y período salen de
+ * `statItemView` (el mismo que alimenta la web).
+ */
+export const buildStatSlides = (
+  stat: PlanStatFigureV1,
+  byId: ReadonlyMap<string, EvidenceFactV1>,
+  reading: PlanFigureReadingV1 | undefined,
+  claims: readonly PlanClaimV1[],
+  locale: string,
+  capacity: FigureCapacity
+): FigureSlide[] => {
+  const S = GH_INSIGHTS.stat
+
+  // Isotipos del tablero (contrato AXIS 0.2.0): una vez en el título, o en cada celda si mezcla motores de respuesta.
+  const board = statBoardChannelsOf(stat.items.flatMap(item => byId.get(item.factId) ?? []))
+
+  const views = stat.items.flatMap(item => {
+    const view = statItemView(item, byId, locale, board)
+
+    return view ? [{ view, fact: byId.get(item.factId)! }] : []
+  })
+
+  if (views.length === 0) return []
+
+  for (const { view } of views) {
+    const words = view.label.trim().split(/\s+/).length
+
+    if (words > STAT_NAME_MAX_WORDS || view.label.length > STAT_NAME_MAX_CHARS) {
+      throw new InsightsRenderRejectedError(
+        `La cifra «${view.label}» de ${stat.figureId} tiene un nombre de ${words} palabras y ${view.label.length} caracteres: el máximo es ${STAT_NAME_MAX_WORDS} y ${STAT_NAME_MAX_CHARS}.`
+      )
+    }
+  }
+
+  return balancedPages(views, capacity.stats).map(page => {
+    const factIds = page.flatMap(({ view }) => [view.factId, ...(view.comparison ? [view.comparison.factId] : [])])
+    const citing = claims.filter(claim => claim.factIds.some(id => factIds.includes(id)))
+    const conclusionClaim = reading?.conclusion ?? citing[0]
+    const conclusion = conclusionClaim?.text ?? stat.title
+    const concluded = new Set(conclusionClaim?.factIds ?? [])
+    const lead = citing.find(claim => claim.text !== conclusion && !(claim.factIds[0] !== undefined && concluded.has(claim.factIds[0])))?.text ?? null
+
+    return {
+      kind: 'stat' as const,
+      factIds,
+      eyebrow: { icon: 'numbers', label: L.figureEyebrow.stat },
+      keyFigure: null,
+      keyCaption: null,
+      conclusion,
+      lead,
+      figureTitle: stat.title,
+      unitText: L.statUnit,
+      sourceText: sourcesOf(factIds, byId),
+      closing: closingOf(reading, conclusion),
+      body: {
+        statCount: L.statCount(page.length),
+        statItems: page.map(({ view, fact }) => ({
+          // El isotipo del canal reemplaza al ícono de la métrica: nunca los dos.
+          ...(view.channel ? { channel: view.channel.platform } : iconOf(fact) ? { icon: iconOf(fact) } : {}),
+          name: view.label,
+          ...(view.context ? { context: view.context } : {}),
+          ...(view.estimated ? { estimated: S.estimated } : {}),
+          ...view.parts,
+          ...(view.change ? { trend: `${view.change.direction}:${view.change.tone}`, delta: view.change.display } : {}),
+          ...(view.comparison ? { versus: S.versus(`<strong>${escapeHtml(view.comparison.display)}</strong>`, escapeHtml(view.comparison.period)) } : {}),
+          // La línea gris bajo la cifra dice por qué no hay variación: sin dato, o primer período medido.
+          ...(view.noData ? { noData: view.noData } : view.firstPeriod ? { noData: view.firstPeriod } : {}),
+          ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
+        })),
+        // La nota del tablero es una afirmación del plan (con sus hechos): se imprime su texto.
+        ...(stat.note ? { note: { text: stat.note.text } } : {}),
+        ...(board.title.length > 0 ? { titleChannels: board.title.map(platform => ({ channelId: platform })) } : {})
+      }
+    }
+  })
+}
+
+/** Una página de figura con el id que la ubica en el plan (para los mensajes de rechazo y el índice). */
+export interface ChapterFigure {
+  figureId: string
+  figure: FigureSlide
+}
+
+/**
+ * TASK-1975 — TODAS las páginas de figura de un capítulo, en el orden del criterio (§5.2): la página de cifras primero
+ * y después los gráficos con página PDF, en el orden del plan (el planner ya los ordenó por pregunta). Un solo lugar
+ * para el informe A4 y el deck.
+ */
+export const chapterFigureSlides = (
+  chapter: Pick<PlanChapterV1, 'charts' | 'stats' | 'readings' | 'claims'>,
+  byId: ReadonlyMap<string, EvidenceFactV1>,
+  locale: string,
+  capacity: FigureCapacity
+): ChapterFigure[] => {
+  const statFactIds = new Set((chapter.stats ?? []).flatMap(stat => stat.items.map(item => item.factId)))
+
+  const stats = (chapter.stats ?? []).flatMap(stat =>
+    buildStatSlides(stat, byId, chapter.readings?.find(reading => reading.chartId === stat.figureId), chapter.claims, locale, capacity).map(figure => ({
+      figureId: stat.figureId,
+      figure
+    }))
+  )
+
+  const charts = chapter.charts.filter(hasPdfFigurePage).flatMap(chart =>
+    buildFigureSlides(chart, byId, readingFor(chapter.readings, chart), chapter.claims, locale, capacity, { statFactIds }).map(figure => ({
+      figureId: chart.chartId,
+      figure
+    }))
+  )
+
+  return [...stats, ...charts]
 }
 
 /**

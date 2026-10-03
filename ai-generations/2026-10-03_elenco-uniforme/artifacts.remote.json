@@ -1,0 +1,107 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-03T09:48:32.359Z",
+  "run": "ai-generations/2026-10-03_elenco-uniforme",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-03_elenco-uniforme",
+  "totalBytes": 25685235,
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 178272,
+      "sha256": "ea23d01bd0deae29730576e53af9561a97097cc5a539d2f0923994689a4097d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/UN-antonio-A.png",
+      "sizeBytes": 1745421,
+      "sha256": "c1d7ed441112dc269ade3e4f04de7bea3a724e68a25e0455aa28e037cf241d5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-antonio-A.png"
+    },
+    {
+      "path": "plates/UN-antonio-B.png",
+      "sizeBytes": 1682026,
+      "sha256": "b7eb98eec52c414c4801753ee64b0ffc848ccb5dcbad01aa7b5f94861d339820",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-antonio-B.png"
+    },
+    {
+      "path": "plates/UN-antonio-C.png",
+      "sizeBytes": 1593250,
+      "sha256": "701a432177a85dadcb3c34de01c6c999004fa7840f13b546c3f60ee46f7c2b4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-antonio-C.png"
+    },
+    {
+      "path": "plates/UN-hum-A.png",
+      "sizeBytes": 1744701,
+      "sha256": "9ac9e91d6de66135083d9a886342926ffb4803617333876770633db60704c8ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-hum-A.png"
+    },
+    {
+      "path": "plates/UN-hum-B.png",
+      "sizeBytes": 1734278,
+      "sha256": "1bdb8040883a37515cba0cf33345102b768e525dd78e822df7f70b7f346b639d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-hum-B.png"
+    },
+    {
+      "path": "plates/UN-hum-C.png",
+      "sizeBytes": 1612096,
+      "sha256": "2d8f529294a24d8fb3466614dd0fe7f781f9ef96f8bf4e8679e594dbe3a6ef4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-hum-C.png"
+    },
+    {
+      "path": "plates/UN-isabella-A.png",
+      "sizeBytes": 1727208,
+      "sha256": "620541b6c29ba72526765f5b4ee9478de07db6743b669ddf6fd0d253636c8ee4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-isabella-A.png"
+    },
+    {
+      "path": "plates/UN-isabella-B.png",
+      "sizeBytes": 1689943,
+      "sha256": "32560b20bff1c2021f854cec1e19bf426de655ddfc89ab650979901fc27b0d81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-isabella-B.png"
+    },
+    {
+      "path": "plates/UN-isabella-C.png",
+      "sizeBytes": 1659112,
+      "sha256": "02985434fbe71a8244a3bbfcea1162094ccc251f0532eeea107f16c9365dbba7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-isabella-C.png"
+    },
+    {
+      "path": "plates/UN-karo-A.png",
+      "sizeBytes": 1801931,
+      "sha256": "b82878ec8337ce59ea968a7b525eb15906f3b0cdba919e1ed0c130149c1a5844",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-karo-A.png"
+    },
+    {
+      "path": "plates/UN-karo-B.png",
+      "sizeBytes": 1745102,
+      "sha256": "897339a7ee8d4ba6548b471a5fb8371c0289b4404fd1f8ce6ed487e80892d1b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-karo-B.png"
+    },
+    {
+      "path": "plates/UN-karo-C.png",
+      "sizeBytes": 1667221,
+      "sha256": "afcf628a60064ea6876307aff04d9827cc2cf42884a714683b2b6469d0ec1405",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-karo-C.png"
+    },
+    {
+      "path": "plates/UN-sophia-A.png",
+      "sizeBytes": 1743982,
+      "sha256": "27129502f68bb101f507a26d3c9ba9bcea73a664326035fd87add127492f1fb5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-sophia-A.png"
+    },
+    {
+      "path": "plates/UN-sophia-B.png",
+      "sizeBytes": 1742117,
+      "sha256": "3c8ef3ea189a87c2dc02b3223ae725b01eb2e5c478bf8867c4eb7f1365dd11e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-sophia-B.png"
+    },
+    {
+      "path": "plates/UN-sophia-C.png",
+      "sizeBytes": 1618575,
+      "sha256": "2eaa03e37fee944a79e8f9447b9f4c8ff2309b8e2e2bf91e38ffe785cce8c046",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-03_elenco-uniforme/plates/UN-sophia-C.png"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.045 (1 × 1510 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-02_elenco-efeonce/sophia/sophia-a.png (edit) …
+  ✓ 1859KB · gpt-image-2.5-sunburst · 1024x1280 · high
+    usage: in 1663 (img 1280 · txt 383) · out 1510 · total 3173
+done
