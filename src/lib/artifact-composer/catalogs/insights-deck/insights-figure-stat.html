@@ -208,6 +208,17 @@
 
   .stat-cell:only-child .stat-unit { margin-left: 14px; font-size: 17px; }
 
+  /* TASK-1996: la cifra única baja por ancho visible (hook `deckSingleStatHook`); prefijo y sufijo conservan la proporción. */
+  .stat-cell:only-child.stat-cell--md .stat-figure { font-size: 96px; }
+  .stat-cell:only-child.stat-cell--md .stat-prefix { font-size: 58px; }
+  .stat-cell:only-child.stat-cell--md .stat-suffix { font-size: 48px; }
+  .stat-cell:only-child.stat-cell--sm .stat-figure { font-size: 80px; }
+  .stat-cell:only-child.stat-cell--sm .stat-prefix { font-size: 48px; }
+  .stat-cell:only-child.stat-cell--sm .stat-suffix { font-size: 40px; }
+  .stat-cell:only-child.stat-cell--xs .stat-figure { font-size: 66px; }
+  .stat-cell:only-child.stat-cell--xs .stat-prefix { font-size: 40px; }
+  .stat-cell:only-child.stat-cell--xs .stat-suffix { font-size: 33px; }
+
   .stat-cell:only-child .stat-change {
     padding: 0 0 0 28px;
     flex-direction: column;

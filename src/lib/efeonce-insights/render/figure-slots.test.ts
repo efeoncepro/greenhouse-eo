@@ -386,3 +386,31 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
   })
 })
 
+
+describe('TASK-1990 — cifras con canal en el PDF y el deck', () => {
+  const f = (factId: string, metricId: string, source: string, channelId?: string) =>
+    [factId, { factId, value: 40, unit: 'percent', label: metricId, metricId, module: 'aeo', source, evidenceRef: 'e', ...(channelId ? { channelId } : {}), window: { start: '2026-09-01', endExclusive: '2026-10-01' } }] as const
+
+  const stat = (ids: string[]) => ({
+    figureId: 'stats.x', question: 'value_change', title: 'Cifras del período', note: null,
+    items: ids.map(id => ({ itemId: id, label: 'Cifra', factId: id, comparisonFactId: null, direction: 'higher_is_better', estimated: false }))
+  }) as never
+
+  it('una celda lleva canal o ícono, nunca los dos; el canal va en el título o en las celdas, nunca en los dos', async () => {
+    const { buildStatSlides } = await import('./figure-slots')
+
+    const engines = new Map([f('a', 'mention_rate.openai', 'greenhouse_growth.grader_runs', 'chatgpt'), f('b', 'mention_rate.gemini', 'greenhouse_growth.grader_runs', 'gemini')]) as never
+    const [mixed] = buildStatSlides(stat(['a', 'b']), engines, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+    const mixedBody = mixed!.body as { statItems: Array<Record<string, unknown>>; titleChannels?: unknown }
+
+    expect(mixedBody.titleChannels).toBeUndefined()
+    expect(mixedBody.statItems.map(cell => [cell.channel, cell.icon])).toEqual([['chatgpt', undefined], ['gemini', undefined]])
+
+    const seo = new Map([f('c', 'clicks', 'greenhouse_growth.seo_gsc_daily'), f('i', 'impressions', 'greenhouse_growth.seo_gsc_daily')]) as never
+    const [single] = buildStatSlides(stat(['c', 'i']), seo, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+    const singleBody = single!.body as { statItems: Array<Record<string, unknown>>; titleChannels?: unknown }
+
+    expect(singleBody.titleChannels).toEqual([{ channelId: 'google_search_console' }])
+    expect(singleBody.statItems.every(cell => cell.channel === undefined)).toBe(true)
+  })
+})

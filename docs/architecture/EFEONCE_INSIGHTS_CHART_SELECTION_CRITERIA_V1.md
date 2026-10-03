@@ -201,12 +201,28 @@ de clics). El gate se suma a los existentes del dominio (consistencia del contra
 - **Documentación funcional:** `docs/documentation/insights/efeonce-insights-dominio-ediciones.md`.
 - **Manual de uso:** `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`.
 
-## 11. Propuesta pendiente: tarjetas con isotipo de canal
+## 11. Tarjetas con isotipo de canal (vigente desde 2026-10-03)
 
-**Propuesta, no vigente ni implementada.** Tarjetas de cifra que llevan el isotipo del canal medido (AI Overview,
-ChatGPT, Gemini, Perplexity), dibujadas en los tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y
-`Cifras-Canal-Norma` del canvas de la tarjeta. Espera aprobación del operador; hasta entonces la tarjeta de §5.1 no lleva
-isotipo de canal.
+**Aprobada por el operador el 2026-10-03** (canvas de la tarjeta, tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal`,
+`Cifras-Canal-Norma` y `Cifras-Canal-Inventario`) y **en producción** desde el release `36a73e7b7e19` (TASK-1990 contrato,
+TASK-1996 render). Contrato de AXIS: `efeonce.insights-stat-card` 0.2.0; isotipos: `AXIS_PLATFORM_ASSETS` de
+`@efeoncepro/axis-brand-assets` (19 plataformas, el mismo vocabulario que `INSIGHT_CHANNEL_IDS`).
 
-También pendiente de decisión: el color por orden de las partes en waffle y dona cuando la parte no declara rol (el plan
-aún no declara `role`).
+- **De dónde sale la plataforma.** Del hecho sellado, nunca de un autor: la fuente manda sobre el canal (Search Console,
+  GA4 e ICO tienen su isotipo aunque midan Google); si no, el `channelId` del hecho. Una sola resolución para PDF, deck y
+  web: `presentation/stat-card.ts` (`statPlatformOf`, `statBoardChannelsOf`, `statItemView`).
+- **Dónde va.** Si todas las cifras del tablero salen de las mismas plataformas (hasta 3), los isotipos van una vez junto
+  al título (Search Console primero) y cada celda conserva su ícono. Si el tablero mezcla motores de respuesta, cada
+  celda lleva el isotipo de su canal, se nombra por el canal y la métrica va debajo de la cifra. Si alguna cifra no tiene
+  plataforma conocida, no se dibuja ningún isotipo: el título no afirma una fuente que no es.
+- **Nunca los dos.** Una celda lleva isotipo o ícono; el canal va en el título o en las celdas. Estas reglas se cumplen
+  por construcción y se prueban sobre el resolver con todas las mezclas de fuentes (`stat-card-channels.test.ts`) y sobre
+  las páginas (`figure-slots.test.ts`).
+- **Visitas por asistente de IA (GA4).** Hoy salen en dona cuando son 2–3 partes (pregunta de composición, §5) y el mismo
+  hecho no se repite en tarjetas (`duplicated_fact`). La alternativa aprobada en el canvas, una tarjeta por asistente con
+  su isotipo, existe en el contrato pero el planificador todavía no la elige: qué gana por defecto cuando las dos explican
+  igual es una decisión abierta del operador (propuesta: tarjetas cuando hay período anterior, dona en el primer período
+  medido; TASK-1990, Open Questions).
+
+Pendiente de decisión: el color por orden de las partes en waffle y dona cuando la parte no declara rol (el plan aún no
+declara `role`). En la dona real de Berel (septiembre 2026) Gemini queda pintado con el color de «oportunidad».

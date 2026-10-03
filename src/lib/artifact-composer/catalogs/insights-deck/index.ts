@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
-import { makeColumnsHook, makeLinesHook, withDeckFigureSize } from '../insights-shared/figure-hooks'
+import { deckSingleStatHook, makeColumnsHook, makeLinesHook, withDeckFigureSize } from '../insights-shared/figure-hooks'
 import { DECK_COLUMNS_BOX, DECK_LINES_BOX } from '../insights-shared/figure-svg'
 import { DECK_DONUT_BOX, makeDonutHook } from '../insights-shared/figure-donut'
 import { DECK_STACKED_BOX, makeStackedHook } from '../insights-shared/figure-stacked'
@@ -46,7 +46,8 @@ export const insightsDeckCatalog: ArtifactCatalog = {
     InsightsFigureWaterfallSlide: withDeckFigureSize(makeWaterfallHook(DECK_WATERFALL_BOX)),
     InsightsFigureWaffleSlide: withDeckFigureSize(makeWaffleHook(DECK_WAFFLE_BOX)),
     InsightsFigureDonutSlide: withDeckFigureSize(makeDonutHook(DECK_DONUT_BOX)),
-    InsightsFigureStackedSlide: withDeckFigureSize(makeStackedHook(DECK_STACKED_BOX))
+    InsightsFigureStackedSlide: withDeckFigureSize(makeStackedHook(DECK_STACKED_BOX)),
+    InsightsFigureStatSlide: deckSingleStatHook
   },
   brand: {
     packName: 'axis',

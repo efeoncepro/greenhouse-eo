@@ -79,9 +79,9 @@ export interface StatItemView {
 /**
  * Plataforma de la que sale una cifra: la marca cuyo isotipo la identifica (`AXIS_PLATFORM_ASSETS` de
  * @efeoncepro/axis-brand-assets). La fuente manda sobre el canal: Search Console y GA4 miden Google pero tienen su
- * propio isotipo, e ICO lo mide Greenhouse.
+ * propio isotipo, e ICO lo mide Greenhouse. Es el vocabulario de canales (TASK-1990: los 19 ids de AXIS).
  */
-export type StatPlatform = InsightChannelId | 'google_search_console' | 'google_analytics' | 'greenhouse'
+export type StatPlatform = InsightChannelId
 
 const AI_ANSWER_PLATFORMS: ReadonlySet<StatPlatform> = new Set(['chatgpt', 'gemini', 'claude', 'perplexity', 'google_ai_overview'])
 

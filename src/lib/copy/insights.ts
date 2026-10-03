@@ -208,7 +208,21 @@ export const GH_INSIGHTS = {
     chatgpt: 'ChatGPT',
     gemini: 'Gemini',
     claude: 'Claude',
-    perplexity: 'Perplexity'
+    perplexity: 'Perplexity',
+    // TASK-1990 — los nombres visibles de las demás plataformas del contrato AXIS (`AXIS_PLATFORM_ASSETS[].name`).
+    google_search_console: 'Search Console',
+    google_analytics: 'Google Analytics',
+    google_ads: 'Google Ads',
+    bing: 'Bing',
+    youtube: 'YouTube',
+    reddit: 'Reddit',
+    wikipedia: 'Wikipedia',
+    linkedin: 'LinkedIn',
+    instagram: 'Instagram',
+    tiktok: 'TikTok',
+    meta: 'Meta',
+    frameio: 'Frame.io',
+    greenhouse: 'Greenhouse'
   } as Readonly<Record<string, string>>,
 
   /**

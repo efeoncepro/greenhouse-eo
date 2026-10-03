@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961; Think 0c5701a): isotipo por celda o en el título en A4, deck y Live; faltan glifos Trazo para las métricas sin uno, los 10 isotipos sin productor y el tamaño adaptativo de la cifra única del deck`
+- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961; Think 0c5701a): isotipo por celda o en el título en A4, deck y Live; cifra única del deck adaptativa en develop (2026-10-03). Faltan glifos Trazo para clics, impresiones, CTR y posición (diseño y aprobación del operador) y los 10 isotipos sin productor (TASK-1991/1992)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)
@@ -406,9 +406,11 @@ coincidencia, sólo el nombre.
 
 ## Follow-ups
 
-- Cifra única del deck con tamaño adaptativo (2026-10-03): a 112 px cabe una cifra de hasta 6 caracteres («130.166» queda
-  con 7 px); una de 7 o más («770.462») se rechaza en el encaje, con causa. Calcular el tamaño por ancho visible, como
-  `deckFigureSizeClass` hace con la cifra principal, en vez de un tamaño fijo.
+- ~~Cifra única del deck con tamaño adaptativo.~~ Hecho el 2026-10-03: `deckSingleStatHook` y
+  `deckSingleStatSizeClass` (`catalogs/insights-shared/figure-hooks.ts`) bajan la cifra por ancho visible en escalones
+  fijos (≤ 6 caracteres 112 px; 7 → 96; 8–9 → 80; 10–11 → 66); con 12, el máximo del contrato, el encaje sigue
+  rechazando con causa. Tests en `insights-figure-stat.test.ts` (verificado que falla sin el escalón) y
+  `insights-figure-geometry.test.ts`; gate visual de Insights a 0 px (el probe tiene 6 caracteres).
 
 - Tarjetas de redes y pauta cuando TASK-1995 defina su fuente.
 

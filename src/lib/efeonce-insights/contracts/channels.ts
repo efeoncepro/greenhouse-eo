@@ -9,7 +9,16 @@
  * nada: queda SIN `channelId` (campo ausente) y el documento muestra su nombre sin isotipo.
  */
 
-export const INSIGHT_CHANNEL_IDS = ['google', 'google_ai_overview', 'chatgpt', 'gemini', 'claude', 'perplexity'] as const
+/**
+ * TASK-1990 — las 19 plataformas del contrato AXIS `efeonce.insights-stat-card` 0.2.0, con los mismos ids que
+ * `AXIS_PLATFORM_ASSETS[].platform` de `@efeoncepro/axis-brand-assets` (un test falla si las listas difieren). Que un id
+ * esté acá no hace que un adapter lo emita: sólo lo vuelve un `channelId` válido cuando un productor lo selle.
+ */
+export const INSIGHT_CHANNEL_IDS = [
+  'google', 'google_ai_overview', 'chatgpt', 'gemini', 'claude', 'perplexity',
+  'google_search_console', 'google_analytics', 'google_ads', 'bing', 'youtube', 'reddit', 'wikipedia', 'linkedin',
+  'instagram', 'tiktok', 'meta', 'frameio', 'greenhouse'
+] as const
 export type InsightChannelId = (typeof INSIGHT_CHANNEL_IDS)[number]
 
 export const isInsightChannelId = (value: unknown): value is InsightChannelId =>
@@ -29,3 +38,27 @@ export const channelForAeoProvider = (provider: string): InsightChannelId | unde
 
 /** Search Console y el ranking orgánico miden Google. */
 export const SEO_SEARCH_CHANNEL: InsightChannelId = 'google'
+
+/**
+ * TASK-1990 — dominio citado → plataforma con isotipo. Sólo las plataformas cuyo dominio identifica sin ambigüedad a la
+ * fuente (una página de YouTube, un hilo de Reddit, un artículo de Wikipedia en cualquier idioma, un perfil de LinkedIn,
+ * Instagram o TikTok, una página de Facebook). Cualquier otro dominio queda sin canal: la cifra lleva su glifo.
+ */
+const DOMAIN_CHANNELS: ReadonlyArray<readonly [string, InsightChannelId]> = [
+  ['youtube.com', 'youtube'],
+  ['youtu.be', 'youtube'],
+  ['reddit.com', 'reddit'],
+  ['wikipedia.org', 'wikipedia'],
+  ['linkedin.com', 'linkedin'],
+  ['instagram.com', 'instagram'],
+  ['tiktok.com', 'tiktok'],
+  ['facebook.com', 'meta']
+]
+
+export const channelForDomain = (domain: string): InsightChannelId | undefined => {
+  const host = domain.trim().toLowerCase().replace(/^[a-z]+:\/\//, '').split(/[/?#:]/)[0]!.replace(/\.$/, '')
+
+  if (!host) return undefined
+
+  return DOMAIN_CHANNELS.find(([root]) => host === root || host.endsWith(`.${root}`))?.[1]
+}

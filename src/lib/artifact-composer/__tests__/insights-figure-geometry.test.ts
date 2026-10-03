@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { bulletRowEffects, deltaToneEffects, iconEffects, pairBarsEffects } from '../catalogs/insights-shared/editorial-resolvers'
-import { deckFigureSizeClass } from '../catalogs/insights-shared/figure-hooks'
+import { deckFigureSizeClass, deckSingleStatSizeClass } from '../catalogs/insights-shared/figure-hooks'
 import {
   FigureDataError,
   groupedColumnsSvg,
@@ -155,5 +155,17 @@ describe('resolvers de figura', () => {
     expect(deckFigureSizeClass('62 %')).toBe('fig-number--lg')
     expect(deckFigureSizeClass('+182')).toBe('fig-number--lg')
     expect(deckFigureSizeClass('6 de 8')).toBe('fig-number--md')
+  })
+})
+
+describe('TASK-1996 — escalones de la cifra única del deck', () => {
+  it('cuenta prefijo, valor y sufijo sin espacios ni signo; hasta 6 no cambia, más de 11 no tiene escalón', () => {
+    expect(deckSingleStatSizeClass('13.606')).toBeNull()
+    expect(deckSingleStatSizeClass('#6,9')).toBeNull()
+    expect(deckSingleStatSizeClass('770.462')).toBe('stat-cell--md')
+    expect(deckSingleStatSizeClass('−770.462')).toBe('stat-cell--md')
+    expect(deckSingleStatSizeClass('1.234.567')).toBe('stat-cell--sm')
+    expect(deckSingleStatSizeClass('12.345.678')).toBe('stat-cell--xs')
+    expect(deckSingleStatSizeClass('123.456.789.012')).toBeNull()
   })
 })

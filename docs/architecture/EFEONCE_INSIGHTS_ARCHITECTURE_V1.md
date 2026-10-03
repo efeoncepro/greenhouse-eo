@@ -1625,7 +1625,8 @@ del render, que rechazan con causa (`InsightsRenderRejectedError`) en vez de dib
 - **Barras apiladas:** el total del período es la suma de sus segmentos (hasta 4).
 - **Tarjeta:** hasta 6 cifras por página en A4 y deck (`FIGURE_CAPACITY`), con más en páginas equilibradas seguidas;
   un nombre de más de 3 palabras o 24 caracteres se rechaza. La cifra principal del deck se mide por ancho visible
-  (sin espacios ni signo).
+  (sin espacios ni signo). La cifra única de la lámina de cifras también: baja de 112 a 96, 80 o 66 px según sus
+  caracteres visibles (`deckSingleStatHook`, TASK-1996); con 12 el encaje rechaza con causa.
 
 **Tono semántico de la variación, por fondo.** Verde si el cambio es mejor, rojo si es peor y gris si es neutro, con la
 dirección declarada por métrica (`METRIC_DIRECTIONS` en `editorial/figure-selection.ts`; «Menor es mejor» se imprime
@@ -1644,6 +1645,16 @@ agosto de 2026») y sus piezas `comparison {display, period}`, `firstPeriod` («
 `lowerIsBetter`, `parts` (cifra grande y unidad pequeña) y `count {from, to, decimals}`. Think imprime esos textos tal
 cual; nunca calcula la variación, su tono ni el período. La resolución es `statItemView` (`presentation/stat-card.ts`),
 la misma para PDF, deck y web.
+
+**Isotipo de canal en la tarjeta (TASK-1990/1996, aditivo en 1.4).** La plataforma de una cifra sale del hecho sellado
+(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 19 ids de
+`INSIGHT_CHANNEL_IDS`, igual a `AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain`
+traduce un dominio citado a su plataforma. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
+Search Console primero) y cada celda conserva su ícono. Tablero que mezcla motores de respuesta: cada celda trae
+`channel {platform, name}` y `context` (la métrica bajo la cifra). Isotipo o ícono, nunca los dos; título o celdas,
+nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Pendiente:
+`metricIcon` (glifos Trazo de clics, impresiones, CTR y posición, TASK-1996) y la regla por defecto de visitas por
+asistente entre tarjetas y dona (decisión del operador, criterio §11).
 
 **Motion de la tarjeta, sólo en el Live.** En Think la cifra recorre del valor anterior al actual (`count`) y después la
 variación pasa de gris a su tono y el triángulo entra en su dirección; con `prefers-reduced-motion` se muestra el estado

@@ -1,5 +1,20 @@
 # TASK-1990 — Efeonce Insights: contrato de la tarjeta de cifra con canal (plataformas, glifo por métrica y tablero de un canal)
 
+## Delta 2026-10-03 (noche) — Slice 1 hecho y cambio de decisión sobre la validación
+
+- **Slice 1 hecho:** `INSIGHT_CHANNEL_IDS` tiene las 19 plataformas y `contracts/channels.test.ts` lo compara con
+  `AXIS_PLATFORM_ASSETS` del paquete instalado (`@efeoncepro/axis-brand-assets` 0.4.15), no con una copia; nombres
+  visibles en `GH_INSIGHTS.channels`; `channelForDomain` con su test (subdominios, esquema y ruta; dominios parecidos
+  quedan sin canal).
+- **Cambio de decisión (validación):** el canal no viaja como campo autorado del plan: lo resuelve `statItemView` desde
+  el hecho sellado, igual para PDF, deck y web (eso ya salió en el release `36a73e7b7e19`). No hay campo que un autor
+  pueda poner mal, así que los códigos de AXIS no van a `plan-validation.ts`: las reglas se prueban sobre el resolver con
+  todas las mezclas de fuentes de hasta 6 cifras (`stat-card-channels.test.ts`) y sobre las páginas
+  (`figure-slots.test.ts`: isotipo o ícono, nunca los dos; título o celdas, nunca los dos).
+- **Sigue pendiente:** `metricIcon` (depende de los glifos Trazo de clics, impresiones, CTR y posición, TASK-1996) y la
+  regla por defecto de visitas por asistente entre tarjetas y dona (decisión del operador; criterio §11 ya vigente y
+  documentado con el estado actual).
+
 ## Delta 2026-10-03 — trabajo en curso detectado en el árbol compartido
 
 - Al crear esta task, el árbol compartido tenía cambios **sin commitear** de otra sesión en
@@ -31,7 +46,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19): la regla vive en presentation/stat-card.ts y la usan PDF, deck y modelo web 1.4; faltan el vocabulario de 19 plataformas, channelForDomain y la validación del plan`
+- Status real: `Regla en producción (release 36a73e7b7e19); vocabulario de 19 plataformas, channelForDomain e invariantes del tablero hechos en develop (2026-10-03). Faltan metricIcon (glifos Trazo, TASK-1996) y la decisión del operador sobre visitas por asistente`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -226,12 +241,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: `contracts/channels.ts`, `presentation/stat-card.ts`, `contracts/web-model.ts`; consumidores PDF, deck y Think.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Invariantes probados en `stat-card-channels.test.ts`; resolución determinista desde el snapshot sellado; sin frontera nueva.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Sin migración; aditivo; rollback = revert.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. Evidencia: vistas previas de Berel y Sky (`docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/`) y release `36a73e7b7e19`.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. Sin datos nuevos; los dominios citados ya pasan el gate client-fit.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -350,12 +365,12 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 
 ## Acceptance Criteria
 
-- [ ] `INSIGHT_CHANNEL_IDS` contiene las 19 plataformas de AXIS y un test falla si las listas difieren.
-- [ ] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test).
-- [ ] Un plan con canal y glifo en la misma celda, canal sin `label` igual al nombre, `context` sin canal, canal en título y celda, o todas las celdas de una plataforma sin canal en el título es rechazado por `plan-validation.ts` (test por cada código).
+- [x] `INSIGHT_CHANNEL_IDS` contiene las 19 plataformas de AXIS y un test falla si las listas difieren. Evidencia: `contracts/channels.test.ts` contra `AXIS_PLATFORM_ASSETS` del paquete instalado.
+- [x] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test). Evidencia: `contracts/channels.test.ts`.
+- [x] Un plan con canal y glifo en la misma celda, canal sin `label` igual al nombre, `context` sin canal, canal en título y celda, o todas las celdas de una plataforma sin canal en el título es rechazado por `plan-validation.ts` (test por cada código). Cambio de decisión (Delta 2026-10-03 noche): el canal lo resuelve `statItemView` y no es campo autorado; las reglas se prueban sobre el resolver (`stat-card-channels.test.ts`, todas las mezclas de hasta 6 cifras) y las páginas (`figure-slots.test.ts`).
 - [x] El capítulo SEO de Berel sale con Search Console en el título y glifo por celda; un capítulo ICO sale con Greenhouse en el título (vista previa). Evidencia: `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/berel-2026-09-a4-cifras-seo.png` (Search Console y Google) y `sky-2026-09-deck-cifras-ico.png` (Greenhouse).
 - [ ] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test). Cambio de decisión: el modelo 1.4 aún no está publicado, así que `titlePlatforms`, `items[].channel` y `context` entran como aditivos en 1.4 (resueltos por `statItemView` y `statBoardChannelsOf`); falta `metricIcon` (depende de los glifos Trazo de TASK-1996).
-- [ ] El criterio de selección documenta la regla de visitas por asistente como tarjetas o dona y su §11 queda vigente con fecha 2026-10-03.
+- [ ] El criterio de selección documenta la regla de visitas por asistente como tarjetas o dona y su §11 queda vigente con fecha 2026-10-03. §11 vigente y documentado con el estado actual (dona; tarjetas por asistente posibles en el contrato); falta la decisión del operador sobre cuál gana por defecto.
 
 ## Verification
 
@@ -375,7 +390,7 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] Skill `efeonce-insights` actualizada (ledger, contratos, lecciones) y espejada a `.codex/`.
-- [ ] Arquitectura de Insights §15 con el modelo web 1.5 y la regla de canal.
+- [x] Arquitectura de Insights §15 con el modelo web 1.5 y la regla de canal. Evidencia: §15 «Isotipo de canal en la tarjeta» (aditivo en 1.4, sin 1.5).
 
 ## Follow-ups
 
