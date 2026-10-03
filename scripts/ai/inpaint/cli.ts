@@ -11,6 +11,7 @@ import { resolveVideoEngine, VIDEO_ENGINE_IDS } from './adapters/video-fal'
 import type { CropMode } from './crop'
 import { assertFfmpeg } from './ffmpeg'
 import { MASK_CONVENTIONS, type MaskConvention } from './mask'
+import { runBackground } from './background'
 import { runErase } from './erase'
 import type { ExpandAnchor } from './expand'
 import { runExpand } from './expand-run'
@@ -56,6 +57,8 @@ Proveedor:
 
 Control:
   --crop auto|on|off         Recorte con contexto (default auto: si la zona ocupa < 25 %)
+  --zone-resolution <px>     Pasada de detalle: genera la zona recortada a ese lado largo (512–4096) y la devuelve
+                             a su lugar (rehacer manos, una textura, un detalle). Activa el recorte
   --run <dir>                Carpeta de la pieza (default ai-generations/<fecha>_inpaint)
   --dry-run                  Máscara, recorte, payload y costo SIN llamar al proveedor
   --force                    Regenera aunque la misma entrada ya exista
@@ -77,6 +80,8 @@ interface ImageCliArgs {
   anchor?: ExpandAnchor
   prefill?: 'mirror' | 'neutral'
   blend?: number
+  edge?: number
+  zoneResolution?: number
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -148,6 +153,8 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
 
       case '--scale': args.scale = toNumber(next(), flag); break
       case '--blend': args.blend = toNumber(next(), flag, true); break
+      case '--edge': args.edge = toNumber(next(), flag, true); break
+      case '--zone-resolution': args.zoneResolution = toNumber(next(), flag, true); break
 
       case '--anchor': {
         const value = next()
@@ -278,6 +285,7 @@ const runImage = async (argv: string[]): Promise<number> => {
     quality: args.quality,
     seed: args.seed,
     providerMask: args.providerMask,
+    zoneResolution: args.zoneResolution,
     colorMatch: args.colorMatch,
     guide: args.guide,
     growMask: args.growMask,
@@ -515,15 +523,66 @@ const runExpandCli = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const BACKGROUND_HELP = `pnpm ai:inpaint background — cambia el fondo y deja el sujeto intacto (TASK-1973)
+
+  pnpm ai:inpaint background --image foto.png --prompt "<fondo nuevo>"                         # sujeto por matting local
+  pnpm ai:inpaint background --image foto.png --layers <layers.json> --layer "person" --prompt "..."
+
+El sujeto queda en delta 0 (verificado); el fondo es el inverso del sujeto. --edge <px> (default 3) es la franja del
+borde que el modelo rehace contra el fondo nuevo: el comando reporta su costura; míralo al 100 % (pelo, transparencias).
+Personas reales del equipo: sigue las reglas de identidad de brand-photography (no injertar caras).
+  --adapter / --model / --quality / --provider-mask / --count / --run / --dry-run / --force / --max-usd / --yes
+`
+
+const runBackgroundCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(BACKGROUND_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint background --help.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  if (!prompt) throw new Error('Falta --prompt: describe el fondo nuevo.')
+
+  const result = await runBackground({
+    imagePath: resolvePath(args.image),
+    layersJson: args.layersJson ? resolvePath(args.layersJson) : undefined,
+    layerSelectors: args.layerSelectors,
+    edgePx: args.edge,
+    prompt,
+    adapter: resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
   if (command === 'image') return runImage(rest)
   if (command === 'erase') return runEraseCli(rest)
   if (command === 'expand') return runExpandCli(rest)
+  if (command === 'background') return runBackgroundCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }

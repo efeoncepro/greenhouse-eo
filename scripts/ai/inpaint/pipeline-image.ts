@@ -49,6 +49,11 @@ export interface ImageInpaintOptions {
   colorMatch?: 'auto' | 'on' | 'off'
   count?: number
   crop?: CropMode
+  /**
+   * Pasada de detalle: lado largo (px) al que se pide generar la zona recortada. El recorte con contexto la genera a esa
+   * resolución (hasta el tope del proveedor) y la recomposición la devuelve a su lugar.
+   */
+  zoneResolution?: number
   /** Carpeta de la pieza (p. ej. `ai-generations/2026-10-02_mi-pieza`); la corrida vive en `<runRoot>/inpaint/<id>/`. */
   runRoot: string
   dryRun?: boolean
@@ -231,7 +236,22 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
   if (!adapter.verifiedAt) log(`  ⚠ ${adapter.id}: contrato verificado, generación real SIN verificar todavía.`)
   if (!adapter.sendsMask) log(`  · ${adapter.id} edita por instrucción: la máscara no viaja, sólo recompone.`)
 
-  const plan = planCrop({ imageWidth: base.width, imageHeight: base.height, maskBox: stats.bbox!, pick: adapter.pickSize(model), mode: options.crop })
+  if (options.zoneResolution !== undefined && !(options.zoneResolution >= 512 && options.zoneResolution <= 4096)) {
+    throw new Error('--zone-resolution debe estar entre 512 y 4096 px.')
+  }
+
+  const plan = planCrop({
+    imageWidth: base.width,
+    imageHeight: base.height,
+    maskBox: stats.bbox!,
+    pick: adapter.pickSize(model),
+    mode: options.zoneResolution ? 'on' : options.crop,
+    ...(options.zoneResolution ? { minTargetArea: options.zoneResolution * options.zoneResolution } : {})
+  })
+
+  if (options.zoneResolution && Math.max(plan.target.width, plan.target.height) < options.zoneResolution * 0.9) {
+    log(`  ⚠ el proveedor topa la zona en ${plan.target.width}x${plan.target.height}, bajo los ${options.zoneResolution} px pedidos.`)
+  }
 
   log(`  ✂ ${plan.mode === 'crop' ? `recorte ${plan.box.width}x${plan.box.height} en (${plan.box.left}, ${plan.box.top})` : 'imagen completa'} → ${plan.target.width}x${plan.target.height} · ${plan.reason}`)
 
@@ -258,7 +278,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
       guide: zoneGuide,
       growMask: !options.maskPath && sketch ? options.growMask ?? 'auto' : null,
       count,
-      crop: { box: plan.box, target: plan.target }
+      crop: { box: plan.box, target: plan.target },
+      zoneResolution: options.zoneResolution ?? null
     })
   )
 
