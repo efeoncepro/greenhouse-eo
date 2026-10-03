@@ -3,7 +3,7 @@
 ## Meta
 
 - Task: `TASK-1969` · Wireframe: `docs/ui/wireframes/TASK-1969-portal-chrome-and-greeting-elio.md` · Flow: `docs/ui/flows/TASK-1969-portal-chrome-and-greeting-elio-flow.md`
-- Fuente: motion probado en el canvas aprobado (https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU) el 2026-10-02.
+- Fuente: motion probado en el canvas aprobado (https://claude.ai/artifact/4Qbk74gjXBkBddx1fjQgQU) el 2026-10-02; la «magia» de las burbujas la pidió el operador el 2026-10-03 y quedó probada en el canvas.
 - Elio trae su propio motion (rig AXIS: mira el puntero, saluda, salta, cara LED); este contrato sólo cubre lo que la Home agrega alrededor.
 
 ## Motion Inventory
@@ -21,7 +21,9 @@
 | Novedades | cada 7 s | crossfade de foto; barra de progreso de la pestaña activa | 600 ms fade; progreso lineal 7 s |
 | Estado de plataforma (footer) | siempre | ping del punto verde (escala 1 → 2,6, opacidad .5 → 0) | 2400 ms, infinito |
 | Menú colapsar | clic | ancho del sidebar | transición nativa del layout Vuexy |
-| Burbujas / botones | hover | botones suben 1 px; burbujas cambian fondo y borde | 150 ms, `standard` |
+| Botones | hover | suben 1 px | 150 ms, `standard` |
+| Burbujas de sugerencia · hover/foco | hover o foco de teclado | «magia» sutil de IA: un barrido de luz azul cruza la burbuja una vez, el borde y el fondo toman el azul de Engine con un halo suave y entra un destello de cuatro puntas (el glifo del Spark) a la izquierda del texto | barrido 900 ms una vez; destello 200–300 ms, `emphasized` |
+| Burbujas de sugerencia · clic | clic o Enter | la burbuja se presiona (escala .97), emite un pulso de luz que se expande, el destello gira 180° y tres chispas salen de él; al terminar se envía la pregunta y se abre la conversación (Elio pasa a «Escuchando» durante el pulso) | 420 ms, `emphasized`; el envío espera al pulso |
 
 ## Reglas
 
@@ -36,6 +38,7 @@
 - Indicador: esferas quietas a opacidad .6; sólo cambia la etiqueta.
 - Panel: aparece sin desplazamiento ni fade.
 - Novedades: sin rotación automática; las pestañas cambian sólo por clic.
+- Burbujas: sin barrido, pulso ni chispas; el hover sólo cambia color y el clic envía de inmediato (sin la espera de 420 ms).
 - Footer: punto verde fijo, sin ping.
 
 ## Non-goals
