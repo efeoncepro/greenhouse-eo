@@ -1,5 +1,9 @@
 # TASK-1958 — Efeonce Insights: jerarquía visual apta para cliente en el informe live y los PDF
 
+## Delta 2026-10-03 (criterio de figuras)
+
+- El operador canonizó el criterio de selección de gráficos (`docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`) y lo partió en TASK-1974 (planificador y contrato: tarjeta de cifra, deduplicación, dona y barras apiladas) y TASK-1975 (páginas PDF, deck y Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas). **La cascada en el PDF, que la arquitectura §15 dejaba como follow-up de esta task o de TASK-1902, pasa a TASK-1975.** El plan de acción y la petición en el PDF siguen siendo de esta task.
+
 ## Delta 2026-10-02 (TASK-1962)
 
 - TASK-1962 movió al API (modelo web 1.3) las decisiones de contenido que Think deducía: módulo y figura de cada hallazgo, esenciales por módulo, nombre corto de capítulo, nota de escala, período anterior, módulo de cada acción y bajada de tabla. Pendiente de esta task: (1) el pie del titular de Think aún se arma recortando el texto (`heroCaption`); (2) los catálogos PDF no dibujan el plan de acción ni la petición (Think sí); (3) Think muestra el plan con sólo petición. — por trabajo en TASK-1962
