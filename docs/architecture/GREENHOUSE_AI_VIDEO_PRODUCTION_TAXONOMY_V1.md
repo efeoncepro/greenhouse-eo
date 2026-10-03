@@ -1,9 +1,9 @@
 # Greenhouse — Taxonomía de la producción de video con IA V1
 
 > **Tipo de documento:** Referencia técnica agent-facing (clasificación y vocabulario)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-03 por Claude (sesión «Clasificación de producción de video con IA»)
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.2: tipo de video (§3.1b: registro visual y técnica, con camino, candidatos, costo y esfuerzo). v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
 > **Dueña del oficio:** skill `motion-design-studio` (audio: `audio-studio`; dirección de arte y canon fotográfico:
 > `design-studio`; método de elección de modelos y costo: `ai-model-selection`)
 > **Programa que la implementa:** [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md)
@@ -19,7 +19,7 @@
 ## 0. Para qué sirve y qué no
 
 **Sirve para clasificar** cualquier pieza de video de Efeonce antes de gastar, recorriendo sus tres fases
-—**preproducción, producción y posproducción**—: qué es, a qué barra de calidad se
+—**preproducción, producción y posproducción**—: qué es y de qué tipo (hiperrealista, motion, personaje 3D…), a qué barra de calidad se
 entrega, qué operaciones necesita, con qué cast, qué referencias, qué texto, qué audio, en qué formato y con qué
 derechos. Con esa clasificación se elige el motor (guía §3 y §4.3), se arma el paquete de producción (método) y se
 sabe si la capacidad existe, existe sin garantía o no existe (§5).
@@ -68,6 +68,7 @@ los que adoptan los manifiestos del programa (EPIC-051):
 
 ```yaml
 pieza: reel-social            # §3.1
+tipo: personaje-3d            # §3.1b (por toma si la pieza combina tipos)
 uso: organico                 # §3.1
 nivel: final                  # §3.2
 fidelidad:                    # §3.3
@@ -110,6 +111,43 @@ carril: cli-verificado        # §3.12 (el más débil de las operaciones)
 regla es la opuesta a generar; `brand-film` es la única pieza que exige continuidad entre muchas tomas, y eso cambia
 operaciones (§3.6, identidad) y nivel (§3.2). **Fuera de esta taxonomía:** el motion del logo y de Glitch, que vive en
 el repo taller `efeonce-brand-workshop` (`tools/brand-motion`, `tools/glitch-motion`) y no se genera con IA.
+
+### 3.1b Tipo de video: registro visual y técnica
+
+El **tipo de pieza** (§3.1) dice para qué sirve; el **tipo de video** dice **qué es la imagen y con qué técnica se
+hace**. Es la dimensión que más mueve la elección de motor, el costo y el esfuerzo: un video hiperrealista con
+personas y un motion graphics tipográfico no comparten ni motor ni barra ni presupuesto. Una pieza puede combinar
+tipos por toma (un explainer con personaje 3D y cartelas de motion); cada toma declara el suyo.
+
+**Costo** en bandas que define la guía (§4.3, «Bandas de costo»): **0** determinístico · **bajo** · **medio** ·
+**alto**. **Esfuerzo** = preproducción + iteraciones esperables + post, en tres niveles. Los motores se listan como
+**candidatos sin orden**: la evidencia por tipo casi no existe todavía y la produce el banco de TASK-1980, que corre
+un brief por tipo. Etiquetas: `[verificado]` corrida nuestra · `[tercero]` ranking o descripción del proveedor ·
+`[criterio]` oficio de la skill, no medido.
+
+| id | Tipo | Qué lo define | Qué juzga la barra | Camino (propio primero) | Motores candidatos | Costo IA | Esfuerzo | Riesgos que ya conocemos |
+|---|---|---|---|---|---|---|---|---|
+| `fotorrealista` | hiperrealista live-action: personas, lugares, objetos reales | que parezca filmado | piel, manos, ojos, física, luz creíble, identidad estable | generativo; post propio (grade, overlay, reframe) | Veo 3.1 y Kling 3.0 [contrato, CLI de Higgsfield]; Seedance 2.5 [tercero: #1 OpenArt]; H3 Max [tercero: #1 AA imagen a video con audio]; Wan 3.0 [tercero: #1 AA texto a video] | alto | alto | valle inquietante; deriva de identidad; **personas reales: los motores ByteDance las rechazan y cobran** |
+| `cine` | registro cine de marca: look cinematográfico, luz con carácter, Nexa protagonista | que se sienta película, no stock | composición, cámara y lente, luz como fenómeno de la escena, canon del registro cine | still aprobado primero (`foto:*`), después i2v; isotipo compuesto | Cinema Studio 3.0/4.0 (cámara, lente, era, rig de luz) [contrato]; Seedance 2.5 [tercero]; Veo 3.1 [contrato] | alto | alto | frontera del registro cine (sólo Nexa protagonista); el plate se regenera, no se relumina |
+| `producto` | producto o packshot en movimiento (real o 3D) | el objeto es la verdad | forma, material, color y marca **exactos** en todos los cuadros | still aprobado con kits → i2v o cámara sobre escena quieta; marca compuesta; variantes de producto por reemplazo | Seedance 2.x (retuvo el set desde un KV [verificado, Glitch]); `h3max-camera` (escena congelada, órbita) [verificado]; Flux 3 primer/último cuadro y keyframes [verificado]; Genjutsu reemplazo de objeto [contrato] | medio | medio | la marca no se anima dentro del plano generado; filtro ByteDance con marcas |
+| `ugc` | estilo creador: cámara en mano, auténtico, «grabado con el teléfono» | que parezca orgánico | naturalidad, actuación, ritmo de plataforma; el pulido bajo es intencional | generativo; subtítulos y cortes propios | Omni i2v (microescenas UGC publicadas, modelo anterior) [verificado]; Marketing Studio video [contrato]; Seedance 2.5, Kling 3.0, Veo 3.1 [contrato] | medio | bajo | persona real o voz real exige consentimiento; disclosure IA |
+| `personaje-3d` | personaje animado 3D: Nexa, Sparks, mascotas de partner, estilo clay | que el personaje sea siempre el mismo | identidad (proporción, emblema, vestuario) entre tomas y piezas; actuación | hoja de identidad (`pre.cast-sheet`) → r2v o i2v desde pose; previs en Blender si la cámara importa | Seedance 2.5 r2v (las mascotas de partner no se rechazaron [operador]); Wan 3.0 r2v y H3 r2v [verificado, contrato del endpoint]; Kling `elements` [contrato] | medio | alto | deriva de identidad; una mascota de partner en cuadro contamina el emblema del uniforme |
+| `animacion-2d` | ilustración o dibujo animado, estilo plano | que respete un estilo dibujado | consistencia del trazo y la paleta cuadro a cuadro | **propio primero**: animar las ilustraciones propias (HyperFrames, After Effects por handoff); IA sólo si el estilo tolera reinterpretación | `wan2_6` («estilizado»), `draw_to_video` [contrato]; [sin dato] sobre estilo propio | bajo a medio | medio | la IA redibuja el estilo; las ilustraciones de Efeonce son obra propia, no stock |
+| `motion-graphics` | tipografía kinética, formas, datos animados, logo, UI abstracta | el diseño se mueve con intención | texto y marca **exactos**, timing, legibilidad, safe zones | **determinístico**: HyperFrames, `tools/brand-motion` y `tools/glitch-motion` (repo taller), After Effects por handoff; IA sólo para texturas o fondos | ninguno para el texto; texturas: cualquier motor de banda baja | 0 (más diseño) | medio a alto en diseño | todo texto generado es concept-only; el motion de marca vive en el taller |
+| `demo-ui` | interfaz o producto digital real en pantalla | la UI es verdad | UI legible, real y actual | **determinístico**: captura real o render de la UI (workflow `ui-without-after-effects`); IA sólo para el mundo alrededor (`hybrid-world-plus-ui`) | para el entorno: los de `fotorrealista` o `cine` | 0 a medio | medio | una UI generada se reinterpreta y miente; las pantallas en escena se protegen con texto grande y referencias |
+| `atmosfera` | fondos, texturas, partículas, loops abstractos, hero de sitio | que acompañe sin protagonismo | loop sin costura, peso del archivo, sin artefactos | generativo barato + loop y export propios | H3 Max Turbo, Wan 3.0 a 480p, Seedance 2.0 mini [verificado, contrato del endpoint]; Grok Video 1.5 lite [contrato] | bajo | bajo | costura del loop sin medir (H7) |
+| `hibrido` | mundo generado + producto, UI o marca compuestos exactos | lo exacto convive con lo generado | integración: luz, escala, contacto, sin bordes | generativo para el mundo + composición determinística verificada | según la parte generada (`fotorrealista`, `cine`, `atmosfera`) | medio a alto | alto | integración de luz (relight, H4) y bordes (H5) |
+
+**Cómo decide el tipo:**
+
+- **Fija la banda de costo esperable** antes de elegir motor: `motion-graphics` y `demo-ui` casi no gastan en IA;
+  `fotorrealista` y `cine` son las bandas altas, y ahí es donde más rinde explorar barato y generar el final una sola vez
+  (guía §7.2).
+- **Fija el camino propio**: en `motion-graphics`, `demo-ui` y `animacion-2d` lo propio es la técnica principal, no la
+  terminación. En los tipos generativos, lo propio es la preproducción (stills, cast) y la post.
+- **Fija qué se mide en el canario**: identidad en `personaje-3d`, objeto exacto en `producto`, piel y manos en
+  `fotorrealista`, costura en `atmosfera`. El banco de TASK-1980 corre un brief por tipo con esas métricas.
+- **El nivel (§3.2) es otra dimensión**: un `fotorrealista` puede ser previs o premium; el tipo no cambia, la barra sí.
 
 ### 3.2 Nivel de producción y barra de calidad
 

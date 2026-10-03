@@ -100,7 +100,7 @@ no es techo de factura.
 
 | # | Canario | Motores y operaciones | Estimado (USD) | Qué mide (garantía) | Task |
 |---|---|---|---|---|---|
-| C1 | **i2v desde still aprobado** (la operación más usada), mismo still y acción, 9:16 | Seedance 2.5 720p ≈ 2,31 · Flux 3 720p 0,85 · Wan 3.0 720p 0,50 · H3 Max 768P 0,20 · H3 Turbo 768P 0,10 · Omni 720p ≈ 0,51 (nominal, guía) · Kling 3 std (Higgsfield) ≈ 0,54 (estimate de la guía §5.8) | **≈ 5,0** | fidelidad del primer cuadro contra el still, parpadeo, deriva de identidad, duración y fps; costo real por request | TASK-1980 |
+| C1 | **i2v desde still aprobado** (la operación más usada), **un brief por tipo de video** (taxonomía §3.1b: `fotorrealista`, `producto`, `personaje-3d`, `atmosfera`), 9:16 | Seedance 2.5 720p ≈ 2,31 · Flux 3 720p 0,85 · Wan 3.0 720p 0,50 · H3 Max 768P 0,20 · H3 Turbo 768P 0,10 · Omni 720p ≈ 0,51 (nominal, guía) · Kling 3 std (Higgsfield) ≈ 0,54 (estimate de la guía §5.8) | **≈ 5,0 por tipo** (hasta ≈ 20) | fidelidad del primer cuadro contra el still, métrica principal del tipo, parpadeo, deriva de identidad, duración y fps; costo real por request | TASK-1980 |
 | C2 | **Cast entre tres tomas** (Nexa o elenco ficticio), misma ancla | Wan r2v 720p 3 × 0,50 · H3 Max r2v 768P 3 × 0,20 · Omni referencias 720p 3 × ≈ 0,51 · Seedance 2.5 r2v 720p 1 × ≈ 2,31 | **≈ 6,0** | identidad entre tomas con `foto:rostro` por cuadro muestreado; emblema con `foto:emblema` si hay uniforme | TASK-1980 |
 | C3 | **Borrar un objeto** en tres clips (cámara quieta, paneo, objeto en movimiento) | SAM 2 video + Wan VACE inpainting | **[sin dato]**: medir con `--balance`; tope propuesto 3,0 | delta 0 fuera de la máscara dilatada por cuadro; residuo con SAM 2 sobre la salida; parpadeo en el borde | TASK-1979 |
 | C4 | **Editar una zona con cámara en movimiento** (máscara de SAM 2) | SAM 2 + `flux3-edit` 3 × 0,15 | **≈ 0,45 + SAM 2 [sin dato]** | delta 0 por cuadro con máscara móvil; deriva medida en banda junto a la máscara | TASK-1979 |
@@ -112,7 +112,7 @@ no es techo de factura.
 | C11 | **Humo del puente Higgsfield** (una corrida por capacidad): Veo 3.1 lite, Kling 3.0, `sam_3_video`, `video_background_remover`, `topaz_video`, `hf_mult_replace_object`, `reframe`, `dubbing` a español | Veo 3.1 lite 8 s 12 cr · Kling 3.0 5 s 8,75 cr · resto requiere subir la fuente para estimar | **≈ 21 créditos + post [sin dato]**; tope propuesto 150 créditos | entrega real, formato, tiempo y créditos reales por job; valor del crédito en USD | TASK-1986 |
 | C10 | **Diálogo en español con lipsync** (elenco ficticio + voz sintética, sin persona real) | Seedance 2.5 720p ≈ 2,31 · Flux 3 720p 0,85 · Wan 720p 0,50 | **≈ 3,7** | sincronía labial y pronunciación por escucha | TASK-1985 |
 
-**Total aproximado del programa:** ≈ USD 32 en fal/Omni más lo `[sin dato]` (C3, C4, C8), y ≈ 150 créditos de Higgsfield
+**Total aproximado del programa:** ≈ USD 32–47 en fal/Omni (según cuántos tipos se corran en C1) más lo `[sin dato]` (C3, C4, C8), y ≈ 150 créditos de Higgsfield
 (C11, de 4.118 disponibles el 2026-10-03). **Saldo fal al 2026-10-03:** cuenta A
 USD 0,00 · cuenta B USD 11,46: alcanza para C1 + C6 (o C1 + C2 parcial); el resto requiere recarga.
 

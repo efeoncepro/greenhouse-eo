@@ -75,7 +75,9 @@ description: >-
 
 **Clasificar antes de producir:** toda pieza de video se clasifica primero con la
 [taxonomía de producción de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md):
-pieza, nivel, contrato de fidelidad, operaciones por fase (preproducción, producción, posproducción), cast,
+pieza, **tipo de video** (hiperrealista, cine, producto, UGC, personaje 3D, 2D, motion graphics, demo de UI,
+atmósfera, híbrido: decide camino, costo y esfuerzo), nivel, contrato de fidelidad, operaciones por fase
+(preproducción, producción, posproducción) con la regla **propio primero, proveedor como puente**, cast,
 referencias, texto, audio, formato y derechos. Es **neutral de motor**: cada operación la resuelven varios
 motores (Seedance, Flux 3, Wan, H3, Omni, Kling vía Higgsfield…) y la
 [guía §4.3](../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) dice cuáles y con qué

@@ -198,6 +198,19 @@ manifiesto: no es carril de producción). **Canario** = corrida real con **garan
 (ADR-024 req. 1); hoy hay **uno** en video. Precio: USD por segundo **publicado** a 720p · 1080p (§4.2 manda; donde
 el escalón difiere se indica). Los costos por canario están en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md).
 
+**Bandas de costo** (las cita la [taxonomía](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) §3.1b por tipo de video;
+USD por segundo de salida **publicado**, a la resolución de entrega, 2026-10-03):
+
+| Banda | USD/s | Ejemplos (de esta guía) |
+|---|---|---|
+| **0** | sin generación | post determinístico (ffmpeg, HyperFrames, `pnpm ai:inpaint` sin motor) |
+| **bajo** | ≤ 0,10 | Wan 3.0 480p/720p · H3 Max 768P/1080P · H3 Max Turbo · Seedance 2.0 mini 480p · `flux3-edit` · Flux 3 draft |
+| **medio** | 0,10 – 0,30 | Flux 3 720p/1080p · Seedance 2.0 base/fast 720p · Seedance 2.0 mini 720p · Omni 720p/1080p · Wan 3.0 Prime 1080p · Wan 3.0 1080p |
+| **alto** | > 0,30 | Seedance 2.5 720p/1080p · Seedance 2.0 1080p/4K · `flux3-extend` |
+
+Los modelos de la CLI de Higgsfield (Veo 3.1, Cinema Studio, Kling 3.0) cobran en **créditos** y entran en una banda
+cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan entre sí en créditos.
+
 #### Preproducción
 
 | Operación | Herramienta | Estado | Nota |

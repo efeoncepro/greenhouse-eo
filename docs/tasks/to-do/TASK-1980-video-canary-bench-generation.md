@@ -154,7 +154,7 @@ garantía** las operaciones de producción más usadas: `gen.i2v`, `gen.r2v` (ca
 
 ### Slice 2 — Banco: brief, motores, costo y reconciliación
 
-- Formato del brief (`brief.json`): operación de la taxonomía, still/referencias con rol, prompt, duración, aspecto,
+- Formato del brief (`brief.json`): tipo de video (§3.1b), operación de la taxonomía, still/referencias con rol, prompt, duración, aspecto,
   resolución, motores; validación local.
 - `engines.ts`: mapa a `pnpm ai:fal --capability …` / `pnpm ai:omni …` por operación; `--dry-run` suma las
   estimaciones de cada CLI (`--estimate`) y aplica el tope (`--max-usd`, `--yes`).
@@ -169,8 +169,12 @@ garantía** las operaciones de producción más usadas: `gen.i2v`, `gen.r2v` (ca
 
 ### Slice 4 — Canarios C1 y C6
 
-- C1: mismo still aprobado (elenco ficticio, sin persona real, para que entren los motores con filtro), misma acción,
-  9:16, 5 s: Seedance 2.5, Flux 3, Wan 3.0, H3 Max, H3 Turbo, Omni y Kling 3 std vía Higgsfield. ≈ USD 5,0.
+- C1 **por tipo de video** (taxonomía §3.1b), un brief por tipo con su métrica principal: `fotorrealista` (elenco
+  ficticio, sin persona real, para que entren los motores con filtro; piel, manos, identidad), `producto` (objeto
+  exacto), `personaje-3d` (Nexa; identidad) y `atmosfera` (loop). Mismo still y acción dentro de cada tipo, 9:16, 5 s:
+  Seedance 2.5, Flux 3, Wan 3.0, H3 Max, H3 Turbo, Omni y Kling 3 std vía Higgsfield (más Veo 3.1 lite con TASK-1986).
+  ≈ USD 5,0 por tipo con los siete motores (hasta ≈ 20 con los cuatro); se autoriza tipo por tipo y se puede recortar
+  el set de motores por tipo (por ejemplo, `atmosfera` sólo con los de banda baja).
 - C6: `flux3-keyframes-draft` → `flux3-enhance` y H3 Max con `--end-image`. ≈ USD 0,9.
 - Cada uno con autorización del monto en chat antes de correr.
 
