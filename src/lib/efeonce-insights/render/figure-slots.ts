@@ -743,18 +743,8 @@ export const buildFigureSlides = (
 const STAT_NAME_MAX_WORDS = 3
 const STAT_NAME_MAX_CHARS = 24
 
-/** «#6,9» → prefijo «#», cifra «6,9»; «1,8 %» → cifra «1,8», sufijo «%». La cifra grande y su unidad pequeña. */
-export const splitStatValue = (display: string): { prefix?: string; value: string; suffix?: string; unitLabel?: string } => {
-  const match = /^(#?)([+\-−]?\d[\d.,]*)\s*(.*)$/.exec(display.trim())
-
-  if (!match) return { value: display }
-
-  // Un símbolo («%», «pp») va pegado a la cifra; una palabra («pos.», «piezas») va como unidad en palabras.
-  const rest = match[3] ?? ''
-  const tail = rest === '' ? {} : /^(%|‰|pp)$/.test(rest) ? { suffix: rest } : { unitLabel: rest }
-
-  return { ...(match[1] ? { prefix: match[1] } : {}), value: match[2]!, ...tail }
-}
+/** La división de la cifra vive con la tarjeta (`presentation/stat-card.ts`): la usan el PDF, el deck y la web. */
+export { splitStatValue } from '../presentation/stat-card'
 
 const escapeHtml = (text: string): string => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
@@ -819,7 +809,7 @@ export const buildStatSlides = (
           ...(iconOf(fact) ? { icon: iconOf(fact) } : {}),
           name: view.label,
           ...(view.estimated ? { estimated: S.estimated } : {}),
-          ...splitStatValue(view.display),
+          ...view.parts,
           ...(view.change ? { trend: `${view.change.direction}:${view.change.tone}`, delta: view.change.display } : {}),
           ...(view.comparison ? { versus: S.versus(`<strong>${escapeHtml(view.comparison.display)}</strong>`, escapeHtml(view.comparison.period)) } : {}),
           ...(view.noData ? { noData: view.noData } : {}),

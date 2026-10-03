@@ -12,6 +12,33 @@ import { changeToneOf, type ChangeDirection, type ChangeTone } from '../editoria
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { windowLabelOf } from './vocabulary'
 
+/** Piezas de la cifra: la grande y su unidad pequeña («#» antes; «%»/«pp» pegado después; una palabra como unidad). */
+export interface StatValueParts {
+  prefix?: string
+  value: string
+  suffix?: string
+  unitLabel?: string
+}
+
+/** «#6,9» → prefijo «#», cifra «6,9»; «1,8 %» → cifra «1,8», sufijo «%»; «12 pos.» → cifra «12», unidad «pos.». */
+export const splitStatValue = (display: string): StatValueParts => {
+  const match = /^(#?)([+\-−]?\d[\d.,]*)\s*(.*)$/.exec(display.trim())
+
+  if (!match) return { value: display }
+
+  const rest = match[3] ?? ''
+  const tail = rest === '' ? {} : /^(%|‰|pp)$/.test(rest) ? { suffix: rest } : { unitLabel: rest }
+
+  return { ...(match[1] ? { prefix: match[1] } : {}), value: match[2]!, ...tail }
+}
+
+/** Decimales impresos de una cifra es-CL («1,8» → 1; «13.606» → 0). */
+const decimalsOf = (value: string): number => {
+  const comma = value.indexOf(',')
+
+  return comma === -1 ? 0 : value.length - comma - 1
+}
+
 export interface StatItemView {
   itemId: string
   label: string
@@ -30,6 +57,13 @@ export interface StatItemView {
   noData: string | null
   /** «Menor es mejor» sólo cuando subir es malo. */
   lowerIsBetter: string | null
+  /** Piezas de la cifra para dibujarla grande con su unidad pequeña. */
+  parts: StatValueParts
+  /**
+   * TASK-1975 — recorrido de la cifra en el informe Live (motion aprobado): del valor anterior al actual, con los decimales
+   * que se imprimen. null sin comparable o sin dato (no hay recorrido que mostrar).
+   */
+  count: { from: number; to: number; decimals: number } | null
 }
 
 const unsigned = (delta: string): string => delta.replace(/^[+\-−]\s*/, '')
@@ -58,6 +92,8 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
       ? { factId: comparable.factId, display: formatFactValue(comparable.value, comparable.unit, locale), period: windowLabelOf(comparable.window, locale) }
       : null,
     noData: fact.value === null ? GH_INSIGHTS.stat.noDataIn(windowLabelOf(fact.window, locale)) : null,
-    lowerIsBetter: item.direction === 'lower_is_better' ? GH_INSIGHTS.stat.lowerIsBetter : null
+    lowerIsBetter: item.direction === 'lower_is_better' ? GH_INSIGHTS.stat.lowerIsBetter : null,
+    parts: splitStatValue(formatFactValue(fact.value, fact.unit, locale)),
+    count: comparable ? { from: comparable.value!, to: fact.value!, decimals: decimalsOf(splitStatValue(formatFactValue(fact.value, fact.unit, locale)).value) } : null
   }
 }

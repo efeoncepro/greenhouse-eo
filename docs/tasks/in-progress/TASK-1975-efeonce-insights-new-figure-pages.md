@@ -1,5 +1,18 @@
 # TASK-1975 — Figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — tono de la variación y animación de la tarjeta (aprobados)
+
+- **Tono por fondo:** tras el análisis de saturación en el canvas, el operador eligió la variante A sobre papel (píldora
+  teñida) y la C sobre navy (sin píldora rellena; tono sólo en el triángulo, cifra en tinta suave). En el deck, además, el
+  rojo de «empeoró» era idéntico al coral de «oportunidad». **Triángulo de puntas redondeadas en todas las superficies.**
+  Implementado en ambos catálogos (`0b0233de3`) y en AXIS local.
+- **Animación aprobada:** en el informe Live la cifra recorre del valor anterior al actual y después la variación toma
+  su tono. Esto deja de ser `Motion: none`: contrato en
+  [`TASK-1975-efeonce-insights-stat-card-motion.md`](../../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md).
+  El modelo web 1.4 suma `parts` y `count` por cifra para que Think anime sin partir ni deducir texto.
+- **AXIS (decisión del operador):** tokens `efeonceInsights`, contrato `efeonce.insights-stat-card` y sección del Lab
+  viven en AXIS; se quitó la regla «AXIS no publica UI ni contratos de Insights». Commits locales sin push hasta cerrar.
+
 ## Delta 2026-10-03 — Slice 1 aprobado
 
 - **Tarjeta de cifra aprobada por el operador** en el canvas
@@ -50,7 +63,7 @@
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1975-efeonce-insights-new-figure-pages.md`
 - Flow: `none`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
 - Status real: `Diseño aprobado (Slice 1); implementación pendiente`

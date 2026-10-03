@@ -213,7 +213,9 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
                 ...(view.change ? { change: view.change } : {}),
                 ...(view.versus ? { versus: view.versus } : {}),
                 ...(view.noData ? { noData: view.noData } : {}),
-                ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
+                ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {}),
+                parts: view.parts,
+                ...(view.count ? { count: view.count } : {})
               }]
             }),
             ...(stat.note ? { note: projectClaim(stat.note) } : {})

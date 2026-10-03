@@ -131,6 +131,14 @@ export interface InsightWebStatItemV1 {
   noData?: string
   /** «Menor es mejor». Sólo cuando subir es malo. */
   lowerIsBetter?: string
+  /** Piezas de `display` para dibujar la cifra grande y su unidad pequeña (Think no parte el texto). */
+  parts?: { prefix?: string; value: string; suffix?: string; unitLabel?: string }
+  /**
+   * Recorrido de la cifra en el informe Live (TASK-1975, motion aprobado): del valor anterior al actual con los decimales
+   * que se imprimen. Ausente sin comparable o sin dato. Las cifras intermedias son movimiento, no contenido: el final es
+   * siempre `display`.
+   */
+  count?: { from: number; to: number; decimals: number }
 }
 
 /** 1.4 (TASK-1974) — tarjeta de cifra: la figura de «¿cuánto es y cómo cambió?». Abre el capítulo. */
