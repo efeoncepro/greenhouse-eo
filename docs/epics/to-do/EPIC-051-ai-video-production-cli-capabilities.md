@@ -29,13 +29,23 @@ cada operación por motor está en la [guía de selección §4.3](../../architec
   `flux3-edit`, canario 2026-10-02). Las demás generaciones están verificadas sólo a nivel de contrato del endpoint
   (2026-09-16/24): sabemos que devuelven un archivo con la resolución pedida, no si conservan el primer cuadro, la
   identidad o la continuidad.
-- **Nueve operaciones de posproducción no tienen carril CLI** (borrar, seguir, fondo, relight, upscale con detalle,
-  grade, reencuadre, retime, montaje): se hacen ad hoc o sólo existen en MCP de sesión (Magnific, Higgsfield) sin
-  presupuesto gobernado ni manifiesto.
+- **La mayoría de las operaciones de posproducción no tienen camino propio** (borrar, seguir, reemplazar, fondo,
+  relight, upscale con detalle, grade, reencuadre, retime, montaje): se hacen ad hoc o con herramientas de proveedor.
+  El 2026-10-03 se verificó que la **CLI de la app de Higgsfield** (`higgsfield`, con sesión) cubre casi todas como
+  puente —Veo 3.1, Genjutsu, SAM 3, Topaz, reframe, doblaje—, pero ninguna se corrió y ninguna tiene garantía.
 - **El gasto real se desvió de lo estimado** (SKY V11: estimado USD 23,88, facturado USD 34,16). Un programa de
   canarios sin reconciliación por request repetiría ese error.
 - No cabe en una task: son capacidades independientes (segmentación, generación comparativa, acabado determinístico,
   relight, audio) que comparten taxonomía, banco de medición y núcleo.
+
+## Regla del programa: propio primero, proveedor como puente
+
+*(Operador, 2026-10-03.)* Si una operación la resuelven nuestros CLIs —los que existen o los que construye este
+epic—, va por ahí; mientras no exista lo nuestro, se usa la herramienta del proveedor (CLI de Higgsfield, MCP de
+Higgsfield o Magnific, fal) y cada operación declara qué task la reemplaza (taxonomía §3.13). Los modelos generativos
+siempre son de un proveedor: lo propio es la capa que los invoca con estimación, manifiesto y garantía, más lo
+determinístico. TASK-1986 hace que el puente de Higgsfield se invoque **desde nuestros CLIs**, para que incluso el
+puente quede con costo, manifiesto y, donde aplique, la verificación del pipeline.
 
 ## Outcome
 
@@ -72,8 +82,11 @@ cada operación por motor está en la [guía de selección §4.3](../../architec
 - `TASK-1983` — Recorte de sujeto / reemplazo de fondo y upscale con detalle verificable.
 - `TASK-1984` — Relight de video que conserva el sujeto (continuación de TASK-1977).
 - `TASK-1985` — Diálogo, voz y lipsync en español sobre video (con `audio-studio`).
+- `TASK-1986` — Puente de la CLI de Higgsfield como motor de nuestros CLIs: costo en créditos, manifiesto, retome por
+  job, reconciliación crédito→USD y canario de humo C11 de las capacidades puente más usadas.
 
-**Orden:** TASK-1979 y TASK-1980 en paralelo (son las de más uso y la primera candidata conocida); TASK-1981 en
+**Orden:** TASK-1986 temprano (habilita a las demás a comparar contra el puente de Higgsfield desde el banco);
+TASK-1979 y TASK-1980 en paralelo (son las de más uso y la primera candidata conocida); TASK-1981 en
 paralelo desde el inicio (0 créditos, no compite por presupuesto); TASK-1982 y TASK-1983 usan el banco de TASK-1980;
 TASK-1984 espera a TASK-1977; TASK-1985 al final.
 
@@ -96,9 +109,11 @@ no es techo de factura.
 | C7 | **1080p nativo vs reescalado**, sólo con los motores que pasen C1 | Seedance 2.5 1080p ≈ 5,20 (CLI; la guía publica 5,82) · Flux 3 1080p 1,45 · Wan 1080p 1,00 · H3 Max 1080P 0,40 | **≈ 8,1** | detalle nativo (detector de TASK-1983) además de dimensiones | TASK-1980 |
 | C8 | **Recorte de sujeto y upscale** | candidatos fal de matting y upscale de video | **[sin dato]**; tope propuesto 2,0 | borde sin halo; detalle nativo frente a la fuente | TASK-1983 |
 | C9 | **Relight de video** | ID-V2V Relight 5 s ≈ 1,00 · LightX ≈ 0,50 (tarifas [tercero], guía §10.3) | **≈ 1,5** | sujeto exacto entre cuadros; luz coherente | TASK-1984 |
+| C11 | **Humo del puente Higgsfield** (una corrida por capacidad): Veo 3.1 lite, Kling 3.0, `sam_3_video`, `video_background_remover`, `topaz_video`, `hf_mult_replace_object`, `reframe`, `dubbing` a español | Veo 3.1 lite 8 s 12 cr · Kling 3.0 5 s 8,75 cr · resto requiere subir la fuente para estimar | **≈ 21 créditos + post [sin dato]**; tope propuesto 150 créditos | entrega real, formato, tiempo y créditos reales por job; valor del crédito en USD | TASK-1986 |
 | C10 | **Diálogo en español con lipsync** (elenco ficticio + voz sintética, sin persona real) | Seedance 2.5 720p ≈ 2,31 · Flux 3 720p 0,85 · Wan 720p 0,50 | **≈ 3,7** | sincronía labial y pronunciación por escucha | TASK-1985 |
 
-**Total aproximado del programa:** ≈ USD 32 más lo `[sin dato]` (C3, C4, C8). **Saldo fal al 2026-10-03:** cuenta A
+**Total aproximado del programa:** ≈ USD 32 en fal/Omni más lo `[sin dato]` (C3, C4, C8), y ≈ 150 créditos de Higgsfield
+(C11, de 4.118 disponibles el 2026-10-03). **Saldo fal al 2026-10-03:** cuenta A
 USD 0,00 · cuenta B USD 11,46: alcanza para C1 + C6 (o C1 + C2 parcial); el resto requiere recarga.
 
 **Lo que no se paga:** todo `TASK-1981` (determinístico) y los re-pasos de medición sobre salidas ya pagadas.
@@ -115,7 +130,7 @@ USD 0,00 · cuenta B USD 11,46: alcanza para C1 + C6 (o C1 + C2 parcial); el res
 
 ## Exit Criteria
 
-- [ ] Las siete tasks hijas quedaron `complete` o explícitamente descartadas con razón.
+- [ ] Las ocho tasks hijas quedaron `complete` o explícitamente descartadas con razón.
 - [ ] Cada operación de producción y post de la taxonomía §3.5 tiene, en la guía §4.3, un motor con canario de
       garantía o una fila de hueco con razón y fecha.
 - [ ] Cada canario del plan tiene README en `ai-generations/<fecha>_<task>-canary/` con costo estimado y costo real

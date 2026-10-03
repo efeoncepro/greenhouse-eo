@@ -3,7 +3,7 @@
 > **Tipo de documento:** Referencia técnica agent-facing
 > **Version:** 1.13
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
 > **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
 > **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
 > **Antes:** 2026-09-27 por Claude — v1.9: nueva ficha §5.9 **Música de marca vía fal** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5), con la evidencia de uso real de la música de Glitch [verificado 2026-09-27] y la regla «nunca síntesis pura para música de marca; medir medios ≥ ~35 % antes de mostrar».
@@ -193,7 +193,7 @@ la operación; se elige por contrato de fidelidad (§0) y por esta evidencia. Le
 
 **Estado:** `[verificado AAAA-MM-DD]` = generación real nuestra que verificó el **contrato del endpoint** (resolución,
 duración, audio, que el CLI arma bien el pedido), según la leyenda de §1 · `[contrato]` = conectado, nunca corrido ·
-`[sin dato]` = no medido · `[mcp]` = sólo en un MCP de sesión de Claude (out-of-band, sin presupuesto gobernado ni
+`[sin dato]` = no medido · `[hf-cli]` = CLI de la app de Higgsfield (bloque al final de esta sección) · `[mcp]` = sólo en un MCP de sesión de Claude (out-of-band, sin presupuesto gobernado ni
 manifiesto: no es carril de producción). **Canario** = corrida real con **garantía medida** y README de evidencia
 (ADR-024 req. 1); hoy hay **uno** en video. Precio: USD por segundo **publicado** a 720p · 1080p (§4.2 manda; donde
 el escalón difiere se indica). Los costos por canario están en [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md).
@@ -277,9 +277,52 @@ el escalón difiere se indica). Los costos por canario están en [EPIC-051](../e
 | `audio.mix` | ffmpeg `loudnorm` | D sin CLI de manifiesto | no | 0 | TASK-1981 |
 | `deliver.export` | ffmpeg + hash | D manual | no | 0 | TASK-1981 |
 
-🔴 **Lo que la matriz deja a la vista:** de 30 operaciones de producción y post, **una** tiene canario de garantía
-(`edit.zone` con cámara quieta). Todo lo demás está, como mucho, verificado a nivel de contrato del endpoint, y nueve
-operaciones de post no tienen carril CLI. El plan para cerrarlo es EPIC-051.
+#### Puente Higgsfield: CLI de la app (`higgsfield`) y su MCP
+
+Regla de uso: **propio primero, proveedor como puente** (taxonomía §1 y §3.13). Este bloque es el puente más amplio
+disponible hoy. **No es la API de Higgsfield** (`hf-*` de §5.8): es la CLI de la app, con sesión de usuario
+(mkt@efeoncepro.com, plan Ultra, **4.118 créditos** el 2026-10-03) y el catálogo de la app. Inventario leído el
+2026-10-03: **39 modelos de video** en `higgsfield model list --video` más los workflows de video (`higgsfield workflow
+list`); el MCP de la misma cuenta lista 54. `higgsfield generate cost` estima **gratis** sin encolar; para las
+operaciones sobre un video existente la estimación exige subir antes la fuente (`higgsfield upload`), que no se hizo.
+**Ninguna corrida real**: todo es `[contrato]` (catálogo y validación de parámetros).
+
+| Operación | `job_type` / workflow | Estado | Créditos estimados (`generate cost`, 2026-10-03) |
+|---|---|---|---|
+| `gen.t2v` / `gen.i2v` | `veo3_1`, `veo3_1_lite`, `veo3` (**Veo, que la API nos rechaza**) | [contrato] | Veo 3.1 8 s: 32 · Veo 3.1 lite 8 s: 12 |
+| | `kling3_0` (std/pro/4K), `kling3_0_turbo`, `kling2_6` | [contrato] | Kling 3.0 5 s: 8,75 · Turbo 720p 5 s: 7,5 |
+| | `seedance_2_5` (t2v, omni-reference, edición, extensión), `seedance_2_0`, `seedance_2_0_mini`, `seedance1_5` | [contrato] | Seedance 2.5 5 s: 720p 35 · 1080p 60 |
+| | `wan3_0`, `wan3_0_prime`, `wan2_7`, `wan2_6` | [contrato] | Wan 3.0 720p 5 s: 8,75 |
+| | `minimax_h3`, `minimax_h3_max`, `minimax_hailuo` | [contrato] | H3 Max 5 s: 12,5 |
+| | `flux_3_video`, `gemini_omni`, `gemini_omni_flash_1_1`, `grok_video_v15`, `happy_horse_video` | [contrato] | [sin dato] (requieren parámetros adicionales) |
+| | workflows Cinema Studio `cinematic_studio_video_v2`, `_3_0` (hasta 4K, género, rampas de velocidad, multi-shot), `_3_5`, `cinematic_studio_video_4_0` (cámara, lente, era, paleta, rig de luz) | [contrato] | [sin dato] |
+| `gen.motion-transfer` | `hf_mult_motion_control` (Genjutsu), workflow `kling3_0_motion_control` | [contrato] | requiere fuente |
+| `time.extend` | `seedance_2_5` modo extensión; Cinema Studio 4.0 `video_extension` (adelante y atrás) | [contrato] | requiere fuente |
+| `time.interpolate` | `fps_boost` (ByteDance o Topaz) | [contrato] | requiere fuente |
+| `edit.global` | `kling_video_edit`, `flux_3_video_edit`, Seedance 2.5 `video_edit`, Cinema Studio 4.0 `video_edit` | [contrato] | requiere fuente |
+| `edit.replace` | `hf_mult_replace_object` (Genjutsu) | [contrato] | requiere fuente |
+| `edit.track` | `sam_3_video` (SAM 3, `apply_mask`) | [contrato] | requiere fuente |
+| `edit.depth` | `depth_anything_video` | [contrato] | requiere fuente |
+| `edit.background` | `video_background_remover` | [contrato] | requiere fuente |
+| `edit.relight` | Cinema Studio 4.0 (`light: preset\|custom\|user`, rig ordenado) | [contrato] | requiere fuente |
+| `finish.reframe` | workflow `reframe` (expansión generativa a 16:9, 9:16, 4:3, 3:4, 1:1, 21:9; **sin 4:5**) | [contrato] | requiere fuente |
+| `finish.upscale` | `topaz_video` (1080p/2160p, interpolación), `bytedance_video_upscale` (1080p/2K/4K), `video_upscale` | [contrato] | requiere fuente |
+| `finish.deflicker` | `video_deflicker` | [contrato] | requiere fuente |
+| `finish.hdr` | `topaz_hyperion_2_5` | [contrato] | requiere fuente |
+| `assemble.auto-clips` | `clipify` (desde YouTube, subtítulos, recorte que sigue la cara) | [contrato] | [sin dato] |
+| `audio.voice` | workflow `voice_change` | [contrato] | requiere fuente |
+| `audio.lipsync` | workflow `dubbing` (18 idiomas, incluye `spa`); **sólo en el MCP:** `sync_so` (lipsync con audio propio) | [contrato] | requiere fuente |
+| `pre.reference-analysis` | **sólo en el MCP:** `video_analysis_create` (escena por escena) | [contrato] | [sin dato] |
+
+**Créditos ≠ USD.** El valor del crédito de la suscripción es **[sin dato]**. Comparando el mismo modelo en los dos
+carriles, Wan 3.0 720p 5 s cuesta USD 0,50 en fal y 8,75 créditos aquí, y Seedance 2.5 720p 5 s USD 2,31 y 35 créditos:
+eso da ≈ USD 0,057–0,066 por crédito **[cálculo indirecto, no medido]**. La cifra real sale de `higgsfield account
+transactions` después de la primera corrida (TASK-1986).
+
+🔴 **Lo que la matriz deja a la vista:** de 41 operaciones de producción y post, **una** tiene canario de garantía
+(`edit.zone` con cámara quieta). El resto está verificado como mucho a nivel de contrato del endpoint. Las operaciones
+de post sin camino propio tienen casi todas un **puente** en el CLI de Higgsfield, pero ninguno corrido. El plan para
+cerrarlo es EPIC-051.
 
 ---
 
@@ -776,7 +819,7 @@ pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolu
 
 **Cuándo SÍ.** Modelos que fal no expone (SOUL, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image, LTX 2.5, PixVerse 6, Happy Horse, Kling Omni/O3); comparar precio exacto antes de gastar [contrato].
 
-**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]; Nano Banana y Gemini Omni siempre directo por Google [decisión].
+**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]. **Ojo:** eso vale para la **API**; la **CLI de la app** (`higgsfield`, otra cuenta y otro catálogo) sí lista Veo 3.1, Veo 3.1 lite y Veo 3 [contrato, 2026-10-03] — ver §4.3, bloque «Puente Higgsfield»; Nano Banana y Gemini Omni siempre directo por Google [decisión].
 
 **Vectores (Recraft).** La API rechaza `output_format: svg` (400: sólo `jpg`/`png`/`webp`) [verificado 2026-09-16]. La app de Higgsfield ofrece Recraft V4.1 con `model_type` `vector` y `utility_vector` (logos, íconos, ilustración tipo SVG) [verificado con el conector de la app 2026-09-16]. La API no documenta `model_type` y su estimación acepta cualquier campo (`foo`, `model_type: "banana"` → 200), así que no prueba nada: **si `--input '{"model_type":"vector"}'` entrega SVG por la API está sin confirmar** hasta una generación real (USD 0,035). La CLI deja pasar ese campo para poder probarlo.
 

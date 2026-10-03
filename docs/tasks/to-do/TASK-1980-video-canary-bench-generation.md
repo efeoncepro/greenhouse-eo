@@ -87,6 +87,7 @@ garantía** las operaciones de producción más usadas: `gen.i2v`, `gen.r2v` (ca
 - `pnpm foto:rostro` y `pnpm foto:emblema` como detectores de identidad sobre cuadros extraídos [verificar que acepten
   un PNG arbitrario en Discovery].
 - **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
+- **Motores del puente en el banco (propio primero, 2026-10-03):** con TASK-1986, el banco suma motores de la CLI de la app de Higgsfield que no están en fal ni en la API (Veo 3.1 y Veo 3.1 lite, Kling 3.0 completo, Cinema Studio 3.0/4.0). Estimaciones gratis del 2026-10-03: Veo 3.1 lite 8 s 12 créditos, Kling 3.0 5 s 8,75. Sus costos van en créditos hasta conocer el valor del crédito.
 
 ### Blocks / Impacts
 

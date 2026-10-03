@@ -88,6 +88,7 @@ trabaja dentro de la máscara, el pipeline recompone el original afuera y verifi
   frontera y TASK-1976 lo absorbe.
 - **Secuencia con TASK-1976 (acordado con la sesión del pipeline, 2026-10-03):** TASK-1976 separa lógica e I/O en `video-mask.ts`, `pipeline-video.ts` y `adapters/video-fal.ts`, los mismos archivos que toca esta task. Nunca en paralelo: la que se tome segunda rebasa sobre la que cerró primero.
 - **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
+- **Puente mientras tanto (propio primero, 2026-10-03):** `sam_3_video` (CLI de Higgsfield) como alternativa o motor de `ai:track` frente a SAM 2 de fal; borrado por instrucción sin garantía con `kling_video_edit` o Seedance 2.5 `video_edit`, y reemplazo de objeto con Genjutsu `hf_mult_replace_object`, todos vía el adaptador de TASK-1986. Comparar en el canario C3/C4 si sobra presupuesto.
 
 ### Blocks / Impacts
 

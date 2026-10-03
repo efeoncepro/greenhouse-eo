@@ -76,6 +76,7 @@ oficio sonoro es de `audio-studio`.
 - TASK-1980 (banco de canarios y reconciliación de costo).
 - TASK-1981 (`audio.mix`) para la mezcla final, si ya existe.
 - **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
+- **Puente mientras tanto (propio primero, 2026-10-03):** el workflow `dubbing` (incluye español) y `voice_change` están en la CLI de Higgsfield; el lipsync con audio propio (`sync_so`) sólo en su MCP. Entran al canario C10 como camino «voz aparte + lipsync» vía el adaptador de TASK-1986.
 
 ### Blocks / Impacts
 

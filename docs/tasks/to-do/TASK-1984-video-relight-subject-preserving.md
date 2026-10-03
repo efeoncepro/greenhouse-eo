@@ -78,6 +78,7 @@ taxonomía. Es el follow-up que TASK-1977 declara en su sección de Follow-ups.
 - TASK-1979 (máscara por cuadro del sujeto) — bloqueante para sujetos en movimiento; con cámara quieta basta una
   máscara fija.
 - **Secuencia con TASK-1976 (acordado con la sesión del pipeline, 2026-10-03):** TASK-1976 separa lógica e I/O en `video-mask.ts`, `pipeline-video.ts` y `adapters/video-fal.ts`, los mismos archivos que toca esta task. Nunca en paralelo: la que se tome segunda rebasa sobre la que cerró primero.
+- **Puente mientras tanto (propio primero, 2026-10-03):** Cinema Studio 4.0 (`cinematic_studio_video_4_0`, modo `video_edit` con rig de luz) está en la CLI de Higgsfield; entra al canario C9 como relight dedicado vía el adaptador de TASK-1986, junto a ID-V2V/LightX de fal.
 
 ### Blocks / Impacts
 

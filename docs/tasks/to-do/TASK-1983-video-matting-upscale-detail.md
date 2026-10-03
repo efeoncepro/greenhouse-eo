@@ -78,6 +78,7 @@ necesita el canario C7 de TASK-1980.
 - TASK-1980 (banco y métricas). La máscara por cuadro de TASK-1979 mejora el recorte, pero no bloquea: el matting
   dedicado produce su propia alfa.
 - **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** el gate de TASK-1976 derivará de un manifiesto los directorios cubiertos y romperá con cualquier archivo nuevo de `scripts/ai/inpaint/` o `scripts/ai/video/` sin clasificar. Si esta task crea `scripts/ai/video/` antes de que cierre TASK-1976, clasifica cada módulo como núcleo, orquestación o adaptador desde el primer archivo.
+- **Puente mientras tanto (propio primero, 2026-10-03):** en la CLI de Higgsfield existen `video_background_remover`, `topaz_video`, `bytedance_video_upscale`, `video_upscale`, `fps_boost`, `video_deflicker` y `topaz_hyperion_2_5` (HDR). Son los candidatos a comparar contra lo que se conecte en fal, vía el adaptador de TASK-1986; el detector de detalle propio se aplica igual a sus salidas.
 
 ### Blocks / Impacts
 

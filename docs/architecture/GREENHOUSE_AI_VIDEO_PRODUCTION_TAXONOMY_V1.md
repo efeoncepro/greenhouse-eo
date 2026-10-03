@@ -1,9 +1,9 @@
 # Greenhouse — Taxonomía de la producción de video con IA V1
 
 > **Tipo de documento:** Referencia técnica agent-facing (clasificación y vocabulario)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-03 por Claude (sesión «Clasificación de producción de video con IA»)
-> **Ultima actualizacion:** 2026-10-03 por Claude
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
 > **Dueña del oficio:** skill `motion-design-studio` (audio: `audio-studio`; dirección de arte y canon fotográfico:
 > `design-studio`; método de elección de modelos y costo: `ai-model-selection`)
 > **Programa que la implementa:** [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md)
@@ -40,7 +40,7 @@ desincroniza en silencio de la guía. Si necesitas el dato, ábrelo allá.
 vocabulario que los CLIs del programa adoptan en su manifiesto (ADR-024 §D3, «contrato estable»); Globe, si algún día
 gradúa una capacidad, traduce ese vocabulario a su propio contrato.
 
-## 1. Cuatro principios que mandan sobre todas las dimensiones
+## 1. Cinco principios que mandan sobre todas las dimensiones
 
 1. **El contrato de fidelidad elige el motor; el canal y el precio son datos de forma.** Qué debe quedar idéntico y
    qué puede reinterpretar el modelo decide si se genera y con qué tolerancia (canon: workflow de selección por
@@ -52,7 +52,13 @@ gradúa una capacidad, traduce ese vocabulario a su propio contrato.
 3. **Neutral de motor.** Hay muchos motores de video (Seedance, Flux 3, Wan, MiniMax H3, Gemini Omni, la API de
    Higgsfield con Kling y otros) y cada operación la resuelven varios. Ninguno es el default de la clasificación: el
    motor sale del contrato de fidelidad y de la evidencia de la guía §4.3.
-4. **Un `completed` sólo acredita recepción.** Una salida técnicamente válida sigue siendo candidata hasta la revisión
+4. **Propio primero, proveedor como puente** *(operador, 2026-10-03)*. Si una operación la resuelven nuestros CLIs
+   —los que existen o los que construye EPIC-051—, va por ahí; mientras no exista lo nuestro, se usa la herramienta
+   del proveedor (CLI de Higgsfield, MCP de Higgsfield o Magnific, fal) y la operación declara qué task la reemplaza
+   (§3.13). Los modelos generativos siempre son de un proveedor: lo **propio** es la capa que los invoca con
+   estimación, manifiesto y garantía, más todo lo determinístico. Un puente de proveedor envuelto como motor de
+   nuestro pipeline (por ejemplo, un modelo de Higgsfield dentro de `pnpm ai:inpaint video`) recupera la garantía.
+5. **Un `completed` sólo acredita recepción.** Una salida técnicamente válida sigue siendo candidata hasta la revisión
    humana al 100 %; el veredicto de un detector garantiza lo que no se tocó, no que el pedido se haya cumplido.
 
 ## 2. Ficha de clasificación (lo que toda pieza declara)
@@ -166,6 +172,7 @@ Aquí se gasta poco y se decide casi todo. Las salidas de pre son **entradas con
 | `pre.cast-sheet` | hoja de identidad del cast (ángulos, expresiones, vestuario) | G | anclas de identidad | proporción y emblema medidos en foto (`foto:rostro`, `foto:emblema`) | canon de fotografía de marca |
 | `pre.coverage` | cobertura de cámaras y shot list | D | mapa de cobertura y continuidad | entradas, salidas y reservas previstas | método (companion de preproducción) |
 | `pre.pilot` | piloto sólo del riesgo incierto | G | una toma corta y barata | la prueba responde una pregunta escrita antes | el motor más barato que conserve lo que se juzga |
+| `pre.reference-analysis` **[agregado]** | analizar escena por escena un video de referencia (ritmo, planos, cámara) | G | desglose por escena | — (exploratorio; la precisión baja con la duración) | puente: `video_analysis` del MCP de Higgsfield |
 | `pre.estimate` | estimación y autorización del gasto | D | costo por operación a la resolución de entrega | autorización explícita del monto | `--dry-run` / `--estimate` de cada CLI |
 
 #### 3.5.2 Producción — generar o capturar la toma
@@ -179,6 +186,7 @@ Aquí se gasta poco y se decide casi todo. Las salidas de pre son **entradas con
 | `gen.keyframes` | pasar por varios cuadros clave | G | cada keyframe fiel en su índice | ninguno (H13) |
 | `gen.camera` | mover sólo la cámara sobre una escena quieta | G | trayectoria cumplida; escena sin cambios | ninguno |
 | `gen.source-doc` | video a partir de una web o un documento | G | — (exploratorio) | — |
+| `gen.motion-transfer` **[agregado]** | transferir el movimiento de un video conductor a un sujeto de referencia | G | gesto y cámara del conductor; identidad del sujeto | ninguno |
 | `gen.multishot` **[agregado]** | varias tomas dentro de una sola generación | G | cortes donde el guion los pide, continuidad entre ellos | ninguno |
 | `time.extend` | extender una toma | G | **costura invisible**: continuidad de posición, luz y audio en la junta | ninguno (H8) |
 | `audio.native` | audio generado junto con la toma | G | — (provisional por regla) | — |
@@ -193,18 +201,23 @@ Aquí se gasta poco y se decide casi todo. Las salidas de pre son **entradas con
 | `edit.zone` | editar sólo una zona | H | **delta 0 fuera de la zona en cada cuadro** | ✅ `pnpm ai:inpaint video` (cámara quieta) |
 | `edit.erase` | borrar un objeto | H | zona protegida en delta 0 + **sin residuo del objeto** en ningún cuadro | ninguno (H1) |
 | `edit.track` | seguir un objeto (máscara por cuadro) — operación de soporte | D sobre modelo de segmentación | máscara cubre el objeto en todos los cuadros | ninguno (H2) |
+| `edit.replace` **[agregado]** | reemplazar un objeto, producto, prenda o personaje en un video desde referencias | H | resto del cuadro intacto; el reemplazo sigue el movimiento | ninguno |
+| `edit.depth` **[agregado]** | mapa de profundidad por cuadro — operación de soporte (relight, composición, desenfoque) | G | profundidad coherente entre cuadros | ninguno |
 | `edit.background` | reemplazar el fondo (recorte con alfa + composición) | H | sujeto intacto; borde sin halo | ninguno (H5) |
 | `edit.relight` | reiluminar | H | sujeto exacto (forma, color, texto); luz coherente entre cuadros | ninguno (H4) |
 | `time.loop` | loop sin costura | G o D | último cuadro ≈ primero; movimiento continuo en el cierre | ninguno (H7) |
 | `time.retime` | cambiar velocidad (constante o rampa) | D (H si interpola) | duración resultante; sin cuadros duplicados visibles | ninguno (H15) |
 | `time.interpolate` | subir fps / slow motion | G | sin artefactos de interpolación | ninguno (H15) |
 | `assemble.cut` | cortar/recortar | D | cuadros exactos | ffmpeg |
+| `assemble.auto-clips` **[agregado]** | derivar clips cortos de un video largo (con subtítulos y seguimiento de cara) | G | cortes en frases completas; cara dentro del cuadro | ninguno |
 | `assemble.edit` | montaje por EDL (orden, empalmes, transiciones) | D | EDL reproducible; empalmes en cuadro | ninguno (H10) |
 | `finish.overlay` | componer texto, logo, firma, cartelas | D | texto y logo exactos, contraste medido | parcial (HyperFrames/Glitch; sin CLI genérico, H10) |
 | `finish.captions` | subtítulos | D | sincronía y legibilidad | ninguno |
 | `finish.grade` | color grade (LUT o ajustes) | D | LUT/ajuste aplicado tal cual; colorimetría de marca | ninguno (H10) |
 | `finish.upscale` | subir resolución / restaurar | G | **detalle nativo**, no sólo dimensiones | ninguno (H6) |
-| `finish.reframe` | reencuadrar a otro aspecto | D | franjas recortadas vacías; sujeto y safe zones dentro | medición manual (H9) |
+| `finish.deflicker` **[agregado]** | quitar parpadeo | G | sin parpadeo; sin pérdida de detalle | ninguno |
+| `finish.hdr` **[agregado]** | convertir SDR a HDR | G | rango y color coherentes con la fuente | ninguno |
+| `finish.reframe` | reencuadrar a otro aspecto (recorte **D**, o expansión **G** cuando hay que agregar borde) | D o G | franjas recortadas vacías; sujeto y safe zones dentro | medición manual (H9) |
 | `finish.stabilize` | estabilizar | D | sin bordes negros ni warping | ninguno |
 | `audio.voice` | voz / TTS | G | dicción y pronunciación aprobadas | escucha humana |
 | `audio.music` | música | G o licencia | medios ≥ umbral (guía §5.9); sin síntesis pura para marca | medición de balance (Glitch) |
@@ -216,6 +229,12 @@ Aquí se gasta poco y se decide casi todo. Las salidas de pre son **entradas con
 **Cómo se usa:** una pieza lista sus operaciones por fase (§2); por cada operación de producción y post, la guía §4.3
 dice qué motores la hacen y con qué evidencia. Una operación sin motor verificado es un hueco (§5) y la pieza no la
 promete al cliente.
+
+**Por qué se agregaron (segunda pasada, 2026-10-03, tras leer el catálogo de Higgsfield):** `gen.motion-transfer`,
+`edit.replace`, `edit.depth`, `finish.deflicker`, `finish.hdr`, `assemble.auto-clips` y `pre.reference-analysis` son
+operaciones que un proveedor conectado ya ofrece y que la primera versión no nombraba; sin id, una pieza no podía
+declararlas ni la matriz decir quién las hace. `edit.replace` es la de más valor comercial: cambiar el producto de un
+video ya aprobado.
 
 **Por qué se agregaron** `gen.multishot` (varios motores generan varias tomas en una sola solicitud y eso cambia la
 continuidad), `capture.real` (parte del material de Efeonce es grabado y entra a la misma post) y `deliver.export`
@@ -304,17 +323,58 @@ Duración (por plataforma y por pieza), resolución de entrega, aspecto y fps. R
 | `cli-canario` | CLI con canario de garantía documentado (ADR-024 req. 1) | sí, dentro de la garantía medida |
 | `cli-verificado` | CLI con generación real verificada (contrato del endpoint), sin canario de garantía | sí, como candidato técnico con revisión al 100 % |
 | `cli-contrato` | conectado en el CLI, nunca corrido | no: correr una generación real antes |
-| `mcp-sesion` | sólo existe en un MCP de sesión de Claude (Magnific, Higgsfield Cinema Studio) | no en producción: es out-of-band, sin presupuesto gobernado ni manifiesto; sirve para explorar |
+| `cli-higgsfield` | CLI de la app de Higgsfield (`higgsfield`, sesión de usuario, créditos de la suscripción): `generate cost` estima gratis, `generate create/wait` encola y retoma | sí, como **puente** con estimación en créditos y revisión al 100 %; mejor aún envuelto como motor de nuestros CLIs (TASK-1986) |
+| `mcp-sesion` | sólo existe en un MCP de sesión de Claude (Magnific; las pocas herramientas de Higgsfield que no están en su CLI, como el lipsync de sync.so o el análisis de video) | como puente puntual con el costo preflight del propio MCP; sin manifiesto nuestro |
 | `handoff-humano` | After Effects, Resolve, Nuke u otra mano humana | sí, con spec de handoff |
+
+🔴 **No confundir los dos carriles de Higgsfield:** su **API** (`pnpm ai:fal --capability hf-*`, créditos de API propios,
+sin Veo ni varias herramientas de post) y su **CLI de la app** (`higgsfield`, créditos de la suscripción, catálogo de la
+app: Veo 3.1, Kling 3.0 completo, Cinema Studio 2.0–4.0, Genjutsu, SAM 3, Topaz, reframe, doblaje). Son cuentas,
+catálogos y contratos distintos.
 
 **Por qué es una dimensión:** ADR-024 exige saber en qué carril está cada operación para decidir qué se gradúa; y una
 pieza hereda el carril **más débil** de sus operaciones.
 
+### 3.13 Propio primero: camino propio y puente por operación
+
+Lectura: si existe camino propio, se usa; si no, se usa el puente y la task de la columna «Propio a construir» lo
+retira. Estado de cada puente (verificado o no) y su costo: guía §4.3.
+
+| Operación | Camino propio hoy | Propio a construir | Puente de proveedor mientras tanto |
+|---|---|---|---|
+| `gen.t2v`, `gen.i2v`, `gen.r2v`, `gen.flf`, `gen.keyframes`, `gen.camera` | `pnpm ai:fal` (fal y API de Higgsfield) y `pnpm ai:omni`, con estimación y tope | banco de canarios (TASK-1980) | CLI de Higgsfield para motores que sólo están ahí: Veo 3.1, Kling 3.0 completo, Cinema Studio 3.0–4.0 (adaptador TASK-1986) |
+| `gen.motion-transfer` | — | — (generativo puro; se mide en el banco) | Genjutsu motion control y Kling 3.0 motion control (CLI de Higgsfield) |
+| `time.extend` | `ai:fal` (Seedance 2.5, `flux3-extend`), `ai:omni` | costura medida (TASK-1982) | Seedance 2.5 y Cinema Studio 4.0 (extensión hacia adelante y atrás) en el CLI de Higgsfield |
+| `time.loop` | — | TASK-1982 | — |
+| `time.retime` | ffmpeg a mano | TASK-1981 | rampas de Cinema Studio 3.0; `video_speed` de Magnific |
+| `time.interpolate` | — | follow-up de EPIC-051 | `fps_boost` y Topaz (CLI de Higgsfield) |
+| `edit.zone` | ✅ `pnpm ai:inpaint video` (canario 2026-10-02) | máscara móvil (TASK-1979) | — |
+| `edit.global` | `ai:fal` (`flux3-edit`, Seedance editing), `ai:omni` editar | — | `kling_video_edit`, Cinema Studio 4.0 `video_edit` (CLI de Higgsfield); `video_modify` de Magnific |
+| `edit.track` | cajas por keyframes en `ai:inpaint video` | `pnpm ai:track` (TASK-1979) | `sam_3_video` (CLI de Higgsfield), que además puede ser el motor de `ai:track` |
+| `edit.erase` | — | `--op erase` con garantía (TASK-1979) | edición por instrucción sin garantía: `kling_video_edit`, Seedance 2.5 `video_edit` |
+| `edit.replace` | — | follow-up sobre la máscara de TASK-1979 | Genjutsu `hf_mult_replace_object` (CLI de Higgsfield) |
+| `edit.background` | — | TASK-1983 | `video_background_remover` (CLI de Higgsfield); `video_remove_background` de Magnific |
+| `edit.relight` | — | TASK-1984 (tras TASK-1977) | Cinema Studio 4.0 con rig de luz (CLI de Higgsfield); `video_relight` de Magnific (Beeble) |
+| `edit.depth` | — | — | `depth_anything_video` (CLI de Higgsfield) |
+| `finish.grade` | ffmpeg a mano | TASK-1981 | `video_color_grade` de Magnific |
+| `finish.reframe` | recorte con ffmpeg y medición a mano | recorte medido (TASK-1981) | `reframe` generativo (CLI de Higgsfield) sólo cuando hay que **agregar** borde; no ofrece 4:5 |
+| `finish.upscale` | `flux3-enhance` (sólo su propio draft) | detector de detalle (TASK-1983) | `topaz_video`, `bytedance_video_upscale`, `video_upscale` (CLI de Higgsfield); Magnific |
+| `finish.deflicker` | — | — | `video_deflicker` (CLI de Higgsfield) |
+| `finish.hdr` | — | — | `topaz_hyperion_2_5` (CLI de Higgsfield) |
+| `finish.overlay`, `finish.captions` | HyperFrames y el motor de Glitch, por pieza | TASK-1981 | — |
+| `assemble.cut`, `assemble.edit` | ffmpeg a mano | TASK-1981 | — |
+| `assemble.auto-clips` | — | — | `clipify` (CLI de Higgsfield, desde YouTube) |
+| `audio.voice` | — | TASK-1985 | `voice_change` (CLI de Higgsfield); ElevenLabs (MCP) |
+| `audio.lipsync` | — | TASK-1985 | `dubbing` (CLI de Higgsfield, incluye español); sync.so (MCP de Higgsfield) |
+| `audio.mix` | ffmpeg a mano | TASK-1981 | — |
+| `pre.reference-analysis` | — | — | `video_analysis` (MCP de Higgsfield) |
+
 ## 4. Cómo se usa
 
 1. Llenar la ficha (§2) con la pieza, nivel, fidelidad, origen y operaciones.
-2. Por operación, abrir la guía §4.3: motor, evidencia y canario. Si el carril es `cli-contrato` o `mcp-sesion`, la
-   operación **no se promete**; se resuelve con otra operación o se pide un canario (EPIC-051).
+2. Por operación, mirar §3.13 (camino propio o puente) y la guía §4.3 (motor, evidencia, canario y costo). Si el carril
+   es `cli-contrato`, o un puente sin corrida real, la operación **no se promete** al cliente hasta un canario
+   (EPIC-051).
 3. Estimar con `--dry-run`/`--estimate` y pedir autorización del monto (guía §7).
 4. Producir según el método; cerrar con la barra del nivel (§3.2).
 
@@ -324,22 +384,22 @@ Severidad: **A** bloquea piezas reales frecuentes · **B** limita calidad o prom
 
 | # | Hueco | Severidad | Estado hoy | Dónde se cierra |
 |---|---|---|---|---|
-| H1 | Borrar un objeto de un video (`edit.erase`) | A | ningún motor conectado; VACE inpainting existe en fal sin conectar | TASK-1979 |
-| H2 | Seguir un objeto: máscara por cuadro (`edit.track`) | A | sólo cajas interpoladas en línea recta (keyframes) | TASK-1979 |
+| H1 | Borrar un objeto de un video (`edit.erase`) | A | sin camino propio; puente: edición por instrucción sin garantía (`kling_video_edit`, Seedance 2.5 `video_edit` en el CLI de Higgsfield); VACE en fal sin conectar | TASK-1979 |
+| H2 | Seguir un objeto: máscara por cuadro (`edit.track`) | A | propio: sólo cajas interpoladas; puente: `sam_3_video` (CLI de Higgsfield), sin corrida | TASK-1979 |
 | H3 | Editar una zona con cámara en movimiento | A | la máscara fija queda pegada a la pantalla; la deriva medida está al borde del umbral aun con cámara quieta | TASK-1979 |
-| H4 | Reiluminar un video (`edit.relight`) | B | nada en el CLI; candidatos sólo por MCP o fal sin conectar | TASK-1984 (tras TASK-1977) |
-| H5 | Reemplazar fondo / recorte de sujeto con alfa | B | nada en el CLI; existe en el MCP de Magnific | TASK-1983 |
-| H6 | Upscale con detalle verificable | B | sólo `flux3-enhance` de su propio draft; «dimensiones ≠ detalle» sin detector | TASK-1983 |
+| H4 | Reiluminar un video (`edit.relight`) | B | sin camino propio; puente: Cinema Studio 4.0 con rig de luz (CLI de Higgsfield) y `video_relight` de Magnific, sin invocar | TASK-1984 (tras TASK-1977) |
+| H5 | Reemplazar fondo / recorte de sujeto con alfa | B | sin camino propio; puente: `video_background_remover` (CLI de Higgsfield) y Magnific, sin corrida | TASK-1983 |
+| H6 | Upscale con detalle verificable | B | propio: sólo `flux3-enhance`; puente: Topaz y ByteDance (CLI de Higgsfield), sin corrida; «dimensiones ≠ detalle» sin detector | TASK-1983 |
 | H7 | Loop sin costura verificado | B | primer/último cuadro iguales o crossfade a mano, sin medir el cierre | TASK-1982 |
 | H8 | Extensión con costura medida | B | los motores entregan la continuación sin medir la junta | TASK-1982 |
 | H9 | 4:5 y reencuadre con franjas medidas | A | recorte manual con medición a mano | TASK-1981 |
 | H10 | Acabado determinístico con manifiesto (grade, reencuadre, retime, montaje por EDL, overlays, loudness) | A | ffmpeg y HyperFrames ad hoc por pieza | TASK-1981 |
 | H11 | Identidad entre tomas sin detector ni ancla entrenada | A | r2v sin medir; LoRA, elements y Soul ID sin verificar | TASK-1980 (detector + canario); identidad entrenada como follow-up |
-| H12 | Diálogo y lipsync en español | B | declarado por proveedores, sin prueba | TASK-1985 |
+| H12 | Diálogo y lipsync en español | B | sin camino propio; puente: `dubbing` en español (CLI de Higgsfield) y sync.so (MCP), sin corrida | TASK-1985 |
 | H13 | Ninguna generación tiene canario de garantía (primer cuadro fiel, parpadeo, deriva) | A | sólo verificación del contrato del endpoint (humo) | TASK-1980 |
 | H14 | Estimación ≠ factura | A | SKY V11 facturó ≈ 43 % sobre lo estimado; el CLI estima Seedance 2.5 1080p bajo la tarifa que publica la guía | TASK-1980 (reconciliación por request en el banco) |
-| H15 | Interpolación / slow motion sin judder | C | sin motor en el CLI | follow-up (EPIC-051) |
-| H16 | Video por la API de Higgsfield (Kling 3, PixVerse, LTX, …) | C | ninguna capacidad de video verificada en salida | TASK-1980 (una corrida por capacidad candidata) |
+| H15 | Interpolación / slow motion sin judder | C | sin camino propio; puente: `fps_boost` y Topaz (CLI de Higgsfield), sin corrida | follow-up (EPIC-051) |
+| H16 | Video por la API de Higgsfield (Kling 3, PixVerse, LTX, …) | C | ninguna capacidad de video de la API verificada en salida; el CLI de la app de Higgsfield es otro carril (§3.12) | TASK-1980 (una corrida por capacidad candidata) |
 | H17 | Texto en escena (pantallas) sin detector | C | protegido por receta | follow-up |
 | H18 | Stream en tiempo real dirigido | C | no operable por cola | fuera del programa |
 
