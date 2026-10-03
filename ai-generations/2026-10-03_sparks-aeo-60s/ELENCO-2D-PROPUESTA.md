@@ -1,6 +1,6 @@
 # Elenco 2D de Efeonce — propuesta (2026-10-03)
 
-> **Estado:** **aprobado por el operador (2026-10-03)**: los cuatro personajes y su rol en el video (Tomás protagonista). Estilo: tres direcciones generadas (`elenco-2d/estilo/`, ≈ USD 0,12 de salida + entrada), pendiente de elección. Las reglas del elenco 2D siguen [propuesta] hasta documentarse como canon.
+> **Estado:** **canonizado el 2026-10-03**: el canon vigente es [`EFEONCE_2D_CAST_V1.md`](../../docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md); este archivo queda como propuesta de origen.
 > **Origen:** pedido del operador, 2026-10-03: «crea 4 personas ficticias 2D; elige nombres, características y
 > nacionalidades tú». Nace con el video «Los Sparks de Efeonce × Efeonce AEO» y define el estilo de personajes 2D.
 

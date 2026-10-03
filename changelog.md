@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — Elenco 2D de Efeonce canonizado
+
+- [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
+  dibujados, representan al grupo de compra del cliente y supervisan a los Sparks; estilo «vector con volumen» con
+  sello Efeonce (línea de luz azul + objeto azul).
+- Hojas de giro y expresiones en `ai-generations/_identidad-elenco-2d/`, selladas en el lock (catálogo `ELENCO_2D`,
+  rol `ilustracion-2d`, 560 assets) y publicadas en el canon. GPT Image 2.5 Sunburst, ≈ USD 0,78.
+
 ## 2026-10-03 — Video con IA: taxonomía, producto e interfaces y pipelines por plan (EPIC-051)
 
 - [Taxonomía de video](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) por fase, tipo, look,
@@ -647,17 +655,3 @@ guía. Manual de la línea §10.0, lenguaje fotográfico v1.6, doc funcional 1.7
 El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface:resolve`, tokens
 `efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
 código en Greenhouse.
-
-## 2026-09-27 — Glitch: diseño sonoro aprobado (versión B), sólo Glitch (AXIS /references/glitch/#sonido)
-
-El operador aprobó la versión B: «La b me encanta más. Sus sonidos están aprobados». Es **sólo de Glitch**: no forma
-parte de la identidad sonora de Efeonce ni se mezcla con su kit. Idea: «el sonido de Efeonce, con un bug». El motivo
-Mi · Mi · Mi → La hace fallar la tercera nota, que se rompe en bytes y se rearma como la manzana, el único golpe grave. Es
-diseño sonoro, no música, amarrado cuadro a cuadro al piloto de motion. Incluye un WAV por cada `.mov` del kit (lower
-third y transición «manzana en bytes» incluidos) y una pista por transición entre escenas, calculada desde la misma
-programación de celdas que la imagen: una lluvia de clics, nunca un whoosh. Motor determinístico
-que ya vive en el taller (`tools/glitch-motion/src/sound.mjs` + `tools/brand-sound`, `2d411b8`): cada render deja su WAV
-junto al `.mov`. Publicado en AXIS (PR efeoncepro/axis-design-system#8): sección `#sonido`, campo `sound` en
-`glitch.json` y 38 archivos en el bucket `glitch/sound/v1`. La página de sonic brand saca a Glitch de su kit. Canon:
-norma de Glitch §13.11, Delta del ADR, doc funcional, manual de edición, reglas y skills `efeonce-graphic-line`,
-`audio-studio` y `motion-design-studio`.

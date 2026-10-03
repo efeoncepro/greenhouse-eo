@@ -474,6 +474,46 @@
       "rol": "elenco:antonio/perfil-der",
       "sha256": "9315f0c0cb013f267b60fa25eedf3d0e2c1a56f1f8e4b42d44da225a59e2bf62"
     },
+    "ai-generations/_identidad-elenco-2d/tomas/tomas-giro.png": {
+      "rol": "elenco2d:tomas",
+      "sha256": "4e0548e7272e85c25d2a03ba780648580901e305fbdee04c9c60fc459e478c88"
+    },
+    "ai-generations/_identidad-elenco-2d/tomas/tomas-expresiones.png": {
+      "rol": "elenco2d:tomas",
+      "sha256": "ac91c5da48f3d08e0b4fd24c51874f63b3d15cf108dc9ec242992c63d257ee05"
+    },
+    "ai-generations/_identidad-elenco-2d/camila/camila-giro.png": {
+      "rol": "elenco2d:camila",
+      "sha256": "312b1cd4b7abd21a7bc6d0b7fc040d87313d9c7cf218878560d42375aed605a4"
+    },
+    "ai-generations/_identidad-elenco-2d/camila/camila-expresiones.png": {
+      "rol": "elenco2d:camila",
+      "sha256": "2adb93135944daf8202615d61bd7fcbd63444f95c455ba6a8db1a7e940e8e759"
+    },
+    "ai-generations/_identidad-elenco-2d/renata/renata-giro.png": {
+      "rol": "elenco2d:renata",
+      "sha256": "fd657a3dc2d18827088acc5971ede39e3e0fd2b46f48492f5cb5596d7c3ce04a"
+    },
+    "ai-generations/_identidad-elenco-2d/renata/renata-expresiones.png": {
+      "rol": "elenco2d:renata",
+      "sha256": "d82377228b22fd432d46656911a959e9a5b65d0026734e4e3e1af240156f71ef"
+    },
+    "ai-generations/_identidad-elenco-2d/mateo/mateo-giro.png": {
+      "rol": "elenco2d:mateo",
+      "sha256": "4a03da3cea3cac83241bc8226e18903f65768df3fdb5c82c4d32564675946bba"
+    },
+    "ai-generations/_identidad-elenco-2d/mateo/mateo-expresiones.png": {
+      "rol": "elenco2d:mateo",
+      "sha256": "47c7f36f7434778e1b9466eae3ab9659d1bcebedfa93e566a418ec5c80badbb4"
+    },
+    "ai-generations/_identidad-elenco-2d/_estilo/estilo-a-sello-efeonce.png": {
+      "rol": "elenco2d:estilo",
+      "sha256": "33e8628f6f211d09c88f5de2befa4a5a13c47a23ef21cac8135969f0b81581aa"
+    },
+    "ai-generations/_identidad-elenco-2d/elenco-2d-grupo.png": {
+      "rol": "elenco2d:grupo",
+      "sha256": "19b3ec60d1898d6884f2a498fc99983b29704c3c5161281ffae53df68fabf9b2"
+    },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
       "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"

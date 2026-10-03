@@ -424,6 +424,9 @@ Ops llevan al equipo humano. **Nombre:** «Sparks» sirve como nombre interno de
 y salen del kit: reglas de foto en `design-studio` (`efeonce-photographic-language.md` §11 «Sparks»; en cine, dos
 con referencia como máximo y el resto lejos y desenfocado, escena `NX7d` aprobada el 2026-10-02). Canon:
 [`SPARKS_V1.md`](../../../docs/operations/brand-characters/SPARKS_V1.md).
+**Elenco 2D** (aprobado 2026-10-03): Tomás, Camila, Renata y Mateo, ficticios y dibujados, son el grupo de compra del
+cliente y supervisan a los Sparks en piezas animadas; estilo «vector con volumen» con sello (línea de luz azul + objeto
+azul). Canon: [`EFEONCE_2D_CAST_V1.md`](../../../docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md).
 
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
 

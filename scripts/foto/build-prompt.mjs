@@ -531,6 +531,25 @@ export const ELENCO = {
   }
 }
 
+// Elenco 2D (operador, 2026-10-03: «Me encantan, están aprobados todos. Canonízalos»): cuatro personajes FICTICIOS
+// dibujados que representan al grupo de compra del cliente. Catálogo SÓLO DE SELLADO: no es identidad fotográfica y
+// `identidad` no lo resuelve; existe para que sus hojas entren al lock y al canon como cualquier referencia aprobada.
+// Canon: docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md.
+const ELENCO_2D_BASE = 'ai-generations/_identidad-elenco-2d'
+
+export const ELENCO_2D = Object.fromEntries(
+  ['tomas', 'camila', 'renata', 'mateo'].map(clave => [
+    clave,
+    { refs: [`${ELENCO_2D_BASE}/${clave}/${clave}-giro.png`, `${ELENCO_2D_BASE}/${clave}/${clave}-expresiones.png`] }
+  ])
+)
+
+/** Referencias del elenco 2D que no son de un personaje: el ancla del estilo y la escala del grupo. */
+export const ELENCO_2D_COMUNES = {
+  estilo: `${ELENCO_2D_BASE}/_estilo/estilo-a-sello-efeonce.png`,
+  grupo: `${ELENCO_2D_BASE}/elenco-2d-grupo.png`
+}
+
 // Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
 // personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
 // Grupos de 3 a 5 [medido 2026-10-03, EC1-brazo2]: sólo personajes del ELENCO, UNA referencia frontal cada uno. A
@@ -1512,7 +1531,8 @@ export const ROLES_DE_REFERENCIA = {
   identidad: 'Copia la CARA; ignora la ropa y el fondo. Entra en el bloque REFERENCES.',
   'objeto-forma': 'Copia la FORMA de la pieza aislada; ignora su fondo de estudio.',
   'prenda-puesta': 'Copia la PRENDA tal como cae en un cuerpo; ignora a la persona que la lleva.',
-  'macro-marca': 'El emblema en grande, para que el modelo no lo reinvente cuando mide pocos píxeles.'
+  'macro-marca': 'El emblema en grande, para que el modelo no lo reinvente cuando mide pocos píxeles.',
+  'ilustracion-2d': 'Copia el PERSONAJE DIBUJADO (diseño, proporciones, estilo); ignora su fondo. Sólo producción 2D, nunca identidad fotográfica.'
 }
 
 /** Clave del catálogo → rol de las referencias que declara. */
@@ -1562,6 +1582,12 @@ export function referenciasDeclaradas() {
       }
     }
   }
+
+  for (const [clave, personaje] of Object.entries(ELENCO_2D)) {
+    for (const ref of personaje.refs) push(ref, 'ilustracion-2d', `elenco2d:${clave}`)
+  }
+
+  for (const [nombre, ref] of Object.entries(ELENCO_2D_COMUNES)) push(ref, 'ilustracion-2d', `elenco2d:${nombre}`)
 
   for (const [clave, objeto] of Object.entries(OBJETOS)) {
     // `patron` y `patronPorColor` GENERAN rutas combinándose con los sufijos de `vistas`.

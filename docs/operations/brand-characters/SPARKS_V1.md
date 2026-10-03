@@ -16,6 +16,7 @@
 > [Marca de agencia](../../context/09_marca-agencia.md) ·
 > [Mascotas de partners](../social/PARTNER_MASCOT_POSE_LIBRARIES.md) ·
 > [Manual de uso](../../manual-de-uso/creative/usar-sparks-en-fotos-de-marca.md) ·
+> [Elenco 2D (supervisa a los Sparks en 2D)](./EFEONCE_2D_CAST_V1.md) ·
 > [Corrida y kit](../../../ai-generations/2026-10-01_sparks/LEEME.md)
 > **Dónde viven los archivos del kit:** sellado en `scripts/foto/assets.lock.json` (su respaldo es el canon, vía `pnpm creative:assets:publish`); si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull` ([contrato](../AI_GENERATIONS_STORAGE_V1.md)).
 
