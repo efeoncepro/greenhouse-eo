@@ -28,6 +28,15 @@
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |
 | [Efeonce AEO](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) / Search Visibility 360 | Wedge/capability | Efeonce AEO introduce visibilidad de marca en respuestas de IA; Search Visibility 360 integra SEO+AEO | El naming AEO está decidido; su modelo comercial sigue `Draft`. Search Visibility 360 es la familia integral dentro de Wave; ver modelos propios |
 
+### Dirección creativa aceptada — 2026-10-03
+
+La [decisión de ejecución escalable de marca](../../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+orienta Creative Services y sus composiciones a convertir decisiones de marca en capacidad de producción
+consistente, medible y escalable, mediante un recorrido completo o un tramo delimitado. Instalar, operar y expandir
+son etapas de la relación; consumen las líneas económicas existentes y requieren validación de costo, margen,
+adopción y expansión. Esta dirección no sustituye la visión Growth Operating System, el modelo ASaaS ni las demás
+líneas del portfolio; el business model corporativo sigue `Draft` con sus gates pendientes.
+
 ## 3. Revenue architecture pendiente
 
 Debe reconciliarse con Finance y los modelos de oferta:

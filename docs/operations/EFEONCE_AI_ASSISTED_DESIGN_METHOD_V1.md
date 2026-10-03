@@ -183,3 +183,12 @@ expone la receta completa ni material interno que constituya propiedad intelectu
 - No autoriza precios, claims de ahorro, publicación, pauta ni uso de activos de clientes.
 - No convierte el Design Context en un entregable único obligatorio: su forma depende de la disciplina y el scope.
 - No sustituye los contratos de oficio, derechos, accesibilidad, producción, implementación o QA de cada práctica.
+
+## Dirección de negocio aplicada — 2026-10-03
+
+La [decisión de marca y ejecución escalable](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md) conecta este método con la visión
+y el modelo de negocio: hacer operables, automatizables y escalables las decisiones creativas para acelerar
+su salida al mercado preservando calidad, consistencia e identidad. Puede asumir el recorrido completo o un
+tramo acordado de la cadena; cada disciplina conserva sus reglas y autoridad. El compromiso de calidad se
+verifica en la aplicación final y contempla corrección; la velocidad requiere baseline comparable.
+Esta dirección no altera el método aprobado ni amplía por sí sola la autonomía o capacidad runtime.

@@ -208,6 +208,21 @@ ASaaS
 La visión no es “usar más IA”. Es hacer que cada servicio de Efeonce sea más repetible, medible, acumulativo,
 operable y escalable sin perder criterio humano.
 
+## Aplicación a decisiones de marca — 2026-10-03
+
+> **Convertimos las decisiones de marca en una capacidad de producción consistente, medible y escalable.**
+
+La [dirección estratégica aceptada para decisiones de marca y ejecución escalable](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+concreta esta transformación: hacer operables, automatizables y escalables las decisiones creativas para acelerar
+su salida al mercado, desde una aplicación hasta grandes volúmenes, preservando identidad, calidad y consistencia.
+El sistema conserva contexto, reglas, componentes, evidencia y aprendizaje, mientras las personas mantienen
+dirección, criterio y aprobación. Recorrido completo y tramo razonable de la cadena son alcances de responsabilidad
+que deben instanciar los contratos y gates de cada servicio.
+
+Esta aplicación orienta la inversión en capacidad acumulativa y sus métricas de tiempo, calidad y economics.
+Conserva la visión corporativa de Growth Operating System y la amplitud del portfolio; su aceptación estratégica
+no certifica madurez AI-native, capacidad de miles de piezas, aprobación comercial ni resultados de mercado.
+
 ## Related canon
 
 - [`Efeonce Product Service Operating Model`](../business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)

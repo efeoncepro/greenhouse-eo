@@ -17,6 +17,13 @@
   declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
 - EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.
 
+## 2026-10-03 — Decisiones de marca convertidas en capacidad de ejecución escalable
+
+- [Dirección estratégica aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md): hacer operables, automatizables y escalables
+  decisiones creativas para acelerar salida al mercado preservando calidad, consistencia e identidad; recorrido
+  completo o tramo delimitado. Visión, modelo corporativo, oferta, método y skills/routing enlazados; validación
+  económica/comercial permanece por oferta. Cambio documental local, sin alterar runtime ni publicar.
+
 ## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
 
 - Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa

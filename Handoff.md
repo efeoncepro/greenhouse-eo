@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Marca → escala (03/10):** [dirección aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md), local sin commit/push; [revisión y pendientes](docs/audits/strategy/2026-10-03-brand-decisions-scalable-execution.md).
+
 **Insights: criterio de figuras (03/10):** [TASK-1974](docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) y [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) in-progress (Claude), local en develop, sin push. Slice 1 de 1975 (diseño de la tarjeta, tonos semánticos, tokens y norma) aprobado y versionado en `81e50977b`. Orden: 1974 Slices 1–5 → 1975 Slices 2–6; las dos salen en el mismo release, con Think desplegado antes o junto.
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
@@ -244,13 +246,7 @@ costo de 2.5 (ver changelog).
 **Gates:** test y build verdes. **Pendiente:** los dos entregables de Globe, **sin hacer
 por instrucción del operador** (hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
 
-**TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
-Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).
-PR 230/main `45f6910e3`, checks/orquestador `34281143424` success, manifest released y watchdog 5/5.
-Conexiones definitivas conservadas; sólo se sustituyó Claude hospedado del canary bajo autorización.
-Docs/skills reconciliados con tres subagentes; [manual de uso](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
-Push documental disparó auth deploy por su README: run `34284610774` cancelado, sin nuevo build/revisión; tráfico conserva `00048-4vq`. Efecto y prevención documentados en runbook/skills.
-[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+**TASK-1844 COMPLETE (08/09):** producción y cierre preservados íntegros en el [archivo de septiembre](docs/operations/agent-context-history/handoff/2026-09.md); [manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió

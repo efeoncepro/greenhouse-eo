@@ -12,6 +12,16 @@ description: >-
 
 # Efeonce Business Model Operator
 
+## Dirección estratégica de marca y escala — 2026-10-03
+
+Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
+al definir visión, alcance o modelo de producción: convertir decisiones creativas en capacidad operable,
+automatizable y escalable, con calidad, consistencia e identidad verificables y menor tiempo a mercado.
+Recorrido completo y tramo delimitado son alcances, no nuevos delivery models; instalar → operar → expandir
+son etapas, no nuevas líneas de cobro. Conservar autoridad upstream, criterios de aceptación y corrección,
+baseline y costo completo. La dirección aceptada no cambia los estados comerciales ni habilita SLA,
+volumen ilimitado, pricing, publicación o acceso externo.
+
 ## Propósito
 
 Esta skill responde cómo una oferta crea, entrega y captura valor de forma sostenible. No es un tarifario,

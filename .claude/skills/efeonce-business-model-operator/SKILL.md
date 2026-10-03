@@ -69,3 +69,10 @@ When a business model is presented to the team or a third party as a document, d
 skill, section "Artefactos de salida"). Living reference: `docs/business-models/channel-commerce/deliverables/` and
 `scripts/documents/render-channel-commerce-business-model.mjs`. The PDF is derived: regenerate it when the canonical
 model documents change; never edit it as a source.
+
+For the accepted 2026-10-03 brand-to-execution direction, load
+[the canonical decision](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
+Full-chain and bounded-chain scopes preserve delivery/engagement/mode taxonomy; installation, operation and
+expansion are lifecycle stages. Quality requires acceptance and correction, time-to-market claims need a baseline,
+and each offer retains its economic, commercial and runtime gates. The full instructions remain in the canonical
+Codex skill above.

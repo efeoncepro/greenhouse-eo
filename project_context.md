@@ -2,6 +2,8 @@
 
 ## Estado vigente para agentes
 
+Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
+
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Actualización documental reciente
