@@ -114,7 +114,7 @@ stateful `previous_interaction_id`, 720p/1080p/4K, 9:16, fidelidad temporal, C2P
 siguen sin verificar. Para operar, lee el manual antes del POST y usa el interaction ID con
 `--status`/`--wait` si necesitas retomar: no hagas un segundo envío por timeout.
 
-### Cuatro trampas que ya costaron dinero
+### Cinco trampas que ya costaron dinero (o lo harían)
 
 - 🔴 **El precio del registro es el escalón MÁS BARATO, no el de tu resolución.** Sin `--resolution`
   el CLI envía el escalón más barato y lo avisa. Presupuesta por la que vas a pedir.
@@ -126,6 +126,8 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
   —el de las piezas más impactantes— devuelve la zona enmascarada como **panel negro plano** (3 de 3
   pasadas, 2026-09-23 y 2026-10-02); Flare y Flux Pro Fill sí la editan. Para editar una zona usa
   `pnpm ai:inpaint image` (TASK-1965), que elige el modo por modelo y recompone con verificación.
+- 🔴 **Layerize cobra por capa y el número lo decide el modelo** (USD 0,034–0,0675 por capa). `pnpm ai:layers`
+  estima con la cota de 16 capas + base y registra lo real: presupuesta por la cota, no por las capas que esperas.
 
 ## 3. Quién decide qué (boundaries)
 

@@ -99,6 +99,9 @@ del modelo; nunca secretos ni URLs firmadas. **Repetir la misma entrada no vuelv
 El veredicto garantiza lo que **no** se toca; **no** dice si el pedido se cumplio. En el canario, una pasada salio
 `PASS` sin la planta. Abre `candidate-N.png` y mira la union al 100 %.
 
+> **Otras tecnicas sobre el mismo pipeline** (TASK-1973): expandir a otro formato, separar en capas con Layerize,
+> borrar, mover, cambiar fondo y rehacer detalle: [manual](expandir-y-separar-en-capas.md).
+
 ## Editar con un boceto y referencias (como el Markup de ChatGPT)
 
 En ChatGPT se dibuja sobre la foto (Edit → Markup) y se escribe la instruccion; para incorporar un objeto se le pasa su
