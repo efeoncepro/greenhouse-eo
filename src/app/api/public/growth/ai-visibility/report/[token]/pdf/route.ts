@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { buildAiVisibilityReportAttachment } from '@/lib/growth/ai-visibility/public-delivery/email/build-report-attachment'
 import { checkPublicReadAllowed } from '@/lib/growth/ai-visibility/public-delivery/read-guard'
 import { buildReportHeader } from '@/lib/growth/ai-visibility/report/report-header'
+import { readAiVisibilityReportPdfPresentationContext } from '@/lib/growth/ai-visibility/report/pdf-presentation-context'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import { captureWithDomain } from '@/lib/observability/capture'
 
@@ -37,9 +38,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
 
     const header = buildReportHeader({ organizationName: snapshot.brandName, asOf: snapshot.asOf })
 
+    const pdfPresentationContext = await readAiVisibilityReportPdfPresentationContext({
+      runId: snapshot.runId,
+      locale: snapshot.publicReport.provenance.market?.locale,
+      asOf: snapshot.asOf
+    })
+
     const attachment = await buildAiVisibilityReportAttachment({
       publicReport: snapshot.publicReport,
       header,
+      context: pdfPresentationContext,
     })
 
     return new NextResponse(new Uint8Array(attachment.content), {

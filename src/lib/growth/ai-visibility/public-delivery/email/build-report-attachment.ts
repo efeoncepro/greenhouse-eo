@@ -6,6 +6,7 @@ import 'server-only'
 // reactive email consumer runs. The model is pure TS; the PDF renderer is server-only.
 import { modelFromPublicReport, type ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
 import { renderAiVisibilityReportPdf } from '@/components/growth/ai-visibility/report-artifact/pdf/render-ai-visibility-report-pdf'
+import type { AiVisibilityReportPdfPresentationContext } from '@/components/growth/ai-visibility/report-artifact/pdf/report-pdf-presentation'
 import type { ReportHeader } from '@/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact'
 import type { PublicGraderReport } from '@/lib/growth/ai-visibility/report/contracts'
 
@@ -16,10 +17,11 @@ import type { PublicGraderReport } from '@/lib/growth/ai-visibility/report/contr
  * delivery email. Renders the TASK-1273 premium PDF from the FROZEN public snapshot
  * (`PublicGraderReport`) via the `attachment` variant of the report-artifact model.
  *
- * Leak-safe by construction: the input is the public DTO (`PublicGraderReport`) — a type
+ * Leak-safe by construction: the report input is the public DTO (`PublicGraderReport`) — a type
  * that structurally CANNOT carry `providerFindings`, `accuracyFindings`, raw provider
- * text, internal ids or PII. The `attachment` variant restricts disclosure further. Same
- * snapshot → same bytes (deterministic), which backs an idempotent resend.
+ * text, internal ids or PII. The `attachment` variant restricts disclosure further.
+ * The snapshot facts stay frozen; optional commercial branding is explicit, verified
+ * presentation context. Delivery idempotency remains governed by the existing ledger.
  */
 export interface AiVisibilityReportAttachment {
   filename: string
@@ -66,8 +68,9 @@ export const buildAiVisibilityReportAttachmentFilename = (organizationName: stri
 export const buildAiVisibilityReportAttachmentFromModel = async (input: {
   model: ReportArtifactModel
   header: ReportHeader
+  context?: AiVisibilityReportPdfPresentationContext
 }): Promise<AiVisibilityReportAttachment> => {
-  const content = await renderAiVisibilityReportPdf({ model: input.model, header: input.header })
+  const content = await renderAiVisibilityReportPdf({ model: input.model, header: input.header, context: input.context })
 
   return {
     filename: buildAiVisibilityReportAttachmentFilename(input.header.organizationName),
@@ -81,8 +84,10 @@ export const buildAiVisibilityReportAttachmentFromModel = async (input: {
 export const buildAiVisibilityReportAttachment = async (input: {
   publicReport: PublicGraderReport
   header: ReportHeader
+  context?: AiVisibilityReportPdfPresentationContext
 }): Promise<AiVisibilityReportAttachment> =>
   buildAiVisibilityReportAttachmentFromModel({
     model: modelFromPublicReport(input.publicReport, 'attachment'),
-    header: input.header
+    header: input.header,
+    context: input.context
   })

@@ -1,0 +1,78 @@
+{
+  "schema": "efeonce.ai-visibility-pdf-fonts.v1",
+  "source": "BricolageGrotesque-Variable.ttf",
+  "sourceSha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682",
+  "license": "BricolageGrotesque-OFL.txt",
+  "tool": {
+    "name": "fonttools",
+    "version": "4.60.1"
+  },
+  "outputs": [
+    {
+      "file": "BricolageGrotesque-AiVisibility-320.ttf",
+      "family": "AI Visibility Bricolage 320",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 320
+      },
+      "sha256": "36758b74d4f5f907babc2942ecea45057b356059e19bae816d20ea1122c06567",
+      "bytes": 90832
+    },
+    {
+      "file": "BricolageGrotesque-AiVisibility-400.ttf",
+      "family": "AI Visibility Bricolage 400",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 400
+      },
+      "sha256": "c52ba5f03503856a1e3aae80d44ded8d509f8db2b1f2a791429fa135a928a812",
+      "bytes": 90824
+    },
+    {
+      "file": "BricolageGrotesque-AiVisibility-700.ttf",
+      "family": "AI Visibility Bricolage 700",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 700
+      },
+      "sha256": "5f5853105243cea847d4d52941500d21daf3604f84e4c598087b5bbaa7669262",
+      "bytes": 90832
+    },
+    {
+      "file": "BricolageGrotesque-AiVisibility-720.ttf",
+      "family": "AI Visibility Bricolage 720",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 720
+      },
+      "sha256": "d5059b2a2048143832522353fc533f384c9e94d502336db4dab36daa1842fb69",
+      "bytes": 90800
+    },
+    {
+      "file": "BricolageGrotesque-AiVisibility-740.ttf",
+      "family": "AI Visibility Bricolage 740",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 740
+      },
+      "sha256": "b20eaca457e35f1dd3d4561686323703f4853e9f508c9feca4e702b3139173d9",
+      "bytes": 90804
+    },
+    {
+      "file": "BricolageGrotesque-AiVisibility-760.ttf",
+      "family": "AI Visibility Bricolage 760",
+      "axes": {
+        "opsz": 96,
+        "wdth": 100,
+        "wght": 760
+      },
+      "sha256": "766f7dacf4719486ea1b2c1a034e8a4349bf355ec509429a0d4193c289649c27",
+      "bytes": 90784
+    }
+  ]
+}

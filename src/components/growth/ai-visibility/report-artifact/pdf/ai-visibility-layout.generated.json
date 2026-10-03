@@ -1,0 +1,454 @@
+{
+  "schema": "axis.ai-visibility-report-layout-extension.v1",
+  "status": "local-unpublished",
+  "piece": "efeonce-ai-visibility-report",
+  "extendsContract": {
+    "id": "efeonce.ai-visibility-report",
+    "version": "0.1.0"
+  },
+  "source": {
+    "repository": "efeoncepro/axis-design-system",
+    "path": "packages/tokens/src/tokens.ts",
+    "export": "aiVisibilityReport",
+    "sha256": "c4047085ad83db9d7dad600dca3910b47c9259c230f18865b13849b1405fbfb0",
+    "approval": {
+      "date": "2026-09-29",
+      "task": "TASK-1938",
+      "canvasVersion": 17
+    },
+    "approvedArchive": {
+      "repository": "efeoncepro/greenhouse-eo",
+      "path": "docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita/fuente-canvas-2026-09-29.tar.gz",
+      "member": "fuente/generar-hojas.py",
+      "sha256": "81fb206e03155f5c319ddf5d2d7a0d19879c7f1690eb45dad5476ba80922ebaf"
+    }
+  },
+  "extensionSha256": "484a0729d8046383d09ed508f55ae014a788793e3400117d8ecdf74715c62e5e",
+  "extension": {
+    "palette": {
+      "barTrack": "#eef1f4",
+      "dataReference": "#c9d3de"
+    },
+    "type": {
+      "editorial": {
+        "organizationProspect": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "sizePx": 64,
+          "lineHeight": 0.98,
+          "tracking": -0.04
+        },
+        "organizationClient": {
+          "family": "Bricolage Grotesque",
+          "weight": 740,
+          "sizePx": 34,
+          "lineHeight": 1,
+          "tracking": -0.03
+        },
+        "sectionTitle": {
+          "family": "Bricolage Grotesque",
+          "weight": 720,
+          "sizePx": 32,
+          "lineHeight": 1.04,
+          "tracking": -0.03
+        },
+        "sectionSubtitle": {
+          "family": "Bricolage Grotesque",
+          "weight": 720,
+          "sizePx": 26,
+          "lineHeight": 1.04,
+          "tracking": -0.03
+        },
+        "gapHeadline": {
+          "family": "Bricolage Grotesque",
+          "weight": 720,
+          "sizePx": 38,
+          "lineHeight": 1,
+          "tracking": -0.03
+        },
+        "recommendationNumber": {
+          "family": "Bricolage Grotesque",
+          "weight": 720,
+          "sizePx": 32,
+          "lineHeight": 1
+        },
+        "levelScore": {
+          "family": "Bricolage Grotesque",
+          "weight": 720,
+          "sizePx": 28,
+          "lineHeight": 1,
+          "tracking": -0.03
+        },
+        "kpiValue": {
+          "family": "Bricolage Grotesque",
+          "weight": 740,
+          "sizePx": 36,
+          "lineHeight": 1,
+          "tracking": -0.035
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 13,
+          "lineHeight": 1.55
+        },
+        "helper": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 14,
+          "lineHeight": 1.55
+        },
+        "evidence": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 14,
+          "lineHeight": 1.6
+        },
+        "caption": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 11,
+          "lineHeight": 1.45
+        },
+        "label": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 11,
+          "tracking": 0.1
+        },
+        "emphasis": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 17
+        },
+        "barValue": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 14
+        },
+        "levelName": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 15
+        },
+        "levelPrompt": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 12
+        },
+        "movement": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 12
+        },
+        "cardLabel": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 13
+        },
+        "closingQuestion": {
+          "family": "Poppins",
+          "weight": 300,
+          "sizePx": 24,
+          "lineHeight": 1.2
+        },
+        "closingAnswer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "sizePx": 78,
+          "lineHeight": 0.95,
+          "tracking": -0.035
+        },
+        "closingEvidence": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 16,
+          "lineHeight": 1.55
+        },
+        "agenda": {
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 16
+        },
+        "closingCaption": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 13
+        },
+        "legal": {
+          "family": "Poppins",
+          "weight": 400,
+          "sizePx": 11
+        }
+      }
+    },
+    "layout": {
+      "cover": {
+        "headerGapPx": 16,
+        "identity": {
+          "topGapPx": 44,
+          "prospectGapPx": 10,
+          "clientGapPx": 18,
+          "clientTextGapPx": 4,
+          "logoBoxPx": [
+            148,
+            64
+          ]
+        },
+        "period": {
+          "sizePx": 12,
+          "weight": 500,
+          "paddingPx": [
+            6,
+            12
+          ],
+          "borderPx": 1,
+          "borderOpacity": 0.28
+        },
+        "dataAsOf": {
+          "topGapPx": 10,
+          "sizePx": 13
+        },
+        "scoreGroup": {
+          "topGapPx": 28,
+          "gapPx": 14,
+          "textGapPx": 4,
+          "outOfSizePx": 14,
+          "severityTopGapPx": 12
+        },
+        "trend": {
+          "sizePx": 13,
+          "weightFirst": 400,
+          "weightChange": 600
+        },
+        "legend": {
+          "gapPx": 16,
+          "itemGapPx": 6,
+          "sizePx": 11,
+          "dotPx": 7
+        },
+        "verdict": {
+          "topGapPx": 34,
+          "gapPx": 12,
+          "labelSizePx": 12,
+          "labelWeight": 600,
+          "labelTracking": 0.1,
+          "lineHeight": 1.02,
+          "tracking": -0.035
+        },
+        "assessment": {
+          "topGapPx": 6,
+          "gapPx": 16,
+          "enginesGapPx": 8,
+          "logoPx": 19,
+          "lockupHeightPx": 20,
+          "textGapPx": 4,
+          "textSizePx": 12
+        }
+      },
+      "interior": {
+        "sectionGapPx": 30,
+        "section": {
+          "gapPx": 8,
+          "helperMaxWidthPx": 600
+        },
+        "header": {
+          "paddingBottomPx": 16,
+          "chapterGapPx": 14,
+          "glyphGapPx": 8
+        },
+        "footer": {
+          "paddingTopPx": 14,
+          "gapPx": 16,
+          "textSizePx": 11,
+          "textLineHeight": 1.4
+        },
+        "chapterContentGapPx": {
+          "what-to-do": 16,
+          "why": 16,
+          "where": 12,
+          "market": 14
+        },
+        "secondarySectionGapPx": {
+          "what-to-do": 4,
+          "why": 16,
+          "where": 14,
+          "market": 14
+        },
+        "rowsGapPx": {
+          "dimensions": 12,
+          "engines": 10,
+          "market": 10
+        }
+      },
+      "barRow": {
+        "labelWidthPx": 230,
+        "valueWidthPx": 104,
+        "gapPx": 18,
+        "labelGapPx": 10,
+        "heightPx": 10,
+        "radius": "pill",
+        "valueGapPx": 3,
+        "engineDiscPx": 30,
+        "engineLogoPx": 16
+      },
+      "gapCard": {
+        "paddingPx": [
+          28,
+          30
+        ],
+        "gapPx": 14,
+        "radiusPx": 18,
+        "headingGapPx": 12
+      },
+      "recommendationRow": {
+        "numberWidthPx": 44,
+        "gapPx": 16,
+        "paddingBlockPx": 18,
+        "detailGapPx": 6,
+        "headingGapPx": 10,
+        "movementGapPx": 8,
+        "rulePx": 1
+      },
+      "levelRow": {
+        "discPx": 42,
+        "glyphPx": 22,
+        "gapPx": 16,
+        "paddingBlockPx": 10,
+        "textGapPx": 1,
+        "scoreGapPx": 10,
+        "rulePx": 1,
+        "coverage": {
+          "paddingPx": [
+            5,
+            10
+          ],
+          "sizePx": 11,
+          "weight": 600,
+          "borderPx": 1
+        }
+      },
+      "axes": {
+        "gapPx": 24,
+        "sizePx": 12
+      },
+      "qualityCards": {
+        "columns": 3,
+        "gapPx": 14,
+        "paddingPx": [
+          18,
+          20
+        ],
+        "radiusPx": 14,
+        "contentGapPx": 8,
+        "labelGapPx": 8,
+        "sentimentBarPx": 8
+      },
+      "provenance": {
+        "columns": 4,
+        "columnGapPx": 12,
+        "paddingPx": [
+          20,
+          22
+        ],
+        "radiusPx": 14,
+        "gapPx": 14,
+        "itemGapPx": 8,
+        "textGapPx": 2,
+        "labelSizePx": 11,
+        "valueSizePx": 13,
+        "valueWeight": 600
+      },
+      "severityChip": {
+        "light": {
+          "paddingPx": [
+            4,
+            10
+          ],
+          "gapPx": 6,
+          "sizePx": 11,
+          "weight": 600,
+          "dotPx": 7
+        },
+        "dark": {
+          "paddingPx": [
+            6,
+            12
+          ],
+          "gapPx": 8,
+          "sizePx": 12,
+          "weight": 600,
+          "dotPx": 8,
+          "borderPx": 1,
+          "borderOpacity": 0.28
+        },
+        "inline": {
+          "gapPx": 6,
+          "sizePx": 11,
+          "dotPx": 7
+        }
+      },
+      "backCover": {
+        "paddingPx": [
+          64,
+          64,
+          60,
+          64
+        ],
+        "voiceGapPx": 14,
+        "evidenceTopGapPx": 14,
+        "evidenceMaxWidthPx": 460,
+        "questionRing": {
+          "sizeEm": 0.42,
+          "strokeEm": 0.06,
+          "minimumStrokePx": 1,
+          "gapEm": 0.35,
+          "offsetEm": 0.08
+        },
+        "answerSphere": {
+          "sizeEm": 0.2,
+          "gapEm": 0.03
+        },
+        "actionTopGapPx": 34,
+        "agenda": {
+          "paddingPx": [
+            16,
+            30
+          ],
+          "captionGapPx": 12
+        },
+        "clientCards": {
+          "gapPx": 14,
+          "paddingPx": [
+            18,
+            22
+          ],
+          "radiusPx": 16,
+          "textGapPx": 4,
+          "leadMinWidthPx": 250,
+          "nextReportMinWidthPx": 170,
+          "borderPx": 1,
+          "borderOpacity": 0.22,
+          "valueSizePx": 16,
+          "valueWeight": 600
+        },
+        "brandTopGapPx": 112
+      },
+      "socials": {
+        "topGapPx": 30,
+        "gapPx": 12,
+        "bubblePx": [
+          163,
+          32
+        ],
+        "bubbleAfterGapPx": 12,
+        "discPx": 40,
+        "glyphPx": 20,
+        "strokePx": 1.75,
+        "opacity": 0.78,
+        "borderPx": 1,
+        "borderOpacity": 0.22
+      }
+    }
+  }
+}

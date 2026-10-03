@@ -235,3 +235,7 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 - [ ] Consent + audit en envíos a externos; nunca cold send.
 - [ ] Wayfinding: breadcrumbs + active state + deep-links coherentes; operador fuera de `/admin`.
 - [ ] GVC desktop+mobile por nodo nuevo (S1,S6,S8-S12,S13).
+
+## Delta TASK-1938 — PDF AI Visibility Report (2026-10-03)
+
+Refresh local de S3/S14: PDF A4 Engine con portada, cuatro capítulos y cierre por audiencia. Conserva `ReportArtifactModel`, disclosure `attachment`, scores y flujo de envío. Metadatos de marca/audiencia se leen después de los controles vigentes; no hay nuevas escrituras ni llamadas a modelos. El dossier y rollout pendiente viven en TASK-1938. **Web y print conservan el diseño anterior**: su paridad visual requiere continuidad separada. La landing TASK-1966 es otra superficie.

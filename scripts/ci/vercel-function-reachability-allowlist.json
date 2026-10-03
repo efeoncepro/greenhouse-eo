@@ -2,12 +2,6 @@
   "$comment": "ISSUE-177 — Módulos alcanzables desde funciones de Vercel que arman una ruta con process.cwd()/__dirname/import.meta.url más un segmento variable. Turbopack traza el directorio completo. Cada entrada está MEDIDA contra un build real (.next-local/build-20260919232629-17169) y queda bajo el límite; es deuda con dueño, no una excepción permanente. Ratchet: una entrada nueva exige medir el tamaño trazado (pnpm vercel:function-size-gate); una entrada obsoleta se borra.",
   "fsDynamicPath": [
     {
-      "file": "src/components/growth/ai-visibility/report-artifact/pdf/AiVisibilityReportPdf.tsx",
-      "reason": "resolve(process.cwd(), 'public', file) para los PNG de motores del PDF: traza public/** completo (562 archivos, 22,6 MB por función). Llega a 31 entradas vía la proyección reactiva de envío del grader (admin, cloud-integrations, ops-health…). Retiro: mapa estático de rutas literales por motor.",
-      "owner": "growth / AI Visibility (TASK-1273)",
-      "since": "2026-09-22"
-    },
-    {
       "file": "src/lib/finance/pdf/sections/shared.tsx",
       "reason": "publicAssetPath(relativePath) = resolve(process.cwd(), 'public', relativePath) para logos de react-pdf: traza public/** completo (562 archivos, 22,6 MB en /api/finance/quotes/[id]/pdf). Retiro: rutas literales por asset de marca.",
       "owner": "finance / PDF de cotizaciones",

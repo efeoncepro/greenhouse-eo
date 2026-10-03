@@ -1,0 +1,18 @@
+{
+  "label": "Previous HEAD renderer and PDF tokens; synthetic current attachment fixture",
+  "rendererHead": "81b171fc6a0d8aaf006b249f9f2003a3b9c1c051",
+  "header": {
+    "organizationName": "Globe",
+    "reportDate": "19 may 2026",
+    "periodLabel": "4 – 19 de mayo de 2026"
+  },
+  "fixture": "SAMPLE_PUBLIC_REPORT",
+  "fixtureSha256": "a6e30cde610be5d1ee522ad2d1a9ecc7468f715c401aee5afb56df2cf03954c0",
+  "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+  "pdfSha256": "770fdbc9412821a67075788fb630f80c93ef778619e7a19057947e31d44c2e50",
+  "bytes": 82463,
+  "adaptations": [
+    "Relative model/header type imports redirected to workspace aliases",
+    "React import added for standalone tsx runner"
+  ]
+}

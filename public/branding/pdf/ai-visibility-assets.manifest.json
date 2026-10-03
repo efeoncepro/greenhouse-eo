@@ -1,0 +1,433 @@
+{
+  "schema": "efeonce.ai-visibility-pdf-assets.v1",
+  "sources": {
+    "brandAssets": "@efeoncepro/axis-brand-assets",
+    "icons": "@efeoncepro/axis-graphic-line/icons",
+    "approvedMapping": "TASK-1938 fuente-canvas-2026-09-29.tar.gz:fuente/generar-hojas.py"
+  },
+  "outputs": [
+    {
+      "file": "ai-visibility-ai-visibility-report-lockup-positive.png",
+      "sourceId": "ai-visibility-report-lockup-positive",
+      "sourceSha256": "cf89651e9d30d8ada55f5e701cda1da8cba83aca685b2748fe6386dfeee31419",
+      "pngSha256": "de4ea56a1c17d16059e8782e0adc9fd1d1a934f7cb9f97e8034d25f8b6cc4c64",
+      "width": 1554,
+      "height": 112,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-ai-visibility-report-lockup-negative.png",
+      "sourceId": "ai-visibility-report-lockup-negative",
+      "sourceSha256": "cb497e6316d828ed1337abe0cd72c997325515f8d97936e2504d271312bf3dce",
+      "pngSha256": "b5f8b54ce2f35123647a966b1ab5da96ceb283a659ecff758e54917e3b44e2b0",
+      "width": 1554,
+      "height": 112,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-aeo-lockup-positive.png",
+      "sourceId": "aeo-lockup-positive",
+      "sourceSha256": "52860a452dd394d488b9a9bc4893f5c4d4c62311e6519ef96da078999c9fef71",
+      "pngSha256": "3f24ee2e5dc23162e1cf046316f4db3ecaff3ab3efbbb8c18f3d72db3922a766",
+      "width": 790,
+      "height": 104,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-aeo-lockup-negative.png",
+      "sourceId": "aeo-lockup-negative",
+      "sourceSha256": "5e51544c05601735213789b0d9fc8e3be12eee950251bb3a2abf78f49403fecb",
+      "pngSha256": "2354de9b5e30d7d6eafcdfdeb8fdf090aff09c7802a93ebe55524cbeb09be5b8",
+      "width": 790,
+      "height": 104,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-efeonce-logo-positive.png",
+      "sourceId": "efeonce-logo-positive",
+      "sourceSha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e",
+      "pngSha256": "8f1e3c21ec8856c31bc05d2444a93984a0d0cbf635f2f25295cceb70d9f52906",
+      "width": 960,
+      "height": 226,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-efeonce-logo-negative.png",
+      "sourceId": "efeonce-logo-negative",
+      "sourceSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "pngSha256": "06e5efb96e595b49089706786c79d6087c7d6a89d2288530ad458a0ab8fa4bf7",
+      "width": 960,
+      "height": 226,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-url-bubble-baked-light.png",
+      "sourceId": "url-bubble-baked-light",
+      "sourceSha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8",
+      "pngSha256": "6a8dad29dbaf67b0d08052f74029b378d0a91a1900415e84cb225e60dcbb392e",
+      "width": 366,
+      "height": 72,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-url-bubble-baked-dark.png",
+      "sourceId": "url-bubble-baked-dark",
+      "sourceSha256": "cdc09b6b0250cffc442aec76e3415136396400baf433194e594e99496ab73c29",
+      "pngSha256": "3a7e9cad42d779172021103f982656ef3a5d72710810f57df2129b8b8018d6ee",
+      "width": 650,
+      "height": 128,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-engine-chatgpt.png",
+      "sourceId": "chatgpt-isotype",
+      "sourceSha256": "e9ac54ba467b201d531ec339ac7bfb2e4d86cd3582c5b000357f41e4c841fea2",
+      "pngSha256": "836b1883e209fd8c57497a98aed3e0460daf6b396a33981ac37ad0461e9b657c",
+      "width": 141,
+      "height": 144,
+      "transform": "Declared SVG variable fallbacks materialized; then rasterized"
+    },
+    {
+      "file": "ai-visibility-engine-claude.png",
+      "sourceId": "claude-isotype",
+      "sourceSha256": "21f3fca76959d2f831878fe867aaf9899fc9e7beb46d4fb9f81ce800a01dfa36",
+      "pngSha256": "27f8aa0b719f48ddb014f37826a81f6f996f2d90f876a60eae28f1ccd3cdd3f9",
+      "width": 144,
+      "height": 144,
+      "transform": "Declared SVG variable fallbacks materialized; then rasterized"
+    },
+    {
+      "file": "ai-visibility-engine-gemini.png",
+      "sourceId": "gemini-isotype",
+      "sourceSha256": "9c33b09a7ca20bd8f9505f6e5883ed710478f11e07e1c63c1e6f4e656d1878b0",
+      "pngSha256": "82d983a9629604688850994f32ee0c1e3396be9624268fecfd3fb609d926ef69",
+      "width": 144,
+      "height": 135,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-engine-perplexity.png",
+      "sourceId": "perplexity-isotype",
+      "sourceSha256": "3a59cf10cf9983eea182fb6763c415f0d7b1eb42cae2c0f4f0e0a02707c734b8",
+      "pngSha256": "e3e8a72d8d96537ced4c960fccf55d0f2a23e34d614510b1ec139f2a6f70990b",
+      "width": 124,
+      "height": 144,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-engine-google-ai-overview.png",
+      "sourceId": "google-ai-overview-isotype",
+      "sourceSha256": "14f1a3a2ad6fe0079fe89d2f469648741373b6d55a3a1f3c42b0dd71b942450d",
+      "pngSha256": "cc9664dd7191cc90cbc80a1b1bea0e53a043513309d1b5536b0bc959feee13a2",
+      "width": 144,
+      "height": 144,
+      "transform": "SVG rasterized; shape and colour unchanged"
+    },
+    {
+      "file": "ai-visibility-social-linkedin.png",
+      "sourceId": "email-social-linkedin-white",
+      "sourceSha256": "5b50c8c23b446b01dee5c35b3dd7ac31fe5b687ffdefbb80fd4b2f12c67ba984",
+      "pngSha256": "5b50c8c23b446b01dee5c35b3dd7ac31fe5b687ffdefbb80fd4b2f12c67ba984",
+      "width": 80,
+      "height": 80,
+      "transform": "Official AXIS PNG copied byte for byte"
+    },
+    {
+      "file": "ai-visibility-social-instagram.png",
+      "sourceId": "email-social-instagram-white",
+      "sourceSha256": "05d1aa7fc221b0c7ca37314f06676b50418e2ec307babffbfe9da7f9b7f35c54",
+      "pngSha256": "05d1aa7fc221b0c7ca37314f06676b50418e2ec307babffbfe9da7f9b7f35c54",
+      "width": 80,
+      "height": 80,
+      "transform": "Official AXIS PNG copied byte for byte"
+    },
+    {
+      "file": "ai-visibility-social-youtube.png",
+      "sourceId": "email-social-youtube-white",
+      "sourceSha256": "14c56d9b76705116fb4336e6b587594c86f5521bbefd11bab102cdac70cc8cb3",
+      "pngSha256": "14c56d9b76705116fb4336e6b587594c86f5521bbefd11bab102cdac70cc8cb3",
+      "width": 80,
+      "height": 80,
+      "transform": "Official AXIS PNG copied byte for byte"
+    },
+    {
+      "file": "ai-visibility-social-threads.png",
+      "sourceId": "email-social-threads-white",
+      "sourceSha256": "7309a72c38e5cd0059f465976cce4118da8f0ed8bf1e48ae9dcb1e4d53667492",
+      "pngSha256": "7309a72c38e5cd0059f465976cce4118da8f0ed8bf1e48ae9dcb1e4d53667492",
+      "width": 80,
+      "height": 80,
+      "transform": "Official AXIS PNG copied byte for byte"
+    },
+    {
+      "file": "ai-visibility-icon-busqueda-18.png",
+      "sourceId": "axis-graphic-line/icons:busqueda:18:engine:light:rest",
+      "sourceSha256": "cb172af3cc7fc34b7bbc624afc80cc8d54ab7c2200c205c6247ce35389ca1cd7",
+      "pngSha256": "865b2e5da0bc18361ca1b87357e5d889d250fd88d1508b393f98717b101ed186",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-codigo-18.png",
+      "sourceId": "axis-graphic-line/icons:codigo:18:engine:light:rest",
+      "sourceSha256": "847d0977ad9ac1f4e99eb82b9dbabdcd935d80f8ccaaf97223b201c3de5eaa3a",
+      "pngSha256": "bbe789b181d26266cc76ddaaa82ded7a4ae68860ebaaf97ffee5781bd4f2350e",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-checklist-18.png",
+      "sourceId": "axis-graphic-line/icons:checklist:18:engine:light:rest",
+      "sourceSha256": "a69fbe39c8e6179ef8cb4afb3a5eecaa80c592f52cd5b3e2325c40993ba4bb47",
+      "pngSha256": "64219d515623ffa0d2694d52ea13036fbe7ca330d671e8ef96b8a6cafddf71f4",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-integracion-18.png",
+      "sourceId": "axis-graphic-line/icons:integracion:18:engine:light:rest",
+      "sourceSha256": "8cfdf3e281ca08a8812e1ad990dbf1a330ac8ba4f797ed52414a94dc54df8399",
+      "pngSha256": "daf6109b1c3784e1f5cafd4e50c70514a543004afddd1952284d4169232230e7",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-objetivo-18.png",
+      "sourceId": "axis-graphic-line/icons:objetivo:18:engine:light:rest",
+      "sourceSha256": "61daa1c4b96eb185ebf7e30056c8a1aaa59962e66413e67fd858939e31208aa3",
+      "pngSha256": "ab301fd723fdb9ba082830f1a668df518faebe67f7944e4eec15ffeda28e0cce",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-medicion-18.png",
+      "sourceId": "axis-graphic-line/icons:medicion:18:engine:light:rest",
+      "sourceSha256": "eeff903e39f45091fac583b64289b6a7640590ee0b1d3a5908491317576d60c2",
+      "pngSha256": "9429958352f628f521777cd1207d374090d60ebefc70ba9afcea82c8b3145278",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-ia-18.png",
+      "sourceId": "axis-graphic-line/icons:ia:18:engine:light:rest",
+      "sourceSha256": "5063ac771857b2d34dc97feb0d76280ae8f26d30e83385e39bd38d1cf4535e48",
+      "pngSha256": "4665a998dc3c66c289c85ab5e21a39654c9fcd3105cf3be1ecaf97a94491630e",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-prensa-18.png",
+      "sourceId": "axis-graphic-line/icons:prensa:18:engine:light:rest",
+      "sourceSha256": "9536324754d57b7a14a5d35a73bdb6439613324d6d712af9a77da65f0d331f2f",
+      "pngSha256": "fe5203a7b5982bf1982bd67743e66371de419bd170720a6fbd899db16f7cd199",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-social-18.png",
+      "sourceId": "axis-graphic-line/icons:social:18:engine:light:rest",
+      "sourceSha256": "36069dfe8be0a1cee48571b73f1a501ded1a7425f21d764a5e164e8daaf0e92e",
+      "pngSha256": "758f173f5caa0963f775f9656b33d15ee73874b41613f1469a1424f853d10908",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-crm-18.png",
+      "sourceId": "axis-graphic-line/icons:crm:18:engine:light:rest",
+      "sourceSha256": "fd2bca555a209cdb60510c62f2b9184e3c89038769f90a17b66c881558618a3f",
+      "pngSha256": "701179254a7029467591532a0297c5648549b65b12cf80b0a86a68909ef139a6",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-revenue-18.png",
+      "sourceId": "axis-graphic-line/icons:revenue:18:engine:light:rest",
+      "sourceSha256": "bf315508dbd96de7f55e552ae2fb6773c116e57d09bc4c89c3c180a78d3b6e62",
+      "pngSha256": "c75b81fecc57bc203345d4a75def15f7399103ca8a9f12e2858fc65032715caf",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-medios-18.png",
+      "sourceId": "axis-graphic-line/icons:medios:18:engine:light:rest",
+      "sourceSha256": "d834d9654bd8075db33e1dea7d300b816b5b40c58630f853e0510865a47b4324",
+      "pngSha256": "0a01a7b1be01fd2de2b2c8a2205d4ff9a1f17cb475a2b3f8eabb220b2ea06780",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-calendario-18.png",
+      "sourceId": "axis-graphic-line/icons:calendario:18:engine:light:rest",
+      "sourceSha256": "014abc766fdb61b3c0d7400079cb1170f9b53545a0607b36b5c485c05bd49331",
+      "pngSha256": "b4abb17c8f8f475559d8bdf29edee3c8915e5ea29d231cbe58d5a5b100e697eb",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-composer-18.png",
+      "sourceId": "axis-graphic-line/icons:composer:18:engine:light:rest",
+      "sourceSha256": "43443bebd48fcf974f26ff86158433b273cb87375267fcbf73e0aa74a564520f",
+      "pngSha256": "f3bf06ae87dc36c109c303c06a6a4cbd00dd44691e7bfe3540417b2e5e68c0df",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-contrato-18.png",
+      "sourceId": "axis-graphic-line/icons:contrato:18:engine:light:rest",
+      "sourceSha256": "287161b7b3e8c7474f43c462dbb8d11d5cf9e06cd897219f13d82799cd22036f",
+      "pngSha256": "d46cd238b0c481b5750e8c01180b6af68b03cc98485c1935a02f855a8269181c",
+      "width": 72,
+      "height": 72,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-busqueda-22.png",
+      "sourceId": "axis-graphic-line/icons:busqueda:22:engine:light:rest",
+      "sourceSha256": "1d1c05413a1a969532540430e62474835ec487f9cd41064a3b1889f73be09453",
+      "pngSha256": "084b20a3067e0122019dfa4f4deb9f3865daa4fdd382f0472d56fdc627c6b3d7",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-codigo-22.png",
+      "sourceId": "axis-graphic-line/icons:codigo:22:engine:light:rest",
+      "sourceSha256": "c8a4977491f1a1863fecd2281d239cf2ae40c46d35457eb8aed81c3a2c582bdf",
+      "pngSha256": "121debfda9467a03c5edac80bfe69c922487c31a296805f4ba4c4ca78996d40b",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-checklist-22.png",
+      "sourceId": "axis-graphic-line/icons:checklist:22:engine:light:rest",
+      "sourceSha256": "5b3094ff747f1a10751c0ee72ea33580f804124556e51caf30f209e96047c520",
+      "pngSha256": "3aeca550056e6a9ba34117672e90cb2cf76f95d6b807049a0a87dd68ebc08d8e",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-integracion-22.png",
+      "sourceId": "axis-graphic-line/icons:integracion:22:engine:light:rest",
+      "sourceSha256": "0185ece54b7e79b669cf4eeb1eac94cc526cd2d8dbd4c00bd9d868de2c24653f",
+      "pngSha256": "9c36f44ebfe7fe04eddae311e80f9eef207ee702882bff77fd309558f581ea23",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-objetivo-22.png",
+      "sourceId": "axis-graphic-line/icons:objetivo:22:engine:light:rest",
+      "sourceSha256": "328d0ba621e04b410862e97b82933a4e14ed4f373dfef3983b9daadfce6efd8d",
+      "pngSha256": "4e557fdcd06a41969c67f8c99493d9bccbe2dfc3da8aeef2d04222b60dfb959d",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-medicion-22.png",
+      "sourceId": "axis-graphic-line/icons:medicion:22:engine:light:rest",
+      "sourceSha256": "62cb55288dabd26d0d7c0bee48e57ff68d6b2d02628acc76426be0daded0f5f6",
+      "pngSha256": "975c23ba0001a0f1680e8107f0b50665a0e0383adad8efb31458d1b741e8c2d8",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-ia-22.png",
+      "sourceId": "axis-graphic-line/icons:ia:22:engine:light:rest",
+      "sourceSha256": "3beb6e3fb10b7bbd03c57dca35277ff604a8de32b0b0c03010ae9056a9656e0e",
+      "pngSha256": "6d5b42a92b73ba063422532a220a8d729457ab13383458433b1a13afb13e9cc7",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-prensa-22.png",
+      "sourceId": "axis-graphic-line/icons:prensa:22:engine:light:rest",
+      "sourceSha256": "13a59bb085b3869c1a6a1896ef5236b5a0dd3372ea264082937018d119803043",
+      "pngSha256": "93609d913220d618bc494ea127562f70a05a351c9f2dff343e116b5f5cf4522b",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-social-22.png",
+      "sourceId": "axis-graphic-line/icons:social:22:engine:light:rest",
+      "sourceSha256": "bcf341eae95caae2fd66a67feb26567a7382006e5327c8326cdfa7d0f5ca1332",
+      "pngSha256": "6aaa226ac4e06bfa80fae761e02ff94181aa53cbd55ba6cb99ca6ea011bdc7b4",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-crm-22.png",
+      "sourceId": "axis-graphic-line/icons:crm:22:engine:light:rest",
+      "sourceSha256": "204216e6ab1e9751d2decd311072fb867c370c7207da846c8b6171a4c23d67ac",
+      "pngSha256": "a8b20d141012f79175648a75a147611fc7fdd6fb33ad9a76443abeb51876f660",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-revenue-22.png",
+      "sourceId": "axis-graphic-line/icons:revenue:22:engine:light:rest",
+      "sourceSha256": "302fa7961e5c863bd026be8ac7d2e6d5a79d82b34ee28a6e5e1b6e0d737c840d",
+      "pngSha256": "dfcdbfbe6a61d66de1d5860497291b4524edc3b9da352e53f9b14ccab250f73d",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-medios-22.png",
+      "sourceId": "axis-graphic-line/icons:medios:22:engine:light:rest",
+      "sourceSha256": "2f134e8c62ed72d257f8ca5724dbb6eeb0ea7b4c6d6a1d7ac70d0c87bd82cc89",
+      "pngSha256": "19cb9080e69c1ee864f5d989f30b898b13d93592448467ea421d9f76ca3af129",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-calendario-22.png",
+      "sourceId": "axis-graphic-line/icons:calendario:22:engine:light:rest",
+      "sourceSha256": "40ca685c4396dd739504c4725639032926f57d36fa2dcf576a22051539cd0e7a",
+      "pngSha256": "d46afcc2230ede155416d70b1877ff74a72144813751c037cb81ced905f318bd",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-composer-22.png",
+      "sourceId": "axis-graphic-line/icons:composer:22:engine:light:rest",
+      "sourceSha256": "6fd6248386a4d96c5d539157d220b45b4f6f1844e4a1126b96b1d04ec00af808",
+      "pngSha256": "97a7ea2f2fbb231b86e6dce620abb70fb3bf1802a6fd76dfa0cf5beedc73d0cb",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    },
+    {
+      "file": "ai-visibility-icon-contrato-22.png",
+      "sourceId": "axis-graphic-line/icons:contrato:22:engine:light:rest",
+      "sourceSha256": "8f2417d938f1d170b20f8b734e39b0fe760d1b77275979ad17bff5e6cbe83611",
+      "pngSha256": "960613e9532f609ad673b92e202039c57ada2140301055691281b96a712314a2",
+      "width": 88,
+      "height": 88,
+      "transform": "AXIS resolveIcon at approved optical size; rest state; rasterized at 4x"
+    }
+  ]
+}

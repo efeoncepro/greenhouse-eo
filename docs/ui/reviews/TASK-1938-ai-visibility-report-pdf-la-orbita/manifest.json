@@ -1,0 +1,634 @@
+{
+  "schema": "efeonce.ai-visibility-pdf-review.v1",
+  "task": "TASK-1938",
+  "synthetic": true,
+  "localOnly": true,
+  "exports": [
+    {
+      "synthetic": true,
+      "locale": "en",
+      "audience": "client",
+      "fixture": "en-client",
+      "bytes": 226688,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "0b3399814fdbcde8743aa9bd91f89cea8542beccf30d5213e55ce3f6c16d5bc3",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "mailto:jreyes@efeoncepro.com"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nZIDRKI+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nZOAXGF+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     14  0\nHNLJKP+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     15  0\nKOTMBM+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     16  0\nWZFJAJ+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     31  0\nCNVAWQ+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     32  0\nYQNQLS+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     44  0\nAZTLRY+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     49  0\nWJNYIC+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     83  0\nRHBYUV+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     86  0\nSPOMRB+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     87  0\nZNREBL+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes     88  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "en",
+      "audience": "prospect",
+      "fixture": "en-prospect",
+      "bytes": 252056,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "b57daef4a94fa1e861a192759163123f073731963f41e32565d3b064691ed4e0",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nVRSFPY+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nQGDLSY+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nIHQLTQ+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nHDMGYU+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     29  0\nRKSYBW+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     30  0\nIFENKO+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     31  0\nJMCCNP+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     43  0\nYSSQFU+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     48  0\nGFXDPL+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     82  0\nRDFAFA+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes    100  0\nFGNUQL+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes    101  0\nGWRFWF+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    102  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "client",
+      "fixture": "es-client",
+      "bytes": 226826,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "e251756b2e4011065321d23d6dac645081e79a40fb154379f43cf1a3c589b03b",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "mailto:jreyes@efeoncepro.com"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nTXSDIY+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nAGUQDS+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     14  0\nZSTPBD+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     15  0\nNDBFOF+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     16  0\nMYDXYO+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     31  0\nNGVHYK+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     32  0\nTFIFGY+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     44  0\nUEHHYD+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     49  0\nNTOEXD+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     83  0\nKAUONN+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     86  0\nTWKXWT+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     87  0\nOMMNXX+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes     88  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "prospect",
+      "fixture": "es-long",
+      "bytes": 259014,
+      "pages": 7,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 7,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "1ae0a14c6f81ca2ed9327ba9c3857a541930d5d27d9588047dc3b1a3908e5d76",
+      "modelSha256": "a6b3300d92d7b96959252f6284f92e506bbc537093a060f1891f57e1214a5ca0",
+      "header": {
+        "organizationName": "Globe — Organización de ejemplo con un nombre comercial extenso para revisar la composición y continuidad del informe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nNEHRIJ+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nPREODB+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nXESYZT+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nRSGOUN+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     29  0\nKKPYQG+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     30  0\nADOALD+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     31  0\nXXTWHB+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     43  0\nSVMOSQ+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     47  0\nYWEXQH+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     87  0\nOSKNHF+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes    105  0\nRVJIDD+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes    106  0\nGOUTLX+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    107  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "prospect",
+      "fixture": "es-null",
+      "bytes": 242146,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "0a6a98c20863c262c37fc6b705d34a50d95a7a46c3d59fd5483193e77cc15634",
+      "modelSha256": "03a4cd4bdf5fe09580bd802cd7c33cf4306b1ac82510920bbc8292f0040dab06",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nIZKFFC+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nOSUEGF+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nCVCEZE+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nZYCQDP+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     17  0\nSJDRLQ+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     18  0\nBQDIFN+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     31  0\nVCOFXQ+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     35  0\nAIYGNP+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     69  0\nWBIYTT+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     87  0\nFGPFNE+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     88  0\nJWLXZM+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes     89  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "prospect",
+      "fixture": "es-optimal",
+      "bytes": 251925,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "92592b2272d033a867676e4b0e0ea5f1999a58ce6fb6eec6f5a55438ee63c863",
+      "modelSha256": "4ee4ca74be414dad9a207f93fe19f7280b3cd8fb3ca0840dbd285e2257798fae",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nIRJWOT+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nEFVFOY+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nJOWMOV+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nSHJXMK+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     29  0\nBDPWBW+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     30  0\nELSWPO+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     31  0\nFHYPKP+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     43  0\nQIYAGE+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     48  0\nOMFTHS+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     82  0\nJRMIPI+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes    100  0\nLBKBGI+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes    101  0\nGZUVXH+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    102  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "prospect",
+      "fixture": "es-prospect",
+      "bytes": 252197,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "d64730fa60cf0de7c39017d99d2094014935f1c5d7c372b74488e4e3cd22b9e2",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nYCWLKS+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nCMYJHJ+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nZNNFAP+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nQAXVNI+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     29  0\nPTPZMR+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     30  0\nHGOSTM+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     31  0\nAZNKME+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     43  0\nSUYZIR+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     48  0\nSXJUCN+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     82  0\nYXEGSL+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes    100  0\nQQXDRQ+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes    101  0\nHFHCZV+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    102  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "es",
+      "audience": "prospect",
+      "fixture": "es-zero",
+      "bytes": 250298,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "e95bcba40414b1dac815771fae3f70457e9354b9ce989276c1e34da9c403c5ee",
+      "modelSha256": "55f712cf8b533713bd8f26145fae3fba536bae295d5bb8c0dd3d09ebd7f980c7",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nUSHAFI+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nBLVRZN+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nSZCHJV+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nZGCZUC+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     28  0\nCRAJKN+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     29  0\nVEQSKY+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     41  0\nIGOVYP+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     46  0\nVHLMCA+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     80  0\nNNRKHQ+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     98  0\nEUVHVT+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     99  0\nXPSCBP+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    100  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "pt-BR",
+      "audience": "client",
+      "fixture": "pt-BR-client",
+      "bytes": 228623,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "f2a3cd624a8f775eef2578b448e95745362bc3bac04676bff55d51cf0b1ebcfd",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "mailto:jreyes@efeoncepro.com"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nBFTZVO+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nHCSECT+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     14  0\nVWXGXT+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     15  0\nFGRBEG+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     16  0\nIOANSJ+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     31  0\nNKCACH+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     32  0\nJVEKTZ+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     44  0\nVEXXDG+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     49  0\nDUAUZB+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     83  0\nIHOHAN+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     86  0\nJQXKXI+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     87  0\nMRGPUV+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes     88  0\n"
+    },
+    {
+      "synthetic": true,
+      "locale": "pt-BR",
+      "audience": "prospect",
+      "fixture": "pt-BR-prospect",
+      "bytes": 253933,
+      "pages": 6,
+      "pageSizes": [
+        {
+          "page": 1,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 2,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 3,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 4,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 5,
+          "width": 595.280029,
+          "height": 841.890015
+        },
+        {
+          "page": 6,
+          "width": 595.280029,
+          "height": 841.890015
+        }
+      ],
+      "pdfSha256": "9405d37546303892a9c8a242c7f58c95fafd8c4dc347adf7496ac8b884e9381a",
+      "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+      "header": {
+        "organizationName": "Globe",
+        "reportDate": "19 may 2026",
+        "periodLabel": "4 – 19 de mayo de 2026"
+      },
+      "links": [
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com",
+        "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+        "https://efeoncepro.com",
+        "https://www.linkedin.com/company/efeoncecl",
+        "https://instagram.com/efeoncepro",
+        "https://www.youtube.com/@efeoncepro",
+        "https://threads.com/efeoncepro"
+      ],
+      "outsideLinks": [],
+      "outsidePage": [],
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nZGRRKK+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nODLNAI+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nVVKURU+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nGXKNPP+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     29  0\nXDJUYE+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     30  0\nKEPSXM+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     31  0\nBNGKKW+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     43  0\nLMTWSN+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     48  0\nYBXPWY+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     82  0\nIKHDNJ+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes    100  0\nYVXTSE+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes    101  0\nQDUFUD+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    102  0\n"
+    }
+  ],
+  "sourceHashes": {
+    "src/components/growth/ai-visibility/report-artifact/pdf/report-pdf-tokens.ts": "4b800621746d8fc60b1c4d8b6d852f4d7898c76947cb488dd86afc9c5d8d6b6c",
+    "src/components/growth/ai-visibility/report-artifact/pdf/report-pdf-primitives.tsx": "6b884cfa27abab7be8cbd0b5380ea3015fa718eb991890d66dbd17e4d9e12963",
+    "src/components/growth/ai-visibility/report-artifact/pdf/render-ai-visibility-report-pdf.ts": "f6be86950bbfb450394dc73cdb6c256e20945fffe836466202620fa1d0ea222a",
+    "src/components/growth/ai-visibility/report-artifact/pdf/ai-visibility-layout.generated.json": "17da94b99def3a408e42bad4dda969cb8cfe8b39e0e45c246b653fb76d820bc8",
+    "src/components/growth/ai-visibility/report-artifact/pdf/AiVisibilityReportPdf.tsx": "20c1d9caf8acf8c31fefc06663f7e7c42e398574461e4d83c124e3369ea86cf0",
+    "src/components/growth/ai-visibility/report-artifact/pdf/report-pdf-name-fit.ts": "d4098ead69c2890571fd76fdf777cbd09b6037b4e06002af7bdf54a7c0f4aae9",
+    "src/components/growth/ai-visibility/report-artifact/pdf/report-pdf-presentation.ts": "0d4dabd1b0d13631752f1802f5ea73e587721f015b607f3cb9fd4120e7ffa2bb",
+    "src/components/growth/ai-visibility/report-artifact/pdf/report-pdf-asset-paths.generated.ts": "6213d37627eca5f30553a7943eda347141340f3cbd518ef2ac9f88c1f665d832",
+    "src/lib/copy/ai-visibility-report-pdf.ts": "5c8e729a430f2c37e13039767a5815e0371224ae9ab845694f6928613bce72b5",
+    "src/lib/growth/ai-visibility/report/pdf-presentation-context.ts": "e33d6cd59b0fe9cc582a10ab0754d903885ca64e040217f2ded6d8b789649bf2",
+    "public/branding/pdf/ai-visibility-assets.manifest.json": "131d66936a6813361b4a6f554b9efffb909e6c50ed58135c76f053bd123497ed"
+  },
+  "independentReview": "final_pdf_review: no material findings, 2026-10-03; es-null/zero 1.05pt optical overhang advisory",
+  "annotationFixReview": "final_pdf_review: ES/EN/PT-BR date chips centered; public methodology versions; 10 exports without internal score identifier or bounds violations; 2026-10-03 17:13 exports"
+}

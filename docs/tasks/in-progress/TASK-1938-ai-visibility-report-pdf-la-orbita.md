@@ -8,24 +8,28 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1938-ai-visibility-report-pdf-la-orbita.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseño aprobado por el operador el 2026-09-29 y sellado en docs/ui/visual-directions (24 hojas en es, en y pt-BR, más los estados de la órbita). Canonizado en AXIS v0.3.30 el mismo día (tokens aiVisibilityReport y measureSeverity, contrato efeonce.ai-visibility-report 0.1.0, graphic-line 0.12.0) y en v0.3.38 con el recorrido de la órbita (contrato de la órbita 0.5.0); Greenhouse aún fija 0.3.37 y el renderer del PDF no se ha tocado. El commit a124ad9ab es el script de logos de las submarcas SEO/AEO, un insumo de esta task, no su implementación`
+- Status real: `Code complete local 2026-10-03, rollout pendiente. Refresh react-pdf validado en 10 PDFs sintéticos; seis variantes ES/EN/PT-BR × cliente/prospecto, estados null/0/100 y texto largo. 108 tests focales PASS, TypeScript PASS, build PASS y recursos trazados completos. Suite general anterior: 18.148 PASS; su único fallo Manzanitas fue corregido con autorización del operador (metadata 0.4.10 → 0.4.15), check de 49 archivos y siete tests PASS; suite completa no repetida. Dossier y evidencia en docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md. Sin push/envíos ni publicación; verificar adjunto real después de rollout autorizado.`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
+
+## Seguimiento de anotaciones PDF — 2026-10-03
+
+Identificador interno del puntaje retirado del texto público: versión legible, sin fallback a IDs desconocidos, preservando la procedencia del modelo. Chip de fecha centrado con contenedor independiente. Pie contrastado con la fuente aprobada: organización/período + burbuja URL + folio, sin Insights. Diez PDFs reexportados; cuatro suites / 49 tests PASS y lint focal PASS. Evidencia actualizada en el dossier; build final repetido y PASS antes del commit (`.next-local/build-20261003223513-37388`); la suite global del Status real conserva su corte histórico.
 
 ## Summary
 
@@ -163,7 +167,7 @@ Reglas obligatorias:
   (`src/config/efeonce-brand.ts`); nunca copias a mano ni URLs repetidas.
 - Sin el lockup de Efeonce Insights: el Grader no es una edición de Insights.
 - Una cifra ausente nunca se dibuja como cero (puntaje, nivel o dimensión `null` → «—» y «Sin dato»).
-- Copy visible en `src/lib/copy/growth.ts`, validado con `greenhouse-ux-writing`.
+- Copy nuevo específico del PDF en `src/lib/copy/ai-visibility-report-pdf.ts`; `growth.ts` conserva el canon de plantillas reconocidas para no cambiar web, email ni snapshots históricos.
 
 ## Normative Docs
 
@@ -231,7 +235,7 @@ Reglas obligatorias:
   del consumer del correo)
 - Future candidate home: `undecided`
   (el follow-up de motor podría moverlo a un catálogo del Artifact Composer; esta task no toma esa decisión)
-- Boundary: `renderAiVisibilityReportPdf(model, header)`; consumidor autorizado: `build-report-attachment.ts`
+- Boundary: `renderAiVisibilityReportPdf({ model, header, context? })`; `context` es metadata visual opcional, no amplía disclosure ni modifica el modelo. Consumidor autorizado: `build-report-attachment.ts`.
 - Server/browser split: el renderer es `server-only`; ningún Client Component lo importa
 - Build impact: `none` (sin dependencia nueva; a lo sumo archivos de fuente estáticos en `src/assets/fonts/`)
 - Extraction blocker: `none`
@@ -246,7 +250,7 @@ Reglas obligatorias:
 - Resultado perceptible esperado: el documento se ve de la misma familia que un informe de Efeonce Insights y el
   puntaje se entiende de un vistazo.
 - Friccion que debe reducir: la discontinuidad visual entre el diagnóstico gratuito y el producto para clientes.
-- No-goals UX: cambiar el orden narrativo del informe, sumar secciones o datos, cambiar el web/print.
+- No-goals UX: sumar métricas o datos, cambiar web/print o el flujo de envío. El orden narrativo de seis páginas es el aprobado.
 
 ### Surface & system decision
 
@@ -256,7 +260,7 @@ Reglas obligatorias:
 - Primitive decision: `extend` — el renderer react-pdf existente; sin primitive nueva.
 - Adaptive density / The Seam: `no aplica` — página de tamaño fijo.
 - Floating/Sidecar/Dialog decision: no aplica.
-- Copy source: `src/lib/copy/growth.ts`.
+- Copy source: `src/lib/copy/ai-visibility-report-pdf.ts`; plantillas reconocidas desde `growth.ts`.
 - Access impact: `none`.
 
 ### State inventory
@@ -265,10 +269,10 @@ Reglas obligatorias:
 - Loading: no aplica (el PDF se genera en el servidor antes del envío).
 - Empty: puntaje `null` → anillo sin arco ni esfera y «—»; secciones sin datos no se dibujan.
 - Error: si el render falla, el correo sigue el camino de error actual de `build-report-attachment.ts` (sin cambio).
-- Degraded / partial: motores sin respuesta → «N de M motores respondieron»; dimensión sin dato → «Sin dato».
-- Permission denied: no aplica.
+- Degraded / partial: motores sin respuesta → «N de M motores respondieron» si ambos conteos están verificados; legacy sin responded declara cobertura no verificada. Dimensión sin dato → «Sin dato».
+- Permission denied: fuera del PDF; token expirado/inexistente conserva 404 indistinto, rate limit 429; flag/consent/report gates de envío intactos. No se emite un documento de error.
 - Long content: nombres largos ajustan línea; nunca «…».
-- Mobile / compact: no aplica (documento A4).
+- Mobile / compact: 390 px no aplica a documento A4 fijo; lectura mediante visor/zoom. Informe responsive web fuera del scope.
 - Keyboard / focus: no aplica; enlaces reales en la contraportada.
 - Reduced motion: no aplica (documento estático).
 
@@ -298,8 +302,8 @@ Reglas obligatorias:
 - Primitive / variant / kind: renderer react-pdf existente (`extend`).
 - Component candidates: `Gauge` → órbita que mide; nueva página de contraportada; encabezado y pie corridos; disco de
   logo de motor; ícono del Trazo (SVG de `resolveIcon` convertido a primitivas `Svg` de react-pdf).
-- Copy source: `src/lib/copy/growth.ts`.
-- Data reader / command: `ReportArtifactModel` sin cambios de forma.
+- Copy source: `src/lib/copy/ai-visibility-report-pdf.ts`; copy histórico desconocido se conserva literalmente.
+- Data reader / command: `ReportArtifactModel` sin cambios de forma; `report/pdf-presentation-context.ts` lee metadata visual después de la autorización existente.
 - API parity: sin acción de negocio nueva; el adjunto sigue saliendo del mismo contrato.
 - Access / capability: sin cambios.
 - States to implement: los de la tabla de State Copy del wireframe.
@@ -308,16 +312,16 @@ Reglas obligatorias:
 
 - Scenario file: no aplica (sin ruta de portal).
 - Route: no aplica.
-- Viewports: A4 a tamaño físico.
+- Viewports: desktop documental A4 a 96 dpi, 794×1123 px; 390 px mobile no aplicable a PDF fijo, sin ruta de portal.
 - Quality profile: `premium`.
-- Required steps: render con el fixture y con un informe real de staging; abrir cada página.
+- Required steps: render local con fixtures sintéticos y abrir cada página; informe real de staging sólo como verificación pendiente de rollout autorizado, nunca consulta/envío real para QA local.
 - Required captures: cada página en color y en escala de grises, lado a lado con la hoja aprobada del canvas.
 - Required `data-capture` markers: no aplica.
 - Assertions: cifras iguales al modelo; fuentes embebidas; test anti-fuga verde.
 - Scroll-width checks: no aplica a PDF.
 - Reduced-motion / focus evidence: no aplica.
-- Review dossier: `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/`.
-- Baseline decision / surface ID: `growth.ai-visibility.report-pdf`, baseline nuevo tras la aprobación.
+- Review dossier: `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`, en preparación por root; no equivale a evidencia entregada.
+- Baseline decision / surface ID: `growth.ai-visibility.report-pdf`; renderer anterior de cuatro páginas en `.captures/task-1938/baseline.pdf` como regresión de datos, 24 hojas aprobadas como referencia de fidelidad. Baseline nueva sólo tras aceptación visual.
 
 ### Design decision log
 
@@ -326,7 +330,7 @@ Reglas obligatorias:
   minutos y el correo adjunta el PDF en el momento); sólo cambiar la paleta (descartado: dejaría el indicador de carga).
 - Why this pattern: continuidad prospecto → cliente con el menor riesgo operativo.
 - Reuse / extend / new primitive: `extend` del renderer.
-- Open risks: tipografía sin decidir; fuente variable en react-pdf; halo radial en react-pdf.
+- Open risks: instancias estáticas reproducibles de Bricolage; fidelidad del halo en PDF real; contexto de presentación comercial distinto del audience de disclosure. Resolución y límites: plan TASK-1938.
 
 ### Visual verification
 
@@ -355,6 +359,20 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Delta de ejecución 2026-10-03
+
+El plan aprobado de `docs/tasks/plans/TASK-1938-plan.md` actualiza los supuestos siguientes: no se bajan los paquetes instalados; la órbita usa primitivas SVG con los tokens actuales y la anatomía editorial adicional sale de una proyección generada de AXIS. El adapter de campañas ajeno queda fuera. El contexto visual de cliente es aditivo en renderer/consumers y no altera el modelo ni los gates o efectos del envío. La tendencia continúa bajo la política vigente de attachment. El eslogan Engine usa 11.263 em. Estas resoluciones prevalecen sobre las versiones y restricciones de implementación históricas en los slices y AC. UI mapping, escenarios PDF y decisiones cerrados en este plan; readiness documental validada con task:lint, no equivale a aceptación visual.
+
+#### Avance del slice de presentación y contexto
+
+- `report-pdf-presentation.ts` proyecta los datos públicos existentes sin mutar `ReportArtifactModel`: porcentaje crudo de `viewFacts.sharePct`, etiquetas porcentuales enteras, cobertura sin confundir cero con ausencia y las cuatro categorías de sentimiento. `resolveSeverity` resuelve sólo las etiquetas PDF con 40/70; el puntaje general conserva la gravedad del productor. El umbral 45 anterior del modelo compartido queda fuera del refresh.
+- `ai-visibility-report-pdf.ts` centraliza los tres idiomas y el default único de Julio Reyes. Traduce sólo plantillas de headline, brecha, acción y disclaimer reconocidas por igualdad; texto histórico o personalizado desconocido permanece literal. La proyección mantiene `trend: null` por disclosure del attachment y distingue histórico oculto de primera medición.
+- `pdf-presentation-context.ts` verifica `run → profile → organización` y usa `getOrganizationCommercialFacts`; un vínculo por sí solo no prueba que sea cliente. Operator reutiliza sus facts sólo si coinciden con la organización vinculada. `snapshot.asOf` y `snapshot.publicReport.provenance.market.locale` son la primera procedencia de fecha/idioma; si falta locale, usa run, perfil y finalmente `es`.
+- Logo sólo desde el byte reader de sistema existente: asset adjunto de tipo `organization_logo`, ownership exacto, MIME permitido y máximo 2 MiB. Se normaliza a PNG con límite de píxeles y bytes; sin logo o ante fallo se conserva nombre/audiencia y se registra sólo un error redactado. `purpose` distingue Insights de AI Visibility sin modificar los controles. El logo ordinario requiere lecho claro; no se recolorea.
+- Identidad contradictoria o ausente falla cerrado por los caminos de error existentes. No es un fallback a prospecto: los snapshots válidos heredados ya tienen FK obligatorias a run/perfil; run antiguo sin organización sigue siendo prospecto. La ausencia de una fecha de entrega acordada omite «Próximo informe» y nunca reutiliza `recurringRegradeNextAt`.
+- Adjunto, descarga, dispatch y operator transportan únicamente contexto visual opcional. Flag, consentimiento, estado del reporte, claim, destinatarios, idempotencia y efectos de email/CRM conservan su lógica. No hay consulta histórica, consulta a proveedores, persistencia nueva ni cambio de API pública.
+- Evidencia local del slice: 7 suites / 71 pruebas PASS (presentación, reader, dispatch, descarga, ejecución operator, command original y lector de logo). IO mockeada, sin DB/correos reales; ESLint de los archivos del slice y `git diff --check` PASS. Esto no acredita los píxeles, el PDF exportado ni el rollout.
 
 ### Slice 1 — Dirección aprobada y sellada
 
@@ -507,47 +525,48 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 ## Acceptance Criteria
 
 - [x] El operador aprobó la propuesta del canvas y las hojas quedaron en `docs/ui/visual-directions/` (2026-09-29: 24 hojas nativas en `es`, `en` y `pt-BR`, más la lámina de estados de la órbita).
-- [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC
-  scenario plan y design decision log cerrados; si pasa a `yes`, `pnpm task:lint --task TASK-1938` queda sin hallazgos.
-- [ ] La portada dibuja el puntaje con la esfera en `score × 3,6°` y estela de 50°; no queda ningún arco que se llene.
-- [ ] Bajo la estela, la portada dibuja el recorrido desde las 12 hasta la esfera, en el color de la estela, de 3 px al
+- [x] `UI ready: yes` acredita dirección aprobada, implementation mapping, plan de evidencia y decision log; no acredita aceptación visual. El wireframe explicita PDF A4 desktop, 390 px mobile no aplicable y estados externos preservados. `pnpm task:lint --task TASK-1938` debe quedar sin hallazgos después de actualizar el mapping.
+- [x] La portada dibuja el puntaje con la esfera en `score × 3,6°` y estela de 50°; sin disco relleno ni gauge de carga; el recorrido aprobado conserva su arco semántico.
+- [x] Bajo la estela, la portada dibuja el recorrido desde las 12 hasta la esfera, en el color de la estela, de 3 px al
   60 % de opacidad (`aiVisibilityReport.cover.orbit.travelled`): anillo completo con 100 y nada con 0 o sin dato.
-- [ ] Con puntaje `null` la portada muestra el anillo sin arco ni esfera, «—» sin «de 100» y la etiqueta «Sin dato».
-- [ ] Estela, esfera, halo y punto de la etiqueta de la portada toman el color de la gravedad del puntaje, con los umbrales de `recommendations.ts` y los colores `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`. El anillo, la marca de partida y la cifra no cambian, y la etiqueta en texto siempre acompaña al color. Cada estado coincide con `portada-estados-de-la-orbita.png`.
-- [ ] Ningún nivel ni dimensión sin dato se muestra como 0.
-- [ ] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `axisSemanticHex`; ningún HEX escrito a mano.
-- [ ] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.6`; el cierre dice «Empower your Engine».
-- [ ] El documento no usa el lockup de Efeonce Insights.
-- [ ] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
-- [ ] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,586 em), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
-- [ ] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
-- [ ] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
-- [ ] El copy nuevo vive en `src/lib/copy/growth.ts`, incluidos los nombres de las dimensiones en español.
-- [ ] El PDF sale en `es`, `en` y `pt-BR` según el locale del informe, con el texto aprobado en el canvas, fechas y porcentajes formateados con `Intl`, y cae a `es` cuando el locale no está soportado.
-- [ ] Existen dos versiones del documento por audiencia, derivada del cliente que el Grader ya identifica; la de cliente no tiene CTA comercial, redes ni oferta del Grader, y la de no cliente cierra con «Agenda una reunión», que enlaza a `efeoncepro.com/contacto/` con UTM (sin correo comercial).
-- [ ] La contraportada de cliente muestra al responsable de la cuenta desde un único valor configurable (hoy Julio Reyes, Managing Director & GTM).
-- [ ] La tipografía es la canónica de «La órbita» (Bricolage 760 + Poppins), registrada en `register-fonts.ts` con instancias estáticas por peso.
-- [ ] La gravedad de puntaje, niveles, dimensiones y motores sale de los umbrales de `recommendations.ts` (< 40 crítico, < 70 atención) y la portada muestra esa escala.
-- [ ] El puntaje de cada nivel es el promedio ponderado de sus dimensiones medidas; un nivel sin dimensiones medidas muestra «Sin dato» y el de operabilidad sin probes «En cobertura».
-- [ ] Sin histórico la portada dice «Primera medición» y nunca «▲ 0».
-- [ ] Las barras son navy y la gravedad va en etiquetas con punto de color.
-- [ ] El pie de cada página interior queda dentro de la hoja (medido en el PDF real).
-- [ ] La página 05 muestra la participación de voz en porcentaje y las fuentes citadas de `citationSourceBreakdown`.
-- [ ] `renderAiVisibilityReportPdf` conserva su firma y `build-report-attachment.ts` no cambia.
-- [ ] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
-- [ ] Greenhouse fija `axis-tokens` y `axis-ui-contracts` `0.3.38`, `axis-graphic-line` `0.13.0`, `axis-brand-assets`
-  `0.4.6` y `axis-ui-registry` `0.3.3`, instalados con credencial efímera autorizada. En el mismo commit, el adapter
-  `graphic-line.mjs` acepta el contrato `efeonce.graphic-line-orbit` `0.5.0` y `pnpm creative:layout:test` queda verde;
-  `pnpm brand:tokens --check`, `pnpm glitch:tokens --check` y `pnpm manzanitas:tokens --check` quedan verdes.
-- [ ] El renderer lee la anatomía del documento de `aiVisibilityReport` y el color de gravedad de
-  `efeonceGraphicLine.measureSeverity` (`axis-tokens` `0.3.38`), sin HEX ni medidas copiadas del canvas.
-- [ ] La órbita de la portada sale de `aiVisibilityReportOrbitSvg` o se reproduce desde `aiVisibilityReport.cover.orbit`,
-  y coincide con el Lab de AXIS (`/references/ai-visibility-report/`) en sus cuatro estados.
-- [ ] Un intent armado desde el modelo resuelve `status: 'resolved'` con `resolveAiVisibilityReportIntent`
-  (`axis-ui-contracts` `0.3.38`) para las dos audiencias y los tres idiomas del fixture, verificado por un test.
-- [ ] El dossier tiene las ocho hojas de cada idioma en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
+- [x] Con puntaje `null` la portada muestra el anillo sin arco ni esfera, «—» sin «de 100» y la etiqueta «Sin dato».
+- [x] Estela, esfera, halo y punto de la etiqueta de la portada toman el color de la gravedad del puntaje, con los umbrales de `recommendations.ts` y los colores `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`. El anillo, la marca de partida y la cifra no cambian, y la etiqueta en texto siempre acompaña al color. Cada estado coincide con `portada-estados-de-la-orbita.png`.
+- [x] Ningún nivel ni dimensión sin dato se muestra como 0.
+- [x] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `efeonceGraphicLine.measureSeverity`; ningún HEX escrito a mano.
+- [x] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.15`; el cierre dice «Empower your Engine».
+- [x] El documento no usa el lockup de Efeonce Insights.
+- [x] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
+- [x] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,263 em (Engine)), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.
+- [x] Cada motor evaluado (ChatGPT, Claude, Gemini, Perplexity, Google AI Overview) aparece con su logo oficial en la portada y en «Canales de respuesta»; Google AI Overview usa la lupa de Google AI Mode de AXIS, nunca el logo de Gemini.
+- [x] Los íconos son del Trazo de AXIS (`resolveIcon`), en reposo, y cada grupo pasa `auditIconGroup`; ninguno dibujado a mano.
+- [x] El copy nuevo específico del PDF vive en `src/lib/copy/ai-visibility-report-pdf.ts`, incluidos los nombres de dimensiones en los tres idiomas. Evidencia: proyección y tests de locale/copy; el texto histórico desconocido permanece literal.
+- [x] El PDF exportado sale en `es`, `en` y `pt-BR` según el locale del informe, con texto reconocido aprobado, fechas y porcentajes enteros formateados con `Intl`, y cae a `es` cuando no está soportado. Evidencia: seis PDFs y metadata en el dossier, más prueba de fallback de locale.
+- [x] Existen dos versiones exportadas por audiencia comercial verificada; cliente sin CTA comercial/redes/oferta, prospecto con «Agenda una reunión» y UTM hacia `efeoncepro.com/contacto/`. Evidencia: seis contraportadas, enlaces extraídos y tests de reader/dispatch/operator.
+- [x] La contraportada de cliente muestra al responsable desde un único valor configurable (Julio Reyes, Managing Director & GTM). Evidencia: tres PDFs cliente, copy central y test del default.
+- [x] La tipografía es la canónica de «La órbita» (Bricolage 760 + Poppins), registrada en `register-fonts.ts` con instancias estáticas por peso.
+- [x] La gravedad de puntaje, niveles, dimensiones y motores sale de los umbrales de `recommendations.ts` (< 40 crítico, < 70 atención) y la portada muestra esa escala.
+- [x] El PDF conserva exactamente el puntaje de cada nivel del modelo vigente, sin recalcular métricas (límite autorizado 03/10); un nivel sin dimensiones medidas muestra «Sin dato» y el de operabilidad sin probes «En cobertura».
+- [x] Sin histórico la portada dice «Primera medición» y nunca «▲ 0»; con histórico excluido por la política de attachment no se inventa primera medición ni delta. Evidencia: test de la proyección y exportaciones; attachment no expone histórico oculto.
+- [x] Las barras son navy y la gravedad va en etiquetas con punto de color.
+- [x] El pie de cada página interior queda dentro de la hoja (medido en el PDF real).
+- [x] La página 05 muestra la participación de voz en porcentaje y las fuentes citadas de `citationSourceBreakdown`.
+- [x] `renderAiVisibilityReportPdf` y `build-report-attachment.ts` conservan compatibilidad con `{ model, header }` y reciben `context?` aditivo. Evidencia: contratos de descarga/dispatch/operator y diez exports auditados con hash del modelo sin mutación.
+- [x] `report-artifact-pdf-no-leak.test.tsx` sigue verde.
+- [x] Se conserva el juego instalado de AXIS: tokens `0.3.41`, contracts `0.3.40`, graphic-line `0.11.0`, brand-assets `0.4.15`, registry `0.3.1`. El Delta 03/10 sustituye el bump histórico: no se degradan versiones ni se modifica el adapter de campañas. La anatomía editorial faltante sale del productor AXIS local, exportada con hashes; publicación/adopción del paquete equivalente queda como continuidad.
+- [x] Sincronización Manzanitas corregida por autorización explícita del operador (03/10): `pnpm manzanitas:tokens` sólo cambia `source.versions.@efeoncepro/axis-brand-assets` de `0.4.10` a `0.4.15`. `--check` PASS sobre 49 archivos; siete tests de sincronización PASS. Sin cambios en CSS, logos, íconos, compiler ni dependencias. La suite general no se repitió por este ajuste de metadata.
+- [x] El renderer lee la anatomía del documento de `aiVisibilityReport` y el color de gravedad de
+  `efeonceGraphicLine.measureSeverity` (`axis-tokens` `0.3.41` más extensión editorial generada y sellada), sin HEX ni medidas copiadas del canvas.
+- [x] La órbita de la portada sale de `aiVisibilityReportOrbitSvg` o se reproduce desde `aiVisibilityReport.cover.orbit`,
+  con geometría canónica probada y exports crítico, atención, óptimo y sin dato.
+- [x] Un intent armado desde el modelo resuelve `status: 'resolved'` con `resolveAiVisibilityReportIntent`
+  (`axis-ui-contracts` `0.3.40`, estados representables sin ampliar disclosure) para las dos audiencias y los tres idiomas del fixture, verificado por un test.
+- [x] El dossier tiene las ocho hojas de cada idioma en color y en gris, lado a lado con las hojas aprobadas, y el scorecard.
+
+Evidencia común de los criterios locales: [dossier](../../ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md), manifest, diez PDFs, 24 comparaciones color/gris, scorecard y 108 pruebas focales. Los criterios de rollout no se tildan por evidencia local.
 
 ## Verification
+
+Estado de comandos y límites: [verificación](../../ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/verification.md).
 
 - `pnpm lint`
 - `pnpm typecheck`
@@ -557,14 +576,14 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] El master flow `EPIC-020-AEO-PROGRAM-UI-FLOW.md` registra que web y print siguen con el diseño anterior.
+- [x] El master flow `EPIC-020-AEO-PROGRAM-UI-FLOW.md` registra que web y print siguen con el diseño anterior.
 
 ## Follow-ups
 

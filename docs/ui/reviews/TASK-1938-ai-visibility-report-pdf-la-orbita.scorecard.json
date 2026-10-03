@@ -1,0 +1,84 @@
+{
+  "task": "TASK-1938",
+  "surface": "ai-visibility-report.pdf",
+  "verdict": "pass-visual-local; rollout-pending",
+  "reviewedAt": "2026-10-03",
+  "reviewer": "Codex root + final_pdf_review independiente",
+  "evidence": {
+    "dossier": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md",
+    "manifest": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/manifest.json"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Diagnóstico y plan preceden dimensiones, niveles, mercado y fuentes; cierre separado.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "A4 completo, órbita y lockups derivados de AXIS; nombres largos medidos con la fuente real.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Encabezados y pies coherentes; la continuación larga conserva título, contexto y folio.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Seis páginas normales; siete en estrés para conservar evidencia completa sin reducir todo el documento.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "Halo semántico acotado a la portada; interiores planos orientados a lectura.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Sin tarjetas o decoración ajenas al diseño aprobado; datos ausentes no crean secciones vacías.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "Voz del cierre, esfera Engine y firma centrada conservan jerarquía.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Seis instancias Bricolage estáticas, Poppins y pesos del eslogan; fuentes embebidas verificadas.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "Contraste medido, tonos de gravedad canónicos y etiquetas legibles en gris.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "iconography": {
+      "score": 4.6,
+      "rationale": "Trazo, motores y redes oficiales con hashes; RRSS visibles a escala correcta.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "24 comparaciones con hojas aprobadas; datos del fixture preservados, sobrepaso óptico menor documentado.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Identidad AI Visibility Report y Engine específica, sin lockup Insights ni plantillas genéricas.",
+      "evidence": "docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/comparison.html"
+    },
+    "responsive": {
+      "applicable": false,
+      "rationale": "Documento A4 fijo; verificación de MediaBox, no una UI responsive."
+    },
+    "motion": {
+      "applicable": false,
+      "rationale": "PDF estático. Órbita representa medida, no animación."
+    }
+  },
+  "average": 4.575,
+  "averageScope": "12 dimensiones aplicables; responsive/motion no puntúan",
+  "notes": "No hallazgos materiales; no acredita gates globales ni despliegue. Un sobrepaso óptico de 1,05 pt en veredicto de cero/sin dato permanece dentro de hoja."
+}

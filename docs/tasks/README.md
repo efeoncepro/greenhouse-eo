@@ -2,6 +2,7 @@
 
 Panel operativo de tasks del repo.
 
+> TASK-1938 (03/10): refresh PDF **code complete local**, rollout pendiente. [Dossier](../ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md); métricas y flujo conservados. 108 focales y build PASS; sincronización Manzanitas corregida y validada.
 ## Kortex pausado — backlog retirado
 
 Kortex fue pausado por decisión del operador el `2026-10-02`. Por esa razón, las tasks Kortex que estaban

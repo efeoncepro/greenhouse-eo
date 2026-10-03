@@ -543,11 +543,11 @@ oscuro de la línea, la negativa.
 | Landing del AEO Assessment («¿Te recomiendan las IA? / Averígualo») | sí | aprobada en el canvas; no implementada | canvas «Marcas SEO y AEO de Efeonce» |
 | Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine); canónica en AXIS desde `v0.3.30`: la órbita de la portada dice la gravedad | canvas; Lab `/references/ai-visibility-report/`; receta `aiVisibilityReportOrbitSvg` |
 | Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
-| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); el renderer está por implementar y pasa a la paleta Engine | TASK-1938 (dueña del cambio y de la adopción de AXIS 0.3.30) |
+| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); renderer Engine implementado y validado localmente 2026-10-03; rollout pendiente | TASK-1938; dossier de diez PDFs y 24 comparaciones |
 
 Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
 por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
-2026-09-29, AXIS `main` `7f9c8bb`); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Referencia visual en el Lab de AXIS
+2026-09-29, AXIS `main` `7f9c8bb`); Ese registro antecede a la adopción local; ver estado vigente de TASK-1938 a continuación. Referencia visual en el Lab de AXIS
 `/references/seo-aeo/` (JSON `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md`; publicados el
 2026-09-29). Norma: manual §7.2.
 
@@ -561,8 +561,9 @@ su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del 
 (`axis-graphic-line` 0.13.0) lleva además el **camino recorrido** desde las 12, en el color del nivel (§3.4). Página canónica:
 [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) (JSON
 `/references/ai-visibility-report.json`); guía `docs/agent-composition/ai-visibility-report.md`; dirección de
-Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Greenhouse fija
-todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
+Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. La adopción local y el renderer se registran en TASK-1938; el estado de publicación se verifica por separado.
+
+**Aplicación PDF verificada localmente (2026-10-03):** TASK-1938 conserva react-pdf, snapshot, métricas y flujo de envío. Usa tokens `0.3.41`, contracts `0.3.40` y brand-assets `0.4.15`, sin bump de paquetes; la anatomía editorial faltante sale de una extensión generada en AXIS y sellada en el consumidor, todavía sin publicar. Seis variantes normales ES/EN/PT-BR × cliente/prospecto, seis A4; nombres largos se miden con la fuente real y el contenido extenso continúa sin truncarse. Diez PDFs auditados, contraste y 24 comparaciones color/gris en `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`. Recursos oficiales y seis pesos estáticos: `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`; registro aditivo. Redes: el PNG oficial incluye el disco, se muestra completo a 40 px, sin doble reducción. Corrección posterior de anotaciones (03/10): el chip de período centra el texto en un contenedor independiente; las versiones de metodología se presentan como números, nunca como IDs técnicos. Pie interior confirmado: organización/período, burbuja URL y folio, sin lockup Insights. Eslogan Engine al 64 %, divisor canónico 11,263 em. Tipos, build y 108 pruebas focales PASS; desincronización de metadata Manzanitas corregida con autorización del operador (check de 49 archivos y siete tests PASS; suite general no repetida). **Code complete local, rollout pendiente**, no acredita envío ni publicación.
 
 ### B4. Deck de Insights y correo de aviso
 

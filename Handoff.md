@@ -1,5 +1,7 @@
 # Handoff activo
 
+**PDF AI Visibility Report (03/10):** [TASK-1938](docs/tasks/in-progress/TASK-1938-ai-visibility-report-pdf-la-orbita.md) code complete local en develop; [dossier con PDFs y 24 comparaciones](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md). Engine/órbita, fuentes y logos oficiales, ES/EN/PT-BR y cierres por audiencia; métricas y envío preservados. 108 focales, TypeScript y build PASS; 18.148 tests generales PASS en la corrida anterior; único fallo Manzanitas corregido por autorización del operador (metadata de versión, check de 49 archivos y siete tests PASS; suite general no repetida). Rollout pendiente, sin push/envíos. Web/print conservan su diseño.
+
 **Marca → escala (03/10):** [dirección aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md), local sin commit/push; [revisión y pendientes](docs/audits/strategy/2026-10-03-brand-decisions-scalable-execution.md).
 
 **Insights: criterio de figuras (03/10):** [TASK-1974](docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) y [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) in-progress (Claude), local en develop, sin push. Slice 1 de 1975 (diseño de la tarjeta, tonos semánticos, tokens y norma) aprobado y versionado en `81e50977b`. Orden: 1974 Slices 1–5 → 1975 Slices 2–6; las dos salen en el mismo release, con Think desplegado antes o junto.

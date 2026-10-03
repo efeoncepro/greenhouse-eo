@@ -72,6 +72,17 @@ const registerFontsOnce = async (): Promise<void> => {
     tryRegister('Poppins', resolve(FONT_DIR, 'Poppins-SemiBold.ttf'))
     tryRegister('Poppins Bold', resolve(FONT_DIR, 'Poppins-Bold.ttf'))
 
+    // TASK-1938 — additive report families. Keep the shared Poppins=600 alias above unchanged.
+    tryRegister('Poppins Light', resolve(FONT_DIR, 'Poppins-Light.ttf'))
+    tryRegister('Poppins Regular', resolve(FONT_DIR, 'Poppins-Regular.ttf'))
+
+    tryRegister('AI Visibility Bricolage 320', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-320.ttf'))
+    tryRegister('AI Visibility Bricolage 400', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-400.ttf'))
+    tryRegister('AI Visibility Bricolage 700', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-700.ttf'))
+    tryRegister('AI Visibility Bricolage 720', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-720.ttf'))
+    tryRegister('AI Visibility Bricolage 740', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-740.ttf'))
+    tryRegister('AI Visibility Bricolage 760', resolve(FONT_DIR, 'BricolageGrotesque-AiVisibility-760.ttf'))
+
     // Poppins ExtraBold / Black (+ italics) — Efeonce slogan "Empower your Growth".
     // Source: Google Fonts (fonts.gstatic.com Poppins v24, Latin subset), SIL OFL 1.1.
     // Typography contract in src/config/efeonce-brand.ts (EFEONCE_SLOGAN_PARTS).

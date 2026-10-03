@@ -14,6 +14,8 @@
 
 ---
 
+> Actualización de aplicación 2026-10-03: TASK-1938 implementa localmente el refresh del PDF AI Visibility Report, con métricas y motor intactos. Diez exports y 24 comparaciones en el [dossier](../../ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md); rollout pendiente. Los registros de versiones del 29/09 que siguen son históricos: el estado instalado vigente y la extensión editorial AXIS sin publicar están en la task y en la skill, applications.md §B3c.
+
 ## 0. En una frase
 
 **Una esfera que recorre su órbita.** La esfera del isotipo (la nave con su anillo y su esfera) es el activo

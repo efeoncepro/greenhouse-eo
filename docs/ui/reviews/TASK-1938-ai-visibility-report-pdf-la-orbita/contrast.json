@@ -1,0 +1,65 @@
+{
+  "source": "AXIS aiVisibilityReport.palette + measureSeverity",
+  "checks": [
+    {
+      "foreground": "ink",
+      "background": "paper",
+      "ratio": 17.565
+    },
+    {
+      "foreground": "muted",
+      "background": "paper",
+      "ratio": 5.47
+    },
+    {
+      "foreground": "muted",
+      "background": "surface",
+      "ratio": 5.049
+    },
+    {
+      "foreground": "paper",
+      "background": "ground",
+      "ratio": 16.542
+    },
+    {
+      "foreground": "softOnDark",
+      "background": "ground",
+      "ratio": 12.707
+    },
+    {
+      "foreground": "softOnDark",
+      "background": "navy",
+      "ratio": 8.567
+    },
+    {
+      "foreground": "criticalDark",
+      "background": "ground",
+      "ratio": 4.623
+    },
+    {
+      "foreground": "attentionDark",
+      "background": "ground",
+      "ratio": 9.474
+    },
+    {
+      "foreground": "optimalDark",
+      "background": "ground",
+      "ratio": 5.615
+    },
+    {
+      "foreground": "criticalLight",
+      "background": "paper",
+      "ratio": 6.093
+    },
+    {
+      "foreground": "attentionLight",
+      "background": "paper",
+      "ratio": 4.561
+    },
+    {
+      "foreground": "optimalLight",
+      "background": "paper",
+      "ratio": 5.05
+    }
+  ]
+}

@@ -1,762 +1,882 @@
 import 'server-only'
 
-import { resolve } from 'node:path'
+import { Children, type ReactNode } from 'react'
 
-import { Circle, Document, Image, Page, Path, StyleSheet, Svg, Text, View } from '@react-pdf/renderer'
+import { Circle, Document, Image, Link, Page, StyleSheet, Svg, Text, View } from '@react-pdf/renderer'
 
-import { EFEONCE_LEGAL_NAME_FALLBACK, EFEONCE_URL } from '@/config/efeonce-brand'
-import { EfeoncePdfFooter } from '@/lib/finance/pdf/efeonce-pdf-footer'
-import { EfeonceSloganPdf } from '@/lib/finance/pdf/efeonce-slogan-pdf'
-import { GH_GROWTH_AI_VISIBILITY, GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT as C } from '@/lib/copy/growth'
-import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
+import { EFEONCE_LEGAL_NAME_FALLBACK, EFEONCE_SOCIAL_LINKS, EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
+import { SEVERITY_ATTENTION_BELOW, SEVERITY_CRITICAL_BELOW } from '@/lib/growth/ai-visibility/report/recommendations'
 
-import { REPORT_SEVERITY_TONE, reportSectionVisible, type ReportArtifactModel } from '../model'
+import type { ReportArtifactModel } from '../model'
 import type { ReportHeader } from '../web/AiVisibilityReportArtifact'
-import { ReportPdfColors as K, ReportPdfFonts as F, ReportPdfPage as P } from './report-pdf-tokens'
+import {
+  resolveAiVisibilityReportPdfPresentation,
+  type AiVisibilityReportPdfPresentationContext,
+  type AiVisibilityReportPdfPresentation
+} from './report-pdf-presentation'
+import {
+  Bar,
+  BrandImage,
+  ChapterFooter,
+  ChapterHeader,
+  ScoreOrbit,
+  SeverityLabel,
+  Slogan,
+  TrazoIcon
+} from './report-pdf-primitives'
+import {
+  ReportPdfBrand as B,
+  ReportPdfColors as K,
+  ReportPdfEditorial as E,
+  ReportPdfFonts as F,
+  pdfType,
+  px,
+  pdfAlpha
+} from './report-pdf-tokens'
 
-/**
- * TASK-1273 — AI Visibility Report · PDF premium render adapter (Slice 2).
- *
- * Tercer adapter del report artifact (web · print-HTML · PDF), todos sobre el
- * MISMO `ReportArtifactModel`. Documento react-pdf vectorial, paginado A4, con
- * fuentes embebidas. Consume EXCLUSIVAMENTE el variant `attachment`
- * (`modelFromPublicReport(report, 'attachment')`) — leak-safe por tipo; respeta
- * la disclosure matrix (sin trend, sin narrativa cruda por motor).
- *
- * Autoría como UN componente con todo el texto inline (sin sub-componentes que
- * reciban el modelo crudo) para que el no-leak test recorra el árbol de strings.
- * Fuente visual: `docs/research/mockups/ai-visibility-report-pdf-mockup.html` (v5).
- *
- * Charts vectoriales (gauge/barras) via `<Svg>`/`<View>`; logos de marca como
- * `<Image>` PNG (react-pdf no acepta SVG) rasterizados por
- * `scripts/build-pdf-brand-assets.ts`. Marca Efeonce desde el SSOT, NUNCA AxisWordmark.
+/** TASK-1938: six-page presentation adapter of the existing public-safe snapshot.
+ * Native text/graphics, official raster assets, and no data access inside the document.
+ * Existing attachment disclosure is preserved; the projection never receives raw observations.
  */
-
-const asset = (file: string): string => resolve(process.cwd(), 'public', file)
-
-/** provider canónico → PNG del isotipo (rasterizado). Sin entrada = sin tile. */
-const ENGINE_ASSET: Record<string, string | undefined> = {
-  gemini: 'branding/pdf/engine-gemini.png',
-  openai: 'branding/pdf/engine-gpt.png',
-  anthropic: 'branding/pdf/engine-claude.png',
-  perplexity: 'branding/pdf/engine-perplexity.png'
-}
-
-/** Color de texto/cifra por severidad (amber → ink AA). */
-const toneInk = (severity: GraderReportSeverity): string => {
-  const tone = REPORT_SEVERITY_TONE[severity]
-
-  if (tone === 'success') return K.success
-  if (tone === 'warning') return K.warningInk
-  if (tone === 'error') return K.error
-
-  return K.subtle
-}
-
-/** Color de punto/relleno por severidad (amber brillante para el dot). */
-const toneDot = (severity: GraderReportSeverity): string => {
-  const tone = REPORT_SEVERITY_TONE[severity]
-
-  if (tone === 'success') return K.success
-  if (tone === 'warning') return K.warning
-  if (tone === 'error') return K.error
-
-  return K.subtle
-}
-
-const clampPct = (n: number): number => Math.max(0, Math.min(100, n))
+const T = E.type.editorial
+const L = E.layout
 
 const s = StyleSheet.create({
-  // ── cover (full navy) ──
-  // El navy se pinta con un View de fondo (NO Page.backgroundColor): react-pdf
-  // corrompe el render de <Svg> sobre un Page con backgroundColor (color + arco).
-  cover: { color: '#fff', paddingHorizontal: P.padX, paddingTop: P.padTop, position: 'relative' },
-  coverBackdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: K.navy },
-  // Ancho EXPLÍCITO por aspecto real (837.07:196.68 ≈ 4.256) — react-pdf <Image>
-  // con width:'auto' estira al ancho del contenedor (deforma el wordmark).
-  coverWm: { width: 85, height: 20 },
-  coverEyebrow: {
-    fontFamily: F.bodySemibold,
-    fontSize: 7,
-    letterSpacing: 1.4,
-    color: K.onNavyMuted,
-    textTransform: 'uppercase',
-    marginTop: 46
-  },
-  coverOrg: { fontFamily: F.displayBold, fontSize: 42, letterSpacing: -1.2, marginTop: 8, color: '#fff' },
-  coverPeriod: { fontFamily: F.body, fontSize: 10, color: K.onNavyStrong, marginTop: 12 },
-  coverHero: { flexDirection: 'row', alignItems: 'center', gap: 28, marginTop: 64 },
-  // Gauge = arco Svg <Path> (relleno proporcional al score) sobre el backdrop navy.
-  // Path (no dasharray) + colores OPACOS: el navy se pinta con coverBackdrop, no
-  // con Page.backgroundColor — así react-pdf renderiza bien el arco y el color.
-  gaugeWrap: { position: 'relative', width: 118, height: 118 },
-  gaugeCtr: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  gaugeNum: { fontFamily: F.displayExtra, fontSize: 38, color: '#fff', lineHeight: 1 },
-  gaugeUnit: { fontFamily: F.body, fontSize: 8, color: K.onNavyStrong, marginTop: 3 },
-  verdictTitle: { fontFamily: F.display, fontSize: 14, color: '#fff', marginTop: 6 },
-  verdictBody: {
-    fontFamily: F.body,
-    fontSize: 9.5,
-    lineHeight: 1.55,
-    color: K.onNavyStrong,
-    marginTop: 7,
-    maxWidth: 300
-  },
-  coverEngines: { position: 'absolute', left: P.padX, bottom: 60 },
-  coverEnginesLbl: {
-    fontFamily: F.bodySemibold,
-    fontSize: 7,
-    letterSpacing: 1.3,
-    color: K.onNavyFaint,
-    textTransform: 'uppercase',
-    marginBottom: 9
-  },
-  engineStrip: { flexDirection: 'row', gap: 8 },
-  engineTile: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  engineTileImg: { width: 17, height: 17, objectFit: 'contain' },
-  coverFoot: { position: 'absolute', left: P.padX, right: P.padX, bottom: 28 },
-  coverFootText: { fontFamily: F.body, fontSize: 7, color: K.onNavyFaint },
-
-  // ── content page ──
   page: {
-    backgroundColor: K.paper,
-    color: K.text,
-    paddingHorizontal: P.padX,
-    paddingTop: P.padTop,
-    paddingBottom: P.padBottom,
+    height: 841.89,
     fontFamily: F.body,
-    fontSize: 9.5
+    color: K.ink,
+    fontSize: px(T.body.sizePx),
+    lineHeight: T.body.lineHeight
   },
-  pageNo: {
-    position: 'absolute',
-    top: 32,
-    right: P.padX,
-    fontFamily: F.body,
-    fontSize: 7.5,
-    color: K.subtle,
-    letterSpacing: 1
+  cover: {
+    paddingTop: px(B.cover.paddingPx[0]),
+    paddingHorizontal: px(B.cover.paddingPx[1]),
+    paddingBottom: px(B.cover.paddingPx[2])
   },
-  eyebrow: {
-    fontFamily: F.bodySemibold,
-    fontSize: 7.5,
-    letterSpacing: 1.4,
-    color: K.accent,
-    textTransform: 'uppercase'
-  },
-  sectionTitle: { fontFamily: F.display, fontSize: 15, color: K.navy, letterSpacing: -0.3, marginTop: 5 },
-  helper: { fontFamily: F.body, fontSize: 8.5, color: K.muted, marginTop: 4, maxWidth: 440 },
-  section: { marginTop: 26 },
-  axisBand: { flexDirection: 'row', gap: 16, marginTop: 10 },
-  axisBandText: { fontFamily: F.body, fontSize: 8, color: K.muted },
-  axisBandStrong: { fontFamily: F.bodySemibold, color: K.navy },
-
-  // levels
-  levelsRow: { flexDirection: 'row', gap: 10, marginTop: 13 },
-  level: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: K.divider,
-    borderStyle: 'solid',
-    borderRadius: 9,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 9
-  },
-  levelFull: {
-    borderWidth: 1,
-    borderColor: K.divider,
-    borderStyle: 'solid',
-    borderRadius: 9,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 9,
-    marginTop: 10
-  },
-  levelOrd: { fontFamily: F.displayBold, fontSize: 13, color: K.accent, width: 18 },
-  levelMain: { flex: 1 },
-  levelLabel: { fontFamily: F.bodySemibold, fontSize: 9.5, color: K.text },
-  levelEn: { fontFamily: F.body, fontSize: 8, color: K.subtle },
-  levelQ: { fontFamily: F.body, fontSize: 8, color: K.muted, marginTop: 2 },
-  levelScore: { fontFamily: F.displayBold, fontSize: 14 },
-  coverChip: {
-    fontFamily: F.bodySemibold,
-    fontSize: 7.5,
-    color: K.muted,
-    backgroundColor: K.surface,
-    borderWidth: 1,
-    borderColor: K.divider,
-    borderStyle: 'solid',
-    borderRadius: 999,
-    paddingVertical: 3,
-    paddingHorizontal: 8
-  },
-
-  // engine rows
-  engineRow: { flexDirection: 'row', alignItems: 'center', gap: 11, marginTop: 14 },
-  engineRowTile: {
-    width: 27,
-    height: 27,
-    borderRadius: 7,
-    backgroundColor: K.surface,
-    borderWidth: 1,
-    borderColor: K.divider,
-    borderStyle: 'solid',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  engineRowImg: { width: 15, height: 15, objectFit: 'contain' },
-  engineRowBody: { flex: 1 },
-
-  barHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 4 },
-  barName: { fontFamily: F.body, fontSize: 9, color: K.text },
-  barNameBold: { fontFamily: F.bodyBold, fontSize: 9, color: K.text },
-  barVal: { fontFamily: F.bodySemibold, fontSize: 8.5 },
-  track: { height: 6.5, borderRadius: 4, backgroundColor: K.track },
-  fill: { height: 6.5, borderRadius: 4 },
-
-  // gap callout
-  gap: {
-    borderWidth: 1,
-    borderColor: K.divider,
-    borderLeftWidth: 4,
-    borderLeftColor: K.error,
-    borderStyle: 'solid',
-    borderRadius: 9,
-    padding: 15,
-    marginTop: 13,
-    backgroundColor: K.surface
-  },
-  gapTitle: { fontFamily: F.display, fontSize: 11.5, color: K.text },
-  gapMotion: { fontFamily: F.body, fontSize: 8.5, color: K.muted, marginTop: 7, lineHeight: 1.5 },
-  gapMotionStrong: { fontFamily: F.bodySemibold, color: K.accent },
-
-  // dimensions
-  dimRow: { marginTop: 13 },
-  dimScore: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dot: { width: 5, height: 5, borderRadius: 999 },
-
-  // kpis
-  kpis: { flexDirection: 'row', gap: 11, marginTop: 14 },
-  kpi: { flex: 1, borderWidth: 1, borderColor: K.divider, borderStyle: 'solid', borderRadius: 9, padding: 13 },
-  kpiOverline: {
-    fontFamily: F.bodySemibold,
-    fontSize: 6.5,
-    letterSpacing: 1.1,
-    color: K.subtle,
-    textTransform: 'uppercase'
-  },
-  kpiValue: { fontFamily: F.displayBold, fontSize: 19, color: K.navy, marginTop: 8 },
-  kpiValueSm: { fontFamily: F.displayBold, fontSize: 16, color: K.navy, marginTop: 9 },
-  kpiHint: { fontFamily: F.body, fontSize: 8, color: K.muted, marginTop: 6 },
-
-  // sentiment
-  senti: { marginTop: 16 },
-  sentiOverline: {
-    fontFamily: F.bodySemibold,
-    fontSize: 6.5,
-    letterSpacing: 1.1,
-    color: K.subtle,
-    textTransform: 'uppercase',
-    marginBottom: 8
-  },
-  sentiBar: { flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden' },
-  sentiLegend: { flexDirection: 'row', gap: 18, marginTop: 9 },
-  sentiItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  sentiSw: { width: 7, height: 7, borderRadius: 2 },
-  sentiText: { fontFamily: F.body, fontSize: 8, color: K.muted },
-  sentiTextB: { fontFamily: F.bodySemibold, color: K.text },
-
-  // recommendations
-  rec: { flexDirection: 'row', gap: 11, marginTop: 11 },
-  // View contenedor (centra el dígito vertical+horizontalmente; un <Text> con
-  // justifyContent NO centra en vertical en react-pdf → el número quedaba arriba).
-  recNum: {
-    width: 21,
-    height: 21,
-    borderRadius: 6,
-    backgroundColor: K.navy,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  recNumText: { color: '#fff', fontFamily: F.displayBold, fontSize: 10, lineHeight: 1 },
-  recBody: { flex: 1 },
-  recTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  recTitle: { fontFamily: F.bodyBold, fontSize: 10, color: K.text },
-  recAction: { fontFamily: F.body, fontSize: 8.5, color: K.muted, marginTop: 3, lineHeight: 1.45 },
-  sevChip: { fontFamily: F.bodySemibold, fontSize: 7.5, borderRadius: 999, paddingVertical: 2, paddingHorizontal: 7 },
-
-  // provenance
-  prov: { marginTop: 12 },
-  provRow: {
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: K.ground },
+  masthead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: K.divider,
-    borderBottomStyle: 'solid',
-    paddingVertical: 6
+    alignItems: 'center',
+    gap: px(L.cover.headerGapPx)
   },
-  provKey: { fontFamily: F.body, fontSize: 9, color: K.muted },
-  provVal: { fontFamily: F.bodySemibold, fontSize: 9, color: K.text },
-
-  // disclaimer + closing
-  disc: { marginTop: 14, paddingTop: 11, borderTopWidth: 1, borderTopColor: K.divider, borderTopStyle: 'solid' },
-  discText: { fontFamily: F.body, fontSize: 7, color: K.subtle, lineHeight: 1.5 },
-  closing: {
-    marginTop: 18,
-    paddingTop: 13,
-    borderTopWidth: 1,
-    borderTopColor: K.divider,
-    borderTopStyle: 'solid',
-    alignItems: 'center'
+  period: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: px(L.cover.period.paddingPx[0]),
+    paddingHorizontal: px(L.cover.period.paddingPx[1]),
+    borderWidth: px(L.cover.period.borderPx),
+    borderColor: pdfAlpha(K.softOnDark, L.cover.period.borderOpacity),
+    borderRadius: px(B.cover.orbit.boxPx)
   },
-  closingLogo: { width: 77, height: 18, marginBottom: 8 },
-  closingLegal: { fontFamily: F.body, fontSize: 6.5, color: K.subtle, marginTop: 7 }
+  identity: { marginTop: px(L.cover.identity.topGapPx) },
+  organization: { ...pdfType(T.organizationProspect), color: K.paper },
+  clientIdentity: { flexDirection: 'row', alignItems: 'center', gap: px(L.cover.identity.clientGapPx) },
+  date: { ...pdfType(T.body), color: K.softOnDark, marginTop: px(L.cover.dataAsOf.topGapPx) },
+  scoreGroup: { alignItems: 'center', marginTop: px(L.cover.scoreGroup.topGapPx), gap: px(L.cover.scoreGroup.gapPx) },
+  legend: { flexDirection: 'row', justifyContent: 'center', gap: px(L.cover.legend.gapPx) },
+  verdict: { marginTop: px(L.cover.verdict.topGapPx), gap: px(L.cover.verdict.gapPx) },
+  verdictTitle: {
+    fontFamily: F.display(B.cover.verdict.weight),
+    fontSize: px(B.cover.verdict.sizePx),
+    color: K.paper,
+    lineHeight: L.cover.verdict.lineHeight,
+    letterSpacing: px(B.cover.verdict.sizePx) * L.cover.verdict.tracking
+  },
+  assessment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: px(L.cover.assessment.gapPx),
+    marginTop: px(L.cover.assessment.topGapPx)
+  },
+  engineDiscs: { flexDirection: 'row', gap: px(L.cover.assessment.enginesGapPx) },
+  engineDisc: {
+    width: px(B.cover.engineDiscPx),
+    height: px(B.cover.engineDiscPx),
+    borderRadius: px(B.cover.engineDiscPx),
+    backgroundColor: K.paper,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  signature: { position: 'absolute', bottom: px(B.cover.paddingPx[2]), left: 0, right: 0, alignItems: 'center' },
+  interior: {
+    paddingTop: px(B.interior.paddingPx[0]),
+    paddingHorizontal: px(B.interior.paddingPx[1]),
+    paddingBottom: px(B.interior.paddingPx[2] + L.interior.footer.paddingTopPx + B.interior.footer.centerHeightPx)
+  },
+  section: { marginTop: px(L.interior.sectionGapPx), gap: px(L.interior.section.gapPx) },
+  title: pdfType(T.sectionTitle),
+  subtitle: pdfType(T.sectionSubtitle),
+  helper: { ...pdfType(T.helper), color: K.muted },
+  body: pdfType(T.body),
+  caption: { ...pdfType(T.caption), color: K.muted },
+  label: { ...pdfType(T.label), textTransform: 'uppercase' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: px(L.barRow.gapPx) },
+  rowLabel: {
+    width: px(L.barRow.labelWidthPx),
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: px(L.barRow.labelGapPx),
+    flexShrink: 0
+  },
+  rowLabelText: { ...pdfType(T.body), flexShrink: 1 },
+  rowValue: { width: px(L.barRow.valueWidthPx), alignItems: 'flex-end', flexShrink: 0, gap: px(L.barRow.valueGapPx) },
+  value: pdfType(T.barValue),
+  gapCard: {
+    paddingVertical: px(L.gapCard.paddingPx[0]),
+    paddingHorizontal: px(L.gapCard.paddingPx[1]),
+    borderRadius: px(L.gapCard.radiusPx),
+    backgroundColor: K.navy,
+    gap: px(L.gapCard.gapPx)
+  },
+  gapHeading: { ...pdfType(T.gapHeadline), color: K.paper },
+  recommendation: {
+    paddingVertical: px(L.recommendationRow.paddingBlockPx),
+    borderBottomWidth: px(L.recommendationRow.rulePx),
+    borderBottomColor: K.rule,
+    flexDirection: 'row',
+    gap: px(L.recommendationRow.gapPx)
+  },
+  recNumber: { ...pdfType(T.recommendationNumber), width: px(L.recommendationRow.numberWidthPx), flexShrink: 0 },
+  recContent: { flexBasis: 0, minWidth: 0, flexGrow: 1, flexShrink: 1, gap: px(L.recommendationRow.detailGapPx) },
+  recHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: px(L.recommendationRow.headingGapPx),
+    flexWrap: 'wrap'
+  },
+  quality: { flexDirection: 'row', gap: px(L.qualityCards.gapPx) },
+  card: {
+    flexGrow: 1,
+    flexBasis: 0,
+    backgroundColor: K.surface,
+    paddingVertical: px(L.qualityCards.paddingPx[0]),
+    paddingHorizontal: px(L.qualityCards.paddingPx[1]),
+    borderRadius: px(L.qualityCards.radiusPx),
+    gap: px(L.qualityCards.contentGapPx)
+  },
+  cardHeading: { flexDirection: 'row', alignItems: 'center', gap: px(L.qualityCards.labelGapPx) },
+  cardLabel: { ...pdfType(T.caption), fontFamily: F.semibold, color: K.muted },
+  kpi: pdfType(T.kpiValue),
+  level: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: px(L.levelRow.gapPx),
+    paddingVertical: px(L.levelRow.paddingBlockPx),
+    borderBottomWidth: px(L.levelRow.rulePx),
+    borderBottomColor: K.rule
+  },
+  levelDisc: {
+    width: px(L.levelRow.discPx),
+    height: px(L.levelRow.discPx),
+    borderRadius: px(L.levelRow.discPx),
+    backgroundColor: K.surface,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  levelContent: { flexBasis: 0, minWidth: 0, flexGrow: 1, flexShrink: 1, gap: px(L.levelRow.textGapPx) },
+  levelResult: { flexShrink: 0, flexDirection: 'row', alignItems: 'center', gap: px(L.levelRow.scoreGapPx) },
+  provenance: {
+    marginTop: px(L.interior.sectionGapPx),
+    paddingVertical: px(L.provenance.paddingPx[0]),
+    paddingHorizontal: px(L.provenance.paddingPx[1]),
+    backgroundColor: K.surface,
+    borderRadius: px(L.provenance.radiusPx),
+    gap: px(L.provenance.gapPx)
+  },
+  back: {
+    paddingTop: px(L.backCover.paddingPx[0]),
+    paddingHorizontal: px(L.backCover.paddingPx[1]),
+    paddingBottom: px(L.backCover.paddingPx[2]),
+    color: K.paper
+  },
+  closeContent: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
+  voice: { alignItems: 'center', gap: px(L.backCover.voiceGapPx), width: '100%' },
+  question: { ...pdfType(T.closingQuestion), color: K.paper },
+  answer: { ...pdfType(T.closingAnswer), color: K.paper, textAlign: 'center' },
+  closeEvidence: {
+    ...pdfType(T.closingEvidence),
+    color: K.softOnDark,
+    textAlign: 'center',
+    maxWidth: px(L.backCover.evidenceMaxWidthPx),
+    marginTop: px(L.backCover.evidenceTopGapPx)
+  },
+  action: { marginTop: px(L.backCover.actionTopGapPx), alignItems: 'center', gap: px(L.backCover.agenda.captionGapPx) },
+  cta: {
+    ...pdfType(T.agenda),
+    color: K.ink,
+    backgroundColor: K.paper,
+    borderRadius: px(B.cover.orbit.boxPx),
+    paddingVertical: px(L.backCover.agenda.paddingPx[0]),
+    paddingHorizontal: px(L.backCover.agenda.paddingPx[1]),
+    textDecoration: 'none'
+  },
+  clientCards: {
+    flexDirection: 'row',
+    gap: px(L.backCover.clientCards.gapPx),
+    marginTop: px(L.backCover.actionTopGapPx)
+  },
+  clientCard: {
+    borderWidth: px(L.backCover.clientCards.borderPx),
+    borderColor: pdfAlpha(K.softOnDark, L.backCover.clientCards.borderOpacity),
+    paddingVertical: px(L.backCover.clientCards.paddingPx[0]),
+    paddingHorizontal: px(L.backCover.clientCards.paddingPx[1]),
+    borderRadius: px(L.backCover.clientCards.radiusPx),
+    gap: px(L.backCover.clientCards.textGapPx)
+  },
+  socials: { flexDirection: 'row', alignItems: 'center', gap: px(L.socials.gapPx), marginTop: px(L.socials.topGapPx) },
+  socialDisc: {
+    width: px(L.socials.discPx),
+    height: px(L.socials.discPx),
+    borderRadius: px(L.socials.discPx),
+    borderWidth: px(L.socials.borderPx),
+    borderColor: pdfAlpha(K.softOnDark, L.socials.borderOpacity),
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  closeBrand: { marginTop: px(L.backCover.brandTopGapPx) },
+  legal: {
+    ...pdfType(T.legal),
+    position: 'absolute',
+    bottom: px(L.backCover.paddingPx[2]),
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: K.softOnDark
+  }
 })
 
-export interface AiVisibilityReportPdfProps {
-  model: ReportArtifactModel
-  header: ReportHeader
+const DIM_GLYPH = {
+  ai_visibility: 'ia',
+  entity_clarity: 'crm',
+  category_ownership: 'objetivo',
+  competitive_sov: 'medios',
+  citation_quality: 'prensa',
+  message_alignment: 'social',
+  revenue_intent_coverage: 'revenue'
+} as const
+
+const LEVEL_GLYPH = {
+  found: 'busqueda',
+  readable: 'codigo',
+  correct: 'checklist',
+  actionable: 'integracion',
+  intrinsic: 'objetivo'
+} as const
+
+const ENGINE_ID: Record<string, string> = {
+  openai: 'chatgpt',
+  anthropic: 'claude',
+  gemini: 'gemini',
+  perplexity: 'perplexity',
+  google_ai_overview: 'google-ai-overview'
 }
 
-const Gauge = ({ score, severity }: { score: number | null; severity: GraderReportSeverity }) => {
-  const size = 118
-  const c = size / 2
-  const r = 49
-  const sw = 10
-  const pct = score === null ? 0 : clampPct(score) / 100
-  const arcColor = severity === 'sin_dato' ? K.gaugeTrackOnNavy : toneDot(severity)
+const SOCIAL_ORDER = ['linkedin', 'instagram', 'youtube', 'threads'] as const
 
-  // Arco como <Path> A (no dasharray): empieza arriba (-90°) y barre `pct` del círculo.
-  const a0 = -Math.PI / 2
-  const a1 = a0 + 2 * Math.PI * pct
-  const x0 = c + r * Math.cos(a0)
-  const y0 = c + r * Math.sin(a0)
-  const x1 = c + r * Math.cos(a1)
-  const y1 = c + r * Math.sin(a1)
-  const largeArc = pct > 0.5 ? 1 : 0
-  const arcPath = `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`
+const Interior = ({
+  p,
+  index,
+  footerExpanded,
+  children
+}: {
+  p: AiVisibilityReportPdfPresentation
+  index: number
+  footerExpanded?: boolean
+  children: ReactNode
+}) => (
+  <Page
+    size='A4'
+    style={[
+      s.page,
+      s.interior,
+      footerExpanded
+        ? {
+            paddingBottom:
+              s.interior.paddingBottom + px(T.caption.sizePx * T.caption.lineHeight * 2 + L.interior.section.gapPx)
+          }
+        : {}
+    ]}
+  >
+    <ChapterHeader index={index} title={p.copy.chapters[index]} />
+    {children}
+    <ChapterFooter organization={p.organizationName} period={p.periodLabel} expanded={footerExpanded} />
+  </Page>
+)
+
+const Section = ({
+  title,
+  helper,
+  children,
+  secondary = false
+}: {
+  title: string
+  helper?: string | null
+  children?: ReactNode
+  secondary?: boolean
+}) => {
+  const [first, ...rest] = Children.toArray(children)
 
   return (
-    <View style={s.gaugeWrap}>
-      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute' }}>
-        <Circle cx={c} cy={c} r={r} stroke={K.gaugeTrackOnNavy} strokeWidth={sw} fill='none' />
-        {score !== null && pct >= 0.999 ? (
-          <Circle cx={c} cy={c} r={r} stroke={arcColor} strokeWidth={sw} fill='none' />
-        ) : null}
-        {score !== null && pct > 0 && pct < 0.999 ? (
-          <Path d={arcPath} stroke={arcColor} strokeWidth={sw} strokeLinecap='round' fill='none' />
-        ) : null}
-      </Svg>
-      <View style={s.gaugeCtr}>
-        <Text style={s.gaugeNum}>{score === null ? '—' : score}</Text>
-        <Text style={s.gaugeUnit}>de 100</Text>
+    <View style={s.section}>
+      <View wrap={false} style={{ gap: px(L.interior.section.gapPx) }}>
+        <Text style={secondary ? s.subtitle : s.title}>{title}</Text>
+        {helper && <Text style={s.helper}>{helper}</Text>}
+        {first}
       </View>
+      {rest}
     </View>
   )
 }
 
-const StaticBar = ({ value, color }: { value: number; color: string }) => (
-  <View style={s.track}>
-    <View style={[s.fill, { width: `${clampPct(value)}%`, backgroundColor: color }]} />
+const EngineDisc = ({ provider, small = false }: { provider: string; small?: boolean }) => (
+  <View
+    style={[
+      s.engineDisc,
+      small
+        ? {
+            width: px(L.barRow.engineDiscPx),
+            height: px(L.barRow.engineDiscPx),
+            borderWidth: px(B.interior.header.rulePx),
+            borderColor: K.rule
+          }
+        : {}
+    ]}
+  >
+    <BrandImage
+      id={`engine-${ENGINE_ID[provider]}`}
+      width={px(small ? L.barRow.engineLogoPx : L.cover.assessment.logoPx)}
+      height={px(small ? L.barRow.engineLogoPx : L.cover.assessment.logoPx)}
+    />
   </View>
 )
 
-/**
- * Render PDF del informe (variant `attachment`). Un componente, todo el texto
- * inline. Iterar SOLO las secciones visibles del variant attachment.
- */
-const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) => {
-  const show = (section: Parameters<typeof reportSectionVisible>[1]) => reportSectionVisible('attachment', section)
+export interface AiVisibilityReportPdfProps {
+  model: ReportArtifactModel
+  header: ReportHeader
+  context?: AiVisibilityReportPdfPresentationContext
+  /** Physical fit prepared from the registered font by the server renderer. */
+  layout?: { organizationNameFontSize: number; footerExpanded: boolean }
+}
 
-  const sampledCount = (model.provenance.providersRequested ?? model.provenance.providersSampled).length
-  const arcSeverity = model.overallSeverity
+export default function AiVisibilityReportPdf(input: AiVisibilityReportPdfProps) {
+  const p = resolveAiVisibilityReportPdfPresentation(input)
+  const c = p.copy
+  const benchmarkMax = Math.max(1, ...p.benchmark.rows.map(row => row.mentions))
+  const sourceMax = Math.max(1, ...p.citationSources.rows.map(source => source.count))
+  const verdictSplit = p.overall.verdict.indexOf(',')
+  const focus = c.closing.evidenceFocus
+  const focusAt = focus ? p.closing.evidence.indexOf(focus) : -1
+  const ringSize = T.closingQuestion.sizePx * L.backCover.questionRing.sizeEm
 
-  const sovRows = [
-    { name: C.sov.brandLabel, mentions: model.competitiveSov.brandMentions, isBrand: true },
-    ...model.competitiveSov.competitors.map(comp => ({ name: comp.name, mentions: comp.mentions, isBrand: false }))
-  ]
+  const ringStroke = Math.max(
+    L.backCover.questionRing.minimumStrokePx,
+    T.closingQuestion.sizePx * L.backCover.questionRing.strokeEm
+  )
 
-  const sovMax = Math.max(1, ...sovRows.map(row => row.mentions))
-
-  const sentiment = model.sentimentSummary
-  const sentiTotal = Math.max(1, sentiment.positive + sentiment.neutral + sentiment.negative)
-  const sentiPct = (n: number) => Math.round((n / sentiTotal) * 100)
-
-  const sevChipStyle = (severity: GraderReportSeverity) => {
-    const tone = REPORT_SEVERITY_TONE[severity]
-
-    if (tone === 'error') return { backgroundColor: 'rgba(220,46,57,0.10)', color: K.error }
-    if (tone === 'success') return { backgroundColor: 'rgba(21,127,71,0.10)', color: K.success }
-
-    return { backgroundColor: 'rgba(255,183,3,0.16)', color: K.warningInk }
+  const qualityColours = {
+    positive: K.navy,
+    neutral: K.dataReference,
+    negative: B.palette.severity.light.critical,
+    mixed: K.muted
   }
 
   return (
     <Document
-      title={`${C.header.title} — ${header.organizationName}`}
-      author='Efeonce'
-      creator='Greenhouse EO'
-      producer='Greenhouse EO'
+      title={`${c.title} · ${p.organizationName}`}
+      author={EFEONCE_LEGAL_NAME_FALLBACK}
+      subject={c.prospectLabel}
+      language={c.intlLocale}
     >
-      {/* ── PAGE 1 · COVER (full navy hero) ── */}
-      <Page size='A4' style={s.cover}>
-        <View style={s.coverBackdrop} fixed />
-        <Image src={asset('branding/pdf/efeonce-wordmark-white.png')} style={s.coverWm} />
-        <Text style={s.coverEyebrow}>{C.header.title}</Text>
-        <Text style={s.coverOrg}>{header.organizationName}</Text>
-        <Text style={s.coverPeriod}>{header.periodLabel}</Text>
-
-        <View style={s.coverHero}>
-          <Gauge score={model.overallScore} severity={arcSeverity} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.coverEyebrow}>{C.verdict.title}</Text>
-            <Text style={s.verdictTitle}>{model.headline.frame}</Text>
-            <Text style={s.verdictBody}>{C.verdict.scoreContext}</Text>
-            <Text style={[s.coverFootText, { marginTop: 12 }]}>
-              {GH_GROWTH_AI_VISIBILITY.severity_label[model.overallSeverity]} ·{' '}
-              {C.verdict.coverageValue(model.provenance.providersResponded?.length ?? null, sampledCount)} ·{' '}
-              {C.verdict.scoreDisclaimer}
+      <Page size='A4' style={[s.page, s.cover]}>
+        <View style={s.backdrop} />
+        <View style={s.masthead}>
+          <BrandImage id='ai-visibility-report-lockup-negative' height={px(B.cover.lockupHeightPx)} />
+          <View style={s.period}>
+            <Text style={{ fontFamily: F.medium, color: K.softOnDark, fontSize: px(L.cover.period.sizePx), lineHeight: 1, textAlign: 'center' }}>
+              {p.periodLabel}
             </Text>
           </View>
         </View>
-
-        {show('engineSnapshot') && model.engineSnapshot?.length ? (
-          <View style={s.coverEngines}>
-            <Text style={s.coverEnginesLbl}>Evaluado en</Text>
-            <View style={s.engineStrip}>
-              {model.engineSnapshot.map(engine =>
-                ENGINE_ASSET[engine.provider] ? (
-                  <View key={engine.provider} style={s.engineTile}>
-                    <Image src={asset(ENGINE_ASSET[engine.provider] as string)} style={s.engineTileImg} />
-                  </View>
-                ) : null
+        <View style={s.identity}>
+          {p.audience === 'client' ? (
+            <View style={s.clientIdentity}>
+              {p.clientLogo && (
+                <Image
+                  src={{ data: p.clientLogo.data, format: p.clientLogo.format }}
+                  style={{
+                    width: px(L.cover.identity.logoBoxPx[0]),
+                    height: px(L.cover.identity.logoBoxPx[1]),
+                    objectFit: 'contain',
+                    ...(p.clientLogo.onDark === false
+                      ? {
+                          backgroundColor: K.paper,
+                          padding: px(L.cover.identity.clientTextGapPx),
+                          borderRadius: px(L.cover.identity.clientTextGapPx)
+                        }
+                      : {})
+                  }}
+                />
               )}
+              <View style={{ flexShrink: 1, gap: px(L.cover.identity.clientTextGapPx) }}>
+                <Text style={{ ...s.label, color: K.softOnDark }}>{c.preparedFor}</Text>
+                <Text
+                  style={{
+                    ...pdfType(T.organizationClient),
+                    ...(input.layout
+                      ? {
+                          fontSize: input.layout.organizationNameFontSize,
+                          letterSpacing: input.layout.organizationNameFontSize * T.organizationClient.tracking
+                        }
+                      : {}),
+                    color: K.paper
+                  }}
+                >
+                  {p.organizationName}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <Text
+              style={[
+                s.organization,
+                input.layout
+                  ? {
+                      fontSize: input.layout.organizationNameFontSize,
+                      letterSpacing: input.layout.organizationNameFontSize * T.organizationProspect.tracking
+                    }
+                  : {}
+              ]}
+            >
+              {p.organizationName}
+            </Text>
+          )}
+          <Text style={s.date}>
+            {c.asOf} {p.asOfLabel}
+          </Text>
+        </View>
+        <View style={s.scoreGroup}>
+          <ScoreOrbit
+            score={p.overall.score}
+            scoreLabel={p.overall.scoreLabel}
+            unitLabel={p.overall.unitLabel}
+            severity={p.overall.severity}
+            severityLabel={p.overall.severityLabel}
+          />
+          {p.trendState.label && <Text style={{ ...s.body, color: K.softOnDark }}>{p.trendState.label}</Text>}
+          <View style={s.legend}>
+            <SeverityLabel severity='critico' label={`0–${SEVERITY_CRITICAL_BELOW - 1} ${c.severity.critico}`} dark />
+            <SeverityLabel
+              severity='atencion'
+              label={`${SEVERITY_CRITICAL_BELOW}–${SEVERITY_ATTENTION_BELOW - 1} ${c.severity.atencion}`}
+              dark
+            />
+            <SeverityLabel severity='optimo' label={`${SEVERITY_ATTENTION_BELOW}–100 ${c.severity.optimo}`} dark />
+          </View>
+        </View>
+        <View style={s.verdict}>
+          <Text style={{ ...s.label, color: K.softOnDark }}>{c.verdict}</Text>
+          <Text style={s.verdictTitle}>
+            {verdictSplit < 0 ? (
+              p.overall.verdict
+            ) : (
+              <>
+                <Text>{p.overall.verdict.slice(0, verdictSplit + 1)}</Text>
+                <Text style={{ fontFamily: F.display(B.cover.verdict.lightWeight) }}>
+                  {p.overall.verdict.slice(verdictSplit + 1)}
+                </Text>
+              </>
+            )}
+          </Text>
+          <View style={s.assessment}>
+            <View style={s.engineDiscs}>
+              {p.engines
+                .filter(engine => engine.status !== 'not_sampled')
+                .map(engine => (
+                  <EngineDisc key={engine.providerId} provider={engine.providerId} />
+                ))}
+            </View>
+            <View style={{ gap: px(L.cover.assessment.textGapPx), flexBasis: 0, flexGrow: 1 }}>
+              <BrandImage id='aeo-lockup-negative' height={px(L.cover.assessment.lockupHeightPx)} />
+              <Text style={{ ...s.caption, color: K.softOnDark }}>
+                {c.assessmentResult} · {p.coverage.evaluatedLabel} · {p.coverage.basisLabel}
+              </Text>
             </View>
           </View>
-        ) : null}
-
-        <View style={s.coverFoot}>
-          <Text style={s.coverFootText}>Preparado por Efeonce · efeoncepro.com</Text>
+        </View>
+        <View style={s.signature}>
+          <BrandImage id='efeonce-logo-negative' width={px(B.cover.signatureWidthPx)} />
         </View>
       </Page>
 
-      {/* ── PAGE 2 · NIVELES + VISIBILIDAD POR MOTOR ── */}
-      <Page size='A4' style={s.page}>
-        <Text style={s.pageNo}>02</Text>
-
-        {show('levels') ? (
-          <View>
-            <Text style={s.eyebrow}>Marco de evaluación</Text>
-            <Text style={s.sectionTitle}>{C.levelsBand.title}</Text>
-            <View style={s.axisBand}>
-              <Text style={s.axisBandText}>
-                <Text style={s.axisBandStrong}>Percepción</Text> · ¿te mencionan?
-              </Text>
-              <Text style={s.axisBandText}>
-                <Text style={s.axisBandStrong}>Operabilidad</Text> · ¿te pueden usar?
-              </Text>
-            </View>
-
-            {[
-              [model.levels[0], model.levels[1]],
-              [model.levels[2], model.levels[3]]
-            ].map((pair, idx) => (
-              <View key={`lvl-row-${idx}`} style={s.levelsRow}>
-                {pair.map(level => {
-                  const copy = C.level[level.id]
-
-                  return (
-                    <View key={level.id} style={s.level}>
-                      <Text style={s.levelOrd}>{copy.ordinal}</Text>
-                      <View style={s.levelMain}>
-                        <Text style={s.levelLabel}>
-                          {copy.label} <Text style={s.levelEn}>· {copy.labelEn}</Text>
-                        </Text>
-                        <Text style={s.levelQ}>{copy.question}</Text>
-                      </View>
-                      {level.status === 'coverage' ? (
-                        <Text style={s.coverChip}>{C.levelsBand.coverageBadge}</Text>
-                      ) : (
-                        <Text style={[s.levelScore, { color: toneInk(level.severity) }]}>{level.score}</Text>
-                      )}
-                    </View>
-                  )
-                })}
-              </View>
-            ))}
-
-            {model.levels[4] ? (
-              <View style={s.levelFull}>
-                <Text style={s.levelOrd}>{C.level[model.levels[4].id].ordinal}</Text>
-                <View style={s.levelMain}>
-                  <Text style={s.levelLabel}>
-                    {C.level[model.levels[4].id].label}{' '}
-                    <Text style={s.levelEn}>· {C.level[model.levels[4].id].labelEn}</Text>
+      <Interior p={p} footerExpanded={input.layout?.footerExpanded} index={0}>
+        {p.primaryGap && (
+          <Section title={c.primaryGap}>
+            {p.primaryGap ? (
+              <View wrap={false} style={s.gapCard}>
+                <View style={{ ...s.recHeading, justifyContent: 'space-between' }}>
+                  <Text style={{ ...s.label, color: K.softOnDark }}>
+                    {c.mainGap} · {p.primaryGap.dimensionLabel} {p.primaryGap.scoreLabel}
                   </Text>
-                  <Text style={s.levelQ}>{C.level[model.levels[4].id].question}</Text>
+                  <SeverityLabel severity={p.primaryGap.severity} label={p.primaryGap.severityLabel} dark />
                 </View>
-                {model.levels[4].status === 'coverage' ? (
-                  <Text style={s.coverChip}>{C.levelsBand.coverageBadge}</Text>
-                ) : (
-                  <Text style={[s.levelScore, { color: toneInk(model.levels[4].severity) }]}>
-                    {model.levels[4].score}
-                  </Text>
+                <Text style={s.gapHeading}>{p.primaryGap.finding}</Text>
+                {p.primaryGap.evidence && (
+                  <Text style={{ ...pdfType(T.evidence), color: K.softOnDark }}>{p.primaryGap.evidence}</Text>
                 )}
               </View>
-            ) : null}
-          </View>
-        ) : null}
-
-        {show('engineSnapshot') && model.engineSnapshot?.length ? (
-          <View style={s.section}>
-            <Text style={s.sectionTitle}>{C.engineSnapshot.title}</Text>
-            <Text style={s.helper}>{C.engineSnapshot.helper}</Text>
-            {model.engineSnapshot.map(engine => {
-              const pct = engine.resolved === 0 ? 0 : Math.round((engine.present / engine.resolved) * 100)
-
-              const name =
-                GH_GROWTH_AI_VISIBILITY.provider_label[
-                  engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label
-                ] ?? engine.provider
-
-              const barColor = pct >= 70 ? K.success : pct >= 45 ? K.warning : K.error
-
-              return (
-                <View key={engine.provider} style={s.engineRow}>
-                  <View style={s.engineRowTile}>
-                    {ENGINE_ASSET[engine.provider] ? (
-                      <Image src={asset(ENGINE_ASSET[engine.provider] as string)} style={s.engineRowImg} />
-                    ) : null}
-                  </View>
-                  <View style={s.engineRowBody}>
-                    <View style={s.barHead}>
-                      <Text style={s.barName}>{name}</Text>
-                      <Text style={[s.barVal, { color: K.muted }]}>
-                        {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
-                      </Text>
-                    </View>
-                    <StaticBar value={pct} color={barColor} />
-                  </View>
+            ) : (
+              <Text style={s.helper}>{c.noData}</Text>
+            )}
+          </Section>
+        )}
+        <Section title={c.priorityPlan} helper={c.priorityHelper} secondary>
+          {p.priorityPlan.map((rec, index) => (
+            <View key={rec.gapKey} wrap={false} style={s.recommendation}>
+              <Text style={s.recNumber}>{index + 1}</Text>
+              <View style={s.recContent}>
+                <View style={s.recHeading}>
+                  <Text style={pdfType(T.emphasis)}>{rec.title}</Text>
+                  <SeverityLabel severity={rec.severity} label={rec.severityLabel} chip />
                 </View>
-              )
-            })}
-          </View>
-        ) : null}
-
-        <EfeoncePdfFooter generatedAt={null} fixed />
-      </Page>
-
-      {/* ── PAGE 3 · BRECHA + DIMENSIONES + SEÑALES ── */}
-      <Page size='A4' style={s.page}>
-        <Text style={s.pageNo}>03</Text>
-
-        {show('primaryGap') && model.primaryGap ? (
-          <View>
-            <Text style={s.eyebrow}>Dónde enfocar</Text>
-            <Text style={s.sectionTitle}>{C.primaryGap.title}</Text>
-            <View style={s.gap}>
-              <Text style={s.gapTitle}>{model.primaryGap.title}</Text>
-              {model.recommendations[0] ? (
-                <Text style={s.gapMotion}>
-                  <Text style={s.gapMotionStrong}>{C.recommendedMotion.title}</Text> · {model.recommendations[0].action}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        ) : null}
-
-        {show('dimensions') ? (
-          <View style={s.section}>
-            <Text style={s.sectionTitle}>{C.dimensions.title}</Text>
-            {model.dimensions.map(dim => {
-              const empty = dim.score === null
-
-              return (
-                <View key={dim.key} style={s.dimRow}>
-                  <View style={s.barHead}>
-                    <Text style={s.barName}>{dim.label}</Text>
-                    {empty ? (
-                      <Text style={[s.barVal, { color: K.subtle }]}>{C.levelsBand.coverageBadge}</Text>
-                    ) : (
-                      <View style={s.dimScore}>
-                        <View style={[s.dot, { backgroundColor: toneDot(dim.severity) }]} />
-                        <Text style={[s.barVal, { color: toneInk(dim.severity) }]}>{dim.score}/100</Text>
-                      </View>
-                    )}
-                  </View>
-                  {empty ? <View style={s.track} /> : <StaticBar value={dim.score as number} color={K.accent} />}
+                <Text style={{ ...s.body, color: K.muted }}>{rec.action}</Text>
+                <View
+                  style={{ flexDirection: 'row', gap: px(L.recommendationRow.movementGapPx), alignItems: 'center' }}
+                >
+                  <TrazoIcon glyph='medicion' />
+                  <Text style={{ ...pdfType(T.movement), flexShrink: 1 }}>{rec.basisLabel}</Text>
                 </View>
-              )
-            })}
-          </View>
-        ) : null}
-
-        {show('aeoSignals') ? (
-          <View style={s.section}>
-            <Text style={s.sectionTitle}>{C.signals.title}</Text>
-            <Text style={s.helper}>
-              Cómo te citan, con qué tono te mencionan y qué tan arriba apareces en las respuestas.
-            </Text>
-            <View style={s.kpis}>
-              <View style={s.kpi}>
-                <Text style={s.kpiOverline}>{C.signals.citationShareTitle}</Text>
-                <Text style={s.kpiValue}>
-                  {model.citationInsight.ownDomainShare === null ? '—' : `${model.citationInsight.ownDomainShare}%`}
-                </Text>
-                <Text style={s.kpiHint}>
-                  {C.signals.citationShareHelper(
-                    model.citationInsight.findingsCitingOwnDomain,
-                    model.citationInsight.findingsWithCitations
-                  )}
-                </Text>
-              </View>
-              <View style={s.kpi}>
-                <Text style={s.kpiOverline}>{C.signals.sentimentTitle}</Text>
-                <Text style={s.kpiValueSm}>
-                  {GH_GROWTH_AI_VISIBILITY.sentiment_net_label[model.sentimentSummary.net]}
-                </Text>
-                <Text style={s.kpiHint}>{C.signals.sentimentBasis(model.sentimentSummary.evaluated)}</Text>
-              </View>
-              <View style={s.kpi}>
-                <Text style={s.kpiOverline}>{C.signals.prominenceTitle}</Text>
-                <Text style={s.kpiValue}>
-                  {model.positionSummary.best === null ? '—' : `#${model.positionSummary.best}`}
-                </Text>
-                <Text style={s.kpiHint}>
-                  {model.positionSummary.best === null
-                    ? C.signals.prominenceHelper
-                    : `${C.signals.prominenceBest(model.positionSummary.best)} · ${C.signals.prominenceAverage(model.positionSummary.average ?? model.positionSummary.best)}`}
-                </Text>
               </View>
             </View>
+          ))}
+          {p.priorityPlan.length === 0 && <Text style={s.helper}>{c.noData}</Text>}
+        </Section>
+      </Interior>
 
-            <View style={s.senti}>
-              <Text style={s.sentiOverline}>Distribución de sentimiento</Text>
-              <View style={s.sentiBar}>
-                <View style={{ width: `${sentiPct(sentiment.positive)}%`, backgroundColor: K.success }} />
-                <View style={{ width: `${sentiPct(sentiment.neutral)}%`, backgroundColor: K.subtle }} />
-                <View style={{ width: `${sentiPct(sentiment.negative)}%`, backgroundColor: K.error }} />
-              </View>
-              <View style={s.sentiLegend}>
-                <Text style={s.sentiText}>
-                  <Text>{GH_GROWTH_AI_VISIBILITY.sentiment_net_label.positivo} </Text>
-                  <Text style={s.sentiTextB}>{sentiPct(sentiment.positive)}%</Text>
-                </Text>
-                <Text style={s.sentiText}>
-                  <Text>{GH_GROWTH_AI_VISIBILITY.sentiment_net_label.neutral} </Text>
-                  <Text style={s.sentiTextB}>{sentiPct(sentiment.neutral)}%</Text>
-                </Text>
-                <Text style={s.sentiText}>
-                  <Text>{GH_GROWTH_AI_VISIBILITY.sentiment_net_label.negativo} </Text>
-                  <Text style={s.sentiTextB}>{sentiPct(sentiment.negative)}%</Text>
-                </Text>
-              </View>
-            </View>
-          </View>
-        ) : null}
-
-        <EfeoncePdfFooter generatedAt={null} fixed />
-      </Page>
-
-      {/* ── PAGE 4 · SHARE OF VOICE + RECOMENDACIONES + PROVENIENCIA + CIERRE ── */}
-      <Page size='A4' style={s.page}>
-        <Text style={s.pageNo}>04</Text>
-
-        {show('competitiveSov') ? (
-          <View>
-            <Text style={s.eyebrow}>Tu marca frente al mercado</Text>
-            <Text style={s.sectionTitle}>{C.sov.title}</Text>
-            <Text style={s.helper}>{C.sov.helper}</Text>
-            {sovRows.map(row => (
-              <View key={row.name} style={s.dimRow}>
-                <View style={s.barHead}>
-                  <Text style={row.isBrand ? s.barNameBold : s.barName}>{row.name}</Text>
-                  <Text style={[s.barVal, { color: row.isBrand ? K.accent : K.muted }]}>
-                    {row.mentions} {C.sov.mentionsLabel}
+      <Interior p={p} footerExpanded={input.layout?.footerExpanded} index={1}>
+        <Section title={c.dimensionsTitle} helper={c.dimensionsHelper}>
+          <View style={{ gap: px(L.interior.rowsGapPx.dimensions), marginTop: px(L.interior.chapterContentGapPx.why) }}>
+            {p.dimensions.map(dim => (
+              <View key={dim.key} wrap={false} style={s.row}>
+                <View style={s.rowLabel}>
+                  <TrazoIcon glyph={DIM_GLYPH[dim.key]} />
+                  <Text style={s.rowLabelText}>
+                    {dim.label}
+                    <Text style={s.caption}> · {dim.weightLabel}</Text>
                   </Text>
                 </View>
-                <StaticBar value={(row.mentions / sovMax) * 100} color={row.isBrand ? K.accent : K.subtle} />
+                <Bar value={dim.score} />
+                <View style={s.rowValue}>
+                  <Text style={s.value}>{dim.scoreLabel}</Text>
+                  <SeverityLabel severity={dim.severity} label={dim.severityLabel} />
+                </View>
               </View>
             ))}
           </View>
-        ) : null}
-
-        {show('recommendations') ? (
-          <View style={s.section}>
-            <Text style={s.eyebrow}>Plan de acción</Text>
-            <Text style={s.sectionTitle}>{C.recommendations.title}</Text>
-            {model.recommendations.map((rec, idx) => (
-              <View key={rec.gapKey} style={s.rec}>
-                <View style={s.recNum}>
-                  <Text style={s.recNumText}>{idx + 1}</Text>
+        </Section>
+        <Section title={c.qualityTitle} helper={c.qualityHelper} secondary>
+          <View style={s.quality} wrap={false}>
+            <View style={s.card}>
+              <View style={s.cardHeading}>
+                <TrazoIcon glyph='prensa' />
+                <Text style={s.cardLabel}>{c.citationShare}</Text>
+              </View>
+              <Text style={s.kpi}>{p.quality.citationShareLabel}</Text>
+              <Text style={s.caption}>{p.quality.citationBasis}</Text>
+            </View>
+            <View style={s.card}>
+              <View style={s.cardHeading}>
+                <TrazoIcon glyph='social' />
+                <Text style={s.cardLabel}>{c.sentiment}</Text>
+              </View>
+              <Text style={s.kpi}>{p.quality.sentiment.label}</Text>
+              {p.quality.sentiment.total > 0 && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    height: px(L.qualityCards.sentimentBarPx),
+                    borderRadius: px(L.qualityCards.sentimentBarPx),
+                    overflow: 'hidden'
+                  }}
+                >
+                  {p.quality.sentiment.segments
+                    .filter(segment => segment.count > 0)
+                    .map(segment => (
+                      <View
+                        key={segment.key}
+                        style={{
+                          height: '100%',
+                          width: `${segment.percent}%`,
+                          backgroundColor: qualityColours[segment.key]
+                        }}
+                      />
+                    ))}
                 </View>
-                <View style={s.recBody}>
-                  <View style={s.recTitleRow}>
-                    <Text style={s.recTitle}>{rec.title}</Text>
-                    <Text style={[s.sevChip, sevChipStyle(rec.severity)]}>
-                      {GH_GROWTH_AI_VISIBILITY.severity_label[rec.severity]}
+              )}
+              <Text style={s.caption}>
+                {p.quality.sentiment.total === 0
+                  ? c.noData
+                  : p.quality.sentiment.segments
+                      .filter(segment => segment.count > 0)
+                      .map(segment => `${segment.label} ${segment.percentLabel}`)
+                      .join(' · ')}
+              </Text>
+            </View>
+            <View style={s.card}>
+              <View style={s.cardHeading}>
+                <TrazoIcon glyph='medicion' />
+                <Text style={s.cardLabel}>{c.prominence}</Text>
+              </View>
+              <Text style={s.kpi}>{p.quality.prominence.bestLabel}</Text>
+              <Text style={s.caption}>{p.quality.prominence.basisLabel}</Text>
+            </View>
+          </View>
+        </Section>
+      </Interior>
+
+      <Interior p={p} footerExpanded={input.layout?.footerExpanded} index={2}>
+        <Section title={c.levelsTitle}>
+          <View style={{ flexDirection: 'row', gap: px(L.axes.gapPx) }}>
+            <Text style={s.caption}>
+              <Text style={{ fontFamily: F.semibold }}>{c.perception}</Text> · {c.perceptionLegend}
+            </Text>
+            <Text style={s.caption}>
+              <Text style={{ fontFamily: F.semibold }}>{c.operability}</Text> · {c.operabilityLegend}
+            </Text>
+          </View>
+          <View>
+            {p.levels.map(level => (
+              <View key={level.id} wrap={false} style={s.level}>
+                <View style={s.levelDisc}>
+                  <TrazoIcon glyph={LEVEL_GLYPH[level.id]} size={22} />
+                </View>
+                <View style={s.levelContent}>
+                  <Text style={{ ...s.caption, fontFamily: F.semibold }}>{level.axisLabel}</Text>
+                  <Text style={pdfType(T.levelName)}>
+                    {level.label.split(' · ')[0]}
+                    {level.label.includes(' · ') && (
+                      <Text style={{ fontFamily: F.body }}>
+                        {' · ' + level.label.split(' · ').slice(1).join(' · ')}
+                      </Text>
+                    )}
+                  </Text>
+                  <Text style={{ ...pdfType(T.levelPrompt), color: K.muted }}>{level.question}</Text>
+                </View>
+                <View style={s.levelResult}>
+                  {!(level.score === null && level.axis === 'agentic') && (
+                    <Text style={{ ...pdfType(T.levelScore), color: level.score === null ? K.muted : K.ink }}>
+                      {level.score === null ? '—' : String(level.score)}
                     </Text>
-                  </View>
-                  <Text style={s.recAction}>{rec.action}</Text>
+                  )}
+                  <SeverityLabel severity={level.severity} label={level.statusLabel} chip />
                 </View>
               </View>
             ))}
           </View>
-        ) : null}
+        </Section>
+        <Section title={c.enginesTitle} helper={p.engineTakeaway} secondary>
+          <View style={{ gap: px(L.interior.rowsGapPx.engines) }}>
+            {p.engines.map(engine => (
+              <View key={engine.providerId} wrap={false} style={s.row}>
+                <View style={s.rowLabel}>
+                  <EngineDisc provider={engine.providerId} small />
+                  <Text style={s.rowLabelText}>{engine.label}</Text>
+                </View>
+                <Bar value={engine.mentionRate} />
+                <View style={s.rowValue}>
+                  <Text style={s.value}>{engine.percentLabel}</Text>
+                  <SeverityLabel severity={engine.severity} label={engine.fractionLabel} />
+                </View>
+              </View>
+            ))}
+          </View>
+        </Section>
+      </Interior>
 
-        {show('provenance') ? (
-          <View style={[s.section, { marginTop: 22 }]}>
-            <Text style={s.sectionTitle}>{C.provenance.title}</Text>
-            <View style={s.prov}>
-              {[
-                { k: C.provenance.asOf, v: model.provenance.asOfDate ?? '—' },
-                { k: C.provenance.sampledProviders, v: `${sampledCount}` },
-                { k: C.provenance.promptCount, v: `${model.provenance.promptCount}` },
-                { k: C.provenance.scoreVersion, v: model.provenance.scoreVersion },
-                { k: C.provenance.promptPackVersion, v: model.provenance.promptPackVersion }
-              ].map(row => (
-                <View key={row.k} style={s.provRow}>
-                  <Text style={s.provKey}>{row.k}</Text>
-                  <Text style={s.provVal}>{row.v}</Text>
+      <Interior p={p} footerExpanded={input.layout?.footerExpanded} index={3}>
+        {p.benchmark.rows.length > 0 && (
+          <Section title={c.benchmarkTitle} helper={p.benchmark.basisLabel}>
+            <View style={{ gap: px(L.interior.rowsGapPx.market) }}>
+              {p.benchmark.rows.map(row => (
+                <View key={row.name} wrap={false} style={s.row}>
+                  <View style={s.rowLabel}>
+                    <Text style={{ ...s.rowLabelText, fontFamily: row.isBrand ? F.semibold : F.body }}>{row.name}</Text>
+                  </View>
+                  <Bar value={(row.mentions / benchmarkMax) * 100} muted={!row.isBrand} />
+                  <View style={s.rowValue}>
+                    <Text style={s.value}>{row.percentLabel}</Text>
+                    <Text style={s.caption}>{row.mentionsLabel}</Text>
+                  </View>
                 </View>
               ))}
             </View>
+          </Section>
+        )}
+        {p.citationSources.rows.length > 0 && (
+          <Section title={c.sourcesTitle} helper={p.citationSources.basisLabel} secondary>
+            <View style={{ gap: px(L.interior.rowsGapPx.market) }}>
+              {p.citationSources.rows.map(source => (
+                <View key={source.domain} wrap={false} style={s.row}>
+                  <View style={s.rowLabel}>
+                    <Text
+                      style={{
+                        ...s.rowLabelText,
+                        fontFamily: source.classification === 'own_domain' ? F.semibold : F.body
+                      }}
+                    >
+                      {source.domain}
+                    </Text>
+                  </View>
+                  <Bar value={(source.count / sourceMax) * 100} muted={source.classification !== 'own_domain'} />
+                  <View style={s.rowValue}>
+                    <Text style={s.value}>{source.countLabel}</Text>
+                    <Text style={s.caption}>{source.classificationLabel}</Text>
+                  </View>
+                </View>
+              ))}
+              {p.citationSources.rows.length === 0 && <Text style={s.helper}>{c.noData}</Text>}
+            </View>
+          </Section>
+        )}
+        <View wrap={false} style={s.provenance}>
+          <Text style={pdfType(T.cardLabel)}>{c.provenanceTitle}</Text>
+          <View style={{ flexDirection: 'row', gap: px(L.provenance.columnGapPx) }}>
+            {[
+              { glyph: 'calendario', label: c.asOf, value: p.provenance.asOfLabel },
+              { glyph: 'composer', label: c.questions, value: p.provenance.promptCountLabel },
+              { glyph: 'medicion', label: c.scoreVersion, value: p.provenance.scoreVersionLabel },
+              { glyph: 'contrato', label: c.questionPack, value: p.provenance.promptPackVersionLabel }
+            ].map(item => (
+              <View
+                key={item.glyph}
+                style={{ flexDirection: 'row', gap: px(L.provenance.itemGapPx), flexBasis: 0, flexGrow: 1 }}
+              >
+                <TrazoIcon glyph={item.glyph} />
+                <View style={{ flexShrink: 1, gap: px(L.provenance.textGapPx) }}>
+                  <Text style={s.caption}>{item.label}</Text>
+                  <Text style={{ ...s.body, fontFamily: F.semibold }}>{item.value}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-        ) : null}
-
-        {show('disclaimer') ? (
-          <View style={s.disc}>
-            <Text style={s.discText}>{model.disclaimer}</Text>
-          </View>
-        ) : null}
-
-        <View style={s.closing}>
-          <Image src={asset('branding/logo-full.png')} style={s.closingLogo} />
-          <EfeonceSloganPdf fontSize={11} />
-          <Text style={s.closingLegal}>
-            {EFEONCE_LEGAL_NAME_FALLBACK} · {EFEONCE_URL}
-          </Text>
+          <Text style={s.caption}>{p.disclaimer}</Text>
         </View>
+      </Interior>
+
+      <Page size='A4' style={[s.page, s.back]}>
+        <View style={s.backdrop} />
+        <View style={s.closeContent}>
+          <View style={s.voice}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: px(T.closingQuestion.sizePx * L.backCover.questionRing.gapEm)
+              }}
+            >
+              <Svg
+                width={px(T.closingQuestion.sizePx * L.backCover.questionRing.sizeEm)}
+                height={px(T.closingQuestion.sizePx * L.backCover.questionRing.sizeEm)}
+                viewBox={`0 0 ${ringSize} ${ringSize}`}
+              >
+                <Circle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={(ringSize - ringStroke) / 2}
+                  fill='none'
+                  stroke={K.accent}
+                  strokeWidth={ringStroke}
+                />
+              </Svg>
+              <Text style={s.question}>{p.closing.question}</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'baseline',
+                gap: px(T.closingAnswer.sizePx * L.backCover.answerSphere.gapEm)
+              }}
+            >
+              <Text style={s.answer}>{p.closing.answer}</Text>
+              <View
+                style={{
+                  width: px(T.closingAnswer.sizePx * L.backCover.answerSphere.sizeEm),
+                  height: px(T.closingAnswer.sizePx * L.backCover.answerSphere.sizeEm),
+                  borderRadius: px(T.closingAnswer.sizePx),
+                  backgroundColor: K.accent
+                }}
+              />
+            </View>
+            <Text style={s.closeEvidence}>
+              {focusAt < 0 || !focus ? (
+                p.closing.evidence
+              ) : (
+                <>
+                  {p.closing.evidence.slice(0, focusAt)}
+                  <Text style={{ fontFamily: F.semibold }}>{focus}</Text>
+                  {p.closing.evidence.slice(focusAt + focus.length)}
+                </>
+              )}
+            </Text>
+          </View>
+          {p.closing.ctaUrl && (
+            <View style={s.action}>
+              <Link src={p.closing.ctaUrl} style={s.cta}>
+                {p.closing.ctaLabel}
+                <Text style={{ fontFamily: F.display() }}> →</Text>
+              </Link>
+              <Text style={{ ...s.caption, color: K.softOnDark }}>{c.closing.chooseTime}</Text>
+            </View>
+          )}
+          {p.closing.owner && (
+            <View style={s.clientCards}>
+              <View style={s.clientCard}>
+                <Text style={{ ...s.label, color: K.softOnDark }}>{c.closing.accountOwner}</Text>
+                <Text style={{ ...s.body, fontFamily: F.semibold, color: K.paper }}>{p.closing.owner.name}</Text>
+                <Text style={{ ...s.body, color: K.softOnDark }}>{p.closing.owner.role}</Text>
+                <Link
+                  src={`mailto:${p.closing.owner.email}`}
+                  style={{ ...s.body, color: K.softOnDark, textDecoration: 'none' }}
+                >
+                  {p.closing.owner.email}
+                </Link>
+              </View>
+              {p.closing.nextReportDateLabel && (
+                <View style={s.clientCard}>
+                  <Text style={{ ...s.label, color: K.softOnDark }}>{p.closing.nextReportLabel}</Text>
+                  <Text style={{ ...s.body, color: K.paper }}>{p.closing.nextReportDateLabel}</Text>
+                </View>
+              )}
+            </View>
+          )}
+          {p.closing.showSocial && (
+            <View style={s.socials}>
+              <Link src={EFEONCE_URL_HTTPS} style={{ marginRight: px(L.socials.bubbleAfterGapPx) }}>
+                <BrandImage
+                  id='url-bubble-baked-dark'
+                  width={px(L.socials.bubblePx[0])}
+                  height={px(L.socials.bubblePx[1])}
+                />
+              </Link>
+              {SOCIAL_ORDER.map(channel => {
+                const social = EFEONCE_SOCIAL_LINKS.find(item => item.channel === channel)!
+
+                return (
+                  <Link src={social.url} key={channel}>
+                    <BrandImage id={`social-${channel}`} width={px(L.socials.discPx)} height={px(L.socials.discPx)} />
+                  </Link>
+                )
+              })}
+            </View>
+          )}
+          <View style={s.closeBrand}>
+            <Slogan />
+          </View>
+        </View>
+        <Text style={s.legal}>{EFEONCE_LEGAL_NAME_FALLBACK}</Text>
       </Page>
     </Document>
   )
 }
-
-export default AiVisibilityReportPdf

@@ -6,10 +6,12 @@ las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus 
 > **Estado 2026-09-29:** **aprobado por el operador** («con eso cerraríamos … canoniza este informe»). La dirección
 > y sus hojas nativas son el contrato de fidelidad:
 > [`TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`](../visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md).
-> Tiene 24 hojas en `es`, `en` y `pt-BR` y la lámina de estados de la órbita. `UI ready` sigue en `no` hasta cerrar el
-> implementation mapping y el plan GVC contra el renderer real.
+> Tiene 24 hojas en `es`, `en` y `pt-BR` y la lámina de estados de la órbita. Desde el 2026-10-03, `UI ready: yes`
+> indica dirección aprobada, implementation mapping y plan de evidencia definidos. No acredita el PDF exportado,
+> aprobación visual, gates de cierre ni rollout; sus resultados se registran por separado en el dossier.
 
-- Visual direction mode: source-led (aprobada el 2026-09-29).
+- Visual direction mode: `source-led`
+- Product Design asset: `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`
 - **Fuente editable:** canvas «Correo de Efeonce Insights», página «Informe del Grader (PDF)»,
   <https://claude.ai/artifact/1FHPWVxQ2rbK6jdxw2EqNd>. Archivos `project/GraderPortadaProspecto.dc.html`,
   `project/GraderPortadaCliente.dc.html`, `project/GraderQueHacer.dc.html`, `project/GraderPorQue.dc.html`,
@@ -23,6 +25,16 @@ las páginas que TASK-1938 debe producir en el renderer PDF del Grader, con sus 
 - **Master flow del programa:** [`EPIC-020-AEO-PROGRAM-UI-FLOW.md`](../flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md). Esta
   superficie es el render `PDF (vectorial A4)` del nodo **S14 (report artifact)** y el adjunto del nodo **S3 (email del
   informe)**. No agrega nodos ni rutas.
+
+## Delta 2026-10-03 — mapping y límites de ejecución
+
+El [plan autorizado](../../tasks/plans/TASK-1938-plan.md) prevalece sobre los supuestos históricos de paquetes,
+copy, logo y tendencia: conserva pins instalados, genera la anatomía editorial desde AXIS, usa copy específico del
+PDF en `src/lib/copy/ai-visibility-report-pdf.ts` y contexto visual compatible sin mutar el modelo. Audience comercial
+se verifica por facts de la organización vinculada; el logo procede del byte reader autorizado, nunca de una URL
+privada. Attachment mantiene la tendencia excluida: no se dibuja delta ni se inventa primera medición cuando hay
+histórico oculto. El eslogan es «Empower your Engine», con divisor 11.263 em. Se actualizan aquí estados y mapping;
+la fidelidad se verifica en las páginas exportadas, no en la aprobación documental.
 
 ## Delta 2026-09-29 — el documento es el Efeonce AI Visibility Report
 
@@ -71,13 +83,15 @@ nunca se le «ofrece» el Grader ni se le vende**. Las cuatro páginas interiore
 |---|---|---|
 | Rótulo de portada | «Diagnóstico de visibilidad en IA» | «Informe de visibilidad en IA» |
 | Identidad | nombre de la marca a 64 px | «Preparado para» + logo del cliente + nombre |
-| Bajo la órbita | «Primera medición: tu punto de partida» | «▲ N puntos desde el [fecha anterior]» (`trend.overall`) |
+| Bajo la órbita | «Primera medición: tu punto de partida» sólo cuando `trend.status` confirma ausencia de histórico | Attachment no revela `trend.overall`; conserva espacio y omite delta. Histórico oculto no implica primera medición |
 | Contraportada | «¿Conversamos? / Cuando quieras» + «Agenda una reunión →» (enlace a `efeoncepro.com/contacto/`, que abre el agendamiento; sin correo) + burbuja URL y redes | «¿Lo revisamos juntos? / Cuando quieras» + responsable de la cuenta (hoy Julio Reyes, Managing Director & GTM, `jreyes@efeoncepro.com`) + próximo informe; sin CTA comercial ni redes |
 
-**Qué decide la variante:** el Grader ya identifica al cliente cuando el informe viene de uno, con su país y su logo
-(perfil con organización, país y mercado en `provision-profile.ts`; logo por `resolveOrganizationLogoUrl` en `store.ts`;
-operador, 2026-09-29). Con cliente identificado → versión cliente; lead del intake público → versión no cliente. La
-variante es un dato del informe que el renderer recibe, nunca una deducción visual.
+**Qué decide la variante:** `report/pdf-presentation-context.ts` verifica el vínculo run/perfil y consulta
+`getOrganizationCommercialFacts`; un perfil con organización por sí solo no prueba relación cliente. El renderer
+recibe `audience` y `audienceSource` explícitos. Sin contexto conserva prospecto; contexto contradictorio falla
+cerrado. Logo ausente conserva el nombre y la audiencia; logo normal usa lecho claro, variante oscura sólo si existe.
+El default único de responsable es Julio Reyes y no se inventa fecha de próximo informe. Fecha/idioma y fallbacks
+están trazados en el plan autorizado.
 
 ## Desktop Target
 
@@ -147,8 +161,9 @@ portada, 02, 03, 04, 05 y contraportada. Orden «respuesta primero»: qué hacer
 
 ## Mobile Target
 
-No aplica: el PDF se lee a tamaño físico. La lectura en pantalla es el informe web (`report-artifact/web`), fuera de
-esta task (ver Out of Scope de la task).
+390px mobile: no aplica a este documento A4 de formato fijo; no existe layout responsive ni ruta nueva. Se verifica
+que el archivo se pueda abrir y ampliar en un visor, sin reflow ni recorte de contenido. La lectura responsive es
+el informe web (`report-artifact/web`), fuera de esta task; no se inventa captura GVC de portal para acreditar el PDF.
 
 ## Action Hierarchy
 
@@ -187,8 +202,9 @@ tiene acciones de negocio; los enlaces (agenda, correo, URL, redes) son reales.
 
 ## Copy Ledger
 
-Copy existente en `src/lib/copy/growth.ts` (`GH_GROWTH_AI_VISIBILITY`, `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`).
-Nuevo, a agregar ahí y validar con `greenhouse-ux-writing`:
+Canon de plantillas reconocidas en `src/lib/copy/growth.ts`; copy específico en los diccionarios `es`, `en` y `pt-BR`
+de `src/lib/copy/ai-visibility-report-pdf.ts`. Sólo se traducen strings/plantillas reconocidos por igualdad; unknown
+histórico se preserva literalmente. La proyección no consulta un LLM ni selecciona nuevas recomendaciones.
 
 - Rótulos «Diagnóstico de visibilidad en IA» (prospecto) y «Preparado para» (cliente); «Primera medición: tu punto de
   partida»; «▲ N puntos desde el [fecha]»; la leyenda de la escala.
@@ -208,9 +224,14 @@ Nuevo, a agregar ahí y validar con `greenhouse-ux-writing`:
 
 | State | Qué se ve | Regla |
 |---|---|---|
-| informe completo | seis páginas | ninguna |
+| ready | seis páginas con «AI Visibility Report», datos públicos y cierre según audiencia/idioma | leer y seguir los enlaces reales; evidencia final pendiente de PDF exportado |
+| loading | fuera del PDF: el servidor produce el Buffer antes de entregar; no hay hoja, animación ni copy de carga nuevo | esperar el consumer existente; refresh no modifica su estado de carga |
+| empty | «—», «Sin dato»; operabilidad sin probes: «En cobertura» | conservar null y ausencia, nunca convertirlos en cero ni inventar evidencia; revisión de cobertura por flujo existente |
+| partial | «N de M motores respondieron» cuando la procedencia verifica ambos conteos; si no, cobertura no verificada | mantener datos disponibles y estados no respuesta; nueva medición por el flujo existente, sin acción nueva en el PDF |
+| error | fuera del PDF: descarga conserva «No fue posible generar el PDF. Intenta de nuevo en unos minutos.» (502); no se entrega un PDF parcial corrupto | reintento existente; dispatch conserva ledger de fallo/retry y operator su exception path |
+| denied | fuera del PDF: token inexistente/expirado conserva «Este reporte no existe o el enlace expiró.» (404), rate limit conserva su 429; flags/consent/report gates de envío intactos | revisar enlace vigente o esperar el límite; nunca bypass, nuevo acceso ni emisión de documento |
 | puntaje `null` | anillo sin arco ni esfera, «—» y «Sin dato» | nunca un arco en 0 |
-| sin histórico (`trend` sin comparación) | «Primera medición: tu punto de partida» | nunca «▲ 0» |
+| sin histórico (`trend.status === sin_historico`) | «Primera medición: tu punto de partida» | nunca «▲ 0»; histórico oculto por attachment omite etiqueta/delta |
 | nivel sin dimensiones medidas | «—» y «Sin dato» | nunca 0 |
 | nivel del eje de operabilidad sin probes | «En cobertura» | no se dibuja barra |
 | dimensión sin dato | «—» y «Sin dato» en gris | nunca 0/100 |
@@ -218,7 +239,8 @@ Nuevo, a agregar ahí y validar con `greenhouse-ux-writing`:
 | sin benchmark o sin fuentes citadas | la sección no se dibuja | idem |
 | motores que no respondieron | «N de M motores respondieron» | cobertura honesta |
 | cliente sin logo | «Preparado para» con el nombre | sin marcador vacío en producción |
-| cliente sin responsable de cuenta asignado | la tarjeta muestra el correo general de la cuenta | [verificar la fuente del responsable] |
+| cliente sin responsable propio asignado | Julio Reyes, Managing Director & GTM, jreyes@efeoncepro.com | default único aprobado; nunca inventar una persona o reemplazarlo por correo general |
+| cliente sin fecha de próximo informe acordada | se omite ese bloque | `recurringRegradeNextAt` programa un run y no prueba una entrega acordada |
 | nombres largos | ajuste de línea | sin cortar con «…» |
 
 ## Accessibility Contract
@@ -231,10 +253,12 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 - Superficie: `src/components/growth/ai-visibility/report-artifact/pdf/AiVisibilityReportPdf.tsx` (react-pdf) y sus
   tokens `report-pdf-tokens.ts`. `Nav placement: none`.
 - Consumidor: `src/lib/growth/ai-visibility/public-delivery/email/build-report-attachment.ts`.
-  `renderAiVisibilityReportPdf(model, header)` suma un campo de **audiencia** (`prospect | client`) resuelto antes del
-  render, más el logo del cliente y el responsable de la cuenta cuando existen [verificar fuentes en Discovery].
+  `renderAiVisibilityReportPdf({ model, header, context? })` conserva llamadas anteriores y recibe metadata visual
+  verificada. `report/pdf-presentation-context.ts` sólo agrega lecturas después de los gates existentes de descarga,
+  dispatch y operator; no cambia command/intake, destinatarios, consentimiento, idempotencia ni efectos de envío.
 - Modelo: `ReportArtifactModel` ya trae lo necesario para tendencia (`trend`), fuentes (`citationSourceBreakdown`),
-  niveles (`levels` con su eje) y pesos (vía `SCORE_DIMENSION_CONFIG`); el PDF hoy no dibuja tendencia ni fuentes.
+  niveles (`levels` con su eje) y pesos (vía `SCORE_DIMENSION_CONFIG`). `report-pdf-presentation.ts` proyecta viewFacts
+  y copy sin mutarlo; fuentes públicas se dibujan y tendencia conserva el disclosure de attachment.
 - Fuentes: `src/lib/finance/pdf/register-fonts.ts`. Si se adopta Bricolage, react-pdf necesita instancias estáticas
   por peso (el archivo del repo es variable).
 - Primitive: `extend` del renderer existente; sin librería nueva.
@@ -244,9 +268,20 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
 - Quality profile: premium.
 - Scenario: **no aplica** GVC de portal (no hay ruta). Evidencia = PDF real de cada variante, renderizado con el fixture
   y con un informe real de staging, abierto página por página, en color y en escala de grises.
+- Desktop evidence: páginas A4 a 96 dpi, 794×1123 px; seis combinaciones de audiencia/idioma, más estados límite.
+  Es el documento exportado, sin viewport de app ni ruta nueva. Staging permanece pendiente del rollout autorizado.
+- 390px mobile evidence: no aplica a formato PDF fijo; no se inventa layout responsive ni captura de portal. La
+  prueba proporcional es apertura y zoom del archivo en visor cuando corresponda; informe web sigue fuera del scope.
+- Review dossier: `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`, dueño root, en preparación;
+  debe contener PDFs, capturas, gris, extracción de texto/enlaces/fuentes y comparación. Esta referencia es un plan,
+  no una afirmación de evidencia ya entregada.
+- Baseline decision / surface ID: `growth.ai-visibility.report-pdf`; renderer previo de cuatro páginas del HEAD anterior al refresh, exportado en
+  `.captures/task-1938/baseline.pdf` y `baseline-page-1.png` a `baseline-page-4.png`. Sirve para regresión de datos;
+  la fidelidad del nuevo diseño se compara con las 24 hojas aprobadas durables de visual-directions. El dossier root
+  conservará provenance y resultados; generar una captura no implica aprobación visual.
 - Fidelidad: cada página contra la hoja aprobada del canvas (exportada a `docs/ui/visual-directions/TASK-1938-*/`),
   lado a lado en el dossier `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/`.
-- Assertions: el test `report-artifact-pdf-no-leak.test.tsx` sigue verde; cifras y gravedades iguales al modelo; el
+- Assertions a verificar: el test `report-artifact-pdf-no-leak.test.tsx` sigue verde; cifras iguales al modelo y etiquetas PDF de gravedad por `resolveSeverity`; el
   pie de cada página interior queda dentro de la hoja; fuentes embebidas.
 - Scroll-width: no aplica a PDF.
 
@@ -270,4 +305,4 @@ la etiqueta); lectura verificada en escala de grises; enlaces con destino real.
   identifica; «Agenda una reunión» lleva a la agenda, sin correo; el ejemplo del informe se corrige a los umbrales reales.
 - **Resueltas también:** responsable de la cuenta Julio Reyes (Managing Director & GTM) hasta asignar por cliente; el
   botón lleva a `/contacto/` mientras se renueva la agenda.
-- **Abierta:** la palabra del eslogan para el Grader.
+- **Resuelta:** «Empower your Engine» (Delta 2026-09-29); divisor Engine 11.263 em confirmado en el plan 2026-10-03.

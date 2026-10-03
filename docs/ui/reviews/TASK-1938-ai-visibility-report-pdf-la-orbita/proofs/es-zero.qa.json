@@ -1,0 +1,62 @@
+{
+  "synthetic": true,
+  "locale": "es",
+  "audience": "prospect",
+  "fixture": "es-zero",
+  "bytes": 250298,
+  "pages": 6,
+  "pageSizes": [
+    {
+      "page": 1,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 2,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 3,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 4,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 5,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 6,
+      "width": 595.280029,
+      "height": 841.890015
+    }
+  ],
+  "pdfSha256": "e95bcba40414b1dac815771fae3f70457e9354b9ce989276c1e34da9c403c5ee",
+  "modelSha256": "55f712cf8b533713bd8f26145fae3fba536bae295d5bb8c0dd3d09ebd7f980c7",
+  "header": {
+    "organizationName": "Globe",
+    "reportDate": "19 may 2026",
+    "periodLabel": "4 – 19 de mayo de 2026"
+  },
+  "links": [
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "https://efeoncepro.com/contacto/?utm_source=ai-visibility-grader&utm_medium=pdf&utm_campaign=grader-report&utm_content=contraportada",
+    "https://efeoncepro.com",
+    "https://www.linkedin.com/company/efeoncecl",
+    "https://instagram.com/efeoncepro",
+    "https://www.youtube.com/@efeoncepro",
+    "https://threads.com/efeoncepro"
+  ],
+  "outsideLinks": [],
+  "outsidePage": [],
+  "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nUSHAFI+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nBLVRZN+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     13  0\nSZCHJV+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     14  0\nZGCZUC+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     28  0\nCRAJKN+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     29  0\nVEQSKY+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     41  0\nIGOVYP+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     46  0\nVHLMCA+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     80  0\nNNRKHQ+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     98  0\nEUVHVT+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     99  0\nXPSCBP+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes    100  0\n"
+}

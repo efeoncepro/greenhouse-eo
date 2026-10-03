@@ -10,6 +10,9 @@ vi.mock('@/lib/growth/ai-visibility/hubspot/report-link', () => ({
   buildPublicReportUrl: (token: string) => `https://think.efeoncepro.com/brand-visibility/r/${token}`
 }))
 vi.mock('@/lib/growth/ai-visibility/report/snapshot', () => ({ readPublicGraderReport: vi.fn() }))
+vi.mock('@/lib/growth/ai-visibility/report/pdf-presentation-context', () => ({
+  readAiVisibilityReportPdfPresentationContext: vi.fn(async () => ({ audience: 'prospect', audienceSource: 'public_intake' }))
+}))
 vi.mock('@/lib/email/delivery', () => ({ sendEmail: vi.fn() }))
 vi.mock('../build-report-attachment', () => ({
   buildAiVisibilityReportAttachment: vi.fn(async () => ({
@@ -31,6 +34,7 @@ import { sendEmail } from '@/lib/email/delivery'
 import { isReportEmailDeliveryEnabled } from '@/lib/growth/ai-visibility/flags'
 import { getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
 import { getGraderLeadForHandoff } from '@/lib/growth/ai-visibility/public-intake/store'
+import { readAiVisibilityReportPdfPresentationContext } from '@/lib/growth/ai-visibility/report/pdf-presentation-context'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 
 import { buildAiVisibilityReportAttachment } from '../build-report-attachment'
@@ -53,6 +57,7 @@ const lead = {
 
 const snapshot = (gateStatus: string = 'ready') => ({
   reportId: 'grpt-1',
+  runId: RUN_ID,
   reportToken: 'grt-xyz',
   asOf: '2026-06-27T12:00:00.000Z',
   expiresAt: null,
@@ -68,6 +73,7 @@ const mocks = {
   claim: vi.mocked(claimReportEmailDispatch),
   markSent: vi.mocked(markReportEmailDispatchSent),
   markFailed: vi.mocked(markReportEmailDispatchFailed),
+  presentation: vi.mocked(readAiVisibilityReportPdfPresentationContext),
   attachment: vi.mocked(buildAiVisibilityReportAttachment)
 }
 
@@ -90,6 +96,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
 
     expect(res).toMatchObject({ status: 'skipped', reason: 'disabled', retryable: false })
     expect(mocks.claim).not.toHaveBeenCalled()
+    expect(mocks.presentation).not.toHaveBeenCalled()
     expect(mocks.send).not.toHaveBeenCalled()
   })
 
@@ -106,6 +113,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
     mocks.lead.mockResolvedValue({ ...lead, consent: false } as never)
 
     expect(await dispatchAiVisibilityReportEmail(RUN_ID)).toMatchObject({ status: 'skipped', reason: 'no_consent' })
+    expect(mocks.presentation).not.toHaveBeenCalled()
     expect(mocks.send).not.toHaveBeenCalled()
   })
 
@@ -119,6 +127,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
 
     expect(res).toMatchObject({ status: 'skipped', reason: 'gated:review_required' })
     expect(mocks.claim).not.toHaveBeenCalled()
+    expect(mocks.presentation).not.toHaveBeenCalled()
     expect(mocks.send).not.toHaveBeenCalled()
   })
 
@@ -130,6 +139,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
 
     expect(res).toMatchObject({ status: 'skipped', reason: 'already_sent' })
     expect(mocks.send).not.toHaveBeenCalled()
+    expect(mocks.presentation).not.toHaveBeenCalled()
     expect(mocks.attachment).not.toHaveBeenCalled()
   })
 
@@ -150,7 +160,28 @@ describe('dispatchAiVisibilityReportEmail', () => {
     expect(ctx.organizationName).toBe('Acme')
     expect(ctx.pdfBuffer).toBeInstanceOf(Buffer)
     expect(ctx.attachmentFilename).toBe('informe-visibilidad-ia-globe.pdf')
+    expect(mocks.presentation).toHaveBeenCalledWith({
+      runId: RUN_ID,
+      locale: SAMPLE_PUBLIC_REPORT.provenance.market?.locale,
+      asOf: snapshot().asOf
+    })
+    expect(mocks.attachment).toHaveBeenCalledWith(expect.objectContaining({
+      context: { audience: 'prospect', audienceSource: 'public_intake' }
+    }))
     expect(mocks.markSent).toHaveBeenCalledWith('disp-1', 're-1')
+  })
+
+  it('retains the claimed dispatch failure path when presentation identity cannot be verified', async () => {
+    happyPath()
+    mocks.presentation.mockRejectedValueOnce(new Error('ai_visibility_pdf_presentation_organization_mismatch'))
+
+    const res = await dispatchAiVisibilityReportEmail(RUN_ID)
+
+    expect(res).toMatchObject({ status: 'failed', reason: 'exception', retryable: true })
+    expect(mocks.markFailed).toHaveBeenCalledWith('disp-1', 'ai_visibility_pdf_presentation_organization_mismatch')
+    expect(mocks.attachment).not.toHaveBeenCalled()
+    expect(mocks.send).not.toHaveBeenCalled()
+    expect(mocks.markSent).not.toHaveBeenCalled()
   })
 
   it('marks the dispatch failed and stays retryable when delivery does not reach sent', async () => {

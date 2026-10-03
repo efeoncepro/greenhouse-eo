@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — AI Visibility Report PDF: refresh local
+
+- TASK-1938: mismo motor y snapshot; seis páginas Engine con órbita, logos oficiales y cierres de cliente/prospecto, en ES/EN/PT-BR. Texto largo conserva contenido con continuación; fuentes registradas de forma aditiva. Las RRSS oficiales se muestran completas a su escala y el eslogan mantiene sus tres pesos.
+- [Dossier](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md): diez PDFs auditados, 24 comparaciones color/gris, 108 pruebas focales, TypeScript y build PASS. Fallo de metadata Manzanitas corregido en un commit separado; siete tests y sincronización PASS. Code complete local; rollout, revisión del adjunto real y paridad web/print pendientes. Sin push ni envío real.
+
 ## 2026-10-03 — Elenco 2D de Efeonce canonizado
 
 - [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
@@ -645,18 +650,3 @@ Lecciones: el extruido en Blender quedó plano y se rechazó; `ai:image:rmbg` re
 por color contra el fondo liso; el QA compara silueta, calados y piezas con el plano y avisa sin rechazar. D23: «El corte»
 en el Trazo se descartó; el Trazo queda funcional y la distinción la carga Plastilina. Skill `efeonce-graphic-line`,
 skills vecinas, manual, ADR, doc funcional y manual de uso al día. Corrida: `ai-generations/2026-09-27_plastilina-3d-gpt/`.
-
-## 2026-09-27 — La órbita se compone por superficie
-
-Nace la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md):
-recetas aprobadas, opciones, rechazos, firma y reglas para web, DOOH, pDOOH, motion, producción audiovisual y deck, más
-la tabla de contradicciones del inventario y cómo quedaron. El operador aprobó las recetas de deck `proposal-cinematic`
-(servicios creativos, web, carrera de Nexa, RevOps, AEO y líneas de servicio con Nexa, cuyas cinco esferas son luz de
-la foto) y `method-staircase` (BeX), amplió el registro cine a `proposal-cinematic` con personas del equipo en su
-uniforme por registro, dejó el acento fuera del texto menor de 24 px y aprobó el 1:1 ajustado en el canvas (su salida
-de `sinValidar` va con TASK-1918). El canvas del equipo se separó en una página por superficie, cada una con su lámina
-guía. Manual de la línea §10.0, lenguaje fotográfico v1.6, doc funcional 1.7, manual de uso nuevo y skills
-`efeonce-graphic-line`, `deck-studio`, `motion-design-studio`, `efeonce-advertising-creative` y `design-studio` al día.
-El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface:resolve`, tokens
-`efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
-código en Greenhouse.
