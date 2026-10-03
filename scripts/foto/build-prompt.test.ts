@@ -1815,6 +1815,19 @@ describe('foto:prompt · elenco de marca', () => {
     expect(() => validarVestuarioDeLinea(ficha('antonio', 'revenue-salesforce', 'chaqueta-bomber-efeonce'))).not.toThrow()
   })
 
+  it('un grupo de 3 a 5 sólo vale con personajes del elenco; con el roster sigue el tope de dos', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'karo', 'hum'] })).toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['karo', 'hum', 'sophia', 'isabella', 'antonio', 'karo'] })).toThrow(/no está medido/)
+  })
+
+  itConAssets('el grupo de cinco lleva una referencia frontal por persona, bloques etiquetados y corta la luz de la referencia', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['isabella', 'sophia', 'karo', 'hum', 'antonio'] })
+
+    expect(r.imagenes.slice(0, 5)).toEqual(['isabella', 'sophia', 'karo', 'hum', 'antonio'].map(k => `ai-generations/_identidad-elenco/${k}/${k}-frente.png`))
+    expect(r.prompt).toContain('PERSON 3 — KARO (Image 3): IDENTITY (critical):')
+    expect(r.prompt).toContain('The LIGHT of the identity references does NOT carry over')
+  })
+
   itConAssets('se pide en `identidad` como el roster, con su vista y su cuerpo', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'isabella', vista: 'perfil-izq' }] })
 

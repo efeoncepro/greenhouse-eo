@@ -259,6 +259,22 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    y **no puede interpretar otra línea** (Revenue admite HubSpot y Salesforce). Tests de contrato en
    `scripts/foto/build-prompt.test.ts` (§«elenco de marca»).
 
+## 7b. Uniforme y grupo (2026-10-03)
+
+**Uniforme [operador: «una prueba por cada uno sólo con la chaqueta bomber y polo piqué … con distintos ángulos»].**
+Quince tomas (`ai-generations/2026-10-03_elenco-uniforme/`): frente, 45° con cámara baja y espalda mirando por encima del
+hombro. La prenda va como **imagen de referencia del kit puesta** (`objetos`), no sólo como texto. Bordado del pecho y
+logotipo trasero («efeonce» + «Empower your Growth») correctos al 100 %. Con la bomber abierta, el bordado del polo
+asomaba junto al de la chaqueta («doble logo»): la escena declara que el borde de la chaqueta tapa el del polo.
+
+**Grupo [operador: «una prueba cinemática juntos»].** Los cinco se piden en `identidad` en el orden del cuadro; desde el
+2026-10-03 el compilador admite **grupos de 3 a 5 personajes del elenco** con una referencia frontal cada uno, bloques
+IDENTITY etiquetados y la luz de las referencias cortada (medición y fallas en el
+[casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#elenco-en-grupo-2026-10-03--lo-que-aprendimos), filas 21–25). Con
+personas del roster el tope sigue en dos. Prueba `EC2` (cine, `publicidad-prueba`, no se publica): identidad de los cinco
+sostenida; bordados de Hum y Antonio con isotipo oficial compuesto; el del hoodie de Karo y los de los polos quedan sin
+corregir.
+
 ## 8. Estado
 
 | Personaje | Estado |

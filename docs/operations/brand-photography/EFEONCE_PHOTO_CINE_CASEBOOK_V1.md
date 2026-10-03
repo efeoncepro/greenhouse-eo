@@ -237,6 +237,19 @@ sobre el polo golpea la mesa y el plan de contenidos queda congelado en el aire;
 baja dentro del cuadro. En el login lleva la lente; `LG1` y `LG2e` van **sin lente**, porque su luz ya es la órbita de
 la pieza (una órbita por pieza; el operador lo aceptó). Ficha: `fichas/LG3e-contenidos-estratega.json`.
 
+## Elenco en grupo (2026-10-03) — lo que aprendimos
+
+Prueba cinemática del elenco de marca (`EFEONCE_BRAND_CAST_V1.md`), los cinco juntos, desde C4S07, con dos pasadas del
+`cine-reviewer`. Fichas y plates: `ai-generations/2026-10-03_elenco-cine/` (`EC1`, `EC2`).
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 21 | **Identidad prometida en texto**: tres personajes nombrados salen como otras personas | El tope era de dos personas ancladas; el resto iba sólo descrito | Grupo de 3 a 5 personajes del `ELENCO`: una referencia frontal por persona. Medido: con dos anclados, tres caras cambian; con los cinco, sostienen su identidad (hermanas incluidas) | EC1 → brazo 2 → EC2 | `foto:prompt` (`REFS_POR_PERSONA`) |
+| 22 | **Bloques IDENTITY sin nombre** con varias mujeres de pelo oscuro | El bloque decía «the woman…» sin decir cuál | En grupo, cada bloque empieza `PERSON n — NOMBRE (Image k):` y la escena nombra la imagen de cada persona | EC1 | `foto:prompt` lo inyecta en grupo |
+| 23 | **Caras con luz de estudio** pegadas en una escena oscura | Con cinco anclas, la luz de las referencias se impone a la de la escena | La escena declara la luz en cada cara («a soft teal glow from BELOW…; the light of the identity references does NOT carry over»); en grupo el bloque REFERENCES lo repite | brazo 2 → EC2 | `cine-reviewer` |
+| 24 | **Bordado reinventado** en todas las prendas del grupo | A 40–90 px por pecho el modelo no copia la marca aunque tenga la prenda puesta como referencia | `foto:isotipo --acabado` pecho por pecho; si una mano tapa la marca, la limpieza pinta un rectángulo sobre los dedos: no se compone, se rehace la toma | EC2-b (Hum y Antonio sí; Karo no) | `foto:emblema` al 100 % |
+| 25 | **`primerPlano` igual al `lecho`** | El compilador agrega «a separate object from the bed», y el modelo recibe dos objetos o uno contradictorio | Si el primer plano es el lecho, se omite `primerPlano` | EC1 | `cine-reviewer` |
+
 ## Lo que no se automatiza (y por eso existe el revisor)
 
 `foto:prompt` y `foto:validar:cine` atrapan lo medible. El juicio que queda —si el fenómeno ES el servicio, si la

@@ -492,7 +492,11 @@ export const ELENCO = {
 
 // Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
 // personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
-const REFS_POR_PERSONA = { 1: 3, 2: 2 }
+// Grupos de 3 a 5 [medido 2026-10-03, EC1-brazo2]: sólo personajes del ELENCO, UNA referencia frontal cada uno. A
+// 2048×2560 las cinco caras sostuvieron su identidad (las hermanas Karo y Sophia sin mezclarse); con sólo dos anclados,
+// las otras tres salieron como otras personas. Costo medido: las caras traen la luz de estudio de su referencia, por eso
+// el bloque REFERENCES de un grupo prohíbe que esa luz pase a la escena.
+const REFS_POR_PERSONA = { 1: 3, 2: 2, 3: 1, 4: 1, 5: 1 }
 
 // Las tres dimensiones de una persona resuelven a la MISMA ranura —la referencia que se antepone a las
 // frontales— así que una ficha puede pedir UNA, no dos. `vista` es el ángulo, `expresion` una de las ocho
@@ -538,10 +542,13 @@ function resolverIdentidad(ficha) {
 
   if (!pedidas.length) return null
 
-  if (pedidas.length > 2) {
+  const claveDe = p => (typeof p === 'string' ? p : p?.persona)
+
+  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(p => ELENCO[claveDe(p)]))) {
     throw new Error(
-      'Más de dos personas con identidad en una toma no está medido: la ronda de personas llegó a dos personas ' +
-        '(más dos mascotas con su propio bloque). Divide la pieza o documenta la medición antes de subir el tope.'
+      'Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 personajes del ELENCO ' +
+        '(EC1-brazo2, 2026-10-03). Con personas del roster, la ronda llegó a dos (más dos mascotas con su propio bloque): ' +
+        'divide la pieza o documenta la medición antes de subir el tope.'
     )
   }
 
@@ -691,9 +698,16 @@ function resolverIdentidad(ficha) {
       .map(m => `Image ${m.imagen} is ${t.persona.etiqueta}'s ${m.campo === 'vista' ? 'ANGLE reference: it sets the head angle of this shot' : 'EXPRESSION reference: copy only its facial expression (eyes, brows, mouth), NOT its head angle or tilt'}, still with the face of the identity references.`)
   )
 
+  // Grupo de 3 a 5 (sólo ELENCO): cada bloque IDENTITY lleva su persona y su imagen, porque con varias mujeres de pelo
+  // oscuro un bloque sin nombre se cruza (cine-reviewer, EC1); y la luz de estudio de las referencias se queda fuera.
+  const grupo = tramos.length > 2
+
   const pose =
     ' The references define WHO each person is — features, proportions, skin and hair — never how they hold their head: ' +
     'the head turn, tilt, chin angle, gaze and facial expression come from the SCENE, not from any reference.' +
+    (grupo
+      ? ' Each person matches ONLY their own reference image; never blend features between people. The LIGHT of the identity references does NOT carry over: every face is lit only by the light the scene declares.'
+      : '') +
     (queManda.length ? ` ${queManda.join(' ')}` : '')
 
   // Los accesorios van como BLOQUE APARTE, separados por \n\n, no pegados al IDENTITY. Si se unieran con
@@ -701,7 +715,10 @@ function resolverIdentidad(ficha) {
   // fallaría — y, peor, IDENTITY dejaría de ser citable como unidad.
   return {
     identity: tramos
-      .flatMap(t => [t.persona.identity, t.persona.accesorios].filter(Boolean))
+      .flatMap((t, i) => [
+        grupo ? `PERSON ${i + 1} — ${t.persona.etiqueta.toUpperCase()} (${rango(t)}): ${t.persona.identity}` : t.persona.identity,
+        t.persona.accesorios
+      ].filter(Boolean))
       .join('\n\n'),
     references: references + pose,
     imagenes
