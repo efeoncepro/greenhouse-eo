@@ -5,8 +5,8 @@
 > **Creado:** 2026-10-03 por Claude
 > **Última actualización:** 2026-10-03 por Claude
 > **Estado:** personajes, estilo y sello aprobados por el operador (Julio Reyes) el 2026-10-03 («Me encantan, están
-> aprobados todos. Canonízalos»). Hojas selladas en `scripts/foto/assets.lock.json` y publicadas en el canon. Sin publicar
-> en AXIS; sin prueba de reconocimiento.
+> aprobados todos. Canonízalos»). Hojas selladas en `scripts/foto/assets.lock.json` y publicadas en el canon. Publicado
+> en AXIS el 2026-10-03 (`@efeoncepro/axis-brand-assets` 0.4.16, Lab `/references/cast-2d/`); sin prueba de reconocimiento.
 > **Documentación relacionada:** [Sparks V1](./SPARKS_V1.md) ·
 > [Elenco fotográfico](../brand-photography/EFEONCE_BRAND_CAST_V1.md) ·
 > [Línea gráfica «La órbita»](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) ·
@@ -130,7 +130,14 @@ con el elenco. Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO
 
 ## 8. Pendiente
 
-- **[pendiente]** Publicar el elenco 2D en AXIS (`@efeoncepro/axis-brand-assets` + Lab) junto a los Sparks 2D: **en
-  curso** desde el 2026-10-03, tras el primer uso en video (repo aparte).
+- **Hecho 2026-10-03:** elenco 2D publicado en AXIS **[medido]**: `@efeoncepro/axis-brand-assets` **0.4.16** (registro
+  GitHub Packages, release `v0.4.16`, commit AXIS `5d2482f`) con 41 PNG sin fondo en `assets/cast-2d/` — 4 vistas y 6
+  expresiones (neutral, curiosidad, sorpresa, concentración, aprobación, satisfacción) por personaje, más el grupo de los
+  cuatro **sin** el Spark de la hoja (lo había dibujado el modelo) —, catálogo `cast2d` con reglas de uso y página del
+  Lab `https://axis.efeonce.org/references/cast-2d/` (+ `cast-2d.json`). Origen: las hojas aprobadas editadas con GPT
+  Image 2.5 Sunburst `--background transparent` (sólo se quitó el fondo; comparadas lado a lado) y separadas con
+  `ai-generations/_identidad-elenco-2d/separar-elenco.cjs` (alfa ≥ 240 → 255). El recorte local por relleno se
+  descartó: el halo del fondo y el azul del sello comparten color. **Límite:** resolución nativa (vistas ~900 px de
+  alto, bustos ~450 px).
 - **[pendiente]** Prueba de reconocimiento y de silueta a 390 px.
 - **[pendiente]** Revisión de derechos de uso de imágenes generadas para pauta (`greenhouse-ai-creative-rights-governance`).
