@@ -213,7 +213,7 @@ Reglas obligatorias:
 
 ### Slice 1 — ICO para las tres Homes
 
-- Reader de serie semanal (últimas 6 semanas): piezas entregadas y cycle time por semana, con scope agencia, organización o persona, sobre proyecciones PG.
+- Reader de serie semanal (últimas 6 semanas): piezas entregadas y cycle time por semana, con scope agencia, organización o persona, sobre proyecciones PG. Cada semana trae su fecha de inicio (lunes, zona `America/Santiago`) y un flag `isPartial` para la semana en curso; los totales y comparaciones del bloque usan semanas completas.
 - Clasificación de equipos para el filtro de performance (creativo, contenido, estrategia y SEO) mapeada desde `TeamRoleCategory`/rol; agregado por equipo.
 - Bloque `team-performance` (interna): OTD, FTR, RpA, cycle time con meta y estado, throughput semanal, piezas trabadas (reader en `src/lib`, reemplaza el SQL inline de `/api/ico-engine/stuck-assets`), utilización y personas; filtro equipo/cliente desde la sesión.
 - Bloque `my-performance` (colaborador) y bloque cliente creativo usan el mismo reader con su scope.
@@ -326,7 +326,7 @@ Cada bloque declara `requires.capability`, `timeoutMs` y `fallback`; cada DTO tr
 
 ## Acceptance Criteria
 
-- [ ] Existe un reader de serie semanal (piezas + cycle time) con scope agencia, organización y persona, y se usa en los tres bloques de rendimiento.
+- [ ] Existe un reader de serie semanal (piezas + cycle time) con scope agencia, organización y persona, con semana marcada `isPartial`, y se usa en los tres bloques de rendimiento.
 - [ ] El filtro por equipo existe con una clasificación documentada y mapeada desde los roles.
 - [ ] Todos los bloques de la tabla del Detailed Spec existen en el registro con audiencia, capability, timeout, `fallback`, `asOf` y estado.
 - [ ] Ningún loader contiene SQL inline: cada uno llama a un reader en `src/lib/<dominio>/**` con test.

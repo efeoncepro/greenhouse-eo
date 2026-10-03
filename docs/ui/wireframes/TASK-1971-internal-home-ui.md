@@ -43,7 +43,7 @@
 ```
 
 - **Performance del equipo**: una sola superficie (sin card-on-card) con cuatro KPIs, throughput y franja de contexto. Cada KPI: etiqueta, estado con ícono y palabra (En meta / Bajo la meta), cifra Bricolage 40/620 con `tabular-nums`, barra con marca de meta y línea «Meta … · significado». Bajo la meta, la barra es roja (`#b8232d`).
-- **Throughput**: es el momento visual dominante de la página. Barras de piezas por semana (semana actual en `#0375db`, anteriores al 28 %), línea de cycle time en su propio carril superior sin cruzar las cifras, cycle time bajo cada semana, leyenda.
+- **Throughput**: es el momento visual dominante de la página. dos paneles alineados en el mismo eje de semanas, sin doble eje: arriba barras de piezas por semana con su cifra (última semana completa en `#0375db`, anteriores al 30 %, semana en curso con borde punteado y relleno rayado porque es parcial); abajo, una franja propia «Cycle time · días» con línea, puntos y cifra bajo cada punto, escala propia (3,0–5,5 d) y la meta ≤ 5 d como línea punteada; el tramo hacia la semana en curso va punteado y su punto hueco. Etiquetas de semana por fecha de inicio (lunes) y «en curso» en la actual; tabla accesible con los datos en `sr-only`. El texto compara contra la última semana completa, nunca contra la parcial (corrección del operador 2026-10-03).
 - **Filtro**: botón «👥 <alcance> ▾» abre un panel flotante (ver flow) con buscador, Equipos (Todo el equipo, Creativo, Contenido, Estrategia y SEO) y Por cliente; al pie «Período: Octubre 2026 · Cambiar período». La selección cambia el subtítulo y los datos de toda la sección.
 - **Tu foco hoy**: anillo de avance (arco navy + esfera azul en la punta, cifra en el centro) para el cierre de período; chip de estado; dos acciones; fila de aprobaciones pendientes.
 - **Señales de tus clientes**: tabs segmentados con conteo; filas con badge del tipo (AEO azul, SEO verde, CRM navy), cliente · métrica, detalle, tendencia con flecha y palabra, y acción directa.
@@ -96,6 +96,7 @@
 
 - Performance del equipo en lugar del pulse (Reliability, Margen, Cierre, Pendientes): pedido del operador; Reliability pasa al footer.
 - Throughput como momento visual dominante: el operador pidió ver «piezas entregadas por cycle time».
+- Throughput en dos paneles y no en doble eje (2026-10-03): la primera versión superponía la línea de cycle time sobre las barras sin escala, exageraba la pendiente, desalineaba los puntos de las barras y contaba la semana en curso (parcial) como si fuera completa con una etiqueta «Oct» que se solapaba con la semana del 28 sep.
 - Señales de clientes en lugar de «Tu día»: el operador dijo que Tu día no le aportaba y pidió señales AEO/SEO y acciones comerciales.
 - Novedades + capacidad en la columna derecha: pedido del operador («publicidad como el login» primero, luego capacidad).
 - Banda de capacidad del código (35–85 % equilibrada): decisión del operador del 2026-10-02.
