@@ -1,0 +1,63 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0046c8470626",
+  "key": "0046c84706261663c0f61599f3f37f2a7f73680c249c6411ccf58b14bb005dd1",
+  "status": "dry-run",
+  "createdAt": "2026-10-02T21:52:05.733Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/base.png",
+    "imageSha256": "e31d67c2e464bc9812df4acab212536d3ce1600b5dcc15857e1ed68a7422b6ce",
+    "mask": null,
+    "maskSha256": "44ca5a0e9ede3101d120592fbeb96a653d79f351e65ecd0673187aa577694bff",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-02_task-1965-canary/sketch-planta.png",
+      "sha256": "bd0f78276ce0238de271f519a33ad110a45c05551ba5e2c004fd7b40477a400e",
+      "form": "overlay"
+    },
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Add a small leafy green plant in a matte terracotta pot standing on the desk, following the sketch.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a hand-drawn sketch that marks only where, at what size and with what silhouette the change goes. Use it as a placement guide only: do not reproduce any sketch lines or their color.\nAdd a small leafy green plant in a matte terracotta pot standing on the desk, following the sketch.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.10994784037272136,
+    "editable": 111453,
+    "soft": 61480,
+    "protected": 1399931
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 45 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0103,
+    "basis": "1 × salida 1536x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": []
+}
