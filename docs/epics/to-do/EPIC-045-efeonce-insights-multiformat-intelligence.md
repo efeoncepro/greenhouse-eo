@@ -104,6 +104,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U11 | [TASK-1958](../../tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) | jerarquía visual apta para cliente en Think y PDF (hallazgos, respaldo, alcance) | TASK-1957 |
 | U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
 | U13 | [TASK-1961](../../tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md) | visibilidad en IA por país: un run por mercado en la ventana, lectura por país sin promedio (Sky: siete mercados) | TASK-1863 |
+| U14 | [TASK-1962](../../tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) | contrato de contenido del informe (8 preguntas, gate de mantenimiento), causas SEO, lo que el Grader ya mide, plan de acción y petición, más familias de gráfico y GA4 en el Search Visibility 360 | TASK-1957 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
