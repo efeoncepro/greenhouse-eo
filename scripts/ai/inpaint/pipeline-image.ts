@@ -31,6 +31,8 @@ export interface ImageInpaintOptions {
   /** Referencias del objeto o elemento a incorporar (imágenes 2..N, después del boceto). */
   referencePaths?: string[]
   prompt: string
+  /** Instrucción interna del modo (expand, erase…) que se agrega DESPUÉS de la guarda de marca: la guarda mira sólo lo que escribe el operador. */
+  promptSuffix?: string
   adapter: InpaintImageAdapter
   model?: string
   quality?: string
@@ -216,7 +218,8 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
   if (zoneGuide) log('  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)')
 
-  const providerPrompt = buildRolePrompt({ prompt: options.prompt, hasSketch: Boolean(sketch), referenceCount: references.length, zoneGuide })
+  const operatorPrompt = options.promptSuffix ? `${options.prompt.trim()} ${options.promptSuffix}` : options.prompt
+  const providerPrompt = buildRolePrompt({ prompt: operatorPrompt, hasSketch: Boolean(sketch), referenceCount: references.length, zoneGuide })
 
   if (mask.width !== base.width || mask.height !== base.height) {
     throw new Error(`La máscara mide ${mask.width}x${mask.height} y la base ${base.width}x${base.height}: deben medir lo mismo (pnpm ai:mask --base).`)

@@ -12,6 +12,8 @@ import type { CropMode } from './crop'
 import { assertFfmpeg } from './ffmpeg'
 import { MASK_CONVENTIONS, type MaskConvention } from './mask'
 import { runErase } from './erase'
+import type { ExpandAnchor } from './expand'
+import { runExpand } from './expand-run'
 import { runImageInpaint } from './pipeline-image'
 import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
@@ -69,6 +71,12 @@ interface ImageCliArgs {
   layerSelectors: string[]
   fill?: 'plate' | 'model'
   grow?: number
+  to?: string
+  canvas?: { width: number; height: number }
+  scale?: number
+  anchor?: ExpandAnchor
+  prefill?: 'mirror' | 'neutral'
+  blend?: number
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -128,6 +136,35 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--layers': args.layersJson = next(); break
       case '--layer': args.layerSelectors.push(next()); break
       case '--grow': args.grow = toNumber(next(), flag, true); break
+      case '--to': args.to = next(); break
+
+      case '--canvas': {
+        const match = /^(\d+)x(\d+)$/.exec(next())
+
+        if (!match) throw new Error('--canvas espera ANCHOxALTO (p. ej. 2048x1072).')
+        args.canvas = { width: Number(match[1]), height: Number(match[2]) }
+        break
+      }
+
+      case '--scale': args.scale = toNumber(next(), flag); break
+      case '--blend': args.blend = toNumber(next(), flag, true); break
+
+      case '--anchor': {
+        const value = next()
+
+        if (!['center', 'left', 'right', 'top', 'bottom'].includes(value)) throw new Error('--anchor espera center | left | right | top | bottom.')
+        args.anchor = value as ExpandAnchor
+        break
+      }
+
+      case '--prefill': {
+        const value = next()
+
+        if (!['mirror', 'neutral'].includes(value)) throw new Error('--prefill espera mirror | neutral.')
+        args.prefill = value as 'mirror' | 'neutral'
+        break
+      }
+
 
       case '--fill': {
         const value = next()
@@ -418,14 +455,75 @@ const runEraseCli = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const EXPAND_HELP = `pnpm ai:inpaint expand — lleva una escena a otro formato sin regenerarla (TASK-1973)
+
+  pnpm ai:inpaint expand --image escena-4x5.png --to 9:16 --prompt "<qué hay alrededor>" [opciones]
+  pnpm ai:inpaint expand --image escena-1x1.png --canvas 2048x1072 --scale 0.8 --anchor right --prompt "..."
+
+Agranda el lienzo, ubica la escena y deja editable sólo el área nueva más una franja de fundido sobre el borde que da
+a ella; la escena queda en delta 0 (verificado). El área nueva se rellena antes con espejo de los bordes (--prefill
+mirror, default; neutral = su color medio): un relleno sólido invita al modelo a inventar un panel.
+
+  --to 4:5|9:16|1:1|1.91:1|16:9|3:4|2:3|3:2   Formato destino (el lienzo crece en un solo eje)
+  --canvas WxH               Lienzo explícito (en vez de --to)
+  --scale <0,3–1>            Achica la escena dentro del lienzo (zoom out; la escena se re-muestrea)
+  --anchor center|left|right|top|bottom       Dónde se apoya la escena (default center)
+  --blend <px>               Franja de fundido sobre la escena (default 24; 80–140 si el borde corta objetos)
+  --adapter / --model / --quality / --provider-mask / --count / --run / --dry-run / --force / --max-usd / --yes
+`
+
+const runExpandCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(EXPAND_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint expand --help.')
+  if (!args.to && !args.canvas) throw new Error('Indica --to <formato> o --canvas WxH.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  if (!prompt) throw new Error('Falta --prompt: describe qué hay alrededor de la escena.')
+
+  const result = await runExpand({
+    imagePath: resolvePath(args.image),
+    to: args.to,
+    canvas: args.canvas,
+    scale: args.scale,
+    anchor: args.anchor,
+    fill: args.prefill,
+    blend: args.blend,
+    prompt,
+    adapter: resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
   if (command === 'image') return runImage(rest)
   if (command === 'erase') return runEraseCli(rest)
+  if (command === 'expand') return runExpandCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }
