@@ -1,9 +1,9 @@
 # Greenhouse — Taxonomía de la producción de video con IA V1
 
 > **Tipo de documento:** Referencia técnica agent-facing (clasificación y vocabulario)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-03 por Claude (sesión «Clasificación de producción de video con IA»)
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.2: tipo de video (§3.1b: registro visual y técnica, con camino, candidatos, costo y esfuerzo). v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.3: subtipos (§3.1b), estética o look (§3.1c), dificultad de la toma (§3.14), árbol de decisión y presupuesto por toma (§4), casos reales clasificados (§4.3). v1.2: tipo de video (§3.1b: registro visual y técnica, con camino, candidatos, costo y esfuerzo). v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
 > **Dueña del oficio:** skill `motion-design-studio` (audio: `audio-studio`; dirección de arte y canon fotográfico:
 > `design-studio`; método de elección de modelos y costo: `ai-model-selection`)
 > **Programa que la implementa:** [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md)
@@ -68,7 +68,9 @@ los que adoptan los manifiestos del programa (EPIC-051):
 
 ```yaml
 pieza: reel-social            # §3.1
-tipo: personaje-3d            # §3.1b (por toma si la pieza combina tipos)
+tipo: personaje-3d/nexa       # §3.1b tipo/subtipo (por toma si la pieza combina tipos)
+look: cine                    # §3.1c
+dificultad: { R: 2, I: 2, F: 2, C: 2, D: 0, E: 1, P: 2, total: 11, banda: media }   # §3.14
 uso: organico                 # §3.1
 nivel: final                  # §3.2
 fidelidad:                    # §3.3
@@ -148,6 +150,64 @@ un brief por tipo. Etiquetas: `[verificado]` corrida nuestra · `[tercero]` rank
 - **Fija qué se mide en el canario**: identidad en `personaje-3d`, objeto exacto en `producto`, piel y manos en
   `fotorrealista`, costura en `atmosfera`. El banco de TASK-1980 corre un brief por tipo con esas métricas.
 - **El nivel (§3.2) es otra dimensión**: un `fotorrealista` puede ser previs o premium; el tipo no cambia, la barra sí.
+
+#### Subtipos: lo que cambia la decisión dentro de cada tipo
+
+Un subtipo existe sólo si cambia algo de la decisión (camino, motor, barra o dificultad). Ids `tipo/subtipo`.
+
+| Tipo | Subtipo | Qué cambia frente al tipo base |
+|---|---|---|
+| `fotorrealista` | `/persona-habla` | diálogo y lipsync (`audio.lipsync`, hueco H12); cara en plano medio o cercano: dificultad de rostro máxima |
+| | `/persona-accion` | cuerpo completo, manos e interacción con objetos: la física y las manos dominan la falla |
+| | `/grupo` | varias personas: identidad múltiple, interacción entre sujetos; en registro cine, nunca dos personas mirándose de cerca |
+| | `/lugar` | sin gente: el riesgo baja a física del ambiente (agua, humo, multitudes lejanas); bueno para motores de banda baja |
+| | `/comida` | textura, vapor y brillo; el alimento no debe deformarse (workflow `food-table-native-reel-and-exact-post`) |
+| `cine` | `/nexa-protagonista` | canon del registro cine con Nexa (identidad A, cámara ≈ 2 m, 85 mm, isotipo compuesto) |
+| | `/equipo` | personas del equipo en registro cine: **en prueba** en publicidad según el canon; consentimiento |
+| | `/titulo` | apertura o title sequence: el texto es determinístico (`finish.overlay`) y el plano generado sólo pone atmósfera |
+| `producto` | `/estudio` | packshot sobre fondo controlado: cámara sobre escena quieta (`gen.camera`) suele bastar |
+| | `/en-uso` | el producto en manos o en contexto: suma rostro, manos e interacción |
+| | `/cgi` | producto modelado o 3D: previs en Blender y referencia de movimiento; material exacto |
+| | `/variantes` | el mismo video con otro producto, color o mercado: `edit.replace` en vez de regenerar |
+| `ugc` | `/camara-al-frente` | creador hablando a cámara: lipsync y naturalidad |
+| | `/unboxing` | manos + producto exacto + acción continua |
+| | `/tutorial` | pasos en pantalla: texto compuesto y ritmo didáctico |
+| | `/reaccion` | expresión facial y tiempo de comedia |
+| `personaje-3d` | `/nexa` | identidad A, 25 expresiones, uniforme o traje biónico por kit |
+| | `/sparks` | máximo dos con referencia en registro cine |
+| | `/mascota-partner` | pose desde la biblioteca del estudio de origen; contamina el emblema del uniforme si comparte cuadro |
+| | `/estilo` | clay, estilizado o realista: el estilo se fija con referencias y no se mezcla dentro de una pieza |
+| `animacion-2d` | `/ilustracion-propia` | animar las ilustraciones de Efeonce: camino propio, nunca regenerarlas |
+| | `/estilizado-ia` | estilo nuevo que tolera reinterpretación: generativo con referencias de estilo |
+| `motion-graphics` | `/tipografia-kinetica` | el texto es la animación |
+| | `/datos` | gráficos animados: valores exactos (`dataviz-design`) |
+| | `/logo` | motion de marca: vive en el repo taller (`tools/brand-motion`), fuera de esta taxonomía |
+| | `/explainer-plano` | íconos y formas planas con narración |
+| `demo-ui` | `/captura` | grabación real de la interfaz |
+| | `/render` | UI reconstruida y animada en código (HyperFrames) |
+| | `/en-dispositivo` | pantalla dentro de una escena: la UI se protege o se compone (`hibrido`) |
+| `atmosfera` | `/loop-fondo` | cierre de loop obligatorio (H7) |
+| | `/textura` | capa para componer: puede ir sin audio y en baja resolución |
+| `hibrido` | `/mundo-mas-ui` | workflow `hybrid-world-plus-ui` |
+| | `/mundo-mas-producto` | producto exacto compuesto en un mundo generado; integración de luz (H4) |
+
+### 3.1c Estética o look
+
+Eje **independiente** del tipo: un `producto` puede ser documental o publicitario brillante. El look decide referencias,
+lenguaje del prompt, parámetros de época o género del motor y el grade. **Regla:** lo que es **color** se logra en post
+de forma determinística (`finish.grade`, LUT versionada); lo que es **luz, lente, textura de época o movimiento de
+cámara** se pide en la generación, porque el grade no lo puede inventar.
+
+| id | Look | Se logra con | Nota de marca |
+|---|---|---|---|
+| `documental` | observacional, cámara en mano, luz disponible | prompt de cámara en mano y luz natural; grade suave | cercano a `ugc`, pero dirigido |
+| `cine` | dramático, contraste, profundidad, luz motivada | lente, luz y rig en la generación (Cinema Studio expone cámara, lente, era y luz); grade propio | el registro cine de Efeonce tiene su propio canon (luz de la línea como fenómeno de la escena) |
+| `publicitario` | pulido, high-key, producto brillante | luz de estudio en la generación; grade limpio | la colorimetría de marca manda (día neutro-cálido, sombras neutras) |
+| `editorial` | moda o revista: encuadres gráficos, poses | dirección de arte de los stills de entrada | lo dirige `design-studio` |
+| `hecho-a-mano` | grano, papel, cinta, imperfección intencional | textura en post (grano, overlays) más que en la generación | tendencia vigente en `motion-design-studio` (doctrina 2026) |
+| `epoca` | 70s, 90s, VHS, película antigua | época en la generación (parámetros de era/género donde existan) + textura en post | la textura de época generada no se puede quitar después: decidir antes |
+| `estilizado` | anime, cel, pintura | referencias de estilo; motores que toleran estilización | consistencia de estilo entre tomas = riesgo principal |
+| `corporativo-minimal` | limpio, plano, mucho aire | composición y post; poca generación | frecuente en `motion-graphics` y `demo-ui` |
 
 ### 3.2 Nivel de producción y barra de calidad
 
@@ -407,14 +467,78 @@ retira. Estado de cada puente (verificado o no) y su costo: guía §4.3.
 | `audio.mix` | ffmpeg a mano | TASK-1981 | — |
 | `pre.reference-analysis` | — | — | `video_analysis` (MCP de Higgsfield) |
 
-## 4. Cómo se usa
+### 3.14 Dificultad de la toma
 
-1. Llenar la ficha (§2) con la pieza, nivel, fidelidad, origen y operaciones.
-2. Por operación, mirar §3.13 (camino propio o puente) y la guía §4.3 (motor, evidencia, canario y costo). Si el carril
-   es `cli-contrato`, o un puente sin corrida real, la operación **no se promete** al cliente hasta un canario
-   (EPIC-051).
-3. Estimar con `--dry-run`/`--estimate` y pedir autorización del monto (guía §7).
-4. Producir según el método; cerrar con la barra del nivel (§3.2).
+La dificultad predice **dónde va a fallar el modelo, cuántos intentos harán falta y cuánto va a costar**. Se mide por
+toma, en siete ejes de 0 a 3. **Primero se baja la dificultad, después se sube el motor**: partir una toma, congelar la
+escena y mover sólo la cámara, fijar primer y último cuadro o componer lo exacto suele rendir más que pagar el motor
+más caro.
+
+| Eje | 0 | 1 | 2 | 3 | Cómo se baja |
+|---|---|---|---|---|---|
+| **R** rostros y manos | ninguno | lejanos o parciales | cara en plano medio o manos visibles | primer plano, habla o manos manipulando | alejar o reencuadrar; esconder manos; diálogo con voz aparte + lipsync |
+| **I** interacción | nada | sujeto solo con gesto | sujeto con objeto | sujetos entre sí o contacto físico | partir en tomas de un sujeto; resolver el contacto en el corte |
+| **F** física | rígido o estático | movimiento simple | tela, pelo, humo | líquidos, multitudes, colisiones, deporte | sacar la física del plano principal o componerla como capa |
+| **C** cámara | fija | paneo o push simple | órbita o grúa | coreografía compleja o cámara en mano larga | `gen.camera` sobre escena quieta; previs 3D como referencia de movimiento |
+| **D** duración y continuidad | ≤ 5 s, una toma | ≤ 10 s | > 10 s o extensión | varias tomas que deben empalmar | tomas cortas y corte; handles planificados; extensión con costura medida |
+| **E** exactitud | nada exacto | marca compuesta después | objeto o producto exacto en cuadro | texto o UI diegéticos, o producto exacto en movimiento | componer en post (`finish.overlay`), primer cuadro aprobado, `edit.zone` |
+| **P** identidad | sin cast | extra sin identidad | cast de marca recurrente | persona real del equipo o del cliente | ancla única por toma; detector de identidad; evitar motores con filtro de personas reales |
+
+**Puntaje** = R + I + F + C + D + E + P (0 a 21):
+
+| Banda | Puntaje | Qué implica | Intentos esperables por toma final | Estrategia |
+|---|---|---|---|---|
+| **baja** | 0–5 | cualquier motor la resuelve | 1–2 | ir directo al motor de banda de costo baja o media |
+| **media** | 6–11 | el motor importa | 2–3 | piloto barato de la parte riesgosa; final en el motor que pasó el banco |
+| **alta** | 12–16 | varios ejes en 2–3: falla frecuente | 3–5 | previs o animatic; bajar ejes antes de generar; prueba comparativa corta |
+| **extrema** | 17–21 | no conviene como toma única | — | **partir la toma** hasta que cada parte quede en media o alta |
+
+Los intentos esperables son `[criterio]`: los calibra el banco de TASK-1980 con los casos reales (§7) y se corrigen
+acá con evidencia. Un eje en 3 por sí solo ya justifica un piloto, aunque el puntaje total sea bajo.
+
+## 4. Cómo se usa: árbol de decisión y presupuesto por toma
+
+### 4.1 Árbol (por toma)
+
+```text
+1. TIPO (§3.1b) y SUBTIPO
+   ¿El camino principal es propio? (motion-graphics, demo-ui, animacion-2d/ilustracion-propia)
+   ├─ sí → técnica propia (HyperFrames, captura, taller, handoff); IA sólo para texturas o entorno → banda 0–baja
+   └─ no → seguir
+2. CONTRATO DE FIDELIDAD (§3.3): ¿qué es exacto?
+   ├─ texto, logo, legal, UI ........ se compone en post (finish.overlay); nunca se genera
+   ├─ producto, objeto o KV ......... still aprobado como primer cuadro (pre.keyframe-still → gen.i2v) o edit.zone
+   └─ rostro o cast recurrente ...... ancla de identidad única + detector por cuadro (§3.6)
+3. DIFICULTAD (§3.14): puntuar R I F C D E P
+   ├─ bajar ejes (partir, cámara sola, primer/último cuadro, componer) y volver a puntuar
+   └─ si queda EXTREMA → partir la toma; no se genera como una sola
+4. NIVEL (§3.2)
+   ├─ previs ........ pilotos en banda de costo baja
+   ├─ borrador ...... motor candidato a baja resolución o en draft
+   └─ final/premium . motor que pasó el banco, a la resolución de entrega; premium exige prueba comparativa corta
+5. MOTOR (guía §4.3), filtrado por operación + tipo + restricciones duras:
+   personas reales → sin motores con filtro ByteDance · 4:5 → generar 3:4 y recortar · sin audio → no H3 ·
+   look de época/luz → en la generación; color → en post · propio primero en toda la post (§3.13)
+6. PRESUPUESTO (§4.2) → autorización del monto → producir según el método
+```
+
+### 4.2 Presupuesto por toma
+
+```text
+presupuesto = Σ pilotos (costo del piloto)
+            + intentos esperables (banda de dificultad) × duración × tarifa del motor a la resolución de entrega
+            + entradas que se cobran (video de referencia, cuadro de imagen previo, segunda pasada de detector)
+            + post propio (0 créditos; sólo tiempo)
+            × (1 + reserva por diferencia estimación/factura)
+```
+
+- **Tarifas:** guía §4.2 y §4.3 (la taxonomía no copia precios). **Presupuestos de ejemplo por tipo y dificultad:**
+  guía §7.4.
+- **Reserva:** hasta que el banco de TASK-1980 reconcilie costo real por request, se usa la última diferencia medida:
+  **+43 %** (SKY V11: estimado USD 23,88, facturado USD 34,16) **[verificado, 2026-09-24]**. Con reconciliación propia,
+  la reserva baja a lo medido.
+- **Intentos esperables:** los de la banda de dificultad (§3.14), `[criterio]` hasta calibrarlos con el banco.
+
 
 ## 5. Huecos: lo que la taxonomía pide y nada resuelve con garantía (as-of 2026-10-03)
 

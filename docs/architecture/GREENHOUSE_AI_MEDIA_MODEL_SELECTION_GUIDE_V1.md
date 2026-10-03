@@ -1087,6 +1087,33 @@ Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una
   pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p --yes --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
   ```
 
+### 7.4 Presupuesto por toma según tipo y dificultad (ejemplos)
+
+Aplica la fórmula de la [taxonomía §4.2](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md): pilotos + intentos
+esperables × tarifa a la resolución de entrega + entradas cobradas, **× 1,43 de reserva** mientras la diferencia
+medida estimación/factura siga siendo la de SKY V11. Tarifas: `pnpm ai:fal --estimate` del 2026-10-03 [contrato] o
+publicadas (§4.2) [oficial]; tomas de 5 s, 9:16. **Son ejemplos para presupuestar, no recomendaciones de motor**: el
+motor sale del banco de TASK-1980.
+
+| Tipo / subtipo · dificultad | Nivel | Pilotos | Final (intentos × costo) | Subtotal | Con reserva |
+|---|---|---|---|---|---|
+| `atmosfera/loop-fondo` · baja (≈ 2) | final 720p | — | Wan 3.0 720p: 1,5 × 0,50 | 0,75 | ≈ 1,1 |
+| | | — | H3 Max Turbo 768P: 2 × 0,10 | 0,20 | ≈ 0,3 |
+| `producto/estudio` · media (≈ 7: C 2, E 2, D 0…) | final 1080p | `h3max-camera` 768P: 0,20 | Wan 3.0 1080p: 2,5 × 1,00 | 2,70 | ≈ 3,9 |
+| | | | Flux 3 1080p: 2,5 × 1,45 | 3,83 | ≈ 5,5 |
+| `fotorrealista/persona-accion` · alta (≈ 13) | final 1080p | 2 × H3 Max Turbo 768P: 0,20 | H3 Max 1080P: 4 × 0,40 | 1,80 | ≈ 2,6 |
+| | | | Wan 3.0 1080p: 4 × 1,00 | 4,20 | ≈ 6,0 |
+| | | | Seedance 2.5 1080p: 4 × 5,20 (sin personas reales) | 21,00 | ≈ 30,0 |
+| `personaje-3d/nexa` · alta, **3 tomas** con la misma ancla | final 720p | 1 × Seedance 2.0 mini 480p: 0,35 | Wan 3.0 r2v 720p: 3 tomas × 4 × 0,50 | 6,35 | ≈ 9,1 |
+| | | | Seedance 2.5 r2v 720p: 3 × 4 × 2,31 | 28,07 | ≈ 40,1 |
+| `motion-graphics/tipografia-kinetica` · cualquiera | final | — | camino propio (HyperFrames / taller) | 0 | 0 (créditos); el costo es tiempo de diseño |
+| `demo-ui/captura` · cualquiera | final | — | captura real + `pnpm video:finish` (TASK-1981) | 0 | 0 |
+
+**Lecturas que da la tabla:** en dificultad alta la diferencia entre motores es de hasta **≈ 12×** por toma (H3 Max contra
+Seedance 2.5 a 1080p), así que el banco por tipo (C1) se paga solo antes de la primera pieza premium; y los tipos con
+camino propio no compiten por presupuesto de IA. Los motores de la CLI de Higgsfield se presupuestan en créditos con
+`higgsfield generate cost` (§4.3) hasta conocer el valor del crédito.
+
 ---
 
 ## 8. Brechas, fallas conocidas y pendientes
