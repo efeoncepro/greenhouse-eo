@@ -610,7 +610,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   oscurece nada, mueve la materia de la propia foto. La firma no se movió y pasó de 6,53 a 11,58:1. Script:
   `ai-generations/2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs` (el halo del apoyabrazos y los rangos de
   búsqueda están medidos para ese plate de 941×1672: en otro se vuelven a medir). **Lo que NO funcionó, y por qué:**
-  **inpainting con máscara sobre la franja** (GPT Image 2.5 Sunburst, `--mask`) — los dos candidatos llenaron TODA la
+  **inpainting con máscara sobre la franja** (GPT Image 2.5 Sunburst, `--mask`; desde 2026-10-02 la vía canónica para
+  editar una zona es `pnpm ai:inpaint`, que nunca manda máscara a Sunburst y verifica lo protegido en delta 0) — los dos candidatos llenaron TODA la
   zona editable con un panel oscuro plano, de borde superior recto justo en el límite de la máscara, y borraron el
   apoyabrazos: el modelo rellena la zona transparente entera con «el objeto» aunque el prompt pida conservar lo que
   queda sobre el nuevo borde, y se lee como un velo · **levantar sólo el centro del lecho** (deformación con caída +

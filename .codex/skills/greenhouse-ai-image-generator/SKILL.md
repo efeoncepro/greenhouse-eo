@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -58,6 +58,8 @@ Read only what the task needs:
   uses GPT Image, transparency, editing, masks, flexible sizes, streaming, pricing or model selection
 - `references/seedream-5-gpt-image-2-hybrid-production.md` when the task uses Seedream 5,
   fal.ai still-image generation, multiple image models or campaign profusion
+- `references/inpainting-and-editing.md` whenever the task edits an existing image or video locally (zone edit,
+  erase, move, place, background, expand, layers, detail pass) or asks about relighting
 - `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` when stills hand off to Gemini Omni,
   or the campaign includes motion, print/OOH or explicit branded/brand-light/neutral/client modes
 - `../design-studio/modules/13_LAYOUT_DESIGN_AND_FINISHING.md` when static campaign pieces need controlled
@@ -126,26 +128,20 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
 3. **¿Edición donde la precisión manda o entregable final?** → `gpt-image-2.5-sunburst` en `xhigh`/`max`, #1 en
    edición en Arena y Artificial Analysis [tercero, 2026-09-07/16]. **¿Editar SÓLO una zona y dejar el resto
-   idéntico?** → **`pnpm ai:inpaint image`** (TASK-1965), nunca `ai:image --mask` a mano: arma la máscara con
-   `pnpm ai:mask`, recorta, genera, recompone y verifica el ARCHIVO en delta máximo 0 (código 2 si no). 🔴 **Sunburst
-   CON máscara devuelve la zona como PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos el 2026-10-02]: el
-   pipeline usa Flare con máscara por defecto y, si eliges Sunburst, lo hace editar **sin máscara** (`--provider-mask
-   auto`), le manda la zona en magenta como imagen 2 de guía (sin ella puso el objeto FUERA de la zona, medido
-   2026-10-02), corrige el desplazamiento de color en un anillo (Sunburst aclara todo: −16 niveles medidos en MC1h) y
-   recompone — el mismo método de `pnpm foto:isotipo --acabado`. Verificado 2026-10-02. Código 3 = revisar. Alternativa con máscara: `fal:flux-pro-fill`.
-   **¿Incorporar un objeto o guiar con un dibujo, como el Markup de ChatGPT?** → `--sketch` (trazo sobre la foto; viaja
-   como imagen 2 de guía y la máscara sale del trazo) y `--reference` (el objeto, imágenes 3..N). En la API no hay
-   parámetro de boceto: es una imagen más con su rol numerado (guía de prompting 2.5, leída 2026-10-02).
-   **¿Expandir a otro formato, separar en capas, borrar, mover, cambiar fondo o rehacer un detalle?** →
-   `pnpm ai:inpaint expand|erase|move|place|background`, `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen:
-   máscara por elemento con `ai:mask --from-layer` y clean plate) y `--zone-resolution` (TASK-1973). Las capas son
-   contenido regenerado: sólo máscara y clean plate; lo no editado sale de la original en delta 0. **Incorporar un
-   objeto de otra foto** → `place` (recorte con el alfa de su capa + el modelo sólo termina sombra, reflejo y borde).
-   Medido 2026-10-03: la base de Layerize saca también la mesa (el clean plate recompone las demás capas), la sombra
-   proyectada se suma sola con capas (`--shadow off` la deja), y para **expandir** el default es Flux Fill (`fal:flux-pro-fill`):
-   en el mismo canario Flare achicó la escena y Sunburst copió el relleno en espejo; Flux continuó sin costura. `--zone-resolution` reinterpreta, no escala.
-   **Borrar:** clean plate (gratis) o **Sunburst por instrucción** (default de `--fill model`, limpio en el canario);
-   Flare con máscara y Flux Fill rellenan la silueta con otro objeto, Seedream dejó un fantasma.
+   idéntico?** → **`pnpm ai:inpaint`** (TASK-1965 + TASK-1973), nunca `ai:image --mask` a mano. **Playbook completo
+   (intención → comando → modelo → flags → qué mirar al 100 % → costos): [`references/inpainting-and-editing.md`](references/inpainting-and-editing.md).**
+   Lo mínimo: máscara con `pnpm ai:mask` (blanco = editable) → el comando recorta, genera, recompone sobre la
+   original y verifica el ARCHIVO en **delta máximo 0** fuera de la zona. Salida `0` PASS · `2` FAIL (no usar) ·
+   `3` REVISAR (panel plano, reencuadre, residuo, zona sin cambio) · `1` error. `--dry-run` gratis; tope `--max-usd`.
+   Subcomandos: `image` (zona; `--sketch`/`--reference` como el Markup de ChatGPT; `--zone-resolution` reinterpreta,
+   no escala) · `erase` · `move` · `place` (objeto de otra foto) · `background` · `expand` · `video` (`flux3-edit`
+   [verificado]). `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen) da máscara por elemento
+   (`ai:mask --from-layer`) y clean plate; **las capas nunca son píxeles finales** y **la base se cobra como una capa**.
+   Defaults medidos [verificado 2026-10-02/03]: zona con máscara → **Flare** · 🔴 **Sunburst NUNCA con máscara**
+   (panel negro 3 de 3: el pipeline lo hace editar sin máscara + guía de zona + corrección de color) · **borrar** →
+   clean plate con capas (gratis) o **Sunburst por instrucción** (Flare con máscara y Flux Fill dibujan otro objeto;
+   Seedream deja fantasma) · **expandir** → **Flux Fill** (`fal:flux-pro-fill`), nunca GPT Image (Flare achica la
+   escena, Sunburst copia el espejo). **Reiluminar:** no hay relight conectado (estado en el playbook §7).
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
@@ -158,7 +154,8 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 7. **¿Materialidad, atmósfera, color, look development, fusión multirreferencia orientada a material, cambio
    regional sin máscara?** → `seedream5-pro` / `seedream5-pro-edit` (edit hasta 10 referencias).
 8. **¿Separar una pieza aprobada en capas editables?** → `seedream5-pro-layerize` (hasta 16 capas PNG con alfa +
-   `layers.json`, sin prompt). No regeneres.
+   `layers.json`; prompt y `--bbox` opcionales). No regeneres. Para editar con esas capas (máscara, clean plate,
+   borrar, mover), entra por `pnpm ai:layers`, que guarda la caja en píxeles de la base y alimenta `ai:inpaint`.
 9. **¿Resolución nativa sobre 2K?** → `seedream5-lite` (área hasta 4096² según schema; la ficha dice 3072²) o GPT
    Image (hasta 3840×2160; sobre 2560×1440 es experimental). 🔴 **Seedream 5 Pro en fal NO es 4K**: área máxima
    2048×2048 (la nota "Hasta 4K" del registro era incorrecta).
@@ -259,7 +256,9 @@ rechaza marcas y personas reales **después de cobrar**.
   (`scripts/ai/resolve-output-dir.ts`, con 7 tests).
 - **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
   por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
-  `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
+  `--count` de imagen sin validar; layerize: el número de capas lo decide el modelo y varía entre corridas, y **la
+  base se cobra como una capa** (medido 2026-10-03 con el saldo de fal; `pnpm ai:layers` estima con la cota 16 +
+  base); la API de pricing
   devuelve la mitad del precio publicado de Flux 3 (sin dato por qué); tablas de escalones al 2026-09-16, pueden
   cambiar. Toda estimación es orientativa: `pnpm ai:fal --balance` antes y después.
 
@@ -523,8 +522,11 @@ tuvo delta máximo **221/255** (los ojos del sujeto, **147/255**) con una media 
 criterio. Desde el 2026-10-02 la recomposición y la verificación las hace **`pnpm ai:inpaint image`** (TASK-1965):
 no escribas el pegado a mano. Además marca `suspectFlatPanel` (salida cruda negra: la trampa de Sunburst con
 máscara), avisa si la zona abierta casi no cambió (un `PASS` sin el objeto pedido es posible) y si el modelo corrió
-el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la cámara). Manual:
-[editar una zona de una imagen](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md).
+el encuadre. Para video: `pnpm ai:inpaint video` (aborta si el motor movió la cámara). Manuales:
+[editar una zona de una imagen](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md) ·
+[de un video](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md) ·
+[expandir y separar en capas](../../../docs/manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md); playbook:
+[`references/inpainting-and-editing.md`](references/inpainting-and-editing.md).
 
 - El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
@@ -988,7 +990,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   No existe Seedream 5.1 al 2026-09-16.
 - **Layerize** recibe UNA imagen, sin prompt obligatorio, y devuelve la base + hasta 16 capas por `z_index`
   (nombre, descripción, bounding box y recorte con **alfa real**, reconstruyendo lo ocluido). El CLI guarda
-  `NN-<nombre>.png` + `layers.json`. Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
+  `NN-<nombre>.png` + `layers.json` (para editar, `pnpm ai:layers` hace lo mismo con caja en píxeles de la base,
+  `--prompt`/`--bbox` y caché; la base saca también las superficies y se cobra como una capa). Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
   fondo) para recomponer, retocar o animar por separado **sin volver a generar**. No reemplaza la composición
   determinística: el logo oficial y el copy final siguen saliendo del vector y del compositor.
 
@@ -1098,9 +1101,9 @@ deterministic and are composed after any generative finish.
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
   brand materialization uses official references and the separate identity/material review above.
 - Seedream Pro Edit «region/layer editing» is semantic art direction over one flattened raster, not editable
-  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost, then
-  recompose the protected region from the base (the mask reduces drift, it does not eliminate it: 221/255 max
-  measured 2026-09-17); when
+  layers or pixel-perfect locality. When protected-region drift has operational cost, use `pnpm ai:inpaint`
+  (it recomposes over the original and verifies delta 0 on the written file; the mask alone reduces drift, it does
+  not eliminate it: 221/255 max measured 2026-09-17 — see `references/inpainting-and-editing.md`); when
   you need separable layers of an approved piece, run `seedream5-pro-layerize` instead of regenerating.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
   family in deterministic post; use Seedance (2.5/2.0 via `pnpm ai:fal`) only for a genuinely new shot/action/continuity need,

@@ -154,6 +154,10 @@ Ahí la pantalla la renderiza el modelo con pantallas video-safe como referencia
 - **Tipo kinética / mograph de precisión / 3D** → AE/Blender/Houdini o animador local HTML/Playwright/Sharp/FFmpeg con reloj por cuadro y alcance aprobado. SKY probó cartelas alpha y URL Luminosidad; ver companion de posproducción.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft
   humano (Nuke/Fusion/AE + Mocha) + AI-VFX (Runway roto, Wonder/Flow mocap, Beeble relight); ver `../modules/11`.
+- **Editar sólo una zona de un clip y dejar el resto idéntico** → `pnpm ai:inpaint video` sobre `fal:flux3-edit`
+  [verificado] (aborta si el motor corre el encuadre; delta 0 cuadro a cuadro; audio original). **Reiluminar un
+  video** → no hay motor conectado: candidatos (ID-V2V Relight, lightx, Beeble SwitchX, Runway Aleph 2.0, Higgsfield
+  Cinema Studio 4.0, Magnific `video_relight`) sin verificar; estado en `../modules/11` §6b.
 - **Restaurar detalle** → Magnific o Topaz en la superficie disponible. SKY verificó Topaz vía ElevenLabs con piloto 4 s y metraje 26 s; no es 4K nativo ni garantía para otra fuente. Recomponer textos/vectores después.
 - **Keyframes** → `greenhouse-ai-image-generator` / `design-studio`. **Formato por red** → `social-media-studio`.
 

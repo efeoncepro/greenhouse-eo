@@ -1,6 +1,6 @@
 # Formatos de pauta: safe zones, cursores y las trampas medidas
 
-> **as-of 2026-09-22** (zona segura de AXIS y firma del gate, §1 y §2c: **2026-09-23**; horizontal 1,91:1 por expansión, §0c: **2026-10-02**) · evidencia de composición local; separar mediciones, decisiones editoriales y especificaciones de plataforma. Caduca 2027-03.
+> **as-of 2026-09-22** (zona segura de AXIS y firma del gate, §1 y §2c: **2026-09-23**; horizontal 1,91:1 por expansión, §0c: **2026-10-02**; `ai:inpaint expand` en §0c: **2026-10-03**) · evidencia de composición local; separar mediciones, decisiones editoriales y especificaciones de plataforma. Caduca 2027-03.
 > Hermanos: [evidencia](ad-creative-evidence-2026.md) (qué está medido) ·
 > [playbook](paid-visual-attention-playbook.md) (cómo se produce y se mide) ·
 > [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) (el CTA) ·
@@ -145,6 +145,25 @@ operador: izquierda alineada.
 `dominantSize` 146 · `dominantMax` 0,42 · `after` null · CTA 58/48 px con padding 34×16 · `logo { width: 0.25,
 x: 0.1524, y: 0.86 }`. Ajustes por pieza: S03 y S05 `dominantSize` 200 (titulares cortos: el CTA competía); S02
 `cursorScale` 0,45. Receta en Recursos `2026-10-02-formatos-pauta/{composicion,nativas/horizontal}`.
+
+**Otra herramienta para cambiar de formato, con otro contrato *(2026-10-03, TASK-1973)*:** `pnpm ai:inpaint expand`
+agranda el lienzo y rellena **sólo el área nueva** con Flux Fill (`fal:flux-pro-fill`); la escena aprobada queda en
+**delta 0** verificado sobre el archivo (salida `0` PASS · `3` REVISAR):
+
+```bash
+pnpm ai:inpaint expand --image <escena-aprobada> --canvas 2048x1072 --scale 0.8 --anchor right --prompt "<qué hay alrededor>" --dry-run
+```
+
+| | `pnpm foto:expandir` (receta de arriba) | `pnpm ai:inpaint expand` |
+|---|---|---|
+| Modelo | Sunburst | Flux Fill (GPT Image no sirve para expandir: Flare achica la escena, Sunburst copia el espejo) |
+| La escena | **se redibuja** (`--reponer no`): sin costura, pero hay que revisar caras | **idéntica** a la aprobada (delta 0) |
+| Cuándo | la serie CMP-004 y cualquier pieza que ya nació con este flujo: **es el flujo aprobado** | cuando la escena aprobada no puede cambiar ni un píxel (persona del roster, producto, practical) y el área nueva es fondo continuable |
+| Qué mirar | caras y borde contra la aprobada | uniones y **elementos inventados** en el área nueva (Flux puso una banca en un 9:16); en lienzos grandes genera a menor resolución y escala la extensión |
+
+No cambies una herramienta por la otra dentro de una serie ya aprobada: la gradación y el borde cambian. Unificarlas
+(que `foto:expandir` delegue en el núcleo de `ai:inpaint`) es decisión de **TASK-1925**. Manual:
+[expandir y separar en capas](../../../../docs/manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md).
 
 ## 1. 🔴 La reserva del comando NO es la safe zone de la plataforma
 

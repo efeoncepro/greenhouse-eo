@@ -109,6 +109,25 @@ respaldadas en `~/.higgsfield/skills-backup-0.3.0-2026-09-24`. Actualizar: `git 
 volver a correr el `setup`. Siguen siendo **referencias de composición**: sus acciones de deploy, publicación,
 websites o secrets no se ejecutan sin adaptar los gates de Efeonce (regla de arriba).
 
+## Relight y Cinema Studio 4.0: lo que el MCP lista y la API no (verificado 2026-10-03)
+
+- La **API** de Higgsfield está conectada como carril out-of-band (`pnpm ai:fal --provider higgsfield` /
+  `--capability hf-*`, secreto `greenhouse-higgsfield-api-key`, catálogo `src/lib/ai/higgsfield-capabilities.ts` +
+  `higgsfield-schemas.json`). **No expone relight dedicado:** ni nuestro catálogo, ni las páginas públicas, ni el MCP
+  (`models_explore` con «relight» → 0). El «Relight» de Higgsfield es una función de su app.
+- El **MCP** lista **Cinema Studio 4.0** (`cinematic_studio_video_4_0`, video) con `mode: video_edit` (edita un video
+  de referencia, cobrado por su duración) y control de luz `light: preset|custom|user`, `light_id`, `light_custom`
+  (rig ordenado: la primera fuente es la llave), además de cámara, lente, apertura, era, género y paleta. Es el único
+  candidato de Higgsfield a **relight de video por rig**, y está **sin verificar**. `soul_cinematic` (imagen) no
+  relumina una imagen existente.
+- 🔴 **No está en nuestro catálogo de la API** (0 coincidencias en `higgsfield-capabilities.ts` y en el snapshot de
+  esquemas). Para usarlo por API: correr `pnpm ai:higgsfield:sync-schemas` y confirmar que el snapshot lo recoge (sale
+  de `console.higgsfield.ai/explore` y `docs.higgsfield.ai`; si no tiene esquema queda en `missing`), declararlo como
+  capacidad en `higgsfield-capabilities.ts`, `--estimate` sin cobrar y un **canario** autorizado antes de cualquier
+  entrega. Por el MCP es exploración de sesión Claude, no una ruta: no la promuevas a Globe sin route card.
+- Estado del relight en toda la flota: `ai-model-selection` §Reiluminar; video: `motion-design-studio` →
+  `modules/11_VFX_COMPOSITING.md` §6b.
+
 ## Checklist de ruta
 
 1. Lee `GLOBE_RUNTIME_HANDOFF.md`; respeta hibernación.

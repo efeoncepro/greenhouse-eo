@@ -42,7 +42,9 @@
 - **¿Hay que recomponer, retocar o animar por partes un KV ya aprobado?** → no regeneres:
   `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
   con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
-  saliendo del vector y de la composición determinística.
+  saliendo del vector y de la composición determinística. Para **editar** con capas (máscara, clean plate,
+  borrar, mover) usa `pnpm ai:layers` + `pnpm ai:inpaint`: las capas son contenido regenerado y sólo sirven de
+  máscara y clean plate; la base se cobra como una capa.
 - **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni 1.1 (`pnpm ai:omni`, Cloud directo, nunca Fal; seis modos probados sólo a 360p/16:9/3 s);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
@@ -57,9 +59,14 @@
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.
 - **¿Es un logo real de tercero?** → `greenhouse-digital-brand-asset-designer`.
-- **¿Es retoque de una zona de una imagen que ya existe?** → el CLI canónico ya trae máscara:
-  `pnpm ai:image --image base.png --mask mask.png --prompt "…" --out out.png` (la máscara marca en
-  **transparente** lo que se reemplaza). **Editar no abarata** — en `low` cuesta ~2,3× una generación,
+- **¿Es retoque de una zona de una imagen que ya existe?** → `pnpm ai:inpaint` (TASK-1965 + TASK-1973), no
+  `ai:image --mask` (el modelo redibuja la imagen entera aunque lleve máscara: 221/255 medido). Subcomandos
+  `image` (zona) · `erase` · `move` · `place` · `background` · `expand` · `video`; máscara con `pnpm ai:mask` y capas
+  con `pnpm ai:layers`. Recompone sobre la original y verifica **delta 0** fuera de la zona (salida `0` PASS ·
+  `2` FAIL · `3` REVISAR). Defaults medidos: zona → Flare; borrar → clean plate o Sunburst por instrucción;
+  expandir → Flux Fill. Playbook: `greenhouse-ai-image-generator` → `references/inpainting-and-editing.md`.
+  En fotografía de marca es cirugía sobre un plate aprobado; un plate cine que falla se regenera, no se relumina
+  (no hay relight conectado). **Editar no abarata** — en `low` cuesta ~2,3× una generación,
   porque el modelo devuelve la imagen completa y la base entra como input; el `usage` que imprime el
   CLI es la fuente real de costo. Y el recorte de fondo de un asset existente va por
   `pnpm ai:image:rmbg` (matting local, costo cero), nunca pidiéndoselo al modelo. Detalle y evidencia:

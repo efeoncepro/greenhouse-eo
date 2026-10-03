@@ -1,12 +1,12 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude — (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
+> **Ultima actualizacion:** 2026-10-03 por Claude — (2.1, TASK-1965 + TASK-1973) nueva seccion «Para agentes»: arbol de decision por intencion con los ganadores medidos, lineas de comando, codigos de salida y que hacer con cada uno, regla del tope de costo y checklist de revision al 100 %; codigo 1 y tope de costo en la tabla de senales; tabla de tecnicas hermanas (borrar, expandir, mover, incorporar, fondo, detalle). Antes (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
 > **Modulo:** AI Tooling / Asset Generation
-> **Comandos:** `pnpm ai:mask`, `pnpm ai:inpaint image` (antes: `pnpm ai:image --image ... --mask ...`, que sigue funcionando pero no recompone), `pnpm ai:image:rmbg`
-> **Documentacion relacionada:** [editar una zona de un video](editar-una-zona-de-un-video.md), `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-10-02_task-1965-canary/`
+> **Comandos:** `pnpm ai:mask`, `pnpm ai:inpaint image` (tecnicas hermanas: `pnpm ai:inpaint erase|expand|move|place|background`, `pnpm ai:layers`) (antes: `pnpm ai:image --image ... --mask ...`, que sigue funcionando pero no recompone), `pnpm ai:image:rmbg`
+> **Documentacion relacionada:** [editar una zona de un video](editar-una-zona-de-un-video.md), [expandir, separar en capas, borrar, mover, incorporar y cambiar fondo](expandir-y-separar-en-capas.md), `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-10-02_task-1965-canary/`, `ai-generations/2026-10-03_task-1973-canary/`
 
 ## Para que sirve
 
@@ -31,6 +31,10 @@ Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-can
 | `openai` · `gpt-image-2.5-sunburst` ★ | **El mas potente**: la pieza final de mayor impacto | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara**, recibe la zona marcada en magenta como guia (imagen 2) y el comando recompone y corrige el color. Verificado 2026-10-02: planta dentro de la zona, sin rastro del magenta. Sin la guia puso la planta fuera de la zona |
 | `fal:flux-pro-fill` | Rellenar una zona con algo nuevo; buena alternativa a OpenAI | Mascara blanca = editable; USD 0,05 por megapixel (redondeado arriba). Puso el objeto limpio en el canario |
 | `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone. Canario Lite 2026-10-02: objeto dentro de la zona, pero **costura visible en superficies lisas** (cambia el tono local) e ignora `image_size`. No es la primera opcion para pieza final |
+
+Esta tabla vale para **agregar o cambiar** algo en una zona. Para **borrar** y para **expandir** los ganadores son
+otros (canario del 2026-10-03): borrar → clean plate si hay capas, si no Sunburst; expandir → Flux Fill, nunca GPT
+Image. Ver [expandir, separar en capas, borrar…](expandir-y-separar-en-capas.md).
 
 ### Preparacion
 
@@ -99,8 +103,20 @@ del modelo; nunca secretos ni URLs firmadas. **Repetir la misma entrada no vuelv
 El veredicto garantiza lo que **no** se toca; **no** dice si el pedido se cumplio. En el canario, una pasada salio
 `PASS` sin la planta. Abre `candidate-N.png` y mira la union al 100 %.
 
-> **Otras tecnicas sobre el mismo pipeline** (TASK-1973): expandir a otro formato, separar en capas con Layerize,
-> borrar, mover, cambiar fondo y rehacer detalle: [manual](expandir-y-separar-en-capas.md).
+### Otras tecnicas sobre el mismo pipeline (TASK-1973)
+
+Todas comparten la misma garantia (lo que no se edita queda identico, verificado sobre el archivo escrito) y se
+explican en [expandir, separar en capas, borrar, mover, incorporar y cambiar fondo](expandir-y-separar-en-capas.md):
+
+| Quiero… | Comando |
+|---|---|
+| Borrar un objeto | `pnpm ai:inpaint erase` |
+| Llevar la escena a otro formato (4:5 → 9:16, 1:1 → 1,91:1) | `pnpm ai:inpaint expand` |
+| Separar la foto en elementos con nombre (mascaras exactas y clean plate) | `pnpm ai:layers` |
+| Mover o escalar un objeto | `pnpm ai:inpaint move` |
+| Incorporar un objeto de otra foto | `pnpm ai:inpaint place` |
+| Cambiar el fondo dejando al sujeto intacto | `pnpm ai:inpaint background` |
+| Rehacer un detalle a mas resolucion (manos, una textura) | `pnpm ai:inpaint image --zone-resolution 2048` |
 
 ## Editar con un boceto y referencias (como el Markup de ChatGPT)
 
@@ -225,6 +241,8 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
 | `↺ misma entrada ya generada` | Cache: no se paga de nuevo. `--force` para regenerar. |
 | `⚠ el modelo REENCUADRO (…)` (`suspectMisaligned`) | El detector de bordes vio la escena corrida o escalada: la zona pegada no corresponde a lo generado. |
 | `⚠ REVISAR (codigo 3)` | Todos los candidatos pasaron la verificacion, pero ninguno muestra la edicion pedida (panel negro, reencuadre o zona sin cambio). |
+| `La estimación (USD X) supera el tope de USD Y. Repite con --yes o ajusta --max-usd.` (codigo 1) | El costo estimado pasa el tope de confirmacion (default USD 1). No se gasto nada. Confirma el monto antes de repetir con `--yes`. |
+| `FATAL: …` (codigo 1) | Error de entrada (falta un flag, mascara invalida, archivo inexistente) o del proveedor. Lee el mensaje; no es un resultado. |
 | `★ usando gpt-image-2.5-flare (default…)` | Recordatorio: para la pieza final, `--model gpt-image-2.5-sunburst`. |
 | `El prompt nombra "logo"…` | Guarda de marca: compone el SVG oficial despues; `--allow-brand` si la edicion solo toca el contexto. |
 
@@ -284,12 +302,110 @@ Lo que sigue abierto:
 - **La zona quedo bien pero el estilo no calza.** Sube la calidad un escalon; el costo del output sube pero
   el de la imagen base no cambia.
 
+## Para agentes
+
+Esta seccion es para un agente (Claude, Codex u otro) que opera el pipeline sin supervision continua. El contrato de
+cada comando es su `--help` (`pnpm ai:inpaint image --help`, `… erase --help`, `pnpm ai:mask --help`,
+`pnpm ai:layers --help`): si algo de aqui difiere del `--help`, gana el `--help`.
+
+### Arbol de decision: que comando y que modelo
+
+Ganadores medidos en los canarios del 2026-10-02 y 2026-10-03 (`ai-generations/2026-10-02_task-1965-canary/`,
+`ai-generations/2026-10-03_task-1973-canary/`):
+
+```text
+¿La edicion toca un logo, una marca o un texto legal?
+└─ si → NO con IA. Se compone el arte oficial despues. (--allow-brand solo si la edicion toca el CONTEXTO del logo)
+
+¿Que quieres hacer?
+├─ Agregar o cambiar algo en una zona ............................ pnpm ai:inpaint image
+│   ├─ uso diario, con mascara ........... default: --adapter openai (gpt-image-2.5-flare, quality medium)
+│   ├─ pieza final de mayor impacto ...... --model gpt-image-2.5-sunburst (el mas potente; edita SIN mascara y
+│   │                                      recibe la zona marcada como guia: lo hace --provider-mask auto, default)
+│   ├─ relleno puro, alternativa ......... --adapter fal:flux-pro-fill
+│   └─ "dibujo donde va" / objeto dado ... --sketch boceto.png [--reference objeto.png] --model gpt-image-2.5-sunburst
+├─ Rehacer un detalle a mas resolucion ............................ image --zone-resolution 2048 (REINTERPRETA, no escala)
+├─ Borrar un objeto .............................................. pnpm ai:inpaint erase
+│   ├─ hay capas (pnpm ai:layers) ........ --layers <layers.json> --layer "<nombre>"  → clean plate, USD 0
+│   └─ no hay capas ...................... --mask mascara.png → Sunburst por instruccion (default de --fill model)
+│                                          NUNCA Flare con mascara ni Flux Fill: rellenan la silueta con otro objeto
+├─ Mover o escalar un objeto ..................................... pnpm ai:inpaint move   (necesita capas)
+├─ Incorporar un objeto de OTRA foto ............................. pnpm ai:inpaint place  (capas de la foto de origen)
+├─ Llevar la escena a otro formato ............................... pnpm ai:inpaint expand (default fal:flux-pro-fill;
+│                                                                  NUNCA GPT Image: Flare reescala, Sunburst copia el espejo)
+├─ Cambiar el fondo .............................................. pnpm ai:inpaint background
+├─ Separar en capas / mascara exacta de un elemento .............. pnpm ai:layers + pnpm ai:mask --from-layer
+├─ Editar una zona de un video ................................... pnpm ai:inpaint video (default fal:flux3-edit)
+└─ Reiluminar una foto ........................................... NO hay relight conectado. Lo unico cercano:
+                                                                   place --finish element relumina solo el elemento pegado
+```
+
+### Lineas de comando
+
+```bash
+# 1. Mascara + revision (gratis)
+pnpm ai:mask --base base.png --rect 0.33,0.42,0.67,0.72 --feather 24 --out mascara.png
+pnpm ai:mask --inspect mascara.png --base base.png
+
+# 2. Siempre primero el dry-run (gratis: mascara, recorte, payload y costo)
+pnpm ai:inpaint image --image base.png --mask mascara.png --prompt "<que va en la zona>" --run ai-generations/<fecha>_<pieza> --dry-run
+
+# 3. La corrida real (Flare por defecto)
+pnpm ai:inpaint image --image base.png --mask mascara.png --prompt "<que va en la zona>. Keep everything else exactly the same." --run ai-generations/<fecha>_<pieza>
+
+# Pieza final con Sunburst (sin mascara al proveedor + guia de zona + correccion de color: automatico)
+pnpm ai:inpaint image --image base.png --mask mascara.png --model gpt-image-2.5-sunburst --prompt "..." --run ai-generations/<fecha>_<pieza>
+
+# Boceto + referencia
+pnpm ai:inpaint image --image base.png --sketch boceto.png --reference objeto.png --model gpt-image-2.5-sunburst --prompt "Add the X from the reference where the sketch marks it." --run ai-generations/<fecha>_<pieza>
+```
+
+### Codigos de salida y que hacer con cada uno
+
+| Codigo | Significa | Que hace el agente |
+|---|---|---|
+| `0` PASS | La zona protegida quedo identica bit a bit y al menos un candidato no es sospechoso | Hacer la revision al 100 % (checklist de abajo) antes de entregar. PASS no prueba que el pedido se cumplio |
+| `2` FAIL | Algo fuera de la zona cambio en el archivo escrito | **Nunca usar el candidato.** No reintentar a ciegas: leer `manifest.json` (veredicto por zona) y reportar |
+| `3` REVISAR | Lo protegido esta intacto, pero todos los candidatos son sospechosos: panel plano, reencuadre, residuo de borrado o zona casi sin cambio | Leer el aviso impreso: panel negro → no forzar `--provider-mask on`, volver a `auto` o usar Flare; reencuadre → cambiar de modelo (al expandir, Flux Fill); zona sin cambio → reescribir el prompt o agrandar la mascara; residuo de borrado → clean plate con capas o Sunburst. No entregar sin ojos humanos |
+| `1` error | Entrada invalida, tope de costo superado sin `--yes`, error del proveedor (`FATAL: …`) | Leer el mensaje. Si es el tope de costo, **detenerse y pedir autorizacion** (regla de abajo) |
+
+### Regla del tope de costo
+
+1. **Siempre `--dry-run` primero.** Es gratis e imprime el costo estimado.
+2. El tope de confirmacion es `--max-usd` o la variable `AI_COST_CONFIRM_USD` (default USD 1). Si la estimacion lo
+   supera, el comando sale con codigo 1 sin gastar.
+3. `--yes` (o subir `--max-usd`) **solo con autorizacion humana explicita del monto en el chat**. Un agente no sube el
+   tope por su cuenta ni cambia la variable de entorno.
+4. `--count N` son N pedidos pagados. Repetir la misma entrada no paga (cache por hash); `--force` vuelve a pagar:
+   usalo solo con una razon.
+
+### Revision visual al 100 % (obligatoria con PASS)
+
+El detector mide lo que no se toca y algunos sintomas; no ve todo. Abrir `candidate-N.png` (o el `final`) al 100 %,
+no la miniatura, y revisar:
+
+- [ ] **El pedido se cumplio**: el objeto esta, completo, sin cortes en el borde de la mascara.
+- [ ] **Costuras**: el borde de la zona no muestra cambio de tono, linea recta ni halo (el canario de Seedream Lite dejo
+      costura en una pared lisa).
+- [ ] **Fantasmas**: no quedan restos tenues de lo que se quito (el asa que dejo Seedream Pro Edit al borrar: el
+      detector **no** la vio).
+- [ ] **Elementos inventados**: el modelo no agrego objetos que nadie pidio (otra taza al borrar con Flux Fill; una
+      banca al expandir a 9:16).
+- [ ] **Reencuadre**: la escena pegada calza con lo generado, sin desplazamiento ni cambio de escala, aunque no haya
+      aviso.
+- [ ] **Forma conservada** cuando se pidio la misma forma (`--zone-resolution` redibujo una taza y le quito el pie).
+- [ ] **Sin rastro del magenta** de la guia de zona o del boceto.
+- [ ] **Sin logos ni texto generados**; personas reales con su identidad intacta.
+
+Si un punto falla, el resultado no se entrega aunque el codigo sea 0.
+
 ## Referencias tecnicas
 
 - Guía canónica de selección de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
 - Contrato del proveedor: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
 - Cliente canonico: `src/lib/ai/openai-image.ts` (`editOpenAIImage`)
-- Pipeline: `scripts/ai/inpaint/` (`mask.ts`, `recompose.ts`, `crop.ts`, `pipeline-image.ts`, `adapters/`)
+- Pipeline: `scripts/ai/inpaint/` (`mask.ts`, `recompose.ts`, `crop.ts`, `sketch.ts`, `pipeline-image.ts`, `adapters/`); CLI `scripts/ai/inpaint/cli.ts` y `mask-cli.ts` (su `--help` es el contrato)
 - CLI legado sin recomposicion: `scripts/ai/generate-image.ts`
-- Canario del pipeline: `ai-generations/2026-10-02_task-1965-canary/README.md`
+- Canarios: `ai-generations/2026-10-02_task-1965-canary/README.md` (pipeline) y `ai-generations/2026-10-03_task-1973-canary/README.md` (tecnicas)
+- Spec: [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) §Pipeline de inpainting
 - Medicion de costo con evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`

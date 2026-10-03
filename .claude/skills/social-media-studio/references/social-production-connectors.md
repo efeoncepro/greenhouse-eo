@@ -11,6 +11,8 @@ todas las herramientas para producir una pieza. El acceso a un conector no autor
 | Crear/editar imagen en esta conversación | motor nativo `image_gen` | seguir la skill `imagegen`; revisar el input local primero |
 | Imagen/video por referencias, presets o producto | Higgsfield | discovery → schema → costo si aplica → input confirmado → job → lectura |
 | Upscale de un plate insuficiente | Magnific | comparar nitidez/fidelidad; no usar para arreglar concepto ni tipografía |
+| Corregir una zona de un plate aprobado (quitar, mover, extender) y dejar el resto idéntico | `pnpm ai:inpaint` (out-of-band) | delta 0 verificado fuera de la zona; playbook en `greenhouse-ai-image-generator` → `references/inpainting-and-editing.md` |
+| Reiluminar | **ningún conector verificado** | Magnific y Higgsfield listan herramientas (abajo); sin corrida, no prometerlo |
 | Geometría/material exactos y repetibles | mockup fotográfico o 3D disponible | arte oficial, superficie calibrada y material; no afirmar que existe herramienta 3D sin verificar |
 | Texto editorial, firma gráfica, export | compositor determinístico | fuente y logo oficiales; fuera del último pase generativo |
 | Producción gobernada del portal/Globe | skill del runtime | este workflow no cambia su allowlist, ledger o aprobación |
@@ -34,6 +36,11 @@ todas las herramientas para producir una pieza. El acceso a un conector no autor
 ratios incluidos `9:16` y `4:5`, resoluciones `1k|2k|4k`. Es evidencia de catálogo, **no un smoke de generación**
 ni autorización del runtime Globe. El MCP puede diferir de la web, CLI y API directa.
 
+**Delta 2026-10-03:** Higgsfield no expone relight dedicado (`models_explore` con «relight» → 0; el «Relight» es de su
+app). El MCP sí lista **Cinema Studio 4.0** (`cinematic_studio_video_4_0`, video) con `mode: video_edit` —edita un video
+de referencia, cobrado por su duración— y control de luz por preset o rig propio. **No está en nuestro catálogo de API**
+y no tiene corrida: candidato a relight de video, sin verificar (`higgsfield-provider`).
+
 Para macros/presets, cargar instrucciones del preset real y comprobar si su ejecución está disponible.
 No adoptar un efecto porque sea popular: debe ejecutar el mecanismo creativo y preservar el producto.
 
@@ -49,6 +56,13 @@ No adoptar un efecto porque sea popular: debe ejecutar el mecanismo creativo y p
   acceso y contrato antes de usarla. No abrir una integración nueva sólo para imitar una receta.
 - Para importar y renderizar, descubrir las herramientas actuales y seguir sus instrucciones. Guardar
   identificador, leer estado terminal y mostrar con `creations_show` cuando el conector lo requiera.
+- **Delta 2026-10-03 — cuenta y relight.** El MCP oficial (`https://mcp.magnific.com`, OAuth) está conectado en las
+  sesiones Claude con la **cuenta Efeonce** (`account_profile`). Lista además `images_relight` (pide
+  `creationIdentifier` + `lights`, hasta 4 luces) y `video_relight` (video + primer cuadro o creación, `lights` o
+  imagen de transferencia de luz), pero sus esquemas no cargaron en la sesión: **sin invocación verificada**. No
+  prometas relight por esta vía ni inventes argumentos; la API publicada de relight re-renderiza la imagen (riesgo en
+  caras pequeñas). Si se usa algún día: reiluminar y volver a pegar el objeto exacto (pipeline `pnpm ai:inpaint`).
+  Estado completo: `ai-model-selection` §Reiluminar.
 
 Regla de aplicación: ampliar **antes** de añadir texto y firma editorial exactos. Si el plate ya contiene
 marca física, revisarla después del upscale; rechazar cualquier cambio de silueta, letras, proporción o acabado. Comparar crops 100% de cara/manos/producto,

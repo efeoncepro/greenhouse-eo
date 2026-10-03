@@ -764,6 +764,14 @@ contacto → medir lecho → regenerar si falla → curar pantallas → componer
 Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloques de prompt y scripts:
 [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
+**Corrección local de un plate YA aprobado *(2026-10-03)*:** quitar un distractor, mover o escalar un objeto, traer
+uno de otra foto o extender el lienzo se hace con `pnpm ai:inpaint erase|move|place|expand` (+ `pnpm ai:layers` para la
+máscara y el clean plate): todo lo que no se toca queda en **delta 0 verificado** sobre el archivo. Es cirugía sobre
+una foto buena, no un atajo para una mala: si fallan luz, lecho, color, identidad o «se siente IA», **se corrige la
+ficha y se regenera** (canon cine: «sin relight ni upscale»), la piel de una cara no se arregla retocándola (§ casting,
+retrato ancla), un logo nunca se edita con IA, y **no hay relight conectado**: la luz se dirige en la ficha.
+Playbook: `greenhouse-ai-image-generator` → `references/inpainting-and-editing.md`.
+
 ## 13. Checklist QA (antes de mostrar o entregar)
 
 - [ ] Pasa la barra (§2): sustitución, obra, mecanismo, idea, 3 modos, 390 px, verdad operativa.

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-10-02 por Claude — (1.17, TASK-1965) editar una zona de una imagen o de un video tiene comandos propios que recomponen y verifican solos: `pnpm ai:mask` y `pnpm ai:inpaint image|video`; Sunburst con mascara devuelve un panel negro, por eso edita sin mascara. Antes (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-10-03 por Claude — (1.18, TASK-1973) nueva sección «Editar fotos y videos que ya existen»: borrar, mover, incorporar un objeto de otra foto, llevar a otro formato, separar en capas, cambiar fondo, rehacer un detalle, dibujar con referencias y editar una zona de video, con la garantía verificada, costos medidos, qué modelo ganó en cada caso y lo que no hace (logos nunca con IA; no hay reiluminación conectada); la tabla de modelos ya no recomienda Sunburst «con máscara»; las capas no sirven para reutilizar un logo. Antes (1.17, TASK-1965) editar una zona de una imagen o de un video tiene comandos propios que recomponen y verifican solos: `pnpm ai:mask` y `pnpm ai:inpaint image|video`; Sunburst con mascara devuelve un panel negro, por eso edita sin mascara. Antes (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -78,7 +78,7 @@ La decisión completa, con evidencia, costos y comandos, está en la guía técn
 | Necesito… | Primera opción | Por qué |
 |---|---|---|
 | Una imagen de calidad para uso diario | **GPT Image 2.5 Flare** (`pnpm ai:image`) | Rápida y buena; OpenAI la recomienda para trabajos nuevos |
-| Corregir una zona exacta de una imagen, o la pieza final más cuidada | **GPT Image 2.5 Sunburst** con máscara | Es la más precisa editando; cuesta igual que Flare, pero tarda más |
+| Corregir una zona exacta de una imagen, o la pieza final más cuidada | **GPT Image 2.5 Sunburst** con `pnpm ai:inpaint image` | Es la más potente editando; con máscara devuelve un rectángulo negro, así que el comando le pasa la zona como guía y la máscara la usa sólo para pegar. Para el uso diario con máscara, Flare |
 | Íconos o recortes con fondo transparente | **GPT Image 2.5** | Soporta transparencia de forma completa |
 | Explorar muchas ideas distintas por poco dinero | **Seedream 5 Lite** (`pnpm ai:fal`) | Unos USD 0,035 por imagen y puede sacar series relacionadas |
 | Textura, material, atmósfera y "look" de una campaña | **Seedream 5 Pro** | Su fuerte medido es la riqueza de material y luz |
@@ -196,6 +196,95 @@ nave blanca sobre azul marino), el recorte puede dejar **tapados** los agujeros 
 ventanas o los cortes de una orbita. Con esa opcion la herramienta los vacia. No viene activada, porque si el
 personaje tiene partes del mismo color que el fondo tambien las borraria.
 
+## Editar fotos y videos que ya existen (desde 2026-10-03)
+
+Además de crear imágenes nuevas, el equipo puede **editar una imagen o un video que ya existe** sin rehacerlo. Son
+herramientas de trabajo del equipo (se usan desde la terminal, no desde el portal) construidas en TASK-1965 y
+TASK-1973.
+
+### Qué se puede hacer
+
+| Quiero… | Qué hace la herramienta |
+|---|---|
+| **Cambiar o agregar algo en una zona** | Se marca la zona (la «máscara») y se describe qué va ahí: una planta sobre la mesa vacía, otro material, un detalle corregido |
+| **Dibujar dónde va y dar una referencia** | Como el Markup de ChatGPT: se dibuja sobre la foto dónde y de qué tamaño va el objeto, y se entrega la foto del objeto a incorporar |
+| **Borrar un objeto** | Lo quita junto con su sombra y reconstruye lo que había detrás |
+| **Mover o achicar un objeto** | Lo corre de lugar, rellena el hueco que deja y le agrega la sombra de contacto en su lugar nuevo |
+| **Traer un objeto de otra foto** | Recorta el objeto de una foto y lo pone en otra, con sombra y reflejo para que se integre |
+| **Llevar una pieza a otro formato** | Agranda el lienzo (de 4:5 a 9:16, de cuadrado a horizontal) y completa lo que falta alrededor sin redibujar la escena |
+| **Separar una foto en capas** | Devuelve cada elemento por separado (la taza, el cuaderno, la mesa) y un fondo limpio |
+| **Cambiar el fondo** | Deja a la persona o al producto intactos y cambia lo de atrás |
+| **Rehacer un detalle** | Vuelve a generar sólo una parte chica (unas manos, una textura) a más resolución |
+| **Editar una zona de un video** | Cambia algo dentro de una zona del clip y deja el resto igual en cada cuadro, con el audio original |
+
+> Detalle técnico: [§Pipeline de inpainting en la spec](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
+> manuales: [editar una zona de una imagen](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md),
+> [borrar, mover, incorporar, expandir, capas y fondo](../../manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md) y
+> [editar una zona de un video](../../manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md).
+
+### Lo que está garantizado
+
+**Lo que no se edita queda idéntico, y está verificado.** Ningún modelo de IA devuelve el resto de la imagen intacto:
+en las pruebas, zonas que debían quedar iguales cambiaron hasta 179 de 255. Por eso la herramienta toma de la
+**imagen original** todo lo que no se debía tocar, lo vuelve a pegar y **revisa el archivo final**: si fuera de la zona
+cambió un solo punto, lo marca como fallido y ese resultado no se usa. En video lo comprueba cuadro por cuadro.
+
+Además, antes de gastar muestra una vista previa y el costo estimado; si el costo pasa un tope (USD 1 por defecto),
+se detiene y pide confirmación; y si se repite la misma edición, no se vuelve a pagar.
+
+Lo que la verificación **no** garantiza es que el resultado se vea bien: que el objeto esté, que no haya una costura o
+un resto tenue de lo borrado, o que el modelo no haya inventado algo. Cuando sospecha de un resultado (por ejemplo, la
+escena quedó corrida o el objeto sigue ahí) avisa «revisar»; igual, **todo resultado se mira a tamaño real** antes de
+entregarlo.
+
+> Detalle técnico: [§Pipeline de inpainting](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) (máscara,
+> recomposición, verificación y códigos de salida).
+
+### Qué modelo ganó en cada caso (pruebas del 2026-10-02 y 2026-10-03)
+
+| Para… | Ganó | Lo que se vio con los demás |
+|---|---|---|
+| Cambiar o agregar algo en una zona | **Flare** para el día a día; **Sunburst** para la pieza final | Sunburst no acepta la máscara (devuelve un rectángulo negro): la herramienta le marca la zona como guía y la máscara la usa sólo para pegar. Seedream dejó costura en una pared lisa |
+| Borrar | **El fondo limpio de las capas** (gratis) o **Sunburst** | Los modelos que rellenan una silueta dibujaron otra taza o dejaron media taza; Seedream dejó un fantasma tenue que la herramienta no detectó |
+| Llevar a otro formato | **Flux Fill** | Los modelos de OpenAI achicaron la escena o copiaron el borde como contenido. Flux, en el formato vertical, inventó una banca en primer plano: hay que mirarlo |
+| Editar una zona de video | **Flux 3 edit** | Es el único probado de punta a punta |
+
+> Detalle técnico: [guía de selección de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) y
+> los resultados por técnica en el [manual](../../manual-de-uso/ai-tooling/expandir-y-separar-en-capas.md).
+
+### Cuánto cuesta, aproximadamente
+
+Costos medidos en las pruebas, con una foto de 1536×1024:
+
+| Edición | Costo aproximado |
+|---|---|
+| Borrar con el fondo limpio de las capas | USD 0 |
+| Borrar, mover, traer un objeto con su sombra, cambiar el fondo | alrededor de USD 0,01 cada una |
+| Rehacer un detalle a más resolución | alrededor de USD 0,02 |
+| Separar en capas | unos USD 0,034 por capa, y el fondo se cobra como una capa más (4 capas + fondo = USD 0,17) |
+| Llevar a otro formato con Flux Fill | USD 0,10 (horizontal 1,91:1) a USD 0,15 (vertical 9:16) |
+| Editar una zona de video | USD 0,03 por segundo del clip (5 segundos ≈ USD 0,15) |
+
+Toda la batería de pruebas de TASK-1973 costó alrededor de USD 0,98, y la de TASK-1965 alrededor de USD 0,40.
+
+> Detalle técnico: precios en `src/lib/ai/fal-pricing.ts` y evidencia en
+> `ai-generations/2026-10-03_task-1973-canary/README.md`.
+
+### Lo que no hace
+
+- **Logos y marcas nunca se generan, se borran, se mueven ni se reconstruyen con IA.** Se componen después con el
+  archivo oficial. La herramienta se detiene si la instrucción o el nombre del elemento elegido los menciona.
+- **No reilumina una foto.** No hay una herramienta de reiluminación conectada. Lo único cercano es que, al traer un
+  objeto de otra foto, se le puede pedir que tome la luz de la escena nueva (y entonces su forma puede variar un poco).
+  Se investigaron opciones del mercado (Magnific, IC-Light y otras), pero ninguna está conectada ni probada.
+- **No sigue algo que se mueve en un video**: funciona con cámara quieta o con una zona que se desplaza en línea recta.
+  Si el modelo mueve la cámara, la herramienta se detiene para no dejar imágenes fantasma.
+- **No decide el tamaño ni la perspectiva** de un objeto traído de otra foto: eso lo define quien edita.
+- **No reemplaza el criterio**: un resultado «correcto» puede verse mal; siempre se mira.
+
+> Detalle técnico: guarda de marca y estado de la reiluminación en
+> [§Pipeline de inpainting](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
+
 ## Cuánto cuesta generar una imagen
 
 Cifras **medidas el 2026-09-16**, en dólares y por imagen:
@@ -295,8 +384,11 @@ los huecos internos, como el centro de una letra) y con su posición y orden gua
 No hace falta escribir instrucciones: basta con la imagen. En una prueba real sobre un key visual devolvió 8
 capas.
 
-Sirve para reaprovechar una pieza plana que no tiene archivo de diseño editable: mover un elemento, reutilizar
-el logo o el sujeto en otro formato, o armar variantes sin volver a generar todo.
+Sirve para reaprovechar una pieza plana que no tiene archivo de diseño editable: mover un elemento, reutilizar el
+sujeto en otro formato, o armar variantes sin volver a generar todo. Ojo con dos cosas medidas el 2026-10-03: cada
+capa es una **reconstrucción** (el modelo la vuelve a dibujar), así que sirve como molde y como fondo limpio, no como
+el píxel final; y un **logo nunca se reutiliza desde una capa**: se compone con el archivo oficial. La imagen base
+también se cobra como una capa más. Cómo se usa en la edición: sección «Editar fotos y videos que ya existen».
 
 **Se cobra por capa:** unos USD 0,034 por capa en piezas de hasta 1536×1536 y el doble en piezas más grandes. Una
 pieza de 8 capas a 2K rondaría medio dólar.

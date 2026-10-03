@@ -543,6 +543,7 @@ escena (escala 0,88–0,90) y Sunburst copia el relleno en espejo como contenido
   --scale <0,3–1>            Achica la escena dentro del lienzo (zoom out; la escena se re-muestrea)
   --anchor center|left|right|top|bottom       Dónde se apoya la escena (default center)
   --blend <px>               Franja de fundido sobre la escena (default 24; 80–140 si el borde corta objetos)
+  --prefill mirror|neutral   Relleno previo del área nueva: espejo de los bordes (default) o su color medio
   --adapter / --model / --quality / --provider-mask / --count / --run / --dry-run / --force / --max-usd / --yes
 `
 
