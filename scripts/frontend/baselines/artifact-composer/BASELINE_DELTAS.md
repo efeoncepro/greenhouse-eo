@@ -1,5 +1,42 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-03 (v) — TASK-1975: cifras, cascada, waffle, dona y apiladas en Insights; variación con tono semántico
+
+<!-- sealed-by-freeze: 38573c6a55c820f922a46f048474752adaebd9e0f8cb5cae3bf6d6d60ff16463 -->
+
+Las cinco figuras del criterio de selección (aprobado el 2026-10-03) tienen página A4 y lámina 16:9; las hojas aprobadas
+del canvas las miden a ≤ 1 % (`pnpm insights:canvas-fidelity`: cascada 0,59 % / 0,54 %, waffle 0,03 % / 0,01 %, dona
+0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,17 %). Los frames nuevos son el probe de cada plantilla (los
+`example` de su `slots.json`, sacados de la hoja aprobada).
+
+Frames nuevos:
+- `templates-insights-report/ReportFigureStatPage.png` — 🆕 página de cifras (retícula de hasta 6 cifras, sin cifra principal)
+- `templates-insights-report/ReportFigureWaterfallPage.png` — 🆕 cascada («qué explica el cambio»), barras desde 0, signo siempre impreso
+- `templates-insights-report/ReportFigureWafflePage.png` — 🆕 waffle de un cuadro por unidad
+- `templates-insights-report/ReportFigureDonutPage.png` — 🆕 dona de 2 o 3 partes con cuenta y participación
+- `templates-insights-report/ReportFigureStackedPage.png` — 🆕 barras apiladas por período, segmento base abajo
+- `templates-insights-deck/InsightsFigureStatSlide.png` — 🆕 lámina de cifras 3×2
+- `templates-insights-deck/InsightsFigureWaterfallSlide.png` — 🆕 cascada en navy
+- `templates-insights-deck/InsightsFigureWaffleSlide.png` — 🆕 waffle en navy
+- `templates-insights-deck/InsightsFigureDonutSlide.png` — 🆕 dona en navy
+- `templates-insights-deck/InsightsFigureStackedSlide.png` — 🆕 apiladas en navy
+
+Frames que cambian (existían), todos por decisiones del operador del 2026-10-03 (canvas de TASK-1975, análisis de
+saturación del tono): triángulo de puntas redondeadas en toda variación; sobre papel la píldora teñida con tono semántico
+(peor en rojo, ya no en gris); sobre navy la variante C (sin píldora rellena, tono sólo en el triángulo, cifra en tinta
+suave); y la cifra principal del deck se mide por su ancho visible, sin espacios ni signo (como componen las hojas).
+- `templates-insights-report/ReportFigureComparisonPage.png` — cambia: tono semántico y triángulo redondeado en la píldora
+- `templates-insights-report/ReportFigureColumnsPage.png` — cambia: triángulo redondeado bajo las columnas (36 px)
+- `templates-insights-report/ReportFigureTargetsPage.png` — cambia: triángulo redondeado en la insignia de la meta
+- `templates-insights-report/ReportTablePage.png` — cambia: triángulo redondeado en la columna de variación (5 px)
+- `templates-insights-deck/InsightsFigureComparisonSlide.png` — cambia: cifra principal por ancho visible + variante C
+- `templates-insights-deck/InsightsFigureColumnsSlide.png` — cambia: cifra principal por ancho visible + variante C bajo las columnas
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — cambia: cifra principal por ancho visible + triángulo redondeado
+- `templates-insights-deck/InsightsFigureTrendSlide.png` — cambia: cifra principal por ancho visible
+
+Las plantillas existentes además traen los íconos `steps`, `grid`, `donut`, `layers` y `numbers` (el resolver los quita:
+sin efecto de píxel).
+
 ## 2026-09-30 (u) — TASK-1949: las seis láminas nativas del deck SEO/AEO y el lockup de submarca
 
 <!-- sealed-by-freeze: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
@@ -1149,7 +1186,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: a631ba6cb06ad22d6dafa63c8fa09d09293f5631b1b5c49d41cfc2f6b1c360e9 -->
+<!-- manifest-digest: 38573c6a55c820f922a46f048474752adaebd9e0f8cb5cae3bf6d6d60ff16463 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

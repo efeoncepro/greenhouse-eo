@@ -266,7 +266,7 @@
       },
       "notes": "Variación del segmento base entre los dos últimos períodos (sin signo: el signo lo pone la dirección). Conector punteado entre las cimas del segmento base y el texto a la derecha de la última columna; la dirección se verifica contra los segmentos. Sólo si el plan la trae.",
       "example": {
-        "delta": "28 %",
+        "delta": "14 %",
         "direction": "up",
         "tone": "better",
         "label": "sin marca"
