@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Insights: criterio de figuras (03/10):** [TASK-1974](docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) y [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) in-progress (Claude), local en develop, sin push. Slice 1 de 1975 (diseño de la tarjeta, tonos semánticos, tokens y norma) aprobado y versionado en `81e50977b`. Orden: 1974 Slices 1–5 → 1975 Slices 2–6; las dos salen en el mismo release, con Think desplegado antes o junto.
+
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 
 **Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.

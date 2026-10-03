@@ -163,8 +163,8 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 | [TASK-1889](complete/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25): portadas por módulo, contraportada, capítulos, prosa y gráficos premium; verificación con Berel y Sky y release — **complete 2026-09-26, en producción** (releases `0e87c7a443a2` + `f9257b9c94af`; primeras ediciones internas de Berel y Sky renderizadas en producción) | complete |
 | [TASK-1901](to-do/TASK-1901-efeonce-insights-richer-evidence-for-chart-families.md) | evidencia más rica para más familias de gráfico: serie diaria de Search Console, tramos y keyword × semana, historial del puntaje de IA; `dimensionKind` | to-do |
 | [TASK-1902](to-do/TASK-1902-efeonce-insights-gauge-heatmap-pages.md) | páginas de medidor y mapa de calor (A4 y deck) y columnas por tramo; bloqueada por TASK-1901 | to-do |
-| [TASK-1974](to-do/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador: la pregunta elige la familia, tarjeta de cifra en el contrato, sin datos repetidos, dona y barras apiladas con evidencia | to-do |
-| [TASK-1975](to-do/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas (canvas TASK-1889; tarjeta pendiente de diseño); bloqueada por TASK-1974 | to-do |
+| [TASK-1974](in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador: la pregunta elige la familia, tarjeta de cifra en el contrato, sin datos repetidos, dona y barras apiladas con evidencia | in-progress |
+| [TASK-1975](in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas (canvas TASK-1889; tarjeta pendiente de diseño); bloqueada por TASK-1974 | to-do |
 
 ## Proveedor de imagen OpenAI
 
@@ -2615,8 +2615,8 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - [TASK-1969](to-do/TASK-1969-portal-chrome-and-greeting-elio.md): hija B de TASK-1967; chrome del portal y saludo con Elio (Spark rig) y composer de Nexa in-place; P1/Alto.
 - [TASK-1970](to-do/TASK-1970-home-api-role-blocks.md): hija C de TASK-1967; API de la Home por rol sobre readers canónicos (ICO semanal, foco, señales, cliente, colaborador, clima); P1/Alto; bloqueada por TASK-1968.
 - [TASK-1971](to-do/TASK-1971-internal-home-ui.md): hija F de TASK-1967; Home interna/admin; P1/Medio; bloqueada por TASK-1969 y TASK-1970.
-- [TASK-1974](to-do/TASK-1974-efeonce-insights-figure-selection-planner.md): EPIC-045; criterio canónico de figuras en el planificador (tarjeta de cifra, deduplicación, dona y barras apiladas); P1/Medio; backend-data.
-- [TASK-1975](to-do/TASK-1975-efeonce-insights-new-figure-pages.md): EPIC-045; páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas; P1/Alto; ui-ux; bloqueada por TASK-1974.
+- [TASK-1974](in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md): EPIC-045; criterio canónico de figuras en el planificador (tarjeta de cifra, deduplicación, dona y barras apiladas); P1/Medio; backend-data.
+- [TASK-1975](in-progress/TASK-1975-efeonce-insights-new-figure-pages.md): EPIC-045; páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas; P1/Alto; ui-ux; bloqueada por TASK-1974.
 - [TASK-1976](to-do/TASK-1976-creative-core-extraction-ready.md): tooling; núcleo de `scripts/ai/inpaint/**` listo para extraer según ADR-024 (manifiesto, gate de frontera, lógica separada del I/O); sin paquete ni Globe; P2/Medio.
 - [TASK-1977](to-do/TASK-1977-ai-inpaint-relight-light-transfer.md): tooling; `pnpm ai:inpaint relight` que nunca regenera el objeto: transferencia de luz desde un modelo (prueba de concepto 2026-10-03) y relight físico desde normales/albedo; P2/Alto.
 - [TASK-1972](to-do/TASK-1972-collaborator-home-ui.md): hija H de TASK-1967; Home de colaboradores en `/my`; P1/Medio; bloqueada por TASK-1969 y TASK-1970.

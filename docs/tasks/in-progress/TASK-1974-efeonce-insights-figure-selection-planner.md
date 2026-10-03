@@ -32,7 +32,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -45,7 +45,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Diseño`
+- Status real: `Implementación en curso (Slice 1)`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`

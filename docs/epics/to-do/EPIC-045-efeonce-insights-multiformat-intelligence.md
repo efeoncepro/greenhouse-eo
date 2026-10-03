@@ -105,8 +105,8 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
 | U13 | [TASK-1961](../../tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md) | visibilidad en IA por país: un run por mercado en la ventana, lectura por país sin promedio (Sky: siete mercados) | TASK-1863 |
 | U14 | [TASK-1962](../../tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) | contrato de contenido del informe (8 preguntas, gate de mantenimiento), causas SEO, lo que el Grader ya mide, plan de acción y petición, más familias de gráfico y GA4 en el Search Visibility 360 | TASK-1957 |
-| U15 | [TASK-1974](../../tasks/to-do/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador (canon `EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`) | TASK-1962 |
-| U16 | [TASK-1975](../../tasks/to-do/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas | TASK-1974 |
+| U15 | [TASK-1974](../../tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador (canon `EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`) | TASK-1962 |
+| U16 | [TASK-1975](../../tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas | TASK-1974 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
