@@ -322,7 +322,9 @@ export const GH_INSIGHTS = {
     /** «vs 16.390 en agosto de 2026»: el período de comparación siempre explícito, con su valor. */
     versus: (value: string, period: string) => `vs ${value} en ${period}`,
     /** Sin dato: «—» en el valor y esta línea en lugar de la variación. Nunca 0. */
-    noDataIn: (period: string) => `Sin dato en ${period}`
+    noDataIn: (period: string) => `Sin dato en ${period}`,
+    /** TASK-1975 — con valor pero sin período anterior (primer mes medido): no hay variación que mostrar. */
+    firstPeriod: 'Primer período medido'
   },
 
   reading: {

@@ -818,7 +818,8 @@ export const buildStatSlides = (
           ...view.parts,
           ...(view.change ? { trend: `${view.change.direction}:${view.change.tone}`, delta: view.change.display } : {}),
           ...(view.comparison ? { versus: S.versus(`<strong>${escapeHtml(view.comparison.display)}</strong>`, escapeHtml(view.comparison.period)) } : {}),
-          ...(view.noData ? { noData: view.noData } : {}),
+          // La línea gris bajo la cifra dice por qué no hay variación: sin dato, o primer período medido.
+          ...(view.noData ? { noData: view.noData } : view.firstPeriod ? { noData: view.firstPeriod } : {}),
           ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
         })),
         // La nota del tablero es una afirmación del plan (con sus hechos): se imprime su texto.

@@ -183,7 +183,8 @@ describe('buildInsightWebModel', () => {
     expect(clicks).toMatchObject({ display: '13.606', change: { display: '17,0 %', direction: 'down', tone: 'worse' } })
     expect(clicks!.versus).toMatch(/^vs 16\.390 en /)
     // TASK-1975 — Think anima la cifra con lo que trae el modelo: piezas y recorrido, sin partir ni deducir nada.
-    expect(clicks).toMatchObject({ parts: { value: '13.606' }, count: { from: 16390, to: 13606, decimals: 0 } })
+    expect(clicks).toMatchObject({ parts: { value: '13.606' }, count: { from: 16390, to: 13606, decimals: 0 }, comparison: { display: '16.390' } })
+    expect(clicks).not.toHaveProperty('firstPeriod')
     // Sin dato: «—» y la línea «Sin dato en …», nunca 0 ni variación.
     expect(empty).toMatchObject({ display: '—' })
     expect(empty).not.toHaveProperty('change')

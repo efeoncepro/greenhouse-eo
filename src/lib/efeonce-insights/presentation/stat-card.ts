@@ -55,6 +55,8 @@ export interface StatItemView {
   comparison: { factId: string; display: string; period: string } | null
   /** «Sin dato en septiembre de 2026» cuando el hecho no tiene valor. */
   noData: string | null
+  /** «Primer período medido» cuando hay valor pero no comparable: dice por qué no hay variación. */
+  firstPeriod: string | null
   /** «Menor es mejor» sólo cuando subir es malo. */
   lowerIsBetter: string | null
   /** Piezas de la cifra para dibujarla grande con su unidad pequeña. */
@@ -92,6 +94,7 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
       ? { factId: comparable.factId, display: formatFactValue(comparable.value, comparable.unit, locale), period: windowLabelOf(comparable.window, locale) }
       : null,
     noData: fact.value === null ? GH_INSIGHTS.stat.noDataIn(windowLabelOf(fact.window, locale)) : null,
+    firstPeriod: fact.value !== null && !comparable ? GH_INSIGHTS.stat.firstPeriod : null,
     lowerIsBetter: item.direction === 'lower_is_better' ? GH_INSIGHTS.stat.lowerIsBetter : null,
     parts: splitStatValue(formatFactValue(fact.value, fact.unit, locale)),
     count: comparable ? { from: comparable.value!, to: fact.value!, decimals: decimalsOf(splitStatValue(formatFactValue(fact.value, fact.unit, locale)).value) } : null

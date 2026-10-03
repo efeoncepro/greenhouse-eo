@@ -127,6 +127,10 @@ export interface InsightWebStatItemV1 {
   change?: { display: string; direction: 'up' | 'down' | 'flat'; tone: 'better' | 'worse' | 'neutral' }
   /** «vs 16.390 en agosto de 2026». Ausente sin comparable. */
   versus?: string
+  /** Las piezas de `versus` (cifra y período) para destacar la cifra; el texto completo sigue en `versus`. */
+  comparison?: { display: string; period: string }
+  /** «Primer período medido»: hay valor pero no período anterior, por eso no hay variación. */
+  firstPeriod?: string
   /** «Sin dato en septiembre de 2026». Sólo sin valor. */
   noData?: string
   /** «Menor es mejor». Sólo cuando subir es malo. */

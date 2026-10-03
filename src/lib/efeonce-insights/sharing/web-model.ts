@@ -215,6 +215,8 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
                 ...(view.noData ? { noData: view.noData } : {}),
                 ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {}),
                 parts: view.parts,
+                ...(view.comparison ? { comparison: { display: view.comparison.display, period: view.comparison.period } } : {}),
+                ...(view.firstPeriod ? { firstPeriod: view.firstPeriod } : {}),
                 ...(view.count ? { count: view.count } : {})
               }]
             }),
