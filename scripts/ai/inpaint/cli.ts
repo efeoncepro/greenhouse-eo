@@ -11,6 +11,7 @@ import { resolveVideoEngine, VIDEO_ENGINE_IDS } from './adapters/video-fal'
 import type { CropMode } from './crop'
 import { assertFfmpeg } from './ffmpeg'
 import { MASK_CONVENTIONS, type MaskConvention } from './mask'
+import { runErase } from './erase'
 import { runImageInpaint } from './pipeline-image'
 import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
@@ -64,6 +65,10 @@ Control:
 interface ImageCliArgs {
   image?: string
   mask?: string
+  layersJson?: string
+  layerSelectors: string[]
+  fill?: 'plate' | 'model'
+  grow?: number
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -101,7 +106,7 @@ const toNumber = (raw: string, flag: string, integer = false): number => {
 }
 
 export const parseImageArgs = (argv: string[]): ImageCliArgs => {
-  const args: ImageCliArgs = { references: [], convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
+  const args: ImageCliArgs = { layerSelectors: [], references: [], convention: 'white-editable', count: 1, crop: 'auto', dryRun: false, force: false, yes: false, allowBrand: false, allowFull: false, help: false }
 
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i]
@@ -120,6 +125,18 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--image': args.image = next(); break
       case '--mask': args.mask = next(); break
       case '--sketch': args.sketch = next(); break
+      case '--layers': args.layersJson = next(); break
+      case '--layer': args.layerSelectors.push(next()); break
+      case '--grow': args.grow = toNumber(next(), flag, true); break
+
+      case '--fill': {
+        const value = next()
+
+        if (!['plate', 'model'].includes(value)) throw new Error('--fill espera plate | model.')
+        args.fill = value as 'plate' | 'model'
+        break
+      }
+
       case '--sketch-margin': args.sketchMargin = toNumber(next(), flag, true); break
       case '--reference': args.references.push(next()); break
 
@@ -347,13 +364,68 @@ const runVideo = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const ERASE_HELP = `pnpm ai:inpaint erase — borra un objeto y deja el resto idéntico (TASK-1973)
+
+  pnpm ai:inpaint erase --image foto.png --layers <layers.json> --layer "mug"      # clean plate, sin gasto
+  pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # un modelo reconstruye el fondo
+
+Zona: --mask (explícita, nunca se altera) o --layers + --layer (repetible; se agranda --grow px, default 16, para
+llevarse borde y sombra). Relleno: --fill plate (default con --layers: la base de Layerize) o model (default con
+--mask; --adapter/--model/--quality como en image). Después de verificar la zona protegida mide si el objeto
+sigue ahí; si en ningún candidato cambió, sale con código 3 (revisar). Un logo o una marca no se borra con IA.
+Control: --prompt (default: quitar el objeto y su sombra y reconstruir lo de atrás), --count, --run, --dry-run,
+--force, --max-usd/--yes, --allow-brand.
+`
+
+const runEraseCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(ERASE_HELP)
+
+    return 0
+  }
+
+  if (!args.image) throw new Error('--image es obligatorio. Ver pnpm ai:inpaint erase --help.')
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  const result = await runErase({
+    imagePath: resolvePath(args.image),
+    maskPath: args.mask ? resolvePath(args.mask) : undefined,
+    maskConvention: args.convention,
+    layersJson: args.layersJson ? resolvePath(args.layersJson) : undefined,
+    layerSelectors: args.layerSelectors,
+    fill: args.fill,
+    growPx: args.grow,
+    modelAdapter: args.fill === 'plate' || (!args.fill && args.layersJson) ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    prompt: prompt || undefined,
+    count: args.count,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  process.stdout.write(`  ✎ ${join(result.runDir, 'manifest.json').replace(process.cwd(), '.')}\n`)
+
+  if (result.exitCode === 3) process.stderr.write('  ⚠ REVISAR (código 3): el objeto parece seguir ahí en todos los candidatos.\n')
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
   if (command === 'image') return runImage(rest)
+  if (command === 'erase') return runEraseCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }
