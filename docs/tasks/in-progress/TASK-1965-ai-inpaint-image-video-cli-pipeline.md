@@ -379,7 +379,7 @@ Autorización explícita del operador para el gasto de los canarios reales (imag
 
 - Seguimiento de objeto (SAM 2) y motor de video con máscara, tras verificar endpoints y esquema.
 - `ai:omni` como motor de `ai:inpaint video`.
-- `scripts/foto/expandir.mjs` sobre el núcleo de recomposición.
+- `scripts/foto/expandir.mjs` sobre el núcleo de recomposición → tomado por `TASK-1973` (Slice 2), junto con expandir multiformato, capas Layerize, borrar, fondo y detalle.
 - Endpoint de imagen con máscara en fal si el Slice 4 no encuentra uno verificable.
 
 ## Delta 2026-10-02
