@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-051`
-- Status real: `Sin empezar. ADR-025 en Proposed (2026-10-03): empezar sólo cuando el operador la acepte`
+- Status real: `Sin empezar. ADR-025 aceptada por el operador el 2026-10-03; lista para tomar`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -77,7 +77,7 @@ pieza** —un grafo de pasos por toma, cada uno una operación de la taxonomía�
 
 ### Depends on
 
-- Aceptación de ADR-025 por el operador.
+- ADR-025 aceptada (2026-10-03).
 - Los CLIs existentes como ejecutores (`foto:*`, `ai:image`, `ai:fal`, `ai:omni`, `ai:inpaint`); los nuevos de EPIC-051
   se suman como ejecutores cuando existan.
 - **Clasificación desde el primer archivo (acordado con la sesión del pipeline, 2026-10-03):** todo módulo nuevo bajo `scripts/ai/video/` se declara núcleo, orquestación o adaptador desde el primer archivo, para el gate por manifiesto de TASK-1976.
@@ -187,8 +187,7 @@ pieza** —un grafo de pasos por toma, cada uno una operación de la taxonomía�
 
 ### Slice ordering hard rule
 
-1. Esperar la aceptación de ADR-025.
-2. Slices 1–4 sin gasto (con `--dry-run`); Slice 5 con autorización del monto.
+1. ADR-025 aceptada (2026-10-03); Slices 1–4 sin gasto (con `--dry-run`); Slice 5 con autorización del monto.
 
 ### Risk matrix
 
@@ -215,7 +214,7 @@ N/A — no hay runtime de producción. Verificación: pruebas del núcleo, dry-r
 
 ### Out-of-band coordination required
 
-- Aceptación de ADR-025; autorización de gasto para el Slice 5; lista de aprobadores de video.
+- Autorización de gasto para el Slice 5; lista de aprobadores de video.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

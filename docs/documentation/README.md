@@ -18,6 +18,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Clasificación y orquestación de la producción de video con IA](creative-production/clasificacion-y-orquestacion-de-video.md) —
+  cómo se clasifica una pieza (tipo, look, fidelidad, dificultad, operaciones por fase), personas usando producto
+  digital, «propio primero» y el plan con compuertas de ADR-025; complemento del
+  [método de producción de video](creative-production/video-production.md).
 - [Proveedor Higgsfield en Creative Studio](creative-studio/HIGGSFIELD_PROVIDER.md) — superficies de API, SDK,
   CLI, skills, MCP remoto y puentes MCP locales (Blender, Illustrator, Photoshop); estados de adopción y evidencia
   exigida antes de entregar una salida.

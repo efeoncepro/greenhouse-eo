@@ -16,6 +16,9 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de
+  clasificación, camino propio o puente, dificultad por toma, referencias aprobadas antes de generar, motor y
+  presupuesto con reserva; complemento del [manual de producción de video](creative-production/video-production.md).
 - [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,
   ejecución, readback, governance, puentes MCP locales (Blender, Illustrator y Photoshop instalados y conectados
   desde el 2026-09-24; After Effects requiere la app) y CLI `higgsfield` con sesión.

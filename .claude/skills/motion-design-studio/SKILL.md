@@ -86,7 +86,7 @@ evidencia (sólo `edit.zone` tiene canario de garantía al 2026-10-03). Programa
 [anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md): gramática de planos P1–P10, verbos de
 interacción, guion de interfaz con corte en la acción, formatos narrativos y la regla de pantallas del operador
 (la pantalla en escena la renderiza el modelo; la UI exacta va en inserto o flotante).
-**Orquestación de una pieza** (ADR-025, Proposed; runner en TASK-1989): plan declarativo por toma, ejecutores
+**Orquestación de una pieza** (ADR-025, aceptada 2026-10-03; runner en TASK-1989): plan declarativo por toma, ejecutores
 (nuestro CLI, puente de proveedor, persona), compuertas automática/humana/de gasto y ledger con retome; **ningún paso
 generativo corre con una referencia sin aprobación creativa** →
 [arquitectura](../../../docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md).

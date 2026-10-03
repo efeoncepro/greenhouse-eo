@@ -1,9 +1,9 @@
 # ADR-025 — Pipelines de producción de video: plan declarativo por toma, ejecutores y compuertas
 
 - **Decision:** ADR-025
-- **Status:** Proposed (2026-10-03) — pendiente de aceptación del operador; sin runtime
+- **Status:** Accepted (2026-10-03, decisión del operador: «estoy de acuerdo con todo») — sin runtime todavía; implementación en TASK-1989
 - **Date:** 2026-10-03
-- **Deciders:** operador de Efeonce (decide); Claude (propone, sesión «Clasificación de producción de video con IA»)
+- **Deciders:** operador de Efeonce (aceptó el 2026-10-03); Claude (propuso, sesión «Clasificación de producción de video con IA»)
 - **Tags:** creative-production, video, orchestration, cli, graduation
 - **Reversibility:** `two-way` mientras viva en el CLI (plan y ledger en archivos); `two-way-but-slow` al graduar a Globe
 - **Confidence:** alta en la forma (reutiliza patrones ya probados en el repo); media en el formato exacto de recetas

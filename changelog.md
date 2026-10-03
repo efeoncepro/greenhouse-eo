@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-03 — Video con IA: taxonomía, producto e interfaces y pipelines por plan (EPIC-051)
+
+- [Taxonomía de video](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) por fase, tipo, look,
+  dificultad y fidelidad, neutral de motor y con «propio primero, proveedor como puente»; [anexo de producto e
+  interfaces con personas](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md); matriz operación × motor
+  y presupuestos por toma en la guía (§4.3, §7.4).
+- [ADR-025 aceptada](docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md): plan
+  declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
+- EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.
+
 ## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
 
 - Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa

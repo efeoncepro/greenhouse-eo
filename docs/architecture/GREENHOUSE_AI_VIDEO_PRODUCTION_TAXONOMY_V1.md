@@ -8,7 +8,7 @@
 > `design-studio`; método de elección de modelos y costo: `ai-model-selection`)
 > **Programa que la implementa:** [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md)
 > **Anexo:** [producto e interfaces con personas](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md)
-> **Arquitectura de pipelines (ADR-025, Proposed):** [plan declarativo por toma, ejecutores y compuertas](creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md)
+> **Arquitectura de pipelines (ADR-025, Accepted 2026-10-03):** [plan declarativo por toma, ejecutores y compuertas](creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md)
 > **Vista navegable (privada del operador):** https://claude.ai/artifact/SALEjhTyiehiRyXRvoFQzY — fases, tipos, producto e
 > interfaces, calculadora de dificultad y presupuesto, árbol, casos, matriz y huecos. Si difiere de este documento, manda el documento.
 > **Documentación relacionada (no se duplica acá):**

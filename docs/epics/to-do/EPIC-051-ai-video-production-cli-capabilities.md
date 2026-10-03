@@ -72,7 +72,7 @@ puente quede con costo, manifiesto y, donde aplique, la verificación del pipeli
 
 ## Arquitectura
 
-Los pasos de cada pieza se orquestan con el runner de [ADR-025 (Proposed)](../../architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md):
+Los pasos de cada pieza se orquestan con el runner de [ADR-025 (Accepted 2026-10-03)](../../architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md):
 plan declarativo por toma, ejecutores (`cli`, `puente`, `humano`, `local`), compuertas automática, humana y de gasto, y
 ledger append-only. Las demás tasks del epic son **ejecutores** de ese runner: devuelven manifiesto y código 0/2/3/1.
 
