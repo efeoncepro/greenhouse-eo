@@ -249,7 +249,7 @@ export const PERSONAS = {
     // que separa la identidad canónica de la descartada («el más rápido de verificar es el delineado»).
     // Entra como marcador de continuidad con el material aprobado.
     identity:
-      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Her face is a SOFT OVAL, a little wider than it is long from the eyes down: the width across the cheekbones is about 1.2 times the distance from the eyes to the chin — never a narrow, elongated or slimmed face, never a sharpened jaw. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her FACE and HAIR exactly as in the references — her features, not the moment they caught: her head turn, tilt, gaze and expression come from the scene and are never copied from a reference. Only pose, expression, clothing, light and setting change.',
     // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
     // 🔴 El reloj dejó de ser analógico: es un SMARTWATCH **[decisión del operador, 2026-09-21]**. Nexa es
     // tecnológica y sus objetos lo dicen; un reloj de agujas la contradice. Ecosistema completo de props en
@@ -294,12 +294,17 @@ export const PERSONAS = {
     // lado»]: con el rostro en TRES CUARTOS primero, el modelo copiaba también su giro, su inclinación y su media
     // sonrisa (medido en NX5b, NX7d y la vista puesta del traje). La frontal neutra va primero; un ángulo o una
     // expresión pedidos en la ficha se anteponen igual que antes.
+    // 🔴 2026-10-03: la frontal es `-v2`, la aprobada estirada ×1,037 en horizontal (sin modelo). Medida con Vision, la
+    // aprobada daba largo/ancho 0,85 contra 0,81–0,83 del ancla de cuerpo y las portadas aprobadas: puesta primera,
+    // afinaba la cara de toda la serie [operador: «le alarga o achata la cara al ancho, poniéndola excesivamente fina»].
+    // La v2 mide 0,83. La aprobada sigue en disco como histórico. `rostro` declara la proporción para `pnpm foto:rostro`.
     refs: [
-      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png',
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
+    rostro: { largoAncho: 0.83, tolerancia: 0.015 },
     // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
     // la identidad A; no usar `2-angulos/`, que conserva el rostro/ acabado anterior y queda retirado como
     // referencia de identidad. Las vistas que el set no cubre se resuelven con las anclas fotográficas.
@@ -336,23 +341,25 @@ export const PERSONAS = {
       'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
       'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png',
-      // 🔴 2026-10-03: comparten el giro del ancla en tres cuartos, así que NUNCA van primeras (el ancla frontal va antes;
-      // ver `resolverIdentidad`). Se intentó rehacerlas de frente y el operador las rechazó: «se ven muy IA, rasgos muy
-      // ficticios; Nexa debe tener sí o sí rasgos reales». No se rehacen sin un método que conserve la piel de las anclas.
+      // 🔴 2026-10-03: apuntan a `5-expresiones-frente/`, las 12 casi de frente aprobadas por el operador («lo veo bien,
+      // la verdad»). Método A2: el ancla frontal v2 + la CAUSA de la expresión (no músculos), la cabeza libre de hacer su
+      // movimiento natural, intensidad cotidiana, la receta de piel v3 y la geometría del rostro. Un primer intento de
+      // frente estricto con marcadores musculares fue rechazado («se ven muy IA»). Las de `5-expresiones/` (tres cuartos,
+      // todas con el mismo giro) quedan en disco como histórico. La expresión va DETRÁS del ancla (`resolverIdentidad`).
       // Las 12 expresiones FOTOGRÁFICAS de `5-expresiones/` (acabado de las anclas, no sintético). Existían en disco y
       // el catálogo no las conocía: por eso casi toda ficha caía en el gesto por defecto (2026-10-02).
-      carcajada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png',
-      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png',
-      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png',
-      esceptica: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png',
-      pensativa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png',
-      neutra: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png',
-      preocupada: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png',
-      conviccion: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png',
-      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png',
-      curiosa: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png',
-      complicidad: 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png',
-      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png'
+      carcajada: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-01-carcajada.png',
+      'risa-elegante': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-02-risa-elegante.png',
+      sorprendida: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-03-sorprendida.png',
+      esceptica: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-04-esceptica.png',
+      pensativa: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-05-pensativa.png',
+      neutra: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-06-neutra-reposo.png',
+      preocupada: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-07-preocupada.png',
+      conviccion: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-08-conviccion.png',
+      'escucha-empatica': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-09-escucha-empatica.png',
+      curiosa: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-10-curiosa.png',
+      complicidad: 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-11-complicidad.png',
+      'mirada-lateral': 'ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png'
     },
     // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
     // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se
@@ -1511,7 +1518,7 @@ export const CLAVES_DE_REFERENCIA = {
 // sufijos que se combinan con `patron`, no rutas. Si aparece una clave que no está ni aquí ni arriba,
 // el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
 export const CLAVES_SIN_ARCHIVO = {
-  persona: ['etiqueta', 'silueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
+  persona: ['etiqueta', 'silueta', 'rostro', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
   objeto: ['etiqueta', 'aviso', 'instruccion', 'instruccionEnUso', 'acabadoMarca', 'macroEnUso', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
 }
 

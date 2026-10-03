@@ -56,6 +56,15 @@ Julio, no de sus prompts, porque el de perfil se contradice solo y documentarlo 
 
 ### `5-expresiones/` — qué funcionó y qué no **[medido]**
 
+> **Delta 2026-10-03 (b) — expresiones de frente reales y la cara afinada.** El ancla frontal aprobada medía largo/ancho
+> 0,85 contra 0,81–0,83 del ancla de cuerpo y las portadas aprobadas (Vision, `pnpm foto:rostro`): puesta primera, afinaba
+> la cara de toda la serie. `1-anclas/nexa-ancla-1-rostro-frontal-v2.png` es la misma imagen estirada ×1,037 en horizontal
+> (sin modelo) y mide 0,83; es la que usa `foto:prompt`. Las 12 expresiones casi de frente de `5-expresiones-frente/` se
+> hicieron desde esa ancla con el método A2: la CAUSA de la expresión en vez de músculos, la cabeza libre de su
+> movimiento natural, intensidad cotidiana, piel v3 y la geometría «el ancho entre pómulos ≈ 1,2 × ojos→mentón».
+> Aprobadas por el operador («lo veo bien, la verdad»). Un intento previo de frente estricto con marcadores musculares
+> fue rechazado («se ven muy IA»). Corrida: `2026-10-03_nexa-expresiones-piloto/`.
+>
 > **Delta 2026-10-03 — la pose repetida.** Las 12 comparten el tres cuartos del ancla desde la que se editaron, y cuando
 > una ficha pedía `expresion` la imagen entraba PRIMERA: la serie salía con la cara volteada al mismo lado aunque la
 > frase pidiera copiar sólo el gesto. Desde ahora `foto:prompt` pone el ancla frontal primero y la expresión detrás (en

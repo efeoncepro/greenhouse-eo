@@ -314,7 +314,7 @@ conAssets('foto:prompt · identidad', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'conviccion' }] })
 
     expect(r.imagenes[0]).toMatch(/nexa-ancla-1-rostro-frontal/)
-    expect(r.imagenes[1]).toMatch(/5-expresiones\/nexa-expr-08-conviccion/)
+    expect(r.imagenes[1]).toMatch(/5-expresiones-frente\/nexa-expr-08-conviccion/)
     expect(r.prompt).toContain("Image 2 is Nexa's EXPRESSION reference: copy only its facial expression")
   })
 
@@ -1938,5 +1938,19 @@ describe('foto:prompt · selección de la vista puesta (2026-10-03)', () => {
     expect(tapaEnEscena('holding a closed tablet against her chest')).toBe('objeto')
     expect(tapaEnEscena('he raises a coffee cup near his opposite shoulder')).toBe('cruza')
     expect(tapaEnEscena('she walks toward the window')).toBeNull()
+  })
+})
+
+describe('foto:prompt · proporción del rostro de Nexa (2026-10-03)', () => {
+  it('la frontal es la v2 corregida y Nexa declara su proporción para foto:rostro', () => {
+    expect(PERSONAS.nexa.refs[0]).toMatch(/nexa-ancla-1-rostro-frontal-v2\.png$/)
+    expect(PERSONAS.nexa.rostro).toEqual({ largoAncho: 0.83, tolerancia: 0.015 })
+    expect(PERSONAS.nexa.identity).toMatch(/about 1\.2 times the distance from the eyes to the chin/)
+  })
+
+  it('las expresiones de Nexa son las casi frontales', () => {
+    for (const ruta of Object.values(PERSONAS.nexa.expresiones as Record<string, string>).filter(r => r.includes('nexa-expr-'))) {
+      expect(ruta).toMatch(/5-expresiones-frente\//)
+    }
   })
 })

@@ -320,6 +320,7 @@
     "foto:componer": "node scripts/foto/componer.mjs",
     "foto:expandir": "node scripts/foto/expandir.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
+    "foto:rostro": "node scripts/foto/rostro.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",
     "brand:compose": "tsx scripts/brand-surfaces/compose.ts",
     "brand:deck-plan": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/brand-surfaces/deck-plan.ts",

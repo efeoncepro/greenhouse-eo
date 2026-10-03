@@ -38,9 +38,9 @@
       "rol": "persona:julio/espalda",
       "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
     },
-    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png": {
       "rol": "persona:nexa",
-      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
+      "sha256": "2937f1fe3d37383d2e80b74282a8543eb30e161c92c25d98717552ac8a850aa2"
     },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png": {
       "rol": "persona:nexa",
@@ -130,53 +130,53 @@
       "rol": "persona:nexa/mic-drop",
       "sha256": "1e05a848669405bd073522e703786802dbbbf6fd92c5fc4532471804f3b89df9"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-01-carcajada.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-01-carcajada.png": {
       "rol": "persona:nexa/carcajada",
-      "sha256": "5fd4399de4574892d057f89de3f21a8380a6575bb7e93ade4289994a382c51ff"
+      "sha256": "a2baf677d1580aadd02002d61450f40612b661523febcfc9542aeaa13dd83684"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-02-risa-elegante.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-02-risa-elegante.png": {
       "rol": "persona:nexa/risa-elegante",
-      "sha256": "831e80b99050acfde8570b65edde4c9d1a94e191c1950c10f8fb8812a46f190c"
+      "sha256": "85d0aba9bd1a514cf5c544dd36ede859727d3b572f8c8eaec6f0ef4aa24f0c77"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-03-sorprendida.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-03-sorprendida.png": {
       "rol": "persona:nexa/sorprendida",
-      "sha256": "1c7538625cad5e5edc9711a1d94793455ea927827e0b5b5cdb79fe23f57b1c75"
+      "sha256": "3c172a94f7a024130adb398a07fb5ac8573d5fa9d7057156750e02de48403c25"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-04-esceptica.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-04-esceptica.png": {
       "rol": "persona:nexa/esceptica",
-      "sha256": "3aaa187d7d8368f04a948b02200a2ce9d4772c02ff4144374247b704b5678541"
+      "sha256": "db585c35561866a6d60513f807b6f56762f062419c784cf77e2948f2acd86648"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-05-pensativa.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-05-pensativa.png": {
       "rol": "persona:nexa/pensativa",
-      "sha256": "cda951d13cafe543a13c2dd4d72480afe9f7c34c02cb62f31dec488832b4be10"
+      "sha256": "3b7bb83ba81ff340ff7e1309f3d838bb54e39b122c62c83908eb858c911d0c4f"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-06-neutra-reposo.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-06-neutra-reposo.png": {
       "rol": "persona:nexa/neutra",
-      "sha256": "7320c3d72c35811528880cbccd9a2b501eb862e60a90a1db5c2d6e302aeb2ac3"
+      "sha256": "11db091e4262cc91b3b7fb3a3a31732259f34c4cdd5b4b54a1a4024ce0371e3e"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-07-preocupada.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-07-preocupada.png": {
       "rol": "persona:nexa/preocupada",
-      "sha256": "88420ff0009204f657c11997795229c103545e6be5524ef24726c13bb13334b6"
+      "sha256": "181d84888948bc58d35b549a946974c0a77977718493bc2f7508eeff5bd113b1"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-08-conviccion.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-08-conviccion.png": {
       "rol": "persona:nexa/conviccion",
-      "sha256": "aa76d4e6c2a3f76eb746dab9ecd215774221c7794d67fe51b8957b9fb18c620e"
+      "sha256": "72613f246cc9abb8661e7b7bbfe874c6514ce2b19b21c0c80b99db4a9c6bfa0b"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-09-escucha-empatica.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-09-escucha-empatica.png": {
       "rol": "persona:nexa/escucha-empatica",
-      "sha256": "beb65c8a7c80319d27ed936877108adac0a4684315513c269554b5f33d15d97d"
+      "sha256": "2c228bc3057b3be00be206759ba97ec7564f5b2230b36ed7da901902e33520cf"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-10-curiosa.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-10-curiosa.png": {
       "rol": "persona:nexa/curiosa",
-      "sha256": "f81c71927a9bad6017050c56bfe7a986e83ff3bf6889d47c1228380f668a516f"
+      "sha256": "b3a6138f348c91b001d4cf05e8b6c94ef3bd698672b55ed2be5dbd20b813701a"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-11-complicidad.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-11-complicidad.png": {
       "rol": "persona:nexa/complicidad",
-      "sha256": "be98e52eb87c0fede856c4b73821e27a15632617f2423234e9dd419ad40ba2d4"
+      "sha256": "4711963a23ac1262057808ff6592aa48e682ea503137a53a160407120bee44e8"
     },
-    "ai-generations/_identidad-nexa/5-expresiones/nexa-expr-12-mirada-lateral.png": {
+    "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png": {
       "rol": "persona:nexa/mirada-lateral",
-      "sha256": "dbde6448bd8908af60fd3079e9bd3ee00e76196e8818c6f57663ae1c0ebf1667"
+      "sha256": "3ad780587e358a5a16fa090e55e6f410eb78dfb6f5758ea3e7dd5ca1be1a9fa8"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
       "rol": "persona:nexa/prof-1",
