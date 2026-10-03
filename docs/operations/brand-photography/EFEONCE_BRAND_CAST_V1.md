@@ -240,21 +240,23 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    revisa la cara al 100 % antes de usarlos.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
-5. **Registro.** Hoy un personaje de campaña se declara ficha por ficha en `casting`
-   ([personas, delta 2026-10-02](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md#delta-2026-10-02--casting-de-campaña-para-personajes-ficticios)).
-   Para un elenco que vuelve en varias campañas, eso copia la identidad en cada ficha y deriva: se propone un catálogo
-   compartido `ELENCO` en `scripts/foto/build-prompt.mjs`, separado de `PERSONAS` y fuera de `EQUIPO_REAL`, que las
-   fichas pidan en `identidad` y al que se aplique la guarda de vestuario por línea **[propuesta, requiere cambio de
-   código]**.
+5. **Registro [hecho, 2026-10-02].** Catálogo `ELENCO` en `scripts/foto/build-prompt.mjs`, separado de `PERSONAS`
+   (commit `3a05ec0db`). Una ficha lo pide en `identidad` igual que al roster —`["karo"]` o
+   `[{ "persona": "isabella", "vista": "perfil-izq" }]`— y recibe su bloque `IDENTITY`, sus referencias (frente, elegida,
+   cuerpo) y la vista pedida. Las referencias viven en `ai-generations/_identidad-elenco/<clave>/` (con su `LEEME.md`),
+   selladas en `scripts/foto/assets.lock.json` y publicadas al canon `gs://efeonce-creative-canon`. Guardas: un
+   `casting` de ficha no puede usar una clave del elenco; con `linea` declarada el personaje viste la prenda de esa línea
+   y **no puede interpretar otra línea** (Revenue admite HubSpot y Salesforce). Tests de contrato en
+   `scripts/foto/build-prompt.test.ts` (§«elenco de marca»).
 
 ## 8. Estado
 
 | Personaje | Estado |
 |---|---|
-| Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
-| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo: 6 vistas, manos y ancla en alta resolución (`realismo-v3/hum/`). Humberly sigue en el roster sin cambios |
-| Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo (`realismo-v3/isabella/`); revisar la frente del ancla en alta resolución; pendiente la marca de carácter |
-| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia. Set v3 listo (`realismo-v3/karo/`) |
-| Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo (`realismo-v3/antonio/`); revisar la frente del ancla en alta resolución y el 45° derecha |
-| Sophia | **Elegida: candidata B con pelo castaño oscuro** (`sophia/sophia-b-castano.png`, editada desde Karo A) **[aprobada por el operador, 2026-10-02: «Esta queda aprobada para Sophia»]**. Set v3 listo (`realismo-v3/sophia/`) |
-| Catálogo `ELENCO` | Propuesto (§7.5) |
+| Julio | Aprobado (roster). A/B de edad generado (`2026-10-02_elenco-efeonce/julio-edad-ab/`): espera la elección del operador (§6) |
+| Hum | **Elenco listo**: set v3, cuerpo extendido, manos y ancla en alta resolución |
+| Karo | **Elenco listo** |
+| Sophia | **Elenco listo** |
+| Isabella | **Elenco listo**, con su marca de carácter: pecas suaves en nariz y pómulos en todo el set **[criterio de Claude, a pedido del operador «vamos con todas»]**; ancla en alta resolución rehecha sin la frente craquelada |
+| Antonio | **Elenco listo**. Su ancla en alta resolución sigue con la frente rugosa aun rehecha: para primeros planos se usa `antonio-frente.png` (`antonio-ancla-hd-no-usar.png` queda como evidencia) |
+| Catálogo `ELENCO` | Registrado, sellado y publicado (§7.5) |
