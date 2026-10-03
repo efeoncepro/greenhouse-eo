@@ -221,3 +221,32 @@ El video (cuadros clave, piloto y tomas H3) se presupuesta aparte: ≈ USD 16 co
 4. Música: ¿arreglo nuevo desde el material de marca (recomendado) o edición de la pieza del kit?
 5. Destino: ¿orgánico, landing o también pauta? (define loudness y revisión de derechos de música y voz).
 6. URL del cierre (AI Visibility Report / AEO Assessment).
+
+## 11. Producción y cierre (2026-10-03)
+
+**Entregable:** `final/sparks-aeo-60s-1080-es.mp4` (1920×1080, 24 fps, 59,96 s, subtítulos quemados) y
+`final/sparks-aeo-60s-1080-es-sin-subtitulos.mp4`. Audio `audio/master-60s.wav`: −16,0 LUFS integrado,
+−1,0 dBTP, LRA 7,1 LU. Stems en `audio/stems/` (voz, música, SFX, premaster). Subtítulos laterales
+`SUBTITULOS.es.srt` (diálogo) y `SUBTITULOS.es.sdh.srt` (con descriptores de sonido).
+
+**Locución.** Voz «Andre – Clear Studio Voiceover Narration» (`K7vlllngMGapgRQRDsqK`, es-latam) con
+`eleven_v4` y etiquetas de interpretación (`[curious]`, `[excited]`, `[warmly]`, `[dramatically]`), vía el
+conector ElevenLabs Creative (flow «Sparks × AEO · locución 60 s»). Dos tomas por línea; se montó la t1 de
+cada una por calce de tiempo (`audio/vo/montaje-vo.py`). La elección es **por medición, no por escucha**:
+falta la revisión de oído del operador; las t2 están en `audio/vo/tomas/` para reemplazar sin regenerar.
+El llamado a la acción de S10 va a tempo 1,04 para cerrar antes del final.
+
+**Mezcla** (`audio/mezcla-final.py`): voz +7 dB con compresión suave; cama −5 dB con ducking por la voz
+(sidechain 6:1); bus SFX −1 dB; reveal de marca a 55,4 s con ducking leve. Balance medido: con voz, la mezcla
+está a 0,3–0,9 dB de la voz sola (música y SFX ~10 dB debajo); en S2 y S8 la música sube.
+
+**Gasto medido.** fal (H3, tomas y pilotos): USD 4,38. Keyframes GPT Image: dentro de lo autorizado.
+ElevenLabs: el estimado decía 71 créditos por toma corta (~USD 0,016); el run reportó 0 créditos por
+generación. Higgsfield: créditos de casting de voz. Total bajo el tope de ~USD 8.
+
+**Lecciones que valen para la próxima.**
+- H3 base con `--prompt-expansion disabled` es más fiel que H3 Max (Max gira los Sparks en 3D).
+- Cuadro inicial y final deben compartir el eje de cámara, o la toma salta.
+- El prompt de video debe prohibir texto en pantalla (si no, aparece texto ilegible) y fijar la paleta.
+- Tope de 15 s por request en fal y Higgsfield (verificado): las escenas cortas son límite, no preferencia.
+- Sin ASR local no hay verificación automática del texto dicho; dejar la revisión de oído como paso explícito.
