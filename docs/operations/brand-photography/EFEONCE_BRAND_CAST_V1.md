@@ -212,6 +212,20 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
    referencia, solo para la dirección (`<clave>-45-der-v2.png`). (b) El cuerpo entero sale bien por edición desde un
    retrato si el prompt fija la proporción (cabeza ≈ 13 % de la altura, 85 mm a 7 m); el fallo de Humberly venía de
    una referencia de medio cuerpo con la cara muy grande en cuadro.
+   **Realismo v3 en todo el elenco [decisión del operador, 2026-10-02: «Nexa empezó a salir bien cuando hicimos sus
+   pruebas de rostro real, manos, cabello; necesito todas con más realismo»].** Se aplica la receta v3 de Nexa
+   (`ai-generations/_identidad-nexa/LEEME.md`): la textura sale **sólo de poros irregulares y vello fino**, con tono
+   parejo, piel sana y luminosa, sin rojeces, manchas ni ojeras, y la misma edad aparente. Para el elenco se suma pelo
+   con mechones reales, manos reales y barba con pelos individuales. Se aplica **por edición, al mismo tamaño de la
+   fuente**, sobre la foto elegida y las seis vistas; y cada personaje suma un **ancla de manos** y un **ancla de rostro
+   en alta resolución** (`quality max`), igual que Nexa. Piloto con Sophia: al 100 % aparecieron poros, pecas suaves y
+   vello fino, sin cambiar la cara. Prompts y salidas en `ai-generations/2026-10-02_elenco-efeonce/realismo-v3/`
+   (`acabado-v3-elenco.txt`, `manos.txt`). **Las versiones v3 reemplazan a las anteriores como referencia.**
+   Resultado **[medido, 2026-10-02]**: 40 imágenes v3 (elegida + 6 vistas + manos × 5) y 5 anclas `max`
+   (`<clave>-ancla-hd.png`, 2560×3200; Hum 2048×3072 por ser 2:3), ≈ USD 4,7. Las v3 sostienen la identidad. En las
+   anclas de **Antonio e Isabella** la frente sale con una **textura craquelada inventada** al 100 %, el riesgo que el
+   LEEME de Nexa anota para la alta resolución: antes de usarlas en un primer plano se miran al 100 % y, si molesta, se
+   rehacen o se usa la v3 de 1024 como ancla.
 4. **Control de identidad.** Tres escenas con 35, 85 y 200 mm, más las pruebas de §5. Se revisa al zoom, al lado del
    set.
 5. **Registro.** Hoy un personaje de campaña se declara ficha por ficha en `casting`
@@ -226,9 +240,9 @@ gana el texto nuevo, se cambia en `PERSONAS` y en el canon §3.6 en el mismo com
 | Personaje | Estado |
 |---|---|
 | Julio | Aprobado (roster). Pendiente el A/B de edad (§6) |
-| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/hum/`). Humberly sigue en el roster sin cambios |
-| Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/isabella/`); pendiente la marca de carácter |
-| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia. Set de 6 vistas listo (`sets/karo/`) |
-| Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Set de 6 vistas listo (`sets/antonio/`); revisar al zoom el 45° derecha |
-| Sophia | **Elegida: candidata B con pelo castaño oscuro** (`sophia/sophia-b-castano.png`, editada desde Karo A) **[aprobada por el operador, 2026-10-02: «Esta queda aprobada para Sophia»]**. Set de 6 vistas listo (`sets/sophia/`) |
+| Hum | **Elegida: candidata B** (`hum/hum-b.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo: 6 vistas, manos y ancla en alta resolución (`realismo-v3/hum/`). Humberly sigue en el roster sin cambios |
+| Isabella | **Elegida: candidata D de la ronda 2** (`ronda-2/isabella-d.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo (`realismo-v3/isabella/`); revisar la frente del ancla en alta resolución; pendiente la marca de carácter |
+| Karo | **Elegida: candidata A de la ronda 2** (`ronda-2/karo-a.png`) **[decisión del operador, 2026-10-02]**; reemplaza a la favorita previa (B de la ronda 1). Base de Sophia. Set v3 listo (`realismo-v3/karo/`) |
+| Antonio | **Elegido: candidato D de la ronda 2** (`ronda-2/antonio-d.png`) **[decisión del operador, 2026-10-02]**. Set v3 listo (`realismo-v3/antonio/`); revisar la frente del ancla en alta resolución y el 45° derecha |
+| Sophia | **Elegida: candidata B con pelo castaño oscuro** (`sophia/sophia-b-castano.png`, editada desde Karo A) **[aprobada por el operador, 2026-10-02: «Esta queda aprobada para Sophia»]**. Set v3 listo (`realismo-v3/sophia/`) |
 | Catálogo `ELENCO` | Propuesto (§7.5) |
