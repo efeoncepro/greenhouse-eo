@@ -122,10 +122,14 @@ pnpm ai:inpaint expand --image escena-1x1.png --canvas 2048x1072 --scale 0.8 --a
   los bordes que dan al area nueva. El interior de la escena queda en delta 0.
 - El area nueva se rellena antes con **espejo de los bordes** (`--prefill mirror`); un relleno solido invita al modelo a
   inventar un panel.
-- **Flare reencuadra al expandir** (medido 2026-10-03, 9:16 y 1,91:1): achica la escena (escala 0,88–0,90) en vez de
-  continuarla, y al pegar la original queda una costura. El comando lo detecta y sale con codigo 3: **no uses ese
-  resultado**. La alternativa es un modelo de relleno puro, que sale al tamano de la entrada y respeta la mascara:
-  `--adapter fal:flux-pro-fill` (≈ USD 0,05 por megapixel; su canario en expansion esta pendiente).
+- **Modelo: Flux Fill por defecto** (`fal:flux-pro-fill`, ≈ USD 0,05 por megapixel: 1,91:1 ≈ 0,10 y 9:16 ≈ 0,15).
+  Es un modelo de relleno puro: sale al tamano de la entrada y continua la escena. Canario del 2026-10-03, misma foto y
+  prompt: Flux continuo mesa, ventana y techo sin costura en 1,91:1 y 9:16; **Flare** achico la escena (escala
+  0,88–0,90) y **Sunburst** copio el relleno en espejo como contenido (ventana y canto de mesa reflejados). Si eliges un
+  modelo de OpenAI, el comando avisa.
+- Flux genera el area nueva a menor resolucion en lienzos grandes (9:16 de 1536×2730 → 1088×1904) y la escala; la
+  escena original conserva la suya. Puede **inventar elementos** en el area nueva (en el 9:16 agrego una banca): si
+  molesta, describe en el prompt que hay alrededor y repite.
 - `pnpm foto:expandir` sigue existiendo para el flujo de marca de CMP-004; su migracion a este nucleo esta pendiente
   (TASK-1973, Slice 2).
 

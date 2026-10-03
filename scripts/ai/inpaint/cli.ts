@@ -14,7 +14,7 @@ import { MASK_CONVENTIONS, type MaskConvention } from './mask'
 import { runBackground } from './background'
 import { runErase } from './erase'
 import type { ExpandAnchor } from './expand'
-import { runExpand } from './expand-run'
+import { EXPAND_DEFAULT_ADAPTER, runExpand } from './expand-run'
 import { runMove } from './move'
 import { runPlace } from './place'
 import { runImageInpaint } from './pipeline-image'
@@ -524,6 +524,10 @@ Agranda el lienzo, ubica la escena y deja editable sólo el área nueva más una
 a ella; la escena queda en delta 0 (verificado). El área nueva se rellena antes con espejo de los bordes (--prefill
 mirror, default; neutral = su color medio): un relleno sólido invita al modelo a inventar un panel.
 
+Modelo: Flux Fill (fal:flux-pro-fill) por defecto, ≈ USD 0,05 por megapixel. Es un modelo de relleno puro: sale al
+tamaño de la entrada y continúa la escena. GPT Image NO sirve para expandir (canario 2026-10-03): Flare achica la
+escena (escala 0,88–0,90) y Sunburst copia el relleno en espejo como contenido; los dos dejan costura.
+
   --to 4:5|9:16|1:1|1.91:1|16:9|3:4|2:3|3:2   Formato destino (el lienzo crece en un solo eje)
   --canvas WxH               Lienzo explícito (en vez de --to)
   --scale <0,3–1>            Achica la escena dentro del lienzo (zoom out; la escena se re-muestrea)
@@ -557,7 +561,7 @@ const runExpandCli = async (argv: string[]): Promise<number> => {
     fill: args.prefill,
     blend: args.blend,
     prompt,
-    adapter: resolveImageAdapter(args.adapter),
+    adapter: resolveImageAdapter(args.adapter ?? (args.model?.startsWith('gpt-image') ? 'openai' : EXPAND_DEFAULT_ADAPTER)),
     model: args.model,
     quality: args.quality,
     providerMask: args.providerMask,

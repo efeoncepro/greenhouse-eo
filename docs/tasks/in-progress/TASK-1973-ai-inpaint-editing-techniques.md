@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete local 2026-10-03 (Slices 1, 3–8 + place; commits fd7e17c4b…8fb2a9efe en develop, sin push; 106 pruebas). Canario real 2026-10-03 (≈ USD 0,18): capas, borrar, mover, place, fondo y detalle PASS; expand con Flare reencuadra (código 3). Pendiente: expand con Flux Fill y erase --fill model (gasto aparte), Slice 2 (WIP ajeno en foto:expandir)`
+- Status real: `Code complete local 2026-10-03 (Slices 1, 3–8 + place; commits fd7e17c4b…8fb2a9efe en develop, sin push; 106 pruebas). Canario real 2026-10-03 (≈ USD 0,47): capas, borrar, mover, place, fondo, detalle y expand (Flux Fill, default) PASS. Pendiente: erase --fill model (gasto aparte), Slice 2 (WIP ajeno en foto:expandir)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -307,7 +307,7 @@ Slice 2 no es limpia, la delegación no se mergea y el comando sigue con su reco
 
 ## Acceptance Criteria
 
-- [ ] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1. — la escena queda en delta 0 (PASS en los dos formatos), pero **Flare reencuadró** (escala 0,88–0,90) y el detector sale con código 3: el resultado no es usable. Falta repetir con un modelo de relleno puro (`--adapter fal:flux-pro-fill`, ≈ USD 0,35 los dos formatos), que requiere autorización de gasto aparte.
+- [x] `pnpm ai:inpaint expand --to <formato>` entrega el lienzo destino con la foto original en delta 0 fuera de la franja de fundido, verificado en canario real a 9:16 y a 1,91:1. — canario 2026-10-03 con Flux Fill (ahora default): PASS y código 0 en los dos formatos, uniones limpias al 100 % (`inpaint/06eb30b0034d`, `inpaint/df9cfdbda52e`). Flare (escala 0,88–0,90) y Sunburst (copia el espejo) quedan descartados para expandir, con aviso en el comando.
 - [ ] `pnpm foto:expandir` conserva flags y salidas; su recomposición vive en el núcleo y la regresión contra dos horizontales aprobadas de CMP-004 está documentada. — **pendiente**: `scripts/foto/expandir.mjs` tiene WIP sin commitear de otra sesión (2026-10-03); requiere coordinación con CMP-004.
 - [x] `pnpm ai:layers` separa una pieza, guarda capas, `layers.json` y clean plate con caché por hash, y registra el costo real. — canario real 2026-10-03 (`ai-generations/2026-10-03_task-1973-canary/README.md`): 3 capas + base, USD 0,101 registrado en `layers.json`; pruebas simuladas en `layers.test.ts`.
 - [x] `pnpm ai:mask --from-layer` produce una máscara canónica desde una capa con nombre, y la edición resultante deja el resto de la ORIGINAL en delta 0. — `layers.test.ts` (alfa ubicado con su caja y reescalado de base 400×200 a original 800×400, unión de capas) + `erase.test.ts`/`move.test.ts` (resto en delta 0).

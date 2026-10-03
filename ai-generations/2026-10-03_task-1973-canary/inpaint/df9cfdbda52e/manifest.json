@@ -1,0 +1,143 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "df9cfdbda52e",
+  "key": "df9cfdbda52e1ebac48f2555b79f20fb05e21bc56d2f3137c936874508c6ac83",
+  "status": "completed",
+  "createdAt": "2026-10-03T09:46:06.946Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-canvas.png",
+    "imageSha256": "90854c716fc77959d70ed650ec78bbea6a18c7de19ecce5a28932096c5cf97c2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/expand-inputs/bfb5acc8854d-mask.png",
+    "maskSha256": "0d00f89dc25b184459f5cfe044b019d314f7f341975776b70f4ed1870add720e",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 2730,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "the same quiet room continues: the grey plaster wall and ceiling above, the window light from the right, the oak table and its legs below, a plain floor",
+    "providerPrompt": "the same quiet room continues: the grey plaster wall and ceiling above, the window light from the right, the oak table and its legs below, a plain floor Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.6424908424908425,
+    "editable": 2623488,
+    "soft": 70656,
+    "protected": 1499136
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 2730
+    },
+    "target": {
+      "width": 1088,
+      "height": 1904
+    },
+    "aspectError": 0.01538461538461533,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 47.357,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.13,
+        "bestError": 1.13,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1499136,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 2623488,
+        "maxDelta": 230,
+        "meanDelta": 48.598,
+        "worst": {
+          "x": 1533,
+          "y": 2539
+        }
+      },
+      "seam": {
+        "pixels": 70656,
+        "maxDelta": 49,
+        "meanDelta": 1.269,
+        "worst": {
+          "x": 1376,
+          "y": 854
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1499136,
+        "maxDelta": 82,
+        "meanDelta": 3.248,
+        "worst": {
+          "x": 1151,
+          "y": 1374
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a10128-3257-78d1-a96d-f8ff30d35b75",
+        "account": "FAL_API_KEY_B",
+        "seed": 1976999528
+      }
+    }
+  ],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-03_task-1973-canary/base.png",
+    "sourceSha256": "69afa01a78f40b7f4997b07449e4bfd5487877c6abb71f301d6e87f5a81defa7",
+    "to": "9:16",
+    "plan": {
+      "canvas": {
+        "width": 1536,
+        "height": 2730
+      },
+      "scene": {
+        "left": 0,
+        "top": 853,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 24
+  }
+}

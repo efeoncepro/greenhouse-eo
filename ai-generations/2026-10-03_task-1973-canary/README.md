@@ -1,6 +1,6 @@
 # Canario real TASK-1973 — capas, borrar, mover, incorporar, fondo, detalle y expandir
 
-> 2026-10-03 · Claude · gasto autorizado por el operador (≈ USD 0,20) · gasto real ≈ USD 0,18
+> 2026-10-03 · Claude · gasto autorizado por el operador en dos tandas · gasto real ≈ USD 0,47 (0,18 + 0,29 de la comparación de expansión)
 > Foto: `base.png` (copia de `2026-10-02_task-1965-canary/base.png`, 1536×1024: mesa de roble, taza, cuaderno, ventana).
 
 ## Resultado por técnica
@@ -29,9 +29,17 @@
 4. **`--layer "mug"` coincidía con las tres capas**: Layerize describe cada capa citando a las demás. El nombre gana;
    la descripción sólo si ningún nombre coincide.
 
+## Comparación de modelos para expandir (segunda tanda)
+
+| Modelo | Formato | Veredicto | Costo | Qué se vio |
+|---|---|---|---|---|
+| Flux Fill (`fal:flux-pro-fill`) | 1,91:1 | ✓ PASS, código 0 | 0,100 | Mesa, ventana y alféizar continúan; uniones invisibles al 100 % (`inpaint/06eb30b0034d/`) |
+| Sunburst `high`, sin máscara + guía | 1,91:1 | ⚠ código 3 | 0,036 | Copió el relleno en espejo como contenido: ventana en V y canto de mesa reflejados (`inpaint/333fe6146ca2/`) |
+| Flux Fill | 9:16 | ✓ PASS, código 0 | 0,150 | Techo inclinado, ventana y patas coherentes; generado a 1088×1904 y escalado; **inventó una banca** en primer plano (`inpaint/df9cfdbda52e/`) |
+
+Decisión: Flux Fill es el default de `expand` (`EXPAND_DEFAULT_ADAPTER`); elegir un modelo de OpenAI avisa.
+
 ## Pendiente
 
-- **Expandir con un modelo de relleno puro** (Flux Fill, `--adapter fal:flux-pro-fill`): sale al tamaño de la
-  entrada y respeta la máscara, así que no puede reencuadrar. Costo estimado: ≈ USD 0,10 (1,91:1) y ≈ 0,25 (9:16).
-  Requiere autorización de gasto aparte.
+- `erase --fill model` en vivo (≈ USD 0,01).
 - `foto:expandir` delegando en el núcleo (Slice 2): WIP de otra sesión en `scripts/foto/expandir.mjs`.

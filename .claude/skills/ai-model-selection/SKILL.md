@@ -129,8 +129,9 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **Layerize cobra por capa y el número lo decide el modelo** (USD 0,034–0,0675 por capa). `pnpm ai:layers`
   estima con la cota de 16 capas + base y registra lo real: presupuesta por la cota, no por las capas que esperas.
   Una foto simple da pocas (mesa con taza y cuaderno: 3 capas, ≈ USD 0,10, 2026-10-03).
-- 🔴 **Para expandir, no uses Flare**: reencuadra la escena (escala 0,88–0,90, medido 2026-10-03) y al pegar la
-  original queda costura. Un modelo de relleno puro (`fal:flux-pro-fill`) sale al tamaño de la entrada.
+- 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
+  (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
+  (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
 
 ## 3. Quién decide qué (boundaries)
 

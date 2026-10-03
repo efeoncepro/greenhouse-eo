@@ -41,8 +41,20 @@ export interface ExpandResult extends ImageInpaintResult {
 export const DEFAULT_EXPAND_PROMPT_SUFFIX =
   'Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos.'
 
+/**
+ * Adaptador por defecto para expandir: un modelo de relleno puro. Canario real del 2026-10-03 (1,91:1, misma foto y
+ * prompt): Flux Fill continuó mesa y ventana sin costura; Flare achicó la escena (escala 0,88–0,90) y Sunburst copió
+ * el relleno en espejo como contenido (ventana y canto de mesa reflejados). Los dos de OpenAI dejaron costura.
+ */
+export const EXPAND_DEFAULT_ADAPTER = 'fal:flux-pro-fill'
+
 export const runExpand = async (options: ExpandOptions): Promise<ExpandResult> => {
   const log = options.log ?? (line => process.stdout.write(`${line}\n`))
+
+  if (options.adapter.provider === 'openai') {
+    log('  ⚠ GPT Image no sirve para expandir: Flare reencuadra la escena y Sunburst copia el relleno en espejo (canario 2026-10-03). Usa el default (--adapter fal:flux-pro-fill).')
+  }
+
   const source = await loadRgba(options.imagePath, 'escena')
   const plan = planExpansion({ sourceWidth: source.width, sourceHeight: source.height, to: options.to, canvas: options.canvas, scale: options.scale, anchor: options.anchor })
   const blend = options.blend ?? 24
