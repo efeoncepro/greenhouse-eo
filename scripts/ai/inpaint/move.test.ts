@@ -11,6 +11,7 @@ import { loadRgba } from './raw'
 vi.mock('server-only', () => ({}))
 
 const { runMove } = await import('./move')
+const { runPlace } = await import('./place')
 
 const W = 400
 const H = 300
@@ -70,5 +71,42 @@ describe('pnpm ai:inpaint move', () => {
   it('rechaza no moverse y una escala absurda', async () => {
     await expect(runMove({ imagePath: image, layersJson, layerSelectors: ['box'], harmonize: 'off', runRoot: join(dir, 'x'), log: () => undefined })).rejects.toThrow(/no se mueve/)
     await expect(runMove({ imagePath: image, layersJson, layerSelectors: ['box'], scale: 9, harmonize: 'off', runRoot: join(dir, 'x'), log: () => undefined })).rejects.toThrow(/--scale/)
+  })
+})
+
+describe('pnpm ai:inpaint place', () => {
+  it('incorpora el elemento en OTRA imagen con píxeles del origen y deja el destino idéntico fuera de lo pegado', async () => {
+    const target = join(dir, 'destino.png')
+
+    await writeFile(target, await sharp({ create: { width: 600, height: 400, channels: 3, background: { r: 20, g: 120, b: 40 } } }).png().toBuffer())
+
+    const result = await runPlace({
+      imagePath: target,
+      sourceImagePath: image,
+      layersJson,
+      layerSelectors: ['box'],
+      at: { x: 0.5, y: 0.5 },
+      width: 0.2,
+      finish: 'off',
+      runRoot: join(dir, 'run-place'),
+      log: () => undefined
+    })
+
+    const final = await loadRgba(result.final)
+    const px = (x: number, y: number) => Array.from(final.data.slice((y * 600 + x) * 4, (y * 600 + x) * 4 + 3))
+
+    expect(result.verdict).toBe('PASS')
+    expect(px(300, 200)).toEqual([40, 90, 200]) // el color del ORIGEN, no el rojo de la capa
+    expect(px(20, 20)).toEqual([20, 120, 40]) // el destino intacto
+    // 0.2 × 600 = 120 px de ancho; el alto conserva la proporción 80:60
+    expect(px(300 - 58, 200)).toEqual([40, 90, 200])
+    expect(px(300 - 63, 200)).toEqual([20, 120, 40])
+  })
+
+  it('valida --at y --width', async () => {
+    const base = { imagePath: image, sourceImagePath: image, layersJson, layerSelectors: ['box'], finish: 'off' as const, runRoot: join(dir, 'x'), log: () => undefined }
+
+    await expect(runPlace({ ...base, at: { x: 1.4, y: 0.5 } })).rejects.toThrow(/--at/)
+    await expect(runPlace({ ...base, at: { x: 0.5, y: 0.5 }, width: 2 })).rejects.toThrow(/--width/)
   })
 })

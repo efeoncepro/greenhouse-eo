@@ -234,7 +234,7 @@ export const runImageInpaint = async (options: ImageInpaintOptions): Promise<Ima
 
   if (baseMeta.icc) log('  ⚠ la base trae perfil ICC: la salida queda en sRGB (la verificación compara en sRGB).')
   if (!adapter.verifiedAt) log(`  ⚠ ${adapter.id}: contrato verificado, generación real SIN verificar todavía.`)
-  if (!adapter.sendsMask) log(`  · ${adapter.id} edita por instrucción: la máscara no viaja, sólo recompone.`)
+  if (!maskWillTravel) log(`  · ${adapter.id} edita por instrucción: la máscara no viaja, sólo recompone.`)
 
   if (options.zoneResolution !== undefined && !(options.zoneResolution >= 512 && options.zoneResolution <= 4096)) {
     throw new Error('--zone-resolution debe estar entre 512 y 4096 px.')

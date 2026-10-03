@@ -210,7 +210,7 @@ export const maskFromSubject = async (
  * Transformada de distancia euclidiana al cuadrado (Felzenszwalb y Huttenlocher), O(n): dilatar y erosionar con
  * radios grandes sobre piezas de 8 MP sin un filtro O(n·r).
  */
-const squaredDistanceTransform = (width: number, height: number, isSeed: (index: number) => boolean): Float64Array => {
+export const squaredDistanceTransform = (width: number, height: number, isSeed: (index: number) => boolean): Float64Array => {
   const INF = 1e20
   const grid = new Float64Array(width * height)
 

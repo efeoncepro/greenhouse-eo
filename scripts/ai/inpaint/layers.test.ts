@@ -5,8 +5,9 @@ import { join } from 'node:path'
 import sharp from 'sharp'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { bboxTag, describeLayers, layerFileName, maskFromLayers, readLayersDocument, selectLayers, type LayersDocument } from './layers'
+import { bboxTag, describeLayers, layerFileName, maskFromLayers, plateWithoutLayers, readLayersDocument, selectLayers, type LayersDocument } from './layers'
 import { maskStats } from './mask'
+import { loadRgba } from './raw'
 
 vi.mock('server-only', () => ({}))
 
@@ -68,6 +69,25 @@ describe('selección de capas', () => {
     expect(selectLayers(doc, ['ceramic'])[0].index).toBe(1) // también busca en la descripción
   })
 
+  it('el nombre gana sobre la descripción (Layerize describe cada capa citando a las demás)', () => {
+    const doc: LayersDocument = {
+      kind: 'ai-layers',
+      version: 1,
+      source: { image: 'x', sha256: 'x', width: 10, height: 10 },
+      base: { file: 'b.png', width: 10, height: 10 },
+      layers: [
+        { index: 1, zIndex: 1, name: 'Oak table', description: 'A table holding a mug and a notebook', file: '1.png', width: 1, height: 1, box: { left: 0, top: 0, right: 1, bottom: 1 }, alphaCoverage: 1 },
+        { index: 2, zIndex: 2, name: 'White mug', description: 'A mug on the table', file: '2.png', width: 1, height: 1, box: { left: 0, top: 0, right: 1, bottom: 1 }, alphaCoverage: 1 }
+      ],
+      request: { prompt: null, imageSize: 'auto' },
+      cost: { layerCount: 2, perLayerUsd: null, estimatedUsd: null, note: '' },
+      providerMeta: {}
+    }
+
+    expect(selectLayers(doc, ['mug'])[0].index).toBe(2)
+    expect(selectLayers(doc, ['holding'])[0].index).toBe(1)
+  })
+
   it('rechaza lo ambiguo, lo inexistente y la base', async () => {
     const doc = await readLayersDocument(layersJson)
 
@@ -98,6 +118,18 @@ describe('máscara desde capa', () => {
     const mug = await maskFromLayers(layersJson, ['#1'], { width: 800, height: 400 })
 
     expect(maskStats(both).editable).toBeGreaterThan(maskStats(mug).editable)
+  })
+})
+
+describe('clean plate sin las capas elegidas', () => {
+  it('recompone las demás capas sobre la base: borrar la taza no se lleva el cuaderno (ni la mesa)', async () => {
+    const doc = await readLayersDocument(layersJson)
+    const plate = await loadRgba(await plateWithoutLayers(layersJson, doc, selectLayers(doc, ['white mug']), { width: 800, height: 400 }))
+    const at = (x: number, y: number) => plate.data[(y * 800 + x) * 4]
+
+    expect([plate.width, plate.height]).toEqual([800, 400])
+    expect(at(580, 140)).toBeLessThan(150) // donde estaba la taza: la base gris
+    expect(at(620, 280)).toBeGreaterThan(240) // el cuaderno sigue ahí, recompuesto desde su capa
   })
 })
 

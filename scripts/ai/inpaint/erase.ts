@@ -4,12 +4,12 @@ import sharp from 'sharp'
 
 import type { InpaintImageAdapter } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
-import { cleanPlatePath, maskFromLayers, readLayersDocument, selectLayers } from './layers'
-import { encodeMaskPng, loadMask, type MaskConvention } from './mask'
+import { maskFromLayers, otherObjectsMask, plateWithoutLayers, readLayersDocument, selectLayers } from './layers'
+import { encodeMaskPng, intersect, invert, loadMask, type MaskConvention } from './mask'
 import { runImageInpaint, type ImageInpaintResult } from './pipeline-image'
 import { loadRgba } from './raw'
 import { readJson, sha256, writeFileEnsured, writeJson } from './run-io'
-import { createPlateAdapter, ERASE_DEFAULT_PROMPT, loadPlateAtSize, measureErasure, prepareEraseMask, type ErasureReport } from './techniques'
+import { createPlateAdapter, detectCastShadow, ERASE_DEFAULT_PROMPT, measureErasure, prepareEraseMask, withCastShadow, type ErasureReport } from './techniques'
 
 /**
  * `pnpm ai:inpaint erase` (TASK-1973, Slice 4): borra un objeto.
@@ -28,6 +28,8 @@ export interface EraseOptions {
   layerSelectors?: string[]
   fill?: 'plate' | 'model'
   growPx?: number
+  /** Incluir la sombra proyectada medida contra el clean plate (sólo con capas). Default `auto`. */
+  shadow?: 'auto' | 'off'
   modelAdapter?: InpaintImageAdapter
   model?: string
   quality?: string
@@ -58,17 +60,36 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
   if (fill === 'plate' && !options.layersJson) throw new Error('--fill plate necesita --layers (el clean plate sale de pnpm ai:layers).')
 
   let maskPath = options.maskPath
+  let shadowReport: { pixels: number; meanDarkening: number } | null = null
+  const doc = options.layersJson ? await readLayersDocument(options.layersJson) : null
+  const selectors = options.layerSelectors ?? []
+  const erased = doc ? selectLayers(doc, selectors) : []
+  // La escena sin los elementos borrados: base + las demás capas. Sirve de relleno y de referencia para medir la sombra.
+  const platePng = doc ? await plateWithoutLayers(options.layersJson!, doc, erased, { width: meta.width, height: meta.height }) : null
 
   if (!maskPath) {
-    const doc = await readLayersDocument(options.layersJson!)
-    const selectors = options.layerSelectors ?? []
-
     if (!selectors.length) throw new Error('--layers necesita al menos un --layer <nombre|#índice>.')
 
     // Un logo o una marca no se borra ni se reconstruye con IA.
-    for (const layer of selectLayers(doc, selectors)) assertBrandSafePrompt(`${layer.name ?? ''} ${layer.description ?? ''}`, Boolean(options.allowBrand))
+    for (const layer of erased) assertBrandSafePrompt(`${layer.name ?? ''} ${layer.description ?? ''}`, Boolean(options.allowBrand))
 
-    const derived = await prepareEraseMask(await maskFromLayers(options.layersJson!, selectors, { width: meta.width, height: meta.height }), options.growPx ?? 16)
+    let objectMask = await maskFromLayers(options.layersJson!, selectors, { width: meta.width, height: meta.height })
+    const others = await otherObjectsMask(options.layersJson!, doc!, erased, { width: meta.width, height: meta.height })
+
+    if ((options.shadow ?? 'auto') === 'auto') {
+      const shadow = detectCastShadow(await loadRgba(options.imagePath), await loadRgba(platePng!), objectMask, { others })
+
+      shadowReport = { pixels: shadow.pixels, meanDarkening: shadow.meanDarkening }
+      objectMask = withCastShadow(objectMask, shadow)
+      log(
+        shadow.pixels
+          ? `  ◐ sombra proyectada incluida: ${shadow.pixels} px, ${shadow.meanDarkening} niveles más oscura que el plate (--shadow off para dejarla)`
+          : '  · sin sombra proyectada medible junto al objeto'
+      )
+    }
+
+    // El agrandado nunca pisa a otro objeto de la escena.
+    const derived = intersect(await prepareEraseMask(objectMask, options.growPx ?? 16), invert(others))
     const png = await encodeMaskPng(derived)
 
     maskPath = join(options.runRoot, 'erase-masks', `${sha256(png).slice(0, 12)}.png`)
@@ -79,15 +100,8 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
   let adapter: InpaintImageAdapter
 
   if (fill === 'plate') {
-    const doc = await readLayersDocument(options.layersJson!)
-
-    adapter = createPlateAdapter({
-      png: await loadPlateAtSize(cleanPlatePath(options.layersJson!, doc), meta.width, meta.height),
-      width: meta.width,
-      height: meta.height,
-      source: doc.base.file
-    })
-    log('  ◫ relleno: clean plate de Layerize (sin proveedor, sin gasto)')
+    adapter = createPlateAdapter({ png: platePng!, width: meta.width, height: meta.height, source: `${doc!.base.file} + capas restantes` })
+    log(`  ◫ relleno: clean plate de Layerize sin ${erased.map(layer => `#${layer.index}`).join(', ') || 'ninguna capa'} (base + las demás capas; sin proveedor, sin gasto)`)
   } else {
     if (!options.modelAdapter) throw new Error('--fill model necesita un adaptador de imagen.')
     adapter = options.modelAdapter
@@ -131,7 +145,7 @@ export const runErase = async (options: EraseOptions): Promise<EraseResult> => {
   const manifestPath = join(result.runDir, 'manifest.json')
   const manifest = await readJson<Record<string, unknown>>(manifestPath)
 
-  if (manifest) await writeJson(manifestPath, { ...manifest, erase: { fill, layers: options.layerSelectors ?? null, erasure } })
+  if (manifest) await writeJson(manifestPath, { ...manifest, erase: { fill, layers: options.layerSelectors ?? null, shadow: shadowReport, erasure } })
 
   const exitCode = result.exitCode === 0 && erasure.length && erasure.every(report => report.residueSuspected) ? 3 : result.exitCode
 

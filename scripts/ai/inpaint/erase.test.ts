@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { InpaintImageAdapter } from './adapters/types'
 import { pickGridSize } from './crop'
-import { encodeMaskPng, maskFromRect } from './mask'
+import { createMask, encodeMaskPng, maskFromRect } from './mask'
 import type { LayersDocument } from './layers'
 import { loadRgba } from './raw'
 import { verifyRecomposition } from './recompose'
@@ -15,6 +15,7 @@ import { verifyRecomposition } from './recompose'
 vi.mock('server-only', () => ({}))
 
 const { runErase } = await import('./erase')
+const { detectCastShadow } = await import('./techniques')
 
 const W = 600
 const H = 400
@@ -131,5 +132,67 @@ describe('pnpm ai:inpaint erase', () => {
   it('pide la zona y no acepta --fill plate sin capas', async () => {
     await expect(runErase({ imagePath: image, runRoot: join(dir, 'x'), log: () => undefined })).rejects.toThrow(/Indica la zona/)
     await expect(runErase({ imagePath: image, maskPath: join(dir, 'mask.png'), fill: 'plate', runRoot: join(dir, 'x'), log: () => undefined })).rejects.toThrow(/clean plate/)
+  })
+})
+
+describe('sombra proyectada', () => {
+  const W2 = 300
+  const H2 = 200
+  const flat = (value: number) => ({ width: W2, height: H2, channels: 4 as const, hadAlpha: false, data: new Uint8Array(W2 * H2 * 4).fill(value) })
+
+  const paint = (image: ReturnType<typeof flat>, x0: number, y0: number, x1: number, y1: number, value: number) => {
+    for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) image.data.fill(value, (y * W2 + x) * 4, (y * W2 + x) * 4 + 3)
+  }
+
+  it('suma la sombra pegada al objeto y deja una mancha oscura que no lo toca', () => {
+    const plate = flat(160)
+    const original = flat(163) // el plate viene corrido de color en bloque: se mide relativo a la mediana
+
+    paint(original, 150, 80, 190, 120, 240) // el objeto
+    paint(original, 110, 100, 150, 120, 90) // su sombra, pegada a la izquierda
+    paint(original, 20, 20, 40, 40, 60) // una mancha oscura lejos: no es su sombra
+
+    const object = createMask(W2, H2)
+
+    for (let y = 80; y < 120; y += 1) for (let x = 150; x < 190; x += 1) object.data[y * W2 + x] = 255
+
+    const shadow = detectCastShadow(original, plate, object, { radius: 80 })
+
+    expect(shadow.mask.data[110 * W2 + 120]).toBe(255)
+    expect(shadow.mask.data[30 * W2 + 30]).toBe(0)
+    expect(shadow.mask.data[100 * W2 + 170]).toBe(0) // el objeto no se cuenta como sombra
+    expect(shadow.pixels).toBe(40 * 20)
+    expect(shadow.meanDarkening).toBeGreaterThan(60)
+  })
+
+  it('no toma la sombra de un objeto vecino aunque se toque con la propia, ni pisa al vecino', () => {
+    const plate = flat(160)
+    const original = flat(160)
+
+    paint(original, 150, 80, 190, 120, 240) // objeto elegido
+    paint(original, 60, 80, 100, 120, 230) // vecino
+    paint(original, 100, 100, 150, 120, 80) // sombra continua entre los dos
+
+    const object = createMask(W2, H2)
+    const neighbour = createMask(W2, H2)
+
+    for (let y = 80; y < 120; y += 1) {
+      for (let x = 150; x < 190; x += 1) object.data[y * W2 + x] = 255
+      for (let x = 60; x < 100; x += 1) neighbour.data[y * W2 + x] = 255
+    }
+
+    const shadow = detectCastShadow(original, plate, object, { radius: 120, others: neighbour })
+
+    expect(shadow.mask.data[110 * W2 + 140]).toBe(255) // junto al elegido: suya
+    expect(shadow.mask.data[110 * W2 + 105]).toBe(0) // junto al vecino: del vecino
+    expect(shadow.mask.data[100 * W2 + 80]).toBe(0) // el vecino nunca
+  })
+
+  it('sin sombra no agrega nada', () => {
+    const object = createMask(W2, H2)
+
+    for (let y = 80; y < 120; y += 1) for (let x = 150; x < 190; x += 1) object.data[y * W2 + x] = 255
+
+    expect(detectCastShadow(flat(150), flat(150), object).pixels).toBe(0)
   })
 })

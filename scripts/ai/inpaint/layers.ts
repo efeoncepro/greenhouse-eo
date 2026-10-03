@@ -77,7 +77,11 @@ export const selectLayers = (doc: LayersDocument, selectors: string[]): LayerRec
 
     if (exact.length === 1) return exact[0]
 
-    const partial = candidates.filter(layer => normalize(layer.name ?? '').includes(wanted) || normalize(layer.description ?? '').includes(wanted))
+    // Primero el nombre; la descripción sólo si ningún nombre coincide. Layerize describe cada capa en relación con
+    // las demás («a table with a mug and a notebook»), así que buscar en las dos a la vez vuelve ambiguo hasta el
+    // nombre más claro (medido en el canario del 2026-10-03: «mug» coincidía con las tres capas).
+    const byName = candidates.filter(layer => normalize(layer.name ?? '').includes(wanted))
+    const partial = byName.length ? byName : candidates.filter(layer => normalize(layer.description ?? '').includes(wanted))
 
     if (partial.length === 1) return partial[0]
     if (partial.length > 1) throw new Error(`"${selector}" coincide con varias capas (${partial.map(layer => `#${layer.index} ${layer.name}`).join(', ')}): usa el índice.`)
@@ -137,8 +141,85 @@ export const maskFromLayers = async (layersJsonPath: string, selectors: string[]
   return masks.reduce((acc, mask) => union(acc, mask))
 }
 
-/** Ruta del clean plate (la base) de un `layers.json`. */
+/** Ruta de la base de un `layers.json`: la escena sin NINGUNA capa (ni la mesa, si la mesa es una capa). */
 export const cleanPlatePath = (layersJsonPath: string, doc: LayersDocument) => join(dirname(layersJsonPath), doc.base.file)
+
+/**
+ * Clean plate SIN las capas elegidas: la base con todas las demás capas recompuestas encima por `z_index`, en el
+ * tamaño `target`. La base sola no sirve para borrar un objeto: Layerize separa también las superficies (la mesa es
+ * una capa), así que la base deja pared donde había mesa —medido en el canario del 2026-10-03—. Cada capa trae lo
+ * que ocluía otra ya completado, así que recomponer las restantes da la escena sin el elemento.
+ */
+export const plateWithoutLayers = async (layersJsonPath: string, doc: LayersDocument, excluded: LayerRecord[], target: { width: number; height: number }): Promise<Buffer> => {
+  const skip = new Set(excluded.map(layer => layer.index))
+  const kept = doc.layers.filter(layer => layer.box && !skip.has(layer.index)).sort((a, b) => a.zIndex - b.zIndex || a.index - b.index)
+
+  const overlays = await Promise.all(
+    kept.map(async layer => {
+      const box = layer.box!
+      const width = Math.max(1, Math.round(box.right - box.left))
+      const height = Math.max(1, Math.round(box.bottom - box.top))
+      const left = Math.round(box.left)
+      const top = Math.round(box.top)
+      // Recorta lo que cae fuera del lienzo de la base: `composite` rechaza capas que se salen.
+      const cropLeft = Math.max(0, -left)
+      const cropTop = Math.max(0, -top)
+      const visibleWidth = Math.min(width - cropLeft, doc.base.width - Math.max(0, left))
+      const visibleHeight = Math.min(height - cropTop, doc.base.height - Math.max(0, top))
+
+      if (visibleWidth <= 0 || visibleHeight <= 0) return null
+
+      const input = await sharp(join(dirname(layersJsonPath), layer.file))
+        .ensureAlpha()
+        .resize(width, height, { fit: 'fill' })
+        .extract({ left: cropLeft, top: cropTop, width: visibleWidth, height: visibleHeight })
+        .png()
+        .toBuffer()
+
+      return { input, left: Math.max(0, left), top: Math.max(0, top) }
+    })
+  )
+
+  const composed = await sharp(cleanPlatePath(layersJsonPath, doc))
+    .resize(doc.base.width, doc.base.height, { fit: 'fill' })
+    .composite(overlays.filter((overlay): overlay is NonNullable<typeof overlay> => overlay !== null))
+    .png()
+    .toBuffer()
+
+  return sharp(composed).resize(target.width, target.height, { fit: 'fill', kernel: 'lanczos3' }).png().toBuffer()
+}
+
+/**
+ * Los DEMÁS objetos de la escena —todas las capas no elegidas salvo las superficies sobre las que descansan las
+ * elegidas—, como máscara en `target`. Una capa es superficie si su alfa cubre al menos la mitad de lo elegido: la
+ * mesa viene completa por detrás de la taza; la taza vecina, no. Lo usa la detección de sombra para no tomar la
+ * sombra de otro objeto.
+ */
+export const otherObjectsMask = async (layersJsonPath: string, doc: LayersDocument, chosen: LayerRecord[], target: { width: number; height: number }): Promise<CanonicalMask> => {
+  const skip = new Set(chosen.map(layer => layer.index))
+  const chosenMasks = await Promise.all(chosen.map(layer => maskFromLayer(layersJsonPath, layer, doc, target)))
+  const selection = chosenMasks.reduce((acc, mask) => union(acc, mask), createMask(target.width, target.height))
+  let selectionPixels = 0
+
+  for (const value of selection.data) if (value > 127) selectionPixels += 1
+
+  let others = createMask(target.width, target.height)
+
+  for (const layer of doc.layers) {
+    if (!layer.box || skip.has(layer.index)) continue
+
+    const mask = await maskFromLayer(layersJsonPath, layer, doc, target)
+    let under = 0
+
+    for (let i = 0; i < mask.data.length; i += 1) if (selection.data[i] > 127 && mask.data[i] > 127) under += 1
+
+    if (selectionPixels && under / selectionPixels >= 0.5) continue
+
+    others = union(others, mask)
+  }
+
+  return others
+}
 
 /** Fracción opaca del alfa de una imagen (para registrar qué tan «llena» viene cada capa). */
 export const alphaCoverage = async (png: Buffer): Promise<number> => {

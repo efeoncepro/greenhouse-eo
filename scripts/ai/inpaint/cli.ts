@@ -16,6 +16,7 @@ import { runErase } from './erase'
 import type { ExpandAnchor } from './expand'
 import { runExpand } from './expand-run'
 import { runMove } from './move'
+import { runPlace } from './place'
 import { runImageInpaint } from './pipeline-image'
 import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
@@ -86,6 +87,11 @@ interface ImageCliArgs {
   dx?: number
   dy?: number
   harmonize?: 'auto' | 'off'
+  shadow?: 'auto' | 'off'
+  from?: string
+  at?: { x: number; y: number }
+  width?: number
+  finish?: 'halo' | 'element' | 'off'
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -166,6 +172,34 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
 
         if (!['auto', 'off'].includes(value)) throw new Error('--harmonize espera auto | off.')
         args.harmonize = value as 'auto' | 'off'
+        break
+      }
+
+      case '--from': args.from = next(); break
+
+      case '--at': {
+        const [x, y] = next().split(',').map(Number)
+
+        if (![x, y].every(value => Number.isFinite(value) && value >= 0 && value <= 1)) throw new Error('--at espera x,y en fracciones 0–1 (ej. 0.3,0.6).')
+        args.at = { x, y }
+        break
+      }
+
+      case '--width': args.width = toNumber(next(), flag); break
+
+      case '--finish': {
+        const value = next()
+
+        if (!['halo', 'element', 'off'].includes(value)) throw new Error('--finish espera halo | element | off.')
+        args.finish = value as 'halo' | 'element' | 'off'
+        break
+      }
+
+      case '--shadow': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--shadow espera auto | off.')
+        args.shadow = value as 'auto' | 'off'
         break
       }
 
@@ -430,7 +464,9 @@ const ERASE_HELP = `pnpm ai:inpaint erase — borra un objeto y deja el resto id
   pnpm ai:inpaint erase --image foto.png --mask mascara.png --fill model          # un modelo reconstruye el fondo
 
 Zona: --mask (explícita, nunca se altera) o --layers + --layer (repetible; se agranda --grow px, default 16, para
-llevarse borde y sombra). Relleno: --fill plate (default con --layers: la base de Layerize) o model (default con
+llevarse el borde). Con capas, --shadow auto (default) suma la sombra proyectada del objeto, medida contra el clean
+plate y conectada al objeto; off la deja. Relleno: --fill plate (default con --layers: la base de Layerize con las
+demás capas recompuestas, así la mesa sigue siendo mesa) o model (default con
 --mask; --adapter/--model/--quality como en image). Después de verificar la zona protegida mide si el objeto
 sigue ahí; si en ningún candidato cambió, sale con código 3 (revisar). Un logo o una marca no se borra con IA.
 Control: --prompt (default: quitar el objeto y su sombra y reconstruir lo de atrás), --count, --run, --dry-run,
@@ -458,6 +494,7 @@ const runEraseCli = async (argv: string[]): Promise<number> => {
     layerSelectors: args.layerSelectors,
     fill: args.fill,
     growPx: args.grow,
+    shadow: args.shadow,
     modelAdapter: args.fill === 'plate' || (!args.fill && args.layersJson) ? undefined : resolveImageAdapter(args.adapter),
     model: args.model,
     quality: args.quality,
@@ -592,7 +629,8 @@ const MOVE_HELP = `pnpm ai:inpaint move — mueve o escala un elemento usando su
 
   pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40 [--scale 0.9]
 
-1) el hueco se rellena con el clean plate (corregido de color); 2) el elemento se recorta de la imagen ORIGINAL con
+1) el hueco —con la sombra proyectada del elemento, salvo --shadow off— se rellena con el clean plate sin ese
+elemento (corregido de color); 2) el elemento se recorta de la imagen ORIGINAL con
 el alfa de su capa y se pega en la posición nueva (escala alrededor de su centro); 3) --harmonize auto (default) hace
 una pasada SÓLO de sombra de contacto y reflejo en un halo alrededor (con --adapter/--model; off = sin IA ni gasto).
 Verifica que todo lo que no es hueco, elemento ni halo quede idéntico a la original. Un logo no se mueve con IA.
@@ -617,10 +655,62 @@ const runMoveCli = async (argv: string[]): Promise<number> => {
     dy: args.dy,
     scale: args.scale,
     harmonize: args.harmonize,
+    shadow: args.shadow,
     adapter: args.harmonize === 'off' ? undefined : resolveImageAdapter(args.adapter),
     model: args.model,
     quality: args.quality,
     providerMask: args.providerMask,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  return result.exitCode
+}
+
+const PLACE_HELP = `pnpm ai:inpaint place — incorpora un elemento separado con ai:layers en OTRA imagen (TASK-1973)
+
+  pnpm ai:inpaint place --image destino.png --from origen.png --layers <layers.json> --layer "mug" --at 0.3,0.62 [--width 0.12]
+
+1) el elemento se recorta de la imagen de ORIGEN con el alfa de su capa (nunca los píxeles regenerados de la capa);
+2) se pega en el destino con su centro en --at (fracciones x,y) y el ancho --width (fracción del ancho del destino;
+default: el mismo tamaño en píxeles); 3) el modelo lo termina: --finish halo (default: sólo sombra de contacto,
+reflejo y borde alrededor) · element (además relumina el elemento para que tome la luz de la escena: su forma puede
+variar, míralo al 100 %) · off (sin IA ni gasto). Verifica que el destino quede idéntico fuera de lo pegado y de su
+acabado. Modelo: --adapter/--model/--quality como en image. Un logo o una marca no se incorpora con IA.
+`
+
+const runPlaceCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(PLACE_HELP)
+
+    return 0
+  }
+
+  if (!args.image || !args.from || !args.layersJson || !args.layerSelectors.length || !args.at) {
+    throw new Error('--image, --from, --layers, --layer y --at son obligatorios. Ver pnpm ai:inpaint place --help.')
+  }
+
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+
+  const result = await runPlace({
+    imagePath: resolvePath(args.image),
+    sourceImagePath: resolvePath(args.from),
+    layersJson: resolvePath(args.layersJson),
+    layerSelectors: args.layerSelectors,
+    at: args.at,
+    width: args.width,
+    finish: args.finish,
+    adapter: args.finish === 'off' ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    prompt: prompt || undefined,
     runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
     dryRun: args.dryRun,
     force: args.force,
@@ -640,9 +730,10 @@ const main = async () => {
   if (command === 'expand') return runExpandCli(rest)
   if (command === 'background') return runBackgroundCli(rest)
   if (command === 'move') return runMoveCli(rest)
+  if (command === 'place') return runPlaceCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|move|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|move|place|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }

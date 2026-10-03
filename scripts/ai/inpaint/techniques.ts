@@ -1,7 +1,5 @@
-import sharp from 'sharp'
-
 import type { InpaintImageAdapter } from './adapters/types'
-import { dilate, feather, type CanonicalMask } from './mask'
+import { createMask, dilate, feather, maskStats, squaredDistanceTransform, union, type CanonicalMask } from './mask'
 import type { RgbaImage } from './raw'
 
 /**
@@ -19,6 +17,102 @@ export const ERASE_DEFAULT_PROMPT =
  */
 export const prepareEraseMask = async (mask: CanonicalMask, growPx = 16, featherPx = 12): Promise<CanonicalMask> => feather(dilate(mask, growPx), featherPx)
 
+export interface ShadowDetection {
+  mask: CanonicalMask
+  /** Píxeles de sombra agregados (fuera del objeto). */
+  pixels: number
+  /** Cuánto más oscura es la original que el plate dentro de la sombra (luminancia media, 0–255). */
+  meanDarkening: number
+}
+
+const luminance = (data: Uint8Array, offset: number) => 0.299 * data[offset] + 0.587 * data[offset + 1] + 0.114 * data[offset + 2]
+
+/**
+ * Sombra proyectada del objeto, medida contra el clean plate: la capa de la superficie viene SIN la sombra (medido en
+ * el canario del 2026-10-03: la original 50–100 niveles más oscura que el plate bajo la sombra de la taza, ±2 en el
+ * resto). Crece por conectividad DESDE el borde del objeto, sólo por píxeles donde la original es más oscura que el
+ * plate, y nunca más allá de `radius`: una zona oscura que no toca al objeto no es su sombra.
+ *
+ * El oscurecimiento se mide relativo a la mediana del anillo de búsqueda, porque el plate regenerado puede venir
+ * corrido de color en bloque (+9 niveles en el mismo canario).
+ *
+ * `others` son los DEMÁS objetos de la escena (no las superficies sobre las que descansa): una sombra nunca se toma
+ * encima de otro objeto ni más cerca de él que del elegido. Sin esa regla, mover el cuaderno se llevó la base y la
+ * sombra de la taza vecina, porque las dos sombras se tocan (canario del 2026-10-03).
+ */
+export const detectCastShadow = (
+  original: RgbaImage,
+  plate: RgbaImage,
+  objectMask: CanonicalMask,
+  options: { radius?: number; threshold?: number; others?: CanonicalMask } = {}
+): ShadowDetection => {
+  const { width, height } = original
+  const box = maskStats(objectMask).bbox
+  const empty = { mask: createMask(width, height), pixels: 0, meanDarkening: 0 }
+
+  if (!box) return empty
+
+  const radius = options.radius ?? Math.round(Math.max(box.width, box.height) * 0.6)
+  const threshold = options.threshold ?? 14
+  const reach = dilate(objectMask, radius)
+  const darkening = new Float32Array(width * height)
+  const ring: number[] = []
+
+  for (let i = 0; i < width * height; i += 1) {
+    if (!reach.data[i] || objectMask.data[i] > 127) continue
+    darkening[i] = luminance(plate.data, i * 4) - luminance(original.data, i * 4)
+    ring.push(darkening[i])
+  }
+
+  if (!ring.length) return empty
+
+  ring.sort((a, b) => a - b)
+
+  const median = ring[Math.floor(ring.length / 2)]
+  const others = options.others && maskStats(options.others).bbox ? options.others : null
+  // Distancia al objeto elegido y a los demás: cada píxel de sombra pertenece al objeto más cercano.
+  const toObject = others ? squaredDistanceTransform(width, height, i => objectMask.data[i] > 127) : null
+  const toOthers = others ? squaredDistanceTransform(width, height, i => others.data[i] > 0) : null
+  const owned = (i: number) => !toObject || (others!.data[i] === 0 && toObject[i] <= toOthers![i])
+  const isShadow = (i: number) => reach.data[i] > 0 && objectMask.data[i] <= 127 && darkening[i] - median > threshold && owned(i)
+  const seeds = dilate(objectMask, 2)
+  const out = createMask(width, height)
+  const queue: number[] = []
+
+  for (let i = 0; i < width * height; i += 1) {
+    if (seeds.data[i] && isShadow(i)) {
+      out.data[i] = 255
+      queue.push(i)
+    }
+  }
+
+  let sum = 0
+
+  for (let head = 0; head < queue.length; head += 1) {
+    const i = queue[head]
+    const x = i % width
+    const y = (i - x) / width
+
+    sum += darkening[i] - median
+
+    for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+
+      const n = ny * width + nx
+
+      if (!out.data[n] && isShadow(n)) {
+        out.data[n] = 255
+        queue.push(n)
+      }
+    }
+  }
+
+  return { mask: out, pixels: queue.length, meanDarkening: queue.length ? Math.round((sum / queue.length) * 10) / 10 : 0 }
+}
+
+/** Máscara de borrado con la sombra del objeto incluida (agrandada y difuminada como el resto). */
+export const withCastShadow = (objectMask: CanonicalMask, shadow: ShadowDetection): CanonicalMask => (shadow.pixels ? union(objectMask, dilate(shadow.mask, 4)) : objectMask)
+
 /**
  * Adaptador local «clean plate»: devuelve la base de Layerize (la escena sin los elementos) ya en el tamaño de la
  * original, sin llamar a ningún proveedor ni gastar. El pipeline la trata como cualquier salida cruda: corrige color,
@@ -31,7 +125,8 @@ export const createPlateAdapter = (plate: { png: Buffer; width: number; height: 
   defaultModel: 'clean-plate',
   sendsMask: false,
   maskConvention: null,
-  verifiedAt: null,
+  // Verificado en vivo sobre capas reales de Layerize (canario TASK-1973, 2026-10-03).
+  verifiedAt: '2026-10-03',
   revision: 1,
   // La máscara no viaja, pero tampoco hay guía que mandar: el plate ya es la escena sin el objeto.
   willSendMask: () => true,
@@ -50,10 +145,6 @@ export const createPlateAdapter = (plate: { png: Buffer; width: number; height: 
     return { image: plate.png, providerModel: 'clean-plate', outputUsd: 0, usage: null, meta: { source: plate.source } }
   }
 })
-
-/** Lleva el clean plate (que puede medir distinto) al tamaño exacto de la original. */
-export const loadPlateAtSize = async (platePath: string, width: number, height: number): Promise<Buffer> =>
-  sharp(platePath).resize(width, height, { fit: 'fill', kernel: 'lanczos3' }).png().toBuffer()
 
 export interface ErasureReport {
   /** Diferencia media (0–255) entre la original y el resultado en el NÚCLEO de la zona: bajo = el objeto sigue ahí. */

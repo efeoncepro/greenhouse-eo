@@ -4,13 +4,13 @@ import sharp from 'sharp'
 
 import type { InpaintImageAdapter, ProviderMaskMode } from './adapters/types'
 import { assertBrandSafePrompt } from './brand'
-import { cleanPlatePath, maskFromLayers, readLayersDocument, selectLayers } from './layers'
+import { maskFromLayers, otherObjectsMask, plateWithoutLayers, readLayersDocument, selectLayers } from './layers'
 import { createMask, dilate, encodeMaskPng, erode, feather, intersect, invert, maskStats, union, type CanonicalMask } from './mask'
 import { runImageInpaint, type ImageInpaintManifest } from './pipeline-image'
 import { encodeRgbaPng, loadRgba, readRaw, singleChannel, type RgbaImage } from './raw'
 import { matchColorInRing, measureZones, recompose, type ZoneDelta } from './recompose'
 import { sha256, writeFileEnsured, writeJson } from './run-io'
-import { prepareEraseMask } from './techniques'
+import { detectCastShadow, prepareEraseMask, withCastShadow } from './techniques'
 
 /**
  * Mover o escalar un elemento desde sus capas (TASK-1973, Slice 7), sin IA en lo sensible:
@@ -33,6 +33,8 @@ export interface MoveOptions {
   dy?: number
   scale?: number
   harmonize?: 'auto' | 'off'
+  /** Incluir en el hueco la sombra proyectada del elemento, medida contra el clean plate. Default `auto`. */
+  shadow?: 'auto' | 'off'
   adapter?: InpaintImageAdapter
   model?: string
   quality?: string
@@ -68,6 +70,68 @@ const scaleMask = async (mask: CanonicalMask, width: number, height: number): Pr
   return { width, height, data: raw.data }
 }
 
+export interface CutElement {
+  pixels: RgbaImage
+  alpha: CanonicalMask
+}
+
+/** Recorta un elemento de la imagen ORIGINAL con el alfa de su máscara (nunca con los píxeles regenerados de la capa). */
+export const cutElement = (image: RgbaImage, mask: CanonicalMask, box: { left: number; top: number; width: number; height: number }): CutElement => {
+  const pixels: RgbaImage = { ...image, width: box.width, height: box.height, data: new Uint8Array(box.width * box.height * 4) }
+  const alpha = createMask(box.width, box.height)
+
+  for (let y = 0; y < box.height; y += 1) {
+    for (let x = 0; x < box.width; x += 1) {
+      const from = (box.top + y) * image.width + box.left + x
+
+      pixels.data.set(image.data.subarray(from * 4, from * 4 + 4), (y * box.width + x) * 4)
+      alpha.data[y * box.width + x] = mask.data[from]
+    }
+  }
+
+  return { pixels, alpha }
+}
+
+/**
+ * Pega un elemento recortado sobre `target` en la caja `at` (escalándolo a su tamaño). Devuelve la composición y la
+ * máscara de lo pegado, en el tamaño del destino.
+ */
+export const pasteElement = async (
+  target: RgbaImage,
+  cut: CutElement,
+  at: { left: number; top: number; width: number; height: number }
+): Promise<{ composed: RgbaImage; placed: CanonicalMask }> => {
+  const [pixels, alpha] = await Promise.all([scaleRgba(cut.pixels, at.width, at.height), scaleMask(cut.alpha, at.width, at.height)])
+  const placed = createMask(target.width, target.height)
+  const composed: RgbaImage = { ...target, data: new Uint8Array(target.data) }
+
+  for (let y = 0; y < at.height; y += 1) {
+    for (let x = 0; x < at.width; x += 1) {
+      const cx = at.left + x
+      const cy = at.top + y
+
+      if (cx < 0 || cy < 0 || cx >= target.width || cy >= target.height) continue
+
+      const a = alpha.data[y * at.width + x]
+
+      if (!a) continue
+
+      const o = (cy * target.width + cx) * 4
+      const i = (y * at.width + x) * 4
+
+      for (let c = 0; c < 4; c += 1) composed.data[o + c] = Math.round((pixels.data[i + c] * a + composed.data[o + c] * (255 - a)) / 255)
+      placed.data[cy * target.width + cx] = a
+    }
+  }
+
+  if (!maskStats(placed).editable && !maskStats(placed).soft) throw new Error('El elemento quedó fuera del lienzo con esa posición.')
+
+  return { composed, placed }
+}
+
+/** Halo de integración alrededor de lo pegado: donde el modelo pone sombra de contacto y reflejo, nunca encima del elemento. */
+export const integrationHalo = (placed: CanonicalMask): Promise<CanonicalMask> => feather(intersect(dilate(placed, 48), invert(erode(placed, 4))), 12)
+
 export const runMove = async (options: MoveOptions): Promise<MoveResult> => {
   const log = options.log ?? (line => process.stdout.write(`${line}\n`))
   const dx = options.dx ?? 0
@@ -87,57 +151,31 @@ export const runMove = async (options: MoveOptions): Promise<MoveResult> => {
 
   if (!box) throw new Error('La capa elegida no tiene píxeles visibles.')
 
-  const runDir = join(options.runRoot, 'move', sha256(JSON.stringify({ image: sha256(base.data), layers: options.layerSelectors, dx, dy, scale, h: options.harmonize ?? 'auto' })).slice(0, 12))
+  const runDir = join(options.runRoot, 'move', sha256(JSON.stringify({ v: 2, image: sha256(base.data), layers: options.layerSelectors, dx, dy, scale, h: options.harmonize ?? 'auto', shadow: options.shadow ?? 'auto' })).slice(0, 12))
 
   // 1. Hueco: clean plate corregido de color, sólo dentro de la máscara agrandada del elemento.
-  const plate = await loadRgba(await sharp(cleanPlatePath(options.layersJson, doc)).resize(base.width, base.height, { fit: 'fill' }).png().toBuffer())
-  const hole = await prepareEraseMask(element, 12)
+  const plate = await loadRgba(await plateWithoutLayers(options.layersJson, doc, selectLayers(doc, options.layerSelectors), { width: base.width, height: base.height }))
+  const others = await otherObjectsMask(options.layersJson, doc, selectLayers(doc, options.layerSelectors), { width: base.width, height: base.height })
+  const shadow = (options.shadow ?? 'auto') === 'auto' ? detectCastShadow(base, plate, element, { others }) : null
+  // El hueco nunca pisa a otro objeto: el agrandado y el difuminado se recortan contra los demás.
+  const hole = intersect(await prepareEraseMask(shadow ? withCastShadow(element, shadow) : element, 12), invert(others))
+
+  if (shadow?.pixels) log(`  ◐ la sombra del elemento en su lugar original también se borra: ${shadow.pixels} px (--shadow off para dejarla)`)
+
   const corrected = matchColorInRing(base, plate, hole).image
   const withHole = recompose(base, corrected, hole)
 
-  // 2. Elemento recortado de la ORIGINAL, escalado y pegado en la posición nueva.
-  const cutBox = { left: box.left, top: box.top, width: box.width, height: box.height }
-  const cutPixels: RgbaImage = { ...base, width: cutBox.width, height: cutBox.height, data: new Uint8Array(cutBox.width * cutBox.height * 4) }
-  const cutAlpha = createMask(cutBox.width, cutBox.height)
+  // 2. Elemento recortado de la ORIGINAL, escalado alrededor de su centro y pegado en la posición nueva.
+  const cut = cutElement(base, element, box)
+  const width = Math.max(1, Math.round(box.width * scale))
+  const height = Math.max(1, Math.round(box.height * scale))
 
-  for (let y = 0; y < cutBox.height; y += 1) {
-    for (let x = 0; x < cutBox.width; x += 1) {
-      const from = (cutBox.top + y) * base.width + cutBox.left + x
-
-      cutPixels.data.set(base.data.subarray(from * 4, from * 4 + 4), (y * cutBox.width + x) * 4)
-      cutAlpha.data[y * cutBox.width + x] = element.data[from]
-    }
-  }
-
-  const width = Math.max(1, Math.round(cutBox.width * scale))
-  const height = Math.max(1, Math.round(cutBox.height * scale))
-  const [pixels, alpha] = await Promise.all([scaleRgba(cutPixels, width, height), scaleMask(cutAlpha, width, height)])
-  // Escala alrededor del centro del elemento, luego el desplazamiento.
-  const left = Math.round(cutBox.left + cutBox.width / 2 - width / 2 + dx)
-  const top = Math.round(cutBox.top + cutBox.height / 2 - height / 2 + dy)
-  const placed = createMask(base.width, base.height)
-  const composed: RgbaImage = { ...withHole, data: new Uint8Array(withHole.data) }
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const cx = left + x
-      const cy = top + y
-
-      if (cx < 0 || cy < 0 || cx >= base.width || cy >= base.height) continue
-
-      const a = alpha.data[y * width + x]
-
-      if (!a) continue
-
-      const o = (cy * base.width + cx) * 4
-      const i = (y * width + x) * 4
-
-      for (let c = 0; c < 4; c += 1) composed.data[o + c] = Math.round((pixels.data[i + c] * a + composed.data[o + c] * (255 - a)) / 255)
-      placed.data[cy * base.width + cx] = a
-    }
-  }
-
-  if (!maskStats(placed).editable && !maskStats(placed).soft) throw new Error('El elemento quedó fuera del lienzo con ese desplazamiento.')
+  const { composed, placed } = await pasteElement(withHole, cut, {
+    left: Math.round(box.left + box.width / 2 - width / 2 + dx),
+    top: Math.round(box.top + box.height / 2 - height / 2 + dy),
+    width,
+    height
+  })
 
   const composedPath = join(runDir, 'composed.png')
 
@@ -145,7 +183,7 @@ export const runMove = async (options: MoveOptions): Promise<MoveResult> => {
   log(`  ⇢ elemento movido (${dx}, ${dy}) px · escala ${scale} · hueco con clean plate · píxeles del elemento tomados de la ORIGINAL`)
 
   // 3. Integración opcional en un halo alrededor de la posición nueva.
-  const halo = await feather(intersect(dilate(placed, 48), invert(erode(placed, 4))), 12)
+  const halo = await integrationHalo(placed)
   let finalPath = composedPath
   let harmonized = false
   let manifest: ImageInpaintManifest | null = null
@@ -195,6 +233,7 @@ export const runMove = async (options: MoveOptions): Promise<MoveResult> => {
     dy,
     scale,
     harmonized,
+    shadowPixels: shadow?.pixels ?? 0,
     final: finalPath,
     untouched,
     verdict,
