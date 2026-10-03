@@ -1,5 +1,28 @@
 # TASK-1975 — Figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — Slice 1 aprobado
+
+- **Tarjeta de cifra aprobada por el operador** en el canvas
+  <https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>. La dirección es la retícula de cifras, sin cifra principal en
+  el héroe. Hojas a tamaño nativo: `paginas/Premium-Cifras.png` y `paginas/Deck-Cifras.png`. Registro:
+  [`TASK-1975-efeonce-insights-stat-card-direction.md`](../../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md).
+- Cambios frente al wireframe: el deck admite 6 cifras (3×2), no 4; el copy de la variación pasa a «vs {valor} en
+  {período}»; si la métrica tiene tarjeta, el centro de la dona muestra la participación de la parte principal; y se
+  aprobó la norma de tarjetas y gráficos en un capítulo.
+- **Tokens aprobados:** el rol nuevo `dataStepOnPaper` / `dataStepOnNavy` (`--axis-ppt-blue-500` /
+  `--axis-deck-cyan-700`) colorea el paso «Sumó» y la cuarta parte de waffle y apiladas. El coral de oportunidad en
+  papel (2,94:1) queda aceptado con nota.
+- **Tonos semánticos en la variación:** mejor en verde, peor en rojo, neutro en gris.
+  - ⚠️ **Toca frames existentes del gate visual.** La píldora de TASK-1889 pinta «peor» en gris, igual que «neutro», y
+    la regla aprobada lo cambia en todas las figuras. Por eso las plantillas existentes con píldora cambian de píxeles,
+    y la frase «ningún frame existente cambia» del GVC scenario plan deja de ser cierta.
+  - El rebaseline de esos frames va declarado en `BASELINE_DELTAS.md`, en el mismo commit que el cambio de la píldora.
+  - Los tonos nacen como roles en `editorial-roles.json` con valores de AXIS (`status/success-text`,
+    `status/error-text`); nunca como literales.
+- Lo que el contrato de TASK-1974 debe traer (dirección declarada, nombres cortos, excepción de la cascada, cifras
+  agrupadas) quedó como Delta en esa task.
+- `UI ready` sigue en `no`: faltan el mapping implementado, el dossier y el scorecard.
+
 ## Delta 2026-10-03 — decisiones del operador
 
 - **Tarjeta de cifra:** se diseña y aprueba en un canvas antes de implementarla (Slice 1). Las tres direcciones del
@@ -30,7 +53,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseño`
+- Status real: `Diseño aprobado (Slice 1); implementación pendiente`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1974` (tarjeta de cifra en el contrato del plan y del modelo web; evidencia de dona y barras apiladas)
@@ -467,7 +490,7 @@ estados. Puntos que el agente debe resolver contra el código y el contrato fina
 ## Acceptance Criteria
 
 - [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; el wireframe existe; `UI ready` permanece `no` hasta que la tarjeta esté aprobada y el mapping, el dossier y el scorecard estén completos.
-- [ ] El operador aprobó la tarjeta de cifra en el canvas; sus hojas `Premium-Cifras.png` y `Deck-Cifras.png` existen en `paginas/` y la dirección quedó registrada en `docs/ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md`.
+- [x] El operador aprobó la tarjeta de cifra en el canvas; sus hojas `Premium-Cifras.png` y `Deck-Cifras.png` existen en `paginas/` y la dirección quedó registrada en `docs/ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md`.
 - [ ] `PDF_FIGURE_FAMILIES` incluye `waterfall`, `waffle`, `donut` y `bar_stacked`, y la tarjeta de cifra tiene página; `hasFigurePage` devuelve `true` para cada una con hechos suficientes (test).
 - [ ] `report-figure-{waterfall,waffle,donut,stacked}` e `insights-figure-{waterfall,waffle,donut,stacked}` quedan a ≤ 1 % de sus ocho hojas aprobadas (o excepción aprobada por el operador, con techo), en color y en gris.
 - [ ] `report-figure-stat` e `insights-figure-stat` quedan a ≤ 1 % de las hojas de cifras aprobadas.

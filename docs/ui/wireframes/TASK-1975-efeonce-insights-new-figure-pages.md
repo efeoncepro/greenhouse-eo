@@ -1,5 +1,25 @@
 # TASK-1975 — Wireframe: figuras nuevas del informe en PDF, deck y Think
 
+## Delta 2026-10-03 — tarjeta de cifra aprobada
+
+- El operador aprobó la **dirección 2 (retícula de cifras)** en el canvas
+  <https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>. La sección de la tarjeta deja de ser propuesta.
+  - Hojas: `paginas/Premium-Cifras.png` y `paginas/Deck-Cifras.png`.
+  - Registro, tokens y norma: [`TASK-1975-efeonce-insights-stat-card-direction.md`](../visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md).
+- Cambios frente a lo que proponía este wireframe (rigen sobre las secciones de abajo):
+  - **Deck:** la retícula admite **6 cifras (3×2)**, no 4 (2×2).
+  - **Variación:** «vs {valor} en {período}» reemplaza a `vsPeriod` «vs {período}» en el Copy Ledger. Usa **tonos
+    semánticos**: mejor en verde (`status/success-text`), peor en rojo (`status/error-text`), neutro en gris.
+    - ⚠️ Esto cambia la píldora `delta-pill` en **todas** las figuras: «peor» deja de ser `delta--plain` y toca frames
+      existentes del gate visual.
+  - **Centro de la dona:** si la métrica ya tiene tarjeta, el centro muestra la participación de la parte principal;
+    sin tarjeta, el total de las partes. Reemplaza la regla del Design Decision Log.
+  - **Paso «Sumó» y 4.ª parte del waffle o de las apiladas:** rol `dataStepOnPaper` / `dataStepOnNavy`
+    (`--axis-ppt-blue-500` / `--axis-deck-cyan-700`), aprobado. El coral de oportunidad en papel (2,94:1) queda
+    aceptado con nota.
+  - **Norma de tarjetas y gráficos en un capítulo** (orden cifras → evolución → explicación → composición →
+    comparación; una página de cifras por capítulo; métrica con meta sólo en bullet): criterio canónico §5.2.
+
 Creado 2026-10-03. Describe, región por región, las cinco figuras que TASK-1975 agrega a los catálogos
 `insights-report` (A4) e `insights-deck` (16:9) y a la vista web de Think: **cascada, waffle, dona, barras apiladas y
 tarjeta de cifra**. Las cuatro primeras tienen hoja aprobada; la tarjeta de cifra **no**, y su sección es una
@@ -96,11 +116,11 @@ Partes: de 2 a 4 (criterio: waffle con ≤ 4 categorías). Con más de 4, la fig
 | Anotación (opcional) | conector punteado entre la cima del segmento base de los dos últimos períodos + «+28 % sin marca» | `formatDeltaForUnit` sobre los dos hechos del segmento base | sólo con dos o más períodos; el triángulo/signo dice la dirección |
 | Nota | «La base de cada barra es la búsqueda sin marca: su crecimiento se lee sobre la misma escala.» | `figure.note` | |
 
-### A4 — Tarjeta de cifra (`report-figure-stat`) — **PROPUESTA PENDIENTE DE APROBACIÓN**
+### A4 — Tarjeta de cifra (`report-figure-stat`) — **APROBADA 2026-10-03 (dirección 2)**
 
-No hay hoja aprobada. El Slice 1 de la task diseña esta página en el mismo canvas «Gráficos de Efeonce Insights»
-(tableros nuevos `Premium-Cifras` y `Deck-Cifras`) y la somete al operador. Hasta esa aprobación nada de esta sección
-se implementa. Lo que sigue es la propuesta que se lleva al canvas.
+Hojas aprobadas: `Premium-Cifras.png` y `Deck-Cifras.png`, en un canvas propio
+(<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>). Lo que sigue era la propuesta que se llevó al canvas; rige con
+los cambios del Delta del inicio.
 
 **Anatomía de una tarjeta** (criterio §5.1, en orden de lectura):
 
@@ -155,7 +175,7 @@ el pie; pie con logo, edición, URL y folio.
 | Waffle | `Deck-Waffle.png` | retícula ~250 px a la izquierda del panel, leyenda con cuentas a la derecha; actual teal, oportunidad coral, tercera parte periwinkle, ausencia rayada |
 | Dona | `Deck-Donut.png` | fila de motores bajo el título del panel; anillo ~240 px; filas con cuenta y participación |
 | Apiladas | `Deck-Apiladas.png` | base en teal, segmento superior en periwinkle; hasta **4 períodos** |
-| Cifras (propuesta) | sin hoja | columna izquierda **sin cifra principal**: antetítulo, conclusión grande y lead; panel con retícula 2×2 (hasta 4 cifras); valor ~40 px en teal sobre navy, píldora con el tono de la regla única |
+| Cifras (aprobada) | `Deck-Cifras.png` | columna izquierda **sin cifra principal**: antetítulo, conclusión grande y lead; panel con retícula 3×2 (hasta 6 cifras); valor 38 px en teal sobre navy, píldora con tono semántico |
 
 ### Think — vista web (S6)
 

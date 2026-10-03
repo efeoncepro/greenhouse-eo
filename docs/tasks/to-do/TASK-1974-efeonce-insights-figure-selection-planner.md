@@ -1,5 +1,29 @@
 # TASK-1974 — Criterio de figuras en el planificador de Insights
 
+## Delta 2026-10-03
+
+- El operador aprobó el canvas de la tarjeta de cifra (Slice 1 de TASK-1975). Dirección:
+  [`TASK-1975-efeonce-insights-stat-card-direction.md`](../../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md).
+  Lo que el contrato de esta task debe traer para que se dibuje como se aprobó:
+  - **(a) Dirección declarada.** Declarar «mayor es mejor» en clics, impresiones, CTR, tráfico estimado y visitas
+    desde IA. Sin esa declaración, la variación sale en gris (neutra) y no en verde o rojo.
+  - **(b) Nombre de tarjeta de 3 palabras como máximo** (24 caracteres). «Keywords en primera página» tiene 4 y se
+    rechaza: el plan debe mandar «Primera página».
+  - **(c) Excepción en el gate «ningún hecho alimenta dos figuras».** Los totales de una cascada (Berel: 16.390 →
+    13.606) son anclas de la explicación y conviven con la tarjeta de la misma métrica sin contar como segunda figura.
+  - **(d) Centro de la dona.** Si la métrica de la dona ya tiene tarjeta, el centro muestra la participación de la
+    parte principal («97,7 % ChatGPT») y no el total. Sin tarjeta, el total de las partes.
+  - **(e) Cifras agrupadas al inicio del capítulo.** Las tarjetas de un capítulo van juntas, en una figura o página,
+    antes de los gráficos.
+- **Orden del capítulo:** cifras → evolución → explicación → composición → comparación. La familia que no aplica se
+  salta; el orden no se invierte.
+- **Una métrica con meta va sólo en bullet, sin tarjeta.**
+- **Una sola página de cifras por capítulo:** hasta 6 cifras en A4 y en deck (3×2); con más, páginas equilibradas una
+  tras otra, nunca separadas por gráficos.
+- **Copy de la variación:** «vs {valor} en {período}» («vs 16.390 en agosto 2026»), así que el modelo web y el plan
+  deben traer el valor anterior junto al período.
+- Criterio canónico actualizado con estas reglas: `EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` §5.2.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

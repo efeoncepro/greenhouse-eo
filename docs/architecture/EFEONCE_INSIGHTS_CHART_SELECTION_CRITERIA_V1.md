@@ -79,6 +79,32 @@ El orden importa: la regla 3 nunca pasa por encima de la 1 ni de la 2.
 - **Dirección declarada** cuando subir es malo (posición, rondas de revisión).
 - Un valor estimado lleva su marca **«estimado»**.
 - Sin dato: **«—»**, nunca 0.
+- La variación usa **tonos semánticos**: verde si el cambio es mejor, rojo si es peor y gris si es neutro (sin
+  dirección declarada o sin cambio). El triángulo sigue al valor y el tono sigue a la dirección de la métrica. La
+  píldora es la misma en la tarjeta, bajo las columnas y en las tablas.
+- El período se escribe con el valor anterior: «vs {valor} en {período}».
+- Dirección visual aprobada (2026-10-03):
+  [`TASK-1975-efeonce-insights-stat-card-direction.md`](../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md).
+
+### 5.2 Tarjetas y gráficos en un capítulo
+
+Aprobado por el operador el 2026-10-03, junto con la tarjeta de cifra.
+
+1. **Orden del capítulo:** cifras → evolución → explicación → composición → comparación. La familia que no aplica se
+   salta; el orden no se invierte.
+2. **Una sola página de cifras por capítulo**, al inicio: hasta 6 cifras en A4 y en deck (3×2). Con más, páginas
+   equilibradas una tras otra, nunca separadas por gráficos.
+3. **Una métrica con meta va sólo en bullet, sin tarjeta** (regla 2 de §4).
+4. **La tarjeta da el total; el gráfico, el porqué.** Cuando una tarjeta y un gráfico hablan de la misma métrica, el
+   gráfico no repite el total:
+   - si la métrica de una dona ya tiene tarjeta, el centro muestra la participación de la parte principal, no el
+     total;
+   - excepción declarada: los totales de una cascada son anclas de la explicación y conviven con la tarjeta de la
+     misma métrica sin contar como segunda figura de esos hechos (el gate de §9 la acepta).
+5. **Dos barras no son un gráfico:** una métrica contra su período anterior es una tarjeta.
+6. **Dos sistemas de color:** las series usan roles de dato (actual, anterior, oportunidad, paso, ausencia) y la
+   variación usa tonos semánticos. Una serie nunca se pinta de rojo o verde porque bajó o subió.
+7. En Think rige el mismo orden: la retícula de tarjetas va al inicio del capítulo y los gráficos debajo.
 
 ## 6. Reglas duras heredadas
 
