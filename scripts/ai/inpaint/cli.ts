@@ -15,6 +15,7 @@ import { runBackground } from './background'
 import { runErase } from './erase'
 import type { ExpandAnchor } from './expand'
 import { runExpand } from './expand-run'
+import { runMove } from './move'
 import { runImageInpaint } from './pipeline-image'
 import { runVideoInpaint, type VideoStrategy } from './pipeline-video'
 import { localDate } from './run-io'
@@ -82,6 +83,9 @@ interface ImageCliArgs {
   blend?: number
   edge?: number
   zoneResolution?: number
+  dx?: number
+  dy?: number
+  harmonize?: 'auto' | 'off'
   sketch?: string
   sketchMargin?: number
   references: string[]
@@ -154,6 +158,17 @@ export const parseImageArgs = (argv: string[]): ImageCliArgs => {
       case '--scale': args.scale = toNumber(next(), flag); break
       case '--blend': args.blend = toNumber(next(), flag, true); break
       case '--edge': args.edge = toNumber(next(), flag, true); break
+      case '--dx': args.dx = toNumber(next(), flag, true); break
+      case '--dy': args.dy = toNumber(next(), flag, true); break
+
+      case '--harmonize': {
+        const value = next()
+
+        if (!['auto', 'off'].includes(value)) throw new Error('--harmonize espera auto | off.')
+        args.harmonize = value as 'auto' | 'off'
+        break
+      }
+
       case '--zone-resolution': args.zoneResolution = toNumber(next(), flag, true); break
 
       case '--anchor': {
@@ -573,6 +588,50 @@ const runBackgroundCli = async (argv: string[]): Promise<number> => {
   return result.exitCode
 }
 
+const MOVE_HELP = `pnpm ai:inpaint move — mueve o escala un elemento usando sus capas (TASK-1973)
+
+  pnpm ai:inpaint move --image foto.png --layers <layers.json> --layer "notebook" --dx -300 --dy 40 [--scale 0.9]
+
+1) el hueco se rellena con el clean plate (corregido de color); 2) el elemento se recorta de la imagen ORIGINAL con
+el alfa de su capa y se pega en la posición nueva (escala alrededor de su centro); 3) --harmonize auto (default) hace
+una pasada SÓLO de sombra de contacto y reflejo en un halo alrededor (con --adapter/--model; off = sin IA ni gasto).
+Verifica que todo lo que no es hueco, elemento ni halo quede idéntico a la original. Un logo no se mueve con IA.
+`
+
+const runMoveCli = async (argv: string[]): Promise<number> => {
+  const args = parseImageArgs(argv)
+
+  if (args.help) {
+    process.stdout.write(MOVE_HELP)
+
+    return 0
+  }
+
+  if (!args.image || !args.layersJson || !args.layerSelectors.length) throw new Error('--image, --layers y --layer son obligatorios. Ver pnpm ai:inpaint move --help.')
+
+  const result = await runMove({
+    imagePath: resolvePath(args.image),
+    layersJson: resolvePath(args.layersJson),
+    layerSelectors: args.layerSelectors,
+    dx: args.dx,
+    dy: args.dy,
+    scale: args.scale,
+    harmonize: args.harmonize,
+    adapter: args.harmonize === 'off' ? undefined : resolveImageAdapter(args.adapter),
+    model: args.model,
+    quality: args.quality,
+    providerMask: args.providerMask,
+    runRoot: resolvePath(args.run ?? join('ai-generations', `${localDate()}_inpaint`)),
+    dryRun: args.dryRun,
+    force: args.force,
+    maxUsd: args.maxUsd,
+    yes: args.yes,
+    allowBrand: args.allowBrand
+  })
+
+  return result.exitCode
+}
+
 const main = async () => {
   const [command, ...rest] = process.argv.slice(2).filter(arg => arg !== '--')
 
@@ -580,9 +639,10 @@ const main = async () => {
   if (command === 'erase') return runEraseCli(rest)
   if (command === 'expand') return runExpandCli(rest)
   if (command === 'background') return runBackgroundCli(rest)
+  if (command === 'move') return runMoveCli(rest)
   if (command === 'video') return runVideo(rest)
 
-  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|video … (--help en cada uno)\n\n${HELP}`)
+  process.stdout.write(`Uso: pnpm ai:inpaint image|erase|expand|background|move|video … (--help en cada uno)\n\n${HELP}`)
 
   return command === '--help' || command === '-h' ? 0 : 1
 }
