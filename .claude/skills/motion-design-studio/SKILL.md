@@ -82,6 +82,10 @@ referencias, texto, audio, formato y derechos. Es **neutral de motor**: cada ope
 motores (Seedance, Flux 3, Wan, H3, Omni, Kling vía Higgsfield…) y la
 [guía §4.3](../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) dice cuáles y con qué
 evidencia (sólo `edit.zone` tiene canario de garantía al 2026-10-03). Programa de capacidades: EPIC-051.
+**Producto y personas usando producto digital** (el género más frecuente) tiene su
+[anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md): gramática de planos P1–P10, verbos de
+interacción, guion de interfaz con corte en la acción, formatos narrativos y la regla de pantallas del operador
+(la pantalla en escena la renderiza el modelo; la UI exacta va en inserto o flotante).
 
 Para producción de principio a fin, empieza por el
 [método operativo](../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md).

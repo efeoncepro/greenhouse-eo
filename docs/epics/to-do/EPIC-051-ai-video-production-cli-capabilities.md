@@ -82,6 +82,10 @@ puente quede con costo, manifiesto y, donde aplique, la verificación del pipeli
 - `TASK-1983` — Recorte de sujeto / reemplazo de fondo y upscale con detalle verificable.
 - `TASK-1984` — Relight de video que conserva el sujeto (continuación de TASK-1977).
 - `TASK-1985` — Diálogo, voz y lipsync en español sobre video (con `audio-studio`).
+- `TASK-1987` — Producto físico exacto compuesto cuadro a cuadro, con oclusión de manos y pase de integración obligatorio
+  ([anexo de producto e interfaces](../../architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) §2).
+- `TASK-1988` — Kit propio de motion de UI y sincronía por acción: captura o render → cursor, tap, scroll, typing, zoom,
+  llamadas, marco de dispositivo; detección del cuadro del gesto para cortar en la acción (anexo §3).
 - `TASK-1986` — Puente de la CLI de Higgsfield como motor de nuestros CLIs: costo en créditos, manifiesto, retome por
   job, reconciliación crédito→USD y canario de humo C11 de las capacidades puente más usadas.
 
@@ -110,6 +114,8 @@ no es techo de factura.
 | C8 | **Recorte de sujeto y upscale** | candidatos fal de matting y upscale de video | **[sin dato]**; tope propuesto 2,0 | borde sin halo; detalle nativo frente a la fuente | TASK-1983 |
 | C9 | **Relight de video** | ID-V2V Relight 5 s ≈ 1,00 · LightX ≈ 0,50 (tarifas [tercero], guía §10.3) | **≈ 1,5** | sujeto exacto entre cuadros; luz coherente | TASK-1984 |
 | C11 | **Humo del puente Higgsfield** (una corrida por capacidad): Veo 3.1 lite, Kling 3.0, `sam_3_video`, `video_background_remover`, `topaz_video`, `hf_mult_replace_object`, `reframe`, `dubbing` a español | Veo 3.1 lite 8 s 12 cr · Kling 3.0 5 s 8,75 cr · resto requiere subir la fuente para estimar | **≈ 21 créditos + post [sin dato]**; tope propuesto 150 créditos | entrega real, formato, tiempo y créditos reales por job; valor del crédito en USD | TASK-1986 |
+| C12 | **Producto físico en mano** (hero hold + giro), tres técnicas: i2v desde still, sustituto + Genjutsu, sustituto + composición propia con integración | según motor; estimar en la task | **[sin dato]**; tope a autorizar | forma y marca del producto, oclusión de dedos, **«¿se ve pegado?»** contra el i2v nativo | TASK-1987 |
+| C13 | **Persona usando nuestro portal** (feature spotlight 15 s, tenant de ejemplo): pantalla nativa «video-safe» en P3/P4 contra partir con inserto P6 | Wan 3.0 720p ≈ 3,05 · Seedance 2.5 720p ≈ 13,37 (guía §7.4) | **≈ 4,4–19,1** con reserva | legibilidad, sincronía gesto→UI (≤ 2 cuadros), coherencia pantalla nativa/inserto, manos | TASK-1988 |
 | C10 | **Diálogo en español con lipsync** (elenco ficticio + voz sintética, sin persona real) | Seedance 2.5 720p ≈ 2,31 · Flux 3 720p 0,85 · Wan 720p 0,50 | **≈ 3,7** | sincronía labial y pronunciación por escucha | TASK-1985 |
 
 **Total aproximado del programa:** ≈ USD 32–47 en fal/Omni (según cuántos tipos se corran en C1) más lo `[sin dato]` (C3, C4, C8), y ≈ 150 créditos de Higgsfield
@@ -130,7 +136,7 @@ USD 0,00 · cuenta B USD 11,46: alcanza para C1 + C6 (o C1 + C2 parcial); el res
 
 ## Exit Criteria
 
-- [ ] Las ocho tasks hijas quedaron `complete` o explícitamente descartadas con razón.
+- [ ] Las diez tasks hijas quedaron `complete` o explícitamente descartadas con razón.
 - [ ] Cada operación de producción y post de la taxonomía §3.5 tiene, en la guía §4.3, un motor con canario de
       garantía o una fila de hueco con razón y fecha.
 - [ ] Cada canario del plan tiene README en `ai-generations/<fecha>_<task>-canary/` con costo estimado y costo real

@@ -1106,6 +1106,8 @@ motor sale del banco de TASK-1980.
 | | | | Seedance 2.5 1080p: 4 × 5,20 (sin personas reales) | 21,00 | ≈ 30,0 |
 | `personaje-3d/nexa` · alta, **3 tomas** con la misma ancla | final 720p | 1 × Seedance 2.0 mini 480p: 0,35 | Wan 3.0 r2v 720p: 3 tomas × 4 × 0,50 | 6,35 | ≈ 9,1 |
 | | | | Seedance 2.5 r2v 720p: 3 × 4 × 2,31 | 28,07 | ≈ 40,1 |
+| **Feature spotlight 15 s** (`demo-ui/con-persona`, [anexo](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) §3.6): P2 5 s media · P5 4 s alta · P6 5 s propio · cierre | final 720p | 2 × H3 Max Turbo 768P: 0,20 | Wan 3.0 720p: P2 2,5 × 0,50 + P5 4 × 0,40 · P6 y cierre 0 | 3,05 | ≈ 4,4 |
+| | | | Seedance 2.5 720p (mínimo 4 s): P2 2,5 × 2,31 + P5 4 × 1,85 | 13,37 | ≈ 19,1 |
 | `motion-graphics/tipografia-kinetica` · cualquiera | final | — | camino propio (HyperFrames / taller) | 0 | 0 (créditos); el costo es tiempo de diseño |
 | `demo-ui/captura` · cualquiera | final | — | captura real + `pnpm video:finish` (TASK-1981) | 0 | 0 |
 

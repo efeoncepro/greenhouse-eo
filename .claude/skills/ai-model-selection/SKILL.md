@@ -144,7 +144,9 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 Para video, la pregunta no es «¿qué modelo?» sino «¿qué operación de qué fase?»: la
 [taxonomía de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) fija el vocabulario
 (pre, producción, post) y la guía §4.3 cruza cada operación con todos los motores que la hacen, separando
-`[verificado]` (contrato del endpoint) de **canario de garantía** (medido). No hay motor por defecto.
+`[verificado]` (contrato del endpoint) de **canario de garantía** (medido). No hay motor por defecto. Para producto y
+interfaces con personas, el [anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) decide qué
+planos son nuestros (0 créditos) y cuáles generativos antes de elegir motor.
 
 ### Editar lo que ya existe: otra pregunta, otro árbol
 

@@ -1,12 +1,15 @@
 # Greenhouse — Taxonomía de la producción de video con IA V1
 
 > **Tipo de documento:** Referencia técnica agent-facing (clasificación y vocabulario)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-03 por Claude (sesión «Clasificación de producción de video con IA»)
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.3: subtipos (§3.1b), estética o look (§3.1c), dificultad de la toma (§3.14), árbol de decisión y presupuesto por toma (§4), casos reales clasificados (§4.3). v1.2: tipo de video (§3.1b: registro visual y técnica, con camino, candidatos, costo y esfuerzo). v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
+> **Ultima actualizacion:** 2026-10-03 por Claude — v1.4: §3.15 producto físico y digital con personas (anexo propio) y subtipos de `demo-ui` según la regla de pantallas del operador. v1.3: subtipos (§3.1b), estética o look (§3.1c), dificultad de la toma (§3.14), árbol de decisión y presupuesto por toma (§4), casos reales clasificados (§4.3). v1.2: tipo de video (§3.1b: registro visual y técnica, con camino, candidatos, costo y esfuerzo). v1.1: principio «propio primero, proveedor como puente» (§1, §3.13), carril CLI de Higgsfield (§3.12) y siete operaciones nuevas (§3.5).
 > **Dueña del oficio:** skill `motion-design-studio` (audio: `audio-studio`; dirección de arte y canon fotográfico:
 > `design-studio`; método de elección de modelos y costo: `ai-model-selection`)
 > **Programa que la implementa:** [EPIC-051](../epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md)
+> **Anexo:** [producto e interfaces con personas](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md)
+> **Vista navegable (privada del operador):** https://claude.ai/artifact/SALEjhTyiehiRyXRvoFQzY — fases, tipos, producto e
+> interfaces, calculadora de dificultad y presupuesto, árbol, casos, matriz y huecos. Si difiere de este documento, manda el documento.
 > **Documentación relacionada (no se duplica acá):**
 > [Guía de selección de modelos](GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) (la matriz operación × motor vive en su §4.3) ·
 > [Método de producción y posproducción de video](../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) ·
@@ -183,9 +186,11 @@ Un subtipo existe sólo si cambia algo de la decisión (camino, motor, barra o d
 | | `/datos` | gráficos animados: valores exactos (`dataviz-design`) |
 | | `/logo` | motion de marca: vive en el repo taller (`tools/brand-motion`), fuera de esta taxonomía |
 | | `/explainer-plano` | íconos y formas planas con narración |
-| `demo-ui` | `/captura` | grabación real de la interfaz |
-| | `/render` | UI reconstruida y animada en código (HyperFrames) |
-| | `/en-dispositivo` | pantalla dentro de una escena: la UI se protege o se compone (`hibrido`) |
+| `demo-ui` | `/pantalla-completa` | la interfaz llena el cuadro: captura real (`pnpm fe:capture`) o render en código; cursor, tap, scroll y zoom determinísticos |
+| | `/flotante` | paneles de la UI junto a una persona o en el espacio, compuestos **fuera** del dispositivo |
+| | `/en-dispositivo` | pantalla dentro de una escena: **la renderiza el modelo** con pantallas «video-safe» y la lectura va en un inserto (decisión del operador) |
+| | `/dispositivo-3d` | packshot del dispositivo con la UI exacta como textura de un modelo 3D |
+| | `/con-persona` | persona usando la interfaz: se planifica con la gramática de planos P1–P10 del [anexo de producto e interfaces](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) |
 | `atmosfera` | `/loop-fondo` | cierre de loop obligatorio (H7) |
 | | `/textura` | capa para componer: puede ir sin audio y en baja resolución |
 | `hibrido` | `/mundo-mas-ui` | workflow `hybrid-world-plus-ui` |
@@ -467,6 +472,21 @@ retira. Estado de cada puente (verificado o no) y su costo: guía §4.3.
 | `audio.mix` | ffmpeg a mano | TASK-1981 | — |
 | `pre.reference-analysis` | — | — | `video_analysis` (MCP de Higgsfield) |
 
+### 3.15 Producto físico y producto digital con personas
+
+Es el género que más se va a producir y tiene su propio anexo:
+[GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md). Resume acá:
+
+- **Producto físico:** técnicas ordenadas por fidelidad del producto (grabar, 3D, composición cuadro a cuadro con pase de
+  integración, cámara sola, i2v, sustituto + reemplazo), naturaleza del producto y gestos (sostener, tocar, abrir,
+  aplicar, vestir, entregar).
+- **Producto digital:** clase de interfaz (real propia, real del cliente, prototipo, conceptual, de terceros),
+  dispositivos, **gramática de planos P1–P10**, verbos de interacción, **guion de interfaz y corte en la acción** para
+  sincronizar el gesto con la UI, formatos narrativos con recetas de planos, cast (Nexa como agente), localización,
+  derechos y QA propio.
+- **Regla de oro:** la persona pone la emoción y la acción; la UI se lee en un plano propio (inserto o flotante), nunca
+  forzada dentro de una pantalla generada.
+
 ### 3.14 Dificultad de la toma
 
 La dificultad predice **dónde va a fallar el modelo, cuántos intentos harán falta y cuánto va a costar**. Se mide por
@@ -599,6 +619,7 @@ Severidad: **A** bloquea piezas reales frecuentes · **B** limita calidad o prom
 | H15 | Interpolación / slow motion sin judder | C | sin camino propio; puente: `fps_boost` y Topaz (CLI de Higgsfield), sin corrida | follow-up (EPIC-051) |
 | H16 | Video por la API de Higgsfield (Kling 3, PixVerse, LTX, …) | C | ninguna capacidad de video de la API verificada en salida; el CLI de la app de Higgsfield es otro carril (§3.12) | TASK-1980 (una corrida por capacidad candidata) |
 | H17 | Texto en escena (pantallas) sin detector | C | protegido por receta | follow-up |
+| H19–H23 | Género producto e interfaces: detectar el cuadro del gesto, kit de motion de UI, producto físico compuesto con integración, modelos 3D de dispositivos, canarios del género | A–C | anexo §4 · TASK-1987, TASK-1988 |
 | H18 | Stream en tiempo real dirigido | C | no operable por cola | fuera del programa |
 
 ## 6. Mantenimiento
