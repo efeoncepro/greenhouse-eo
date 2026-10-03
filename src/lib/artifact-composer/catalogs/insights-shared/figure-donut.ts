@@ -152,17 +152,21 @@ export const donutSlices = (parts: readonly DonutPartInput[], box: DonutBox): Do
 
   const total = counts.reduce<number>((sum, count) => sum + count!, 0)
 
-  // La participación impresa es derivada (restos mayores): nunca se aleja un punto entero de la cuenta.
-  parts.forEach((part, index) => {
-    const printed = parsePrintedNumber(part.share)
-    const exact = (counts[index]! / total) * 100
+  // La participación impresa es derivada (restos mayores): nunca se aleja un punto entero de la cuenta. Una parte que
+  // redondea a 0 se imprime «<1 %» (TASK-1975): vale 0 en la suma y exige una cuenta mayor que 0 y menor que el 1 %.
+  const printedShareOf = (share: string): number | null => (/^<\s*1(\s|%|$)/.test(share.trim()) ? 0 : parsePrintedNumber(share))
 
-    if (printed === null || Math.abs(printed - exact) >= 1) {
+  parts.forEach((part, index) => {
+    const printed = printedShareOf(part.share)
+    const exact = (counts[index]! / total) * 100
+    const underOne = /^</.test(part.share.trim())
+
+    if (printed === null || Math.abs(printed - exact) >= 1 || (underOne && !(exact > 0 && exact < 1))) {
       throw new FigureDataError(`La participación «${part.share}» de «${part.label}» no corresponde a su cuenta (${part.count} de ${total}).`)
     }
   })
 
-  const printedSum = parts.reduce((sum, part) => sum + parsePrintedNumber(part.share)!, 0)
+  const printedSum = parts.reduce((sum, part) => sum + printedShareOf(part.share)!, 0)
 
   if (Math.round(printedSum) !== 100) throw new FigureDataError(`Las participaciones de la dona suman ${printedSum}, no 100.`)
 

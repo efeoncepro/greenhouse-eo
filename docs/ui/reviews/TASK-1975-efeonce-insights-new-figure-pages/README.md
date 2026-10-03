@@ -142,7 +142,10 @@ meta de 28 caracteres en el deck.
   [`berel-2026-09-a4-dona-ga4-real.png`](berel-2026-09-a4-dona-ga4-real.png).
 
 Defecto que destapó: una parte con valor que redondea a 0 % se leía «0 %». Ahora se lee «<1 %» (`shareLabel` en
-`figure-slots.ts`, commit `8e4fbac7b`). Queda una decisión abierta: el color de las partes de waffle y dona sin rol
+`figure-slots.ts`, commit `8e4fbac7b`); el validador de la dona del compositor también lo acepta (vale 0 en la suma y
+exige una cuenta mayor que 0 y menor que el 1 %), sin lo cual la página no componía. Vista previa regenerada el
+2026-10-03 con las dos correcciones: dona p. 17 y cascada p. 7 con «(−17,0 %)» sin partir
+([`berel-2026-09-a4-cascada-lead.png`](berel-2026-09-a4-cascada-lead.png)). Queda una decisión abierta: el color de las partes de waffle y dona sin rol
 declarado se asigna por orden, y en esta dona Gemini queda pintado con el color de «oportunidad».
 
 **Observaciones de esta revisión, no corregidas:**
