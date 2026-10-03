@@ -4,7 +4,7 @@
 
 **Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
 
-**Inpainting (02/10):** [TASK-1965](docs/tasks/in-progress/TASK-1965-ai-inpaint-image-video-cli-pipeline.md) code complete local, sin push: `pnpm ai:mask` + `ai:inpaint image|video` (delta 0). Sunburst con máscara = panel negro → edita sin máscara. Faltan canarios Sunburst, boceto y Seedream (autorización de gasto).
+**Inpainting (03/10):** TASK-1965 complete, en producción (`fe261ca27`). Sigue [TASK-1973](docs/tasks/to-do/TASK-1973-ai-inpaint-editing-techniques.md); coordinar `foto:expandir` con CMP-004.
 
 **Marketing Studio (02/10, noche):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress. A y B en producción (API 1.4.0, `pnpm studio:write`); gateway v1.10.0 desplegado sin federar escrituras. **Operador:** release de las capabilities de Greenhouse `9d0d698d4`. C diferido. [§7.4](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 

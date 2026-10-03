@@ -22,7 +22,7 @@
 - Status real: `Diseño acordado con el operador 2026-10-02; sin implementación`
 - Rank: `TBD`
 - Domain: `content|platform`
-- Blocked by: `TASK-1965`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

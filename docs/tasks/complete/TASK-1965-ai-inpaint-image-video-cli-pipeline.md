@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete local 2026-10-02, todos los criterios verificados (canarios Flare, Flux Fill, Sunburst con guía y con boceto + referencia, Seedream Lite y flux3-edit; ≈ USD 0,40). Falta el gate pnpm build de cierre (requiere autorización del operador: cuelga el equipo) y push`
+- Status real: `Complete 2026-10-03 — en producción con el release fe261ca27 (PR #249, orquestador success; build y CI Deep verdes, con tope de 60 s para las pruebas del pipeline de imagen bajo cobertura, commit 1e4fdf2d8). Todos los criterios verificados con canarios reales (≈ USD 0,40). Herramienta out-of-band: sin deploy propio ni flags`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -365,15 +365,15 @@ Autorización explícita del operador para el gasto de los canarios reales (imag
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1925 y TASK-1973 con delta; TASK-1497/1572 de Globe sin cambios)
 
-- [ ] Delta registrado en `TASK-1925` con el crecimiento de `scripts/ai`
-- [ ] Evidencia de los canarios (manifiestos y veredictos) referenciada en la task
+- [x] Delta registrado en `TASK-1925` con el crecimiento de `scripts/ai`
+- [x] Evidencia de los canarios (manifiestos y veredictos) referenciada en la task: `ai-generations/2026-10-02_task-1965-canary/README.md`
 
 ## Follow-ups
 

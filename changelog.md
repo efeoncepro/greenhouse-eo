@@ -26,6 +26,7 @@
 - Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
   con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
   no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
+- Cerrada el 2026-10-03: en producción con el release `fe261ca27`; siguiente paso, TASK-1973 (expandir, capas, borrar, fondo y detalle).
 
 ## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
 
