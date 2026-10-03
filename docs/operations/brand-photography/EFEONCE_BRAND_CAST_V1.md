@@ -267,8 +267,10 @@ logotipo trasero («efeonce» + «Empower your Growth») correctos al 100 %. Con
 asomaba junto al de la chaqueta («doble logo»): la escena declara que el borde de la chaqueta tapa el del polo.
 
 **Grupo [operador: «una prueba cinemática juntos»].** Los cinco se piden en `identidad` en el orden del cuadro; desde el
-2026-10-03 el compilador admite **grupos de 3 a 5** con al menos un personaje del elenco, y el elenco **no sale sólo:
-Nexa y Julio se suman al grupo** **[operador, 2026-10-03: «no quiero que se entienda que el elenco sale siempre solo»]**.
+2026-10-03 el compilador admite **grupos de 3 a 5 con cualquier combinación de personajes del elenco, Nexa y Julio**. El
+elenco existe para variar las personas de una foto de equipo o de varias personas y **se suma cuando hace falta: no es
+una regla que alguno deba estar** **[operador, 2026-10-03: «no quiero que se entienda que el elenco sale siempre solo»;
+«debe usarse el elenco si es necesaria su inclusión»]**.
 Cada persona lleva una referencia frontal, su bloque IDENTITY etiquetado y la luz de las referencias cortada (medición y
 fallas en el [casebook](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#elenco-en-grupo-2026-10-03--lo-que-aprendimos), filas
 21–25). En dupla, cualquier combinación (un personaje con Nexa, con Julio o con otro personaje) funciona como siempre,

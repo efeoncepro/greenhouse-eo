@@ -515,8 +515,8 @@ export const ELENCO = {
 // el bloque REFERENCES de un grupo prohíbe que esa luz pase a la escena.
 const REFS_POR_PERSONA = { 1: 3, 2: 2, 3: 1, 4: 1, 5: 1 }
 
-// Personas del roster que pueden sumarse a un grupo del elenco (3 a 5): una referencia frontal cada una, como el elenco.
-export const GRUPO_CON_ELENCO = ['nexa', 'julio']
+// Personas del roster que entran en un grupo de 3 a 5 (una referencia frontal cada una, como el elenco).
+export const EN_GRUPO = ['nexa', 'julio']
 
 // Las tres dimensiones de una persona resuelven a la MISMA ranura —la referencia que se antepone a las
 // frontales— así que una ficha puede pedir UNA, no dos. `vista` es el ángulo, `expresion` una de las ocho
@@ -566,16 +566,20 @@ function resolverIdentidad(ficha) {
 
   const claveDe = p => (typeof p === 'string' ? p : p?.persona)
 
-  // El elenco no sale sólo: puede ir con Nexa y con Julio [operador, 2026-10-03: «no quiero que se entienda que el elenco
-  // sale siempre solo; también puede salir con Nexa (…) y conmigo»]. En un grupo de 3 a 5 entran los personajes del
-  // ELENCO más `GRUPO_CON_ELENCO`, siempre con al menos un personaje del elenco; el resto del roster sigue con tope dos.
-  const enGrupo = p => ELENCO[claveDe(p)] || GRUPO_CON_ELENCO.includes(claveDe(p))
+  // Un grupo de 3 a 5 es CUALQUIER combinación de personajes del ELENCO, Nexa y Julio (`EN_GRUPO`). El elenco existe
+  // para variar las personas de una foto de equipo o de varias personas, y se suma cuando hace falta: no es una regla
+  // que alguno deba estar [operador, 2026-10-03: «debe usarse el elenco si es necesaria su inclusión»]. Otras personas
+  // del roster siguen con tope dos: con ellas el grupo no está medido.
+  const enGrupo = p => ELENCO[claveDe(p)] || EN_GRUPO.includes(claveDe(p))
+  const repetida = pedidas.map(claveDe).find((k, i, todas) => todas.indexOf(k) !== i)
 
-  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(enGrupo) || !pedidas.some(p => ELENCO[claveDe(p)]))) {
+  if (repetida) throw new Error(`"${repetida}" aparece dos veces en \`identidad\`: cada persona va una sola vez (su vista o expresión se declara en su entrada).`)
+
+  if (pedidas.length > 2 && (pedidas.length > 5 || !pedidas.every(enGrupo))) {
     throw new Error(
-      'Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 con al menos un personaje ' +
-        `del ELENCO y el resto del ELENCO o ${GRUPO_CON_ELENCO.join(' / ')} (EC1-brazo2, 2026-10-03). Con otras personas del ` +
-        'roster, la ronda llegó a dos (más dos mascotas con su propio bloque): divide la pieza o documenta la medición antes de subir el tope.'
+      `Más de dos personas con identidad en una toma no está medido, salvo grupos de 3 a 5 entre el ELENCO, ${EN_GRUPO.join(' y ')} ` +
+        '(EC1-brazo2 y VP3, 2026-10-03). Con otras personas del roster la ronda llegó a dos (más dos mascotas con su propio ' +
+        'bloque): divide la pieza o documenta la medición antes de subir el tope.'
     )
   }
 

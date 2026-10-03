@@ -405,8 +405,12 @@ conAssets('foto:prompt · identidad', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['juan'] })).toThrow(/desconocida/)
   })
 
-  it('aborta sobre dos personas: el tope está medido, no supuesto', () => {
-    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'julio'] })).toThrow(/no está medido/)
+  it('aborta sobre dos personas fuera del grupo medido: el tope está medido, no supuesto', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'daniela'] })).toThrow(/no está medido/)
+  })
+
+  it('la misma persona no se pide dos veces', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'julio'] })).toThrow(/aparece dos veces/)
   })
 
   it('exige que `identidad` sea una lista', () => {
@@ -1835,11 +1839,13 @@ describe('foto:prompt · elenco de marca', () => {
     expect(() => validarVestuarioDeLinea(ficha('antonio', 'revenue-salesforce', 'chaqueta-bomber-efeonce'))).not.toThrow()
   })
 
-  // El elenco también sale con Nexa y con Julio (operador, 2026-10-03); el resto del roster sigue con tope dos.
-  it('un grupo de 3 a 5 lleva al menos un personaje del elenco, y suma a Nexa y a Julio; el resto del roster no', () => {
+  // Grupo = cualquier combinación de elenco, Nexa y Julio; el elenco no es obligatorio (operador, 2026-10-03). El resto
+  // del roster sigue con tope dos.
+  it('un grupo de 3 a 5 combina elenco, Nexa y Julio; con otras personas del roster no', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['andres', 'karo', 'hum'] })).toThrow(/no está medido/)
     expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'andres'] })).toThrow(/no está medido/)
-    expect(() => construirPrompt({ ...fichaBase, identidad: ['karo', 'hum', 'sophia', 'isabella', 'antonio', 'karo'] })).toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'karo'] })).not.toThrow(/no está medido/)
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['karo', 'hum', 'sophia', 'isabella', 'antonio', 'julio'] })).toThrow(/no está medido/)
   })
 
   itConAssets('Nexa y Julio se suman a un grupo del elenco con su referencia frontal', () => {
