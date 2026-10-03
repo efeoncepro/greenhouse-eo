@@ -31,6 +31,7 @@ import {
   OBJETOS,
   PALANCAS,
   EQUIPO_REAL,
+  ELENCO,
   LINEA_CREATIVA,
   PERSONAS,
   referenciasDeclaradas,
@@ -1777,3 +1778,49 @@ describe('foto:prompt · casting de campaña (2026-10-02)', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['nadie'] })).toThrow(/casting/)
   })
 })
+
+// Elenco de marca (EFEONCE_BRAND_CAST_V1, 2026-10-02): personajes FICTICIOS que reaparecen entre campañas. Viven
+// separados del roster real, interpretan sólo su línea y visten la prenda de esa línea.
+describe('foto:prompt · elenco de marca', () => {
+  it('ningún personaje del elenco comparte clave con el equipo real', () => {
+    for (const clave of Object.keys(ELENCO)) expect(PERSONAS[clave as keyof typeof PERSONAS], clave).toBeUndefined()
+  })
+
+  it('cada personaje declara su línea, su bloque IDENTITY, su cuerpo dentro de refs y cuatro vistas', () => {
+    for (const [clave, p] of Object.entries(ELENCO as Record<string, { linea: string; identity: string; refs: string[]; cuerpo: string; vistas: Record<string, string> }>)) {
+      expect(p.identity, clave).toMatch(/^IDENTITY \(critical\):.*fictional Efeonce campaign character/)
+      expect(p.refs, clave).toContain(p.cuerpo)
+      expect(Object.keys(p.vistas), clave).toEqual(['45-izq', '45-der', 'perfil-izq', 'perfil-der'])
+      expect(['growth', 'brand', 'engine', 'voice', 'revenue-hubspot', 'revenue-salesforce'], clave).toContain(p.linea)
+    }
+  })
+
+  it('el lock sella las referencias del elenco', () => {
+    const etiquetas = referenciasDeclaradas().map((r: { etiqueta: string }) => r.etiqueta)
+
+    for (const clave of Object.keys(ELENCO)) expect(etiquetas, clave).toContain(`elenco:${clave}/cuerpo`)
+  })
+
+  it('un casting de ficha no puede tomar la clave de un personaje del elenco', () => {
+    expect(() => castingDeFicha({ casting: { karo: { identity: 'IDENTITY (critical): x', refs: ['a.png'] } } }, 'karo')).toThrow(/elenco de marca/)
+  })
+
+  it('en rol, el elenco viste la prenda de su línea y no interpreta otra línea', () => {
+    const ficha = (persona: string, linea: string, objeto: string) => ({ identidad: [persona], linea, objetos: [{ objeto }] })
+
+    expect(() => validarVestuarioDeLinea(ficha('karo', 'brand', 'hoodie-efeonce'))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(ficha('karo', 'brand', 'chaqueta-bomber-efeonce'))).toThrow(/hoodie Efeonce/)
+    expect(() => validarVestuarioDeLinea(ficha('sophia', 'engine', 'chaqueta-softshell-efeonce'))).not.toThrow()
+    expect(() => validarVestuarioDeLinea(ficha('sophia', 'voice', 'chaqueta-softshell-efeonce'))).toThrow(/no interpreta otra/)
+    expect(() => validarVestuarioDeLinea(ficha('antonio', 'revenue-salesforce', 'chaqueta-bomber-efeonce'))).not.toThrow()
+  })
+
+  itConAssets('se pide en `identidad` como el roster, con su vista y su cuerpo', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'isabella', vista: 'perfil-izq' }] })
+
+    expect(r.imagenes[0]).toMatch(/_identidad-elenco\/isabella\/isabella-perfil-izq\.png$/)
+    expect(r.imagenes).toContain('ai-generations/_identidad-elenco/isabella/isabella-cuerpo.png')
+    expect(r.prompt).toContain(ELENCO.isabella.identity)
+  })
+})
+

@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-10-02",
+  "sellado": "2026-10-03",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -281,6 +281,146 @@
     "ai-generations/_identidad-equipo/valentina/avatar-bomber-2026-09.png": {
       "rol": "persona:valentina/cuerpo",
       "sha256": "6d40946528781cfb9c03a2ae7ad0dfc920840ca7b8805231913b167c768237ae"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-frente.png": {
+      "rol": "elenco:hum",
+      "sha256": "7ee0892973ea5d95005a731fbb972d449266c793a941701c0aaea10f04967213"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-elegida.png": {
+      "rol": "elenco:hum",
+      "sha256": "b87203efdb0388aa077af4231bbfb2da9fc41c72dae577c64e8c3cb85cbfa6d1"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-cuerpo.png": {
+      "rol": "elenco:hum/cuerpo",
+      "sha256": "dd85526cc3ba446e603f565f8eda660d85ed63fc2c8bd2602805cf47cd49e3c9"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-45-izq.png": {
+      "rol": "elenco:hum/45-izq",
+      "sha256": "464a0947e232191306813e143e468e9be3546e29e3135b52befaa3b0e0fc6adc"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-45-der.png": {
+      "rol": "elenco:hum/45-der",
+      "sha256": "3b5dee69bb61d27fc1081337a1bbd8f0d8384af72f555417321744dc76e5ef52"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-perfil-izq.png": {
+      "rol": "elenco:hum/perfil-izq",
+      "sha256": "45105067edb1964231a8e9b27551b261e15b170d7f6aa9288f2fcf4690c1cb37"
+    },
+    "ai-generations/_identidad-elenco/hum/hum-perfil-der.png": {
+      "rol": "elenco:hum/perfil-der",
+      "sha256": "f445da8f3cfeef861f2a890d819016ab9ef6ccfc6f60eadd069309758b054649"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-frente.png": {
+      "rol": "elenco:karo",
+      "sha256": "2d49683fcdd5b6f5d5eea9bcc5b8357edccbc7ab7f1551077a03c876c4508d12"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-elegida.png": {
+      "rol": "elenco:karo",
+      "sha256": "3c40a7d756a5dfa05e02db3b9b64d0bc24832277a9c79f09fb33688e57be480e"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-cuerpo.png": {
+      "rol": "elenco:karo/cuerpo",
+      "sha256": "1c3203d363c2afa9f614c7feda005d748db175deeecab6d99132486c0abbbfb4"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-45-izq.png": {
+      "rol": "elenco:karo/45-izq",
+      "sha256": "d05b9ca0182738e73266d088ec74bbdc3c165fe60e6d8e02abb914297134ec2c"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-45-der.png": {
+      "rol": "elenco:karo/45-der",
+      "sha256": "348d788ce26a8b9207451fb93c49238adcc14888bf808866acd697bc42a5748d"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-perfil-izq.png": {
+      "rol": "elenco:karo/perfil-izq",
+      "sha256": "47bdddde389ba42ec8ef18376e788ce2b42eb40b087a30046f1bdd68c12a6dc7"
+    },
+    "ai-generations/_identidad-elenco/karo/karo-perfil-der.png": {
+      "rol": "elenco:karo/perfil-der",
+      "sha256": "ebe1a26997cd7abade29c00a47724bd0bb147b8224abde5772a11dd457724309"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-frente.png": {
+      "rol": "elenco:sophia",
+      "sha256": "5e812949011d6acf9fe33e9b120871e3ba5b40925799acffb0ac6a7da7def86b"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-elegida.png": {
+      "rol": "elenco:sophia",
+      "sha256": "0e617e87f2e1e08532305b5581cdb7d918299cbf6e221f973b41e075242594b5"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-cuerpo.png": {
+      "rol": "elenco:sophia/cuerpo",
+      "sha256": "60aa5b11f42fb0c14bba6dd59fc8367fc1785e8723637cb9161c6542894880b3"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-45-izq.png": {
+      "rol": "elenco:sophia/45-izq",
+      "sha256": "b3c14abba40b1b52ec62ce1dd335755ffeeaf4e26f278e7c2249d23ebc1fd60a"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-45-der.png": {
+      "rol": "elenco:sophia/45-der",
+      "sha256": "0da1ecbb1b17669297405bbc73858b69094d45f75c3299518145dce5ce49bfa9"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-perfil-izq.png": {
+      "rol": "elenco:sophia/perfil-izq",
+      "sha256": "9741b1dcc48e422740592211b6c82ec2b7b4563ab1f122e72ff808386a2fb12c"
+    },
+    "ai-generations/_identidad-elenco/sophia/sophia-perfil-der.png": {
+      "rol": "elenco:sophia/perfil-der",
+      "sha256": "fb2d5f49f764592d48e7985d8df8c96b67ba1d5d481f80a71c51f601858b08a5"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-frente.png": {
+      "rol": "elenco:isabella",
+      "sha256": "0881c53155305afa1f5748a3d5b208f6e9e05d2147185b1a5813823ccac24d2f"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-elegida.png": {
+      "rol": "elenco:isabella",
+      "sha256": "f9518b2c97bb8d2da8aee0fff65d1bd4d5f6a3ff9607cacf3c4fa19c168a4c53"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-cuerpo.png": {
+      "rol": "elenco:isabella/cuerpo",
+      "sha256": "39ee61bc3d85426645f9e2ae1de7325b09199bd1a64e23e69357ac5dbf1855aa"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-45-izq.png": {
+      "rol": "elenco:isabella/45-izq",
+      "sha256": "926744f71f0d628ffe0bcef5612ca078fa73ee48d3a4f2af54852c5e28fb200e"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-45-der.png": {
+      "rol": "elenco:isabella/45-der",
+      "sha256": "38221320d5ff706e3f7b062e3e1e3f427e214990c9db2aa99cd48f723824a34b"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-perfil-izq.png": {
+      "rol": "elenco:isabella/perfil-izq",
+      "sha256": "fcdd4e429738fa60bfff86cd688272f7796d2c94840e165d3c4f6dfad71c9ffb"
+    },
+    "ai-generations/_identidad-elenco/isabella/isabella-perfil-der.png": {
+      "rol": "elenco:isabella/perfil-der",
+      "sha256": "109aaa031adb9221c4611ceb3599648e1312dc20d7110530d93f39849b96abdb"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-frente.png": {
+      "rol": "elenco:antonio",
+      "sha256": "c4c63e4c6f9b9747cd0d8848bf2374367c29f084bcae83218ce5cfcd81dcd834"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-elegida.png": {
+      "rol": "elenco:antonio",
+      "sha256": "ba7a3165ecdd767ad7ceff3c37bf8d7692aab4ca1dfdcfdea2a4b20e11293fd9"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-cuerpo.png": {
+      "rol": "elenco:antonio/cuerpo",
+      "sha256": "ddb6d73b036d661ba339337d598af3938b56c95947a225cf346afb20a62f6210"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-45-izq.png": {
+      "rol": "elenco:antonio/45-izq",
+      "sha256": "e5e24a53c969854116695d3b292b6838355bb39b4c5e4659cbbba64e9888a81c"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-45-der.png": {
+      "rol": "elenco:antonio/45-der",
+      "sha256": "8398bcbb008bf404bca1334cc0bdb3df26b2014a8821639c0d5e5386bfce3999"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-perfil-izq.png": {
+      "rol": "elenco:antonio/perfil-izq",
+      "sha256": "b5135dbc2da64b3057c38cdeae838e2dcdba312a79d339efd6826e89f5ef02b4"
+    },
+    "ai-generations/_identidad-elenco/antonio/antonio-perfil-der.png": {
+      "rol": "elenco:antonio/perfil-der",
+      "sha256": "9315f0c0cb013f267b60fa25eedf3d0e2c1a56f1f8e4b42d44da225a59e2bf62"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",

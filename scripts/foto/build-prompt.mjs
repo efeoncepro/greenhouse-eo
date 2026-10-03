@@ -435,6 +435,61 @@ export const PERSONAS = {
   }
 }
 
+// ── Elenco de marca: personajes FICTICIOS que reaparecen entre campañas [operador, 2026-10-02] ──
+// Canon: docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md. Separado de PERSONAS a propósito: nadie debe
+// confundir un personaje con alguien del equipo real, y el gate del canon §3.6 vale para el roster, no para el elenco.
+// Cada uno interpreta el rol de SU línea de servicio (`linea`) y viste la prenda de esa línea (`validarVestuarioDeLinea`).
+// Las referencias viven en `ai-generations/_identidad-elenco/<clave>/`: realismo v3 de Nexa (poros y vello fino, tono
+// parejo), vistas por EDICIÓN desde la foto elegida y cuerpo entero EXTENDIDO desde ella (regenerarlo inventaba otra
+// silueta). Orden de `refs`: frente (rostro), elegida y cuerpo.
+const ELENCO_BASE = 'ai-generations/_identidad-elenco'
+
+const refsElenco = clave => ({
+  refs: [`${ELENCO_BASE}/${clave}/${clave}-frente.png`, `${ELENCO_BASE}/${clave}/${clave}-elegida.png`, `${ELENCO_BASE}/${clave}/${clave}-cuerpo.png`],
+  cuerpo: `${ELENCO_BASE}/${clave}/${clave}-cuerpo.png`,
+  // El nombre de la vista dice hacia qué lado del CUADRO mira la persona (así se construyeron: pedirlo por el lado de
+  // la persona devolvió las dos vistas de 45° hacia el mismo lado).
+  vistas: Object.fromEntries(['45-izq', '45-der', 'perfil-izq', 'perfil-der'].map(v => [v, `${ELENCO_BASE}/${clave}/${clave}-${v}.png`]))
+})
+
+export const ELENCO = {
+  hum: {
+    etiqueta: 'Hum',
+    linea: 'growth',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Venezuelan, 33. Her face is a SOFT OVAL, slightly full at the cheeks, with a softly rounded chin — never long, never angular. EYES dark brown and slightly almond-shaped; BROWS dark, full and softly arched. NOSE straight with a softly rounded tip, with a tiny silver stud on one nostril. LIPS medium-full in a natural rosy-nude tone. HAIR very dark brown, long past the shoulders, parted slightly to one side, with soft loose waves and natural glossy highlights. Fair skin with a warm undertone and a natural blush; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Medium build with natural moderate curves, about 1.70 m. Preserve her face and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('hum')
+  },
+  karo: {
+    etiqueta: 'Karo',
+    linea: 'brand',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Venezuelan, 28. Her face is HEART-SHAPED: wide at the high cheekbones and narrowing to a fine, slightly pointed chin. NOSE small and slightly upturned. EYES light brown; BROWS medium, softly arched. LIPS full, with rosy-pink lipstick. HAIR long, voluminous and CURLY, defined 3A-3B ringlets in a rich copper-brown, falling past the shoulders. Fair skin with a natural rosy flush and a few faint freckles; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Medium gold hoop earrings. Slim build with narrow shoulders, about 1.63 m. Her signature expression is a playful half-smile. Preserve her face and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('karo')
+  },
+  sophia: {
+    etiqueta: 'Sophia',
+    linea: 'engine',
+    identity:
+      "IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character and Karo's older sister. Venezuelan, 31. She shares the family face: HEART-SHAPED, high cheekbones narrowing to a fine chin, a small slightly upturned nose and light brown eyes. HAIR DARK espresso-brown and CURLY, cut in a SHORT curly bob at jaw length — never long, never copper. GLASSES with thin metal frames in fine gold wire and rectangular lenses, always worn. Small simple stud earrings; no lipstick, natural make-up. Fair skin with a natural rosy flush; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy tone. Slim build, about 1.65 m. Her signature expression is calm and analytical, a contained closed-mouth smile. Preserve her face, hair and glasses EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.",
+    ...refsElenco('sophia')
+  },
+  isabella: {
+    etiqueta: 'Isabella',
+    linea: 'voice',
+    identity:
+      'IDENTITY (critical): the woman is the SAME person shown in the reference images, a fictional Efeonce campaign character. Colombian from Barranquilla, 27. Deep brown skin with a warm golden undertone and a soft scattering of small freckles across the bridge of the nose and the upper cheekbones; the texture comes only from fine irregular pores and fine facial hair, with an even, healthy glow. EYES large and dark brown; BROWS full and defined; high cheekbones; LIPS full. Her smile is wide and bright with straight, even teeth. HAIR big, voluminous, natural CURLY 3C-4A coils, dark brown-black. Small gold stud earrings. Slim and long-limbed, about 1.68 m. Preserve her face, freckles and hair EXACTLY as in the references — her features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or slim her.',
+    ...refsElenco('isabella')
+  },
+  antonio: {
+    etiqueta: 'Antonio',
+    linea: 'revenue-hubspot',
+    identity:
+      'IDENTITY (critical): the man is the SAME person shown in the reference images, a fictional Efeonce campaign character. Mexican, 35. Tan olive skin with a warm undertone; the texture comes only from fine irregular pores, with an even, healthy tone. Strong SQUARE jaw, straight nose, thick straight dark BROWS, dark brown eyes. HAIR straight and BLACK with no grey, short on the sides and longer on top, combed back with a natural loose wave of movement. A short, well-groomed BEARD of 3 to 5 mm with real individual hairs, full coverage and soft natural lines on the cheeks and neck — never painted, never long. NO glasses. Athletic build with broad shoulders, about 1.78 m. Preserve his face, hair and beard EXACTLY as in the references — his features, not the moment they caught: head turn, gaze and expression come from the scene. Do not age, beautify or change his build.',
+    ...refsElenco('antonio')
+  }
+}
+
 // Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
 // personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
 const REFS_POR_PERSONA = { 1: 3, 2: 2 }
@@ -459,6 +514,7 @@ export function castingDeFicha(ficha, clave) {
 
   if (!c) return undefined
   if (PERSONAS[clave]) throw new Error(`El casting "${clave}" choca con una identidad canónica del roster: usa otra clave.`)
+  if (ELENCO[clave]) throw new Error(`El casting "${clave}" choca con un personaje del elenco de marca: pídelo en \`identidad\` sin \`casting\`, o usa otra clave.`)
 
   if (typeof c.identity !== 'string' || !/^IDENTITY \(critical\):/.test(c.identity)) {
     throw new Error(`El casting "${clave}" necesita \`identity\` que empiece con «IDENTITY (critical):» y describa la cara sin envejecerla.`)
@@ -495,11 +551,12 @@ function resolverIdentidad(ficha) {
     // Una entrada puede ser "julio" (vista frontal), { persona: 'julio', vista: 'perfil-izq' },
     // { persona: 'nexa', expresion: 'the-read' } o { persona: 'nexa', vestuario: 'speaker-1' }.
     const clave = typeof pedido === 'string' ? pedido : pedido?.persona
-    const persona = PERSONAS[clave] ?? castingDeFicha(ficha, clave)
+    const persona = PERSONAS[clave] ?? ELENCO[clave] ?? castingDeFicha(ficha, clave)
 
     if (!persona) {
       throw new Error(
         `Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}. ` +
+          `Elenco de marca (ficticio): ${Object.keys(ELENCO).join(', ')}. ` +
           'Para un personaje ficticio de campaña, declara su set en `casting` de la ficha.'
       )
     }
@@ -1267,13 +1324,15 @@ export function referenciasDeclaradas() {
   const out = []
   const push = (ruta, rol, etiqueta) => out.push({ ruta: path.normalize(ruta), rol, etiqueta })
 
-  for (const [clave, persona] of Object.entries(PERSONAS)) {
-    for (const ref of persona.refs) push(ref, 'identidad', `persona:${clave}`)
-    if (persona.cuerpo) push(persona.cuerpo, 'identidad', `persona:${clave}/cuerpo`)
+  for (const [prefijo, catalogo] of [['persona', PERSONAS], ['elenco', ELENCO]]) {
+    for (const [clave, persona] of Object.entries(catalogo)) {
+      for (const ref of persona.refs) push(ref, 'identidad', `${prefijo}:${clave}`)
+      if (persona.cuerpo) push(persona.cuerpo, 'identidad', `${prefijo}:${clave}/cuerpo`)
 
-    for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
-      for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) {
-        push(ref, 'identidad', `persona:${clave}/${nombre}`)
+      for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
+        for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) {
+          push(ref, 'identidad', `${prefijo}:${clave}/${nombre}`)
+        }
       }
     }
   }
@@ -2385,7 +2444,8 @@ export const VESTUARIO_POR_LINEA = {
 
 export const validarVestuarioDeLinea = ficha => {
   const personas = (Array.isArray(ficha.identidad) ? ficha.identidad : []).map(p => (typeof p === 'string' ? p : p?.persona))
-  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p))
+  // El elenco de marca interpreta el rol de su línea: viste igual que el equipo (EFEONCE_BRAND_CAST_V1 §4).
+  const delEquipo = personas.filter(p => EQUIPO_REAL.includes(p) || ELENCO[p])
 
   if (delEquipo.length === 0 || ficha.linea === undefined) return
 
@@ -2393,6 +2453,18 @@ export const validarVestuarioDeLinea = ficha => {
 
   if (!lineas.includes(ficha.linea)) {
     throw new Error(`La línea "${ficha.linea}" no existe. Usa una de efeonceGraphicLine.lines: ${lineas.join(', ')}.`)
+  }
+
+  // Un personaje del elenco no cambia de línea entre piezas (Revenue admite las dos plataformas: HubSpot y Salesforce).
+  const familiaDe = linea => (linea.startsWith('revenue-') ? 'revenue' : linea)
+
+  for (const clave of delEquipo.filter(p => ELENCO[p])) {
+    if (familiaDe(ELENCO[clave].linea) !== familiaDe(ficha.linea)) {
+      throw new Error(
+        `${ELENCO[clave].etiqueta} es el personaje de la línea ${ELENCO[clave].linea} y no interpreta otra (pediste ${ficha.linea}). ` +
+          'Usa al personaje de esa línea o casting por rol (EFEONCE_BRAND_CAST_V1 §1).'
+      )
+    }
   }
 
   const familia = ficha.linea === LINEA_CREATIVA ? 'creativa' : 'negocio'
