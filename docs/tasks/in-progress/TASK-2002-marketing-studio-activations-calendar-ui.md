@@ -95,7 +95,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -108,7 +108,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Diseno — dirección visual v3, v3.1 y v3.2 aprobada por el operador el 2026-10-04; wireframe y flow conciliados; espera el contrato de TASK-2001`
+- Status real: `En implementación (Claude, 2026-10-04) contra el contrato local de TASK-2001 (corte 4094da0); Postgres local con datos de staging; sin push`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
