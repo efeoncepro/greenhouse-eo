@@ -1,10 +1,31 @@
 # TASK-1284 — Growth GA4 (Google Analytics 4) multi-tenant connection + grader signal
 
+## Delta 2026-10-04 — reconciliación de implementación y rollout
+
+La conexión/reader **ya están implementados**. El canary histórico del 02/10 verificó IAM, URIs,
+redeploy staging, consentimiento desde la UI de Grupo Berel, propiedad `328274754` en estado `active`
+y Data API real (13 filas por canal). Fuente: commit `0bafbd2c654e491fb0817360df8594263f9ca906` y
+[ledger](../../operations/FEATURE_FLAG_STATE_LEDGER.md). El release `fe261ca2745f` del 03/10
+(run `37093141725`; commit documental `c517eac75`) llevó código/flag a Production y OAuth/flag al
+worker `ops-worker-00757-f6x`. No se repiten como pendientes IAM/URIs/release ya registrados.
+
+Revisión local del 04/10: 4 archivos / **13 tests passed** (commands GA4, cliente API, facts de
+Insights y coverage de capabilities). Se verificó código de OAuth/state single-use, stores,
+capability/grant, cinco rutas internas, panel y reader. No se consultaron envs, PG, Google ni tokens
+live; estas pruebas no certifican todas las organizaciones ni conectividad vigente en producción.
+
+**Trabajo restante:** conversions no existe aún entre métricas admitidas del reader; GA4 no está
+cableado al run/report del grader ni a una señal propia de salud de token. Insights ya consume sesiones
+orgánicas/IA mediante TASK-1962; esa entrega no sustituye todos los criterios de esta task. Falta
+verificar revocación/disabled del reader, cierre de parity con consumers previstos, rollback y
+monitoreo 7d/alcance de consentimiento proporcional. La conexión entregada desbloquea el sustrato
+TASK-1787; no debe esperar el cierre del grader/reliability de TASK-1284.
+
 ## Delta 2026-09-19 — conexión visible solicitada por el operador
 
 El operador pidió exponer la conexión GA4 junto al botón de Search Console en el Account 360 del cliente. Se implementaron localmente el panel, OAuth read-only, selector de propiedades, comandos, capability, reader histórico y migración additive. La dirección visual está en `docs/architecture/growth/ga4-connection-ui-v1.md`.
 
-**Estado real:** typecheck, lint, cinco pruebas de autorización/API y GVC local desktop/móvil verdes para el panel (`.captures/2026-09-19T23-25-04_ga4-connection-panel`). Faltan OAuth/IAM de Google, aplicación de migración con el release y smoke real de Grupo Berel. El cableado al grader y su señal de salud siguen pendientes dentro de esta task. No marcar la task completa por la sola presencia del panel. La migración SQL queda estacionada en `docs/tasks/pending-migrations/` hasta el release, conforme al contrato de tooling de base de datos.
+**Estado al 19/09 (histórico, supersedido por la reconciliación del 04/10):** typecheck, lint, cinco pruebas de autorización/API y GVC local desktop/móvil verdes para el panel (`.captures/2026-09-19T23-25-04_ga4-connection-panel`). Faltan OAuth/IAM de Google, aplicación de migración con el release y smoke real de Grupo Berel. El cableado al grader y su señal de salud siguen pendientes dentro de esta task. No marcar la task completa por la sola presencia del panel. La migración SQL queda estacionada en `docs/tasks/pending-migrations/` hasta el release, conforme al contrato de tooling de base de datos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -39,7 +60,7 @@ rollout quedan idénticos.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
@@ -52,7 +73,7 @@ rollout quedan idénticos.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Conexión, UI y reader implementados; canary histórico Berel en staging 02/10 y release productivo 03/10. Pendientes conversions del reader, integración al grader, señal de salud y verificación residual; sin readback live nuevo 04/10.`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -146,9 +167,11 @@ Reglas obligatorias:
   `SearchConsoleConnectionPanel.tsx`) — se crea como task aparte (ver Follow-ups)
 - Follow-up: render del eje "tráfico real / AI-attributed traffic" en el report del grader
 - Grader run-engine / report: nueva señal opcional
-- **`TASK-1668`** (QA/outcome/iteración editorial, EPIC-022): sus ventanas de outcome declaran GA4 y
-  HubSpot como fuentes. Sin esta conexión, ese eje del outcome queda permanentemente en
-  `insufficient_data`. Adoptar esta task o declarar el loop parcial — ver Delta 2026-08-15.
+- **`TASK-1668`** (medición/outcomes SEO, EPIC-022): TASK-1284 habilita el eje de conversión GA4;
+  GSC/rank/AEO pueden funcionar con negocio declarado parcial mientras no haya conexión gobernada.
+  La producción y QA editorial son de Studio (TASK-1667, EPIC-049), no de este reader.
+- **`TASK-1787`** (referrals desde motores de IA, EPIC-022): consume esta conexión y el resolver
+  canónico; no los duplica. Sin conexión de la organización responde `no_ga4_connection`.
 
 ### Files owned
 
@@ -164,27 +187,30 @@ Reglas obligatorias:
 
 ## Current Repo State
 
-### Already exists
+### Already exists (contrastado 2026-10-04)
 
-- `src/lib/growth/search-console/**` — patrón multi-tenant OAuth completo a espejar:
-  `oauth-client.ts`, `api-client.ts`, `command.ts`, `connection-store.ts`, `state-store.ts`,
-  `secret-naming.ts`, `reader.ts`, `contracts.ts`, `flags.ts`, `index.ts` + `__tests__/`
-- `src/app/api/admin/growth/search-console/**` — rutas `oauth/start`, `oauth/callback`, `sites`,
-  `select-property`, `disconnect` (plantilla de las rutas GA4)
-- `src/views/greenhouse/agency/clients/SearchConsoleConnectionPanel.tsx` + el picker en
-  `src/app/(dashboard)/agency/clients/[organizationId]/lifecycle/page.tsx` (mirror del UI follow-up)
-- `greenhouse_growth.grader_profiles.organization_id` (TASK-1243) — bridge org↔run
-- `google-auth-library` ya instalado; `resolveSecret`/`resolveSecretByRef`/`createOrAddSecretVersion`
-  ya existen (helpers de secrets)
-- `src/lib/reliability/queries/growth-search-console-token-health.ts` — patrón de signal de salud
-  de token a espejar para GA4
+- `src/lib/growth/analytics-ga4/{contracts,flags,oauth-client,state-store,connection-store,command,reader,index}.ts`:
+  OAuth read-only, state hash/TTL/single-use con transacción, token sólo en Secret Manager y conexión
+  por `organization_id`; commands start/complete/list/select/disconnect y reader paginado.
+- `src/lib/growth/ga4/api-client.ts`: GA4 Admin API para property-picker y Data API para informes.
+- Cinco rutas `src/app/api/admin/growth/analytics-ga4/**`, con contexto interno y `growth.ga4.connect`;
+  `src/views/greenhouse/agency/clients/Ga4ConnectionPanel.tsx` integrado en Account 360.
+- Capability en `src/config/entitlements-catalog.ts`, grant operador en `src/lib/entitlements/runtime.ts`
+  y seed/schema en `migrations/20261002225253390_task-1284-ga4-connections.sql`.
+  Aplicación registrada 02/10; no nuevo readback DB ni prueba rollback 04/10.
+- `GROWTH_GA4_ENABLED` default false en código; activación histórica staging/Production/worker en ledger.
+- `src/lib/efeonce-insights/adapters/ga4-site-facts.ts` y adapters SEO/AEO: consumidor de sesiones
+  por canal y asistente con ventana/fuente/metodología, de TASK-1962; no señal del grader.
 
-### Gap
+### Gap vigente
 
-- No existe `src/lib/growth/analytics-ga4/**` ni tabla `ga4_connections`
-- El grader no tiene ninguna señal de tráfico real / atribución a motores de IA
-- No existe capability `growth.ga4.connect` ni flag `GROWTH_GA4_ENABLED`
-- No existe el OAuth client GCP de GA4 (consent screen + secrets) — gestión out-of-band
+- El reader admite `sessions`, `totalUsers`, `engagedSessions` y duraciones; **no conversions**.
+  La segmentación IA está en el adapter Insights sobre canal/fuente, no en un DTO propio del reader.
+- Sin import/consumer GA4 en `src/lib/growth/ai-visibility/**` ni señal GA4 en `src/lib/reliability/**`.
+  Quedan integración al grader, decisión de uso como contexto/scoring y token-health gobernado.
+- Verificación residual: reader OFF/revocación, pruebas de stores/rollback y parity para consumers
+  previstos, monitoreo 7d, alcance/estado de consentimiento Google y login/canary de producción.
+- No hay nuevo check live al 04/10; el canary y release históricos no acreditan toda la cohorte.
 
 ## Backend/Data Contract
 
@@ -262,19 +288,19 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales
-- [ ] Invariantes de data, tenant boundary e idempotencia explícitos
-- [ ] Migration/backfill/rollback posture explícito y proporcional
-- [ ] Evidencia runtime/DB listada para cada cambio más allá de docs
+- [x] Source of truth, contract surface y consumers nombrados con paths reales — código/Current Repo State contrastados 04/10.
+- [x] Invariantes de data, tenant boundary e idempotencia explícitos — schema, state/store y guards revisados 04/10; no nuevo smoke DB.
+- [x] Migration/backfill/rollback posture explícito y proporcional — SQL additive vigente y rollout registrado; ejecutar rollback no validado.
+- [x] Evidencia runtime/DB listada para cada cambio más allá de docs — commits históricos 02/10 y 03/10 + ledger; límites de frescura explícitos.
 - [ ] Dominio sensible (secrets Google) con errores canónicos, señal de salud y sin leak de token
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive `src/lib/growth/analytics-ga4/**`, no en UI
-- [ ] Modelada como command/reader (connect/select/disconnect + `readGa4Analytics`), no click-handler
+- [x] Lógica en el primitive `src/lib/growth/analytics-ga4/**`, no en UI — código revisado 04/10; coverage focal PASS cuando aplica.
+- [x] Modelada como command/reader (connect/select/disconnect + `readGa4Analytics`), no click-handler — código revisado 04/10; coverage focal PASS cuando aplica.
 - [ ] Read = reader canónico; write = commands con authz fina, errores canónicos, observabilidad
-- [ ] Capability `growth.ga4.connect` + grant a ≥1 rol real + coverage test en el MISMO PR
-- [ ] Camino programático declarado (rutas `api/admin/growth/analytics-ga4/*` + reader server-side)
+- [x] Capability `growth.ga4.connect` + grant a ≥1 rol real + coverage test en el MISMO PR — código revisado 04/10; coverage focal PASS cuando aplica.
+- [x] Camino programático declarado (rutas `api/admin/growth/analytics-ga4/*` + reader server-side) — código revisado 04/10; coverage focal PASS cuando aplica.
 - [ ] Reader apto para consumo por Nexa por construcción; connect gobernado capability-gated
 - [ ] Un primitive, muchos consumers (grader/Nexa/UI) sin lógica duplicada
 - [ ] Parity check = SÍ
@@ -290,6 +316,10 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+> Estado de slices al 04/10: 1–3 entregadas y rollout histórico registrado; Slice 4 tiene reader de
+> sesiones/usuarios/interacción, pero conversions/segmento propio y token-health siguen pendientes.
+> Slice 5 (grader) no implementada. Panel UI absorbido el 19/09; no crear otro picker como follow-up.
 
 ### Slice 1 — Schema + capability + flag (foundation)
 
@@ -428,20 +458,31 @@ token (igual que `api-client.ts` de SC). `OAuth2Client` solo para el OAuth dance
 
 ## Acceptance Criteria
 
-- [ ] Una org puede conectar su property GA4 vía OAuth read-only; binding UNIQUE por `organization_id`
-- [ ] El refresh token vive SOLO en Secret Manager; la fila PG guarda `token_secret_ref`, nunca el token
+- [x] Una org puede conectar su property GA4 vía OAuth read-only; binding UNIQUE por `organization_id` — canary Grupo Berel staging 02/10 (`0bafbd2c654e`), schema/código actuales; no nueva conexión 04/10.
+- [x] El refresh token vive SOLO en Secret Manager; la fila PG guarda `token_secret_ref`, nunca el token — `command.ts`/store/schema revisados 04/10; pruebas de scope antes de persistencia PASS.
 - [ ] `readGa4Analytics(orgId, params)` retorna sessions/users/conversions por canal + segmento
       AI-attributed, con honest degradation (`disabled`/`not_connected`/`token_unhealthy`)
-- [ ] Capability `growth.ga4.connect` existe en registry + catalog + grant a ≥1 rol real;
-      coverage test verde
+      — parcial: sesiones/usuarios/interacción existen; conversions y segmento propio del reader pendientes.
+- [x] Capability `growth.ga4.connect` existe en registry + catalog + grant a ≥1 rol real;
+      coverage test verde — migración/catalog/runtime existentes; coverage focal PASS 04/10.
 - [ ] Flag `GROWTH_GA4_ENABLED` default OFF; con OFF, rutas y reader resuelven disabled sin crash;
       fila en `FEATURE_FLAG_STATE_LEDGER.md`
+      — default false y branches disabled existen; falta prueba focal del reader OFF y registro de su ejecución.
 - [ ] La señal GA4 se adjunta al run/report del grader solo si la org tiene conexión activa + flag ON;
       runs sin GA4 quedan idénticos
-- [ ] Rutas dual-gate (internal tenant + capability); clientes excluidos del connect
+- [x] Rutas dual-gate (internal tenant + capability); clientes excluidos del connect — las cinco rutas revisadas 04/10, sin nuevo canary deny live.
 - [ ] Migración additive verificada en staging (tablas/CHECK/UNIQUE existen); rollback `migrate:down` OK
+      — aplicación registrada 02/10 y canary conectado; rollback no ejecutado/verificado.
 
 ## Verification
+
+Revisión focal 2026-10-04: `pnpm test src/lib/growth/analytics-ga4/__tests__/command.test.ts
+src/lib/growth/ga4/__tests__/api-client.test.ts src/lib/efeonce-insights/adapters/ga4-site-facts.test.ts
+src/lib/entitlements/capability-grant-coverage.test.ts` — **4 archivos, 13 passed**.
+No reemplaza el round-trip OAuth de 02/10 ni verifica revocación del reader, rollback, health o nuevos
+consumers. Canaries históricos y release: ledger + commits `0bafbd2c654e` / `c517eac75`.
+
+Gates de cierre restantes:
 
 - `pnpm lint`
 - `pnpm typecheck`
@@ -452,8 +493,8 @@ token (igual que `api-client.ts` de SC). `OAuth2Client` solo para el OAuth dance
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`)
+- [x] `Lifecycle` sincronizado con el estado real — in-progress por implementación y rollout histórico parciales; sin cierre.
+- [x] el archivo vive en la carpeta correcta (`to-do/` → `in-progress/` → `complete/`) — move tras task lint 0/0 el 04/10; pendientes conservados.
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado
 - [ ] `changelog.md` actualizado
@@ -463,8 +504,7 @@ token (igual que `api-client.ts` de SC). `OAuth2Client` solo para el OAuth dance
 
 ## Follow-ups
 
-- **TASK ui-ux** — Panel property-picker GA4 en client lifecycle (mirror de
-  `SearchConsoleConnectionPanel.tsx`) + estados connect/active/revoked
+- Panel property-picker GA4 ya entregado en Account 360 (19/09); verificar runtime configurado, no duplicar implementación.
 - **TASK ui-ux** — Render del eje "tráfico real / AI-attributed traffic" en el report del grader
 - Evaluar export nativo GA4→BigQuery como segunda fuente (histórico/joins) si la Data API REST
   se queda corta en volumen o se necesitan joins con data interna
@@ -477,3 +517,12 @@ token (igual que `api-client.ts` de SC). `OAuth2Client` solo para el OAuth dance
   `entity` (TASK-1267) o se mantiene independiente en `analytics-ga4/contracts.ts`?
 - ¿La señal GA4 entra al scoring del grader o solo se muestra como contexto (no afecta el score)?
   Decisión de producto a confirmar antes del Slice 5.
+
+
+## Documentation reconciliation 2026-10-04
+
+Lifecycle corregido a in-progress tras `pnpm task:lint --task TASK-1284` pre-move (0 errores/0 warnings).
+Se conservan sin tildar los criterios con conversions, grader, salud del token o verificación residual.
+Triple documentación: [técnica](../../architecture/growth/ga4-connection-ui-v1.md),
+[funcional](../../documentation/growth/conexion-ga4-por-organizacion.md) y
+[manual](../../manual-de-uso/growth/conectar-ga4-por-organizacion.md). No nuevas escrituras runtime.

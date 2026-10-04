@@ -16,7 +16,7 @@ profundiza).
 - **Epic:** `EPIC-049` — [`docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`](../../../docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
 - **ADR de agentes híbridos:**
   [`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](../../../docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
-  (en redacción al 2026-09-26; si todavía no existe, rige el ADR de estrategia).
+  (Accepted 2026-09-26; implementación/rollout por sus tasks).
 - **ADR de la capa de estrategia** (§4.5 SEO/AEO con SV360, §5 niveles):
   [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](../../../docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md).
 - **Manuales MCP servidos:** [`seo-visibility-reading`](../../../docs/mcp/skills/seo-visibility-reading/SKILL.md) (dos
@@ -24,6 +24,18 @@ profundiza).
   (protocolo de gasto). Cargarlos antes de leer o proponer.
 
 Si un ADR o un manual servido contradice esta tarjeta, **gana el ADR/manual** y la tarjeta se corrige.
+
+## Especialización editorial y plan diario (pendiente de implementación)
+
+TASK-1669 especializa este rol para plan diario en Studio, reutilizando work items TASK-1913,
+registry TASK-1914 y dispatcher TASK-1915. No instalar un orquestador ni tablas de plan/feedback
+en Greenhouse/Nexa. Research/editorial/measurement son perspectivas bounded de la misma
+foundation; recomendaciones preservan orden/version/expiry de la cola1700 y sólo proponen.
+TASK-1667 (Studio) conserva brief de cinco insumos, CMS draft/private, QA/approval y publicación
+observada; TASK-1668 (Greenhouse) conserva indexación/outcome con baseline/cobertura/D-3.
+Ausencias se declaran; plan aceptado no ejecuta comandos ni publica. Estas tasks siguen to-do:
+modo interactivo actual no equivale a workflow ni ejecución programada desplegados.
+Canon: ADR de estrategia §14, precisión aceptada 2026-10-04.
 
 ## Misión
 

@@ -116,6 +116,16 @@ Reglas obligatorias:
   `.claude/skills/axis-design-system/SKILL.md`, `.claude/skills/digital-marketing/SKILL.md`, `.claude/skills/dataviz-design/SKILL.md` (oficios que las tres
   skills de rol nuevas orquestan sin repetir).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+El rol SEO/AEO es la foundation de la especialización advisory TASK-1669: tres perspectivas
+de research/editorial/measurement se modelan como tarjetas/variantes/steps versionados dentro
+de este registry. No registry propio en SEO/Nexa. Cards respetan orden/version/expiry de
+TASK-1700 y no permiten provider/CMS/commands mutantes directos por una recomendación.
+1669 especializa/evalúa el rol; no bloquea el catálogo genérico ni publica cards por documentación.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -128,6 +138,8 @@ Reglas obligatorias:
   más bajo).
 
 ### Blocks / Impacts
+
+- TASK-1669 especializa el rol SEO/AEO, sin bloquear el registry genérico.
 
 - `TASK-1913` Slice 4: asignar a un rol exige tarjeta publicada, modo habilitado y kill switch apagado.
 - `TASK-1915`: los adaptadores compilan la especificación portable; la guarda de lista blanca rechaza llamadas de
@@ -155,7 +167,7 @@ Reglas obligatorias:
 - Skills de rol interactivas `efeonce-agent-media-planner` y `efeonce-agent-seo-aeo` (commit `07e0efdca`), con
   misión, flujo, tools y niveles, plantilla de entregable y `agents/openai.yaml`; ambas remiten al ADR híbrido.
 - Skill `efeonce-campaign-planning` (commit `03671e3e3`).
-- Registro de operaciones de Studio con 13 tools + 5 exclusiones (`packages/contracts/src/operations.ts`); el
+- Registro de operaciones Studio (`packages/contracts/src/operations.ts`, inventario derivado del registro); el
   gateway deriva políticas del manifiesto (`efeonce-mcp/src/providers/marketing-studio*.ts`).
 - Capabilities `marketing_studio.campaign.read` y `marketing_studio.asset.download` en
   `src/config/entitlements-catalog.ts` con grants en `src/lib/entitlements/runtime.ts`.
@@ -430,6 +442,9 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Especialización SEO/AEO1669 usa este registry/cardDigest y conserva prohibiciones/inputs/evaluaciones de sus tres perspectivas, sin registry paralelo.
+- [ ] Card SEO exige lectura canónica de prioridad/evidencia y autoridad humana para acciones mutantes/coste, no ejecución de recomendaciones stale o arbitrarias.
 
 - [ ] Las seis tablas existen en staging y production; una versión publicada no se puede modificar.
 - [ ] Una tarjeta con clave de proveedor o con una tool inexistente responde `422`; una tool con nivel menor al del registro es rechazada.

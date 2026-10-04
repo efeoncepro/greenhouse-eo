@@ -49,7 +49,7 @@ de salud operativa — útil como guardrail automático (`../modules/04`, `06`).
 
 ## GA4 — PLANNED (aún sin runtime)
 
-`docs/tasks/to-do/TASK-1284-growth-ga4-multitenant-connection-signal.md`. No hay
+`docs/tasks/in-progress/TASK-1284-growth-ga4-multitenant-connection-signal.md`. No hay
 runtime GA4 propio todavía. Al planear medición web, trátalo como pendiente y apóyate
 en GSC + el forms ledger como fuente confiable, y en GA/GTM del sitio como consumer.
 

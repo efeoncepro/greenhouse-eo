@@ -42,6 +42,22 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 - El reader Search Console per-org `readSearchConsoleAnalytics(orgId, params)` (TASK-1282) — el SEO es su consumer principal.
 - El patrón report artifact (TASK-1252) para el entregable cliente.
 
+
+### 1.3 Flujo editorial, planificación e informes: dueños vigentes
+
+La [precisión aceptada del 2026-10-04](marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#14-precision-aceptada-2026-10-04--flujo-editorial-en-marketing-studio)
+asigna el flujo editorial a **Marketing Studio** (EPIC-049). SV360/Greenhouse mide, captura, controla
+acceso/gasto y entrega prioridad por la cola TASK-1700; Studio posee plan/brief/work item, producción,
+QA, aprobación, calendario, evidencia de publicación e iteración; Efeonce Insights posee los informes
+y su entrega. El CMS/Content Factory sigue siendo dueño de la mutación externa/readback.
+
+TASK-1667 y TASK-1669 pertenecen a EPIC-049; TASK-1668 permanece en EPIC-022 para indexación/outcome
+SEO desde referencias de publicación Studio. Ninguna crea aquí tablas/workflows editoriales ni
+un runtime Nexa de agentes. Studio reutiliza work items TASK-1913, role registry TASK-1914 y dispatcher
+TASK-1915; su plan mantiene el orden/version de `readSeoWorkQueue`, sin otra cola ni feedback ledger.
+La medición usa lectores canónicos, referencias opacas, métodos/as-of y cobertura explícitos; production
+QA/publicado ≠ indexado ≠ resultado causal. Las tres tasks siguen en to-do: este contrato no afirma rollout.
+
 ---
 
 ## 2. Complementariedad SEO ↔ AEO
@@ -1107,6 +1123,19 @@ acuerde.
 | TASK-1665 | ui-ux | Lente `Descubrir` — la cara visible de 1664: conmutador de lentes, builder, banda de costo, estado de corrida, canvas de candidatos y drawer de decisión | **code complete**, evidencia GVC pendiente |
 | TASK-1693 | ui-ux | Lo que 1664/1665 construyeron y no llegaba al operador: **paginación por cursor** (el reader la servía y la page descartaba `nextCursor`), **selector de fuente de seed** (`resolveSeeds` cubre cinco y el workbench mandaba `'manual'` fijo) y **filtros del canvas server-side** (`keyword-discovery-query.ts` existía sin un solo importador) | **code complete**; `ui:visual-gate` PASS, `ui:quality` BLOCK declarado (`visualImpact` 4.2: el techo lo fija el canvas de 1665, fuera de alcance) |
 | TASK-1666 | backend-data | Puente grounded SEO → AEO (`createGroundedQueryDraft`), consumido por el drawer de 1665 | **`complete` 2026-08-14** |
+
+
+**Flujo editorial y agentes (ownership reconciliado 2026-10-04):**
+
+| Task | Epic dueño | Qué entrega | Foundation/consumer |
+|---|---|---|---|
+| TASK-1667 | EPIC-049 | Brief/work especializado Studio, adapter CMS draft/private, QA/receipt/readback de publicación | Reusa TASK-1908 y TASK-1913; no lifecycle editorial SEO |
+| TASK-1668 | EPIC-022 | Indexación y outcome medible con baseline/ventana/cobertura | Recibe evidencia Studio; conserva GSC/rank/AEO/metodología; GA4 opcional con loop parcial explícito |
+| TASK-1669 | EPIC-049 | Plan diario SEO/AEO advisory conservando la prioridad de TASK-1700 | Especializa TASK-1914/1915; no nuevo runtime Nexa ni prioridad IA |
+
+Las tres siguen pendientes. [Historia de las specs previas](../audits/seo/editorial-history/2026-10-04/README.md)
+no es contrato de ejecución. La conexión Studio TASK-1908 puede planificar antes de que outcome1668 exista;
+no se agrega un bloqueo circular.
 
 **Delta 2026-08-14 (`TASK-1665`) — la lente `Descubrir` no es una ruta nueva.** Vive dentro de
 `/admin/growth/seo/keywords` y se selecciona con `?view=discovery`: mismo viewCode

@@ -1,6 +1,11 @@
 # GA4 Connection UI V1
 
-> Estado (2026-10-02): migración aplicada; flag y cliente OAuth (compartido con Search Console) configurados en Vercel staging y Production. Pendientes: IAM `ga4-token-*`, URIs de redirección, release a producción y prueba OAuth real.
+> Estado reconciliado (2026-10-04): conexión, commands, reader y panel implementados. Canary histórico
+> del 02/10: IAM/URIs, consentimiento UI de Berel, propiedad `328274754` active y lectura Data API
+> (13 filas). Release `fe261ca2745f` del 03/10: código/flag Production y OAuth/flag worker.
+> Fuentes: [TASK-1284](../../tasks/in-progress/TASK-1284-growth-ga4-multitenant-connection-signal.md) y
+> [ledger](../../operations/FEATURE_FLAG_STATE_LEDGER.md); sin nuevo readback live el 04/10.
+
 > Superficie: Account 360, `/agency/clients/[organizationId]/lifecycle`.
 
 ## Dirección visual
@@ -16,8 +21,18 @@ El panel de GA4 es hermano del panel existente de Search Console. Reutiliza su c
 
 La UI consume comandos/rutas del dominio `src/lib/growth/analytics-ga4`; nunca recibe el refresh token. El flag `GROWTH_GA4_ENABLED` está apagado por defecto. Sin permiso, el panel muestra su estado sin acciones.
 
-## Verificación pendiente
+## Verificación residual
 
-- Configurar IAM para `ga4-token-*` y las URIs de redirección del callback (migración y variables ya aplicadas el 2026-10-02).
-- Completar consentimiento real, selección de la propiedad de Grupo Berel y lectura Data API.
-- Revisar captura GVC en desktop y 390 px, teclado, foco y diálogo de desconexión sobre el runtime configurado.
+- No repetir IAM/URIs/release ya registrados como trabajo faltante. Si una conexión falla, revisar
+  configuración vigente antes de recuperar mediante los comandos gobernados.
+- La task conserva integración al grader, conversions/segmento propio del reader y señal de salud.
+  Insights ya consume sesiones orgánicas/IA (TASK-1962); no reemplaza esos criterios.
+- Verificar reader OFF/revocación, rollback, monitoreo 7d y alcance/estado del consentimiento Google;
+  no se revalidaron estos gates en esta pasada documental.
+- Captura GVC de runtime configurado: desktop/390 px, teclado/foco y desconexión. La evidencia
+  local del 19/09 no se presenta como nueva QA visual productiva.
+
+## Fuentes funcionales y operación
+
+- [Qué hace la conexión](../../documentation/growth/conexion-ga4-por-organizacion.md).
+- [Cómo conectar y verificar](../../manual-de-uso/growth/conectar-ga4-por-organizacion.md).

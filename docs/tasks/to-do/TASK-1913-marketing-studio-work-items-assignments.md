@@ -107,6 +107,16 @@ Reglas obligatorias:
 - `docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md` (kernel, errores, digest).
 - `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` (canje por capability, `Efeonce-Delegated-Token`).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+Esta task es la única foundation de work items para el flujo editorial SEO. TASK-1667
+especializa tipos/inputs/entregables/evidencias, reutilizando estas entidades y sus commands;
+QA y publication evidence no sustituyen la state machine genérica. TASK-1669 entrega el plan
+advisory en el mismo modelo, no un aggregate Greenhouse paralelo. Las especializaciones son
+consumers y no bloquean la foundation; tras aceptar, una iteración/traspaso es trabajo nuevo.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -119,6 +129,8 @@ Reglas obligatorias:
 - `TASK-1907` (pregunta abierta 6): relación entre tipos de work item e ítems del plan de contenidos.
 
 ### Blocks / Impacts
+
+- TASK-1667 y TASK-1669 como especializaciones posteriores; no blockers de foundation.
 
 - `TASK-1914`: los roles declaran qué tipos de work item aceptan (catálogo de esta task).
 - `TASK-1915`: consume el evento de asignación a un rol de agente y `assignmentId` como clave de idempotencia.
@@ -136,8 +148,10 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Studio en producción con 13 tools + 5 exclusiones en `packages/contracts/src/operations.ts` y test de paridad
-  `apps/web/src/server/operations-parity.test.ts`.
+- Registro de operaciones Studio en `packages/contracts/src/operations.ts` y test de paridad
+  `apps/web/src/server/operations-parity.test.ts`; el inventario actual se deriva del registro, no del conteo histórico.
+- Kernel de commands de escritura existente en `packages/domain/src/commands/kernel.ts` (verificado en el
+  checkout Studio el 2026-10-04). Sus gates se reutilizan; esta task no reconstruye la foundation TASK-1894.
 - Tabla `studio.audit_event` (`packages/database/migrations/1758800000000_studio-foundation.sql`) y el actor `user`
   con `subject` en `packages/domain/src/actor.ts`.
 - ADR híbrido aceptado (2026-09-26) y skills de rol interactivas `efeonce-agent-media-planner` y
@@ -146,8 +160,6 @@ Reglas obligatorias:
 ### Gap
 
 - No existe entidad de trabajo, catálogo de tipos, máquina de estados, asignación, revisión ni traspaso.
-- El kernel de commands de escritura aún no existe (llega con TASK-1894) [verificar su ruta final:
-  `packages/domain/src/commands/kernel.ts`].
 - No hay forma de listar «qué tengo asignado» para una persona ni para un rol de agente.
 
 ## Modular Placement Contract
@@ -426,6 +438,10 @@ asignar a un rol puede devolver `confirmation_required` y que el agente debe mos
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] El modelo permite la especialización editorial SEO TASK-1667 por inputs/entregables/evidencias y la entrega advisory TASK-1669 sin duplicar entidades/lifecycle.
+- [ ] Trabajo/deliverable aprobado no implica publish/indexación/outcome; refs de versión/publicación y QA permanecen distinguibles.
+- [ ] Iteración/traspaso conserva parent/reason/evidence y assignment estable para el dispatcher1915, sin depender del runtime de 1669.
 
 - [ ] Las cinco tablas existen en staging y production; `work_item_event` rechaza `UPDATE` y `DELETE`.
 - [ ] Toda transición fuera de la matriz responde `409 work_item_invalid_transition`; toda transición válida escribe `work_item_event` y `audit_event` en la misma transacción.

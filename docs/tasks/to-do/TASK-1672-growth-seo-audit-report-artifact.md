@@ -1,153 +1,8 @@
-# TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
+# TASK-1672 — Efeonce Insights: especialización de auditoría técnica SEO
 
-## Delta 2026-10-03 — tarjeta de salud técnica en Efeonce Insights
+> Ajuste de alcance autorizado el 2026-10-04: informes pertenecen a EPIC-045; SEO conserva medición, readers y hallazgos. [Spec y deltas anteriores preservados íntegros](../../audits/insights/history/2026-10-04-seo-specialization/README.md), sin vigencia normativa. No se ha implementado la especialización.
 
-- TASK-1992 (EPIC-045) agrega al informe mensual de Insights una tarjeta de «Salud técnica del sitio» (puntaje y páginas
-  rotas) leída de `readSiteAuditReport`, con el mismo gate `GROWTH_SEO_SITE_FINDINGS_ENABLED` y la misma frescura que
-  este artefacto. No reemplaza el artefacto ni crea otro motor: cuando esta task publique el artefacto, la tarjeta remite
-  a él. — por trabajo en TASK-1990…1996
-
-
-## Delta 2026-09-26
-
-- TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON; el código de TASK-1889 salió en el release
-  `0e87c7a443a2`. En Discovery, confirmar contra producción qué catálogo y contrato usa esta task. — por trabajo en TASK-1888
-- TASK-1889 complete y en producción (releases `0e87c7a443a2` y `f9257b9c94af`): `insights-report` e `insights-deck`
-  quedan sólo con el diseño v2 del canvas y el legado v1 de TASK-1847 se retiró (`ReportAnalysisPage`,
-  `InsightsEvidenceSlide`, moldes v1, `render/figure-pages.ts`). El delta de abajo que habla de «v1 hasta el release de
-  TASK-1889» ya no aplica: mapear contra v2. — cerrado por trabajo en TASK-1889
-
-## Delta 2026-09-25 (TASK-1888 code complete)
-
-- **Construido (flag ON desde 2026-09-26, ver delta de arriba):** `ChartSpecV1` admite 15 familias (datos propios en `data`), con validación estructural en
-  `src/lib/efeonce-insights/contracts/chart-spec.ts` y de valor en `editorial/chart-values.ts` sobre la misma
-  `chart-geometry.ts`. Qué familia puede emitir cada módulo lo decide `editorial/family-evidence-matrix.ts`; las
-  métricas SEO por página o keyword siguen sin evidencia en el adapter. — por trabajo en TASK-1888
-
-## Delta 2026-09-25
-
-- TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
-  2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
-  premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
-- **Rediseño Insights (planificado, no construido).** Los catálogos que esta task consume (`insights-report` A4 e
-  `insights-deck`) se rehacen en TASK-1889: plantillas nuevas (portada navy o blanca con variantes por módulo,
-  contraportada, aperturas de capítulo, prosa y páginas de gráfico premium) bajo un contrato de fidelidad de 41 páginas
-  de referencia (≤ 1 % de píxeles distintos). El contrato editorial se amplía de forma aditiva en TASK-1888 (15
-  familias, lectura por figura, cifra principal, `channelId`), que declara esta task en sus impactos. Al ejecutar,
-  confirmar en Discovery qué catálogo está vigente en producción (v1 de TASK-1847 hasta el release de TASK-1889) y
-  mapear contra ese. — por trabajo en TASK-1888/TASK-1889
-
-## Delta 2026-09-15
-
-- Desbloqueada de TASK-1845 (2026-09-15): la foundation de Efeonce Insights está en producción (release `9c094688309d`, generación ON en Vercel, gateway v1.5.0 federado, scope en Entra); TASK-1845 sigue `in-progress` sólo por dos evidencias de cierre (ensayo `migrate:down` y sesión MCP con token humano) que no condicionan este trabajo. — cerrado por rollout de TASK-1845
-
-## Delta 2026-09-01 (2) — `TASK-1671` cerró; el gate de esta task SIGUE siendo el flag, no una task
-
-`TASK-1671` está en `complete`: la superficie que renderiza los hallazgos de dominio existe en
-código. Con eso, **ya no queda ninguna task bloqueando a ésta** — pero el gate real nunca fue una
-task, y por eso `Blocked by` pasa a `none` sin que la condición se afloje ni un milímetro:
-
-🔴 **El artefacto NO se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en
-producción con una corrida real verificada.** Hoy sigue OFF, y además el código de `TASK-1670` y
-`TASK-1671` todavía no está desplegado. Publicar el artefacto con el detector apagado produce
-exactamente lo que esta task existe para evitar: un documento con nuestro nombre, reenviado a una
-agencia, declarando sano un sitio invisible para los motores de IA.
-
-Lo que sí hereda esta task, ya resuelto: la partición por alcance (`partitionAuditIssuesByScope`),
-las 7 fichas es-CL, la taxonomía de familias y la regla de que un hallazgo de dominio va ANTES de
-la lista y nunca se cuenta como página afectada.
-
-## Delta 2026-09-01 — `TASK-1670` cerró, pero el gate de esta task NO se movió
-
-`TASK-1670` está en `complete`: el motor de hallazgos de sitio existe y está verificado. **El gate de
-esta task sigue exactamente donde estaba**, y por eso se retira del `Blocked by` sin aflojar la
-condición: lo que bloquea al artefacto no es que ese código exista, es que el flag
-`GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` con una corrida verificada — y esa llave la tiene
-`TASK-1671`. Publicar el artefacto con el detector apagado produciría exactamente lo que esta task
-existe para evitar: un documento con nuestro nombre declarando sano un sitio invisible para la IA,
-reenviado a una agencia.
-
-
-## Delta 2026-08-15 (2) — decisión de secuencia verificada: el candado estaba mal escrito
-
-El gate de esta task se podía cumplir **con el audit todavía ciego**, y hay que arreglarlo.
-
-**El defecto.** El criterio decía: *"`TASK-1670` está en `develop` antes del primer render
-publicable"*. Verificado contra el diseño de 1670: esa task **nace con flag default OFF**, y con el
-flag OFF el collect **materializa cero hallazgos de sitio**. Es decir, `TASK-1670` puede estar en
-`develop` —criterio cumplido, checkbox marcado de buena fe— y el documento sale exactamente igual de
-ciego que hoy: sin la detección de bloqueo a crawlers de IA. **El escenario que esta task declara
-innegociable se colaba por su propia redacción**, y peor: se colaba con la conciencia tranquila de
-quien marcó el checkbox.
-
-**El gate correcto**, que reemplaza al anterior en `## Acceptance Criteria` y en
-`### Slice ordering hard rule`:
-
-> **El flag de hallazgos de sitio está en `ON` en producción, con `TASK-1671` desplegada y una
-> corrida real verificada** que muestre los hallazgos de sitio materializados.
-
-Los tres pedazos son necesarios: el flag ON porque sin él no hay detección; `TASK-1671` porque el
-flip de 1670 depende de ella (sin la superficie, un hallazgo de sitio se renderiza como "1 página
-afectada", que es falso); y la corrida real porque un flag ON sin evidencia es una declaración, no
-una verificación — y este documento sale de la plataforma con nuestro nombre.
-
-`Depends on` += **`TASK-1671`**.
-
-⚠️ **`TASK-1673` hereda el mismo gate por transitividad.** Compartir y enviar mueve este documento a
-un tercero; si el documento pudo nacer ciego, el correo lo distribuye. **Sin excepción por urgencia
-comercial** — es la misma presión que el Delta anterior ya nombró como riesgo `high`, y esta
-corrección existe justamente porque la presión encuentra las redacciones flojas.
-
-## Delta 2026-08-15 — `Depends on` += `TASK-1698`; y `Blocked by: TASK-1670` es innegociable
-
-Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§1.1
-`message_alignment` medido contra un posicionamiento que nunca se declara; §3.4 brecha C8).
-
-**Sin cambio de alcance.** Sigue siendo el documento con dos densidades, web + print, reusando
-`ReportArtifactModel`. Cambian dos cosas del contorno.
-
-### `Depends on` += `TASK-1698` (posicionamiento declarado)
-
-La auditoría midió un defecto de fondo: la dimensión **`message_alignment` pesa 10 puntos** y su
-definición canónica es *"la narrativa de la IA coincide con el posicionamiento **deseado**"* — pero
-ese posicionamiento **nunca entra como input**. `ProseExtractionInput` lleva `excerpt`, `subjectBrand`,
-`subjectDomain` y `maxTokens`, y el prompt igual le pide al modelo que detecte desvío. **El modelo
-está infiriendo cuál es el posicionamiento y midiendo contra su propia inferencia.**
-
-En pantalla eso es un número discutible. **En un documento firmado con nuestro nombre, reenviado a un
-tercero, es otra cosa:** son 10 puntos de un puntaje que un cliente puede citar en una decisión, y no
-podríamos defender de dónde salieron. No se firma un documento que incluye una dimensión de 10 puntos
-medida contra un posicionamiento que nunca se declaró. `TASK-1698` inyecta el dato —que además **ya
-existe y está cacheado** en `brand_intelligence.whatTheBrandDoes`— y esta task espera.
-
-### `Blocked by: TASK-1670` sigue en su lugar, y el orden es innegociable
-
-Confirmado: `Blocked by: TASK-1670` permanece en `Status`.
-
-Se refuerza porque el **incentivo comercial de publicar antes es fuerte y va a existir**: el artefacto
-es material de conversación de SOW, hay demanda inmediata, y `TASK-1670` se ve desde afuera como un
-detalle técnico postergables. No lo es. `TASK-1670` es lo que detecta el **bloqueo a crawlers de IA**,
-y sin eso **un sitio invisible para los motores de respuesta puede puntuar 95/100**.
-
-Publicar el artefacto antes de `TASK-1670` es **firmar que está sano un sitio invisible para los
-motores de IA**. Un documento sobrevive fuera de Greenhouse: se lee tres semanas después, reenviado,
-sin nosotros al lado para matizar. El daño no es un número mal puesto en una pantalla que se
-actualiza — es un documento con nuestro nombre que dice lo contrario de la realidad y que ya no
-podemos alcanzar. **Ninguna urgencia comercial revierte este orden.**
-
-## Delta 2026-08-08 — TASK-1309 cerrada
-
-`TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
-10377/0, `pnpm build` de producción verde, `ui:quality` PASS 4.63. Lo que esta task da por existente
-de 1309 —`groupAuditIssues`, las fichas es-CL de los checks con su drift test, `readSiteAuditReport`
-con `run`/`findings`/`totals`/`previous`— **ya está en `develop` y verificado con datos reales de
-Grupo Berel**, no es supuesto.
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
-
-> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+<!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
@@ -163,141 +18,96 @@ Grupo Berel**, no es supuesto.
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Epic: `EPIC-022`
-- Status real: `Diseño; artefacto web/print especializado de Insights sin implementar. TASK-1670/1671 complete y flag del worker ON, revalidado 04/10; ya no falta activar el flag. Antes de publicar el artefacto, contrastar una corrida real y su tratamiento sitio/página; no inferirlo de un collect vacío.`
+- Epic: `EPIC-045`
+- Status real: `Diseño reformulado 2026-10-04; edición especializada de auditoría técnica sin implementar. Insights ya genera/renderiza/distribuye informes; el adapter SEO no consume readSiteAuditReport y el request no liga una corrida explícita. TASK-1670/1671 complete; flag del worker ON y corrida con 2 hallazgos de sitio contrastados en auditoría 04/10. Falta binding, evidencia especializada, detalle y verificación del artefacto.`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `none` en tasks; activación de hallazgos cumplida. Gate de publicación: corrida materializada contrastada y evidencia vigente, ver auditoría 04/10.
+- Blocked by: `TASK-1992` sólo Slice 6 (contrato/backend de auditoría por corrida); no espera los demás hechos ni la tarjeta de canal. Publicación conserva gates SEO/Insights.
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-El diagnóstico técnico deja de morir en la pantalla: se convierte en un **documento** con dos
-densidades (portada ejecutiva de una plana + detalle completo), renderizable en web e
-imprimible, que **operador y cliente** pueden generar. Reusa `ReportArtifactModel` y el par
-`web/`+`print/` que TASK-1310 ya construyó para el informe de visibilidad.
+Una edición de Insights presenta una auditoría técnica SEO identificada por target, corrida y fecha: resumen ejecutivo de una página y detalle para quien ejecuta. Reutiliza snapshot, plan, catálogos A4/deck, web Think y ciclo de revisión/emisión existentes. No construye otro informe general, renderer ni una ruta de impresión SEO.
 
 ## Why This Task Exists
 
-El site audit es **material de conversación de SOW** (arch §11), pero hoy termina en
-`/admin/growth/seo/audit`: para llevarlo a una propuesta hay que copiar 91 URLs a mano.
-
-Y el escenario real no es que el cliente arregle: **el cliente reenvía a una agencia** —seamos
-nosotros u otra—. Eso define dos lectores con trabajos distintos: quien DECIDE necesita magnitud
-y urgencia; quien EJECUTA necesita la lista y el orden. Un documento que sirva a los dos, o dos
-que se desincronizan: se elige lo primero, con dos densidades.
-
-Se hace **después de TASK-1670** por una razón dura: un artefacto con nuestro nombre que declara
-sano un sitio invisible para los motores de IA es peor que no tener artefacto.
+Un informe mensual de visibilidad y su tarjeta de salud no explican todos los hallazgos técnicos del crawl. El cliente necesita reenviar evidencia defendible: alcance de la muestra, qué afecta al sitio completo, páginas afectadas, prioridades y límites. La fecha y procedencia deben sobrevivir fuera de la plataforma.
 
 ## Goal
 
-- Un documento que **sobrevive fuera de Greenhouse**: se lee tres semanas después, reenviado,
-  sin nosotros al lado y sin perder la procedencia de sus datos.
-- Un solo modelo con `variant`, no dos documentos.
-- Client-safe por construcción, verificado por test de no-fuga.
+- Adaptar un crawl terminado y autorizado a la evidencia y edición inmutables de Insights.
+- Un resumen ejecutivo y un detalle técnico dentro de la misma edición, con fecha visible.
+- Client-safe por construcción; sin declarar sano un sitio con hallazgos no verificados.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
 ## Architecture Alignment
 
-Revisar y respetar:
-
-- `docs/ui/wireframes/TASK-1672-growth-seo-audit-report-artifact.md` — el contrato de diseño.
-- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` — §6 (degradación honesta),
-  §10.6 (superficie de auditoría), §11 (el audit como material de pitch).
-- `src/components/growth/seo/report-artifact/` (TASK-1310) — el patrón `ReportArtifactModel` +
-  `modelFromSeoReport(input, variant)` + adaptadores `web/` y `print/`.
-- `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
-
-Reglas obligatorias:
-
-- 🔴 **Client-safe por construcción**: el documento NUNCA incluye `provider_cost_usd`, tier ni
-  cupo del entitlement, `provider_task_id`, ni los ids de máquina de los checks. Test de no-fuga
-  obligatorio, espejando el que 1310 ya tiene.
-- 🔴 **La procedencia viaja CON el dato.** En pantalla es contexto; en un PDF reenviado es lo
-  único que impide que nos citen mal: qué mide el puntaje (del proveedor), qué es estimación
-  nuestra (el esfuerzo) y qué es laboratorio (la carga).
-- **NUNCA** emitir un documento cuando no hay diagnóstico: sin crawl o con crawl en curso, el
-  artefacto no se genera. Un informe vacío es peor que ninguno.
-- **NUNCA** un tercer render para el PDF: la variante imprimible es `?print=1`, como 1310.
-- **NUNCA** interacción dentro del documento (filtros, drill). Es de lectura.
-- Severidad = icono + palabra + color; tiene que funcionar impreso en blanco y negro.
+- `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §§2, 5, 6, 7–10: dueño de ediciones y distribución.
+- `docs/architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`: decisión existente; no nuevo deployable.
+- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`: dueño de métricas, gates y readers.
+- `readSiteAuditReport(seoTargetId, auditRunId?)` es la fuente; admite corrida explícita tenant-safe.
+- `groupAuditIssues` y la partición sitio/página mantienen taxonomía y orden canónicos.
+- Insights no recalcula scoring ni ETV, no consulta tablas SEO directamente y no convierte ausencia en cero.
+- Snapshot/plan/output emitidos no se actualizan con un crawl nuevo: una corrección crea otra versión.
+- Sin crawl terminado elegible, sin evidencia de alcance o con gate SEO no satisfecho, no se genera un artefacto técnico publicable. Un crawl parcial elegible declara su cobertura.
+- Si se incluye `message_alignment`, exige posicionamiento declarado y contrato vigente de TASK-1698. La auditoría técnica puede omitir esa dimensión AEO; no se bloquea por incluirla implícitamente.
 
 ## Normative Docs
 
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `DESIGN.md`
-- `docs/ui/wireframes/TASK-1672-growth-seo-audit-report-artifact.md`
+- `docs/ui/wireframes/TASK-1672-growth-seo-audit-report-artifact.md` (diseño pendiente de mapping final)
+- `.codex/skills/efeonce-insights/SKILL.md` y su espejo Claude
 
 ## Dependencies & Impact
 
-### Depende de
+### Depends on
 
-- `TASK-1670` — hallazgos de sitio (crawlers IA, JSON-LD, sitemap). **Bloqueante e innegociable**:
-  sin eso el documento omite lo más consecuente y puede declarar sano un sitio invisible para los
-  motores de IA (95/100 con crawlers bloqueados). Ver Delta 2026-08-15. ⚠️ El gate **no** es su merge
-  sino su **flag en ON con corrida verificada** — ver Delta 2026-08-15 (2).
-- **`TASK-1671`** — superficie de hallazgos de sitio. Es la condición del flip del flag de
-  `TASK-1670`: sin ella un hallazgo de sitio se renderiza como "1 página afectada", que es falso, y
-  por eso el flag no se prende. Sin flip no hay detección, y sin detección este documento no se emite.
-- **`TASK-1698`** — posicionamiento declarado como input del extractor de prosa (Delta 2026-08-15).
-  Sin él, `message_alignment` —**10 puntos**— se mide contra un posicionamiento que el modelo infiere
-  solo. Aceptable en pantalla; no en un documento firmado que sale de la plataforma.
-- `TASK-1304` — `readSiteAuditReport` (`complete`).
-- `TASK-1309` — `groupAuditIssues` + fichas es-CL de los checks (code complete).
-- `TASK-1310` — `ReportArtifactModel` + el par `web/`/`print/` (in-progress).
+- TASK-1845/1846/1847/1888/1889/1875: foundation, render, catálogos y web disponibles; no se reconstruyen.
+- TASK-1304/1309/1670/1671: reader, agrupación, materialización y presentación sitio/página, complete. Revalidar evidencia de la corrida elegida y runtime al publicar.
+- TASK-1992, Slice 6: backend de audit facts y binding exacto de corrida; bloqueante sólo para ese contrato. La tarjeta de canal puede esperar TASK-1990 sin bloquear el contrato básico de auditoría. No requiere entregar los otros siete slices de 1992.
+- TASK-1849: entrypoint en biblioteca/portal cuando exista; se consume su superficie, sin una cuarta pestaña SEO obligatoria.
 
 ### Blocks / Impacts
 
-- `TASK-1673` `[por crear]` — compartir y enviar. Sin documento no hay nada que mandar, y **hereda
-  el mismo gate por transitividad, sin excepción por urgencia comercial**: si el documento pudo nacer
-  ciego, el correo lo distribuye a un tercero (Delta 2026-08-15 (2)).
-- **La 4.ª sección del portal cliente** `[task por crear]` — el cliente ya tiene navegador de
-  3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como cuarta,
-  espejando las 4 tabs del operador. **NO** se agrega a TASK-1310: esa task está en su última
-  milla de rollout (migración + staging) y meterle una sección nueva le reinicia la verificación.
+- TASK-1673 depende de esta edición especializada; compartir no genera evidencia faltante.
+- EPIC-022 conserva el contrato productor SEO; EPIC-045 posee esta task y su cierre.
 
 ### Files owned
 
-- `src/components/growth/seo/audit-report/**` — modelo + `web/` + `print/`
-- `src/app/(dashboard)/admin/growth/seo/audit/report/page.tsx` — ruta operador
-- ruta cliente del artefacto `[definir junto con la task de la 4.ª sección]`
-- `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_AUDIT_REPORT`)
-- `route-reachability-manifest.ts` (registro de alcanzabilidad de rutas, TASK-982)
-- `scripts/frontend/scenarios/growth-seo-audit-report*.scenario.ts`
+- Evidencia/request/binding/backend son ownership de TASK-1992 Slice 6, no de esta task UI. Consumir ese DTO ya validado; sin editar adapter/readers/stores por este slice.
+- `src/lib/efeonce-insights/editorial/**`, `render/**` y catálogos `insights-report`/`insights-deck`: extensión acotada de detalle técnico, sin segundo renderer.
+- `src/lib/copy/insights.ts`; UI de Insights y proyección Think sólo donde el contrato especializado lo requiera.
+- Paths anteriores son ownership propuesto; cada slice declara paths reales y gates antes de implementar.
 
 ## Current Repo State
 
 ### Already exists
 
-- `src/components/growth/seo/report-artifact/{model,contracts,web,print}` — el patrón a espejar,
-  con `variant: 'clientPortal' | 'attachment'` y su test de modelo.
-- `readSiteAuditReport` con `run` + `findings` + `totals` + `previous` (TASK-1309).
-- `groupAuditIssues` (severidad ▸ alcance × valor ÷ esfuerzo) y `SeoHealthGauge` compartido.
-- Gate cliente `growth.seo.report.read_client` scope `own`, ya usado en `/growth/seo`.
+- Foundation y render de Insights (1845/1846), catálogos premium (1847/1889), contrato editorial (1888), web compartida Think (1875) y sharing/delivery (1848).
+- `src/lib/growth/seo/site-audit/reader.ts`: run explícito, findings, totals y comparación; autorización por target/run.
+- `src/lib/efeonce-insights/adapters/seo-adapter.ts`: desempeño GSC/ranking/ETV/GA4 y oportunidades; no consume auditoría técnica. Inspección local 2026-10-04.
+- Auditoría SEO 04/10: worker `ops-worker-00762-njg`, flag ON; corrida del 28/09 con 2 hallazgos de sitio. Esta evidencia no prueba exactitud bot por bot ni el render aún inexistente.
 
 ### Gap
 
-- No existe artefacto del audit: el diagnóstico sólo vive en la pantalla operador.
-- El informe cliente de 1310 **no incluye** la auditoría técnica (verificado): es narrativa de
-  visibilidad, otro lector.
+- Binding explícito y validado de corrida→edición: `InsightRequestV1` actual no incluye audit run.
+- Evidencia técnica, resumen y detalle dentro de los contratos de Insights.
+- Mapping/paginación de hallazgos y URLs, privacidad y QA de outputs especializados.
+- TASK-1992 sigue to-do: su tarjeta no está entregada ni sustituye este detalle.
 
 ## Modular Placement Contract
 
 - Topology impact: `portal`
-- Current home: `src/components/growth/seo/audit-report/**` + rutas `(dashboard)`
+- Current home: `src/lib/efeonce-insights/**` y consumers actuales de Insights
 - Future candidate home: `remain-shared`
-- Rationale del candidate home: espeja la ubicación que 1310 eligió para el informe hermano;
-  moverlo antes que a su hermano fragmentaría la familia.
-- Boundary: consume `readSiteAuditReport` y `groupAuditIssues`; no crea contrato de datos.
-- Server/browser split: el modelo es puro; el render web es cliente; la resolución de acceso es
-  server en la page.
-- Build impact: `none`
+- Rationale del candidate home: especialización de un dominio de informes existente; sin extracción anticipada.
+- Boundary: consume readers SEO dueños; edición, snapshot, plan y outputs son Insights.
+- Server/browser split: resolución de corrida, autorización y evidencia server-side; proyección client-safe en web.
+- Build impact: `none`; reutiliza el aislamiento del render y los catálogos.
 - Extraction blocker: `none`
 
 ## UI/UX Contract
@@ -305,248 +115,173 @@ Reglas obligatorias:
 ### Experience brief
 
 - UI rigor: `ui-standard`
-- Usuario / rol: dos audiencias, un documento — quien decide y reenvía; quien ejecuta.
-- Momento del flujo: fuera de Greenhouse, semanas después, sin contexto.
-- Resultado perceptible: entiende la magnitud en una plana y encuentra la lista completa detrás.
-- Friccion que reduce: copiar 91 URLs a mano para armar una propuesta.
-- No-goals UX: no es plan de ejecución ni cotización; no reemplaza la pantalla operador.
+- Usuario / rol: quien decide y reenvía; quien ejecuta cambios técnicos.
+- Momento del flujo: revisar una edición congelada, incluso semanas después del crawl.
+- Resultado perceptible: magnitud, fecha, tres prioridades y detalle verificable.
+- Fricción que reduce: copiar manualmente URLs y perder el alcance del diagnóstico.
+- No-goals UX: editor libre, cotización o explorador que sustituya la auditoría operativa.
 
 ### Surface & system decision
 
-- Surface: `/admin/growth/seo/audit/report` (+ `?print=1`). La entrada del cliente NO es una ruta paralela: el cliente ya tiene su portal SEO (TASK-1310, con navegador de 3 secciones) y la auditoría entra ahí como **cuarta sección**, en task aparte.
-- Composition Shell: `aplica` — composición `single`, documento lineal.
-- Primitive decision: `reuse` (`ReportArtifactModel`, `web/`+`print/`, `SeoHealthGauge`,
-  `GreenhouseChip`) + `new` acotado (`modelFromSeoAuditReport`, portada, hallazgos de sitio).
-- Adaptive density / The Seam: `no aplica` — la estructura no cambia en móvil, sólo la densidad.
-- Superficies flotantes: ninguna. El documento no abre nada: se lee de arriba abajo.
-- Copy source: `GH_GROWTH_SEO_AUDIT_REPORT` + reuso de `GH_GROWTH_SEO_AUDIT`.
-- Access impact: `entitlements` — operador `growth.seo.observation.read`; cliente
-  `growth.seo.report.read_client` scope `own`.
+- Surface: edición de Insights en sus superficies existentes; entrypoint de biblioteca coordinado con TASK-1849.
+- Composition Shell: `aplica`; composición de edición existente.
+- Primitive decision: `reuse`; catálogos, figuras, proyección de audiencia y web Insights. Extender sólo slots necesarios para hallazgos y detalle.
+- Adaptive density / The Seam: resumen y detalle conservan el orden; móvil apila URLs y evita scroll horizontal.
+- Superficies flotantes: las existentes del consumer Insights, sin paneles técnicos propios dentro del PDF.
+- Copy source: `src/lib/copy/insights.ts` y vocabulario canónico SEO.
+- Access impact: gates Insights de audiencia/módulo/capability más autorización del target/run productor; leer SEO no concede emitir.
 
 ### State inventory
 
-- Default: documento completo.
-- Sin auditoría / crawl en curso: **no se emite documento**.
-- Crawl parcial (`degraded`): banner dentro del documento.
-- Sitio limpio: "sin hallazgos", que es buena noticia.
-- Hallazgo de sitio no verificado: "no pudimos verificarlo: {razón}", jamás "sano".
-- Permission denied: lo resuelve la ruta (401/404), no el documento.
-- Long content: techo propio de URLs por grupo, con lo omitido declarado.
-- Mobile: misma estructura, menor densidad; tabla de URLs pasa a lista.
-- Keyboard / focus: único focusable en web es `Imprimir / guardar PDF`; en `?print=1`, ninguno.
-- Reduced motion: sin motion que degradar.
+- Crawl ausente/en curso/ineligible: rechazo explícito, sin documento técnico vacío.
+- Crawl parcial: cobertura y limitaciones visibles en la edición.
+- Sitio sin hallazgos: afirmación acotada a checks y muestra efectivamente verificados.
+- Hallazgo no verificado: razón explícita, nunca «sano».
+- Stale: política del reader y as-of visible; no sustituir por la última corrida después de sellar.
+- Edición borrador/emitida/retirada y enlace expirado/revocado: estados actuales de Insights.
+- Long content: techo de URLs propuesto en Discovery; no truncar silenciosamente hechos o afirmaciones.
+- Mobile: orden equivalente, URLs en lista; PDF con paginación estable.
+- Keyboard / focus / reduced motion: contrato del consumer Insights; severidad también en texto.
 
 ### Interaction contract
 
-- Primary interaction: leer. No hay otra.
-- Hover / focus / active: sólo el CTA de imprimir.
-- Pending / disabled: n/a.
-- Escape / click-away: n/a.
-- Focus restore: n/a.
-- Latency feedback: se renderiza con datos ya materializados.
-- Toast / alert behavior: ninguno dentro del documento.
+- Primary interaction: leer el resumen y consultar el detalle.
+- Descarga/compartir/revisión: acciones del consumer Insights con sus permisos; 1673 integra distribución.
+- Pending/disabled, focus restore, alerts y errores: reusar estados actuales, sin afirmar éxito antes de tener outputs validados.
 
 ### Motion & microinteractions
 
-- Motion primitive: ninguno.
-- Enter / exit, layout morph, stagger: ninguno — es un documento.
-- Reduced-motion fallback: no aplica, no hay motion.
-- Non-goal motion: cualquier animación. Un informe que se anima al abrirse se lee como marketing.
+- Web: motion del consumer Insights existente y fallback reducido; no agregar animación técnica propia.
+- PDF/deck: composición estática, legible en blanco y negro.
 
 ### Implementation mapping
 
-- Ver `## Implementation Mapping` del wireframe (rutas, primitives, variant, copy, reader,
-  capability, client-safe).
+El wireframe detalla regiones, evidenceRef/asOf y extensión de catálogos. No obliga a `ReportArtifactModel`, `variant` legacy, una ruta SEO separada ni `?print=1`.
 
 ### GVC scenario plan
 
-- Ver `## GVC Scenario Plan` del wireframe (scenarios web + print, markers, assertions, 1440+390).
+Capturar una edición especializada en superficies Insights vigentes, desktop 1440 y móvil 390; inspeccionar también A4 final a color y gris. Los paths/markers finales se fijan con el mapping implementable.
 
 ### Design decision log
 
-- Ver `## Design Decision Log` del wireframe (dos densidades en un documento; hallazgos de sitio
-  primero; fecha en portada; procedencia obligatoria; sin interacción; estructura estable en
-  móvil; PDF por `?print=1`).
+Una edición con dos densidades; hallazgos de sitio antes de páginas; fecha visible; procedencia junto al dato; reutilización del motor y acceso de Insights. Wireframe sigue pendiente de mapping final, no ready-for-implementation.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE (no llenar al crear)
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 2 — PLAN MODE: Discovery y plan al ejecutar, no implementado en este ajuste. -->
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
 
-### Slice 1 — Modelo + portada + procedencia
+### Slice 1 — Consumo del contrato de auditoría
 
-- `modelFromSeoAuditReport(input, variant)` sobre `ReportArtifactModel`, espejando 1310.
-- Portada: dominio, **fecha del crawl**, salud con su alcance, las tres prioridades.
-- Bloque de procedencia (puntaje del proveedor / esfuerzo estimado / carga de laboratorio / as-of).
-- Test de no-fuga client-safe.
+- Consumir el DTO y binding compatibles de organización/target/run/versión/fecha de TASK-1992 Slice 6; no implementar otro request/backend.
+- Mapear evidencia audit validada al plan editorial especializado, conservando referencias/alcance y hechos `site_health.*`.
+- No persistir un segundo snapshot SEO ni decidir la identidad del crawl sólo por una ventana mensual. La separación backend/UI evita convertir esta task en híbrida.
 
-### Slice 2 — Detalle: hallazgos de sitio + lista + URLs
+### Slice 2 — Resumen y detalle
 
-- Hallazgos de sitio **antes** de la lista, con su estado verificado / no verificado.
-- Banda de reparto (estática) + lista priorizada completa reusando `groupAuditIssues`.
-- URLs por grupo con techo propio del documento y lo omitido declarado.
+- Resumen de una plana: dominio, fecha, alcance, salud y tres prioridades.
+- Hallazgos de sitio antes de los grupos de páginas; orden canónico, severidad textual y razón de no verificación.
+- URLs con límites y omisiones declaradas; procedencia de puntaje, esfuerzo y carga de laboratorio.
 
-### Slice 3 — Rutas, print y acceso
+### Slice 3 — Consumers Insights
 
-- Ruta operador + `?print=1`; entrada cliente coordinada con 1310, con su gate.
-- `route-reachability-manifest` + estados que no emiten documento.
+- Mapear plan a catálogos existentes y proyección web. Extensión de contrato sólo donde faltan slots técnicos.
+- Entry points existentes de edición/revisión/descarga; conservar gates y audiencia.
 
-### Slice 4 — GVC + cierre documental
+### Slice 4 — Verificación y cierre
 
-- Scenarios web y print, desktop + 390px; los cuatro gates de UI.
+- Pruebas de exactitud de corrida, privacidad, audiencia, ausencia/stale/partial y versión inmutable.
+- GVC web desktop/móvil y QA del PDF final; evidencia productiva proporcional tras release autorizado.
 
 ## Out of Scope
 
-- **Compartir y enviar por correo** → `TASK-1673`. Esta task produce el documento; la otra lo mueve.
-- Cotizar el trabajo o proponer el *cómo* de cada arreglo: eso es el SOW, no el diagnóstico.
-- Cambiar el reader o el scoring.
-- Un render propio de PDF (se usa `?print=1`).
+- Compartir/enviar: TASK-1673 sobre TASK-1848.
+- Otro renderer, print route, biblioteca, tabla de snapshots, token store o sender SEO.
+- Nueva captura pagada, nuevos scores, cotización o ejecución editorial.
+- Incorporar AEO message_alignment sin su contrato de posicionamiento.
 
 ## Detailed Spec
 
-El detalle vive en el wireframe. Lo que esta spec fija: **un modelo, un render, la audiencia la
-resuelve el `variant`** — exactamente el contrato de `modelFromSeoReport`. Dos documentos
-paralelos se desincronizan en la primera iteración, y además obligan a elegir cuál mandar.
-
-Y la decisión que gobierna el orden interno: **los hallazgos de sitio van antes que la lista
-priorizada** porque la invalidan. No tiene sentido discutir títulos si el `robots.txt` tiene el
-sitio cerrado a los motores de respuesta.
+La corrida seleccionada es identidad del diagnóstico; la ventana Insights da contexto, no autoriza reemplazarla por «latest». La edición sella hechos, plan, audiencia y outputs. El lector público sirve esa edición exacta y nunca consulta de nuevo el crawl para actualizar lo emitido. Los detalles técnicos deben usar slots/contratos del motor existente; si requieren extensión, se declara y valida con el dueño, sin fallback a un renderer paralelo.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 → 2 → 3 → 4. La ruta (3) no se expone antes de que el documento (1+2) esté completo:
-  una ruta viva con un documento a medias es un informe emitido a medias.
-- 🔴 **El primer render publicable NO ocurre antes de que el flag de hallazgos de sitio esté en `ON`
-  en producción, con `TASK-1671` desplegada y una corrida real verificada.** El merge de `TASK-1670`
-  a `develop` **no** es el gate: con su flag default OFF, el collect materializa cero hallazgos de
-  sitio y el documento saldría ciego igual (Delta 2026-08-15 (2)). **Innegociable** aunque haya un
-  SOW esperando — publicar antes es firmar que está sano un sitio invisible para los motores de IA.
-  El trabajo de Slices 1–2 (modelo, sin ruta expuesta) sí puede adelantarse; lo que el gate bloquea es
-  **emitir**.
-- `TASK-1698` debe estar en `develop` antes de que el documento incluya `message_alignment`. Si por
-  secuenciación no lo está, el documento **omite esa dimensión** en vez de firmarla; no se publica
-  "con una nota al pie".
+Binding y evidencia → plan/detalle → consumers → verificación. No se emite antes del gate de materialización SEO y la validación de outputs Insights. Activación pasada del flag no exime de comprobar la corrida elegida.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Fuga de dato interno al cliente (costo, tier, cupo, ids) | entitlements / cliente | medium | Test de no-fuga en el modelo, espejando 1310; `variant` resuelve audiencia | test en CI |
-| El documento se cita meses después como vigente | reputación | **high** | Fecha del crawl en portada + bloque de procedencia con as-of | revisión de contenido |
-| Se atribuye a nuestro juicio lo que mide el proveedor | reputación | high | Bloque de procedencia obligatorio, con assertion en GVC | GVC |
-| Documento enorme (200 URLs × N grupos) impide imprimirlo | UI | medium | Techo propio del documento + lo omitido declarado | GVC print |
-| Se emite un informe sin diagnóstico o a medias | data quality | medium | Estados que NO generan documento (sin crawl / en curso) | revisión de código |
-| Divergencia visual con el informe hermano de 1310 | UI | medium | Reuso del mismo `ReportArtifactModel` y adaptadores | revisión de código |
-| **Se publica antes de `TASK-1670` por presión comercial** (SOW en curso, demanda inmediata) | reputación / comercial | **high** | Gate innegociable; un sitio con crawlers de IA bloqueados puede puntuar 95/100 y el documento sale de la plataforma sin nosotros al lado | cualquier intento de shippear con 1670 abierta |
-| **Se publica con `TASK-1670` mergeada pero su flag en OFF** — el gate viejo se cumplía con el audit todavía ciego y el checkbox se marcaba de buena fe | reputación / comercial | **high** | Gate reescrito: flag `ON` en producción + `TASK-1671` desplegada + corrida real verificada (Delta 2026-08-15 (2)) | Un render publicable sin evidencia de corrida con hallazgos de sitio materializados |
-| `message_alignment` (10 pts) medido contra un posicionamiento inferido por el modelo | reputación / medición | high | `Depends on: TASK-1698`; el input existe cacheado en `brand_intelligence.whatTheBrandDoes` | dimensión presente en el documento con 1698 abierta |
+| Puntaje atribuido a sitio completo o no verificado | datos/reputación | high | Alcance, as-of, taxonomía sitio/página y pruebas de ausencia/partial | revisión de edición |
+| Se comparte otro run u organización | acceso | medium | Binding explícito tenant-safe y snapshot inmutable | negativos tenant/run |
+| Filtración de datos internos | cliente | medium | Allowlist; tests de costo, tier, cupo e IDs proveedor/check | test no-leak |
+| Detalle excede el catálogo | render | medium | Validar slots/paginación y declarar omisiones | render rechazado/QA |
 
 ### Feature flags / cutover
 
-- Sin flag propio: hereda `GROWTH_SEO_ENABLED` y los gates de capability. La exposición real la
-  controla el entitlement per-org, no un flag. Additive: la ruta no existe hasta que se despliega.
+Reutiliza gates SEO productor e Insights generation/render/issuance/sharing. Sin nuevo flag propio obligatorio; si un slice necesita gate adicional lo justifica y registra. Estado actual se consulta en ledger, no en deltas históricos.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | revert PR (modelo aislado, sin ruta expuesta) | <5 min | si |
-| Slice 2 | revert PR | <5 min | si |
-| Slice 3 | revert de la ruta + manifest | <5 min | si |
-| Slice 4 | sin rollback propio: verifica y documenta, additive y sin impacto de runtime | — | no aplica |
+| 1–3 | Deshabilitar especialización/revert compatible; conservar ediciones selladas y outputs | medir en staging | sí para nuevas ediciones; copias descargadas no |
+| 4 | Corregir evidencia y versión, retirar emisión si corresponde | medir | no borrar historia |
 
 ### Production verification sequence
 
-0. **Precondición verificada, no asumida:** el flag de hallazgos de sitio de `TASK-1670` está en `ON`
-   en producción, `TASK-1671` está desplegada, y una corrida real muestra hallazgos de sitio
-   materializados para el target que se va a documentar. Si esa corrida no existe, **no se genera el
-   informe** — ni siquiera para revisión interna, porque un PDF de revisión también se reenvía.
-1. Operador genera el informe de Berel y lo mira en web y en `?print=1`.
-2. Se verifica que la portada cabe en una plana y que la fecha del crawl se lee de inmediato.
-3. Identidad cliente: se comprueba que NO aparece costo, tier, cupo ni ids de máquina.
-4. Se imprime a PDF y se lee en blanco y negro: severidades legibles sin color.
-5. GVC desktop + 390px, web y print.
+1. Local: corrida exacta, no-leak, límites y render especializado; inspección de archivo final.
+2. Staging: org/run autorizado, dos tenants, stale/partial y salida web/A4 de la misma edición.
+3. Release autorizado y readback del runtime; verificar corrida y gates del entorno objetivo.
+4. Revisión humana previa a emisión; documentar evidencia sin enviar correo por este cierre.
 
 ### Out-of-band coordination required
 
-- Ninguna que bloquee. La entrada del cliente se resuelve en su propia task (4.ª sección del
-  navegador de TASK-1310), después de que este documento exista y su forma esté decidida.
+Contrato y UI de Insights/Think cuando requieren extensión; producer SEO valida semántica. Release/emisión/distribución mantienen autorización propia.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 
-- [ ] El artefacto de auditoría técnica se integra como sección/version de Insights mediante TASK-1845/1847; conserva los gates existentes, evidencia/asOf, audiencia y densidades, sin segundo snapshot ni renderer general.
+- [ ] Binding explícito organización/target/audit_run_id/fecha queda validado y sellado en una edición Insights; dos corridas no se confunden ni se muta una versión.
+- [ ] Evidencia viene de `readSiteAuditReport` sin SQL productor directo ni snapshot/renderer paralelo; mapping comparte hechos con TASK-1992.
+- [ ] Resumen de una plana contiene dominio, fecha del crawl, alcance real y tres prioridades canónicas.
+- [ ] Hallazgos de sitio preceden páginas; severidad textual distingue recuperación y entrenamiento, con razón de no verificación.
+- [ ] Gate de materialización SEO revalidado para la corrida y runtime usados, sin asumir exactitud a partir del flag ON o un collect vacío.
+- [ ] `message_alignment` se omite o incluye sólo con posicionamiento declarado y contrato TASK-1698 vigente.
+- [ ] Procedencia distingue puntaje del proveedor, esfuerzo estimado, carga de laboratorio y as-of.
+- [ ] Allowlist y test de no-fuga excluyen costo, tier, cupo, IDs proveedor y códigos de checks internos.
+- [ ] Crawl ausente/en curso/ineligible rechaza emisión; parcial y stale conservan sus límites; ausencia no se vuelve cero.
+- [ ] Detalle y techo de URLs se mapean a catálogos/proyección actuales; omisiones declaradas, sin truncar afirmaciones.
+- [ ] Acceso por org/audiencia y gates Insights verificados; leer el audit no concede emitir/distribuir.
+- [ ] Web desktop/móvil y PDF final color/gris revisados con evidencia; UI ready sólo tras mapping/gates UI sin findings.
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`.
-- [ ] Un solo modelo con `variant`; NO existen dos documentos paralelos.
-- [ ] La portada cabe en una plana y contiene dominio, **fecha del crawl**, salud con su alcance
-      y las tres prioridades.
-- [ ] Los hallazgos de sitio se renderizan **antes** de la lista priorizada.
-- [ ] 🔴 **El flag de hallazgos de sitio de `TASK-1670` está en `ON` en producción, con `TASK-1671`
-      desplegada y una corrida real verificada** que muestre hallazgos de sitio materializados, antes
-      del primer render publicable. **No basta con que `TASK-1670` esté en `develop`**: nace con flag
-      default OFF y con el flag OFF el collect materializa cero hallazgos de sitio — el documento
-      saldría igual de ciego con el checkbox marcado (Delta 2026-08-15 (2)). Ninguna urgencia
-      comercial revierte este orden.
-- [ ] **`TASK-1698` está en `develop`** o el documento **no incluye** la dimensión `message_alignment`:
-      no se firma un puntaje de 10 puntos medido contra un posicionamiento nunca declarado.
-- [ ] Un hallazgo no verificado dice "no pudimos verificarlo" con su razón, nunca "sano".
-- [ ] El bloque de procedencia está presente y cubre: puntaje del proveedor, esfuerzo estimado,
-      carga de laboratorio y as-of.
-- [ ] Test de no-fuga: el documento no contiene `provider_cost_usd`, tier, cupo,
-      `provider_task_id` ni ids de máquina de los checks.
-- [ ] Sin crawl o con crawl en curso, **no se emite documento**.
-- [ ] `?print=1` produce la variante imprimible; no hay un tercer render.
-- [ ] Severidad legible impresa en blanco y negro (icono + palabra).
-- [ ] El techo de URLs del documento está declarado y lo omitido se dice.
-- [ ] Ruta registrada en el manifiesto de alcanzabilidad; gate cliente `growth.seo.report.read_client` `own`.
-- [ ] GVC desktop + 390px, web y print, mirado; los cuatro gates de UI en verde.
-- [ ] `UI ready` pasa a `yes` sólo cuando `pnpm task:lint --task TASK-1672` queda sin findings.
+Todos permanecen abiertos: la infraestructura reutilizada no prueba la especialización pendiente. Evidencia heredada y límites: Current Repo State y [auditoría SEO 04/10](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 
 ## Verification
 
-- `pnpm local:check:ui`
-- `pnpm test`
-- `pnpm fe:capture growth-seo-audit-report --env=local`
 - `pnpm task:lint --task TASK-1672`
 - `pnpm ui:wireframe-check --task TASK-1672`
 - `pnpm ui:readiness-check --task TASK-1672`
-- `pnpm docs:closure-check`
+- Implementación: tests focales Insights/SEO, checks UI y GVC especializados, QA A4 final.
+- `pnpm docs:closure-check`; strict context gate después de la última edición documental.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] doc funcional + manual de uso actualizados
-- [ ] `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 con el artefacto declarado
+- [ ] Lifecycle/carpeta/Status real/acceptance sincronizados con evidencia proporcional.
+- [ ] README/registry y EPIC-045 sincronizados; EPIC-022 conserva dependencia productora.
+- [ ] Arquitectura, manual/funcional, skill espejo y Handoff/changelog reflejan disponibilidad real.
+- [ ] Contratos UI/API/MCP, gates y outputs especializados verificados; no cierre por reparenting.
 
 ## Follow-ups
 
-- `TASK-1673` — compartir y enviar (enlace por defecto, adjunto como opción declarada).
-- Si el techo de URLs resulta insuficiente para sitios grandes, evaluar un anexo aparte.
+- TASK-1673 integra esta edición con distribución existente.
+- Anexo técnico sólo si la evidencia de límites lo justifica; sin nueva task preventiva.
 
 ## Open Questions
 
-1. **Techo de URLs del documento.** **Techo de URLs del documento.** En pantalla son 200 con scroll interno; impreso, 200 × varios
-   grupos es un PDF enorme. Propuesta: 25 por grupo con el resto declarado, y el detalle completo
-   sólo en la superficie web.
-3. ¿La portada muestra el delta contra el crawl anterior (`previous`, ya disponible)? Suma
-   contexto, pero también ruido cuando es el primer crawl. Propuesta: sólo si existe comparación.
-
-## Delta 2026-09-08 — Consumer especializado de Efeonce Insights
-
-Esta task conserva el artefacto especializado de auditoría técnica, las dos densidades y sus gates de hallazgos/frescura. Se adapta al snapshot/plan y catálogos de Insights (TASK-1845/1847), sin crear otro motor ni congelar cifras por separado. La fuente de sus hallazgos y el contrato ReportArtifactModel se conservan; el mapping no convierte SEO en score AEO. El consumer genérico de biblioteca/web es TASK-1849; esta task conserva la semántica especializada.
-
-Canon: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`; EPIC-045. Este delta actualiza ownership futuro, no declara implementación ni verifica flags productivos.
+- Mapping del contrato/backend TASK-1992 Slice 6 al plan/catálogos: fijar en Discovery; no hay código nuevo en este ajuste.
+- Techo por grupo y paginación: fijar según catálogo y QA, con omisiones explícitas.

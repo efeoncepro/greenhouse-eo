@@ -1,5 +1,7 @@
 # QA Release Audit — EPIC-045, reconciliación y cierre (2026-10-04)
 
+> **Corte de auditoría previo al reparto del 04/10:** preserva su evidencia y censo originales. TASK-1672/1673 pasan después a EPIC-045 (26 hijas, 7 complete, 6 in-progress y 13 to-do), sin implementación ni cierre. El [mapa vigente](../seo/2026-10-04-epic-022-ownership-and-remaining-work.md) detalla el alcance especializado pendiente.
+
 ## Verdict
 
 **PASS** para la reconciliación documental del alcance Insights; gates focales registrados abajo.

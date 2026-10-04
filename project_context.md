@@ -103,18 +103,17 @@ ledger y Globe Producer muestra un self-view read-only de effective/funding/cap-
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
-Growth SEO (`growth.seo`, EPIC-022) autoriza cada run en `enforceSeoRunEntitlement` y sólo lee `seo_v2` de
-`greenhouse_client_portal.modules` (TASK-1677). Sus readers canónicos se exponen por
-`/api/platform/ecosystem/growth/seo/*` y MCP en el mismo PR. El orden de trabajo tiene una sola autoridad
-append-only, `greenhouse_growth.seo_work_queue_*` (TASK-1700): ningún consumer recompone prioridad y sin demanda
-medida `priority_score` queda NULL. La curva CTR declara usabilidad y distingue cero de ausencia de muestra
-(TASK-1792); discovery identifica keywords normalizadas, no filas del proveedor. El módulo vive en producción
-y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENABLED` gobierna Vercel y
-`ops-worker`: Cloud Run compartido, `seo_gsc_daily`, sin flip aislado. Verificar credenciales en runtime. Canon:
-`docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
-`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
+Growth SEO (`growth.seo`, EPIC-022) está en producción y federado, fail-closed por organización.
+`enforceSeoRunEntitlement` autoriza cada run con `seo_v2`; app/ecosystem/MCP reusan readers canónicos.
+La cola append-only de TASK-1700 es la única autoridad de prioridad: sin demanda medida el score es NULL.
+CTR distingue ausencia de muestra de cero; discovery identifica keywords normalizadas. `GROWTH_SEO_ENABLED`
+gobierna Vercel y `ops-worker` conjuntamente; no flip aislado. Contratos, crons y verificación:
+[arquitectura SEO](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
+[invariantes ops](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-SEO: [estado vigente](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
+SEO: [ownership y trabajo pendiente](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
+Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editorial; Insights posee informes.
+[Evidencia del corte anterior](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 
 Insights: [estado y cierre de EPIC-045](docs/audits/insights/2026-10-04-epic-045-closure-review.md).

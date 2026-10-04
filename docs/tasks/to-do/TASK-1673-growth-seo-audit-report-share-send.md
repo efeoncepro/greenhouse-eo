@@ -1,16 +1,8 @@
-# TASK-1673 — Growth SEO: compartir y enviar el informe de auditoría
+# TASK-1673 — Efeonce Insights: distribución de la edición de auditoría SEO
 
-## Delta 2026-08-08 — TASK-1309 cerrada
+> Ajuste de alcance autorizado el 2026-10-04. [Spec y deltas anteriores preservados íntegros](../../audits/insights/history/2026-10-04-seo-specialization/README.md). EPIC-045 posee informes/distribución; EPIC-022 conserva el productor SEO. No se implementó esta integración ni se envió correo.
 
-`TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
-10377/0, `pnpm build` de producción verde, `ui:quality` PASS 4.63. Lo que esta task da por existente
-de 1309 —`groupAuditIssues`, las fichas es-CL de los checks con su drift test, `readSiteAuditReport`
-con `run`/`findings`/`totals`/`previous`— **ya está en `develop` y verificado con datos reales de
-Grupo Berel**, no es supuesto.
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
@@ -26,352 +18,265 @@ Grupo Berel**, no es supuesto.
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `command`
-- Epic: `EPIC-022`
-- Status real: `Diseno`
+- Epic: `EPIC-045`
+- Status real: `Diseño reformulado 2026-10-04; infraestructura de compartir/enviar existe en TASK-1848, integración de corrida→edición técnica TASK-1672 pendiente. Falta selección exacta, dedupe y revalidación en el entrypoint, pruebas tenant/expiry/revoke/dispatch y verificación humana. TASK-1848 sigue in-progress por gates propios; no falta construir otro sender/token store.`
 - Rank: `TBD`
 - Domain: `growth|data`
-- Blocked by: `TASK-1672, TASK-1848`
+- Blocked by: `TASK-1672`; TASK-1848 aporta infraestructura disponible, sus pendientes se verifican por lane/caso.
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Command gobernado para que el informe de auditoría **salga de la plataforma**: enlace compartible
-con código corto, caducidad y **revocación**, tracking de apertura, y envío por correo desde la
-pantalla del operador — **con enlace por defecto y PDF adjunto como opción declarada**. El
-cliente genera y se lleva el documento; el reenvío a su agencia lo hace desde su propio inbox.
+Integrar la edición inmutable de auditoría técnica de TASK-1672 con los commands existentes de sharing/delivery Insights. El entrypoint selecciona el run correcto y su edición elegible, conserva autorización, frescura y modalidad, y evita efectos duplicados. No crea enlace SEO, token store, reader público, sender, ledger, plantilla ni flag paralelos.
 
 ## Why This Task Exists
 
-El escenario real: el cliente no ejecuta, **reenvía a una agencia**. Sin una forma de sacar el
-documento, el diagnóstico muere en la pantalla y el equipo copia URLs a mano.
-
-Y hay una asimetría que decide el diseño: **el audit tiene contrato de frescura**. La pantalla
-dice "último crawl: ayer" y avisa cuando envejece; todo el trabajo de honestidad de TASK-1309
-existe para que nadie lea el dato fuera de contexto. Un PDF adjunto **congela eso**: queda en un
-inbox ajeno, sin caducidad y sin revocación, y se lee como vigente para siempre. Un enlace puede
-declarar su propia edad.
-
-El repo ya tiene los dos patrones y la división es deliberada: **adjunto para registros
-inmutables** (cotización firmada, comprobante de pago a contractor), **enlace para diagnósticos
-vivos** (el informe AEO se comparte por URL con código corto). La auditoría es del segundo grupo.
-
-Beneficio adicional que responde a la pregunta comercial: el enlace **te dice si lo abrieron**.
-Con adjunto no te enteras nunca de si el diagnóstico está vivo o murió en un inbox.
+La auditoría se reenvía a quien ejecuta. El motor general ya comparte y envía ediciones, pero aún no hay una edición técnica ligada al crawl ni un entrypoint que valide esa selección. Un enlace debe servir la versión elegida y declarar fecha/alcance; nunca cambiar al último crawl después de compartirla.
 
 ## Goal
 
-- Sacar el informe de la plataforma **sin perder su contrato de frescura**.
-- Enlace revocable y caducable, con tracking de apertura.
-- Envío por correo del operador, con la consecuencia del adjunto declarada en la UI.
-- Cero vectores de abuso nuevos desde nuestro dominio de envío.
+- Distribuir la edición audit exacta con permisos y commands Insights.
+- Conservar idempotencia de selección y entrega sin recuperar un bearer persistido.
+- Verificar revoke/expiry/tenant y revalidación al despacho sobre esa especialización.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
 ## Architecture Alignment
 
-Revisar y respetar:
-
-- `src/lib/finance/quote-share/{short-link,view-tracker}.ts` — el patrón de enlace corto +
-  tracking de apertura ya canonizado.
-- `src/lib/growth/ai-visibility/{public-report-url.ts,report/short-link.ts}` — cómo el informe
-  hermano construye su URL pública larga y corta.
-- `src/app/api/finance/quotes/[id]/share/[shortCode]/send-email/route.ts` — el patrón de envío
-  con adjunto PDF.
-- `src/lib/email/{delivery,rate-limit,types}.ts` — contrato de envío y límites.
-- `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
-
-Reglas obligatorias:
-
-- 🔴 **Enviar ≠ ver.** Capability propia para el envío. Quien puede leer el diagnóstico no
-  necesariamente puede mandarlo a un tercero desde nuestro dominio.
-- 🔴 **El cliente NO envía correos desde nuestro dominio.** Genera, descarga y copia el enlace;
-  el reenvío lo hace desde su inbox — que además llega mejor a su agencia y no cruza su filtro de
-  spam. Un botón que deje a un cliente disparar correos a direcciones arbitrarias desde nuestro
-  remitente pone en riesgo la misma reputación con la que mandamos facturas y liquidaciones.
-- 🔴 **El adjunto es irrevocable y la UI lo dice**, junto a la opción y no en un tooltip.
-- **NUNCA** un enlace que muera solo antes de que la agencia lo abra: caducidad larga + revocación
-  explícita, no expiración agresiva.
-- **NUNCA** `Sentry.captureException` directo ni prosa cruda al cliente: `captureWithDomain` +
-  `canonicalErrorResponse`.
-- Todo envío queda registrado: quién, a quién, con qué modalidad y cuándo.
+- `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §§5, 7–10.
+- `docs/architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`: ADR existente de dominio y distribución.
+- `src/lib/efeonce-insights/sharing/{commands,store,public,token}.ts` y `delivery/{commands,dispatch,store}.ts`.
+- `src/lib/email/delivery.ts` y reconciliación: transporte único.
+- **Leer/generar no concede compartir ni enviar.** Insights valida módulo, capability, audiencia, estado de edición y org.
+- Compartir: ediciones client issued, `insights.share.manage`, TTL 1–90 días/default 30 y cuota vigente de grants. Se permiten varios grants; el token sólo se devuelve una vez y sólo su digest se persiste.
+- Enviar: sólo App, persona interna con `insights.delivery.send`, destinatarios canónicos activos autorizados; cliente no envía desde Efeonce. Ecosystem/MCP sólo leen delivery; no se habilita envío por propose/confirm MCP.
+- Enlace por defecto (`share_link`); `attachment` exige outputs elegibles y consecuencia irrevocable declarada, como en el contrato existente.
+- Accepted, delivered y acceso no son lectura humana. El access log no identifica quién leyó ni prueba contratación.
+- Delivery ambiguo se reconcilia; no se reenvía ciegamente. Token perdido se revoca/reemplaza explícitamente, no se reconstruye.
 
 ## Normative Docs
 
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
-- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`
+- TASK-1672 y TASK-1848, con evidencia y pendientes por criterio.
+- Manual `operar-efeonce-insights-api-mcp.md`: recetas actuales de los commands, no otro flujo de distribución.
 
 ## Dependencies & Impact
 
-### Depende de
+### Depends on
 
-- `TASK-1672` — el artefacto. **Bloqueante**: sin documento no hay nada que compartir.
-- `TASK-1670` — hallazgos de sitio (vía 1672).
+- TASK-1672: edición especializada, binding exacto y outputs validados; bloqueante.
+- TASK-1848: grants/delivery/reader público disponibles. Revalidar canary humano y negativos MCP del carril usado; portal_link depende de TASK-1849, no se usa como fallback a share_link sin elección.
+- TASK-1670/1671 y evidencia SEO: hereda gates de 1672, no requiere activar de nuevo un flag ya ON.
 
 ### Blocks / Impacts
 
-- Habilita el uso comercial real del audit: material de SOW que llega a quien ejecuta.
+- Distribución comercial de auditoría técnica, sin bloquear informes generales de desempeño.
+- EPIC-045 posee cierre; EPIC-022 permanece dependencia de evidencia y autorización SEO.
 
 ### Files owned
 
-- `src/lib/growth/seo/audit-report/share/**` — adapter de grants/delivery Insights; token store y lifecycle transversales en TASK-1848
-- `src/app/api/admin/growth/seo/audit/report/share/**` — rutas del command
-- ruta pública del informe compartido `[definir en Discovery: hub headless vs portal]`
-- `src/lib/copy/growth.ts` — copy del panel de compartir y del correo
-- Sin tabla de tokens propia: consumer de los stores de TASK-1848; cualquier metadata específica se justifica en Discovery
+- `src/lib/efeonce-insights/**`: adapter/command fino de selección audit→edición, sólo si Discovery demuestra que no basta el command existente.
+- Lanes existentes `/api/platform/app/insights/**` y `/api/platform/ecosystem/insights/**` según matriz vigente; no rutas de envío MCP.
+- Tests de binding/tenant/dedupe y contratos; el UI de entrypoint queda en consumers de TASK-1849/1672.
+- Stores sharing/delivery y Email se reutilizan; no ownership nuevo de transporte ni migración de token store SEO.
 
 ## Current Repo State
 
 ### Already exists
 
-- `src/lib/shared/short-code.ts` — generación de códigos cortos.
-- `quote-share/view-tracker.ts` — tracking de apertura de un documento compartido.
-- `public-report-url.ts` — builder de URL larga y corta del informe AEO sobre el hub headless.
-- `send-email` de cotizaciones — envío con adjunto PDF construido en el route handler.
-- `src/lib/email/rate-limit.ts` + `email_deliveries` con `has_attachments`.
+Inspección local 2026-10-04, no nuevo canary ni envío:
+
+| Cobertura reutilizada | Evidencia | Lo que no certifica |
+|---|---|---|
+| Grants, digest, TTL/cuota, revocación | `sharing/commands.ts`, `store.ts`, `public.ts`; tests de TASK-1848 | Integración con audit run aún ausente |
+| Público client-safe edición exacta + descargas | TASK-1848 y web Think TASK-1875 | Detalle técnico de TASK-1672 |
+| Delivery interno, dedupe, destinatarios y reconciliación | `delivery/commands.ts`, `dispatch.ts`, tests | Canary humano pendiente ni envío de este nuevo artefacto |
+| Infraestructura desplegada/activada | Auditoría Insights 04/10; sharing/emisión 28/09, delivery/schedules 02/10 | Cierre total de TASK-1848 |
 
 ### Gap
 
-- El audit no tiene token, enlace ni envío.
-- No hay revocación explícita como concepto reusable (la cotización comparte, pero el ciclo de
-  vida del enlace del audit es distinto: caduca por frescura del dato, no por estado comercial).
+- TASK-1672 no implementada: no hay edición técnica que el entrypoint pueda distribuir.
+- Mapping exacto run→edición/versión/audiencia; selección y retry del caller no duplican edición/entrega.
+- Negativos de corrida/tenant, expiry/revoke y revalidación de autoridad/destinatario en esta integración.
+- No falta reconstruir el renderer, bearer, sender o ledger generales.
 
 ## Modular Placement Contract
 
 - Topology impact: `api`
-- Current home: `src/lib/growth/seo/audit-report/share/**` + rutas `api/admin/growth/seo/...`
+- Current home: `src/lib/efeonce-insights/**` y lanes actuales
 - Future candidate home: `remain-shared`
-- Rationale del candidate home: el ciclo de vida del enlace es del dominio SEO; si un día tres
-  dominios comparten artefactos, ahí recién corresponde un primitive de share.
-- Boundary: command canónico en `src/lib/**`; las rutas son transporte.
-- Server/browser split: server-only (tokens, envío, tracking).
+- Rationale del candidate home: extensión de dominio existente, sin otro primitive/store SEO.
+- Boundary: SEO produce evidencia; Insights controla edición/grants/intents; Email controla transporte.
+- Server/browser split: resolución/autorización/commands server-side; DTOs redactados al consumer.
 - Build impact: `none`
 - Extraction blocker: `none`
 
 ## Backend/Data Contract
 
+### Backend/data brief
+
 - Backend rigor: `backend-standard`
 - Impacto principal: `command`
-- Source of truth afectado: tabla de share tokens del audit `[nombre en Discovery]` +
-  `email_deliveries` (ya existente).
-- Consumidores afectados: `UI` (panel de compartir), `external` (quien abre el enlace).
-- Runtime target: `local`, `staging`, `production`.
+- Source of truth afectado: edición y binding de TASK-1672; `greenhouse_insights` grants/delivery intents; `email_deliveries` canónico.
+- Consumidores afectados: entrypoint App/Insights, lectores de Ecosystem/MCP permitidos y web Think.
+- Runtime target: Vercel y dispatcher ops-worker existentes; presentación Think.
 
-### Contrato
+### Contract surface
 
-- Contrato existente a respetar: `sendEmail` de `src/lib/email/delivery.ts`; el patrón de
-  short-code; `readSiteAuditReport`.
-- Contrato nuevo: command `shareSiteAuditReport` (crear enlace), `revokeSiteAuditReportShare`,
-  `sendSiteAuditReportEmail`; ruta pública de lectura del informe compartido.
-- Backward compatibility: `compatible` — todo aditivo.
-- Full API parity: los tres son commands canónicos en `src/lib/**`; la UI es un cliente. Nexa y
-  MCP pueden operarlos por construcción (el envío, vía el loop propose → confirm → execute).
+- Contrato existente a respetar: `createInsightShare`, `revokeInsightShare`, `readInsightShares`, `requestInsightDelivery`, readers y reconciliación de TASK-1848.
+- Contrato nuevo o modificado: sólo selección/binding audit→edición si los commands actuales no lo cubren; no comandos SEO paralelos de envío.
+- Backward compatibility: `compatible`, extensión acotada.
+- Full API parity: mismo command y errores por carril permitido. Matriz vigente excluye envío/schedules writes en MCP/Ecosystem.
 
-### Datos e invariantes
+### Data model and invariants
 
-- Entidades/tablas/views afectadas: share tokens del audit; `email_deliveries`.
-- Invariantes que no se pueden romper:
-  - **un enlace revocado deja de servir el documento inmediatamente**;
-  - el enlace declara la fecha del crawl que sirve — nunca muestra un diagnóstico sin su as-of;
-  - un envío siempre deja registro (quién, a quién, modalidad, cuándo);
-  - el adjunto, una vez enviado, **no se puede revocar**, y la UI lo dijo antes.
-- Tenant/space boundary: el token pertenece a un `audit_run_id` de un `seo_target` de una org;
-  la ruta pública sirve **sólo** ese run, sin sesión y sin poder pivotar a otro.
-- Idempotency/concurrency: crear un enlace para un run que ya lo tiene devuelve el existente en
-  vez de multiplicar tokens.
-- Audit/outbox/history: append-only de envíos y de aperturas; revocación como transición, no
-  como borrado.
+- Entidades/tablas/views afectadas: bindings de 1672 y stores Insights existentes; ninguna tabla de tokens propuesta.
+- Invariantes que no se pueden romper: org/target/run/edición exactos, client-safe, no mutación de edición, digest-only y revalidación antes de efectos externos.
+- Tenant/space boundary: binding autorizado en servidor; el grant da acceso sólo a la edición/output seleccionado, no a otro run, biblioteca ni identidad.
+- Idempotency/concurrency: selección por organización+run+versión/audiencia/request estable; delivery usa idempotencyKey+request_hash del dominio. Distinto destinatario/modalidad no colapsa en «un envío por run».
+- Grants: no imponer «un enlace por audit_run_id devuelve el anterior». El command actual permite varios grants; no puede devolver el bearer anterior. Retries conservan referencias sin reemisión ciega; pérdida de token exige revoke/replacement explícito.
+- Audit/outbox/history: eventos actuales Insights y email ledger; no bearer ni destinatario crudo en logs.
 
-### Migración y rollback
+### Migration, backfill and rollout
 
-- Migration posture: `additive`
-- Default state: `flag OFF`
-- Backfill plan: ninguno — no hay enlaces previos.
-- Rollback path: flag OFF (deja de ofrecerse compartir) + revocación masiva si hiciera falta.
-  Los enlaces ya emitidos se revocan, no se borran.
-- External coordination: env var del flag en Vercel; dominio de la ruta pública si va al hub.
+- Migration posture: `none` por defecto; cualquier metadata adicional va con justificación/boundary del dominio, sin grant store propio.
+- Default state: gates existentes, sin nuevo flag SEO de compartir.
+- Backfill plan: ninguno.
+- Rollback path: detener entrypoint/especialización y revocar grants afectados vía commands existentes; no borrar evidencia ni recuperar adjuntos.
+- External coordination: release/activación por owners actuales; dominio Think ya decidido.
 
-### Seguridad y errores
+### Security and access
 
-- Auth/access gate: capability propia de envío (≠ `observation.read`); la ruta pública se abre
-  con token, sin sesión, y sólo sirve ese run.
-- Sensitive data posture: el documento es client-safe por construcción (garantizado por 1672);
-  el correo del destinatario es dato personal — se registra, no se expone.
-- Error contract: `canonicalErrorResponse` con códigos propios (enlace revocado, enlace vencido,
-  cupo de envío excedido) y `actionable` correcto: un enlace revocado NO ofrece reintentar.
-- Abuse/rate-limit posture: rate limit por operador y por org; el destinatario queda registrado.
-  **El cliente no envía**, lo que elimina el vector más ancho.
+- Auth/access gate: capabilities/módulo/estado/audiencia Insights más binding productor autorizado; el cliente puede compartir sólo si su capability vigente lo permite.
+- Sensitive data posture: allowlist de 1672; destinatarios por identidad canónica, sin relay arbitrario.
+- Error contract: errores Insights canónicos (`not_found`, `not_ready`, `idempotency_conflict`, disabled/quota) y adapter vigente; no raw errors. No retry automático sobre revoke/expiry sin acción autorizada.
+- Abuse/rate-limit posture: cuotas y rate limits existentes por dominio; no ampliar límites por el entrypoint.
 
-### Evidencia runtime
+### Runtime evidence
 
-- Crear enlace, abrirlo en incógnito, verificar tracking de apertura.
-- Revocar y verificar que deja de servir **de inmediato**.
-- Enviar con enlace y con adjunto; verificar `email_deliveries` y el registro de ambos.
-- Verificar que un cliente autenticado NO puede disparar el envío.
+- Local: corrida exacta/dos orgs/dos versiones, request estable vs conflicto, no duplicar delivery/grant en retry incierto.
+- Staging: share_link y revocación/expiry; descarga elegible, autoridad retirada y revalidación de destinatario al despachar.
+- Correo: sólo ensayo a inbox autorizado dentro del cierre de implementación; este ajuste no autoriza un envío real.
+- MCP: negativos permiso/tenant para operaciones permitidas; envío inexistente por contrato.
+- Señales: intents/recipient/transport correlacionados, accepted≠delivered y acceso≠lectura.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE (no llenar al crear)
-     ═══════════════════════════════════════════════════════════ -->
+### Acceptance criteria additions
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+- [ ] Source of truth, tenant boundary y binding explícito implementados sin store paralelo.
+- [ ] Commands/capabilities por carril, idempotencia, errores y revalidación verificados.
+- [ ] Postura migration/rollback proporcional y evidencia runtime registrada sin secrets/bearer.
+
+<!-- ZONE 2 — PLAN MODE: Discovery y plan al ejecutar, no implementado en este ajuste. -->
+
+<!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
 
-### Slice 1 — Enlace compartible con ciclo de vida
+### Slice 1 — Selección de edición
 
-- Token + código corto por `audit_run_id`, idempotente.
-- Ruta pública que sirve el informe con su as-of visible, sin sesión.
-- Revocación explícita con efecto inmediato.
+- Resolver binding audit exacto y una edición emitida client elegible.
+- Reutilizar command/readers de 1672/Insights; idempotencia de request/versión, con conflicto declarado.
 
-### Slice 2 — Tracking de apertura
+### Slice 2 — Compartir con infraestructura existente
 
-- Registro de aperturas reusando el patrón de `quote-share/view-tracker`.
-- Visible para el operador: si el cliente lo abrió, y si lo abrió alguien más.
+- Delegar create/revoke/list y reader público a 1848, conservando TTL/cuota/no-store/anti-oracle.
+- No recuperar bearer perdido, crear rutas públicas SEO o afirmar lectura humana a partir de logs.
 
-### Slice 3 — Envío por correo (operador)
+### Slice 3 — Entrega con infraestructura existente
 
-- Command de envío con **enlace por defecto**; adjunto PDF como opción.
-- Plantilla de correo en la capa de copy, es-CL.
-- Capability propia + rate limit + registro de destinatario.
+- Delegar delivery a App interno; share_link default, attachment explícito con output y ack irrevocable.
+- Revalidar destinatarios canónicos, autorización y versión; dedupe y reconciliación existentes.
 
-### Slice 4 — Verificación runtime + ledger
+### Slice 4 — Verificación específica
 
-- Los cuatro caminos ejercitados en vivo; fila del flag en el ledger.
+- Matriz dos orgs/runs/versiones, revoke/expiry/download, retry ambiguo y envío cliente rechazado.
+- Evidence readback de edition/run/delivery; reutilizar evidencia transversal fechada sin declararla canary de esta integración.
 
 ## Out of Scope
 
-- **Que el cliente envíe correos desde nuestro dominio.** Genera, descarga y copia el enlace; el
-  reenvío lo hace desde su inbox. Si algún día se habilita, carga rate limit por org, allowlist
-  de destinatarios y un plan para el abuso.
-- Generar el documento (es `TASK-1672`).
-- Un render propio de PDF: se imprime la variante `?print=1`.
-- Firma electrónica o acuse de recibo formal.
+- Generación/render de documento: 1672 sobre foundations Insights.
+- Token store, short-code SEO, sender, transporte/ledger, plantilla o flag nuevos.
+- Envío desde identidad cliente, por MCP/Ecosystem o a email arbitrario no autorizado.
+- In-app/Teams/preferencias/Hub general y portal_link sin TASK-1849.
+- Firma electrónica, prueba de lectura o actualización en vivo de un crawl sellado.
 
 ## Detailed Spec
 
-La decisión de fondo es **enlace por defecto, adjunto como excepción declarada**, y sale de la
-división que el repo ya hace: adjunto para registros inmutables (una cotización acordada, un
-comprobante), enlace para diagnósticos vivos (el informe AEO).
-
-El audit es un diagnóstico **con contrato de frescura**: le construimos a la pantalla la
-capacidad de decir "último crawl: ayer" y de advertir cuando envejece. Un PDF adjunto tira eso:
-queda congelado, sin caducidad ni revocación, y se lee como vigente para siempre — con nuestro
-nombre en la portada. El enlace puede declarar su propia edad y puede apagarse.
-
-El adjunto igual existe porque hay casos reales donde gana: el correo corporativo de la agencia
-bloquea enlaces externos, o el cliente quiere el documento en la carpeta del proyecto. Pero
-elegirlo es aceptar una consecuencia, y la UI la pone **junto a la opción**.
+El enlace sirve una edición congelada, con fecha del crawl y su alcance. Caducidad o revocación afectan acceso futuro, no los bytes ya descargados. El entrypoint pasa referencias autorizadas a los commands actuales; no sustituye políticas de sharing/delivery. Compartir y enviar son acciones distintas y la idempotencia se define por operación/payload, no sólo por run.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 (enlace + revocación) → Slice 2 (tracking) → Slice 3 (envío) → Slice 4 (verificación).
-- El envío (3) **NO** puede shippear antes que la revocación (1): habilitar la salida de un
-  documento sin poder apagarlo es exactamente el riesgo que esta task existe para controlar.
+1672 elegible → binding/selección → sharing → delivery → verificación. No distribución de una edición técnica incompleta, sin emisión o fuera de audiencia.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Un enlace revocado sigue sirviendo el documento | seguridad / cliente | medium | Revocación verificada en runtime como criterio de aceptación; sin caché del documento en la ruta pública | verificación del slice 1 |
-| Envío usado como vector de spam desde nuestro dominio | reputación de envío | medium | Capability propia, rate limit por operador y org, destinatario registrado; **el cliente no envía** | `email_deliveries` + monitor de deliverability |
-| El adjunto se envía sin que nadie entienda que es irrevocable | reputación | medium | La consecuencia va junto a la opción en la UI, no en tooltip | revisión de diseño |
-| El enlace caduca antes de que la agencia lo abra | UX / comercial | medium | Caducidad larga + revocación explícita en vez de expiración agresiva | tracking de aperturas fallidas |
-| Un token permite pivotar a otro run u otra org | seguridad | low | El token sirve un `audit_run_id` y nada más; test dedicado | test |
-| Se acumulan tokens duplicados por run | data quality | low | Creación idempotente | test |
+| Otro run/tenant servido | acceso | medium | Binding sellado y negativos dos orgs/runs | test y readback |
+| Retry crea enlace/envío extra | fiabilidad | medium | Contratos existentes y reconcile antes de repetir | intents/grants correlacionados |
+| Email arbitrario o MCP ampliado | reputación | medium | App interno, identidad canónica y matriz de carriles | negativos de acceso |
+| Adjuntos interpretados como revocables | cliente | medium | Ack vigente y consecuencia visible | revisión de consumer |
 
 ### Feature flags / cutover
 
-- Flag nuevo `[nombrar en Discovery]`, default **OFF**, leído por Vercel (rutas + UI). Fila en
-  `FEATURE_FLAG_STATE_LEDGER.md`. Cutover: OFF → ON en staging con un enlace real → producción.
+Gates vigentes `INSIGHTS_SHARING_ENABLED`, `INSIGHTS_DELIVERY_ENABLED`, issuance y gates SEO de 1672; EmailType conservado. No nueva env obligatoria ni reactivación de flags ya ON. Verificar runtime objetivo antes de publicar.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | flag OFF + revocar los enlaces emitidos | <10 min | si |
-| Slice 2 | revert PR (el tracking es aditivo) | <5 min | si |
-| Slice 3 | flag OFF: deja de ofrecerse el envío. Los correos ya enviados **no se recuperan** | <10 min | parcialmente — el correo enviado es irreversible por naturaleza |
-| Slice 4 | sin rollback propio: verifica y documenta, additive y sin impacto de runtime | — | no aplica |
+| 1–2 | Detener entrypoint y revocar grants específicos por command | medir staging | sí para acceso futuro |
+| 3 | Detener nuevos intents/reconciliar pendientes | medir staging | correo/adjuntos enviados no |
+| 4 | Corregir evidencia, sin borrar historial | no aplica | no cambia runtime |
 
 ### Production verification sequence
 
-1. Crear enlace en staging, abrirlo en incógnito, confirmar que se registra la apertura.
-2. Revocar y confirmar que deja de servir de inmediato.
-3. Enviar con enlace a una casilla propia; verificar `email_deliveries` y el registro.
-4. Enviar con adjunto; verificar el PDF y que quede marcado `has_attachments`.
-5. Con identidad cliente, confirmar que el envío **no está disponible**.
+1. Local y staging con fixtures identificados: binding/negativos/revoke/expiry/dedupe.
+2. Release autorizado: comprobar SHA/gates/readers y edición técnica exacta.
+3. Revisión humana y ensayo de distribución sólo a destino autorizado, con readback de ledger.
+4. Correlación exacta run→edition→grant/delivery y ausencia de doble efecto.
 
 ### Out-of-band coordination required
 
-- Env var del flag en Vercel.
-- Dominio de la ruta pública si se decide servirla desde el hub headless.
+Cierre de gates humanos de TASK-1848 del carril utilizado y autorización de release/emisión/envío; este cambio documental no los ejecuta.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 
-- [ ] El entrypoint SEO usa grants/delivery de TASK-1848, con edición inmutable de TASK-1672, autorización exacta y prueba de revoke/expiry/dedupe; no crea token store, sender ni ledger de transporte paralelo.
+- [ ] Entry point selecciona org/target/run/edición/versión exactos de TASK-1672, sin sustituir por último crawl.
+- [ ] Idempotencia de selección/request y delivery por payload verificada; grants múltiples y digest-only respetados, sin recuperar bearer anterior.
+- [ ] Enlace y descarga sólo sirven esa edición client issued, con fecha/alcance y anti-oracle/no-store actuales.
+- [ ] Revoke/expiry/withdraw bloquean siguiente acceso/descarga, verificados en el caso audit; copias descargadas se declaran irrevocables.
+- [ ] Cliente no envía; App interno exige capability propia, autoridad y destinatario canónico revalidados al dispatch; MCP/Ecosystem no envían.
+- [ ] Share_link default y attachment explícito con output elegible/ack; no fallback silencioso portal_link o destinatario.
+- [ ] Rate limits, logs redactados y correlación actuales reutilizados sin nuevo store/sender/ledger; acceso no se presenta como lectura.
+- [ ] Retry ambiguo se reconcilia, payload distinto produce conflicto o nuevo intent autorizado y no duplica efectos.
+- [ ] Negativos tenant/run/versión/permiso y gates humanos/runtime del carril usado documentados con evidencia fechada.
 
-- [ ] Se declaró `Execution profile: backend-data` y `Backend impact: command`.
-- [ ] El enlace se crea de forma **idempotente** por `audit_run_id`.
-- [ ] **Revocar apaga el enlace de inmediato**, verificado en runtime.
-- [ ] El enlace sirve **sólo** ese run: no permite pivotar a otro run ni a otra org.
-- [ ] El documento servido por enlace muestra la **fecha del crawl**.
-- [ ] Las aperturas quedan registradas y son visibles para el operador.
-- [ ] El envío requiere capability propia, distinta de `growth.seo.observation.read`.
-- [ ] Una identidad cliente **no** puede disparar el envío, verificado en runtime.
-- [ ] Enlace es el default del envío; el adjunto es opción y su consecuencia está declarada.
-- [ ] Rate limit por operador y por org; destinatario registrado en cada envío.
-- [ ] Códigos canónicos con `actionable` correcto: enlace revocado o vencido **no** ofrece reintentar.
-- [ ] Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime.
+Todos abiertos: cobertura genérica reutilizada de 1848 no acredita el entrypoint especializado ni cierra sus propios canaries pendientes.
 
 ## Verification
 
-- `pnpm local:check`
-- `pnpm test`
 - `pnpm task:lint --task TASK-1673`
-- `pnpm docs:closure-check`
-- `pnpm qa:gates --changed`
+- Implementación: tests focales binding/sharing/delivery; live y canary autorizados del caso especializado.
+- `pnpm docs:closure-check`, `pnpm qa:gates --changed` y strict context gate al final de edición.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] manual de uso: cómo compartir, cuándo usar adjunto y cómo revocar
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md`
+- [ ] Lifecycle/carpeta/Status real/acceptance y evidencia sincronizados.
+- [ ] EPIC-045/README/registry actualizados; dependencia SEO explícita.
+- [ ] Manual/funcional, arquitectura, skill espejo y handoff documentan el caso disponible sin declarar cierre de 1848 por transitividad.
+- [ ] Verificación de integración y cierre documental completos; sin push/env/correo automáticos.
 
 ## Follow-ups
 
-- Si el uso comercial lo pide, evaluar que el cliente pueda enviar — con rate limit por org,
-  allowlist de destinatarios y plan de abuso declarados **antes**, no después.
-- Métrica de negocio: qué proporción de informes compartidos se abre, y si abrir se correlaciona
-  con que el trabajo se contrate.
+Medición comercial a partir de accesos sólo con su limitación explícita; no es prueba de lectura ni causalidad. No abrir sender cliente preventivo.
 
 ## Open Questions
 
-1. **Dónde vive la ruta pública del informe compartido**: ¿hub headless `efeonce-think` (como el
-   informe AEO) o el propio portal con token? El hub es coherente con el hermano; el portal evita
-   cruzar repos. Propuesta: portal con token, porque el documento consume el reader de Greenhouse
-   y llevarlo al hub obligaría a exportar el modelo.
-2. **Caducidad por defecto del enlace.** Propuesta: sin expiración automática y con revocación
-   explícita — un enlace muerto cuando la agencia por fin lo abre es peor que uno vivo de más.
-   Alternativa: caducidad larga (90 días) con aviso.
-3. ¿El operador ve las aperturas en la pantalla de auditoría o en un lugar propio? Propuesta: en
-   el panel de compartir, junto al enlace que las produjo.
-
-## Delta 2026-09-08 — Consumer especializado de Efeonce Insights
-
-Esta task conserva el entrypoint y las policies especializadas de distribución de auditoría SEO; TASK-1848 posee la nueva infraestructura transversal de grants/delivery. El alcance que antes proponía token store propio se implementa como adapter de los commands Insights, sin segundo ledger/token/sender. Se preservan autorización interna de envío, advertencia del adjunto irrevocable y todos los gates heredados de TASK-1672. Frescura del diagnóstico se muestra por asOf, nunca mutando una versión compartida.
-
-Canon: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`; EPIC-045. Este delta actualiza ownership futuro, no declara implementación ni verifica flags productivos.
+Mapping final del entrypoint en consumers Insights y política de retry de selección: resolver en Discovery con 1672/1849. Dominio público, TTL y persistencia bearer ya están decididos; no reabrirlos como alternativas.

@@ -84,6 +84,17 @@ resultado es advisory y la decisión permanece humana.
 
 ---
 
+## Frontera de producto: editorial Studio, medición SV360, informes Insights
+
+Para tareas del módulo SEO de Greenhouse, aplicar el ADR de estrategia Marketing Studio §14
+(precisión Accepted 2026-10-04): TASK-1667/TASK-1669 pertenecen a EPIC-049 y siguen pendientes;
+producción/brief/work/QA/aprobación/publicación observada/iteración se construyen en Studio.
+TASK-1668 conserva en EPIC-022 indexación y outcome desde refs de publicación Studio.
+SV360 mide y prioriza; Studio consume readers autorizados, snapshot fechado y cola TASK-1700
+sin recalcular su orden. Reportes/render/distribución son de Efeonce Insights. No crear lifecycle
+editorial ni runtime agéntico Nexa/SEO en Greenhouse; reusar Studio TASK-1913/1914/1915.
+El oficio y los adapters existentes de CMS siguen aplicando; esto no autoriza publish o gasto.
+
 ## 1. Modelo mental: SEO y AEO no son dos juegos, son tres capas
 
 ```

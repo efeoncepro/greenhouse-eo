@@ -1,25 +1,16 @@
-# TASK-1672 / Artefacto de auditoría técnica — informe compartible
+# TASK-1672 / Edición Insights de auditoría técnica SEO
 
 ## Meta
 
-- Status: `ready-for-implementation`
-- Owner task: `TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)`
-- Product Design asset: sin PNG dedicado — dirección derivada del **artefacto hermano ya
-  construido** (`src/components/growth/seo/report-artifact/`, TASK-1310: `ReportArtifactModel`
-  + adaptadores `web/` y `print/`) y del artefacto AEO (`components/growth/ai-visibility/report-artifact/`).
-  La dirección visual NO se inventa: se hereda del `ReportArtifactModel` que ya rige los dos informes del módulo.
+- Status: `draft`
+- Owner task: `TASK-1672 — Efeonce Insights: especialización de auditoría técnica SEO` (EPIC-045).
+- Product Design asset: catálogos Insights A4/deck y web vigentes; adaptación técnica pendiente de mapping de slots/contrato y aprobación. No hay referencia específica de auditoría aprobada todavía.
 - Visual direction mode: `repo-native-benchmark`
-- Intended consumers: **dos audiencias, un documento**. (a) quien DECIDE y reenvía —cliente o
-  AM— que necesita magnitud y urgencia; (b) quien EJECUTA —agencia técnica, seamos nosotros u
-  otra— que necesita la lista completa y el orden.
-- Copy source: `src/lib/copy/growth.ts` → `GH_GROWTH_SEO_AUDIT_REPORT` (nuevo) + reuso de
-  `GH_GROWTH_SEO_AUDIT` (severidades, esfuerzo, fichas de los 34 checks) y
-  `GH_GROWTH_SEO_AUDIT_ISSUES`.
-- Primitive decision: `reuse` — `ReportArtifactModel` + el par `web/` `print/` de TASK-1310;
-  `SeoHealthGauge` (`views/.../seo/shared/`) para la salud; `groupAuditIssues` para la
-  priorización. `new` acotado: el adapter `modelFromSeoAuditReport` y las dos secciones propias
-  (portada ejecutiva, hallazgos de sitio).
+- Intended consumers: quien decide/reenvía y quien ejecuta; una edición con dos densidades.
+- Copy source: `src/lib/copy/insights.ts` + vocabulario canónico de severidad/hallazgos SEO. Ledger de abajo es propuesta, no strings implementados.
+- Primitive decision: `reuse` — contratos de evidencia/edición, catálogos `insights-report`/`insights-deck`, figuras y consumer Think existentes. `extend` sólo para slots técnicos que falten; sin ReportArtifactModel/rutas print paralelos.
 - UI ready target: `no`
+- Historical reference: [wireframe anterior íntegro](../../audits/insights/history/2026-10-04-seo-specialization/wireframe-TASK-1672-growth-seo-audit-report-artifact.md), superseded el 2026-10-04. El mapping vigente reemplaza las instrucciones de renderer SEO y `?print=1`.
 
 ## Brief
 
@@ -38,8 +29,8 @@
 ## Desktop Target — 1440×1000
 
 Documento de **lectura lineal**, no superficie exploratoria: sin filtros, sin drill, sin
-controles. El primer fold es **la portada completa** — dominio, fecha del crawl, salud con su
-alcance, y las tres prioridades. Si la portada no cabe en una plana, está mal hecha.
+controles. El A4 tiene **resumen de una página**; en web el primer fold destaca el resumen — dominio, fecha del crawl, salud con su
+alcance, y las tres prioridades. El resumen no desborda la página A4; web respeta su superficie live existente.
 
 La región dominante es la **fecha del crawl junto a la salud**, no la salud sola: un puntaje sin
 fecha es la forma más fácil de que alguien nos cite mal en noviembre un diagnóstico de agosto.
@@ -59,63 +50,61 @@ scroll horizontal y el documento se lee de arriba abajo.
 
 ## Action Hierarchy
 
-- Primary: **ninguna dentro del documento**. Es de lectura. Las acciones viven en la pantalla que
-  lo genera (`Compartir informe`) y en el navegador (imprimir / guardar PDF).
-- Secondary: en la variante web, un `Imprimir / guardar PDF` discreto en la cabecera, que
-  desaparece en `?print=1`.
-- Destructive: ninguna.
-- Selection vs action: no hay selección. Un documento que invita a clickear enseña a leerlo mal.
-- Pending / disabled: n/a — se renderiza con datos ya materializados.
+- Primary: leer el resumen y consultar detalle técnico en la edición Insights.
+- Secondary: descarga/revisión/compartir actuales, con permisos; distribución especializada en TASK-1673.
+- Destructive: retiro/revocar sólo en el consumer autorizado, nunca embebidos en el documento.
+- Selection vs action: el contenido técnico no dispara un crawl ni una publicación.
+- Pending / disabled: estados existentes de edición/render/emisión; no afirmar éxito sin outputs validados.
 
 ## Visual Fidelity Mapping
 
-| Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
+| Source cue | Token / primitive / recipe | Intent preserved | Literal value rejected |
 |---|---|---|---|
-| Informe cliente SEO (TASK-1310) | `ReportArtifactModel` + `web/` `print/` | Misma familia visual entre los informes del módulo | No se copia su composición: el lector técnico es otro |
-| Gauge de salud del audit | `SeoHealthGauge` (`seo/shared/`) | Misma métrica, mismos umbrales que la pantalla | No se redibuja el arco ni se cambian los cortes |
-| Severidad de la lista | `GreenhouseChip` + `SEVERITY_PRESENTATION` | Icono + palabra + color, nunca color solo | No se traduce a un semáforo impreso sin etiqueta |
-| Banda proporcional de severidades | ancho proporcional al conteo (TASK-1309) | El reparto se ve, no se lee | No se importa el filtro: en un documento no hay interacción |
+| Insights A4/deck vigente | Catálogos y slots actuales | Misma edición/identidad y export validado | No copiar el renderer legacy SEO |
+| Web Insights Think | InsightWebModelV1/proyección existente | Resumen y detalle responsive | No nueva ruta pública SEO |
+| Salud y severidades SEO | Hechos/labels del reader dueño; representación Insights | Método, umbrales, severidad con texto | No scoring/gauge recalculado |
+| Reparto por severidad | Familia elegible y alternativa textual | Conteos observados por alcance | No convertir hallazgo de sitio en una página |
 
 ## Layout Skeleton
 
 | Region | Slot | Purpose | Component candidate | Data source |
 |---|---|---|---|---|
-| 0 | Portada — identidad | Dominio auditado + **fecha del crawl** + marca Efeonce | cabecera del `ReportArtifactModel` | `run.captureDate`, `rootDomain`, SSOT de marca |
-| 1 | Portada — salud | Puntaje + su **alcance** ("muestra de N páginas" si tocó el techo) + qué mide el puntaje | `SeoHealthGauge` + texto | `run.healthScore`, `run.crawledPages`, cap |
+| 0 | Portada — identidad | Dominio auditado + **fecha del crawl** + marca Efeonce | cover/summary de Insights | `run.captureDate`, `rootDomain`, SSOT de marca |
+| 1 | Portada — salud | Puntaje + su **alcance** ("muestra de N páginas" si tocó el techo) + qué mide el puntaje | figura/card Insights + alcance textual | `run.healthScore`, `run.crawledPages`, cap |
 | 2 | Portada — las tres prioridades | Los 3 primeros grupos del orden canónico, una frase cada uno | lista corta | `groupAuditIssues(...)`.slice(0,3) |
 | 3 | Hallazgos de sitio | `robots.txt` / JSON-LD / sitemap, **antes** de la lista: invalidan lo de abajo | bloque propio con estado verificado / no verificado | findings de alcance `site` (TASK-1670) |
 | 4 | Reparto por severidad | Banda proporcional: cuánto hay de cada nivel | banda estática (sin filtro) | `totals` |
 | 5 | Lista priorizada completa | Todos los grupos: severidad · nombre es-CL · páginas · esfuerzo | filas | `groupAuditIssues` |
 | 6 | URLs por grupo | Por cada grupo, sus URLs afectadas con el detalle acotado | tabla (desktop) / lista (móvil) | `findings` por `issueType` |
-| 7 | Procedencia | Qué es del proveedor, qué es estimación nuestra, qué es laboratorio, y el as-of | pie del documento | constantes + `captureDate` |
+| 7 | Procedencia | Qué es del proveedor, qué es estimación nuestra, qué es laboratorio, y el as-of | pie del documento | evidence source/method/asOf + `captureDate` |
 
 ## Copy Ledger
 
 | Copy id | Region | Text | Dynamic values | Notes |
 |---|---|---|---|---|
-| `growth.seo.auditReport.title` | 0 | Auditoría técnica del sitio | — | |
-| `growth.seo.auditReport.domain` | 0 | {domain} | `{domain}` | |
-| `growth.seo.auditReport.crawledAt` | 0 | Diagnóstico del {date} | `{date}` | **grande**: es lo que caduca |
-| `growth.seo.auditReport.healthLabel` | 1 | Salud técnica | — | |
-| `growth.seo.auditReport.healthScope` | 1 | Sobre una muestra de {n} páginas, no el sitio completo | `{n}` | sólo si el crawl tocó el techo |
-| `growth.seo.auditReport.healthMeaning` | 1 | El puntaje pesa sobre todo lo que rompe la indexación. | — | reconcilia puntaje vs volumen |
-| `growth.seo.auditReport.prioritiesTitle` | 2 | Por dónde empezar | — | |
-| `growth.seo.auditReport.priorityLine` | 2 | {label}: {n} páginas · esfuerzo {effort} | `{label}`,`{n}`,`{effort}` | |
-| `growth.seo.auditReport.siteTitle` | 3 | Hallazgos que afectan a todo el sitio | — | |
-| `growth.seo.auditReport.siteIntro` | 3 | Estos condicionan todo lo demás: se revisan primero. | — | |
-| `growth.seo.auditReport.siteUnverified` | 3 | No pudimos verificarlo | — | **nunca** "sin problemas" |
-| `growth.seo.auditReport.siteUnverifiedWhy` | 3 | {reason} | `{reason}` | la razón viaja del probe |
-| `growth.seo.auditReport.breakdownTitle` | 4 | Cómo se reparte | — | |
-| `growth.seo.auditReport.issuesTitle` | 5 | Todo lo encontrado, en orden | — | |
-| `growth.seo.auditReport.issuesOrder` | 5 | Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja por lo que menos cuesta. | — | mismo criterio que la pantalla |
-| `growth.seo.auditReport.urlsTitle` | 6 | Páginas afectadas | — | |
-| `growth.seo.auditReport.urlsTruncated` | 6 | Mostramos {shown} de {total}. | `{shown}`,`{total}` | honestidad del techo de render |
-| `growth.seo.auditReport.provenanceTitle` | 7 | Cómo leer estos datos | — | |
-| `growth.seo.auditReport.provenanceScore` | 7 | El puntaje de salud lo calcula nuestro proveedor de datos con su propia ponderación; el conteo de hallazgos sale de nuestro catálogo. No miden lo mismo. | — | 🔴 sin esto nos citan mal |
-| `growth.seo.auditReport.provenanceEffort` | 7 | El esfuerzo es una estimación nuestra, no una medición. | — | |
-| `growth.seo.auditReport.provenanceLab` | 7 | Las métricas de carga son de laboratorio; la señal que usan los buscadores viene de datos de campo. | — | |
-| `growth.seo.auditReport.provenanceAsOf` | 7 | Diagnóstico del {date}. Un sitio cambia: si pasaron semanas, conviene repetirlo. | `{date}` | |
-| `growth.seo.auditReport.print` | 0 | Imprimir / guardar PDF | — | sólo variante web |
+| `insights.seoAudit.title` | 0 | Auditoría técnica del sitio | — | |
+| `insights.seoAudit.domain` | 0 | {domain} | `{domain}` | |
+| `insights.seoAudit.crawledAt` | 0 | Diagnóstico del {date} | `{date}` | **grande**: es lo que caduca |
+| `insights.seoAudit.healthLabel` | 1 | Salud técnica | — | |
+| `insights.seoAudit.healthScope` | 1 | Sobre una muestra de {n} páginas, no el sitio completo | `{n}` | sólo si el crawl tocó el techo |
+| `insights.seoAudit.healthMeaning` | 1 | El puntaje pesa sobre todo lo que rompe la indexación. | — | reconcilia puntaje vs volumen |
+| `insights.seoAudit.prioritiesTitle` | 2 | Por dónde empezar | — | |
+| `insights.seoAudit.priorityLine` | 2 | {label}: {n} páginas · esfuerzo {effort} | `{label}`,`{n}`,`{effort}` | |
+| `insights.seoAudit.siteTitle` | 3 | Hallazgos que afectan a todo el sitio | — | |
+| `insights.seoAudit.siteIntro` | 3 | Estos condicionan todo lo demás: se revisan primero. | — | |
+| `insights.seoAudit.siteUnverified` | 3 | No pudimos verificarlo | — | **nunca** "sin problemas" |
+| `insights.seoAudit.siteUnverifiedWhy` | 3 | {reason} | `{reason}` | la razón viaja del probe |
+| `insights.seoAudit.breakdownTitle` | 4 | Cómo se reparte | — | |
+| `insights.seoAudit.issuesTitle` | 5 | Todo lo encontrado, en orden | — | |
+| `insights.seoAudit.issuesOrder` | 5 | Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja por lo que menos cuesta. | — | mismo criterio que la pantalla |
+| `insights.seoAudit.urlsTitle` | 6 | Páginas afectadas | — | |
+| `insights.seoAudit.urlsTruncated` | 6 | Mostramos {shown} de {total}. | `{shown}`,`{total}` | honestidad del techo de render |
+| `insights.seoAudit.provenanceTitle` | 7 | Cómo leer estos datos | — | |
+| `insights.seoAudit.provenanceScore` | 7 | El puntaje de salud lo calcula nuestro proveedor de datos con su propia ponderación; el conteo de hallazgos sale de nuestro catálogo. No miden lo mismo. | — | 🔴 sin esto nos citan mal |
+| `insights.seoAudit.provenanceEffort` | 7 | El esfuerzo es una estimación nuestra, no una medición. | — | |
+| `insights.seoAudit.provenanceLab` | 7 | Las métricas de carga son de laboratorio; la señal que usan los buscadores viene de datos de campo. | — | |
+| `insights.seoAudit.provenanceAsOf` | 7 | Diagnóstico del {date}. Un sitio cambia: si pasaron semanas, conviene repetirlo. | `{date}` | |
+| `insights.seoAudit.download` | consumer | Descargar informe | — | acción existente, según output/permiso |
 
 ## State Copy
 
@@ -134,56 +123,41 @@ scroll horizontal y el documento se lee de arriba abajo.
 - Heading order: `h1` título del informe → `h2` por región (Salud, Por dónde empezar, Hallazgos
   que afectan a todo el sitio, Cómo se reparte, Todo lo encontrado, Cómo leer estos datos) →
   `h3` por grupo de issue en la región 6.
-- Chart/table alternatives: el gauge lleva `role="img"` + `aria-label` con el puntaje, y el
+- Chart/table alternatives: la figura lleva alternativa accesible y, donde aplique, `role="img"` + `aria-label` con el puntaje, y el
   número va **también** como texto. La banda proporcional lleva su conteo en texto por segmento:
   el ancho es refuerzo, nunca el único portador del dato.
 - Aria labels: la banda es un grupo con nombre; los segmentos **no** son interactivos en el
-  documento (a diferencia de la pantalla) y por lo tanto no llevan `aria-pressed`.
-- Focus notes: documento de lectura — el único elemento focusable de la variante web es
-  `Imprimir / guardar PDF`. En `?print=1` no hay ninguno.
+  PDF y por lo tanto no llevan `aria-pressed`. En web se conservan los controles existentes de Insights.
+- Focus notes: navegación y acciones del consumer Insights; orden de lectura/foco coherente y reduced motion existente. PDF estático sin controles propios.
 - Color-independent state labels: severidad = icono + **palabra** + color; el estado "no
   verificado" es texto, nunca un ícono gris solo. El documento tiene que funcionar impreso en
   blanco y negro, que es como termina en la mitad de las reuniones.
 
 ## Implementation Mapping
 
-- Route / surface: `/admin/growth/seo/audit/report` (operador) y la entrada cliente
-  `[coordinar con TASK-1310: ruta hermana de /growth/seo/report vs acceso desde su dashboard]`.
-  Ambas con `?print=1` para la variante imprimible, igual que 1310.
-- Primitives: `ReportArtifactModel` + adaptadores `web/` `print/`; `SeoHealthGauge`;
-  `GreenhouseChip` (severidad).
-- Variants / kinds: `variant: 'clientPortal' | 'attachment'` — **el mismo contrato de
-  `modelFromSeoReport`**. La audiencia la resuelve el entitlement, no una copia del documento.
-- Component candidates: `src/components/growth/seo/audit-report/{model,web,print}.ts(x)`,
-  espejando la carpeta que 1310 ya creó para el informe de visibilidad.
-- Copy source: `GH_GROWTH_SEO_AUDIT_REPORT` (nuevo) + reuso de `GH_GROWTH_SEO_AUDIT`.
-- Data reader / command: `readSiteAuditReport(targetId)` (TASK-1304) — **sin reader nuevo**.
-  La priorización se reusa de `groupAuditIssues` (TASK-1309); los hallazgos de sitio llegan por
-  TASK-1670.
-- API parity: el documento es un render del reader canónico. Nada que Nexa o MCP no puedan pedir.
-- Access / capability: operador `growth.seo.observation.read`; cliente
-  `growth.seo.report.read_client` scope `own` (el mismo gate que 1310).
-- Runtime consumers: view runtime + render imprimible.
-- Print/email/PDF: `?print=1` como 1310. El PDF se produce imprimiendo esa variante — **no** se
-  mantiene un tercer render.
-- 🔴 Client-safe por construcción: el documento **nunca** incluye `provider_cost_usd`, tier ni
-  cupo del entitlement, `provider_task_id`, ni los ids de máquina de los checks (van con su
-  nombre en español). Test de no-fuga, espejando el que 1310 ya tiene.
+- Route / surface: edición Insights en biblioteca/portal TASK-1849 y web Think actual; definir el entrypoint técnico en Discovery. No se crea `/admin/growth/seo/audit/report` ni un reader público SEO.
+- Primitives: EvidenceFactV1/snapshot/plan/outputs/audiencia actuales, catálogos Insights y proyección web. El detalle técnico requiere mapping verificable antes de ready.
+- Variants / kinds: audiencias `client`/`internal` y profundidad de Insights, no `variant` legacy ni documentos paralelos.
+- Component candidates: adapters/editorial/render/catálogos actuales de Insights; extensión acotada de findings/URLs si faltan slots.
+- Copy source: `src/lib/copy/insights.ts`, ledger propuesto `insights.seoAudit.*`.
+- Data reader / command: `readSiteAuditReport(seoTargetId, auditRunId)`; binding exacto autorizado y sellado. Nunca reemplazar por latest una edición emitida. Taxonomía/prioridades del reader/grouping SEO.
+- API parity: command/readers canónicos de Insights, con matriz actual de audiencia/carril; generar/leer no concede emitir/distribuir.
+- Access / capability: módulo/capabilities/audiencia Insights más autorización del target/run SEO; compartir/enviar en 1673→1848.
+- Runtime consumers: generación Insights Vercel/worker, render Artifact Worker y web Think existentes.
+- Print/email/PDF: output `report_pdf` del motor existente; distribución 1848/1673. Sin `?print=1` ni PDF de navegador como requisito.
+- Client-safe: no costos proveedor, tier/cupo, IDs proveedor/check internos. No-leak también en outputs/proyección; IDs de binding quedan en evidencia interna autorizada.
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/growth-seo-audit-report.scenario.ts` +
-  `growth-seo-audit-report-print.scenario.ts`.
-- Route: `/admin/growth/seo/audit/report?space=<Berel>` y su `?print=1`.
+- Scenario file: especializado en los escenarios Insights existentes; path/route/markers finales pendientes de mapping implementable.
+- Route: edición especializada autenticada y la misma edición en web Think con grant autorizado, sin tokens en capturas/logs.
 - Viewports: desktop 1440×900 + 390×844.
-- Required captures: portada, hallazgos de sitio, lista priorizada, URLs de un grupo, pie de
-  procedencia, y la variante print.
-- Required `data-capture` markers: `seo-audit-report-cover`, `seo-audit-report-site`,
-  `seo-audit-report-issues`, `seo-audit-report-urls`, `seo-audit-report-provenance`.
-- Assertions: `noLoginRedirect`, `noErrorBoundary`, portada visible, bloque de procedencia
-  visible (es el que evita que nos citen mal), gauge `role=img`.
-- Scroll-width checks: `scrollWidth==clientWidth` en desktop y 390px.
-- Reduced-motion: el documento **no tiene motion**. No hay nada que degradar.
+- Required captures: resumen con fecha/alcance, hallazgos de sitio, grupos/URLs, procedencia, estados sin auditoría/partial/no verificado. PDF A4 final en color y gris.
+- Proposed `data-capture` markers: `insights-seo-audit-summary`, `insights-seo-audit-site`, `insights-seo-audit-issues`, `insights-seo-audit-urls`, `insights-seo-audit-provenance`; fijar reales en Discovery.
+- Assertions: no error boundary, fecha y procedencia visibles, severidades textuales y alternativa de figura, mismo run/versión en todas las salidas.
+- Scroll-width checks: sin overflow horizontal desktop/390; URLs partidas sin cambiar evidencia.
+- Reduced-motion: fallback del consumer Insights; PDF estático.
+- Readiness: pendiente; esta guía no certifica superficie construida ni mapping final de catálogo.
 
 ## Design Decision Log
 
@@ -201,10 +175,8 @@ scroll horizontal y el documento se lee de arriba abajo.
   (rechazado — un documento que invita a clickear enseña a leerlo mal, y el PDF no clickea).
 - Decision: la estructura **no se reordena en móvil**, sólo cambia densidad. Why: el orden de
   lectura es el contrato del documento; reordenarlo rompe "mira la segunda sección".
-- Decision: PDF por `?print=1` + imprimir del navegador, **no** un tercer render. Why: 1310 ya
-  probó ese camino; un render propio se desincroniza del web en la primera iteración.
-- Reuse / extend / new: reuse casi total. Nuevo: el adapter `modelFromSeoAuditReport` y las dos
-  secciones propias (portada, hallazgos de sitio).
+- Decision: reutilizar outputs A4/deck y web de Insights. La decisión anterior de imprimir `?print=1` queda superseded; no otro renderer ni snapshot.
+- Reuse / extend / new: reuse del motor y catálogos; extend sólo semántica/evidencia/slots técnicos, sin biblioteca ni distribución paralelas.
 - Open risk: el techo de URLs por grupo. En pantalla el drill corta en 200 con scroll interno;
   en un documento imprimible 200 URLs × varios grupos es un PDF enorme. Hay que declarar un
   techo propio del documento y decir cuántas se omitieron.
@@ -215,7 +187,7 @@ scroll horizontal y el documento se lee de arriba abajo.
 - [ ] Dynamic values are named and bounded (`{domain}`, `{date}`, `{n}`, `{label}`, `{effort}`, `{reason}`).
 - [ ] Partial/degraded states are explicit (crawl parcial, hallazgo no verificado, sitio limpio).
 - [ ] No copy implies a guarantee when data is estimated/stale (bloque de procedencia + as-of).
-- [ ] Charts have text alternatives (gauge con número en texto; banda con conteo por segmento).
+- [ ] Charts have text alternatives (cifra en texto; reparto con conteo por segmento).
 - [ ] State and aria copy is ready for implementation.
 - [ ] Implementation mapping names primitive, copy source, data contract and route/surface.
 - [ ] GVC scenario plan is specific enough for `pnpm fe:capture`.

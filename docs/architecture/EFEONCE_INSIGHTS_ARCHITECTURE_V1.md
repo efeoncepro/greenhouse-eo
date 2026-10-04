@@ -38,11 +38,25 @@ Inspección local del 2026-09-08; disponibilidad productiva se verifica al ejecu
 | `src/lib/email/delivery.ts`, `types.ts`, `context-resolver.ts` | Entrega, clasificación, dedupe/contexto | Nuevo caso Insights; TASK-1848. Presentación visual del correo: TASK-1849 |
 | `src/mcp/greenhouse/tool-manifest.ts` | Inventario federable | Entradas por capability en sus tasks backend, no otra API de reportes |
 
-`TASK-1672` conserva el artefacto especializado de auditoría técnica SEO y `TASK-1673` su entrypoint de
-sharing/envío. Adoptan Insights como consumidoras; no duplican motor, snapshot, tokens ni sender. Su gate
-de hallazgos de sitio y restricciones de audiencia permanece. `TASK-1644` conserva VisualProfile; co-branding
-de Insights usa el brand pack actual y no introduce un segundo registry de skins. EPIC-018 conserva los
-dashboards de desempeño; Insights sólo produce entregas congeladas.
+### Auditoría técnica SEO: especialización pendiente de Insights
+
+TASK-1672 y TASK-1673 pertenecen a **EPIC-045** desde el ajuste de ownership autorizado el 2026-10-04. EPIC-022 conserva captura, métricas, taxonomía, readers y gates de evidencia; no conserva otro producto de informes. Ambas tasks siguen `to-do`.
+
+| Unidad | Cobertura reutilizada | Residual exigible |
+|---|---|---|
+| TASK-1992, Slice 6 | Reader `readSiteAuditReport` y contratos EvidenceFact/ventana | Hechos de salud técnica, cobertura/frescura y binding compartido de corrida; no detalle completo |
+| TASK-1672 | Snapshot/plan/audiencia/render/catálogos/web de Insights | Edición técnica por corrida exacta, resumen ejecutivo y detalle de hallazgos sitio/página/URLs; privacidad, procedencia y QA |
+| TASK-1673 | Grants/reader público/delivery/Email de TASK-1848 | Entry point run→edición elegible, selección/dedupe, revalidación y negativos especializados |
+
+Inspección local del 2026-10-04: `src/lib/efeonce-insights/adapters/seo-adapter.ts` no consume `readSiteAuditReport`; `InsightRequestV1` tampoco liga explícitamente un audit run. Que el motor genere informes no prueba que esta evidencia o su detalle estén presentes. La tarjeta de TASK-1992 y el detalle de TASK-1672 comparten fuente y método; ninguna sustituye a la otra ni exige finalizar todos los otros slices de TASK-1992.
+
+La identidad del diagnóstico es organización+target+run+fecha, validada por el reader productor. El binding y su versión se sellan en la edición; no reemplazar el crawl por latest durante render/share. El resumen muestra fecha/alcance/tres prioridades; el detalle antepone hallazgos de sitio a páginas, distingue recuperación/entrenamiento/no verificado y declara omisiones. Sin corrida elegible/materialización/gates reales no hay emisión técnica. El score de proveedor, esfuerzo estimado y carga de laboratorio conservan método y procedencia; ausencia no se convierte en cero. `message_alignment` se omite salvo contrato de posicionamiento declarado vigente.
+
+No crear ReportArtifactModel/print route SEO, otro snapshot, renderer, token store, sender, transporte/ledger o dominio público. Se reutilizan catálogos premium, `report_pdf`/`deck_pdf` y proyección web Think. Compartir permite múltiples grants por edición, TTL/cuota vigentes y sólo digest persistido: no exigir recuperar un bearer previo por audit_run_id. Idempotencia de selección/request y delivery es por payload/versión/actor autorizados, nunca «un envío para cualquier destinatario por run». Envío permanece App interno; Ecosystem/MCP sólo leen delivery.
+
+La evidencia histórica de activación de TASK-1848 no cierra sus canaries humanos ni certifica esta integración inexistente. Cada residual conserva acceptance sin marcar hasta verificación proporcional. [Contratos anteriores íntegros](../audits/insights/history/2026-10-04-seo-specialization/README.md) quedan como historia, no instrucciones de implementación.
+
+TASK-1644 conserva VisualProfile; co-branding usa el brand pack actual sin segundo registry. EPIC-018 conserva dashboards de desempeño; Insights produce entregas congeladas.
 
 ## 3. Ownership y topología
 
@@ -755,8 +769,8 @@ fija la de su dominio: access events de enlaces 180 días y rate buckets 1 día,
 > **TASK-1889** — catálogos premium A4 y deck (`ui-ux`, `to-do`; sus Slices 3–5 dependen del contrato de TASK-1888).
 > TASK-1849, TASK-1875 y TASK-1672 son consumers de ambas.
 
-Cinco nuevas unidades; cada una tiene slices, pruebas y rollout propios. TASK-1672/1673 son dos integraciones
-especializadas ya en backlog: se coordinan, no se cuentan como nuevas ni se borran. No bloquean un informe
+Las foundations tienen slices, pruebas y rollout propios. TASK-1672/1673 son dos hijas de EPIC-045
+reparentadas desde EPIC-022 el 2026-10-04: especialización de artefacto e integración de distribución, no foundations nuevas. No bloquean un informe
 SEO de desempeño sin auditoría técnica; esa sección sólo se habilita cuando sus gates reales estén satisfechos.
 El programa completo exige sus adapters si se ofrece dicha sección. No declarar auditoría técnica disponible
 por haber terminado las cinco foundations.

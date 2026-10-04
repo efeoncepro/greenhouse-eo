@@ -140,6 +140,16 @@ Reglas obligatorias:
 - Skill de usuario `gcp-cloud-run` y `.claude/skills/greenhouse-secret-hygiene/SKILL.md`.
 - `docs/tasks/to-do/TASK-1909-marketing-studio-agentic-ai-provenance.md` (procedencia que cierra cada corrida).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+Este es el único dispatcher para el plan diario SEO/AEO TASK-1669. La especialización
+reutiliza assignment/run/provenance/provider ports y program/role caps; no crea runtime
+Greenhouse/Nexa. El plan V1 tiene como máximo 3 llamadas de modelo, 50 candidatos, 20 refs
+work/outcome y 10 recomendaciones, o techos más estrictos del programa; fallback determinista
+no necesita modelo. 1669 es consumer/fixture posterior, no blocker del dispatcher genérico.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -157,6 +167,8 @@ Reglas obligatorias:
   creada por decisión del operador el 2026-09-26.**
 
 ### Blocks / Impacts
+
+- TASK-1669 consumer especializado del dispatcher, no dependencia de foundation.
 
 - `TASK-1916`: las evals corren por el despachador en modo evaluación; las métricas leen el ledger de corridas.
 - `TASK-1899`: su camino de confirmación `T2` recibe la guarda «confirmación sólo desde token sin `act`» por hook del
@@ -467,6 +479,9 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Plan SEO/AEO1669 reutiliza este dispatcher/run/assignment/costo/provenance, sin otro runtime Nexa/Greenhouse ni loop agent-to-agent.
+- [ ] La especialización respeta el techo más estricto entre rol/programa y límites1669; fallback/partial son visibles sin writes de negocio.
 
 - [ ] `agent_run` rechaza una segunda corrida con el mismo `run_key`; un reintento reusa la fila.
 - [ ] Un timeout forzado tras una escritura deja la corrida en `unknown` y se resuelve leyendo, sin escritura duplicada.

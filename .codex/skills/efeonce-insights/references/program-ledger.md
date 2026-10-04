@@ -3,7 +3,7 @@
 The single place where a session learns **what exists, where it runs and what the next task inherits**.
 One section per task. Update yours at closure (Skill Maintenance Contract); append to "Sessions" as you go.
 
-**Estado reconciliado 2026-10-04:** 24 hijas (7 complete, 6 in-progress, 11 to-do). [Auditoría de cierre](../../../../docs/audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques y sesiones fechados conservan historia; esta tabla y los deltas nuevos prevalecen. Despliegue no implica aprobación del cliente ni cierre de task.
+**Estado reconciliado 2026-10-04 (ownership ajustado):** 26 hijas (7 complete, 6 in-progress, 13 to-do), tras reparentar TASK-1672/1673 desde EPIC-022. El censo de 24 de la auditoría previa conserva su fecha; no describe el backlog posterior al ajuste. [Auditoría de cierre](../../../../docs/audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques y sesiones fechados conservan historia; esta tabla y los deltas nuevos prevalecen. Despliegue no implica aprobación del cliente ni cierre de task.
 
 | Task | Scope | Lifecycle | Live where | Closed on |
 | --- | --- | --- | --- | --- |
@@ -11,6 +11,8 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
 | TASK-1848 | Sharing, email delivery and schedules | **in-progress — sharing/issuance/delivery/schedules ON** | Vercel Production flags exactos ON verificados 04/10; delivery/schedules activados 02/10. Canary humano App/MCP, portal/Hub/correo/guard pendientes | — |
+| TASK-1672 | Auditoría técnica SEO: especialización de plan/outputs Insights; contrato backend en TASK-1992 Slice 6 | **to-do; diseño reformulado 04/10** | No implementada; readSiteAuditReport aún no consumido por adapter. Sin renderer/print/snapshot paralelo | — |
+| TASK-1673 | Selección run→edición y distribución sobre sharing/delivery TASK-1848 | **to-do; diseño reformulado 04/10** | No implementada; infraestructura general ya existe. Digest-only/múltiples grants; no envío MCP/cliente | — |
 | TASK-1849 | Library, builder, review and portal/email experience | to-do; backend base disponible | Sin UI de biblioteca; sin blocker backend formal | — |
 | TASK-1875 | Shared web report in Think | **complete** | Think main `0c5701a`; Greenhouse modelo 1.4 publicado con `36a73e7b7e19`; sharing ON | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
@@ -22,6 +24,14 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1975 | Páginas A4/deck y Think de cifra, cascada, waffle, dona y apiladas | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; revisión Berel/Sky, promoción de fixes posteriores y decisión de color pendientes | — |
 | TASK-1990 | Contrato de tarjeta por canal | **in-progress — base en producción; Slice 1 local** | `36a73e7b7e19`; `03e19f3ee` (19 plataformas/channelForDomain) pendiente de promover; metricIcon/visitas por asistente pendientes | — |
 | TASK-1996 | Render de tarjeta con isotipo y glifos Trazo | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; cifra única adaptable local en `03e19f3ee`; glifos y 10 isotipos sin productor pendientes | — |
+
+## Auditoría técnica SEO — ownership y residual (2026-10-04)
+
+TASK-1672/1673 son hijas de EPIC-045; EPIC-022 sigue siendo productor de captura/medición/prioridad. TASK-1992 Slice 6 posee backend/facts/binding exacto de run para tarjeta mensual y detalle; contrato básico independiente de nuevos canales/glifos. TASK-1672 posee UI/plan/catálogos/Think de la edición técnica, no el backend. TASK-1673 integra selección, permisos, idempotencia y distribución existente.
+
+Lectura local 04/10: adapter SEO sin `readSiteAuditReport` y request sin audit run explícito. Esto es alcance pendiente, no task cerrada por reutilizar informes generales. La tarjeta no sustituye detalle; no otro snapshot, renderer, dominio público, grant store/sender/ledger. No idempotencia «devolver token anterior por run»: el bearer no se guarda, hay múltiples grants. Delivery App interno, MCP/Ecosystem sólo read; gates humanos/runtime de 1848 permanecen.
+
+[Arquitectura vigente](../../../../docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#auditoría-técnica-seo-especialización-pendiente-de-insights) · [Requisitos anteriores íntegros](../../../../docs/audits/insights/history/2026-10-04-seo-specialization/README.md).
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 

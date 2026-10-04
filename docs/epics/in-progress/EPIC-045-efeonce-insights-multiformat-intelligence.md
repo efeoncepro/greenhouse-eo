@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución. Censo 2026-10-04: 24 hijas, 7 complete, 6 in-progress y 11 to-do. Foundation/render/catálogos/editorial/shared web y criterio de figuras publicados; modelo vigente 1.4. Generación, render, IA, editorial v2, compartir, emisión, correo y recurrencias ON en Vercel Production (readback 2026-10-04). TASK-1957/1962 desplegadas, cierre pendiente de prueba productiva; TASK-1975 requiere revisión y promoción de fixes posteriores. Portal, jerarquía cliente, agente editorial, expansión de evidencia y canales siguen abiertos. Ver auditoría de cierre.`
+- Status real: `En ejecución. Censo 2026-10-04: 26 hijas, 7 complete, 6 in-progress y 13 to-do. Foundation/render/catálogos/editorial/shared web y criterio de figuras publicados; modelo vigente 1.4. Generación, render, IA, editorial v2, compartir, emisión, correo y recurrencias ON en Vercel Production (readback 2026-10-04). TASK-1957/1962 desplegadas, cierre pendiente de prueba productiva; TASK-1975 requiere revisión y promoción de fixes posteriores. Portal, jerarquía cliente, agente editorial, expansión de evidencia y canales siguen abiertos. Ver auditoría de cierre.`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -74,9 +74,9 @@ contratos/datos de 1847 y autoridad/paridad de 1849, usando Astra `xhigh` en las
 Revisar PDFs finales completos y GVC desktop/390; aprobar el modelo o los docs no aprueba su resultado visual.
 
 **Integración SEO:** TASK-1672 (Claude · Opus 5 `high`) adapta la auditoría al catálogo; TASK-1673
-(Codex · GPT-5.6 Sol `high`) integra compartir/enviar sobre TASK-1848. Ambas conservan EPIC-022 y sus
-gates de findings/rollout; no otro motor ni sender. La matriz dueña está en
-[SEO](../in-progress/EPIC-022-growth-seo-search-visibility-360-module.md#ejecución-con-claude-y-codex).
+(Codex · GPT-5.6 Sol `high`) integra compartir/enviar sobre TASK-1848. Ambas pertenecen a EPIC-045 desde la decisión del operador del 2026-10-04; los readers,
+la captura y los gates de findings siguen en
+[SEO](EPIC-022-growth-seo-search-visibility-360-module.md). Reusan el motor y el transporte de Insights.
 Las dependencias de Hub/transporte/preferencias están asignadas en
 [EPIC-046](../to-do/EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
 
@@ -86,7 +86,7 @@ La skill `.claude/skills/efeonce-insights/` (espejo `.codex/`) es la memoria ope
 
 ## Child Tasks
 
-**24 hijas vigentes.** Las cinco unidades originales se ampliaron por decisiones del operador. TASK-1901/1902 también son hijas (U23/U24); las dependencias de correo/Hub/guard conservan sus epics dueños. No crear otra unidad para QA/rollout.
+**26 hijas vigentes.** Las cinco unidades originales se ampliaron por decisiones del operador. TASK-1901/1902 también son hijas (U23/U24); las dependencias de correo/Hub/guard conservan sus epics dueños. No crear otra unidad para QA/rollout.
 
 | Unidad | Task | Resultado | Blocked by |
 |---|---|---|---|
@@ -112,9 +112,12 @@ La skill `.claude/skills/efeonce-insights/` (espejo `.codex/`) es la memoria ope
 | U20 | [TASK-1994](../../tasks/to-do/TASK-1994-efeonce-insights-ico-production-facts.md) | indicadores de producción ICO: ciclo, throughput, velocidad, trabadas, atrasos, SLO y revisiones | TASK-1990 |
 | U21 | [TASK-1995](../../tasks/to-do/TASK-1995-efeonce-insights-missing-sources-decision.md) | policy: fuentes que faltan (Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta) | — |
 | U22 | [TASK-1996](../../tasks/in-progress/TASK-1996-efeonce-insights-channel-stat-card-render.md) | isotipos base publicados; cifra adaptativa local; glifos y productores pendientes | TASK-1975, TASK-1990 (cierre; base publicada) |
-
 | U23 | [TASK-1901](../../tasks/to-do/TASK-1901-efeonce-insights-richer-evidence-for-chart-families.md) | series diarias SEO, posiciones por keyword e historial AEO | none |
 | U24 | [TASK-1902](../../tasks/to-do/TASK-1902-efeonce-insights-gauge-heatmap-pages.md) | páginas de medidor/mapa de calor y columnas por tramo | TASK-1901 |
+| U25 | [TASK-1672](../../tasks/to-do/TASK-1672-growth-seo-audit-report-artifact.md) | especialización de auditoría técnica SEO: edición ligada a una corrida, hallazgos y detalle sobre el motor existente de Insights; diseño, sin implementar | TASK-1992 Slice 6 (contrato backend de auditoría) |
+| U26 | [TASK-1673](../../tasks/to-do/TASK-1673-growth-seo-audit-report-share-send.md) | integración de esa edición con grants y delivery existentes; sin segundo sender/token store ni recuperación de bearer | TASK-1672 (TASK-1848 es foundation entregada, con gates propios) |
+
+**Reparto 2026-10-04:** TASK-1672/1673 se trasladan desde EPIC-022 sin cambio de lifecycle. TASK-1992 Slice 6 posee los hechos y binding backend de auditoría; su tarjeta de salud técnica no reemplaza el detalle especializado de TASK-1672. [Mapa de trabajo restante](../../audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 
@@ -181,8 +184,8 @@ operador; se abren como task cuando la decisión exista):
   contexto desde productores; P04 enlaza desde Inicio/Mis servicios. TASK-1849 conserva toda la UI Insights
   y TASK-1845/1848 sus permisos. El dashboard inicial no bloquea el dominio Insights ni viceversa; la
   integración E2E es criterio compartido de cierre. No reparentar ni duplicar tasks.
-- [TASK-1672](../../tasks/to-do/TASK-1672-growth-seo-audit-report-artifact.md): artefacto especializado de auditoría técnica SEO. Conserva findings/frescura y gates; consume el nuevo catálogo y snapshot. No otro motor.
-- [TASK-1673](../../tasks/to-do/TASK-1673-growth-seo-audit-report-share-send.md): entrypoint de compartir/enviar esa auditoría; consume TASK-1848 sin segundo token store/sender.
+- [TASK-1672](../../tasks/to-do/TASK-1672-growth-seo-audit-report-artifact.md) (hija U25): artefacto especializado de auditoría técnica SEO. Conserva findings/frescura y gates; consume el nuevo catálogo y snapshot. No otro motor.
+- [TASK-1673](../../tasks/to-do/TASK-1673-growth-seo-audit-report-share-send.md) (hija U26): entrypoint de compartir/enviar esa auditoría; consume TASK-1848 sin segundo token store/sender.
 - **Vista web compartida en `efeonce-think` (decisión 2026-09-15, delta del ADR):** la salida `web` por token se renderiza en `think.efeoncepro.com` con el patrón headless del Grader ([ADR](../../architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md), TASK-1325). Greenhouse expone `InsightWebModelV1` + resolver/proxy (TASK-1848); TASK-1849 ejecuta el render como slice en el repo hermano. La biblioteca autenticada sigue en el portal.
 - [TASK-1644](../../tasks/to-do/TASK-1644-artifact-composer-visual-profiles-proposal-studio.md): única dueña de VisualProfile; co-branding simple no la reimplementa ni depende de construir skins.
 - EPIC-018: dashboards de desempeño y primitives; Insights es edición congelada, no rediseño de esas pantallas.
@@ -249,7 +252,7 @@ Resumen del estado real; el detalle verificado vive en
 - [ ] EPIC-046 integra biblioteca y generación desde Inicio/Mis servicios de Berel/Sky, con contexto permitido, fuentes/cortes declarados y sin builder paralelo. La entrada shared no abre biblioteca ni generación.
 - [ ] Skill efeonce-insights publicada sobre capacidades verificadas, discoverable por MCP y harness; fuente común, mirrors/routing y versiones coherentes. Un agente sin historial completa recetas y negativos con evidencia de llamadas reales (arquitectura §13; TASK-1845/1848/1849).
 
-- [ ] Las cinco hijas cerraron con evidencia y estado runtime honesto; ningún checkbox sólo por código local.
+- [ ] Todas las hijas directas cerraron con evidencia y estado runtime honesto; ningún checkbox sólo por código local.
 - [ ] SEO, AEO e ICO/RpA/OTD generan una edición por ventana y comparación válida desde UI/API/MCP.
 - [ ] Web, deck PDF horizontal e informe PDF A4 vertical comparten identidad y hechos sin perder narrativa/legibilidad.
 - [ ] Gráficos de barras, líneas, circular/donut y dispersión pasan validación de geometría, etiquetas y fuentes.

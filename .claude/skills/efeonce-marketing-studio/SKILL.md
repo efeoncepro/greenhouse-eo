@@ -30,6 +30,21 @@ already cost a day*. It grows with every task (see the maintenance contract).
 | Person authority for MCP (RFC 8693 exchange, capability) | Greenhouse `src/lib/sister-platforms/mcp-token-exchange.ts` + `capabilities_registry` |
 | MCP-served manual for external agents | Greenhouse `docs/mcp/skills/marketing-studio/SKILL.md` (entry `provider: 'marketing-studio'` in `src/mcp/greenhouse/skill-manifest.ts`) |
 
+## Editorial SEO: frontera ratificada y alcance pendiente
+
+La precisión Accepted del 2026-10-04 en el ADR de estrategia §14 coloca el flujo editorial en
+**Marketing Studio**: brief, trabajo/producción, QA/aprobación, calendario, publicación observada
+e iteraciones. TASK-1667 y TASK-1669 pertenecen a EPIC-049 y siguen to-do; TASK-1668 queda en
+EPIC-022 para indexación/outcome. No presentar las primitives actuales de brief/copy/calendar
+como el circuito editorial completo.
+
+Reusar work items TASK-1913, roles TASK-1914 y dispatcher TASK-1915; no crear otra tabla/lifecycle,
+cola/feedback ni runtime Nexa/Greenhouse. SV360 entrega evidencia/orden/método por lanes; el plan
+es subsecuencia en orden de readSeoWorkQueue. CMS conserva write/readback: draft privado, QA,
+aprobación, publicación observada e indexación son estados distintos. El brief conserva los cinco
+insumos SEO con fuente/as-of y null/[]+razón; refresh/fix sin owner URL bloquea handoff. Insights
+conserva informes/render/grants/distribución. No spend/publish implícito ni copia de series SEO.
+
 ## Read order
 
 1. This file (rules + workflows).

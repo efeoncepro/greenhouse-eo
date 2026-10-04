@@ -1,0 +1,24 @@
+{
+  "purpose": "Superseded pre-reconciliation task specifications. Historical evidence only, not executable instructions.",
+  "capturedOn": "2026-10-04",
+  "files": [
+    {
+      "source": "docs/tasks/to-do/TASK-1667-growth-seo-editorial-work-item-content-factory-handoff.md",
+      "snapshot": "docs/audits/seo/editorial-history/2026-10-04/TASK-1667-growth-seo-editorial-work-item-content-factory-handoff.md",
+      "sha256": "5f40e147cfb030d327015329799e9e7ebcc399572904d0a17dc8665dd3fce8e6",
+      "bytes": 54209
+    },
+    {
+      "source": "docs/tasks/to-do/TASK-1668-growth-seo-editorial-qa-outcome-iteration-loop.md",
+      "snapshot": "docs/audits/seo/editorial-history/2026-10-04/TASK-1668-growth-seo-editorial-qa-outcome-iteration-loop.md",
+      "sha256": "0ecb3894243bcb7f88c1e9db107cf1eaaea0aad9012113a9b174a0c700a8e143",
+      "bytes": 48016
+    },
+    {
+      "source": "docs/tasks/to-do/TASK-1669-growth-seo-agentic-daily-plan.md",
+      "snapshot": "docs/audits/seo/editorial-history/2026-10-04/TASK-1669-growth-seo-agentic-daily-plan.md",
+      "sha256": "3049f629f5b9cb049f6f162390c62f4d005623b0bbe5d5b8c7e08634ea4483be",
+      "bytes": 59030
+    }
+  ]
+}

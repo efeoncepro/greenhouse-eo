@@ -1,6 +1,6 @@
 # Handoff activo
 
-**SEO:** [EPIC-022, 04/10](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
+**SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
 
 **Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».
 

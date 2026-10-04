@@ -183,6 +183,25 @@ como contrato:
   aprendizajes append-only con evidencia; chequeo de destino antes de lanzar; calendario unificado. Escribir en
   plataformas publicitarias queda fuera (ADR nuevo, scope propio).
 
+
+### 3.2 Flujo editorial SEO (contrato vigente, implementación pendiente)
+
+La [precisión aceptada del ADR de estrategia](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#14-precision-aceptada-2026-10-04--flujo-editorial-en-marketing-studio)
+ratificada el 2026-10-04 coloca producción editorial en Studio. TASK-1667 (EPIC-049) especializa los
+work items TASK-1913 con brief SEO, adapter CMS draft/private, QA/aprobación y publicación observada;
+TASK-1669 (EPIC-049) especializa roles/dispatcher TASK-1914/1915 para el plan diario advisory. La UI
+consume estas operaciones en TASK-1912, plan/calendario/aprendizaje en TASK-1907/1911 y procedencia IA
+en TASK-1909; no se crean entidades editoriales o runtimes paralelos en Greenhouse o Nexa.
+
+SV360 posee fuente/metodología, captura, gasto, acceso y orden de trabajo TASK-1700; TASK-1668 queda en
+EPIC-022 para indexación/outcome desde evidencia Studio. Studio registra referencias y snapshots fechados
+y sigue leyendo los hechos actuales del dueño; Insights renderiza/distribuye informes. El CMS conserva
+write/readback, el publish en V1 es del operador y un handoff privado no autoriza publicación.
+
+Work, QA/approval, publicación observada, indexación y resultado son estados distintos. Las tres tasks
+1667/1668/1669 siguen en to-do; reutilizar primitives de brief/copy/calendario existentes no equivale
+a un flujo editorial completo desplegado. No hubo implementación o cambio runtime en esta reconciliación.
+
 ## 4. Contrato API v1
 
 - Base `/api/v1`. Documento `GET /api/v1/openapi.json` (OpenAPI 3.1, versión **1.3.0** desde TASK-1894 Entregable A, 2026-10-02: las dos primeras escrituras, §7.3; 1.2.0 trajo con TASK-1893 la descarga de originales, derechos y evidencia de publicación).
@@ -810,6 +829,9 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1898 | Login con Efeonce ID | To-do, última |
 
 Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898.
+
+- **Flujo editorial SEO (pendiente):** TASK-1667 y TASK-1669 ahora pertenecen a EPIC-049; reutilizan
+  TASK-1908 y TASK-1913/1914/1915. Medición/outcome TASK-1668 permanece en EPIC-022.
 
 ## 11. Referencias
 
