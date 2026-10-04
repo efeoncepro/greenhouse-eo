@@ -22,8 +22,10 @@ antes de publicar» y «Blog · después de publicar»). Corrigen el delta anter
   y no bloquea el cierre. Lo que sí deja esta task: `draft_url`, el CMS del sitio y la evidencia de publicación.
 - **Etiquetas de honestidad del dato:** todo valor de terceros se marca «Estimado · tercero» con fuente y fecha; lo de
   Search Console, el Grader y GA4 se marca «Medido». Sin dato se muestra «no medido», nunca un número inventado.
-- **Pendientes del operador:** fuente principal de volumen y dificultad (Semrush o SV360); panel de prompts por campaña o
-  por clúster temático; si el gate bloquea la autorización de publicar o sólo avisa.
+- **Decidido por el operador (2026-10-04):** (1) volumen y dificultad salen del **Search Visibility 360** (marcados
+  «Estimado», con fuente y fecha); (2) el panel de prompts de IA es **por clúster temático**: todas las piezas del clúster
+  se miden contra el mismo panel versionado; (3) el gate **sólo avisa**: se puede autorizar la publicación con avisos y
+  los avisos abiertos quedan registrados en la autorización (evento con actor persona).
 
 ## Delta 2026-10-04 (posterior) — lo que la UI aprobada necesita del contrato
 
