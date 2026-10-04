@@ -4,7 +4,11 @@
 
 Usa este recurso cuando una pieza comercial necesite evocar una pregunta en búsqueda con IA, una conversación de ChatGPT o Gemini, un composer, una burbuja, una respuesta o una cita. La [galería pública de AXIS](https://axis.efeonce.org/references/creative-resources/) permite explorar las variantes. La entrada operativa para agentes es el [índice de composición de AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/README.md), en el repo hermano `../axis-design-system`.
 
-Esta biblioteca es **candidata y local**. No forma parte del paquete AXIS estable, no es un servicio de búsqueda, no entrega una respuesta real y no aprueba una pieza. El agente sigue el brief, la skill `efeonce-advertising-creative`, los derechos de assets y el proceso de revisión/publicación de la campaña.
+Esta biblioteca es **candidata y se ejecuta en el checkout**; sus referencias se pueden consultar en el Lab. No forma parte del paquete AXIS estable, no es un servicio de búsqueda, no entrega una respuesta real y no aprueba una pieza. El agente sigue el brief, la skill `efeonce-advertising-creative`, los derechos de assets y el proceso de revisión/publicación de la campaña.
+
+Para descubrir capacidades y distinguir render, resolver, package y adapter, empieza por el
+[manual general de AXIS](descubrir-y-componer-con-axis.md). Los íconos AEO/SEO/Autoridad tienen sus propios
+estados en el catálogo unificado y no heredan el estado de estos módulos gráficos.
 
 ## Selecciona el módulo
 

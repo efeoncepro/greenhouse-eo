@@ -1,5 +1,7 @@
 # Registro de decisiones y versiones
 
+> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964) — 2026-10-02 (últimas filas: el login V4
 > de Greenhouse y el avatar como referencia de identidad, 2026-10-02 (b) y (c)); antes, AXIS `d54c873` (tag `v0.4.11`) — 2026-10-01 (el Spark 2D, 2026-10-01 (g)); antes, greenhouse-eo `develop` en `d1a41babb` — 2026-10-01 (últimas filas: los perfiles sociales de
 > Efeonce, 2026-10-01 a (d)); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO aprobado y en el
@@ -383,3 +385,93 @@ siendo pruebas.
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 
 Greenhouse: tokens y contracts 0.3.5, registry y brand-assets 0.3.1 en `develop` desde el 2026-09-26 (llega a producción con el próximo release); el adapter soporta el contrato de la órbita 0.3.1; no usa todavía el contrato de firma. Motion V1.1: las 30 variantes en el bucket (7596 archivos verificados) y en la galería del Lab (AXIS `d847b44`).
+
+## 2026-10-04 — Producción del set AEO autorizada; formas en revisión
+
+Operador: «Bien, hazlos todos», sobre la propuesta de diez glifos nuevos y ocho reutilizados. Se produjeron como
+colección Trazo/Engine candidata, con API de revisión, 72 SVG y Lab local. En esa primera entrega la geometría estaba pendiente de aprobación visual. Estado y promoción: [aeo-icons.md](aeo-icons.md).
+Verificado contra: `axis-design-system@c4bfefe` + cambios locales de esta colección — 2026-10-04.
+
+
+### Aprobación posterior — 2026-10-04
+
+Operador: «Las apruebo todas». Diez formas nuevas aprobadas, sin cambio geométrico. Alta en ICON_CATALOG,
+API AEO delegada al renderer canónico y Lab actualizado. 60 Trazo + 49 Plastilina; versión local 0.17.0.
+En esa etapa quedaban commit, push y publicación pendientes; la publicación `v0.17.0` documentada abajo cierra esos pasos.
+
+
+## 2026-10-04 — Colección SEO y corrección de redondez
+
+«Vamos con todos» autoriza los 24 conceptos (12 nuevos + 12 reutilizados). «Muy cuadrados deben ser mas redondeados»
+corrige R1. R2 redondea contornos, nodos y conexiones. Pendiente aprobación visual; no es canon ni release.
+Verificado contra axis-design-system@c4bfefe + cambios locales. [Inventario](seo-icons.md).
+
+
+## 2026-10-04 — Trece formas de autoridad y enlaces autorizadas
+
+«Bien, hagamos todos, adicional hoy con AEO se suma el concepto de Brand Authority». Doce off-page + autoridad-marca.
+Contornos redondeados; Brand Authority compartida SEO/AEO, con autoridad de dominio/página diferenciada.
+Producción y QA completos; aprobación visual pendiente. La publicación posterior de 0.17.0 conserva candidate. [Detalle](authority-icons.md).
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+
+## Aplicación en el Lab · 2026-10-04 · componentes
+
+> Verificado contra: axis-design-system@aee99d2 — 2026-10-04; componentes incorporados en `9eb3da9`.
+
+El operador pidió: «Quiero renovar los componentes y patrones con la nueva línea gráfica».
+Se aplica la línea en el catálogo y las fichas de AXIS, conservando la navegación aprobada.
+Implementación y límites: [lab-components.md](lab-components.md). No es promoción de
+contratos, adopción de Greenhouse ni publicación de paquetes. Aceptación visual final
+por el operador y publicación de paquetes siguen siendo evidencias separadas del deploy del Lab.
+
+
+## 2026-10-04 — Logos completos y agrupados
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04; logos incorporados en `617ee02`.
+
+El operador detectó que faltaban Wave, Globe, AEO y sus familias, Marketing Studio, Insights y Greenhouse.
+Decisión aplicada: un catálogo central en Marca → Logotipos, proyectado desde packages y descubierto por
+búsqueda global. No redibujar las marcas ni mantener listas de archivos paralelas en el Lab. Las identidades
+editoriales conservan su alcance; los logos de clientes y partners mantienen sus permisos separados.
+Código incorporado a `main` en `617ee02` y Lab publicado; export `/logos` y nuevos assets pendientes de release instalable.
+
+
+### 2026-10-04 — El operador pide también las otras marcas
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04.
+Se incorpora la biblioteca existente de herramientas y plataformas al catálogo central, separada por
+colección y con procedencia visible. No se recrean logos ni se convierte un PNG en un supuesto SVG.
+Las restricciones previas de clientes y badges internos se conservan. Total: 52 marcas, 223 archivos;
+22 E2E de logos, búsqueda y agentes pasan en desktop y móvil. Push y Lab verificados; publicación npm pendiente.
+
+## 2026-10-04 — Entrada agentic, catálogo de iconos y tipografía editorial
+
+- `060174c`: entrada `/agents/` y manifest del registry; 41 capacidades conectan packages, Lab,
+  ejemplos, CLIs y adapters. Búsqueda global indexa recursos versionados sin DB de catálogo.
+- `bf93d3a`: «Ajusta eso entonces» tras detectar SEO/AEO ausentes en la galería principal. Un catálogo
+  de 134 únicos con estados, filtros y JSON, compartido con búsqueda. No cambia aprobación ni renderers.
+- `aee99d2`: «Corrígelo de forma robusta y escalable» tras detectar Poppins en títulos de Insights.
+  `LabHeading` deriva Bricolage del token; carga compartida, gates de fuentes y recorrido dinámico de
+  65 rutas / 132 casos E2E. Preserva specimens y tipografía de producto. Push solicitado por el operador;
+  Vercel success y readback HTTP 200 de Insights/Iconography/Agents confirmados; CI `37216960966` en curso al actualizar. Evidencia final en `docs/audits/2026-10-04-axis-documentation-closure.md`. [Implementación](lab-components.md).
+
+Estado de distribución: `axis-graphic-line` 0.17.0 publicado; nuevas exports de logos en fuente
+`axis-brand-assets` 0.4.18 pendientes de un nuevo release. No actualizar pins de consumidores por inferencia.

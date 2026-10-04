@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-04",
+  "commit": "aee99d282a9ee1216dd3839d9b5a0e184819019d",
+  "ciRun": 37216960966,
+  "ciConclusion": "success",
+  "vercelStatus": "success",
+  "publicManifests": {
+    "/agents/capabilities.json": {
+      "httpStatus": 200,
+      "count": 41
+    },
+    "/references/logos.json": {
+      "httpStatus": 200,
+      "count": 223
+    },
+    "/references/iconography.json": {
+      "httpStatus": 200,
+      "count": 134
+    }
+  }
+}

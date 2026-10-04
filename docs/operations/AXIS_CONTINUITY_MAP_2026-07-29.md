@@ -8,6 +8,16 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización — 2026-10-04: descubrimiento y composición
+
+AXIS incorpora entrada para agentes, búsqueda unificada, catálogos de íconos/logos y tipografía editorial compartida.
+El [overview](../documentation/creative/axis-packages-y-lab.md), el
+[manual](../manual-de-uso/creative/descubrir-y-componer-con-axis.md) y el
+[cierre con evidencia](../audits/2026-10-04-axis-documentation-closure.md) distinguen Lab, checkout, packages
+publicados y adapters consumidores. `axis-graphic-line@0.17.0` publicado; nueva API `axis-brand-assets/logos`
+en source y Lab, con release pendiente. No se cambiaron pins de consumidores. Las secciones siguientes son
+registros fechados, no certifican por sí solas el estado actual de credenciales o despliegues.
+
 ## Actualización de cierre — 2026-07-30
 
 La migración Axis descrita por este diagnóstico quedó ejecutada y verificada. Esta actualización supersede

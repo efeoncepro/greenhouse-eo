@@ -1,5 +1,7 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver
 > [ledger.md](ledger.md)). §3.14 «Plastilina en volumen» (D24): AXIS `main@c18e3d3` — 2026-09-27.
@@ -851,3 +853,25 @@ en este archivo (palabra de RevOps en el manual, gris del eslogan en `05`) se re
 resuelvan, se reescribe la entrada y se registra en [ledger.md](ledger.md). El halo en papel, el logo dentro de la
 órbita, el contraste del acento, el magenta de HubSpot, el «Growth» del cierre del deck y el anillo propio de la esfera
 quedaron decididos el 2026-09-26.
+
+
+## Descubrimiento de identidades — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04; catálogo de logos incorporado en `617ee02`.
+
+Una marca presente en el package pero sin galería ni búsqueda es, para quien compone, un recurso invisible.
+El catálogo Marca → Logotipos debe agrupar cada familia con todas sus variantes selladas, nombre, ID, fondo
+y descarga. Las guías de La órbita, Insights y SEO/AEO explican el uso; el catálogo central permite encontrar
+el archivo. Ejemplo: las 24 variantes de Marketing Studio ya existían, pero no tenían una entrada visible.
+
+El mismo criterio rige los íconos: una entrada central, no colecciones invisibles entre sí. Los filtros
+AEO, SEO y Autoridad muestran pertenencia, no aprobación. Los 134 resultados únicos incluyen 25 candidatos
+marcados; esa visibilidad no los convierte en canon. Una geometría compartida debe tener una sola identidad.
+
+## Identidad editorial del Lab — 2026-10-04
+
+El operador detectó títulos Poppins en páginas del Lab y pidió una corrección robusta y escalable.
+La voz editorial usa Bricolage de `efeonceGraphicLine.type.answer.family` mediante `LabHeading`.
+No se corrige página por página ni con un selector global que cambie los ejemplos: el componente posee
+la familia y el layout carga la fuente una vez. Las muestras de producto, métricas y specimens respetan
+sus contratos. El gate comprueba la fuente efectiva, no solo que el CSS declare Bricolage.

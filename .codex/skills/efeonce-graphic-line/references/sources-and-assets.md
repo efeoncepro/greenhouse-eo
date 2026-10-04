@@ -8,6 +8,19 @@
 > — 2026-09-28 (tag AXIS `v0.3.24`). Efeonce AI Visibility Report: AXIS `main` `26097c5`, tag `v0.3.30` — 2026-09-29.
 > Módulos de correo y camino recorrido: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29.
 
+## Entrada actual de descubrimiento — 2026-10-04
+
+Verificado contra: `axis-design-system@aee99d2`. Empezar por `/agents/` y
+`/agents/capabilities.json` (41 capacidades). Los packages poseen exports y archivos; Lab proyecta
+referencias; checkout ejecuta CLIs; cada consumidor mantiene sus adapters. Los mínimos y versiones
+históricas de las tablas siguientes no prueban el estado del tarball actualmente instalado.
+
+| Recurso | Fuente actual | Descubrimiento |
+| --- | --- | --- |
+| Íconos | `axis-graphic-line` 0.17.0 publicado: `/icons`, `/icons/aeo`, `/icons/seo`, `/icons/authority` | `/references/iconography/` y `.json`: 134 únicos, 109 canónicos + 25 candidatos; [estado](iconography.md) |
+| Logos | Fuente `axis-brand-assets/logos`: `AXIS_LOGO_ASSETS`, `AXIS_LOGO_FAMILIES`, `findLogoAsset`, `logoAssetUrl`; nuevo release pendiente, aunque workspace declare 0.4.18 | `/references/logos/` y `.json`: 223 assets, 52 familias; [límites](package-and-tokens.md) |
+| Títulos del Lab | `LabHeading.astro`, `editorial-typography.css`, token `efeonceGraphicLine.type.answer.family` | [Implementación y gates](lab-components.md); specimens conservan contrato |
+
 ## Fuentes de verdad (por orden de autoridad)
 
 | Qué | Dónde | Quién manda |
@@ -108,7 +121,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | PNG para correo (logo 220, eslogan por línea separado del logo, 4 redes, burbuja horneada) | `@efeoncepro/axis-brand-assets` **0.4.6** (`assets/email/`, `AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl`); se regeneran con `pnpm email:assets` en AXIS; Greenhouse fija 0.4.5 y todavía no los usa |
 | Firma de correo (personal y de equipo) | contrato `efeonce.email-signature`; imágenes en `gs://efeonce-group-axis-public-media/email-signature/v3.1/` (`shared/<dark\|light>/`, `people/<persona>-<dark\|light>.png`, `areas/<área>-<dark\|light>.png`); generador vigente `ai-generations/2026-09-26_firma-partners/build4.mjs` (sin versionar: `pnpm ai-gen:pull` si falta; `HOST_BASE=<url>` escribe `hosted/` y los HTML de Outlook; `AREA=<área>` para la de equipo). La exploración de `exploracion-v5/firma/` es histórica (origen del token `portrait`) |
 | Kits 3D, prendas, lanyard, SVG oficiales | OneDrive `…/13- Branding/` (ver skill `efeonce-brand-studio`) |
-| Íconos de la línea (79 glifos aprobados: 36 Trazo + 43 Plastilina, desde D26) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (79 desde 0.6.0, tag `v0.6.0`; 60 en 0.5.0; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
+| Íconos de la línea (109 glifos aprobados: 60 Trazo + 49 Plastilina, en 0.17.0) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (historia: 79 desde 0.6.0, tag `v0.6.0`; 60 en 0.5.0; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
 | Plastilina en volumen (43 PNG desde D26, 1024 px, alfa) | `@efeoncepro/axis-brand-assets` 0.3.4 (publicado con el tag `v0.6.0`; la 0.3.3 trae 33 y la 0.3.2 los 18 de la base): `assets/volume/<glifo>.png`, sellados en `src/volume-manifest.ts`; `volumeIconUrl(glyph)`. Nunca se regenera dentro de una pieza |
 | Prompt canónico del volumen | AXIS `docs/agent-composition/iconography/volume-prompt.txt` (copia en el Lab: `/media/iconography/volume-prompt.txt`). No se reescribe: si un detalle falla, se agrega UNA línea |
 | Corridas del volumen (no canónicas) | Greenhouse `ai-generations/2026-09-27_plastilina-3d-gpt/` (`ref/`, `crudo/`, `alfa/`, prompts, QA; la vía aprobada) y `ai-generations/2026-09-26_plastilina-volumen/` (intento Blender, rechazado). Canvas «Íconos de La órbita» (claude.ai artifact Y9mx42L72zYc6iLg4j3Maj): lámina Y2 aprobada, Y1 (Blender) descartada |

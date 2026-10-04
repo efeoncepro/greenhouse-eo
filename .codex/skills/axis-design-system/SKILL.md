@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), the SEO/AEO product sub-brands SV360, AEO, AEO Assessment and AI Visibility Report (`axis-brand-assets` 0.4.2, Lab `/references/seo-aeo/`), and the Efeonce email modules — footer, primary CTA, agenda card and footer brand block (`efeonceEmail`, contract `efeonce.email-modules`, email-safe PNGs in `axis-brand-assets` 0.4.6, Lab `/references/email/`; 0.3.38 set)."
+description: "Consume, extend and verify AXIS packages, contracts, assets and renderers. Route agents through the public Lab, visual search and executable capability catalog; distinguish published exports, checkout CLIs, candidate resources and consumer adoption. Includes logos, AEO/SEO/Authority iconography, typography, La órbita and Insights."
 ---
 
 # AXIS Design System
@@ -29,8 +29,9 @@ canonical source:
 - \`@efeoncepro/axis-tokens\`, \`axis-ui-contracts\` and \`axis-ui-registry\` remain portable: no
   imports from MUI, Vuexy, Next, browser globals or product logic.
 - AXIS owns the portable value and semantic role; each product owns materialization in its own
-  styling engine. AXIS may publish values, never painted components or engine-specific appearance. The one
-  declared exception is `@efeoncepro/axis-graphic-line` (the Efeonce orbit brand form, below); do not extend it.
+  styling engine. Tokens/contracts remain portable. The explicitly exported brand renderers in
+  `@efeoncepro/axis-graphic-line` own La órbita and its graphic resources; this does not make the Lab
+  or consumer UI components a universal package renderer.
 - AXIS owns portable color values, semantic roles, neutral light/dark data and chart palettes. Products own
   engine-specific materialization such as MUI's `axisSemanticPalette`, product flags and layout/painted components.
   Brand-value changes are signed through the Greenhouse ADR/task governance before an AXIS package release.
@@ -44,6 +45,13 @@ canonical source:
   consumer evidence and commercial/product gates explicitly authorize broader rollout.
 
 ## Choose the workflow
+
+### Discover and consume AXIS
+
+Start with [agent consumption](references/agent-consumption.md): public navigation and visual search,
+capability selection, package/checkout prerequisites, reproducible output and evidence. It also owns the
+current logo/icon catalog entry points and the Lab editorial typography boundary. Use the live catalog
+and installed exports rather than historic version examples below; consumer adoption is verified separately.
 
 ### Tokens, contracts or registry
 
@@ -146,7 +154,7 @@ Greenhouse pins the `0.3.0` set on `develop` (not in `main` until the next relea
 its Campaign Layout Compiler implements the first non-Lab adapter for
 `headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
-### AEO creative graphics for agents (local candidate)
+### AEO creative graphics for agents (checkout exporters; candidate graphics)
 
 For a commercial piece evoking AEO, search with AI, a ChatGPT/Gemini conversation or citability, start at the sibling AXIS
 [agent composition index](../../../../axis-design-system/docs/agent-composition/README.md) and the
@@ -166,9 +174,10 @@ Edit the JSON intent, not the SVG geometry. The local commands emit editable SVG
 composer, not the sent user bubble. The Google AI Mode magnifier has a sparkle and no rainbow ring; the
 Efeonce rainbow field is a separate hypothesis. Keep provider-specific logos, controls and citation anatomy
 separate. Verify each cited passage, favicon host, provenance and final pixels. `editorial-sample` is an
-example; `captured-output` needs a real interaction, reference and date. These tools are local candidate
-resolvers, not published package contracts, a Greenhouse/Globe adapter, an MCP tool, a live model result or
-creative approval.
+example; `captured-output` needs a real interaction, reference and date. These are checkout exporters:
+`aeo-search` is discoverable through the public capability catalog and `agent:doctor`/`agent:run`. Their
+exporters are not npm bins; published contract metadata and a Lab reference do not imply a consumer adapter,
+a live model result or creative approval. See [agent consumption](references/agent-consumption.md).
 
 ### Efeonce graphic line «La órbita» (tokens, stable contract, orbit package)
 
@@ -467,64 +476,27 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   now aliases `axisMotion.duration` (`fast` 150ms, `standard` **200ms** — was 220ms in TS, the CSS already emitted
   200ms —, `slow` 300ms); the drift test only checks the keys, so review any TS consumer of those values.
 
-### Efeonce iconography (Trazo and Plastilina)
+### Efeonce iconography (Trazo, Plastilina and thematic collections)
 
-Canonized by the operator on 2026-09-26 (D22). Values in `efeonceGraphicLine.icons` (`axis-tokens` `0.3.6`); geometry
-(79 glyphs since `0.6.0`: 36 Trazo + 43 Plastilina; `0.5.0` shipped 60 and `0.4.0` the 30 base glyphs) and executable
-rules in
-`@efeoncepro/axis-graphic-line/icons`:
-`resolveIcon`, `iconSvg`, `auditIconGroup`, `skewedOrbitHeroSvg`, `iconVoiceForLine`, `strokeSphereClearance`. Commands in
-AXIS: `pnpm icons:export`, `pnpm icons:check` (gate for a new glyph), `pnpm icons:vectorize` (Plastilina sheet → glyph
-JSON). Guide `docs/agent-composition/iconography.md`, ADR `ICONOGRAPHY_DECISION_V1.md`, Lab `/references/iconography/`
-and `/references/iconography.json`. State: first published 2026-09-26 with tag `v0.3.6` (AXIS `main@5b8ab20`); current
-catalog published with tag `v0.6.0` (see D26 below). Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
-history: `efeonce-graphic-line` → `references/iconography.md`.
+Use [the catalog and distribution map](references/agent-consumption.md#iconography) before choosing a glyph.
+The main Lab catalog unifies canonical glyphs and candidate SEO/Authority entries while preserving their
+status and renderer; membership in AEO, SEO and Authority overlaps and must not be summed.
+`axis-graphic-line@0.17.0` is published; this does not update Greenhouse's installed version.
 
-**Plastilina en volumen (D24, 2026-09-27):** third layer — each Plastilina glyph in inflated matte clay, 1024 px PNG with
-alpha, generated from its approved vector. Only for hero moments (cover, key visual, single-object social piece), one per
-piece, ≥ 160 px; never in lists, tables, deck content, dashboards or UI. Tokens `efeonceGraphicLine.icons.volume`
-(`axis-tokens` `0.3.7`); files `@efeoncepro/axis-brand-assets` `0.3.2` `assets/volume/<glyph>.png` (18, sealed in
-`src/volume-manifest.ts`; API `AXIS_VOLUME_ICONS`, `findVolumeIcon`, `volumeIconUrl(glyph)`); command
-`pnpm icons:volume -- refs|key|check|publish`. Canonical on AXIS `main` (`c18e3d3`) and in the Lab
-(`/references/iconography/#volumen`). **Both packages are published** (tag `v0.3.7`, 2026-09-27, on `main@c0020b6`:
-`axis-tokens` `0.3.7`, `axis-brand-assets` `0.3.2`, `axis-ui-contracts` `0.3.6`, released together with the surfaces work;
-`axis-graphic-line` stays at `0.4.0`). Greenhouse already pins these versions (commit `f3f93c926`, 2026-09-27: tokens `0.3.7`,
-contracts `0.3.6`, brand-assets `0.3.2`, and `axis-graphic-line` `0.4.0` as a direct dependency). Guide §9, ADR delta D24.
+Values belong to `efeonceGraphicLine.icons`; geometry and rules belong to `axis-graphic-line`.
+Canonical entries use `resolveIcon`/`iconSvg`; the catalog routes candidates to `resolveSeoIcon` and preserves
+warnings. Never send a candidate key to the canonical API or draw a new glyph inside a piece. A new glyph
+needs `pnpm icons:check` and operator approval. Criterion: `efeonce-graphic-line/references/iconography.md`;
+AXIS guide `docs/agent-composition/iconography.md`, ADR `ICONOGRAPHY_DECISION_V1.md`.
 
-**Craft glyphs (D25, 2026-09-27; verified against AXIS main@aa66225, 2026-09-27):** 30 new glyphs approved — 15 Trazo (`correo`,
-`llamada`, `calendario`, `reunion`, `objetivo`, `presentacion`, `contrato`, `checklist`, `codigo`, `base-de-datos`,
-`nube`, `integracion`, `seguridad`, `ubicacion`, `reloj`) and 15 Plastilina (`lapiz`, `rodillo`, `aerosol`, `escuadra`,
-`postit`, `encuadre`, `pelicula`, `vinilo`, `guitarra`, `reproducir`, `varita`, `taza`, `lampara`, `trofeo`, `estrella`),
-the Plastilina ones also in volume. The set is now 27 Trazo + 33 Plastilina = 60, with 33 volume PNGs. Published with tag
-`v0.5.0`: `axis-graphic-line` `0.5.0` and `axis-brand-assets` `0.3.3` (`axis-tokens` stays at `0.3.7`). Keys are unique across voices (the phone Trazo is `llamada`; `telefono` is the Plastilina), and
-Trazo never uses elliptical arcs (`samplePath` only measures circular ones: ovals are four tangent circular arcs). Guide
-§«Catálogo aprobado» (with the design notes), ADR delta D25.
+Trazo expresses measurement; Plastilina expresses creation. Use `auditIconGroup`; one icon responds and
+no icon adds a second sphere to a piece that already has one. Third-party product logos remain official
+assets, not thematic glyphs. The rejected Trazo hoodie stays excluded; Plastilina has the approved hoodie.
 
-**AI, social and staff glyphs (D26, 2026-09-27; AXIS main@cf77452 (2026-09-27)):** operator, verbatim: «Subelos todos a excepción
-del hoodie de trazo que no parece un hoodie». 19 new glyphs — 9 Trazo (`ia`, `composer`, `buscador`, `influencer`,
-`prensa`, `social`, `multimedia`, `assets`, `staff-gorra` labeled «Staff») and 10 Plastilina (`chispa`, `prompt`,
-`barra-busqueda`, `aro-de-luz`, `television`, `like` «Me gusta», `galeria`, `biblioteca` «Biblioteca de assets»,
-`hoodie` «Hoodie Efeonce», `gorra` «Gorra Efeonce»), each Plastilina with its volume. The Trazo hoodie (`staff-hoodie`)
-was rejected (it did not read as a hoodie): the hoodie exists only in Plastilina. One key per voice per concept
-(ia/chispa, composer/prompt, buscador/barra-busqueda, influencer/aro-de-luz, prensa/television, social/like,
-multimedia/galeria, assets/biblioteca, staff-gorra/gorra). None imitates a third-party assistant's UI or logo (ChatGPT,
-Gemini); hoodie and cap carry no drawn logo — the sphere is the brand (on the hood, on the cap's front panel). Usage
-notes: `influencer` (Trazo) in response resembles `talent`, never together; `chispa` never with `estrella` or `varita`;
-`galeria` and `biblioteca` look alike, use them apart; `prompt` is the weakest at 32 px. The set is now **36 Trazo + 43
-Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-graphic-line` `0.6.0` and
-`axis-brand-assets` `0.3.4` (`axis-tokens` was at `0.3.8`, published by another session with the surfaces work, and
-did not change for D26; its latest is `0.3.21`, see Surface composition). Greenhouse pinned `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4` at that release; it now pins `0.7.0` and `0.3.5` (D27 below). Guide §«Catálogo
-aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
-
-**Glitch action glyphs (D27, 2026-09-27; AXIS tag `v0.3.12`, commit `29a40b5`):** 5 new Plastilina glyphs in
-`PLASTILINA_GLYPHS` — `guardar`, `compartir`, `recomendar`, `comentar` and the gesture `deslizar`. Their volumes were
-generated with the D24 method and approved by the operator before sealing (the `icons:check` warnings on `comentar` and
-`deslizar` were reviewed, not ignored). The set is now **36 Trazo + 48 Plastilina = 84**, with **48 volume PNGs**.
-Published in `axis-graphic-line` `0.7.0` and `axis-brand-assets` `0.3.5`; Greenhouse pins both. They are ordinary catalog
-glyphs, but **in Glitch pieces they are always flat**: `glitchLine.icons.actions` (`row` = back cover «SI TE SIRVIÓ»
-with guardar/compartir/recomendar/comentar; `swipe` = `deslizar` on covers and interior slides; `rendering: 'flat'`,
-`volume: 'never'`). Operator, verbatim: «si es para la slide de cierre de glitch, prefiero los iconos plastilina en
-vectores que en 3d en esa lámina». The Glitch contract rejects volume with `icon-volume-not-applicable`.
+Plastilina in volume is a separate hero layer from `axis-brand-assets` (`AXIS_VOLUME_ICONS`, `volumeIconUrl`),
+not a UI or report icon. One per piece, at least 160 px, never in lists, tables, deck content or dashboards.
+Glitch action icons remain flat (`icon-volume-not-applicable`). Sources, recipes and current inventory belong
+to the graphic-line skill and the package manifests, not historical release counts in this skill.
 
 ### Glitch sub-line (tokens, contract, assets; published 2026-09-27, tag `v0.3.12`; Flash in tag `v0.3.24`)
 
@@ -839,16 +811,14 @@ and the **footer brand block**; other emails build their own body on the same ba
 
 ### AXIS Lab
 
-The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6
-with `output: 'static'`, public Vercel delivery, and no consumer adapter imports. The static reference is
-derived from the published/workspace registry and tokens. Astro Content Loader validates contracts and generates
-the catalog, per-pattern routes, MDX usage docs and sitemap; search uses a minimal vanilla script rather than a
-hydrated React application.
+The Lab lives in `../axis-design-system/apps/lab`, an Astro static public reference. Navigation, visual
+search, logos, icon collections and agent capabilities project package sources; no database or remote
+search service is needed. Read [agent consumption](references/agent-consumption.md#lab-maintenance) for
+editorial typography, gates and the boundary between Lab chrome and product specimens.
 
-For Lab work, run `pnpm --filter @efeonce/axis-design-system-lab build`, `typecheck`, `test` and `lint` in
-the AXIS repository. `astro check` is the type/lint gate; `test` runs Vitest and `test:e2e` runs Playwright
-desktop/mobile smoke. Do not add SSR, Actions, secrets, Greenhouse imports or product-specific adapters to
-the Lab; a missing portable contract is an AXIS gap.
+Build and test in AXIS, not Greenhouse. Do not add SSR, Actions, secrets, Greenhouse runtime imports or
+product adapters to the Lab. A missing portable contract belongs to AXIS; adoption evidence belongs to
+the consumer. A deployed Lab can contain source exports that have not yet had a private package release.
 
 ### Color ownership cutover (TASK-1600)
 

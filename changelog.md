@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — AXIS: recursos, agentes y tipografía editorial
+
+- Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
+
 ## 2026-10-04 — Marketing Studio reproduce video (code complete, sin desplegar)
 
 - [TASK-1998](docs/tasks/in-progress/TASK-1998-marketing-studio-video-playback-rendition.md): derivado `playback` (MP4 H.264, lado corto ≤ 720 px, faststart) en el worker con backfill por el barrido, `302` a URL firmada V4 (GCS atiende `Range`; ningún video pasa por Vercel), `Asset.playback`, API 1.5.0.
@@ -571,35 +575,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - `pnpm brand:compose` acepta un documento (`pages`) y entrega un PDF multipágina con su manifest y procedencia.
   Detalle: [norma de superficie §2.1 y §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) y
   [manual](docs/manual-de-uso/creative/componer-por-superficie-con-axis.md). Local en `develop`, sin runtime productivo.
-
-## 2026-09-27 — Glitch en AXIS: token `glitchLine`, contrato `efeonce.glitch-line` y archivos publicados (TASK-1922)
-
-Los valores de Glitch dejaron de vivir como literales en el Lab, la norma y el canvas. AXIS `v0.3.12` (`29a40b5`, push y
-tag autorizados por el operador) publica `axis-tokens` 0.3.12 con el token de franquicia `glitchLine` (lo heredado de La
-órbita, por referencia), `axis-ui-contracts` 0.3.10 con el contrato `efeonce.glitch-line` 0.1.0 candidate (23 códigos
-estables con mensaje es-CL, falla cerrado; `pnpm glitch:resolve`), `axis-brand-assets` 0.3.5 con el wordmark y la
-manzana aparte de la familia, y `axis-graphic-line` 0.7.0 con 5 glifos Plastilina nuevos y su volumen (84 glifos, 48
-volúmenes). El Lab lee el token. Greenhouse los fija en `4dfb147f7`; visual gate de graphic-line a 0 px. Decisión del
-operador durante la task: los íconos de acción de Glitch van en Plastilina plana, nunca en volumen.
-
-## 2026-09-27 — Glitch: motion, sonido y música listos para producir desde el taller (docs, manuales, skills)
-
-Con motion, sonido B y música aprobados, se sincronizó todo lo que un editor humano o agente necesita para producir una
-edición: norma de Glitch v1.8 con §13.13 como referencia única de comandos y argumentos (`--sound`, `--music`,
-`--deliver`, `--skip-render`…), manual nuevo `producir-motion-glitch.md` (runbook del taller) y manual del editor al día
-(mapa de la edición, pre-roll, cama y cortina, podcast), TASK-1924/1925/1922/1923 y EPIC-031, ADR del taller v1.1,
-AGENTS.md y skills graphic-line, motion-design-studio, audio-studio y hyperframes (+espejos). En el taller: la cama de la
-última noticia ya no suena bajo el cierre del host (`7ed6219`, kit re-entregado 95/95) y el comando `sonido`, declarado
-pero inexistente, quedó implementado. Pendiente abierto: si el reel abre con el pre-roll (rompe el bucle exacto).
-
-## 2026-09-27 — Registro cine con documento propio, pruebas publicitarias, repo taller y AXIS 0.3.9
-
-El operador pidió documentar «con altísimo nivel de detalle» el estilo cinematográfico: nace
-[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (cámara,
-luz de la línea como fenómeno, color por línea, vestuario, emblema compuesto, robots agentes, reservas, ficha comentada,
-trampas, barra de juicio y evidencia), con punteros en el canon, la regla auto-load y diez skills (+espejo `.codex`).
-Primera tanda publicitaria 9:16 y 4:5 en prueba: la firma caía sobre el sujeto con el contraste pasando hasta usar un
-primer plano oscuro como lecho. Se creó el repo taller `efeoncepro/efeonce-brand-workshop` (ADR
-`EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1`, TASK-1925) para sacar la producción de marca de Greenhouse sin reactivar
-Globe. AXIS publicó `v0.3.9`: `efeonce.surface-composition` 0.1.2 (uso propuesta/brochure, portada y cierre, layouts de
-`proposal-cinematic`, documento brochure).

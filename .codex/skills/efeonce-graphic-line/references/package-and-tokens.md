@@ -1,5 +1,7 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
+> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 (versiones vigentes
 > y regla del bump: greenhouse-eo@24e4c72ee, AXIS `v0.3.24`, 2026-09-28) · decisiones del
 > operador D1–D15 del 2026-09-26 registradas y **publicadas** (tag `v0.3.5`, axis@5a87d7a): tokens y contratos 0.3.5,
@@ -1289,7 +1291,7 @@ para agentes. A diferencia de Insights, sí hay contrato (§7.10); el renderer d
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
-| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **86** desde 0.9.0 (37 Trazo + 49 Plastilina: la Plastilina `mano` de D29, con su volumen en `axis-brand-assets` 0.3.6); 85 en 0.8.0 (el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
+| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **109** en 0.17.0 (60 Trazo + 49 Plastilina). Historia: **86** desde 0.9.0 (37 Trazo + 49 Plastilina: la Plastilina `mano` de D29, con su volumen en `axis-brand-assets` 0.3.6); 85 en 0.8.0 (el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
 | `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
 | `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
 | `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |
@@ -1303,3 +1305,73 @@ con url, use, method, review, prompt). Los PNG del volumen están en `@efeoncepr
 --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>`; prompt canónico AXIS
 `docs/agent-composition/iconography/volume-prompt.txt`.
 
+
+## Colecciones AEO, SEO y Autoridad — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. APIs publicadas en `axis-graphic-line` 0.17.0:
+
+| Subpath | Exports | Entradas y estado | Exportación |
+| --- | --- | --- | --- |
+| `/icons/aeo` | `AEO_ICON_COLLECTION`, `AEO_STROKE_GLYPHS`, `resolveAeoIcon` | 19: 18 canónicas + Brand Authority candidata | 76 SVG |
+| `/icons/seo` | `SEO_ICON_COLLECTION`, `SEO_STROKE_CANDIDATES`, `resolveSeoIcon` | 37: 12 canónicas + 25 candidatas | 148 SVG |
+| `/icons/authority` | `AUTHORITY_ICON_COLLECTION`, `AUTHORITY_STROKE_CANDIDATES`, `resolveAuthorityIcon` | 13 candidatas | 52 SVG |
+
+`ICON_CATALOG` contiene 109 aprobados (60 Trazo + 49 Plastilina). El catálogo principal del Lab
+reúne esos 109 y 25 candidatos únicos: **134**, con estado y colecciones explícitos; comparte inventario
+con la búsqueda y `/references/iconography.json`. No cambia el canon por aparecer en la galería.
+Brand Authority comparte geometría y estado en las tres colecciones. Guías: [AEO](aeo-icons.md),
+[SEO](seo-icons.md), [Autoridad](authority-icons.md).
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+
+## 2026-10-04 — Catálogo de logotipos del ecosistema (Lab publicado; package release pendiente)
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. Catálogo incorporado a `main` en `617ee02`.
+
+La entrada es **Marca → Logotipos**, `/references/logos/`; su proyección para agentes es
+`/references/logos.json` (`axis.logos.v1`). La fuente portable es `@efeoncepro/axis-brand-assets/logos`:
+`AXIS_LOGO_FAMILIES`, `AXIS_LOGO_ASSETS`, `findLogoAsset`, `logoAssetUrl`. En la colección propia, 14 familias y 99 archivos,
+incluidos Wave, Globe, Reach, Insights, Marketing Studio, SEO/AEO, Greenhouse, AXIS, Glitch y Manzanitas.
+Se migraron 13 SVG oficiales de AXIS/Greenhouse byte por byte; su procedencia y hash están en el paquete.
+La búsqueda global añade tipo `logo`, ID exacto y enlace al archivo dentro del catálogo.
+El subpath y los archivos nuevos aún requieren publicación; el número 0.4.18 no prueba su disponibilidad remota.
+Canon de la decisión: AXIS `docs/architecture/LOGO_CATALOG_DECISION_V1.md`.
+
+
+### Ampliación del catálogo a terceros — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04.
+`/logos` ahora proyecta 223 archivos de 52 marcas: 99 propios y 124 de terceros. Colección, Familia y
+búsqueda separan identidades propias, herramientas, plataformas y partners. La biblioteca histórica se
+concilió: 96 archivos migrados byte por byte, 3 reutilizados, Gemini azul defectuoso excluido a favor de
+`gemini-isotype-color`. SVG y cuatro PNG conservan su formato. Terceros declaran scope, procedencia y uso;
+partners conservan autorización y claim. `AXIS_LOGO_EXCLUSIONS` es información del paquete, no proyección
+pública de clientes. Clientes sólo-packages, HubSpot Gold interno y Claudeforce pendiente no se sirven.
+Nuevo seal `scripts/seal-tool-logos.mjs`, invocado por `seal`. Código en `main` y Lab público; export `/logos` y archivos nuevos pendientes de una nueva publicación instalable. El paquete sigue declarando 0.4.18; no asumir que el tarball publicado de esa versión contiene el catálogo.
+
+## Descubrimiento y composición por agentes — 2026-10-04
+
+Entrada `/agents/`; manifest `/agents/capabilities.json` generado desde el registry (41 capacidades
+en este corte). Leer recurso, contrato, lifecycle, adapter y paquete requerido antes de componer;
+seguir sus comandos y ejemplos en `docs/agent-composition/`. La búsqueda visual del Lab y su JSON
+ayudan a encontrar el recurso; los packages poseen valores, archivos y funciones portables.
+Un preview no demuestra que exista un adapter en el consumidor. Una versión workspace no prueba
+publicación: resolver la versión instalable mediante el runbook de consumo privado.
+Tipografía y componentes propios del Lab: [lab-components.md](lab-components.md).

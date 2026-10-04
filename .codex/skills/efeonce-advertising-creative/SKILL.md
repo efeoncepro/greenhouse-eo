@@ -60,6 +60,15 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 
 ### Piezas AEO con interfaces componibles
 
+Antes de elegir un recurso, usa la [búsqueda visual AXIS](https://axis.efeonce.org/) y su
+[catálogo de capacidades](https://axis.efeonce.org/agents/capabilities.json). La ruta de ejecución y QA está en
+[consumo AXIS para agentes](../axis-design-system/references/agent-consumption.md): `aeo-search` produce SVG,
+`social-basic`/`deck-basic` son starters acotados y los resolvers producen manifiestos. No extiendas esa cobertura
+a todas las recetas del Lab. Para logos usa [el catálogo oficial](https://axis.efeonce.org/references/logos/);
+para glifos, [Iconografía](https://axis.efeonce.org/references/iconography/), conservando estado y renderer.
+AEO, SEO y Autoridad se solapan; candidato disponible no equivale a forma aprobada. El contrato de tipografía
+publicitaria sigue gobernando la pieza: los headings editoriales Bricolage del Lab no sustituyen sus roles.
+
 Usa el [manual de composición AXIS](../../../docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md)
 para elegir campo de búsqueda, SVG original, composer de ChatGPT/Gemini, burbuja, respuesta o cita. Trabaja
 desde `../axis-design-system`: cambia el JSON de intención y exporta SVG editable más `manifest.json` con

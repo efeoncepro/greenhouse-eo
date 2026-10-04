@@ -1262,6 +1262,20 @@ operador.
 | `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`, `orbit-sound.mjs`, `encode-orbit-motion.mjs`) | Render, sonido y codificación de las animaciones del logo V1.1 (reveal, apertura y sting). Lee cada tiempo y proporción de `efeonceGraphicLine.motion`; spec en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md) y reglas en [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) |
 | `src/config/efeonce-brand-assets.test.ts` | Guarda de deriva: las copias locales del logo y de la burbuja deben ser el mismo dibujo que el paquete de assets |
 
+## Actualización de iconografía y distribución — 2026-10-04
+
+El inventario vigente se consulta en [Iconografía AXIS](https://axis.efeonce.org/references/iconography/)
+y su manifest: 134 entradas únicas, 109 canónicas (60 Trazo, 49 Plastilina) y 25 candidatas. Las colecciones AEO,
+SEO y Autoridad se superponen; Brand Authority tiene una identidad compartida. La geometría nueva SEO/Autoridad
+usa remates y encuentros redondeados. Estar distribuido no equivale a promover una referencia candidata.
+`axis-graphic-line@0.17.0` está publicado; los candidatos usan `resolveSeoIcon` desde `/icons/seo`, mientras
+`resolveIcon` y `icons:export` conservan el catálogo canónico. Las cifras y pins de D22–D26 abajo son históricos.
+El catálogo de [logos](https://axis.efeonce.org/references/logos/) organiza familias propias y de terceros con
+procedencia y restricciones; su API `/logos` requiere nuevo release del package. No reconstruir lockups.
+[Manual de consumo](../../manual-de-uso/creative/descubrir-y-componer-con-axis.md) ·
+[Estado de distribución](../AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) ·
+[Auditoría de cierre](../../audits/2026-10-04-axis-documentation-closure.md).
+
 ## 14. Iconografía: Trazo y Plastilina
 
 La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22), en **dos voces de una familia**:
@@ -1287,11 +1301,11 @@ La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22
 `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos
 `pnpm icons:export|check|vectorize`, la página [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/)
 y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: publicado por primera vez el
-2026-09-26 con el tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0); el catálogo vigente, con el tag `v0.6.0`. La firma de correo y la de equipo siguen
+2026-09-26 con el tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0); el corte D26, con el tag `v0.6.0`. La firma de correo y la de equipo siguen
 con íconos Tabler hasta que el operador decida el reemplazo. Criterio e historia: skill `efeonce-graphic-line`,
 `references/iconography.md`.
 
-**El set: 36 Trazo + 43 Plastilina = 79 glifos** (AXIS main@cf77452 (2026-09-27)). La base de D22 tenía 12 de
+**El set histórico D26: 36 Trazo + 43 Plastilina = 79 glifos** (AXIS main@cf77452 (2026-09-27)). La base de D22 tenía 12 de
 Trazo y 18 de Plastilina. El **2026-09-27 (D25)** el operador aprobó **30 íconos de oficio**, objetos del trabajo diario
 que el set no tenía, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de La órbita»
 (sección 7): 15 de Trazo (correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist, código,
@@ -1315,7 +1329,7 @@ Gemini); hoodie y gorra van sin logo dibujado: la marca la pone la esfera (en la
 de uso: influencer (Trazo) al responder se parece a talent, así que no van juntos; chispa no va con estrella ni varita;
 galería y biblioteca se parecen y se usan separados; prompt es el más débil a 32 px. Publicados con el tag `v0.6.0`:
 `axis-graphic-line` **0.6.0** y `axis-brand-assets` **0.3.4** (`axis-tokens` va en 0.3.8, publicado con superficies, y
-no cambia por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4. La lista completa con claves y
+no cambia por D26). En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4. La lista completa con claves y
 notas vive en la guía de AXIS §«Catálogo aprobado» (delta del ADR «IA, social y staff: 19 glifos nuevos (D26)») y en la
 skill (`references/iconography.md` §13).
 
@@ -1357,5 +1371,5 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 **publicados** con el tag `v0.3.7` (2026-09-27, sobre `main@c0020b6`; la 0.3.7 de tokens salió coordinada junto con los
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
 (D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
-muestra los 43 volúmenes. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+muestra los 43 volúmenes. En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 

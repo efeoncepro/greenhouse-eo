@@ -168,6 +168,12 @@ it without repeating what already cost a day*. It grows with every task: see the
   none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
   swap or mix sets piecemeal, and never hand-draw a new icon into a catalog. The third layer, **Plastilina en volumen**
   (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
+- For new semantic icon selection, use the unified [AXIS icon catalog](https://axis.efeonce.org/references/iconography/)
+  and its per-entry status/renderer; AEO/SEO/Authority collections overlap. Canonical AEO forms and candidate
+  Authority forms must not be conflated, and Brand Authority is not a universal AI metric. Channel/source identity
+  still uses the official platform isotype. Follow [AXIS consumption](../axis-design-system/references/agent-consumption.md)
+  for package publication versus the installed consumer: `axis-graphic-line@0.17.0` availability does not certify
+  adoption in existing report templates. `insights-resolve` produces a stat-card manifest, not a complete report.
 - Product mark, report look, live-report UI, AXIS Lab page → [`references/ui-and-brand.md`](references/ui-and-brand.md)
   + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
   `axis-design-system`. Boundary (binding, **changed by the operator on 2026-10-03**): AXIS is the home of the Insights

@@ -211,6 +211,12 @@ decisiones del operador, ejecución y evidencia; no tratar una aprobación esté
 
 ### Línea gráfica «La órbita» (canónica 2026-09-25)
 
+El [catálogo de logotipos AXIS](https://axis.efeonce.org/references/logos/) reúne las identidades propias y
+marcas externas admitidas, con variante, fondo, procedencia y alcance. Elige el archivo oficial; un logo de
+plataforma y un glifo conceptual SEO/AEO son recursos distintos. Publicar el catálogo no amplía derechos de
+terceros ni confirma un partnership vigente. El nuevo subpath de package `/logos` todavía requiere release;
+[consumo AXIS](../axis-design-system/references/agent-consumption.md) separa Lab, checkout, publicación y adopción.
+
 > **Skill dueña de la línea:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (viva) guarda el criterio, todo lo disponible en AXIS, las aplicaciones, el motion y la convergencia con la foto. Cárgala para componer; esta sección resume sólo lo que decide marca.
 
 La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,

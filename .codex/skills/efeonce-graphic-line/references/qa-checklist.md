@@ -1,5 +1,7 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
+> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
 > operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
 > tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27. §8d (piezas compuestas con
@@ -301,3 +303,70 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Video de la órbita sola | AXIS | `pnpm orbit:video -- --format 16x9 --surface dark --out /tmp/orbita` |
 | Plastilina en volumen: referencias, alfa por color, QA contra el plano y sello | AXIS | `pnpm icons:volume -- refs\|key\|check\|publish` |
 | Storyboard de una animación del logo | Greenhouse | `node scripts/creative/brand-motion/render-orbit-motion.mjs --out <dir> --anim reveal --storyboard` |
+
+## Colección AEO (2026-10-04)
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. [Inventario y API](aeo-icons.md).
+- [ ] Respuesta, composer, mención, cita y recomendación se distinguen a 20/24/32 px.
+- [ ] Los diez nuevos pasan `icons:check`; revisar también aire con trazo pequeño.
+- [ ] La esfera es un estado gráfico; cobertura no se interpreta como porcentaje codificado.
+- [ ] Los ocho reutilizados conservan bytes de render; los diez nuevos aprobados están una sola vez en `ICON_CATALOG`.
+- [ ] Lab: filtros/búsqueda, claro/oscuro, tamaño, descarga del estado elegido, manifest y móvil sin desborde.
+- [ ] Registrar aprobación visual antes del alta canónica; release y readback remoto son estados separados.
+
+
+## Colección SEO (2026-10-04)
+
+[API y estado](seo-icons.md).
+- [ ] Usar R2 redondeada; R1-cuadrados es historia de una corrección.
+- [ ] Doce nuevos con margen y aire ≥0,5 en ambos grosores; distintos de AEO.
+- [ ] Doce reutilizados sin redibujar; nuevos fuera del catálogo hasta aprobación visual.
+- [ ] Revisar 20/24/32 px, claro/oscuro y estados; comprobar SVG descargado y móvil sin desborde.
+- [ ] Registrar aprobación visual antes del alta; distinguirla de publicación y readback remoto.
+
+
+## Autoridad y enlaces (2026-10-04)
+
+[Fuente y estado](authority-icons.md).
+- [ ] Domain, Page y Brand Authority se distinguen en ambos estados a 20/24/32 px.
+- [ ] Brand Authority idéntica en las tres APIs; solo una geometría.
+- [ ] Todos los estados de enlaces nuevos/perdidos/rotos mantienen su diferencia.
+- [ ] Proveedor y metodología explícitos para scores; ninguna promesa ni score IA universal.
+- [ ] Trece checks de margen/aire; SEO 37 (25 candidatos), AEO 19 (1 candidato), autoridad 13 candidatos.
+- [ ] Aprobación visual precede alta; publicación y readback se registran aparte.
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+## Descubrimiento completo y tipografía editorial del Lab (2026-10-04)
+
+- [ ] Un recurso nuevo aparece en su package, catálogo central, JSON y búsqueda, sin listas manuales paralelas.
+- [ ] Iconography incluye canonical/candidate con estado explícito y sin duplicar claves compartidas;
+  corte actual: 109 + 25 = 134, con AEO 19 / SEO 37 / Autoridad 13 como pertenencias superpuestas.
+- [ ] Logos: variantes con ID, fondo, formato original y procedencia; clientes y badges restringidos no
+  se sirven públicamente. Comparar hash del asset servido con el package; no convertir PNG en falso SVG.
+- [ ] Separar fuente en main, Lab desplegado y versión npm instalable. `/logos` aún requiere nuevo release.
+- [ ] Títulos editoriales usan `LabHeading`; Bricolage proviene del token y se carga una vez.
+- [ ] Encabezados de Markdown conservan el rol; specimens y métricas no heredan accidentalmente Bricolage.
+- [ ] Ejecutar unitarias, build y `test:e2e editorial-typography.spec.ts` del Lab; el recorrido descubre
+  rutas y comprueba fuente efectiva mediante CDP en escritorio/móvil. Evidencia de corte: 65 rutas,
+  132 casos E2E y 167 unitarias. No atribuir este resultado a toda la suite E2E histórica.
+
+Fuentes ejecutables: `apps/lab/src/test/unit/editorial-typography.test.ts`,
+`apps/lab/src/test/e2e/editorial-typography.spec.ts`, tests de logos/iconografía y
+`apps/lab/scripts/check-agent-capabilities.mjs`. Guía: [lab-components.md](lab-components.md).

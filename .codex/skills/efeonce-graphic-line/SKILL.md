@@ -57,6 +57,22 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 `axis-ui-contracts` 0.3.28, `axis-graphic-line` 0.10.1) y **compone con `pnpm manzanitas:compose`** desde el
 2026-09-29 (TASK-1939, `references/manzanitas.md` §10.1).
 
+## Estado operativo de AXIS para esta skill — 2026-10-04
+
+Verificado contra `axis-design-system@aee99d2`. Para descubrir y componer, entrar por
+[/agents/](https://axis.efeonce.org/agents/) y su manifest `/agents/capabilities.json`: el registry
+conecta 41 capacidades con sus paquetes, contratos, ejemplos y límites de adapter. Packages son la
+fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implementa su adapter.
+
+- **Íconos:** [catálogo común](https://axis.efeonce.org/references/iconography/#catalogo), 134 únicos
+  (109 canónicos + 25 candidatos), filtros y JSON. APIs AEO/SEO/Autoridad publicadas en
+  `axis-graphic-line` 0.17.0. No promover candidatos por estar publicados.
+- **Logos:** [catálogo común](https://axis.efeonce.org/references/logos/), 223 archivos de 52 familias
+  (99 propios, 124 terceros). Código `/logos` de `axis-brand-assets` y Lab disponibles; **nueva versión
+  instalable del catálogo pendiente**. 0.4.18 en workspace no acredita que el export esté publicado.
+- **Lab:** títulos editoriales con Bricolage desde el token oficial, mediante `LabHeading`;
+  componentes y specimens mantienen sus fuentes. [Contrato y QA](references/lab-components.md).
+
 ## Por dónde empezar (carga selectiva)
 
 | Necesitas… | Lee |
@@ -68,6 +84,7 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 | **Planificar un deck entero y validarlo antes de componer** (plan de ids de receta, `pnpm brand:deck-plan -- --plan`, códigos de error y aviso, propuesta del agente con `--propose --context`) | skill `deck-studio` §«Plan del deck» + [applications.md §L, «Componer el deck hoy»](references/applications.md) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Llenar los slots de datos de un deck con datos reales** (logo del cliente, cifras, casos, testimonios, logos de terceros, montos, equipo; `bindDeckSlots`, `pnpm brand:deck-plan -- --bind`, motivos de «sin ligar») | [applications.md §L, «Ligar los datos reales»](references/applications.md) + catálogo `docs/operations/brand-graphic-line/deck-recipes/README.md` §«Datos reales por slot» + manual `componer-deck-con-recetas.md` paso 5b |
 | **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …»). **Receta aprobada → `pnpm brand:compose`** ([norma §2.1](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919), [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md)) |
+| **Renovar componentes y patrones de AXIS con La órbita** (catálogo y fichas del Lab; adapter local, sin adopción automática por Greenhouse) | [references/lab-components.md](references/lab-components.md) |
 | **El criterio**: qué significa cada elemento (anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), cuándo usar la órbita y cuándo no, con qué se combina y qué delata que no se entendió la línea — **léelo primero** | [references/criteria.md](references/criteria.md) |
 | Saber qué existe: tokens, contratos, funciones del paquete, assets, comandos, versiones, el mapa del Lab | [references/package-and-tokens.md](references/package-and-tokens.md) |
 | **Una aplicación concreta**: post, story, banner de LinkedIn, ads, deck, informe, firma de correo (personal y de equipo), oficina y uso del espacio, objetos, merch, vestir, credenciales, papelería, eventos, video — qué elementos van, dónde y cómo se produce | [references/applications.md](references/applications.md) |
@@ -77,6 +94,9 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 | Animar (la órbita sola o las animaciones del logo) | [references/motion.md](references/motion.md) |
 | **Sonido de la marca**: logo sonoro, motion con sonido y etiqueta con voz (identidad **recomendada**, no canon; el sonido de Glitch es aparte: [glitch.md §13](references/glitch.md)) | [references/motion.md](references/motion.md) §Sonido · [canon](../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · skill `audio-studio` · AXIS `/references/sonic-brand.json` |
 | Dónde está cada doc, archivo, medio y repositorio | [references/sources-and-assets.md](references/sources-and-assets.md) |
+| **Autoridad, backlinks y Brand Authority (2026-10-04, candidatos)**: trece formas redondeadas; autoridad-marca compartida entre SEO y AEO; métricas con proveedor y método | [references/authority-icons.md](references/authority-icons.md) |
+| **Set SEO (2026-10-04, publicado; R2 redondeada con estado por entrada)**: 37 entradas: 25 candidatas + 12 canónicas, API, Lab y exportación; aprobación visual pendiente | [references/seo-icons.md](references/seo-icons.md) |
+| **Set AEO (2026-10-04, publicado)**: 18 aprobados + Brand Authority candidata, paquetes y Lab; conceptos, API, QA y estado por entrada | [references/aeo-icons.md](references/aeo-icons.md) |
 | **Íconos**: las dos voces canónicas (Trazo y Plastilina), la esfera como estado, cuándo responde, la órbita sesgada y cómo dar de alta un glifo nuevo. **Fuente de verdad en AXIS**: `efeonceGraphicLine.icons` + `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`) y `pnpm icons:*` | [references/iconography.md](references/iconography.md) |
 | **Un objeto protagonista en volumen** (Plastilina en volumen, D24): la tercera capa, arcilla mate inflada derivada del vector aprobado; portada, KV, social de un objeto, escenario, merch. PNG con alfa de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), tokens `efeonceGraphicLine.icons.volume`, alta con `pnpm icons:volume` en AXIS | [references/iconography.md §12](references/iconography.md) + [criteria.md §3.14](references/criteria.md) |
 | **Marca de producto de Efeonce Insights** (logo, isotipo, lockup `insights-*` en `axis-brand-assets` 0.4.0): reglas, dónde se aplica (archivo oficial sólo en el informe live de Think; portadas del PDF/deck con una versión tipográfica) y qué sigue pendiente (archivo oficial en PDF/deck, «INSIGHTS» en el acento en esas portadas —decisión abierta del operador—, correo, favicon, portal, MCP; Greenhouse fija 0.3.5) | [criteria.md](references/criteria.md) («Insights, marca de producto que acompaña») + [applications.md §B3b](references/applications.md) + skill `efeonce-insights` → `references/ui-and-brand.md` · referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`); ejemplo vivo del producto: la muestra `think.efeoncepro.com/insights/muestra` |

@@ -8,6 +8,8 @@
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
 
+> **Actualización AXIS 2026-10-04:** catálogo unificado de íconos, logos y workflow de agentes en [AXIS: packages y Lab](../../documentation/creative/axis-packages-y-lab.md). Los releases y pins fechados en el historial inferior describen esos cortes; consulta el [runbook vigente](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) antes de instalar.
+
 ## Para qué sirve
 
 Este manual explica cómo hacer una pieza de Efeonce con la órbita (post, slide, portada, informe, merch, papelería,
@@ -325,8 +327,9 @@ este paso a paso no las repite todas.
 2. **Elige la voz por la línea de servicio de la pieza:** Growth, Engine o Revenue → Trazo; Brand → Plastilina. La
    línea Voice todavía no tiene voz fija: elige con criterio y decláralo en la pieza. Una voz por grupo, nunca las dos
    juntas.
-3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 79
-   aprobados (36 de Trazo y 43 de Plastilina) en cada línea y fondo, con «Copiar SVG». Desde el 2026-09-27 incluye los
+3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra 134 íconos únicos: 109
+   canónicos (60 Trazo y 49 Plastilina) y 25 candidatos, con filtros AEO, SEO y Autoridad y «Copiar SVG».
+   Confirma el estado antes de elegir. Las colecciones se superponen; Brand Authority conserva una sola identidad. Desde el 2026-09-27 incluye los
    **30 íconos de oficio**: en Trazo, correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist,
    código, base de datos, nube, integración, seguridad, ubicación y reloj; en Plastilina, lápiz, rodillo, aerosol,
    escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo y estrella. Y los
@@ -359,10 +362,14 @@ este paso a paso no las repite todas.
 8. **Si trabajas en código o con un agente,** pinta con `resolveIcon`, revisa el grupo con
    `auditIconGroup(items, { pieceHasSphere })` antes de entregar y usa `skewedOrbitHeroSvg` para la protagonista
    (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0; los íconos de oficio, desde 0.5.0, tag `v0.5.0`; los de IA,
-   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set completo como archivos sale con `pnpm icons:export` en
-   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Greenhouse fija
-   axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4; dentro de Greenhouse sólo lo usa el generador de piezas por
+   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set canónico como archivos sale con `pnpm icons:export` en
+   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Al corte 2026-10-04, Greenhouse fija
+   axis-graphic-line 0.11.0 y axis-brand-assets 0.4.15; dentro de Greenhouse sólo lo usa el generador de piezas por
    superficie. Para otra pieza, úsalo desde AXIS o copia el SVG del Lab.
+
+Para los candidatos, usa `resolveSeoIcon` desde `@efeoncepro/axis-graphic-line/icons/seo`, como declara el
+manifest del Lab. `resolveIcon` y `icons:export` sólo cubren canónicos. El release `0.17.0` de graphic-line
+está publicado; consumirlo en Greenhouse exige actualizar y verificar su pin por separado.
 
 ### Pedir un ícono nuevo
 

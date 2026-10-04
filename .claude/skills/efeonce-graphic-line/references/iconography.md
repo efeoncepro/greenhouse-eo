@@ -1,5 +1,7 @@
 # Iconografía de la línea: Trazo y Plastilina
 
+> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: AXIS `main@5b8ab20` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, publicados con el
 > tag `v0.3.6`) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
 > decisiones del operador D16–D22 ([ledger.md](ledger.md)). §12 (Plastilina en volumen, D24): AXIS `main@c18e3d3`
@@ -417,7 +419,7 @@ megáfono deja el anillo de la esfera como hueco.
   **No se mezclan en una pieza.**
 - **No** se anima con el paquete: es un PNG, y el motion de los íconos sigue diferido (ver [ledger.md](ledger.md)).
 
-## 13. Catálogo aprobado (88 glifos; oficio desde D25, IA, social y staff desde D26, redes de Glitch D27, swipe D28, mano D29 y republicar y enviar, 2026-09-29)
+## 13. Historia del catálogo aprobado (88 glifos; oficio desde D25, IA, social y staff desde D26, redes de Glitch D27, swipe D28, mano D29 y republicar y enviar, 2026-09-29)
 
 > **Estado:** canónico. Oficio (D25; operador, 2026-09-27: «Bien, subamos esos íconos al package de axis y a su web,
 > cuidando el diseño que ya tiene la web y documentando para agentes y el equipo»). IA, social y staff (D26; operador,
@@ -525,3 +527,50 @@ Trazo del hoodie. Material de producción en [sources-and-assets.md](sources-and
   sigue sin íconos sociales ni botones simulados ([manzanitas.md](manzanitas.md) §7).
 - Los borradores del 2026-09-28 (aire 0,535 y 0,611, [ledger.md](ledger.md)) no son estos: los glifos publicados son los
   de AXIS 0.11.0; su geometría vive sólo en `STROKE_GLYPHS` y se pinta con `resolveIcon`.
+
+## 14. Colección AEO · aprobada (2026-10-04)
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. El catálogo canónico publicado tiene 60 Trazo y 49 Plastilina;
+los diez AEO nuevos fueron aprobados por el operador («Las apruebo todas»). AEO incluye 18 canónicos y Brand Authority candidata; API y Lab: [aeo-icons.md](aeo-icons.md).
+Las cifras de 88 de la historia anterior corresponden al corte 2026-09-29, no al catálogo actual.
+
+
+## 15. Colección SEO · R2 redondeada (2026-10-04)
+
+Doce formas nuevas candidatas y doce reutilizadas. El operador corrigió la primera versión por demasiado cuadrada.
+R2 redondea siluetas y conexiones, sin tocar AEO. API, Lab, QA y estado: [seo-icons.md](seo-icons.md).
+
+
+## 16. Autoridad y backlinks, incluida Brand Authority (2026-10-04)
+
+Trece nuevas formas candidatas redondeadas. SEO: 37 entradas; AEO: 19. Una geometría autoridad-marca compartida,
+con límites de métrica y de proveedor explícitos. Catálogo canónico sin cambios (109). [Guía](authority-icons.md).
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+## 17. Catálogo principal completo y estados (2026-10-04)
+
+`/references/iconography/#catalogo` y `/references/iconography.json` son la entrada completa:
+134 glifos únicos, 109 canónicos y 25 candidatos. Filtrar por voz, colección (incluidas AEO, SEO,
+Autoridad) y aprobación; buscar por concepto o clave. El Lab lee la versión del paquete, sin texto
+manual de versión. La búsqueda global comparte el inventario y enlaza cada glifo.
+Los 19 AEO, 37 SEO y 13 de Autoridad se superponen: Brand Authority es una sola geometría.
+Descubrir, exportar o publicar un candidato no lo vuelve aprobado. La aprobación de las diez
+formas AEO se conserva; las doce SEO R2 y trece de autoridad requieren decisión visual.
+El cambio de descubrimiento `bf93d3a` no cambia el paquete publicado 0.17.0 ni sus renderers.

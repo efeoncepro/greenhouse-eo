@@ -20,9 +20,7 @@ Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_D
 
 TeamBot: `pnpm teams:announce` sólo para grupos con menciones explícitas; 1:1 manual requiere dispatcher/audit, Entra e idempotencia. Performance Reports verifica mención publicada, no infiere sobrecarga por volumen. [Manual](docs/operations/manual-teams-announcements.md).
 
-AXIS: consumo privado interno/productivo; PAT temporal hasta identidad de máquina para rollout externo. Release
-`30502476429` y rollback: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección
-colaborativa `0.2.0` sigue `candidate`; Lab es el primer adapter, otros runtimes `pending`.
+AXIS: Lab público, checkout ejecutable y packages privados; [manual para agentes](docs/manual-de-uso/creative/descubrir-y-componer-con-axis.md). Consumo interno/productivo; PAT temporal hasta identidad de máquina para rollout externo. Releases, rollback y adopción: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección colaborativa sigue candidate; otros adapters pending.
 
 Globe (`../efeonce-globe`): Tailwind v4; hibernación/encendido en [estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 y [runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md); caller pausado hasta SQL/API y tenancy fresca.

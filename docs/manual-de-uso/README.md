@@ -14,6 +14,8 @@ La diferencia con otras capas de documentacion:
 
 - [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
 
+- [Descubrir recursos y componer con AXIS](creative/descubrir-y-componer-con-axis.md) — Lab, packages, CLI, íconos, logos y evidencia de salida.
+
 ### Social y Creative Studio
 
 - [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de

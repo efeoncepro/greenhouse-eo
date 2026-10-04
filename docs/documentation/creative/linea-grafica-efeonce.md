@@ -7,6 +7,8 @@
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
+> **Actualización AXIS 2026-10-04:** catálogo unificado de íconos, logos y workflow de agentes en [AXIS: packages y Lab](../../documentation/creative/axis-packages-y-lab.md). Los releases y pins fechados en el historial inferior describen esos cortes; consulta el [runbook vigente](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) antes de instalar.
+
 ## Qué es
 
 La línea gráfica de Efeonce es la **forma propia** con la que se reconocen las piezas de la marca, además del logo,
@@ -197,7 +199,9 @@ La línea Voice (medios) todavía no tiene voz fija: se elige con criterio y se 
 | **La órbita sesgada es la firma de Plastilina** | una elipse inclinada alrededor del objeto protagonista; una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular) |
 | **Un ícono que falta no se dibuja en la pieza** | se pide, se verifica y entra al set con la aprobación del operador |
 
-Hay **79 íconos aprobados**: 36 de Trazo y 43 de Plastilina. Los primeros 30 (12 y 18) se aprobaron el 26 de septiembre de
+El catálogo actual tiene **109 íconos canónicos** (60 Trazo y 49 Plastilina) y **25 candidatos**, con filtros AEO, SEO y Autoridad. [Uso y estados](../../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+
+Como historia de las primeras incorporaciones, al 27 de septiembre había 79 aprobados (36 Trazo y 43 Plastilina). Los primeros 30 (12 y 18) se aprobaron el 26 de septiembre de
 2026; al día siguiente el operador sumó **30 íconos de oficio**, cosas que el equipo usa todos los días y que no estaban:
 
 | Voz | Íconos de oficio |

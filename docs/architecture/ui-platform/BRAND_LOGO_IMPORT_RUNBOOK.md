@@ -8,6 +8,16 @@
 
 Este runbook documenta lo aprendido al portar los logos Gemini, ChatGPT/GPT, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
 
+## Distribución AXIS — 2026-10-04
+
+La biblioteca normalizada de este runbook se incorporó al catálogo portable del repo AXIS y al
+[Lab de logos](https://axis.efeonce.org/references/logos/), conservando los bytes y su procedencia. El catálogo
+unifica propios y terceros, deduplica aliases y excluye assets restringidos o la variante Gemini defectuosa.
+Antes de una nueva importación, busca en ese catálogo; no vuelvas a dibujar ni descargar un duplicado.
+La API `@efeoncepro/axis-brand-assets/logos` está en source y Lab y requiere un nuevo release instalable.
+Esto no migra automáticamente el controller ni los imports de Greenhouse: conserva su contrato actual hasta
+adopción explícita. [Consumo y estado](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+
 ## Principio
 
 Los logos de marca son assets de terceros, no componentes tipográficos del portal. La primitive Greenhouse solo gobierna `kind`, `variant`, tamaño, a11y y placement; la identidad visual vive dentro del asset.

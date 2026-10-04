@@ -1,0 +1,6 @@
+{
+  "source": "Handoff.md",
+  "historicalDate": "2026-09-29",
+  "sha256": "129dfaec29768b9434660e981a4d3a8bd2347db04beaeea20aeb973597c89337",
+  "content": "**AI Visibility Report y módulos de correo en AXIS (29/09):** AXIS `v0.3.38` publicado (`c92160b`; antes `v0.3.30`, `26097c5`): contrato `efeonce.ai-visibility-report` 0.1.0, `efeonce.email-modules` 0.1.0 (pie, CTA principal, agenda y bloque de marca por línea; «Suscribirme» retirado; el correo de Insights es una aplicación, no la plantilla), `graphic-line-orbit` 0.5.0 con el **recorrido desde las 12 en toda medida** (decidido por el operador), graphic-line 0.13.0 y brand-assets 0.4.6 (PNG de correo; logo y eslogan separados). Lab `/references/ai-visibility-report/` y `/references/email/`. Greenhouse fija 0.3.37 y **el adapter de la órbita (`scripts/creative/layout-compiler/graphic-line.mjs`, sólo acepta 0.3.1) ya da 0/7 en `develop`** desde `9289cab0c`; lo arregla el bump de [TASK-1944](docs/tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md) o [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md). **Decide el operador:** propósito del correo de Insights frente a la política de TASK-1764 (el contrato exige agenda, preferencias y baja en todo pie).\n\n"
+}

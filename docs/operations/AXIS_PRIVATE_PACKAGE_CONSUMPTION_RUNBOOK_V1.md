@@ -1,5 +1,18 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Corte de distribución — 2026-10-04
+
+Para descubrir y componer: [manual de AXIS](../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+Estado y evidencia: [cierre documental](../audits/2026-10-04-axis-documentation-closure.md).
+`axis-graphic-line@0.17.0` está publicado (tag `v0.17.0`). Los cambios posteriores de navegación, agentes,
+logos, iconografía unificada y tipografía están en `main` y desplegados en el Lab. Esto no publica packages:
+la nueva API `@efeoncepro/axis-brand-assets/logos` y sus archivos requieren un nuevo release; el workspace
+conserva `0.4.18`, por lo que instalar el tarball histórico de esa versión no garantiza estos exports.
+Las nuevas APIs de capacidades/evidencia del registry también requieren verificar el tarball antes de consumirlas.
+Los pins de Greenhouse, Globe y Marketing Studio no se actualizaron en este trabajo. El owner de release AXIS
+publica una versión nueva con preflight y lectura del registry; cada owner consumidor fija y valida su adopción
+por separado. Las verificaciones fechadas siguientes permanecen como historia y no son permisos vigentes.
+
 ## Purpose
 
 This runbook describes how Greenhouse, Globe and future Efeonce products consume the
@@ -912,3 +925,21 @@ version in the consumer lockfile and deployment evidence.
 - Package foundation: `TASK-1589`.
 - Registry/Lab: `TASK-1590` and `TASK-1592`.
 - Package repository: `../axis-design-system`.
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.

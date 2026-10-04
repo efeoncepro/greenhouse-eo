@@ -1,5 +1,7 @@
 # Handoff activo
 
+**AXIS (04/10):** `aee99d2` pushed; CI y Lab verificados. [Docs/skills y pendientes](docs/audits/2026-10-04-axis-documentation-closure.md). Siguiente: release privado de logos/capacidades y adopción por consumidores.
+
 Staging: ISSUE-178 resuelto.
 
 **SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
@@ -52,7 +54,7 @@ Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y tota
 
 **Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete** (94/94 con plantilla, AXIS `v0.3.36`, insignia autorizada). Pendiente externo: autorización de Anthropic para Claude/Claudeforce en SF16 (TASK-1937). Siguiente: serie HubSpot (TASK-1943).
 
-**AI Visibility Report y módulos de correo en AXIS (29/09):** AXIS `v0.3.38` publicado (`c92160b`; antes `v0.3.30`, `26097c5`): contrato `efeonce.ai-visibility-report` 0.1.0, `efeonce.email-modules` 0.1.0 (pie, CTA principal, agenda y bloque de marca por línea; «Suscribirme» retirado; el correo de Insights es una aplicación, no la plantilla), `graphic-line-orbit` 0.5.0 con el **recorrido desde las 12 en toda medida** (decidido por el operador), graphic-line 0.13.0 y brand-assets 0.4.6 (PNG de correo; logo y eslogan separados). Lab `/references/ai-visibility-report/` y `/references/email/`. Greenhouse fija 0.3.37 y **el adapter de la órbita (`scripts/creative/layout-compiler/graphic-line.mjs`, sólo acepta 0.3.1) ya da 0/7 en `develop`** desde `9289cab0c`; lo arregla el bump de [TASK-1944](docs/tasks/to-do/TASK-1944-efeonce-email-modules-adoption.md) o [TASK-1938](docs/tasks/to-do/TASK-1938-ai-visibility-report-pdf-la-orbita.md). **Decide el operador:** propósito del correo de Insights frente a la política de TASK-1764 (el contrato exige agenda, preferencias y baja en todo pie).
+**AXIS — corte 29/09:** [registro histórico y continuidad](docs/audits/2026-10-04-axis-documentation-closure.md#registro-histórico-de-continuidad). Estado actual de packages y Lab en el mismo cierre.
 
 **Naming Efeonce AEO (29/09):** el [ADR aceptado](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) fija **Efeonce AEO** → **Efeonce AEO Assessment** → **Efeonce AI Visibility Report**. Documentación y skills se alinean conservando aliases técnicos/históricos; el copy de los runtimes públicos sigue pendiente de edición y readback. Search Visibility 360 permanece como oferta SEO+AEO.
 

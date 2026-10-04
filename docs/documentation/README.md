@@ -4,6 +4,8 @@
 
 Documentacion oficial de la plataforma Greenhouse. Cada documento describe como opera un modulo o dominio del portal en terminos claros, orientados a entender el funcionamiento y las reglas de negocio. Para detalle tecnico (schemas, APIs, decisiones de diseno), cada seccion enlaza a su spec de arquitectura correspondiente.
 
+- [AXIS: packages, Lab y composición por agentes](creative/axis-packages-y-lab.md) — descubrimiento, íconos, logos, búsqueda y estados de distribución.
+
 ## Regla obligatoria
 
 Todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface de Greenhouse debe tener tres capas documentales:
