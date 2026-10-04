@@ -31,7 +31,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En producción desde el release 9a906a164677 (2026-10-04); Think en producción (fd83a3b). Canary interno de Berel: deck completo; el A4 se rechazó por la metodología (9 líneas para 8) y el arreglo va en PR #253. Falta la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04); Think en producción (fd83a3b). Canary interno de Berel verde en producción (2026-10-04): la v1 rechazó el A4 por la metodología (9 líneas para 8), corregido en el release 7182af769; la revisión `insed-edd1f0b0…` renderizó A4 (27 págs.) y deck (20 láminas) al primer intento, con los tableros por asistente y por motor con sus isotipos. Falta la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)

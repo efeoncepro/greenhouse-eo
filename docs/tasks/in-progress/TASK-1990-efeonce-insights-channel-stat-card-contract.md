@@ -55,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `En producción desde el release 9a906a164677 (2026-10-04): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. El plan del canary interno de Berel trae los dos tableros; falta cerrar el canary con el A4 (PR #253)`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. Canary interno de Berel verde en producción (2026-10-04, revisión `insed-edd1f0b0…`, release 7182af769): el plan trae los dos tableros y A4 y deck renderizan`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
