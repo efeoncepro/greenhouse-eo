@@ -1,9 +1,9 @@
 # Operar los hallazgos de sitio de la auditoría SEO (crawlers de IA, borde, JSON-LD, sitemap)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-01 por Claude (TASK-1670)
-> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670)
+> **Ultima actualizacion:** 2026-10-04 por Codex (activación documentada desde 02/09; flag revalidado en worker activo).
 > **Documentacion tecnica:** [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §6 y §10.6
 > **Documentacion funcional:** [`modulo-seo-search-visibility-360.md`](../../documentation/growth/modulo-seo-search-visibility-360.md)
 > **Manual de la pantalla:** [Auditoría del sitio](usar-auditoria-sitio-seo.md)
@@ -24,15 +24,11 @@ Este runbook cubre la **operación** de esa capacidad: cómo se prende, cómo se
 apaga. Para **leer** los hallazgos en la pantalla, el manual es
 [Auditoría del sitio](usar-auditoria-sitio-seo.md).
 
-### 🔴 Hoy está APAGADO, y eso importa
+### Estado actual
 
-El flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` está en **OFF en todos los ambientes**. Mientras siga
-así, **el punto ciego sigue abierto**: un sitio que le cierra la puerta a `OAI-SearchBot`,
-`PerplexityBot` o `ClaudeBot` sigue puntuando 95/100 en la auditoría y presentándose como sano.
+El flag de hallazgos está ON desde 02/09 y se revalidó el 04/10 en `ops-worker-00762-njg` (100% tráfico, Ready). La activación ya ocurrió. Readback PG 04/10: corrida `seoar-c9cb9376-6c0a-40e9-8aee-bf258bed1b38` del 28/09, `succeeded`, con 2 hallazgos de alcance sitio. Confirma persistencia; falta contrastar su precisión contra el sitio y verificar `seo.audit.stuck_tasks`. Un collect vacío no demuestra los evaluadores. [Evidencia](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 
-El motor existe, está en `develop` y fue verificado contra red real el 2026-09-01 sobre 6 dominios.
-**Pero el merge no cerró el agujero; lo cierra el flip.** Y el flip está bloqueado por `TASK-1671`
-(ver más abajo por qué, que no es cautela genérica).
+La receta de activación que sigue sirve para recuperación o rollback gobernado; no instruye un segundo flip.
 
 ## Antes de empezar
 
@@ -197,7 +193,7 @@ cerrar. Si aparece, la respuesta correcta es "no lo pudimos medir", no "está co
 
 | Sintoma | Causa probable | Que hacer |
 |---|---|---|
-| Corrí el collect y no aparece ningún hallazgo de sitio | El flag está OFF en el ops-worker | Verificar la **revisión activa**, no `deploy.sh`: `gcloud run services describe ops-worker --region=us-east4 --format='value(spec.template.spec.containers[0].env)'` |
+| Corrí el collect y no aparece ningún hallazgo de sitio | Puede no haber runs pendientes, no existir hallazgos o estar el flag OFF | Verificar la **revisión activa**, no `deploy.sh`: `gcloud run services describe ops-worker --region=us-east4 --format='value(spec.template.spec.containers[0].env)'` |
 | Lo prendí y a la semana dejó de aparecer | Se aplicó sólo con `--update-env-vars` y un deploy lo borró | Escribirlo en `deploy.sh` y volver a aplicarlo. Es el modo de falla más frecuente de este flag |
 | No aparece nada aunque el flag esté ON | `GROWTH_SEO_ENABLED` está apagado | Es el flag padre; sin él no corre nada del módulo |
 | Todos los chequeos salen "sin verificar" | El sitio no responde, o se agotó el presupuesto de 15 segundos | Abrir el sitio a mano. Si responde normal y desde el worker no, revisar si el borde del cliente bloquea a nuestro rastreador — eso **es** un hallazgo, no una falla nuestra |

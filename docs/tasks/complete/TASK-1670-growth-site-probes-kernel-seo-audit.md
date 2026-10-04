@@ -168,6 +168,8 @@ Los 3 slices están en `develop`. Lo que hay que leer antes de asumir que esto c
    entero: el PARSEO viene del sustrato (`parseRobotsPolicy`), el JUICIO (familias + severidad) se
    escribe en `growth/seo`.
 
+> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+
 ## Status
 
 - Lifecycle: `complete`
@@ -183,7 +185,7 @@ Los 3 slices están en `develop`. Lo que hay que leer antes de asumir que esto c
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Code complete, rollout pendiente — flag OFF; el punto ciego SIGUE ABIERTO hasta el flip con TASK-1671`
+- Status real: `Complete; activación productiva documentada desde 02/09 (375f56e24187). Readback 04/10: ops-worker-00762-njg, 100% tráfico, Ready, GROWTH_SEO_SITE_FINDINGS_ENABLED=true. Readback PG 04/10: corrida `seoar-c9cb9376-6c0a-40e9-8aee-bf258bed1b38` del 28/09, `succeeded`, con 2 hallazgos de alcance sitio. Confirma persistencia; falta contrastar su precisión contra el sitio y verificar `seo.audit.stuck_tasks`.`
 - Rank: `TBD`
 - Domain: `growth|data`
 - Blocked by: `none`

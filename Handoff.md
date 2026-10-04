@@ -1,5 +1,7 @@
 # Handoff activo
 
+**SEO:** [EPIC-022, 04/10](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
+
 **Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».
 
 **PDF AI Visibility Report (03/10):** [TASK-1938](docs/tasks/in-progress/TASK-1938-ai-visibility-report-pdf-la-orbita.md) code complete local en develop; [dossier con PDFs y 24 comparaciones](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md). Engine/órbita, fuentes y logos oficiales, ES/EN/PT-BR y cierres por audiencia; métricas y envío preservados. 108 focales, TypeScript y build PASS; 18.148 tests generales PASS en la corrida anterior; único fallo Manzanitas corregido por autorización del operador (metadata de versión, check de 49 archivos y siete tests PASS; suite general no repetida). Rollout pendiente, sin push/envíos. Web/print conservan su diseño.

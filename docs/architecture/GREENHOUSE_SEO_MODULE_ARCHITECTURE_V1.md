@@ -1,152 +1,20 @@
 # Greenhouse SEO Module Architecture V1 — "Search Visibility 360"
 
-> **Nomenclatura desde 2026-09-29:** [Efeonce AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es la capacidad de visibilidad en IA y su diagnóstico público se denomina **Efeonce AEO Assessment**. `AEO Grader` en esta arquitectura sigue identificando el motor técnico `growth.ai_visibility` y su historia. **Search Visibility 360** conserva el alcance SEO+AEO y las fronteras entre los dos motores.
+> **Nomenclatura desde 2026-09-29:** [Efeonce | AEO](EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) es el servicio de visibilidad en IA y la landing y el informe público se denominan **Efeonce | AI Visibility Report**; **Efeonce | AEO Assessment** conserva su identidad aprobada. `AEO Grader` en esta arquitectura sigue identificando el motor técnico `growth.ai_visibility` y su historia. **Search Visibility 360** conserva el alcance SEO+AEO y las fronteras entre los dos motores.
 
 > **Status:** Accepted (design) · 2026-07-01
 > **ADR:** [GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md](GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md)
 > **Epic:** `EPIC-022` · **Dominio:** `growth.seo` (hermano de `growth.ai_visibility`)
 > **Autoría:** planificación con 4 lentes (arquitectura, SEO/AEO, product design, comercial).
-> **Última actualización:** 2026-09-03 — dimensión metodológica ETV formula-aware (`TASK-1805`, en producción); ver §4.2, §5, §6, §8 y el delta final.
+> **Última actualización:** 2026-10-04 — reconciliación EPIC-022, hallazgos de sitio y cutover ETV completado.
+
+> **Estado vigente:** 84 hijas (43 complete, 3 en curso, 38 to-do). TASK-1655 tiene slices 1–4 entregadas; backfill histórico completo (07/08); export nativo/paridad/retención pendientes. Hallazgos de sitio ON desde 02/09; worker activo `ops-worker-00762-njg` al 04/10 con ambos selectores ETV `improved_layout_clickstream_v2`. El contract/cutover de TASK-1806 está completo; las referencias legacy/parqueado en los deltas describen la foundation anterior. [Evidencia](../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
+
+[Historial de releases y verificaciones anteriores](GREENHOUSE_SEO_MODULE_HISTORIAL.md): separado del contrato vigente, sin eliminar evidencia.
 
 Documento maestro del módulo SEO. Contrato técnico + de negocio del que derivan las tasks `TASK-1299…1310`. Complementa (no reemplaza) `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (el motor hermano).
 
 ---
-
-## Delta 2026-08-28 — el carril de competencia y contexto de SERP está VIVO en producción (release `c983be7f18e6`)
-
-El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
-`release_id` `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, manifiesto `released`, run
-`33178544139`) llevó a `main` el trabajo de `TASK-1696` (dimensión de consumidor del ledger),
-`TASK-1662` (gap competitivo) y `TASK-1699` (top-N del SERP). El estado se declara **por runtime**,
-porque decir «el flag está ON» sin nombrar en cuál de los 5 runtimes es exactamente el error que
-este documento existe para evitar.
-
-**Migraciones (4) — aplicadas en la instancia única Cloud SQL `greenhouse-pg-dev`** (verificado con
-`pnpm pg:connect:status` → `No migrations to run!`): `20260828015655472_task-1696-seo-provider-spend-consumer-dimension`
-· `20260828020728716_task-1696-seo-provider-spend-cost-basis-in-key`
-· `20260828113457119_task-1662-seo-competitor-gap-foundation`
-· `20260828124352232_task-1699-seo-serp-top-results`.
-
-| Flag | Runtime donde SE LEE | Estado real 2026-08-28 |
-|---|---|---|
-| `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (TASK-1699) | **dual-runtime**: `ops-worker` (escritura del top-N dentro del rank capture) + Vercel (lectura de lanes) | **ON en los dos.** Worker desde antes del release (revisión `ops-worker-00610-kc8`); Vercel `Production` prendido **con** este release + redeploy obligatorio `greenhouse-aj0ng1mfw` |
-| `GROWTH_SEO_COMPETITOR_GAP_ENABLED` (TASK-1662) | **sólo `ops-worker`** — en Vercel es **inerte** | **ON y vivo** en el worker. Scheduler `ops-seo-competitor-coverage` **ENABLED desde 2026-08-29** (⚠️ esta fila decía «ENABLED» desde el 28 y era FALSO: estaba `PAUSED` con `lastAttemptTime` vacío) |
-| `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` + `..._ENFORCED` (TASK-1696) | dual (Vercel + `ops-worker`) | **OFF por diseño, ambos.** No se prendieron con este release y no deben prenderse sin decisión explícita del operador tras un ciclo mensual de shadow |
-
-🔴 **Vercel congela las env vars al crear el build**: prender el flag no basta. Por eso el
-`vercel env add … production` (el nombre del entorno va en **minúscula**) viene acompañado del
-redeploy `greenhouse-aj0ng1mfw`, y la verificación es contra el **runtime**, nunca contra la env
-var: el canary del lane `serp-top-results` contra `https://greenhouse.efeoncepro.com` devolvió
-`serp-top-results read: {"ok":true,…,"rows":[]}` — `ok:true`, **no** `disabled`. El array vacío es
-lo esperado y no es un fallo: **el día 1 de la serie es el 2026-08-29** (cron `ops-seo-rank-capture`,
-05:00 CLT) y la serie **no es backfilleable**.
-
-Los 4 lanes internal-only nuevos responden `ok` contra producción, con `404` anti-oracle en el deny
-(`provider-spend` · `keyword-gap` · `serp-top-results` · `competitor-candidates`).
-
-**Primera corrida real de cobertura competitiva** (Berel MX, 1 competidor declarado
-`comex.com.mx`): **USD 0,1076**, con gap medido de **357 `content_gap` / 54 `ranks_worse` / 269
-excluidas** por tener impresiones medidas en GSC.
-
-## Delta 2026-08-27 — tier `prospect`: el módulo aprende a hablarle a quien no firmó (TASK-1709)
-
-El SEO gana su carril de ADQUISICIÓN: `runProspectDiagnostic` corre un diagnóstico ÚNICO sobre
-cualquier dominio usando sólo fuentes que no piden acceso a nadie (`ranked_keywords` con
-`ai_overview_reference` · `competitors_domain` · `backlinks/competitors` + `domain_intersection` —
-esta task estrena el colector de competidores; `TASK-1662` lo consume desde 2026-08-28 como
-propuesta de declaración) + evidencia de sitio
-**delegada** al sustrato (`@/lib/growth/site-substrate`: home/JSON-LD/robots/sitemap, USD 0) +
-reads OnPage post-crawl gratis si ya existe crawl del dominio. Primitives en
-`src/lib/growth/seo/prospect/**`; lanes app + ecosystem (`internal`-only ambos verbos) + MCP tools
-`get_seo_prospect_diagnostic` / `run_seo_prospect_diagnostic` en el mismo PR.
-
-**Reglas duras del carril (violarlas es regresión, no mejora):**
-
-- **NUNCA captura recurrente sobre un prospecto**: sin `next_run_at`, sin cron, sin scheduler que
-  lea `seo_prospect_diagnostics` (test fuente `prospect-boundary.test.ts` + DO guard en la
-  migración). Re-correr = disparo humano que vuelve a pasar por todos los topes. La corrida V1 es
-  **inline en Vercel** (todas las fuentes live) — el ops-worker NO participa.
-- **Tope duro POR DIAGNÓSTICO**, no mensual: `enforceProspectDiagnosticBudget` valida el forecast
-  del CONJUNTO antes de la primera llamada; presupuesto efectivo =
-  `min(GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD (default 1,00), restante del mes de Efeonce)`.
-  No cabe → `cost_blocked` con CERO llamadas. + tope diario por actor (default 10).
-- **El gasto es costo de adquisición de Efeonce**: se atribuye a la org canónica `EO-ORG-0007`
-  (resuelta server-side por `public_id`) en el ledger único `seo_provider_spend_daily`. Cero
-  segundo almacén de gasto; el margen por cliente no se contamina.
-- **Toda cifra es `◑ estimada` y lo dice**: `lens` con CHECK de un solo valor + `captured_at NOT
-  NULL`; `magnitude: null` = no medido, JAMÁS 0. **El contrato de salida NO tiene campo de score,
-  veredicto, salud, benchmark ni lift** — el diagnóstico enumera pérdida cuantificada, nunca
-  certifica que un sitio está sano (un audit no detecta bloqueo a crawlers IA: un sitio invisible
-  puede puntuar 95/100).
-- **Un bloqueo es un hallazgo** (`site_crawl_blocked` / `extended_crawl_status` prohibido), nunca
-  un obstáculo a evadir: cero `robots_txt_merge_mode: override`, cero proxy pools, UA siempre
-  identificable (postura verificada por test negativo).
-- **Idempotencia por (dominio, mercado, idioma, día)** vía índice único parcial: repetir el mismo
-  día devuelve lo existente con USD 0. `SeoTier` gana `prospect` pero NO está en `VALID_TIERS`: un
-  `module_assignment` jamás lo declara.
-
-Señal: `growth.seo.prospect_diagnostic.cost_overrun` (steady 0). Evento:
-`growth.seo.prospect_diagnostic.completed` (in-tx, sin consumer; hand-off HubSpot = task aparte).
-La cara visible (artefacto/PDF/short-link) sigue fuera: `TASK-1672`/`TASK-1673`, bloqueadas tras
-`TASK-1670` (§3.4 C8 de la auditoría). Capabilities en §9.
-
-## Delta 2026-08-14 — el dato de mercado por keyword está VIVO (TASK-1661 `complete`, release `3754a17d3b1d`)
-
-El módulo dejó de ser ciego a la demanda que no mide Search Console. `greenhouse_growth.seo_keyword_market_data`
-(§4.2) es el SSOT del hecho de mercado, **multi-productor y desacoplado del target**; los primitives
-(`captureKeywordMarketData` · `previewKeywordMarketDataCapture` · `readKeywordMarketData` · `deriveLinkBarrier`)
-viven en `src/lib/growth/seo/keyword-market-data.ts` (§7); el scheduler mensual `ops-seo-keyword-market-data`
-está **ACTIVO** y `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` **ON** en el ops-worker (§8).
-
-Tres correcciones que este delta hace al texto anterior del documento, porque hoy son falsas:
-
-1. **`readKeywordOpportunities` ya NO cablea `market: 'unavailable'`** — pasa a `'available'` cuando hay captura,
-   y cada oportunidad viaja con `linkBarrier` derivada server-side (§7, §10.4).
-2. **La barrera de enlaces NO sale de `keyword_difficulty`.** Ese índice colapsa a `0` en SERPs es-LATAM
-   (`pintura`, 135.000 búsquedas/mes en MX, daba KD 0). La derivación canónica es `deriveLinkBarrier` sobre el
-   perfil de enlaces del top-10, ponderando **diversidad de dominios referentes + page rank, nunca el conteo**.
-   `classifyLinkBarrier` fue eliminada (§7).
-3. **El mercado (país) es dimensión EXPLÍCITA** en toda resolución de target (ISSUE-153, §7) y **corregirlo es
-   crear un target nuevo, nunca un `UPDATE` de `location_code`** (ISSUE-152, §4.1).
-
----
-
-## Delta 2026-08-08 — catálogo cliente TASK-1310: `seo_v2` pendiente de aplicar
-
-`seo_v1` se creó con `view_codes=[]`. TASK-1310 necesita exponer dashboard e informe en el menú
-compuesto del portal, pero `greenhouse_client_portal.modules` prohíbe mutar esos campos in-place.
-La migración `20260808131441444_task-1310-seo-client-view-codes.sql` crea **`seo_v2`**, conserva
-status/tier/metadata de cada assignment vigente, cierra `seo_v1` y registra
-`cliente.growth_seo_dashboard` + `cliente.growth_seo_report` con denials explícitos por rol. El
-acceso sigue siendo per-org (`module_assignment` + capability), nunca role-wide.
-
-**Estado (actualizado 2026-08-09):** migración aplicada y código en producción. `seo_v2` existe con
-sus dos viewCodes y las dos organizaciones asignadas, y desde el release `49f86c98cda6` el runtime
-**lee y escribe sólo `seo_v2`** (`TASK-1677` — ver §10.7). **El cutover está CERRADO desde el
-2026-08-09**: código y datos. Los assignments `seo_v1` quedaron superseded por `effective_to`
-(migración `20260809163352129`), y la fila `seo_v1` sigue en el catálogo como historia append-only.
-Sobre la navegación cliente: `TASK-1675` cableó el menú module-driven y se verificó con sesión de
-Grupo Berel contra producción el 2026-08-09 — el ítem `SEO` aparece compuesto desde
-`module_assignments` y la ruta abre con datos medidos.
-
----
-
-## Delta 2026-08-07 — `get_seo_overview_kpis` verificada end-to-end (TASK-1306)
-
-La tool y su lane (`/api/platform/ecosystem/growth/seo/overview-kpis`) quedaron **ejercitados
-contra staging con datos reales**, no sólo cableados y cubiertos por tests:
-
-- Berel → `200` con 2.596 clics, 136.146 impresiones, posición ponderada 5.783, CTR 1.91%,
-  `previous: null` y 5 puntos de serie. **Coincide exactamente con lo que muestra la UI**,
-  que es la prueba de parity: un solo cálculo, dos consumidores.
-- Org sin `module_assignment` → `404 not_found` (anti-oracle: no revela si la org existe).
-- Sin token → `401`. `rangeDays=99999` → clampeado a `365` server-side.
-
-⚠️ **El lane ecosystem NO se puede probar en `localhost`**: devuelve `500` por un `ENOENT` de
-`@opentelemetry/instrumentation` en `node_modules`, y falla igual para endpoints sanos en
-producción (verificado contra `rank-evolution`). Un 500 local no dice nada del endpoint —
-la verificación válida es contra el deployment de staging. Receta con `curl`:
-`docs/manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md`.
 
 ## 1. Tesis y bounded context
 
@@ -266,7 +134,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
   - 🔴 **Desambiguación de las dos autoridades de dominio (decisión 2026-08-27, TASK-1775).** Coexisten dos mediciones cercanas: `seo_backlink_snapshots.domain_rank` (familia `backlinks`, semanal, escala 0–100 pedida con `rank_scale: 'one_hundred'` para ser comparable a DR/DA) y esta tabla. **`domain_rank_overview` NO devuelve ningún score de autoridad** (verificado contra la doc oficial 2026-08-27): la "foto" es distribución de posiciones + counts + ETV. Por lo tanto **la autoridad canónica para superficie es `seo_backlink_snapshots.domain_rank`** — única cifra de authority del módulo, sin competidor — y esta tabla aporta las dimensiones complementarias (tamaño en keywords, tráfico estimado, trayectoria). Cadencias y proveedor distintos: **jamás se promedian ni se grafican en la misma serie**, la misma regla que rige el cruce con GSC.
 
 - `seo_url_visibility_snapshots` — el hecho de **sujeto-página** (TASK-1776, migración `20260827194219636`; append-only). Lo que Semrush vende como `url_research`/`subdomain_research`/`subfolder_research` es en DataForSEO **UN endpoint** (`ranked_keywords`) con el `target` cambiado: por eso hay UNA tabla con `subject_kind` bajo **CHECK cerrado** (`domain|subdomain|subfolder|url`) y un **resolver de sujeto** (`url-visibility/resolve-subject.ts`) — la clase se **DECLARA, jamás se infiere**, y la normalización (esquema/www/trailing-slash/query fuera de la clave) va PRIMERO porque la clave única `(subject_kind, normalized_subject, location_code, language_code, capture_date)` — **sin organización**, mismo contrato multi-productor — depende de ella. Tres productores comparten `persistUrlVisibilitySnapshots`: la captura directa (`ranked_keywords`; cron `ops-seo-url-visibility` día 17, flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` **sólo ops-worker**, sobre target + competidores), `relevant_pages` (cada página → fila `url`) y `subdomains` (cada subdominio → fila `subdomain`), ambos on-demand. La **foto sale del agregado `metrics` del proveedor** (cubre el set COMPLETO del sujeto, independiente del `limit`); el `limit` (knob `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`, default 100) acota sólo el detalle `top_keywords` JSONB y es la **palanca de costo**. 🔴 Gotchas verificados contra la doc oficial (2026-08-27): una URL como `target` va **CON esquema** (sin él el proveedor devuelve el dominio entero y lo cobra); la subcarpeta no tiene target nativo — host + filtro server-side `ranked_serp_element.serp_item.relative_url` (gratis). 🔴 **Tercer productor del mercado**: el `keyword_data.keyword_info` viene inline **ya pagado** en cada fila y se escribe en `seo_keyword_market_data` vía `persistKeywordMarketData` con **costo 0** + pre-check `loadFreshMarketKeywords` (la migración expandió su CHECK de `source_endpoint` con `ranked_keywords`). Reader canónico `readUrlVisibility` + `readVisibilityConcentration`: lens `estimated` + `capturedAt`, `no_market_data` sin ceros, posición ◑ **jamás** promediada con la posición ● de GSC (una es la posición exacta en una SERP concreta; la otra, un promedio ponderado por impresiones).
-- **Delta 2026-09-03 (TASK-1805) — dimensión metodológica ETV en `seo_domain_overview_snapshots`, `seo_url_visibility_snapshots` y `seo_prospect_diagnostics`** (migración `20260902221432772_task-1805-etv-methodology-expand`, aplicada; fase expand). Columnas nuevas en las tres tablas: `etv_methodology_version` (CHECK cerrado `legacy_static_v1 | improved_layout_clickstream_v2`), `etv_methodology_evidence` (CHECK `explicit_request | contract_default_pre_cutoff`), `etv_requested_at timestamptz` y `etv_policy_version`, acopladas por el CHECK de consistencia `<tabla>_etv_evidence_consistency_check` (`explicit_request` ⇔ `etv_requested_at` y `etv_policy_version` no nulos). Sólo domain overview agrega `etv_historical_basis` (CHECK `fully_recomputed | calibrated_approximation`, admitido sólo con improved). **La idempotencia pasa a ser formula-aware:** `seo_domain_overview_capture_method_unique (normalized_domain, location_code, language_code, capture_date, etv_methodology_version)` y `seo_url_visibility_capture_method_unique (subject_kind, normalized_subject, location_code, language_code, capture_date, etv_methodology_version)`; los writers hacen `ON CONFLICT ON CONSTRAINT <method_unique>` y los pre-checks de frescura (`loadFreshOverviewDomains`, `loadFreshVisibilitySubjects`, `hasFreshRunForDomain`, `loadExistingMonths`) filtran por método — una fila legacy no ahoga una captura improved del mismo sujeto/día. Las UNIQUE legacy se conservan hasta el contract. Trigger `BEFORE INSERT` `guard_seo_etv_methodology_cutoff()` (`trg_seo_domain_overview_etv_cutoff_guard`, `trg_seo_url_visibility_etv_cutoff_guard`, `trg_seo_prospect_diagnostics_etv_cutoff_guard`) rechaza evidencia contractual desde el corte del proveedor (`2026-11-01T00:00:00Z`) y una fila legacy con `etv_requested_at` desde el corte. Las filas previas (5 fotos, 8 de visibilidad, 2 diagnósticos) quedaron atribuidas `legacy_static_v1` + `contract_default_pre_cutoff` (cuenta anterior al 2026-09-01, código sin flag, capturas pre-corte). Append-only intacto; `top_keywords` hereda el método del padre. **Contract PARQUEADO** (no aplicado): `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending` retira los DEFAULT transitorios, retira las UNIQUE legacy y agrega un CHECK `NOT VALID` en `seo_prospect_diagnostic_facts` (`estimated_monthly_traffic` exige `detail_json.etvMethodologyVersion`); condición: release en `main` (cumplida) + 7 días sin filas nuevas con evidencia contractual (cuenta desde 2026-09-03) + selectores explícitos en ambos runtimes (cumplida). Es la precondición 4 de `TASK-1806`.
+- **Delta 2026-09-03 (TASK-1805) — dimensión metodológica ETV en `seo_domain_overview_snapshots`, `seo_url_visibility_snapshots` y `seo_prospect_diagnostics`** (migración `20260902221432772_task-1805-etv-methodology-expand`, aplicada; fase expand). Columnas nuevas en las tres tablas: `etv_methodology_version` (CHECK cerrado `legacy_static_v1 | improved_layout_clickstream_v2`), `etv_methodology_evidence` (CHECK `explicit_request | contract_default_pre_cutoff`), `etv_requested_at timestamptz` y `etv_policy_version`, acopladas por el CHECK de consistencia `<tabla>_etv_evidence_consistency_check` (`explicit_request` ⇔ `etv_requested_at` y `etv_policy_version` no nulos). Sólo domain overview agrega `etv_historical_basis` (CHECK `fully_recomputed | calibrated_approximation`, admitido sólo con improved). **La idempotencia pasa a ser formula-aware:** `seo_domain_overview_capture_method_unique (normalized_domain, location_code, language_code, capture_date, etv_methodology_version)` y `seo_url_visibility_capture_method_unique (subject_kind, normalized_subject, location_code, language_code, capture_date, etv_methodology_version)`; los writers hacen `ON CONFLICT ON CONSTRAINT <method_unique>` y los pre-checks de frescura (`loadFreshOverviewDomains`, `loadFreshVisibilitySubjects`, `hasFreshRunForDomain`, `loadExistingMonths`) filtran por método — una fila legacy no ahoga una captura improved del mismo sujeto/día. Las UNIQUE legacy se conservan hasta el contract. Trigger `BEFORE INSERT` `guard_seo_etv_methodology_cutoff()` (`trg_seo_domain_overview_etv_cutoff_guard`, `trg_seo_url_visibility_etv_cutoff_guard`, `trg_seo_prospect_diagnostics_etv_cutoff_guard`) rechaza evidencia contractual desde el corte del proveedor (`2026-11-01T00:00:00Z`) y una fila legacy con `etv_requested_at` desde el corte. Las filas previas (5 fotos, 8 de visibilidad, 2 diagnósticos) quedaron atribuidas `legacy_static_v1` + `contract_default_pre_cutoff` (cuenta anterior al 2026-09-01, código sin flag, capturas pre-corte). Append-only intacto; `top_keywords` hereda el método del padre. **Contract aplicado por TASK-1806 el 2026-09-03:** `migrations/20260903103858964_task-1806-etv-methodology-contract.sql` retiró los DEFAULT transitorios y las UNIQUE legacy, y agregó el CHECK `NOT VALID` en `seo_prospect_diagnostic_facts` (`estimated_monthly_traffic` exige `detail_json.etvMethodologyVersion`). El `.pending` inicial fue eliminado; el readback histórico confirmó constraints formula-aware, 0 de 6 defaults transitorios y 0/0/0 filas contractuales posteriores al release. La condición y aplicación quedaron documentadas en TASK-1806; no hay un contract pendiente en TASK-1805.
 
 - `seo_competitors` (+ autoría TASK-1662, migración `20260828113457119`) · `seo_competitor_coverage_runs` · `seo_competitor_keyword_coverage` — el **gap competitivo** (TASK-1662). Un competidor es una **CLASIFICACIÓN CON AUTOR**, nunca una inferencia: `declared_by/at/source` acoplados por CHECK (vocabulario `operator_ui|nexa|mcp|seed|backfill`), `proposal_ref` **OPACA** cuando la declaración confirma una propuesta de máquina (top-N de TASK-1699, prospect de TASK-1709) — propone la máquina, declara el humano. Retirar cierra la vigencia (`clock_timestamp()`, jamás `NOW()`) con `retired_by` obligatorio (CHECK). Commands canónicos `declareCompetitors`/`retireCompetitors` (`competitors.ts`): **compromiso de gasto diferido** clase `trackKeywords` — techo `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5) contra conteo proyectado, outcome por ítem, reverso mismo PR, outbox `growth.seo.competitor.{declared,retired}` en la misma tx; el dominio del propio cliente es `invalid`. La **cobertura** (`competitor-coverage.ts`, flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **sólo ops-worker** —en Vercel es inerte—, **ON y vivo desde el 2026-08-28**; cron `ops-seo-competitor-coverage` día 18, nacido PAUSADO y **ENABLED desde el 2026-08-29** (⚠️ corregido: se afirmó «desde el 28» y era FALSO — la verdad live era `PAUSED` con `lastAttemptTime` VACÍO, nunca había corrido; se despausó el 29 tras verificar el `dryRun` contra la revisión activa), V1 `maxCompetitors=1`) compra `labs/google/domain_intersection` ×2 (target1=COMPETIDOR, target2=cliente; `intersections:false` → cliente ausente, `:true` → ambos ranquean; `include_serp_info` para las SERP features; row limit knob `GROWTH_SEO_COMPETITOR_COVERAGE_ROW_LIMIT` default 500 ≈ USD 0,15/competidor/ciclo) y persiste **INSUMOS fechados**, con **run ledger** como veredicto + ancla de frescura (un `captured` con 0 filas de gap es un hecho, no un hueco re-comprable — invariante TASK-1661; un `failed` no consume la ranura del día) y el `keyword_data` inline al mercado compartido (**productor #4**, costo 0). 🔴 **El GAP NO SE PERSISTE: se deriva al leer** (`readKeywordGap`, `keyword-gap-reader.ts`) — persistirlo lo congela y envejece sin señal. El reader: **excluye** toda keyword con impresiones GSC en 28 días (● gana sobre ◑ también al ordenar, `excluded.measuredInGsc` declarado); separa `content_gap` (cliente ausente → contenido nuevo) de `ranks_worse` (optimización) de `declaredTargets` (compromiso TASK-1659 con fecha — jamás un "hallazgo"); expone factores con procedencia (`searchVolume`/`cpcUsd`/`linkBarrier` vía `deriveLinkBarrier` + `marketAsOf`; `serpFeatures` como LISTA + `aiOverviewPresent`; `attainablePositionBand` derivada SOLO de la barrera, mapa puro `link_barrier_v1`) con `sin_dato` explícito; y 🔴 **NO devuelve orden propio** — listas alfabéticas neutrales, techo declarado en `truncated`; la cola de TASK-1700 es la autoridad de orden y ancla su `evidence_ref` opaco en `seo:competitor_gap:<coverage_run_id>`. Lanes: admin (`/api/admin/growth/seo/{competitors,keyword-gap}`, `target.configure`/`observation.read`) · ecosystem (writes sólo bindings `internal`; el gap **sólo-internal con 404 anti-oracle** — la comparativa competitiva NUNCA es client-facing, auditoría §7) · MCP `declare_seo_competitors`/`retire_seo_competitors` (scope `efeonce.mcp.seo.write` existente) + `get_seo_keyword_gap`. Señal `seo.competitor_coverage.stale`. Primera corrida real 2026-08-28 (Berel MX vs `comex.com.mx`): **USD 0,1076**, gap de 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Sanity 22/22 contra PG real (`_sanity-task-1662-keyword-gap.ts`).
 
@@ -351,7 +219,7 @@ ai_optimization /v3/ai_optimization/ research AEO sobre LLMs y menciones
 - **Honest degradation:** un audit que crawlea y devuelve 0 findings (`succeeded`) ≠ uno que falló el crawl (`failed`). Nunca fabricar snapshot.
 - **OnPage es task-based (async):** POST crea task, se poll-ea → ops-worker (queue+poll), no Vercel route handler.
 
-- **Metodología ETV — policy pura, no flag en el transporte (TASK-1805, 2026-09-03):** la fórmula de `etv` no se inyecta en el cliente genérico ni se copia por callsite; la fija `src/lib/growth/seo/etv-methodology/**` (sin `server-only`: corre en Vercel y en el ops-worker). `families.ts` clasifica las **14 familias Labs ETV-capable**: 6 `etv_consumed` (`ranked_keywords` por dos caminos —url-visibility y prospecto—, `relevant_pages`, `subdomains`, `domain_rank_overview`, `historical_rank_overview`, `bulk_traffic_estimation`), 3 `etv_ignored` (`competitors_domain`, `domain_intersection`, `historical_serps`) y 5 `provider_supported_not_enabled` con task dueña (`serp_competitors`→`TASK-1809`, `categories_for_domain` y `domain_metrics_by_categories`→`TASK-1808`, `page_intersection`→`TASK-1810`, `historical_bulk_traffic_estimation`→`TASK-1811`). `buildEtvMethodologyRequest({ endpoint, env?, now?, methodologyOverride? })` devuelve `{ requested, providerEffective, requestedAt, policyVersion, evidence: 'explicit_request', requestParams: { use_improved_etv } }` y **falla cerrado** (`EtvMethodologyPolicyError`, códigos `unsupported_etv_methodology | methodology_not_available | mixed_etv_methodology | etv_methodology_drift | legacy_requested_after_cutoff | invalid_etv_methodology_config`) ante endpoint no consumido o desconocido, config inválida o legacy desde `ETV_PROVIDER_CUTOFF_ISO = 2026-11-01T00:00:00.000Z` (`deriveProviderEffectiveEtvMethodology`: desde el corte todo es improved). `resolveEtvHistoricalCalculationBasis` decide `fully_recomputed` (meses desde 2026-07) o `calibrated_approximation`. Selector de escritura `GROWTH_SEO_ETV_METHODOLOGY_VERSION` (`resolveConfiguredEtvMethodology`; ausente = `legacy_static_v1`, `source: 'default'`); `ETV_METHODOLOGY_POLICY_VERSION = etv-policy.v1`; `AI_OVERVIEW_ETV_ATTRIBUTION = modeled_uniform_share_among_cited_domains`. Los siete caminos consumidores piden el flag por la policy: `domain-overview/capture.ts`, `domain-overview/history-backfill.ts` (base histórica por mes; conserva `include_clickstream_data: false`), `domain-overview/traffic-estimation.ts`, `url-visibility/capture.ts`, `url-visibility/relevant-pages.ts` (`relevant_pages` + `subdomains`) y `prospect/collect.ts` (`ranked_keywords`; `competitors_domain` NO recibe el flag). `persistDomainOverviewSnapshots` / `persistUrlVisibilitySnapshots` exigen `etvMethodology: PersistedEtvMethodology` por tipo. Los selectores viven en `services/ops-worker/deploy.sh` (`:-legacy_static_v1`, protegidos por `deploy-contract.test.ts`) y en Vercel Production + staging; `/health` del ops-worker expone `etvMethodology { configuredWriteMethod, configuredWriteSource, configuredReadMethod, policyVersion, providerCutoffAt, afterCutoff, valid }`. Evaluador A/B (`evaluator.ts`, puro): gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED` (OFF) + knobs `GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST` / `_MAX_REQUESTS` / `_BUDGET_USD` (default vacío/0/0 = fail-closed); `planEtvEvaluation` (`exact_ab` = 2 requests por celda; `temporal_canary` declarado como no-paridad), `dryRunEtvEvaluation` (`providerCalls: 0`), `compareEtvSnapshots`, `compareEtvWithGscBenchmark`; `replay.ts` (server-only) proyecta fixtures con los parsers de producción. Improved NO está activado: shadow pagado, decisión histórica y cutover = `TASK-1806`.
+- **Metodología ETV — policy pura, no flag en el transporte (TASK-1805, 2026-09-03):** la fórmula de `etv` no se inyecta en el cliente genérico ni se copia por callsite; la fija `src/lib/growth/seo/etv-methodology/**` (sin `server-only`: corre en Vercel y en el ops-worker). `families.ts` clasifica las **14 familias Labs ETV-capable**: 6 `etv_consumed` (`ranked_keywords` por dos caminos —url-visibility y prospecto—, `relevant_pages`, `subdomains`, `domain_rank_overview`, `historical_rank_overview`, `bulk_traffic_estimation`), 3 `etv_ignored` (`competitors_domain`, `domain_intersection`, `historical_serps`) y 5 `provider_supported_not_enabled` con task dueña (`serp_competitors`→`TASK-1809`, `categories_for_domain` y `domain_metrics_by_categories`→`TASK-1808`, `page_intersection`→`TASK-1810`, `historical_bulk_traffic_estimation`→`TASK-1811`). `buildEtvMethodologyRequest({ endpoint, env?, now?, methodologyOverride? })` devuelve `{ requested, providerEffective, requestedAt, policyVersion, evidence: 'explicit_request', requestParams: { use_improved_etv } }` y **falla cerrado** (`EtvMethodologyPolicyError`, códigos `unsupported_etv_methodology | methodology_not_available | mixed_etv_methodology | etv_methodology_drift | legacy_requested_after_cutoff | invalid_etv_methodology_config`) ante endpoint no consumido o desconocido, config inválida o legacy desde `ETV_PROVIDER_CUTOFF_ISO = 2026-11-01T00:00:00.000Z` (`deriveProviderEffectiveEtvMethodology`: desde el corte todo es improved). `resolveEtvHistoricalCalculationBasis` decide `fully_recomputed` (meses desde 2026-07) o `calibrated_approximation`. Selector de escritura `GROWTH_SEO_ETV_METHODOLOGY_VERSION` (`resolveConfiguredEtvMethodology`; ausente = `legacy_static_v1`, `source: 'default'`); `ETV_METHODOLOGY_POLICY_VERSION = etv-policy.v1`; `AI_OVERVIEW_ETV_ATTRIBUTION = modeled_uniform_share_among_cited_domains`. Los siete caminos consumidores piden el flag por la policy: `domain-overview/capture.ts`, `domain-overview/history-backfill.ts` (base histórica por mes; conserva `include_clickstream_data: false`), `domain-overview/traffic-estimation.ts`, `url-visibility/capture.ts`, `url-visibility/relevant-pages.ts` (`relevant_pages` + `subdomains`) y `prospect/collect.ts` (`ranked_keywords`; `competitors_domain` NO recibe el flag). `persistDomainOverviewSnapshots` / `persistUrlVisibilitySnapshots` exigen `etvMethodology: PersistedEtvMethodology` por tipo. Los selectores viven en `services/ops-worker/deploy.sh` (`:-improved_layout_clickstream_v2`, protegidos por `deploy-contract.test.ts`; la policy conserva legacy como fallback cuando no hay configuración) y en Vercel Production + staging; `/health` del ops-worker expone `etvMethodology { configuredWriteMethod, configuredWriteSource, configuredReadMethod, policyVersion, providerCutoffAt, afterCutoff, valid }`. Evaluador A/B (`evaluator.ts`, puro): gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED` (OFF) + knobs `GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST` / `_MAX_REQUESTS` / `_BUDGET_USD` (default vacío/0/0 = fail-closed); `planEtvEvaluation` (`exact_ab` = 2 requests por celda; `temporal_canary` declarado como no-paridad), `dryRunEtvEvaluation` (`providerCalls: 0`), `compareEtvSnapshots`, `compareEtvWithGscBenchmark`; `replay.ts` (server-only) proyecta fixtures con los parsers de producción. Improved está activado desde el cutover de TASK-1806 (03/09); ambos selectores improved revalidados en el worker el 04/10. El evaluador pagado permanece OFF en los runtimes.
 
 **Costos DataForSEO (verificado 2026-06):** Labs desde ~$0.0001/item + ~$0.01/task; OnPage crawl **$0.000125/pág**, JS render **$0.00125/pág**, **Lighthouse $0.00425/pág**; Backlinks **$0.02/req + $0.00003/fila**. Audits programados (no on-demand), cache, presupuesto por-org.
 
@@ -1330,7 +1198,8 @@ E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el 
 - Data platform: `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - Entitlements: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - Full API Parity: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
-- Funcional + manual: pendientes (exit criteria EPIC-022 — documentación triple).
+- Funcional: [Módulo SEO](../documentation/growth/modulo-seo-search-visibility-360.md).
+- Manuales operativos: [GSC histórico](../manual-de-uso/growth/backfill-historico-gsc.md), [auditoría de sitio](../manual-de-uso/growth/usar-auditoria-sitio-seo.md), [hallazgos de sitio](../manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md) y [transición ETV](../manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md). Las capabilities futuras deberán extender la documentación con su entrega.
 
 ## 17. Placement y camino de extracción a Wave (`wave.efeonce.org`) — vigente 2026-08-05
 
@@ -2103,40 +1972,3 @@ Una tool de lectura sólo consume evidencia persistida. Capturar, escribir o com
 separada cuando exista un consumer legítimo, con presupuesto, idempotencia, audit, confirmación y el scope de
 blast-radius vigente; nunca se cablea un write scope al cliente PKCE público. La capacidad no está operativa hasta
 probar lane y gateway con allow/deny/fault y sincronizar `mcp:manifest` + `skills:mirrors`.
-
-## Delta 2026-09-03 — identidad metodológica ETV formula-aware en producción (TASK-1805)
-
-Release `5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba` (run `33698245254`, PR #217; el Slice 3 salió antes
-en PR #216). Lo que cambió por capa, con el detalle en su sección:
-
-- **Schema (§4.2):** columnas `etv_methodology_version` / `etv_methodology_evidence` / `etv_requested_at` /
-  `etv_policy_version` (+ `etv_historical_basis` en domain overview), UNIQUE formula-aware
-  `seo_domain_overview_capture_method_unique` y `seo_url_visibility_capture_method_unique`, trigger
-  `guard_seo_etv_methodology_cutoff()`; contract parqueado en
-  `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending` con condición de tres puntos.
-- **Policy (§6):** `src/lib/growth/seo/etv-methodology/**` (`contracts` · `families` · `policy` · `provenance` ·
-  `persisted` · `evaluator` · `replay`); selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION` (escritura) y
-  `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` (lectura), ausentes = `legacy_static_v1` explícito.
-- **Lectura (§5):** `etvMethodology` en todo `ok: true` de `readDomainOverview` / `readUrlVisibility` /
-  `readVisibilityConcentration`; `not_available_for_method` como `reason` del reader y `errorCode` del lane.
-- **Prospecto:** `runProspectDiagnostic` fija el método ANTES del claim (errorCode de dominio
-  `etv_methodology_rejected` → canónico `seo_etv_methodology_rejected`, 409); `claimProspectDiagnostic`
-  persiste la identidad en la cabecera y `finalizeProspectDiagnostic` actualiza `etv_requested_at`. El hecho
-  `estimated_monthly_traffic.detail` = `{ basis: 'etv_sum_organic', etvMethodologyVersion, sampleRows,
-  rowsWithEtv, rowLimit, truncated }`; el hecho `ai_overview_citations.detail` =
-  `{ etvAttribution: 'modeled_uniform_share_among_cited_domains', etvSummed: false }`.
-- **Observabilidad (§8):** señal `seo.etv_methodology.drift`; `/health` del ops-worker con bloque `etvMethodology`.
-- **Eventos:** los payloads de `growth.seo.domain_overview.snapshot_captured`,
-  `growth.seo.url_visibility.snapshot_captured` y `growth.seo.prospect_diagnostic.completed` **no cambian**
-  (coordenadas y resumen; el consumer re-lee PG, donde la metodología ya vive por fila).
-- **Sanity contra PG real:** `scripts/growth/_sanity-task-1805-etv-schema.ts` (17/17 en transacción con rollback,
-  incluye el contract) y `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (dry-run + replay + ledger intacto, 8/8).
-
-**Estado runtime verificado 2026-09-03:** los lanes de producción (Berel MX) sirven
-`etvMethodology.version = legacy_static_v1` con evidencia `contract_default_pre_cutoff`; `/health` del worker
-reporta `configuredWriteSource: env`; selectores presentes en Vercel Production + staging y en `deploy.sh`. La
-señal permanece en `awaiting_data` hasta la primera captura explícita del worker (crons `ops-seo-domain-overview`
-día 16 y `ops-seo-url-visibility` día 17). **Improved NO está activado.** Shadow pagado, decisión
-rebaseline/breakpoint, cutover y aplicación del contract quedan en `TASK-1806`. ADR:
-`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` (§Runtime Contract); runbook:
-`docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`.

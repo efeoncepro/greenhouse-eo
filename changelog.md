@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — SEO: reconciliación documental de EPIC-022
+
+- Censo de 84 hijas (43 complete, 3 en curso, 38 to-do), estados TASK-1655/1670/1671/1672/1805 e índices conciliados. Flag de hallazgos y selectores Improved ETV revalidados en worker activo; pendientes conductuales conservados.
+- [Evidencia y límites](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Sin cierres de tasks, cambio de configuración, calls pagadas, backfill ni emisión de informes.
+
 ## 2026-10-04 — Spot «Los Sparks»: Studio, Metricool y naming «Efeonce | AEO»
 
 - Spot cargado en Marketing Studio como CMP001-08 de CMP-001 (orgánico) y programado en Metricool: IG lun 05-oct 14:00 (portada 4:5), LinkedIn jue 08-oct 11:00; media re-alojada con SHA-256 idéntico.
@@ -616,19 +621,3 @@ gorra). El Trazo `staff-hoodie` no entró. El set queda en 36 Trazo + 43 Plastil
 en AXIS con el tag `v0.6.0` (`axis-graphic-line` 0.6.0, `axis-brand-assets` 0.3.4); Greenhouse fija axis-graphic-line
 0.6.0 y axis-brand-assets 0.3.4. Documentado en el ADR (delta D26), el manual §14, la doc funcional 1.11, el manual de
 uso 1.9 y las skills `efeonce-graphic-line` y `axis-design-system`.
-
-## 2026-09-27 — «La órbita» por superficie en el Artifact Composer (TASK-1919) y `foto:isotipo` (TASK-1920)
-
-Las 20 recetas aprobadas de la línea gráfica por superficie son plantillas del Artifact Composer en tres catálogos
-nuevos: `graphic-line-deck` (PDF 16:9, seis láminas), `graphic-line-stills` (heros web, el teléfono por ancho, caminero,
-último cuadro del loop y storyboard de motion) y `graphic-line-overlays` (capas de video en PNG con alfa). Una pieza sale
-entera de un intent con `pnpm brand:compose` (mapper puro `src/lib/brand-surfaces`: exige receta aprobada y valida con el
-contrato AXIS); opciones y pendientes fallan con `recipe-not-approved` y el video queda en motion
-(`recipe-outside-composer`). Motor domain-free: fondo transparente por plantilla, gate de tinta ponderado por alfa y fix
-de slots anidados; pintores de selección y CTA inyectados. `pnpm brand:tokens [--check]` y gate propio
-`pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; la deriva global de 60 frames es previa,
-ISSUE-122). Greenhouse fija AXIS `v0.3.8` (`efeonce.surface-composition` 0.1.1) y depende de `axis-graphic-line`.
-`pnpm foto:isotipo` compone el isotipo oficial sobre la prenda cuando `foto:emblema` muestra otro (TASK-1920). Local en
-`develop`, sin push; ruta productiva en TASK-1921. Docs: ADR del composer, runbook del gate, norma por superficie §2.1,
-índice de la línea, runbook AXIS, doc funcional 1.10, manual de uso 1.1 y skills `efeonce-graphic-line`, `deck-studio`,
-`motion-design-studio` y `efeonce-advertising-creative`.

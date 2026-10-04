@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
 > **Version:** 1.3
 > **Creado:** 2026-08-08 por Claude (TASK-1309)
-> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670 — hallazgos de sitio, hoy apagados)
+> **Ultima actualizacion:** 2026-10-04 por Codex (activación documentada desde 02/09; flag revalidado en worker activo).
 > **Documentacion funcional:** [Modulo SEO — Search Visibility 360](../../documentation/growth/modulo-seo-search-visibility-360.md)
 
 # Auditoria del sitio — leer la salud tecnica y priorizar
@@ -155,57 +155,11 @@ siendo un issue.
 | La auditoria fallo | El crawl no se pudo completar | Reintentar |
 | No pudimos cargar la auditoria | Fallo la lectura, no el crawl | Reintentar; si persiste, es un problema de plataforma |
 
-## Los hallazgos de sitio (todavía apagados)
+## Los hallazgos de sitio
 
-🔴 **Hoy esta pantalla no los muestra.** El motor existe y está verificado, pero el interruptor
-(`GROWTH_SEO_SITE_FINDINGS_ENABLED`) está en **OFF** y no se prende hasta que la pantalla sepa
-renderizarlos con su alcance correcto (`TASK-1671`). **Mientras tanto el punto ciego sigue abierto**:
-un sitio que le cierra la puerta a los rastreadores de ChatGPT, Perplexity o Claude **puntúa 95/100
-acá y se presenta como sano**. No le prometas esta cobertura a nadie todavía; la operación del
-encendido vive en [Operar los hallazgos de sitio](operar-hallazgos-de-sitio-seo.md).
+El flag de hallazgos está ON desde 02/09 y se revalidó el 04/10 en `ops-worker-00762-njg` (100% tráfico, Ready). La activación ya ocurrió. Readback PG 04/10: corrida `seoar-c9cb9376-6c0a-40e9-8aee-bf258bed1b38` del 28/09, `succeeded`, con 2 hallazgos de alcance sitio. Confirma persistencia; falta contrastar su precisión contra el sitio y verificar `seo.audit.stuck_tasks`. Un collect vacío no demuestra los evaluadores. [Evidencia](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 
-Esto es lo que vas a ver cuando se prenda, y cómo se lee.
-
-Todo lo demás en esta pantalla es de **página**: un título duplicado, una imagen sin texto
-alternativo. Estos cuatro chequeos son del **dominio entero** — un `robots.txt` no pertenece a
-ninguna página. Por eso, cuando aparezcan, no van a decir "N páginas afectadas".
-
-| Lo que vas a ver | Gravedad | Que significa |
-|---|---|---|
-| **Los motores de IA no pueden leer el sitio** | Crítico | El `robots.txt` le niega el paso a los rastreadores que **citan** páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso, el sitio no puede aparecer en esas respuestas |
-| **El servidor rechaza a los rastreadores** | Crítico | El `robots.txt` está limpio, pero el servidor o el CDN los rechaza igual. **Se arregla en el CDN o el firewall, no en `robots.txt`** — si le pides al cliente que edite el `robots.txt`, no va a pasar nada |
-| **Entrenamiento de modelos de IA bloqueado** | Aviso | El sitio bloquea a los rastreadores que recolectan contenido para **entrenar** modelos. **No es una falla.** Ver abajo |
-| **Sin datos estructurados en la portada** | Atención | La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca |
-| **Sin mapa del sitio** | Aviso | No hay sitemap en la ruta habitual ni declarado en `robots.txt` |
-| **El mapa del sitio declarado no responde** | Atención | El `robots.txt` anuncia un sitemap que no se puede leer. Los buscadores lo buscan justo ahí |
-| **Chequeo de sitio sin verificar** | Aviso | **No se pudo medir. Ni sano ni roto.** Ver abajo |
-
-### Retrieval y entrenamiento no se cuentan igual — y esa frase te la va a pedir el cliente
-
-Son dos permisos distintos que se ven parecidos, y confundirlos hace que le reportes una alarma a
-alguien que tomó una decisión a propósito.
-
-- **Los rastreadores de *retrieval*** leen el sitio **para citarlo en una respuesta**
-  (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`, `ChatGPT-User`). Bloquearlos
-  es **crítico**, y el efecto es directo y verificable: el sitio no puede aparecer.
-- **Los rastreadores de *entrenamiento*** recolectan contenido **para entrenar modelos** (`GPTBot`,
-  `Google-Extended`, `CCBot`, `anthropic-ai`, `Applebot-Extended`). Bloquearlos es una **decisión
-  sobre el uso del contenido**, legítima y frecuentísima —muchos medios lo hacen a propósito— y por
-  eso sale como **aviso, nunca como crítico**.
-
-Un sitio puede tener el retrieval completamente abierto y bloquear sólo entrenamiento: eso es un
-sitio **sano con una postura declarada**, y así hay que decirlo. Si se lo pintas en rojo al cliente,
-le enseñas a desconfiar del resto del informe — y la próxima vez que aparezca un crítico de verdad,
-no lo va a mirar.
-
-### "Sin verificar" no es "está bien"
-
-Cuando la revisión no se pudo completar —el sitio no respondió, se agotó el tiempo, el `robots.txt`
-no se pudo leer— el hallazgo dice **"Chequeo de sitio sin verificar"** y trae la razón.
-
-**No es un veredicto.** No significa que esté bien ni que esté mal: quedó sin medir. Si aparece, lo
-que se reporta es "no lo pudimos medir", nunca "está correcto". Declarar sano algo que no miramos es
-exactamente el error que estos chequeos existen para evitar.
+Se muestran bajo «Acceso y presentación del sitio», con alcance de dominio, severidad y estado de verificación; no se cuentan como una página afectada.
 
 ## Que no hacer
 
@@ -272,7 +226,7 @@ exactamente el error que estos chequeos existen para evitar.
   `src/lib/growth/seo/site-audit/queue-audit.ts`.
 - Los hallazgos de sitio (rastreadores de IA, borde/WAF, datos estructurados, sitemap): el motor está
   en `src/lib/growth/seo/site-audit/site-findings.ts` con sus fichas es-CL en
-  `GH_GROWTH_SEO_AUDIT_ISSUES`, y hoy está **apagado** detrás de `GROWTH_SEO_SITE_FINDINGS_ENABLED`.
+  `GH_GROWTH_SEO_AUDIT_ISSUES`, y está habilitado por `GROWTH_SEO_SITE_FINDINGS_ENABLED` (ON en el worker activo, readback 04/10).
   Operación del encendido: [Operar los hallazgos de sitio](operar-hallazgos-de-sitio-seo.md). Spec:
   `docs/tasks/complete/TASK-1670-growth-site-probes-kernel-seo-audit.md`; la superficie que habilita
   el flip: `docs/tasks/to-do/TASK-1671-growth-seo-site-findings-audit-surface.md`.

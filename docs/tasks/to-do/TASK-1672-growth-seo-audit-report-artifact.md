@@ -147,6 +147,8 @@ Grupo Berel**, no es supuesto.
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -162,10 +164,10 @@ Grupo Berel**, no es supuesto.
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Diseño; artefacto web/print especializado de Insights sin implementar. TASK-1670/1671 complete y flag del worker ON, revalidado 04/10; ya no falta activar el flag. Antes de publicar el artefacto, contrastar una corrida real y su tratamiento sitio/página; no inferirlo de un collect vacío.`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `none` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
+- Blocked by: `none` en tasks; activación de hallazgos cumplida. Gate de publicación: corrida materializada contrastada y evidencia vigente, ver auditoría 04/10.
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
