@@ -32,6 +32,8 @@ La publicación y el cierre del 03/10 corresponden a la versión anterior; no ac
 Implementación y QA del refinamiento: [dossier](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md).
 Think `09e1976` comprometido y empujado a `origin/main` con autorización el 04/10. Pendientes para este delta: verificar despliegue, activar el orden gobernado del formulario y readback live.
 
+Nueva iteración autorizada el 04/10: hero con demostración ilustrativa y botones por contraste. Implementación local y QA en [hero-demo](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md). Think `6aab907` comprometido y empujado a `origin/main` por pedido del operador. Vercel en despliegue al verificar; readback pendiente. Documentación Greenhouse local para no arrastrar dos commits previos de Insights. Error localhost diagnosticado como CORS; no se amplían orígenes productivos.
+
 ## Summary
 
 La landing pública `think.efeoncepro.com/brand-visibility`, donde está el formulario del diagnóstico de visibilidad en
