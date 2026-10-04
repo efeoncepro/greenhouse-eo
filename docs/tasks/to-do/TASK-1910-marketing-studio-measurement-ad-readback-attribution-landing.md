@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
+
+- La evidencia de paid (anuncio activo, entregas observadas) se adjunta a **activaciones pagadas** (`kind: span`) como `execution_record` del modelo de TASK-2001; el `buying method` y el `deal type` viven en el anuncio (ADR de estrategia §15).
+
 ## Delta 2026-09-26 — decisiones del operador
 
 - **El canje de `marketing_studio.integration.manage` verifica la acción única `update`** (decisión de Julio Reyes,

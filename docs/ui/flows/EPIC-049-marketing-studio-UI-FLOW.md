@@ -188,6 +188,7 @@ el master flow; `MS-N3` se descompone en subnodos y se agregan `MS-N8…MS-N10`.
 | `MS-N3.9` | Hoja de revisión de tres estados + historial | `?review=creative\|media\|launch` (se consume) | TASK-1895 sobre TASK-1894 | diseño |
 | `MS-N3.x` | Superpuestas: `Sheet`, `ConfirmDialog`, `ConflictDialog`, `UploadVersionDialog`, `WriteGateNotice` | sin URL | TASK-1895 | diseño |
 | `MS-N4` | Calendario global (vuelos por semana, posts vencidos a verificar), Piezas globales, Medios globales | `/calendar?month=YYYY-MM`, `/library`, `/media` | TASK-1887 | en vivo |
+| `MS-N4` (calendario de activaciones) | Calendario de Studio con filtros por modality/family/platform/account, estados de ejecución, hoja de activación y bandeja «Ejecución sin activación» (ADR de estrategia §15) | `/calendar?month=…&view=week&modality=…&activation=…` | TASK-2001 + TASK-2002 | diseño |
 | `MS-N5` | Búsqueda ⌘K | overlay global | TASK-1887 | en vivo |
 | `MS-N6` | Login Efeonce ID (redirect), callback, **sin acceso**, **control de cuenta / salir** | `/auth/login`, `/auth/callback`, `POST /auth/logout` | TASK-1898 (runtime) + delta de UI en TASK-1895 | diseño |
 | `MS-N7` | Agentes por Efeonce MCP (tools `studio.*`) | `mcp.efeonce.org/mcp` | TASK-1890 (manifiesto) + TASK-1891 (federación) | diseño; no es superficie visual |

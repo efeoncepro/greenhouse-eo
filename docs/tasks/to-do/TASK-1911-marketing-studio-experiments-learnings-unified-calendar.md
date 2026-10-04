@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
+
+- Por decisión del operador (ADR de estrategia §15) el **calendario unificado** pasa a TASK-2001 (reader de activaciones con evidencia de ejecución y estados `planned · scheduled · scheduled_off_plan · published · overdue · cancelled`) y TASK-2002 (UI). Esta task conserva experimentos y biblioteca de aprendizajes, y suma las **ventanas de experimento** al reader de calendario de TASK-2001 como capa adicional; no construye otro reader de calendario.
+
 ## Status
 
 - Lifecycle: `to-do`

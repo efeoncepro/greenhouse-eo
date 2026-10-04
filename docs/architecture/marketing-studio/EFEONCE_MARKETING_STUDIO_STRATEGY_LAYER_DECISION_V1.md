@@ -511,13 +511,30 @@ Meta Ads sale en Instagram, Facebook y Threads; una de DV360, en sitios, apps de
   cliente o de creator) o como organic (repost). Se registra en la pieza como **content source** (`brand` · `creator` ·
   `ugc` · `ai_generated`), junto a sus derechos de uso (`rights.licenseKind`), nunca dentro de `channel_key`.
 
-**Calendario.** Cada activación lleva campaña, modalidad, familia, plataforma, placement, cuenta, mercado, pieza(s) en
-su versión exacta y copy. Una activación orgánica es un **punto** (fecha y hora); una pagada es una **franja** (el
-flight). El calendario se filtra por las cuatro dimensiones. Una publicación agendada en una herramienta externa
-(Metricool) que no tenga campaña se muestra en «Hoy» como **pendiente de asignar**, nunca invisible.
+**Calendario: es de Studio; la ejecución es evidencia** (decisión del operador 2026-10-04). El calendario muestra el
+**plan** de activaciones de Studio, no el reflejo de una herramienta. Cada activación lleva campaña, modalidad, familia,
+plataforma, placement, cuenta, mercado, pieza(s) en su versión exacta, copy y **fecha planificada**; una orgánica es un
+**punto** (fecha y hora) y una pagada una **franja** (el flight). Se filtra por las cuatro dimensiones.
+
+Las herramientas que ejecutan (Metricool para organic; Meta Ads, Google Ads, LinkedIn Ads o un DSP para paid) **no
+definen el plan**: aportan **evidencia de ejecución** que se adjunta a la activación como atributo (referencia en la
+herramienta, fecha programada allí, fecha observada de publicación, permalink). Studio compara plan contra ejecución:
+
+| Estado de ejecución | Cuándo |
+|---|---|
+| `planned` | En el plan; ninguna herramienta la tiene programada |
+| `scheduled` | La herramienta la tiene programada en la fecha del plan (dentro de la tolerancia del canal) |
+| `scheduled_off_plan` | Programada, pero en otra fecha u hora que la planificada |
+| `published` | La plataforma confirma que salió (fecha y permalink observados) |
+| `overdue` | Pasó la fecha del plan sin evidencia de publicación |
+| `cancelled` | La activación se canceló en Studio |
+
+Lo que una herramienta tiene programado **sin** activación no se convierte en plan por sí solo: aparece en «Hoy» como
+**ejecución sin activación** y una persona la vincula a una activación existente o crea la activación con su campaña.
+Programado sigue sin ser publicado (invariante vigente): sólo la observación con fecha dice qué pasó.
 
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
 plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra
 `content source` en la pieza y agrega `buying method` y `deal type` al anuncio (`ad_configuration`) y a la línea de
-presupuesto (`budget_line`). La entidad *activación*, el descubrimiento de lo agendado en Metricool y el vínculo activación ↔ versión
-de pieza quedan para una task nueva de EPIC-049 (por crear). Nada de esto está en runtime todavía.
+presupuesto (`budget_line`). La entidad *activación*, la evidencia de ejecución, el descubrimiento de lo agendado en Metricool y el calendario
+son TASK-2001 (contrato) y TASK-2002 (UI); toman el calendario unificado que estaba en TASK-1911. Nada de esto está en runtime todavía.

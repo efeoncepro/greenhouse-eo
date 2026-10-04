@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
+
+- El plan de contenidos sigue siendo **qué producir** (versión aprobada). La salida concreta a un canal es una **activación** (TASK-2001): un ítem puede tener varias. `setContentPlanItemProgress` vincula también `activation_id`, y el hueco considera cubierto un ítem cuando su activación tiene evidencia `published`, no sólo un `post_id`.
+
 ## Delta 2026-10-02
 
 - **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`); Entregable C diferido por el
