@@ -1,0 +1,39 @@
+# TASK-2001 — plan de ejecución local (2026-10-04)
+
+Goal confirmado por el operador en Codex. Sin push ni deploy. Studio main y Greenhouse develop compartidos;
+implementación secuencial por dependencias causales, sin subagentes. Documentación en Greenhouse.
+
+## Audit y decisiones
+
+- ADR gobernante: Marketing Studio Strategy Layer §15 + API-first + SSOT/ingest; Delta de la task y UI aprobada prevalecen sobre los seis estados antiguos.
+- TASK-1905 ya entrega catálogo/taxonomía/UTM; pendientes ICP y MCP no bloquean. TASK-2003 no tiene implementación ni archivos reservados, confirmado por su chat.
+- Commit previo 3cc5fa968 conserva los bloques propios de Codex retirando TASK-1899 en TASK-2001/2002.
+- Reusar kernel runCommand, permisos/actor/scopeCampaigns, ChannelValidator, renditionPath, audit y worker_run.
+- Activaciones escribibles en campañas onedrive: son territorio de Studio y el import no las define.
+- Emparejar sólo por referencia inequívoca de campaña (UTM id/slug), cuenta/plataforma y una candidata dentro de tolerancia. Una cuenta compartida nunca identifica una campaña.
+- Organic: 15 minutos; paid: 0 días por cada extremo en zona IANA de la cuenta. Tolerancia versionada con el catálogo.
+- Historial append-only; no guardar estado calculado. Published/delivering/ended requieren observación del proveedor.
+- Validación en seco no escribe ni historial ni idempotency records; reprogramación sólo cambia plan.
+- Evidencia owned: adapters de lectura HubSpot/WordPress; sin evidencia observada nunca simular publicación.
+- Riesgos: enlaces entre campañas/organizaciones, pérdida de posts durante coexistencia, concurrencia y tracking congelada. Probar negativos con PostgreSQL real local.
+
+## Orden de slices y evidencia
+
+1. Esquema aditivo, relaciones/constraints/grants, Always On en commands y readers existentes; up/down/up local y pruebas reales de integridad/autoridad/replay.
+2. Contratos y commands de activación, estados puros y validación: cada operación nace con ruta/tool/manifiesto. Tests focales + PostgreSQL antes de avanzar.
+3. Registro de evidencia, descubrimiento Metricool, owned readers, vínculos y creación desde ejecución; historial y tracking freeze atómicos; mocks de proveedor + SQL real, nunca publicación externa.
+4. Readers/calendario/atención, avisos y frescura, filtros de mercado, zona de cuenta/Santiago, previews de versiones exactas y permisos.
+4b. Tracking URL pura con catálogo, validación de destino y comparación de evidencia; congelamiento y slug estable.
+5. Compatibilidad/backfill en seco, CLI dinámica, manifiesto/manuales, check/build completos y QA. Datos reales se migran sólo en rollout autorizado.
+
+Cada corte deja evidencia en la task. Flags STUDIO_ACTIVATIONS_ENABLED y MEDIA_WORKER_METRICOOL_DISCOVERY_ENABLED OFF por defecto. PostgreSQL temporal local, sin credenciales remotas.
+
+## Cierre honesto
+
+Implementación local no equivale a task complete: migraciones staging/prod, scheduler, backfill confirmado, herramientas remotas y canary MCP real quedan pendientes de autorización/dependencias. No ampliar TASK-2002 ni TASK-2003.
+
+## Avance
+
+Slices 1–4 PASS en Studio: 39a74c0, 78205fb, af608a8, 9bc974e. Último check: 264 tests + 7 gates, todos los carriles PostgreSQL habilitados, cero skips.
+
+Delta blog recibido durante ejecución: CMS y dominio pertenecen a la cuenta owned del cliente; draft_url sólo se guarda/devuelve. Añadir slice de URL pública y confirmación personal de fecha, con herramienta MCP y evento confirmed_by. WordPress se generaliza a sitios del cliente autorizados. Dossier/gate/medición SEO-AEO fuera de alcance, follow-up sin ID. Se conserva íntegro el bloque del operador y sus referencias aprobadas de TASK-2002 (60ef4e26c).

@@ -1,5 +1,30 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-04 (blog) — CMS del cliente, borrador en Notion y medición SEO/AEO
+
+Decisiones del operador sobre las hojas de blog de TASK-2002 (canvas, página «v3.2 · Planificar y operar», tableros «Blog ·
+antes de publicar» y «Blog · después de publicar»). Corrigen el delta anterior, que daba por hecho WordPress:
+
+- **El CMS es del cliente, no de Efeonce.** Cada sitio declara su CMS (`wordpress`, `drupal`, `webflow`, `modyo`,
+  `hubspot_cms` u `other`) como atributo del sitio o cuenta owned, no de la activación. La dimensión visible es «CMS» y
+  va separada de «Sitio» (dominio). El lector de WordPress sigue aprobado; un CMS con lector conectado aporta la fecha de
+  publicación observada.
+- **CMS sin lector conectado.** La evidencia sale de la URL pública (respuesta 200, robots, canonical y presencia en el
+  sitemap) y una persona confirma la fecha de publicación (`confirmed_by` persona, en el registro de eventos). Sin esa
+  fecha observada o confirmada la activación no pasa a `published`.
+- **Borrador en el Content Hub de Notion.** La activación de blog guarda `draft_url`, el enlace al borrador en el Content
+  Hub de Notion, que es donde se escribe. La hoja lo muestra como enlace externo; Studio no lee ni escribe Notion en esta
+  task.
+- **SEO y AEO quedan fuera del alcance de esta task.** El dossier antes de publicar (búsqueda e intención, metadata,
+  fan-out y citabilidad, E-E-A-T y schema, enlaces y gate de publicación) y la medición después de publicar (Search
+  Console: URL Inspection y rendimiento de 28 días; panel de prompts del AI Visibility Grader y del Search Visibility 360;
+  GA4: sesiones orgánicas, referidas por IA y conversiones) necesitan su propio contrato. Va como follow-up `backend-data`
+  y no bloquea el cierre. Lo que sí deja esta task: `draft_url`, el CMS del sitio y la evidencia de publicación.
+- **Etiquetas de honestidad del dato:** todo valor de terceros se marca «Estimado · tercero» con fuente y fecha; lo de
+  Search Console, el Grader y GA4 se marca «Medido». Sin dato se muestra «no medido», nunca un número inventado.
+- **Pendientes del operador:** fuente principal de volumen y dificultad (Semrush o SV360); panel de prompts por campaña o
+  por clúster temático; si el gate bloquea la autorización de publicar o sólo avisa.
+
 ## Delta 2026-10-04 (posterior) — lo que la UI aprobada necesita del contrato
 
 El operador aprobó la dirección visual completa de TASK-2002 (páginas v3, v3.1 y v3.2; renders en
@@ -88,7 +113,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -101,10 +126,10 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Diseno — creada 2026-10-04 por decisión del operador (ADR de estrategia §15: el calendario es de Studio; la ejecución es evidencia); ningún slice empezado`
+- Status real: `En ejecución local — preflight y coordinación completados; Slice 1 verificado (schema + Always On); Slice 2 verificado; Slice 3 verificado local; Slice 4 verificado; Slice 4b en construcción; sin push, migración remota ni rollout`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1905 (catálogo de canales con channel_key, valores UTM por canal y semilla de §15). La evidencia de paid desde Meta/LinkedIn llega con TASK-1910`
+- Blocked by: `none`
 - Branch: `efeonce-marketing-studio main (migraciones, dominio, worker, rutas, registro, manifiesto) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (sync del manifiesto); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -175,6 +200,14 @@ Reglas obligatorias:
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
 - Skill `efeonce-marketing-studio` (`references/contracts.md`, `operations.md`, `lessons.md`)
 - `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md` (nodos `MS-N1` Hoy y `MS-N4` Calendario)
+
+## Dependency readback — 2026-10-04
+
+TASK-1905 entrega el catálogo y taxonomía requeridos en Studio `74073de1188f`: migraciones
+`1791144092031_channel-catalog.sql` y `1791144092429_channel-key-expand.sql`, seed v1 de 52 canales,
+API 1.6.0. Código y dossier `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`
+verificados durante el preflight. Sus pendientes ICP/capability/federación no bloquean esta implementación local.
+TASK-1910 conserva los adapters de paid; TASK-2003 se coordina en paralelo, sin ownership activo del registro.
 
 ## Dependencies & Impact
 
@@ -463,6 +496,37 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 
 ## Verification
 
+### Slice 4 — evidencia local 2026-10-04
+
+- Studio `9bc974e`, 71 tools. Detalle, lista por campaña y ejecución sin activación; calendario aditivo con filtros por mercado/dimensiones/estado, fechas en zona de cuenta y cursor. Eventos en detalle y previews de la versión exacta.
+- Reader calcula pieza no aprobada, versión distinta identificable, colisión y herramienta stale. `activationItems` es un campo aditivo de Atención para conservar clientes actuales con enum exhaustivo; TASK-2002 consume este campo junto a `activations`/`executionTools`.
+- Compatibilidad de posts proyecta observaciones Metricool desde execution_record y mantiene identidad/revisión de scheduled_post durante coexistencia. Flags OFF conservan el reader legado.
+- `pnpm check` PASS con todos los PG, 264 Vitest y 7 gates. Integración valida DTOs reales, hora local, cursor, aislamiento de organización, avisos por versión, calendario/atención y health SQL (`activations_overdue`, frescura de ambos jobs).
+
+### Slice 3 — evidencia local 2026-10-04
+
+- `pnpm check` PASS: 264 Vitest, 7 gates, cero skips, todos los carriles PG. Migración de frescura up/down/up PASS en Postgres 18 local.
+- Descubrimiento Metricool acotado −30/+120 días, bindings administrados por organización + allowlist de marcas; un registro de cuenta creado por API no concede lectura del proveedor. Observación idempotente, vínculo único por UTM/cuenta/plataforma/tolerancia, respeto de desvinculación manual y congelamiento atómico con evidencia publicada.
+- Tools link/unlink/from_execution declaradas (68 total), con revisión de ambos recursos y precarga `source: tool`. El readback anterior puede reflejar observaciones en la evidencia nueva conservando `scheduled_post`.
+- Lector WordPress público implementado con paginación y comprobación de URL viva; consumidor de emails Greenhouse con verificación de organización/portal y `sentAt` explícito. No hay reader de emails de Greenhouse entregado en este checkout: endpoint/consumer/binding y canary reales siguen pendientes; nunca se sustituye por credencial directa HubSpot.
+- Jobs y scheduler preparados; flags nuevos OFF por defecto. Ningún scheduler/deploy/consulta remota de cuentas fue ejecutado. Manifiesto corrige resolución de referencias de schemas de cuerpos antes de expandir argumentos MCP; coordinación enviada a TASK-2003.
+
+### Slice 2 — evidencia local 2026-10-04
+
+- Studio `78205fb`: plan/update/reschedule/cancel y registro/listado de cuentas; seis tools nuevas (65 total). Dry-run, idempotencia, If-Match, límites de copy/formato, aprobación de versiones y colisiones.
+- `pnpm check` PASS con todos los carriles Postgres: 259 Vitest y 7 gates, cero skips. Los ocho estados cubren 15 minutos orgánicos, 0 días paid, ambos extremos del intervalo y fecha local de cuenta.
+- La integración real detectó y corrigió defaults de Zod que borraban fechas en PATCH parcial. Reprogramar conserva intacta la evidencia de la herramienta; cancelar conserva historial y observaciones.
+- Flags OFF; no push ni operaciones remotas.
+
+### Slice 1 — evidencia local 2026-10-04
+
+- PostgreSQL 18 local descartable en 127.0.0.1:55441: migración `1791149145299_campaign-activations.sql` up/down/up PASS; cinco tablas, relaciones compuestas por campaña/organización/cuenta, historial append-only, tracking congelada y zona IANA.
+- Always On en create/update/readers existentes, commands y tools ya registradas; flag OFF niega crearlo. Tolerancia versionada: organic 15 minutos, paid 0 días. API 1.7.0 / manifiesto regenerado (59 tools, sin nuevas operaciones todavía).
+- `pnpm check` con todos los carriles PG habilitados: 255 Vitest PASS (218 dominio, 9 contratos, 8 observabilidad, 6 worker, 14 web), 7 gates PASS; cero skips. Incluye dry-run sin escritura, replay, revisión, anti-oráculo, FK cross-campaign/tenant, fecha publicada sin observación denegada, historial protegido y freeze.
+- Seed v1/52 canales publicado sólo en base local de pruebas; no se cambió catálogo remoto. Logs de esta corrida en `/tmp/studio-task-2001/`.
+- Sin push, migración staging/prod, datos reales/backfill, UI ni canary MCP. Los AC de activaciones se verificarán al completar los commands/readers.
+
+
 - `pnpm check` y `pnpm build` (Studio); tests del worker
 - Migración y backfill en staging con evidencia SQL
 - Descubrimiento real contra Metricool en staging
@@ -481,6 +545,8 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 
 - Contract de `scheduled_post` después del release.
 - Evidencia pagada (TASK-1910) y ventanas de experimento (TASK-1911) en el mismo reader.
+- Contrato SEO/AEO del blog (`backend-data`, sin ID reservado): dossier y gate antes de publicar, y lector de Search
+  Console, panel del AI Visibility Grader y GA4 después de publicar. Ver el delta «(blog)» de 2026-10-04.
 
 ## Open Questions
 
