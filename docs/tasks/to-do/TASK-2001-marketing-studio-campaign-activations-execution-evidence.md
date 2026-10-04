@@ -4,6 +4,10 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
+
+- Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md): cada activación expone su **tracking URL** generada con la convención (`utm_content` = id de la activación, `utm_id` = id de la campaña); la evidencia de ejecución compara la URL publicada con la generada (sin UTM o con otra = advertencia).
+
 ## Status
 
 - Lifecycle: `to-do`

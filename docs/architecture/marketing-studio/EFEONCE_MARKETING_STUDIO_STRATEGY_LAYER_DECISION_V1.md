@@ -533,6 +533,15 @@ Lo que una herramienta tiene programado **sin** activación no se convierte en p
 **ejecución sin activación** y una persona la vincula a una activación existente o crea la activación con su campaña.
 Programado sigue sin ser publicado (invariante vigente): sólo la observación con fecha dice qué pasó.
 
+**Medición: UTM derivadas de la activación** ([RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md),
+as of 2026-10-04). Las UTM siguen siendo la única señal de origen que leen GA4, HubSpot y el warehouse sin integración y
+que sobrevive a la eliminación de click IDs en Safari. Studio genera la tracking URL de cada activación; nadie escribe
+UTM a mano: `utm_source` = plataforma de aparición, `utm_medium` derivado de modalidad × familia y compatible con el
+agrupamiento por defecto de GA4 (`paid_social`, `social`, `cpc`, `display`, `paid_video`, `email`), `utm_campaign` =
+slug de la campaña, `utm_id` = id de la campaña, `utm_content` = id de la activación, `utm_source_platform` = plataforma
+de compra en paid. Google Ads con auto-tagging (sin UTM o con el set completo, nunca parcial); nunca UTM en enlaces
+internos; lo que GA4 no tiene como canal se resuelve con un custom channel group, no inventando mediums.
+
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
 plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra
 `content source` en la pieza y agrega `buying method` y `deal type` al anuncio (`ad_configuration`) y a la línea de

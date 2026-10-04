@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
+
+- Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md): el Slice 5 ya no define la convención UTM por `channel_key`; la toma del catálogo (TASK-1905) y de la activación (TASK-2001). El plan de medición declara eventos de conversión, cadencia y responsable.
+
 ## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
 
 - El plan de contenidos sigue siendo **qué producir** (versión aprobada). La salida concreta a un canal es una **activación** (TASK-2001): un ítem puede tener varias. `setContentPlanItemProgress` vincula también `activation_id`, y el hueco considera cubierto un ítem cuando su activación tiene evidencia `published`, no sólo un `post_id`.

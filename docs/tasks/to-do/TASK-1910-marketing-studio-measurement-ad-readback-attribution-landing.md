@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
+
+- Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md): el join de resultados pagados con GA4/HubSpot se hace por `utm_id` + `utm_content` (campaña + activación).
+
 ## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
 
 - La evidencia de paid (anuncio activo, entregas observadas) se adjunta a **activaciones pagadas** (`kind: span`) como `execution_record` del modelo de TASK-2001; el `buying method` y el `deal type` viven en el anuncio (ADR de estrategia §15).

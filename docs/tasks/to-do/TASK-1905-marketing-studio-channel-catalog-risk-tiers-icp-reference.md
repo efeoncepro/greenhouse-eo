@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
+
+- Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md) (UTM con GA4, 2026-10-04): cada canal del catálogo guarda su `utm_source` y su `utm_medium` derivados (compatibles con el agrupamiento por defecto de GA4; dato versionado con fuente y fecha) y la plataforma de compra para `utm_source_platform`.
+
 ## Delta 2026-10-04 — taxonomía de canales decidida por el operador
 
 - El ADR de estrategia §15 fija la semilla del catálogo: cuatro dimensiones independientes (**modalidad** `paid` ·
