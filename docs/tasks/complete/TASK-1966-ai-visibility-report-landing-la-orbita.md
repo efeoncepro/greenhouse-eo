@@ -19,20 +19,26 @@
 - Motion: `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Landing aprobada, publicada y verificada en producción 2026-10-03: Think f4426d2, Vercel READY. Formulario cargado; sin envío real, fuera de alcance.`
+- Status real: `Hero interactivo y ancho acotado publicados y verificados el 2026-10-04: Think 6aab907/56a300a, Vercel success. Hover azul profundo 06449ca validado y comprometido sólo local; push pendiente. Formulario productivo Entrega primero; candidato Marca primero sin activar. Sin nuevo envío real.`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
-- Branch: `efeonce-think codex/ai-visibility-landing-release desde origin/main; commit aislado f4426d2 empujado a main con autorización; Greenhouse develop sólo docs locales`
+- Branch: `efeonce-think main: 56a300a publicado, 06449ca local; Greenhouse develop: documentación local sin push en este cierre`
 
-## Refinamiento posterior · 2026-10-04 (local)
+## Refinamiento posterior · estado vigente 2026-10-04
 
-El operador autorizó las seis mejoras UX de la landing y la revisión de movimiento continuo.
-La publicación y el cierre del 03/10 corresponden a la versión anterior; no acreditan este delta.
-Implementación y QA del refinamiento: [dossier](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md).
-Think `09e1976` comprometido y empujado a `origin/main` con autorización el 04/10. Pendientes para este delta: verificar despliegue, activar el orden gobernado del formulario y readback live.
+El cierre original del 03/10 permanece histórico. Los deltas posteriores autorizados están documentados en
+[UX](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md) y
+[hero, pantalla amplia y hover](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md).
 
-Nueva iteración autorizada el 04/10: hero con demostración ilustrativa y botones por contraste. Implementación local y QA en [hero-demo](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md). Think `6aab907` comprometido y empujado a `origin/main` por pedido del operador. Vercel en despliegue al verificar; readback pendiente. Documentación Greenhouse local para no arrastrar dos commits previos de Insights. Error localhost diagnosticado como CORS; no se amplían orígenes productivos.
+- [x] Think `09e1976` y `6aab907`: recorrido UX y hero demostrativo publicados; pausa directa con clic/Enter/espacio, sin enlace «Cómo funciona» ni pie visible. La descripción accesible conserva que es un ejemplo.
+- [x] Think `56a300a`: shell máximo 1360 px y escena máxima 500 px publicados, Vercel success y readback público 1710/2560 sin overflow, formulario en y=678.
+- [x] Think `06449ca`: hover primario azul Engine profundo con texto blanco, contraste 6,80:1; sólo dos declaraciones CSS. CUA, type-check (0 errores/warnings, 17 hints) y build PASS. Commit local.
+- [ ] Publicar y verificar en producción el hover `06449ca`: requiere push del operador; este cierre sólo autoriza commit.
+- [ ] Activar el contrato candidato Marca primero y hacer readback gobernado: producción conserva Entrega primero. QA con envíos bloqueados no acredita activación.
+
+El error de formulario en localhost:4331 fue diagnosticado como CORS; se mantiene la allowlist productiva.
+El harness :4332 sirve contrato candidato y renderer real con POST deshabilitado. No hay nuevo smoke de envío/PDF/correo.
 
 ## Summary
 
@@ -184,6 +190,8 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
+Contrato vigente: escena DOM/CSS continua de 12 s específica de esta landing, con SVG oficial intacto, pausa manual por botón transparente y suspensión fuera de pantalla/pestaña. Sin JS o con movimiento reducido queda estática. Detalle y evidencia en el [motion spec](../../ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md). Los puntos siguientes conservan la especificación inicial del 03/10, sustituida por ese contrato.
+
 - Motion primitive: `CSS` oficial de AXIS (snapshot con hash en Think)
 - Enter / exit: entrada de la órbita finita (2 s), cuadro final fijo; salida ninguna.
 - Layout morph: ninguno.
@@ -204,6 +212,8 @@ Reglas obligatorias:
 - States to implement: los del inventario.
 
 ### GVC scenario plan
+
+Plan inicial del 03/10; el delta del 04/10 amplía QA local hasta 2560 px y readback público a 1710/2560. Evidencia vigente en el dossier hero enlazado arriba.
 
 - Scenario file: `efeonce-think/scripts/verify-brand-visibility-landing.mjs` (extendido).
 - Route: `/brand-visibility`

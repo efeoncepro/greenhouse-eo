@@ -3,6 +3,24 @@
 > **Tipo:** dirección visual (repo-native-benchmark). **Creado:** 2026-10-02 por Claude (Opus 5.5).
 > **Superficie:** `think.efeoncepro.com/brand-visibility` (repo `efeonce-think`, `src/pages/brand-visibility/index.astro`).
 
+## Dirección vigente · revisión del operador 2026-10-04
+
+La base Engine, el lockup oficial y la pareja «¿Te recomiendan las IA? / Averígualo» se conservan. El operador pidió mayor impacto y retiró después el enlace «Cómo funciona» y el pie de la escena. El hero demostrativo quedó publicado en Think `6aab907`; el ajuste de anchos grandes en `56a300a`, con Vercel success y readback público.
+
+- **Composición:** dos columnas en desktop, voz/CTA a la izquierda y escena de consulta/respuesta a la derecha. Shell máximo 1360 px y escena máxima 500 px. A 1710/2560 px el formulario comienza en y=678; no hacer que el círculo crezca indefinidamente con el viewport.
+- **Móvil/tablet:** texto y motores primero, luego escena y CTA en flujo normal; sin reserva absoluta vacía encima del titular.
+- **Copy:** «Descubre cómo aparece tu marca, quién aparece en su lugar y qué mejorar primero». Descriptor del CTA: «Informe en pantalla y descarga en PDF».
+- **Demostración:** órbita única oficial alrededor de consulta → respuesta → «Tu marca» → fuente citada. DOM/CSS, sin proveedor que se atribuya esa respuesta ni datos reales. Descripción accesible ilustrativa; sin pie visible por decisión del operador.
+- **Interacción:** ciclo de 12 s de esta superficie, pausa/reanudación haciendo clic o tocando la escena, con botón nativo transparente, Enter/espacio y foco visible. Sin JS/reduced-motion: ejemplo estático. [Contrato de motion](../motion/TASK-1966-ai-visibility-report-orbit-motion.md).
+- **Resto del recorrido:** método con preguntas desplegables, preview ampliable del PDF sintético, FAQ de entrega/acceso y CTA final. Formulario gobernado intacto; Entrega primero en producción, Marca primero sólo en QA candidato.
+- **Hover primario del formulario:** ajuste posterior todavía local: fondo `color-mix(in srgb, var(--engine-accent) 70%, var(--engine-ground))`, texto blanco, contraste calculado 6,80:1. Sustituye el celeste pálido sin agregar efectos; no es una nueva regla global de AXIS.
+
+[Evidencia, capturas y límites del rollout](../reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md).
+
+## Dirección inicial — registro histórico 2026-10-02
+
+Las especificaciones siguientes documentan el artboard inicial. La órbita vacía, el enlace de cabecera y la composición absoluta móvil quedaron sustituidos por la revisión vigente; se conservan como procedencia, no como instrucciones para reintroducirlos.
+
 ## Modo y fuente
 
 - **Modo:** `repo-native-benchmark`. La dirección no se inventa: se ancla en tres fuentes ya aprobadas por el operador.

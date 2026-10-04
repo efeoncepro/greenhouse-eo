@@ -12,7 +12,7 @@
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 
-**AI Visibility Report (04/10):** UX/motion Think `09e1976` empujado a main; 84 tests y build PASS. [Evidencia](docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Operador/release: verificar despliegue, activar formulario y readback.
+**AI Visibility Report (04/10):** Think `56a300a` publicado/verificado; hover `06449ca` local, tipos/build PASS, push pendiente. Producción Entrega primero; candidato Marca primero sin activar. [Estado y QA](docs/tasks/complete/TASK-1966-ai-visibility-report-landing-la-orbita.md).
 
 **Inpainting (03/10):** [TASK-1973](docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md) complete local (sin push). Pendiente: Slice 2 en TASK-1925; BFL FLUX Tools cuando el operador cree la cuenta.
 

@@ -540,22 +540,63 @@ oscuro de la línea, la negativa.
 
 | Superficie | ¿Lleva la marca? | Estado | Dónde |
 |---|---|---|---|
-| Landing del AI Visibility Report («¿Te recomiendan las IA? / Averígualo») | sí, lockup del Report por decisión del operador (2026-10-02) | publicada y verificada en producción (2026-10-03), Think `f4426d2` | TASK-1966; canvas «Marcas SEO y AEO de Efeonce» |
+| Landing del AI Visibility Report («¿Te recomiendan las IA? / Averígualo») | sí, lockup del Report por decisión del operador (2026-10-02) | hero y encaje amplio publicados/verificados el 2026-10-04, Think `56a300a`; último ajuste de hover sólo local | TASK-1966; canvas «Marcas SEO y AEO de Efeonce» |
 | Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine); canónica en AXIS desde `v0.3.30`: la órbita de la portada dice la gravedad | canvas; Lab `/references/ai-visibility-report/`; receta `aiVisibilityReportOrbitSvg` |
 | Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
 | PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); renderer Engine implementado y validado localmente 2026-10-03; rollout pendiente | TASK-1938; dossier de diez PDFs y 24 comparaciones |
 
-**Landing (2026-10-03):** Engine, lockup oficial de `axis-brand-assets` 0.4.10, una órbita (entrada CSS oficial de AXIS de 2 s, final fijo; ampliación pedida el 2026-10-03), Trazo y firma «Empower your Engine». Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md`; firma compactada por corrección del operador (2026-10-03), sin sumar gap del contenedor al margen canónico del eslogan; el formulario local está bloqueado por CORS, sin envío ni deploy. Esto no certifica la página del informe ni el PDF.
+**Estado vigente de la landing (2026-10-04):** identidad Engine y lockup oficial de `axis-brand-assets`
+0.4.10, SVG orbital oficial, Trazo y firma «Empower your Engine». El hero demostrativo de Think `6aab907`
+y su corrección de ancho `56a300a` están publicados; Vercel success y readback público a 1710/2560 px
+registrados en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md`.
+La última corrección del **color de hover** sigue local y no está publicada. Esta evidencia no certifica
+el PDF, la página del informe ni un envío real.
 
-**Siguiente paso del pie (operador, 2026-10-03):** el bloque del método se reemplaza por el SVG oficial `aeo-logo-negative.svg` pequeño y enlace a `https://efeoncepro.com/aeo-2/` (destino verificado). AEO es contexto del servicio en una columna separada, no firma ni lockup compuesto; Efeonce conserva la firma principal. Título legal 600 en caja normal, copyright 400 y enlace 500. Aplicación local revisada en 1440/390; evidencia `footer-aeo/` del dossier, sin deploy.
+**Hero y movimiento vigentes:** consulta → respuesta → marca → fuente ilustrativas, sin atribuir una respuesta
+real a un proveedor. Por decisión del operador no lleva «Cómo funciona» ni leyenda/control visible al pie.
+La escena completa es un botón nativo transparente: clic, toque, Enter y espacio pausan/reanudan; el foco de
+teclado es visible y la descripción accesible conserva que es un ejemplo ficticio. Suspende el movimiento fuera
+de pantalla y en pestaña oculta; reducido/sin JS muestra el ejemplo completo, estable y sin control inoperante.
+Grid en flujo normal y mensaje primero en móvil. Escena DOM/CSS con una sola órbita oficial y sin dependencias
+nuevas. La composición y los tiempos son propios de esta superficie, **no motion canónico AXIS**.
 
-**Revisión de motion de la landing (operador, 2026-10-04):** la entrada de 2 s se percibe demasiado estática. Propuesta local en Think: una órbita oficial continua y tarjetas conceptuales de respuestas que se relevan, con pausa, suspensión fuera de pantalla/pestaña y fallback reducido/sin JS. El ciclo de 12 s es candidato de superficie, no canon AXIS. Dirección y evidencia en `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`; sin publicación ni aprobación visual de esta nueva versión.
+**Encaje y contraste:** cabecera y hero comparten shell acotado a 1360 px; escena cuadrada con máximo de
+500 px. Esos límites locales evitan que el ancho del viewport agrande la fila y aleje el formulario: readback
+1710/2560, escena 500 px y comienzo del formulario en y=678, sin overflow. Think y local medidos al mismo ancho
+eran idénticos antes del arreglo; no era deriva de assets/CSS. El hover primario se mantiene sin elevación.
+El operador rechazó el celeste pálido: el ajuste local usa `color-mix(in srgb, var(--engine-accent) 70%,
+var(--engine-ground))` con `var(--engine-ink)` blanco, **6,80:1** medido; sólo cambia dos declaraciones de
+`BrandVisibilityFormDock.astro`, sin nuevas flechas, motion o geometría. Los tamaños y la mezcla son del adapter
+Think; no se incorporan como tokens generales de la marca.
 
-**Refinamiento UX local (2026-10-04):** el operador pidió ejecutar las seis mejoras del resto de la landing: muestra ampliable del PDF real con datos sintéticos, formulario marca primero desde su contrato gobernado, método de cinco niveles desplegable y liderado por preguntas en español, menor peso tipográfico, aclaraciones de entrega/acceso y CTA final al formulario. Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md`. Commit + push de la iteración autorizados el 04/10: Think `09e1976` confirmado en `origin/main`; despliegue/readback y activación de la nueva versión del formulario pendientes.
+**Formulario y entorno de prueba:** el readback productivo conserva **Entrega primero**. La versión gobernada
+**Marca primero** se prueba en `localhost:4332` mediante `scripts/growth/preview-ai-visibility-landing.cjs`, con
+renderer real, contrato candidato, banner de QA y POST deshabilitado. **No está activada** en producción y un
+push de la landing no la activa. `localhost:4331` recibe HTTP 200 del contrato pero sin autorización CORS para
+ese Origin; el browser no puede leerlo. No ampliar allowlists ni ocultar el error para obtener una captura.
 
-**Hero demostrativo local (operador, 2026-10-04):** sustituye las tarjetas abstractas por consulta, respuesta, marca y fuente ilustrativas; sin atribuir una respuesta real a un proveedor. Por ajuste posterior del operador se quita el pie visible del ejemplo y «Cómo funciona»; la propia escena pausa/reanuda con clic o Enter/espacio, conservando descripción accesible. Grid en flujo normal, mensaje primero en móvil y hover por contraste/borde sin elevación del formulario. Usa SVG orbital oficial, una escena DOM/CSS y fallback completo reducido/sin JS. No cambia motion canónico AXIS ni contratos del embed. Dirección y QA: `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md`. Think `6aab907` comprometido y empujado a `origin/main` por pedido del operador el 04/10. Vercel en despliegue al verificar; readback público pendiente. Documentación Greenhouse local: no se empujan los dos commits previos de Insights fuera del alcance.
+**Criterio reutilizable de esta aplicación:** probar la composición tanto en móvil como por encima del ancho
+de diseño; comparar local y producción con el mismo viewport y distinguir contrato de formulario de estilos
+host. Un control de pausa integrado en la escena debe seguir siendo botón de teclado con foco y nombre
+accesibles. Un ajuste de color se valida sobre el botón real y con contraste medido; no requiere añadir
+movimiento. Registrar por separado implementación, commit, push, despliegue y readback.
 
-**Registro de publicación B3c (2026-10-03):** el operador autorizó el push; landing y pie AEO publicados en Think `f4426d2`, Vercel READY. Formulario cargado y CUA 1440/1280/390 sin overflow; sin envío. Los estados locales del registro anterior son históricos. Evidencia en el dossier TASK-1966, `production/`.
+**Antecedentes preservados:**
+
+- 03/10, Think `f4426d2`: primera landing Engine publicada y verificada, con entrada orbital oficial de 2 s y
+  final fijo. Firma compactada sin sumar gap al margen canónico del eslogan. Pie con SVG `aeo-logo-negative.svg`
+  pequeño y enlace verificado a `https://efeoncepro.com/aeo-2/`: contexto del servicio en columna separada,
+  nunca otra firma ni lockup armado. Legal 600 en caja normal, copyright 400 y enlace 500. Evidencia en el dossier
+  TASK-1966, `production/` y `footer-aeo/`.
+- 04/10, Think `09e1976`: primera revisión continua con tarjetas conceptuales y refinamiento UX (muestra
+  ampliable del PDF con datos sintéticos, cinco niveles desplegables, menor peso tipográfico, aclaraciones de
+  entrega/acceso y CTA final). El hero quedó reemplazado por la escena demostrativa; el candidato Marca primero
+  sigue separado. Evidencia en `ux-revision-2026-10-04/` y dirección en
+  `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`.
+- 04/10, Think `6aab907` → `56a300a`: hero demostrativo, pausa directa y corrección de pantalla amplia. El
+  readback de `56a300a` sustituye el estado anterior de «Vercel en despliegue / readback pendiente» de `6aab907`.
+  El celeste pálido documentado en capturas anteriores es histórico; `form-hover-engine-blue.png` registra el
+  nuevo candidato local. Documentación Greenhouse y hover nuevo permanecen fuera del release publicado.
 
 Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
 por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
