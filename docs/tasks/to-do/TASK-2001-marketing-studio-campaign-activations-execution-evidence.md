@@ -1,5 +1,34 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-04 (posterior) — lo que la UI aprobada necesita del contrato
+
+El operador aprobó la dirección visual completa de TASK-2002 (páginas v3, v3.1 y v3.2; renders en
+`docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/`) y las decisiones propuestas. Esta task suma al
+contrato lo que esas pantallas leen o escriben; la UI no calcula nada de esto:
+
+- **Mercado y hora local.** La activación guarda `market` (país ISO, atributo de la activación según TASK-1905) y la cuenta
+  su zona IANA. `GET /api/v1/calendar` acepta `market` como filtro y cada activación devuelve la hora en la zona de la
+  cuenta y en America/Santiago.
+- **Evidencia owned.** Email desde HubSpot (proveedor de lectura `hubspot`, canal `email_hubspot`): programado y enviado
+  como evidencia; entregados, aperturas y clics llegan con TASK-1892/1910. Blog y landing: **lector del WordPress del sitio
+  público** (proveedor nuevo `wordpress`, aprobado por el operador) con URL viva y fecha de publicación observada; sin él,
+  esas activaciones sólo pueden quedar `planned` u `overdue`.
+- **Avisos que calcula el reader:** `piece_not_approved` (la versión planificada no está aprobada), `version_mismatch` (la
+  versión en la herramienta no es la planificada; identificada por hash o nombre canónico del archivo), `same_account_same_time`
+  (otra activación de la misma cuenta a la misma hora; advierte, no bloquea) y `tool_stale` (frescura por herramienta, que
+  alimenta la barra de estado).
+- **Command `rescheduleActivation`** separado de `updateActivation`: recibe la nueva fecha y devuelve el estado resultante
+  (p. ej. `scheduled_off_plan` con su diferencia) para que el diálogo avise antes de confirmar; nunca toca la herramienta.
+- **Validación en seco.** `planActivation` y `updateActivation` aceptan `dryRun: true` y devuelven los chequeos del catálogo
+  (copy contra el límite del canal, formato admitido en el placement, pieza aprobada, colisión de hora) sin escribir.
+- **Crear desde ejecución.** `createActivationFromExecution` responde los campos precargados con su origen
+  (`source: tool`) y exige campaña y pieza antes de vincular.
+- **Registro de eventos** append-only por activación (`planned`, `updated`, `rescheduled`, `linked`, `unlinked`,
+  `discovered`, `published_observed`, `cancelled`, con actor persona, agente o regla), expuesto por `getActivation`; es la
+  base del historial que construye TASK-2005.
+- **Tracking congelada** (`tracking_frozen`) en cuanto hay evidencia publicada o de entrega, ya prevista; la UI la muestra
+  bloqueada.
+
 ## Delta 2026-10-04 — estados de pauta y tolerancia (decisión del operador, dirección visual v3)
 
 Decidido por el operador sobre la dirección visual v3 de TASK-2002 ([canvas «Efeonce Marketing Studio»](https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi), páginas
