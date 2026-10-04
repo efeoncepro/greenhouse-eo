@@ -44,8 +44,8 @@ la traducción al motor, no redefine valores de diseño. Canon de carga: §3 de
 - [x] `pnpm build:fast` PASS completo: Turbopack, TypeScript y generación de páginas. No se invocan loaders remotos.
 - [x] 90 pruebas focales PASS (guard, tipografía y elevación); lint focal PASS. El guard rechaza los dos imports originales y detecta assets faltantes/corruptos.
 - [x] Los cinco WOFF2 versionados tienen exactamente el SHA-256 de los archivos servidos por staging anterior; acentos ES/PT-BR, euro y cifras presentes.
-- [ ] Staging READY con la corrección; fuentes servidas y cargadas en navegador.
-- [ ] Sesión anónima/login sanos; producción sin promover.
+- [x] Staging READY con la corrección; fuentes servidas y cargadas en navegador.
+- [x] Sesión anónima/login sanos; producción sin promover.
 
 ### Evidencia local y no regresión
 
@@ -64,9 +64,22 @@ la traducción al motor, no redefine valores de diseño. Canon de carga: §3 de
 - Rollback: conservar como referencia `dpl_68f2mdqkApHTyoqct2p9awNLYfJu`. Revertir este cambio
   restaura el loader remoto y su riesgo; no retirar el guard para ocultar un asset corrupto.
 
+### Evidencia del despliegue
+
+- Commit publicado: `63c9b875ba541cc90e548e1ab7b12a1812227519`; incluye los tres commits
+  documentales previos autorizados por el operador. Pre-push completo PASS, sin bypass.
+- Vercel: `dpl_tHV1tw9veEnafX4dkLmxuEM5uwSE`, target `staging`, **READY**;
+  build completo en 5 minutos. El alias `dev-greenhouse.efeoncepro.com` apunta a ese ID.
+- `.captures/issue-178-staging/evidence.json`: login HTTP 200 en 1440/390 px, cinco
+  WOFF2 HTTP 200, Geist 400/800 y Poppins 600/700/800 cargados explícitamente, Bricolage
+  500 cargada; cero page errors, cero peticiones Google Fonts y sin overflow horizontal.
+- `/api/auth/session`: HTTP 200, sesión anónima vacía. No se ensayó login humano.
+- Producción conserva `dpl_A2HgtQRfKTcC6isrPitjHh4Gr47U`, target `production`, READY.
+- GitHub: smoke Playwright y cuatro workflows de gobernanza/contratos PASS.
+
 ## Estado
 
-open — code complete local, push autorizado con los tres commits documentales anteriores; despliegue y readback pendientes.
+resolved — 2026-10-04, corrección publicada y verificada en staging. Producción sin promover.
 
 ## Relacionado
 

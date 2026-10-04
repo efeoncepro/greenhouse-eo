@@ -1,6 +1,6 @@
 # Handoff activo
 
-Staging: ISSUE-178 pendiente.
+Staging: ISSUE-178 resuelto.
 
 **SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
 
