@@ -98,6 +98,21 @@ El release inicial y su instalación privada se verificaron; la adopción del pr
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
 
-Versión actual de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+Corte anterior de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
 de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
 Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.
+
+
+### Contexto heredado y controles de elección
+
+La familia añade ButtonProvider, RadioButtonGroup y ButtonToolbar: contexto de línea con excepción
+explícita, selección exclusiva y barra de acciones con flechas. MenuButton controlado admite opciones
+dinámicas y portalContainer; conserva ownership del diálogo y escapa a su recorte por top layer.
+SplitButton conserva los atributos nativos/ref de su acción principal. El Lab muestra estos recorridos
+con React real. El consumidor mantiene focus trap, confirmaciones y anuncios de resultado.
+Matriz canónica: AXIS `docs/quality/buttons.md`; no atribuir VoiceOver/NVDA manual a un pase de axe.
+
+Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.

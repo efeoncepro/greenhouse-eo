@@ -12,10 +12,19 @@ limpia verificados. HTML/CSS funciona sin React (`npm install --omit=peer`); los
 pins ni reemplazar MUI/Vuexy sólo por disponibilidad. La instalación con el usuario operador
 no prueba permisos `GITHUB_TOKEN` de otros repositorios para este package nuevo. Los consumidores
 conservan sus pins y fixtures de status/progress; adoptar botones exige evidencia propia y rollback.
-Parche documental actual: primitives 0.1.1 y registry 0.4.1 (`31b146e`, tag v0.4.1);
+Parche documental previo: primitives 0.1.1 y registry 0.4.1 (`31b146e`, tag v0.4.1);
 API/CSS sin cambios, instalación privada repetida y verificada.
 [Evidencia, versiones y alcance](../audits/2026-10-04-axis-buttons-release.md).
+La extensión de controles incluye contexto heredado, selección exclusiva, toolbar, menús controlados
+y portales modales; consulta el mismo dossier para versiones y readback. La matriz automática cubre
+cuatro perfiles; VoiceOver/NVDA manual y zoom nativo requieren evidencia independiente.
 
+
+
+Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
 
 ## Corte de distribución — 2026-10-04
 

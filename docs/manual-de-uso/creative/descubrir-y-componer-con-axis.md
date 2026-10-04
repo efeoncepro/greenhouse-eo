@@ -87,3 +87,17 @@ publicada del package y verifica allí el adapter; desplegar el Lab no actualiza
 
 Para los módulos gráficos de búsqueda/conversación AEO, continúa con
 [componer recursos AEO](componer-recursos-aeo-con-axis.md); para reglas visuales, con la skill `efeonce-graphic-line`.
+
+
+## Botones como componente de producto
+
+La guía [Consumir botones](https://axis.efeonce.org/docs/buttons/) usa `axis-ui-primitives`:
+entrada raíz HTML/CSS sin React y `/react` opcional. No copies el código del Lab. La capacidad
+`adopt-efeonce-button` enumera exports; confirma la versión instalada en el registry.
+
+Elige `ButtonGroup` para Tab normal, `ButtonToolbar` para acciones recorridas con flechas,
+`RadioButtonGroup` para una elección exclusiva y `ToggleButton` para activar/desactivar una función.
+`ButtonProvider` hereda línea/tamaño/superficie/tono; props explícitos conservan prioridad. La línea sólo
+recolorea tono brand. Para menús en diálogos/paneles usa el host modal predeterminado o `portalContainer`;
+la aplicación conserva su focus trap y anuncios. `SplitButton` separa acción principal y alternativas.
+Consulta [evidencia y límites de QA](../../audits/2026-10-04-axis-buttons-release.md) antes de certificar accesibilidad.

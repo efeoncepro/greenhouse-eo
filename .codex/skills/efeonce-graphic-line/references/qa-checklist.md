@@ -385,3 +385,17 @@ Fuentes ejecutables: `apps/lab/src/test/unit/editorial-typography.test.ts`,
 > Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+
+Extensión de QA de controles compuestos:
+- Herencia y override de línea, neutral/danger invariantes; radio exclusivo y toolbar con una parada Tab.
+- Menú en diálogo/panel transformado con overflow: top layer, hit testing, Escape, foco y viewport.
+- Menú controlado, opciones dinámicas e IDs estables; atributos de formulario/ref del split.
+- `playwright.buttons.config.ts`: Chromium, Firefox y WebKit escritorio/móvil, axe, ARIA y referencias visuales.
+- Texto a 200/400% y reflujo 320px; alto contraste Chromium/Firefox y reduced motion.
+- VoiceOver/NVDA manual y zoom real siguen pendientes de evidencia; no marcarlos passed por automatización.
+
+Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.

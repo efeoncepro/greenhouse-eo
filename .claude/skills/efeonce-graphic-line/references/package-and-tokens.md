@@ -1395,6 +1395,19 @@ id único, label, icon, disabled y tone; errores `MENU_ITEMS_REQUIRED`, `MENU_IT
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
 
-Versión actual de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+Corte anterior de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
 de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
 Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.
+
+
+`/react` suma ButtonProvider, RadioButtonGroup y ButtonToolbar. Se elige la semántica por intención:
+group = Tab normal; toolbar = acciones con flechas; radiogroup = una elección; toggle = acción binaria.
+El contexto hereda line/tone/size/surface, pero cada prop explícito gana. No duplicar paletas por control.
+MenuButton agrega open/defaultOpen/onOpenChange/portalContainer y reconcilia opciones por ID estable;
+SplitButton reenvía ref/atributos al primario y configura por separado su menú. API en el README del
+package; matriz y limitaciones de accesibilidad en AXIS `docs/quality/buttons.md`.
+
+Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.

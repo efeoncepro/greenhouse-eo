@@ -139,6 +139,27 @@ menu keyboard/typeahead/dismissal and split actions. `buttonOptions.icons` lists
 Native ARIA, form attributes and focus handlers are forwarded. Publication and opt-in product adoption
 remain separate from local package implementation.
 
-Current verified distribution: primitives 0.1.1, registry 0.4.1, tokens 0.3.43, contracts 0.4.0
+Previous verified distribution: primitives 0.1.1, registry 0.4.1, tokens 0.3.43, contracts 0.4.0
 (AXIS 31b146e, v0.4.1). HTML-only npm consumers can use `--omit=peer`; React consumers install
 React/React DOM explicitly. The documentation patch changes no button API/CSS.
+
+
+### Composed controls and verification
+
+`ButtonProvider` inherits line/tone/size/surface; explicit props win. `RadioButtonGroup` is exclusive
+selection with one Tab stop and optional submitted value. `ButtonToolbar` gives AXIS actions roving
+arrow focus; a normal ButtonGroup keeps native Tab order. MenuButton supports controlled open state,
+stable dynamic items and portalContainer. It stays in the dialog DOM and uses native popover top layer
+to escape drawer clipping; older engines need an unclipped host. SplitButton forwards native form/ref
+props to its primary action and configures alternatives independently. The product still owns its
+focus trap, confirmations, validation and async result announcements.
+
+Canonical API: AXIS `packages/primitives/README.md`; evidence: `docs/quality/buttons.md`.
+The button Playwright config covers Chromium, Firefox, desktop WebKit and emulated iPhone WebKit,
+with axe/ARIA, keyboard, 320px reflow, text scaling 200/400%, reduced motion and reviewed screenshots.
+Manual VoiceOver/NVDA, actual browser zoom and physical iOS are not inferred from these checks.
+
+Verified current release: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43, contracts 0.4.0.
+AXIS `13db367`, tag `v0.5.1`, release `37223839523` succeeded on 2026-10-04. A fresh private
+registry install verified HTML/CSS without React and SSR of all eight exports with React 18.3.1.
+The public Lab and modal menu focus were checked; product adoption remains separate.

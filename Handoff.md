@@ -1,6 +1,6 @@
 # Handoff activo
 
-**AXIS (04/10):** botones por línea, órbita y controles React publicados; [evidencia y adopción pendiente](docs/audits/2026-10-04-axis-buttons-release.md). [Cierre de recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
+**AXIS (04/10):** botones con contexto, selección exclusiva, toolbar y menú modal; QA manual de lectores pendiente; [evidencia y adopción pendiente](docs/audits/2026-10-04-axis-buttons-release.md). [Cierre de recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
 
 Staging: ISSUE-178 resuelto.
 
