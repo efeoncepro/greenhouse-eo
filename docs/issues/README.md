@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-178`
+`ISSUE-179`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-178` | [Staging no compila al procesar Geist de Google Fonts](open/ISSUE-178-staging-build-google-font-query.md) | staging | 2026-10-04 | open — build, 90 tests y GVC PASS; rollout de staging pendiente |
 | `ISSUE-176` | [La proyección PG de `ai_signals` pierde el 90 % de las señales y eso filtra en silencio lo que el digest semanal muestra a liderazgo](open/ISSUE-176-ai-signals-pg-projection-drift-filters-digest.md) | producción | 2026-09-21 | open — 6 de 63 señales proyectadas (jul 21→0, ago 24→4, sep 18→2). El `INNER JOIN` del digest contra `greenhouse_serving.ico_ai_signals` convierte el drift en filtro editorial: el correo del 2026-09-21 mostró las dos causas de menor contribución (8,33 % y 16,67 %) y no la anomalía madre ni la del 75 %. El detector de frescura compara contra la tabla de *enrichments*, no la de *signals*, y sólo alerta en cero absoluto. Task: `TASK-1883` Slice 1. |
 | `ISSUE-174` | [Una ráfaga a una ruta pública sin sesión agota las conexiones de la instancia PostgreSQL compartida](open/ISSUE-174-public-route-burst-exhausts-shared-pg-connections.md) | staging → instancia compartida (incluye producción) | 2026-09-18 | open — 64 requests concurrentes al reader público de Insights dejaron 86–88 conexiones `idle` (máx 100) por 5 min: cada invocación Vercel abre su pool, el `idleTimeoutMillis` no corre con la función congelada y el servidor recién corta a los 5 min (`idle_session_timeout`). El rate limit consume conexión antes de rechazar. Aplica a toda ruta pública. Task: `TASK-1876` — mitigado 2026-09-28: staging en `enforce` y verificado con ráfaga controlada (20×404 + 10×429 del borde, pico 26 → 6 en 1 min), alerta `num_backends > 85` activa; se resuelve con el cutover de producción a `enforce` (≥ 2026-10-05). |
 | `ISSUE-173` | [El consumer reactivo deja huérfanos los eventos que un breaker saltó cuando otro handler del mismo evento ya los reconoció](open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md) | producción (`ops-worker`) | 2026-09-12 | open — reproducido (drain del dominio `0 processed`; drain acotado por handler `6/6 ok`) y mitigado a mano; el fetch de Phase A excluye un evento si **cualquier** handler tiene fila, así que el handler saltado por el breaker (que no escribe fila a propósito) nunca vuelve a verlo. Fix estructural pendiente en task propia. |

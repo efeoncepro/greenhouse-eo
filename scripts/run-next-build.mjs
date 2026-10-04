@@ -2,6 +2,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 
+import { checkWebFonts } from './ci/web-fonts-gate.mjs'
+
 import {
   getNextBuildTarget,
   pruneOldIsolatedBuilds,
@@ -31,6 +33,10 @@ const runProcess = (command, args, env) =>
       reject(new Error(`${command} exited with code ${code}`))
     })
   })
+
+const fontErrors = checkWebFonts()
+
+if (fontErrors.length) throw new Error(`Web font preflight failed:\n${fontErrors.join('\n')}`)
 
 const { distDir, buildId } = getNextBuildTarget()
 

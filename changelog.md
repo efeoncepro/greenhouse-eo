@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — Build de fuentes independiente de Google Fonts
+
+- ISSUE-178: Geist/Poppins y Bricolage del login pasan a `next/font/local`, WOFF2 con origen/licencia/hash fijados. El build comprueba los archivos y bloquea la reintroducción de loaders remotos; roles y variables CSS preservados. Build completo, 90 tests y GVC en tres tamaños PASS; rollout de staging pendiente.
+
+
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 
 - Hero con demostración interactiva y pausa directa; shell/escena acotados en pantallas amplias. Think `6aab907`/`56a300a` publicados y verificados en producción a 1710/2560 px. Hover primario azul profundo `06449ca` validado y comprometido sólo local, pendiente de push.
@@ -581,19 +586,6 @@ edición: norma de Glitch v1.8 con §13.13 como referencia única de comandos y 
 AGENTS.md y skills graphic-line, motion-design-studio, audio-studio y hyperframes (+espejos). En el taller: la cama de la
 última noticia ya no suena bajo el cierre del host (`7ed6219`, kit re-entregado 95/95) y el comando `sonido`, declarado
 pero inexistente, quedó implementado. Pendiente abierto: si el reel abre con el pre-roll (rompe el bucle exacto).
-
-## 2026-09-27 — Glitch: música aprobada, publicada e integrada (tema B + cama post-punk), sólo Glitch
-
-El operador aprobó la música de Glitch: tema B (intro, cortina y salida: «Me parecen bien todas») y la cama post-punk bajo
-la noticia («Post-punk definitivamente»), que reemplaza «la voz sola bajo las noticias». Los 7 másteres (más versiones web)
-están en el bucket público `glitch/music/v1` con `index.json` y sha256 verificados; AXIS los publica en
-`/references/glitch/#musica` y `glitch.json → music` (PR #10, `87c3298`); el taller los integra con `music.mjs` y un pre-roll
-animado elegido por el operador (`2c8f36c`, `ed89a0b`). Lección medida: lo «arcade» es falta de medios (13 % entre 300 Hz y
-3 kHz contra 45 %); nunca síntesis pura ni recortar medios, el espacio para la voz lo da el ducking. Documentado con sus
-argumentos en la norma de Glitch (§13.12 «Por qué»), el ADR, DECISIONS_INDEX, la documentación funcional, el manual del
-editor, la identidad sonora de Efeonce (sólo punteros), la guía de selección de modelos (ficha §5.9) y las skills
-graphic-line, audio-studio, motion-design-studio, ai-model-selection y axis-design-system (+espejos). Único pendiente:
-probar la mezcla con la voz real del host.
 
 ## 2026-09-27 — Registro cine con documento propio, pruebas publicitarias, repo taller y AXIS 0.3.9
 
