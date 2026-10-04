@@ -535,3 +535,24 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
 - **Tono por fondo**: papel (A4, Live) = píldora teñida con texto en tono (variante A); navy (deck) = sin píldora
   rellena, tono sólo en el triángulo y la cifra en `navyLead` (variante C). Triángulo de puntas redondeadas en todas las
   superficies. Roles `deltaBetter/WorseOnPaper`, `deltaBetter/WorseOnNavy`, `dataStepOnPaper/OnNavy`.
+
+### Glifos, isotipos y tableros por plataforma (TASK-1990/1996 — code complete en develop 2026-10-04)
+
+- **Plataformas:** `INSIGHT_CHANNEL_IDS` = las 19 de `AXIS_PLATFORM_ASSETS` (test de deriva contra el paquete instalado);
+  `channelForDomain(domain)` traduce un dominio citado (youtube.com, reddit.com, *.wikipedia.org, linkedin.com,
+  instagram.com, tiktok.com, facebook.com → meta). Los 19 isotipos están copiados en `catalogs/insights-*/assets/channels/`
+  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`).
+- **`metricIcon`:** glifo Trazo de la métrica (`presentation/metric-glyphs.ts`, `metricGlyphOf`), resuelto por
+  `statItemView` y aditivo en el modelo web 1.4. Nunca junto a `channel`. Catálogo: campo `metricIcon` con resolver
+  `*-metric-icon` en cifras, comparación, metas (A4 y deck) y tabla (A4); trazos sellados en
+  `insights-shared/metric-glyphs.axis.json` (axis-graphic-line 0.16.0; Greenhouse sigue fijando 0.11.0 por otras
+  superficies). Columnas: `glyph` por categoría (SVG del hook), sin glifo para «Sin clasificar».
+- **Reglas de plataforma (`statBoardChannelsOf`):** ≥2 motores/asistentes distintos ⇒ isotipo por celda (una celda sin
+  plataforma, como «Otros asistentes», queda con su nombre); si no, cualquier cifra sin plataforma apaga los isotipos;
+  si todas comparten plataformas (≤3), van en el título. Filas de tabla: isotipo si la tabla mezcla plataformas o es un
+  dominio citado; si toda la tabla es de una plataforma, glifo (`rowMarkOf`).
+- **Tableros extra del capítulo AEO:** `assistantStatFigureFor` (visitas por asistente, sólo si los asistentes con isotipo
+  tienen período anterior; si no, la dona) y `engineStatFigureFor` (mención por motor, sólo si todas las tasas son
+  iguales; si varían, barras por canal). `chapter.stats` puede traer varios tableros.
+- **Color por rol:** partes sin rol actual → anterior → paso (→ gris medio en waffle); coral sólo con rol declarado.
+

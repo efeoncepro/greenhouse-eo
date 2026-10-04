@@ -1,5 +1,14 @@
 # TASK-1990 — Efeonce Insights: contrato de la tarjeta de cifra con canal (plataformas, glifo por métrica y tablero de un canal)
 
+## Delta 2026-10-04 — metricIcon, tableros por motor y por asistente (decisiones del operador)
+
+- `metricIcon` resuelto por `statItemView` (`presentation/metric-glyphs.ts`, una tabla para PDF, deck y web; aditivo en el
+  modelo web 1.4) y usado también en comparación, metas, filas de tabla y columnas de categorías. Seis glifos Trazo nuevos
+  (D31) publicados en AXIS `axis-graphic-line` 0.16.0 (tag `v0.16.0`).
+- Visitas por asistente: tarjetas con isotipo cuando hay período anterior, dona en el primero (`assistantStatFigureFor`).
+  Mención por motor con tasas iguales: tablero por motor (`engineStatFigureFor`). Criterio §11 actualizado.
+- Commit `6656fe1d0` (Greenhouse) y `fd83a3b` (Think). — por trabajo en TASK-1990/TASK-1996
+
 ## Delta 2026-10-03 (noche) — Slice 1 hecho y cambio de decisión sobre la validación
 
 - **Slice 1 hecho:** `INSIGHT_CHANNEL_IDS` tiene las 19 plataformas y `contracts/channels.test.ts` lo compara con
@@ -46,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Regla base en producción (release 36a73e7b7e19); vocabulario de 19 plataformas, channelForDomain e invariantes del tablero hechos en develop (03e19f3ee, posterior al release). Pendientes: promover ese slice, metricIcon (glifos Trazo, TASK-1996) y decisión del operador sobre visitas por asistente. El canal se deriva del hecho sellado: no falta un campo autorado ni validación de canal en plan-validation.`
+- Status real: `Code complete en develop (2026-10-04, commit 6656fe1d0): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. Falta el release a producción`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -369,8 +378,8 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 - [x] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test). Evidencia: `contracts/channels.test.ts`.
 - [x] Un plan con canal y glifo en la misma celda, canal sin `label` igual al nombre, `context` sin canal, canal en título y celda, o todas las celdas de una plataforma sin canal en el título es rechazado por `plan-validation.ts` (test por cada código). Cambio de decisión (Delta 2026-10-03 noche): el canal lo resuelve `statItemView` y no es campo autorado; las reglas se prueban sobre el resolver (`stat-card-channels.test.ts`, todas las mezclas de hasta 6 cifras) y las páginas (`figure-slots.test.ts`).
 - [x] El capítulo SEO de Berel sale con Search Console en el título y glifo por celda; un capítulo ICO sale con Greenhouse en el título (vista previa). Evidencia: `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/berel-2026-09-a4-cifras-seo.png` (Search Console y Google) y `sky-2026-09-deck-cifras-ico.png` (Greenhouse).
-- [ ] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test). Cambio de decisión: el modelo 1.4 aún no está publicado, así que `titlePlatforms`, `items[].channel` y `context` entran como aditivos en 1.4 (resueltos por `statItemView` y `statBoardChannelsOf`); falta `metricIcon` (depende de los glifos Trazo de TASK-1996).
-- [ ] El criterio de selección documenta la regla de visitas por asistente como tarjetas o dona y su §11 queda vigente con fecha 2026-10-03. §11 vigente y documentado con el estado actual (dona; tarjetas por asistente posibles en el contrato); falta la decisión del operador sobre cuál gana por defecto.
+- [x] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test). Cambio de decisión: el modelo 1.4 aún no está publicado, así que `titlePlatforms`, `items[].channel` y `context` entran como aditivos en 1.4 (resueltos por `statItemView` y `statBoardChannelsOf`); falta `metricIcon` (depende de los glifos Trazo de TASK-1996). Evidencia (2026-10-04): `metricIcon` aditivo en 1.4 junto a `channel`/`context` (sin 1.5, decisión registrada); `sharing/web-model.ts`; tests de `stat-card-channels.test.ts`.
+- [x] El criterio de selección documenta la regla de visitas por asistente como tarjetas o dona y su §11 queda vigente con fecha 2026-10-03. §11 vigente y documentado con el estado actual (dona; tarjetas por asistente posibles en el contrato); falta la decisión del operador sobre cuál gana por defecto. Evidencia: criterio §11 actualizado el 2026-10-04 con la decisión del operador (tarjetas con período anterior, dona en el primero) y `criterion-boards.test.ts`.
 
 ## Verification
 

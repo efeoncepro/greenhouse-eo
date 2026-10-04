@@ -218,11 +218,19 @@ TASK-1996 render). Contrato de AXIS: `efeonce.insights-stat-card` 0.2.0; isotipo
 - **Nunca los dos.** Una celda lleva isotipo o ícono; el canal va en el título o en las celdas. Estas reglas se cumplen
   por construcción y se prueban sobre el resolver con todas las mezclas de fuentes (`stat-card-channels.test.ts`) y sobre
   las páginas (`figure-slots.test.ts`).
-- **Visitas por asistente de IA (GA4).** Hoy salen en dona cuando son 2–3 partes (pregunta de composición, §5) y el mismo
-  hecho no se repite en tarjetas (`duplicated_fact`). La alternativa aprobada en el canvas, una tarjeta por asistente con
-  su isotipo, existe en el contrato pero el planificador todavía no la elige: qué gana por defecto cuando las dos explican
-  igual es una decisión abierta del operador (propuesta: tarjetas cuando hay período anterior, dona en el primer período
-  medido; TASK-1990, Open Questions).
+- **Visitas por asistente de IA (GA4)** (operador, 2026-10-04): **tarjetas** con el isotipo de cada asistente cuando los
+  asistentes con isotipo tienen período anterior (la variación por asistente es la noticia); **dona** en el primer período
+  medido. «Otros asistentes» va al final, con su nombre y sin isotipo. Un mismo hecho nunca en las dos (`duplicated_fact`).
+  Productor: `assistantStatFigureFor`.
+- **Mención por motor** (operador, 2026-10-04): si las tasas varían, barras por canal (comparación, §5); si todos los
+  motores dan la MISMA tasa (no hay barras que comparar), un tablero con una tarjeta por motor y su isotipo, y la frase
+  uniforme sigue siendo la lectura. Productor: `engineStatFigureFor`.
+- **Glifos e isotipos en todo el informe** (operador, 2026-10-04: «los íconos e isotipos ayudan a reducir la carga
+  cognitiva»): cada cifra, fila de comparación, meta y fila de tabla lleva el glifo Trazo de su métrica (`metricIcon`,
+  `presentation/metric-glyphs.ts`) o el isotipo de su plataforma, nunca los dos; una tabla de una sola plataforma lleva
+  glifos (repetir el mismo isotipo no dice nada); la leyenda de la dona lleva el isotipo de la parte que es una
+  plataforma; las columnas de categorías llevan su glifo; «Medimos la marca en» incluye los motores de los tableros.
 
-Pendiente de decisión: el color por orden de las partes en waffle y dona cuando la parte no declara rol (el plan aún no
-declara `role`). En la dona real de Berel (septiembre 2026) Gemini queda pintado con el color de «oportunidad».
+**Color por rol, nunca por orden** (operador, 2026-10-04). Las partes sin rol declarado en dona y waffle van actual →
+anterior → paso (→ gris medio en el waffle); el coral de «oportunidad» y el gris rayado de «ausencia» sólo aparecen
+cuando la parte de verdad lo es. La identidad de cada parte la da su isotipo, no su color.

@@ -1,5 +1,12 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-04 · TASK-1996 · Tres trampas al publicar y commitear los glifos.** (1) El release de AXIS exige que el tag
+  coincida con la versión de un paquete: `v0.4.18` para `axis-graphic-line` 0.16.0 falló («Ningún paquete está en
+  0.4.18»); el tag correcto fue `v0.16.0`. (2) Greenhouse fija `axis-graphic-line` 0.11.0 por brand-surfaces y Manzanitas:
+  subirlo para leer glifos nuevos cambiaría otros renders; los trazos se sellan en `metric-glyphs.axis.json` con test.
+  (3) En zsh, `git add $P` con una lista multilínea no separa palabras; usar `--pathspec-from-file`. Un `index.lock` sin
+  proceso git vivo es huérfano. Regla: commitear con `--pathspec-from-file` las rutas propias cuando el índice compartido
+  tiene cambios preparados de otra sesión.
 - **2026-10-04 · Estado desplegado frente a cierre.** Síntoma: `Status real`, epic y referencias activas seguían declarando contratos locales y flags OFF tras #248/#250. Regla: contrastar snapshots de código de releases squash por blobs, flags exactos y alias actual; registrar canary y aprobación por separado. Las previews sobre planes anteriores no prueban generación productiva de una edición nueva. Gcloud con reautenticación requerida no permite afirmar salud actual del worker; preservar la limitación.
 
 - **2026-10-03 · TASK-1975 · GA4 sólo se ve en local con su flag y su OAuth, y los datos reales destaparon dos fallas

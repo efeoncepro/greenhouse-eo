@@ -648,6 +648,7 @@ paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan 
 
 ## Sessions (append as you go; newest first)
 
+- 2026-10-04 · Claude («Canvas tarjeta cifra») · pedido del operador: aprovechar íconos e isotipos. AXIS `axis-graphic-line` 0.16.0 (tag `v0.16.0`, seis glifos D31); Greenhouse `6656fe1d0` (metricIcon, tableros por motor y asistente, isotipos en filas/leyendas/aperturas, 19 isotipos, color por rol, gate sección (z)); Think `fd83a3b` en producción. Falta release de Greenhouse y canary del contrato.
 - 2026-10-04 · Codex · reconciliación documental y revisión de cierre: releases #248/#250 y runs success; alias Vercel Production READY; ocho flags INSIGHTS exactos ON; 116 pruebas PASS; lectura de PG sin planes congelados post-release. Cloud Run no se revalidó por reautenticación requerida de gcloud. Ninguna hija cerrada sin evidencia faltante; epic sincronizado a in-progress. Auditoría: `docs/audits/insights/2026-10-04-epic-045-closure-review.md`.
 
 - 2026-10-03 (noche) · Claude · release `36a73e7b7e19` en producción (TASK-1974/1975 + isotipos de canal TASK-1990/1996; AXIS `v0.3.42`; Think `0c5701a`). GA4 real verificado en Berel; correcciones «<1 %» y espacio duro entre cifra y unidad; rol `channelDisc`. TASK-1974 cerrada; TASK-1975 espera la revisión del operador. Después, en develop: TASK-1990 Slice 1 (19 plataformas contra `AXIS_PLATFORM_ASSETS`, `channelForDomain`, invariantes del tablero probados en el resolver) y TASK-1996 cifra única adaptativa del deck (`deckSingleStatHook`).

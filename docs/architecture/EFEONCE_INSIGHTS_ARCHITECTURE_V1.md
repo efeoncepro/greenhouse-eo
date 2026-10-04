@@ -1509,9 +1509,10 @@ en producción con el release `36a73e7b7e19` (orquestador `37158679961`, PR #250
 Ningún flag nuevo: el render ya estaba encendido. Las ediciones internas de Berel y Sky se revisan antes de compartirlas
 (la emisión está encendida en producción desde el 2026-09-28; el gate humano es esa revisión).
 
-**Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`): en la dona
-real de Berel, Gemini queda pintado con el color del rol «oportunidad». Decisión del operador pendiente. Las tarjetas
-con isotipo de canal se aprobaron el 2026-10-03 y se implementaron en TASK-1990/TASK-1996.
+**Resuelto el 2026-10-04 (operador).** Color por rol, nunca por orden: las partes sin rol van actual → anterior → paso y
+el coral queda sólo para una oportunidad declarada (`figure-donut.ts`, `figure-waffle.ts`). Glifos Trazo e isotipos en
+cifras, filas, leyendas y aperturas, tableros por motor y por asistente: criterio §11 y §15 «Isotipo de canal en la
+tarjeta» (TASK-1990/TASK-1996).
 
 
 ## 15. Contrato de contenido del informe (TASK-1962)
@@ -1642,9 +1643,11 @@ la misma para PDF, deck y web.
 traduce un dominio citado a su plataforma. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
 Search Console primero) y cada celda conserva su ícono. Tablero que mezcla motores de respuesta: cada celda trae
 `channel {platform, name}` y `context` (la métrica bajo la cifra). Isotipo o ícono, nunca los dos; título o celdas,
-nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Pendiente:
-`metricIcon` (glifos Trazo de clics, impresiones, CTR y posición, TASK-1996) y la regla por defecto de visitas por
-asistente entre tarjetas y dona (decisión del operador, criterio §11).
+nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Cada cifra
+sin plataforma trae `metricIcon` (glifo Trazo de AXIS, `presentation/metric-glyphs.ts`; seis glifos nuevos D31 en
+axis-graphic-line 0.16.0), el mismo en cifras, comparación, metas, filas de tabla (A4) y Think. Un capítulo puede traer
+varios tableros: el principal, visitas por asistente (con período anterior) y mención por motor (tasas iguales);
+criterio §11.
 
 **Motion de la tarjeta, sólo en el Live.** En Think la cifra recorre del valor anterior al actual (`count`) y después la
 variación pasa de gris a su tono y el triángulo entra en su dirección; con `prefers-reduced-motion` se muestra el estado
