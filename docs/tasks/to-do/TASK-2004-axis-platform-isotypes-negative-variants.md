@@ -1,4 +1,4 @@
-# TASK-2004 — AXIS: isotipos de plataforma en negativo y Facebook/Threads en `axis-brand-assets`
+# TASK-2004 — AXIS: isotipos de plataforma en negativo y Facebook, Threads y Microsoft Advertising en `axis-brand-assets`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -32,8 +32,8 @@
 ## Summary
 
 Registrar en `@efeoncepro/axis-brand-assets` las variantes en negativo (blanco, para fondo oscuro) de los isotipos de
-Instagram, LinkedIn, Meta, ChatGPT y Threads y del logotipo de Metricool, más los isotipos de Facebook y Threads que hoy
-no existen en AXIS, cada uno sellado y con procedencia. El calendario de activaciones de Marketing Studio (TASK-2002) los
+Instagram, LinkedIn, Meta, ChatGPT, Threads y TikTok y del logotipo de Metricool, más los isotipos de Facebook, Threads y
+Microsoft Advertising que hoy no existen en AXIS, cada uno sellado y con procedencia. El calendario de activaciones de Marketing Studio (TASK-2002) los
 consume desde AXIS en vez de copias sueltas en un canvas.
 
 ## Why This Task Exists
@@ -101,8 +101,8 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `axis-design-system/packages/brand-assets/assets/platforms/{instagram,linkedin,meta,chatgpt,threads}-isotype-negative.svg`
-- `axis-design-system/packages/brand-assets/assets/platforms/{facebook,threads}-isotype.svg`
+- `axis-design-system/packages/brand-assets/assets/platforms/{instagram,linkedin,meta,chatgpt,threads,tiktok}-isotype-negative.svg`
+- `axis-design-system/packages/brand-assets/assets/platforms/{facebook,threads,microsoft-advertising}-isotype.svg`
 - `axis-design-system/packages/brand-assets/assets/tools/metricool-logotype-negative.svg`
 - `axis-design-system/packages/brand-assets/src/index.ts` (entradas y tipo)
 - `axis-design-system/packages/brand-assets/src/logos.ts` (catálogo y superficie de vista previa)
@@ -160,11 +160,15 @@ Reglas obligatorias:
   `simple-icons` CC0 (Threads, como Wikipedia).
 - Regenerar sellos con `scripts/seal.mjs`; tests del paquete en verde.
 
+- Registrar el isotipo de Microsoft Advertising desde una fuente con licencia verificable (Iconify o el kit oficial de
+  Microsoft); si no hay fuente válida, documentarlo y mantener Bing (`bing-isotype`) como marca de la plataforma.
+
 ### Slice 2 — Variantes en negativo
 
 - Agregar al tipo una forma explícita de la variante para fondo oscuro (decisión en Open Questions; recomendado
   `variant: 'negative'` con `surface: 'dark'`, alineado con los activos propios positive/negative).
-- Crear `*-isotype-negative.svg` de Instagram, LinkedIn, Meta, ChatGPT y Threads y `tools/metricool-logotype-negative.svg`
+- Crear `*-isotype-negative.svg` de Instagram, LinkedIn, Meta, ChatGPT, Threads y TikTok (en TikTok sólo la forma negra
+  pasa a blanco; el cian y el rojo se conservan, como su versión oficial para fondo oscuro) y `tools/metricool-logotype-negative.svg`
   derivando del archivo en color: sólo el relleno pasa a `#FFFFFF`; LinkedIn conserva el «in» calado; Meta pierde el
   degradado. Procedencia con `transformed: true` y la transformación literal.
 - Google, Google Ads y Facebook no reciben negativo (se leen en color sobre oscuro); dejarlo documentado.
@@ -241,8 +245,9 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] `facebook-isotype` y `threads-isotype` existen en `AXIS_PLATFORM_ASSETS`, sellados, con procedencia `@iconify/json` y licencia CC0.
-- [ ] Existen las variantes en negativo de Instagram, LinkedIn, Meta, ChatGPT y Threads, cada una con `transformed: true` y su transformación descrita.
+- [ ] Existen las variantes en negativo de Instagram, LinkedIn, Meta, ChatGPT, Threads y TikTok, cada una con `transformed: true` y su transformación descrita.
 - [ ] `metricool-logotype-negative` existe en el catálogo de herramientas, sellado.
+- [ ] Microsoft Advertising tiene isotipo registrado con procedencia, o la task documenta por qué se usa `bing-isotype`.
 - [ ] Ningún archivo nuevo contiene `<style>`, `<image>`, `foreignObject` ni animación.
 - [ ] El tipo distingue la variante para fondo oscuro sin ambigüedad y los consumidores existentes compilan.
 - [ ] El Lab muestra cada plataforma en color y en negativo, y el test `brand-assets` byte a byte pasa.
@@ -271,6 +276,12 @@ Reglas obligatorias:
 
 - Negativos de otras plataformas cuando un consumidor los necesite (YouTube, TikTok, Reddit).
 - Reemplazar en el canvas de Marketing Studio los derivados por los archivos del paquete.
+
+## Delta 2026-10-04
+
+- El operador sumó TikTok Ads, ChatGPT Ads, Microsoft Advertising y DOOH a la vista de pauta del canvas: se agregan el
+  negativo de TikTok y el isotipo de Microsoft Advertising (hoy el canvas usa `bing-isotype`). DOOH no tiene marca
+  propia: usa un ícono de pantalla hasta definir el DSP (fuera de esta task).
 
 ## Open Questions
 
