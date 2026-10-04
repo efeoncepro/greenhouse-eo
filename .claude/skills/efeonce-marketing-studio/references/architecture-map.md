@@ -224,3 +224,5 @@ All paths below are in Studio unless marked Greenhouse.
   plus `--project`: one credential source. No new scope, secret, DB connection or runtime resource is provisioned.
 - `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`: operator canon;
   `docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`: verification evidence and runtime limits.
+
+- TASK-2001 rollout 2026-10-04: discovery scheduler enabled; activation/discovery flags versioned in deploy.sh, two existing Metricool brand bindings; tracking domain allowlist per organization. No new secrets or IAM grants. See release audit for exact runtime pointers.

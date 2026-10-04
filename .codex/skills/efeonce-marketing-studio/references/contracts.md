@@ -415,3 +415,5 @@ Upload uses the API ticket then direct GCS transfer and confirmation with one st
 `--resume` only resumes confirmation. Download verifies original byte size and SHA-256. Receipts redact tokens and
 signed URLs, files are private/no-overwrite, storage requests carry no Studio bearer. No production applied write
 was performed to verify this client. Canonical command examples: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`.
+
+- Verified production 2026-10-04: Studio aa6fa07 serves API 1.7.0,75 tools/80 HTTP and activation calendar; HTTP CLI discovers the contract unchanged. Person T1/MCP federation remains pending TASK-2003. Runtime receipt: docs/audits/marketing-studio/TASK-2001-release-2026-10-04-checks.json.

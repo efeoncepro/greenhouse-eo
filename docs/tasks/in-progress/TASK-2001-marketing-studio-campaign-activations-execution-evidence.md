@@ -163,7 +163,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Delta email multiproveedor aceptado; implementación pendiente (Resend primero, HubSpot, Engagement y Next). Corte previo local verificado hasta Studio 4094da0 — slices 1–5 y delta blog, API/CLI/contratos MCP; 276 tests + 7 gates y build PASS. Flags OFF; pendientes puerto HubSpot owner, migraciones/bindings/backfill reales y canary delegado TASK-2003. Sin push ni rollout`
+- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Pendientes delta email Resend/HubSpot/Engagement/Next, owned Greenhouse y MCP delegado TASK-2003; TASK sigue in-progress`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -524,16 +524,20 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 
 - [x] Una activación no se puede crear sin campaña ni con un `channel_key` fuera del catálogo; las campañas Always On existen.
 - [x] El estado de ejecución se calcula para los ocho casos del delta (incluye delivering/ended), con tests y nunca se persiste.
-- [ ] El descubrimiento trae lo programado en Metricool de las marcas permitidas, idempotente, sin crear activaciones. Implementación/fixtures/PG PASS; falta canary con proveedor real y bindings autorizados.
+- [x] El descubrimiento trae lo programado en Metricool de las marcas permitidas, idempotente, sin crear activaciones. Canary real: 3 cuentas, 62 observaciones, replay 0 cambios/0 errores; scheduler OIDC PASS. [Release](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md).
 - [x] Lo programado sin activación aparece como `execution_without_activation` en «Hoy» y en `listUnlinkedExecutions`.
 - [x] `studio.calendar.get` devuelve activaciones con sus dimensiones y estado, filtrables; posts actuales siguen visibles durante la convivencia.
-- [ ] Los 6 posts existentes quedan como evidencia, vinculados a activaciones confirmadas por una persona. Seis fixtures + dry-run/apply/replay + convivencia PASS en PG; datos reales pendientes de rollout revisado.
+- [x] Los 6 posts existentes quedan como evidencia, vinculados a activaciones confirmadas por una persona. Dry-run/apply staging → producción, CL confirmado por operador, versiones verificadas por hash, eventos person; legacy conservado. [Release](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md).
 - [x] Cada activación tiene su tracking URL generada sólo por `buildTrackingUrl`; tests de determinismo, omisión de `null`, modo `auto` de Google Ads, validación de destino y congelamiento con evidencia.
 - [x] `tracking_missing` y `tracking_mismatch` aparecen al comparar con lo publicado (fixture de un post de Metricool sin UTM y otro con UTM distinta).
 - [x] Registro, manifiesto, paridad y leak test verdes; `pnpm check` y `pnpm build` de Studio verdes.
 - [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado. Contratos/manual PASS local; sesión delegada depende de TASK-2003.
 
 ## Verification
+
+### Rollout autorizado — 2026-10-04
+
+[Release y canaries reales](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md): Studio aa6fa07 en producción, migraciones y seis vínculos CL completos, CLI/calendario y scheduler verificados. CMP-001 conserva tres overdue por falta de fecha publicada; CMP-003 scheduled. Email/owned/MCP delegado siguen pendientes. Las secciones locales siguientes conservan la evidencia anterior al rollout.
 
 ### Cierre del corte local — 2026-10-04
 

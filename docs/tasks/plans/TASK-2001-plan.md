@@ -50,3 +50,7 @@ Resend será el mayor volumen; prioridad de integración. No basta el reader Hub
 4. Cada slice: Studio check + Postgres real y prueba CLI, commits propios, flags OFF, sin push. No afirmar soporte operativo por añadir un enum o fixture.
 
 El delta email de la task es el dueño del nuevo alcance. Los resultados del corte previo no certifican estos adapters.
+
+## Rollout autorizado ejecutado — 2026-10-04
+
+Studio aa6fa07 desplegado, cinco migraciones staging/prod, seis activaciones CL vinculadas y canary Metricool/CLI/scheduler PASS. [Evidencia](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md). Continúan los slices email y las dependencias owned/TASK-2003.

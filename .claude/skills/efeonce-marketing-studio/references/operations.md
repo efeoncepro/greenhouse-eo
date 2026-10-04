@@ -399,7 +399,7 @@ Do not rerun the seed or apply guessed aliases just because the following comman
   T1 still needs TASK-2003 real authority. No deploy or federation is implied by tests.
 
 - Final local verification: seed52/replay no-op, full PG suite34files216tests zero skips, build PASS, UI1440/390 PASS;
-  CLIbackfill dry0/apply1/replay0/revert1 with three successful ops. These are isolated local evidence, not rollout.
+  CLIbackfill dry0/apply1/replay 0/revert1 with three successful ops. These are isolated local evidence, not rollout.
 - Backfill preserves ANY existing versioned nonempty canonical snapshot, including deduplicated and partially resolved
   arrays. Such arrays require explicit revalidation. Operator maintenance rejects `onlyOrganizationId` before DB access.
 
@@ -443,3 +443,11 @@ antes de llegar al contenedor; no era un problema IAM. Imagen `74073de1188f`, di
 producción `00004-j4h` / staging `00006-p8q`: Ready al 100%, health 200. Vercel Ready y API1.6.0 confirmados.
 Rollback conserva esquema expand y catálogo publicado: volver código/imagen, nunca down/borrado como atajo.
 Dossier completo: `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`.
+
+## TASK-2001 rollout — 2026-10-04
+
+Actual production: aa6fa07, API 1.7.0/75 tools/80 HTTP, worker 00005-wc5 (staging 00007-kt9). Activations ON web/workers; discovery ON production with existing Efeonce brand bindings, staging OFF; owned OFF. `marketing-studio-metricool-discovery` active at 7,37 each hour Santiago, OIDC canary succeeded. Read-only discovery never creates plans. Six reviewed plans use CL. Old PUBLISHED labels without publication date stay overdue.
+
+Greenhouse `pnpm studio doctor`, `call getCalendarRange --param from=2026-09-01 --param to=2026-11-01 --param market=CL`, `call getActivation --param activationId=ACT-000001`, `call listUnlinkedExecutions` verified in production with the existing authorized read credential. Person-only commands still need TASK-2003 for delegated HTTP/MCP.
+
+Rollback: pause discovery job, flags OFF through versioned deploy config and redeploy; preserve schema and legacy rows. Prior web dpl_61kJPNWNXabGYetKC6dxwch2s2uW, prior worker 00004-j4h. Never migrate down with protected evidence. Audit: docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md.

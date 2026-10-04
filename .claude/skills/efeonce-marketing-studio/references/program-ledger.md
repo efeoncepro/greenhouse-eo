@@ -36,7 +36,7 @@ old local/not-pushed/pending-rollout snapshots; do not replay completed migratio
 | TASK-1998 | Video playback rendition: MP4 H.264 ≤ 720 px faststart in the media worker (flag `MEDIA_WORKER_PLAYBACK_ENABLED`, backfill by the sweep), `/api/v1/media/{token}` → 302 to a 1 h V4 URL (Range by GCS), `Asset.playback` / `AssetVersionDetail.playback`, API 1.5.0 | **complete 2026-10-04** | Studio prod `c52eb4a` (API 1.5.0); worker prod `00003-hrw`, staging `00004-6v7`; 6/6 prod videos with `playback`; gateway manifest synced (efeonce-mcp `454d80eb6`, no deploy needed) |
 | TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
 | TASK-1905 | Versioned channels, taxonomy/UTM, governance, transactional validation, alias/backfill, campaign audiences and ICP references | **in progress** — Studio deployed; Greenhouse capability, real ICP, MCP and human-reviewed backfill pending | API 1.6.0, 59 tools; catalog v1 / 52 channels, warn / ICP false |
-| TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | to-do (blocked by TASK-1905) | — |
+| TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | in-progress: Studio aa6fa07 deployed; email/owned/delegated MCP pending | TASK-2001 release 2026-10-04 |
 | TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | to-do (blocked by TASK-2001 + direction v3) | — |
 | TASK-2003 | MCP delegated-writes core (agent-friendly): Entra write scope, Greenhouse exchange per exact capability (asset.download/asset.write/campaign.write), Studio delegated actor (person via MCP), gateway federates `T1` writes; no `T2`/approvals (TASK-1899 retired 2026-10-04) | to-do (Codex implements) | — |
 | TASK-1899 | Withdrawn by the operator 2026-10-04; local implementation reverted; no automatic resume or development prerequisite | to-do (withdrawn; not executable) | No rollout |
@@ -379,7 +379,7 @@ health `1.5.0` → `curl -I` media link of `CMP001-08-video-16x9` → 302 → fi
   ICP real consumer depends on TASK-1906/TASK-1892; disabled by default. TASK-2003 is parallel; real MCP federation/canary
   remains pending. Coordinator readback: Studio pnpm check PASS (API 1.6.0, 59 tools, 241 Vitest tests + 7 gates); 9 DB tests skipped
   in normal env were subsequently covered by the full local PG suite (34 files, 216 tests, zero skips; IT/CHANNEL/CONCURRENCY/SEED).
-  Studio build and UI desktop1440/mobile390 PASS. Seed 52 published/replay no-op; CLI backfill dry0/apply1/replay0/revert1,
+  Studio build and UI desktop1440/mobile390 PASS. Seed 52 published/replay no-op; CLI backfill dry0/apply1/replay 0/revert1,
   three ops succeeded. Greenhouse typecheck default4GB OOM, retry12GB pending. Evidence: Greenhouse
   `docs/audits/marketing-studio/TASK-1905-local-verification.md`; operating instructions in
   `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md`.
@@ -410,7 +410,7 @@ Evidence: `docs/audits/marketing-studio/TASK-1905-local-verification.md`,
 Manuals: `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md` and `operar-por-cli-api.md`.
 TASK-1905 is not complete merely because Studio was released or the local CLI works.
 
-## TASK-2001 — local implementation, rollout pending (2026-10-04)
+## TASK-2001 — local implementation (historical pre-rollout) (2026-10-04)
 
 Commits Studio 39a74c0 → 78205fb → af608a8 → 9bc974e → acdf30f → 946fda4, then final backfill/contract cut. API 1.7.0,
 75 tools, 80 HTTP operations. Local PostgreSQL validates every slice; web build and Greenhouse HTTP CLI smoke are in
@@ -423,3 +423,11 @@ old campaigns precede their activations. Import skips posts of activated campaig
 Pending owners: Studio operator for migration/config/jobs/backfill; Greenhouse integration owner for HubSpot email lane;
 TASK-2003 for person-delegated T1 and MCP sync/canary. UI remains TASK-2002. SEO/AEO blog follow-up has no reserved ID:
 SV360 estimates with provenance/date, cluster prompt panel, advisory gate with person-attributed warnings at authorization.
+
+## Session 2026-10-04 — TASK-2001 authorized rollout
+
+Studio aa6fa07 pushed and deployed: API 1.7.0/75 tools/80 HTTP operations. Five migrations staging → production; six reviewed CL activations with exact asset hashes and person events. Same worker image promoted staging 00007-kt9 → production 00005-wc5; Vercel production dpl_Atr8ThFhy4UNG8HGtAXYkL529pmA Ready.
+
+Activations ON; Metricool discovery production ON/staging OFF, owned OFF. Three accounts/two previously allowed brands; 62 observations/0 errors, replay 0 changes and scheduler OIDC succeeded. Calendar/activation/unlinked via existing Greenhouse CLI, deny tests and 44 thumbs PASS. Three historical activations overdue without observed publication date; no guessed published timestamp. Full audit: docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md.
+
+Greenhouse/gateway unchanged by release; delegated T1 TASK-2003, UI TASK-2002, owned bindings/Greenhouse endpoint and Resend/HubSpot/Engagement/Next adapters pending. TASK remains in progress. Catalog alias migration TASK-1905 is separate from execution evidence backfill.

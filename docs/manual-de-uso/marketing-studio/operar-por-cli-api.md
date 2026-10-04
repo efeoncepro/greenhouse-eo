@@ -9,8 +9,8 @@ Fecha: 2026-10-04. Comando local: `pnpm studio` (Node 24, sin dependencias nueva
 
 La CLI consulta el OpenAPI y el manifiesto **del servidor elegido en cada ejecución**. Acepta tanto el
 `operationId` de HTTP como el nombre `studio.*` usado por los agentes. No importa código del repo hermano,
-no conecta a PostgreSQL y no crea una segunda lista de capacidades. Al verificar API 1.6.0 aparecieron
-**64 operaciones HTTP: 59 con tool declarada y cinco transportes/metadatos excluidos de MCP con razón**.
+no conecta a PostgreSQL y no crea una segunda lista de capacidades. El rollout de API 1.7.0 verifica
+**80 operaciones HTTP: 75 con tool declarada y cinco transportes/metadatos excluidos de MCP con razón**.
 El mismo nombre `studio.*` invocado por esta CLI usa HTTP directo, no una sesión MCP.
 
 ```bash
@@ -250,3 +250,7 @@ que usa los mismos commands y acceso PostgreSQL gobernado. No transforma el bear
 La confirmación de publicación requiere evidencia pública reciente (máximo dos horas) y URL 200, misma cuenta y sitio,
 revisiones vigentes y fecha no posterior a la observación; el actor sale de la identidad. Conserva la fecha observada del
 CMS separada de la confirmada. Los avisos de robots/canonical/sitemap no inventan un gate SEO ni una autorización para publicar.
+
+## Activaciones en producción — 2026-10-04
+
+`doctor`, `call getCalendarRange`, `call getActivation` y `call listUnlinkedExecutions` verificados contra producción 1.7.0. Seis activaciones históricas CL visibles; cada operación nueva se descubre con `describe`. Las escrituras siguen requiriendo su scope y actor: confirmación de publicación, slug legacy y backfill exigen persona; su carril HTTP delegado depende de TASK-2003. El backfill productivo se ejecutó por el command CLI autorizado de Studio, no por esta CLI HTTP. [Release y límites](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md).

@@ -270,3 +270,10 @@
   Keep that evidence distinct from production writes. Resume confirms an existing upload; it does not resume bytes.
 - **Idempotency survives uncertainty.** Emit the logical key before writing, retain it when a call times out, and
   reread on revision conflict. Neither a new key nor a refreshed If-Match is an automatic retry strategy.
+
+## 2026-10-04 — activations rollout
+
+- Legacy post UUIDs differ between staging and production; verify campaign/post key/provider identity and query target-local IDs. Reuse original command inputs and revision for replay, not the later campaign revision.
+- Tracking allowlists must be configured before a preview canary; fail-closed validation correctly rejects an undeclared destination. Rebuild after Vercel config changes.
+- Metricool PUBLISHED without an observed timestamp is not published evidence. Keep overdue and a reconciliation item, never copy the scheduled timestamp. Preserve a legacy record absent from discovery results.
+- Verify scheduler identity separately from operator invocation. Three accounts read 62 records, repeat changes 0; scheduler run succeeded with its own OIDC.

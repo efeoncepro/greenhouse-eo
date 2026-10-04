@@ -9,9 +9,9 @@ fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/U
 
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-04 — consolidación posterior al release de TASK-1905 y entrega local de la CLI HTTP en Greenhouse.
+> **Última actualización:** 2026-10-04 — rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -20,18 +20,18 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 
 ## Estado vivo verificado (2026-10-04, después del release)
 
-Fuente: [release autorizado de Studio](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md) y
-[readback estructurado](../../audits/marketing-studio/TASK-1905-release-2026-10-04-checks.json).
+Fuente: [release autorizado de Studio](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md) y
+[readback estructurado](../../audits/marketing-studio/TASK-2001-release-2026-10-04-checks.json).
 
 | Pieza | Estado verificado |
 | --- | --- |
-| Web/API | Studio `main 74073de1188f`, Vercel Production Ready `dpl_61kJPNWNXabGYetKC6dxwch2s2uW`; health 200, API 1.6.0, database reachable, acceso open. |
-| Contrato | 59 tools de negocio, 64 operaciones HTTP; manifiesto `2302c683cd1eee0d96d89f85b72ded73a50ff30152c8f0f34fa9279b739390e6`. Servido no significa federado. |
-| Catálogo/schema | Migraciones `1791144092031` y `1791144092429` aplicadas staging y producción; catálogo v1 published, 52 canales. UPDATE de especificación publicada rechazado en ambas bases (23514). |
-| Datos productivos | 5 campañas y 103 assets conservados. Backfill sólo dry-run: 134 unmapped; cinco aliases con owner efeonce_operations. |
-| Flags | Web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`, `STUDIO_CUSTOMER_MODEL_ENABLED=false`. No promoción a enforce. |
-| Worker | Staging `00006-p8q`, producción `00004-j4h`, Ready/100%, `/health` 200; misma imagen `74073de1188f`, digest `sha256:7e95c904dd9c01f7c023e56111f4495444220f64f162dfef8d15ce034c96b43e`. |
-| Canaries | Producción: org ajena404, bearer inválido401, escritura global de catálogo con bearer403 sin write; 44/44 thumbs 200. Escritura positiva/warnings/replay sólo sandbox staging CMP-900. |
+| Web/API | Studio `main aa6fa0771ff0`, Vercel Production Ready `dpl_Atr8ThFhy4UNG8HGtAXYkL529pmA`; health 200, API 1.7.0, database reachable, acceso open. |
+| Contrato | 75 tools de negocio, 80 operaciones HTTP; manifiesto `d9f5db8f7729255d59921dd591c2f9963f0abe8a637bf288c235fceb6fd1ccc2`. Servido no significa federado. |
+| Catálogo/schema | Catálogo previo y cinco migraciones TASK-2001 (`1791149145299`…`1791151780000`) aplicadas staging y producción; catálogo v1 published, 52 canales. UPDATE de especificación publicada rechazado en ambas bases (23514). |
+| Datos productivos | 5 campañas y 103 assets conservados. Backfill activaciones: 6 evidencias legacy vinculadas a 6 planes CL; 63 evidencias totales/57 sin vincular. Aliases TASK-1905 (134 unmapped) siguen pendientes. |
+| Flags | Web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`, `STUDIO_CUSTOMER_MODEL_ENABLED=false`. No promoción a enforce. Activaciones ON web/workers; discovery sólo producción ON, owned OFF. |
+| Worker | Staging `00007-kt9`, producción `00005-wc5`, Ready/100%, `/health` 200; misma imagen `aa6fa0771ff0`, digest `sha256:3001726da1f901843c3c4b19e8b52e00ce3be0cf0c7e172d956bc0376df1f5d2`. |
+| Canaries | Producción: org ajena404, bearer inválido401, escritura de activación con bearer read-only403 sin write; 44/44 thumbs 200. Plan/reschedule/cancel/replay HTTP staging PASS; descubrimiento real 62/replay 0 cambios, scheduler OIDC PASS. Tres overdue CMP-001 sin fecha publicada; CMP-003 scheduled. |
 | Greenhouse/gateway/ICP | Sin release Greenhouse ni gateway en esta entrega. Capability pendiente de activar; nueva federación MCP pendiente. ICP real depende1906/1892 y sigue disabled; T1 delegado corresponde2003 en paralelo. |
 | CLI HTTP Greenhouse | `pnpm studio` local, API-only: 18 tests/lint PASS; discovery, lectura autenticada y upload dry-run reales. No carga aplicada productiva ni release Greenhouse. [Auditoría](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). |
 
@@ -687,7 +687,7 @@ La CLI HTTP y las CLIs de mantenimiento del repo Studio son carriles distintos: 
 concede `studio:write` general, y el catálogo global responde403 con bearer de servicio. Seed/backfill siguen siendo
 mantenimiento autorizado por operador en Studio. Las cinco campañas OneDrive conservan su frontera de escritura.
 
-## Candidato local TASK-2001 — 2026-10-04
+## Candidato local TASK-2001 — 2026-10-04 (histórico pre-rollout)
 
 **Sin push, deploy ni cambios de datos remotos.** Studio main incorpora slices hasta 4094da0, incluyendo el corte final de
 backfill/contrato documentado en [QA local](../../audits/marketing-studio/TASK-2001-local-verification.md). API 1.7.0,
@@ -718,3 +718,11 @@ implementación 4094da0 y su QA no cubren la ampliación: el lector actual está
 por provider/cuenta/envío, añadir catálogo versionado y adapters independientes, empezando por la evidencia Resend
 ya gobernada en Greenhouse. No existe todavía soporte runtime de los nuevos proveedores. Ver delta email y plan
 TASK-2001; flags OFF, sin push ni envíos. CLI/API/MCP deben conservar las mismas operaciones de activación.
+
+## Rollout TASK-2001 — estado vigente 2026-10-04
+
+[Release completo y límites](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md). Studio aa6fa07 pushed/desplegado; cinco migraciones en staging/prod. Seis posts preservados y vinculados a ACT-000001…000006 con CL confirmado, hora America/Santiago y versiones verificadas por hash. No hubo envíos ni publicaciones nuevas.
+
+Activaciones ON en web preview/producción y ambos workers; library default false. Discovery ON sólo producción, bindings Efeonce × 3961547/5105024. Scheduler marketing-studio-metricool-discovery ENABLED (`7,37 * * * *`, Santiago), OIDC probado. Lectura 62 ejecuciones, replay 0 cambios/0 errores; 63 evidencias almacenadas (una legacy no retornada por la ventana), 57 sin vincular. Owned OFF: faltan bindings y adapters/owner Greenhouse. Tracking permite efeoncepro.com por organización, web preview/prod.
+
+CLI HTTP producción verificada: doctor, calendario, activación y unlinked; no concede identidad personal por usar --confirm. Backfill real por command CLI autorizado. Tres CMP-001 overdue: sin fecha publicada aunque dos provider_status sean PUBLISHED; conciliación pendiente sin inventar timestamps. Email multiproveedor, owned, MCP delegado TASK-2003 y UI TASK-2002 conservan sus pendientes. Rollback: pausar discovery, flags OFF/redeploy, mantener schema/datos; ninguna migración down con evidencia.

@@ -318,11 +318,11 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 
 ## Program status (verified 2026-10-04)
 
-- Studio production `main` is `74073de1188f`: API **1.6.0**, **59 business tools + 5 HTTP exclusions**. Published
+- Studio production `main` is `aa6fa0771ff0`: API **1.7.0**, **75 business tools + 5 HTTP exclusions**. Published
   catalog v1 has **52 channels**. Web and worker were verified; `STUDIO_CHANNEL_VALIDATION_MODE=warn` and
-  `STUDIO_CUSTOMER_MODEL_ENABLED=false`. Evidence: `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`.
+  `STUDIO_CUSTOMER_MODEL_ENABLED=false`. Evidence: `docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md`.
 - TASK-1894 A and B are deployed; C remains deferred. TASK-1998/1999 playback is deployed. The current worker is
-  production `00004-j4h` / staging `00006-p8q`; earlier revisions in task history are deployment evidence, not the live pointer.
+  production `00005-wc5` / staging `00007-kt9`; earlier revisions in task history are deployment evidence, not the live pointer.
 - **Local Greenhouse CLI:** `pnpm studio` covers the live OpenAPI/manifest by operationId or `studio.*`, with
   `list`, `describe`, `call`, `doctor`, `upload`, `download`. It is API-only, uses dryRun by default and `--apply`
   for writes, retains revisions/idempotency, streams GCS bytes without the Studio bearer and verifies downloads.
@@ -380,10 +380,10 @@ retired. No T1 federation is claimed before real delegated
 authority is verified. T2 remains operator CLI. Gateway/Greenhouse rollout and legacy backfill are pending. Evidence and limits:
 `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md` in Greenhouse.
 
-## TASK-2001 local contract (2026-10-04)
+## TASK-2001 contract and rollout (2026-10-04)
 
 Activation plans, execution evidence, owned client CMS/Notion-link handling, deterministic tracking and reviewed legacy
-backfill are implemented locally with flags OFF. Every operation has a tool; current local inventory is 75 tools / 80 HTTP
+backfill are deployed in Studio aa6fa07. Activations ON, production Metricool discovery ON, owned OFF; library defaults remain OFF. Six reviewed CL activations linked, real discovery/replay/scheduler and HTTP CLI PASS. Every operation has a tool: 75 tools / 80 HTTP
 operations. Use Greenhouse `pnpm studio` against the chosen origin to discover schemas; input defaults are optional.
 Person-only T1 operations (publication confirmation, old campaign slug, legacy backfill) reject service bearers and await
 TASK-2003 for human HTTP/MCP authority. Production/MCP availability is separate; see program-ledger and runtime handoff.

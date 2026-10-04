@@ -1,6 +1,6 @@
 # Handoff activo
 
-**TASK-2001 (04/10):** corte local Studio `4094da0` verificado (276+7, build, CLI/Postgres); nuevo delta email: Resend principal + HubSpot, Engagement y Next, implementación pendiente. [Task](docs/tasks/in-progress/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md). Flags OFF; sin push. Rollout/canary delegado pendientes.
+**TASK-2001 (04/10):** Studio `aa6fa07` desplegado, API 1.7.0/75 tools, cinco migraciones staging/prod; seis activaciones CL vinculadas, Metricool/CLI/scheduler PASS. Activaciones/discovery ON, owned OFF. Pendientes email Resend/HubSpot/Engagement/Next, owned y MCP delegado. [Release](docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md).
 
 **Marketing Studio — cierre 04/10:** main `74073de`, API 1.6.0/59 tools y catálogo v1/52 canales desplegados; worker `/health` verificado. `pnpm studio` disponible localmente en Greenhouse: API-only, cargas/descargas, copys/canales y dryRun por defecto; 18 tests y lectura/dryRun autenticados PASS. [Cierre y evidencias](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md). Pendientes: backfill humano de 134 registros (`efeonce_operations`), ICP 1906/1892 y autoridad de catálogo; MCP write retirado como requisito (1899), sin federación nueva. Greenhouse/gateway sin release. Video 1998/1999 sigue completo; estado de 1894 en [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
