@@ -788,3 +788,9 @@ Este ledger es **doc viva**. Al cerrar una task con flag:
 
 Son flags del repo hermano, no env vars de Greenhouse. Contrato/config/rollback:
 [handoff de Studio](marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#candidato-local-task-2001--2026-10-04).
+
+### Marketing Studio — puerto owned (TASK-2001, 2026-10-04)
+
+| Flag | Owner | Default / estado verificado | Acción pendiente |
+| --- | --- | --- | --- |
+| `GREENHOUSE_STUDIO_EMAIL_EVIDENCE_ENABLED` | TASK-2001 | OFF por defecto; código local, sin nuevo deploy. Rechazo OFF verificado en test; valores Vercel no consultados en este corte. | Release autorizado del puerto; consumer/binding organization y `GREENHOUSE_STUDIO_EMAIL_EVIDENCE_BINDINGS` exactos, canary M2M antes de ON. No habilita envíos. |

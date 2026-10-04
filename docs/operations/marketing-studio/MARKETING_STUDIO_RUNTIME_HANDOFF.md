@@ -726,3 +726,15 @@ TASK-2001; flags OFF, sin push ni envíos. CLI/API/MCP deben conservar las misma
 Activaciones ON en web preview/producción y ambos workers; library default false. Discovery ON sólo producción, bindings Efeonce × 3961547/5105024. Scheduler marketing-studio-metricool-discovery ENABLED (`7,37 * * * *`, Santiago), OIDC probado. Lectura 62 ejecuciones, replay 0 cambios/0 errores; 63 evidencias almacenadas (una legacy no retornada por la ventana), 57 sin vincular. Owned OFF: faltan bindings y adapters/owner Greenhouse. Tracking permite efeoncepro.com por organización, web preview/prod.
 
 CLI HTTP producción verificada: doctor, calendario, activación y unlinked; no concede identidad personal por usar --confirm. Backfill real por command CLI autorizado. Tres CMP-001 overdue: sin fecha publicada aunque dos provider_status sean PUBLISHED; conciliación pendiente sin inventar timestamps. Email multiproveedor, owned, MCP delegado TASK-2003 y UI TASK-2002 conservan sus pendientes. Rollback: pausar discovery, flags OFF/redeploy, mantener schema/datos; ninguna migración down con evidencia.
+
+
+## Candidato local 2026-10-04 — owned Resend/HubSpot/WordPress
+
+[Evidencia y checklist de rollout](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
+Nuevo corte sin push: Studio API 1.8.0, migración 1791155100000 y catálogo email aditivo; Greenhouse f06f61efb aporta
+el puerto de evidencia sister-platforms con resolvers canónicos. Adapters verificados contra proveedores reales,
+pero transporte M2M, consumer/binding, secretos worker, migración remota, publicación de catálogo y scheduler owned
+siguen pendientes de release. No modificar flags productivas ni afirmar owned operativo desde este candidato.
+Marketing Cloud Engagement/Next preparados, sin entorno de prueba por decisión del operador. El worker mantiene
+owned OFF y deploy.sh conserva los knobs del endpoint y consumer; su configuración forma parte del próximo commit
+de rollout revisado. No hay pipeline alterno de envío ni importación de destinatarios.

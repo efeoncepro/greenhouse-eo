@@ -2,6 +2,8 @@
 
 ## Estado vigente para agentes
 
+Marketing Studio: conexiones owned locales Resend/HubSpot/WordPress y límites de rollout en [dossier TASK-2001](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md); producción sigue owned OFF, Marketing Cloud preparado.
+
 Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).

@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-04",
+  "environment": "local PostgreSQL and read-only real provider adapters",
+  "studioCommit": "f72e408",
+  "greenhouseCodeCommit": "f06f61efb",
+  "apiVersion": "1.8.0",
+  "manifestHash": "ece8711173bc7f5e0bb473cd446ece43efb7adc766c0115ea55f2be41b254859",
+  "tests": {
+    "studio": 288,
+    "studioGates": 7,
+    "greenhouseOwned": 9,
+    "cliUnit": 18,
+    "cliGeneral": 25,
+    "cliOwned": 15
+  },
+  "rollout": "pending; no new push",
+  "providerCanary": [
+    {
+      "provider": "resend",
+      "pages": 1,
+      "total": 1,
+      "complete": 0,
+      "partial": 0,
+      "notStarted": 1
+    },
+    {
+      "provider": "hubspot",
+      "pages": 2,
+      "total": 16,
+      "complete": 2,
+      "partial": 0,
+      "notStarted": 14
+    }
+  ],
+  "wordpressCanary": {
+    "count": 96,
+    "posts": 44,
+    "pages": 52,
+    "elapsedMs": 53436,
+    "sample": {
+      "id": "posts:251941",
+      "publishedAt": "2026-09-28T19:16:21Z",
+      "url": "https://efeoncepro.com/glitch/glitch-flash-claude-sonnet-5-5/",
+      "checkedAt": "2026-10-04T23:17:40.814Z",
+      "httpStatus": 200,
+      "robotsMeta": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "robotsHeader": null,
+      "robotsTxtStatus": 200,
+      "canonical": "https://efeoncepro.com/glitch/glitch-flash-claude-sonnet-5-5/",
+      "sitemapPresent": true
+    }
+  },
+  "postgresReplay": {
+    "accounts": 3,
+    "observed": 113,
+    "changed": 0,
+    "errors": 0
+  },
+  "mobileInteraction": [
+    {
+      "chain": false,
+      "status": "FAIL",
+      "layout": {
+        "x": 33.234375,
+        "y": 0.390625,
+        "w": 113.3125,
+        "h": 30,
+        "atPoint": [
+          "HEADER.topbar",
+          "LI.unlinked-item",
+          "UL.unlinked-list",
+          "SECTION.card side-panel"
+        ],
+        "scrollY": 343
+      }
+    },
+    {
+      "chain": true,
+      "status": "FAIL",
+      "layout": {
+        "x": 33.234375,
+        "y": 0.390625,
+        "w": 113.3125,
+        "h": 30,
+        "atPoint": [
+          "HEADER.topbar",
+          "LI.unlinked-item",
+          "UL.unlinked-list",
+          "SECTION.card side-panel"
+        ],
+        "scrollY": 343
+      }
+    }
+  ],
+  "logSha256": {
+    "owned-final-check.log": "b411ab58463ea62c9202c840a55a3205f5ab87a340e5923d890c06137f50841f",
+    "owned-build.log": "7fdfc724cc31d55f167ac2388c19f567cc1d14b9ebd206246bce8fdca19ae9f6",
+    "owned-port-tests4.log": "4b0b7e65b042c73687d487eec580a80839a69f34512cb7f6d0aace72299c74b0",
+    "owned-cli-unit2.log": "44ea47c72c0cc3a1908ce3e8af7137468e587df06f8eee217c274e9e2bfb3596",
+    "owned-greenhouse-final-type2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "owned-gvc2.log": "c239ba25deb0aed2c340920d4275cf038c5243a6b4a37ba8a3c66921644439a0"
+  }
+}

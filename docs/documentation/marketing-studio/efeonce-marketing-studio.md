@@ -268,3 +268,16 @@ Estas capacidades están verificadas localmente con flags OFF por defecto; no es
 producción ni en una conexión MCP. [Manual de operación](../../manual-de-uso/marketing-studio/operar-por-cli-api.md)
 y [QA](../../audits/marketing-studio/TASK-2001-local-verification.md). Dossier SEO/AEO, autorización para publicar y
 métricas posteriores pertenecen a un follow-up independiente.
+
+
+### Próximo contrato owned, implementado localmente (2026-10-04)
+
+Resend y HubSpot tienen adapters de evidencia de campaña; Salesforce Marketing Cloud Engagement y Next se
+representan como proveedores distintos todavía sin lector. Una evidencia de email distingue borrador, parcial,
+completo y desconocido: sólo envío completo con fecha observada acredita publicación. No se importan destinatarios
+ni correo transaccional. La integración Resend de este corte lee broadcasts nativos; otros batches requieren vínculo
+explícito a una campaña. CMS sigue siendo atributo del sitio cliente: WordPress se verifica por API pública; otros
+CMS usan URL pública y fecha confirmada por una persona. Notion sólo es referencia del borrador.
+
+Este contrato local no acredita habilitación en producción. [Conexiones y límites](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md)
+y [operación por CLI](../../manual-de-uso/marketing-studio/operar-por-cli-api.md).

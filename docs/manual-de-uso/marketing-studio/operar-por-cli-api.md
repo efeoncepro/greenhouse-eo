@@ -254,3 +254,38 @@ CMS separada de la confirmada. Los avisos de robots/canonical/sitemap no inventa
 ## Activaciones en producción — 2026-10-04
 
 `doctor`, `call getCalendarRange`, `call getActivation` y `call listUnlinkedExecutions` verificados contra producción 1.7.0. Seis activaciones históricas CL visibles; cada operación nueva se descubre con `describe`. Las escrituras siguen requiriendo su scope y actor: confirmación de publicación, slug legacy y backfill exigen persona; su carril HTTP delegado depende de TASK-2003. El backfill productivo se ejecutó por el command CLI autorizado de Studio, no por esta CLI HTTP. [Release y límites](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md).
+
+
+## Conexiones owned: corte local API 1.8.0
+
+El contrato local amplía los providers email; producción conserva API 1.7.0 hasta el siguiente rollout autorizado.
+La CLI descubre la versión del servidor elegido. Las operaciones son comunes a HubSpot, Resend y los dos
+Marketing Cloud; no hay comandos paralelos por proveedor.
+
+```bash
+pnpm studio describe studio.activation.account.upsert --base-url http://127.0.0.1:3101
+pnpm studio call studio.activation.accounts.list --base-url http://127.0.0.1:3101
+pnpm studio describe studio.activation.plan --base-url http://127.0.0.1:3101
+pnpm studio call studio.execution.unlinked.list --base-url http://127.0.0.1:3101
+pnpm studio describe studio.activation.reschedule --base-url http://127.0.0.1:3101
+pnpm studio describe studio.activation.from_execution --base-url http://127.0.0.1:3101
+```
+
+Para cuenta Resend: provider y platform `resend`; providerAccountRef es el alias de cuenta que Greenhouse tenga
+vinculado a la credencial. HubSpot usa provider/platform `hubspot` y portal ID como providerAccountRef. Para el
+sitio público: provider `wordpress`, platform `website`, cms `wordpress`, siteOrigin y providerAccountRef
+`https://efeoncepro.com`. Registrar una cuenta no instala credenciales ni habilita el worker. Todas las escrituras
+usan `--file`, dryRun por defecto, `--apply`, Idempotency-Key e If-Match según `describe`.
+
+Los canales nuevos se publican como nueva versión: `owned_email_resend`, `owned_email_sfmc_engagement`,
+`owned_email_sfmc_next`. El archivo Studio `packages/database/seeds/channel-catalog-email-additions.json` contiene
+sólo las tres adiciones: crear draft basado en la versión vigente, upsert de cada canal, revisión y publicación
+por el carril de operador autorizado. Nunca editar v1. El gobierno global aún rechaza bearers de servicio:
+la CLI no convierte una credencial en operador ni elude esa decisión.
+
+`emailEvidence.completion=partial|unknown` no equivale a published; sentCount/expectedCount pueden ser null.
+Marketing Cloud devuelve readerAvailability=not_implemented; no hay conexión ni evidencia simulada. Para un CMS
+sin lector, `studio.activation.publication.confirm` requiere persona y fecha explícita: la CLI de servicio es
+rechazada. draftUrl es una referencia Notion y ningún comando abre ni modifica ese borrador.
+
+[Evidencia, límites y rollout](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).

@@ -169,7 +169,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Nuevo corte local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. Faltan release/configuración owned, canary WP y QA UI/CLI del nuevo corte; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
+- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Nuevo corte local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. WP real 96 URLs y replay owned PG 113/0 cambios PASS; CLI y GVC básico PASS; navegación móvil Día→Línea de tiempo falla y se entrega a Claude. Faltan release/configuración owned y QA final UI de Claude; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -630,3 +630,17 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 Studio `e62b5e3` + `055860d`: API 1.8.0 aditiva; consumer Greenhouse paginado con aislamiento org/proveedor/cuenta, resumen de completitud, lectura sin destinatarios y fallo cerrado para Marketing Cloud. Suite Studio 286 tests + 7 gates, todas las integraciones PG habilitadas; migración up/down/up. Greenhouse: nueve pruebas focales, lint y typecheck PASS. Puerto usa consumidor/binding sister-platforms y resolvers canónicos; flags OFF.
 
 Canary real de sólo lectura: Resend un broadcast borrador (ningún envío completo disponible para certificar ese caso); HubSpot dos páginas, 16 emails BATCH, dos completos acreditados por SENT y catorce borradores. No se enviaron emails. El canary ejecuta adapters con credenciales reales, no certifica aún el transporte M2M desplegado: requiere release Greenhouse, consumer/binding y configuración worker. No hay nuevo push.
+
+### Cierre del corte local owned — 2026-10-04
+
+- [x] Resend/HubSpot: adapters reales en Greenhouse y consumidor paginado Studio; límites e identidad verificados.
+- [x] Engagement/Next preparados: providers/catálogo, sin lector ni prueba live (alcance confirmado por operador).
+- [x] WordPress público: metadata paginada acotada, caché por corrida de robots/sitemaps y fecha observada; conserva otros CMS y draftUrl.
+- [x] Studio 288 tests + 7 gates con Postgres real; build PASS. Greenhouse 9 focales + 18 CLI, lint y typecheck PASS.
+- [x] Worker-domain sobre PG local con evidencia real; replay final 3 cuentas, 113 observaciones, 0 cambios, 0 errores.
+- [x] CLI HTTP: flujo general de 25 comprobaciones + 15 owned; GVC desktop/móvil sin errores runtime. Datos locales desechables.
+- [ ] Rollout: nuevo push no autorizado; migration/catalog/consumer/binding/flags/worker/scheduler pendientes. Owned sigue OFF en producción.
+- [ ] TASK-2002: QA de formularios de escritura y navegación móvil Día→Línea de tiempo y presentación emailEvidence/nombres de proveedores corresponden al trabajo actual de Claude.
+
+[Dossier y handoff de integración](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
+No se mueve la TASK a complete ni se interpreta este corte como federación MCP o habilitación productiva.
