@@ -498,6 +498,10 @@ export const GH_INSIGHTS = {
 
   methodology: {
     cutoff: 'corte al',
+    /** Mismo origen con varias fechas de corte (período actual y anterior): «cortes al A y al B». */
+    cutoffs: 'cortes al',
+    cutoffJoin: 'al',
+    cutoffLast: 'y al',
     cutoffUndeclared: 'sin fecha de corte declarada',
     fallback: 'Las cifras provienen del snapshot sellado de la edición.'
   },
