@@ -548,8 +548,9 @@ evidencia de ejecución; comparación con lo publicado) están especificados en 
 
 **Operación por MCP obligatoria** (operador, 2026-10-04). Refuerza §4.1: ninguna capacidad de taxonomía, activaciones,
 calendario o UTM se da por terminada sin su tool federada y operable por Efeonce MCP, escrituras incluidas, con la
-identidad delegada de la persona (carril de TASK-2003; las aprobaciones `T2` siguen por CLI/UI mientras TASK-1899
-esté retirada), verificada en una sesión MCP real.
+identidad delegada de la persona (carril de TASK-2003, que corre en paralelo y no bloquea el producto; las
+aprobaciones `T2` siguen por CLI/UI mientras TASK-1899 esté retirada), verificada en una sesión MCP real desde la
+conexión que el operador usa.
 
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
 plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra

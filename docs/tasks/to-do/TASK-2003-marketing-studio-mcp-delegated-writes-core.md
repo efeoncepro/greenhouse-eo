@@ -20,7 +20,7 @@
 - Backend impact: `integration`
 - Epic: `EPIC-049`
 - Status real: `Diseno — creada 2026-10-04 por decisión del operador: núcleo de escritura agent-friendly separado de TASK-1899 (retirada); la implementa Codex`
-- Rank: `1 en la ruta de activaciones (TASK-2003 → TASK-1905 → TASK-2001 → TASK-2002)`
+- Rank: `TBD — independiente: no bloquea TASK-1905/2001/2002; habilita sus escrituras por MCP cuando esté vivo`
 - Domain: `platform`
 - Blocked by: `none` (TASK-1894 Entregables A y B en producción desde 2026-10-02; las capabilities marketing_studio.asset.write y .campaign.write están en develop y salen a producción con el release de Greenhouse de esta task)
 - Branch: `efeonce-marketing-studio main (actor delegado) · Greenhouse develop (canje, clientes, scope, manual servido) · efeonce-mcp rama + PR (carril de escritura); sin worktrees`
@@ -34,8 +34,8 @@ pasos extra. Hoy por MCP sólo se lee: el gateway filtra las tools de escritura 
 lecturas). Esta task agrega las cuatro piezas mínimas: el scope de escritura en Entra; el canje de Greenhouse por
 capability exacta; Studio registrando a la persona (vía MCP) como autora del cambio; y el gateway federando las tools
 de escritura `T1`. Las **aprobaciones (`T2`) quedan fuera**: siguen por CLI o UI, y su confirmación con
-`proposalDigest` sigue en TASK-1899, retirada. Desde aquí, toda task de EPIC-049 nace con sus tools —lectura y
-escritura— federadas.
+`proposalDigest` sigue en TASK-1899, retirada. Las tasks de producto (TASK-1905, 2001, 2002…) avanzan en paralelo con sus tools en
+el manifiesto; sus escrituras se federan en cuanto este carril esté vivo.
 
 ## Why This Task Exists
 
@@ -45,7 +45,7 @@ escritura— federadas.
 - Sin este núcleo, las tools de escritura existen en el manifiesto (44 tools desde API 1.4.0) pero el gateway las
   filtra, y si se federaran sin identidad delegada Studio registraría al **gateway** como autor (prohibido por el ADR de
   fuente única: el actor de una escritura es la persona).
-- TASK-1905, TASK-2001 y TASK-2002 dependen de este carril para cumplir la regla de MCP obligatoria.
+- TASK-1905, TASK-2001 y TASK-2002 lo necesitan para que sus escrituras se operen por MCP, pero no lo esperan para avanzar.
 
 ## Goal
 
@@ -92,7 +92,7 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- **TASK-1905, TASK-2001, TASK-2002**: nacen con sus escrituras federadas sobre este carril.
+- **TASK-1905, TASK-2001, TASK-2002**: avanzan en paralelo; sus escrituras se federan sobre este carril cuando esté vivo (no lo esperan).
 - **TASK-1899** (retirada): conserva sólo la confirmación de `T2` (`proposalDigest`), la capability `marketing_studio.campaign.approve` y la federación de aprobaciones, para cuando el operador la retome.
 - **TASK-1895**: la UI y el MCP escriben por los mismos commands.
 
@@ -139,8 +139,10 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: canje RFC 8693 de TASK-1891, `sisterPlatformOAuthPolicyV1Schema`, kernel de commands de TASK-1894, manifiesto `studio-tool-manifest.v1`.
 - Contrato nuevo o modificado (de TASK-1899 Slices 1–4, **sin** lo marcado fuera de alcance):
+  - **Conexión real (revisión de Codex, 2026-10-04):** el carril se prueba desde la conexión que el operador usa a diario (conector de Efeonce MCP en Claude y en Codex), no sólo agregando el scope al servidor. El Slice 0 determina qué cliente y qué identidad usa esa conexión: si es el cliente público Entra (PKCE), su consentimiento debe poder obtener `efeonce.mcp.marketing_studio.write`; si es la identidad nativa de Efeonce ID, hoy la política del gateway la excluye para Studio (`marketing_studio_native_policy_missing`) y el grant nativo debe delegar las capabilities de Studio (nuevo consentimiento, decisión D10 del ADR de autoridad nativa). Sin esa ruta probada, la task no está completa.
   - Scope Entra `efeonce.mcp.marketing_studio.write` (consentimiento de administrador) en la app «Efeonce MCP Resource».
-  - Greenhouse: contratos de canje `asset.download`, `asset.write`, `campaign.write` (uno por capability, cliente propio, input scope de escritura); `authorizeMarketingStudio(tenant, capability, action)`; revalidación en `userinfo` para clientes `resourceFamily = 'marketing_studio'`.
+  - Greenhouse: contratos de canje `asset.write` y `campaign.write` con input scope de **escritura**, y `asset.download` con input scope de **lectura** (`efeonce.mcp.read`, como en el diseño de TASK-1899: descargar no es escribir); uno por capability, cliente propio; `authorizeMarketingStudio(tenant, capability, action)`; revalidación en `userinfo` para clientes `resourceFamily = 'marketing_studio'`.
+  - Studio: `issueOriginalDownload` (`packages/domain/src/media/download.ts`, hoy sólo acepta `actor.kind === 'api_client'`) acepta también al actor delegado `user` con `authority.capabilities` que incluya `marketing_studio.asset.download`, manteniendo el scope del `api_client` del gateway; sin esto, las descargas por MCP se pierden.
   - Studio: cabecera `Efeonce-Delegated-Token` aceptada sólo desde `api_client` confiable (`STUDIO_DELEGATION_TRUSTED_API_CLIENT_IDS`) con `STUDIO_DELEGATED_ACTOR_ENABLED`; actor `user` con `authority { kind: 'delegated_oauth', via: 'mcp', capabilities }`; errores `delegation_required`, `delegation_invalid`, `delegation_insufficient`, `delegation_unavailable`.
   - Gateway: tabla `capability → { clientId, inputScope, forwardDelegatedToken }`; transporte de escritura (`Idempotency-Key`, `If-Match`, `dryRun`, cuerpo); federación de tools `writes` con `riskTier = T1`; flag `MARKETING_STUDIO_MCP_WRITES_ENABLED`.
 - **Fuera de alcance (queda en TASK-1899):** capability `marketing_studio.campaign.approve` y su cliente de canje; `proposalDigest` y la confirmación de `T2`; federación de tools `class: 'approve'` o `riskTier = T2` (siguen fuera del filtro del gateway).
@@ -210,9 +212,16 @@ Reglas obligatorias:
 
 ## Scope
 
+### Slice 0 — Conexión real del operador
+
+- Identificar el cliente y la identidad del conector de Efeonce MCP que el operador usa en Claude y en Codex (Entra
+  PKCE o identidad nativa de Efeonce ID) y cómo obtendrá el scope de escritura (consentimiento). Si es la identidad
+  nativa, agregar el alcance necesario para que su grant delegue las capabilities de Studio (y dejar
+  `marketing_studio_native_policy_missing` sólo para lo no delegado). Documentar el resultado antes del Slice 1.
+
 ### Slice 1 — Greenhouse: canje por capability y manual
 
-- TASK-1899 Slice 1 **sin** `campaign.approve`: tres contratos de canje (`asset.download`, `asset.write`, `campaign.write`), tres clientes por migración (patrón `efeonce-mcp-marketing-studio`, `requireOnPrivilegedAction = true`, `taskId = 'TASK-2003'`), `authorizeMarketingStudio(tenant, capability, action)`, revalidación en `userinfo`, scope en `EFEONCE_MCP_WRITE_SCOPES` (no publicado en `PUBLISHED_SCOPES_SUPPORTED`).
+- TASK-1899 Slice 1 **sin** `campaign.approve`: tres contratos de canje (`asset.download` con input scope de lectura; `asset.write` y `campaign.write` con input scope de escritura), tres clientes por migración (patrón `efeonce-mcp-marketing-studio`, `requireOnPrivilegedAction = true`, `taskId = 'TASK-2003'`), `authorizeMarketingStudio(tenant, capability, action)`, revalidación en `userinfo`, scope en `EFEONCE_MCP_WRITE_SCOPES` (no publicado en `PUBLISHED_SCOPES_SUPPORTED`).
 - Manual servido: flujo de escritura por MCP (subida en dos pasos, `Idempotency-Key`, `If-Match`, `dryRun`, qué hacer ante 412/428/409/`upstream_timeout_unknown_outcome`), y que **aprobar** sigue siendo por CLI/UI; `pnpm mcp:skills:generate` + `check`.
 - Release de Greenhouse por el control plane (incluye las capabilities de escritura hoy en `develop`) y allowlist de los tres clientes.
 
@@ -224,6 +233,7 @@ Reglas obligatorias:
 
 - TASK-1899 Slice 3 **sin** la confirmación (`proposalDigest`, `confirmation_*`): `delegated-actor.ts`, `authority` en el actor, errores `delegation_*`, nuevo `api_client` del gateway con `studio:read`, `studio:assets:download`, `studio:assets:write`, `studio:write` (versión nueva del secreto), env vars con el flag OFF, push.
 - El kernel acepta al actor `user` con `authority.via = 'mcp'` para `T1`; `T2` sigue respondiendo `confirmation_required` (hasta TASK-1899).
+- `issueOriginalDownload` acepta al actor delegado con la capability de descarga (test: delegado con capability 200; sin capability 403; anónimo sigue 403 `download_disabled`).
 
 ### Slice 4 — Gateway: carril de escritura
 
@@ -282,7 +292,7 @@ en vez de federar todo `writes`; sin `proposalDigest` ni errores `confirmation_*
 
 1. Staging: canje de prueba por cada capability; Studio con flag ON en preview; gateway en staging si existe, si no, prueba de contrato.
 2. Producción: release de Greenhouse → allowlist → Entra → Studio (flag OFF) → gateway (flag OFF) → flag Studio ON → flag gateway ON.
-3. Sesión MCP real con token Entra humano: crear concepto y copy en la sandbox de producción gobernada por Studio (o una campaña creada por `createCampaign`), subir una versión a una pieza, editar con `If-Match`; verificar `audit_event` con la persona y `via: mcp`; persona sin capability ⇒ `forbidden`; tool `T2` ausente.
+3. Sesión MCP real **desde el conector que usa el operador** (Claude o Codex): crear concepto y copy en la sandbox de producción gobernada por Studio (o una campaña creada por `createCampaign`), subir una versión a una pieza, editar con `If-Match`; verificar `audit_event` con la persona y `via: mcp`; persona sin capability ⇒ `forbidden`; tool `T2` ausente.
 4. Revocar el `api_client` anterior.
 
 ### Out-of-band coordination required
@@ -300,6 +310,8 @@ en vez de federar todo `writes`; sin `proposalDigest` ni errores `confirmation_*
 - [ ] Una persona sin la capability recibe `forbidden` por MCP; un token canjeado para otra capability se rechaza.
 - [ ] Sin `Efeonce-Delegated-Token`, el gateway no puede escribir (`delegation_required`); el token nunca aparece en logs.
 - [ ] Las tools `approve`/`T2` no están federadas; por API siguen respondiendo `confirmation_required`.
+- [ ] La sesión MCP de verificación sale de la conexión que el operador usa habitualmente (conector de Claude o Codex), no de un token armado aparte.
+- [ ] `studio.asset.download` sigue funcionando por MCP con el actor delegado (canje de lectura).
 - [ ] Con los flags OFF, el comportamiento es idéntico al de hoy.
 - [ ] Tests de Greenhouse, Studio y gateway verdes; `pnpm check`/`pnpm build` de Studio, `pnpm check` del gateway y gates de Greenhouse verdes.
 - [ ] Sesión MCP real en producción con evidencia registrada; manual servido y skill actualizados.

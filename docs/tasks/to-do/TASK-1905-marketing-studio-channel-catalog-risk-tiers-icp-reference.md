@@ -12,8 +12,12 @@ El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es 
 nace Full API Parity con sus tools en el MCP, **escrituras incluidas**. La «nueva decisión» que dejaba pendiente la
 retirada de TASK-1899 es **TASK-2003**: núcleo de escritura por MCP con identidad delegada (scope en Entra, canje por
 capability exacta, persona como actor, gateway con escrituras `T1`), **sin** aprobaciones ni `proposalDigest`, que
-siguen retirados en TASK-1899. Desde TASK-2003, las escrituras `T1` de esta task nacen federadas; las `T2` siguen por
-CLI/UI. La implementa Codex.
+siguen retirados en TASK-1899. Las escrituras `T1` de esta task se federan sobre TASK-2003 cuando esté vivo; las `T2`
+siguen por CLI/UI. La implementa Codex.
+
+**Sin bloqueo** (revisión de Codex aceptada por el operador, 2026-10-04): esta task **no espera** a TASK-2003. Se
+construye en paralelo (API, CLI y UI) con todas sus tools en el manifiesto; sus escrituras se federan por MCP en cuanto
+TASK-2003 esté vivo.
 
 ## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
 
@@ -25,7 +29,8 @@ CLI/UI. La implementa Codex.
 - **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
   —leer, planificar y editar (las `T2` por CLI/UI mientras TASK-1899 esté retirada)— y la evidencia queda registrada. Manual servido
   (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
-- **Consecuencia de orden:** TASK-2003 (núcleo de escritura por MCP) va antes; sin ese carril esta task no puede cumplir la regla.
+- **Orden:** no espera a TASK-2003. Toda operación nace con su tool en el manifiesto; las lecturas se federan y prueban al
+  cerrar; las escrituras se federan y prueban por MCP cuando TASK-2003 esté vivo (si ya lo está al cerrar, se prueban ahí).
 
 ## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
 

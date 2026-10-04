@@ -6,8 +6,12 @@ El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es 
 nace Full API Parity con sus tools en el MCP, **escrituras incluidas**. La «nueva decisión» que dejaba pendiente la
 retirada de TASK-1899 es **TASK-2003**: núcleo de escritura por MCP con identidad delegada (scope en Entra, canje por
 capability exacta, persona como actor, gateway con escrituras `T1`), **sin** aprobaciones ni `proposalDigest`, que
-siguen retirados en TASK-1899. Desde TASK-2003, las escrituras `T1` de esta task nacen federadas; las `T2` siguen por
-CLI/UI. La implementa Codex.
+siguen retirados en TASK-1899. Las escrituras `T1` de esta task se federan sobre TASK-2003 cuando esté vivo; las `T2`
+siguen por CLI/UI. La implementa Codex.
+
+**Sin bloqueo** (revisión de Codex aceptada por el operador, 2026-10-04): esta task **no espera** a TASK-2003. Se
+construye en paralelo (API, CLI y UI) con todas sus tools en el manifiesto; sus escrituras se federan por MCP en cuanto
+TASK-2003 esté vivo.
 
 ## Status
 
@@ -92,7 +96,7 @@ Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo ·
 
 Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
 
-**Regla del programa (operador, 2026-10-04): todo lo que se implemente en EPIC-049 es Full API Parity y operable por MCP, lecturas y escrituras, con identidad delegada; ninguna task cierra sin una sesión MCP real que ejecute sus operaciones nuevas.** Por eso la ruta de activaciones y calendario (ADR de estrategia §15) es: **TASK-2003** (núcleo de escritura delegada por MCP, sin aprobaciones; TASK-1899 retirada) → **TASK-1905** (catálogo de canales con la taxonomía de §15 y los valores UTM de RESEARCH-012) → **TASK-2001** (activaciones, evidencia de ejecución, descubrimiento de Metricool, tracking URL por activación) → **TASK-2002** (calendario), con la dirección visual v3 de 2002 en paralelo desde ya.
+**Regla del programa (operador, 2026-10-04): todo lo que se implemente en EPIC-049 es Full API Parity y operable por MCP, lecturas y escrituras, con identidad delegada; ninguna task cierra sin una sesión MCP real que ejecute sus operaciones nuevas.** La ruta de producto de activaciones y calendario (ADR de estrategia §15) es: **TASK-1905** → **TASK-2001** → **TASK-2002**, y en paralelo, sin bloquearla, **TASK-2003** (núcleo de escritura delegada por MCP, sin aprobaciones; TASK-1899 retirada), que federa las escrituras de cada una cuando esté vivo. Detalle anterior de la ruta, reemplazado: **TASK-1905** (catálogo de canales con la taxonomía de §15 y los valores UTM de RESEARCH-012) → **TASK-2001** (activaciones, evidencia de ejecución, descubrimiento de Metricool, tracking URL por activación) → **TASK-2002** (calendario), con la dirección visual v3 de 2002 en paralelo desde ya.
 
 Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 (Slices 1–3, work items con personas) → 1914 (registro de roles y tarjetas) → 1913 Slice 4 (asignación a roles) → 1915 (ledger y modo interactivo primero; despachador y adaptadores después) → 1916 (evals, costo y métricas; compuerta de autonomía). El modo delegado en segundo plano de 1915 queda bloqueado por TASK-1917 (EPIC-044 U22: delegación por corrida con claim `act`, creada por decisión del operador el 2026-09-26). La UI de work items, roles, corridas y métricas es follow-up consumidor de 1895/1912.
 
@@ -125,7 +129,7 @@ Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 
 - `TASK-1999` — **Complete 2026-10-04 (en producción).** Reproductor nativo en el panel de la pieza (feed e historia, sin autoplay), todas las piezas de un formato en el tablero (la versión «con intro para Instagram» de CMP001-08 era invisible), duración y «Ver video» / «Ver imagen» en los huecos.
 - `TASK-2001` — To-do. Activaciones de campaña: la salida concreta de una campaña en un canal (campaña obligatoria, campañas Always On, modality × family × platform × placement, cuenta, mercado, pieza en versión exacta, fecha planificada), evidencia de ejecución adjunta (Metricool, después plataformas de ads), estado calculado plan vs ejecución, descubrimiento de lo programado en Metricool y «ejecución sin activación» en Hoy; el calendario lee activaciones. Bloqueada por TASK-1905 (catálogo).
 - `TASK-2002` — To-do. Calendario de activaciones en la UI: filtros por dimensión, tarjetas con pieza y estado de ejecución, hoja de detalle y bandeja de ejecución sin activación. Bloqueada por TASK-2001 y por la dirección visual v3.
-- `TASK-2003` — To-do (la implementa Codex). Núcleo de escritura por MCP con identidad delegada: scope de escritura en Entra, canje por capability exacta en Greenhouse, Studio registra a la persona vía MCP como autora, gateway federa las escrituras `T1`. Sin aprobaciones (`T2` siguen por CLI/UI; su confirmación queda en TASK-1899, retirada). Primera de la ruta de activaciones.
+- `TASK-2003` — To-do (la implementa Codex). Núcleo de escritura por MCP con identidad delegada: scope de escritura en Entra, canje por capability exacta en Greenhouse, Studio registra a la persona vía MCP como autora, gateway federa las escrituras `T1`. Sin aprobaciones (`T2` siguen por CLI/UI; su confirmación queda en TASK-1899, retirada). Corre en paralelo: no bloquea TASK-1905/2001/2002; federa sus escrituras cuando esté vivo.
 
 
 ### Flujo editorial SEO/AEO — decisión 2026-10-04
