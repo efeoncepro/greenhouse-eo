@@ -443,7 +443,10 @@ export const markInsightOutputFailed = async (input: {
  * un `failed` reusa SU fila. Nunca se crea una segunda, y un `completed` ni se mira.
  *
  * `dead_letter` NO se reintenta acá: es terminal por diseño (intentos agotados o fallo no
- * reintentable). Resucitarlo es una decisión humana con su propio command, no un retry genérico.
+ * reintentable) y este retry reusa el manifest sellado, que un fallo determinista volvería a
+ * rechazar. La salida de un `dead_letter` es un encargo NUEVO del mismo target
+ * (`requestInsightRender`): recompone el manifest con el código vigente sobre el mismo plan
+ * congelado y crea otra fila; el índice parcial `insight_outputs_live_identity_uq` lo permite.
  */
 export const retryFailedInsightOutputs = async (input: {
   organizationId: string
@@ -593,14 +596,19 @@ export interface InsertInsightRenderRunInput {
     manifestHash: string
     constraints?: Record<string, unknown>
     deadline?: Date | null
+    /** Output terminal (`dead_letter`/`cancelled`) de la misma identidad que éste reemplaza; queda en el historial. */
+    supersedesOutputId?: string | null
   }>
   client: InsightsDbClient
 }
 
 /**
- * Inserta run + outputs en la transacción del caller. Un output por target; la UNIQUE
- * `(org, edición, output, audiencia)` hace que un segundo encargo del mismo target reviente en DB
- * en vez de duplicar bytes — el command lo resuelve ANTES leyendo lo existente.
+ * Inserta run + outputs en la transacción del caller. Un output por target; el índice parcial
+ * `insight_outputs_live_identity_uq` (`(org, edición, output, audiencia) WHERE state NOT IN
+ * ('dead_letter','cancelled')`) hace que un segundo encargo VIVO del mismo target reviente en DB en vez
+ * de duplicar bytes — el command lo resuelve ANTES leyendo lo existente, y traduce la carrera residual
+ * (23505 de ese índice) a idempotencia o `render_rejected`, nunca a un 500. Un output terminal no
+ * ocupa la identidad: re-encargarlo crea una fila nueva y la vieja queda como historial.
  */
 export const insertInsightRenderRun = async (
   input: InsertInsightRenderRunInput
@@ -654,7 +662,11 @@ export const insertInsightRenderRun = async (
         row.rows[0]!.insight_output_id,
         runRecord.renderRunId,
         input.organizationId,
-        JSON.stringify({ manifestHash: output.manifestHash, catalogName: output.catalogName }),
+        JSON.stringify({
+          manifestHash: output.manifestHash,
+          catalogName: output.catalogName,
+          ...(output.supersedesOutputId ? { supersedes: output.supersedesOutputId } : {})
+        }),
         input.requestedByKind
       ]
     )
@@ -680,7 +692,7 @@ export const findInsightOutputsForEdition = async (input: {
     input.client,
     `SELECT ${OUTPUT_COLUMNS} FROM greenhouse_insights.insight_outputs
       WHERE organization_id = $1 AND edition_id = $2 AND audience = $3
-      ORDER BY created_at DESC`,
+      ORDER BY created_at DESC, insight_output_id`,
     [input.organizationId, input.editionId, input.audience]
   )
 

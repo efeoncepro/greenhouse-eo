@@ -71,6 +71,9 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Job launcher | `src/lib/render-dispatch/job-runner.ts` | domain-free Cloud Run Job execution launcher |
 | Worker consumer | `services/artifact-worker/consumers/insights.ts` | claim + render + upload for Insights outputs; Job `parallelism=1`; assets bucket fixed to staging bucket, `bucket_name` per row |
 | Migration | `20260916201127095_task-1846-insights-render-client-user-actor` | runs/events accept `client_user`; human actor on run, enqueue event, retry, cancel |
+| Migration | `20261004152040741_insights-outputs-live-identity-partial-unique` | replaces the total `insight_outputs_identity_uq` with the partial `insight_outputs_live_identity_uq` (`WHERE state NOT IN ('dead_letter','cancelled')`): a terminal output frees its identity for a new request |
+| Domain | `render/contracts.ts` (`INSIGHT_OUTPUT_RELEASED_STATES`, `isInsightOutputLive`, `isInsightOutputLiveIdentityViolation`) | mirror of the partial index predicate + detector of its `23505` (race → idempotent/422, never 500) |
+| Live test | `render/render-identity.live.test.ts` | applies the migration Up in a rolled-back tx as `ops`; proves dead_letter → new row, live collision, no revive |
 | Gateway | `efeonce-mcp` v1.6.0 (PR #14 `da8295a`, 51 tools) | 4 render tools federated; writes need `efeonce.mcp.insights.write`; deployed 2026-09-16 (revision `00054-n78`) |
 | Release plane | artifact-worker Job in the production release control plane | first productive deploy in release `917491fd02e4` (2026-09-16, change-gated) |
 

@@ -46,17 +46,20 @@ is switched off in this runtime — report it and stop. Never tell a human that 
   `outputAssetId`; that id is not a download link and the document is not shared or sent.
 - **Retry** (`retry_insight_render`) re-queues only failed outputs; completed ones are never touched. A
   failure caused by the content (for example text that does not fit a slide) fails again with the same
-  cause and, after its attempts are exhausted, becomes `dead_letter`. Report the cause; the fix is a
-  corrected edition, not more retries.
+  cause and, after its attempts are exhausted, becomes `dead_letter`. Retry reuses the same sealed input,
+  so it never fixes that. Report the cause; once the product fix is live, request a new render of that
+  output alone (it is composed again from the same frozen plan). If the plan itself is wrong, the fix is a
+  corrected edition.
 - **Cancel** (`cancel_insight_render`) stops what has not started; what is already rendering finishes and
   the answer says so (`stillRunning`). A cancelled run is **terminal**: retrying it answers successfully
   but re-queues nothing. To get the document after cancelling, request a new render.
 - **Asking twice does not draw twice.** If the outputs you ask for already have a live render in one run
   (`queued`, `running`, `completed` or `failed`), `request_insight_render` answers with that same run and
   `idempotent: true`; nothing new is queued. A failed output is recovered with `retry_insight_render`; a new
-  render is possible only after `dead_letter` or a cancel. If only some of the requested outputs are live in
-  another run, the request is rejected with `render_rejected` naming them: follow that run, or ask for the
-  missing output alone.
+  render is possible only after `dead_letter` or a cancel; the dead or cancelled output stays as history. If
+  only some of the requested outputs are live in another run, the request is rejected with `render_rejected`
+  naming them and listing which outputs you can request (`requestable`): follow that run, or ask for those
+  alone.
 - **Only an edition in review renders.** The edition must be in `ready_for_review`; any other state (for
   example an issued one) answers `not_ready`.
 - **Name the outputs.** `outputs` must be outputs the edition declared. If you omit it, every declared output

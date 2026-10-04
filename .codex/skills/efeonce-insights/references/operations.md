@@ -218,6 +218,20 @@ flag, 202 after.
   deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.
 - Semantics seen live: `retry` re-queues only failed (completed untouched; content failures fail again, attempts →3 →
   `dead_letter`); `cancel` on a queued run ⇒ `cancelled`, 0 attempts; `retry` on cancelled ⇒ 200, no re-queue.
+- **Recovering a `dead_letter` / `cancelled` output (from 2026-10-04, once migration
+  `20261004152040741_insights-outputs-live-identity-partial-unique` is applied and the command is released):** ship the
+  fix first, then, with the edition still `ready_for_review`, `POST …/editions/<id>/render '{"outputs":["<target>"]}'`
+  with ONLY the dead targets (asking also for a target that is alive ⇒ `422` with `details.requestable`). Expect `202`, a
+  new run, the new output `queued` and its queued event with `detail.supersedes`. Do not `retry` (sealed manifest fails
+  again) and do not `revise` unless the edition left `ready_for_review` or the plan must change. Before the migration
+  is applied, the same request answers `500 internal_error` (total UNIQUE): the only path then is `revise`.
+- The migration is a relaxation, safe in both directions: apply it BEFORE releasing the command (the code before it
+  already intended this contract). Its Down fails on purpose once a terminal identity has a live successor; rows are
+  append-only, never delete to make the total index fit.
+- Live test of the index: `pnpm test:live src/lib/efeonce-insights/render` (needs the proxy on `127.0.0.1:15432`).
+  `render-identity.live.test.ts` runs as the `ops` profile and applies the migration's Up INSIDE a rolled-back
+  transaction (DDL needs the table owner; the runtime profile gets `must be owner of table insight_outputs`), so it
+  proves the real SQL without mutating the shared instance; it uses output `web`, which no real row has.
 - Staging canary (recipe used 2026-09-16; synthetic org "Greenhouse Demo", persona `agent-client`):
   1. `AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org pnpm staging:request POST /api/platform/app/insights/editions '<InsightRequestV1, outputs ["deck_pdf"]>'` → 202 `ready_for_review`.
   2. `… pnpm staging:request POST /api/platform/app/insights/editions/<editionId>/render '{}'` → 202, output `queued`.

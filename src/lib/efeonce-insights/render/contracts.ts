@@ -171,3 +171,24 @@ export const isInsightOutputTransitionAllowed = (
   from: InsightOutputState,
   to: InsightOutputState
 ): boolean => INSIGHT_OUTPUT_TRANSITIONS[from].includes(to)
+
+/**
+ * Estados terminales SIN salida: un output así ya no ocupa su identidad. Espeja el predicado del
+ * índice parcial `insight_outputs_live_identity_uq` (`WHERE state NOT IN ('dead_letter','cancelled')`);
+ * si cambia uno, cambia el otro. `completed` SÍ es vivo: hay a lo más un asset final por identidad.
+ */
+export const INSIGHT_OUTPUT_RELEASED_STATES: ReadonlySet<InsightOutputState> = new Set(['dead_letter', 'cancelled'])
+
+export const isInsightOutputLive = (state: InsightOutputState): boolean => !INSIGHT_OUTPUT_RELEASED_STATES.has(state)
+
+/** Nombre del índice que garantiza "a lo más un output vivo por (org, edición, target, audiencia)". */
+export const INSIGHT_OUTPUT_LIVE_IDENTITY_INDEX = 'insight_outputs_live_identity_uq'
+
+/** `true` sólo para la unique violation de ESE índice (no para cualquier 23505). */
+export const isInsightOutputLiveIdentityViolation = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') return false
+
+  const pgError = error as { code?: unknown; constraint?: unknown }
+
+  return pgError.code === '23505' && pgError.constraint === INSIGHT_OUTPUT_LIVE_IDENTITY_INDEX
+}

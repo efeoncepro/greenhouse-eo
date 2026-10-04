@@ -61,10 +61,29 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
   with `details.alive` (never mixes runs). Precondition failure (edition not `ready_for_review`, e.g. already issued) ⇒
   `not_ready`. `outputs` omitted ⇒ every output the edition declared, so an edition that declared `web` is rejected
   whole (`details.unsupported`) unless the caller passes the renderable ones; an undeclared output ⇒ `details.outside`.
+  Since 2026-10-04 the partial rejection also carries `details.requestable` (the requested targets with nothing alive).
+- **Way out of a terminal output (decided 2026-10-04, verified in code + real PG the same day):** the DB identity is the
+  partial unique index `insight_outputs_live_identity_uq` on `(organization_id, edition_id, output, audience) WHERE state
+  NOT IN ('dead_letter','cancelled')` (migration `20261004152040741_insights-outputs-live-identity-partial-unique`,
+  replaces the total `insight_outputs_identity_uq`). `dead_letter`/`cancelled` have no outgoing transition, so they free
+  their identity forever; `completed` stays alive (≤ 1 final asset per identity). Re-requesting a terminal target with
+  `POST …/editions/{id}/render {"outputs":[…]}` while the edition is still `ready_for_review` ⇒ `202` with a NEW output
+  row whose manifest is RECOMPOSED with the current mapper code over the same frozen plan; the terminal row stays as
+  history and the new output's `queued` event carries `detail.supersedes = <old insightOutputId>`. This is the canonical
+  exit after a code fix for a deterministic failure (`semantic_rejected`); `retry` is not (it reuses the sealed manifest)
+  and `revise` is only needed when the edition is no longer `ready_for_review` or the plan itself must change.
+  Concurrent re-requests: the index stops the second INSERT (`23505` on that index, matched by
+  `isInsightOutputLiveIdentityViolation`) and the command re-reads ⇒ `200 idempotent:true` if the winning run covers the
+  request, else `422 render_rejected` with `details.alive` — never `500 internal_error` (which is what the total index
+  produced on 2026-10-04 for the Berel canary).
+- Readers by edition (`findInsightOutputsForEdition`, ordered `created_at DESC, insight_output_id`) may return several
+  rows per target (one alive + terminal history). Every consumer (outputs port, delivery attachments, public download)
+  selects `state === 'completed' && outputAssetId`, never "the row of the target".
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
-- `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none). `dead_letter` is terminal.
+- `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none) with their SEALED
+  manifest. `dead_letter` is terminal: its exit is a new render request (above), never `retry`.
 - `POST …/render-runs/{id}/cancel` → `{ run, outputs, cancelled, stillRunning, idempotent }`; running outputs are not lied about.
   `cancelled` is TERMINAL: `retry` on a cancelled run answers `200` without re-queuing (verified in staging 2026-09-16);
   to get the deck, request a new render.

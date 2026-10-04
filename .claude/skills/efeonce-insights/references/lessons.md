@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-04 · Un `dead_letter` no tenía salida: el comando lo permitía y la base no.** Síntoma: tras corregir el
+  mapper (release `7182af769`), re-encargar `report_pdf` de la edición de Berel respondió `500 internal_error`; hubo que
+  `revise`. Causa: `requestInsightRender` trataba `dead_letter`/`cancelled` como «no vivos» y su comentario decía que se
+  podía re-encargar, pero `insight_outputs_identity_uq` era una UNIQUE total; y `retry` sólo toma `failed` y reusa el
+  manifest sellado, que el mapper viejo había producido. Ningún test lo veía: el unitario mockeaba el store («dead_letter
+  ⇒ inserta») y el live sólo insertaba la primera fila. Regla: cuando un comando promete un camino que depende de una
+  restricción de base, el live test ejercita ESE camino entero contra PG real (fila terminal + fila nueva + choque de
+  dos vivas); la identidad de una fila con estados terminales va en un índice parcial que espeja el predicado del código
+  (`INSIGHT_OUTPUT_RELEASED_STATES` ↔ `WHERE state NOT IN (…)`). Dos trampas al probarlo: el DDL dentro de un live test
+  exige el perfil `ops` fijado antes de que exista el pool, y dos filas insertadas en la misma transacción empatan en
+  `created_at` (`now()` es el de la transacción): ordenar con desempate y comparar como conjunto.
+
 - **2026-10-04 · TASK-1996 · Tres trampas al publicar y commitear los glifos.** (1) El release de AXIS exige que el tag
   coincida con la versión de un paquete: `v0.4.18` para `axis-graphic-line` 0.16.0 falló («Ningún paquete está en
   0.4.18»); el tag correcto fue `v0.16.0`. (2) Greenhouse fija `axis-graphic-line` 0.11.0 por brand-surfaces y Manzanitas:

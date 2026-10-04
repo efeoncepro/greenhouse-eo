@@ -1018,7 +1018,8 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 
 **Existe en código (develop):**
 - Schema: `insight_render_runs` (solicitud por edición), `insight_outputs` (unidad reclamable por target, UNIQUE
-  `(org, edición, output, audiencia)`), `insight_render_events` (append-only); columnas `lease_expires_at` +
+  `(org, edición, output, audiencia)` — parcial sobre los outputs vivos desde el Delta 2026-10-04 de abajo),
+  `insight_render_events` (append-only); columnas `lease_expires_at` +
   `fence_token` en `insight_outputs` **y** en `proposal_render_jobs` (additive; el reclamo de Proposal queda apagado).
 - Motor: `services/artifact-worker` despacha por `RenderConsumer` (registry con Proposal e Insights); claim
   atómico con lease, reclamo de lease vencido, fencing en la finalización, cuota por org, retry sólo de fallidos,
@@ -1033,6 +1034,31 @@ cero píxeles (Proposal intacto), `pnpm test` completo y `pnpm build` de producc
 
 **NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); el render
 corre en producción desde 2026-09-16 (ver delta de producción); el defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
+
+#### Delta 2026-10-04 — salida canónica de un output terminal
+
+**Incidente:** canary interno de Berel en producción (edición `insed-658861b2…`, run `irun-329330e5…`): `report_pdf`
+quedó `dead_letter` (`semantic_rejected`). Tras el fix (release `7182af769`), re-encargar `report_pdf` respondió
+`500 internal_error`; se salió con `revise`. Causas: (1) `requestInsightRender` trataba `dead_letter`/`cancelled` como
+no vivos, pero `insight_outputs_identity_uq` era una UNIQUE total y el INSERT chocaba sin manejo; (2)
+`retryFailedInsightOutputs` sólo toma `failed` y reusa el manifest sellado.
+
+**Contrato decidido:** la identidad `(org, edición, output, audiencia)` se garantiza sobre los outputs **vivos**:
+índice parcial `insight_outputs_live_identity_uq … WHERE state NOT IN ('dead_letter','cancelled')` (migración
+`20261004152040741_insights-outputs-live-identity-partial-unique`, reemplaza la UNIQUE total). Como esos dos estados no
+tienen transición de salida, una fila terminal libera su identidad para siempre y nunca vuelve a ocuparla; `completed`
+sigue siendo vivo (a lo más un asset final por identidad). Con la edición todavía en `ready_for_review`, un encargo nuevo
+del target muerto crea una fila **nueva** cuyo manifest se recompone con el código vigente sobre el **mismo** plan
+congelado; la fila terminal queda como historial y el evento `queued` del output nuevo lleva `detail.supersedes`. No se
+viola la inmutabilidad: ningún manifest ni plan sellado cambia; se produce otro output del mismo plan.
+`retry` conserva su semántica (sólo `failed`, mismo manifest: fallos transitorios). `revise` sólo hace falta si la
+edición ya salió de `ready_for_review` o si el plan mismo debe cambiar. La carrera entre dos encargos simultáneos la
+frena el índice (`23505` de ESE índice) y el comando la traduce a `200 idempotent:true` o `422 render_rejected`, nunca a
+500. El encargo parcial (un target vivo + uno muerto) sigue rechazándose, ahora con `details.requestable`.
+
+**Estado:** código y migración escritos y probados (unitarios + `render-identity.live.test.ts` contra PostgreSQL real,
+aplicando el Up dentro de una transacción revertida con el perfil `ops`). La migración **no está aplicada** en la
+instancia compartida ni liberada; hasta entonces, el camino para un `dead_letter` sigue siendo `revise`.
 
 #### Delta 2026-09-16 — runtime real, benchmark en Cloud Run y auditoría del actor
 
