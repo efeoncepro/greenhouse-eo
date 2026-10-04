@@ -1,5 +1,19 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-04 — estados de pauta y tolerancia (decisión del operador, dirección visual v3)
+
+Decidido por el operador sobre la dirección visual v3 de TASK-2002 ([canvas «Efeonce Marketing Studio»](https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi), páginas
+«v3 · Calendario de activaciones» y «v3.1 · Línea de tiempo por plataforma»):
+
+- **Dos estados de ejecución nuevos, sólo para paid:** `delivering` («En curso»: entrega observada desde el inicio real) y
+  `ended` («Finalizada»: fin observado). `published` queda para organic y owned. En paid, `overdue` significa que pasó el
+  inicio planificado sin entrega observada. Los calcula el reader; la UI nunca los deriva.
+- **Paid compara inicio y fin por separado**, como fechas de calendario en la zona horaria de la cuenta de anuncios (no
+  horas). Tolerancia por defecto **0 días**, como dato del catálogo de canales y editable por versión, igual que la de
+  organic. Una diferencia en el inicio o en el fin es `scheduled_off_plan`, con la diferencia visible (p. ej. «inicio +2 d»).
+- El reader expone por activación paid: fechas planificadas, fechas configuradas en la herramienta, inicio y fin observados
+  y el id de la campaña en la herramienta, para que la UI pinte plan, herramienta y entrega como tres capas.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

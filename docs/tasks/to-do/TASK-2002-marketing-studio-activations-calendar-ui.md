@@ -1,5 +1,22 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-04 — dirección visual v3 y decisiones del operador
+
+Dirección visual en revisión en el [canvas «Efeonce Marketing Studio»](https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi): página «v3 · Calendario de activaciones»
+(mes, semana, Gantt alternativo, hoja, bandeja y «Vincular», estados, pauta y móvil, en claro y en oscuro) y página
+«v3.1 · Línea de tiempo por plataforma». Decisiones del operador (2026-10-04):
+
+- **Pauta en el mes:** una franja por campaña con el plan y, encima, el peor estado de sus líneas en texto
+  («CMP-001 · Paid · 3 líneas · 1 vencida»). Las tres capas (plan, fechas en la herramienta, entrega observada) se leen sólo
+  en la vista de pauta, la línea de tiempo y la hoja. Estados `delivering`/`ended` y tolerancia de 0 días: ver TASK-2001.
+- **Vista por plataforma:** no un canvas libre, sino una línea de tiempo con ejes fijos (fechas arriba, filas a la izquierda),
+  escala Día · Semana · Mes, grupos por platform con accounts plegables y conteo, sólo filas con actividad por defecto
+  («Mostrar todas») y filas virtualizadas.
+- **Marcas:** isotipos oficiales de AXIS para plataformas y herramientas, en color en tema claro y en negativo en oscuro;
+  logotipo de Metricool donde cabe el nombre. Pendiente registrar en `@efeoncepro/axis-brand-assets` los negativos y los
+  isotipos de Facebook y Threads (hoy tomados de @iconify/json, CC0); la UI los consume de ahí, nunca de copias.
+- Pantallas de escritorio a 1440×1100, igual que v2.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
