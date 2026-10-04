@@ -1,5 +1,7 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-04 · Estado desplegado frente a cierre.** Síntoma: `Status real`, epic y referencias activas seguían declarando contratos locales y flags OFF tras #248/#250. Regla: contrastar snapshots de código de releases squash por blobs, flags exactos y alias actual; registrar canary y aprobación por separado. Las previews sobre planes anteriores no prueban generación productiva de una edición nueva. Gcloud con reautenticación requerida no permite afirmar salud actual del worker; preservar la limitación.
+
 - **2026-10-03 · TASK-1975 · GA4 sólo se ve en local con su flag y su OAuth, y los datos reales destaparon dos fallas
   de lectura.** Síntoma: la vista previa local devolvía `disabled` y luego `query_failed` para GA4, así que la dona de
   sesiones desde IA y las apiladas sólo se habían probado con fixtures. El lector exige `GROWTH_GA4_ENABLED=true` más

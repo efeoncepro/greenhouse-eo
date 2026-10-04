@@ -48,7 +48,7 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
   pieces and real PDFs → one internal edition in production before sharing with a client.
 - **Rollback**: revert the release; sealed plans are unaffected (render reads the frozen plan).
 
-## TASK-1974 / TASK-1975 — figuras del criterio: cómo verificarlas y cómo sacarlas (code complete local, 2026-10-03)
+## TASK-1974 / TASK-1975 — figuras del criterio: cómo verificarlas y cómo sacarlas (publicadas; cierre pendiente, 2026-10-04)
 
 Sin flag propio: el criterio corre sólo en planes con `INSIGHTS_EDITORIAL_V2_ENABLED` (ya ON en staging, Production y
 `ops-worker`), así que entra en cuanto el código llega al runtime. Ediciones selladas no cambian (el render compone el
@@ -67,15 +67,14 @@ plan congelado); sólo las ediciones NUEVAS traen tarjetas y páginas nuevas.
   `.captures/insights-preview/<código>-<target>/` y no escribe en la base (salvo la bitácora de acceso del logo).
   `--plan-only` imprime el plan sin componer. Referencia 2026-10-03 (septiembre 2026): Berel 22 páginas + 18 láminas,
   Sky 10 + 8, sin figuras omitidas. **Abrir el PDF página por página**: las seis fallas de esta vista previa no las vio
-  ninguna prueba (ver [`lessons.md`](lessons.md)). GA4 no corre en local: la dona de fuentes IA y las apiladas no
-  aparecen ahí; se verifican en staging.
+  ninguna prueba (ver [`lessons.md`](lessons.md)). El dossier posterior del 03/10 sí verifica dona y apiladas con datos GA4 reales en preview local; no reemplaza el canary pendiente de una edición nueva en runtime.
 - **Fidelidad**: `pnpm insights:canvas-fidelity` (`--only=<nombre>`, `--gray`). Estado: 31 hojas dentro del umbral
   (nuevas 0,01–0,59 %); `Deck-Agrupadas` sigue con su excepción aprobada (2,2 %, techo 2,5 %). Fixtures de las figuras
   nuevas: `scripts/insights/canvas-fixtures/{report,deck}/44–48-figura-*.json`.
 - **Gate visual scoped**: `pnpm composer:visual-gate --catalog=insights` → 37 frames a 0 px (10 nuevos + 8 que cambian,
   sección (v) de `BASELINE_DELTAS.md`, sellada con `--freeze` en scope insights). Nunca re-congelar `deck-axis` ni SKY.
   El probe compone con los `example` de cada `slots.json`: un ejemplo que no cuadra con su geometría rompe el frame.
-- **Rollout conjunto, en este orden (cada paso con OK explícito del operador; nada hecho):**
+- **Rollout histórico ejecutado el 03/10: AXIS v0.3.42 → Think 0c5701a → Greenhouse 36a73e7b7e19. Secuencia original para futuras promociones (con autorización propia):**
   1. **AXIS** — push a `main` (despliega `axis.efeonce.org`, Lab con la tarjeta) + tag `v0.3.42` (publica
      `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` 0.3.42). Ningún consumer lo instala todavía: Think copia
      los tokens.
@@ -84,8 +83,8 @@ plan congelado); sólo las ediciones NUEVAS traen tarjetas y páginas nuevas.
   3. **Greenhouse** — push de `develop` → staging → release por el control plane (`greenhouse-production-release`). El
      Job `artifact-worker` es UNO para staging y producción: el release cambia los dos. Ediciones internas de Berel y Sky
      revisadas antes de compartir con el cliente.
-  4. **Staging**: verificar dona y apiladas con datos GA4 reales (nunca vistas con datos reales).
-  5. Gate de cierre: `pnpm test` completo + `pnpm build` (este último con autorización del operador).
+  4. **Canary pendiente**: verificar dona y apiladas de una edición nueva en runtime; la evidencia real del preview local del 03/10 ya existe.
+  5. Gate de cierre funcional: pruebas proporcionales, build según el carril de release y revisión humana del archivo generado. La reconciliación documental del 04/10 no ejecuta una promoción.
 - **Rollback**: revertir el release de Greenhouse (los planes sellados no se tocan). Think 1.4 sigue aceptando un modelo
   anterior; AXIS publicado no se despublica (sólo se deja de consumir).
 
@@ -233,10 +232,10 @@ flag, 202 after.
 - Rollback: disable the flag in both runtimes; keep tables and assets; never `migrate:down` on the shared instance
   without explicit operator authorization (it serves production).
 
-## Sharing, delivery, schedules (TASK-1848) — sharing ON; delivery/schedules OFF in production
+## Sharing, delivery, schedules (TASK-1848) — sharing/issuance/delivery/schedules ON in production
 
 `INSIGHTS_SHARING_ENABLED` is ON in Vercel Production since 2026-09-28 after the TASK-1875 behavior canary. Delivery
-and schedules remain OFF. ISSUE-174 (connection exhaustion by a concurrent burst on a public DB-backed route) remains
+and schedules are ON since 02/10; exact Vercel Production flags re-read 04/10. EmailTypes were enabled 02/10 (ledger); authenticated App behavior still needs its canary. Schedules create draft + render and never issue/send. ISSUE-174 (connection exhaustion by a concurrent burst on a public DB-backed route) remains
 governed by TASK-1876; all probes against the public reader stay sequential.
 
 **Edge guard (TASK-1876, applied and read back without drift 2026-09-28):** `/api/public/**` — public reader and download
@@ -313,9 +312,11 @@ is off is `skipped/email_type_paused` (no grant issued).
   (both work with the flag OFF); deleting the Cloud Scheduler job stops the tick entirely.
 - **Schema:** never `migrate:down` on the shared instance without explicit operator authorization (it serves production).
 
-## Shared web in Think (TASK-1875) — Think and Greenhouse sharing in production; 1.1 remains in staging (2026-09-28)
+## Shared web in Think (TASK-1875) — model 1.4 published; sharing ON (updated 2026-10-04)
 
-State: Think `main` `544ecd4` is in production (`/insights/r/<token>` and public sample `/insights/muestra`). Greenhouse
+Current: Think remote `main` is `0c5701a` (read 04/10); Greenhouse model 1.4 was published in `36a73e7b7e19`. Closure canaries and real-client approval remain distinct.
+
+**Historical activation, 2026-09-28 (superseded version numbers):** Think `main` `544ecd4` was in production (`/insights/r/<token>` and public sample `/insights/muestra`). Greenhouse
 production serves `InsightWebModelV1` 1.0, supported by Think; Greenhouse `13fd47381` keeps model 1.1 in staging. The
 WAF exception is applied and read back without drift; `INSIGHTS_SHARING_ENABLED` is exact `true` in Vercel Production,
 deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`) is Ready with alias
@@ -376,3 +377,12 @@ revoked. Never record the one-time link token.
 
 **Think-side verification:** `pnpm test:insights`, `scripts/verify-insights-report.mjs`,
 `scripts/audit-insights-a11y.mjs`, `scripts/capture-insights-report.mjs` (repo `efeonce-think`).
+
+
+## Revisión de cierre 2026-10-04 (sin mutaciones runtime)
+
+- Releases `fe261ca2745f` y `36a73e7b7e19`, runs `37093141725` / `37158679961` success. Alias Production `greenhouse.efeoncepro.com` READY (`dpl_7Qb82GFi4Vkz3oDSyTN5M6aoy7Gh`). Los ocho flags INSIGHTS son `true` exacto; env leído sólo en archivo temporal privado, destruido después.
+- SQL de sólo lectura mediante pool canónico y perfil runtime, máximo una conexión: no hay plan congelado con snapshot de una edición creada después del merge #248. No inferir ausencia de borradores sin snapshot/plan.
+- TASK-1962 necesita una edición nueva y lectura productiva de los campos de contenido; TASK-1957 necesita además el gate y la decisión AEO/copy. Crear/revisar/emitir/enviar no se ejecutó para arreglar documentación.
+- Cloud Run no se revalidó: gcloud exige reautenticación interactiva. No declarar salud o flags actuales del worker desde el Handoff. Ver auditoría y tareas para siguientes pasos.
+- Correcciones `8e4fbac7b`, `c782449f0` y `03e19f3ee` posteriores al release quedan pendientes de promoción/verificación; no son un release faltante del contrato de TASK-1962.

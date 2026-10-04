@@ -1,10 +1,12 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-10-04 por Codex (1.20: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
+
+> **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
 
 ## Para qué sirve
 
@@ -13,13 +15,13 @@ portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosyst
 agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging y producción, hasta el deck PDF renderizado;
 emitir está encendido en producción desde el 2026-09-28 (y en staging desde 2026-09-18). Las
 recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) están en su sección: el código está
-**en producción con los flags OFF** (release `bda1cf2cd938`, 2026-09-18) y encendido en staging.
+**en producción** desde el release `bda1cf2cd938` (18/09); sus flags están ON en Vercel Production en el readback del 04/10, con canaries/dependencias de TASK-1848 pendientes.
 
 ## Antes de empezar
 
 1. Flags en el runtime donde vas a operar (ledger `FEATURE_FLAG_STATE_LEDGER.md`; se leen sólo en Vercel):
    `INSIGHTS_GENERATION_ENABLED` para crear/revisar — **ON en staging y producción desde 2026-09-15**, OFF en
-   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) — **OFF en producción**; `INSIGHTS_AUTHORING_AI_ENABLED` (IA) —
+   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) — **ON en producción desde 28/09**; `INSIGHTS_AUTHORING_AI_ENABLED` (IA) —
    **ON en producción desde 2026-09-26** (sólo Vercel; staging OFF; las recurrencias del `ops-worker` salen con plan
    determinista). Verifícalo en el plan sellado: `authoringMode = ai_bounded`, `modelId`, `promptVersion`. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
    `INSIGHTS_EDITORIAL_V2_ENABLED` (contrato editorial v2) es la excepción a «sólo Vercel»: se lee en Vercel (crear,
@@ -70,7 +72,7 @@ Verificado el 2026-09-15 en staging (lanes app y ecosystem) y producción (lane 
 | Misma `idempotencyKey` con un encargo distinto (por ejemplo otro `depth`) | `409 idempotency_conflict` | Por diseño: una clave por encargo humano distinto |
 | Cualquier ruta sobre una org sin módulo, o un cliente apuntando a otra org | `404 not_found` | Anti-oráculo: no se distingue "no existe" de "no tiene módulo" |
 | `POST .../editions` con generación apagada en ese runtime | `503 service_unavailable` (`details.code = generation_disabled`) | Prender el flag en el target correcto y redeploy |
-| `POST .../editions/<id>/issue` | `409` (`details.code = not_ready`) | Faltan outputs `completed` de la misma audiencia (`missing`/`pending`); además la emisión sigue OFF |
+| `POST .../editions/<id>/issue` | `409` (`details.code = not_ready`) | Faltan outputs `completed` de la misma audiencia (`missing`/`pending`); en esa prueba histórica la emisión seguía OFF |
 | `GET .../editions/<id>?include=evidence` como cliente sobre una no emitida | `200` con `evidence` y `plan` en `null` | Por diseño: el cliente ve evidencia/plan sólo de ediciones emitidas; el interno siempre |
 
 ## Qué ve un cliente y qué ve un interno
@@ -181,7 +183,7 @@ El Job y el `ops-worker` son **únicos** para staging y producción: la puerta p
 El bucket de assets del Job está fijo en `efeonce-group-greenhouse-private-assets-staging` (cada asset guarda su
 `bucket_name`). Las 4 tools de render están en el gateway `efeonce-mcp` v1.6.0, **desplegado el 2026-09-16** (revisión
 `efeonce-mcp-gateway-00054-n78`, 51 tools). El Job recibió su primer deploy productivo con el release `917491fd02e4`
-(change-gated por el control plane). `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
+(change-gated por el control plane). `INSIGHTS_ISSUANCE_ENABLED` está ON en Production desde 28/09 (readback 04/10).
 
 **Doble ejecución en frío (comportamiento conocido).** Si el Job arranca en frío (~2 min), el tick siguiente del
 dispatcher puede ver el output todavía `queued` y lanzar una segunda ejecución. Sólo una lo reclama y finaliza
@@ -332,14 +334,10 @@ descargas (o, en la muestra, «Conversemos») → pie con la firma de Efeonce. �
 bajo 720 px. Estados: 404, 410, 429 y 502 (ver arriba). Imprimir la página es sólo un respaldo: para papel, descarga
 el PDF.
 
-> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
-> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
-> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
-> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
-> lo enseña. Si revisas un enlace real y falta la decisión, no es un error.
+> **Modelo publicado vigente: 1.4.** Las ediciones nuevas pueden incluir decisión, apertura y lectura de capítulos, alcance, acciones y tarjetas de cifra según la evidencia. Una edición anterior conserva su modelo y plan; el readback de una edición nueva y su revisión siguen pendientes (TASK-1957/1962).
 
 **PDF:** el A4 tiene portada (navy o blanca), índice, «Lo esencial», aperturas de capítulo, una página por gráfico
-(comparación, columnas, metas o tendencia), tabla, plan, límites y contraportada; el deck, lo mismo en 12 tipos de
+(incluidas las figuras publicadas por TASK-1975), tabla, plan, límites y contraportada; el deck, lo mismo en 17 tipos de
 lámina, sin portada blanca, índice ni tabla. Las portadas y las aperturas de capítulo muestran «efeonce | INSIGHTS»
 tipográfico (mayúsculas espaciadas); el lockup oficial en PDF y el color de acento de «INSIGHTS» en las portadas navy
 están pendientes de decisión del operador (no los cambies por tu cuenta).
@@ -450,8 +448,7 @@ hace falta, apagarlo.
 **Estado.** `INSIGHTS_EDITORIAL_V2_ENABLED` está ON en Vercel staging, Vercel Production y el `ops-worker` (default
 `:-true` en `services/ops-worker/deploy.sh`). Toda edición **nueva** sale con el plan v2 (lectura por figura,
 apertura de capítulo, «Lo esencial», `scopeLines`, `cover` sellada, tabla de respaldo, acciones con
-impacto/esfuerzo/semanas). Las ediciones ya creadas no cambian: son inmutables. Emisión, sharing y delivery siguen
-OFF en Production.
+impacto/esfuerzo/semanas). Las ediciones ya creadas no cambian: son inmutables. Emisión, sharing y delivery están ON en Vercel Production en el readback del 04/10. El estado actual del worker no se revalidó en esta auditoría.
 
 **Antes de empezar.** Fijar la preferencia exige ser administración o cuentas de Efeonce (capability
 `insights.cover_preference.manage`); leerla, poder leer los informes de esa organización. La organización debe tener
@@ -564,7 +561,7 @@ con este diseño; las primeras ediciones internas de Berel y Sky se generaron en
 2. Pide el render con `POST …/editions/<id>/render` y `{"outputs":["deck_pdf","report_pdf"]}`.
 3. Espera al dispatcher: toma un PDF cada 2 minutos. Un informe completo (deck + A4) tarda unos 4 a 5 minutos.
 4. Consulta `GET …/render-runs/<id>` hasta `completed` y revisa los PDF (número de páginas, portada, tabla y tonos).
-   Emitir y compartir siguen apagados en producción: el cliente no ve nada.
+   Mantén esta prueba interna y sin emitir ni compartir; esos flags están encendidos en producción y requieren revisión humana.
 
 **Antes de empezar.**
 

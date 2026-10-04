@@ -25,7 +25,7 @@ it without repeating what already cost a day*. It grows with every task: see the
    rollback, deploy traps.
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
 7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
-   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates in production; 20 + 17 locally with TASK-1975 — stat card, waterfall, waffle, donut, stacked —, family → page,
+   (ids, rules, where it applies and where it is missing), the A4/deck report (20 + 17 templates published with TASK-1975 — stat card, waterfall, waffle, donut, stacked —, family → page,
    variation rule, data roles, cover), the live Think report (anatomy, 1.0 vs 1.1, presentation mode, states, motion,
    print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: the AXIS Lab
    page `https://axis.efeonce.org/references/insights/`, published 2026-09-28 (AXIS main `3dfbf0e`; agent data at
@@ -82,7 +82,7 @@ it without repeating what already cost a day*. It grows with every task: see the
   caption the common name, never the first tied fact); essentials and the thesis cite only findings (target met or
   missed, a change that prints, a unique superlative or a tie), never a bare value nor a 0,0 % change; the first
   reading of every chapter is its main finding. Sealed editions are immutable, so a fix applies to new editions only.
-- **Figure selection (TASK-1974, code complete local; applies only to plans built with editorial v2)**: the reader's
+- **Figure selection (TASK-1974, complete and published in `36a73e7b7e19`; applies only to plans built with editorial v2)**: the reader's
   question picks the family (`ChartSpecV1.question` + `QUESTION_FAMILIES`; an incoherent pair does not validate), one
   current-period fact feeds ONE figure of the chapter (`duplicated_fact`; only waterfall totals are anchors), and the
   stat card lives in `chapter.stats`, outside the 15 families. A stat name has ≤ 3 words and ≤ 24 characters: the
@@ -96,7 +96,7 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
-  Think consumes it server-side as `InsightWebModelV1` (`modelVersion` `'1.0'` or `'1.1'`; 1.1 is additive — optional
+  Think consumes it server-side as `InsightWebModelV1` (current `modelVersion` `'1.4'`; supports the 1.x family; 1.1 introduced additive optional
   editorial v2 fields + client logo — so a 1.0 consumer still works; client-facing projection only). Think's server
   reads are exempted from the `/api/public` edge limit only by its key header `x-efeonce-think-key`, never by raising
   the limit. NEVER probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting
@@ -133,7 +133,7 @@ it without repeating what already cost a day*. It grows with every task: see the
   Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos (+
   § Pregunta de la figura, § Tarjeta de cifra, § Modelo web 1.4, § Contrato de render de las figuras nuevas) +
   `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` (decidido 2026-10-03; implementado por TASK-1974
-  planner/contrato/modelo web y TASK-1975 páginas/tarjeta/diseño, **code complete local, sin desplegar**: rollout
+  planner/contrato/modelo web y TASK-1975 páginas/tarjeta/diseño, **en producción desde `36a73e7b7e19`**; historial del rollout
   AXIS → Think → Greenhouse en `references/operations.md` § TASK-1974 / TASK-1975).
   Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
   2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
@@ -170,9 +170,8 @@ it without repeating what already cost a day*. It grows with every task: see the
   + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
   `axis-design-system`. Boundary (binding, **changed by the operator on 2026-10-03**): AXIS is the home of the Insights
   design system — brand files (`insights-{logo,isotype,lockup}-*`, `axis-brand-assets`), data-color tokens
-  `efeonceInsights`, contracts (`efeonce.insights-stat-card` 0.1.0 `candidate`) and the Lab reference; Greenhouse
-  catalogs and Think are its consumers and keep the templates. That AXIS work is LOCAL (AXIS `main` unpushed, tag
-  `v0.3.42` pending). Think still copies the tokens and chart geometry is still duplicated: adopt the package / extract,
+  `efeonceInsights`, contracts (`efeonce.insights-stat-card` 0.2.0 `candidate`) and the Lab reference; Greenhouse
+  catalogs and Think are its consumers and keep the templates. AXIS `v0.3.42` was published for the 03/10 release; the local-only statement is superseded. Think still copies the tokens and chart geometry is still duplicated: adopt the package / extract,
   never fix a copy inline. The PDF/deck covers and chapter openings show a TYPE
   version (Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking —spaced capitals, not true small caps—,
   `.brand-product` / `.product`), not the official `insights-lockup-*` file; on the navy covers that word is painted in
@@ -188,7 +187,7 @@ it without repeating what already cost a day*. It grows with every task: see the
   reason), the navy primary CTA and the agenda card are canon; the Insights header, «Lo esencial del mes», its measure
   orbit (with the travelled path, decided the same day) and the decision card belong to this email only. «Suscribirme»
   is retired. Greenhouse has **not** adopted it: `src/emails/InsightsEditionDeliveryEmail.tsx` and `EmailLayout.tsx`
-  are unchanged and pin the older AXIS set. Open tension with TASK-1764 (footer policy). Route: `greenhouse-email`
+  are unchanged and pin the older AXIS set. Purpose/footer exception decided 29/09: `relationship_transactional`, exception `efeonce-insights-delivery`; implementation still pending. Route: `greenhouse-email`
   («Delta 2026-09-29»), `efeonce-graphic-line` → `applications.md` §C4, [`references/ui-and-brand.md`](references/ui-and-brand.md) §5.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

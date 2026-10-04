@@ -97,7 +97,7 @@ Revisión cruzada: Claude Opus 5 revisa claridad de resultados/flujos y GVC dond
 contratos del trabajo de Claude. Para TASK-1669, revisión técnica por Astra `xhigh` de autoridad, efectos,
 costo, replay y aprobación humana antes de habilitar agentes. No confundir prompts correctos con operación segura.
 
-La [matriz Insights](../to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex)
+La [matriz Insights](../in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex)
 posee TASK-1845–1849; la [matriz portal/canales](../to-do/EPIC-046-client-services-visibility-and-self-service.md#ejecución-con-claude-y-codex)
 posee el reparto de experiencia cliente y coordina las dependencias de comunicación sin reparentarlas.
 

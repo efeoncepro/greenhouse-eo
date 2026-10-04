@@ -6,7 +6,7 @@
 
 **Marca → escala (03/10):** [dirección aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md), local sin commit/push; [revisión y pendientes](docs/audits/strategy/2026-10-03-brand-decisions-scalable-execution.md).
 
-**Insights: criterio de figuras (03/10):** en producción (release `36a73e7b7e19`). [TASK-1974](docs/tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md) complete; [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) espera la revisión del operador de las ediciones de Berel y Sky. Abierto: color por rol de parte en waffle y dona.
+**Insights: criterio de figuras (03/10):** en producción (release `36a73e7b7e19`). [TASK-1974](docs/tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md) complete; [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) espera revisión de Berel/Sky y promoción/verificación de fixes posteriores (`<1 %`, encaje de unidad). Abierto: color por rol de parte en waffle y dona.
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 
@@ -25,9 +25,9 @@ task explícita de Kortex en `to-do` ni `in-progress`. Una reactivación requier
 Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y total GCP CLP 237.068,14/mes
 (rango 230k–245k) son **modelos**, no ahorro realizado; confirmar con ventanas post-corte. [Runbook](docs/architecture/kortex/operations/runbook.md) · [auditoría](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
 
-**Insights: qué dice el informe (02/10):** [TASK-1962](docs/tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) code complete local, sin push; va en el release de TASK-1957 y Think se empuja después.
+**Insights: contenido y client-fit (04/10):** TASK-1957/1962 desplegadas; modelo 1.4, 116 pruebas PASS. TASK-1962 espera verificar una edición nueva en producción. [Evidencia y pendientes](docs/audits/insights/2026-10-04-epic-045-closure-review.md).
 
-**Insights apto para cliente (02/10):** [TASK-1957](docs/tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) code complete local (Slices 1–6, sin push): vocabulario único web/PDF, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit que bloquea emitir a cliente e indicadores AEO estándar (Share of Model, Share of Voice, tasa de mención, citas). Falta `pnpm build` autorizado, release y canary. [TASK-1958](docs/tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) (jerarquía Think/PDF) bloqueada por 1957. Ninguna edición de cliente se emite antes de cerrar ambas.
+**Insights apto para cliente:** TASK-1957 pendiente de canary/aceptación; TASK-1958 conserva jerarquía Think/PDF, plan y petición en PDF. Ninguna edición de cliente se emite antes de cerrar TASK-1957/1958 y de su revisión humana. El build/release de los contratos ya ocurrió.
 
 **Release 02/10 (`6ea157e6e641`, PR #247, run `37003281899`):** develop→main `released` 12:04Z; watchdog ok 6/6; canary prod web Insights 1.1 (crear→leer `modelVersion=1.1`→revocar). Migración TASK-1950 aplicada antes del merge. `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Production + EmailTypes de Insights ON (redeploy `dpl_B1v1vReWS44UYMi7u9LHKqSPpJ7K`); falta canary con sesión humana (lane `app`). `BRAND_RENDER_ENABLED` sigue OFF en prod (canary Proposal pendiente). [Tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
 
@@ -92,9 +92,9 @@ TASK-1863: staging; main retenido.
 
 **Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
 
-**Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). Siguen TASK-1889 (catálogos) y TASK-1903 (agente redactor).
+**Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). TASK-1889 complete; sigue TASK-1903 (agente redactor).
 
-**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emitir/compartir OFF; siguen TASK-1901/1902.
+**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emisión/sharing ON desde 28/09; siguen TASK-1901/1902.
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
@@ -161,7 +161,7 @@ beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente 
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights (estado actualizado 28/09):** generación, render, editorial v2, IA, sharing y emisión están ON en Production; delivery y schedules siguen OFF. TASK-1875 está complete; 1849/1876 siguen abiertas. **TASK-1847:** complete y en producción desde 24/09 (`ebb9212a32ce`), con renders productivos verificados.
+**Efeonce Insights (estado reconciliado 04/10):** generación, render, editorial v2, IA, sharing y emisión están ON en Production; delivery y schedules ON desde 02/10. TASK-1875 está complete; 1849/1876 siguen abiertas. **TASK-1847:** complete y en producción desde 24/09 (`ebb9212a32ce`), con renders productivos verificados.
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);

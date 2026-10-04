@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción desde 2026-09-18 (release bda1cf2cd938, gateway 1.7.0): compartir ON en producción desde 2026-09-28, correo y recurrencia OFF; in-progress por in-app/Teams, portal_link e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 en diseño; TASK-1875 (vista web en Think) COMPLETE 2026-09-28 (cierre df6f37ccd): en producción (efeonce-think main 544ecd4, `INSIGHTS_SHARING_ENABLED` ON en producción, canary productivo verde; producción sirve el modelo web 1.0 y el 1.1 queda en staging hasta el próximo release de Greenhouse); TASK-1888 (contrato editorial v2) COMPLETE 2026-09-26: en producción (releases 0e87c7a443a2 + f9257b9c94af, `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y ops-worker, gateway efeonce-mcp v1.9.0, canary sintético de producción con plan v2 sellado; emisión y entrega siguen OFF; compartir ON desde 2026-09-28); TASK-1889 (catálogos premium) COMPLETE 2026-09-26: en producción (mismos releases; A4 y deck sólo v2, 20 de 21 páginas ≤1 % del canvas + excepción aprobada, PDFs reales aprobados por el operador, primeras ediciones internas de Berel y Sky renderizadas en producción)`
+- Status real: `En ejecución. Censo 2026-10-04: 24 hijas, 7 complete, 6 in-progress y 11 to-do. Foundation/render/catálogos/editorial/shared web y criterio de figuras publicados; modelo vigente 1.4. Generación, render, IA, editorial v2, compartir, emisión, correo y recurrencias ON en Vercel Production (readback 2026-10-04). TASK-1957/1962 desplegadas, cierre pendiente de prueba productiva; TASK-1975 requiere revisión y promoción de fixes posteriores. Portal, jerarquía cliente, agente editorial, expansión de evidencia y canales siguen abiertos. Ver auditoría de cierre.`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -50,7 +50,7 @@ entregas. Este programa coordina esas fronteras sin crear otro producto desplega
 ## Ejecución con Claude y Codex
 
 Asignación del 2026-09-09 documentada por pedido del operador. Aplican las
-[reglas compartidas de ejecución y revisión](EPIC-046-client-services-visibility-and-self-service.md#reglas-compartidas-de-ejecución-y-revisión):
+[reglas compartidas de ejecución y revisión](../to-do/EPIC-046-client-services-visibility-and-self-service.md#reglas-compartidas-de-ejecución-y-revisión):
 un editor por archivos, review cruzada, esfuerzo proporcional, continuidad del owner y sin ejecución
 implícita. Es una recomendación de reparto, no una certificación comparativa de modelos ni estado runtime.
 
@@ -78,7 +78,7 @@ Revisar PDFs finales completos y GVC desktop/390; aprobar el modelo o los docs n
 gates de findings/rollout; no otro motor ni sender. La matriz dueña está en
 [SEO](../in-progress/EPIC-022-growth-seo-search-visibility-360-module.md#ejecución-con-claude-y-codex).
 Las dependencias de Hub/transporte/preferencias están asignadas en
-[EPIC-046](EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
+[EPIC-046](../to-do/EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
 
 ## Contrato de la skill `efeonce-insights` (obligatorio para cada hija)
 
@@ -86,35 +86,39 @@ La skill `.claude/skills/efeonce-insights/` (espejo `.codex/`) es la memoria ope
 
 ## Child Tasks
 
-**Cinco tasks nuevas de implementación.** Son unidades de ownership con varios slices, no cinco cambios
-pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra para QA/rollout.
+**24 hijas vigentes.** Las cinco unidades originales se ampliaron por decisiones del operador. TASK-1901/1902 también son hijas (U23/U24); las dependencias de correo/Hub/guard conservan sus epics dueños. No crear otra unidad para QA/rollout.
 
 | Unidad | Task | Resultado | Blocked by |
 |---|---|---|---|
 | U01 | [TASK-1845](../../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **complete 2026-09-16: en producción desde 2026-09-15, rollback ensayado** | none |
 | U02 | [TASK-1846](../../tasks/complete/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **complete 2026-09-16: en producción** (`deck_pdf`; `report_pdf`/`web` en TASK-1847/1848) | none |
 | U03 | [TASK-1847](../../tasks/complete/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical — **complete 2026-09-25: en producción desde 2026-09-24**, render productivo de A4 y deck verificado con datos reales (Sky interno) | TASK-1845 |
-| U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados — **en producción 2026-09-18 con flags OFF** (release `bda1cf2cd938`; staging ON; gateway 1.7.0); enlace compartido ON en producción desde el 2026-09-28 (con TASK-1875), correo y recurrencia OFF; in-progress | none |
-| U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1848 |
-| U06 | [TASK-1875](../../tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) — **complete 2026-09-28: en producción** (`efeonce-think` `main` `544ecd4`; `/insights/r/<token>` y la muestra `/insights/muestra`; `INSIGHTS_SHARING_ENABLED` ON en producción) | TASK-1848 |
+| U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | sharing/correo/recurrencia publicados y ON; pendientes de cierre en su Status real | none |
+| U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca/encargo/revisión del portal y presentación de correo; diseño, backend base disponible | none |
+| U06 | [TASK-1875](../../tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) | shared web en Think complete; modelo de producción 1.4 (release 36a73e7b7e19) | none |
 | U07 | [TASK-1888](../../tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada — **complete 2026-09-26: en producción 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y `ops-worker`; gateway efeonce-mcp v1.9.0; canary sintético de producción con plan v2 sellado y ediciones internas v2 de Berel y Sky en staging** | none |
 | U08 | [TASK-1889](../../tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release — **complete 2026-09-26, en producción** (releases `0e87c7a443a2` + `f9257b9c94af`; `insights-report` A4 e `insights-deck` 16:9 sólo con el diseño v2; fidelidad 20 de 21 páginas ≤1 % + Deck-Agrupadas aprobada; PDFs reales aprobados por el operador; primeras ediciones internas de Berel y Sky renderizadas en producción) | none |
 | U09 | [TASK-1903](../../tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md) | agente redactor de informes de clientes, operable por MCP en dos modos (operar el redactor; autor externo que envía la propuesta): propone interpretación, próximos pasos, decisión y plan de acción sobre evidencia sellada; aceptación humana por campo; modelo por comparación medida — pedido del operador 2026-09-25 | TASK-1888, TASK-1889 |
-| U10 | [TASK-1957](../../tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) | contrato de presentación apto para cliente: vocabulario único, modelo web 1.2 sin identificadores internos, selección de hallazgos, límites de cliente, elegibilidad de gráficos y gate — pedido del operador 2026-10-02 | none |
+| U10 | [TASK-1957](../../tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) | contrato client-fit desplegado; prueba productiva y aceptación pendientes | none |
 | U11 | [TASK-1958](../../tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) | jerarquía visual apta para cliente en Think y PDF (hallazgos, respaldo, alcance) | TASK-1957 |
 | U12 | [TASK-1960](../../tasks/to-do/TASK-1960-efeonce-insights-report-per-contracted-service.md) | un informe por servicio contratado: vínculo proyecto↔servicio, evidencia acotada y destinatarios por informe (Sky: Diseño digital y Blog SEO/AEO) | — |
 | U13 | [TASK-1961](../../tasks/to-do/TASK-1961-efeonce-insights-aeo-per-market.md) | visibilidad en IA por país: un run por mercado en la ventana, lectura por país sin promedio (Sky: siete mercados) | TASK-1863 |
-| U14 | [TASK-1962](../../tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) | contrato de contenido del informe (8 preguntas, gate de mantenimiento), causas SEO, lo que el Grader ya mide, plan de acción y petición, más familias de gráfico y GA4 en el Search Visibility 360 | TASK-1957 |
-| U15 | [TASK-1974](../../tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras en el planificador (canon `EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`) | TASK-1962 |
-| U16 | [TASK-1975](../../tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | páginas PDF/deck y render Think de tarjeta de cifra, cascada, waffle, dona y barras apiladas | TASK-1974 |
-| U17 | [TASK-1990](../../tasks/to-do/TASK-1990-efeonce-insights-channel-stat-card-contract.md) | contrato de la tarjeta de cifra con canal: 19 plataformas, dominio → plataforma, canal o glifo Trazo por cifra, canal del tablero, modelo web 1.5 — inventario aprobado 2026-10-03 | TASK-1974 |
+| U14 | [TASK-1962](../../tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) | contrato de contenido desplegado (fe261ca2745f); candidata a cierre tras verificación de edición nueva | none |
+| U15 | [TASK-1974](../../tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md) | criterio de figuras complete; en producción (36a73e7b7e19) | none |
+| U16 | [TASK-1975](../../tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) | base publicada; revisión Berel/Sky, fixes posteriores y color por rol pendientes | none |
+| U17 | [TASK-1990](../../tasks/in-progress/TASK-1990-efeonce-insights-channel-stat-card-contract.md) | regla base publicada; 19 plataformas/channelForDomain hechos en develop; promoción, metricIcon y decisión pendientes | none |
 | U18 | [TASK-1991](../../tasks/to-do/TASK-1991-efeonce-insights-aeo-per-engine-facts.md) | visibilidad en IA por motor: lugar, cita, tono, Share of Voice y plataforma citada | TASK-1424, TASK-1961, TASK-1990 |
 | U19 | [TASK-1992](../../tasks/to-do/TASK-1992-efeonce-insights-seo-visibility-360-facts.md) | hechos nuevos del Search Visibility 360 (SERP, plataformas, movimiento, pagado, enlaces, salud técnica, URL; competidores con gate de política) | TASK-1990 (Slice 2: TASK-1993, de EPIC-022) |
 | U20 | [TASK-1994](../../tasks/to-do/TASK-1994-efeonce-insights-ico-production-facts.md) | indicadores de producción ICO: ciclo, throughput, velocidad, trabadas, atrasos, SLO y revisiones | TASK-1990 |
 | U21 | [TASK-1995](../../tasks/to-do/TASK-1995-efeonce-insights-missing-sources-decision.md) | policy: fuentes que faltan (Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta) | — |
-| U22 | [TASK-1996](../../tasks/to-do/TASK-1996-efeonce-insights-channel-stat-card-render.md) | tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think | TASK-1975, TASK-1990, publicación de AXIS |
+| U22 | [TASK-1996](../../tasks/in-progress/TASK-1996-efeonce-insights-channel-stat-card-render.md) | isotipos base publicados; cifra adaptativa local; glifos y productores pendientes | TASK-1975, TASK-1990 (cierre; base publicada) |
+
+| U23 | [TASK-1901](../../tasks/to-do/TASK-1901-efeonce-insights-richer-evidence-for-chart-families.md) | series diarias SEO, posiciones por keyword e historial AEO | none |
+| U24 | [TASK-1902](../../tasks/to-do/TASK-1902-efeonce-insights-gauge-heatmap-pages.md) | páginas de medidor/mapa de calor y columnas por tramo | TASK-1901 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
+
+> Los deltas fechados siguientes conservan el estado de su fecha; el `Status real` y la auditoría del 2026-10-04 prevalecen para operar.
 
 **Delta 2026-09-25 — rediseño premium aprobado.** El operador aprobó en el canvas «Gráficos de Efeonce Insights» el
 aspecto que debe tener todo informe. TASK-1847 cierra con los catálogos v1 ya en producción; el rediseño se reparte
@@ -172,7 +176,7 @@ operador; se abren como task cuando la decisión exista):
 
 ## Existing Related Work
 
-- [EPIC-046](EPIC-046-client-services-visibility-and-self-service.md): consumidor obligatorio del portal,
+- [EPIC-046](../to-do/EPIC-046-client-services-visibility-and-self-service.md): consumidor obligatorio del portal,
   Berel SEO/marketing de contenidos y Sky diseño digital. P01 coordina entitlement/fuentes; P02 aporta
   contexto desde productores; P04 enlaza desde Inicio/Mis servicios. TASK-1849 conserva toda la UI Insights
   y TASK-1845/1848 sus permisos. El dashboard inicial no bloquea el dominio Insights ni viceversa; la
@@ -276,3 +280,10 @@ Grader. Sólo planificación local en checkout compartido; runtime de Insights a
 Las cinco tasks pasan `pnpm task:lint --task TASK-1845` … `TASK-1849` con template=1, legacy=0,
 errors=0 y warnings=0 (2026-09-08). `pnpm ops:lint --changed` no reporta errores; sus advertencias
 de child-parity pertenecen a otros epics históricos. Esto valida el registro, no los exit criteria del producto.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Se sincroniza `in-progress` y el censo de hijas; ninguna task pasa a `complete` sin su evidencia pendiente.
+- [Auditoría de cierre](../../audits/insights/2026-10-04-epic-045-closure-review.md): releases #248/#250 confirmados, flags Production exactos ON, 116 pruebas PASS; sin plan congelado post-release en la lectura acotada. TASK-1962 es la candidata más próxima.
+- Historial anterior preservado como evidencia fechada, no estado activo.

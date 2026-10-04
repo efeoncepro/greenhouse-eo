@@ -632,14 +632,3 @@ ISSUE-122). Greenhouse fija AXIS `v0.3.8` (`efeonce.surface-composition` 0.1.1) 
 `develop`, sin push; ruta productiva en TASK-1921. Docs: ADR del composer, runbook del gate, norma por superficie §2.1,
 índice de la línea, runbook AXIS, doc funcional 1.10, manual de uso 1.1 y skills `efeonce-graphic-line`, `deck-studio`,
 `motion-design-studio` y `efeonce-advertising-creative`.
-
-## 2026-09-27 — Iconografía: 30 íconos de oficio (D25)
-
-El operador aprobó 30 glifos nuevos, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de
-La órbita» (sección 7): 15 de Trazo (correo, `llamada`, calendario, reunión, objetivo, presentación, contrato, checklist,
-código, base de datos, nube, integración, seguridad, ubicación, reloj) y 15 de Plastilina (lápiz a estrella), éstos
-también en volumen. El set queda en 27 Trazo + 33 Plastilina = 60 glifos y 33 PNG de volumen, publicados en AXIS con el
-tag v0.5.0 (`axis-graphic-line` 0.5.0, `axis-brand-assets` 0.3.3; `axis-tokens` sigue en 0.3.7); el Lab muestra el
-catálogo completo. Reglas nuevas: claves únicas entre voces y Trazo sin arcos elípticos. Documentado en la skill
-`efeonce-graphic-line` (iconography §13, ledger, lecciones), manual §14, ADR, doc funcional 1.9 y manual de uso 1.8;
-Greenhouse ya fija `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3.

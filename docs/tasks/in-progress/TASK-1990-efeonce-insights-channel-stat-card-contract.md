@@ -46,7 +46,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Regla en producción (release 36a73e7b7e19); vocabulario de 19 plataformas, channelForDomain e invariantes del tablero hechos en develop (2026-10-03). Faltan metricIcon (glifos Trazo, TASK-1996) y la decisión del operador sobre visitas por asistente`
+- Status real: `Regla base en producción (release 36a73e7b7e19); vocabulario de 19 plataformas, channelForDomain e invariantes del tablero hechos en develop (03e19f3ee, posterior al release). Pendientes: promover ese slice, metricIcon (glifos Trazo, TASK-1996) y decisión del operador sobre visitas por asistente. El canal se deriva del hecho sellado: no falta un campo autorado ni validación de canal en plan-validation.`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -401,3 +401,9 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 
 - Visitas por asistente: ¿qué gana por defecto cuando las dos explican igual? Propuesta: tarjetas con canal cuando hay
   período anterior (la variación por asistente es la noticia) y dona cuando es el primer período medido.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.

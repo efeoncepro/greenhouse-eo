@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961; Think 0c5701a): isotipo por celda o en el título en A4, deck y Live; cifra única del deck adaptativa en develop (2026-10-03). Faltan glifos Trazo para clics, impresiones, CTR y posición (diseño y aprobación del operador) y los 10 isotipos sin productor (TASK-1991/1992)`
+- Status real: `Isotipo por celda o título en A4/deck/Live en producción (release 36a73e7b7e19; Think 0c5701a). Cifra única adaptable del deck implementada en develop (03e19f3ee), pendiente de promover. Faltan glifos Trazo de clics/impresiones/CTR/posición y los 10 isotipos sin productor (TASK-1991/1992); revisión visual y cierre pendientes.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)
@@ -418,3 +418,9 @@ coincidencia, sólo el nombre.
 
 - ¿La variante mono de AI Overview se usa en algún caso (impresión en gris)? Propuesta: no; el disco es blanco en
   todas las superficies y la prueba en gris se hace sobre la versión en color.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.

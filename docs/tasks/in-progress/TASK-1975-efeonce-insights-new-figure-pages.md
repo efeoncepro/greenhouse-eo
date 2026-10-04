@@ -83,7 +83,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-10-03 (release 36a73e7b7e19, run 37158679961, PR #250; Think 0c5701a). Dona y apiladas verificadas con GA4 real de Berel. Sólo falta que el operador revise las ediciones reales de Berel y Sky`
+- Status real: `Base en producción desde 2026-10-03 (release 36a73e7b7e19; Think 0c5701a). Pendientes: revisión del operador de Berel/Sky y promoción/verificación de las correcciones posteriores del porcentaje <1 % y del encaje de unidad. La decisión de color por rol de parte en waffle/dona sigue abierta; no confundir preview local con output productivo.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -572,3 +572,10 @@ estados. Puntos que el agente debe resolver contra el código y el contrato fina
   dibujan rayado, «Oportunidad» ni «Estimado».
 - Centro de la dona: ¿se acepta la regla propuesta (cifra principal si la lectura cita hechos de la dona; si no, total
   de las partes)?
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.
+- «Sólo falta la revisión» describía la base publicada; los commits posteriores (`8e4fbac7b`, `c782449f0`) requieren promoción y readback del render. Se preserva la aprobación humana pendiente.

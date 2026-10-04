@@ -1,17 +1,9 @@
 # Efeonce Insights — Architecture V1
 
-> Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
-> staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
-> y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
-> y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
-> la vista web compartida en Think está en producción desde el 2026-09-28 (TASK-1875 complete, §14.10) y la UI del portal sigue
-> pendiente (TASK-1849); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
-> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6); el criterio de
-> selección de figuras, la tarjeta de cifra y las páginas PDF de cascada, waffle, dona y barras apiladas están **en
-> producción desde el 2026-10-03** (TASK-1974 + TASK-1975, release `36a73e7b7e19`, §14.12 y §15). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
-> rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
+> Status: **En ejecución, actualizado 2026-10-04.** Foundation/render/catálogos/editorial v2/shared web y criterio de figuras publicados; modelo web vigente **1.4** (release `36a73e7b7e19`). Generación, render, IA, editorial v2, sharing, emisión, correo y recurrencias ON en Vercel Production (readback 04/10). TASK-1957/1962 desplegadas, cierre pendiente; TASK-1975 espera revisión y promoción de fixes posteriores. Portal (TASK-1849), jerarquía cliente (TASK-1958), canales y expansión de evidencia siguen abiertos.
+> [Auditoría de cierre](../audits/insights/2026-10-04-epic-045-closure-review.md). Los deltas fechados de §14 conservan historia; no sustituyen este estado vigente.
 > Owner: Platform + Client Experience.
-> [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+> [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
 ## 1. Producto y alcance inicial
 
@@ -1451,7 +1443,7 @@ respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y
 4. Push del `main` de Think (despliega producción).
 5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.
 
-### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (code complete local, 2026-10-02)
+### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (desplegado; cierre pendiente, 2026-10-04)
 
 **Decisión.** La frontera entre evidencia interna y documento de cliente tiene dueño y gate. El vocabulario de cara al
 lector (fuente, unidad, corte, ventana, título) vive en `src/lib/efeonce-insights/presentation/vocabulary.ts` y lo
@@ -1481,9 +1473,7 @@ lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente l
 - **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
   informes ya creados conservan su título: no existe comando de renombre.
 
-Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insights:canvas-fidelity` verdes; planes
-regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
-producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
+Estado: implementación inicial `c56f62d09`, incluida en `fe261ca2745f` y conservada en `36a73e7b7e19`; 116 pruebas focales PASS el 04/10. Modelo vigente 1.4. Pendiente: canary de los campos/gate client-fit en una edición nueva, aceptación del criterio AEO/copy y TASK-1958; no otro release del contrato. La lectura acotada del 04/10 no encontró planes congelados de ediciones creadas después del release.
 
 ### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (en producción, 2026-10-03)
 
@@ -1661,7 +1651,7 @@ variación pasa de gris a su tono y el triángulo entra en su dirección; con `p
 final. El PDF A4 y el deck son estáticos. Contrato:
 [`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md).
 
-**Criterio de selección (aprobado 2026-10-03; code complete en TASK-1974 + TASK-1975, rollout pendiente, §14.12).** Qué
+**Criterio de selección (aprobado 2026-10-03; en producción por TASK-1974 + TASK-1975, release `36a73e7b7e19`, §14.12).** Qué
 familia usar para cada dato lo decide
 [`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md); la matriz de
 arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
@@ -1673,5 +1663,5 @@ arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
 
 Orden del capítulo: cifras → metas → evolución → explicación → composición → subconjunto → comparación.
 
-**Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
+**Pendiente de render (TASK-1958):** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
 ni la petición (sólo la decisión); Think sí. La página de plan en los PDF queda como follow-up de UI.

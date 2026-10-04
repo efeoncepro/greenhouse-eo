@@ -1,10 +1,12 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.20
+> **Version:** 1.21
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-10-04 por Codex (1.21: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
+
+> **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
 
 ## Qué es
 
@@ -22,7 +24,7 @@ enlace y la muestra para clientes»). La biblioteca para pedir y revisar informe
 La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
 dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
 por correo y la recurrencia (TASK-1848: en producción; el enlace compartido está encendido desde el 2026-09-28, el
-correo y la recurrencia siguen apagados) y el informe A4 junto con el deck nuevo
+correo y la recurrencia están encendidos en Vercel Production, verificados el 04/10) y el informe A4 junto con el deck nuevo
 (TASK-1847, en producción desde el 2026-09-24), y el contrato editorial v2 que ordena qué dice cada informe
 (TASK-1888, encendido en producción desde el 2026-09-26). La vista web ya existe: es la página del enlace en Think,
 en producción desde el 2026-09-28 (TASK-1875), con el enlace compartido encendido. La emisión está encendida en producción desde el 2026-09-28: una edición llega
@@ -465,7 +467,7 @@ y donas cuyas partes no declaran un papel.
 > `src/lib/efeonce-insights/render/figure-slots.ts`; la elección actual de figuras en
 > `src/lib/efeonce-insights/editorial/deterministic-planner.ts`.
 
-## Estado de disponibilidad (2026-09-28)
+## Estado de disponibilidad (reconciliado 2026-10-04)
 
 > **Delta 2026-09-25 (TASK-1847 cerrada):** el informe A4 y el deck nuevo están **en producción desde el
 > 2026-09-24**, y el 2026-09-25 se renderizó ahí el primer informe con datos reales (edición interna de Sky, ver «Los
@@ -486,7 +488,7 @@ asignado. Lo que está encendido y lo que no:
 | Contrato editorial v2 (lectura por figura, «Lo esencial», alcance, portada sellada) | **Encendido en staging y producción** (desde 2026-09-26) | Flag `INSIGHTS_EDITORIAL_V2_ENABLED=true` en Vercel (staging y producción) y en el ops-worker (recurrencias). Aplica a ediciones nuevas; las ya creadas no cambian |
 | Redacción asistida por IA | Encendida en producción desde 2026-09-26 | Gemini (flash-lite) reescribe conclusiones y lecturas sin cambiar cifras; si algo no cuadra, queda el texto determinista. Las ediciones de las recurrencias salen sin IA |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
-| Enlace compartido | **Encendido en producción** (desde 2026-09-28) | Se encendió al existir la página del enlace en Think (TASK-1875). Probado en producción con la edición de prueba `EO-INS-000014`: crear el enlace, verlo en Think, descargar el deck, revocar y comprobar que deja de abrir. Sólo se comparten ediciones **emitidas**, y emitir sigue apagado en producción, así que hoy no hay ediciones reales de clientes para compartir |
+| Enlace compartido | **Encendido en producción** (desde 2026-09-28) | Se encendió al existir la página del enlace en Think (TASK-1875). Probado en producción con la edición de prueba `EO-INS-000014`: crear el enlace, verlo en Think, descargar el deck, revocar y comprobar que deja de abrir. Sólo se comparten ediciones **emitidas**. Emisión está encendida; la revisión humana y el cierre de TASK-1957/1958 preceden a la entrega real a clientes |
 | Envío por correo y recurrencia | **Encendidos** en staging y producción (producción desde 2026-10-02) | Flags `INSIGHTS_DELIVERY_ENABLED` y `INSIGHTS_SCHEDULES_ENABLED` en Vercel y el ops-worker; los tipos de correo de Insights también encendidos. Una recurrencia nunca emite ni envía: deja la edición en revisión |
 | Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
 | Pantalla pública del enlace | **En producción** (desde 2026-09-28) | `think.efeoncepro.com/insights/r/<enlace>` (TASK-1875) y la muestra `think.efeoncepro.com/insights/muestra`. Ver «La página del enlace y la muestra para clientes» |
@@ -532,11 +534,7 @@ oscuro de Efeonce y una órbita de la marca. Debajo:
 - El plan de acción, «Cómo se midió» (cerrado; se abre al tocarlo), las descargas permitidas y el pie con la firma de
   Efeonce.
 
-> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
-> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
-> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
-> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
-> lo enseña.
+> **Modelo publicado vigente: 1.4.** Las ediciones nuevas pueden incluir decisión, apertura y lectura de capítulos, alcance, acciones y tarjetas de cifra según la evidencia. Una edición anterior conserva su modelo y plan; el readback de una edición nueva y su revisión siguen pendientes (TASK-1957/1962).
 
 Hay un botón **Presentar** que muestra lo mismo en láminas, para usarlo en una reunión. La página se adapta al
 celular y respeta a quien prefiere menos movimiento.
@@ -589,17 +587,11 @@ firma de Efeonce.
   barra y marca cuánto se ha leído.
 - **Presentar** muestra el informe como láminas; **Descargas** entrega los PDF que el enlace permite.
 - Si el período todavía no cerró, un aviso lo dice arriba: las cifras son las del corte y no se actualizan solas.
-- La página sabe dibujar todas las formas de gráfico del contrato; el PDF en producción, sólo cuatro (comparación,
-  columnas, metas y tendencia). Un informe que trae una cascada o un waffle (como el de Berel) los muestra sólo en la
-  web; en el PDF quedan como frase y tabla. Desde TASK-1975 (en producción desde el 2026-10-03) el PDF y el deck suman cifras, cascada,
+- La página, el PDF y el deck comparten las figuras del criterio publicado. Desde TASK-1975 (en producción desde el 2026-10-03) el PDF y el deck suman cifras, cascada,
   waffle, dona y apiladas, y la web suma la tarjeta de cifra con su animación (modelo web 1.4; ver «Cómo elige el
   informe sus gráficos»).
 
-> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
-> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
-> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
-> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
-> lo enseña.
+> **Modelo publicado vigente: 1.4.** Las ediciones nuevas pueden incluir decisión, apertura y lectura de capítulos, alcance, acciones y tarjetas de cifra según la evidencia. Una edición anterior conserva su modelo y plan; el readback de una edición nueva y su revisión siguen pendientes (TASK-1957/1962).
 
 **Movimiento y accesibilidad.** Al abrir, la esfera recorre su órbita (unos 2 segundos) y las cifras cuentan hasta su
 valor, terminando exactamente en la cifra del informe. Quien pide menos movimiento en su equipo ve todo sin
@@ -666,8 +658,7 @@ momento, no borra copias. Los registros de acceso guardan si hubo una visita (si
 
 ## Enviar un informe por correo
 
-> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
-> probado en staging, donde los dos correos de prueba llegaron).
+> Estado: código en producción desde el 18/09; flag de delivery ON en Vercel Production, leído el 04/10. El canary humano de entrega y las dependencias de TASK-1848 siguen pendientes; no se envió correo en esta auditoría.
 
 **Qué hace.** Envía una edición emitida por correo, desde Efeonce, a personas elegidas de la lista de usuarios
 activos de la organización (o a internos). Cada persona tiene su propio resultado.
@@ -692,12 +683,11 @@ un enlace personal; un interno lo revisa contra el registro de correo antes de d
 reintentar (hasta 5 intentos); en ese caso el enlace del intento fallido se anula y el nuevo intento lleva uno nuevo.
 
 **Qué no hace todavía.** No envía avisos dentro del portal ni por Teams: sólo correo. La presentación final del
-correo llegará con TASK-1849.
+correo depende de TASK-1944; la pantalla del portal, de TASK-1849.
 
 ## Programar informes recurrentes
 
-> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
-> probado en staging).
+> Estado: código en producción desde el 18/09; flag de schedules ON en Vercel Production, leído el 04/10. Falta revalidar el worker y el canary de recurrencia de TASK-1848. Ninguna recurrencia emite ni envía sola.
 
 **Qué hace.** Prepara automáticamente una edición por cada período que se cierra (semanal o mensual), con el mismo
 encargo cada vez, en la zona horaria de la cuenta. **No emite ni envía nada solo:** cada edición queda lista para

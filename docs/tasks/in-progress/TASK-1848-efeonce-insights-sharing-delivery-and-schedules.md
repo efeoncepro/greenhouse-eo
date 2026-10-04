@@ -52,7 +52,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0; 2026-09-28: cero doble envío verificado en datos reales y fix de email_delivery_id en adjuntos (8882af0e3, local sin push). Abierto por dependencias con dueño propio: in-app/Teams y preferencias (TASK-690–693), portal_link (TASK-1849), lector Think (TASK-1875, bloquea flags de producción), guard ISSUE-174 (TASK-1876 code complete, rollout pendiente) y negativos MCP con sesión humana`
+- Status real: `En producción; compartir ON desde 2026-09-28, emisión ON desde 2026-09-28, correo y recurrencias ON desde 2026-10-02. Flags Vercel Production exactos verificados 2026-10-04. Pendientes: canary App con sesión humana, negativos MCP de permiso/tenant, portal_link (TASK-1849), in-app/Teams/preferencias (TASK-690–693), correo aprobado (TASK-1944/1774) y cutover del guard (TASK-1876).`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`
@@ -399,3 +399,9 @@ unidad se resuelven en sus slices. TASK-1672/1673 conservan la integración espe
 
 Sin preguntas que bloqueen el registro. Confirmar límites, rutas y mapping propuestos en Discovery contra
 código/runtime; no inventar disponibilidad. Antes de implementar, /goal explícito y codex:task-hook.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.

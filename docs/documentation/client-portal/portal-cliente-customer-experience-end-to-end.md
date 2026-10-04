@@ -61,7 +61,7 @@ Interpretacion: el catalogo runtime existe y esta sembrado; este ambiente no mue
 La evolución por servicios de Berel (SEO y marketing de contenidos) y Sky (diseño digital) se planifica
 en [EPIC-046](../../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md), con
 [ADR aceptado para planificación](../../architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md).
-Integra [Efeonce Insights](../../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md): el cliente
+Integra [Efeonce Insights](../../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md): el cliente
 consulta/genera informes propios y el colaborador autorizado los gestiona con los mismos commands e historial;
 el link compartido sólo permite leer la edición. El programa separa visibilidad inicial, Insights y
 autogestión de solicitudes. TASK-1852–1856 registradas; TASK-1852 conecta con TASK-1834 para identidad,

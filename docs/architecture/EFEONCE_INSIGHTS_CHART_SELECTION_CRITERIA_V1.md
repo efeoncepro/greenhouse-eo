@@ -13,7 +13,7 @@
 - Validated as of: 2026-10-03 — caso de referencia medido con el código en producción (septiembre 2026 contra agosto,
   Berel y Sky) y vista previa real con el criterio implementado en local (`scripts/insights/preview-edition.ts
   --editorial-v2`).
-- Program: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+- Program: [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 - Technical contract: [arquitectura](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §15 («Familias de gráfico (matriz v2)») ·
   [ADR del dominio](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md).
 - Skills: `efeonce-insights` (operación del dominio) y `dataviz-design` (dueña de las reglas duras de visualización
@@ -192,7 +192,7 @@ de clics). El gate se suma a los existentes del dominio (consistencia del contra
   §15 + fila en [`DECISIONS_INDEX.md`](DECISIONS_INDEX.md).
 - **Sistema de diseño:** AXIS es su casa (decisión del operador, 2026-10-03): tokens `efeonceInsights`
   (`@efeoncepro/axis-tokens`), contrato `efeonce.insights-stat-card` (`@efeoncepro/axis-ui-contracts`) y la referencia
-  del Lab `/references/insights/`. Versión 0.3.42, local sin publicar (arquitectura §6.4 y §14.12).
+  del Lab `/references/insights/`. Versión 0.3.42 publicada (tag verificado 04/10) (arquitectura §6.4 y §14.12).
 - **Dirección visual y motion de la tarjeta:**
   [`TASK-1975-efeonce-insights-stat-card-direction.md`](../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md)
   y [`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md)
