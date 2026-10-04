@@ -11,7 +11,7 @@ Ninguno es persona del equipo real. Interpretan el rol de su línea y no se pres
 
 | Clave | Personaje | Edad · origen | Línea | Rol | Silueta | Carácter | Rasgos que lo separan |
 |---|---|---|---|---|---|---|---|
-| `hum` | Hum | 33 · venezolana | `growth` | Estratega de crecimiento y medición | `mujer` | **[propuesta]** serena y analítica, escucha antes de proponer (la ficha no lo define todavía) | pelo negro largo con ondas, piercing plateado en la nariz |
+| `hum` | Hum | 33 · venezolana | `growth` | Estratega de crecimiento y medición | `mujer` | serena y analítica, escucha antes de proponer (aprobado por el operador, 2026-10-04) | pelo negro largo con ondas, piercing plateado en la nariz |
 | `karo` | Karolyne «Karo» | 28 · venezolana | `brand` | Directora de arte y creadora de contenido | `mujer` | coqueta en el gesto (sonrisa ladeada, mirada pícara), social, presenta y convence | rizos 3A–3B cobrizos largos, aros dorados medianos, labial rosado |
 | `sophia` | Sophia | 31 · venezolana, hermana mayor de Karo | `engine` | Estratega SEO/AEO y analítica web | `mujer` | seria, analítica, sonrisa contenida de boca cerrada | bob rizado castaño oscuro a la mandíbula, lentes de montura metálica dorada fina |
 | `isabella` | Isabella | 27 · colombiana (Barranquilla) | `voice` | Especialista de medios pagados y distribución | `mujer` | energía alta, gesticula al explicar, ríe fácil | rizos 3C–4A, pecas suaves en nariz y pómulos, aretes de botón dorados pequeños (catálogo) |
