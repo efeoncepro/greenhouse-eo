@@ -509,7 +509,7 @@ Estado: **en producción desde el 2026-10-04** (rollout autorizado por el operad
 | 2. Migración `marketing_studio` | ✅ `1791129772182`; tres constraints en `pg_constraint` |
 | 3. Worker producción | ✅ `marketing-studio-media-worker-00003-hrw` (imagen `aa35e0202de5`); barrido `repaired 6, failed 0` |
 | 4. Push Studio `main` | ✅ `aa35e02` y `c52eb4a`; health `1.5.0`; `302` → `206 video/mp4` verificado con «Los Sparks» |
-| 5. Gateway | 🟡 manifiesto 1.5.0 sincronizado en efeoncepro/efeonce-mcp#24 (CI verde); merge pendiente del operador; sin deploy necesario (superficie sin cambios) |
+| 5. Gateway | ✅ manifiesto 1.5.0 sincronizado (efeoncepro/efeonce-mcp#24, mergeado `454d80eb6`); sin deploy necesario (superficie sin cambios) |
 
 Orden de rollout:
 

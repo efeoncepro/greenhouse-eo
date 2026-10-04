@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-049`
-- Status real: `Complete 2026-10-04 — en producción: worker marketing-studio-media-worker-00003-hrw con MEDIA_WORKER_PLAYBACK_ENABLED (6/6 videos con playback), Studio c52eb4a (API 1.5.0), 302 → 206 verificado; follow-up: merge de efeoncepro/efeonce-mcp#24 (sólo artefacto, superficie sin cambios)`
+- Status real: `Complete 2026-10-04 — en producción: worker marketing-studio-media-worker-00003-hrw con MEDIA_WORKER_PLAYBACK_ENABLED (6/6 videos con playback), Studio c52eb4a (API 1.5.0), 302 → 206 verificado; gateway sincronizado (efeonce-mcp 454d80eb6)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (TASK-1893 dejó el worker de derivados y los originales en GCS; TASK-1894 Entregable A dejó la puerta de ingreso)
@@ -396,8 +396,8 @@ resolución completa, que se conserva para descarga/colocación.
   (`bytes 0-1023/7643530` y rango a mitad); Playwright con Chrome: pausado al cargar, duración 49,6 s, adelanta a 30 s,
   `error null`, medios `302 studio.efeonce.org` + `206 storage.googleapis.com`.
 - **Gateway:** `studio:manifest:sync` (44 tools, hash `60dfac7524ee`), `pnpm check` 237 tests verdes, superficie sin cambios
-  (digest `193e182cd743`, versión 1.10.0), PR efeoncepro/efeonce-mcp#24 con CI verde. **El merge lo bloqueó el
-  clasificador de permisos («Merge Without Review») y queda para el operador.** No requiere deploy: el provider no valida
+  (digest `193e182cd743`, versión 1.10.0), PR efeoncepro/efeonce-mcp#24 con CI verde, mergeado (`454d80eb6`) por instrucción explícita del operador
+  en el chat (antes el clasificador lo había bloqueado como «Merge Without Review»). No requiere deploy: el provider no valida
   esquemas de salida y `playback` ya llega a los agentes.
 - **Nota de proceso:** el deploy del worker de producción lo bloqueó el clasificador hasta que el operador lo autorizó
   explícitamente en el chat («te autorizo a correrlo tu todo»).
@@ -421,7 +421,6 @@ resolución completa, que se conserva para descarga/colocación.
 
 ## Follow-ups
 
-- Merge de efeoncepro/efeonce-mcp#24 (manifiesto 1.5.0 sincronizado; sin deploy necesario: la superficie no cambió).
 - Release de Greenhouse que sirva el manual MCP `marketing-studio` actualizado (línea `playback`).
 - Transcode en streaming (original a disco por partes, sin `Buffer`) antes de admitir videos cercanos a 1 GiB en producción.
 - Cloud CDN con backend bucket si las piezas se comparten fuera del equipo o el egreso crece.

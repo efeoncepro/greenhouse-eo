@@ -4,7 +4,7 @@
 
 Staging: ISSUE-178 resuelto.
 
-**Marketing Studio — video (04/10):** [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md) + [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md) complete y en producción (Studio `c52eb4a`, API 1.5.0, worker `00003-hrw`, 6/6 videos con `playback`). Pendiente del operador: merge de efeoncepro/efeonce-mcp#24 (sólo artefacto, sin deploy). Estado en el [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#reproducción-de-video-task-19981999).
+**Marketing Studio — video (04/10):** [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md) + [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md) complete y en producción (Studio `c52eb4a`, API 1.5.0, worker `00003-hrw`, 6/6 videos con `playback`). Gateway sincronizado (efeonce-mcp `454d80eb6`, sin deploy necesario). Estado en el [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#reproducción-de-video-task-19981999).
 
 **SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
 
