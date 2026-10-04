@@ -128,7 +128,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `En ejecución local — preflight y coordinación completados; Slice 1 verificado (schema + Always On); Slice 2 verificado; Slice 3 verificado local; Slice 4 verificado; Slice 4b en construcción; sin push, migración remota ni rollout`
+- Status real: `En ejecución local — preflight y coordinación completados; Slice 1 verificado (schema + Always On); Slice 2 verificado; Slice 3 verificado local; Slice 4 y delta blog verificados; Slice 4b en construcción; sin push, migración remota ni rollout`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -497,6 +497,15 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 - [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado.
 
 ## Verification
+
+### Delta blog — evidencia local 2026-10-04
+
+- Studio `acdf30f`: CMS y sitio por cuenta owned del cliente; WordPress como primer reader con binding autorizado; fallback URL pública con HTTP, robots, canonical y sitemap. Lectura pública acotada por origen, IP pública, DNS fijado, tiempo/tamaño y sin redirects.
+- `draft_url` de Notion se guarda/devuelve; ningún reader lo consulta. `confirmPublication` tiene tool, ruta y CLI de primitives; exige persona, revisión de ambos recursos y evidencia pública reciente. Guarda fecha confirmada separada de la observada, evento `publication_confirmed` con `confirmed_by`; congela tracking.
+- PostgreSQL real local: migración owned-blog up/down/up PASS; una URL 200 sin fecha permanece overdue; servicio y fecha futura rechazados; dry-run, replay y confirmación humana comprobados. WordPress con URL 404 no aporta publicación.
+- `pnpm check` PASS: 268 tests y 7 gates, todos los carriles Postgres habilitados, cero skips. Sin lectura real de proveedores, push ni rollout.
+- Decisiones adicionales del operador conservadas en `3b5c97091`: SV360 estimado con fuente/fecha, panel IA por clúster y gate que sólo avisa. Pertenecen al follow-up SEO/AEO; no se implementa su autorización ni medición aquí.
+- Próximo: tracking, compatibilidad/backfill y verificación de la CLI HTTP `pnpm studio` de Greenhouse contra el contrato nuevo. Confirmación por HTTP con persona depende del carril TASK-2003; no se transforma un bearer de servicio en persona.
 
 ### Slice 4 — evidencia local 2026-10-04
 
