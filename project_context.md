@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-Marketing Studio: conexiones owned locales Resend/HubSpot/WordPress y límites de rollout en [dossier TASK-2001](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md); producción sigue owned OFF, Marketing Cloud preparado.
+Studio: [conexiones y rollout TASK-2001](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
 
 Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
 
@@ -251,8 +251,6 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 - Contexto: `pnpm docs:context-check`; cierre/enforcement: `pnpm docs:context-check:strict`.
 
 ## Entry points ejecutables
-
-- **Studio:** `pnpm studio`: API/activaciones/email; [manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md). DryRun; autoridad remota, sin SQL.
 
 - **GCP local multi-proyecto:** mantener `default` en `efeonce-group` y usar la configuración nombrada `globe` para `efeonce-globe`; preferir `gcloud --configuration=globe ... --project=efeonce-globe` para no mutar el contexto compartido. No sustituye IAM ni cambia la postura runtime. Detalle operativo: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
 - **Gcloud local para agentes:** ante solicitud explícita, invocar la skill espejo `greenhouse-gcloud-auth-playwright` y ejecutar `pnpm gcloud:auth:playwright -- --force`; el runner completa CLI + ADC con Playwright y verifica `gcloud-auth-preflight.sh`. La credencial queda en `.auth/` ignorada por Git con `0600`; no hay scheduler, deploy ni cambio de postura runtime.
