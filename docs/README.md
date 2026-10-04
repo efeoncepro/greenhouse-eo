@@ -197,7 +197,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Issue Tracker](issues/README.md)
 - [Efeonce Partnership Registry V1](operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)
-- [AXIS: packages, Lab y agentes](documentation/creative/axis-packages-y-lab.md) · [manual operativo](manual-de-uso/creative/descubrir-y-componer-con-axis.md) · [cierre documental 2026-10-04](audits/2026-10-04-axis-documentation-closure.md)
+- [AXIS: packages, Lab y agentes](documentation/creative/axis-packages-y-lab.md) · [manual operativo](manual-de-uso/creative/descubrir-y-componer-con-axis.md) · [cierre documental](audits/2026-10-04-axis-documentation-closure.md) · [release de formularios](audits/2026-10-04-axis-forms-release.md)
 - [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)

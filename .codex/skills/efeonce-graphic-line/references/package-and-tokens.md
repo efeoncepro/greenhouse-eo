@@ -1,6 +1,6 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
-> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 (versiones vigentes
 > y regla del bump: greenhouse-eo@24e4c72ee, AXIS `v0.3.24`, 2026-09-28) · decisiones del
@@ -1368,7 +1368,7 @@ Nuevo seal `scripts/seal-tool-logos.mjs`, invocado por `seal`. Código en `main`
 
 ## Descubrimiento y composición por agentes — 2026-10-04
 
-Entrada `/agents/`; manifest `/agents/capabilities.json` generado desde el registry (41 capacidades
+Entrada `/agents/`; manifest `/agents/capabilities.json` generado desde el registry (52 capacidades
 en este corte). Leer recurso, contrato, lifecycle, adapter y paquete requerido antes de componer;
 seguir sus comandos y ejemplos en `docs/agent-composition/`. La búsqueda visual del Lab y su JSON
 ayudan a encontrar el recurso; los packages poseen valores, archivos y funciones portables.
@@ -1407,7 +1407,100 @@ MenuButton agrega open/defaultOpen/onOpenChange/portalContainer y reconcilia opc
 SplitButton reenvía ref/atributos al primario y configura por separado su menú. API en el README del
 package; matriz y limitaciones de accesibilidad en AXIS `docs/quality/buttons.md`.
 
-Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+Corte de distribución anterior verificado: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
 (AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
 HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
 52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### Destino de adopción Greenhouse — 2026-10-04
+
+El operador confirma que Greenhouse migrará eventualmente a los colores de La órbita.
+Las rampas heredadas son compatibilidad de transición, no una identidad paralela permanente.
+`axisColorSystem.adoption.greenhouse` declara el destino como `planned`; el mapeo de roles y el
+rollout siguen pendientes. La futura implementación debe mapear superficie, texto, borde, acción,
+foco y estados mediante un adapter semántico del theme sobre los tokens del package, preservando
+Vuexy y validando claro/oscuro y estados reales. El resolver de composición de marca no es todavía
+un theme completo de producto. Esta dirección no inicia la migración ni cambia pins de Greenhouse.
+
+
+### Botones, chips y badges conectados a La órbita — 2026-10-04
+
+Implementación AXIS: `axisButton` consume `axisColorSystem`/`axisOrbitRamp`, con roles de reposo,
+hover, presionado, foco y deshabilitado. La carga conserva la paleta normal. `default` usa Growth;
+neutral/peligro conservan función. El acento 500 es identidad; si no permite texto pequeño AA, se
+selecciona un tono de la rampa para el fondo del componente (Growth claro: teal vivo del ancla oscura, texto oscuro y borde teal profundo; corrección visual del operador), sin cambiar la marca.
+HTML/React/Lab usan el mismo CSS. Incluidos en tokens 0.5.0 y primitives 0.4.0;
+Greenhouse no cambia pins ni theme. Dueño: AXIS `docs/architecture/BUTTON_ORBIT_COLOR_DECISION_V1.md`.
+
+Chips y badges están **implementados en packages y proyectados en el Lab**:
+`Badge`, `CountBadge`, `Chip`, `FilterChip`, `ChoiceChipGroup`, `ActionChip` y `RemovableChip`;
+HTML/CSS sin framework y React opcional en primitives 0.4.0. Tokens 0.5.0 (`axisCompact`, `axisChip`,
+`axisBadge`), contracts 0.6.0 y registry 0.7.2. `efeonce.chip` y `efeonce.badge` 1.0.0
+candidate; chip 0.1.1 se sustituye por API discriminada, sin animaciones implícitas.
+El Lab consume los mismos exports en `/patterns/efeonce.chip/`, `/patterns/efeonce.badge/` y
+`/docs/chips-badges/`. Fuentes: AXIS `packages/primitives/README.md`,
+`docs/architecture/CHIPS_BADGES_PRIMITIVES_PLAN_V1.md` y `docs/quality/compact.md`.
+Badges informan; filtros y choices son campos nativos; action/removable tienen acciones explícitas.
+El producto posee lógica, operaciones asíncronas y foco al quitar. Soft por defecto;
+outline sólo donde el borde aporta jerarquía. No migrar pins de Greenhouse por un push de fuente.
+
+
+## Distribución de primitives y formularios — 2026-10-04
+
+Fuente `axis-design-system@df2de61`; **`v0.7.2` publicado y verificado**.
+[Release `37239150937`](https://github.com/efeoncepro/axis-design-system/actions/runs/37239150937)
+finalizó `success`; registry remoto e instalaciones privadas limpias confirman las versiones.
+El intento `v0.7.0` (run `37238026404`) se detuvo antes de publicar por overflow de un chip
+removible a 400% en WebKit móvil/Linux. El intento `v0.7.1` se canceló antes de publicar por timeouts de matrices de QA. La fuente
+`df2de61` separa esas pruebas por contexto/ruta sin ampliar timeout ni reducir cobertura.
+La verificación de `v0.7.2` superó esos intentos; un tag o versión en package.json por sí solo no
+acredita instalación remota. Versiones
+de esta entrega: `axis-tokens` **0.5.0**, `axis-ui-contracts` **0.6.0**, `axis-ui-primitives` **0.4.0**
+y `axis-ui-registry` **0.7.2**. Este corte incluye colores/rampas, botones y compactos descritos arriba,
+y diez contratos candidate de formularios. No confundir el número del tag con la versión de cada paquete.
+Instalación verificada: HTML/CSS sin React, SSR con React 18.3.1 y 19.2.7, diez builders,
+`forms.css`, 52 capacidades y subpath `/evidence`. La CI general `37239148653` también finalizó success,
+verificada por separado del workflow de publicación.
+
+`axisForms` posee geometría, paletas, foco y menús. La API canónica vive en
+[README de primitives](https://github.com/efeoncepro/axis-design-system/blob/main/packages/primitives/README.md)
+y [ADR de formularios](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/FORM_PRIMITIVES_DECISION_V1.md).
+Usar `/forms.css` una vez y `/react` para Field, Input, Textarea, Checkbox, RadioGroup, Switch,
+CheckboxGroup, Select, Combobox y NumberField. FormProvider hereda contexto; Field compuesto,
+SearchField, PasswordField, NativeSelect y FormErrorSummary resuelven composición y ayudas.
+La entrada raíz conserva HTML portable; Combobox requiere React.
+
+Select en React añade opciones con descripción/check y teclado; conserva un select nativo para
+validación, FormData y refs, y fallback de servidor/sin JS. `NativeSelect` y `selectHtml` mantienen
+el picker del sistema. Select y Combobox comparten menú tokenizado; no reconstruirlo en cada producto.
+`axisForms.inputFocusOffset` y el CSS del wrapper evitan doble foco; `leadingIcon="mail"` o
+`leadingIcon="folder"` usan íconos funcionales accesibles como decoración, no como sustitutos del label.
+La lógica de guardado, permisos, errores del servidor y reset controlado pertenece al consumidor.
+
+QA y pendientes: [matriz forms](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/forms.md).
+Greenhouse conserva sus pins: adopción y migración del theme siguen separadas de esta distribución.
+Este release no incluye un nuevo `axis-brand-assets`; el catálogo `/logos` sigue necesitando publicación propia.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.

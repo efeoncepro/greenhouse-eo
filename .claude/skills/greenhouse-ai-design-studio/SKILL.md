@@ -14,6 +14,12 @@ lanes to the locally available Claude skills, but do not change the order,
 artifacts, readiness fields, GVC premium requirements, score dimensions or
 thresholds.
 
+
+For AXIS buttons, chips, badges or forms, load [the primitive consumption guide](../axis-design-system/references/ui-primitives.md).
+It identifies packaged exports, La órbita roles, rich Select/native fallback and visual/interaction checks.
+Use it to evaluate reuse or an explicit adapter; it does not supersede Greenhouse's MUI/Vuexy controls,
+typography or adoption gates. A Lab specimen and a published package are different evidence.
+
 ## AXIS foundation pointer
 
 AXIS is Efeonce's portable foundation and Lab. Keep adapters native to each

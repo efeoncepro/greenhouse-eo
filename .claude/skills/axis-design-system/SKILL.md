@@ -53,6 +53,14 @@ capability selection, package/checkout prerequisites, reproducible output and ev
 current logo/icon catalog entry points and the Lab editorial typography boundary. Use the live catalog
 and installed exports rather than historic version examples below; consumer adoption is verified separately.
 
+### Product controls: buttons, chips, badges and forms
+
+Read [UI primitives](references/ui-primitives.md) before composing or adopting controls. It routes the
+compatible package set, ten form families, rich `Select` versus `NativeSelect`, shared functional icons,
+single-contour field focus, business-line palettes and consumer verification. `axis-ui-primitives` owns
+explicit HTML/CSS and optional React exports; the Lab demonstrates those exports, not a parallel component
+implementation. This availability does not migrate Greenhouse's MUI/Vuexy adapter or product pins.
+
 ### Tokens, contracts or registry
 
 1. Inspect the current ADR and package exports before editing.

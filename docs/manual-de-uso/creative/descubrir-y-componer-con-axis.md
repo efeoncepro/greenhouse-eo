@@ -101,3 +101,32 @@ Elige `ButtonGroup` para Tab normal, `ButtonToolbar` para acciones recorridas co
 recolorea tono brand. Para menús en diálogos/paneles usa el host modal predeterminado o `portalContainer`;
 la aplicación conserva su focus trap y anuncios. `SplitButton` separa acción principal y alternativas.
 Consulta [evidencia y límites de QA](../../audits/2026-10-04-axis-buttons-release.md) antes de certificar accesibilidad.
+
+## Colores, badges, chips y formularios
+
+1. Consulta [Colores](https://axis.efeonce.org/references/colors/): La órbita es la identidad vigente.
+   Elige línea y superficie antes de resolver roles. Las ramps derivadas sirven para construir jerarquías,
+   pero no asignan por sí solas los estados interactivos. Mantén las ramps antiguas sólo como compatibilidad.
+2. Usa `Badge` para estado/categoría y `CountBadge` para cantidades. `Chip` representa una entidad;
+   `FilterChip` selecciona varias opciones, `ChoiceChipGroup` una sola, `ActionChip` dispara una acción auxiliar
+   y `RemovableChip` separa la etiqueta del botón de eliminar. No conviertas un badge informativo en botón.
+3. Para formularios empieza por [la guía de consumo](https://axis.efeonce.org/docs/forms/) y las
+   páginas [Field](https://axis.efeonce.org/patterns/efeonce.field/),
+   [Select](https://axis.efeonce.org/patterns/efeonce.select/) y
+   [Combobox](https://axis.efeonce.org/patterns/efeonce.combobox/). Confirma la versión publicada en el
+   [runbook](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) antes de instalar.
+4. Importa `@efeoncepro/axis-ui-primitives/forms.css` y los componentes desde `/react`; usa la entrada raíz
+   para HTML sin React. `FormProvider` hereda línea/superficie/tamaño/densidad. Combina `Field` con un control
+   directo o usa `FieldRoot`, `FieldLabel`, `FieldDescription` y `FieldMessage` para composición más compleja.
+5. Añade iconos de apoyo con `leadingIcon="mail"` o `leadingIcon="folder"` cuando aporten significado.
+   Conserva la etiqueta visible. No agregues un outline al input interior: el wrapper dibuja el foco único.
+6. Elige `Select` para listas breves con descripciones y selección marcada; `NativeSelect` cuando prefieras
+   el picker de plataforma, y `Combobox` cuando necesites consulta y selección explícita. Los valores son
+   únicos; los deshabilitados/retirados no deben quedar como selección enviada. Date/file y multiselect
+   combobox no están incluidos.
+7. Verifica datos enviados, required, restablecimiento, teclado y error summary. Mantén los valores ante
+   fallo, permite retry y restaura el estado controlado desde el producto. Los demos del Lab no guardan datos.
+
+Para integrar sin rediseñar: usa los roles y el CSS del package, no colores o menús copiados del Lab.
+La [evidencia de formularios](../../audits/2026-10-04-axis-forms-release.md) distingue pruebas locales,
+publicación y adopción. Prueba lectores de pantalla, autofill y dispositivos reales en el producto consumidor.

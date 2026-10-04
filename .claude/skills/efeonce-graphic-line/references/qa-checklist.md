@@ -1,6 +1,6 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
-> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
 > operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
@@ -395,7 +395,53 @@ Extensión de QA de controles compuestos:
 - Texto a 200/400% y reflujo 320px; alto contraste Chromium/Firefox y reduced motion.
 - VoiceOver/NVDA manual y zoom real siguen pendientes de evidencia; no marcarlos passed por automatización.
 
-Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+Corte de distribución anterior verificado: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
 (AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
 HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
 52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Formularios y selectores compartidos — 2026-10-04
+
+- Revisar el menú abierto: descripción, selección, foco activo, disabled y viewport, en claro/oscuro.
+- Select: teclado/typeahead, Enter/Tab y Escape, validación required, refs, FormData y reset;
+  verificar fallback sin JS/NativeSelect. Combobox conserva consulta y valor confirmado separados.
+- El campo de texto usa un único contorno de foco; el error persiste durante foco/hover. Íconos
+  mail/folder con tamaño y alineación del package, decorativos y con etiqueta persistente.
+- Herencia de contexto, seis líneas/dos superficies, contraste, 320px, RTL, texto ampliado,
+  reduced motion y forced colors; configuradores consumen el mismo Select que el formulario.
+- Usar la matriz ejecutable AXIS `docs/quality/forms.md` y los comandos ahí registrados.
+  Corte inicial: 64 recorridos y 8 comparaciones visuales con 28 baselines macOS registrados.
+  En `df2de61`, las matrices de contexto/ruta se separan en pruebas independientes para evitar
+  acumular doce contextos o diez rutas en un timeout de 30s: 148/148 locales, misma cobertura,
+  sin ampliar timeout. Compactos 20/20 y typecheck PASS. Publicación `v0.7.2` confirmada por
+  release `37239150937` e instalación limpia desde registry con HTML/CSS sin React y SSR React
+  18.3.1/19.2.7; incluye diez builders, `forms.css`, 52 capacidades y `/evidence`.
+  Es evidencia aportada por el executor del corte, no una ejecución de esta sincronización documental.
+- VoiceOver/NVDA, dispositivo táctil físico, autofill/password managers reales y baselines Linux
+  quedan pendientes; axe, emulación y snapshots no los certifican.
+- Verificar instalación remota y exports/CSS antes de marcar distribución; publicación no adopta
+  los componentes en Greenhouse ni cambia la madurez candidate de los contratos.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.

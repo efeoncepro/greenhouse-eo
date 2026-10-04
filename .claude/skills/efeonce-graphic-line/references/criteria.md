@@ -1,6 +1,6 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
-> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver
@@ -886,10 +886,62 @@ La petición del operador se resuelve con contexto optativo `line`, separado de 
 Growth, Brand, Engine, Voice y Revenue (HubSpot/Salesforce) cambian sólo el acento de acciones
 de marca. Neutral y peligro mantienen su significado. Conviene en una landing o flujo de esa línea;
 no justifica recolorear todo Greenhouse o asociar un color de marca a éxito/error. Radio, tipografía,
-estados y accesibilidad son compartidos. Si un acento no admite texto AA, usar la otra variante
-canónica de esa línea, nunca un color inventado. Ejemplo: `line="engine" tone="brand"` para
+estados y accesibilidad son compartidos. Si un acento no admite texto AA, consumir el rol de componente calculado por AXIS desde
+la variante canónica y sus rampas; nunca inventar un color local ni modificar el acento 500. Ejemplo: `line="engine" tone="brand"` para
 «Solicitar propuesta»; `tone="danger"` conserva peligro incluso con `line="engine"`.
 
 > Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+
+## Prioridad de la paleta vigente en AXIS — 2026-10-04
+
+Decisión explícita del operador: «Prevalece por encima de todo la órbita que es la nueva línea».
+La identidad vigente se resuelve desde `efeonceGraphicLine.color` y `efeonceGraphicLine.lines`.
+La hoja general de colores del Lab debe empezar por esa paleta, superficies y acentos por línea
+sobre claro/oscuro, con sus reglas de uso. `axisRamp` documenta rampas de interfaz heredadas de
+Greenhouse: su existencia y consumo no las convierten en una alternativa al canon de La órbita.
+Se identifican como compatibilidad de producto cuando se conservan. La semántica funcional
+(éxito, advertencia, peligro, información) conserva su significado y debe distinguirse de identidad.
+
+El hallazgo original de `13db367` quedó corregido en `3299032`: la hoja y su JSON proyectan
+`axisColorSystem`, paleta, seis líneas y rampas de La órbita. No copiar HEX ni sustituir globalmente
+una rampa compartida sin revisar consumidores. La migración de producto necesita su propia verificación.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Formularios: claridad y foco continuo — 2026-10-04
+
+El operador rechazó los desplegables pobres y el foco con varias líneas. La solución pertenece al
+package: Select presenta título, ayuda y selección marcada; el configurador del Lab usa el mismo
+control. Opciones activas, seleccionadas y deshabilitadas deben distinguirse sin depender sólo del color.
+El campo de texto enfocado tiene **un solo contorno continuo**, conservando el significado de error;
+no se suman un aro externo y otro rectángulo sobre el input.
+
+Los íconos `mail` y `folder` aportan una señal semántica dentro del campo, sin reemplazar su etiqueta
+persistente. Son vocabulario funcional Tabler del primitive, no Trazo/Plastilina ni una esfera de marca
+adicional. No convertir cada campo en una pieza publicitaria. La ayuda, el error y el requerido
+siguen ligados al control. Detalle técnico y límites: [lab-components.md](lab-components.md#formularios-portables--2026-10-04).
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.

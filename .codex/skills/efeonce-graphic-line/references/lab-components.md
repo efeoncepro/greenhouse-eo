@@ -1,6 +1,6 @@
 # Componentes y patrones de marca en el Lab de AXIS
 
-> Verificado contra: axis-design-system@aee99d2 — 2026-10-04. Componentes/navegación en `9eb3da9`, búsqueda en `d9c7e6e`, agentes en `060174c`; tipografía editorial en `aee99d2` (push, despliegue Vercel y CI `37216960966` verificados).
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04. Componentes/navegación en `9eb3da9`, búsqueda en `d9c7e6e`, agentes en `060174c`; tipografía editorial en `aee99d2` (push, despliegue Vercel y CI `37216960966` verificados).
 
 El operador pidió renovar los componentes y patrones de AXIS con `efeonce-graphic-line`.
 La aplicación vive en el catálogo raíz y en `/patterns/*/`, como presentación de marca
@@ -60,7 +60,7 @@ es evidencia del corte, nunca una lista fija que impida cubrir páginas nuevas.
 
 ## Encontrar y usar recursos
 
-`/agents/` presenta cómo pasar del Lab a los packages y las 41 capacidades del registry.
+`/agents/` presenta cómo pasar del Lab a los packages y las 52 capacidades del registry.
 `/agents/capabilities.json` es el manifest ejecutable de descubrimiento. La búsqueda global
 indexa referencias, componentes, íconos, logos, recetas y capacidades; usar ID exacto y filtros.
 Para recursos de marca, `/references/logos/` y `/references/iconography/` son entradas centrales.
@@ -112,7 +112,69 @@ SplitButton conserva los atributos nativos/ref de su acción principal. El Lab m
 con React real. El consumidor mantiene focus trap, confirmaciones y anuncios de resultado.
 Matriz canónica: AXIS `docs/quality/buttons.md`; no atribuir VoiceOver/NVDA manual a un pase de axe.
 
-Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+Corte de distribución anterior verificado: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
 (AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
 HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
 52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### Botones, chips y badges conectados a La órbita — 2026-10-04
+
+Implementación AXIS: `axisButton` consume `axisColorSystem`/`axisOrbitRamp`, con roles de reposo,
+hover, presionado, foco y deshabilitado. La carga conserva la paleta normal. `default` usa Growth;
+neutral/peligro conservan función. El acento 500 es identidad; si no permite texto pequeño AA, se
+selecciona un tono de la rampa para el fondo del componente (Growth claro: teal vivo del ancla oscura, texto oscuro y borde teal profundo; corrección visual del operador), sin cambiar la marca.
+HTML/React/Lab usan el mismo CSS. Incluidos en tokens 0.5.0 y primitives 0.4.0;
+Greenhouse no cambia pins ni theme. Dueño: AXIS `docs/architecture/BUTTON_ORBIT_COLOR_DECISION_V1.md`.
+
+Chips y badges están **implementados en packages y proyectados en el Lab**:
+`Badge`, `CountBadge`, `Chip`, `FilterChip`, `ChoiceChipGroup`, `ActionChip` y `RemovableChip`;
+HTML/CSS sin framework y React opcional en primitives 0.4.0. Tokens 0.5.0 (`axisCompact`, `axisChip`,
+`axisBadge`), contracts 0.6.0 y registry 0.7.2. `efeonce.chip` y `efeonce.badge` 1.0.0
+candidate; chip 0.1.1 se sustituye por API discriminada, sin animaciones implícitas.
+El Lab consume los mismos exports en `/patterns/efeonce.chip/`, `/patterns/efeonce.badge/` y
+`/docs/chips-badges/`. Fuentes: AXIS `packages/primitives/README.md`,
+`docs/architecture/CHIPS_BADGES_PRIMITIVES_PLAN_V1.md` y `docs/quality/compact.md`.
+Badges informan; filtros y choices son campos nativos; action/removable tienen acciones explícitas.
+El producto posee lógica, operaciones asíncronas y foco al quitar. Soft por defecto;
+outline sólo donde el borde aporta jerarquía. No migrar pins de Greenhouse por un push de fuente.
+
+
+## Formularios portables — 2026-10-04
+
+El Lab consume la familia del package en `/patterns/efeonce.field/` y las otras nueve fichas de
+formularios. Formularios y configuradores comparten Select: menú con título, descripción, check,
+foco activo, estado deshabilitado y ajuste al viewport. NativeSelect conserva la opción de picker
+del sistema; el HTML sin React mantiene comportamiento nativo. No copiar un dropdown local para
+resolver densidad, línea o superficie.
+
+Input/Field presentan un único contorno de foco, sin rectángulo interior ni doble aro. Correo y
+proyecto muestran `mail`/`folder` dentro del campo. Los íconos funcionales no reemplazan el label;
+Bricolage permanece editorial y Poppins en los controles. El package posee estilos y estados;
+el Lab demuestra validación, recuperación, carga y reset sin convertirse en backend de producto.
+
+Versiones y entrada API: [package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04).
+Matriz y comandos: AXIS `docs/quality/forms.md`; los diez contratos siguen candidate.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.

@@ -59,9 +59,9 @@ Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de 
 
 ## Estado operativo de AXIS para esta skill — 2026-10-04
 
-Verificado contra `axis-design-system@aee99d2`. Para descubrir y componer, entrar por
+Verificado contra `axis-design-system@df2de61`. Para descubrir y componer, entrar por
 [/agents/](https://axis.efeonce.org/agents/) y su manifest `/agents/capabilities.json`: el registry
-conecta 41 capacidades con sus paquetes, contratos, ejemplos y límites de adapter. Packages son la
+conecta 52 capacidades con sus paquetes, contratos, ejemplos y límites de adapter. Packages son la
 fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implementa su adapter.
 
 - **Íconos:** [catálogo común](https://axis.efeonce.org/references/iconography/#catalogo), 134 únicos
@@ -70,6 +70,11 @@ fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implem
 - **Logos:** [catálogo común](https://axis.efeonce.org/references/logos/), 223 archivos de 52 familias
   (99 propios, 124 terceros). Código `/logos` de `axis-brand-assets` y Lab disponibles; **nueva versión
   instalable del catálogo pendiente**. 0.4.18 en workspace no acredita que el export esté publicado.
+- **Primitives de marca:** botones, chips, badges y diez contratos de formularios comparten tokens
+  y CSS de packages; el Lab los consume. `Select` enriquecido conserva fallback nativo, foco continuo
+  e íconos funcionales. Distribución `v0.7.2` publicada e instalación privada verificada;
+  los contratos mantienen su madurez candidate. [API, versiones y estado de distribución](references/package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04).
+  La migración futura de Greenhouse a estos colores sigue planificada; no cambia pins ni theme.
 - **Lab:** títulos editoriales con Bricolage desde el token oficial, mediante `LabHeading`;
   componentes y specimens mantienen sus fuentes. [Contrato y QA](references/lab-components.md).
 

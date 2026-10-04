@@ -1,6 +1,6 @@
 # Registro de decisiones y versiones
 
-> Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964) — 2026-10-02 (últimas filas: el login V4
 > de Greenhouse y el avatar como referencia de identidad, 2026-10-02 (b) y (c)); antes, AXIS `d54c873` (tag `v0.4.11`) — 2026-10-01 (el Spark 2D, 2026-10-01 (g)); antes, greenhouse-eo `develop` en `d1a41babb` — 2026-10-01 (últimas filas: los perfiles sociales de
@@ -496,3 +496,69 @@ Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, toke
 (AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
 HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
 52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## 2026-10-04 — La órbita prevalece en la hoja de colores
+
+El operador establece: «Prevalece por encima de todo la órbita que es la nueva línea».
+Canon de identidad: `efeonceGraphicLine.color` y `.lines`; las rampas heredadas de Greenhouse
+no gobiernan la identidad nueva. La hoja `references/colors` aún muestra sólo `axisRamp` y
+requiere reorganización: paleta madre, seis líneas con acento claro/oscuro, semántica funcional
+y compatibilidad separadas. Decisión registrada; no se han cambiado tokens, consumidores ni Lab.
+Criterio completo: [criteria.md](criteria.md#prioridad-de-la-paleta-vigente-en-axis--2026-10-04).
+
+> Verificado contra: axis-design-system@13db367 — 2026-10-04.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación local en AXIS, base `13db367`, tokens **0.4.0 preparado, no publicado**:
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins de Greenhouse ni publicación en esta sesión.
+
+> Verificado contra: axis-design-system@13db367 + cambios locales de color — 2026-10-04.
+
+
+### Destino de adopción Greenhouse — 2026-10-04
+
+El operador confirma que Greenhouse migrará eventualmente a los colores de La órbita.
+Las rampas heredadas son compatibilidad de transición, no una identidad paralela permanente.
+`axisColorSystem.adoption.greenhouse` declara el destino como `planned`; el mapeo de roles y el
+rollout siguen pendientes. La futura implementación debe mapear superficie, texto, borde, acción,
+foco y estados mediante un adapter semántico del theme sobre los tokens del package, preservando
+Vuexy y validando claro/oscuro y estados reales. El resolver de composición de marca no es todavía
+un theme completo de producto. Esta dirección no inicia la migración ni cambia pins de Greenhouse.
+
+
+## 2026-10-04 — Formularios, menús y cierre de packages
+
+El operador pide completar las primitives, rechaza los desplegables pobres y el doble contorno de
+foco, y pide íconos en los campos. AXIS `3299032` lleva diez contratos de formulario a packages
+y Lab; Select enriquecido y NativeSelect explícito, configuradores con la misma implementación,
+foco continuo e íconos funcionales mail/folder. Criterio: [criteria.md](criteria.md#formularios-claridad-y-foco-continuo--2026-10-04).
+
+El operador autoriza push, publicación de packages y actualización de docs/skills mediante
+subagentes. El tag `v0.7.0` (run `37238026404`) quedó detenido antes de publicar por overflow
+del chip removible a 400% en WebKit móvil/Linux. Los runs de `v0.7.1` se cancelaron antes de publicar tras detectar cinco timeouts en
+matrices que acumulaban doce contextos o diez rutas dentro de 30 segundos. La fuente `df2de61`
+separa las pruebas por contexto/ruta, con la misma cobertura y sin ampliar timeout.
+`v0.7.2` quedó publicado: release `37239150937` success; registry remoto e instalaciones limpias
+HTML/CSS sin React y SSR React 18.3.1/19.2.7 verificadas. Este corte reemplaza como
+estado de fuente los preparativos locales 0.4.0/0.3.0 de arriba: tokens 0.5.0, contracts 0.6.0,
+primitives 0.4.0 y registry 0.7.2. Estado instalable en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04).
+Se conserva adopción Greenhouse `planned`, sin cambio de pins; lectores de pantalla/dispositivos
+físicos y baselines Linux pendientes. El catálogo de logos requiere otro release de brand-assets.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.

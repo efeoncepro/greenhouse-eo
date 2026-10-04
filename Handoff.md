@@ -7,7 +7,7 @@
 **Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.
 
 
-**AXIS (04/10):** botones con contexto, selección exclusiva, toolbar y menú modal; QA manual de lectores pendiente; [evidencia y adopción pendiente](docs/audits/2026-10-04-axis-buttons-release.md). [Cierre de recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
+**AXIS (04/10):** [distribución de colores, compactos y formularios](docs/audits/2026-10-04-axis-forms-release.md); foco único, iconos y Select enriquecido en primitives. Adopción y QA manual consumidor pendientes. [Botones](docs/audits/2026-10-04-axis-buttons-release.md) · [recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
 
 Staging: ISSUE-178 resuelto.
 

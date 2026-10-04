@@ -1,5 +1,64 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Distribución vigente — formularios y La órbita, 2026-10-04
+
+**Publicados e instalados desde GitHub Packages**: source `df2de61`, tag `v0.7.2`, release
+`37239150937` SUCCESS. Instalaciones nuevas sin React y con React `18.3.1` / `19.2.7` PASS;
+HTML/CSS, forms.css, diez builders, exports React/SSR, 52 capacidades y `/evidence` verificados.
+Vercel SUCCESS y readback público de Field/Select. El CI general `37239148653` también finalizó SUCCESS;
+la publicación tiene su propio workflow completado. Los intentos fallidos/cancelados y su corrección
+quedan trazados en el dossier.
+
+| Package privado | Versión publicada | Superficie |
+| --- | --- | --- |
+| `@efeoncepro/axis-tokens` | `0.5.0` | Roles y ramps de La órbita, `axisButton`, `axisCompact`, `axisForms` |
+| `@efeoncepro/axis-ui-contracts` | `0.6.0` | Contratos/resolvers de botones, chips/badges y diez familias de formularios |
+| `@efeoncepro/axis-ui-primitives` | `0.4.0` | HTML/CSS portable y adapters React opcionales |
+| `@efeoncepro/axis-ui-registry` | `0.7.2` | Descubrimiento de contratos y exports; 52 capacidades |
+
+La evidencia y los pendientes de distribución se centralizan en el
+[dossier de formularios](../audits/2026-10-04-axis-forms-release.md). El tag identifica esta tanda,
+no una versión uniforme de todos los paquetes. La publicación no actualiza los consumidores.
+Greenhouse conserva los pins leídos en `package.json`: tokens `0.3.41`, contracts `0.3.40`, registry
+`0.3.1`, brand-assets `0.4.15` y graphic-line `0.11.0`; no incorpora primitives en este cambio.
+Las secciones fechadas posteriores de este runbook son historia cuando contradicen este corte.
+
+### Contrato de consumo de primitives
+
+- Importar el CSS publicado una vez: `/button.css`, `/compact.css` (aliases `/chip.css` y `/badge.css`)
+  y `/forms.css` según lo usado. Cargar Poppins en el consumidor. Nunca copiar CSS/componentes del Lab.
+- La entrada raíz entrega HTML/CSS sin React; `/react` es optativa. `FormProvider` transmite
+  línea/superficie/tamaño/densidad, con prioridad de props explícitas. `Field` y sus partes compuestas
+  vinculan etiqueta, ayuda y mensaje al control. Los iconos `mail`/`folder` son apoyo decorativo, no etiquetas.
+- React `Select` mejora progresivamente el picker nativo con descripciones, marca seleccionada,
+  typeahead y menú compartido con `Combobox`. `NativeSelect` y `selectHtml` preservan el picker de plataforma.
+  No asumir descripciones enriquecidas en HTML sin React. El select nativo conserva name/form, validación,
+  FormData y ref; su foco se redirige al trigger visible tras hidratar.
+- `Select`: flechas/Home/End/PageUp/PageDown recorren; Enter/Espacio/Tab confirman y Escape cancela.
+  `Combobox` separa query de valor elegido y enviado; no acepta valor libre ni selección múltiple.
+  La posición y el foco se verifican también dentro del modal consumidor.
+- Un único contorno continuo identifica foco en campos; no agregar un segundo outline al input interno.
+  La línea de negocio modifica identidad, nunca el significado de error/advertencia/éxito.
+- La aplicación posee validación de servidor, permisos, persistencia, borradores, retry, fetching y
+  cancelación de respuestas obsoletas. En modo controlado también restaura valores en `onReset`.
+
+### Adopción y rollback
+
+1. Verificar release exitoso, versiones exactas del registry y exports del tarball instalado con acceso privado.
+2. Fijar sólo los paquetes requeridos en el producto y conservar el lockfile anterior como rollback.
+3. Componer una ruta optativa con API/CSS publicado, siguiendo la
+   [guía de formularios](https://axis.efeonce.org/docs/forms/) y el
+   [manual de AXIS](../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+4. Verificar formulario real: estados, envío/reset, teclado, popup en modal, autofill, contraste y móvil.
+   Los 148 casos automáticos y 28 baselines macOS de AXIS no sustituyen VoiceOver/NVDA ni dispositivo físico.
+5. Promover sólo con evidencia del producto; para revertir, retirar la ruta optativa o restaurar pins/lockfile
+   y ejecutar sus gates. Los mappers de tokens se regeneran y comprueban según los deltas de este runbook.
+
+La órbita gobierna la nueva identidad y es destino planificado del tema Greenhouse. Las ramps legadas
+permanecen como compatibilidad transitoria. La migración necesita un adapter semántico por rol y superficie;
+no se sustituye `axisRamp` ni se asigna un paso de ramp a hover/error por su número.
+
+
 ## Delta 2026-10-04 — botones portables y líneas de negocio
 
 Primer release de `@efeoncepro/axis-ui-primitives@0.1.0` (AXIS `1bccb3f`, tag `v0.3.43`),
@@ -21,7 +80,7 @@ cuatro perfiles; VoiceOver/NVDA manual y zoom nativo requieren evidencia indepen
 
 
 
-Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+Distribución anterior verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
 (AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
 HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
 52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.

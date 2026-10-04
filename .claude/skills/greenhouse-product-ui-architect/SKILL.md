@@ -29,6 +29,13 @@ coverage or confidence before a large empty chart. Tables should be queues or
 rankings with density, sort/filter/action model and responsive list strategy,
 not flat exports.
 
+## Portable control boundary
+
+Before inventing a control family, check [AXIS primitive consumption](../axis-design-system/references/ui-primitives.md):
+buttons, chips, badges and ten form families have explicit package contracts and adapters. Record reuse/extend/adapt
+against the existing Greenhouse primitive and MUI/Vuexy base. AXIS Select, NativeSelect and Combobox have different
+interaction contracts; publication does not authorize a global control replacement or the planned La órbita migration.
+
 ## Required Reads
 
 - `DESIGN.md`

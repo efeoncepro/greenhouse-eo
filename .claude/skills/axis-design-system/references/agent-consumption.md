@@ -8,8 +8,8 @@
 - [LLM entry](https://axis.efeonce.org/llms.txt): navigation for text agents; follow the catalog rather than inventing a command.
 
 AXIS source: `packages/registry/src/capabilities.ts`; decision:
-`docs/architecture/AGENT_CAPABILITIES_DECISION_V1.md`. The catalog currently exposes 41 capabilities:
-29 contract-adoption entries and 12 checkout routes (3 artifact starters, 9 manifest resolvers).
+`docs/architecture/AGENT_CAPABILITIES_DECISION_V1.md`. At AXIS `df2de617`, the catalog exposes 52 capabilities:
+40 contract-adoption entries and 12 checkout routes (3 artifact starters, 9 manifest resolvers).
 Counts are a 2026-10-04 inventory, not a limit; enumerate the current catalog when operating.
 
 | Surface | Owns | Boundary |
@@ -19,7 +19,11 @@ Counts are a 2026-10-04 inventory, not a limit; enumerate the current catalog wh
 | AXIS checkout | Local authoring CLIs | Not published npm bins; source/build requirements apply |
 | Consumer repo | Runtime adapter and adoption evidence | Package availability does not update the consumer |
 
-The Lab reports `workspaceVersion`, not verified registry publication. At the 2026-10-04 cut,
+The Lab reports `workspaceVersion`, not verified registry publication. The earlier 2026-10-04 cut below
+is historical; the current form package matrix and release boundary are in [UI primitives](ui-primitives.md).
+The `v0.7.2` package set is now published and clean-install verified; registry `/capabilities` and
+`/evidence` are included. Product adoption remains separate.
+At that earlier cut,
 `axis-graphic-line@0.17.0` is published (AEO/SEO/Authority); the new registry `/capabilities` and `/evidence`
 and brand-assets `/logos` exports are source-only until their own package releases. Brand-assets remains
 `0.4.18`; that version must not be claimed to include `/logos`. Verify installed exports and exact pins.
@@ -112,7 +116,10 @@ verify the font actually paints glyphs, plus specimen isolation. The 65-route / 
 2026-10-04 is evidence of that revision, not a substitute for rerunning after a typography change.
 CI, public deployment, private package publication and consumer adoption are four separate readbacks.
 
-## Native buttons (private distribution, 2026-10-04)
+## Native buttons (distribution history, 2026-10-04)
+
+For the current compatible forms/compact/button package set, use [UI primitives](ui-primitives.md).
+The following release snapshots preserve their original evidence, not current consumer pins.
 
 The `efeonce.button` 1.0.0 candidate contract now has a portable implementation in
 `@efeoncepro/axis-ui-primitives` (initial private release 0.1.0 verified from GitHub Packages, tag v0.3.43).
@@ -159,7 +166,63 @@ The button Playwright config covers Chromium, Firefox, desktop WebKit and emulat
 with axe/ARIA, keyboard, 320px reflow, text scaling 200/400%, reduced motion and reviewed screenshots.
 Manual VoiceOver/NVDA, actual browser zoom and physical iOS are not inferred from these checks.
 
-Verified current release: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43, contracts 0.4.0.
+Verified earlier release: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43, contracts 0.4.0.
 AXIS `13db367`, tag `v0.5.1`, release `37223839523` succeeded on 2026-10-04. A fresh private
 registry install verified HTML/CSS without React and SSR of all eight exports with React 18.3.1.
 The public Lab and modal menu focus were checked; product adoption remains separate.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Registro de preparación anterior: los estados locales de estas tres secciones quedan superados por
+el [corte de primitives y formularios](ui-primitives.md). Se conservan las decisiones y versiones de origen.
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación local en AXIS, base `13db367`, tokens **0.4.0 preparado, no publicado**:
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins de Greenhouse ni publicación en esta sesión.
+
+> Verificado contra: axis-design-system@13db367 + cambios locales de color — 2026-10-04.
+
+
+### Destino de adopción Greenhouse — 2026-10-04
+
+El operador confirma que Greenhouse migrará eventualmente a los colores de La órbita.
+Las rampas heredadas son compatibilidad de transición, no una identidad paralela permanente.
+`axisColorSystem.adoption.greenhouse` declara el destino como `planned`; el mapeo de roles y el
+rollout siguen pendientes. La futura implementación debe mapear superficie, texto, borde, acción,
+foco y estados mediante un adapter semántico del theme sobre los tokens del package, preservando
+Vuexy y validando claro/oscuro y estados reales. El resolver de composición de marca no es todavía
+un theme completo de producto. Esta dirección no inicia la migración ni cambia pins de Greenhouse.
+
+
+### Botones conectados a La órbita; siguientes primitives — 2026-10-04
+
+Implementación local AXIS: `axisButton` consume `axisColorSystem`/`axisOrbitRamp`, con roles de reposo,
+hover, presionado, foco y deshabilitado. La carga conserva la paleta normal. `default` usa Growth;
+neutral/peligro conservan función. El acento 500 es identidad; si no permite texto pequeño AA, se
+selecciona un tono de la rampa para el fondo del componente (Growth claro: teal vivo del ancla oscura, texto oscuro y borde teal profundo; corrección visual del operador), sin cambiar la marca.
+HTML/React/Lab usan el mismo CSS. Tokens 0.4.0 y primitives 0.3.0 preparados, aún sin publicación;
+Greenhouse no cambia pins ni theme. Dueño: AXIS `docs/architecture/BUTTON_ORBIT_COLOR_DECISION_V1.md`.
+
+Chips y badges están **implementados en el checkout de AXIS; publicación pendiente**:
+`Badge`, `CountBadge`, `Chip`, `FilterChip`, `ChoiceChipGroup`, `ActionChip` y `RemovableChip`;
+HTML/CSS sin framework y React opcional en primitives 0.3.0. Tokens 0.4.0 (`axisCompact`, `axisChip`,
+`axisBadge`), contracts 0.5.0 y registry 0.6.0 preparados. `efeonce.chip` y `efeonce.badge` 1.0.0
+candidate; chip 0.1.1 se sustituye por API discriminada, sin animaciones implícitas.
+El Lab consume los mismos exports en `/patterns/efeonce.chip/`, `/patterns/efeonce.badge/` y
+`/docs/chips-badges/`. Fuentes: AXIS `packages/primitives/README.md`,
+`docs/architecture/CHIPS_BADGES_PRIMITIVES_PLAN_V1.md` y `docs/quality/compact.md`.
+Badges informan; filtros y choices son campos nativos; action/removable tienen acciones explícitas.
+El producto posee lógica, operaciones asíncronas y foco al quitar. Soft por defecto;
+outline sólo donde el borde aporta jerarquía. No migrar pins de Greenhouse por un push de fuente.

@@ -8,6 +8,19 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización — 2026-10-04: primitives y formularios
+
+AXIS `df2de61` / tag `v0.7.2`: release `37239150937` SUCCESS y readback de GitHub Packages confirmado.
+Publicados tokens `0.5.0`, contracts `0.6.0`, primitives `0.4.0` y registry `0.7.2`.
+Instalaciones privadas nuevas sin React y con React 18.3.1/19.2.7 PASS, incluidos HTML/CSS/SSR y capacidades.
+Vercel SUCCESS y readback de Field/Select. Formularios 148/148 locales PASS; CI general `37239148653`
+confirmado SUCCESS para el mismo corte. Intentos anteriores fallidos/cancelados conservados en el dossier.
+La entrega agrega roles/ramps de La órbita, chips/badges y diez familias de formularios, incluido Select
+enriquecido con fallback nativo, foco continuo e iconos de apoyo. El Lab consume los mismos packages.
+[Estado, verificación y pendientes](../audits/2026-10-04-axis-forms-release.md) y
+[consumo/rollback](AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) son las fuentes operativas.
+No se cambian pins ni runtime de Greenhouse, Globe o Marketing Studio; publicación y adopción son pasos separados.
+
 ## Actualización — 2026-10-04: descubrimiento y composición
 
 AXIS incorpora entrada para agentes, búsqueda unificada, catálogos de íconos/logos y tipografía editorial compartida.

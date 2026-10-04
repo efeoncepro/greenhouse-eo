@@ -58,6 +58,27 @@ desplegará como proyecto Vercel independiente, inicialmente en modo internal-on
 crea un runtime Cloud Run para el Lab mientras no exista una necesidad de backend,
 persistencia o jobs.
 
+## Aplicación vigente: identidad y primitives portables
+
+La dirección aprobada de La órbita se materializa en AXIS como fuente de valores y roles de identidad.
+Las ramps legadas conservan compatibilidad mientras Greenhouse prepara un adapter de tema semántico;
+la migración futura no autoriza reemplazos globales de MUI/Vuexy. El canon de color y de formularios vive en
+las decisiones [de color](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md)
+y [de formularios](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/FORM_PRIMITIVES_DECISION_V1.md)
+del repositorio dueño.
+
+`axis-ui-primitives` implementa HTML/CSS portable y adapters React opcionales sobre tokens y contratos.
+El Lab demuestra estos mismos exports. Incluye botones, badges/chips y Field, Input, Textarea, Checkbox,
+RadioGroup, Switch, CheckboxGroup, Select, Combobox y NumberField. Select React mejora el picker nativo;
+NativeSelect conserva la ruta de plataforma. El contrato de formulario mantiene validación nativa, envío,
+IDs/ARIA y reset; el producto conserva permisos, validación de servidor, persistencia y recuperación.
+No se introduce una librería de formularios ni se comparte la lógica de negocio entre productos.
+
+Las versiones, pruebas y estados de publicación se registran en el
+[runbook](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) y el
+[dossier](../audits/2026-10-04-axis-forms-release.md), no se infieren del código o del despliegue del Lab.
+Los diez contratos de formularios conservan lifecycle `candidate`; publicación no los promueve a `stable`.
+
 ## Delta 2026-09-14 — intención portable de selección colaborativa
 
 AXIS incorpora `efeonce.collaboration-selection` `0.2.0` como contrato `candidate` para representar una
