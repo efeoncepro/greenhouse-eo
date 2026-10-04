@@ -6,13 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
-## Delta 2026-10-04 — pasa a ser la primera de la ruta de activaciones
+## Delta 2026-10-04 (posterior) — el núcleo de escritura pasa a TASK-2003
 
-- Decisión del operador: todo lo que se implemente en EPIC-049 debe ser Full API Parity y operable por MCP, lecturas y
-  escrituras. Esta task es el carril que lo permite, así que va **antes** de TASK-1905, TASK-2001 y TASK-2002.
-- Su mecánica (clase `efeonce.mcp.marketing_studio.write`, canje por capability exacta, `Efeonce-Delegated-Token`
-  revalidado por Studio, `dryRun` → `proposalDigest` en `T2`) debe quedar como **patrón reutilizable**: cada task
-  siguiente agrega sus tools y su cliente de canje sin rediseñar el carril.
+- Después de retirar esta task, el operador pidió el núcleo agent-friendly: **TASK-2003** reutiliza el diseño de los
+  Slices 1–4 de esta task **sin** `marketing_studio.campaign.approve`, `proposalDigest` ni federación de `T2`. Esta task
+  conserva sólo las aprobaciones por MCP con confirmación y sigue retirada hasta nueva decisión. (Este delta reemplaza
+  el anterior del mismo día, que la ponía primera en la ruta.)
 
 ## Delta 2026-10-02
 

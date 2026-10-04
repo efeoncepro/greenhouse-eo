@@ -1,12 +1,21 @@
 # EPIC-049 — Efeonce Marketing Studio: plataforma de campañas API-first
 
+## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
+
+El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es agent-friendly y que todo lo de EPIC-049
+nace Full API Parity con sus tools en el MCP, **escrituras incluidas**. La «nueva decisión» que dejaba pendiente la
+retirada de TASK-1899 es **TASK-2003**: núcleo de escritura por MCP con identidad delegada (scope en Entra, canje por
+capability exacta, persona como actor, gateway con escrituras `T1`), **sin** aprobaciones ni `proposalDigest`, que
+siguen retirados en TASK-1899. Desde TASK-2003, las escrituras `T1` de esta task nacen federadas; las `T2` siguen por
+CLI/UI. La implementa Codex.
+
 ## Status
 
 - Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. TASK-1894 Entregables A (puerta de ingreso) y B (commands de escritura, revisión y tres estados; API 1.4.0) en producción de Studio desde 2026-10-02; gateway v1.10.0 con las escrituras en el manifiesto pero sin federar; capabilities de escritura en Greenhouse `develop`, sin release a producción; Entregable C (corte de CMP-001…005 a Studio) diferido por el operador. Siguen TASK-1892, 1894 (Entregable C), 1895, 1897, 1898 y 1899 (métricas, corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do. ADR de operación híbrida con agentes aceptado el 2026-09-26 (work items, registro de roles, despachador Claude/OpenAI, evals y costo por rol); sus tasks TASK-1913…1916 están en to-do. El flujo editorial SEO/AEO pertenece a Studio por decisión del operador del 2026-10-04: TASK-1667 y TASK-1669 se trasladan desde EPIC-022, en diseño. La reproducción de video (TASK-1998 contrato y transporte, TASK-1999 reproductor) está en producción desde el 2026-10-04 (Studio API 1.5.0). Activaciones y calendario de Studio (ADR de estrategia §15, 2026-10-04): TASK-2001 y TASK-2002. Censo: 29 hijas, 7 complete, 1 in-progress y 21 to-do.`
+- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. TASK-1894 Entregables A (puerta de ingreso) y B (commands de escritura, revisión y tres estados; API 1.4.0) en producción de Studio desde 2026-10-02; gateway v1.10.0 con las escrituras en el manifiesto pero sin federar; capabilities de escritura en Greenhouse `develop`, sin release a producción; Entregable C (corte de CMP-001…005 a Studio) diferido por el operador. Siguen TASK-1892, 1894 (Entregable C), 1895, 1897, 1898 y 1899 (métricas, corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do. ADR de operación híbrida con agentes aceptado el 2026-09-26 (work items, registro de roles, despachador Claude/OpenAI, evals y costo por rol); sus tasks TASK-1913…1916 están en to-do. El flujo editorial SEO/AEO pertenece a Studio por decisión del operador del 2026-10-04: TASK-1667 y TASK-1669 se trasladan desde EPIC-022, en diseño. La reproducción de video (TASK-1998 contrato y transporte, TASK-1999 reproductor) está en producción desde el 2026-10-04 (Studio API 1.5.0). Activaciones y calendario de Studio (ADR de estrategia §15, 2026-10-04): TASK-2001 y TASK-2002, sobre el núcleo de escritura por MCP TASK-2003. Censo: 30 hijas, 7 complete, 1 in-progress y 22 to-do.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -77,13 +86,13 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 ## Child Tasks
 
-**Censo 2026-10-04: 29 hijas directas; 7 complete, 1 in-progress y 21 to-do.** El traslado de TASK-1667/1669 cambia ownership, no acredita implementación.
+**Censo 2026-10-04: 30 hijas directas; 7 complete, 1 in-progress y 22 to-do.** El traslado de TASK-1667/1669 cambia ownership, no acredita implementación.
 
 Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 · 1899 (ambas consumen los commands de 1894) → 1897 (cuando convenga) → 1898 al final.
 
 Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
 
-**Regla del programa (operador, 2026-10-04): todo lo que se implemente en EPIC-049 es Full API Parity y operable por MCP, lecturas y escrituras, con identidad delegada; ninguna task cierra sin una sesión MCP real que ejecute sus operaciones nuevas.** Por eso la ruta de activaciones y calendario (ADR de estrategia §15) es: **TASK-1899** (carril de escritura delegada por MCP) → **TASK-1905** (catálogo de canales con la taxonomía de §15 y los valores UTM de RESEARCH-012) → **TASK-2001** (activaciones, evidencia de ejecución, descubrimiento de Metricool, tracking URL por activación) → **TASK-2002** (calendario), con la dirección visual v3 de 2002 en paralelo desde ya.
+**Regla del programa (operador, 2026-10-04): todo lo que se implemente en EPIC-049 es Full API Parity y operable por MCP, lecturas y escrituras, con identidad delegada; ninguna task cierra sin una sesión MCP real que ejecute sus operaciones nuevas.** Por eso la ruta de activaciones y calendario (ADR de estrategia §15) es: **TASK-2003** (núcleo de escritura delegada por MCP, sin aprobaciones; TASK-1899 retirada) → **TASK-1905** (catálogo de canales con la taxonomía de §15 y los valores UTM de RESEARCH-012) → **TASK-2001** (activaciones, evidencia de ejecución, descubrimiento de Metricool, tracking URL por activación) → **TASK-2002** (calendario), con la dirección visual v3 de 2002 en paralelo desde ya.
 
 Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 (Slices 1–3, work items con personas) → 1914 (registro de roles y tarjetas) → 1913 Slice 4 (asignación a roles) → 1915 (ledger y modo interactivo primero; despachador y adaptadores después) → 1916 (evals, costo y métricas; compuerta de autonomía). El modo delegado en segundo plano de 1915 queda bloqueado por TASK-1917 (EPIC-044 U22: delegación por corrida con claim `act`, creada por decisión del operador el 2026-09-26). La UI de work items, roles, corridas y métricas es follow-up consumidor de 1895/1912.
 
@@ -116,6 +125,7 @@ Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 
 - `TASK-1999` — **Complete 2026-10-04 (en producción).** Reproductor nativo en el panel de la pieza (feed e historia, sin autoplay), todas las piezas de un formato en el tablero (la versión «con intro para Instagram» de CMP001-08 era invisible), duración y «Ver video» / «Ver imagen» en los huecos.
 - `TASK-2001` — To-do. Activaciones de campaña: la salida concreta de una campaña en un canal (campaña obligatoria, campañas Always On, modality × family × platform × placement, cuenta, mercado, pieza en versión exacta, fecha planificada), evidencia de ejecución adjunta (Metricool, después plataformas de ads), estado calculado plan vs ejecución, descubrimiento de lo programado en Metricool y «ejecución sin activación» en Hoy; el calendario lee activaciones. Bloqueada por TASK-1905 (catálogo).
 - `TASK-2002` — To-do. Calendario de activaciones en la UI: filtros por dimensión, tarjetas con pieza y estado de ejecución, hoja de detalle y bandeja de ejecución sin activación. Bloqueada por TASK-2001 y por la dirección visual v3.
+- `TASK-2003` — To-do (la implementa Codex). Núcleo de escritura por MCP con identidad delegada: scope de escritura en Entra, canje por capability exacta en Greenhouse, Studio registra a la persona vía MCP como autora, gateway federa las escrituras `T1`. Sin aprobaciones (`T2` siguen por CLI/UI; su confirmación queda en TASK-1899, retirada). Primera de la ruta de activaciones.
 
 
 ### Flujo editorial SEO/AEO — decisión 2026-10-04

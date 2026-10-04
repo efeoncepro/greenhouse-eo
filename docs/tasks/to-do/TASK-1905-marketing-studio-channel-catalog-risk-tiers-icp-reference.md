@@ -6,17 +6,26 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
+
+El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es agent-friendly y que todo lo de EPIC-049
+nace Full API Parity con sus tools en el MCP, **escrituras incluidas**. La «nueva decisión» que dejaba pendiente la
+retirada de TASK-1899 es **TASK-2003**: núcleo de escritura por MCP con identidad delegada (scope en Entra, canje por
+capability exacta, persona como actor, gateway con escrituras `T1`), **sin** aprobaciones ni `proposalDigest`, que
+siguen retirados en TASK-1899. Desde TASK-2003, las escrituras `T1` de esta task nacen federadas; las `T2` siguen por
+CLI/UI. La implementa Codex.
+
 ## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
 
 - **Regla:** todo lo que esta task implemente nace con command o reader en `packages/domain`, ruta `/api/v1`, entrada en
   el registro con **tool** (exclusión sólo para transporte o metadatos, nunca para una capacidad de negocio) y **tool
   federada y operable por Efeonce MCP**, lecturas **y escrituras**, con la identidad delegada de la persona
-  (mecánica de TASK-1899: clase `efeonce.mcp.marketing_studio.write`, canje por capability, `dryRun` → confirmación en
-  `T2`). La UI es un cliente más de esos commands.
+  (carril de TASK-2003: clase `efeonce.mcp.marketing_studio.write`, canje por capability exacta, persona como actor;
+  las aprobaciones `T2` siguen por CLI/UI mientras TASK-1899 esté retirada). La UI es un cliente más de esos commands.
 - **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
-  —leer, planificar o editar, y confirmar las `T2`— y la evidencia queda registrada. Manual servido
+  —leer, planificar y editar (las `T2` por CLI/UI mientras TASK-1899 esté retirada)— y la evidencia queda registrada. Manual servido
   (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
-- **Consecuencia de orden:** TASK-1899 va antes; sin su carril de escritura delegada esta task no puede cumplir la regla.
+- **Consecuencia de orden:** TASK-2003 (núcleo de escritura por MCP) va antes; sin ese carril esta task no puede cumplir la regla.
 
 ## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
 
