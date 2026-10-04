@@ -46,6 +46,14 @@ No duplicar lifecycle editorial ni prioridad en Greenhouse o componentes UI, no 
 aprobado en publicación. Tasks1667/1668/1669 siguen to-do, según ADR de estrategia §14 Accepted
 2026-10-04; la documentación no certifica tools nuevas ni rollout.
 
+## TASK-1905: contrato implementado localmente, rollout pendiente (2026-10-04)
+
+Studio API 1.6.0 declara canales, hallazgos y referencias ICP; verificar disponibilidad en la sesión antes de usar.
+`studio.channels.list`/`studio.channel.get` devuelven la versión de catálogo, que se conserva con el plan.
+No usar aliases históricos como claves canónicas ni copiar límites de un formato a otro. `studio.customer_model.get`
+requiere TASK-1906/1892; sin modelo, referencia pendiente explícita. T1 por MCP espera TASK-2003, no TASK-1899
+(retirada); T2 sigue en CLI del operador. La existencia del contrato no acredita federación ni rollout.
+
 ## Entradas
 
 | Entrada | Obligatoria | Cómo se obtiene si falta |
@@ -81,8 +89,8 @@ El detalle de parámetros, orden de llamadas y trampas está en `references/work
    falsables (qué creemos, cómo lo sabremos, criterio de parada). Con `gtm-architect` si la campaña abre
    posicionamiento o motion nuevos.
 3. **Matriz de audiencias.** Persona (BP del context pack + rol en el buying group) × etapa (TOFU/MOFU/BOFU del
-   journey y stage del bow-tie de HubSpot) × **canal canónico** (lista cerrada en
-   `references/channels-and-measurement.md`). Cada celda: job, trigger, mensaje, acción y destino. Una pieza sin
+   journey y stage del bow-tie de HubSpot) × **canal canónico** del catálogo versionado cuando esté disponible;
+   `references/channels-and-measurement.md` distingue catálogo de valores históricos. Cada celda: job, trigger, mensaje, acción y destino. Una pieza sin
    rol asignado no se produce.
 4. **Message house.** Promesa central, 3–4 pilares con su prueba (dato/caso/mecanismo con fuente), lo que **no**
    se promete, vocabulario sí/no. Sale del brief; si el plan necesita una promesa que el brief no tiene, se

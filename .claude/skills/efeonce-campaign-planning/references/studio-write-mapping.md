@@ -1,4 +1,21 @@
-# Cuando existan las tools de escritura
+# Contrato de escritura y disponibilidad por sesión
+
+**Decisión vigente 2026-10-04:** TASK-1899 retirada; TASK-2003 habilita T1 con identidad delegada. El protocolo
+con proposalDigest descrito como diseño histórico abajo NO es un requisito vigente ni debe implementarse.
+T2 sigue en el carril de operador. TASK-1905 declara localmente las siguientes tools; aún sin rollout/canary MCP:
+
+| Uso | Tool | Tier |
+| --- | --- | --- |
+| Consultar canales/versiones/aliases | `studio.channels.list`, `studio.channel.get`, `studio.channel_catalog.versions.list`, `studio.channel_aliases.list` | T0 |
+| Evidencia de validación / modelo ICP | `studio.campaign.channel_findings.list`, `studio.customer_model.get` | T0 |
+| Preparar/publicar catálogo / mapear alias | `studio.channel_catalog.draft.create`, `.draft.channel.upsert`, `.version.publish`, `studio.channel_alias.map` | T1, catalog.manage |
+| Revalidar / escribir audiencia / fijar versión ICP | `studio.campaign.channels.revalidate`, `studio.campaign.audience.upsert`, `studio.campaign.customer_model_version.set` | T1 |
+| Descartar draft / quitar audiencia | `studio.channel_catalog.draft.discard`, `studio.campaign.audience.remove` | T2, operador |
+
+No crear identidad/organización ficticia para gobierno global. ICP real depende de TASK-1906/TASK-1892. Referencias previas
+no migran al fijar otra versión. Tools ausentes = propuesta documental; no simular ejecución.
+
+## Historia de diseño (supeditada a la decisión anterior)
 
 > **Delta 2026-10-02 (TASK-1894 Entregables A y B en producción).** Studio API `1.4.0` ya tiene los commands de
 > esta tabla marcados como de TASK-1894 (manifiesto de 44 tools; las de estrategia siguen por definir). Lo que cambia

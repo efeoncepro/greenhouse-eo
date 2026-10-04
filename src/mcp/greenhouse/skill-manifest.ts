@@ -187,7 +187,22 @@ export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestE
       'studio.campaign.media_plan.get',
       'studio.campaign.posts.list',
       'studio.calendar.get',
-      'studio.search'
+      'studio.search',
+      'studio.channels.list',
+      'studio.channel.get',
+      'studio.channel_catalog.versions.list',
+      'studio.channel_catalog.draft.create',
+      'studio.channel_catalog.draft.channel.upsert',
+      'studio.channel_catalog.version.publish',
+      'studio.channel_catalog.draft.discard',
+      'studio.channel_aliases.list',
+      'studio.channel_alias.map',
+      'studio.campaign.channel_findings.list',
+      'studio.campaign.channels.revalidate',
+      'studio.campaign.audience.upsert',
+      'studio.campaign.audience.remove',
+      'studio.customer_model.get',
+      'studio.campaign.customer_model_version.set'
     ]
   }
 ] as const

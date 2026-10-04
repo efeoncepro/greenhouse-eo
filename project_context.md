@@ -114,6 +114,10 @@ Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editoria
 [Evidencia del corte anterior](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 
+Marketing Studio: skills `efeonce-marketing-studio` y `efeonce-campaign-planning`; el catálogo versionado
+rige canales y límites, no los aliases históricos. [Contrato](docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
+Disponibilidad y rollout: [handoff de Studio](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+
 Insights: [estado y cierre de EPIC-045](docs/audits/insights/2026-10-04-epic-045-closure-review.md).
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).

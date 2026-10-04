@@ -1,5 +1,12 @@
 # Flujo detallado: tool o fuente exacta por paso
 
+Actualización 2026-10-04: implementación local TASK-1905, API 1.6.0; disponibilidad MCP no certificada.
+Tras identificar organización/campaña, leer `studio.channels.list` → `studio.channel.get` (versión explícita),
+`studio.campaign.channel_findings.list` y `studio.customer_model.get` si existen en la sesión. Conservar versión,
+fuentes y unknowns. No redefinir ICP ante unavailable; usar pendiente explícito. Publicar un catálogo no migra
+contenido; la revalidación es una operación T1 explícita. La siguiente verificación 2026-09-26 es histórica.
+
+
 Verificado contra el repo el 2026-09-26: manual servido `docs/mcp/skills/marketing-studio/SKILL.md`, registro de
 Studio (API `1.2.0`, 13 tools de lectura + 5 exclusiones), `src/mcp/greenhouse/tool-manifest.ts` (tools SEO con
 `writes` y `spendsProviderBudget`) y los manuales MCP de SEO en `docs/mcp/skills/`. Si una tool no aparece en la

@@ -1,17 +1,28 @@
 # Canales canónicos, especificaciones, nombres de archivo, UTM y eventos
 
+## Fuente vigente y límites del inventario histórico
+
+TASK-1905 implementa localmente el catálogo versionado (52 canales; API 1.6.0). Cuando esté desplegado/federado,
+leer `studio.channels.list` y `studio.channel.get` con versión, modalidad/familia, compra, aparición y evidencia.
+Las tablas históricas siguientes documentan decisiones de CMP-001; NO son un catálogo cerrado global ni un
+mapeo automático de aliases. `linkedin`/`meta`/`meta-vertical` se conservan como raw hasta revisión humana.
+Cada límite se aplica sólo al formato/placement que declara su fuente. UTM puede quedar null con razón si falta
+aparición/inventario; el clasificador GA4 sólo cubre tráfico manual. Perfil LinkedIn = cuenta; UGC = contentSource;
+mercado no forma parte de la clave. Si las tools no están disponibles, citar esta limitación al planificar.
+
+
 Todo valor de este archivo lleva su fuente y su fecha. Una especificación de plataforma **se verifica contra la
 fuente oficial vigente antes de salida**; lo de acá sirve para planificar, no para certificar.
 
-## 1. Lista canónica de canales
+## 1. Inventario histórico de canales de CMP-001
 
-Studio guarda el canal como texto (no hay enum en `packages/contracts/src/dto.ts` al 2026-09-26), así que la lista
-cerrada vive acá, derivada de lo que Efeonce ya opera y registra. **Un canal fuera de esta lista es una decisión
-abierta del humano** (se registra como CDR de la campaña y luego se agrega aquí con su fuente).
+Al 2026-09-26 Studio guardaba el canal como texto sin enum. Este inventario conserva los valores de CMP-001
+y su evidencia de esa fecha. La selección de campaña requiere revisión humana; las altas globales se gobiernan
+en el catálogo versionado, no agregando filas a esta guía.
 
 ### Pagados
 
-| Clave (`channel` en Studio / `utm_source`) | Qué es | Formatos | Estado de la cuenta | Fuente |
+| Valor histórico (`channel`; no equivale a `utm_source`) | Qué es | Formatos | Estado de la cuenta | Fuente |
 |---|---|---|---|---|
 | `linkedin` | LinkedIn Ads, Sponsored Content (imagen y video) | 4:5 estático móvil · 1:1 ambos dispositivos · video MP4 | **sin confirmar** para pauta (I2) | catálogo Studio CMP-001 (46 copys `linkedin`); `CMP-001-MEDIA-PLAN-Q4-2026.md` I2 (2026-09-22) |
 | `meta` | Meta Ads feed (Facebook/Instagram) | 4:5 feed imagen/video | **conectado por MCP** (declarado por el operador 2026-09-22) | catálogo Studio (61 copys `meta`); media plan CMP-001 I2 |

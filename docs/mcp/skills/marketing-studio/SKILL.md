@@ -1,17 +1,20 @@
 ---
 name: marketing-studio
-description: How to read Efeonce Marketing Studio through MCP — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
+description: How to use available Efeonce Marketing Studio MCP tools — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
 ---
 
-# Reading Efeonce Marketing Studio
+# Using Efeonce Marketing Studio
 
 Efeonce Marketing Studio is the system of record for Efeonce campaigns: brief and decisions, creative concepts,
 pieces (images and videos) with their versions, literal copies per channel, ad configurations, the media plan and
 the publishing calendar. This manual teaches you to read it correctly through its `studio.*` tools. It grants no
 permission: every call is scoped server-side to the organizations your connection may see.
 
-Everything here is read-only today. You cannot create, edit or approve anything yet; if a person asks for a change,
-say so and point them to the Studio web app.
+Discover the tools actually available in the current session before acting. The versioned channel catalog
+requires a compatible Studio deployment and gateway configuration. Delegated T1 writes also require the
+connection to carry the corresponding authority. T2 actions remain in the operator lane. A name in this manual
+or in Studio's provider manifest does not prove federation or permission. If a required tool is absent, report the limitation
+and prepare a reviewable proposal; do not claim the write happened or substitute a service identity.
 
 ## Recommended flow
 
@@ -115,3 +118,36 @@ simply answers as not found. Omit the filter unless the person asked about a spe
 - That a post was published because its scheduled date passed.
 - An approval that is not recorded in the states.
 - Any number, date or text that the tools did not return.
+
+## Versioned channels and ICP (use only tools available in the session)
+
+- Read `studio.channels.list`, optionally with an exact `version`; `studio.channel.get` gives one channel.
+  Keep the returned version with the plan. `studio.channel_catalog.versions.list` describes publication history.
+  Published and superseded specifications are immutable; publishing another version does not revalidate content.
+- A canonical channel separates modality/family from buying platform and appearance. Market and account belong
+  to the activation; LinkedIn personal is an account, and UGC is asset content source. Never infer canonical keys
+  from historical values such as `linkedin`, `meta` or `meta-vertical`.
+- Tracking is scoped by appearance/placement. Null tracking with an unresolved reason is incomplete coverage,
+  not permission to invent UTMs. GA4 classification describes manual traffic only; automatic tagging is separate.
+- For legacy channels, read `studio.channel_aliases.list`; propose an exact rawValue → channelKey/version mapping
+  for human review. When authorized and available, `studio.channel_alias.map` uses that mapping plus status,
+  idempotency key and the alias's current revision when it exists. Mapping an alias does not rewrite old snapshots.
+  The operator-only backfill CLI is separate and defaults to dry-run.
+- Read `studio.campaign.channel_findings.list` for evidence. `channelCatalogVersion` identifies the original
+  validation, and `validatedWithPreviousSpec` means a newer catalog exists, not that the record is invalid.
+  `studio.campaign.channels.revalidate` is an explicit T1 write: first dry-run with the campaign revision, review
+  findings, then apply when authorized. Only records without hard findings advance; blocked records retain their
+  snapshot. Reread findings and affected records after applying.
+- Copy remains literal. In warn mode a hard finding can accompany a successful write; that success does not
+  certify compliance. In enforce mode blocking findings reject the write. Fix the proposed content or reference
+  deliberately, never silently truncate copy to pass.
+- Catalog governance uses `studio.channel_catalog.draft.create`, `.draft.channel.upsert`, `.version.publish` and
+  `.draft.discard`, with `marketing_studio.catalog.manage` (admin/operations). Catalog scope is global, not a
+  fabricated organization. Service tokens cannot govern it. Discard is T2 and is not newly federated by this work.
+- `studio.customer_model.get` intersects organization authority and returns a versioned Greenhouse model only
+  when the customer-model reader is provisioned. Disabled/unavailable is not an empty model. Never fabricate names or ids.
+  `studio.campaign.audience.upsert` stores ids/version/buying role and a bow-tie stage independently of creative
+  funnel phase; an explicit pending note is the supported fallback. `.audience.remove` is T2.
+  `studio.campaign.customer_model_version.set` reports incompatible references without migrating audiences.
+
+These workflows grant no permission and certify no deployment, approval, media launch or spend.
