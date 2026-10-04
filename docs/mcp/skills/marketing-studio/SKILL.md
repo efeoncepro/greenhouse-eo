@@ -29,7 +29,8 @@ say so and point them to the Studio web app.
    - to actually look at a piece → `studio.asset.preview`. It returns the image itself: by default the
      thumbnail (longest side 640 px), which is enough to recognize and describe a piece. Ask for
      `size: "preview"` (1600 px) only when you must read fine detail such as small text. For a video it is a
-     single frame, not the video;
+     single frame, not the video; whether the person can watch it in Studio is the piece's `playback` (null = no
+     light web version yet), not something you can play;
    - copies → `studio.campaign.copies.list`;
    - ad configurations → `studio.campaign.ads.list`;
    - budget, flight and audiences → `studio.campaign.media_plan.get`;
@@ -78,6 +79,9 @@ them. Mentions, emojis and line breaks are intentional. Character counts are giv
 - A piece has versions; the current one is the latest. Two versions with the same fingerprint are the same file.
 - The original file may live in the team's working folder; the piece still exists in Studio with its versions and
   previews. Do not tell a person a piece "is missing" because its original is not stored in Studio.
+- `playback` is a light web copy of a video for watching in Studio (up to 720 px on the short side). It is not the
+  original and not what gets published; its `url` is temporary like the previews. `null` means the piece is not a
+  video or its web copy is not ready yet, never that the video is missing.
 - `thumbUrl` and `previewUrl` are temporary links (one to two weeks). Do not store them or hand them out as
   permanent; read the resource again to get fresh ones, or use `studio.asset.preview` to look at the piece.
 - An ad configuration (piece + copy + channel + placement + audience + tracking parameters) is not an active ad.

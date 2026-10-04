@@ -33,7 +33,7 @@ estados y pestañas, tablero concepto × formato a la izquierda e `inspector` de
 3. **Inspector:** en la tarjeta de feed (1:1, 4:5, 16:9, 1,91:1) la imagen se reemplaza por el reproductor con la
    proporción real (`aspect-ratio`), póster = cuadro del segundo 1, controles nativos. En la tarjeta de historia
    (9:16) el reproductor ocupa `story-media`; las capas de la historia (cabecera y texto) dejan libre la franja
-   inferior de 48 px de los controles y no capturan clics.
+   inferior de 76 px de los controles (48 px quedaba bajo la barra nativa de Chrome, verificado en captura) y no capturan clics.
 4. **Línea de metadatos:** «Los Sparks · 16:9 · 1920×1080 · 0:50 · 34,8 MB · v1» (duración agregada después de la
    resolución; el tamaño sigue siendo el del original).
 
@@ -59,7 +59,7 @@ estados y pestañas, tablero concepto × formato a la izquierda e `inspector` de
 | Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
 |---|---|---|---|
 | Medio de la tarjeta de feed con proporción real (`Studio-Campaign`, `before-desktop.png`) | `.feed-media` + `style.aspectRatio` vigente sobre `<video>` | el video se ve como se verá en el feed | alto fijo o recorte del video |
-| Historia 9:16 con capas (`Studio-Campaign`) | `.story-media` + capas con `pointer-events: none` y franja de controles | la historia sigue leyéndose como historia | ocultar el texto de la historia para hacer sitio |
+| Historia 9:16 con capas (`Studio-Campaign`) | `.story-media` + capas con `pointer-events: none` y franja de controles de 76 px | la historia sigue leyéndose como historia | ocultar el texto de la historia para hacer sitio |
 | Falla honesta de `MediaImage` («Vista previa no disponible») | `.media-fallback` reutilizado por `MediaVideo` | nunca un ícono roto | un reproductor negro sin explicación |
 | Etiqueta de formato sobre la miniatura (`.piece-ratio`) | misma pastilla con «16:9 · 0:50» | el tablero dice formato y duración | un ícono de play sobre cada miniatura |
 | Claro y oscuro (AXIS 0.2.5) | roles `--card`, `--line`, `--t2`, `--t3` vigentes; fondo del video `#000` sólo dentro del medio | el reproductor no cambia el tema | colores nuevos fuera de `theme.generated.css` |
@@ -84,6 +84,7 @@ estados y pestañas, tablero concepto × formato a la izquierda e `inspector` de
 | `player.failed` | «No se pudo cargar el video.» | error tras un reintento |
 | `player.retry` | «Reintentar» | botón del estado de error |
 | `workspace.watchVideo` | «Ver video» | celda fantasma de la pestaña Imágenes |
+| `workspace.watchImage` | «Ver imagen» | celda fantasma de la pestaña Videos (antes decía «solo video» por error) |
 | `duration(ms)` | «0:50», «1:05:09» | miniatura y línea de metadatos (minutos:segundos; horas si corresponde) |
 
 ## State Copy

@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.10
+> **Versión:** 1.11
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-04 por Claude (TASK-1998/1999 code complete, sin desplegar en producción: derivado `playback` de video, transporte 302 a URL firmada V4, `Asset.playback`, API 1.5.0, reproductor en el inspector, §7.5 y §8; antes, 2026-10-02 (noche): TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -704,6 +704,35 @@ ajenos (barra de estado de otra sesión). Sandbox `CMP-900` creada por `createCa
 **Pendiente.** Push de Studio a `main`; release de Greenhouse a producción; sync del gateway; Entregable C (corte de
 las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2 por API, federación de escrituras).
 
+## 7.5 Reproducción de video (TASK-1998, code complete 2026-10-04; producción pendiente)
+
+- **Derivado `playback`.** El worker de medios (§7.2) genera para cada versión de video con original en GCS un MP4 H.264
+  High `yuv420p` (CRF 23, techo 2,5 Mbps), lado corto ≤ 720 px sin agrandar, AAC 128 kbps si el original tiene audio,
+  sin metadatos y con `+faststart` (`moov` antes de `mdat`: el navegador empieza a reproducir sin bajar todo). Objeto
+  `renditions/<asset_version_id>/playback-<sha12>.mp4` en el bucket de medios, subido sin sobrescribir; fila
+  `asset_rendition` `kind='playback'`, `mime_type='video/mp4'` (CHECK de pareja `asset_rendition_playback_mime_chk`,
+  migración `1791129772182`). Es una vista de la versión: nunca una `asset_version` ni cambia la revisión.
+- **Flag y backfill.** `MEDIA_WORKER_PLAYBACK_ENABLED` (SoT `apps/worker/deploy.sh`). El evento `OBJECT_FINALIZE` cubre
+  lo nuevo y el barrido horario `/jobs/reconcile-derivatives` hace el backfill de lo ya ingestado, idempotente (segunda
+  corrida `up_to_date`). El cuadro del segundo 1 sólo se extrae si falta un derivado de imagen. Medido con «Los Sparks»
+  (49,6 s, 36,4 MB): 7,7 MB a 1280×720 en ~20 s de CPU, holgado frente al ack de 600 s y al timeout de 900 s.
+- **Transporte sin bytes por Vercel.** El reader entrega el mismo enlace HMAC de los medios (`/api/v1/media/{token}`,
+  sin base). Para `video/*` la ruta responde `302` a una URL V4 de 1 h firmada por IAM `signBlob`
+  (`STUDIO_MEDIA_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`), con
+  `response-content-type` y la redirección cacheada 5 min; GCS atiende `Range` (`206`). Sin firmante: `503
+  playback_unavailable`. Sólo `next dev` sin firmante hace de proxy con `Range` (la cuenta personal no firma como la SA
+  del runtime); en Vercel, nunca. Alternativas descartadas: streaming por la función (límite de respuesta de 4,5 MB,
+  doble egreso, una invocación por rango) y URL V4 en el reader (IAM por video y por página). **Cloud CDN** con backend
+  bucket y URL firmada HMAC queda evaluado y diferido: cambia sólo el adaptador `apps/web/src/server/media-signing.ts`;
+  entra si las piezas se comparten fuera del equipo o el egreso crece.
+- **Contrato.** `PlaybackRendition { url, posterUrl, mimeType, widthPx, heightPx, byteSize }` en `Asset.playback` (versión
+  vigente) y `AssetVersionDetail.playback`; `null` si no es video o el derivado no existe (nunca el original).
+  `posterUrl` = el `preview` del segundo 1. API 1.5.0; manifiesto 44 tools (hash `60dfac7524ee`); `getMedia` sigue
+  como exclusión con la razón actualizada. El gateway no valida esquemas de salida, así que el campo viaja antes del
+  sync; el sync del manifiesto sólo actualiza descripciones (follow-up con autorización).
+- **Riesgo declarado.** El worker carga el original completo en memoria (2 GiB); con el tope de subida de 1 GiB, un
+  video cercano a ese tamaño podría agotarla. Follow-up: transcode en streaming.
+
 ## 8. Interfaz
 
 - Diseño aprobado por el operador el 2026-09-25 (artifact «v2 · Claro y oscuro»).
@@ -711,6 +740,7 @@ las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2
 - Claro/oscuro con switch; preferencia en la cookie `studio-theme`, leída en el servidor (sin parpadeo). Poppins (display) y Geist (texto) vía `next/font`.
 - Pantallas: Hoy (decisiones), Campañas (hero + tarjetas con pista de tres estados), espacio de campaña (piezas concepto × formato con inspector y preview; copys; anuncios; medios; calendario), Calendario mensual (vuelos por semana, posts vencidos a verificar), Piezas (`/library`) y Medios. Búsqueda ⌘K. Bajo 860 px, navegación inferior.
 - **Vista previa por formato:** 9:16 se muestra como story; 1:1, 4:5 y 16:9 en tarjeta de feed con su proporción real (antes un `max-height` de 320 px recortaba).
+- **Video (TASK-1999):** `MediaVideo` reproduce `Asset.playback` en la tarjeta de feed o en la story con controles nativos, póster del segundo 1, `preload=metadata`, `playsInline` y sin autoplay ni loop; sin `playback` muestra el cuadro con una nota y, si falla, «No se pudo cargar el video.» con «Reintentar». En la story las capas no capturan clics y dejan libre la franja de controles. El tablero dibuja todas las piezas de cada concepto × tipo × formato (con la etiqueta de variante y la duración en los videos), y el hueco de un formato que sólo existe en el otro tipo lleva a esa pieza («Ver video» / «Ver imagen»).
 - Logos oficiales (`public/brand/`) copiados de `greenhouse-eo/public/branding/`.
 - Flujo maestro y huecos conocidos (p. ej. `/library` no alcanzable a 390 px): `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`; la UI de edición es TASK-1895.
 

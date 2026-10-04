@@ -3,6 +3,8 @@
 Verified against `packages/contracts/src/{operations,semantics,tool-manifest,errors,dto,openapi}.ts` on 2026-09-25
 (Studio `d3ab68e`, API `1.1.0`, manifest hash `96d1f0caf6e5571d1d51a93dd8824cb69f578f514945c563b7c6bd5bb39326bb`).
 
+> **Update 2026-10-04 (TASK-1998, local `main`, not deployed):** API `1.5.0`, manifest 44 tools hash `60dfac7524ee`; see §Video playback.
+>
 > **Current (2026-10-02):** API `1.3.0`, 20 operations = 15 tools + 5 exclusions (two `T1` writes). The 17-row table
 > below is the TASK-1890 baseline; op 18 (download) is in §Originals and ops 19–20 (writes) in §Writes.
 
@@ -343,3 +345,15 @@ names; TASK-1894/1899 fix the final ones in the registry.
 Client `efeonce-mcp-marketing-studio`, `resourceFamily: 'marketing_studio'`, scope `marketing_studio.campaign.read`,
 input scope `efeonce.mcp.read`, authorizer `can(persona, 'marketing_studio.campaign.read', 'read', 'tenant')`.
 Endpoint: `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/oauth/token`.
+
+## Video playback (TASK-1998, verified against code and localhost 2026-10-04, Studio `f5ae10a`, API `1.5.0`)
+
+- `PlaybackRendition { url, posterUrl, mimeType: 'video/mp4', widthPx, heightPx, byteSize }` (`packages/contracts/src/dto.ts`);
+  `Asset.playback` (current version) and `AssetVersionDetail.playback`: `null` if not a video or not generated (never the
+  original). `posterUrl` = the `preview` (WebP 1600, frame at 1 s); `byteSize` is the playback file, not the original.
+- Glossary key `playback`. Tools affected (schema/description): `studio.campaign.assets.list`, `studio.asset.get`.
+- `getMedia` (exclusion, reason updated): image → bytes from the function as before; `video/*` → **302** to a V4 URL (1 h,
+  `response-content-type`), `Cache-Control: private, max-age=300`; GCS serves Range (`206`). New error
+  **`playback_unavailable`** 503, `actionable: false` (no signer in that environment).
+- Rendition kinds: + `playback` (`RenditionKind`), mimes + `video/mp4` (`RenditionMimeType`).
+- The gateway does not validate output schemas: new fields flow before a manifest sync; the sync only refreshes descriptions.

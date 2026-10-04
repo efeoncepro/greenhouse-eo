@@ -499,6 +499,29 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
 4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898/1899 para persona por sesión,
    confirmación T2 por API y federación de escrituras.
 
+## Reproducción de video (TASK-1998/1999)
+
+Estado: **code complete, rollout pendiente.** Studio `f5ae10a`, `995bb73`, `35093c3` en `main` local sin empujar (push =
+deploy de producción, requiere autorización del operador). Migración `1791129772182_video-playback-rendition` aplicada
+sólo en `marketing_studio_staging` (up → down → up verificado). Los 4 videos de staging tienen su `playback`, generado
+desde local con el mismo primitive del worker (el worker de staging aún no se redeploya). Contrato y diseño:
+arquitectura §7.5 y §8; flag `MEDIA_WORKER_PLAYBACK_ENABLED` en `FEATURE_FLAG_STATE_LEDGER.md`.
+
+Orden de rollout:
+
+1. Worker staging: `bash apps/worker/deploy.sh --env staging --apply` (flag `true` en `deploy.sh`).
+2. Migración en `marketing_studio` (migrator, proxy local) y verificación en `pg_constraint`.
+3. `PLAYBACK_ENABLED="true"` de producción en `deploy.sh` → commit → `deploy.sh --env production --apply` →
+   `gcloud scheduler jobs run marketing-studio-reconcile-derivatives --project efeonce-group --location us-east4` →
+   6 filas `kind='playback'` (CMP001-01 ×3, CMP001-08 ×2, CMP003-01) y `worker_run` sin `failed`.
+4. `git push origin main` en Studio → `/api/v1/health` `1.5.0` → `curl -m 10 -I` del `playback.url` de
+   `CMP001-08-video-16x9` → `302` → `curl -m 10 -r 0-1023` a la `Location` → `206 video/mp4`; abrir
+   `studio.efeonce.org/campaigns/CMP-001?piece=CMP001-08-video-16x9` y reproducir.
+5. Gateway: `pnpm studio:manifest:sync` + versión + PR + dispatch (sólo descripciones; el campo ya viaja).
+
+Rollback: flag `false` + redeploy del worker (las filas existentes siguen sirviendo); revert del deploy web;
+`migrate down` sólo después de borrar las filas `playback`.
+
 ## DNS (aplicado 2026-09-25)
 
 | Tipo | Nombre | Valor | TTL |

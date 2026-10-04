@@ -2660,8 +2660,8 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 - [TASK-1995](to-do/TASK-1995-efeonce-insights-missing-sources-decision.md): EPIC-045; policy — fuentes de Bing, Core Web Vitals, indexación, piezas por canal o formato, redes y pauta; P2/Bajo.
 - [TASK-1996](in-progress/TASK-1996-efeonce-insights-channel-stat-card-render.md): EPIC-045; tarjetas con isotipo de canal y glifos Trazo en PDF, deck y Think; P1/Alto; ui-ux; bloqueada por TASK-1975, TASK-1990 (cierres pendientes; AXIS v0.3.42 ya publicado).
 - [TASK-1997](to-do/TASK-1997-release-ci-wall-time-reduction.md): ops; releases más cortos — un solo CI por árbol, CI en paralelo, smoke automático, CI Deep con holgura, setup de tests por entorno y `ai-generations/` fuera del build; P1/Alto; standard.
-- [TASK-1998](to-do/TASK-1998-marketing-studio-video-playback-rendition.md): EPIC-049; Marketing Studio — derivado de reproducción de video, transporte sin bytes por Vercel y `playback` en el contrato; P1/Alto; backend-data.
-- [TASK-1999](to-do/TASK-1999-marketing-studio-video-player-ui.md): EPIC-049; Marketing Studio — reproductor de video en el panel de la pieza y todas las piezas por formato; P1/Alto; ui-ux; bloqueada por TASK-1998.
+- [TASK-1998](in-progress/TASK-1998-marketing-studio-video-playback-rendition.md): EPIC-049; Marketing Studio — derivado de reproducción de video, transporte sin bytes por Vercel y `playback` en el contrato; P1/Alto; backend-data.
+- [TASK-1999](in-progress/TASK-1999-marketing-studio-video-player-ui.md): EPIC-049; Marketing Studio — reproductor de video en el panel de la pieza y todas las piezas por formato; P1/Alto; ui-ux; bloqueada por TASK-1998.
 - [TASK-1972](to-do/TASK-1972-collaborator-home-ui.md): hija H de TASK-1967; Home de colaboradores en `/my`; P1/Medio; bloqueada por TASK-1969 y TASK-1970.
 
 ## AEO X-Ray — composición y experiencia

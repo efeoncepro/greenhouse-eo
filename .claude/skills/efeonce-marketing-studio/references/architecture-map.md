@@ -81,6 +81,9 @@ only; never write values here.
 | `packages/domain/src/channels/validator.ts` | `ChannelValidator` port, `enforceChannels`, `normalizeChannelKeys`, default `unvalidatedChannels` (TASK-1905 plugs the catalog) |
 | `packages/contracts/src/operations-{write,review,catalog,plan}.ts` | `writeOperation` helper + write operations by slice, spread into `operations.ts` |
 | `apps/web/src/server/commands.ts` | `commandRoute` (thin write route: body schema → `runCommand`) |
+| `packages/domain/src/media/derivatives.ts` + `toolkit-node.ts` (TASK-1998) | `playback` derivative (`expectedDerivatives({ playback })`, `derivativeObjectName`, `PLAYBACK_SHORT_EDGE = 720`); `transcodePlayback` + pure `playbackArgs`; test `toolkit-node.test.ts` (real ffmpeg, skipped without it) |
+| `apps/web/src/server/media-signing.ts` (TASK-1998) | V4 read signer for the media bucket (`signPlaybackUrl`, 1 h; redirect cache 5 min) + Range proxy only for `next dev` |
+| `apps/web/src/components/MediaVideo.tsx` (TASK-1999) | Native video player with honest failure (sibling of `MediaImage`) |
 | `scripts/studio-upload.ts`, `scripts/studio-review.ts`, `scripts/studio-write.ts` | `pnpm studio:upload` (API, api_client), `pnpm studio:review`, `pnpm studio:write <operationId>` (operator_cli, dry-run default, T2 `--apply --confirm`) |
 
 ## Database (schema `studio`)
@@ -93,6 +96,7 @@ TASK-1894: `asset_upload`, `idempotency_record` (migration `1790956839977_asset-
 `campaign_brief_audience`, `campaign_brief_kpi` + `campaign.source_of_truth/cutover_on/cutover_by` + revisions
 (migration `1790967435017_catalog-write-commands`, staging and production 2026-10-02). Staging sandbox `CMP-900`
 (synthetic, `source_of_truth = 'studio'`); ids `CMP-900`+ are reserved for sandbox/tests.
+TASK-1998: migration `1791129772182_video-playback-rendition` (`asset_rendition` kind `playback`, mime `video/mp4`, CHECK `asset_rendition_playback_mime_chk`; staging applied 2026-10-04, production pending). Object `renditions/<versionId>/playback-<sha12>.mp4`.
 Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
 1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
 
@@ -132,8 +136,9 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `SENTRY_AUTH_TOKEN` | Source-map upload at build (encrypted); absent ⇒ no upload |
 | `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`, `SENTRY_ORG`, `SENTRY_PROJECT` | Optional overrides (default env from `VERCEL_ENV`, release from `VERCEL_GIT_COMMIT_SHA`/`K_REVISION`) |
 | `STUDIO_MEDIA_BUCKET` | Bucket probed by the deep health (else deduced from renditions) |
+| `STUDIO_MEDIA_SIGNER_EMAIL` (TASK-1998) | Signer of the playback 302 (fallback `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`); must read the media bucket |
 | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED`, `STUDIO_ORIGINALS_BUCKET`, `STUDIO_DOWNLOAD_SIGNER_EMAIL` | Original download (TASK-1893; off by default; signer defaults to `GCP_SERVICE_ACCOUNT_EMAIL`) |
-| Worker (Cloud Run): `STUDIO_ORIGINALS_BUCKET`, `STUDIO_MEDIA_BUCKET`, `MEDIA_WORKER_{DERIVATIVES,METRICOOL_READBACK,ARCHIVE_TIERING}_ENABLED`, `MEDIA_WORKER_RECONCILE_BATCH`, `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | SoT `apps/worker/deploy.sh` |
+| Worker (Cloud Run): `STUDIO_ORIGINALS_BUCKET`, `STUDIO_MEDIA_BUCKET`, `MEDIA_WORKER_{DERIVATIVES,METRICOOL_READBACK,ARCHIVE_TIERING,UPLOAD_VERIFY,PLAYBACK}_ENABLED`, `MEDIA_WORKER_RECONCILE_BATCH`, `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | SoT `apps/worker/deploy.sh` |
 
 ## Secrets (Secret Manager, project `efeonce-group`)
 

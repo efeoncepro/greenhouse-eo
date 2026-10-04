@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Diseno — creada 2026-10-04; consumidora de TASK-1998`
+- Status real: `Code complete, rollout pendiente (2026-10-04): Studio 35093c3 en main local sin push; verificado en localhost contra staging con Playwright (Chrome); falta producción (autorización del operador) y ver CMP001-08 en vivo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1998` (campo `AssetDto.playback` y transporte con `302`)
@@ -295,15 +295,15 @@ Ver `docs/ui/wireframes/TASK-1999-marketing-studio-video-player.md` (copy ledger
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux`, `UI impact: interaction`, wireframe existente; `pnpm task:lint --task TASK-1999` sin hallazgos.
-- [ ] Un video con `playback` se reproduce en el inspector con controles nativos, póster y proporción real; nunca arranca solo.
-- [ ] La historia 9:16 deja los controles utilizables (capas sin capturar clics).
-- [ ] Un video sin `playback` muestra el póster y la nota; un fallo de carga muestra «No se pudo cargar el video.» con «Reintentar».
-- [ ] El tablero muestra las dos piezas 16:9 de CMP001-08 y permite abrir la versión con intro.
-- [ ] «Ver video» en la pestaña Imágenes abre la pieza de video correspondiente.
-- [ ] Todo el copy nuevo vive en `apps/web/src/copy.ts` (español neutro, sin voseo) y lo cubre `copy.test.ts`.
-- [ ] Sin scroll horizontal de página en 1440 y 390; capturas `after-*` y scorecard registradas.
-- [ ] `pnpm check` y `pnpm build` verdes en Studio.
+- [x] Se declaró `Execution profile: ui-ux`, `UI impact: interaction`, wireframe existente; `pnpm task:lint --task TASK-1999` sin hallazgos.
+- [x] Un video con `playback` se reproduce en el inspector con controles nativos, póster y proporción real; nunca arranca solo.
+- [x] La historia 9:16 deja los controles utilizables (capas sin capturar clics).
+- [x] Un video sin `playback` muestra el póster y la nota; un fallo de carga muestra «No se pudo cargar el video.» con «Reintentar».
+- [ ] El tablero muestra las dos piezas 16:9 de CMP001-08 y permite abrir la versión con intro. — implementado (`pieces` por celda + etiqueta de variante); CMP001-08 no existe en staging, se verifica en producción.
+- [x] «Ver video» en la pestaña Imágenes abre la pieza de video correspondiente.
+- [x] Todo el copy nuevo vive en `apps/web/src/copy.ts` (español neutro, sin voseo) y lo cubre `copy.test.ts`.
+- [x] Sin scroll horizontal de página en 1440 y 390; capturas `after-*` y scorecard registradas.
+- [x] `pnpm check` y `pnpm build` verdes en Studio.
 
 ## Verification
 
@@ -320,6 +320,18 @@ Ver `docs/ui/wireframes/TASK-1999-marketing-studio-video-player.md` (copy ledger
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] Manual de uso y documentación funcional de Marketing Studio actualizados; skill `efeonce-marketing-studio` al día
+
+## Delta 2026-10-04 — code complete, rollout pendiente
+
+- **Hecho (Studio `35093c3`):** `MediaVideo`, video en feed y story, capas de story sin capturar clics con franja libre de
+  76 px (la primera captura mostró «Más información» encima de los controles con 48 px), todas las piezas por celda con
+  etiqueta de variante, duración en miniaturas y en la línea de datos, hueco «Ver video» / «Ver imagen» (corrige
+  también «solo video» en la pestaña Videos). Copy en `apps/web/src/copy.ts` (`COPY.player`, `watchVideo`,
+  `watchImage`, `formatDuration`) con test.
+- **Evidencia:** `docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-{desktop,mobile,story,dark,empty}.png`
+  y scorecard `docs/ui/reviews/TASK-1999-marketing-studio-video-player.scorecard.json` (promedio 4,47). La captura del
+  panel del navegador muestra negro el video en reproducción (no capta la capa de video); la evidencia es Playwright con
+  Chrome y la lectura del cuadro a un canvas.
 
 ## Follow-ups
 

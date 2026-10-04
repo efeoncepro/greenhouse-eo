@@ -352,3 +352,26 @@ pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.
 - Pending (operator): `git push origin main` in Studio; gateway: apply the prepared read-only federation filter →
   `pnpm studio:manifest:sync` → test → PR → merge → deploy (never sync the 1.4.0 manifest without the filter); Greenhouse
   production release of `marketing_studio.asset.write` + `marketing_studio.campaign.write`.
+
+## Video playback (TASK-1998/1999 — code complete 2026-10-04, production pending)
+
+```bash
+# Migration (migrator) — staging applied 2026-10-04; production with authorization
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:<port>/<db>" PGPASSWORD="…" pnpm migrate up
+# Worker: PLAYBACK_ENABLED in apps/worker/deploy.sh (staging true, production false) → commit → deploy
+bash apps/worker/deploy.sh --env staging --apply
+# Backfill = the idempotent sweep (batch MEDIA_WORKER_RECONCILE_BATCH); run it now instead of waiting for :07
+gcloud scheduler jobs run marketing-studio-reconcile-derivatives-staging --project efeonce-group --location us-east4
+# Checks
+SELECT a.asset_id, r.width_px, r.height_px, r.byte_size FROM studio.asset_rendition r JOIN studio.asset_version v USING (asset_version_id) JOIN studio.asset a USING (asset_id) WHERE r.kind = 'playback';
+curl -s -m 10 -o /dev/null -D - "$B<playback.url>"                      # Vercel: 302 Location storage.googleapis.com
+curl -s -m 10 -o /dev/null -D - -H 'Range: bytes=0-1023' "<Location>"   # 206 video/mp4
+```
+
+- Localhost: the personal ADC cannot `signBlob` as `marketing-studio-runtime-stg@` (403) — `next dev` proxies with Range
+  instead (never on Vercel). The 302 path is proven by signing as an SA you can impersonate on an object it can read.
+- Always cap `curl` with `-m` against local dev: a hung `next dev` blocks the call forever (2026-10-04).
+- The browser pane screenshot does not capture the video layer (looks black while playing); use Playwright with
+  `channel: 'chrome'` (Chromium lacks H.264) or read the frame into a canvas.
+- Rollback: `PLAYBACK_ENABLED="false"` + redeploy (existing rows keep serving); revert the web deploy; `migrate down` only
+  after deleting `kind = 'playback'` rows.

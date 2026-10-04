@@ -19,6 +19,8 @@ Insights (EPIC-045), not Studio.
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
 | TASK-1898 | Login with Efeonce ID (`auth.efeonce.org`), `STUDIO_ACCESS_MODE=efeonce_id`; last; also depends on TASK-1834 | to-do | — |
+| TASK-1998 | Video playback rendition: MP4 H.264 ≤ 720 px faststart in the media worker (flag `MEDIA_WORKER_PLAYBACK_ENABLED`, backfill by the sweep), `/api/v1/media/{token}` → 302 to a 1 h V4 URL (Range by GCS), `Asset.playback` / `AssetVersionDetail.playback`, API 1.5.0 | **in progress — code complete 2026-10-04, rollout pending** | Studio local `main` (`f5ae10a`, `995bb73`); migration on staging only; 4 staging videos with `playback` |
+| TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **in progress — code complete 2026-10-04, rollout pending** | Studio local `main` (`35093c3`); verified on localhost against staging |
 | TASK-1899 | MCP writes and approvals: write-class tools with own scopes (`.write`/`.approve`), delegated person identity (RFC 8693, Studio audience), `dryRun` → explicit confirm, `proposalDigest`; blocked by 1891 + 1894 | to-do | — |
 
 ## TASK-1887 — foundation (complete)
@@ -290,3 +292,48 @@ only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:
   `gcs`, `imported` (approval pending, human). Organic piece (paid not authorized until the music license); organic
   destination `https://think.efeoncepro.com/brand-visibility`; copies «propuesta». Recipe: `operations.md` §New concept
   with finals in an OneDrive-governed campaign.
+
+## TASK-1998 / TASK-1999 — video playback (code complete 2026-10-04, rollout pending)
+
+Problem (verified 2026-10-04): videos had only `thumb`/`preview`/`poster`; no `<video>` in the web; `/api/v1/media/{token}`
+buffered whole objects through the function (no Range, Vercel 4.5 MB response cap); `asset_rendition` CHECK admitted
+image mimes only; the board drew ONE piece per concept × kind × ratio (`CMP001-08-video-16x9-instagram` was
+unreachable) and the ghost cell said «solo video» even in the Videos tab.
+
+**Studio commits (local `main`, NOT pushed — push = production deploy, needs the operator):** `f5ae10a` migration +
+worker + transport + contract · `995bb73` Range proxy for `next dev` without signer · `35093c3` player UI.
+
+- Migration `1791129772182_video-playback-rendition.sql`: `kind` + `playback`, `mime_type` + `video/mp4`, CHECK
+  `asset_rendition_playback_mime_chk` (`kind = 'playback'` ⇔ `video/mp4`); Down aborts with playback rows.
+- Worker: `MediaToolkit.transcodePlayback` (`playbackArgs`: libx264 faster CRF 23 ≤ 2.5 Mbps, yuv420p, short edge
+  ≤ 720 never upscaled, AAC 128k if audio, `+faststart`, no metadata); frame extracted lazily; flag
+  `MEDIA_WORKER_PLAYBACK_ENABLED` (`deploy.sh`: staging `true`, production `false`). Real file: «Los Sparks» 36.4 MB →
+  7.7 MB 1280×720 in ~20 s CPU.
+- Transport: `getMedia` for `video/*` → 302 to V4 (1 h, `response-content-type`), redirect cached 5 min; signer
+  `STUDIO_MEDIA_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`; none → 503
+  `playback_unavailable`; `next dev` without signer → Range proxy (never on Vercel).
+- Contract: `PlaybackRendition { url, posterUrl (= preview), mimeType 'video/mp4', widthPx, heightPx, byteSize }`;
+  `Asset.playback`, `AssetVersionDetail.playback` (null = not video / not generated); glossary `playback`; API 1.5.0;
+  manifest 44 tools hash `60dfac7524ee`.
+- UI: `MediaVideo` (native controls, `preload=metadata`, `playsInline`, no autoplay/loop, one retry, not-ready and
+  error states); story layers `pointer-events: none` + 76 px free band; board shows every piece per cell with a
+  variant label, duration on video thumbs, ghost cell → «Ver video» / «Ver imagen».
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | all of the above | code complete | `pnpm check` exit 0 (domain 124 + 4 skipped, worker 6, web 8, contracts 9, gates, manifest), `pnpm build` OK; real ffmpeg transcode tests (h264/aac, moov before mdat, 1920×1080→1280×720, 1080×1920→720×1280, 640×360 kept) |
+| Staging DB | migration `1791129772182` | applied 2026-10-04 | up → down → up; 3 constraints in `pg_constraint` |
+| Staging data | 4 `playback` rows + objects | generated from local with `generateDerivatives` (same primitive, ADC) | second run `up_to_date`; delete-one + rerun → row back with `uploaded 0` |
+| Local `next dev` (staging DB) | contract + transport + UI | verified | `playback` present for video, null for image; Range `206`; tampered token `not_found`; Playwright (Chrome) desktop 1440, mobile 390, story, dark + reduced motion: paused on load, `readyState 4`, duration = `durationMs`, seek OK, `error null`, scrollWidth = clientWidth; ghost «Ver video» opens the video piece |
+| V4 read signing | `signReadUrlV4` + `response-content-type` | verified | signed as `marketing-studio-ingest-stg@` on a staging original → GCS `206 video/mp4`; on the media bucket → `AccessDenied` (permissions, not signature) |
+| Staging worker | flag ON | **not redeployed** | — |
+| Production | migration, worker, web, gateway sync | **pending (operator authorization)** | — |
+
+**Hand-off (exact order):** (1) redeploy staging worker (`bash apps/worker/deploy.sh --env staging --apply`); (2)
+migration `1791129772182` on `marketing_studio`; (3) `PLAYBACK_ENABLED="true"` for production in `deploy.sh` →
+commit → `deploy.sh --env production --apply` → `gcloud scheduler jobs run marketing-studio-reconcile-derivatives`
+(6 videos; check `worker_run` and `studio.asset_rendition` kind `playback` = 6); (4) `git push origin main` (Studio) →
+health `1.5.0` → `curl -I` media link of `CMP001-08-video-16x9` → 302 → final `206`; (5) gateway `studio:manifest:sync`
++ version bump + PR + dispatch (descriptions only; the gateway does not validate output schemas). «Los Sparks»
+(CMP001-08) only exists in production: staging was never imported/ingested for it.
+- 2026-10-04 — TASK-1998/1999 (video playback) code complete; migration on staging; 4 staging `playback` derivatives; localhost verified; production rollout pending authorization.

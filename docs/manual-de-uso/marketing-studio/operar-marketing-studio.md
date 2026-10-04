@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-03 por Claude (agregar un concepto nuevo con video a una campaña gobernada por OneDrive; caso CMP-001 «Los Sparks»)
+> **Ultima actualizacion:** 2026-10-04 por Claude (ver y revisar videos en el panel de la pieza, TASK-1998/1999; antes, 2026-10-03: agregar un concepto nuevo con video a una campaña gobernada por OneDrive; caso CMP-001 «Los Sparks»)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -47,6 +47,10 @@ Studio por Efeonce MCP.
 4. En la pestaña **Piezas**, haz clic en una pieza. A la derecha verás cómo se ve publicada:
    - si es **9:16**, como una story;
    - si es **1:1, 4:5 o 16:9**, dentro de una tarjeta de feed con su proporción real.
+   - si es un **video**, presiona play en el reproductor (no arranca solo). Puedes adelantar, ponerlo a pantalla
+     completa y ver su duración en la línea de datos. Para revisar la versión con intro de Instagram (u otra variante
+     del mismo formato), elígela en el tablero: aparece al lado del máster con su etiqueta.
+   - si buscas el video de un formato y estás en **Imágenes**, el hueco dice **Ver video**: haz clic y te lleva a él.
 5. Cambia **LinkedIn/Meta** y **Copy A/B** para revisar cada combinación. Si aparece «Sin copy registrado para
    este canal y variante», falta ese copy en la fuente.
 6. Copia la **URL con UTM** con el botón **Copiar URL**. La dirección de la página queda enlazada a esa pieza, así
@@ -404,6 +408,8 @@ con otra integración.
 | Una integración recibe **401** | El token está mal copiado, revocado o tiene saltos de línea. Los tokens empiezan con `mst_` y tienen 47 caracteres. Un token inválido responde 401 aunque la web esté abierta. |
 | Una integración recibe **404** en una campaña que existe | La campaña es de una organización que su token no tiene permitida. Es intencional: no se revela si existe. |
 | Una pieza muestra «Vista previa no disponible» | Primero recarga la página: los enlaces de imagen vencen cada semana y se renuevan al recargar. Si sigue igual, a esa pieza le faltan sus imágenes: corre `media:renditions` para ese ambiente. |
+| Un video muestra el primer cuadro y «La versión para reproducir todavía no está lista» | El worker aún no genera su versión liviana. Se crea sola en el barrido horario del worker; para no esperar, el equipo técnico puede correr el barrido (`gcloud scheduler jobs run marketing-studio-reconcile-derivatives`). Recarga después. |
+| Un video dice «No se pudo cargar el video.» | Presiona **Reintentar**. Si sigue, recarga la página: el enlace del video vence y se renueva al recargar. Si persiste, revisa `/api/v1/health` y avisa al equipo técnico (puede faltar el firmante en ese ambiente: error `playback_unavailable`). |
 | Muchas imágenes fallan a la vez | Revisa `https://studio.efeonce.org/api/v1/health`. Si la base responde bien, avisa al equipo técnico: puede faltar la configuración de enlaces de imagen en ese ambiente. |
 | «No pudimos cargar esta vista» | Revisa `/api/v1/health`. Si dice `database: unreachable`, la base no responde: revisa el secreto y la cuenta de servicio del ambiente. |
 | Un comando local dice que la base no responde (`database: unreachable` o conexión rechazada) | Casi siempre es la sesión de `gcloud` vencida o el túnel cerrado. Renueva la sesión desde greenhouse-eo con `pnpm gcloud:auth:playwright -- --force` y vuelve a abrir el túnel en el puerto 15433. |

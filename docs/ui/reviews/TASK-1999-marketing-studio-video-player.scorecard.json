@@ -1,0 +1,89 @@
+{
+  "task": "TASK-1999",
+  "surface": "studio.campaign.pieces (tablero + inspector con vista en el feed / story)",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-10-04",
+  "reviewer": "claude-opus-5-5 (capturas Playwright con Chrome contra localhost:3100 sobre la base de staging, mirada cada una: escritorio 1440, móvil 390, story 9:16, oscuro + reduced motion y estado sin versión para reproducir; antes vs después con before-*.png de producción)",
+  "evidence": {
+    "before": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/before-desktop.png",
+    "desktop": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png",
+    "mobile": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-mobile.png",
+    "story": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-story.png",
+    "dark": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png",
+    "empty": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-empty.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "El video es el momento dominante del inspector: ocupa el medio de la tarjeta con su proporción real, debajo del copy y sobre el pie; el tablero sigue siendo la selección.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png"
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "4:5 en feed y 9:16 en story sin recorte ni barras (object-fit contain sólo si el archivo difiere); la celda con dos piezas 16:9 conserva el ancho real de cada una.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png"
+    },
+    "rhythm": {
+      "score": 4.4,
+      "rationale": "Sin regiones nuevas: el ritmo vertical del inspector (copy → medio → pie → datos) no cambia; la nota de «no lista» usa el inset existente.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-empty.png"
+    },
+    "density": {
+      "score": 4.4,
+      "rationale": "La duración entra en la etiqueta de formato de la miniatura y en la línea de datos; no agrega filas.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png"
+    },
+    "depth": {
+      "score": 4.3,
+      "rationale": "Mismas superficies (card, sombra media de la tarjeta de feed); el medio negro sólo dentro del recuadro del video.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.8,
+      "rationale": "Cero superficies nuevas: ni modal, ni drawer, ni pantalla aparte; el reproductor reemplaza la imagen en el mismo espacio.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "Ver el spot moviéndose dentro de la tarjeta de LinkedIn/Meta con su copy real es el cambio perceptible que faltaba.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png"
+    },
+    "typography": {
+      "score": 4.3,
+      "rationale": "Sin tipografía nueva; la nota usa el tamaño de texto secundario vigente.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-empty.png"
+    },
+    "color": {
+      "score": 4.4,
+      "rationale": "Tokens AXIS vigentes; el único color literal es el negro del medio de video, acotado al recuadro.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png"
+    },
+    "iconography": {
+      "score": 4.0,
+      "rationale": "Controles nativos del navegador por decisión (accesibles por defecto); no se agregan íconos propios.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-story.png"
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "390 px: inspector bajo el tablero, reproductor a ancho de tarjeta, playsInline, sin scroll horizontal (390 = 390).",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-mobile.png"
+    },
+    "motion": {
+      "score": 4.6,
+      "rationale": "Sin autoplay ni loop con o sin reduced motion; no se agrega ninguna transición.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Mantiene la dirección v2 aprobada (feed con proporción real, story 9:16); las capas de la story dejan libres los controles tras corregir la franja a 76 px.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-story.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "El video vive en la vista de publicación real (canal, variante, copy, CTA), no en un reproductor genérico aislado.",
+      "evidence": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-desktop.png"
+    }
+  },
+  "average": 4.47,
+  "notes": "Code complete, rollout pendiente. Aserciones: pausado al cargar, readyState 4, duración = durationMs, adelanta, error null, medios 206, scrollWidth = clientWidth en 1440 y 390; «Ver video» abre la pieza de video. «Los Sparks» (CMP001-08) y su versión para Instagram no están en staging: la celda con dos piezas se verifica con la lógica y queda para la verificación en producción. Subtítulos fuera de alcance."
+}

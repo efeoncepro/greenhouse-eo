@@ -235,6 +235,8 @@ runtime, memory or delegated authority.
   values are raw scalars (no quotes, no newline).
 - **NUNCA** query Postgres per image: readers return HMAC-signed `/api/v1/media/{token}` links served from the bucket
   without touching the database (see lessons: the 20-connection incident).
+- **NUNCA** pass video bytes through a web function: `/api/v1/media/{token}` answers `video/*` with a 302 to a short V4
+  URL (GCS serves Range); a video without its `playback` derivative is `playback: null`, never the original (TASK-1998).
 - **NUNCA** declare a version per package: every version is in the `catalog:` of `pnpm-workspace.yaml`
   (`dependency-catalog-gate`).
 - **NUNCA** run Vercel commands on Studio without checking `.vercel/project.json` → `prj_dztLezZkYxAJikDuPSdT9QROEJRS`
@@ -322,6 +324,10 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
   real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
 - Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
+- TASK-1998/1999 (2026-10-04): video playback — `playback` derivative (MP4 H.264 ≤ 720 px, faststart, flag
+  `MEDIA_WORKER_PLAYBACK_ENABLED`), 302 transport, `Asset.playback`, API 1.5.0, native player in the inspector and every
+  piece per format in the board. **Code complete on Studio local `main` (`f5ae10a`, `995bb73`, `35093c3`), migration on
+  staging only; production rollout pending the operator.** Ledger §TASK-1998 / TASK-1999 has the exact hand-off.
 - Next: TASK-1892 → 1894 (B, C) → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing

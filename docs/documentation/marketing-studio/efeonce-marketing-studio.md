@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-04 (ownership del flujo editorial SEO/AEO; sin implementación)
+> **Ultima actualizacion:** 2026-10-04 por Claude (reproducción de video en el panel de la pieza, TASK-1998/1999; antes, el mismo día: ownership del flujo editorial SEO/AEO)
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -58,6 +58,17 @@ Al hacer clic en una pieza, a la derecha aparece cómo se vería publicada, con 
 
 - una pieza **vertical 9:16** se muestra como una **story**, a pantalla completa, con el texto encima;
 - una pieza **1:1, 4:5 o 16:9** se muestra dentro de una **tarjeta de feed**, con su proporción real (no se recorta).
+
+**Los videos se reproducen ahí mismo.** Si la pieza es un video, la tarjeta muestra un reproductor con los controles
+del navegador y el primer cuadro como portada. No arranca solo: el sonido empieza cuando presionas play. Se puede
+adelantar, ver a pantalla completa y, en el celular, verlo dentro de la tarjeta. Lo que se reproduce es una versión
+liviana para web (hasta 720 px en el lado corto): para el archivo final se pide la descarga del original. Si un video
+todavía no tiene esa versión, Studio muestra el primer cuadro y lo avisa; si no carga, lo dice y ofrece reintentar.
+
+Cuando un concepto tiene dos piezas del mismo formato (por ejemplo «Los Sparks» y «Los Sparks · con intro para
+Instagram», ambas 16:9), el tablero muestra las dos, y la segunda lleva una etiqueta con lo que la distingue. Las
+miniaturas de video muestran su duración. Si un formato sólo existe como video (o sólo como imagen), su hueco dice
+**Ver video** (o **Ver imagen**) y lleva directo a esa pieza.
 
 Arriba de esa vista se elige el canal (**LinkedIn** o **Meta**) y la variante (**Copy A** o **Copy B**). Si no
 hay copy para esa combinación, Studio lo dice. Debajo aparecen los datos de la pieza (tamaño, peso, versión),

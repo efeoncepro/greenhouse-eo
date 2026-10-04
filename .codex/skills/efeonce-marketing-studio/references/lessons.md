@@ -196,3 +196,23 @@
 - **Re-importing corrects copy text without duplicates** (copies upsert by `copy_id`; verified 2026-10-03 fixing the
   service name in two copies). The import report prints `updated: N` for every row it touches, changed or not. Rule:
   never read `updated: N` as "everything changed"; verify the specific field with a read.
+
+## 2026-10-04 — Video playback (TASK-1998/1999)
+
+- **The board hid real pieces.** `PiecesWorkspace` picked `assets.find(...)` per concept × kind × ratio, so the second
+  16:9 video of CMP001-08 («con intro para Instagram») had no cell; «Videos 5» showed 4. Rule: a grid keyed by
+  attributes must render every match (or say how many it hides); compare the tab counter with what is drawn.
+- **A function cannot be a video transport.** The media route buffered whole objects (no Range) and Vercel caps a
+  response at 4.5 MB. Rule: big media = 302 to a short V4 URL; authorization stays in the reader's HMAC link.
+- **The operator's ADC cannot sign as the runtime SA** (`signBlob` 403), and the SA that can be impersonated
+  (`ingest-stg`) cannot read the media bucket (`AccessDenied`, signature valid). Rule: do not touch IAM to test
+  locally; dev-only Range proxy + a positive V4 check on an object the signer can read.
+- **Interrupted session = dead proxies and a hung dev server.** The session cut sent SIGTERM to every
+  `cloud-sql-proxy` started from it, and an old `next dev` (2 days) sat at 98 % CPU answering nothing; an uncapped
+  `curl` hung the turn. Rule: run the proxy as a background task, cap every local `curl` with `-m`, check
+  `/api/v1/health` first.
+- **The browser pane screenshot shows a playing video as black.** A canvas read proved real frames (max luma 255).
+  Rule: visual evidence of video with Playwright + Chrome (`channel: 'chrome'`; bundled Chromium has no H.264).
+- **Staging is not production's data.** «Los Sparks» (CMP001-08) was loaded only in production on 2026-10-03; staging
+  has 4 videos. Rule: when a recipe says «staging first», do it, or record that staging was skipped.
+

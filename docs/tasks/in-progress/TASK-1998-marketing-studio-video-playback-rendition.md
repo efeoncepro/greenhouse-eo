@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-049`
-- Status real: `Diseno — creada 2026-10-04 tras verificar que Studio no reproduce videos; ningún slice empezado`
+- Status real: `Code complete, rollout pendiente (2026-10-04): Studio f5ae10a + 995bb73 en main local sin push; migración aplicada sólo en staging; 4 videos de staging con playback generado desde local; worker de staging sin redeploy; producción y gateway esperan autorización del operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (TASK-1893 dejó el worker de derivados y los originales en GCS; TASK-1894 Entregable A dejó la puerta de ingreso)
@@ -356,14 +356,14 @@ resolución completa, que se conserva para descarga/colocación.
 
 ## Acceptance Criteria
 
-- [ ] `studio.asset_rendition` admite `kind='playback'` y `mime_type='video/mp4'` en staging y producción (verificado en `pg_constraint`).
+- [ ] `studio.asset_rendition` admite `kind='playback'` y `mime_type='video/mp4'` en staging y producción (verificado en `pg_constraint`). — staging ✅ (up → down → up, 2026-10-04); producción pendiente de autorización.
 - [ ] Para cada video `gcs` existe exactamente una fila `playback` con `source_sha256` = sha de la versión; re-correr el barrido no crea filas ni objetos nuevos.
-- [ ] El MP4 generado es H.264 + AAC (o sin audio si el original no tiene), lado corto ≤ 720 px sin agrandar, con `moov` antes de `mdat` (verificado por test con ffprobe sobre un fixture).
+- [x] El MP4 generado es H.264 + AAC (o sin audio si el original no tiene), lado corto ≤ 720 px sin agrandar, con `moov` antes de `mdat` (verificado por test con ffprobe sobre un fixture).
 - [ ] `GET /api/v1/media/{token}` de un video responde `302` a `storage.googleapis.com` sin consultar Postgres, y la URL final atiende `Range` con `206`.
-- [ ] `AssetDto.playback` y `AssetVersionDetail.playback` son `null` para imágenes y para videos sin derivado.
-- [ ] Manifiesto regenerado con `pnpm mcp:manifest:generate`, `API_VERSION` 1.5.0, tests de paridad/fuga/determinismo verdes.
-- [ ] `pnpm check` y `pnpm build` verdes en Studio; tests del worker verdes.
-- [ ] Flag registrado en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime.
+- [x] `AssetDto.playback` y `AssetVersionDetail.playback` son `null` para imágenes y para videos sin derivado.
+- [x] Manifiesto regenerado con `pnpm mcp:manifest:generate`, `API_VERSION` 1.5.0, tests de paridad/fuga/determinismo verdes.
+- [x] `pnpm check` y `pnpm build` verdes en Studio; tests del worker verdes.
+- [x] Flag registrado en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime.
 
 ## Verification
 
@@ -383,6 +383,25 @@ resolución completa, que se conserva para descarga/colocación.
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] Skill `efeonce-marketing-studio` actualizada (ledger, architecture-map, contracts, operations, lessons) y espejada a `.codex/`
 - [ ] Arquitectura de Marketing Studio, manual de uso y documentación funcional actualizados
+
+## Delta 2026-10-04 — code complete, rollout pendiente
+
+- **Hecho (Studio `f5ae10a`, `995bb73`, `main` local sin push):** migración `1791129772182_video-playback-rendition`
+  (+ CHECK de pareja `asset_rendition_playback_mime_chk`), `transcodePlayback` + `playbackArgs`, flag
+  `MEDIA_WORKER_PLAYBACK_ENABLED` (`deploy.sh`: staging `true`, producción `false`), `302` a V4 de 1 h, error
+  `playback_unavailable`, `PlaybackRendition` en `Asset` y `AssetVersionDetail`, API 1.5.0, manifiesto 44 tools hash
+  `60dfac7524ee`. Desvío declarado: `next dev` sin firmante hace de proxy con `Range` (la cuenta personal recibe 403 al
+  firmar como `marketing-studio-runtime-stg@`); en Vercel nunca.
+- **Evidencia:** `pnpm check` exit 0 y `pnpm build` OK; tests con ffmpeg real (h264/aac, `moov` antes de `mdat`,
+  1920×1080→1280×720, 1080×1920→720×1280, 640×360 se conserva); «Los Sparks» real 36,4 MB → 7,7 MB en ~20 s de CPU;
+  staging: migración up → down → up, 4 `playback` generados desde local con `generateDerivatives` (segunda corrida
+  `up_to_date`; borrar uno y volver a correr lo repone con `uploaded 0`); localhost: `206` por `Range`, token alterado
+  `not_found`, imagen `playback: null`; firma V4 con `response-content-type` → GCS `206 video/mp4` (sobre un original
+  que la SA firmante puede leer).
+- **Criterios sin tildar y por qué:** la fila `playback` de producción y el `302` en Vercel requieren la migración de
+  producción, el redeploy de los workers y el push de Studio `main`, que esperan la autorización del operador.
+- **Hallazgo de la sesión:** el `cloud-sql-proxy` de 15433 llevaba dos días aceptando y cortando conexiones; se
+  reinició en el mismo puerto. Un `next dev` de Studio colgado al 98 % de CPU se reinició con la vista previa.
 
 ## Follow-ups
 
