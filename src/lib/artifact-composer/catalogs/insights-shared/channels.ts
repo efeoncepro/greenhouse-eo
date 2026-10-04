@@ -29,7 +29,19 @@ export const CHANNEL_ISOTYPES: Readonly<Record<string, string>> = {
   chatgpt: 'assets/channels/chatgpt.svg',
   gemini: 'assets/channels/gemini.svg',
   claude: 'assets/channels/claude.svg',
-  perplexity: 'assets/channels/perplexity.svg'
+  perplexity: 'assets/channels/perplexity.svg',
+  // TASK-1996 (2026-10-04) — las demás plataformas del contrato AXIS: el dominio citado (linkedin.com, youtube.com…) y la
+  // pauta llevan su isotipo apenas un hecho trae su `channelId` (`channelForDomain`).
+  google_ads: 'assets/channels/google-ads.svg',
+  bing: 'assets/channels/bing.svg',
+  youtube: 'assets/channels/youtube.svg',
+  reddit: 'assets/channels/reddit.svg',
+  wikipedia: 'assets/channels/wikipedia.svg',
+  linkedin: 'assets/channels/linkedin.svg',
+  instagram: 'assets/channels/instagram.svg',
+  tiktok: 'assets/channels/tiktok.svg',
+  meta: 'assets/channels/meta.svg',
+  frameio: 'assets/channels/frameio.svg'
 }
 
 /**

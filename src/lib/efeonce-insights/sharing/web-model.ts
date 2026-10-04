@@ -224,7 +224,8 @@ export const buildInsightWebModel = ({ plan, facts }: BuildInsightWebModelInput)
                 ...(view.firstPeriod ? { firstPeriod: view.firstPeriod } : {}),
                 ...(view.count ? { count: view.count } : {}),
                 ...(view.channel ? { channel: view.channel } : {}),
-                ...(view.context ? { context: view.context } : {})
+                ...(view.context ? { context: view.context } : {}),
+                ...(view.metricIcon ? { metricIcon: view.metricIcon } : {})
               }]
             }),
             ...(stat.note ? { note: projectClaim(stat.note) } : {})

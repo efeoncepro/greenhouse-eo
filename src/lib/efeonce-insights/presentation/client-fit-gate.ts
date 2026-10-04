@@ -39,7 +39,9 @@ const STRUCTURAL_KEYS = new Set([
   // TASK-1974 — enums de la tarjeta de cifra y de la pregunta de cada figura: datos para el render, no texto.
   'question', 'direction', 'tone',
   // Tarjeta con isotipo de canal (contrato AXIS 0.2.0): ids de plataforma que el consumer traduce a su isotipo.
-  'platform', 'titlePlatforms'
+  'platform', 'titlePlatforms',
+  // TASK-1990/1996 — clave del glifo Trazo de la métrica: dato para el render, no texto.
+  'metricIcon'
 ])
 
 const isStructuralKey = (key: string): boolean => STRUCTURAL_KEYS.has(key) || /Ids?$/.test(key)

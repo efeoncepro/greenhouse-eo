@@ -54,6 +54,8 @@ import { channelNameOf, channelsOf, coverPage } from './cover'
 import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
+import { channelForDomain } from '../contracts/channels'
+import { metricGlyphOf } from '../presentation/metric-glyphs'
 
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
 /**
@@ -171,12 +173,31 @@ const essentialOf = (item: PlanClaimV1, factsById: ReadonlyMap<string, EvidenceF
 }
 
 /** «Medimos la marca en»: los canales que miden los gráficos del capítulo (`channelId`, TASK-1888). */
-const measuredChannelsOf = (chapter: PlanChapterV1): SlotValues => {
-  const channels = channelsOf([chapter])
+const measuredChannelsOf = (chapter: PlanChapterV1, factsById: ReadonlyMap<string, EvidenceFactV1>): SlotValues => {
+  const channels = channelsOf([chapter], factsById)
 
   return channels.length > 0
     ? { measuredChannels: { label: GH_INSIGHTS.catalog.measuredIn, channels: channels.map(channelId => ({ channelId, name: channelNameOf(channelId) })) } }
     : {}
+}
+
+/**
+ * TASK-1996 (operador, 2026-10-04) — marca de una fila de tabla: el isotipo de su plataforma (un motor, un asistente o un
+ * dominio citado que es una plataforma, como linkedin.com) o, si no es una plataforma, el glifo Trazo de su métrica.
+ * Nunca los dos; sin hecho reconocible, nada. Si todas las filas son de la MISMA plataforma (las métricas de Search
+ * Console son todas de Google), repetir su isotipo en cada fila no dice nada: va el glifo de la métrica.
+ */
+export const rowMarkOf = (fact: EvidenceFactV1 | undefined, entity: string, uniformChannel: string | null): { channel?: string; metricIcon?: string } => {
+  if (!fact) return {}
+
+  const own = fact.channelId && fact.channelId !== uniformChannel ? fact.channelId : undefined
+  const channel = own ?? (fact.metricId.startsWith('cited_source.') ? channelForDomain(entity) : undefined)
+
+  if (channel) return { channel }
+
+  const glyph = metricGlyphOf(fact.metricId)
+
+  return glyph ? { metricIcon: glyph } : {}
 }
 
 /** Páginas en papel: llevan cabecera corrida, pie institucional y folio «NN / total». */
@@ -310,6 +331,9 @@ const chapterBodyPages = (
     const valueColumn = table.columns[1] ?? ''
     const secondColumn = sharedUnit ? table.columns[2] : L.tableVariation
     const drawnFacts = rowFacts.flatMap(fact => (fact ? [fact.factId] : []))
+    // Una sola plataforma en toda la tabla (o ninguna): sus filas llevan glifo, no el mismo isotipo repetido.
+    const tableChannels = new Set(rowFacts.map(fact => fact?.channelId ?? null))
+    const uniformChannel = tableChannels.size === 1 ? [...tableChannels][0] ?? null : null
 
     // Una etiqueta que no cabe en una línea de la columna ocupa dos líneas (nunca se recorta). La fila no mide el doble:
     // su alto es el texto más el mismo relleno que una fila de una línea; medido con las tablas de Berel (septiembre
@@ -340,7 +364,10 @@ const chapterBodyPages = (
               const variation = sharedUnit ? null : variationOf(index)
               const second = sharedUnit ? (row[2] != null ? String(row[2]) : null) : (variation?.text ?? '—')
 
+              const mark = rowMarkOf(rowFacts[index], String(row[0] ?? ''), uniformChannel)
+
               return {
+                ...mark,
                 entity: String(row[0] ?? '—'),
                 valueA: String(row[1] ?? '—'),
                 ...(second !== null ? { valueB: second } : {}),
@@ -488,7 +515,7 @@ export const buildInsightReportPlanInput = ({
           ...(chapter.opening
             ? { chapterLead: rejectIfLonger(chapter.opening.text, BUDGET.chapterLead, `${chapter.chapterId}.opening`) }
             : {}),
-          ...measuredChannelsOf(chapter)
+          ...measuredChannelsOf(chapter, factsById)
         }
       }
     }

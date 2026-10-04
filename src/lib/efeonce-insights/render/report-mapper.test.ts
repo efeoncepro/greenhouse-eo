@@ -676,3 +676,17 @@ describe('buildInsightReportPlanInput', () => {
     expect(pages.some(p => p.contentType === 'report-narrative')).toBe(true)
   })
 })
+
+describe('TASK-1996 — marca de las filas de tabla', () => {
+  const f = (metricId: string, channelId?: string) => ({ factId: metricId, metricId, ...(channelId ? { channelId } : {}) }) as never
+
+  it('isotipo cuando la tabla mezcla plataformas; glifo cuando todas son de la misma; dominio citado con isotipo', async () => {
+    const { rowMarkOf } = await import('./report-mapper')
+
+    expect(rowMarkOf(f('mention_rate.gemini', 'gemini'), 'Mención en Gemini', null)).toEqual({ channel: 'gemini' })
+    expect(rowMarkOf(f('clicks', 'google'), 'Clics orgánicos', 'google')).toEqual({ metricIcon: 'clic' })
+    expect(rowMarkOf(f('cited_source.linkedin.com'), 'linkedin.com', null)).toEqual({ channel: 'linkedin' })
+    expect(rowMarkOf(f('cited_source.indeed.com'), 'indeed.com', null)).toEqual({})
+    expect(rowMarkOf(undefined, 'x', null)).toEqual({})
+  })
+})

@@ -167,6 +167,38 @@
             "resolver": "report-table-rank",
             "consumer": "resolver-only"
           },
+          "channel": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-stat-channel",
+            "notes": "TASK-1996: la fila es una plataforma (motor, asistente o dominio citado con isotipo) → su isotipo oficial; nunca junto al glifo."
+          },
+          "metricIcon": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-metric-icon",
+            "values": [
+              "clic",
+              "impresion",
+              "ctr",
+              "posicion",
+              "keyword",
+              "visita",
+              "ia",
+              "cita",
+              "enlace",
+              "competencia",
+              "medicion",
+              "reloj",
+              "checklist",
+              "reunion",
+              "assets",
+              "social",
+              "prensa",
+              "web"
+            ],
+            "notes": "TASK-1996: glifo Trazo de la métrica de la fila (metricGlyphOf)."
+          },
           "entity": {
             "type": "string",
             "required": true,

@@ -58,7 +58,7 @@ describe('resolvers editoriales de Insights (TASK-1889)', () => {
     expect(channelIsotypeEffects('chatgpt')).toEqual([{ selector: ':field', attr: 'src', value: 'assets/channels/chatgpt.svg' }])
     // AI Overview lleva su lupa con el degradado de la G (aprobada el 2026-10-03), no la G de Google.
     expect(CHANNEL_ISOTYPES.google_ai_overview).toBe('assets/channels/google-ai-overview.svg')
-    expect(channelIsotypeEffects('bing')).toEqual([{ selector: '.channel-disc', remove: true }])
+    expect(channelIsotypeEffects('myspace')).toEqual([{ selector: '.channel-disc', remove: true }])
   })
 
   it('el número de capítulo terminado en 1 se corre 20 px (compensación óptica del canvas)', () => {

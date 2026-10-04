@@ -177,20 +177,31 @@
       "item": {
         "type": "object",
         "shape": {
-          "icon": {
+          "metricIcon": {
             "type": "string",
             "required": false,
-            "resolver": "deck-icon",
+            "resolver": "deck-metric-icon",
             "values": [
-              "bars",
-              "clicks",
-              "impressions",
+              "clic",
+              "impresion",
               "ctr",
-              "search",
-              "target",
-              "link",
-              "trend"
-            ]
+              "posicion",
+              "keyword",
+              "visita",
+              "ia",
+              "cita",
+              "enlace",
+              "competencia",
+              "medicion",
+              "reloj",
+              "checklist",
+              "reunion",
+              "assets",
+              "social",
+              "prensa",
+              "web"
+            ],
+            "notes": "TASK-1990/1996: glifo Trazo de la métrica (AXIS STROKE_GLYPHS, estado reposo), resuelto por statItemView / metricGlyphOf. Nunca junto al isotipo de canal."
           },
           "direction": {
             "type": "enum",

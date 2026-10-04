@@ -164,7 +164,7 @@ describe('cifras: la retícula sale de la cantidad y nada se trunca', () => {
   it.each(CASES)('$name: sin dato no lleva píldora y «Menor es mejor» sólo donde viene', async c => {
     const items = itemsOf(fixtureOf(c)).slice(0, 3)
 
-    const noData: StatItem = { icon: 'clicks', name: 'Clics', value: '—', noData: 'Sin dato en septiembre de 2026' }
+    const noData: StatItem = { metricIcon: 'clic', name: 'Clics', value: '—', noData: 'Sin dato en septiembre de 2026' }
 
     const result = await render(c, withItems(c, [noData, ...items.slice(1)]))
 

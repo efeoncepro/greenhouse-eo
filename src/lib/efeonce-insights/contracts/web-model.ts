@@ -151,6 +151,11 @@ export interface InsightWebStatItemV1 {
   channel?: { platform: string; name: string }
   /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
   context?: string
+  /**
+   * Glifo Trazo de la métrica (clave de `STROKE_GLYPHS` en @efeoncepro/axis-graphic-line/icons), resuelto por
+   * `statItemView`. Ausente con `channel` (isotipo o glifo, nunca los dos) o si la métrica no tiene glifo. Aditivo en 1.4.
+   */
+  metricIcon?: string
 }
 
 /** 1.4 (TASK-1974) — tarjeta de cifra: la figura de «¿cuánto es y cómo cambió?». Abre el capítulo. */

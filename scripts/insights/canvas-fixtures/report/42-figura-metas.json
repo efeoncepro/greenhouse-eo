@@ -22,7 +22,7 @@
     "bulletDirection": "higher_is_better",
     "bulletRows": [
       {
-        "icon": "clicks",
+        "metricIcon": "clic",
         "name": "Clics desde Google",
         "unit": "cantidad",
         "value": "1.284",
@@ -33,7 +33,7 @@
         "band": "1.020"
       },
       {
-        "icon": "search",
+        "metricIcon": "posicion",
         "name": "Keywords en primera página",
         "unit": "cantidad",
         "value": "26",
@@ -44,7 +44,7 @@
         "band": "25,5"
       },
       {
-        "icon": "ctr",
+        "metricIcon": "ctr",
         "name": "CTR",
         "unit": "porcentaje",
         "value": "2,66 %",
@@ -55,7 +55,7 @@
         "band": "2,55 %"
       },
       {
-        "icon": "link",
+        "metricIcon": "enlace",
         "name": "Citas de IA con enlace",
         "unit": "cantidad",
         "value": "19",

@@ -352,7 +352,8 @@ export const GH_INSIGHTS = {
     /** La métrica bajo el nombre del canal, por métrica o por familia (`mention_rate.openai` → `mention_rate`). */
     channelContext: {
       mention_rate: 'de las respuestas menciona la marca',
-      ai_sessions: 'visitas desde el asistente'
+      ai_sessions: 'visitas desde el asistente',
+      ai_source: 'visitas desde el asistente'
     } as Readonly<Record<string, string>>
   },
 

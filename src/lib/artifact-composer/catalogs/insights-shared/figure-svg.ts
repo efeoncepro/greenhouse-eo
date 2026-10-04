@@ -14,6 +14,8 @@
 
 import { parsePrintedNumber } from '../../bar-figure'
 
+import metricGlyphSeal from './metric-glyphs.axis.json'
+
 export class FigureDataError extends Error {
   constructor(message: string) {
     super(message)
@@ -89,6 +91,12 @@ export interface ColumnGroupInput {
   direction?: 'up' | 'down' | 'flat'
   /** Mejor o peor según la dirección de la métrica; sin él se lee como el canvas (subir = mejor). */
   tone?: 'better' | 'worse' | 'neutral'
+  /**
+   * TASK-1996 (operador, 2026-10-04) — glifo Trazo de la categoría (clave de `metric-glyphs.axis.json`), sobre su etiqueta.
+   * Una categoría sin clase («Sin clasificar») va sin glifo pero con la etiqueta alineada; una clave desconocida falla
+   * cerrado.
+   */
+  glyph?: string
 }
 
 export interface ColumnBandInput {
@@ -196,8 +204,18 @@ export const groupedColumnsSvg = (
   const out: string[] = []
   const labelLines = groups.map(group => wrapLabel(group.label, slot - 8, box.fonts.dimension))
   const lineHeight = Math.round(box.fonts.dimension * 1.25)
-  // Cada línea extra de etiqueta hace crecer la figura: nada se monta sobre la variación.
-  const extra = (Math.max(...labelLines.map(lines => lines.length)) - 1) * lineHeight
+  // TASK-1996 — fila de glifos sobre las etiquetas; las etiquetas quedan alineadas aunque una categoría no tenga glifo.
+  const glyphPaths = metricGlyphSeal.glyphs as Record<string, string[]>
+  const withGlyphs = groups.some(group => group.glyph !== undefined)
+
+  for (const group of groups) {
+    if (group.glyph !== undefined && !glyphPaths[group.glyph]) throw new FigureDataError(`Columnas agrupadas: glifo desconocido «${group.glyph}».`)
+  }
+
+  const glyphSize = Math.round(box.fonts.dimension * 1.35)
+  const glyphRow = withGlyphs ? glyphSize + 6 : 0
+  // Cada línea extra de etiqueta (y la fila de glifos) hace crecer la figura: nada se monta sobre la variación.
+  const extra = (Math.max(...labelLines.map(lines => lines.length)) - 1) * lineHeight + glyphRow
   const height = box.height + extra
 
   const display = box.optics.display ?? { width: box.width, height: box.height }
@@ -263,8 +281,18 @@ export const groupedColumnsSvg = (
 
     const lines = labelLines[index]!
 
+    if (withGlyphs && group.glyph !== undefined) {
+      const top = box.dimensionY - box.fonts.dimension
+
+      out.push(
+        `<g class="fig-dimension-glyph" transform="translate(${n(c - glyphSize / 2)} ${n(top)}) scale(${n(glyphSize / 24)})">` +
+          glyphPaths[group.glyph!]!.map(d => `<path d="${d}"></path>`).join('') +
+          '</g>'
+      )
+    }
+
     labels.push(
-      `<text class="fig-dimension" x="${n(c)}" y="${box.dimensionY}" font-size="${box.fonts.dimension}">` +
+      `<text class="fig-dimension" x="${n(c)}" y="${box.dimensionY + glyphRow}" font-size="${box.fonts.dimension}">` +
         lines.map((line, k) => (k === 0 ? esc(line) : `<tspan x="${n(c)}" dy="${lineHeight}">${esc(line)}</tspan>`)).join('') +
         '</text>'
     )

@@ -28,6 +28,7 @@ import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { metricDirectionOf } from '../editorial/figure-selection'
 import { statItemView, statBoardChannelsOf } from '../presentation/stat-card'
 import { sourcesLabelOf } from '../presentation/vocabulary'
+import { metricGlyphOf } from '../presentation/metric-glyphs'
 
 export type FigureKind = 'comparison' | 'columns' | 'targets' | 'trend' | 'stat' | 'waterfall' | 'waffle' | 'donut' | 'stacked'
 
@@ -385,7 +386,7 @@ export const buildFigureSlides = (
       return [{
         ids: [now.factId, before.factId],
         row: {
-          ...(iconOf(now) ? { icon: iconOf(now) } : {}),
+          ...(metricGlyphOf(now?.metricId) ? { metricIcon: metricGlyphOf(now?.metricId) } : {}),
           name: chart.dimensionLabels[index] ?? now.label,
           unit: unitWordOf(now.unit),
           current: fmt(now, locale),
@@ -424,6 +425,7 @@ export const buildFigureSlides = (
 
       return [{
         ids: [now.factId, ...(before ? [before.factId] : [])],
+        glyph: metricGlyphOf(now.metricId),
         group: {
           label: chart.dimensionLabels[index] ?? now.label,
           current: fmt(now, locale),
@@ -434,6 +436,14 @@ export const buildFigureSlides = (
     })
 
     if (groups.length < 2) return []
+
+    // TASK-1996 — el glifo de cada categoría (tipo de fuente: redes, medios, sitios propios…) cuando la mayoría lo tiene;
+    // «Sin clasificar» queda sin glifo y con su etiqueta alineada.
+    const withGlyphs = groups.filter(entry => entry.glyph !== null).length * 2 >= groups.length
+
+    groups.forEach(entry => {
+      if (withGlyphs && entry.glyph) Object.assign(entry.group, { glyph: entry.glyph })
+    })
 
     const first = measured(byId, current?.factIds[0])
 
@@ -474,7 +484,7 @@ export const buildFigureSlides = (
         ids: [value.factId, target.factId, ...(band ? [band.factId] : [])],
         met,
         row: {
-          ...(iconOf(value) ? { icon: iconOf(value) } : {}),
+          ...(metricGlyphOf(value?.metricId) ? { metricIcon: metricGlyphOf(value?.metricId) } : {}),
           name: item.label,
           direction,
           unit: unitWordOf(value.unit),
@@ -653,7 +663,13 @@ export const buildFigureSlides = (
       ...base(
         parts.map(entry => entry.fact!.factId),
         {
-          donutParts: parts.map((entry, index) => ({ label: entry.label, count: fmt(entry.fact!, locale), share: shareLabel(shares[index]!, values[index]!) })),
+          // TASK-1996 — la parte que es una plataforma (asistente o motor) lleva su isotipo: el lector la reconoce sin leer.
+          donutParts: parts.map((entry, index) => ({
+            label: entry.label,
+            count: fmt(entry.fact!, locale),
+            share: shareLabel(shares[index]!, values[index]!),
+            ...(entry.fact!.channelId ? { channel: entry.fact!.channelId } : {})
+          })),
           donutCenter: totalHasCard
             ? { value: percentLabel(shares[main]!), label: parts[main]!.label }
             : { value: formatFactValue(total, unit, locale), label: L.donutTotal }
@@ -820,9 +836,9 @@ export const buildStatSlides = (
       closing: closingOf(reading, conclusion),
       body: {
         statCount: L.statCount(page.length),
-        statItems: page.map(({ view, fact }) => ({
-          // El isotipo del canal reemplaza al ícono de la métrica: nunca los dos.
-          ...(view.channel ? { channel: view.channel.platform } : iconOf(fact) ? { icon: iconOf(fact) } : {}),
+        statItems: page.map(({ view }) => ({
+          // El isotipo del canal reemplaza al glifo Trazo de la métrica: nunca los dos (`statItemView` ya lo resolvió).
+          ...(view.channel ? { channel: view.channel.platform } : view.metricIcon ? { metricIcon: view.metricIcon } : {}),
           name: view.label,
           ...(view.context ? { context: view.context } : {}),
           ...(view.estimated ? { estimated: S.estimated } : {}),

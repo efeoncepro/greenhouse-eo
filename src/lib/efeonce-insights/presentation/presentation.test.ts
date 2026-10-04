@@ -255,13 +255,15 @@ describe('TASK-1957 — indicadores estándar de visibilidad en motores de respu
     expect(clientFitViolations({ model: buildInsightWebModel({ plan, facts: snapshot.facts }), facts: snapshot.facts })).toEqual([])
   })
 
-  it('la misma tasa en todos los motores se dice en una frase, sin figura', () => {
+  it('la misma tasa en todos los motores se dice en una frase y cada motor va en su tarjeta con isotipo, sin barras', () => {
     const snapshot = indicators([2, 2, 2])
     const plan = buildDeterministicPlan(snapshot, { modules: ['aeo'], locale: 'es-CL', editorialV2: true })
     const chapter = plan.chapters[0]!
 
     expect(chapter.charts.find(chart => chart.chartId === 'chart.aeo.percent.mention-rate')).toBeUndefined()
     expect(chapter.claims[0]).toMatchObject({ text: 'La marca aparece en el 33,3 % de las respuestas de cada motor.', role: 'finding' })
+    // TASK-1990/1996 — operador, 2026-10-04: el lector ve los motores, no sólo la frase.
+    expect(chapter.stats?.find(figure => figure.figureId === 'stats.aeo.engines')?.items.map(item => item.label)).toEqual(['ChatGPT', 'Gemini', 'Perplexity'])
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 })

@@ -169,3 +169,16 @@ describe('TASK-1996 — escalones de la cifra única del deck', () => {
     expect(deckSingleStatSizeClass('123.456.789.012')).toBeNull()
   })
 })
+
+describe('TASK-1996 — glifos de categoría en las columnas', () => {
+  it('cada categoría con clase lleva su glifo sobre la etiqueta; la que no tiene clase queda alineada; clave desconocida falla', async () => {
+    const { groupedColumnsSvg, REPORT_COLUMNS_BOX } = await import('../catalogs/insights-shared/figure-svg')
+
+    const plain = groupedColumnsSvg([{ label: 'Redes sociales', current: '12' }, { label: 'Sin clasificar', current: '22' }], REPORT_COLUMNS_BOX, { ariaLabel: 'x' })
+    const withGlyph = groupedColumnsSvg([{ label: 'Redes sociales', current: '12', glyph: 'social' }, { label: 'Sin clasificar', current: '22' }], REPORT_COLUMNS_BOX, { ariaLabel: 'x' })
+
+    expect(plain).not.toContain('fig-dimension-glyph')
+    expect(withGlyph.match(/fig-dimension-glyph/g)).toHaveLength(1)
+    expect(() => groupedColumnsSvg([{ label: 'A', current: '1', glyph: 'nope' }, { label: 'B', current: '2' }], REPORT_COLUMNS_BOX, { ariaLabel: 'x' })).toThrow()
+  })
+})

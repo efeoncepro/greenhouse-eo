@@ -126,8 +126,8 @@ describe('porciones de la dona', () => {
 })
 
 describe('tonos de las partes', () => {
-  it('sin rol, por orden: actual → oportunidad → anterior', () => {
-    expect(donutTones([{ label: 'a' }, { label: 'b' }, { label: 'c' }])).toEqual(['current', 'opportunity', 'prior'])
+  it('sin rol, por orden: actual → anterior → paso (el coral sólo con rol de oportunidad)', () => {
+    expect(donutTones([{ label: 'a' }, { label: 'b' }, { label: 'c' }])).toEqual(['current', 'prior', 'step'])
   })
 
   it('un rol declarado manda y las demás toman los tonos libres', () => {

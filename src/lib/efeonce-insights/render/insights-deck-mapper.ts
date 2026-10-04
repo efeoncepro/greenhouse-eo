@@ -259,11 +259,11 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
         ...(chapter.opening
           ? { chapterLead: rejectIfLonger(chapter.opening.text, BUDGET.chapterLead, `${chapter.chapterId}.opening`) }
           : {}),
-        ...(channelsOf([chapter]).length > 0
+        ...(channelsOf([chapter], factsById).length > 0
           ? {
               measuredChannels: {
                 label: L.measuredIn,
-                channels: channelsOf([chapter]).map(channelId => ({ channelId, name: channelNameOf(channelId) }))
+                channels: channelsOf([chapter], factsById).map(channelId => ({ channelId, name: channelNameOf(channelId) }))
               }
             }
           : {})

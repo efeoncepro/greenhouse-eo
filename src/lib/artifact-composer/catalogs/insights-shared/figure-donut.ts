@@ -8,7 +8,7 @@
  * con una no hay composición que leer y con más el ángulo se estima mal. Todo lo ilegible falla cerrado.
  *
  * El color no vive acá: el SVG sólo lleva clases (`fig-donut-*`) y cada plantilla las pinta con sus roles. El tono de
- * cada parte sale de su rol declarado (`opportunity`, `absence`) o, sin rol, del orden actual → oportunidad → anterior.
+ * cada parte sale de su rol declarado (`opportunity`, `absence`) o, sin rol, del orden actual → anterior → paso.
  */
 
 import type { CatalogLayoutHook } from '../../catalog'
@@ -23,7 +23,7 @@ export type DonutPartIcon = (typeof DONUT_PART_ICONS)[number]
 
 export type DonutRole = 'opportunity' | 'absence'
 
-export type DonutTone = 'current' | 'opportunity' | 'prior' | 'absence'
+export type DonutTone = 'current' | 'opportunity' | 'prior' | 'step' | 'absence'
 
 export interface DonutPartInput {
   label: string
@@ -97,8 +97,8 @@ const esc = (text: string): string =>
 const c1 = (value: number): string => value.toFixed(1)
 
 /**
- * Tono de cada parte. Un rol declarado manda; las partes sin rol toman, en orden, los tonos que ningún rol ocupó
- * (actual → oportunidad → anterior). Dos oportunidades o dos ausencias no se distinguen: falla cerrado. Una dona sólo
+ * Tono de cada parte. Un rol declarado manda; las partes sin rol toman, en orden, actual → anterior → paso. El coral de
+ * oportunidad es SÓLO de una parte que lo declara (operador, 2026-10-04: por orden pintaba a Gemini de «oportunidad»). Dos oportunidades o dos ausencias no se distinguen: falla cerrado. Una dona sólo
  * de ausencia no dice nada.
  */
 export const donutTones = (parts: readonly Pick<DonutPartInput, 'role' | 'label'>[]): DonutTone[] => {
@@ -114,8 +114,7 @@ export const donutTones = (parts: readonly Pick<DonutPartInput, 'role' | 'label'
 
   if (parts.every(part => part.role === 'absence')) throw new FigureDataError('Una dona sólo de ausencia no tiene composición que leer.')
 
-  const taken = new Set(parts.map(part => part.role).filter(Boolean))
-  const free = (['current', 'opportunity', 'prior'] as const).filter(tone => !taken.has(tone as DonutRole))
+  const free = ['current', 'prior', 'step'] as const
   let next = 0
 
   return parts.map(part => part.role ?? free[next++]!)

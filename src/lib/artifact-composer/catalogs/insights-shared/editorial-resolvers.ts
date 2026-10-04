@@ -12,6 +12,7 @@
 import type { FieldEffect, ResolverRegistry } from '../../resolver-contract'
 import { parsePrintedNumber } from '../../bar-figure'
 import { channelIsotypeEffects, CHANNEL_ISOTYPES } from './channels'
+import { CATALOG_METRIC_GLYPH_KEYS, metricGlyphEffects } from './metric-glyphs'
 
 /**
  * El dato no vino (el campo es opcional en el contrato): el resolver derivado corre igual y recibe
@@ -274,6 +275,11 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
   [`${prefix}-icon`]: {
     known: [...FIGURE_ICON_KEYS],
     build: value => iconEffects(value)
+  },
+  /** TASK-1990/1996 — glifo Trazo de la métrica (cifras, comparación y metas). */
+  [`${prefix}-metric-icon`]: {
+    known: [...CATALOG_METRIC_GLYPH_KEYS],
+    build: value => metricGlyphEffects(value)
   },
   /** Dirección de la variación contra el período anterior. */
   [`${prefix}-delta-tone`]: {

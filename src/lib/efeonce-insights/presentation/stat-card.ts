@@ -12,6 +12,7 @@ import type { PlanStatDirection, PlanStatItemV1 } from '../contracts/plan'
 import { changeToneOf, type ChangeDirection, type ChangeTone } from '../editorial/figure-selection'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { windowLabelOf } from './vocabulary'
+import { metricGlyphOf, type MetricGlyphKey } from './metric-glyphs'
 
 /** Piezas de la cifra: la grande y su unidad pequeña («#» antes; «%»/«pp» pegado después; una palabra como unidad). */
 export interface StatValueParts {
@@ -74,6 +75,11 @@ export interface StatItemView {
   channel: { platform: StatPlatform; name: string } | null
   /** La métrica bajo el nombre del canal («de las respuestas menciona la marca»). Sólo con `channel`. */
   context: string | null
+  /**
+   * TASK-1990/1996 — glifo Trazo de la métrica (`metric-glyphs.ts`). null con `channel` (isotipo o glifo, nunca los dos) o
+   * cuando la métrica no tiene glifo.
+   */
+  metricIcon: MetricGlyphKey | null
 }
 
 /**
@@ -91,9 +97,10 @@ const TITLE_ORDER: readonly StatPlatform[] = ['google_search_console', 'google_a
 /** Máximo de isotipos en el título de un tablero; con más fuentes no se dibuja ninguno (el título ya las nombra). */
 const TITLE_MAX = 3
 
-export const statPlatformOf = (fact: Pick<EvidenceFactV1, 'source' | 'channelId'>): StatPlatform | null => {
+export const statPlatformOf = (fact: Pick<EvidenceFactV1, 'source' | 'channelId'> & { metricId?: string }): StatPlatform | null => {
   if ((fact.source ?? '').startsWith('greenhouse_growth.seo_gsc')) return 'google_search_console'
-  if ((fact.source ?? '').startsWith('ga4:')) return fact.channelId ?? 'google_analytics'
+  // GA4 por asistente: cada parte es su asistente; «Otros asistentes» no es GA4 ni un asistente con isotipo (sin plataforma).
+  if ((fact.source ?? '').startsWith('ga4:')) return fact.channelId ?? ((fact.metricId ?? '').startsWith('ai_source.') ? null : 'google_analytics')
   if ((fact.source ?? '').startsWith('ico_engine')) return 'greenhouse'
 
   return fact.channelId ?? null
@@ -107,17 +114,21 @@ export interface StatBoardChannels {
   perCell: boolean
 }
 
-export const statBoardChannelsOf = (facts: ReadonlyArray<Pick<EvidenceFactV1, 'source' | 'channelId'>>): StatBoardChannels => {
+export const statBoardChannelsOf = (facts: ReadonlyArray<Pick<EvidenceFactV1, 'source' | 'channelId'> & { metricId?: string }>): StatBoardChannels => {
   const platforms = facts.map(statPlatformOf)
+  const known = [...new Set(platforms.filter((platform): platform is StatPlatform => platform !== null))]
 
-  if (platforms.length === 0 || platforms.some(platform => platform === null)) return { title: [], perCell: false }
+  if (platforms.length === 0 || known.length === 0) return { title: [], perCell: false }
 
-  const distinct = [...new Set(platforms as StatPlatform[])]
+  // Tablero de motores o asistentes distintos: isotipo en cada celda. Una celda sin plataforma conocida («Otros
+  // asistentes») queda sólo con su nombre (contrato AXIS 0.2.0, `unknownPlatform: 'name-only'`).
+  if (known.length > 1 && known.every(platform => AI_ANSWER_PLATFORMS.has(platform))) return { title: [], perCell: true }
 
-  if (distinct.length > 1 && distinct.every(platform => AI_ANSWER_PLATFORMS.has(platform))) return { title: [], perCell: true }
+  // Fuera de eso, una cifra sin plataforma apaga los isotipos: el título no afirma una fuente que no es.
+  if (platforms.some(platform => platform === null)) return { title: [], perCell: false }
 
   const rank = (platform: StatPlatform) => (TITLE_ORDER.indexOf(platform) === -1 ? TITLE_ORDER.length : TITLE_ORDER.indexOf(platform))
-  const title = distinct.sort((a, b) => rank(a) - rank(b))
+  const title = known.sort((a, b) => rank(a) - rank(b))
 
   return { title: title.length <= TITLE_MAX ? title : [], perCell: false }
 }
@@ -166,6 +177,7 @@ export const statItemView = (item: PlanStatItemV1, byId: ReadonlyMap<string, Evi
     parts: splitStatValue(formatFactValue(fact.value, fact.unit, locale)),
     count: comparable ? { from: comparable.value!, to: fact.value!, decimals: decimalsOf(splitStatValue(formatFactValue(fact.value, fact.unit, locale)).value) } : null,
     channel,
-    context: channel ? channelContextOf(fact, item.label) : null
+    context: channel ? channelContextOf(fact, item.label) : null,
+    metricIcon: channel ? null : metricGlyphOf(fact.metricId)
   }
 }

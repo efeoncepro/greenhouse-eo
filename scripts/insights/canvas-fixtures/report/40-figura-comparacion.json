@@ -21,7 +21,7 @@
     },
     "metrics": [
       {
-        "icon": "clicks",
+        "metricIcon": "clic",
         "name": "Clics",
         "unit": "cantidad",
         "current": "1.284",
@@ -30,7 +30,7 @@
         "delta": "16,5 %"
       },
       {
-        "icon": "impressions",
+        "metricIcon": "impresion",
         "name": "Impresiones",
         "unit": "cantidad",
         "current": "48.310",
@@ -39,7 +39,7 @@
         "delta": "7,0 %"
       },
       {
-        "icon": "ctr",
+        "metricIcon": "ctr",
         "name": "CTR",
         "unit": "porcentaje",
         "current": "2,66 %",
