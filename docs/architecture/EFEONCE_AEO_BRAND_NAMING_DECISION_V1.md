@@ -78,3 +78,14 @@ El operador corrigió el nombre del proceso a **Efeonce AEO Assessment** (no «A
 
 **Canon visual del AI Visibility Report (2026-09-29).** Vive en AXIS desde el tag `v0.3.30`: página del Lab `https://axis.efeonce.org/references/ai-visibility-report/` y contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`, `@efeoncepro/axis-ui-contracts` 0.3.30), con el token `aiVisibilityReport` en `@efeoncepro/axis-tokens` 0.3.30. Greenhouse lo adopta en TASK-1938; hasta entonces fija el juego 0.3.29.
 
+
+## Delta 2026-10-03 — En el copy, la marca es Efeonce y el servicio es «Efeonce | AEO»
+
+El operador corrigió los copies del spot «Los Sparks» (CMP001-08): «Mi marca no se llama Efeonce AEO sino Efeonce. Efeonce | AEO es el servicio». Desde ahora:
+
+- La marca que habla en el copy es **Efeonce** («en Efeonce…»). «Efeonce AEO» nunca es el emisor.
+- En texto, el servicio se escribe **«Efeonce | AEO»**, con barra, igual que el lockup del delta 2026-09-29. Ejemplo: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO».
+- La cláusula 1 se lee así: la capacidad sigue siendo la misma, pero en copy nuevo su nombre escrito lleva la barra. Las menciones previas sin barra quedan como registro histórico.
+- No cambian el Report, el Assessment ni los aliases de la cláusula 6.
+
+El spot ya aprobado mantiene «Efeonce AEO» en la voz y en los subtítulos. El operador decidió no volver a renderizarlo; la corrección se aplicó en los copies de Instagram y LinkedIn.
