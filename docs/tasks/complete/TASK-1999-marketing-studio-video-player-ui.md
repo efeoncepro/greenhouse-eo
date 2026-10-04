@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Code complete, rollout pendiente (2026-10-04): Studio 35093c3 en main local sin push; verificado en localhost contra staging con Playwright (Chrome); falta producción (autorización del operador) y ver CMP001-08 en vivo`
+- Status real: `Complete 2026-10-04 — en producción (Studio c52eb4a): reproductor en el inspector, dos piezas 16:9 de CMP001-08 visibles y reproducibles, duración alineada con el reproductor nativo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1998` (campo `AssetDto.playback` y transporte con `302`)
@@ -299,7 +299,7 @@ Ver `docs/ui/wireframes/TASK-1999-marketing-studio-video-player.md` (copy ledger
 - [x] Un video con `playback` se reproduce en el inspector con controles nativos, póster y proporción real; nunca arranca solo.
 - [x] La historia 9:16 deja los controles utilizables (capas sin capturar clics).
 - [x] Un video sin `playback` muestra el póster y la nota; un fallo de carga muestra «No se pudo cargar el video.» con «Reintentar».
-- [ ] El tablero muestra las dos piezas 16:9 de CMP001-08 y permite abrir la versión con intro. — implementado (`pieces` por celda + etiqueta de variante); CMP001-08 no existe en staging, se verifica en producción.
+- [x] El tablero muestra las dos piezas 16:9 de CMP001-08 y permite abrir la versión con intro. — verificado en producción el 2026-10-04 (`prod-los-sparks.png`, `prod-los-sparks-instagram.png`).
 - [x] «Ver video» en la pestaña Imágenes abre la pieza de video correspondiente.
 - [x] Todo el copy nuevo vive en `apps/web/src/copy.ts` (español neutro, sin voseo) y lo cubre `copy.test.ts`.
 - [x] Sin scroll horizontal de página en 1440 y 390; capturas `after-*` y scorecard registradas.
@@ -321,7 +321,15 @@ Ver `docs/ui/wireframes/TASK-1999-marketing-studio-video-player.md` (copy ledger
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] Manual de uso y documentación funcional de Marketing Studio actualizados; skill `efeonce-marketing-studio` al día
 
-## Delta 2026-10-04 — code complete, rollout pendiente
+## Delta 2026-10-04 — en producción (complete)
+
+- Studio `aa35e02` y `c52eb4a` en producción. En `studio.efeonce.org/campaigns/CMP-001?piece=CMP001-08-video-16x9`: el
+  tablero muestra «Los Sparks 16:9 0:49» y «Los Sparks · con intro para Instagram 16:9 0:52»; la versión con intro se
+  abre (`?piece=CMP001-08-video-16x9-instagram`) y se reproduce; sin scroll horizontal (1440 = 1440).
+- Ajuste tras mirar producción (`c52eb4a`): la duración truncaba distinto que el reproductor nativo («0:50» vs «0:49»);
+  `formatDuration` ahora trunca igual que el navegador.
+
+## Delta 2026-10-04 — code complete
 
 - **Hecho (Studio `35093c3`):** `MediaVideo`, video en feed y story, capas de story sin capturar clics con franja libre de
   76 px (la primera captura mostró «Más información» encima de los controles con 48 px), todas las piezas por celda con

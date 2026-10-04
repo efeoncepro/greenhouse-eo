@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-049`
-- Status real: `Rollout parcial (2026-10-04, autorizado): staging completo (worker 00004-6v7, barrido repaired 1); migración aplicada en producción; worker de producción (deploy.sh true en aa35e02), push de Studio main y gateway pendientes — el deploy de producción lo bloqueó el clasificador de permisos y lo corre el operador`
+- Status real: `Complete 2026-10-04 — en producción: worker marketing-studio-media-worker-00003-hrw con MEDIA_WORKER_PLAYBACK_ENABLED (6/6 videos con playback), Studio c52eb4a (API 1.5.0), 302 → 206 verificado; follow-up: merge de efeoncepro/efeonce-mcp#24 (sólo artefacto, superficie sin cambios)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (TASK-1893 dejó el worker de derivados y los originales en GCS; TASK-1894 Entregable A dejó la puerta de ingreso)
@@ -357,9 +357,9 @@ resolución completa, que se conserva para descarga/colocación.
 ## Acceptance Criteria
 
 - [x] `studio.asset_rendition` admite `kind='playback'` y `mime_type='video/mp4'` en staging y producción (verificado en `pg_constraint`). — staging (up → down → up) y producción, 2026-10-04.
-- [ ] Para cada video `gcs` existe exactamente una fila `playback` con `source_sha256` = sha de la versión; re-correr el barrido no crea filas ni objetos nuevos.
+- [x] Para cada video `gcs` existe exactamente una fila `playback` con `source_sha256` = sha de la versión; re-correr el barrido no crea filas ni objetos nuevos.
 - [x] El MP4 generado es H.264 + AAC (o sin audio si el original no tiene), lado corto ≤ 720 px sin agrandar, con `moov` antes de `mdat` (verificado por test con ffprobe sobre un fixture).
-- [ ] `GET /api/v1/media/{token}` de un video responde `302` a `storage.googleapis.com` sin consultar Postgres, y la URL final atiende `Range` con `206`.
+- [x] `GET /api/v1/media/{token}` de un video responde `302` a `storage.googleapis.com` sin consultar Postgres, y la URL final atiende `Range` con `206`.
 - [x] `AssetDto.playback` y `AssetVersionDetail.playback` son `null` para imágenes y para videos sin derivado.
 - [x] Manifiesto regenerado con `pnpm mcp:manifest:generate`, `API_VERSION` 1.5.0, tests de paridad/fuga/determinismo verdes.
 - [x] `pnpm check` y `pnpm build` verdes en Studio; tests del worker verdes.
@@ -384,7 +384,25 @@ resolución completa, que se conserva para descarga/colocación.
 - [ ] Skill `efeonce-marketing-studio` actualizada (ledger, architecture-map, contracts, operations, lessons) y espejada a `.codex/`
 - [ ] Arquitectura de Marketing Studio, manual de uso y documentación funcional actualizados
 
-## Delta 2026-10-04 — code complete, rollout pendiente
+## Delta 2026-10-04 — en producción (complete)
+
+- **Rollout autorizado por el operador:** worker staging `00004-6v7` (barrido `repaired 1`, `failed 0`, transcode real en
+  Cloud Run); migración en `marketing_studio`; worker producción `00003-hrw` (imagen `aa35e0202de5`, flag ON, Studio
+  `aa35e02`); barrido manual `succeeded`, `repaired 6`, `failed 0`: CMP001-01 ×3, CMP001-08 ×2 (7,3 MB, 1280×720) y
+  CMP003-01; push de Studio `main` (`aa35e02`, luego `c52eb4a`) → health `1.5.0`.
+- **Verificación en producción:** `playback` en los 2 videos de CMP001-08 y `null` en sus imágenes; enlace → `302`
+  `Location storage.googleapis.com/efeonce-marketing-studio-media/renditions/…/playback-….mp4` con `X-Goog-Expires=3600`
+  y `response-content-type=video/mp4`, `Cache-Control: private, max-age=300`; destino `206 video/mp4`
+  (`bytes 0-1023/7643530` y rango a mitad); Playwright con Chrome: pausado al cargar, duración 49,6 s, adelanta a 30 s,
+  `error null`, medios `302 studio.efeonce.org` + `206 storage.googleapis.com`.
+- **Gateway:** `studio:manifest:sync` (44 tools, hash `60dfac7524ee`), `pnpm check` 237 tests verdes, superficie sin cambios
+  (digest `193e182cd743`, versión 1.10.0), PR efeoncepro/efeonce-mcp#24 con CI verde. **El merge lo bloqueó el
+  clasificador de permisos («Merge Without Review») y queda para el operador.** No requiere deploy: el provider no valida
+  esquemas de salida y `playback` ya llega a los agentes.
+- **Nota de proceso:** el deploy del worker de producción lo bloqueó el clasificador hasta que el operador lo autorizó
+  explícitamente en el chat («te autorizo a correrlo tu todo»).
+
+## Delta 2026-10-04 — code complete
 
 - **Hecho (Studio `f5ae10a`, `995bb73`, `main` local sin push):** migración `1791129772182_video-playback-rendition`
   (+ CHECK de pareja `asset_rendition_playback_mime_chk`), `transcodePlayback` + `playbackArgs`, flag
@@ -398,13 +416,12 @@ resolución completa, que se conserva para descarga/colocación.
   `up_to_date`; borrar uno y volver a correr lo repone con `uploaded 0`); localhost: `206` por `Range`, token alterado
   `not_found`, imagen `playback: null`; firma V4 con `response-content-type` → GCS `206 video/mp4` (sobre un original
   que la SA firmante puede leer).
-- **Criterios sin tildar y por qué:** la fila `playback` de producción y el `302` en Vercel requieren la migración de
-  producción, el redeploy de los workers y el push de Studio `main`, que esperan la autorización del operador.
 - **Hallazgo de la sesión:** el `cloud-sql-proxy` de 15433 llevaba dos días aceptando y cortando conexiones; se
   reinició en el mismo puerto. Un `next dev` de Studio colgado al 98 % de CPU se reinició con la vista previa.
 
 ## Follow-ups
 
-- Sync del manifiesto en `efeonce-mcp` (descripciones de `studio.asset.get` / `studio.campaign.assets.list`), bump de versión y deploy manual, con autorización.
+- Merge de efeoncepro/efeonce-mcp#24 (manifiesto 1.5.0 sincronizado; sin deploy necesario: la superficie no cambió).
+- Release de Greenhouse que sirva el manual MCP `marketing-studio` actualizado (línea `playback`).
 - Transcode en streaming (original a disco por partes, sin `Buffer`) antes de admitir videos cercanos a 1 GiB en producción.
 - Cloud CDN con backend bucket si las piezas se comparten fuera del equipo o el egreso crece.

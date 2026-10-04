@@ -19,8 +19,8 @@ Insights (EPIC-045), not Studio.
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
 | TASK-1898 | Login with Efeonce ID (`auth.efeonce.org`), `STUDIO_ACCESS_MODE=efeonce_id`; last; also depends on TASK-1834 | to-do | — |
-| TASK-1998 | Video playback rendition: MP4 H.264 ≤ 720 px faststart in the media worker (flag `MEDIA_WORKER_PLAYBACK_ENABLED`, backfill by the sweep), `/api/v1/media/{token}` → 302 to a 1 h V4 URL (Range by GCS), `Asset.playback` / `AssetVersionDetail.playback`, API 1.5.0 | **in progress — code complete 2026-10-04, rollout pending** | Studio local `main` (`f5ae10a`, `995bb73`); migration on staging only; 4 staging videos with `playback` |
-| TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **in progress — code complete 2026-10-04, rollout pending** | Studio local `main` (`35093c3`); verified on localhost against staging |
+| TASK-1998 | Video playback rendition: MP4 H.264 ≤ 720 px faststart in the media worker (flag `MEDIA_WORKER_PLAYBACK_ENABLED`, backfill by the sweep), `/api/v1/media/{token}` → 302 to a 1 h V4 URL (Range by GCS), `Asset.playback` / `AssetVersionDetail.playback`, API 1.5.0 | **complete 2026-10-04** | Studio prod `c52eb4a` (API 1.5.0); worker prod `00003-hrw`, staging `00004-6v7`; 6/6 prod videos with `playback`; gateway PR efeoncepro/efeonce-mcp#24 open (merge by the operator, no deploy needed) |
+| TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
 | TASK-1899 | MCP writes and approvals: write-class tools with own scopes (`.write`/`.approve`), delegated person identity (RFC 8693, Studio audience), `dryRun` → explicit confirm, `proposalDigest`; blocked by 1891 + 1894 | to-do | — |
 
 ## TASK-1887 — foundation (complete)
@@ -293,7 +293,7 @@ only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:
   destination `https://think.efeoncepro.com/brand-visibility`; copies «propuesta». Recipe: `operations.md` §New concept
   with finals in an OneDrive-governed campaign.
 
-## TASK-1998 / TASK-1999 — video playback (code complete 2026-10-04, rollout pending)
+## TASK-1998 / TASK-1999 — video playback (complete 2026-10-04, in production)
 
 Problem (verified 2026-10-04): videos had only `thumb`/`preview`/`poster`; no `<video>` in the web; `/api/v1/media/{token}`
 buffered whole objects through the function (no Range, Vercel 4.5 MB response cap); `asset_rendition` CHECK admitted
@@ -328,8 +328,9 @@ worker + transport + contract · `995bb73` Range proxy for `next dev` without si
 | V4 read signing | `signReadUrlV4` + `response-content-type` | verified | signed as `marketing-studio-ingest-stg@` on a staging original → GCS `206 video/mp4`; on the media bucket → `AccessDenied` (permissions, not signature) |
 | Staging worker | flag ON | live `00004-6v7` (image `35093c39f748`) | manual sweep `succeeded`, `repaired 1, failed 0` (real transcode in Cloud Run) |
 | Production DB | migration `1791129772182` | applied 2026-10-04 | 3 constraints in `pg_constraint` |
-| Production worker | `deploy.sh` `true` (`aa35e02`) | **not deployed** — the session permission classifier blocked `deploy.sh --env production --apply`; the operator runs it | — |
-| Production web / gateway | push `main`, manifest sync | pending (after the worker) | — |
+| Production worker | flag ON | live `00003-hrw` (image `aa35e0202de5`) | manual sweep `succeeded`, `repaired 6, failed 0`; CMP001-08 ×2 = 7.3 MB 1280×720 |
+| Production web | Studio `aa35e02` + `c52eb4a` pushed | live, health `1.5.0` | link → `302` to `storage.googleapis.com/efeonce-marketing-studio-media/renditions/…/playback-….mp4` (`X-Goog-Expires=3600`, `response-content-type=video/mp4`) → `206 video/mp4`; Playwright (Chrome): paused on load, 49.6 s, seek to 30 s, no error; both 16:9 pieces of CMP001-08 in the board |
+| Gateway | manifest 1.5.0 synced | PR efeoncepro/efeonce-mcp#24, CI green, **merge blocked by the permission classifier («Merge Without Review») → operator** | surface digest unchanged `193e182cd743`, version stays 1.10.0, no deploy needed |
 
 **Hand-off (exact order):** (1) redeploy staging worker (`bash apps/worker/deploy.sh --env staging --apply`); (2)
 migration `1791129772182` on `marketing_studio`; (3) `PLAYBACK_ENABLED="true"` for production in `deploy.sh` →
@@ -340,3 +341,4 @@ health `1.5.0` → `curl -I` media link of `CMP001-08-video-16x9` → 302 → fi
 (CMP001-08) only exists in production: staging was never imported/ingested for it.
 - 2026-10-04 — TASK-1998/1999 (video playback) code complete; migration on staging; 4 staging `playback` derivatives; localhost verified; production rollout pending authorization.
 - 2026-10-04 (later) — rollout authorized: staging worker `00004-6v7` live; production migration applied; production worker deploy blocked by the permission classifier (operator runs it), then push `main`, then gateway.
+- 2026-10-04 (closing) — production worker `00003-hrw` (after explicit operator authorization in chat), sweep 6/6, Studio pushed (`aa35e02`, `c52eb4a` duration fix), verified with «Los Sparks»; TASK-1998/1999 complete; gateway PR #24 awaits the operator's merge.

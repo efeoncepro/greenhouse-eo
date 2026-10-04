@@ -1,7 +1,7 @@
 {
   "task": "TASK-1999",
   "surface": "studio.campaign.pieces (tablero + inspector con vista en el feed / story)",
-  "verdict": "pass-local",
+  "verdict": "pass-production",
   "reviewedAt": "2026-10-04",
   "reviewer": "claude-opus-5-5 (capturas Playwright con Chrome contra localhost:3100 sobre la base de staging, mirada cada una: escritorio 1440, móvil 390, story 9:16, oscuro + reduced motion y estado sin versión para reproducir; antes vs después con before-*.png de producción)",
   "evidence": {
@@ -10,7 +10,9 @@
     "mobile": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-mobile.png",
     "story": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-story.png",
     "dark": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-dark.png",
-    "empty": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-empty.png"
+    "empty": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/after-empty.png",
+    "production": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/prod-los-sparks.png",
+    "productionVariant": "docs/ui/visual-sources/TASK-1999-marketing-studio-video-player/prod-los-sparks-instagram.png"
   },
   "dimensions": {
     "hierarchy": {
@@ -85,5 +87,5 @@
     }
   },
   "average": 4.47,
-  "notes": "Code complete, rollout pendiente. Aserciones: pausado al cargar, readyState 4, duración = durationMs, adelanta, error null, medios 206, scrollWidth = clientWidth en 1440 y 390; «Ver video» abre la pieza de video. «Los Sparks» (CMP001-08) y su versión para Instagram no están en staging: la celda con dos piezas se verifica con la lógica y queda para la verificación en producción. Subtítulos fuera de alcance."
+  "notes": "En producción desde 2026-10-04 (Studio c52eb4a). Aserciones locales y en producción: pausado al cargar, readyState 4, duración = durationMs, adelanta, error null, medios 302 (studio) + 206 (GCS), scrollWidth = clientWidth en 1440 y 390; «Ver video» abre la pieza de video; las dos piezas 16:9 de CMP001-08 visibles y reproducibles. Subtítulos fuera de alcance."
 }

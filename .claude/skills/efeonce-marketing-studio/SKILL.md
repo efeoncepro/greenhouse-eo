@@ -324,10 +324,10 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
   real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
 - Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
-- TASK-1998/1999 (2026-10-04): video playback — `playback` derivative (MP4 H.264 ≤ 720 px, faststart, flag
-  `MEDIA_WORKER_PLAYBACK_ENABLED`), 302 transport, `Asset.playback`, API 1.5.0, native player in the inspector and every
-  piece per format in the board. **Code complete on Studio local `main` (`f5ae10a`, `995bb73`, `35093c3`), migration on
-  staging only; production rollout pending the operator.** Ledger §TASK-1998 / TASK-1999 has the exact hand-off.
+- TASK-1998/1999 **complete 2026-10-04, in production**: video playback — `playback` derivative (MP4 H.264 ≤ 720 px,
+  faststart, flag `MEDIA_WORKER_PLAYBACK_ENABLED` ON in staging `00004-6v7` and production `00003-hrw`), 302 transport to
+  a 1 h V4 URL, `Asset.playback`, API 1.5.0 (Studio `c52eb4a`), native player in the inspector and every piece per format
+  in the board. Pending: merge of efeoncepro/efeonce-mcp#24 (artifact only, no deploy).
 - Next: TASK-1892 → 1894 (B, C) → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing

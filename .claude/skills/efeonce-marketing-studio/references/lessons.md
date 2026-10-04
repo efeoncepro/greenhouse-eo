@@ -215,4 +215,14 @@
   Rule: visual evidence of video with Playwright + Chrome (`channel: 'chrome'`; bundled Chromium has no H.264).
 - **Staging is not production's data.** «Los Sparks» (CMP001-08) was loaded only in production on 2026-10-03; staging
   has 4 videos. Rule: when a recipe says «staging first», do it, or record that staging was skipped.
+- **Production deploys and merges need the operator's authorization stated in chat, not inferred.** The permission
+  classifier blocked `deploy.sh --env production --apply` after a generic «Autorizado» and only let it run after «te
+  autorizo a correrlo tu todo»; `gh pr merge` stayed blocked («Merge Without Review»). Rule: ask for the explicit
+  production authorization up front, and plan the PR merge as an operator step.
+- **Never write a file with `open(dst, 'w')` in the same expression that reads it.** A script truncated `Handoff.md`
+  (and another session's uncommitted line) before reading it. Rule: read into a variable first, or write to a scratch
+  file; for shared files with foreign hunks commit through a temporary index (`GIT_INDEX_FILE`) built from HEAD + your
+  block, then `git reset -- <paths>` on the real index.
+- **Show durations the way the native player does.** The board said «0:50» and Chrome's controls «0:49» for 49.6 s.
+  Rule: truncate seconds (`Math.floor`), like the browser.
 

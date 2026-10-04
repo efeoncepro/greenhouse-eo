@@ -501,18 +501,15 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
 
 ## Reproducción de video (TASK-1998/1999)
 
-Estado (2026-10-04, rollout autorizado por el operador): **staging completo; producción a medias.**
+Estado: **en producción desde el 2026-10-04** (rollout autorizado por el operador).
 
 | Paso | Estado |
 |---|---|
-| 1. Worker staging | ✅ `marketing-studio-media-worker-staging-00004-6v7` (imagen `35093c39f748`), flag ON; barrido manual `succeeded`, `repaired 1, failed 0` (transcode real en Cloud Run de CMP003-01) |
-| 2. Migración `marketing_studio` | ✅ aplicada; `asset_rendition_kind_check`, `_mime_type_check`, `_playback_mime_chk` en `pg_constraint` |
-| 3. Worker producción | ⏳ `deploy.sh` producción `true` en Studio `aa35e02`; el deploy lo bloqueó el clasificador de permisos de la sesión. Lo corre el operador |
-| 4. Push Studio `main` | ⏳ **después del paso 3** (si la web sale antes, los videos muestran «todavía no está lista») |
-| 5. Gateway | ⏳ sync del manifiesto, versión, PR y dispatch |
-
-Studio `f5ae10a`, `995bb73`, `35093c3`, `aa35e02` en `main` local sin empujar. Contrato y diseño:
-arquitectura §7.5 y §8; flag `MEDIA_WORKER_PLAYBACK_ENABLED` en `FEATURE_FLAG_STATE_LEDGER.md`.
+| 1. Worker staging | ✅ `marketing-studio-media-worker-staging-00004-6v7` (imagen `35093c39f748`); barrido `repaired 1, failed 0` |
+| 2. Migración `marketing_studio` | ✅ `1791129772182`; tres constraints en `pg_constraint` |
+| 3. Worker producción | ✅ `marketing-studio-media-worker-00003-hrw` (imagen `aa35e0202de5`); barrido `repaired 6, failed 0` |
+| 4. Push Studio `main` | ✅ `aa35e02` y `c52eb4a`; health `1.5.0`; `302` → `206 video/mp4` verificado con «Los Sparks» |
+| 5. Gateway | 🟡 manifiesto 1.5.0 sincronizado en efeoncepro/efeonce-mcp#24 (CI verde); merge pendiente del operador; sin deploy necesario (superficie sin cambios) |
 
 Orden de rollout:
 

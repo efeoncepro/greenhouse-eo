@@ -3,7 +3,7 @@
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
 > **Versión:** 1.11
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-04 por Claude (TASK-1998/1999 code complete, sin desplegar en producción: derivado `playback` de video, transporte 302 a URL firmada V4, `Asset.playback`, API 1.5.0, reproductor en el inspector, §7.5 y §8; antes, 2026-10-02 (noche): TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-04 por Claude (TASK-1998/1999 en producción desde el mismo día: derivado `playback` de video, transporte 302 a URL firmada V4, `Asset.playback`, API 1.5.0, reproductor en el inspector, §7.5 y §8; antes, 2026-10-02 (noche): TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -704,7 +704,7 @@ ajenos (barra de estado de otra sesión). Sandbox `CMP-900` creada por `createCa
 **Pendiente.** Push de Studio a `main`; release de Greenhouse a producción; sync del gateway; Entregable C (corte de
 las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2 por API, federación de escrituras).
 
-## 7.5 Reproducción de video (TASK-1998, code complete 2026-10-04; producción pendiente)
+## 7.5 Reproducción de video (TASK-1998, en producción desde 2026-10-04)
 
 - **Derivado `playback`.** El worker de medios (§7.2) genera para cada versión de video con original en GCS un MP4 H.264
   High `yuv420p` (CRF 23, techo 2,5 Mbps), lado corto ≤ 720 px sin agrandar, AAC 128 kbps si el original tiene audio,
@@ -715,7 +715,7 @@ las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2
 - **Flag y backfill.** `MEDIA_WORKER_PLAYBACK_ENABLED` (SoT `apps/worker/deploy.sh`). El evento `OBJECT_FINALIZE` cubre
   lo nuevo y el barrido horario `/jobs/reconcile-derivatives` hace el backfill de lo ya ingestado, idempotente (segunda
   corrida `up_to_date`). El cuadro del segundo 1 sólo se extrae si falta un derivado de imagen. Medido con «Los Sparks»
-  (49,6 s, 36,4 MB): 7,7 MB a 1280×720 en ~20 s de CPU, holgado frente al ack de 600 s y al timeout de 900 s.
+  (49,6 s, 36,4 MB): 7,3 MB a 1280×720 en ~20 s de CPU (6/6 videos de producción en un barrido), holgado frente al ack de 600 s y al timeout de 900 s.
 - **Transporte sin bytes por Vercel.** El reader entrega el mismo enlace HMAC de los medios (`/api/v1/media/{token}`,
   sin base). Para `video/*` la ruta responde `302` a una URL V4 de 1 h firmada por IAM `signBlob`
   (`STUDIO_MEDIA_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`), con
@@ -729,7 +729,7 @@ las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2
   vigente) y `AssetVersionDetail.playback`; `null` si no es video o el derivado no existe (nunca el original).
   `posterUrl` = el `preview` del segundo 1. API 1.5.0; manifiesto 44 tools (hash `60dfac7524ee`); `getMedia` sigue
   como exclusión con la razón actualizada. El gateway no valida esquemas de salida, así que el campo viaja antes del
-  sync; el sync del manifiesto sólo actualiza descripciones (follow-up con autorización).
+  sync; el sync del manifiesto (efeoncepro/efeonce-mcp#24) no cambia la superficie federada (digest `193e182cd743`) y no requiere deploy.
 - **Riesgo declarado.** El worker carga el original completo en memoria (2 GiB); con el tope de subida de 1 GiB, un
   video cercano a ese tamaño podría agotarla. Follow-up: transcode en streaming.
 
