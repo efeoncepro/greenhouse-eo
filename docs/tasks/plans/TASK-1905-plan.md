@@ -28,6 +28,14 @@ Baseline reportada por el subagente Studio: 50 tests PASS (kernel, catálogo, pl
 + 1 test de paridad PASS. Las integraciones PostgreSQL no se ejecutaron: necesitan `STUDIO_IT_PG_URL`.
 No se leyeron valores distintos de canales productivos ni se probaron triggers en DB.
 
+Discovery de autoridad: gateway con checkout limpio; guard local
+`src/providers/marketing-studio-tool-parity.ts:46` todavía rechaza writes sin clase de scope.
+No se certificó su despliegue. Búsqueda focal del principal confirmó `.asset.write`/`.campaign.write` en
+`src/config/entitlements-catalog.ts:2522` y grants en `src/lib/entitlements/runtime.ts:3224`; no encontró
+`.catalog.manage` en esos archivos ni en `mcp-token-exchange.ts`. Tampoco encontró rutas/archivos
+`customer-model` bajo `src/lib/commercial` y el lane ecosystem. Esto acredita gaps locales, no ausencia
+de tablas ni de bindings en producción. No se consultaron grants efectivos, consumer o DB de Greenhouse.
+
 ## Dependencias y hook
 
 `pnpm codex:task-hook TASK-1905 --subagents` fue ejecutado después de confirmar el goal y rechazó el
