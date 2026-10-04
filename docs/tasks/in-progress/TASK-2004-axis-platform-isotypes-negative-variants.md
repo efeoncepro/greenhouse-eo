@@ -6,9 +6,23 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — publicado en `axis-brand-assets` 0.4.20 (Claude, a pedido del operador)
+
+- **Hecho:** negativos sellados de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, derivados por
+  `packages/brand-assets/scripts/platform-negatives.mjs` con la transformación declarada en `provenance`
+  (`variant: 'negative'`, vista previa oscura en el catálogo de logos); Facebook (`logos:facebook`, sin transformar) y
+  Threads (`simple-icons:threads`, `currentColor` fijado en `#000`) desde `@iconify/json` 2.2.408, CC0.
+  `efeonceInsights.statCard.channel.platforms` suma `facebook` y `threads` (paridad con `AXIS_PLATFORM_ASSETS`);
+  `axis-tokens` 0.5.1. Los logos de herramientas ya sellados (HubSpot, Metricool, Notion) también se publicaron.
+- **Release:** AXIS `e8f1901` + `8adedef`, tag `v0.4.20` (el tag `v0.4.19` falló antes de publicar porque el Lab
+  citaba 0.4.18; no se movió). El mismo tag publicó `axis-ui-primitives` 0.5.0 de otra sesión, con el visto bueno del
+  operador.
+- **Consumidor:** Marketing Studio (TASK-2002) lo usa desde `0856ee0`.
+- **Pendiente:** isotipo de Microsoft Advertising (hoy se usa el de Bing) y logotipo de Metricool en negativo.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -21,7 +35,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Diseno`
+- Status real: `Publicado en axis-brand-assets 0.4.20 (2026-10-04): negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads; Facebook y Threads en color. Pendiente: Microsoft Advertising y el logotipo de Metricool en negativo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`

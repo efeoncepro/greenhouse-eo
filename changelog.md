@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — TASK-2002/2004: calendario de activaciones (lectura) e isotipos de plataforma en AXIS
+
+- Studio (local): el calendario pasa a ser de activaciones — vistas Mes, Semana, Día, Línea de tiempo y Pauta, filtros por dimensión en la URL, hoja con evidencia y tracking URL, bandeja «Ejecución sin activación», móvil y teclado. Las escrituras se muestran bloqueadas con su razón hasta que exista autoridad de escritura.
+- AXIS: `@efeoncepro/axis-brand-assets` 0.4.20 publica negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, isotipos de Facebook y Threads y los logos de herramientas; `axis-tokens` 0.5.1.
 
 ## 2026-10-04 — TASK-2001: conexiones owned locales
 
@@ -573,14 +577,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   seguidas, plate repetido, slots y ritmo, sin duplicar códigos. `--propose` le pide al agente un plan validado que
   falla cerrado; una persona confirma (TASK-1932 lo expone por API, Nexa y MCP). El catálogo de runtime se genera con
   `pnpm brand:deck-recipes`.
-
-## 2026-09-28 — Las 69 recetas de deck de «La órbita» componen (TASK-1928)
-
-- El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
-  cotización y próximos pasos, prueba (clientes, partners, caso, gráfico, testimonio), secciones y «quiénes somos», y
-  contenido y día a día. Todas se componen con `pnpm brand:compose` y entran al gate visual (66 frames a 0 px).
-- Greenhouse sube a AXIS `v0.3.21` (tokens 0.3.21, ui-contracts 0.3.19). El compositor gana logos de terceros
-  normalizados, capas pintadas con foto adentro y recorte dirigido; el test de paridad exige que cada slot de la
-  receta tenga campo en su plantilla. La portada de brochure con la selección de Nexa compone con
-  la composición `document-selection` (el operador relajó la regla el 2026-09-28).
-  Aprobado por el operador; `pnpm build` verde, en `develop`.

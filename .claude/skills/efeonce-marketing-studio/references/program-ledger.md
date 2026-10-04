@@ -431,3 +431,22 @@ Studio aa6fa07 pushed and deployed: API 1.7.0/75 tools/80 HTTP operations. Five 
 Activations ON; Metricool discovery production ON/staging OFF, owned OFF. Three accounts/two previously allowed brands; 62 observations/0 errors, replay 0 changes and scheduler OIDC succeeded. Calendar/activation/unlinked via existing Greenhouse CLI, deny tests and 44 thumbs PASS. Three historical activations overdue without observed publication date; no guessed published timestamp. Full audit: docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md.
 
 Greenhouse/gateway unchanged by release; delegated T1 TASK-2003, UI TASK-2002, owned bindings/Greenhouse endpoint and Resend/HubSpot/Engagement/Next adapters pending. TASK remains in progress. Catalog alias migration TASK-1905 is separate from execution evidence backfill.
+
+## TASK-2002 — activations calendar UI (local, read side; 2026-10-04)
+
+- Studio commits (local, not pushed): `985354b` views + sheet, `036dbd6` mobile/lanes/loading/campaign tab, `0856ee0`
+  AXIS 0.4.20 marks, `e90fb6e` fixes. Files: `apps/web/src/app/calendar/{page,loading}.tsx`,
+  `apps/web/src/components/activations/**` (model, platforms, cards, Month/Week/Day/Timeline/Paid views, sheet, panels,
+  grid keys, legacy calendar), `copy.ts` (`COPY.activations`), `app.css` (TASK-2002 block).
+- Reads only the TASK-2001 readers (`getCalendarRange`, `getActivation`, `listUnlinkedExecutions`,
+  `listActivationAccounts`, `listCampaignActivations`); the UI never computes an execution state. With
+  `STUDIO_ACTIVATIONS_ENABLED` off the page renders `LegacyCalendar` (the previous calendar, unchanged).
+- Writes are visible but `aria-disabled` with the reader's `lockReason` / `open_mode`: no actor can write from the web
+  until TASK-1898 (login) and TASK-2003 (delegated MCP). Forms/dialogs of v3.2 are not built yet.
+- Platform marks come from `@efeoncepro/axis-brand-assets` 0.4.20 (static SVG imports; dark mode uses the sealed
+  negatives). AXIS release done in the same session (TASK-2004): `axis-brand-assets` 0.4.20, `axis-tokens` 0.5.1,
+  and `axis-ui-primitives` 0.5.0 (another session's commit, published by the same tag with operator consent).
+- Evidence: 18 `after-*.webp` + scorecard 4.38 in Greenhouse; local Postgres 18 on 127.0.0.1:55461 with staging data
+  copied read-only plus local-only sample activations (never written to staging/production).
+- Pending: write UI, «+N» popover, mobile filter sheet, blog SEO/AEO sections (no contract), `pnpm check`/`build` once
+  Codex's in-flight domain work is committed, real MCP session, push and rollout.

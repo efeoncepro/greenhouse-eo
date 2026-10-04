@@ -277,3 +277,12 @@
 - Tracking allowlists must be configured before a preview canary; fail-closed validation correctly rejects an undeclared destination. Rebuild after Vercel config changes.
 - Metricool PUBLISHED without an observed timestamp is not published evidence. Keep overdue and a reconciliation item, never copy the scheduled timestamp. Preserve a legacy record absent from discovery results.
 - Verify scheduler identity separately from operator invocation. Three accounts read 62 records, repeat changes 0; scheduler run succeeded with its own OIDC.
+- 2026-10-04 (TASK-2002): a published `@efeoncepro/axis-brand-assets` version can lag the AXIS repo — 0.4.18 lacked
+  `assets/tools/` (HubSpot, Metricool, Notion) although they were committed. Check the installed package, not the repo,
+  before importing an asset; publish a new version instead of copying files.
+- 2026-10-04: running `pnpm install` while `next dev` is up can change Next's resolved path (peer reshuffle) and every
+  route then fails with «module factory is not available»; media 500s look like broken thumbnails. Restart the dev server.
+- 2026-10-04: in server components Turbopack may give a static SVG import as a string instead of `StaticImageData`;
+  read `typeof src === 'string' ? src : src.src`.
+- 2026-10-04: an AXIS release tag publishes every package version on `main` not yet in the registry, including other
+  sessions' bumps. List HEAD versions vs registry before tagging; never move a pushed tag — release the next version.

@@ -1,5 +1,30 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-04 (implementación) — lectura completa en local
+
+Implementado en `efeonce-marketing-studio` (local, sin push) contra el contrato de TASK-2001, con Postgres 18 descartable
+(datos copiados de staging en sólo lectura, más activaciones de ejemplo que nunca salen del equipo):
+
+- **Vistas:** Mes (dos tarjetas por día y «+N más» → vista Día; una franja de pauta por campaña con el estado más grave),
+  Semana (franjas mañana · tarde · noche; en móvil, lista por día), Día, Línea de tiempo (fila por plataforma y cuenta,
+  carriles para no superponer pauta) y Pauta (plan, herramienta y entrega por línea; en móvil, tarjetas).
+- **Filtros** por modality, family, platform, account, mercado, campaña y estado, en la URL.
+- **Hoja** de activación (pantalla completa en móvil): pieza con escenario fijo, preview de email y web en claro, copy
+  literal, evidencia por herramienta, avisos del reader, tracking URL con copiar y sus advertencias, historial; en blog,
+  CMS, sitio y «Borrador en Content Hub». Foco al título, Esc y fondo cierran, foco de vuelta a la tarjeta.
+- **Bandeja** «Ejecución sin activación», frescura por herramienta y «Sin fechas». Pestaña Calendario de la campaña con
+  sus activaciones. Esqueleto de carga con «Sigue cargando…». Teclado de la grilla según V3-A11y.
+- **Isotipos** desde AXIS `@efeoncepro/axis-brand-assets` 0.4.20 (publicado hoy por TASK-2004): negativos sellados en
+  oscuro, Facebook, Threads, HubSpot, Metricool y Notion. X y WordPress van con inicial porque AXIS no los tiene.
+- **Escrituras:** «Planificar», «Editar», «Reprogramar», «Cancelar», «Vincular» y «Crear activación» se muestran con
+  `aria-disabled` y la razón. En modo abierto el reader devuelve `writable: false` y no hay actor con permiso de
+  escritura, así que los formularios y diálogos de v3.2 quedan para cuando exista la autoridad (TASK-1898 en la web,
+  TASK-2003 por MCP).
+- **Desvíos de la dirección aprobada:** «+N» lleva directo a la vista Día (sin popover); los filtros en móvil son una fila
+  deslizable (sin hoja); las secciones SEO/AEO del blog muestran «no medido» hasta que exista su contrato.
+- **Evidencia:** `docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-*.webp` (18) y
+  `docs/ui/reviews/TASK-2002-marketing-studio-activations-calendar.scorecard.json` (promedio 4,38).
+
 ## Delta 2026-10-04 (blog) — hoja de blog con SEO y AEO
 
 El operador revisó en el canvas (página `v3.2 · Planificar y operar`) las hojas «Blog · antes de publicar» y «Blog ·
@@ -108,7 +133,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `En implementación (Claude, 2026-10-04) contra el contrato local de TASK-2001 (corte 4094da0); Postgres local con datos de staging; sin push`
+- Status real: `Lectura implementada y verificada en local (Studio 985354b · 036dbd6 · 0856ee0 · e90fb6e, sin push): mes, semana, día, línea de tiempo, pauta, hoja, bandeja, pestaña de campaña, móvil, carga y teclado; 18 capturas after-* y scorecard 4,38. Pendiente: escrituras (formularios y diálogos) bloqueadas hasta TASK-1898/2003, popover «+N», hoja de filtros móvil, pnpm check/build con el árbol de Codex en curso, sesión MCP real y rollout`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
@@ -377,15 +402,15 @@ Ver wireframe y flow de esta task.
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, wireframe y flow existentes; `UI ready` pasa a `yes` sólo con la dirección v3 aprobada y `pnpm task:lint --task TASK-2002` sin hallazgos.
-- [ ] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL.
-- [ ] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada.
-- [ ] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver.
-- [ ] Copy en `apps/web/src/copy.ts` con test; sin voseo.
-- [ ] Sin scroll horizontal de página en 1440 y 390; capturas y scorecard registrados.
-- [ ] La hoja muestra la tracking URL de la activación (copiar) y sus advertencias; ninguna UTM se construye en el cliente.
-- [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada).
-- [ ] `pnpm check` y `pnpm build` de Studio verdes.
+- [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, wireframe y flow existentes; `UI ready` pasa a `yes` sólo con la dirección v3 aprobada y `pnpm task:lint --task TASK-2002` sin hallazgos.
+- [x] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL.
+- [ ] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada. _(2026-10-04: pieza, plataforma, hora y estado con texto, y ninguna «Publicada» sin `publishedAt` — verificado en las 18 activaciones; la cuenta va en la etiqueta accesible y en la hoja, pero no se ve en la tarjeta compacta del mes.)_
+- [ ] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver. _(2026-10-04: la bandeja lista lo programado sin activación con su conteo; «Vincular» y «Crear activación» se muestran con `aria-disabled` y la razón, porque en modo abierto no hay actor con permiso de escritura hasta TASK-1898/TASK-2003.)_
+- [x] Copy en `apps/web/src/copy.ts` con test; sin voseo.
+- [x] Sin scroll horizontal de página en 1440 y 390; capturas y scorecard registrados.
+- [x] La hoja muestra la tracking URL de la activación (copiar) y sus advertencias; ninguna UTM se construye en el cliente.
+- [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada). _(Pendiente de TASK-2003.)_
+- [ ] `pnpm check` y `pnpm build` de Studio verdes. _(2026-10-04: typecheck, lint y 22 tests de `@studio/web` verdes; el `pnpm check` completo falla por el trabajo en curso de Codex en `packages/domain` (delta de email), ajeno a esta task. Se corre de nuevo cuando ese trabajo esté commiteado.)_
 
 ## Verification
 

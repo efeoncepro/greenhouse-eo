@@ -1,0 +1,103 @@
+{
+  "task": "TASK-2002",
+  "surface": "studio.calendar (mes, semana, día, línea de tiempo, pauta, hoja de activación, bandeja de ejecución sin activación) y pestaña Calendario de la campaña",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-10-04",
+  "reviewer": "claude-opus-5-5 (Playwright con Chrome contra localhost:3102: Studio local con Postgres 18 descartable, datos copiados de staging + activaciones de ejemplo locales; 1440×1100 y 390×844, claro y oscuro, reduced motion; mirada cada captura)",
+  "evidence": {
+    "month": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-month.webp",
+    "month-dark": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-month-dark.webp",
+    "week": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-week.webp",
+    "day": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-day.webp",
+    "timeline": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-timeline.webp",
+    "timeline-dark": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-timeline-dark.webp",
+    "paid": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-paid.webp",
+    "sheet-offplan": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-offplan.webp",
+    "sheet-published": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-published.webp",
+    "sheet-paid-dark": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-paid-dark.webp",
+    "sheet-email": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-email.webp",
+    "sheet-blog": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-blog.webp",
+    "filters-empty": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-filters-empty.webp",
+    "campaign-tab": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-campaign-tab.webp",
+    "mobile-week": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-week.webp",
+    "mobile-month-dark": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-month-dark.webp",
+    "mobile-sheet": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-sheet.webp",
+    "mobile-paid": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-paid.webp",
+    "approvedBaseline": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/approved-v3-month.webp",
+    "before": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/before-global-desktop.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.5,
+      "rationale": "El mes es el momento dominante: título del período, vista y filtros arriba, grilla con tarjetas y franja de pauta; la bandeja «Ejecución sin activación» queda como lateral secundario.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-month.webp"
+    },
+    "proportions": {
+      "score": 4.4,
+      "rationale": "Celdas de 150 px con dos tarjetas y «+N»; la hoja de 560 px con escenario de 320 px conserva la proporción de cada pieza sin recortar.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-published.webp"
+    },
+    "rhythm": {
+      "score": 4.3,
+      "rationale": "Secciones de la hoja separadas por línea y el mismo espaciado; semana en franjas mañana · tarde · noche.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-week.webp"
+    },
+    "density": {
+      "score": 4.3,
+      "rationale": "Dos tarjetas por día y «+N más» hacia la vista Día; la pauta se resume en una franja por campaña y el detalle vive en la vista Pauta.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-month.webp"
+    },
+    "depth": {
+      "score": 4.3,
+      "rationale": "Superficies vigentes de Studio (card, elev, sombra de la hoja); sin card-on-card.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-paid-dark.webp"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "Una sola superficie superpuesta (hoja lateral, pantalla completa en móvil); la bandeja y la frescura son paneles del lateral existente.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-offplan.webp"
+    },
+    "visualImpact": {
+      "score": 4.4,
+      "rationale": "Miniaturas reales de las piezas con su isotipo AXIS y el estado con texto: plan y ejecución se leen juntos sin abrir Metricool.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-month-dark.webp"
+    },
+    "typography": {
+      "score": 4.3,
+      "rationale": "Poppins en títulos y Geist en texto; estados en 10,5–12,5 px con peso 600, sin tamaños nuevos fuera de la escala.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-day.webp"
+    },
+    "color": {
+      "score": 4.4,
+      "rationale": "Sólo tokens AXIS; cada estado lleva glifo y texto, nunca sólo color; negativos sellados de AXIS en oscuro.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-timeline-dark.webp"
+    },
+    "iconography": {
+      "score": 4.4,
+      "rationale": "Isotipos de AXIS 0.4.20 (plataformas, negativos y herramientas); X y WordPress con inicial porque AXIS no los tiene.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-timeline.webp"
+    },
+    "responsive": {
+      "score": 4.4,
+      "rationale": "390 px: semana como lista por día, pauta en tarjetas con mini línea de tiempo, hoja a pantalla completa; scrollWidth = clientWidth en las 18 capturas.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-week.webp"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Sólo la entrada de la hoja con el token vigente, anulada con reduced motion.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-mobile-sheet.webp"
+    },
+    "fidelity": {
+      "score": 4.1,
+      "rationale": "Fiel a v3/v3.1/v3.2 en mes, semana, día, línea de tiempo, pauta, hoja, bandeja y móvil. Pendiente: formularios y diálogos de escritura (bloqueados con razón en modo abierto), popover de «+N» (lleva a la vista Día), hoja de filtros móvil (fila deslizable) y las secciones SEO/AEO del blog (sin contrato).",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-sheet-blog.webp"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Calendario propio del dominio: estados de ejecución del reader, pauta en tres capas (plan, herramienta, entrega) y evidencia por herramienta; no es un calendario genérico.",
+      "evidence": "docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/after-paid.webp"
+    }
+  },
+  "average": 4.38,
+  "notes": "Studio local, sin push ni rollout (commits 985354b, 036dbd6, 0856ee0, e90fb6e). Aserciones: chip = estado del reader en las 18 activaciones; ninguna «Publicada» sin publishedAt; teclado en la grilla (flechas, Inicio/Fin, T, Entrar → vista Día) con un solo tabindex 0; foco al título de la hoja y Esc cierra. Escrituras: botones visibles con aria-disabled y la razón (modo abierto) hasta TASK-1898; la sesión MCP real con identidad delegada depende de TASK-2003."
+}
