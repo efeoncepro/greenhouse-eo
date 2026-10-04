@@ -1056,9 +1056,13 @@ edición ya salió de `ready_for_review` o si el plan mismo debe cambiar. La car
 frena el índice (`23505` de ESE índice) y el comando la traduce a `200 idempotent:true` o `422 render_rejected`, nunca a
 500. El encargo parcial (un target vivo + uno muerto) sigue rechazándose, ahora con `details.requestable`.
 
-**Estado:** código y migración escritos y probados (unitarios + `render-identity.live.test.ts` contra PostgreSQL real,
-aplicando el Up dentro de una transacción revertida con el perfil `ops`). La migración **no está aplicada** en la
-instancia compartida ni liberada; hasta entonces, el camino para un `dead_letter` sigue siendo `revise`.
+**Estado:** código y migración probados (unitarios + `render-identity.live.test.ts` contra PostgreSQL real, con el
+perfil `ops`). **Migración aplicada en la instancia compartida el 2026-10-04 18:29Z** por el operador
+(`pnpm pg:connect:migrate`): queda sólo `insight_outputs_live_identity_uq` (parcial) y el live test pasa también con el
+estado aplicado. El código del comando que ya corre en producción (`7182af769`) tenía esa intención, así que re-encargar un
+target terminal ya no choca desde la aplicación. Lo nuevo de este cambio todavía no está liberado: `supersedes`, la
+carrera tratada como 422 en vez de 500 y `requestable`. Canary pendiente: re-encargar `report_pdf` de la edición de
+Berel `insed-658861b2…` (sigue en `ready_for_review`, con su `report_pdf` en `dead_letter`).
 
 #### Delta 2026-09-16 — runtime real, benchmark en Cloud Run y auditoría del actor
 

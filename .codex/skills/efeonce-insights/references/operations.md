@@ -218,8 +218,9 @@ flag, 202 after.
   deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.
 - Semantics seen live: `retry` re-queues only failed (completed untouched; content failures fail again, attempts →3 →
   `dead_letter`); `cancel` on a queued run ⇒ `cancelled`, 0 attempts; `retry` on cancelled ⇒ 200, no re-queue.
-- **Recovering a `dead_letter` / `cancelled` output (from 2026-10-04, once migration
-  `20261004152040741_insights-outputs-live-identity-partial-unique` is applied and the command is released):** ship the
+- **Recovering a `dead_letter` / `cancelled` output (migration
+  `20261004152040741_insights-outputs-live-identity-partial-unique` APPLIED 2026-10-04 18:29Z; the already-deployed
+  command `7182af769` intended this, so it works now; `supersedes`/race-as-422/`requestable` arrive with the release):** ship the
   fix first, then, with the edition still `ready_for_review`, `POST …/editions/<id>/render '{"outputs":["<target>"]}'`
   with ONLY the dead targets (asking also for a target that is alive ⇒ `422` with `details.requestable`). Expect `202`, a
   new run, the new output `queued` and its queued event with `detail.supersedes`. Do not `retry` (sealed manifest fails
