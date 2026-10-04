@@ -710,3 +710,11 @@ Orden de rollout, sólo con autorización: cinco migraciones aditivas (`17911491
 Los jobs registran worker_run y cada cuenta su frescura. El health profundo añade activations_overdue y frescura de
 descubrimiento/owned. Incluir permisos, canary tenant deny y fallos de proveedor antes de encender. Rollback: flags OFF;
 migrate down sólo sin datos protegidos. Las bases de prueba fueron Postgres local descartable, nunca staging/prod.
+
+### Nuevo alcance email — implementación pendiente (2026-10-04)
+
+El operador requiere Resend (mayor volumen), HubSpot, Marketing Cloud Engagement y Marketing Cloud Next. La
+implementación 4094da0 y su QA no cubren la ampliación: el lector actual está acoplado a HubSpot. Debe generalizarse
+por provider/cuenta/envío, añadir catálogo versionado y adapters independientes, empezando por la evidencia Resend
+ya gobernada en Greenhouse. No existe todavía soporte runtime de los nuevos proveedores. Ver delta email y plan
+TASK-2001; flags OFF, sin push ni envíos. CLI/API/MCP deben conservar las mismas operaciones de activación.

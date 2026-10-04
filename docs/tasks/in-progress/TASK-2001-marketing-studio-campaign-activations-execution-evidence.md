@@ -1,5 +1,40 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-04 (email) — Resend principal y varios proveedores
+
+Decisión posterior del operador: el mayor volumen de emails irá por **Resend**. La plataforma debe soportar también
+**HubSpot**, **Salesforce Marketing Cloud Engagement** y **Salesforce Marketing Cloud Next**. Este delta sustituye
+el supuesto de email exclusivamente HubSpot; Engagement y Next son integraciones distintas.
+
+- **Contrato común, adapters separados.** La activación conserva canal/familia email, cuenta, proveedor, campaña,
+  versión de pieza y plan. La evidencia mantiene identidad de proveedor/cuenta/envío, programación y envío observado,
+  procedencia y frescura. Resend es la primera prioridad de implementación por volumen, no un fallback automático
+  ni una cuenta por defecto para otros clientes.
+- **Tenancy explícita.** La organización autorizada se vincula con la cuenta de Resend, portal de HubSpot, tenant y
+  MID/Business Unit de Engagement u org/entorno de Next. Credenciales y binding vienen de configuración gobernada;
+  registrar la cuenta en Studio no concede acceso. Los detalles y permisos de cada adapter se verifican contra su
+  proveedor, sin tratar Next como alias de Engagement ni inventar un endpoint común de Salesforce.
+- **Evidencia y escala.** Aceptado, en cola, programado, enviado y entregado son hechos distintos. Sin evidencia real
+  de envío no se marca published. Los envíos parciales/de larga duración deben conservar su completitud; observar un
+  destinatario no permite afirmar que toda la campaña fue enviada. Un envío de campaña es la unidad del calendario,
+  no una activación por destinatario. Readers paginados/incrementales, deduplicación y reconciliación; los datos de
+  destinatarios permanecen en el sistema de correo. No se ingieren correos transaccionales ajenos por compartir Resend.
+- **Reuso Resend.** Revisar `src/lib/email/delivery.ts`, `resend-webhook.ts`, `resend-reconciliation.ts` y
+  `/api/webhooks/resend`: existen dispatch/batch, inbox de eventos y reconciliación. Falta demostrar/proveer el vínculo
+  explícito organización/campaña/activación y una proyección autorizada de envíos de marketing; `priority=broadcast`
+  no demuestra por sí sola que el mensaje pertenezca a una campaña Studio.
+- **Catálogo y superficies.** Añadir providers/canales/specs versionados para Resend, Engagement y Next preservando
+  `owned_email_hubspot` y snapshots existentes. API, MCP, CLI y UI consumen las mismas operaciones de activación;
+  no se duplican commands por proveedor. No cambiar a mano el catálogo v1 publicado ni migrar tracking histórica.
+- **Alcance.** Este corte trata planificación/evidencia; no autoriza envíos externos ni implementa audiencias, journeys
+  o campañas en el proveedor. Entregados/aperturas/clics conservan TASK-1892/1910. Adaptadores desconectados aparecen
+  explícitamente como no conectados/sin evidencia, nunca como integración operativa.
+
+Estado al registrar este delta: **requisito aceptado, implementación pendiente**. El commit Studio `4094da0` sólo
+contiene el consumidor de evidencia HubSpot; no acredita soporte Resend/Engagement/Next. La verificación 276+7 y CLI
+anterior conserva validez para aquel corte, no cubre esta ampliación. Cada nuevo slice debe pasar Studio + Postgres
+real antes del siguiente, con flags OFF y sin push.
+
 ## Delta 2026-10-04 (blog) — CMS del cliente, borrador en Notion y medición SEO/AEO
 
 Decisiones del operador sobre las hojas de blog de TASK-2002 (canvas, página «v3.2 · Planificar y operar», tableros «Blog ·
@@ -128,7 +163,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Implementación local verificada hasta Studio 4094da0 — slices 1–5 y delta blog, API/CLI/contratos MCP; 276 tests + 7 gates y build PASS. Flags OFF; pendientes puerto HubSpot owner, migraciones/bindings/backfill reales y canary delegado TASK-2003. Sin push ni rollout`
+- Status real: `Delta email multiproveedor aceptado; implementación pendiente (Resend primero, HubSpot, Engagement y Next). Corte previo local verificado hasta Studio 4094da0 — slices 1–5 y delta blog, API/CLI/contratos MCP; 276 tests + 7 gates y build PASS. Flags OFF; pendientes puerto HubSpot owner, migraciones/bindings/backfill reales y canary delegado TASK-2003. Sin push ni rollout`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -484,6 +519,8 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Delta email: cuentas/catálogo/readers soportan Resend, HubSpot, Marketing Cloud Engagement y Next con adapters separados, aislamiento, evidencia de envío y completitud; API/MCP/CLI comunes. Pendiente, no cubierto por los checks del corte 4094da0.
 
 - [x] Una activación no se puede crear sin campaña ni con un `channel_key` fuera del catálogo; las campañas Always On existen.
 - [x] El estado de ejecución se calcula para los ocho casos del delta (incluye delivering/ended), con tests y nunca se persiste.

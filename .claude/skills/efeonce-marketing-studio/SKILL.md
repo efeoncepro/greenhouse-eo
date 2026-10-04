@@ -387,3 +387,10 @@ backfill are implemented locally with flags OFF. Every operation has a tool; cur
 operations. Use Greenhouse `pnpm studio` against the chosen origin to discover schemas; input defaults are optional.
 Person-only T1 operations (publication confirmation, old campaign slug, legacy backfill) reject service bearers and await
 TASK-2003 for human HTTP/MCP authority. Production/MCP availability is separate; see program-ledger and runtime handoff.
+
+### Email multiproveedor — decisión del operador 2026-10-04
+
+Resend tendrá el mayor volumen; también deben soportarse HubSpot, Salesforce Marketing Cloud Engagement y Next.
+Adapters separados con cuenta/tenant y evidencia de envío/completitud, catálogo aditivo y mismas operaciones API/MCP/CLI.
+Reusar delivery/inbox/reconciliación de Greenhouse para Resend sólo con vínculo explícito a campaña; broadcast no basta.
+El corte 4094da0 no implementa la ampliación; no presentar enums/fixtures como conexiones operativas. Delta email de TASK-2001 gobierna la continuación.

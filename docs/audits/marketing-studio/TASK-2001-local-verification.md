@@ -6,6 +6,12 @@ BLOCK para cierre operativo; implementación local verificada.
 
 Closure state: code complete, rollout pendiente (Studio). El puerto owned HubSpot de Greenhouse y el carril delegado de TASK-2003 siguen pendientes: no se declara completa la integración ni se mueve TASK-2001 a complete.
 
+## Ampliación posterior del alcance
+
+El operador añadió Resend (volumen principal), Salesforce Marketing Cloud Engagement y Next además de HubSpot.
+Este dossier certifica sólo el corte 4094da0; la ampliación email está pendiente y requiere nueva evidencia. Ver
+[delta email de TASK-2001](../../tasks/in-progress/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md#delta-2026-10-04-email--resend-principal-y-varios-proveedores).
+
 ## Scope
 
 - Studio: migraciones aditivas, contratos/registro/manifiesto, commands/readers, tracking, evidencia, adapters y jobs, compatibilidad/import, API. UI aprobada de TASK-2002 usada como contrato; no se implementó ni cambió.

@@ -956,3 +956,13 @@ Implementa la decisión de activaciones de Strategy Layer §15 y los Delta de TA
 
 El dossier/gate/medición SEO-AEO del blog es follow-up backend-data sin ID. SV360 estimado con fuente/fecha, panel IA
 por clúster versionado y autorización con avisos abiertos quedan en ese follow-up; no se implementan ni bloquean 2001.
+
+### Ampliación email del operador — 2026-10-04
+
+Resend (prioridad por volumen), HubSpot, Salesforce Marketing Cloud Engagement y Next requieren adapters distintos
+sobre una proyección común de evidencia de envíos de campaña. Canal/familia, proveedor, cuenta y envío no se
+confunden. Completitud y fecha enviada se observan; la aceptación del proveedor o un destinatario no acreditan
+una campaña completa. El corte 4094da0 tiene consumidor HubSpot, no estos cuatro adapters operativos.
+
+[Decisión y fronteras](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#delta-de-decisión-2026-10-04--email-con-varios-proveedores)
+y [alcance/aceptación](../../tasks/in-progress/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md#delta-2026-10-04-email--resend-principal-y-varios-proveedores).

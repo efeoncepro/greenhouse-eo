@@ -605,3 +605,17 @@ ocurre con publicación/entrega, no con mera programación. La implementación l
 [arquitectura](EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-04--task-2001-implementada-localmente).
 El follow-up SEO/AEO conserva SV360 estimado, panel IA por clúster y gate informativo con autorización personal que
 registra avisos. No altera la prohibición de publicar desde Studio en TASK-2001.
+
+### Delta de decisión 2026-10-04 — email con varios proveedores
+
+El operador amplía §15: Resend será la ruta de mayor volumen; Studio debe soportar también HubSpot, Salesforce
+Marketing Cloud Engagement y Marketing Cloud Next mediante adapters separados. Email es la familia, proveedor
+es una dimensión de cuenta/evidencia; no se infiere la cuenta por cliente ni se hace failover automático.
+
+Una activación representa un envío de campaña con evidencia y completitud explícitas; un destinatario enviado no
+acredita todo el lote. Preservar programado/aceptado/enviado/entregado como hechos distintos, paginación y
+reconciliación. Greenhouse mantiene credenciales y hechos de correo; Studio consume una proyección autorizada sin
+replicar destinatarios. Resend reusa el pipeline/inbox existente cuando haya relación explícita a campaña.
+
+Catálogo aditivo versionado; conservar owned_email_hubspot y tracking histórica. API/MCP/CLI comunes sin commands
+por vendor. La implementación de esta ampliación está pendiente; estado y AC en el delta email de TASK-2001.

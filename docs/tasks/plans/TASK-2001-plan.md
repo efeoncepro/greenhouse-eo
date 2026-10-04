@@ -39,3 +39,14 @@ Slices 1–4 PASS en Studio: 39a74c0, 78205fb, af608a8, 9bc974e. Último check: 
 Delta blog recibido durante ejecución: CMS y dominio pertenecen a la cuenta owned del cliente; draft_url sólo se guarda/devuelve. Implementado slice de URL pública y confirmación personal de fecha, con herramienta MCP y evento confirmed_by. WordPress se generaliza a sitios del cliente autorizados. Dossier/gate/medición SEO-AEO fuera de alcance, follow-up sin ID. Se conserva íntegro el bloque del operador y sus referencias aprobadas de TASK-2002 (60ef4e26c).
 
 Corte local final: tracking `946fda4`, backfill/CLI `4094da0`; 276 tests + 7 gates, build y 31 checks CLI con PG real PASS. Cinco migraciones up/down/up. [QA](../../audits/marketing-studio/TASK-2001-local-verification.md). No se declara runtime completo: endpoint owned HubSpot del owner y carril delegado TASK-2003 pendientes, además del rollout autorizado.
+
+## Ampliación del operador — email con varios proveedores
+
+Resend será el mayor volumen; prioridad de integración. No basta el reader HubSpot anterior.
+
+1. Contrato de cuenta/proveedor y envío agregado con completitud, catálogo aditivo versionado y migración reversible. Mantener las operaciones API/MCP/CLI comunes y las identidades/UTM históricas.
+2. Proyección de evidencia Resend sobre delivery/inbox/reconciliación de Greenhouse, vínculo explícito a campaña y reader paginado; pruebas de reintentos, eventos fuera de orden, envío parcial, tenancy y datos ajenos excluidos.
+3. HubSpot y adapters separados para Engagement (tenant/BU) y Next (org/entorno), con pruebas de contrato y evidencia por proveedor; permisos/provisioning/canary separados del código local.
+4. Cada slice: Studio check + Postgres real y prueba CLI, commits propios, flags OFF, sin push. No afirmar soporte operativo por añadir un enum o fixture.
+
+El delta email de la task es el dueño del nuevo alcance. Los resultados del corte previo no certifican estos adapters.
