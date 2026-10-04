@@ -15,6 +15,11 @@
 - Decisiones que cambian la semilla de §4.2: AEO dentro de Search (placement «respuestas IA»); **ChatGPT Ads = paid
   search**; perfil personal de LinkedIn = cuenta de LinkedIn orgánico (no un canal aparte); Display no es variante de
   social (Audience Network es un placement de Meta); **UGC es content source de la pieza**, no canal.
+- **Programmatic es buying method, no familia ni plataforma:** atributo de la activación pagada `platform` (Meta Ads,
+  Google Ads, LinkedIn Ads, ChatGPT Ads…) · `programmatic` (DSP: DV360, The Trade Desk, Amazon DSP) · `direct` (orden de
+  inserción al publisher); el **deal type** (`open_auction` · `pmp` · `programmatic_guaranteed`) es dato del anuncio. Esta
+  task agrega ambos a `ad_configuration` y `budget_line`; el `channel_key` no los codifica. Familias semilla suman Audio y
+  OOH/DOOH con DSP como plataforma de compra.
 - Nombres en el spanglish del equipo (Paid, Organic, Owned, Earned, Social, Search, Display, Feed, Reels, SERP…).
 - La entidad *activación* (campaña obligatoria, campañas **Always On**, punto vs franja en el calendario,
   descubrimiento de lo agendado en Metricool y vínculo con la versión de la pieza) no es de esta task: nace en una task

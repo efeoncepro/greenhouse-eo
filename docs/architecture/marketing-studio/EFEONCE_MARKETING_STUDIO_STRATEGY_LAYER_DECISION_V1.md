@@ -459,12 +459,25 @@ campaña **Always On** (p. ej. «Marca Efeonce · Always On · Q4 2026»), con l
 | **Plataforma** | ¿Dónde aparece? | Google · Bing · Instagram · Facebook · Threads · LinkedIn · TikTok · YouTube · X · Reddit · WhatsApp · ChatGPT · Gemini · Perplexity · Spotify · sitio web · HubSpot (email)… |
 | **Placement** | ¿En qué lugar exacto? | Feed · Stories · Reels · SERP · AI Overviews / AI Mode · respuestas IA · Shopping · Discover · Performance Max · Audience Network · inbox… |
 
-Más dos atributos de la activación que **no** son canal: **cuenta / voz** (página de Efeonce, perfil personal de Julio,
-cuenta publicitaria de Meta, handle del creator) y **mercado** (país e idioma; §4.2 ya prohíbe codificarlo en el canal).
+Más tres atributos de la activación que **no** son canal: **cuenta / voz** (página de Efeonce, perfil personal de
+Julio, cuenta publicitaria de Meta, handle del creator), **mercado** (país e idioma; §4.2 ya prohíbe codificarlo en el
+canal) y, en las activaciones `paid`, **buying method**:
+
+| Buying method | Qué es | Ejemplos |
+|---|---|---|
+| `platform` | Compra self-serve en la plataforma dueña del inventario | Meta Ads, Google Ads, Microsoft Ads, LinkedIn Ads, TikTok Ads, ChatGPT Ads |
+| `programmatic` | Compra por un DSP sobre inventario de terceros | DV360, The Trade Desk, Amazon DSP, Microsoft Curate |
+| `direct` | Compra directa al publisher con orden de inserción | un medio, un podcast, una pantalla DOOH |
+
+**Programmatic no es familia ni plataforma: es buying method.** Cruza familias (Display, Video incl. CTV/OTT, Audio,
+OOH/DOOH, native): la familia es el formato comprado, la plataforma de compra es el DSP y la plataforma de aparición es
+el inventario del publisher (sitios de medios, apps de CTV, Spotify, pantallas DOOH). El **deal type** (`open_auction` ·
+`pmp` · `programmatic_guaranteed`) es dato del anuncio, no del canal. Así un banner comprado en DV360 y uno en la Google
+Display Network son la misma familia con distinta plataforma de compra, y se comparan por familia.
 
 **Plataforma de compra ≠ plataforma de aparición.** En paid, la compra se hace en una plataforma (Meta Ads, Google Ads,
-Microsoft Ads, LinkedIn Ads, TikTok Ads, ChatGPT Ads) y aparece en una o varias: una campaña de Meta Ads sale en
-Instagram, Facebook y Threads. El catálogo modela ambas.
+Microsoft Ads, LinkedIn Ads, TikTok Ads, ChatGPT Ads, o un DSP como DV360) y aparece en una o varias: una campaña de
+Meta Ads sale en Instagram, Facebook y Threads; una de DV360, en sitios, apps de CTV o Spotify. El catálogo modela ambas.
 
 **Combinaciones de referencia:**
 
@@ -472,8 +485,10 @@ Instagram, Facebook y Threads. El catálogo modela ambas.
 |---|---|---|---|
 | paid | Social | Meta Ads (Instagram, Facebook, Threads), LinkedIn Ads, TikTok Ads, Reddit Ads | Audience Network es un *placement* de Meta, no Display |
 | paid | Search | Google Ads, Microsoft Ads (Bing), **ChatGPT Ads** | Los anuncios en respuestas de IA son paid search (decisión del operador); disponibilidad por mercado y formato se verifican con fuente y fecha al sembrar |
-| paid | Display | Google Display Network, programática | Display **no** es una variante de social |
-| paid | Video | YouTube (Google Ads), CTV/OTT | — |
+| paid | Display | Google Display Network (`platform`); sitios de medios vía DV360 o The Trade Desk (`programmatic`); un medio por orden de inserción (`direct`) | Display **no** es una variante de social |
+| paid | Video | YouTube (Google Ads, `platform`); CTV/OTT vía DSP (`programmatic`) | — |
+| paid | Audio | Spotify Ads (`platform`); audio y podcasts vía DSP (`programmatic`) o directo (`direct`) | — |
+| paid | OOH/DOOH | Pantallas DOOH vía DSP (`programmatic`) o al operador (`direct`) | — |
 | paid | Creators & Influencers | Partnership Ads / Spark Ads / whitelisting | Anuncio pagado con la identidad del creator: cuenta = handle del creator |
 | organic | Social | Instagram, Facebook, Threads, LinkedIn, TikTok, YouTube, X | Lo que hoy se agenda en Metricool; el perfil personal de LinkedIn es una **cuenta** de LinkedIn orgánico, no otro canal |
 | organic | Search | Google y Bing (SEO); ChatGPT, Gemini, Perplexity, AI Overviews (AEO) | AEO vive dentro de Search, placement «respuestas IA» |
@@ -502,6 +517,7 @@ flight). El calendario se filtra por las cuatro dimensiones. Una publicación ag
 (Metricool) que no tenga campaña se muestra en «Hoy» como **pendiente de asignar**, nunca invisible.
 
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
-plataforma de compra o aparición, sin mercado; placements y formatos como datos del canal) y registra `content source`
-en la pieza. La entidad *activación*, el descubrimiento de lo agendado en Metricool y el vínculo activación ↔ versión
+plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra
+`content source` en la pieza y agrega `buying method` y `deal type` al anuncio (`ad_configuration`) y a la línea de
+presupuesto (`budget_line`). La entidad *activación*, el descubrimiento de lo agendado en Metricool y el vínculo activación ↔ versión
 de pieza quedan para una task nueva de EPIC-049 (por crear). Nada de esto está en runtime todavía.
