@@ -55,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Code complete en develop (2026-10-04, commit 6656fe1d0): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. Falta el release a producción`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. El plan del canary interno de Berel trae los dos tableros; falta cerrar el canary con el A4 (PR #253)`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`

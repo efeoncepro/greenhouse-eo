@@ -31,7 +31,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Code complete en develop (2026-10-04, commit 6656fe1d0); Think en producción (fd83a3b). Falta el release de Greenhouse y la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04); Think en producción (fd83a3b). Canary interno de Berel: deck completo; el A4 se rechazó por la metodología (9 líneas para 8) y el arreglo va en PR #253. Falta la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)
