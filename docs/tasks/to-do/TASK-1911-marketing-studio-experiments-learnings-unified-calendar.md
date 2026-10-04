@@ -1,5 +1,14 @@
 # TASK-1911 — Marketing Studio: experimentos, biblioteca de aprendizajes y calendario unificado
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -28,7 +37,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de capa de estrategia (§4.7); prioridad P2 inferida (cierra el ciclo pero no bloquea planificar ni medir)`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1907 (hipótesis del plan y plan de contenidos) · TASK-1910 (observaciones y progreso de KPIs como evidencia) · TASK-1899 (T2 por MCP)`
+- Blocked by: `TASK-1907 (hipótesis del plan y plan de contenidos) · TASK-1910 (observaciones y progreso de KPIs como evidencia)`
 - Branch: `efeonce-marketing-studio main (experimentos, aprendizajes, calendario) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (sync y versión); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

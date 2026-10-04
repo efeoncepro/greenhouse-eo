@@ -1,5 +1,14 @@
 # TASK-1913 — Marketing Studio: work items y asignaciones (personas y roles de agente)
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -30,7 +39,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de operación híbrida con agentes (§4.1, §4.4, §4.5); ningún slice empezado`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1894 (kernel de commands, Idempotency-Key, If-Match, requiresPerson, dryRun → digest) · TASK-1899 (escritura MCP con la persona como actor, un cliente de canje por capability). La asignación a un rol de agente (Slice 4) además necesita TASK-1914 (registro de roles y techos); el entregable con procedencia, TASK-1909`
+- Blocked by: `TASK-1894 (kernel de commands, Idempotency-Key, If-Match, requiresPerson, dryRun → digest). La asignación a un rol de agente (Slice 4) además necesita TASK-1914 (registro de roles y techos); el entregable con procedencia, TASK-1909`
 - Branch: `efeonce-marketing-studio main (entidades, commands, rutas, registro) · Greenhouse develop (capability, manual servido, docs) · efeonce-mcp rama + PR (sync y versión); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -1,5 +1,14 @@
 # TASK-1907 — Marketing Studio: plan de campaña (estrategia, audiencias, casa de mensajes, contenidos, medición y programa)
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -52,7 +61,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de capa de estrategia (§4.4); ningún slice empezado`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1894 (kernel, brief como entidad, capabilities .campaign.write) · TASK-1899 (escritura MCP, marketing_studio.campaign.approve, proposalDigest) · TASK-1905 (channel_key, riskTier, audiencias con referencia ICP) · TASK-1906 (modelo de cliente publicado, para aprobar planes)`
+- Blocked by: `TASK-1894 (kernel, brief como entidad, capabilities .campaign.write) · TASK-1905 (channel_key, riskTier, audiencias con referencia ICP) · TASK-1906 (modelo de cliente publicado, para aprobar planes)`
 - Branch: `efeonce-marketing-studio main (código, migraciones, registro, manifiesto) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (sync del manifiesto, versión); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

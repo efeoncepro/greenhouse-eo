@@ -1,5 +1,14 @@
 # TASK-1909 — Marketing Studio: IA por agentes con procedencia (borradores, validadores, contexto e informe semanal)
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -32,7 +41,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de capa de estrategia (§4.6); ningún slice empezado`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1905 (límites de canal, riskTier, capability de catálogos) · TASK-1907 (commands del plan a los que se engancha la procedencia) · TASK-1899 (escritura MCP y persona como actor). El contexto incluye SEO/AEO cuando exista TASK-1908 y aprendizajes cuando exista TASK-1911; sin ellas esas secciones responden not_available`
+- Blocked by: `TASK-1905 (límites de canal, riskTier, capability de catálogos) · TASK-1907 (commands del plan a los que se engancha la procedencia). El contexto incluye SEO/AEO cuando exista TASK-1908 y aprendizajes cuando exista TASK-1911; sin ellas esas secciones responden not_available`
 - Branch: `efeonce-marketing-studio main (procedencia, validadores, contexto, entidades de borrador) · Greenhouse develop (manual servido, docs, skills) · efeonce-mcp rama + PR (sync y versión); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

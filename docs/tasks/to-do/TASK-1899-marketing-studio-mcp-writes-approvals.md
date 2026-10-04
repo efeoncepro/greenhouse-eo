@@ -1,5 +1,22 @@
 # TASK-1899 — Marketing Studio: escrituras y aprobaciones por MCP
 
+## Decisión vigente 2026-10-04 — retirada por el operador
+
+TASK-1899 queda **retirada de la ejecución y postergada sin reanudación automática**: el operador prioriza la
+libertad de implementación durante la construcción de Marketing Studio. Esta decisión reemplaza el orden y la
+obligatoriedad de TASK-1899 descritos más abajo, que se conservan como diseño histórico, no como instrucciones activas.
+
+- Revertidos los cambios locales de código, contratos, skills y migraciones de esta implementación en Greenhouse
+  y Studio; gateway sin cambios. Sin commit, push, deploy ni aplicación de estas migraciones a staging/producción.
+- La base PostgreSQL temporal usada en pruebas era local y quedó detenida. Trabajo ajeno preservado.
+- TASK-1899 deja de ser requisito para desarrollar API, CLI y UI de Studio. Las entregas MCP de escritura y sus
+  pruebas quedan fuera del alcance actual; no se presentan como disponibles ni se habilitan por esta retirada.
+- Se conservan API-first y los controles de acceso existentes. Cualquier futuro carril MCP de escritura requiere
+  una nueva decisión de alcance; no ejecutar este diseño automáticamente.
+- Se conserva `Lifecycle: to-do` porque el proceso vigente sólo admite `to-do`, `in-progress` y `complete`;
+  `Status real` y `Blocked by` registran que no es ejecutable. No se declara completada.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -142,10 +159,10 @@ Decisiones de Julio Reyes (operador) del 2026-09-26 que tocan la mecánica de es
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Diseno. Contrato cerrado por el ADR de fuente única (2026-09-26) y la regla de paridad del operador (2026-09-25): todo lo de la UI se puede por API y por MCP, incluidas las aprobaciones, que decide siempre una persona.`
+- Status real: `Retirada por el operador el 2026-10-04; implementación local revertida, sin rollout. Postergada sin reanudación automática; no es requisito para desarrollar Marketing Studio.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1894 (commands de escritura y aprobación con dryRun, requestAssetVersionUpload + createAssetVersion, tools de clase write/approve en el manifiesto con método, cabeceras y requiresPerson, scopes de API studio:assets:write y studio:write, puerto de autoridad de Studio que niega por defecto, capabilities marketing_studio.asset.write y marketing_studio.campaign.write sembradas con grant). Las dependencias de federación de lecturas y de almacén de originales ya están cerradas (ver Dependencies & Impact). NO depende de TASK-1898: la identidad llega por el canje de Greenhouse, no por la sesión web de Studio.`
+- Blocked by: `Decisión del operador: retirada; requiere nueva orden y redefinición de alcance antes de cualquier ejecución.`
 - Branch: `Greenhouse develop (canje, clientes OAuth, paridad de scopes, userinfo, manual servido, docs) · efeonce-mcp rama + PR a main (deploy por dispatch manual de deploy.yml, nunca automático al merge) · efeonce-marketing-studio main (actor delegado, digest de confirmación; push a main = deploy de producción); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
