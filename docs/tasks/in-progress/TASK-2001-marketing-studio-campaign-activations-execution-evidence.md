@@ -1,5 +1,11 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Ajuste de alcance 2026-10-04 — conexiones y QA
+
+El operador confirma: conectar sólo Resend y HubSpot; preparar Marketing Cloud Engagement/Next sin conexión ni certificación live (no hay entorno de prueba). Blog: conectar sólo efeoncepro.com con WordPress, conservando CMS por cuenta y el fallback para otros CMS. Incluye QA de integración con UI TASK-2002 y CLI. TASK-2003 no se implementa en este paso. Nuevos cambios local-first, sin nuevo push hasta revisión del corte.
+
+Ownership: Codex toma providers/owned, activations owned-readback, contratos aditivos, migración y puerto email de Greenhouse; Claude conserva apps/web UI de TASK-2002. Operaciones existentes se conservan; provider enums y metadatos de evidencia serán aditivos.
+
 ## Delta 2026-10-04 (email) — Resend principal y varios proveedores
 
 Decisión posterior del operador: el mayor volumen de emails irá por **Resend**. La plataforma debe soportar también
@@ -163,7 +169,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Pendientes delta email Resend/HubSpot/Engagement/Next, owned Greenhouse y MCP delegado TASK-2003; TASK sigue in-progress`
+- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Nuevo corte local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. Faltan release/configuración owned, canary WP y QA UI/CLI del nuevo corte; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -618,3 +624,9 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 2. Auto-link sólo con coincidencia única por campaña UTM + cuenta/plataforma + tolerancia; el backfill y unlink humano excluyen auto-link. Ambigüedad permanece sin vincular.
 3. Tolerancia: 15 min orgánico, 0 días por extremo paid en hora local de la cuenta, versionada con catálogo.
 4. Pendientes: puerto owned HubSpot de Greenhouse, configuración/release autorizado, backfill real revisado y canary MCP delegado con TASK-2003. No bloquean el commit local; sí impiden declarar cierre operativo.
+
+### Owned email — slice de conexión local 2026-10-04
+
+Studio `e62b5e3` + `055860d`: API 1.8.0 aditiva; consumer Greenhouse paginado con aislamiento org/proveedor/cuenta, resumen de completitud, lectura sin destinatarios y fallo cerrado para Marketing Cloud. Suite Studio 286 tests + 7 gates, todas las integraciones PG habilitadas; migración up/down/up. Greenhouse: nueve pruebas focales, lint y typecheck PASS. Puerto usa consumidor/binding sister-platforms y resolvers canónicos; flags OFF.
+
+Canary real de sólo lectura: Resend un broadcast borrador (ningún envío completo disponible para certificar ese caso); HubSpot dos páginas, 16 emails BATCH, dos completos acreditados por SENT y catorce borradores. No se enviaron emails. El canary ejecuta adapters con credenciales reales, no certifica aún el transporte M2M desplegado: requiere release Greenhouse, consumer/binding y configuración worker. No hay nuevo push.

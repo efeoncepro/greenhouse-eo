@@ -619,3 +619,33 @@ replicar destinatarios. Resend reusa el pipeline/inbox existente cuando haya rel
 
 Catálogo aditivo versionado; conservar owned_email_hubspot y tracking histórica. API/MCP/CLI comunes sin commands
 por vendor. La implementación de esta ampliación está pendiente; estado y AC en el delta email de TASK-2001.
+
+
+### Alcance ejecutable 2026-10-04 — owned email y CMS
+
+Decisión del operador: Resend y HubSpot se conectan; Marketing Cloud Engagement/Next se preparan como proveedores
+separados, sin lector ni certificación live por falta de entorno. Sólo se conecta WordPress de efeoncepro.com;
+CMS por cuenta y fallback público conservan el contrato para otros clientes. Flags nuevas OFF de fábrica.
+
+El puerto Greenhouse `GET /api/integrations/v1/sister-platforms/marketing-studio/email-evidence` reutiliza el
+consumidor, binding, revocación, rate limit y auditoría de sister platforms. Exige scope organization y coincidencia
+de organización/proveedor/cuenta con configuración del servidor; un registro de cuenta Studio nunca concede acceso.
+Las dos credenciales canónicas actuales se ligan a una sola cuenta cada una, sin defaults cross-tenant. Más cuentas
+requieren ampliar el resolver gobernado. Este puerto es transporte interno de worker, excluido de MCP por no ser
+una operación de usuario: la capacidad está cubierta por los readers de evidencia registrados en Studio.
+
+Resend lee broadcasts nativos paginados; sólo `status=sent` más `sent_at` prueba envío completo. No importa mensajes
+transaccionales del pipeline Greenhouse ni interpreta `priority=broadcast` como vínculo de campaña. Cuando los
+futuros envíos de marketing usen ese pipeline, deben incorporar el vínculo explícito de campaña/activación antes
+de sumar su proyección; no se duplica el inbox/webhook ni el dispatch existente.
+
+HubSpot lee BATCH_EMAIL no transaccional, verifica portal real, pagina emails y eventos SENT, elimina destinatarios
+y exige conteos terminales y todos los eventos de envío. `publishDate` sirve para fecha planificada sólo con estado
+SCHEDULED; jamás prueba envío. La última fecha SENT acredita la terminación; opens/delivered no sustituyen SENT.
+La paginación se reconstruye sobre hosts fijos; no se siguen URLs del proveedor. Crawls truncados o excedidos
+fallan sin aplicar observaciones y dejan aviso de reader. Presupuesto por página Greenhouse: 45 s; máximo 100 páginas
+de eventos por campaña y 100 páginas de emails por corrida; superar el límite requiere segmentar el adapter,
+no afirmar completitud. No se crean audiencias, envíos ni publicaciones.
+
+Fuentes verificadas 2026-10-04: [Resend broadcasts](https://resend.com/docs/api-reference/broadcasts/list-broadcasts),
+[HubSpot marketing emails](https://developers.hubspot.com/docs/api-reference/legacy/marketing/marketing-emails/get-email).

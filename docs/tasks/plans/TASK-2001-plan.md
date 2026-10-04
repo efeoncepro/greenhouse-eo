@@ -54,3 +54,12 @@ El delta email de la task es el dueño del nuevo alcance. Los resultados del cor
 ## Rollout autorizado ejecutado — 2026-10-04
 
 Studio aa6fa07 desplegado, cinco migraciones staging/prod, seis activaciones CL vinculadas y canary Metricool/CLI/scheduler PASS. [Evidencia](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md). Continúan los slices email y las dependencias owned/TASK-2003.
+
+## Siguiente corte autorizado — Resend/HubSpot/WordPress + QA UI/CLI
+
+1. Contratos aditivos de providers y completitud de envío; migración y PG real, sin cambiar commands de la UI.
+2. Puerto de evidencia Greenhouse: credenciales canónicas, bindings org/cuenta, sólo batch/broadcast marketing; nunca destinatarios ni transaccionales. Conectar readers Resend/HubSpot y probar con cuentas reales, sin enviar. Engagement/Next quedan explícitamente no conectados.
+3. WordPress público efeoncepro.com: canary del reader y configuración lista para activación, CMS por sitio preservado.
+4. Integrar/validar con UI de Claude y CLI; commits propios y revisión antes de un nuevo push.
+
+Primer slice del corte: Studio `e62b5e3`, 285 tests + 7 gates con Postgres aislado, migración up/down/up. Contrato API 1.8.0 aditivo; providers y emailEvidence completitud sin alterar commands de Claude. Sin push.
