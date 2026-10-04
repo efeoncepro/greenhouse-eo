@@ -3234,6 +3234,20 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-1905 — sólo administración y operaciones gobiernan el catálogo compartido.
+  // Operar una cuenta o producir piezas no concede esta autoridad.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'marketing_studio',
+        capability: 'marketing_studio.catalog.manage',
+        action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+  }
+
   if (subject.tenantType === 'client') {
     addEntitlement(entries, {
       module: 'insights',

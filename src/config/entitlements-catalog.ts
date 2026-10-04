@@ -2530,6 +2530,13 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['create', 'update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1905 — gobernar el catálogo global de canales; separado de editar campañas y de aprobar piezas.
+  {
+    key: 'marketing_studio.catalog.manage',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
   { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
   { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' },
