@@ -1,11 +1,5 @@
 # TASK-1905 — Marketing Studio: catálogo de canales gobernado, nivel de riesgo en el registro y referencia al ICP
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
-     ═══════════════════════════════════════════════════════════ -->
-
 ## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
 
 El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es agent-friendly y que todo lo de EPIC-049
@@ -19,6 +13,21 @@ siguen por CLI/UI. La implementa Codex.
 construye en paralelo (API, CLI y UI) con todas sus tools en el manifiesto; sus escrituras se federan por MCP en cuanto
 TASK-2003 esté vivo.
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se trasladan al carril paralelo de TASK-2003; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
 
 - **Regla:** todo lo que esta task implemente nace con command o reader en `packages/domain`, ruta `/api/v1`, entrada en
@@ -26,8 +35,8 @@ TASK-2003 esté vivo.
   federada y operable por Efeonce MCP**, lecturas **y escrituras**, con la identidad delegada de la persona
   (carril de TASK-2003: clase `efeonce.mcp.marketing_studio.write`, canje por capability exacta, persona como actor;
   las aprobaciones `T2` siguen por CLI/UI mientras TASK-1899 esté retirada). La UI es un cliente más de esos commands.
-- **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
-  —leer, planificar y editar (las `T2` por CLI/UI mientras TASK-1899 esté retirada)— y la evidencia queda registrada. Manual servido
+- **Cierre de federación:** una **sesión MCP real** (token Entra humano) debe acreditar cada operación federada nueva
+  —lecturas y T1 cuando el carril de TASK-2003 esté vivo; T2 conserva el carril operador— y registrar evidencia. Esto no convierte TASK-1899/2003 en prerequisito de API/CLI/UI ni permite declarar MCP operativo por cerrar otro slice. Manual servido
   (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
 - **Orden:** no espera a TASK-2003. Toda operación nace con su tool en el manifiesto; las lecturas se federan y prueban al
   cerrar; las escrituras se federan y prueban por MCP cuando TASK-2003 esté vivo (si ya lo está al cerrar, se prueban ahí).
@@ -74,7 +83,7 @@ TASK-2003 esté vivo.
   gobernada por Studio) y el `api_client` de pruebas de escritura de staging (token en Secret Manager
   `marketing-studio-write-tests-token-staging`).
 - **Federación:** el gateway v1.10.0 no federa escrituras (`MARKETING_STUDIO_FEDERATED_TOOLS` = sólo lecturas) hasta
-  TASK-1899; las tools de catálogo de esta task siguen ese mismo carril.
+  el carril que entonces se asignaba a TASK-1899. Referencia histórica: hoy está retirada y TASK-2003 posee T1 delegado.
 
 ## Delta 2026-09-26 — decisiones del operador
 
@@ -98,28 +107,34 @@ TASK-2003 esté vivo.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
-- UI impact: `none`
-- UI ready: `n/a`
-- Wireframe: `none`
+- UI impact: `copy`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1905-channel-attention.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-049`
-- Status real: `Diseno — creada 2026-09-26 desde el ADR de capa de estrategia; ningún slice empezado`
+- Status real: `Studio desplegado 2026-10-04: main 74073de, Vercel Ready, API 1.6.0 / 59 tools, catálogo v1 publicado con 52 canales en staging y producción; migraciones y worker promovidos, canary API verde. Backfill sólo dry-run (134 registros unmapped, owner efeonce_operations). Greenhouse capability sin release; federación T1 espera TASK-2003, ICP real TASK-1906/1892. CLI API-only Greenhouse local: pnpm studio, 18 tests/lint, discovery/lectura/dry-run reales; sin release GH ni carga aplicada productiva. Task sigue in-progress.`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1894 (kernel runCommand, commands de copy/pieza/anuncio/presupuesto/post y brief como entidad, capabilities .asset.write y .campaign.write) · TASK-1899 (clase efeonce.mcp.marketing_studio.write, canje por capability, token delegado, proposalDigest) · Slice 6 también TASK-1906 (catálogo de modelo de cliente en Greenhouse) y el consumer de Studio de TASK-1892 Slice 3`
+- Blocked by: `none`
 - Branch: `efeonce-marketing-studio main (código, migraciones, registro, manifiesto; push a main = deploy de producción) · Greenhouse develop (capability, seed, cliente de canje, docs) · efeonce-mcp rama + PR a main (sync del manifiesto, contratos de canje, versión; deploy por dispatch manual); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
+
+**Discovery y dependencias por slice (2026-10-04):** [plan revisable](../plans/TASK-1905-plan.md).
+La inspección de Studio `c52eb4a` confirma el kernel, `riskTier`, commands y puerto `ChannelValidator` de
+TASK-1894; no es un bloqueo global de construcción. TASK-1906 + TASK-1892 Slice 3 siguen condicionando
+la integración ICP real (Slice 6). TASK-2003 gobierna federación T1, conforme al delta superior. El checkpoint
+P1/Alto del plan fue aprobado explícitamente por el operador; `Blocked by: none` no equivale a cierre.
 
 Reemplaza el `channel` de texto libre de Studio por un **catálogo de canales gobernado y versionado** (`channel_key`,
 tipo, plataforma, placements, formatos, límites de copy duros y recomendados, objetivos válidos, cada especificación
@@ -212,9 +227,7 @@ Reglas obligatorias:
   commands de copy/pieza/anuncio/presupuesto/post, `studio.campaign_brief` con `channels text[]`, capabilities
   `marketing_studio.asset.write` y `marketing_studio.campaign.write`, scopes de bearer `studio:write` y
   `studio:assets:write`.
-- `TASK-1899`: clase `efeonce.mcp.marketing_studio.write`, tabla de contratos de canje (`resolveScopeContract` en
-  Greenhouse y `marketing-studio-exchange-contracts.ts` en el gateway), cabecera `Efeonce-Delegated-Token`,
-  `proposalDigest` para `T2`.
+- `TASK-2003`: integración paralela de identidad delegada y federación T1 por MCP; no bloquea desarrollo API/CLI/UI. TASK-1899 y su proposalDigest están retirados, no son dependencia activa.
 - `TASK-1906`: lane ecosystem del catálogo de modelo de cliente (sólo Slice 6).
 - `TASK-1892` Slice 3: consumer `efeonce-marketing-studio` y binding por organización en Greenhouse (sólo Slice 6).
 
@@ -347,23 +360,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (Studio: N/A declarado; el guard es el test de paridad.)
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo. (Studio: N/A declarado; el guard es el test de paridad.) — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `packages/domain` (catálogo, validación, alias, audiencias, adapter ICP), nunca en la UI ni en handlers.
-- [ ] Modelada como recursos y commands (versión de catálogo, canal, alias, audiencia), no como click-handlers.
-- [ ] Lecturas como readers; escrituras como commands con `riskTier`, capability fina, idempotencia, `If-Match`, `audit_event` y errores canónicos.
-- [ ] Capability `marketing_studio.catalog.manage` + grant + coverage test en el mismo PR de Greenhouse.
-- [ ] Camino programático: `/api/v1` + tool `studio.*` federada con la clase de TASK-1899; la CLI de backfill es exclusión razonada.
-- [ ] `T2` (descartar borrador, quitar audiencia) apto para `dryRun` → digest → confirmación.
+- [x] Lógica en `packages/domain` (catálogo, validación, alias, audiencias, adapter ICP), nunca en la UI ni en handlers. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Modelada como recursos y commands (versión de catálogo, canal, alias, audiencia), no como click-handlers. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Lecturas como readers; escrituras como commands con `riskTier`, capability fina, idempotencia, `If-Match`, `audit_event` y errores canónicos. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Capability `marketing_studio.catalog.manage` + grant + coverage test en el mismo PR de Greenhouse. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Camino API/CLI: `/api/v1` y tool declarada; 15 operaciones verificadas y CLI HTTP cliente local. — [Release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md), [CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). Federación nueva permanece pendiente por separado.
+- [x] `T2` (descartar borrador, quitar audiencia) falla cerrada por API fuera de operador CLI; digest retirado con TASK-1899. `--confirm` del cliente no concede autoridad. — Kernel/tests locales y [CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
 - [ ] Un primitive, muchos consumers: la misma `validateAgainstChannelCatalog` para web, CLI, agentes e importador.
-- [ ] Parity check = SÍ.
+- [x] Parity check = SÍ. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -654,26 +667,73 @@ Nombres finales se confirman con `mcp-craft` en el Slice 5; cualquier cambio se 
 
 ## Acceptance Criteria
 
-- [ ] Toda entrada de `operations.ts` declara `riskTier` y el manifiesto lo exporta por tool.
+Los checks indican su evidencia: implementación/tests locales o release Studio de 2026-10-04. Migraciones y seed en staging/producción sí están verificados; grants Greenhouse efectivos, nueva federación gateway e ICP real siguen pendientes. Un estado local anterior se conserva en el dossier como historia fechada.
+Las referencias a digest/TASK-1899 de la especificación original están retiradas por los deltas del encabezado;
+no se implementaron ni se consideran gate activo. T2 sigue en el carril de operador vigente.
+
+
+- [x] Toda entrada de `operations.ts` declara `riskTier` y el manifiesto lo exporta por tool. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
 - [ ] Cada canal de la semilla tiene `utm_source`, `utm_medium`, modo de etiquetado y (en paid) plataforma de compra; el test `expectedGa4Channel` pasa para todos o el canal declara `ga4_custom_group`; ningún canal cae en Unassigned.
-- [ ] La lectura del catálogo (API y tool MCP) expone los valores de medición por canal y versión.
-- [ ] Cada operación nueva de esta task (lecturas y escrituras del catálogo) se ejecutó en una sesión MCP real con identidad delegada, con evidencia registrada.
-- [ ] El test de paridad falla (visto con un caso inyectado) en cada uno de los cinco casos del Slice 1.
-- [ ] Un `T2` sin digest responde `428 confirmation_required` por API y por MCP.
-- [ ] La versión 1 del catálogo está `published` en staging y production; cada límite, formato y objetivo tiene `source_url` y `verified_on` o vale `NULL`.
-- [ ] Un `UPDATE` sobre una fila de una versión `published` falla por trigger.
-- [ ] Una clave con sufijo de mercado responde `422 channel_key_invalid`.
-- [ ] En `enforce`, un copy con límite duro excedido responde `422 channel_hard_limit_exceeded` y no escribe; en `warn` escribe y registra hallazgo `hard`.
-- [ ] Un límite recomendado excedido escribe, devuelve `warnings[]` y aparece en «atención».
-- [ ] Todo registro nuevo de copy, anuncio, audiencia, presupuesto por canal, post y derechos guarda `channel_key` y `channel_catalog_version`.
-- [ ] Publicar una versión nueva marca `validatedWithPreviousSpec` en los registros previos sin cambiar su versión.
-- [ ] `channel_unmapped = 0` en production al cerrar, o cada alias pendiente tiene dueño declarado en el Handoff.
-- [ ] Una audiencia guarda organización, versión e id de segmento/persona y `bowtie_stage` separado de `funnel_phase`; Studio no guarda nombres de ICP.
+- [ ] La lectura del catálogo (API y tool MCP) expone los valores de medición por canal y versión. — API productiva verificada; MCP pendiente de federación.
+- [ ] Federación: cada operación nueva expuesta por MCP se ejecutó en sesión real con identidad delegada. — Pendiente; T1 por TASK-2003 paralelo, T2 excluida mientras no exista nueva decisión. No bloquea API/CLI/UI por TASK-1899 ni se da por acreditado con el manifiesto servido.
+- [x] El test de paridad falla (visto con un caso inyectado) en cada uno de los cinco casos del Slice 1. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Control vigente T2: fuera de operador CLI falla cerrado; `--confirm` no sustituye autoridad. — Tests locales. **Criterio original retirado:** «sin digest responde428 por API/MCP» pertenecía a TASK-1899; no es gate activo.
+- [x] La versión 1 del catálogo está `published` en staging y production; cada límite, formato y objetivo tiene `source_url` y `verified_on` o vale `NULL`. — [Release 2026-10-04](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md): seed y readback en ambas bases.
+- [x] Un `UPDATE` sobre una fila de una versión `published` falla por trigger. — [Release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md): SQLSTATE23514 verificado con rollback de prueba en staging y producción.
+- [x] Una clave con sufijo de mercado responde `422 channel_key_invalid`. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] En `enforce`, un copy con límite duro excedido responde `422 channel_hard_limit_exceeded` y no escribe; en `warn` escribe y registra hallazgo `hard`. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Un límite recomendado excedido escribe, devuelve `warnings[]` y aparece en «atención». — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] Writers nuevos de copy, anuncio, audiencia, presupuesto, post y derechos persisten claves resueltas y versión según modo; warn conserva raw con key null si es desconocido, off deja metadata sin validar. — Dossier local y canary de copy staging. El criterio no afirma clave no nula en todo modo ni backfill terminado.
+- [x] Publicar una versión nueva marca `validatedWithPreviousSpec` en los registros previos sin cambiar su versión. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] `channel_unmapped = 0` en production al cerrar, o cada alias pendiente tiene dueño declarado en el Handoff. — 134 registros siguen unmapped; cinco aliases, owner efeonce_operations, en Handoff y dossier de release. No se afirma backfill completo.
+- [x] Una audiencia guarda organización, versión e id de segmento/persona y `bowtie_stage` separado de `funnel_phase`; Studio no guarda nombres de ICP. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
 - [ ] `marketing_studio.catalog.manage` existe en catálogo, `capabilities_registry` y grants (sólo `efeonce_admin` y `efeonce_operations`), con coverage test verde.
 - [ ] Sesión MCP real verde: persona con capability ejecuta T0 y T1; persona sin capability recibe `forbidden`; el actor auditado es la persona.
 - [ ] Gateway desplegado con bump minor y `surface-baseline.json` actualizado.
 
+## Hybrid Execution Justification
+
+Perfil primario backend-data. La única UI de esta unidad es el aviso de hallazgos en la tarjeta existente de
+«Hoy», exigido por Slice 3; no hay editor ni nueva composición (TASK-1912 conserva administración visual).
+Frontera: `AttentionItem.kind=channel_validation`, reader con aislamiento por organización y copy centralizado.
+Orden: catálogo/validator → reader → renderer ui-lite → prueba del runtime local. No CSS, motion ni primitive nuevo.
+La clasificación inicial `UI impact: none` se corrige a `copy` al conectar la señal a la superficie existente.
+
+## UI/UX Contract
+
+- Nivel: `ui-lite`; patrón: `DecisionView`/tarjeta de decisión existente, mismo icono y estados warning/critical.
+- Wireframe: [alerta de canales](../../ui/wireframes/TASK-1905-channel-attention.md).
+- Estado normal: sin hallazgos no hay tarjeta. Warning/critical cuentan hallazgos vigentes por revisión.
+- CTA: abre la campaña por el enlace existente; no crea controles de administración.
+- GVC: captura local real con fixture aislado; aceptación visual del operador no asumida.
+
+
+### Capability Greenhouse y autoridad pendiente
+
+`marketing_studio.catalog.manage` existe en código (`src/config/entitlements-catalog.ts`) y grants efectivos
+calculados (`src/lib/entitlements/runtime.ts`): acciones `create`/`update`, sólo `efeonce_admin` y
+`efeonce_operations`. Coverage de 33 tests PASS; account/designer, acciones delete/all y roles no efectivos no
+conceden acceso. Esto acredita implementación local en Greenhouse, no registro/grant efectivo en producción.
+El SQL está en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
+el operador de release debe recrearlo con `pnpm migrate:create`, aplicar y verificar el registry y canje.
+No hubo release Greenhouse en el release Studio ni al entregar la CLI HTTP. Un bearer de servicio no gobierna
+el catálogo: el canary productivo devuelve 403. TASK-2003 resuelve el carril delegado T1 en paralelo; no es
+prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-1906/TASK-1892.
+
 ## Verification
+
+- [Dossier local histórico + readout actual](../../audits/marketing-studio/TASK-1905-local-verification.md).
+- [Release Studio y canaries](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md), [checks JSON](../../audits/marketing-studio/TASK-1905-release-2026-10-04-checks.json), [CLI HTTP local](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+- Greenhouse TypeScript retry heap12GB PASS exit0 (primer intento4GB OOM); 18 tests/lint CLI PASS. No release Greenhouse ni gateway asociado.
+- Studio `pnpm check` y `pnpm build`: PASS. API 1.6.0 / 59 tools; 15 operaciones añadidas.
+- DB: diez migraciones en cluster local nuevo; inmutabilidad, concurrencia, restricciones de arrays,
+  warn/enforce/off, audiencias, derechos y revalidación verificadas; suite completa 34 archivos / 216 pruebas, cero skips.
+- Greenhouse: capability/coverage 33 tests PASS; SQL guardado en
+  `pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending` para reactivar al release.
+- Atención: captura local real desktop 1440/mobile 390, sin overflow/errores y CTA correcto.
+- Manual MCP/appliesTo y planificación actualizados: 34 tests PASS; 27 referencias coinciden con el manifiesto local. Flags documentados y cierre documental focal sin advertencias.
+- Release posterior autorizado: Studio push main 74073de, Vercel/worker Ready, seed/migraciones en ambas bases; [canary API productivo](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md). Backfill apply y sesión MCP delegada pendientes.
+
 
 - Studio: `pnpm check` y `pnpm build`.
 - Greenhouse: `pnpm local:check`, `pnpm test src/lib/entitlements`, `pnpm migration-marker-gate`.
@@ -683,15 +743,15 @@ Nombres finales se confirman con `mcp-craft` en el Slice 5; cualquier cambio se 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla) — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`) — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] `docs/tasks/README.md` sincronizado con avance real in-progress y pendientes; no se declara cierre completo.
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Skill `efeonce-marketing-studio` actualizada según su contrato de mantenimiento (ledger, mapa, contratos, operación, lecciones) y espejada a `.codex/`.
-- [ ] `EPIC-049` refleja el estado de esta task.
+- [x] Skill `efeonce-marketing-studio` actualizada según su contrato de mantenimiento (ledger, mapa, contratos, operación, lecciones) y espejada a `.codex/`. — Evidencia local: [dossier](../../audits/marketing-studio/TASK-1905-local-verification.md); no acredita rollout.
+- [x] `EPIC-049` refleja el estado de esta task.
 
 ## Follow-ups
 

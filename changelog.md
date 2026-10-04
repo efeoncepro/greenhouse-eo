@@ -7,13 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — TASK-1899 retirada por el operador
+
+- Implementación local de escritura MCP revertida en Greenhouse y Studio; sin cambios de runtime desplegados. Se retira como requisito previo al desarrollo de Studio; futura federación pendiente de nueva decisión.
+
 ## 2026-10-04 — AXIS: recursos, agentes, tipografía y botones
 
 - Familia portable de botones: contexto heredado, radio/toolbar, menús controlados y top layer modal; 52 recorridos en cuatro perfiles y 32 referencias visuales. Lab desplegado; VoiceOver/NVDA manual y zoom nativo pendientes. La adopción mantiene sus pins. [Release y evidencia](docs/audits/2026-10-04-axis-buttons-release.md).
 
 - Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
 
-## 2026-10-04 — Marketing Studio reproduce video (en producción)
+## 2026-10-04 — Marketing Studio: catálogo en producción y CLI HTTP local
+
+- Cierre documental con tres subagentes: arquitectura/operación/skills y routers reconciliados; estado local/desplegado separado, MCP futuro no bloquea API/CLI/UI. [Mapa completo y gates](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md).
+
+- CLI HTTP local `pnpm studio`: descubrimiento de 59 operaciones de negocio, cargas verificadas, dryRun/If-Match/idempotencia y credenciales privadas. [Manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md) · [QA](docs/audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+- TASK-1905: catálogo versionado, 52 canales, validación transaccional, backfill revisable, audiencias/ICP y API 1.6.0/59 tools desplegados en Studio (`74073de`). [Release y límites](docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md); backfill humano, ICP y federación pendientes.
 
 - [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md): derivado `playback` (MP4 H.264, lado corto ≤ 720 px, faststart) en el worker con backfill por el barrido (6/6 videos de producción), `302` a URL firmada V4 (GCS atiende `Range`; ningún video pasa por Vercel), `Asset.playback`, API 1.5.0.
 - [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md): reproductor nativo en el panel de la pieza (feed y story, sin autoplay); el tablero muestra todas las piezas de un formato (la versión con intro para Instagram era invisible) y la duración.
@@ -21,7 +31,6 @@
 ## 2026-10-04 — Build de fuentes independiente de Google Fonts
 
 - ISSUE-178: Geist/Poppins y Bricolage del login pasan a `next/font/local`, WOFF2 con origen/licencia/hash fijados. El build comprueba los archivos y bloquea la reintroducción de loaders remotos; roles y variables CSS preservados. Build completo, 90 tests y GVC en tres tamaños PASS; staging READY y fuentes/login/sesión verificados; producción sin promover.
-
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 
@@ -568,12 +577,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   desarma las fotos en bytes sin tocar rostros y verifica los límites de LinkedIn. El contrato de plantilla del motor
   suma `render.minInkTileRatio` (aprobado). Detalle: [manual](docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md).
   Local en `develop`; la ruta productiva es TASK-1921.
-
-## 2026-09-27 — El deck y el brochure de «La órbita» se componen con `pnpm brand:compose` (TASK-1927)
-
-- Greenhouse consume `efeonce.surface-composition` 0.1.2 (AXIS `v0.3.14`). El catálogo `graphic-line-deck` pasa de 6 a
-  16 plantillas: portadas y contraportadas aprobadas de brochure y propuesta, composiciones `hero` y `lines`, la
-  sección partida por la izquierda con tres composiciones y el tríptico de una palabra por toma.
-- `pnpm brand:compose` acepta un documento (`pages`) y entrega un PDF multipágina con su manifest y procedencia.
-  Detalle: [norma de superficie §2.1 y §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) y
-  [manual](docs/manual-de-uso/creative/componer-por-superficie-con-axis.md). Local en `develop`, sin runtime productivo.

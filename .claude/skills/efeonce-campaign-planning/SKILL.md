@@ -139,18 +139,18 @@ manifiesto vigente (lista de tools de la sesión o `GET /api/v1/tool-manifest`),
 
 ### Mañana — modo escritura (cuando existan las tools)
 
-> **Delta 2026-10-02:** los commands de escritura ya existen en la API de Studio (`1.4.0`), pero el gateway no los
-> federa hasta TASK-1899, y CMP-001…005 siguen gobernadas por OneDrive hasta su corte (`409
-> campaign_not_studio_owned`). Ver el delta de `references/studio-write-mapping.md` antes de escribir.
+> **Vigente 2026-10-04:** API1.6.0 expone 59 tools; MCP T1 espera TASK-2003 en paralelo. TASK-1899 está retirada.
+> La CLI local Greenhouse `pnpm studio` descubre la API y opera con sus scopes; no concede delegación ni
+> salta autoridad OneDrive. Ver `references/studio-write-mapping.md` antes de escribir.
 
-La sección «Cuando existan las tools de escritura» de `references/studio-write-mapping.md` mapea cada sección del
+La referencia `references/studio-write-mapping.md` mapea cada sección del
 plan a su command. Niveles de gobierno:
 
 | Nivel | Qué | Cómo |
 |---|---|---|
 | **T0** | Lecturas | Directas (`studio.*` de lectura, tools SEO sin costo). |
 | **T1** | Borradores y ediciones (brief en borrador, conceptos, piezas planificadas, copys, anuncios configurados, flight, líneas `proposed`, posts programados, borrador de prompts AEO) | Directas con la identidad delegada de la persona, `Idempotency-Key` por intento lógico, `If-Match` con la `revision` leída y procedencia registrada. Nacen en borrador / `pending_review`. |
-| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | `dryRun` → `proposalDigest` → **confirmación humana explícita** → ejecución con ese digest. Si el estado cambió, el digest no coincide y no se escribe. |
+| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | En Studio permanecen en el carril de operador con autorización humana; el protocolo proposalDigest fue retirado. Los proveedores externos conservan su protocolo propio de gasto/publicación. |
 
 **El agente nunca aprueba, publica ni gasta solo.** Toda pieza de IA (plan, brief, copy, concepto) registra su
 **procedencia**: modelo exacto, entradas (ids y `revision` leídos, brief con fecha), fuentes con fecha y skill que
@@ -200,7 +200,7 @@ la produjo.
 - Esta skill se espeja byte a byte en `.codex/skills/efeonce-campaign-planning/`
   (`rsync -a --delete .claude/skills/efeonce-campaign-planning/ .codex/skills/efeonce-campaign-planning/` y
   `pnpm skills:mirrors`). Se edita `.claude/` y se espeja.
-- Cuando una task de EPIC-049 (TASK-1894, TASK-1899 o las de la capa de estrategia) publique commands o tools de
+- Cuando una task de EPIC-049 (TASK-1894, TASK-2003 o las de la capa de estrategia) publique commands o tools de
   escritura, actualizar `references/studio-write-mapping.md` con los nombres **del registro de operaciones**
   (verificado contra el manifiesto, con fecha) y mover la regla de modo si cambia.
 - Especificaciones de canal y convención UTM llevan fecha de verificación; al cambiar, se actualiza la fecha y la

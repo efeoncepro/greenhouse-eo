@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-04 por Claude (reproducción de video en el panel de la pieza, TASK-1998/1999; antes, el mismo día: ownership del flujo editorial SEO/AEO)
+> **Ultima actualizacion:** 2026-10-04: catálogo TASK-1905 desplegado, validación warn y referencias ICP; cliente CLI HTTP verificado localmente. Reproducción de video TASK-1998/1999 conservada.
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -128,25 +128,21 @@ aprobaciones.
   permitidas. Sólo ve esas campañas; si pide otra, la respuesta es «no encontrado», sin revelar si existe. Un
   token mal copiado o revocado recibe un rechazo aunque la web esté abierta. Los tokens se crean y revocan por
   consola y quedan auditados.
-- **Agentes de IA.** Los agentes leerán Studio por Efeonce MCP (`mcp.efeonce.org`) con **12 herramientas de
-  lectura**: decisiones pendientes, lista de campañas, detalle de campaña, piezas, detalle de una pieza, ver una
-  pieza (la imagen), copys, anuncios, plan de medios, publicaciones, calendario y búsqueda. Cada herramienta
-  explica qué significa cada dato y qué no (por ejemplo, que un presupuesto propuesto no es gasto), y un manual
-  para agentes les enseña a leer los tres estados sin confundirlos.
+- **Agentes de IA.** Studio publica un manifiesto de **59 tools** (API 1.6.0), incluyendo canales, audiencias y
+  revalidación. Esa lista describe lo que el servidor sabe hacer; la conexión de Efeonce MCP puede exponer una
+  parte menor según su configuración, permisos y rollout. Ver el manifiesto no prueba que el agente pueda usarlo.
 
 ¿Quién puede usar las herramientas de agente? Sólo personas con el permiso de lectura de Studio, que hoy tienen
 los roles de **administración**, **cuentas** y **operaciones** de Efeonce. El agente actúa en nombre de esa
 persona: si la persona no tiene el permiso, el agente tampoco puede leer.
 
-**Estado actual:** las herramientas ya están construidas y desplegadas, pero **apagadas**. Se encienden después de
-la próxima publicación de Greenhouse a producción y de una prueba con una persona real. Hasta entonces, un agente
-no ve Studio por MCP.
+**Estado verificado el 04/10:** Studio y su catálogo están en producción. Este release no publicó Greenhouse
+ni el gateway, ni verificó una sesión MCP real con las nuevas tools. El estado de la conexión debe comprobarse
+en el carril de federación; no se deduce de la salud de Studio.
 
-**Qué no pueden hacer los agentes todavía:** crear, editar ni aprobar nada. Desde el 2026-10-02 las operaciones de
-escritura ya existen en la API de Studio y viajan en su lista de herramientas, pero Efeonce MCP no las ofrece a los
-agentes hasta que exista la puerta de escritura con la persona como responsable (TASK-1899). Cuando llegue la escritura, una
-aprobación seguirá siendo una **decisión de una persona**: el agente podrá prepararla y ejecutarla sólo en
-nombre de alguien que tenga el permiso de aprobar, y queda registrada con esa persona como responsable.
+**Escritura por agentes:** la API ya tiene commands de escritura; consumirlos por MCP T1 depende de TASK-2003,
+que corre en paralelo. TASK-1899 está retirada y no bloquea API, CLI ni UI. Las aprobaciones siguen siendo decisión
+de una persona en un carril habilitado: actualmente la API rechaza T2, aunque una CLI envíe `--confirm`.
 
 > Detalle técnico: API y manifiesto de herramientas en la sección 4.1 de la [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md); proveedor del gateway en el [runbook de Efeonce MCP](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#provider-marketing-studio-efeonce-marketing-studio).
 
@@ -199,7 +195,7 @@ un aviso de conflicto en lugar de pisar el cambio de la primera.
 **Cómo se edita hoy:** todavía no desde las pantallas de la web (llegan con TASK-1895). Hoy se edita por la API de
 Studio, con un token de integración que tenga permiso de escritura, o por la consola del equipo
 (`pnpm studio:write`), que por defecto sólo muestra lo que haría y escribe únicamente si se le pide de forma
-explícita. En producción, hoy ninguna integración tiene permiso de escritura.
+explícita. El cliente de cargas tiene `studio:assets:write`; ese scope no permite editar campañas, copys o planes (`studio:write`).
 
 ### Quién aprueba
 
@@ -207,7 +203,7 @@ explícita. En producción, hoy ninguna integración tiene permiso de escritura.
 presupuesto, o autorizar medios, y también quitar una línea propuesta, exigen que una persona lo
 confirme de forma explícita. Hoy eso sólo se puede hacer desde la consola del equipo, con una confirmación adicional.
 Una integración nunca aprueba (recibe «la aprobación requiere a una persona») y por la API una aprobación queda
-detenida pidiendo confirmación hasta que llegue la puerta de aprobación con la persona como responsable (TASK-1899).
+detenida con `confirmation_required`. TASK-1899 se retiró sin habilitar confirmación delegada por digest.
 Aprobar la creatividad y autorizar medios tienen su propio paso: no se pueden lograr con un cambio de estado genérico.
 
 En Greenhouse, los permisos de escritura de Studio (piezas y campañas) quedaron preparados para los roles de
@@ -217,16 +213,38 @@ En Greenhouse, los permisos de escritura de Studio (piezas y campañas) quedaron
 
 ## Qué viene
 
-El programa (EPIC-049) avanza en este orden, sin fechas comprometidas:
+El programa (EPIC-049) conserva trabajos distintos, sin fechas comprometidas:
 
-1. **Agentes por MCP encendidos** — lectura de campañas desde un asistente, con el permiso de cada persona.
-2. **Originales en la nube y avisos** — los archivos originales dejan de depender de OneDrive, y el equipo recibe
-   alertas en Teams si algo falla.
-3. **Métricas** — resultados de pauta y publicaciones traídos desde Greenhouse.
-4. **Edición y brief como parte de Studio** — ya en Studio desde el 2026-10-02 para campañas gobernadas por Studio
-   (por API y consola). Falta el **corte de las campañas actuales** desde OneDrive, empezando por CMP-004.
-5. **Pantallas de edición, revisión y métricas**, y **escritura y aprobaciones por agentes**, siempre con una
-   persona responsable.
-6. **Inicio de sesión con la cuenta Efeonce**, al final.
+- Activaciones y calendario: TASK-1905 → TASK-2001 → TASK-2002. El catálogo ya está en Studio; cuentas,
+  mercados, URLs de activación y ejecución siguen en esas tareas.
+- Identidad delegada y escrituras MCP T1: TASK-2003 en paralelo, con verificación de sesión real.
+- Customer model y métricas desde Greenhouse: dependencias TASK-1906/TASK-1892; ICP permanece desactivado.
+- Pantallas de edición y revisión, corte de las campañas actuales desde OneDrive e inicio de sesión Efeonce:
+  conservan sus tareas y autorizaciones. Una API disponible no realiza esos cortes automáticamente.
 
 > Detalle técnico: [EPIC-049](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md).
+
+## Catálogo de canales y validación (2026-10-04)
+
+El catálogo publicado v1 contiene 52 canales, organizados por modalidad y familia, con plataformas de compra y
+aparición separadas, placements, formatos, límites y tracking documentados. Al guardar, Studio conserva la clave
+resuelta y la versión de catálogo junto al texto original. La validación está en **warn**: informa hallazgos sin
+bloquear por esos hallazgos. Una especificación nueva no cambia campañas existentes al leerlas.
+
+La atención puede mostrar canales pendientes de resolver; la revalidación es una operación explícita. El backfill
+histórico sigue pendiente. Las referencias ICP no inventan segmentos ni personas: se admite una nota pendiente,
+y el modelo real seguirá desactivado hasta disponer de su conexión autorizada.
+[Contrato funcional](catalogo-canales-y-referencias-icp.md) · [Gobernar el catálogo](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+
+## Operación por CLI HTTP desde Greenhouse (2026-10-04)
+
+`pnpm studio` permite consultar y preparar operaciones sobre campañas, piezas, copys, anuncios, planes,
+calendario, canales y audiencias usando la API de Studio. Descubre el catálogo de operaciones vigente;
+valida sin persistir por defecto y ejecuta con `--apply`. La carga de archivos incluye derechos de uso,
+transferencia y verificación; una carga no aprueba ni publica. Identidad, permisos, fuente maestra,
+revisiones y disponibilidad de capacidades siguen controlados por Studio. El cliente de cargas no otorga
+escritura general ni autoridad de catálogo. [Pasos, credenciales y límites](../../manual-de-uso/marketing-studio/operar-por-cli-api.md).
+
+Verificación del cliente: 18 tests locales, descubrimiento de 64 operaciones HTTP, lecturas autenticadas y carga
+real en dry-run. Las pruebas de transferencia aplicada fueron locales; no acreditan un upload productivo aplicado
+por esta CLI. [Evidencia CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).

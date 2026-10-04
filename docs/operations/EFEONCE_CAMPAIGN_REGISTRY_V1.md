@@ -75,6 +75,16 @@ entregable → **OneDrive**. 🔴 **Nada se escribe en los dos lados: se referen
 > Studio y el importador ya no la toca. La regla de arriba se mantiene: **nunca hay copia de los datos en dos
 > lugares**; cada campaña tiene un solo lugar donde se edita.
 
+### Catálogo de canales y cliente HTTP (2026-10-04)
+
+El catálogo versionado de Studio gobierna las claves de canal, modalidades, plataformas de compra/aparición,
+formatos, límites y tracking. Una carpeta de OneDrive o un alias como `meta` no sustituye a `channelKey` ni
+resuelve el backfill: [contrato](../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
+Desde Greenhouse, `pnpm studio` consulta y opera por API con dryRun por defecto: [manual CLI](../manual-de-uso/marketing-studio/operar-por-cli-api.md).
+Respeta el `source_of_truth` de cada campaña y las credenciales; no crea otro registro ni activa pauta.
+Las cargas de nuevas versiones tienen su puerta propia y no aprueban piezas ni cambian el dueño del catálogo.
+Las escrituras MCP no son prerrequisito de este flujo ni quedan habilitadas por la CLI.
+
 ### CDR · el ADR de las campañas
 
 | | Cuándo | Dónde |

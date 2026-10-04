@@ -1,10 +1,13 @@
 # Handoff activo
 
+**Marketing Studio — cierre 04/10:** main `74073de`, API 1.6.0/59 tools y catálogo v1/52 canales desplegados; worker `/health` verificado. `pnpm studio` disponible localmente en Greenhouse: API-only, cargas/descargas, copys/canales y dryRun por defecto; 18 tests y lectura/dryRun autenticados PASS. [Cierre y evidencias](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md). Pendientes: backfill humano de 134 registros (`efeonce_operations`), ICP 1906/1892 y autoridad de catálogo; MCP write retirado como requisito (1899), sin federación nueva. Greenhouse/gateway sin release. Video 1998/1999 sigue completo; estado de 1894 en [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+
+**Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.
+
+
 **AXIS (04/10):** botones con contexto, selección exclusiva, toolbar y menú modal; QA manual de lectores pendiente; [evidencia y adopción pendiente](docs/audits/2026-10-04-axis-buttons-release.md). [Cierre de recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
 
 Staging: ISSUE-178 resuelto.
-
-**Marketing Studio — video (04/10):** [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md) + [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md) complete y en producción (Studio `c52eb4a`, API 1.5.0, worker `00003-hrw`, 6/6 videos con `playback`). Gateway sincronizado (efeonce-mcp `454d80eb6`, sin deploy necesario). Estado en el [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#reproducción-de-video-task-19981999).
 
 **SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
 
@@ -21,8 +24,6 @@ Staging: ISSUE-178 resuelto.
 **AI Visibility Report (04/10):** Think `56a300a` publicado/verificado; hover `06449ca` local, tipos/build PASS, push pendiente. Producción Entrega primero; candidato Marca primero sin activar. [Estado y QA](docs/tasks/complete/TASK-1966-ai-visibility-report-landing-la-orbita.md).
 
 **Inpainting (03/10):** [TASK-1973](docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md) complete local (sin push). Pendiente: Slice 2 en TASK-1925; BFL FLUX Tools cuando el operador cree la cuenta.
-
-**Marketing Studio (02/10, noche):** [TASK-1894](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md) in-progress. A y B en producción (API 1.4.0, `pnpm studio:write`); gateway v1.10.0 desplegado sin federar escrituras. **Operador:** release de las capabilities de Greenhouse `9d0d698d4`. C diferido. [§7.4](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 
 **CMP-004 completa (02/10):** 44 piezas aprobadas (4:5, 9:16, 1:1, 1,91:1) en OneDrive, Studio y AXIS Lab; horizontales por `pnpm foto:expandir` desde la 1:1 ([CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md), skill `efeonce-advertising-creative` §0c).
 
@@ -95,10 +96,6 @@ TASK-1863: staging; main retenido.
 **La órbita (26/09–01/10):** [índice](docs/operations/brand-graphic-line/README.md); perfiles sociales aprobados 01/10 (§10.1.1), sin publicar; Sparks: TASK-1941 complete. Pendiente: 5 preguntas del operador y TASK-1926.
 
 **Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
-
-**Marketing Studio (26/09):** TASK-1890/1891/[1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md)/[1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (`92002873ced9`, PR #243). Pendiente: denegación live sin capability (1891).
-
-**Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
 
 **Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). TASK-1889 complete; sigue TASK-1903 (agente redactor).
 

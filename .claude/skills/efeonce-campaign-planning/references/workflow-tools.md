@@ -5,6 +5,9 @@ Tras identificar organización/campaña, leer `studio.channels.list` → `studio
 `studio.campaign.channel_findings.list` y `studio.customer_model.get` si existen en la sesión. Conservar versión,
 fuentes y unknowns. No redefinir ICP ante unavailable; usar pendiente explícito. Publicar un catálogo no migra
 contenido; la revalidación es una operación T1 explícita. La siguiente verificación 2026-09-26 es histórica.
+Para operación local solicitada explícitamente, Greenhouse `pnpm studio` descubre las mismas operaciones HTTP
+(`describe`/`call`, upload/download); conserva scope, idempotencia y revisión. No reemplaza una tool MCP ausente
+ni habilita autoridad. Manual: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`.
 
 
 Verificado contra el repo el 2026-09-26: manual servido `docs/mcp/skills/marketing-studio/SKILL.md`, registro de

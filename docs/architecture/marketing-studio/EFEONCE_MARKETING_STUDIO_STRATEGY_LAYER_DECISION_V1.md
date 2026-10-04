@@ -1,7 +1,19 @@
 # Efeonce Marketing Studio — Capa de estrategia: canales, ICP, plan de campaña, SEO/AEO, IA y paridad total (ADR)
 
-> **Status:** `Accepted` (2026-09-26). Implementación y rollout por tasks del EPIC-049; nada de este ADR está en
-> runtime todavía.
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-1899 y su implementación local quedaron retiradas sin rollout. TASK-2003 toma el carril de
+identidad delegada y escrituras MCP T1 en paralelo; no es requisito para entregar API/CLI/UI. La confirmación T2
+por digest propuesta en TASK-1899 queda como diseño histórico, sin contrato operativo vigente. Se mantienen
+API-first, paridad del registro y controles de acceso; una tool declarada no acredita federación ni una sesión MCP.
+El release de Studio del mismo día es independiente y se documenta con su alcance en cada sección vigente.
+
+
+> **Status:** `Accepted` (2026-09-26), actualizado 2026-10-04: catálogo y validación TASK-1905 desplegados en Studio;
+> ICP real, activaciones, federación MCP y demás capacidades conservan sus dependencias y gates.
 > **Date:** 2026-09-26
 > **Deciders:** Julio Reyes (operador). Redacción: Claude.
 > **Owner:** Efeonce Marketing Studio
@@ -47,7 +59,7 @@ requiere atención. Lo que no tiene es la **capa de estrategia** que explica por
 - **Sin IA gobernada.** Los agentes pueden leer 12 tools `studio.*`, pero no pueden redactar un plan, un copy por canal
   ni un informe semanal que quede registrado con su procedencia.
 - **Paridad sólo de lectura.** La regla de EPIC-049 ya dice «todo lo que hace la UI se hace por API y MCP, incluidas
-  las aprobaciones» (TASK-1894/1899). El operador la endurece: los agentes (Claude, Codex, Nexa) tienen que poder
+  las aprobaciones» (TASK-1894; consumo MCP T1 por TASK-2003). El operador la endurece: los agentes (Claude, Codex, Nexa) tienen que poder
   **ejecutar** toda acción de la UI, no sólo leer, con niveles de riesgo explícitos.
 
 ## 2. Drivers de la decisión
@@ -114,14 +126,15 @@ requiere atención. Lo que no tiene es la **capa de estrategia** que explica por
 
 - **Toda capacidad de Studio, de lectura y de escritura, nace con cuatro piezas en el mismo cambio:** command o reader
   de dominio en `packages/domain`; ruta `/api/v1`; entrada en `packages/contracts/src/operations.ts` con `tool` o
-  `exclusion` con razón; y tool MCP federada por Efeonce MCP (sync del manifiesto en el gateway).
+  `exclusion` con razón; y manifiesto generado para Efeonce MCP. Federación, autoridad y canary son gates
+  del carril MCP; su ausencia no bloquea entregar API/CLI/UI (decisión 2026-10-04).
 - **La UI escribe sólo a través de esos commands.** Ninguna Server Action ni handler propio de pantalla contiene lógica
   de dominio que no tenga su operación en el registro.
 - **Nivel de riesgo por operación.** Cada operación del registro declara su nivel (§5): `T0`, `T1` o `T2`. El nivel no
   lo decide el cliente que llama: lo fija el registro y lo aplica el command.
 - **Los agentes ejecutan, no sólo leen.** Claude, Codex y Nexa pueden ejecutar toda acción que la UI permite, con la
-  identidad delegada de la persona (mecánica de TASK-1899: clase de scope de escritura, canje por capability, token
-  delegado revalidado por Studio). El actor auditado es siempre la persona; el agente queda registrado como
+  identidad delegada de la persona cuando el carril T1 de TASK-2003 esté operativo: clase de scope de escritura,
+  canje por capability y token delegado revalidado por Studio. El actor auditado es siempre la persona; el agente queda registrado como
   **canal** (`via: mcp`, cliente) y, si redactó contenido, como **origen** en la procedencia (§4.6).
 - **Test de paridad ampliado.** El test de paridad de Studio (hoy registro ↔ route handlers) se amplía para fallar si:
   una ruta de escritura no tiene entrada; una entrada `write` no tiene tool ni exclusión; una operación no declara
@@ -256,11 +269,11 @@ Por campaña, un plan con revisión, auditoría y aprobación humana, compuesto 
 |---|---|---|---|
 | **T0 — lectura** | Cualquier lectura | Directa; anti-oráculo por organización | Plan, matriz, catálogo de canales, snapshots SEO, métricas, aprendizajes, informe semanal |
 | **T1 — borrador o edición reversible** | Crear y editar borradores; cambios reversibles sin gasto ni efecto externo | Ejecución directa, **idempotente** (`Idempotency-Key`), `If-Match` por `revision`, `audit_event`, **actor = persona** (canal y origen registrados) | Borrador de plan, ítem de contenido, copy en borrador, audiencia de canal, hipótesis, experimento en diseño, aprendizaje propuesto, versión nueva del catálogo de canales (capability restringida) |
-| **T2 — aprobación, publicación, gasto, destructivo** | Todo lo que aprueba, publica, gasta, conecta credenciales externas o destruye | `dryRun` → digest de la propuesta → **confirmación explícita de una persona** → ejecución; actor = la persona por identidad delegada | Aprobar plan, brief, versión o presupuesto; autorizar medios; rastrear palabras clave o declarar competidores (en Greenhouse); conectar cuenta publicitaria; archivar o retirar |
+| **T2 — aprobación, publicación, gasto, destructivo** | Todo lo que aprueba, publica, gasta, conecta credenciales externas o destruye | **Confirmación explícita de una persona** en el carril autorizado. Runtime: operador CLI con `--apply --confirm`; HTTP rechaza T2. El digest delegado de TASK-1899 es diseño retirado | Aprobar plan, brief, versión o presupuesto; autorizar medios; rastrear palabras clave o declarar competidores (en Greenhouse); conectar cuenta publicitaria; archivar o retirar |
 
 - El nivel lo declara el registro de operaciones y lo aplica el command; un cliente no puede degradarlo.
-- La mecánica de escritura MCP es la de TASK-1899: clase de scope de escritura de Studio, canje por capability exacta,
-  token delegado revalidado por Studio. Una operación que **mueva dinero** en una plataforma externa, cuando exista,
+- La escritura MCP T1 corresponde a TASK-2003: clase de scope, canje por capability exacta y token delegado
+  revalidado por Studio. TASK-1899 está retirada; no hay confirmación T2 delegada operativa. Una operación que **mueva dinero** en una plataforma externa, cuando exista,
   tendrá su propia clase de scope (una por clase de radio de impacto).
 
 ## 6. Consecuencias
@@ -326,7 +339,8 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
 | IA agéntica + procedencia | Skills y tools para borradores; modelo de procedencia; puerto de proveedor y techo de costo para la etapa en producto |
 | Medición, gasto y aprendizajes | Readback Meta/LinkedIn; atribución HubSpot por Greenhouse; experimentos; biblioteca de aprendizajes; chequeo de destino; calendario unificado |
 | TASK-1894 | Commands de escritura, brief como entidad, corte por campaña (base de los commands de este ADR) |
-| TASK-1899 | Mecánica MCP de escritura y aprobación (scope, canje por capability, token delegado, `dryRun` → confirmación) |
+| TASK-1899 | Retirada 2026-10-04; diseño histórico sin gate sobre API/CLI/UI |
+| TASK-2003 | Carril paralelo de identidad delegada y escritura MCP T1; federación por verificar |
 | TASK-1895 | UI de edición, revisión y métricas, consumidora de los mismos commands |
 | TASK-1892 | Métricas desde Greenhouse (GSC, GA4, SV360 por landing) y consumer/bindings de Studio |
 
@@ -343,7 +357,7 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
 > Resoluciones del operador (Julio Reyes) del 2026-09-26 marcadas en cada punto; el cuerpo del ADR no cambia.
 > Decisiones del mismo día que precisan tasks sin ser preguntas de esta sección: `studio.voice_rules.publish` es `T2`
 > (TASK-1909); el canje de `marketing_studio.integration.manage` verifica la acción única `update`, y conectar y revocar
-> son `T2` (TASK-1910, TASK-1899).
+> son `T2` (TASK-1910; la mecánica TASK-1899 citada entonces fue retirada el 04/10).
 
 1. **Forma y dueño exacto del catálogo de modelo de cliente en Greenhouse** (dominio comercial o growth, tablas,
    quién publica versiones y con qué capability).
@@ -356,7 +370,9 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
    persona: vía la tool de Greenhouse directamente o vía el lane app con token delegado.
 4. **Límites de copy duros vs recomendados por plataforma** y quién mantiene el catálogo al día.
    **Resuelto quién lo mantiene (2026-09-26):** `efeonce_operations`, con `efeonce_admin`; son los únicos grants de
-   `marketing_studio.catalog.manage` (TASK-1905). Límites duros vs recomendados y cadencia siguen abiertos.
+   `marketing_studio.catalog.manage` (TASK-1905). **Actualización 2026-10-04:** hard/recommended implementados por
+   campo, formato y placement, con fuente y fecha; no se extrapolan a toda la plataforma. La cadencia operativa
+   de revisión sigue por definir.
 5. **Nexa como cliente:** si opera Studio a través del gateway MCP o de un canal propio; en ambos casos, con las mismas
    tools y niveles.
 6. **Modelo de proveedor para la IA en producto** y línea base de evaluación por tarea.
@@ -399,7 +415,7 @@ adapter gobernado, no convierte una aprobación de trabajo en permiso automátic
 
 | Task existente | Dueño y contrato pendiente | Dependencia de foundation |
 |---|---|---|
-| TASK-1667 (EPIC-049) | Especialización editorial SEO: brief, draft/private CMS handoff, QA/aprobación/receipt y readback de publicación | TASK-1908 + TASK-1913; kernel/autoridad TASK-1894/1899 |
+| TASK-1667 (EPIC-049) | Especialización editorial SEO: brief, draft/private CMS handoff, QA/aprobación/receipt y readback de publicación | TASK-1908 + TASK-1913; kernel/autoridad TASK-1894; consumo MCP T1 por TASK-2003 |
 | TASK-1668 (EPIC-022) | Indexación/outcome SEO desde referencias de publicación Studio; baseline/ventana/cobertura/metodología | GSC/rank y receipt1667; AEO/GA4 opcionales por eje, con degradación explícita |
 | TASK-1669 (EPIC-049) | Plan diario SEO advisory, consume cola1700 y estado Studio/outcome | TASK-1908 + TASK-1913/1914/1915; no segundo orquestador ni Nexa runtime |
 | TASK-1907 / 1912 | Plan de contenidos y UI consumidores de referencias/work/brief/QA | Foundation propia; no lifecycle ni reglas de negocio paralelos en la UI |
@@ -546,14 +562,36 @@ internos; lo que GA4 no tiene como canal se resuelve con un custom channel group
 el responsable y el ciclo de vida de cada valor (catálogo → campaña → activación; snapshot que se congela con la primera
 evidencia de ejecución; comparación con lo publicado) están especificados en RESEARCH-012 §Origen y ciclo de vida.
 
-**Operación por MCP obligatoria** (operador, 2026-10-04). Refuerza §4.1: ninguna capacidad de taxonomía, activaciones,
-calendario o UTM se da por terminada sin su tool federada y operable por Efeonce MCP, escrituras incluidas, con la
-identidad delegada de la persona (carril de TASK-2003, que corre en paralelo y no bloquea el producto; las
-aprobaciones `T2` siguen por CLI/UI mientras TASK-1899 esté retirada), verificada en una sesión MCP real desde la
-conexión que el operador usa.
+**API parity y estado MCP** (decisión vigente 2026-10-04). Cada capacidad de taxonomía, activaciones, calendario
+o UTM nace en el contrato API y declara tool o exclusión. API/CLI/UI puede entregarse en su alcance sin MCP
+operativo: TASK-2003 corre en paralelo. Para declarar MCP operativo sí se requiere tool federada, identidad
+delegada y prueba de sesión real. T2 conserva confirmación humana en los carriles habilitados; la CLI HTTP
+no convierte `--confirm` en autoridad remota.
 
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
 plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra
 `content source` en la pieza y agrega `buying method` y `deal type` al anuncio (`ad_configuration`) y a la línea de
 presupuesto (`budget_line`). La entidad *activación*, la evidencia de ejecución, el descubrimiento de lo agendado en Metricool y el calendario
-son TASK-2001 (contrato) y TASK-2002 (UI); toman el calendario unificado que estaba en TASK-1911. Nada de esto está en runtime todavía.
+son TASK-2001 (contrato) y TASK-2002 (UI); toman el calendario unificado de TASK-1911 y siguen pendientes.
+El catálogo y sus campos de apoyo sí están desplegados por TASK-1905; no equivalen a activaciones operativas.
+
+
+### Delta de implementación y release — TASK-1905 (2026-10-04)
+
+El catálogo, sus commands y readers, el validador transaccional, alias/backfill, findings/revalidación y las referencias
+ICP tienen implementación. El release Studio `74073de` desplegó API 1.6.0 y catálogo publicado v1 de 52 canales;
+web y worker mantienen validación `warn` y customer model desactivado. Las escrituras conservan el literal histórico junto a la clave resuelta y la versión;
+`STUDIO_CHANNEL_VALIDATION_MODE` admite `off`, `warn` (default) y `enforce`. ICP sigue desactivado por defecto y su reader
+real depende de TASK-1906 + TASK-1892; una referencia pendiente explícita funciona sin inventar segmentos ni personas.
+
+La capability `marketing_studio.catalog.manage` se limita a admin/operations con acciones create/update. Su migración
+Greenhouse sigue pendiente; gobierno global sólo admite `operator_cli` sin restricción organizacional. Las dos
+migraciones Studio y el seed se aplicaron en staging y producción; el backfill no. El dry-run productivo identificó
+134 registros sin mapear. Greenhouse y gateway no se desplegaron. TASK-2003 corre en paralelo; no se afirma federación T1 ni canary MCP.
+Activaciones/calendario/URLs de tracking derivadas siguen en TASK-2001/TASK-2002.
+
+Detalle: [contrato funcional](../../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md),
+[manual de catálogo](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md) y
+[verificación local previa](../../audits/marketing-studio/TASK-1905-local-verification.md) y
+[release autorizado](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md). La
+[CLI HTTP local](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) materializa API-first sin agregar autoridad.

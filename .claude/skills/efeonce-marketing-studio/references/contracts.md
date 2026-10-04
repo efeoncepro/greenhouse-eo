@@ -3,12 +3,12 @@
 Verified against `packages/contracts/src/{operations,semantics,tool-manifest,errors,dto,openapi}.ts` on 2026-09-25
 (Studio `d3ab68e`, API `1.1.0`, manifest hash `96d1f0caf6e5571d1d51a93dd8824cb69f578f514945c563b7c6bd5bb39326bb`).
 
-> **Update 2026-10-04 (TASK-1998, local `main`, not deployed):** API `1.5.0`, manifest 44 tools hash `60dfac7524ee`; see §Video playback.
->
-> **Current (2026-10-02):** API `1.3.0`, 20 operations = 15 tools + 5 exclusions (two `T1` writes). The 17-row table
-> below is the TASK-1890 baseline; op 18 (download) is in §Originals and ops 19–20 (writes) in §Writes.
+> **Current verification, 2026-10-04:** Studio production `74073de1188f`, API **1.6.0**, **64 HTTP operations =
+> 59 tools + 5 exclusions**, hash `2302c683cd1eee0d96d89f85b72ded73a50ff30152c8f0f34fa9279b739390e6`.
+> The dated sections below preserve the contract evolution; their old versions are historical. Current catalog
+> contract is in §TASK-1905; the Greenhouse HTTP CLI discovers the served contract, not these tables.
 
-## Operations registry (17: 12 tools + 5 exclusions)
+## Initial operations registry (historical baseline: 17, 12 tools + 5 exclusions)
 
 All are `GET`. Tools: capability `marketing_studio.campaign.read`, API scope `studio:read`, `writes: false`.
 
@@ -165,8 +165,7 @@ capability: 'marketing_studio.asset.write', capabilityAction: 'create', apiScope
 
 **Kernel gates** (`kernel.ts`, in order): authority (anonymous open-mode actor → 403 `write_not_allowed`, before body
 validation; session `user` → `forbidden` until TASK-1898; `api_client` → needs the tool's scope, else `forbidden`, and
-never approves; `operator_cli` writes) → riskTier from the registry (T1 needs `Idempotency-Key`; T2 → `forbidden` until
-TASK-1899) → organization (404 anti-oracle) → idempotency (same key + same body digest = replay of the stored terminal
+never approves; `operator_cli` writes) → riskTier from the registry (T1 needs `Idempotency-Key`; T2 retains its operator-only gate) → organization (404 anti-oracle) → idempotency (same key + same body digest = replay of the stored terminal
 response; other body = 422 `idempotency_key_reused`; race resolved by `ON CONFLICT`; records 24 h) → `dryRun` (no
 writes) → terminal response stored in the same transaction.
 
@@ -199,19 +198,17 @@ The worker checks the file's real ratio within 1 % (2048/1072 = 1,9104 passes); 
 digits (`S01`, `BF1`); inferred piece `<concept>-<imagen|video>-<WxH>`; workshop suffixes ⇒ `unmatched`.
 
 **Review** (`commands/review.ts`): `approve` | `request_changes` (note required, ≤ 1000 chars); operator CLI only today;
-an `api_client` gets `approval_requires_person`. API approval (`approveAssetVersion`) = Slice 4 + TASK-1899.
-`studio:review` has **no** `operations.ts` entry yet (operator CLI; exclusion pending decision).
+an `api_client` gets `approval_requires_person`. API approval (`approveAssetVersion`) exists since Slice 4 but requires operator authority; the HTTP CLI cannot bypass it.
+`studio:review` is the operator adapter; the version-approval command has a registered API operation.
 
-**Not in Studio's contract yet:** Greenhouse capability `marketing_studio.asset.write` (catalog + registry seed + grants
-admin/account/operations/designer) is NOT seeded (*update 2026-10-02 night: seeded and granted on `develop`
-`9d0d698d4`, not released; the `ChannelValidator` port and `warnings` now exist — see §Catalog commands*); the gateway has not synced the manifest, and its parity guard would
-drop the write tools (`write_tool_without_scope_class`) until TASK-1899. `ChannelValidator` port and
-`CommandResult.warnings` are spec'd but not built (TASK-1905).
+**Current cross-runtime boundary:** Greenhouse asset/campaign write capabilities were seeded and granted on
+`develop` (`9d0d698d4`), without a verified production release in this session. `ChannelValidator` and command
+warnings now exist and the versioned validator is deployed with TASK-1905. The gateway read-only filter is deployed;
+T1 federation needs TASK-2003, while the retired TASK-1899 design is not a prerequisite.
 
 ## Catalog commands (TASK-1894 Entregable B, verified against code and staging 2026-10-02, Studio `a8c7886`, API `1.4.0`)
 
-> **Not in production:** `a8c7886` lives on local `main`, not pushed; verified on the preview of branch
-> `task-1894-entregable-b` (staging DB). Production serves API 1.3.0 until the operator pushes. Canon:
+> **Deployed:** Entregable B reached production on 2026-10-02; its operations are retained in current API 1.6.0. Canon:
 > `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` §7.4.
 
 **Registry:** split by slice — `operations-review.ts`, `operations-catalog.ts`, `operations-plan.ts`, helper
@@ -258,13 +255,13 @@ Approval targets only via dedicated commands; a generic transition to them ⇒ 4
 | 6 | `createScheduledPost`, `updateScheduledPost`, `cancelScheduledPost` | Studio plans `PLANNED`, cancels `CANCELLED`, never publishes; a provider post is not editable. Readers and health ignore planned/cancelled as provider pending |
 
 **T2 rule (kernel):** T2 (approval or destructive) runs today only for `operator_cli`; via API ⇒ 403
-`confirmation_required` until TASK-1899; an `api_client` that approves ⇒ 403 `approval_requires_person`.
+`confirmation_required`; an `api_client` that approves ⇒ 403 `approval_requires_person`. TASK-1899 is retired.
 
 **DTO/transport additions:** `CampaignDetail.permissions { writable, lockReason: open_mode | missing_capability |
 authority_onedrive | null, canApprove, sourceOfTruth, allowedTransitions, revision }`; `revision` on copy, ad, post,
 concept and plan reads (`flightId`, `budgetLineId`); `ETag` = revision on entity reads; empty body accepted (DELETE
-and approvals); replays answer `Idempotent-Replayed: true`. `ChannelValidator` port (default adapter, no validation,
-`catalogVersion null`) and `warnings` on every write result (real validator: TASK-1905).
+and approvals); replays answer `Idempotent-Replayed: true`. `ChannelValidator` and `warnings` on write results now
+use the versioned transactional validator deployed by TASK-1905 (warn mode; findings retain their snapshot).
 
 **New error codes:**
 
@@ -285,8 +282,8 @@ seeded and granted (admin, account, operations, designer) on `develop` `9d0d698d
 > The upload request tool is `studio.asset.upload.request`; the ingest scope is `studio:assets:write`; sha256 is
 > recomputed by the worker; unconfirmed uploads expire at 24 h and orphans are swept.
 
-Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`. Names are working
-names; TASK-1894/1899 fix the final ones in the registry.
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`. The implemented
+names and scopes are resolved in the operations registry; MCP T1 federation is tracked separately by TASK-2003.
 
 - Command `createAssetVersion` (route under `/api/v1`, tool `studio.asset.version.create`, class `write`): idempotent
   by sha256 + `Idempotency-Key`, `If-Match` on the piece's `revision`, person as actor, `audit_event`, `rights`
@@ -331,12 +328,12 @@ names; TASK-1894/1899 fix the final ones in the registry.
 - Image tools return MCP `image` content (webp/png/jpeg, 1 byte – 2 MB).
 - Parity findings: `manifest_tool_not_registered`, `registered_tool_not_in_manifest`, `write_tool_without_scope_class`,
   `skill_governs_unknown_tool`.
-- **Write tools must be filtered before syncing (2026-10-02).** The provider federated EVERY manifest tool and always
-  calls Studio with GET, so syncing the API 1.4.0 manifest would federate the write tools broken. Prepared change
-  (not committed, not synced; branch `task-1894-studio-write-manifest` from `origin/main` `8ff029d`):
-  `MARKETING_STUDIO_FEDERATED_TOOLS` = reads only, used by the provider and `tool-policy`; `call()` rejects writes and
-  non-GET; parity flags `write_tool_without_scope_class` only if a write gets registered; the sync script accepts write
-  methods/fields in its type; new test. Only new federated read: `studio.campaign.brief.get`.
+- **Write tools remain filtered before syncing.** The read-only filter was deployed 2026-10-02 (gateway PR #23,
+  revision `00064-q6w`); 14 reads were federated. `MARKETING_STUDIO_FEDERATED_TOOLS` is used by provider/policy;
+  calls reject writes and non-GET methods. Parity flags `write_tool_without_scope_class` if a write gets registered.
+  Manifest 1.5.0 was later synced without changing the surface; this session did not sync or deploy 1.6.0 to the
+  gateway. TASK-2003 must supply real delegated T1 authority before the write filter changes.
+
 - Policy: exact names from the manifest (never by prefix); Entra issuer only; native = `unsupported`
   (`marketing_studio_native_policy_missing`).
 
@@ -357,3 +354,64 @@ Endpoint: `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platform
   **`playback_unavailable`** 503, `actionable: false` (no signer in that environment).
 - Rendition kinds: + `playback` (`RenditionKind`), mimes + `video/mp4` (`RenditionMimeType`).
 - The gateway does not validate output schemas: new fields flow before a manifest sync; the sync only refreshes descriptions.
+
+## TASK-1905 contracts (code and production verified 2026-10-04)
+
+The generated manifest remains the authoritative inventory; API 1.6.0 / 59 tools are served from production with
+the hash above. The published catalog v1 has 52 channels. Do not infer gateway exposure from provider declarations.
+
+| Operations | Tier / capability |
+| --- | --- |
+| listChannels, getChannel, listChannelCatalogVersions, listChannelAliases | T0 / campaign.read |
+| createChannelCatalogDraft, upsertDraftChannel, publishChannelCatalogVersion, mapChannelAlias | T1 / catalog.manage create or update; no generic API scope |
+| discardChannelCatalogDraft | T2 / catalog.manage update; operator CLI |
+| getCustomerModel, listCampaignChannelFindings | T0 / campaign.read |
+| upsertChannelAudience, setCampaignCustomerModelVersion, revalidateCampaignChannels | T1 / campaign.write + studio:write |
+| removeChannelAudience | T2 / campaign.write; operator CLI |
+
+Capability names use the `marketing_studio.` prefix. Catalog administration is admin/operations only, never inferred
+from organization or account/designer roles. All mutations use the command kernel with declared revision/idempotency
+policy; destructive T2 is not a new MCP approval/digest implementation. TASK-2003 owns delegated T1 federation.
+
+**Dimensions and specification provenance:** `modality` = paid/organic/owned/earned; `family` = social/search/display/
+video/email/messaging/web_content/community/creators_influencers/pr_media/audio/ooh_dooh. `buyingPlatform` is separate
+from `appearancePlatforms`; placements carry appearance, formats carry media kind/ratio/duration/bytes/file types,
+copy limits distinguish hard/recommended and chars/words/items, and objectives are explicit. Every placement,
+format, limit, objective and tracking row carries `sourceUrl` + `verifiedOn`. UGC is `contentSource`, personal
+LinkedIn is an account, and market belongs to activation, never the channel key. Buying method and deal type are
+orthogonal (`platform|programmatic|direct`; `open_auction|pmp|programmatic_guaranteed`).
+
+Tracking is per appearance/placement: `utmSource`, `utmMedium`, `utmSourcePlatform`, `taggingMode`
+(`utm|auto|auto_plus_full_utm`), expected GA4/manual custom group and an explicit unresolved reason
+(`appearance_required|publisher_inventory_required|auto_tagging|external_tracking_not_applicable`). Null with a
+reason preserves missing coverage; it is not a default UTM. The classifier covers manual traffic, not automatic
+platform tagging. Catalog specifications do not yet implement the activation generator of TASK-2001.
+
+Catalog lifecycle is draft → published → superseded; published/superseded specs are immutable, and a channel can
+be active/retired. Aliases preserve rawValue exactly and mapped/ignored/unmapped status with revision; mapped needs
+both key/version, ignored has neither. Explicit revalidation advances only records without hard findings and
+keeps the old snapshot on blocked records. Catalog publication alone does not migrate or revalidate content.
+
+Metadata: channel_key/channel_catalog_version alongside originals; brief channel_requested_keys and known channel_keys;
+rights_channels and rights_channel_keys. Findings retain entity revision and catalog version, severity hard/warning.
+Campaign ICP version change reports incompatible audience refs without silently migrating them. Customer-model reads
+return available/disabled/unavailable/not_entitled. Real references require an authorized matching published model;
+pendingNote requires all reference IDs/version/stage null. Errors include customer_model_reference_invalid (422),
+customer_model_unavailable (503), audience_in_use, channel_unknown, channel_hard_limit_exceeded and
+channel_catalog_unavailable. Unknown upstream state never yields invented segments/personas.
+
+
+## Greenhouse HTTP CLI contract (local, verified 2026-10-04)
+
+`pnpm studio` discovers OpenAPI plus the provider manifest for each invocation: version/method/path mismatches or
+missing write-risk metadata fail closed. It supports 59 named business tools and all 64 documented HTTP operations,
+with no imported Studio implementation or copied operation registry. Body schemas come from `describe`; business
+validation stays server-side. Metadata availability is not a scope/flag/delegation grant.
+
+Writes default to remote dryRun where supported, otherwise `local_plan` without mutation. `--apply` retains stable
+Idempotency-Key and If-Match; T2 also needs local `--confirm` but the API still denies unauthorized actors. No retry
+with a new key/revision after an uncertain result or 412. JSON/stdin preserves literal copy; cursors are manual.
+Upload uses the API ticket then direct GCS transfer and confirmation with one stable key (202 is pending, exit 2);
+`--resume` only resumes confirmation. Download verifies original byte size and SHA-256. Receipts redact tokens and
+signed URLs, files are private/no-overwrite, storage requests carry no Studio bearer. No production applied write
+was performed to verify this client. Canonical command examples: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`.

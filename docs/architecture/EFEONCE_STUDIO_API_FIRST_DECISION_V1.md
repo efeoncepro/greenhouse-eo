@@ -1,5 +1,17 @@
 # Efeonce Marketing Studio: plataforma API-first y consumo futuro desde Efeonce MCP
 
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-1899 y su implementación local quedaron retiradas sin rollout. TASK-2003 toma el carril de
+identidad delegada y escrituras MCP T1 en paralelo; no es requisito para entregar API/CLI/UI. La confirmación T2
+por digest propuesta en TASK-1899 queda como diseño histórico, sin contrato operativo vigente. Se mantienen
+API-first, paridad del registro y controles de acceso; una tool declarada no acredita federación ni una sesión MCP.
+El release de Studio del mismo día es independiente y se documenta con su alcance en cada sección vigente.
+
+
 Fecha: 2026-09-23 · Deltas 2026-09-25: nombre, runtime y persistencia; agentes, autoridad y medios.
 Estado: Accepted para el principio API-first y el consumo por Efeonce MCP, por instrucción explícita del operador. **Delta 2026-09-25: Accepted el nombre, la ubicación del runtime y la persistencia** y **Accepted las decisiones de agentes, autoridad por persona y medios** (ver ambas secciones Delta 2026-09-25). Implementado y en vivo en `studio.efeonce.org` (TASK-1887, TASK-1890); el provider MCP está desplegado con flag OFF (TASK-1891). Estado técnico vigente: [arquitectura V1](marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 
@@ -144,7 +156,7 @@ Decisiones tomadas al implementar TASK-1890 y TASK-1891 y en el flujo maestro de
    API y por MCP. Las aprobaciones (brief, presupuesto, creatividad, autorización de medios) las **decide una
    persona**; un agente las ejecuta con la identidad delegada de esa persona y su confirmación explícita (propuesta con
    digest → confirmación). Un `api_client` de máquina sin persona no aprueba. Escrituras: TASK-1894; federación de
-   escrituras y aprobaciones con scopes propios: TASK-1899.
+   escrituras y aprobaciones con scopes propios: TASK-1899 (propuesta del 25/09 retirada el 04/10; T1 pasa a TASK-2003 y T2 remoto sigue sin habilitar).
 5. **Login al final.** Studio opera en modo `open` (lectura sin login, `noindex`) hasta que existan las piezas
    anteriores; el login con Efeonce ID (TASK-1898) es la última task del programa por decisión del operador. El modo
    `efeonce_id` hoy falla cerrado.
@@ -184,3 +196,20 @@ Importar conservando IDs de campaña/concepto/asset, procedencia y aprobaciones 
 - [Invariantes de superficie MCP](agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md).
 - [Registro de campañas](../operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 - [Manifiesto de pauta y handoff MCP](../operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+
+## Delta 2026-10-04 — Cliente CLI HTTP en Greenhouse
+
+Por solicitud del operador, `pnpm studio` en `greenhouse-eo` consume el OpenAPI y el tool-manifest del
+origen elegido en cada ejecución. El registro de Studio conserva la autoridad; el cliente resuelve
+operationId o nombre de tool, parámetros, cuerpos, dryRun, Idempotency-Key e If-Match desde ese contrato.
+El helper de carga orquesta reserva HTTP → transferencia firmada → confirmación/verificación. No importa
+commands del repo hermano, no toca SQL, no crea credenciales y no amplía identidad/scope. T2 exige intención
+local explícita y la autorización remota habitual. Contratos inconsistentes bloquean la ejecución.
+
+Esta implementación materializa la decisión API-first existente; no cambia el modelo de acceso ni implica
+federación MCP. Catálogo global, aprobaciones e ICP conservan sus límites runtime. [Manual](../manual-de-uso/marketing-studio/operar-por-cli-api.md)
+y [evidencia](../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+Verificado el 04/10: API 1.6.0, 64 operaciones HTTP y 59 tools declaradas; 18 tests del cliente y ESLint PASS.
+Lecturas autenticadas y upload real en dry-run contra producción; los caminos aplicados de transferencia y
+confirmación se probaron sólo con HTTP local/fetch controlado. No se amplió autoridad ni se verificó MCP desde la CLI.

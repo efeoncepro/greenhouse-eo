@@ -5,7 +5,7 @@
 > **Autor:** Claude, a pedido del operador (Julio Reyes)
 > **Relacionado:** ADR de estrategia de Marketing Studio §15 (taxonomía de canales y activaciones),
 > [TASK-2001](../tasks/to-do/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md),
-> [TASK-1905](../tasks/to-do/TASK-1905-marketing-studio-channel-catalog-risk-tiers-icp-reference.md),
+> [TASK-1905](../tasks/in-progress/TASK-1905-marketing-studio-channel-catalog-risk-tiers-icp-reference.md),
 > [TASK-1907](../tasks/to-do/TASK-1907-marketing-studio-campaign-strategy-plan.md) (plan de medición)
 
 ## Pregunta

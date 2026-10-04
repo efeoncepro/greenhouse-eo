@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-04 por Claude (ver y revisar videos en el panel de la pieza, TASK-1998/1999; antes, 2026-10-03: agregar un concepto nuevo con video a una campaña gobernada por OneDrive; caso CMP-001 «Los Sparks»)
+> **Ultima actualizacion:** 2026-10-04: catálogo desplegado y CLI HTTP local; se conservan los procedimientos de cargas, edición y video anteriores.
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -344,8 +344,9 @@ permiso o gobernada por OneDrive), si puedes aprobar y a qué estados se puede p
    pnpm api-client:create --label "<quién>" --org org-… --scope studio:read --token-only \
      | gcloud secrets versions add <secreto> --data-file=-
    ```
-3. Verifica con `curl -H "Authorization: Bearer <token>" https://studio.efeonce.org/api/v1/campaigns`: debe
-   responder 200 y sólo campañas de sus organizaciones.
+3. Desde Greenhouse, verifica sin poner el token en los argumentos:
+   `pnpm studio call studio.campaigns.list --token-secret <secreto> --project <proyecto>`. Debe responder 200 y
+   mostrar sólo campañas de las organizaciones autorizadas. Consulta `pnpm studio list` para el nombre vigente.
 4. Para cortar el acceso: `pnpm api-client:revoke --id <api_client_id> --reason "<por qué>"`. Desde ese momento
    el token responde 401. La revocación queda auditada.
 
@@ -354,19 +355,20 @@ con otra integración.
 
 ## Paso a paso: pedirle a un agente que lea Studio por MCP
 
-> **Estado:** las herramientas de Studio en Efeonce MCP están desplegadas pero **apagadas** hasta la próxima
-> publicación de Greenhouse a producción y una prueba con una persona real. Estos pasos aplican desde que se
-> enciendan.
+> **Estado al 04/10:** el release Studio publicó API 1.6.0 y 59 tools declaradas; no desplegó Greenhouse/gateway
+> ni verificó estas herramientas en una sesión MCP real. Estos pasos requieren que el provider y la conexión
+> estén habilitados. La autoridad MCP T1 corresponde a TASK-2003; TASK-1899 está retirada.
 
 1. Confirma que tu usuario tenga uno de los roles con permiso de lectura de Studio: **administración**,
    **cuentas** u **operaciones** de Efeonce. Sin ese permiso el agente no puede leer nada en tu nombre.
 2. Conecta tu asistente (por ejemplo, Claude) a `mcp.efeonce.org` e inicia sesión con tu cuenta Efeonce.
 3. Pídele lo que necesitas en lenguaje normal: «¿qué decisiones están pendientes en Studio?», «resúmeme la
    campaña CMP-004», «muéstrame la pieza 4:5 del concepto 2».
-4. El agente carga el manual `marketing-studio` y usa las 12 herramientas de lectura. Debe informarte los tres
+4. El agente carga el manual `marketing-studio` y usa las herramientas disponibles en su conexión. Debe informarte los tres
    estados por separado, decir de qué tipo es cada monto y no dar por publicado un post sólo porque pasó su fecha.
-5. Si te pide aprobar o cambiar algo, recuerda que **todavía no puede**: los cambios se hacen fuera de Studio
-   (OneDrive) y se reimportan.
+5. Si necesita cambiar algo, verifica el carril y los permisos. Una campaña gobernada por Studio se edita por
+   API/CLI con autoridad suficiente; una campaña de OneDrive conserva su flujo de importación. No suponer
+   escritura MCP ni confirmación remota T2 por tener disponible una lectura.
 
 | Lo que responde el agente | Qué significa |
 |---|---|
@@ -425,3 +427,22 @@ con otra integración.
 - [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 - [Runbook de Efeonce MCP — Provider Marketing Studio](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#provider-marketing-studio-efeonce-marketing-studio)
 - [EPIC-049](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
+
+## CLI HTTP desde el repositorio Greenhouse
+
+Para operar Studio sin entrar al repo hermano usa `pnpm studio` desde `greenhouse-eo`:
+[manual de CLI API](operar-por-cli-api.md). Incluye descubrimiento de operaciones, lecturas, copys,
+canales, planes y carga de piezas. Su default es **dryRun**; para escribir se añade `--apply` y se usan
+credenciales con los permisos correspondientes. No confundirlo con las CLIs históricas del repo de Studio.
+
+## Leer alertas de canales
+
+Desde el release del 04/10, una señal de canales en la atención indica hallazgos de la revisión vigente. Abre la
+campaña y revisa el literal, la clave canónica y la versión del catálogo. `validatedWithPreviousSpec` sólo indica
+que existe una especificación publicada posterior; no significa que se haya revalidado la pieza. En modo `warn`,
+los hallazgos no bloquean por sí solos el guardado ni equivalen a una aprobación.
+
+Para mapear aliases, revisar findings o revalidar, usa el [manual de catálogo](gobernar-catalogo-canales.md).
+No cambies flags ni ejecutes un backfill para ocultar la señal: los 134 registros pendientes observados en el
+release necesitan revisión explícita. ICP sigue desactivado; una nota pendiente conserva el trabajo sin inventar
+referencias del modelo de cliente.

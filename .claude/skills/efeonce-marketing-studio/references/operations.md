@@ -324,10 +324,9 @@ pnpm studio:review request-changes <assetId> <versionNo> --reviewer "…" --note
 - Production state (2026-10-02): CMP-004 has 44 pieces (11 concepts × 4:5, 9:16, 1:1, 1,91:1) `origin=studio`, all
   approved, 0 pending review.
 
-## Catalog commands (TASK-1894 Entregable B — verified in staging 2026-10-02, NOT in production)
+## Catalog commands (TASK-1894 Entregable B — deployed 2026-10-02)
 
-Studio `a8c7886` is on **local** `main`, not pushed (push = production deploy; the operator does it). Verified on the
-preview of branch `task-1894-entregable-b` (staging DB). Migration `1790967435017_catalog-write-commands.sql` is
+The Entregable B commands are included in production API 1.6.0 (`74073de`). Migration `1790967435017_catalog-write-commands.sql` is
 already applied on staging and production (additive; the 5 real campaigns stay `onedrive`). Full runbook:
 `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Commands del catálogo.
 
@@ -349,16 +348,16 @@ pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.
 - Rollback: revoke clients holding `studio:write` (`pnpm api-client:revoke --id … --reason …`); revert the Studio
   deploy; `pnpm migrate down` of `1790967435017` only if no campaign is `source_of_truth = 'studio'` (staging has
   `CMP-900`).
-- Pending (operator): `git push origin main` in Studio; gateway: apply the prepared read-only federation filter →
-  `pnpm studio:manifest:sync` → test → PR → merge → deploy (never sync the 1.4.0 manifest without the filter); Greenhouse
-  production release of `marketing_studio.asset.write` + `marketing_studio.campaign.write`.
+- The Studio push and read-only gateway filter are complete. Greenhouse write capability production rollout and
+  new delegated T1 federation remain separate. Prefer `pnpm studio` from Greenhouse for API operator work; the
+  `studio:write` examples above are the separate privileged Studio DB operator lane, never an API-auth fallback.
 
-## Video playback (TASK-1998/1999 — code complete 2026-10-04, production pending)
+## Video playback (TASK-1998/1999 — production verified 2026-10-04)
 
 ```bash
-# Migration (migrator) — staging applied 2026-10-04; production with authorization
+# Migration procedure (already applied to staging and production 2026-10-04)
 DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:<port>/<db>" PGPASSWORD="…" pnpm migrate up
-# Worker: PLAYBACK_ENABLED in apps/worker/deploy.sh (staging true, production false) → commit → deploy
+# Worker: PLAYBACK_ENABLED in apps/worker/deploy.sh (staging and production true); future changes require governed deploy
 bash apps/worker/deploy.sh --env staging --apply
 # Backfill = the idempotent sweep (batch MEDIA_WORKER_RECONCILE_BATCH); run it now instead of waiting for :07
 gcloud scheduler jobs run marketing-studio-reconcile-derivatives-staging --project efeonce-group --location us-east4
@@ -375,3 +374,72 @@ curl -s -m 10 -o /dev/null -D - -H 'Range: bytes=0-1023' "<Location>"   # 206 vi
   `channel: 'chrome'` (Chromium lacks H.264) or read the frame into a canvas.
 - Rollback: `PLAYBACK_ENABLED="false"` + redeploy (existing rows keep serving); revert the web deploy; `migrate down` only
   after deleting `kind = 'playback'` rows.
+
+## TASK-1905 catalog operations (Studio production verified 2026-10-04)
+
+Read Greenhouse `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md` for the full runbook. Both Studio
+migrations and catalog seed v1 (52 channels) were applied in staging/production. Web and worker explicitly retain
+warn / ICP false. Backfill was inventoried only: 134 unmapped rows, five aliases, review by efeonce_operations.
+Do not rerun the seed or apply guessed aliases just because the following commands exist.
+
+- `pnpm channels:seed --dry-run`: validates seed locally without DB. `--file`/`--version` select explicit inputs.
+- `pnpm channels:seed --apply --actor <operator>`: governed draft/upsert/publish with deterministic idempotency and
+  strict readback; never overwrite a different published seed.
+- `pnpm channels:backfill --dry-run`: read-only DB inventory. `--map 'exact raw=canonical_key'` is explicit/repeatable.
+- `pnpm channels:backfill --apply --actor <operator> --version <published> --map 'exact raw=canonical_key'`: exclusive
+  ops_run, batches of 500, readback; unresolved/concurrent rows remain partial. Original labels/UTM are unchanged.
+- `--revert-alias 'exact raw'`: inspect first with dry-run, then apply with actor and `--confirm`; whole-row snapshot
+  comparison protects later edits. Cannot combine with --map.
+- Validation default warn: findings persisted but write allowed; off: no validation metadata; enforce: unknown/no
+  catalog/hard violations block. Recommended limits warn. Invalid flag values fail. Test each environment before promoting.
+- ICP disabled by default. Injectable adapter timeout 5 s, success cache 300 s/failure 60 s, organization+version scoped,
+  404 => not_entitled and flag-off cache clear. Default reader stays unavailable if enabled without consumer provisioning.
+- Remote order: approved migrations and capability grant, seed/readback, legacy inventory/map/readback, controlled
+  validation cases, explicit flag promotion. Gateway checkout reconciliation and generated manifest sync precede canary;
+  T1 still needs TASK-2003 real authority. No deploy or federation is implied by tests.
+
+- Final local verification: seed52/replay no-op, full PG suite34files216tests zero skips, build PASS, UI1440/390 PASS;
+  CLIbackfill dry0/apply1/replay0/revert1 with three successful ops. These are isolated local evidence, not rollout.
+- Backfill preserves ANY existing versioned nonempty canonical snapshot, including deduplicated and partially resolved
+  arrays. Such arrays require explicit revalidation. Operator maintenance rejects `onlyOrganizationId` before DB access.
+
+## CLI HTTP desde Greenhouse (local, 2026-10-04)
+
+Manual canónico: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`. Ejecutar desde Greenhouse, sin
+checkout hermano ni acceso PostgreSQL:
+
+```bash
+pnpm studio --help
+pnpm studio doctor
+pnpm studio list --filter copy
+pnpm studio describe studio.copy.create
+pnpm studio call studio.channels.list
+pnpm studio call studio.copy.create --param campaignId=CMP-900 --file copy.json
+pnpm studio upload ./pieza.png --campaign CMP-004 --asset '<assetId>' --license owned
+pnpm studio download --asset '<assetId>' --version 1 --output ./original.png
+pnpm studio:test
+```
+
+- Descubre contrato en vivo: 59 tools / 64 operaciones HTTP en API 1.6.0. `describe` es dueño del esquema,
+  no una tabla copiada. `call` acepta operationId o nombre `studio.*`; `--file -` acepta JSON desde stdin.
+- Escrituras dryRun por defecto, `--apply` ejecuta; `--key` y `--if-match` conservan intención/revisión.
+  T2 necesita además `--confirm`, sin conceder autoridad. Nunca cambiar llave/revisión para superar un rechazo.
+- Credencial única: `STUDIO_API_TOKEN`, archivo `0600` con `--token-file` o lectura explícita de Secret Manager
+  con `--token-secret <nombre> --project <proyecto>`. Nunca token en argv/salida ni credencial enviada a GCS.
+  El cliente de cargas existente tiene `studio:assets:write`, no `studio:write`; gobierno global aún deniega bearer.
+- `upload` calcula SHA-256 streaming, valida derechos, reserva ticket, transfiere directo a GCS y confirma.
+  `--new-asset` requiere concepto/título/ratio; varios archivos sólo con pieza existente/inferencia. Duplicado no
+  crea versión. `--resume <uploadId>` retoma confirmación, no bytes; pending sale con código 2.
+- `download` verifica tamaño/hash y limpia original incompleto. `call ... --output` permite previews binarios;
+  los archivos nunca se sobrescriben. JSON stdout, progreso stderr; recibos privados redactan URLs/tokens.
+- Verificado: 18 tests + lint; doctor/catálogo/lectura autenticada y upload dryRun reales. Transferencia aplicada,
+  idempotencia, errores y descarga se validaron con HTTP/GCS controlados. No se escribió producción por esta CLI.
+- Esto es cliente local, no deploy ni federación MCP. Un 401/403 se reporta; no se cambia a SQL/operator_cli.
+
+## Sonda del worker y evidencia del release (2026-10-04)
+
+Usar `/health` en Cloud Run. `/healthz` queda sólo como compatibilidad local: el path terminado en z devolvía 404
+antes de llegar al contenedor; no era un problema IAM. Imagen `74073de1188f`, digest `sha256:7e95c904dd9c01f7c023e56111f4495444220f64f162dfef8d15ce034c96b43e`,
+producción `00004-j4h` / staging `00006-p8q`: Ready al 100%, health 200. Vercel Ready y API1.6.0 confirmados.
+Rollback conserva esquema expand y catálogo publicado: volver código/imagen, nunca down/borrado como atajo.
+Dossier completo: `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`.

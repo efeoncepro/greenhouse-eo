@@ -1,5 +1,8 @@
 # Efeonce Marketing Studio — lessons (append; newest first; each with date, symptom, cause, rule)
 
+- **2026-10-04 · Retirada de TASK-1899.** El operador considera prematuro añadir esta fricción durante la construcción. Se retiró la implementación local y su condición de requisito para desarrollar Studio. No reactivar sus gates por referencias históricas; conservar los controles existentes. La decisión posterior TASK-2003 ya prevé T1 delegado en paralelo, pendiente de implementación/rollout/canary; el T2/proposalDigest retirado no se revive.
+
+
 - **2026-09-25 · One Postgres query per thumbnail exhausted the role.** Symptom: grids of 20+ pieces showed broken
   images; `too many connections for role` on `marketing_studio_app` (limit 20); reproduced 18 of 40 concurrent
   requests = 500. Cause: `/renditions/{id}` authorized each image against the DB. Fix (`c949d3f`): readers return
@@ -226,3 +229,44 @@
 - **Show durations the way the native player does.** The board said «0:50» and Chrome's controls «0:49» for 49.6 s.
   Rule: truncate seconds (`Math.floor`), like the browser.
 
+
+## 2026-10-04 — TASK-1905 local implementation
+
+- PostgreSQL integration tests which always roll back can hide deferred FK violations. Seed the referenced catalog
+  version/channel in the fixture and force `SET CONSTRAINTS ALL IMMEDIATE` before rollback. The first real catalog test
+  exposed a hardcoded validator version without its referenced row; fixing the fixture proved persistence honestly.
+- Warn mode must preserve a resolved null for unknown channels. Null-coalescing back to the input literal would invent
+  a canonical key. Preserve original text and store the resolution/version separately.
+- Kernel command coverage is insufficient when legacy rights or upload finalization call a lower primitive. Validate
+  within the same transaction at those entry points too; a prepared upload ticket does not freeze catalog authority.
+- A provisioned consumer and deployed flags are runtime facts. An injectable adapter and a flag set true do not make
+  ICP available; keep the default reader disabled/unavailable until the authorized dependency exists.
+- Check all shared-repo branches before syncing a generated manifest. The gateway was on another task's branch and
+  was deliberately left untouched; never edit generated inventory manually to appear federated.
+
+- A count comparison cannot identify completeness of deduplicated channel arrays: two historical aliases may map to
+  one canonical channel. Preserve any versioned nonempty binding; partial warn arrays use explicit revalidation, not
+  backfill. Global maintenance must reject organization-scoped operators just as the global-catalog kernel does.
+
+- TASK-1905 release: Cloud Run returned Google 404 for /healthz without reaching the container. Use /health
+  (74073de) for the external worker probe; keep /healthz only for local compatibility. Official restriction:
+  https://docs.cloud.google.com/run/docs/known-issues#reserved_url_paths. Probe the actual route after deploy.
+
+
+## 2026-10-04 — catalog release and API operator client
+
+- **Ready is not routable health.** Cloud Run returned 404 on `/healthz` before the container despite a Ready revision.
+  Use `/health`; preserve `/healthz` only for local compatibility. Verify the routable path in staging, then promote
+  the same image digest. Never widen IAM to repair a path intercepted upstream.
+- **Pin validation mode in every writer runtime.** Upload finalization runs in the worker, so web-only `warn` or ICP
+  flags can produce conflicting outcomes. Both deployments now explicitly use warn/ICP false.
+- **Published catalog is not repaired history.** Seed readback of 52 channels did not map 134 legacy records across
+  five ambiguous aliases. Preserve raw labels and existing versioned snapshots; operations owns explicit review.
+- **Contract parity is not authority parity.** The 59 provider tools are callable through the dynamic API client only
+  with the scope/actor accepted by Studio. Upload credentials do not carry general-write scope; catalog service
+  writes still fail closed. Never substitute operator_cli/SQL after an HTTP403, or claim new MCP federation.
+- **CLI output is not a transfer proof.** A live upload dryRun proved metadata validation only. Applied PUT/POST,
+  confirmation polling, duplicates, downloads and hash failures were tested with controlled local HTTP/storage.
+  Keep that evidence distinct from production writes. Resume confirms an existing upload; it does not resume bytes.
+- **Idempotency survives uncertainty.** Emit the logical key before writing, retain it when a call times out, and
+  reread on revision conflict. Neither a new key nor a refreshed If-Match is an automatic retry strategy.

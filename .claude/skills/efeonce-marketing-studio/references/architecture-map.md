@@ -76,7 +76,7 @@ only; never write values here.
 | `apps/worker/` | `src/{config,handlers,server}.ts` (`node:http`), `Dockerfile` (+ ffmpeg), `cloudbuild.yaml`, `deploy.sh` (SoT of env vars) |
 | `scripts/media-ingest.ts`, `scripts/media-rights.ts` | `pnpm media:ingest`, `pnpm media:rights`; `media-renditions.ts` now uses the domain toolkit |
 | `scripts/ops/infra/media-originals.sh`, `scripts/ops/sql/media-worker-roles.sql` | Buckets/SA/IAM/Pub/Sub/Scheduler (`--env`, `--wiring`, dry-run default); worker PG roles |
-| `packages/domain/src/commands/` (TASK-1894) | `kernel.ts` (`runCommand`, `authorize`; T2 only `operator_cli` until TASK-1899), `support.ts` (organization lookup, `lockStudioCampaign` → 409, `assertRevision`, `audit`, `written`), `review.ts` + `asset-review.ts`, `state-transitions.ts`, `catalog.ts` + `catalog/` (campaign, brief, concept/asset, rights), `plan.ts` + `plan/` (copy, ads, media plan, posts), `permissions.ts` (`campaignPermissions`), `registry.ts` (`CATALOG_WRITE_COMMANDS`, test against the operations registry) |
+| `packages/domain/src/commands/` (TASK-1894) | `kernel.ts` (`runCommand`, `authorize`; T2 only `operator_cli`; HTTP clients cannot impersonate it), `support.ts` (organization lookup, `lockStudioCampaign` → 409, `assertRevision`, `audit`, `written`), `review.ts` + `asset-review.ts`, `state-transitions.ts`, `catalog.ts` + `catalog/` (campaign, brief, concept/asset, rights), `plan.ts` + `plan/` (copy, ads, media plan, posts), `permissions.ts` (`campaignPermissions`), `registry.ts` (`CATALOG_WRITE_COMMANDS`, test against the operations registry) |
 | `packages/domain/src/state-machines/` | Review, creative, media-authorization and launch machines (table-driven, approval targets, note-required) |
 | `packages/domain/src/channels/validator.ts` | `ChannelValidator` port, `enforceChannels`, `normalizeChannelKeys`, default `unvalidatedChannels` (TASK-1905 plugs the catalog) |
 | `packages/contracts/src/operations-{write,review,catalog,plan}.ts` | `writeOperation` helper + write operations by slice, spread into `operations.ts` |
@@ -91,12 +91,12 @@ only; never write values here.
 Tables: `campaign`, `concept`, `asset`, `asset_version`, `asset_rendition`, `copy_variant`, `audience`,
 `ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`;
 `media_object`, `worker_run`, `post_observation` (TASK-1893); `ops_run` (TASK-1896, migration `1790409464603_ops-run`,
-staging applied 2026-09-26, production pending).
+staging and production applied 2026-09-26).
 TASK-1894: `asset_upload`, `idempotency_record` (migration `1790956839977_asset-ingest-door`); `campaign_brief`,
 `campaign_brief_audience`, `campaign_brief_kpi` + `campaign.source_of_truth/cutover_on/cutover_by` + revisions
 (migration `1790967435017_catalog-write-commands`, staging and production 2026-10-02). Staging sandbox `CMP-900`
 (synthetic, `source_of_truth = 'studio'`); ids `CMP-900`+ are reserved for sandbox/tests.
-TASK-1998: migration `1791129772182_video-playback-rendition` (`asset_rendition` kind `playback`, mime `video/mp4`, CHECK `asset_rendition_playback_mime_chk`; staging applied 2026-10-04, production pending). Object `renditions/<versionId>/playback-<sha12>.mp4`.
+TASK-1998: migration `1791129772182_video-playback-rendition` (`asset_rendition` kind `playback`, mime `video/mp4`, CHECK `asset_rendition_playback_mime_chk`; staging and production applied 2026-10-04). Object `renditions/<versionId>/playback-<sha12>.mp4`.
 Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
 1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
 
@@ -174,7 +174,7 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | Path / object | Responsibility |
 |---|---|
 | Capability `marketing_studio.campaign.read` (module `marketing_studio`) | Grants: `efeonce_admin`, `efeonce_account`, `efeonce_operations` |
-| Capability `marketing_studio.asset.download` (TASK-1893, seed applied with release `92002873ced9`) | Same grants; the exchange client does not request it yet (gateway federation pending) |
+| Capability `marketing_studio.asset.download` (TASK-1893, seed applied with release `92002873ced9`) | Same grants; federated read since gateway PR #23; exact delegated capability exchange remains TASK-2003 |
 | `src/lib/sister-platforms/mcp-token-exchange.ts` | `resourceFamily: 'marketing_studio'`, `authorizeMarketingStudio` = `can(persona, …, 'read', 'tenant')` |
 | OAuth client `efeonce-mcp-marketing-studio` (migration applied) | Confidential exchange client; allowed via `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` |
 | `src/mcp/greenhouse/skill-manifest.ts` (`'marketing-studio': { toolPrefix: 'studio.' }`) | Served manual entry; Greenhouse validates the prefix, the gateway validates existence |
@@ -183,3 +183,44 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | `src/lib/marketing-studio/health-alert.ts` | `checkAndAlertMarketingStudioHealth` → Teams destination `marketing-studio-reliability-alerts` («EO - Admin») only on `error` |
 | ops-worker `POST /marketing-studio/health-watch` + scheduler `ops-marketing-studio-health-watch` | Daily 12:20, born paused (`services/ops-worker/deploy.sh`) |
 | `docs/operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md` | Restore + rehearsal runbook (RPO/RTO, paths A/B) |
+
+## TASK-1905 map (Studio deployed 2026-10-04; Greenhouse/MCP/ICP pending)
+
+All paths below are in Studio unless marked Greenhouse.
+- `packages/contracts/src/channels.ts`: catalog dimensions, limits, provenance, versions, aliases and command schemas.
+- `packages/contracts/src/customer-model.ts`: organization customer-model DTO and audience/ICP references.
+- `packages/contracts/src/operations-channels.ts`: catalog readers/governance operations and tools.
+- `packages/contracts/src/operations-channel-campaign.ts`: audience and customer-model operations/tools.
+- `packages/contracts/src/operations-channel-validation.ts`: campaign findings and revalidation operations/tools.
+- `packages/domain/src/channels/`: catalog reader, pure validator, transaction adapter/findings persistence, metadata,
+  alias inventory/backfill and GA4 mapping; `commands/channel-catalog.ts` and `commands/channel-validation.ts`: governed writes.
+- `packages/domain/src/customer-model/`: disabled/default reader, injectable Greenhouse adapter and reference validation.
+- `packages/domain/src/commands/audience.ts`: upsert/remove audience and explicit campaign model-version change.
+- Existing catalog/plan commands, rights primitive and upload finalization use the same catalog validation transaction.
+- API routes: `/api/v1/channels[/{channelKey}]`, `/channel-catalog/versions[/{versionNo}[/channels/{channelKey}|/publish]]`,
+  `/channel-aliases[/{rawValue}]`, `/customer-model`, `/campaigns/{campaignId}/audiences/{audienceKey}`,
+  `/campaigns/{campaignId}/customer-model-version`, `/campaigns/{campaignId}/channel-findings` and
+  `/campaigns/{campaignId}/channel-validation/revalidate` (all beneath `/api/v1`).
+- `1791144092031_channel-catalog.sql`: tables channel_catalog_version, channel, channel_placement, channel_format,
+  channel_copy_limit, channel_objective, channel_tracking, channel_alias, channel_validation_finding.
+- `1791144092429_channel-key-expand.sql`: canonical keys/version, original brief requests, audience revision/ICP refs,
+  campaign model version/segments, asset content_source, ad/budget buying_method and deal_type.
+- `packages/database/seeds/channel-catalog-v1.json`, `scripts/channels-seed.ts`, `scripts/channels-backfill.ts`:
+  explicit seed publication and inventory/mapping/backfill/reversion commands.
+- Flags: `STUDIO_CHANNEL_VALIDATION_MODE` default warn; `STUDIO_CUSTOMER_MODEL_ENABLED` default false. No new provisioned
+  secret, service account or bucket. Adapter credentials are injected; enabling a flag does not provision a consumer.
+- Greenhouse: `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`, registry/runtime grant and negative
+  grant tests. Migration prepared, not applied remotely.
+
+
+## Greenhouse API CLI (local, 2026-10-04)
+
+- `scripts/marketing-studio/cli.mjs`: commands, arguments, JSON/stdin, private token-file/Secret Manager inputs and redacted receipts.
+- `scripts/marketing-studio/client.mjs`: live OpenAPI + manifest discovery, transport/risk checks, authority-preserving HTTP client.
+- `scripts/marketing-studio/upload.mjs`: SHA-256 stream, rights/ticket, direct GCS PUT or resumable session, idempotent confirmation.
+- `scripts/marketing-studio/download.mjs`: original download, byte-size/hash verification, cleanup of incomplete originals.
+- `scripts/marketing-studio/*.test.mjs`: 18 local tests; `package.json` exposes `studio` and `studio:test` (Node 24).
+- `STUDIO_API_URL` / `--base-url`: selected origin; `STUDIO_API_TOKEN`, private `--token-file`, or explicit `--token-secret`
+  plus `--project`: one credential source. No new scope, secret, DB connection or runtime resource is provisioned.
+- `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`: operator canon;
+  `docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`: verification evidence and runtime limits.

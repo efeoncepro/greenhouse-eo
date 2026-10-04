@@ -1,8 +1,8 @@
 # Plan — TASK-1905: catálogo de canales y referencias ICP
 
-Fecha: 2026-10-04. Owner: Codex. Estado: discovery terminado; pendiente checkpoint humano del plan.
-Goal confirmado por el operador en esta conversación. Discovery delegado a tres subagentes, sólo lectura.
-No hay implementación, migración, seed, backfill, push ni deploy de esta task en esta sesión.
+Fecha: 2026-10-04. Owner: Codex. Estado: plan aprobado; Studio desplegado y verificado; integración Greenhouse/MCP/ICP y backfill pendientes.
+Goal confirmado por el operador en esta conversación. Discovery delegado a tres subagentes, inicialmente sólo lectura. Tras aprobación del plan, implementación por ownership independiente.
+El discovery inicial no modificó runtime. Sus secciones y resultado local conservan esa evidencia histórica; el release posterior autorizado y el cliente CLI se registran al final, sin reinterpretar los checks iniciales.
 
 ## Discovery summary
 
@@ -48,9 +48,9 @@ de tablas ni de bindings en producción. No se consultaron grants efectivos, con
   implícitamente dentro de 1905. Declarar todas las tools y conectar federación cuando su carril esté listo.
 - TASK-1906 y TASK-1892 Slice 3 condicionan la integración ICP real, no los slices independientes del catálogo.
 
-Antes de código, reconciliar `Blocked by` como ausencia de bloqueo global de construcción, conservando
-dependencias por slice y de cierre en Status real/Dependencies; mover task a in-progress, sincronizar README
-y volver a ejecutar el hook. La task completa no se cierra mientras falten criterios y evidencia requerida.
+Reconciliación documental realizada: `Blocked by: none` para construcción independiente; Status real y README
+conservan las dependencias por slice y el checkpoint pendiente. El hook `--subagents` volvió a ejecutarse y pasó.
+El operador aprobó el plan; task movida a in-progress y referencias sincronizadas. La task completa no se cierra mientras falten criterios y evidencia requerida.
 
 ## Access model
 
@@ -190,8 +190,8 @@ Cadencia propuesta: revisión trimestral de specs y ante cambio anunciado por pr
 sin crear automatización. Ambigüedades de alias sólo se resuelven por persona al revisar el dry-run.
 Dependencias ICP/MCP y ausencia de inventario DB actual no impiden catálogo local, sí limitan cierre operativo.
 
-Se solicita aprobación de este plan concreto antes de código por `TASK_PROCESS.md` Phase 3:
-P1 y Effort Alto requieren checkpoint humano. El goal aprobado fija objetivo; este checkpoint revisa diseño.
+Aprobación recibida explícitamente: «Aprobado», después de presentar este plan. Se cumple `TASK_PROCESS.md`
+Phase 3 (P1 y Effort Alto). El goal y el plan están confirmados.
 Estado de salida antes de aprobación: **discovery/plan**, no code complete. Tras implementar, si faltan rollout
 o dependencias: **implementación local verificada por slice; integración/rollout pendiente**, sin mover a complete.
 
@@ -206,3 +206,57 @@ o dependencias: **implementación local verificada por slice; integración/rollo
   El comando compuesto `pnpm docs:closure-check -- <path>` propagó el argumento sólo al último subcomando;
   su auditoría inicial alcanzó todo el WIP y produjo 2 warnings generales. Se repitió el helper directo
   con pathspec para aislar este plan; no presentar el check global como limpio.
+
+## Resultado de implementación local (2026-10-04)
+
+- Studio: API 1.6.0, 59 tools (+15 operaciones); catálogo de 52 canales con taxonomía/UTM, writers/importador,
+  snapshots/versiones inmutables, findings, revalidación, backfill y audiencias/adapter ICP. Metadata de compra
+  y content source son campos separados. `pnpm check` y `pnpm build` PASS.
+- PostgreSQL aislado: diez migraciones; suite domain completa con los cuatro envs de integración:
+  **34 suites / 216 tests PASS, cero skips**. Pruebas fuerzan constraints diferidas antes de rollback.
+  CLI seed publica 52 y replay no-op; backfill dry-run0, apply1, replay0, revert1 con auditoría/ops_run.
+- Revisión independiente cerró: previews con metadata real; anuncios verifican medio y copy del destino;
+  snapshots deduplicados/arrays parciales no se reescriben por backfill; operadores limitados a org no gobiernan
+  mantenimiento global. Paridad15/15 validada por introspección y cinco negativos del gate.
+- Señal exigida por Slice3 conectada a tarjeta existente Hoy (ui-lite); clasificación corregida a copy, sin editor
+  ni nueva composición. Runtime local1440/390 sin overflow/JS/HTTPerrors y CTA correcto.
+- Greenhouse: capability33tests PASS; SQL parqueado para reactivación en release. Las modificaciones ajenas
+  de docs/skills permanecen en el checkout; no se hace staging masivo.
+- Gateway rama ajena preservada. ICP real (1906/1892), federación T1 (2003), migración/seed/backfill/canary en
+  staging y producción siguen pendientes; TASK-1905 permanece in-progress. Ningún push/deploy/cambio cloud.
+
+[Dossier de evidencia y límites](../../audits/marketing-studio/TASK-1905-local-verification.md).
+
+Commits locales de implementación: Studio `5036d94`, Greenhouse `7d5dc100f`. Greenhouse TypeScript PASS con heap de 12 GB (default de 4 GB agotó memoria). Dossier registra los presupuestos globales de contexto excedidos y preserva el WIP ajeno.
+
+Auditoría documental complementaria: manual MCP y appliesTo actualizados (34 tests PASS, 27 referencias
+verificadas contra manifiesto Studio); skill de planificación espejada, ledger de flags y arquitectura §3.1
+alineados con el contrato local. La federación y el canary siguen pendientes; manual y manifiesto deben
+promoverse coordinadamente. Evidencia ampliada en el dossier local.
+
+Release Studio autorizado y ejecutado posteriormente: main 74073de, Vercel/worker y catálogo verificados. Ver `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`. Greenhouse/gateway/ICP y backfill siguen pendientes.
+
+
+## Readout posterior al release y entrega CLI (2026-10-04)
+
+Este readout sustituye las afirmaciones de rollout pendiente de la fase local anterior, sin borrarlas como historia.
+Studio main `74073de1188f` desplegado: Vercel Ready, API 1.6.0/59 tools; migraciones staging/prod aplicadas, seed v1
+52 canales published. Worker staging 00006-p8q/prod 00004-j4h, misma imagen, health 200. Flags warn/ICP false.
+Canary positivo de copy/warnings/replay en CMP-900 staging; producción lectura+negativos (org 404/bearer 401/catalog
+service write 403), atención 200 y 44/44 thumbs 200. Backfill productivo sólo dry-run: 134 unmapped, revisión de cinco
+aliases por efeonce_operations. Greenhouse capability SQL sigue pendiente; gateway y consumer ICP sin release.
+
+La CLI API-only nueva en Greenhouse (`scripts/marketing-studio`, `pnpm studio`) descubre 59 tools/64 operaciones;
+18 tests/lint PASS y lectura autenticada/upload dry-run real sin ticket. Upload/download/applies se ensayaron con
+servidor local controlado; no transferencia aplicada productiva ni nuevo release Greenhouse. Este cliente conserva
+los permisos/scopes y controles de OneDrive del servidor. `--confirm` no suple autoridad de T2.
+
+Verificación local final: Greenhouse tsc con 12 GB PASS exit 0 (default de 4 GB OOM), Studio check final PASS: 243 Vitest PASS
+(206 domain; 10 tests DB omitidos en esa invocación), 7 gates PASS; la suite PG aislada separada de 34 archivos/216 tests cero
+skips cubre esos casos de dominio. No sumar ambos conteos. Build PASS; docsclosure focal 0 warnings/tasklint 0/0.
+El gate de contexto global conserva excesos de WIP ajeno; la auditoría CLI posterior registra sus tres warnings.
+
+Fuentes: [release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md),
+[checks](../../audits/marketing-studio/TASK-1905-release-2026-10-04-checks.json),
+[CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). TASK-1905 permanece in-progress. TASK-1899 retirada
+no bloquea API/CLI/UI; TASK-2003 posee T1 delegado en paralelo, sin afirmar federación por esta entrega.

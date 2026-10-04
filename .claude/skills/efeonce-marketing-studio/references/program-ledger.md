@@ -1,30 +1,45 @@
 # Efeonce Marketing Studio — program ledger (EPIC-049)
 
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-2003 ya registra la decisión posterior de T1 delegado en paralelo; su implementación, rollout
+y canary siguen pendientes. TASK-1899 y su protocolo T2/proposalDigest permanecen retirados, no se restauran
+como requisito. Se mantienen API-first y controles existentes; la retirada revirtió la implementación local
+sin rollout y no habilitó escrituras MCP ni modificó producción.
+
+
 The single place where a session learns **what exists, where it runs and what the next task inherits**. One section
 per task. Update yours at closure (Skill Maintenance Contract); append to "Sessions" as you go.
 
-EPIC: `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`. Execution order (operator, 2026-09-25):
-**1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898** (login last). TASK-1888/1889 are
-Insights (EPIC-045), not Studio.
+EPIC: `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`. Current activation route:
+**1905 → 2001 → 2002**, with TASK-2003 delegated T1 work in parallel and TASK-1906/1892 for real ICP. Login stays
+last. TASK-1899 is withdrawn. TASK-1888/1889 are Insights (EPIC-045), not Studio.
 
-| Task | Scope | Lifecycle (2026-10-02) | Live where |
+The task sections below are dated delivery history. The current table and §Current session closure supersede
+old local/not-pushed/pending-rollout snapshots; do not replay completed migrations or releases from those snapshots.
+
+| Task | Scope | Lifecycle (2026-10-04) | Live where |
 |---|---|---|---|
 | TASK-1887 | Foundation: repo, DBs/roles, domain model, API v1, catalog import, private renditions, approved UI, Vercel + domain (open mode) | **complete** | `studio.efeonce.org` |
 | TASK-1890 | Agent-ready contract: operations registry + tool manifest, semantics, service bearer, canonical org, capability, served manual | **complete** | Studio prod; Greenhouse release `0e87c7a443a2` serves the manual |
 | TASK-1891 | Federation of every manifest tool in Efeonce MCP | **complete** | Gateway provider **ON** in production |
 | TASK-1892 | Marketing metrics from Greenhouse (Search Console, GA4, SEO) via ecosystem lane `/api/platform/ecosystem/growth/*`, never SQL; paid (Meta/LinkedIn) and organic social (Metricool) as Studio adapters | to-do (GA4 not in production yet: TASK-1284) | — |
 | TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | **complete 2026-09-26** | Studio prod + staging (worker `00001-sgb` / `00002-svt`); Greenhouse release `92002873ced9` |
-| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | **in progress** — Entregable A (ingest door) **in production 2026-10-02**; Entregable B (Slices 4–7) **code complete, verified in staging, NOT in production** (Studio `main` not pushed); C (Slices 8–10) deferred by the operator | Studio prod (API 1.3.0, 15 tools; worker `00002-hzn`) · staging preview of branch `task-1894-entregable-b` (API 1.4.0, 44 tools) |
+| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | **in progress** — Entregables A/B deployed 2026-10-02; C (Slices 8–10) deferred by operator | Retained in Studio production API 1.6.0 / `74073de`; Greenhouse capability rollout remains separate |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
 | TASK-1898 | Login with Efeonce ID (`auth.efeonce.org`), `STUDIO_ACCESS_MODE=efeonce_id`; last; also depends on TASK-1834 | to-do | — |
 | TASK-1998 | Video playback rendition: MP4 H.264 ≤ 720 px faststart in the media worker (flag `MEDIA_WORKER_PLAYBACK_ENABLED`, backfill by the sweep), `/api/v1/media/{token}` → 302 to a 1 h V4 URL (Range by GCS), `Asset.playback` / `AssetVersionDetail.playback`, API 1.5.0 | **complete 2026-10-04** | Studio prod `c52eb4a` (API 1.5.0); worker prod `00003-hrw`, staging `00004-6v7`; 6/6 prod videos with `playback`; gateway manifest synced (efeonce-mcp `454d80eb6`, no deploy needed) |
 | TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
+| TASK-1905 | Versioned channels, taxonomy/UTM, governance, transactional validation, alias/backfill, campaign audiences and ICP references | **in progress** — Studio deployed; Greenhouse capability, real ICP, MCP and human-reviewed backfill pending | API 1.6.0, 59 tools; catalog v1 / 52 channels, warn / ICP false |
 | TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | to-do (blocked by TASK-1905) | — |
 | TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | to-do (blocked by TASK-2001 + direction v3) | — |
 | TASK-2003 | MCP delegated-writes core (agent-friendly): Entra write scope, Greenhouse exchange per exact capability (asset.download/asset.write/campaign.write), Studio delegated actor (person via MCP), gateway federates `T1` writes; no `T2`/approvals (TASK-1899 retired 2026-10-04) | to-do (Codex implements) | — |
-| TASK-1899 | MCP writes and approvals: write-class tools with own scopes (`.write`/`.approve`), delegated person identity (RFC 8693, Studio audience), `dryRun` → explicit confirm, `proposalDigest`; blocked by 1891 + 1894 | to-do | — |
+| TASK-1899 | Withdrawn by the operator 2026-10-04; local implementation reverted; no automatic resume or development prerequisite | to-do (withdrawn; not executable) | No rollout |
 
 ## TASK-1887 — foundation (complete)
 
@@ -273,6 +288,14 @@ only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:
 
 ## Sessions
 
+- 2026-10-04 — TASK-1905 discovery by Codex with three read-only subagents; goal confirmed, plan awaiting the
+  P1/high-effort checkpoint (`docs/tasks/plans/TASK-1905-plan.md`). Studio `c52eb4a`: risk tiers and ChannelValidator
+  already exist; brief already has channel columns; other writers drop catalogVersion. Global catalog needs explicit
+  command scope. 51 focused tests PASS; no DB/live validation or implementation. Hook stopped on stale global
+  blockers; reconcile per-slice ICP/MCP dependencies before rerunning. TASK-1899 stays withdrawn; TASK-2003 owns T1 MCP.
+
+- 2026-10-04 — Operator withdrew TASK-1899 to avoid development friction. Reverted owned local code and migrations in Greenhouse/Studio; gateway unchanged; no commit/push/deploy/live migration. Stopped isolated test PostgreSQL. API/CLI/UI development no longer depends on this MCP design; future federation needs a new scope decision.
+
 - 2026-09-25 — Skill created from the verified facts inventory (Studio `d3ab68e`, gateway `9b93d6a`).
 - 2026-09-26 — TASK-1896 implemented in code (parallel with TASK-1893 in the same checkouts); rollout pending.
 - 2026-09-26 — TASK-1893 implemented in code (Studio `ef2d253`…`697c97c`, Greenhouse `f98c63bff`); rollout pending.
@@ -335,7 +358,7 @@ worker + transport + contract · `995bb73` Range proxy for `next dev` without si
 | Production web | Studio `aa35e02` + `c52eb4a` pushed | live, health `1.5.0` | link → `302` to `storage.googleapis.com/efeonce-marketing-studio-media/renditions/…/playback-….mp4` (`X-Goog-Expires=3600`, `response-content-type=video/mp4`) → `206 video/mp4`; Playwright (Chrome): paused on load, 49.6 s, seek to 30 s, no error; both 16:9 pieces of CMP001-08 in the board |
 | Gateway | manifest 1.5.0 synced | PR efeoncepro/efeonce-mcp#24 merged 2026-10-04 (`454d80eb6`, on the operator's explicit instruction in chat) | surface digest unchanged `193e182cd743`, version stays 1.10.0, no deploy needed |
 
-**Hand-off (exact order):** (1) redeploy staging worker (`bash apps/worker/deploy.sh --env staging --apply`); (2)
+**Historical pre-release hand-off (completed; do not replay):** (1) redeploy staging worker (`bash apps/worker/deploy.sh --env staging --apply`); (2)
 migration `1791129772182` on `marketing_studio`; (3) `PLAYBACK_ENABLED="true"` for production in `deploy.sh` →
 commit → `deploy.sh --env production --apply` → `gcloud scheduler jobs run marketing-studio-reconcile-derivatives`
 (6 videos; check `worker_run` and `studio.asset_rendition` kind `playback` = 6); (4) `git push origin main` (Studio) →
@@ -348,3 +371,41 @@ health `1.5.0` → `curl -I` media link of `CMP001-08-video-16x9` → 302 → fi
 - 2026-10-04 (evening) — operator decisions recorded in strategy ADR §15: channel taxonomy (modality paid/organic/owned/earned × family × platform × placement; buying method platform/programmatic/direct; UGC = content source; Community and Creators & Influencers families; ChatGPT Ads = paid search; Always On campaigns); the calendar belongs to Studio and Metricool is execution evidence → TASK-2001/2002 created (TASK-1911 hands over its unified calendar).
 - 2026-10-04 (night) — RESEARCH-012 (UTM with GA4 still valid; generated by Studio from the activation; origin and lifecycle per value) and operator rule: every EPIC-049 capability must be Full API Parity and operable by MCP, reads and writes, closed only after a real MCP session → route order TASK-1899 → 1905 → 2001 → 2002.
 - 2026-10-04 (late) — operator retired TASK-1899 (its `T2` confirmation flow would slow agents) and asked for the agent-friendly core → TASK-2003 (Codex); route TASK-2003 → 1905 → 2001 → 2002 (corrected the same night after Codex's review: TASK-2003 runs in parallel and blocks nothing; download keeps a read-class exchange and Studio must accept the delegated actor; proven from the operator's real connector).
+
+- 2026-10-04 (TASK-1905 local implementation) — catalog schema/seed, governance commands, transactional validator,
+  metadata on all write paths, aliases/backfill, findings/revalidation and campaign audience/ICP contracts prepared.
+  Greenhouse catalog capability tests pass; its migration is pending. Local PostgreSQL integration exercises deferred
+  FKs before rollback. No commit/push/deploy or production seed/backfill. Gateway checkout belongs to TASK-1921, untouched.
+  ICP real consumer depends on TASK-1906/TASK-1892; disabled by default. TASK-2003 is parallel; real MCP federation/canary
+  remains pending. Coordinator readback: Studio pnpm check PASS (API 1.6.0, 59 tools, 241 Vitest tests + 7 gates); 9 DB tests skipped
+  in normal env were subsequently covered by the full local PG suite (34 files, 216 tests, zero skips; IT/CHANNEL/CONCURRENCY/SEED).
+  Studio build and UI desktop1440/mobile390 PASS. Seed 52 published/replay no-op; CLI backfill dry0/apply1/replay0/revert1,
+  three ops succeeded. Greenhouse typecheck default4GB OOM, retry12GB pending. Evidence: Greenhouse
+  `docs/audits/marketing-studio/TASK-1905-local-verification.md`; operating instructions in
+  `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md`.
+
+- 2026-10-04 — Operator authorized Studio release: main 74073de, Vercel Ready (API 1.6.0, 59 tools),
+  both databases migrated and seeded with 52 channels; workers staged then promoted at the same digest.
+  Production canary and 44 image previews PASS. Warn explicit; ICP false. 134 unmapped legacy records,
+  efeonce_operations owns review. Greenhouse and MCP gateway unchanged. Dossier: TASK-1905-release-2026-10-04.md.
+
+
+## Current session closure — channels, production release and Greenhouse CLI (2026-10-04)
+
+| Surface | Delivered / verified | Remaining boundary |
+| --- | --- | --- |
+| Studio source/web | `5036d94` catalog implementation, `b5f5686` pinned flags, `74073de` worker health; main pushed, Vercel Ready, API1.6.0 / 59 tools | No claim of Greenhouse/gateway release |
+| Database/catalog | Migrations `1791144092031` and `1791144092429` applied to both databases; v1 published with 52 channels, immutable specs; seed readback/replay | Historical raw labels are retained; no guessed mapping |
+| Validation | warn explicit on web/worker; staging copy over hard limit persisted finding/snapshot and replayed idempotently | Enforce not enabled; publish does not revalidate |
+| Worker | Image `74073de1188f`, production `00004-j4h`, staging `00006-p8q`, identical digest; `/health` 200 | `/healthz` is local compatibility only |
+| Production canary | Health/catalog/attention 200, foreign org404, invalid token401, service catalog write403; 44/44 previews200 | Positive write test ran only in staging sandbox |
+| Historical backfill | Dry inventory: 134 unmapped records, 5 aliases; owner efeonce_operations | Human mapping review/apply/readback pending |
+| Authority/ICP | Catalog manage capability code/migration prepared; real references fail closed, ICP false | Greenhouse rollout; TASK-1906/1892 consumer; TASK-2003 T1 MCP. T2 stays operator-only; TASK-1899 withdrawn |
+| Greenhouse CLI | Local `pnpm studio`: dynamic 64 HTTP operations/59 tool aliases; `list`, `describe`, `call`, `doctor`, streaming `upload`, verified `download` | No new grants, deployment or MCP exposure; upload token is not general-write token |
+| CLI verification | 18 tests + lint, live doctor/catalog/authenticated read/upload dryRun; controlled HTTP/GCS applied flows | No production applied write/transfer by this CLI; documentation global gates recorded separately |
+
+Evidence: `docs/audits/marketing-studio/TASK-1905-local-verification.md`,
+`docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`,
+`docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`.
+Manuals: `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md` and `operar-por-cli-api.md`.
+TASK-1905 is not complete merely because Studio was released or the local CLI works.

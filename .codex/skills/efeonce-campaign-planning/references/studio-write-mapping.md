@@ -1,7 +1,7 @@
 # Contrato de escritura y disponibilidad por sesión
 
 **Decisión vigente 2026-10-04:** TASK-1899 retirada; TASK-2003 habilita T1 con identidad delegada. El protocolo
-con proposalDigest descrito como diseño histórico abajo NO es un requisito vigente ni debe implementarse.
+con proposalDigest retirado NO es un requisito vigente ni debe implementarse.
 T2 sigue en el carril de operador. TASK-1905 sirve las siguientes tools en el manifiesto de Studio 1.6.0; aún sin federación/canary MCP:
 
 | Uso | Tool | Tier |
@@ -15,31 +15,23 @@ T2 sigue en el carril de operador. TASK-1905 sirve las siguientes tools en el ma
 No crear identidad/organización ficticia para gobierno global. ICP real depende de TASK-1906/TASK-1892. Referencias previas
 no migran al fijar otra versión. Tools ausentes = propuesta documental; no simular ejecución.
 
-## Historia de diseño (supeditada a la decisión anterior)
+## Disponibilidad vigente (2026-10-04)
 
-> **Delta 2026-10-02 (TASK-1894 Entregables A y B en producción).** Studio API `1.4.0` ya tiene los commands de
-> esta tabla marcados como de TASK-1894 (manifiesto de 44 tools; las de estrategia siguen por definir). Lo que cambia
-> para esta skill:
-> - **Por MCP siguen sin existir:** el gateway (v1.10.0) lleva las escrituras en el manifiesto pero **no las federa**
->   hasta TASK-1899. En sesión MCP el modo sigue siendo documento.
-> - **Autoridad por campaña:** CMP-001…005 están gobernadas por su catálogo de OneDrive (`sourceOfTruth onedrive`)
->   hasta su corte explícito (TASK-1894 Entregable C, diferido): toda escritura del catálogo responde
->   `409 campaign_not_studio_owned`. Para ellas el plan se guarda en OneDrive; nunca se copia a Studio. Leer
->   `permissions` (`writable`, `lockReason`, `sourceOfTruth`, `canApprove`) de `studio.campaign.get` antes de proponer
->   una escritura. Una campaña creada con `createCampaign` nace gobernada por Studio.
-> - **`T2` hoy:** sólo una persona por la CLI del equipo (`pnpm studio:write <operationId> … --apply --confirm`); por API
->   responde `403 confirmation_required` (no el `428` descrito abajo, que es el diseño de TASK-1899) y un `api_client`
->   que aprueba recibe `approval_requires_person`. `approveCreative`/`authorizeMedia` son commands dedicados.
-> - **`T1` hoy:** sólo con un `api_client` con scope `studio:write` o la CLI; en producción ningún `api_client` lo tiene.
->   La identidad delegada de la persona llega con TASK-1898/1899.
-> - Lectura nueva: `studio.campaign.brief.get` (`GET /api/v1/campaigns/{id}/brief`).
+Studio API1.6.0 publica 59 tools y cinco exclusiones HTTP; la CLI de Greenhouse `pnpm studio` las descubre en vivo.
+`pnpm studio describe <tool>` entrega el cuerpo vigente, scope y revisión. Copys/piezas/brief/planes/calendario
+están en API; los commands de estrategia aún pendientes se mantienen como propuestas documentales.
 
-Estado al 2026-09-26: **Studio no tiene escrituras** (API `1.2.0`, 13 tools de lectura). Los commands de abajo
-salen de la tabla «Operaciones y tools» de `TASK-1894` (to-do) y de `TASK-1899` (to-do, federación MCP con
-identidad delegada y `proposalDigest`); los de la capa de estrategia salen del ADR
-`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` y sus tasks (en
-redacción). **Son nombres de trabajo.** Antes de escribir, leer el manifiesto vigente (lista de tools de la sesión o
-`GET /api/v1/tool-manifest`) y usar **sus** nombres; si una tool no existe, esa sección sigue en modo documento.
+- MCP: no usar una escritura ausente de la sesión ni sustituirla por un bearer de servicio; TASK-2003 habilitará T1
+  delegado y corre en paralelo. TASK-1899/proposalDigest fue retirada, no es requisito de API/CLI/UI.
+- Operación local explícita por API: `pnpm studio call <tool> --param ... --file ...` valida sin persistir;
+  `--apply` ejecuta, con `--key`/`--if-match` según esquema. El cliente de cargas no tiene `studio:write`.
+- Catálogo global: rechaza bearer de servicio/usuario mientras no se habilite autoridad delegada. El registro
+  de una operación en `list` no habilita su permiso. T2 queda operator_cli; `--confirm` no fabrica identidad.
+- Leer `permissions`, `revision` y `sourceOfTruth` antes de proponer edición. Las campañas `onedrive` conservan
+  restricciones de sus datos maestros; las creadas por Studio nacen `studio`. La puerta de uploads es separada.
+- Guía operativa API: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`. Las cargas nacen pending_review;
+  descargar un original verifica integridad, no concede derechos ni aprobación.
+
 
 ## Niveles de gobierno
 
@@ -47,7 +39,7 @@ redacción). **Son nombres de trabajo.** Antes de escribir, leer el manifiesto v
 |---|---|---|
 | **T0** | Lecturas | Directas. |
 | **T1** | Borradores y ediciones que no aprueban, no publican, no gastan y no destruyen | Directas, con la **identidad delegada de la persona** (capability `marketing_studio.campaign.write` o `marketing_studio.asset.write`), `Idempotency-Key` estable por intento lógico (reintentar con la misma llave; misma llave + otro cuerpo = `422 idempotency_key_reused`), `If-Match` con la `revision` recién leída (`412 revision_conflict` ⇒ releer y proponer de nuevo, nunca forzar). Todo nace en borrador / `pending_review`. |
-| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | `dryRun` (diff + `revision` base, sin escribir) → mostrar el diff y el `proposalDigest` → **confirmación humana explícita de ese diff** → ejecutar con `confirmation.proposalDigest`. Sin digest: `428 confirmation_required`; con digest viejo: `409 confirmation_mismatch`; en ambos casos no se escribe. Aprobar exige `marketing_studio.campaign.approve` de la persona (un `api_client` nunca aprueba). |
+| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | En Studio, carril de operador con autorización humana explícita; API conserva `403 confirmation_required` o `approval_requires_person` según actor/acción. `--confirm` en el cliente HTTP no concede identidad. Para gasto/publicación externos, usar el contrato vigente del proveedor; no importar el proposalDigest retirado. |
 
 **El agente nunca aprueba, publica ni gasta solo.** Si la persona no tiene la capability, el canje de Greenhouse
 responde `forbidden`: se informa y no se reintenta. Un `401` o `5xx` de escritura con resultado incierto
@@ -69,7 +61,7 @@ command si existe, o en la nota editorial / nota de versión del registro (`copy
 | 1–2 · Plan completo en borrador | ‹command de borrador de plan› | ‹por definir en la capa de estrategia› | T1 | hasta que exista, el plan vive en el documento |
 | 2 · Objetivo, problema, insight, ventana, canales, mandatorios, presupuesto envolvente (**propuesto**) | `upsertCampaignBrief` | `studio.campaign.brief.upsert` | T1 | tabla `campaign_brief`; texto literal; editar un brief aprobado lo devuelve a borrador (auditado) |
 | 2 · KPIs con meta | `upsertCampaignBrief` (`campaign_brief_kpi`: métrica, meta, unidad, fuente esperada) | idem | T1 | una meta sin quién la fijó no se escribe como meta |
-| 3 · Audiencias del brief | `upsertCampaignBrief` (`campaign_brief_audience`: nombre, descripción, referencia opcional a `studio.audience`) | idem | T1 | las audiencias de targeting no tienen command propio en TASK-1894 **[verificar]** |
+| 3 · Audiencias del brief | `upsertCampaignBrief` (`campaign_brief_audience`: nombre, descripción, referencia opcional a `studio.audience`) | idem | T1 | para audiencias de campaña usar además `upsertChannelAudience` / `studio.campaign.audience.upsert` (TASK-1905); ICP real aún depende del reader habilitado |
 | 2–4 · Aprobar el brief | `approveCampaignBrief` | `studio.campaign.brief.approve` | **T2** | persona con `.campaign.approve` |
 | 4–5 · Conceptos | `createConcept` · `updateConcept` | `studio.concept.create` · `.update` | T1 | |
 | 5 · Piezas planificadas | `createAsset` · `updateAsset` | `studio.asset.create` · `.update` | T1 | una pieza sin versión es plan, no final |
@@ -81,7 +73,7 @@ command si existe, o en la nota editorial / nota de versión del registro (`copy
 | 6 · Referencias SEO/AEO del plan | ‹command de referencias SEO/AEO› | ‹por definir en la capa de estrategia› | T1 | referencia keywords/preguntas/URLs; no copia datos de SV360 |
 | 6 · Borrador de prompts AEO | — (Greenhouse) | `prepare_seo_grounded_queries` | T1 | no aprueba ni corre el grader |
 | 6 · Seguir keywords, discovery, competidores, diagnóstico | — (Greenhouse) | `track_seo_keywords` · `discover_seo_keywords` · `declare_seo_competitors` · `run_seo_prospect_diagnostic` | **T2** | protocolo `seo-spend-discipline` (lista exacta + costo + confirmación) |
-| 8 · Copys | `createCopyVariant` · `updateCopyVariant` | `studio.copy.create` · `.update` | T1 | se guarda byte a byte; el command rechaza en vez de «arreglar» |
+| 8 · Copys | `createCopyVariant` · `updateCopyVariant` | `studio.copy.create` · `.update` | T1 | se guarda literal; warn puede persistir hallazgo duro, enforce lo rechaza; nunca truncar para pasar |
 | 8 · Configuraciones de anuncio | `createAdConfiguration` · `updateAdConfiguration` | `studio.ad.create` · `.update` | T1 | configurado ≠ activo |
 | 9 · Flight | `createMediaFlight` · `updateMediaFlight` | `studio.media_plan.flight.create` · `.update` | T1 | |
 | 9 · Líneas de presupuesto | `setBudgetLine` | `studio.media_plan.budget_line.set` | T1 **sólo `proposed`** | `actual` nunca se escribe por command; mezclar kinds = `422 budget_kind_violation` |
@@ -99,5 +91,6 @@ command si existe, o en la nota editorial / nota de versión del registro (`copy
 2. Brief en borrador → conceptos → piezas planificadas → ítems del plan de contenidos → copys → anuncios →
    flight → líneas `proposed` → posts programados → referencias SEO/AEO (todo T1, con procedencia).
 3. Presentar al humano el resumen de lo escrito y la lista de T2 pendientes (aprobar brief, aprobar líneas,
-   gasto SEO), cada una con su `dryRun` y su `proposalDigest`.
-4. Ejecutar sólo los T2 que el humano confirmó, uno por uno, con su digest; releer y reportar el estado leído.
+   gasto SEO), con evidencia y validación disponible, sin inventar digest de confirmación.
+4. Derivar T2 al carril autorizado de operador/proveedor; ejecutar sólo lo autorizado y releer el estado.
+   MCP T1 disponible o CLI HTTP local no habilitan aprobación/publicación por sí solos.

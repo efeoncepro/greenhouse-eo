@@ -269,3 +269,11 @@ Indice maestro de la documentacion no operativa del repo.
   - las tasks existentes en el backlog (`CODEX_TASK_*` y `TASK-###` ya creadas) siguen vigentes con su formato original
   - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
   - si un trabajo cambia el canal o la disponibilidad de una capacidad visible, revisar tambien `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md` y evaluar si corresponde actualizar `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Marketing Studio — catálogo desplegado y CLI HTTP local
+
+- [Contrato funcional: canales y referencias ICP](documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
+- [Manual: gobernar catálogo y backfill](manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+- [Release de Studio y pendientes](audits/marketing-studio/TASK-1905-release-2026-10-04.md).
+- [CLI HTTP: cargas, descargas y operaciones](manual-de-uso/marketing-studio/operar-por-cli-api.md).
+- [Cierre documental completo de sesión](audits/marketing-studio/2026-10-04-session-documentation-closure.md).

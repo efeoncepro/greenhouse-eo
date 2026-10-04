@@ -769,6 +769,18 @@ El canary es `pnpm brand:canary`; requiere `GREENHOUSE_ECOSYSTEM_API_URL`, `GREE
 
 ## Provider Marketing Studio (Efeonce Marketing Studio)
 
+**Lectura vigente del corte 2026-10-04:** Studio sirve API 1.6.0, 59 tools de negocio y 64 operaciones
+OpenAPI; eso **no** equivale al inventario federado del gateway. El release `74073de` sólo promovió Studio.
+TASK-1899 fue retirada como requisito API/CLI/UI; la decisión posterior asigna T1 delegado a TASK-2003,
+en paralelo y pendiente de su propia autoridad/canary. T2/proposalDigest de TASK-1899 siguen retirados. El guard del checkout del gateway sigue rechazando `tool.writes`; no ejecutar
+`studio:manifest:sync` indiscriminadamente contra las 59 tools como supuesto cierre documental.
+La CLI HTTP local de Greenhouse, `pnpm studio`, opera directamente con permisos de API; no usa ni modifica
+este provider. [Manual CLI](../manual-de-uso/marketing-studio/operar-por-cli-api.md) ·
+[release/evidencia](../audits/marketing-studio/TASK-1905-release-2026-10-04.md).
+
+La siguiente revisión del gateway corresponde al encendido histórico del 26/09; no es un nuevo readback
+de Cloud Run ni una certificación de las capabilities añadidas por TASK-1905.
+
 > Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-26: **encendido en producción**. Gateway `958c9de30` (1.8.0 + fix #20)
 > en la revisión `efeonce-mcp-gateway-00061-sbc` al 100 % con `MARKETING_STUDIO_PROVIDER_ENABLED=true`; canary por sesión MCP
 > real en verde. Tres lecciones del encendido:
@@ -776,8 +788,8 @@ El canary es `pnpm brand:canary`; requiere `GREENHOUSE_ECOSYSTEM_API_URL`, `GREE
 > - Si la promoción falla, revisar `spec.traffic`: puede quedar en la revisión rota y bloquear todos los deploys siguientes. Se sale con `update-traffic` a la revisión que sirve y un re-dispatch.
 > - Un `upstream_unavailable` del provider puede venir de un 503 del canje en Greenhouse, no de Studio. Hay que mirar los runtime logs de Vercel de `/api/integrations/v1/sister-platforms/oauth/token`.
 
-El provider `marketing-studio` (`src/providers/marketing-studio.ts`) federa las 12 tools de lectura `studio.*` que
-declara el manifiesto de Studio (`studio-tool-manifest.v1`). **Studio no conoce personas**, así que la autoridad de
+El provider `marketing-studio` (`src/providers/marketing-studio.ts`) federa las tools de lectura `studio.*` de
+su manifiesto sincronizado (`studio-tool-manifest.v1`); el encendido original incluyó 12. **Studio no conoce personas**, así que la autoridad de
 la persona se prueba en Greenhouse antes de CADA llamada:
 
 1. Canje RFC 8693 del token Entra de la persona en `/api/integrations/v1/sister-platforms/oauth/token`, cliente
@@ -794,7 +806,7 @@ la persona se prueba en Greenhouse antes de CADA llamada:
   Greenhouse (`STUDIO_REPO`, `GREENHOUSE_REPO`), verifica ambos hashes y escribe el generado. El hash se verifica al
   cargar: editarlo a mano impide arrancar el gateway.
 - **Guard:** `computeMarketingStudioParity` compara manifiesto ↔ tools registradas en las dos direcciones, rechaza
-  tools de escritura sin clase de scope (TASK-1899) y exige que el `appliesTo` del manual `marketing-studio` exista en
+  tools de escritura (su carril permanece sin habilitar; TASK-1899 fue retirada) y exige que el `appliesTo` del manual `marketing-studio` exista en
   el manifiesto (Greenhouse sólo valida el prefijo).
 - **Política:** inventario exacto derivado del manifiesto; issuer Entra. Nativo `unsupported`
   (`marketing_studio_native_policy_missing`): la autoridad interna v2 sólo delega `growth.seo.observation.read` y

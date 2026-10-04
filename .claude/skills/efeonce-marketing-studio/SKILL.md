@@ -1,6 +1,6 @@
 ---
 name: efeonce-marketing-studio
-description: Operate and extend Efeonce Marketing Studio (studio.efeonce.org, repo efeoncepro/efeonce-marketing-studio, EPIC-049) — the API-first system of record for campaigns CMP-### (brief, concepts, pieces with versions and renditions, literal copy per channel, ad configurations, media plan, calendar, attention), the evolution of the Codex "Campaign Manager" HTML prototype in OneDrive. Use when touching the efeonce-marketing-studio repo, its /api/v1 contract or operations registry (packages/contracts/src/operations.ts), the studio.* MCP tools and their federation in efeonce-mcp (provider marketing-studio, MARKETING_STUDIO_PROVIDER_ENABLED), api_client bearer tokens (mst_…), the marketing_studio.campaign.* capabilities or the RFC 8693 exchange in Greenhouse, importing the catalog from OneDrive, generating renditions, adding an operation/tool, rolling out or rolling back Studio or its gateway provider, or any EPIC-049 task (TASK-1887, 1890–1899). NOT for Efeonce Creative Studio (= Globe, use greenhouse-globe). Every EPIC-049 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Marketing Studio (studio.efeonce.org, repo efeoncepro/efeonce-marketing-studio, EPIC-049) — the API-first system of record for campaigns CMP-### (brief, concepts, pieces with versions and renditions, literal copy per channel, ad configurations, media plan, calendar, attention), the evolution of the Codex "Campaign Manager" HTML prototype in OneDrive. Use when touching the efeonce-marketing-studio repo, its /api/v1 contract or operations registry (packages/contracts/src/operations.ts), the studio.* MCP tools and their federation in efeonce-mcp (provider marketing-studio, MARKETING_STUDIO_PROVIDER_ENABLED), api_client bearer tokens (mst_…), the marketing_studio.campaign.* capabilities or the RFC 8693 exchange in Greenhouse, importing the catalog from OneDrive, generating renditions, adding an operation/tool, rolling out or rolling back Studio or its gateway provider, the API-only Greenhouse CLI `pnpm studio` (upload/download, copy and catalog operations), or any EPIC-049 task. NOT for Efeonce Creative Studio (= Globe, use greenhouse-globe). Every EPIC-049 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Marketing Studio (living skill)
@@ -19,6 +19,16 @@ decisions). It is the productized evolution of the Codex "Campaign Manager" HTML
 This skill is the **accumulated operating knowledge of the program**, not a copy of the docs. The ADR and the
 architecture say what Studio *is*; this skill says what an agent must know to *work on it without repeating what
 already cost a day*. It grows with every task (see the maintenance contract).
+
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-2003 ya registra la decisión posterior de T1 delegado en paralelo; su implementación, rollout
+y canary siguen pendientes. TASK-1899 y su protocolo T2/proposalDigest permanecen retirados, no se restauran
+como requisito. Se mantienen API-first y controles existentes; la retirada revirtió la implementación local
+sin rollout y no habilitó escrituras MCP ni modificó producción.
 
 ## Where everything lives
 
@@ -52,7 +62,7 @@ conserva informes/render/grants/distribución. No spend/publish implícito ni co
    pending. **Start here to know the current state.**
 3. [`references/architecture-map.md`](references/architecture-map.md) — code layout, runtime resources, env vars,
    secrets (names only).
-4. [`references/contracts.md`](references/contracts.md) — the 17 operations, semantics glossary, error contract,
+4. [`references/contracts.md`](references/contracts.md) — the versioned operations inventory, semantics, error contract,
    tool manifest shape and hash.
 5. [`references/operations.md`](references/operations.md) — commands, deploy, verification curls, rollback,
    gateway flag procedure and canary.
@@ -105,8 +115,9 @@ Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_ING
   `If-Match`, the person as actor, `audit_event`, minimal rights (license kind) required, derivatives via the existing
   worker. Upload is two-step: signed V4 URL scoped to one object (resumable for big video; skipped if the sha256 is
   already stored) → client uploads straight to GCS → confirm; Studio verifies size, mime and the **recomputed** sha256
-  before creating the version. Doors: CLI `pnpm studio:upload` (TASK-1894), MCP write tools with delegated identity
-  (`studio.asset.upload.request` + `studio.asset.version.create`, TASK-1899), UI (TASK-1895).
+  before creating the version. Doors: Greenhouse `pnpm studio upload` (API-only), sibling CLI `pnpm studio:upload`,
+  MCP tools with delegated identity (`studio.asset.upload.request` + `studio.asset.version.create`, TASK-2003 pending),
+  UI (TASK-1895 pending).
 - **Inference**: CLI and agents infer campaign, concept, format and version from the canonical filename
   (`CMP001-02 - <título> - 4x5.png`) and the catalog, and only ask for what they cannot infer.
 - **Approval stays human**: a new version lands pending review; a person approves (or an agent with that person's
@@ -116,19 +127,20 @@ Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_ING
   for that campaign; `media:ingest` stays only as history backfill and is retired afterwards. Signal: «pieza aprobada
   sin original en Studio». A Microsoft Graph mirror of SharePoint is **not planned** (a Graph read is only for
   one-off backfill/reconciliation).
-- None of this is in runtime yet: until a campaign's cutover, the TASK-1893 regime holds (OneDrive = source, GCS =
-  verified copy of already registered finals).
+- The ingest door and dated campaign authority are deployed. Existing `onedrive` campaigns retain their master-data
+  restrictions until explicit cutover; new `studio` campaigns use Studio authority. Upload is the separate ingest door.
 
 ## Strategy layer (ADR accepted 2026-09-26)
 
 Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (architecture §3.1).
-Nothing of it is in runtime yet; EPIC-049 tasks implement it by theme.
+The channel catalog and validation slice is deployed (TASK-1905); real ICP and the remaining strategy themes are
+separate deliveries. Never present the entire strategy layer as already operational.
 
-- **Full parity with agent execution**: every capability, read AND write, is born with command, `/api/v1` route,
-  registry entry and federated MCP tool; agents (Claude, Codex, Nexa) execute every UI action with the person's
-  delegated identity (TASK-1899 mechanics). Each operation declares its risk tier in the registry: **T0** read
-  (direct) · **T1** reversible draft/edit (direct, idempotent, `If-Match`, audited, actor = person) · **T2** approve,
-  publish, spend, external credentials or destructive (`dryRun` → proposal digest → explicit human confirm).
+- **Full API parity with agent-ready contracts**: every capability, read AND write, is born with a command/reader,
+  `/api/v1` route, registry entry and tool or reasoned exclusion. The HTTP CLI consumes that contract; MCP exposure
+  requires its own authority and canary. Tiers are declared by the registry: **T0** read · **T1** reversible draft/edit
+  (idempotent, `If-Match`, audited) · **T2** approval/publication/spend/destruction (person/operator lane). TASK-2003
+  owns delegated T1 federation in parallel; the retired proposalDigest protocol must not be restored by inference.
 - **Channel catalog** (Studio, versioned `channel_key`: type, platform, placements, formats, copy limits, objectives,
   source + verified date per spec) validates copies/pieces/ads at write time and replaces free-text `channel`
   (expand → human-reviewed backfill → contract). Market is never encoded in the channel key.
@@ -157,8 +169,9 @@ runtime, memory or delegated authority.
 - **Work items** are the unit of hybrid work per campaign: assignee = person **or** agent role@version, requester,
   state machine, versioned inputs by reference, deliverable = draft with provenance (TASK-1909), review, handoff =
   a **new work item** (never a provider handoff). Assigning to an agent is `T1` within the cost cap, `T2` above it.
-- **MCP is the only action path** for agents (`mcp.efeonce.org`); per-role tool allowlist enforced in the runtime
-  and again in Studio/gateway. Never the `mst_` bearer, SQL or internal APIs.
+- **MCP is the only action path** for delegated or scheduled product agents (`mcp.efeonce.org`); per-role tool allowlist enforced in the runtime
+  and again in Studio/gateway. Never the `mst_` bearer, SQL or internal APIs. Explicit operator work in this local repo may use the
+  authorized HTTP CLI and its service scopes; it is not the product-agent delegation path.
 - **Agent role registry** (versioned data, portable Claude ↔ OpenAI): mission, skills@version, tools with tier
   (`T0`/`T1` direct, `T2` proposal only), cost/turn caps, preferred runtime/model, eval set, enabled modes, kill switch.
   Interactive role skills: `efeonce-agent-media-planner`, `efeonce-agent-seo-aeo` (+ `efeonce-campaign-planning`).
@@ -183,8 +196,9 @@ runtime, memory or delegated authority.
 - Descriptions reuse the glossary `semantics.ts` (never rewritten by hand elsewhere) and pass a **leak test**
   (no ids, repo paths, TASK ids, infrastructure names or secrets).
 - **UI → API → MCP parity, approvals included** (operator decision 2026-09-25): everything the UI can do is doable
-  through `/api/v1` and through MCP. Writes/approvals arrive with TASK-1894 (commands) and TASK-1899 (MCP writes
-  with `.write`/`.approve` scopes, delegated identity, `proposalDigest`). A write tool without its own scope class is
+  through `/api/v1` and through MCP. The command API exists; the Greenhouse HTTP CLI discovers it dynamically. MCP T1 federation is a separate
+  TASK-2003 delivery with delegated identity. TASK-1899 and its proposalDigest design are retired; T2 stays in the
+  operator lane. API/CLI/UI development does not wait for MCP rollout. A write tool without its own scope class is
   a parity finding in the gateway (`write_tool_without_scope_class`) and is not federated.
 
 ## Authority model
@@ -207,10 +221,10 @@ runtime, memory or delegated authority.
   `efeonce_account`, `efeonce_operations` (live). `.asset.write` and `.campaign.write` (`create`/`update`, scope
   `tenant`; admin, operations, account, designer) are seeded and granted on `develop` (`9d0d698d4`, 2026-10-02) but
   **not released to production**. `.approve` (admin, account, operations — designer writes but never approves) is
-  planned in TASK-1899. Studio enforces API scopes `studio:assets:write` / `studio:write` for API clients.
+  not enabled by the retired TASK-1899 design. Studio enforces API scopes `studio:assets:write` / `studio:write` for API clients.
 - **Authority per campaign** (Entregable B): `campaign.source_of_truth` `onedrive` (default) | `studio`. Catalog writes
   on an `onedrive` campaign ⇒ 409 `campaign_not_studio_owned`; T2 (approval/destructive) only for `operator_cli`
-  (`pnpm studio:write … --apply --confirm`), via API 403 `confirmation_required` until TASK-1899.
+  (`pnpm studio:write … --apply --confirm`), via API 403 `confirmation_required`; the new HTTP CLI preserves this boundary.
 
 ## Hard rules
 
@@ -302,33 +316,28 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 - **MCP `forbidden`** → the Greenhouse exchange denied: person lacks `marketing_studio.campaign.read`, or
   `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` lacks `efeonce-mcp-marketing-studio` in that deployment.
 
-## Program status (2026-10-02) and pending
+## Program status (verified 2026-10-04)
 
-- Studio in production; API 1.3.0; 15 tools + 5 exclusions in the Studio manifest (20 operations: 18 reads `T0` + 2
-  writes `T1`); the gateway federates 12 (the `studio.asset.download` federation is a TASK-1893 follow-up, and the
-  manifest with the two write tools is not synced — the parity guard would drop them until TASK-1899).
-- TASK-1894 **Entregable A (ingest door) in production since 2026-10-02**: `studio.asset.upload.request` +
-  `studio.asset.version.create` (scope `studio:assets:write`), CLI `pnpm studio:upload` (HTTP `api_client`) and
-  `pnpm studio:review` (operator only); flags `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` + `STUDIO_UPLOADS_ENABLED` ON; 33
-  CMP-004 finals uploaded and `pending_review`. Greenhouse capability `marketing_studio.asset.write` not seeded (not
-  authorized yet). Entregables B and C pending.
-- TASK-1894 **Entregable B (catalog commands) in production since 2026-10-02** (health 1.4.0, read-only prod smoke):
-  Studio `a8c7886` on `main`, preview of branch `task-1894-entregable-b`; API 1.4.0, 44
-  tools (29 write routes + `studio.campaign.brief.get`), state machines, `CampaignDetail.permissions`, `ETag`, CLI
-  `pnpm studio:write`; migration `1790967435017` applied on staging and prod (5 real campaigns stay `onedrive`);
-  sandbox `CMP-900`. Greenhouse write capabilities on `develop` only. Gateway: synced 2026-10-02 (efeonce-mcp#23, v1.10.0)
-  with the read-only federation filter — **never federate a Studio write before TASK-1899**; deployed (revision 00064). Entregable C deferred by the operator.
-- Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
-  Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
-- Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of
-  `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
-  real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
-- Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
-- TASK-1998/1999 **complete 2026-10-04, in production**: video playback — `playback` derivative (MP4 H.264 ≤ 720 px,
-  faststart, flag `MEDIA_WORKER_PLAYBACK_ENABLED` ON in staging `00004-6v7` and production `00003-hrw`), 302 transport to
-  a 1 h V4 URL, `Asset.playback`, API 1.5.0 (Studio `c52eb4a`), native player in the inspector and every piece per format
-  in the board. Gateway manifest synced (efeonce-mcp `454d80eb6`; surface unchanged, no deploy).
-- Next: TASK-1892 → 1894 (B, C) → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
+- Studio production `main` is `74073de1188f`: API **1.6.0**, **59 business tools + 5 HTTP exclusions**. Published
+  catalog v1 has **52 channels**. Web and worker were verified; `STUDIO_CHANNEL_VALIDATION_MODE=warn` and
+  `STUDIO_CUSTOMER_MODEL_ENABLED=false`. Evidence: `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`.
+- TASK-1894 A and B are deployed; C remains deferred. TASK-1998/1999 playback is deployed. The current worker is
+  production `00004-j4h` / staging `00006-p8q`; earlier revisions in task history are deployment evidence, not the live pointer.
+- **Local Greenhouse CLI:** `pnpm studio` covers the live OpenAPI/manifest by operationId or `studio.*`, with
+  `list`, `describe`, `call`, `doctor`, `upload`, `download`. It is API-only, uses dryRun by default and `--apply`
+  for writes, retains revisions/idempotency, streams GCS bytes without the Studio bearer and verifies downloads.
+  See `references/operations.md` and `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`.
+- CLI verification: 18 tests and lint pass; authenticated read and upload dryRun passed against production.
+  Applied transfer/write scenarios were tested locally; this CLI delivery did not apply production writes or deploy.
+- The upload service client holds `studio:assets:write`, not general `studio:write`. Global catalog management still
+  rejects service/user bearer calls pending delegated authority; `--apply --confirm` cannot create that authority.
+- MCP remains a separately gated read federation: the existing filter includes 14 reads; new catalog tools and T1
+  writes from API 1.6.0 are not certified through the gateway. TASK-2003 runs in parallel; TASK-1899 is retired.
+  ICP requires TASK-1906/1892. Greenhouse catalog capability rollout and the legacy backfill remain pending.
+- Backfill production dry-run found 134 unmapped rows across five aliases; review owner `efeonce_operations`.
+  No mapping was guessed or applied. Publishing a catalog is not revalidation or migration of existing records.
+- TASK-1905 stays in progress with these cross-runtime dependencies. Details and historical delivery evidence:
+  `references/program-ledger.md`.
 
 ## Routing
 
@@ -359,3 +368,14 @@ At closure, in the same commit as the task's lifecycle change (in `greenhouse-eo
 
 Sessions doing partial work (a slice, an incident, a canary) append to `lessons.md` and the ledger's "Sessions" list
 immediately. Claude, Codex and Cursor all own this contract; edit `.claude/` and mirror.
+
+## Channel catalog and ICP delta (2026-10-04, TASK-1905 Studio release)
+
+Studio main 74073de is deployed: API 1.6.0, published catalog v1 (52 channels), web and media worker verified. Read
+`references/contracts.md` and `references/operations.md` before channel writes. `warn` is the default, not a claim of
+valid content. Keep original labels alongside resolved keys/version; unknown labels never become canonical keys.
+`marketing_studio.catalog.manage` is admin/operations only (create/update). ICP defaults disabled; actual references
+fail closed until TASK-1906 + TASK-1892 provide the authorized consumer. TASK-2003 runs in parallel; TASK-1899 is
+retired. No T1 federation is claimed before real delegated
+authority is verified. T2 remains operator CLI. Gateway/Greenhouse rollout and legacy backfill are pending. Evidence and limits:
+`docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md` in Greenhouse.

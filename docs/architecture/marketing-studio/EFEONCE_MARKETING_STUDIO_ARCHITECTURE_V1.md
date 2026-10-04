@@ -1,9 +1,21 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-1899 y su implementación local quedaron retiradas sin rollout. TASK-2003 toma el carril de
+identidad delegada y escrituras MCP T1 en paralelo; no es requisito para entregar API/CLI/UI. La confirmación T2
+por digest propuesta en TASK-1899 queda como diseño histórico, sin contrato operativo vigente. Se mantienen
+API-first, paridad del registro y controles de acceso; una tool declarada no acredita federación ni una sesión MCP.
+El release de Studio del mismo día es independiente y se documenta con su alcance en cada sección vigente.
+
+
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.11
+> **Versión:** 1.12
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-04 por Claude (TASK-1998/1999 en producción desde el mismo día: derivado `playback` de video, transporte 302 a URL firmada V4, `Asset.playback`, API 1.5.0, reproductor en el inspector, §7.5 y §8; antes, 2026-10-02 (noche): TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -104,6 +116,30 @@ tipos hace fallar el build (verificado a propósito).
 
 ## 3. Modelo de dominio
 
+### 3.1 Catálogo y referencias (TASK-1905, 2026-10-04)
+
+Studio main `74073de` desplegado, API 1.6.0, 64 operaciones HTTP y 59 tools declaradas; el [dossier de release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md) actualiza el estado de los apartados
+históricos. Catálogo global versionado (52 canales), taxonomía/UTM por aparición, validación transaccional,
+snapshots inmutables, aliases revisados, revalidación explícita y backfill auditable. Compra/deal type en
+anuncio/presupuesto; contentSource en asset; cuenta/mercado esperan activaciones TASK-2001.
+Web y worker operan con `STUDIO_CHANNEL_VALIDATION_MODE=warn` y `STUDIO_CUSTOMER_MODEL_ENABLED=false`.
+Reader ICP inyectable: referencia real condicionada a TASK-1906/TASK-1892; T1 delegado a TASK-2003. Gobierno global
+requiere `marketing_studio.catalog.manage` y actualmente `operator_cli` sin restricción organizacional; los bearers
+de servicio/usuario no lo conceden. La migración de capability Greenhouse, el backfill y el canary MCP siguen pendientes. [Contrato funcional](../../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md),
+[manual](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md) y [verificación local previa](../../audits/marketing-studio/TASK-1905-local-verification.md).
+
+Los 52 canales combinan las cuatro modalidades y doce familias; no representan 52 plataformas distintas.
+Compra, aparición, placement y formato son dimensiones separadas. Tracking y límites conservan fuente, fecha y
+ámbito; inventario ambiguo conserva nulos con razón explícita. `validatedWithPreviousSpec` expone antigüedad sin
+revalidar al leer. `channel_unmapped` cuenta registros pendientes y findings vigentes alimentan la atención.
+El dry-run productivo encontró 134 registros sin mapear; ninguno se corrigió automáticamente.
+
+La [CLI HTTP de Greenhouse](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) descubre el contrato remoto,
+prepara escrituras por defecto, exige `--apply` para enviarlas y conserva los controles del servidor. Verificación:
+18 tests locales, lecturas autenticadas y upload real en dry-run; ningún upload aplicado en producción acredita
+este cliente. [Dossier CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+
 Schema `studio` dentro de la base `marketing_studio`. IDs de negocio legibles preservados del catálogo
 (`CMP-001`, `CMP001-01`, `CMP001-01-imagen-16x9`, `copy-01-linkedin-a`), porque son los que ya usan los CDR,
 los nombres de archivo y las UTM.
@@ -128,7 +164,7 @@ los nombres de archivo y las UTM.
 | Corrida de import | `studio.import_run` | uuid | fuente, digest, modo, conteos, resultado |
 | Cliente API | `studio.api_client` | uuid | sha256 del token, scopes, organizaciones permitidas, revocación |
 
-Datos vigentes (producción y staging): 5 campañas (CMP-001..005), 21 conceptos, 54 piezas, 48 copys, 72 anuncios,
+Snapshot histórico de la fundación (2026-09-25; no usar como inventario actual): 5 campañas (CMP-001..005), 21 conceptos, 54 piezas, 48 copys, 72 anuncios,
 4 audiencias, 1 flight, 7 líneas de presupuesto y 6 posts, todos con `organization_id =
 org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 
@@ -150,17 +186,19 @@ org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 ## 3.1 Capa de estrategia
 
 Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
-(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
-como contrato:
+(Accepted 2026-09-26). **Actualización 2026-10-04:** catálogo y validación están desplegados (§3); ICP real,
+activaciones y las otras capacidades conservan sus tareas. Contrato vigente:
 
 - **Paridad total con ejecución por agentes.** Toda capacidad, de lectura y de escritura, nace con command o reader de
-  dominio, ruta `/api/v1`, entrada en `operations.ts` (tool o exclusión razonada) y tool MCP federada. La UI escribe
+  dominio, ruta `/api/v1`, entrada en `operations.ts` (tool o exclusión razonada) y manifiesto generado. Federar y
+  verificar MCP es un carril separado que no bloquea API/CLI/UI. La UI escribe
   sólo por esos commands. Claude, Codex y Nexa pueden ejecutar toda acción de la UI con la identidad delegada de la
-  persona (mecánica de TASK-1899). El test de paridad se amplía a escrituras, nivel declarado y mutaciones de la UI.
+  persona (carril T1 de TASK-2003, pendiente de federación; TASK-1899 retirada). El test de paridad se amplía a escrituras, nivel declarado y mutaciones de la UI.
 - **Niveles de riesgo por operación**, declarados en el registro y aplicados por el command: `T0` lectura (directa);
   `T1` borrador o edición reversible (directa, idempotente, `If-Match`, auditada, actor = persona); `T2` aprobación,
-  publicación, gasto, credenciales externas o destructivo (`dryRun` → digest → confirmación explícita de una persona).
-- **Catálogo de canales** gobernado y versionado en Studio (`channel_key`: tipo paid/organic/owned, plataforma,
+  publicación, gasto, credenciales externas o destructivo (confirmación humana; HTTP T2 no habilitado, operador CLI
+  con `--apply --confirm`). El digest propuesto por TASK-1899 quedó retirado.
+- **Catálogo de canales** gobernado y versionado en Studio (`channel_key`: modalidad paid/organic/owned/earned, familia, plataforma,
   placements, formatos, límites de copy, objetivos válidos, fuente y fecha por especificación). Valida copys, piezas y
   anuncios al escribir; reemplaza el `channel` libre por expand → backfill revisado → contract. El mercado no se
   codifica en el canal.
@@ -232,7 +270,7 @@ a un flujo editorial completo desplegado. No hubo implementación o cambio runti
 - **Organización:** toda lectura acepta `organizationId` (id canónico `org-…`). **Intersecta, nunca amplía**: una organización fuera de lo visible responde 404 (anti-oráculo); en modo `open` restringe el resultado.
 - Paginación por cursor opaco en listas que pueden crecer (`assets`, `ads`, `copies`); orden estable por ID.
 - **Escrituras:** hasta el 2026-10-02 no había escrituras HTTP. El import corre por CLI con credencial de migrador. Los commands (crear campaña, versionar asset, revisar copy, aprobar) llegan en TASK-1894 con `Idempotency-Key` + digest, `If-Match` por `revision` y auditoría, y nacen en el mismo registro con su tool de clase `write` o una exclusión con razón. Toda versión nueva entra por **un solo command** (`createAssetVersion`, tool `studio.asset.version.create`) desde CLI, MCP o UI, con subida firmada directa a GCS (§7).
-- **Delta 2026-10-02 (TASK-1894 Entregable A):** existen las dos primeras escrituras, `POST /api/v1/campaigns/{campaignId}/uploads` (tool `studio.asset.upload.request`) y `POST /api/v1/campaigns/{campaignId}/asset-versions` (tool `studio.asset.version.create`), ambas riskTier T1, capability `marketing_studio.asset.write` y scope `studio:assets:write`. El registro declara `riskTier` explícito en sus 20 operaciones (18 lecturas T0 + 2 escrituras T1) y el manifiesto queda en 15 tools + 5 exclusiones. Contrato completo, kernel y compuertas en §7.3. La revisión (aprobar o pedir cambios) existe sólo como CLI de operador; la aprobación por API es Slice 4 + TASK-1899.
+- **Delta 2026-10-02 (TASK-1894 Entregable A):** existen las dos primeras escrituras, `POST /api/v1/campaigns/{campaignId}/uploads` (tool `studio.asset.upload.request`) y `POST /api/v1/campaigns/{campaignId}/asset-versions` (tool `studio.asset.version.create`), ambas riskTier T1, capability `marketing_studio.asset.write` y scope `studio:assets:write`. El registro declara `riskTier` explícito en sus 20 operaciones (18 lecturas T0 + 2 escrituras T1) y el manifiesto queda en 15 tools + 5 exclusiones. Contrato completo, kernel y compuertas en §7.3. En ese release la revisión existía sólo como CLI de operador y se proyectaba aprobación API en Slice 4 + TASK-1899. Actualización 04/10: TASK-1899 retirada; T2 HTTP sigue bloqueado.
 
 ## 4.1 Agentes y Efeonce MCP
 
@@ -248,7 +286,7 @@ el scope de API (`studio:read`). El artefacto `packages/contracts/generated/tool
 
 **Regla del programa.** Toda capacidad nueva de Studio nace en el registro con su tool o una exclusión con razón. Todo
 lo que se puede hacer en la UI se puede hacer por API y por MCP, **incluidas las aprobaciones**: las decide una
-persona; un agente las ejecuta con la identidad delegada de esa persona (TASK-1894 / TASK-1899).
+persona; el consumo MCP T1 requiere el carril delegado de TASK-2003 y su canary. TASK-1899 está retirada y no bloquea API/CLI/UI.
 
 **Autoridad de la persona (lectura).** Studio no conoce personas. La autorización por persona ocurre en Greenhouse:
 
@@ -276,8 +314,8 @@ entrada en `src/mcp/greenhouse/skill-manifest.ts` declara `provider: 'marketing-
 ## 4.2 Operación híbrida con agentes
 
 Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
-(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
-como contrato:
+(Accepted 2026-09-26). **Actualización 2026-10-04:** catálogo y validación están desplegados (§3); ICP real,
+activaciones y las otras capacidades conservan sus tareas. Contrato vigente:
 
 - **Work items**: unidad de trabajo por campaña (tipo, responsable = persona **o** rol de agente, quién lo pidió,
   estado, insumos por referencia versionada, entregable como borrador con procedencia, revisión y traspaso al rol
@@ -367,7 +405,7 @@ Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`
   de licencia) obligatorios. Subida en dos pasos: URL firmada V4 acotada a `originals/sha256/<2>/<sha256>` (reanudable
   para video grande) → el cliente sube directo a GCS → confirma; Studio verifica tamaño, mime y sha256 recalculado antes
   de crear la versión, y los derivados salen por el worker existente. Puertas: CLI `pnpm studio:upload` (TASK-1894),
-  tools MCP de escritura con identidad delegada (TASK-1899) y UI (TASK-1895). Los bytes nunca pasan por MCP ni por Vercel.
+  tools MCP T1 con identidad delegada (TASK-2003, pendiente) y UI (TASK-1895). Los bytes nunca pasan por MCP ni por Vercel.
 - **Inferencia.** CLI y agentes infieren campaña, concepto, formato y versión del nombre canónico
   (`CMP001-02 - <título> - 4x5.png`) y del catálogo; sólo preguntan lo que no pueden inferir.
 - **Aprobación humana.** Una versión nueva entra pendiente de revisión; aprueba una persona (o un agente con su
@@ -453,7 +491,7 @@ mes. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing
 Estado: **en producción desde 2026-10-02** (Studio `a450a3c` puerta de ingreso, `3fe85a2` semilla de CMP-004 con los
 conceptos S01–S08 y BF1–BF3 y creatividad aprobada por CDR-012, `aa91ce3` el anónimo recibe `write_not_allowed` antes de
 validar el cuerpo; API **1.3.0**). Es la primera puerta del command único de §7: la CLI `pnpm studio:upload` ya la usa;
-MCP (TASK-1899) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Subidas.
+MCP T1 (TASK-2003, pendiente) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Subidas.
 
 **Flujo.**
 
@@ -498,7 +536,7 @@ MCP (TASK-1899) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDI
 | Compuerta | Regla |
 |---|---|
 | Autoridad | anónimo del modo open → 403 `write_not_allowed` (antes de validar el cuerpo); `user` → `forbidden` hasta TASK-1898; `api_client` → exige el scope de la tool y nunca aprueba; `operator_cli` → escribe |
-| Riesgo | `riskTier` leído del registro: T1 exige `Idempotency-Key` (400 `idempotency_key_required`); T2 bloqueado hasta TASK-1899 |
+| Riesgo | `riskTier` leído del registro: T1 exige `Idempotency-Key` (400 `idempotency_key_required`); T2 por HTTP bloqueado con `confirmation_required`; operador CLI exige confirmación |
 | Organización | fuera de lo visible → 404 (anti-oráculo) |
 | Idempotencia | misma llave + mismo cuerpo (digest) = replay de la respuesta guardada; otro cuerpo = 422 `idempotency_key_reused`; la carrera se resuelve con `ON CONFLICT`; registros de 24 h |
 | `dryRun` | ejecuta las validaciones sin escribir |
@@ -590,11 +628,11 @@ unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integr
   a producción sigue sin autorizar (§7.4). Hoy no bloquea: el kernel no deja escribir a personas por sesión
   (TASK-1898) y los clientes de API usan scope.
 - Gateway: `pnpm studio:manifest:sync` sin correr; las tools de escritura quedarían fuera por
-  `write_tool_without_scope_class` hasta TASK-1899.
+  `write_tool_without_scope_class` sin su clase/autorización delegada; TASK-2003 es el carril paralelo vigente.
 - De la spec del Entregable A: puerto `ChannelValidator` y `CommandResult.warnings` (*actualizado 2026-10-02 (noche):*
-  existen desde el Entregable B, con adaptador por defecto sin validar; el validador real lo enchufa TASK-1905); decidir la
+  existen desde el Entregable B; TASK-1905 conectó el validador real en producción el 2026-10-04, modo `warn`); decidir la
   exclusión de `studio:review` en `operations.ts` (CLI de operador, hoy sin entrada).
-- Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
+- Entregable B en producción desde el 2026-10-02 (§7.4); Entregable C diferido. La aprobación por HTTP sigue bloqueada: TASK-1899 se retiró sin habilitar ese carril.
 
 ## 7.4 Commands del catálogo (TASK-1894, Entregable B)
 
@@ -643,7 +681,7 @@ Calendario: Studio planifica en `PLANNED` y cancela en `CANCELLED`; nunca public
 se edita. Lectores y salud no cuentan los planificados ni los cancelados como pendientes del proveedor.
 
 **Regla T2.** Una operación T2 (aprobación o destructiva) hoy sólo la ejecuta `operator_cli`; por API responde 403
-`confirmation_required` hasta TASK-1899 (confirmación con persona). Un `api_client` que intenta aprobar recibe 403
+`confirmation_required`; no hay contrato de confirmación por digest activo tras retirar TASK-1899. Un `api_client` que intenta aprobar recibe 403
 `approval_requires_person`. La CLI exige `--confirm` además de `--apply`.
 
 **Errores nuevos** (además de los de §7.3):
@@ -653,7 +691,7 @@ se edita. Lectores y salud no cuentan los planificados ni los cancelados como pe
 | `approval_requires_dedicated_command` | 422 | una transición genérica apunta a un destino aprobatorio |
 | `campaign_not_studio_owned` | 409 | escritura del catálogo en una campaña `onedrive` |
 | `budget_kind_violation` | 422 | `setBudgetLine` con un `kind` distinto de `proposed` |
-| `confirmation_required` | 403 | operación T2 por API (hasta TASK-1899) |
+| `confirmation_required` | 403 | operación T2 por API; carril remoto de confirmación no habilitado |
 | `already_exists` | 409 | el id a crear ya existe |
 
 **Proyección de permisos.** `CampaignDetail.permissions` = `writable`, `lockReason` (`open_mode` |
@@ -668,8 +706,8 @@ DELETE y aprobaciones aceptan cuerpo vacío. Un replay con la misma `Idempotency
 **Exposición.** 29 rutas de escritura (POST/PATCH/PUT/DELETE) + lectura nueva `GET /api/v1/campaigns/{id}/brief`
 (tool `studio.campaign.brief.get`). El registro se reparte por slice (`operations-review.ts`,
 `operations-catalog.ts`, `operations-plan.ts`, helper `operations-write.ts`). Puerto `ChannelValidator` con
-adaptador por defecto sin validar (`catalogVersion null`) y `warnings` en el resultado de toda escritura; el
-validador real llega con TASK-1905.
+`warnings` en el resultado de toda escritura. El adaptador sin validar fue el estado inicial del 02/10; desde
+TASK-1905 (04/10) el default consulta el catálogo publicado, conserva la versión y persiste findings en la misma transacción.
 
 **CLI de operador** `pnpm studio:write <operationId> [--param k=v] [--file cuerpo.json] [--if-match N] [--key llave]
 [--apply [--confirm]]` y `--list`: corre como `operator_cli` con las variables `STUDIO_PG_*` del ambiente, por los
@@ -702,7 +740,7 @@ ajenos (barra de estado de otra sesión). Sandbox `CMP-900` creada por `createCa
 409, brief literal (comillas tipográficas, `\n\n`, espacio final), copy byte a byte, flight y plan con `revision`.
 
 **Pendiente.** Push de Studio a `main`; release de Greenhouse a producción; sync del gateway; Entregable C (corte de
-las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2 por API, federación de escrituras).
+las campañas existentes); TASK-1898 (persona por sesión) y TASK-2003 (federación T1). La confirmación T2 por HTTP no está habilitada; TASK-1899 fue retirada.
 
 ## 7.5 Reproducción de video (TASK-1998, en producción desde 2026-10-04)
 
@@ -786,6 +824,8 @@ alta prioridad hasta portar el script. RTO de referencia medido ≈ 1 min. Runbo
   (`PENDING` con más de 2 h de vencido), `metricool_readback` (48 h, sólo con campañas activas; lee `ops_run` y
   `worker_run.kind = 'metricool_readback'`), `restore_rehearsal` (45 días; fallido o vencido = `down`; nunca corrido =
   `degraded`), `rights_expiring` (versiones cuyo uso vence en 14 días; `not_configured` sin la columna de derechos).
+- TASK-1905 añade `channel_unmapped`: cuenta registros sin resolución canónica en el snapshot, contempla alias
+  exactos en arrays y devuelve `not_configured` si falta el schema. No aplica backfill ni revalidación durante health.
 - Umbrales en un solo módulo: `packages/domain/src/health/thresholds.ts`. Estado global: `down` si la base no
   responde; `degraded` si algo más está degradado o caído; si no, `ok`.
 
@@ -852,13 +892,17 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1893 | Originales en GCS + worker de medios | Complete 2026-09-26 (en producción) |
 | TASK-1896 | Observabilidad, alertas y restauración | Complete 2026-09-26 (en producción; restauración probada) |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
-| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregable B (§7.4) code complete y verificado en staging, sin desplegar en producción; Entregable C diferido |
+| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregable B (§7.4) en producción desde 2026-10-02; Entregable C diferido |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |
-| TASK-1899 | Escrituras, subida y aprobaciones por MCP (scopes `.write`/`.approve`, identidad delegada) | To-do |
+| TASK-1899 | Diseño histórico de escrituras y confirmación MCP | Retirada 2026-10-04, sin rollout; no es prerrequisito API/CLI/UI |
+| TASK-1905 | Catálogo, validación, alias/backfill, audiencias y referencias ICP | Studio desplegado; Greenhouse/MCP/ICP y backfill pendientes |
+| TASK-2003 | Identidad delegada y escrituras MCP T1 | Carril paralelo pendiente; no bloquea producto |
 | TASK-1897 | Revocar `CONNECT` de PUBLIC en `greenhouse_app` | To-do |
 | TASK-1898 | Login con Efeonce ID | To-do, última |
 
-Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898.
+Secuencia histórica inicial: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898.
+Actualización 2026-10-04: TASK-1899 retirada; activaciones siguen TASK-1905 → TASK-2001 → TASK-2002,
+con TASK-2003 en paralelo para MCP T1 y sus dependencias propias.
 
 - **Flujo editorial SEO (pendiente):** TASK-1667 y TASK-1669 ahora pertenecen a EPIC-049; reutilizan
   TASK-1908 y TASK-1913/1914/1915. Medición/outcome TASK-1668 permanece en EPIC-022.

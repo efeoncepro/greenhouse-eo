@@ -1,13 +1,13 @@
 ---
 name: marketing-studio
-description: How to use available Efeonce Marketing Studio MCP tools — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
+description: How to use available Efeonce Marketing Studio MCP tools — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, use versioned channels and validation findings when available, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
 ---
 
 # Using Efeonce Marketing Studio
 
 Efeonce Marketing Studio is the system of record for Efeonce campaigns: brief and decisions, creative concepts,
 pieces (images and videos) with their versions, literal copies per channel, ad configurations, the media plan and
-the publishing calendar. This manual teaches you to read it correctly through its `studio.*` tools. It grants no
+the publishing calendar. This manual teaches you to use the available `studio.*` tools and interpret their results. It grants no
 permission: every call is scoped server-side to the organizations your connection may see.
 
 Discover the tools actually available in the current session before acting. The versioned channel catalog
@@ -79,7 +79,8 @@ them. Mentions, emojis and line breaks are intentional. Character counts are giv
 
 ## Pieces and versions
 
-- A piece has versions; the current one is the latest. Two versions with the same fingerprint are the same file.
+- A piece has versions; the current one is the latest imported or approved version. A newly uploaded version
+  may still be pending review and is not automatically current. Two versions with the same fingerprint are the same file.
 - The original file may live in the team's working folder; the piece still exists in Studio with its versions and
   previews. Do not tell a person a piece "is missing" because its original is not stored in Studio.
 - `playback` is a light web copy of a video for watching in Studio (up to 720 px on the short side). It is not the
@@ -151,3 +152,25 @@ simply answers as not found. Omit the filter unless the person asked about a spe
   `studio.campaign.customer_model_version.set` reports incompatible references without migrating audiences.
 
 These workflows grant no permission and certify no deployment, approval, media launch or spend.
+
+
+## API clients and available write tools
+
+The operator has a separate HTTP client for the same versioned API, including file uploads and original downloads.
+That client does not expose additional MCP tools or grant your connection its credentials. Discover the tools in
+this session; if a needed tool is absent, leave a reviewable proposal and report the limitation.
+
+When a T1 tool is available and authorized, read its current schema and target revision. Validate with dry-run when
+supported, keep one idempotency key per logical write and send the required revision. On an uncertain outcome,
+reread before retrying; on a revision conflict, resolve the change rather than forcing a newer revision. A successful
+write in warn mode may contain hard channel findings: report them and do not treat it as approval.
+
+For uploads, bytes go directly to storage through the ticket, never inside a tool call. The service verifies the
+size and recomputed fingerprint before creating a pending-review version. Pending verification is not completion;
+resuming confirmation does not resume an interrupted byte transfer. An existing fingerprint can resolve as a
+duplicate without creating another version. Preserve usage rights and do not claim that downloading grants a license.
+
+The current catalog separates paid/organic/owned/earned modality, family, buying platform, appearance platforms,
+placements and formats; spec version, provenance and verification date belong with decisions. Do not collapse
+buying and appearance platforms into a single label or infer a market/account from the channel key. API availability,
+local-client support and real MCP delegation are separate facts; approvals remain in the authorized operator lane.

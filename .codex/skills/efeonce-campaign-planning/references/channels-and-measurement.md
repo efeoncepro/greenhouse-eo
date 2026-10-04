@@ -90,9 +90,12 @@ CMP001-02 - La IA es un gasto - 4x5.png
 
 ## 4. Convención UTM
 
-**Regla:** usar la convención **ya registrada** en la campaña (URL con UTM de `studio.campaign.ads.list` o
-`MANIFIESTO-PAUTA.json`). Para una campaña nueva, proponer el patrón **observado en producción** y dejar el
-conflicto documental como decisión abierta del dueño de la taxonomía.
+**Regla vigente:** preservar la UTM ya registrada al citar un anuncio histórico. Para nueva planificación, usar
+el tracking del catálogo versionado por plataforma de aparición/placement, con fuente y fecha; `utm_source` no
+se deduce de la plataforma de compra. Si falta aparición/inventario, conservar null con razón y abrir decisión.
+El generador por activación pertenece a TASK-2001 y aún no se declara operativo. Las siguientes convenciones
+de CMP-001 son evidencia histórica, no defaults del nuevo catálogo. No reescribir sus 72 anuncios ni adoptar
+un patrón global desde un alias ambiguo.
 
 Patrón observado (CMP-001, 72 anuncios del catálogo, 2026-09-22):
 

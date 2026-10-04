@@ -15,6 +15,8 @@ verificado.
 - [2026-09](docs/operations/agent-context-history/handoff/2026-09.md)
 - [Compactación previa al release 2026-10-02](docs/operations/agent-context-history/handoff/2026-10-02-release-compaction.md)
 
+- [Studio: contexto previo a consolidación 2026-10-04, con hashes](docs/operations/agent-context-history/2026-10-04-studio-closure/README.md)
+
 No volver a pegar historia completa en este índice.
 
 ## Entradas archivadas desde Handoff activo

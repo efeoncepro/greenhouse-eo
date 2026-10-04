@@ -1,16 +1,43 @@
 # Efeonce Marketing Studio — Runtime handoff
 
+## TASK-1899 retirada (2026-10-04)
+
+Por decisión del operador se revirtió su implementación local en Greenhouse y Studio. No hubo commit, push,
+deploy ni migraciones de TASK-1899 en staging/producción; el gateway quedó sin cambios. El PostgreSQL temporal de
+pruebas quedó detenido. No hay un candidato de TASK-1899 pendiente de desplegar. Las escrituras MCP continúan
+fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/UI. TASK-2003 es el carril paralelo vigente de escrituras T1 delegadas; no reactiva las aprobaciones/digest retirados.
+
+
 > **Tipo:** runbook operativo
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B verificado en staging, sin desplegar en producción: §Commands del catálogo; antes, el mismo día: Entregable A en producción: §Subidas; antes, 2026-09-26: cierre en producción de TASK-1893 y TASK-1896)
+> **Última actualización:** 2026-10-04 — consolidación posterior al release de TASK-1905 y entrega local de la CLI HTTP en Greenhouse.
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
 
 Este documento dice **cómo operar** Studio. El porqué y los contratos viven en la arquitectura; no se repiten acá.
 
-## Estado vivo (2026-09-26)
+## Estado vivo verificado (2026-10-04, después del release)
+
+Fuente: [release autorizado de Studio](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md) y
+[readback estructurado](../../audits/marketing-studio/TASK-1905-release-2026-10-04-checks.json).
+
+| Pieza | Estado verificado |
+| --- | --- |
+| Web/API | Studio `main 74073de1188f`, Vercel Production Ready `dpl_61kJPNWNXabGYetKC6dxwch2s2uW`; health 200, API 1.6.0, database reachable, acceso open. |
+| Contrato | 59 tools de negocio, 64 operaciones HTTP; manifiesto `2302c683cd1eee0d96d89f85b72ded73a50ff30152c8f0f34fa9279b739390e6`. Servido no significa federado. |
+| Catálogo/schema | Migraciones `1791144092031` y `1791144092429` aplicadas staging y producción; catálogo v1 published, 52 canales. UPDATE de especificación publicada rechazado en ambas bases (23514). |
+| Datos productivos | 5 campañas y 103 assets conservados. Backfill sólo dry-run: 134 unmapped; cinco aliases con owner efeonce_operations. |
+| Flags | Web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`, `STUDIO_CUSTOMER_MODEL_ENABLED=false`. No promoción a enforce. |
+| Worker | Staging `00006-p8q`, producción `00004-j4h`, Ready/100%, `/health` 200; misma imagen `74073de1188f`, digest `sha256:7e95c904dd9c01f7c023e56111f4495444220f64f162dfef8d15ce034c96b43e`. |
+| Canaries | Producción: org ajena404, bearer inválido401, escritura global de catálogo con bearer403 sin write; 44/44 thumbs 200. Escritura positiva/warnings/replay sólo sandbox staging CMP-900. |
+| Greenhouse/gateway/ICP | Sin release Greenhouse ni gateway en esta entrega. Capability pendiente de activar; nueva federación MCP pendiente. ICP real depende1906/1892 y sigue disabled; T1 delegado corresponde2003 en paralelo. |
+| CLI HTTP Greenhouse | `pnpm studio` local, API-only: 18 tests/lint PASS; discovery, lectura autenticada y upload dry-run reales. No carga aplicada productiva ni release Greenhouse. [Auditoría](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). |
+
+## Snapshot histórico (2026-09-26, ampliado 2026-10-02)
+
+La tabla siguiente conserva las verificaciones anteriores; versiones, conteos y revisiones aquí no sustituyen el estado vivo de arriba.
 
 | Pieza | Estado |
 |---|---|
@@ -69,6 +96,8 @@ Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets version
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/183008134038/locations/global/workloadIdentityPools/vercel/providers/greenhouse-eo` | igual |
 | `GCP_SERVICE_ACCOUNT_EMAIL` | `marketing-studio-runtime@efeonce-group.iam.gserviceaccount.com` | `marketing-studio-runtime-stg@…` |
 | `STUDIO_ACCESS_MODE` | sin definir (= `open`) | `open` |
+| `STUDIO_CHANNEL_VALIDATION_MODE` | `warn` (release 2026-10-04) | staging observado en `warn`; verificar cada preview |
+| `STUDIO_CUSTOMER_MODEL_ENABLED` | `false` (release 2026-10-04) | staging `false`; consumer real pendiente |
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
 | `STUDIO_MEDIA_URL_SECRET` | secreto HMAC de los enlaces de imagen (sensitive, ≥ 32 caracteres) | **uno distinto** por ambiente |
 | `NODE_AUTH_TOKEN` | `_authToken` del registro AXIS (encrypted) | igual |
@@ -420,7 +449,7 @@ SELECT kind, status, counts, started_at FROM studio.worker_run ORDER BY started_
   queda por validar en TASK-1895. La CLI no depende de CORS.
 - **Pendientes fuera de Studio:** capability `marketing_studio.asset.write` en Greenhouse (en `develop` desde
   2026-10-02, release a producción sin autorizar; hoy no bloquea) y `pnpm studio:manifest:sync` en el gateway (las tools de escritura quedarían fuera por
-  `write_tool_without_scope_class` hasta TASK-1899).
+  `write_tool_without_scope_class`; T1 delegado corresponde a TASK-2003 y TASK-1899 está retirada).
 
 ## Commands del catálogo (TASK-1894 Entregable B)
 
@@ -469,7 +498,7 @@ Respuestas a esperar (observadas en staging el 2026-10-02):
 | `invalid_state_transition` (409) | La transición no está en la máquina de estados |
 | `precondition_required` (428) / `revision_conflict` (412) | Falta `--if-match` o la revisión cambió; releer y repetir |
 | T2 sin `--confirm` | La CLI no escribe |
-| `confirmation_required` (403) | T2 por API: sólo `operator_cli` hasta TASK-1899 |
+| `confirmation_required` (403) | T2 por API no habilitada: sigue `operator_cli`; TASK-1899 retirada |
 | `approval_requires_person` (403) | Un `api_client` intentó aprobar |
 
 Canary HTTP (como se hizo el 2026-10-02, contra la preview con `vercel curl … --deployment <preview> --scope
@@ -496,7 +525,7 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
    registra; test nuevo. Pasos: aplicar el cambio → `pnpm studio:manifest:sync` → test → PR → merge → deploy. La única
    lectura federada nueva es `studio.campaign.brief.get`.
 3. **Release de Greenhouse a producción** con las dos capabilities (no autorizado aún).
-4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898/1899 para persona por sesión,
+4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898 para persona por sesión y TASK-2003 para delegación MCP,
    confirmación T2 por API y federación de escrituras.
 
 ## Reproducción de video (TASK-1998/1999)
@@ -607,3 +636,53 @@ Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_
 - **`next dev` reescribe archivos.** Genera `apps/web/AGENTS.md`/`CLAUDE.md` (commiteados) y reescribe `next-env.d.ts`: no commitear la variante de dev.
 - **`GRANT CONNECT` lo da el dueño de la base.** Para los roles `marketing_studio_restore` y `marketing_studio_worker` el `GRANT CONNECT` debe correrlo `marketing_studio_migrator` (dueño de las bases), no el admin de la instancia; los scripts de Studio ya lo hacen así (`f9e6cbb`, `82aeab6`).
 - **Gate de versión del gateway.** Mide la superficie construida con todos los providers habilitados: un provider nuevo debe declararse en `src/surface.ts` y en el test de cobertura de políticas, o sus tools quedan fuera de la cuenta.
+
+## TASK-1905 — Studio en producción 2026-10-04; integración y backfill pendientes
+
+Catálogo versionado de 52 canales y taxonomía/UTM; validación en writers e importador, snapshots, hallazgos,
+audiencias y referencia ICP opcional. API 1.6.0 / 59 tools (15 operaciones nuevas), publicada en el release descrito abajo. `pnpm check` y build
+local pasan; DB aislada y atención desktop/mobile verificadas. [Dossier](../../audits/marketing-studio/TASK-1905-local-verification.md),
+[contrato](../../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md) y
+[manual](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+
+Studio fue publicado posteriormente con autorización expresa: main `74073de`, Vercel Ready
+`dpl_61kJPNWNXabGYetKC6dxwch2s2uW`, API pública 1.6.0 y catálogo v1 de 52 canales. Worker producción
+`00004-j4h` / staging `00006-p8q`, misma imagen y health 200. Migraciones Studio aplicadas en ambas bases.
+[Evidencia de release y rollback](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md).
+Flag explícito web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`;
+`off` desactiva validación y `enforce` exige publicación/backfill revisado y un release observado en warn.
+`STUDIO_CUSTOMER_MODEL_ENABLED=false` explícito en web/worker. Activarlo no provisiona un consumer real; depende de TASK-1906/1892.
+Federación de writes T1 depende de TASK-2003. Gateway quedó intacto en rama ajena `feat/task-1921-brand-render`.
+SQL de capability Greenhouse parqueado en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
+owner operador release: recrear timestamp, aplicar staging y readback. Dry-run productivo: 134 registros unmapped; cinco aliases
+pendientes de revisión por efeonce_operations (detalle y conteos en el dossier). No se aplicó backfill ni se
+activó enforce. El canary API pasó. Federación/canary de las nuevas lecturas MCP pendientes; las escrituras T1 requieren TASK-2003. No se bloquea desarrollo ni operación API/CLI/UI por TASK-1899. Greenhouse y gateway no se publicaron.
+
+
+
+### Capability Greenhouse y autoridad pendiente
+
+`marketing_studio.catalog.manage` existe en código (`src/config/entitlements-catalog.ts`) y grants efectivos
+calculados (`src/lib/entitlements/runtime.ts`): acciones `create`/`update`, sólo `efeonce_admin` y
+`efeonce_operations`. Coverage de 33 tests PASS; account/designer, acciones delete/all y roles no efectivos no
+conceden acceso. Esto acredita implementación local en Greenhouse, no registro/grant efectivo en producción.
+El SQL está en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
+el operador de release debe recrearlo con `pnpm migrate:create`, aplicar y verificar el registry y canje.
+No hubo release Greenhouse en el release Studio ni al entregar la CLI HTTP. Un bearer de servicio no gobierna
+el catálogo: el canary productivo devuelve 403. TASK-2003 resuelve el carril delegado T1 en paralelo; no es
+prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-1906/TASK-1892.
+
+## CLI HTTP desde Greenhouse (2026-10-04, entrega local)
+
+`pnpm studio` descubre OpenAPI/manifiesto vivos; no necesita checkout Studio ni acceso SQL. `list`, `describe`,
+`call`, `upload`, `download` y `doctor` consumen la API; escritura en dry-run por defecto, `--apply` explícito,
+idempotencia y revisión. `--confirm` de T2 expresa intención local, nunca concede autoridad ni sustituye una persona.
+
+[Manual API-only](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) y
+[auditoría de 18 tests + HTTP real](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). Operación verificada:
+discovery59/64, catálogo de 52 canales, lectura autenticada de asset y carga dry-run sin ticket ni bytes. Transferencias/applies
+se probaron con servidor local controlado; no se afirma carga aplicada en producción.
+
+La CLI HTTP y las CLIs de mantenimiento del repo Studio son carriles distintos: el bearer existente de cargas no
+concede `studio:write` general, y el catálogo global responde403 con bearer de servicio. Seed/backfill siguen siendo
+mantenimiento autorizado por operador en Studio. Las cinco campañas OneDrive conservan su frontera de escritura.
