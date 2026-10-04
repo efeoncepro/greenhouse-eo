@@ -2,91 +2,136 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `approved`
 - Owner task: `TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI`
-- Product Design asset: docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/before-global-desktop.png (calendario vigente en producción, 2026-10-04; complementos `before-global-mobile.png` y `before-campaign-desktop.png`). Dirección de origen: canvas de Claude Design «Efeonce Marketing Studio», página `v2 · Claro y oscuro` (https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi), artboards `Studio-Calendar`, `Studio-Campaign` y `Studio-Mobile`.
+- Product Design asset: docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/approved-v3-month.webp — dirección aprobada por el operador el 2026-10-04 en el canvas de Claude Design «Efeonce Marketing Studio» (https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi, versión `1791147930-57cf`), páginas `v3 · Calendario de activaciones`, `v3.1 · Línea de tiempo por plataforma` y `v3.2 · Planificar y operar`. Cada artboard aprobado está renderizado en la misma carpeta como `approved-v3-<artboard>.webp` (claro; `month-dark` como referencia del oscuro). El «antes» sigue en `before-*.png`.
 - Visual direction mode: `source-led`
-- Intended consumers: operador de marketing de Efeonce (dueño de campaña), responsable de medios, community manager.
-- Copy source: `apps/web/src/copy.ts` del repo `efeonce-marketing-studio` (namespaces nuevos `activations`, `execution`, `channels`), cubierto por `copy.test.ts`.
-- Primitive decision: `extend` — se extienden el calendario mensual vigente (`/calendar`, pestaña Calendario de la campaña), `.chip`, `.seg`, `.pill`, `.callout-*`; reusa `Sheet` y `ConfirmDialog` de TASK-1895 si ya existen, si no los crea con su mismo contrato.
-- UI ready target: `no` — falta que el operador apruebe los artboards del calendario de activaciones (ver «Brecha de dirección visual»).
+- Intended consumers: operador de marketing de Efeonce (dueño de campaña), responsable de medios, community manager; en lectura, el equipo que revisa la semana.
+- Copy source: `apps/web/src/copy.ts` del repo `efeonce-marketing-studio` (namespaces `activations`, `execution`, `channels`, `calendar`), cubierto por `copy.test.ts`.
+- Primitive decision: `extend` — se extienden el calendario mensual vigente, `.chip`, `.seg`, `.pill`, `.callout-*`, el `Shell` (rail, topbar, ⌘K, switch de tema); `Sheet` y `ConfirmDialog` de TASK-1895 (si no existen, esta task los crea con su contrato).
+- UI ready target: `yes` — dirección aprobada y conciliada con este documento.
 
-### Brecha de dirección visual (declarada, no inventada)
+### Fuentes visuales aprobadas (`docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/`)
 
-El canvas v2 aprobado dibuja un calendario de vuelos (franjas) y posts (miniatura + hora + red). No tiene filtros por
-modalidad, familia, plataforma o cuenta, ni estados de ejecución, ni la hoja de una activación, ni la bandeja de
-«ejecución sin activación». Este wireframe extiende las regiones y tokens aprobados; antes de `UI ready: yes`, el Slice 1
-agrega al canvas una página `v3 · Calendario de activaciones` con los artboards `Calendar-Month`, `Calendar-Week`,
-`Activation-Sheet`, `Unlinked-Executions`, `Calendar-Mobile` (claro y oscuro) y el operador los aprueba.
+| Archivo | Artboard del canvas | Qué fija |
+|---|---|---|
+| `approved-v3-month.webp` · `approved-v3-month-dark.webp` | `V3-Month` | grilla del mes, franjas paid, tarjetas con pieza y estado, bandeja «Ejecución sin activación», «Sin fechas», leyenda, barra de estado |
+| `approved-v3-week.webp` | `V3-Week` | semana por día en franjas mañana · tarde · noche, línea de «ahora» |
+| `approved-v3-gantt.webp` | `V3-Gantt` | alternativa por plataforma (reemplazada por la línea de tiempo de v3.1) |
+| `approved-v3-timeline.webp` | `V3-Timeline` | línea de tiempo por plataforma con ejes fijos, escala Día · Semana · Mes, grupos plegables |
+| `approved-v3-sheet.webp` | `V3-Sheet` | hoja de activación (560 px) con video, copy literal, evidencia y tracking URL |
+| `approved-v3-unlinked.webp` | `V3-Unlinked` | diálogo «Vincular ejecución» con candidatas |
+| `approved-v3-states.webp` | `V3-States` | vacío con filtros, error, parcial, sin permiso, cancelar, catálogo de estados y tracking |
+| `approved-v3-paid.webp` | `V3-Paid` | pauta: plan · herramienta · entrega por línea de compra, resumen del mes |
+| `approved-v3-formats.webp` · `approved-v3-ownedformats.webp` | `V3-Formats` · `V3-OwnedFormats` | preview por formato (reel, carrusel, horizontal, varios tamaños) y owned (email, blogpost, landing) |
+| `approved-v3-plan.webp` · `approved-v3-editpaid.webp` | `V3-Plan` · `V3-EditPaid` | formulario «Planificar activación» y edición de una paid |
+| `approved-v3-reprogram.webp` · `approved-v3-fromexec.webp` | `V3-Reprogram` · `V3-FromExec` | diálogo «Reprogramar» y «Crear activación» desde una ejecución |
+| `approved-v3-day.webp` · `approved-v3-popover.webp` | `V3-Day` · `V3-Popover` | vista Día y detalle del día |
+| `approved-v3-states32.webp` · `approved-v3-a11y.webp` | `V3-States32` · `V3-A11y` | carga, primer uso, pieza no lista, mercado y hora local; contrato de teclado y lector |
+| `approved-v3-sheetemail.webp` | `V3-SheetEmail` | hoja de una activación de email |
+| `approved-v3-mob*.webp` | `V3-MobWeek`, `V3-MobFilters`, `V3-MobSheet`, `V3-MobPaid`, `V3-MobSheetEmail` | móvil 390×844 |
 
 ## Brief
 
 - Primary user: quien planifica y ejecuta la campaña y necesita ver qué sale, dónde y cuándo, con la seguridad de que lo programado en las herramientas coincide con el plan.
-- User moment: revisa la semana o el mes; detecta lo que está programado fuera de plan, lo vencido y lo que se programó en Metricool sin pasar por Studio.
+- User moment: revisa la semana o el mes; detecta lo fuera de plan, lo vencido y lo que se programó en una herramienta sin pasar por Studio; planifica, reprograma o cancela.
 - Job to be done: «Ver el plan de salida de todas mis campañas por canal y plataforma, y saber de un vistazo si cada salida está programada, salió o se atrasó.»
-- Primary decision signal: el estado de ejecución de cada tarjeta (Planificada, Programada, Fuera de plan, Publicada, Vencida).
-- Non-goals: programar o publicar en Metricool o en plataformas de ads (Studio no publica); métricas de desempeño (TASK-1892/1910); edición de piezas o copys (TASK-1895).
+- Primary decision signal: el estado de ejecución de cada tarjeta, siempre en texto.
+- Non-goals: programar o publicar en Metricool, HubSpot, la web o las plataformas de ads (Studio no publica); métricas de desempeño (TASK-1892/1910); editar piezas o copys (se editan en la pieza, TASK-1895).
 
-## Desktop Target — 1440×1000
+## Desktop Target — 1440×1100
 
-Se conserva `Shell` (rail 76 px, topbar con ⌘K) y el encabezado del calendario («Octubre de 2026», flechas de mes).
+Se conserva el `Shell` de v2 (rail de 80 px con Hoy · Campañas · Calendario · Piezas · Medios, topbar con logo, ⌘K y switch de tema) y se agrega una **barra de estado** inferior de 30 px: «Plan de Studio · Evidencia de ejecución:» con la frescura por herramienta y la hora de Santiago.
 
-1. **Barra de filtros** bajo el título: segmentado `Mes · Semana`; chips de **Modality** (Paid · Organic · Owned · Earned), **Family** (Social · Search · Display · Video · Email · Community · Creators & Influencers…), **Platform** (Instagram · LinkedIn · Facebook · Threads · Google · ChatGPT…) y **Account**; selector de campaña; estado de ejecución. Los filtros viajan en la URL.
-2. **Grilla mensual**: las activaciones `span` (paid) son franjas por semana con el nombre de la campaña y su modalidad; las `point` (organic/owned) son tarjetas con miniatura de la **pieza** (no la portada de la campaña), hora, ícono de plataforma, cuenta y **chip de estado de ejecución**. Más de 3 por día ⇒ «+N» que abre el día.
-3. **Columna derecha** (360 px): bloque «Ejecución sin activación» (lo programado en herramientas sin plan, con «Vincular» y «Crear activación»), y debajo «Sin fechas» (vigente).
-4. **Hoja de activación** (`Sheet`, 560 px) al hacer clic en una tarjeta: campaña, dimensiones de canal, pieza y versión con su preview (y reproductor si es video, TASK-1999), copy literal, fecha planificada, **evidencia de ejecución** (herramienta, fecha programada allí, fecha publicada, permalink) y acciones `Editar`, `Reprogramar`, `Cancelar activación`, `Vincular ejecución`.
+1. **Fila de título** (40 px): `h1` «Octubre de 2026» (Poppins 28/600), flechas de período, «Hoy», conteo («17 activaciones»), segmentado de vista (`Mes · Semana`, y `Día`/`Trimestre` donde aplica) y el CTA primario «Planificar activación».
+2. **Barra de filtros** (34 px): chips con ícono para **Modality**, **Family**, **Platform**, **Account**, **Mercado**, separador, **Campaña** y **Estado**; un chip activo se pinta en `info` y aparece «Limpiar filtros». Los filtros viajan en la URL.
+3. **Grilla mensual** (`role="grid"`, 7 columnas, celdas de 150 px): cada semana abre con un carril de 16 px para las franjas paid (rayada = propuesta sin aprobar, sólida = aprobada; resumen del peor estado de sus líneas en texto). Cada día muestra hasta **2 tarjetas** y «+N más» desde la tercera. Tarjeta: miniatura de la **pieza** (20 px), hora, isotipo de plataforma, cuenta y chip de estado a todo el ancho (pasa a dos líneas antes que desbordar). Hoy con el número en círculo `info`. «1 sin activación» en el día que corresponde.
+4. **Columna derecha** (360 px): «Ejecución sin activación» con conteo, ayuda y por ejecución su herramienta, plataforma, cuenta, fecha y texto, con «Vincular» y «Crear activación»; «Sin fechas»; leyenda de franjas y tarjetas.
+5. **Semana**: columnas por día (186 px) y filas **mañana 06–12 · tarde 12–18 · noche 18–24**, tarjetas con pieza 44×55, campaña, pieza, cuenta, estado y evidencia; línea de «ahora» en `info`; aviso «2 ejecuciones sin activación» en la fila del título.
+6. **Línea de tiempo por plataforma** (v3.1): ejes fijos (fechas arriba con horas 0-6-12-18, filas a la izquierda de 270 px), escala `Día · Semana · Mes`, grupos por platform con accounts plegables y conteo, «Sólo filas con actividad», «Plegar todo», «N grupos sin actividad ocultos · Mostrar todas», scroll vertical y horizontal, filas virtualizadas.
+7. **Pauta**: por línea de compra, tres capas — plan (contorno), fechas en la herramienta (rayado), entrega observada (sólido) — con marca de diferencia («+1 d») y estado; resumen «Así se resume en la vista Mes».
+8. **Vista Día**: horas 06–24 en filas de 40 px, tarjetas de 104 px, aviso de coincidencia de hora y resumen lateral.
+9. **Superpuestas**: hoja de activación (560 px), formulario «Planificar»/«Editar» (640 px), diálogos «Vincular» (640), «Reprogramar» (520), confirmación de cancelar (420), detalle del día (popover 300).
 
 ## Mobile Target — 390×844
 
-- Vista por defecto **Semana como lista por día** (no grilla): cada día con sus tarjetas apiladas; franjas paid como encabezado del día.
-- Filtros en una hoja «Filtros» con conteo de activos; la barra muestra sólo los chips activos.
-- «Ejecución sin activación» como callout al inicio con conteo y enlace a su lista.
-- Hoja de activación a pantalla completa; acciones al pie a ancho completo.
+- **Semana como lista por día** (no grilla): título «5 – 11 oct» con flechas de 44 px, segmentado `Mes · Semana`, botón «Filtros · N», callout «2 ejecuciones sin activación · Revisar», franja paid como fila propia y, por día, tarjetas de 44×55 con hora, isotipo, plataforma y placement, pieza, campaña · cuenta y estado. Navegación inferior de v2 con Calendario activo.
+- **Filtros** en una hoja que sube sobre la lista: grupos Modality, Family, Platform (con isotipos), Account, Campaña (select) y Estado, chips de 44 px con `aria-pressed`; pie con «Limpiar filtros» y «Ver N activaciones».
+- **Hoja de activación** a pantalla completa con «Volver», pieza, estado, fechas plan/herramienta, copy literal y avisos; acciones al pie de 48 px y «Más acciones» (vincular, cancelar).
+- **Pauta** como tarjetas por línea de compra con una mini línea de tiempo del mes a todo el ancho (mismas tres capas).
+- **Email** con bandeja y vista previa móvil.
+- Sin scroll horizontal; objetivos táctiles de 44 px como mínimo.
 
 ## Action Hierarchy
 
-- Primary: abrir la hoja de una activación; en la hoja, `Guardar` / `Vincular`.
-- Secondary: `Planificar activación` (botón del encabezado), `Reprogramar`, `Vincular ejecución`, `Crear activación` desde ejecución sin activación, filtros.
-- Destructive: `Cancelar activación` (con `ConfirmDialog`; no borra la evidencia), `Desvincular ejecución`.
-- Selection vs action: filtros, mes/semana y día son selección (URL); toda escritura es explícita en hoja o diálogo.
-- Pending / disabled: sin permiso de escritura, las acciones van `aria-disabled` con la razón (`permissions.lockReason`).
+- Primary: abrir la hoja de una activación; en el encabezado, «Planificar activación»; en formularios, el botón que guarda («Planificar activación», «Guardar cambios», «Reprogramar», «Crear y vincular», «Vincular»).
+- Secondary: «Editar», «Reprogramar», «Vincular ejecución», «Crear activación», filtros, cambio de vista, «Copiar» la tracking URL, «Abrir vista Día».
+- Destructive: «Cancelar activación» (tono `err`, con diálogo «¿Cancelar esta activación? La evidencia de la herramienta se conserva.» y «No, mantener»).
+- Selection vs action: filtros, vista, período y día son selección y viven en la URL; toda escritura es explícita en hoja, formulario o diálogo.
+- Pending / disabled: sin permiso, las acciones quedan visibles y deshabilitadas con «Este acceso es de sólo lectura»; «Crear y vincular» deshabilitado mientras falten campaña o pieza.
 
 ## Visual Fidelity Mapping
 
 | Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
 |---|---|---|---|
-| Franja rayada de vuelo propuesto (`before-global-desktop.png`) | franja vigente + chip de modalidad | paid como franja, con su estado de aprobación | convertir el vuelo en tarjetas diarias |
-| Tarjeta de post con miniatura, hora y red | tarjeta vigente + chip de estado + cuenta | la salida se reconoce por su pieza | la portada de la campaña como miniatura |
-| Columna «Sin fechas» | `.card` lateral vigente | lo pendiente vive al costado | un modal de pendientes |
-| Estados con color + texto (`.callout-*`, `.pill`) | tonos `--ok`, `--warn`, `--err`, `--info` con etiqueta | el estado siempre se lee en texto | estados sólo por color |
-| Claro y oscuro AXIS 0.2.5 | roles de `theme.generated.css` | mismo calendario en ambos temas | hex nuevos |
+| Franja rayada «propuesto, sin aprobar» (`approved-v3-month.webp`) | franja vigente con `--info-bg`/`--info-bg2` rayado y borde `--info-line` | la pauta es un período y su aprobación se ve | convertir la franja en tarjetas diarias |
+| Tarjeta con miniatura de la pieza y chip a todo el ancho | `.chip` de estado con glifo + texto, `--paper`, `--line` | la salida se reconoce por su pieza y su estado se lee | la portada de la campaña como miniatura; estado sólo por color |
+| Isotipos de plataforma en color y en negativo | archivos de `@efeoncepro/axis-brand-assets` (TASK-2004), variante por tema | la plataforma se reconoce por su marca | redibujar logos o usar una baldosa blanca |
+| Hoja lateral de 560 px con bloques separados por línea | `Sheet` `md`, `--paper`, `--shadow-lg` | detalle sin perder el calendario | modal centrado que tapa la grilla |
+| Tres capas de la pauta (contorno · rayado · sólido) | `--line2`, `--info-line` rayado, `--info`/`--ok` sólido | plan, herramienta y entrega se comparan de un vistazo | una sola barra con color por estado |
+| Bloque de copy literal | `pre-wrap`, fuente con respaldo de emojis, alto máximo 220 px | el copy se ve tal como se publica | recortar saltos de línea o emojis |
+| Preview del email y de la web en claro | superficie blanca fija de contenido | se ve como lo recibe la persona | teñir el email con el tema oscuro |
+| Claro y oscuro AXIS de v2 | roles de `theme.generated.css` (`--app`, `--base`, `--paper`, `--t1…t3`, tonos `ok/warn/err/info`) | mismo calendario en ambos temas | hex nuevos fuera de los roles |
 
 ## Layout Skeleton
 
 | Region | Slot | Purpose | Component candidate | Data source |
 |---|---|---|---|---|
-| 1 | Encabezado | mes, navegación, `Planificar activación` | `CalendarHeader` | URL |
-| 1 | Filtros | dimensiones y estado | `ActivationFilters` | catálogo de canales (TASK-1905) |
-| 2 | Grilla / lista | activaciones por día | `CalendarGrid`, `ActivationCard`, `SpanBar` | `GET /api/v1/calendar` (TASK-2001) |
-| 2 | Lateral | ejecución sin activación + sin fechas | `UnlinkedExecutions`, `UndatedList` | `listUnlinkedExecutions` + calendario |
-| 3 | Superpuesta | detalle y edición | `ActivationSheet`, `LinkExecutionDialog`, `ConfirmDialog` | `getActivation`, commands de TASK-2001 |
+| 0 | Shell | rail, topbar, barra de estado | `Shell`, `ExecutionFreshnessBar` | sesión + frescura del reader |
+| 1 | Encabezado | período, vista, «Planificar activación» | `CalendarHeader` | URL |
+| 1 | Filtros | dimensiones, mercado, campaña, estado | `ActivationFilters` | catálogo de canales (TASK-1905) |
+| 2 | Grilla / semana / día / línea de tiempo | activaciones en el tiempo | `CalendarGrid`, `WeekBands`, `DayView`, `PlatformTimeline`, `ActivationCard`, `SpanBar` | `GET /api/v1/calendar` (TASK-2001) |
+| 2 | Pauta | plan · herramienta · entrega | `PaidLines`, `PaidSummary` | reader de TASK-2001 (`delivering`/`ended`) |
+| 2 | Lateral | ejecución sin activación, sin fechas, leyenda | `UnlinkedExecutions`, `UndatedList`, `CalendarLegend` | `listUnlinkedExecutions` + calendario |
+| 3 | Superpuesta | detalle, formularios, diálogos | `ActivationSheet`, `ActivationForm`, `ReprogramDialog`, `LinkExecutionDialog`, `ConfirmDialog`, `DayPopover` | `getActivation` + commands de TASK-2001 |
+| 3 | Preview | pieza por formato y owned | `PiecePreview` (video, carrusel, horizontal, grupo de recursos, email, blog, landing) | pieza y versión (TASK-1998/1999) |
 
 ## Copy Ledger
 
 | Id | Texto | Uso |
 |---|---|---|
 | `execution.planned` | «Planificada» | chip |
-| `execution.scheduled` | «Programada» | chip (con herramienta: «Programada · Metricool») |
-| `execution.scheduledOffPlan(diff)` | «Fuera de plan · {diff}» | chip (ej. «Fuera de plan · +2 h») |
-| `execution.published` | «Publicada» | chip; con permalink |
-| `execution.overdue` | «Vencida» | chip; «Pasó la fecha sin evidencia de publicación» en la hoja |
+| `execution.scheduled` | «Programada» + isotipo de la herramienta (nombre en `aria-label`) | chip |
+| `execution.scheduledOffPlan(diff)` | «Fuera de plan · {diff}» | chip (ej. «+2 h», «inicio +2 d») |
+| `execution.published(time)` | «Publicada · {hora}» | chip; nunca sin fecha observada |
+| `execution.delivering(date)` | «En curso · desde {fecha}» | chip paid |
+| `execution.ended(range)` | «Finalizada · {rango}» | chip paid |
+| `execution.overdue` | «Vencida» | chip; «Sin entrega observada» en paid |
 | `execution.cancelled` | «Cancelada» | chip |
 | `activations.unlinkedTitle` | «Ejecución sin activación» | lateral |
 | `activations.unlinkedHint` | «Programado en una herramienta sin plan en Studio. Vincúlalo a una activación o crea una.» | lateral |
-| `activations.plan` | «Planificar activación» | CTA |
-| `activations.link` | «Vincular ejecución» | CTA |
-| `activations.createFromExecution` | «Crear activación» | CTA |
+| `activations.plan` | «Planificar activación» | CTA y título del formulario |
+| `activations.planHint` | «Studio planifica la salida; la publica la herramienta.» | subtítulo del formulario |
+| `activations.savedAsPlanned` | «Se guarda como «Planificada». Programarla en Metricool es un paso aparte.» | pie del formulario |
+| `activations.edit` | «Editar activación» / «Guardar cambios» | formulario |
+| `activations.reprogram` | «Reprogramar activación» / «Reprogramar» | diálogo |
+| `activations.reprogramOffPlan(diff)` | «Pasará a «Fuera de plan · {diff}»» + «Studio no cambia {herramienta}: para que vuelva a «Programada», mueve también la publicación allá.» | aviso del diálogo |
+| `activations.link` | «Vincular ejecución» / «Vincular» | CTA y diálogo |
+| `activations.createFromExecution` | «Crear activación» / «Crear y vincular» | CTA y formulario precargado |
+| `activations.fromTool(tool)` | «De {herramienta}» | marca de campo precargado |
 | `activations.cancelConfirm` | «¿Cancelar esta activación? La evidencia de la herramienta se conserva.» | diálogo |
+| `activations.pieceNotApproved` | «La pieza no está aprobada» | aviso |
+| `activations.versionMismatch(tool)` | «La versión programada en {herramienta} no es la planificada» | aviso |
+| `activations.sameTime` | «Sin otra activación de esta cuenta a la misma hora» / aviso si la hay | validación |
+| `activations.trackingFrozen` | «Congelada: ya hay evidencia de entrega» | tracking |
+| `tracking.missing` / `tracking.mismatch` | «Sin UTM en lo publicado» / «UTM distinta» | avisos |
+| `calendar.empty` | «No hay activaciones en este período con estos filtros.» | vacío con filtros |
+| `calendar.firstUse` | «Todavía no hay activaciones» + «Una activación es la salida de una pieza en un canal y una fecha. Planifica la primera desde una campaña.» | primer uso |
+| `calendar.error` | «No pudimos cargar el calendario.» + «Reintentar» | error |
+| `calendar.partial(tool, ago)` | «La ejecución de {herramienta} no está al día (última lectura {hace N})» | parcial |
+| `calendar.readOnly` | «Este acceso es de sólo lectura» | permisos |
+| `calendar.clearFilters` | «Limpiar filtros» | filtros |
+| `calendar.localTime(local, santiago)` | «{hora} {ciudad} · {hora} Santiago» | mercado distinto de Chile |
 | `channels.modality.*` | «Paid», «Organic», «Owned», «Earned» | filtros (spanglish por decisión del operador) |
 | `channels.family.*` | «Social», «Search», «Display», «Video», «Email», «Messaging», «Web & Content», «Community», «Creators & Influencers», «PR & Media», «Audio», «OOH/DOOH» | filtros |
 | `activations.alwaysOn` | «Always On» | etiqueta de campaña |
@@ -95,53 +140,55 @@ Se conserva `Shell` (rail 76 px, topbar con ⌘K) y el encabezado del calendario
 
 | State | Copy visible | Recovery behavior |
 |---|---|---|
-| ready | grilla con activaciones y chips de estado | — |
-| loading | esqueleto de la grilla del mes; filtros visibles | se resuelve solo |
-| empty | «No hay activaciones en este período con estos filtros.» + «Limpiar filtros» / «Planificar activación» | limpiar filtros o planificar |
-| partial | aviso «La ejecución de {herramienta} no está al día (última lectura {hace N})» sobre la grilla | se recupera con la próxima lectura del worker |
-| error | «No pudimos cargar el calendario.» + «Reintentar» | reintento; si persiste, `/api/v1/health` |
-| denied | acciones `aria-disabled` con «Este acceso es de sólo lectura» (o la razón de `lockReason`) | pedir acceso |
+| ready | grilla con activaciones y chips de estado en texto | — |
+| loading | esqueleto con la forma de la grilla; a los 10 s «Sigue cargando…» | se resuelve solo; sin animación con movimiento reducido |
+| empty | «No hay activaciones en este período con estos filtros.» + «Limpiar filtros»; sin activaciones nunca: «Todavía no hay activaciones» + «Planificar activación» | limpiar filtros o planificar |
+| partial | «La ejecución de {herramienta} no está al día (última lectura {hace N})» en la barra de estado y sobre la grilla | se recupera con la próxima lectura; ninguna tarjeta pasa a «Publicada» sin fecha observada |
+| error | «No pudimos cargar el calendario.» + «Reintentar»; los filtros se conservan | reintento; si persiste, `/api/v1/health` |
+| denied | acciones visibles y deshabilitadas con «Este acceso es de sólo lectura» (o `permissions.lockReason`) | pedir acceso |
 
 ## Accessibility Contract
 
-- Heading order: `h1` mes; `h2` por bloque lateral; en la hoja, título como nombre accesible del diálogo.
-- Grilla: `role="grid"` con días como `gridcell` y nombre accesible «Lunes 5 de octubre, 2 activaciones»; tarjetas como botones con «Instagram · Los Sparks · 14:00 · Programada».
-- Estados con texto siempre; tonos sólo acompañan.
-- Teclado: flechas entre días, Enter abre el día o la tarjeta; foco atrapado en la hoja; Esc cierra y devuelve el foco.
-- Lista de semana en móvil como lista semántica por día.
+- Heading order: `h1` período; `h2` por bloque lateral y en la hoja (título como nombre accesible del diálogo); `h3` por sección del formulario.
+- Grilla: `role="grid"` con roving tabindex (un solo punto de tabulación); celdas con nombre «Martes 13 de octubre, 2 activaciones»; tarjetas como enlaces con «11:00, LinkedIn, Efeonce, Grader No te leyó, Programada en Metricool».
+- Teclado: ← → ↑ ↓ entre días; Inicio/Fin de la semana; Re Pág/Av Pág cambia de mes conservando el día; Entrar abre el día o la tarjeta; Tab recorre las tarjetas de un día por hora; T vuelve a hoy; Esc cierra popover, hoja o diálogo.
+- Foco: al abrir la hoja va a su título y el resto queda inerte; al cerrar vuelve a la tarjeta de origen; diálogos con foco atrapado que vuelve al botón que los abrió; tras guardar, la tarjeta nueva o movida recibe el foco.
+- Lector: región en vivo única («Mostrando 6 activaciones», estado parcial); isotipos decorativos con el nombre en texto o `aria-label`.
+- Estados siempre con texto; contraste 4,5:1; usable al 200 % sin scroll horizontal; 44 px mínimo en móvil; sin animación con `prefers-reduced-motion`.
 
 ## Implementation Mapping
 
-- Route / surface: `apps/web/src/app/calendar/page.tsx` (`?month=`, `?view=week`, filtros en la URL) y la pestaña Calendario de `apps/web/src/app/campaigns/[campaignId]/page.tsx` (mismo componente filtrado por campaña).
-- Primitives: grilla y tarjetas vigentes extendidas; `Sheet`/`ConfirmDialog` de TASK-1895.
-- Component candidates: `CalendarHeader`, `ActivationFilters`, `CalendarGrid`, `SpanBar`, `ActivationCard`, `ActivationSheet`, `LinkExecutionDialog`, `UnlinkedExecutions`.
-- Copy source: `apps/web/src/copy.ts` (`execution`, `activations`, `channels`).
-- Data reader / command: `GET /api/v1/calendar` con filtros, `listCampaignActivations`, `getActivation`, `listUnlinkedExecutions`; commands `planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution` (TASK-2001).
-- API parity: la UI escribe sólo por esos commands vía `/api/v1`.
-- Access / capability: `marketing_studio.campaign.write` resuelto en el servidor; sin escritura antes de TASK-1898 en modo `open`.
-- GVC markers: `data-capture="calendar-filters"`, `"calendar-grid"`, `"activation-card"`, `"activation-sheet"`, `"unlinked-executions"`.
+- Route / surface: `apps/web/src/app/calendar/page.tsx` (`?view=month|week|day|timeline`, `?month=`, `?week=`, `?day=`, filtros y `?activation=` en la URL) y la pestaña Calendario de `apps/web/src/app/campaigns/[campaignId]/page.tsx` (mismo componente con la campaña fijada).
+- Primitives: grilla y tarjetas vigentes extendidas; `Sheet`/`ConfirmDialog` de TASK-1895; isotipos desde `@efeoncepro/axis-brand-assets` (TASK-2004; mientras tanto, los archivos en color ya publicados).
+- Component candidates: `CalendarHeader`, `ActivationFilters`, `CalendarGrid`, `WeekBands`, `DayView`, `DayPopover`, `PlatformTimeline`, `SpanBar`, `PaidLines`, `ActivationCard`, `ActivationSheet`, `PiecePreview`, `ActivationForm`, `ReprogramDialog`, `LinkExecutionDialog`, `UnlinkedExecutions`, `ExecutionFreshnessBar`.
+- Copy source: `apps/web/src/copy.ts` (`execution`, `activations`, `channels`, `calendar`, `tracking`).
+- Data reader / command: `GET /api/v1/calendar` con filtros (incluye `market`), `listCampaignActivations`, `getActivation` (con evidencia, avisos y eventos), `listUnlinkedExecutions`; commands `planActivation`, `updateActivation`, `rescheduleActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution` (TASK-2001).
+- API parity: la UI escribe sólo por esos commands vía `/api/v1`; cada uno tiene tool MCP (TASK-2001/2003).
+- Access / capability: `marketing_studio.campaign.write` resuelto en el servidor; `permissions` del reader decide qué se deshabilita.
+- GVC markers: `data-capture="calendar-filters"`, `"calendar-grid"`, `"activation-card"`, `"activation-sheet"`, `"unlinked-executions"`, `"activation-form"`, `"platform-timeline"`.
 
 ## GVC Scenario Plan
 
-Studio es una app aparte: la evidencia se produce con Playwright (Chrome) contra `http://localhost:3100` sobre staging,
-con el rigor de GVC premium.
+Studio es una app aparte: la evidencia se produce con Playwright (Chrome) contra `http://localhost:3100` sobre staging, con el rigor de GVC premium.
 
-- Route: `/calendar?month=2026-10`, `?view=week`, filtros por modalidad y plataforma; `/campaigns/CMP-001?tab=calendar`.
-- Viewports: 1440×1000 desktop y 390×844 mobile, claro y oscuro.
+- Route: `/calendar?month=2026-10`, `?view=week`, `?view=day&day=2026-10-16`, `?view=timeline`, filtros por modality, platform y mercado; `/calendar?activation=<id>`; `/campaigns/CMP-001?tab=calendar`.
+- Viewports: 1440×1100 desktop y 390×844 mobile, claro y oscuro.
 - Quality profile: `premium`
-- Required steps: aplicar filtros; abrir una activación programada; abrir una vencida; vincular una ejecución sin activación; crear activación desde ejecución; cancelar con confirmación.
-- Assertions: cada chip coincide con el estado del reader; ninguna tarjeta «Publicada» sin `publishedAt`; la miniatura es la de la pieza.
-- Scroll-width checks: `scrollWidth <= clientWidth` en 1440 y 390.
-- Review dossier: capturas `after-*` en `docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/` y scorecard `docs/ui/reviews/TASK-2002-marketing-studio-activations-calendar.scorecard.json`.
-- Baseline decision: surface ID `studio-calendar-activations`; línea base tras aprobar `v3 · Calendario de activaciones`.
+- Required steps: aplicar y limpiar filtros; abrir una programada, una vencida, una paid en curso y un email; planificar una activación; reprogramar con aviso de fuera de plan; vincular y crear desde una ejecución; cancelar con confirmación; recorrer la grilla con teclado.
+- Required captures: `after-month`, `after-month-dark`, `after-week`, `after-day`, `after-timeline`, `after-paid`, `after-sheet`, `after-sheet-email`, `after-plan`, `after-reprogram`, `after-unlinked`, `after-from-execution`, `after-mobile-week`, `after-mobile-sheet`, `after-mobile-filters`.
+- Assertions: cada chip coincide con el estado del reader; ninguna «Publicada» sin `publishedAt`; miniatura de la pieza; isotipo de la plataforma correcta; tracking URL igual a la del reader.
+- Scroll-width checks: `scrollWidth <= clientWidth` en 1440 y 390 (la fuente aprobada ya mide 1440/1440 y 390/390).
+- Reduced-motion / focus evidence: hoja y diálogos con `reducedMotion: 'reduce'`; recorrido por teclado con foco visible y retorno del foco.
+- Review dossier: capturas `after-*` junto a las `approved-v3-*` en `docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/` y scorecard `docs/ui/reviews/TASK-2002-marketing-studio-activations-calendar.scorecard.json`.
+- Baseline decision / surface ID: `studio-calendar-activations`; la línea base es `approved-v3-*` (canvas `1791147930-57cf`).
 
 ## Design Decision Log
 
-- Decision: el calendario vigente pasa a ser el calendario de activaciones de Studio, con filtros por las cuatro dimensiones, estado de ejecución en cada tarjeta, hoja de detalle y bandeja lateral de ejecución sin activación.
-- Alternatives considered: (a) espejo del calendario de Metricool — descartado por el operador (el calendario es de Studio); (b) vista por canal en filas tipo Gantt — candidata para la vista Semana en el canvas v3, no se decide sin dirección aprobada; (c) bandeja de no vinculados en «Hoy» solamente — descartado: debe verse también donde se planifica.
-- Why this pattern: conserva la dirección aprobada y agrega lo mínimo para que plan y ejecución se lean juntos.
-- Reuse / extend / new primitive: extiende grilla, tarjetas y lateral; reusa `Sheet`/`ConfirmDialog`.
-- Open risks: dirección v3 sin aprobar; densidad con muchas activaciones por día; depende de TASK-1905 y TASK-2001.
+- Decision: el calendario vigente pasa a ser el calendario de activaciones de Studio, con filtros por dimensión y mercado, estado de ejecución en cada tarjeta, hoja con evidencia y tracking, bandeja de ejecución sin activación, formulario de planificación, vista Día y línea de tiempo por plataforma.
+- Alternatives considered: (a) espejo de Metricool — descartado (el calendario es de Studio); (b) Gantt por plataforma en la semana — reemplazado por la línea de tiempo de v3.1 (ejes fijos, escala, grupos plegables); (c) canvas libre con pan/zoom — descartado (pierde el eje de tiempo, cuesta con teclado y no se enlaza a una fecha); (d) baldosa blanca para los isotipos en oscuro — reemplazada por negativos; (e) tres tarjetas por día en el mes — se muestran dos y «+N» desde la tercera.
+- Why this pattern: plan y ejecución se leen juntos sin abrir las herramientas; la densidad se controla con filtros, «+N», vista Día y línea de tiempo.
+- Reuse / extend / new primitive: extiende grilla, tarjetas, lateral y `Shell`; reusa `Sheet`/`ConfirmDialog`; `PiecePreview` y `PlatformTimeline` nacen como componentes de Studio.
+- Open risks: depende de TASK-2001 (reader con `delivering`/`ended`, avisos, eventos y mercado) y TASK-1905 (catálogo); la evidencia de la web necesita el lector de WordPress decidido en TASK-2001; isotipos en negativo hasta TASK-2004.
 
 ## Acceptance Checklist
 
@@ -149,9 +196,9 @@ con el rigor de GVC premium.
 - [x] Dynamic values are named and bounded.
 - [x] Partial/degraded states are explicit.
 - [x] No copy implies a guarantee when data is estimated.
-- [x] Charts have table/text alternatives (no aplica).
+- [x] Charts have table/text alternatives (la pauta y la línea de tiempo tienen la lista equivalente en la hoja y el móvil).
 - [x] State and aria copy is ready for implementation.
 - [x] Implementation mapping names primitive, copy source, data contract and route/surface.
 - [x] GVC scenario plan is specific enough for a scenario file.
 - [x] Design decision log explains reuse/extend/new before JSX starts.
-- [ ] Artboards `v3 · Calendario de activaciones` aprobados por el operador y este wireframe conciliado con ellos.
+- [x] Artboards `v3`, `v3.1` y `v3.2` aprobados por el operador (2026-10-04) y este wireframe conciliado con ellos.

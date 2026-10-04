@@ -1,5 +1,17 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-04 (posterior) — dirección visual aprobada
+
+El operador aprobó el 2026-10-04 todas las páginas del canvas — `v3 · Calendario de activaciones`, `v3.1 · Línea de
+tiempo por plataforma`, `v3.2 · Planificar y operar` y `v3.3 · Siguiente iteración y después` — y las decisiones
+propuestas: estados paid `delivering`/`ended`, tolerancia de 0 días, la pauta resumida en el mes, la línea de tiempo en
+vez de canvas libre, isotipos en negativo (TASK-2004), dos tarjetas por día y «+N» desde la tercera, pantallas de
+1440×1100, la evidencia owned (HubSpot para email; lector del WordPress del sitio público para blog y landing, en
+TASK-2001) y los previews de email y web siempre en claro. Los renders aprobados viven en
+`docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/approved-v3-*.webp`; el wireframe y el flow
+quedaron conciliados y `UI ready` pasa a `yes`. Lo de v3.3 (trimestre, historial, comentarios, lote, exportar, vista de
+cliente, propuesta por agente) sale de esta task: contrato en TASK-2005 y UI en TASK-2006.
+
 ## Delta 2026-10-04 — dirección visual v3 y decisiones del operador
 
 Dirección visual en revisión en el [canvas «Efeonce Marketing Studio»](https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi): página «v3 · Calendario de activaciones»
@@ -56,16 +68,16 @@ TASK-2003 esté vivo.
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md`
 - Flow: `docs/ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Diseno — creada 2026-10-04; consumidora de TASK-2001; falta la dirección visual v3 aprobada`
+- Status real: `Diseno — dirección visual v3, v3.1 y v3.2 aprobada por el operador el 2026-10-04; wireframe y flow conciliados; espera el contrato de TASK-2001`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-2001 (activaciones, evidencia y reader del calendario) · aprobación de los artboards «v3 · Calendario de activaciones» · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
+- Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
 - Branch: `efeonce-marketing-studio main (componentes y copy) · Greenhouse develop (docs, capturas, scorecard); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -73,7 +85,7 @@ TASK-2003 esté vivo.
 ## Summary
 
 Convierte el calendario de Studio (global `/calendar` y la pestaña Calendario de cada campaña) en el **calendario de
-activaciones**: filtros por modality, family, platform y account; tarjetas con la miniatura de la pieza y el **estado de
+activaciones**: filtros por modality, family, platform, account y mercado; tarjetas con la miniatura de la pieza y el **estado de
 ejecución** (Planificada, Programada, Fuera de plan, Publicada, Vencida, Cancelada); hoja de detalle con la evidencia de la
 herramienta; y la bandeja **«Ejecución sin activación»** para vincular o crear la activación de lo que se programó en
 Metricool sin pasar por Studio. Consume el contrato de TASK-2001.
@@ -179,14 +191,14 @@ Reglas obligatorias:
 ### State inventory
 
 - Default: grilla del mes con chips de estado.
-- Loading: esqueleto de grilla.
-- Empty: «No hay activaciones en este período con estos filtros.»
+- Loading: esqueleto con la forma de la grilla; «Sigue cargando…» a los 10 s.
+- Empty: «No hay activaciones en este período con estos filtros.» + «Limpiar filtros»; primer uso: «Todavía no hay activaciones» + «Planificar activación».
 - Error: «No pudimos cargar el calendario.» + Reintentar.
 - Degraded / partial: aviso de lectura de la herramienta atrasada.
 - Permission denied: acciones `aria-disabled` con la razón.
 - Long content: «+N» por día; nombres de campaña con elipsis.
-- Mobile / compact: semana como lista por día; filtros en hoja.
-- Keyboard / focus: flechas entre días; Enter abre; foco atrapado en la hoja.
+- Mobile / compact: semana como lista por día; filtros en hoja; hoja de activación a pantalla completa; pauta como tarjetas con mini línea de tiempo.
+- Keyboard / focus: roving tabindex en la grilla; flechas, Inicio/Fin, Re Pág/Av Pág, T (hoy), Entrar, Esc; foco al título de la hoja y de vuelta a la tarjeta (contrato en el artboard `V3-A11y`).
 - Reduced motion: sin animación propia.
 
 ### Interaction contract
@@ -213,9 +225,9 @@ Reglas obligatorias:
 
 - Route / surface: `apps/web/src/app/calendar/page.tsx` y pestaña Calendario de la campaña.
 - Primitive / variant / kind: grilla y tarjetas extendidas; `Sheet` `md`.
-- Component candidates: `CalendarHeader`, `ActivationFilters`, `CalendarGrid`, `SpanBar`, `ActivationCard`, `ActivationSheet`, `LinkExecutionDialog`, `UnlinkedExecutions`.
+- Component candidates: `CalendarHeader`, `ActivationFilters`, `CalendarGrid`, `WeekBands`, `DayView`, `DayPopover`, `PlatformTimeline`, `SpanBar`, `PaidLines`, `ActivationCard`, `ActivationSheet`, `PiecePreview`, `ActivationForm`, `ReprogramDialog`, `LinkExecutionDialog`, `UnlinkedExecutions`, `ExecutionFreshnessBar`.
 - Copy source: `apps/web/src/copy.ts` (`execution`, `activations`, `channels`).
-- Data reader / command: `GET /api/v1/calendar` con filtros; `getActivation`; `listUnlinkedExecutions`; commands de TASK-2001.
+- Data reader / command: `GET /api/v1/calendar` con filtros (incluye mercado); `getActivation` con evidencia, avisos y eventos; `listUnlinkedExecutions`; commands `planActivation`, `updateActivation`, `rescheduleActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution` (TASK-2001).
 - API parity: escritura sólo por `/api/v1`.
 - Access / capability: `marketing_studio.campaign.write` en servidor.
 - States to implement: ready, loading, empty, partial, error, denied.
@@ -223,30 +235,30 @@ Reglas obligatorias:
 ### GVC scenario plan
 
 - Scenario file: script Playwright (Chrome) contra `localhost:3100` sobre staging; versionado en el harness de TASK-1895 si ya existe.
-- Route: `/calendar?month=2026-10`, `?view=week`, `/campaigns/CMP-001?tab=calendar`.
-- Viewports: 1440×1000 y 390×844, claro y oscuro.
+- Route: `/calendar?month=2026-10`, `?view=week`, `?view=day`, `?view=timeline`, `?activation=<id>`, `/campaigns/CMP-001?tab=calendar`.
+- Viewports: 1440×1100 y 390×844, claro y oscuro.
 - Quality profile: `premium`
-- Required steps: filtros; hoja programada; hoja vencida; vincular; crear desde ejecución; cancelar.
-- Required captures: `after-month`, `after-week`, `after-sheet`, `after-unlinked`, `after-mobile`, `after-dark`.
+- Required steps: filtros; hoja programada, vencida, paid en curso y email; planificar; reprogramar con aviso; vincular; crear desde ejecución; cancelar; recorrido con teclado.
+- Required captures: las 15 `after-*` del wireframe (mes claro y oscuro, semana, día, línea de tiempo, pauta, hojas, formularios, móvil).
 - Required `data-capture` markers: `calendar-filters`, `calendar-grid`, `activation-card`, `activation-sheet`, `unlinked-executions`.
 - Assertions: chip = estado del reader; ninguna «Publicada» sin `publishedAt`; miniatura de la pieza.
 - Scroll-width checks: `scrollWidth <= clientWidth` en 1440 y 390.
 - Reduced-motion / focus evidence: hoja con `reducedMotion: 'reduce'`; recorrido por teclado.
 - Review dossier: capturas `after-*` + scorecard `docs/ui/reviews/TASK-2002-marketing-studio-activations-calendar.scorecard.json`.
-- Baseline decision / surface ID: `studio-calendar-activations`, tras aprobar la dirección v3.
+- Baseline decision / surface ID: `studio-calendar-activations`; línea base `approved-v3-*` (canvas versión `1791147930-57cf`).
 
 ### Design decision log
 
 - Decision: el calendario vigente pasa a ser de activaciones, con filtros por dimensión, estados de ejecución, hoja y bandeja de no vinculados.
-- Alternatives considered: espejo de Metricool (descartado por el operador); Gantt por canal (candidato para Semana en v3); bandeja sólo en Hoy (descartado).
+- Alternatives considered: espejo de Metricool (descartado por el operador); Gantt por plataforma en la semana (reemplazado por la línea de tiempo de v3.1); canvas libre con pan/zoom (descartado); baldosa blanca para isotipos (reemplazada por negativos); bandeja sólo en Hoy (descartado).
 - Why this pattern: conserva la dirección aprobada y junta plan y ejecución.
 - Reuse / extend / new primitive: extiende lo vigente; reusa primitives de TASK-1895.
-- Open risks: dirección v3 sin aprobar; densidad; dependencias de TASK-1905/2001.
+- Open risks: dependencias de TASK-1905 y TASK-2001 (avisos, eventos, mercado, lector de la web); isotipos en negativo hasta TASK-2004.
 
 ### Visual verification
 
 - GVC scenario: ver plan.
-- Viewports: 1440×1000, 390×844.
+- Viewports: 1440×1100, 390×844.
 - Required captures: `after-*` listadas.
 - Required `data-capture` markers: los cinco del plan.
 - Scroll-width check: sí.
@@ -266,17 +278,17 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Dirección visual
+### Slice 1 — Dirección visual (hecho 2026-10-04)
 
-- Página `v3 · Calendario de activaciones` en el canvas con los cinco artboards (claro y oscuro); aprobación del operador; wireframe conciliado y `UI ready: yes`.
+- Páginas v3, v3.1 y v3.2 aprobadas por el operador; renders `approved-v3-*.webp`; wireframe y flow conciliados; `UI ready: yes`.
 
 ### Slice 2 — Calendario y filtros
 
-- Grilla mes/semana, tarjetas con pieza y estado, franjas paid, filtros en la URL, lista móvil.
+- Grilla mes/semana/día, línea de tiempo por plataforma, tarjetas con pieza e isotipo y estado, franjas paid con resumen, vista de pauta, filtros (incluido mercado) en la URL, lista móvil, carga, primer uso y contrato de teclado.
 
 ### Slice 3 — Hoja y acciones
 
-- `ActivationSheet` con evidencia, reproductor, editar/reprogramar/cancelar; bandeja de ejecución sin activación con vincular y crear.
+- `ActivationSheet` con preview por formato (video, carrusel, horizontal, grupo de recursos, email, blog, landing), copy literal, evidencia, avisos de pieza y editar/reprogramar/cancelar; formulario `Planificar`/`Editar`; diálogo `Reprogramar`; bandeja de ejecución sin activación con vincular y crear desde ejecución.
 - Bloque **Tracking URL** en la hoja: la URL generada por TASK-2001 con botón copiar, sus parámetros legibles y las advertencias `tracking_missing` / `tracking_mismatch` / `tracking_frozen`; la UI nunca arma ni edita UTM.
 
 ### Slice 4 — Evidencia
@@ -285,7 +297,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Contrato y descubrimiento (TASK-2001); publicar o programar en herramientas; métricas; arrastrar para reprogramar.
+- Contrato y descubrimiento (TASK-2001); publicar o programar en herramientas; métricas; arrastrar para reprogramar; lo de v3.3 (trimestre, historial, comentarios, lote, exportar, vista de cliente, propuesta por agente: TASK-2005/2006).
 
 ## Detailed Spec
 
@@ -323,7 +335,7 @@ Ver wireframe y flow de esta task.
 
 ### Out-of-band coordination required
 
-- Aprobación de la dirección visual v3 por el operador; autorización de push.
+- Autorización de push del operador (la dirección visual ya está aprobada).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -332,7 +344,7 @@ Ver wireframe y flow de esta task.
 ## Acceptance Criteria
 
 - [ ] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, wireframe y flow existentes; `UI ready` pasa a `yes` sólo con la dirección v3 aprobada y `pnpm task:lint --task TASK-2002` sin hallazgos.
-- [ ] El calendario filtra por modality, family, platform, account, campaña y estado, con los filtros en la URL.
+- [ ] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL.
 - [ ] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada.
 - [ ] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver.
 - [ ] Copy en `apps/web/src/copy.ts` con test; sin voseo.
@@ -358,5 +370,7 @@ Ver wireframe y flow de esta task.
 
 ## Follow-ups
 
+- TASK-2005 (contrato) y TASK-2006 (UI): trimestre, identidad de campaña, feriados, historial, resultados, comentarios, acciones en lote, exportar, vista de cliente y propuesta por agente.
+- TASK-2004: isotipos en negativo en AXIS.
 - Arrastrar tarjetas para reprogramar.
 - Capa de ventanas de experimento (TASK-1911).
