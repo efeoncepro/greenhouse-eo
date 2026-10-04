@@ -565,3 +565,12 @@ cliente, distribución, actualización y soporte. Esta task conserva instruction
 `client-kit/codex/**` como router generado, kit Claude y eval de agentes. TASK-1904 consume ese router;
 no hay dos paquetes OpenAI ni copia de manuales. El cierre de U20 no depende de instalar/publicar el
 producto U21; U21 sí integra el router para cerrar sus skills. Sin implementación en este delta.
+
+## Delta 2026-10-04 — Mitad Claude del Slice 4 traspasada a TASK-2000
+
+[TASK-2000](TASK-2000-efeonce-claude-connector-and-plugin-distribution.md) toma el plugin de Claude y la guía de
+claude.ai del Slice 4. La documentación vigente de Anthropic (`claude.com/docs/plugins/*`, leída 2026-10-04) cambió la
+premisa: un plugin agregado en la cuenta llega a chat, Cowork y Claude Code, y la forma recomendada es conector + plugin
+con la misma URL. Esta task conserva instructions del gateway, contrato `next`, digest, router Codex (`client-kit/codex/**`)
+y eval de agentes. La skill router de TASK-2000 consumirá las instructions cuando existan, sin depender de ellas para
+cerrar. La pregunta abierta 3 (distribución del kit) queda resuelta para Claude en TASK-2000.
