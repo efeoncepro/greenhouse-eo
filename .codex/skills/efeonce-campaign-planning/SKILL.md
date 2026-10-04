@@ -46,9 +46,9 @@ No duplicar lifecycle editorial ni prioridad en Greenhouse o componentes UI, no 
 aprobado en publicación. Tasks1667/1668/1669 siguen to-do, según ADR de estrategia §14 Accepted
 2026-10-04; la documentación no certifica tools nuevas ni rollout.
 
-## TASK-1905: contrato implementado localmente, rollout pendiente (2026-10-04)
+## TASK-1905: Studio desplegado, federación pendiente (2026-10-04)
 
-Studio API 1.6.0 declara canales, hallazgos y referencias ICP; verificar disponibilidad en la sesión antes de usar.
+Studio main 74073de sirve API 1.6.0 y catálogo v1 con 52 canales. ICP real y federación MCP siguen pendientes; verificar disponibilidad en la sesión antes de usar.
 `studio.channels.list`/`studio.channel.get` devuelven la versión de catálogo, que se conserva con el plan.
 No usar aliases históricos como claves canónicas ni copiar límites de un formato a otro. `studio.customer_model.get`
 requiere TASK-1906/1892; sin modelo, referencia pendiente explícita. T1 por MCP espera TASK-2003, no TASK-1899

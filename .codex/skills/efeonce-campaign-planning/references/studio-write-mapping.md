@@ -2,7 +2,7 @@
 
 **Decisión vigente 2026-10-04:** TASK-1899 retirada; TASK-2003 habilita T1 con identidad delegada. El protocolo
 con proposalDigest descrito como diseño histórico abajo NO es un requisito vigente ni debe implementarse.
-T2 sigue en el carril de operador. TASK-1905 declara localmente las siguientes tools; aún sin rollout/canary MCP:
+T2 sigue en el carril de operador. TASK-1905 sirve las siguientes tools en el manifiesto de Studio 1.6.0; aún sin federación/canary MCP:
 
 | Uso | Tool | Tier |
 | --- | --- | --- |

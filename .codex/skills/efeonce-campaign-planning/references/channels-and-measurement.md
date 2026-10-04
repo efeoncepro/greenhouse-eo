@@ -2,7 +2,7 @@
 
 ## Fuente vigente y límites del inventario histórico
 
-TASK-1905 implementa localmente el catálogo versionado (52 canales; API 1.6.0). Cuando esté desplegado/federado,
+TASK-1905 tiene Studio desplegado (74073de, 52 canales, API 1.6.0); federación MCP pendiente. Cuando las tools estén disponibles,
 leer `studio.channels.list` y `studio.channel.get` con versión, modalidad/familia, compra, aparición y evidencia.
 Las tablas históricas siguientes documentan decisiones de CMP-001; NO son un catálogo cerrado global ni un
 mapeo automático de aliases. `linkedin`/`meta`/`meta-vertical` se conservan como raw hasta revisión humana.

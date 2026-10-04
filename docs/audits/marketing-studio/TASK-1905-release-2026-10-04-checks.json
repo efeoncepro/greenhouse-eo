@@ -1,0 +1,68 @@
+{
+  "commit": "74073de1188f17e87111880bdc961c88c3effee6",
+  "deployment": "dpl_61kJPNWNXabGYetKC6dxwch2s2uW",
+  "api": {
+    "health": {
+      "http": 200,
+      "status": "ok",
+      "database": "reachable",
+      "accessMode": "open",
+      "version": "1.6.0"
+    },
+    "manifest": {
+      "http": 200,
+      "hash": "2302c683cd1eee0d96d89f85b72ded73a50ff30152c8f0f34fa9279b739390e6",
+      "tools": 59
+    },
+    "channels": {
+      "http": 200,
+      "version": 1,
+      "count": 52
+    },
+    "foreignOrg": {
+      "http": 404
+    },
+    "invalidBearer": {
+      "http": 401
+    },
+    "serviceCatalogWrite": {
+      "http": 403,
+      "code": "forbidden"
+    },
+    "versions": {
+      "http": 200,
+      "versions": [
+        {
+          "versionNo": 1,
+          "status": "published",
+          "basedOn": null,
+          "notes": "channel-catalog-seed:3a8939184b65d3aecdf66bdc3dfaa87a86363a1943f55ef0c3fd68f7581ee58d",
+          "createdBy": "operator_cli:Julio Reyes (TASK-1905 release autorizado)",
+          "publishedBy": "operator_cli:Julio Reyes (TASK-1905 release autorizado)",
+          "publishedAt": "2026-10-04T20:36:33.200Z",
+          "revision": 54
+        }
+      ]
+    },
+    "attention": {
+      "http": 200,
+      "keys": [
+        "generatedAt",
+        "items",
+        "upcoming",
+        "inventory"
+      ]
+    }
+  },
+  "media": {
+    "count": 44,
+    "all200Images": true,
+    "rootHttp": 200
+  },
+  "worker": {
+    "revision": "marketing-studio-media-worker-00004-j4h",
+    "trafficPercent": 100,
+    "healthHttp": 200,
+    "imageDigest": "sha256:7e95c904dd9c01f7c023e56111f4495444220f64f162dfef8d15ce034c96b43e"
+  }
+}
