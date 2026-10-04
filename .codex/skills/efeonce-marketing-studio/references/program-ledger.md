@@ -326,8 +326,10 @@ worker + transport + contract · `995bb73` Range proxy for `next dev` without si
 | Staging data | 4 `playback` rows + objects | generated from local with `generateDerivatives` (same primitive, ADC) | second run `up_to_date`; delete-one + rerun → row back with `uploaded 0` |
 | Local `next dev` (staging DB) | contract + transport + UI | verified | `playback` present for video, null for image; Range `206`; tampered token `not_found`; Playwright (Chrome) desktop 1440, mobile 390, story, dark + reduced motion: paused on load, `readyState 4`, duration = `durationMs`, seek OK, `error null`, scrollWidth = clientWidth; ghost «Ver video» opens the video piece |
 | V4 read signing | `signReadUrlV4` + `response-content-type` | verified | signed as `marketing-studio-ingest-stg@` on a staging original → GCS `206 video/mp4`; on the media bucket → `AccessDenied` (permissions, not signature) |
-| Staging worker | flag ON | **not redeployed** | — |
-| Production | migration, worker, web, gateway sync | **pending (operator authorization)** | — |
+| Staging worker | flag ON | live `00004-6v7` (image `35093c39f748`) | manual sweep `succeeded`, `repaired 1, failed 0` (real transcode in Cloud Run) |
+| Production DB | migration `1791129772182` | applied 2026-10-04 | 3 constraints in `pg_constraint` |
+| Production worker | `deploy.sh` `true` (`aa35e02`) | **not deployed** — the session permission classifier blocked `deploy.sh --env production --apply`; the operator runs it | — |
+| Production web / gateway | push `main`, manifest sync | pending (after the worker) | — |
 
 **Hand-off (exact order):** (1) redeploy staging worker (`bash apps/worker/deploy.sh --env staging --apply`); (2)
 migration `1791129772182` on `marketing_studio`; (3) `PLAYBACK_ENABLED="true"` for production in `deploy.sh` →
@@ -337,3 +339,4 @@ health `1.5.0` → `curl -I` media link of `CMP001-08-video-16x9` → 302 → fi
 + version bump + PR + dispatch (descriptions only; the gateway does not validate output schemas). «Los Sparks»
 (CMP001-08) only exists in production: staging was never imported/ingested for it.
 - 2026-10-04 — TASK-1998/1999 (video playback) code complete; migration on staging; 4 staging `playback` derivatives; localhost verified; production rollout pending authorization.
+- 2026-10-04 (later) — rollout authorized: staging worker `00004-6v7` live; production migration applied; production worker deploy blocked by the permission classifier (operator runs it), then push `main`, then gateway.

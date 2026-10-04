@@ -4,6 +4,8 @@
 
 Staging: ISSUE-178 resuelto.
 
+**Marketing Studio — video (04/10):** [TASK-1998](docs/tasks/in-progress/TASK-1998-marketing-studio-video-playback-rendition.md) + [TASK-1999](docs/tasks/in-progress/TASK-1999-marketing-studio-video-player-ui.md): rollout autorizado el 04/10. Staging completo; migración de producción aplicada; falta que el operador despliegue el worker de producción (el clasificador lo bloqueó a Claude), después el push de Studio `main` y el gateway. Orden y estado en el [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#reproducción-de-video-task-19981999).
+
 **SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
 
 **Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».

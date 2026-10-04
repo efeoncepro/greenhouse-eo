@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-049`
-- Status real: `Code complete, rollout pendiente (2026-10-04): Studio f5ae10a + 995bb73 en main local sin push; migración aplicada sólo en staging; 4 videos de staging con playback generado desde local; worker de staging sin redeploy; producción y gateway esperan autorización del operador`
+- Status real: `Rollout parcial (2026-10-04, autorizado): staging completo (worker 00004-6v7, barrido repaired 1); migración aplicada en producción; worker de producción (deploy.sh true en aa35e02), push de Studio main y gateway pendientes — el deploy de producción lo bloqueó el clasificador de permisos y lo corre el operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` (TASK-1893 dejó el worker de derivados y los originales en GCS; TASK-1894 Entregable A dejó la puerta de ingreso)
@@ -356,7 +356,7 @@ resolución completa, que se conserva para descarga/colocación.
 
 ## Acceptance Criteria
 
-- [ ] `studio.asset_rendition` admite `kind='playback'` y `mime_type='video/mp4'` en staging y producción (verificado en `pg_constraint`). — staging ✅ (up → down → up, 2026-10-04); producción pendiente de autorización.
+- [x] `studio.asset_rendition` admite `kind='playback'` y `mime_type='video/mp4'` en staging y producción (verificado en `pg_constraint`). — staging (up → down → up) y producción, 2026-10-04.
 - [ ] Para cada video `gcs` existe exactamente una fila `playback` con `source_sha256` = sha de la versión; re-correr el barrido no crea filas ni objetos nuevos.
 - [x] El MP4 generado es H.264 + AAC (o sin audio si el original no tiene), lado corto ≤ 720 px sin agrandar, con `moov` antes de `mdat` (verificado por test con ffprobe sobre un fixture).
 - [ ] `GET /api/v1/media/{token}` de un video responde `302` a `storage.googleapis.com` sin consultar Postgres, y la URL final atiende `Range` con `206`.

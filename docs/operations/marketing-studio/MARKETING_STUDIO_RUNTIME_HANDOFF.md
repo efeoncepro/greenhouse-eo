@@ -501,10 +501,17 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
 
 ## Reproducción de video (TASK-1998/1999)
 
-Estado: **code complete, rollout pendiente.** Studio `f5ae10a`, `995bb73`, `35093c3` en `main` local sin empujar (push =
-deploy de producción, requiere autorización del operador). Migración `1791129772182_video-playback-rendition` aplicada
-sólo en `marketing_studio_staging` (up → down → up verificado). Los 4 videos de staging tienen su `playback`, generado
-desde local con el mismo primitive del worker (el worker de staging aún no se redeploya). Contrato y diseño:
+Estado (2026-10-04, rollout autorizado por el operador): **staging completo; producción a medias.**
+
+| Paso | Estado |
+|---|---|
+| 1. Worker staging | ✅ `marketing-studio-media-worker-staging-00004-6v7` (imagen `35093c39f748`), flag ON; barrido manual `succeeded`, `repaired 1, failed 0` (transcode real en Cloud Run de CMP003-01) |
+| 2. Migración `marketing_studio` | ✅ aplicada; `asset_rendition_kind_check`, `_mime_type_check`, `_playback_mime_chk` en `pg_constraint` |
+| 3. Worker producción | ⏳ `deploy.sh` producción `true` en Studio `aa35e02`; el deploy lo bloqueó el clasificador de permisos de la sesión. Lo corre el operador |
+| 4. Push Studio `main` | ⏳ **después del paso 3** (si la web sale antes, los videos muestran «todavía no está lista») |
+| 5. Gateway | ⏳ sync del manifiesto, versión, PR y dispatch |
+
+Studio `f5ae10a`, `995bb73`, `35093c3`, `aa35e02` en `main` local sin empujar. Contrato y diseño:
 arquitectura §7.5 y §8; flag `MEDIA_WORKER_PLAYBACK_ENABLED` en `FEATURE_FLAG_STATE_LEDGER.md`.
 
 Orden de rollout:
