@@ -95,8 +95,8 @@ La decisión completa, con evidencia, costos y comandos, está en la guía técn
 | Una toma en 4K | **Seedance 2.0 base** | Es la única que entregó 4K real en las pruebas |
 | Controlar exactamente cómo se mueve la cámara sobre una imagen | **H3 Max control de cámara** | Se describe el recorrido y la escena queda quieta |
 | Fijar cómo empieza y cómo termina el video | **Flux 3** primer y último cuadro, o **Wan 3.0** / **Seedance** desde imagen con último cuadro | |
-| Editar o alargar un video **sin** personas ni marcas | **Seedance 2.5** en modo edición o extensión | |
-| Editar o alargar un video **con** personas o marcas | **Flux 3** edit o extend | El filtro de Seedance rechaza personas reales y logos, y cobra el intento |
+| Editar o alargar un video | **Seedance 2.5** en modo edición o extensión | Con personas o marcas, puede rechazar y cobrar el intento en casos puntuales: probar primero corto y a baja resolución |
+| Editar o alargar un video con personas o marcas **sin arriesgar un intento cobrado** | **Flux 3** edit o extend (o Wan 3.0) | También es la alternativa si Seedance rechaza |
 | Un video basado en una página web o un documento | **Wan 3.0** desde referencias, con razonamiento activado | Conviene darle un guion en la instrucción |
 
 Tres advertencias que aplican a todo:
@@ -371,7 +371,7 @@ es el camino para los modelos que viven en Fal.
 | Entrenar un estilo o personaje propio para video | **Minimax H3 trainer** | Un archivo LoRA reutilizable |
 | Probar una idea de video barato y después pasarla a versión final | **Flux 3** (borrador + mejora) | Un borrador y, si gusta, su versión final |
 | Video entre un primer y un último cuadro, o pasando por varios cuadros clave | **Flux 3** | Un video corto |
-| Cambiar el aspecto de un video que ya existe, o alargarlo | **Flux 3 edit / extend** (o Seedance 2.5, sin personas ni marcas) | El video editado, o sólo el tramo nuevo |
+| Cambiar el aspecto de un video que ya existe, o alargarlo | **Flux 3 edit / extend** (o Seedance 2.5; con personas o marcas, contando con un posible rechazo cobrado) | El video editado, o sólo el tramo nuevo |
 | Un video de hasta 30 segundos donde el modelo decide el largo, o que se base en una página web o un documento | **Wan 3.0** (y Wan 3.0 Prime) | Un video corto, con sonido |
 
 ### La separación por capas, en simple
@@ -517,10 +517,12 @@ Sobre Seedance, lo que conviene saber:
 - Los videos de Seedance duran **como mínimo 4 segundos**.
 - Se probó en real el 2026-09-16: la **edición** convirtió un viñedo en paisaje nevado conservando el encuadre, y la
   **extensión** siguió el movimiento de cámara y reveló la cordillera.
-- **Filtro de contenido del proveedor (ByteDance):** Seedance rechaza referencias con **marcas o logotipos** (pasó con
-  el isotipo de Efeonce) y con **personas reales** (pasó con un video de un barista). El rechazo llega **después** de
-  encolar, así que **el intento se cobra**. Para editar o alargar con Seedance 2.5, usar material sin personas
-  identificables ni marcas; si hay personas, usar Flux 3 o Wan 3.0.
+- **Rechazos de contenido del proveedor (ByteDance):** Seedance rechazó dos veces el 2026-09-16: una referencia con el
+  isotipo de Efeonce (**marca**) y un video de un barista (**persona real**). El rechazo llega **después** de encolar,
+  así que **el intento se cobra**. Pero **no es un filtro sistemático**: las mascotas 3D de partner pasaron sin rechazo
+  (2026-09-22) y el operador ha producido en Fal videos con Seedance con personas y marcas reales sin problema
+  (2026-10-04). Qué dispara el rechazo todavía no está medido. Con personas o marcas, Seedance sigue siendo una opción:
+  contar con un posible intento cobrado, probar primero corto y a baja resolución, y si rechaza, usar Flux 3 o Wan 3.0.
 
 ### Qué está probado y qué no
 
@@ -546,7 +548,7 @@ Sobre Seedance, lo que conviene saber:
   registros es el de la resolución más baja. Cuando haya duda, mirar el saldo con `--balance` antes y después de una
   prueba corta.
 - **Costo real medido (2026-09-16):** la prueba completa de 17 videos cortos (de 2 a 4 segundos) costó **USD 7,71**,
-  incluidos 3 intentos que Seedance rechazó por su filtro y que igual se cobraron. Seedance salió cerca del **doble**
+  incluidos 3 intentos que Seedance rechazó por contenido y que igual se cobraron. Seedance salió cerca del **doble**
   de lo estimado con la equivalencia de tokens de OpenArt, así que esa equivalencia no sirve para presupuestar. **La
   fórmula que publica Fal sí sirve** (alto × ancho × segundos × 24 / 1024 tokens): coincidió con lo medido. Como
   referencia: 3 videos de Seedance 2.0 fast de 4 segundos a 480p costaron cerca de USD 1,37, y 3 de mini, USD 0,85.

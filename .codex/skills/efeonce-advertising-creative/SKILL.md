@@ -150,8 +150,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 - Resolución nativa > 2K (OOH, print proof) → Seedream 5 Lite o GPT Image (hasta 3840×2160, experimental sobre
   2560×1440); Seedream 5 Pro en fal **no pasa de 2048²**.
 - Formato más extremo que 3:1 → Seedream (1/16–16); GPT Image tope 3:1.
-- Motion con marca o personas → Flux 3 o Wan 3.0, no Seedance (su filtro rechaza tras cobrar); presupuesta por
-  resolución (el CLI estima antes de encolar y pide `--yes` sobre el tope; sin `--resolution` usa el escalón más
+- Motion con marca o personas → Seedance sigue siendo candidato: hubo rechazos puntuales cobrados tras encolar
+  (condiciones sin medir), así que prueba primero corto y a baja resolución y ten Flux 3 o Wan 3.0 como alternativa
+  si rechaza; presupuesta por resolución (el CLI estima antes de encolar y pide `--yes` sobre el tope; sin `--resolution` usa el escalón más
   barato) y confirma con `pnpm ai:fal --balance`.
 
 ## Bucle de trabajo

@@ -49,8 +49,9 @@
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni 1.1 (`pnpm ai:omni`, Cloud directo, nunca Fal; seis modos probados sólo a 360p/16:9/3 s);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
   `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (árbol por necesidad + costos por
-  resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance: sin marcas ni personas reales,
-  su filtro rechaza tras encolar y cobra); el CLI estima el costo antes de encolar, pide `--yes` sobre el tope
+  resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance sí es candidato con personas y
+  marcas, pero hubo rechazos puntuales cobrados tras encolar (condiciones sin medir): prueba corto y a baja
+  resolución y ten Flux 3 o Wan 3.0 como alternativa); el CLI estima el costo antes de encolar, pide `--yes` sobre el tope
   (USD 1, `FAL_COST_CONFIRM_USD` o `--max-usd`) y, sin `--resolution`, usa el escalón más barato; usa dos cuentas de fal con failover por saldo
   (`docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`);
   Gemini Omni tiene CLI y contrato propios (`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`):

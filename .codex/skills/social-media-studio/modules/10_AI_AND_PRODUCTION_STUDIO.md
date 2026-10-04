@@ -66,8 +66,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    2.5 Sunburst (`pnpm ai:image --model …`); abrir territorios barato → Seedream 5 Lite; material, luz y atmósfera →
    Seedream 5 Pro (`pnpm ai:fal`). Seedream 5 Pro en fal **no es 4K** (máx. 2048²).
 2. **Toma de video:** explorar en el escalón barato (H3 Max Turbo 480P, Flux 3 draft o Seedance 2.0 mini 480p) y
-   generar el final sólo de la toma aprobada; hero → Seedance 2.5; con personas o marcas → Flux 3 o Wan 3.0 (el
-   filtro de Seedance rechaza **después de cobrar**).
+   generar el final sólo de la toma aprobada; hero → Seedance 2.5, también con personas o marcas (hubo rechazos
+   puntuales **cobrados** tras encolar, con condiciones sin medir: prueba primero corto y a baja resolución y ten
+   Flux 3 o Wan 3.0 como alternativa si rechaza).
 3. **Presupuesta por resolución:** fal cobra por escalón y el precio registrado es el más bajo (Wan 1080p 0,20
    USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). `pnpm ai:fal` imprime `$ costo estimado` antes de encolar, pide
    `--yes` sobre el tope (USD 1, `--max-usd`) y, sin `--resolution`, usa el escalón más barato: para el final pasa la

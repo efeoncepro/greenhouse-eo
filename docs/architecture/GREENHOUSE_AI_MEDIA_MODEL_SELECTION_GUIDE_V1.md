@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
+> **Ultima actualizacion:** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
+> **Antes (v1.14):** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
 > **Antes (v1.13):** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
 > **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
 > **Antes (v1.11):** 2026-10-02 por Claude — v1.11 (TASK-1964, escenario del login): 🔴 `pnpm ai:inpaint image` con Sunburst no sirve para retocar la PIEL de una cara (zona casi sin cambio o reencuadre de ~6 px) y una cara a 3840×2160 salió craquelada frente a la de 2560×1440 [verificado, una corrida; causa sin aislar] (§5.1). v1.10 (TASK-1965): inpainting con `pnpm ai:mask` + `pnpm ai:inpaint image|video` (recompone y verifica delta 0); 🔴 Sunburst con máscara devuelve un panel negro plano (3 de 3) y la fila de inpainting pasa a Flare / Flux Pro Fill (§2, §5.1, §6.8).
@@ -111,25 +112,25 @@ El video se opera con `pnpm ai:fal` para fal/Higgsfield y `pnpm ai:omni` para Ge
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
 | **Explorar movimiento o actuación, barato y rápido** | `h3turbo-t2v`/`-i2v` a 480P, 5 s | Latencia medida 2,7–8 s [verificado 2026-09-16]; la H3 más barata [contrato] | `flux3-*-draft` (+ `flux3-enhance` sólo del elegido); `seedance20-mini-*` 480p | Asumir paridad de calidad Turbo = Max: [sin dato]; y usar el precio del registro sin medir (§5.5) |
-| **Toma hero de máxima calidad** | `seedance25-*` (hasta 30 s) | #1 OpenArt video (1125) y lidera adherencia, estética, física y consistencia [tercero] | Wan 3.0 (#1 AA texto a video con audio) [tercero]; H3 Max (#1 AA imagen a video con audio) [tercero] | Seedance con **personas reales o marcas** en las referencias: rechazo tras encolar, **cobrado** [verificado 2026-09-16]. ✅ **El filtro NO alcanza a las mascotas 3D de partner de Efeonce** —Codex, Clawd, Gigi—: probadas sin rechazo [operador, 2026-09-22]. **No extrapolar «marca» a una interpretación 3D propia**; y 1080p de 2.5 sin probar nitidez (§5.3) |
+| **Toma hero de máxima calidad** | `seedance25-*` (hasta 30 s) | #1 OpenArt video (1125) y lidera adherencia, estética, física y consistencia [tercero] | Wan 3.0 (#1 AA texto a video con audio) [tercero]; H3 Max (#1 AA imagen a video con audio) [tercero] | Ir directo al final con **personas reales o marcas** sin una prueba corta: Seedance rechazó dos casos tras encolar, **cobrados** (isotipo Efeonce y video de barista) [verificado 2026-09-16], aunque las mascotas 3D de partner —Codex, Clawd, Gigi— pasaron [operador, 2026-09-22] y el operador ha producido videos con personas y marcas reales sin problema [operador, 2026-10-04]. Es un riesgo puntual, no un filtro sistemático; qué lo dispara: [sin dato]. Presupuestar el posible rechazo (corto y a baja resolución primero) y tener Flux 3 / Wan 3.0 si rechaza; y 1080p de 2.5 sin probar nitidez (§5.3) |
 | **Toma larga (más de 15 s)** | `seedance25-*` (≤ 30 s) o `wan3-*` (2–30 s) | [contrato] | Flux 3 (≤ 20 s) | Seedance 2.0 / H3 (≤ 15 s) [contrato]; y creer que 30 s de Wan son un solo plano: puede cortar entre encuadres [tercero] |
 | **4K** | `seedance20-*` base `--resolution 4k` | Único endpoint conectado que entregó 3840×2160 [verificado 2026-09-16] | `h3-*` base 4K (reescalado desde 768P, no nativo) [contrato] | Seedance 2.0 fast/mini/us (techo 720p); Seedance 2.5, Flux 3 y Wan (techo 1080p) [contrato] |
 | **Control de cámara preciso sobre una imagen fija** | `h3max-camera` | Escena congelada, sólo se mueve la cámara, trayectoria de hasta 12 keyframes [contrato] [verificado 2026-09-16] | Describir el movimiento en el prompt de cualquier i2v | Pedir acción del sujeto: el modelo congela la escena [oficial] |
 | **Controlar principio y fin exactos** | `flux3-flf` (ambos cuadros obligatorios) | Contrato explícito primer + último [contrato] | `wan3-i2v`, `seedance25-i2v`, `seedance20-i2v`, `h3*-i2v` con `--end-image` | `flux3-flf --duration auto` (no acepta auto) [contrato] |
 | **Pasar por varios cuadros clave** | `flux3-keyframes` (1–10, `--keyframe img@frame`) | Único con keyframes [contrato] [verificado 2026-09-16] | Encadenar varios flf | Índices fuera del largo del clip (24 fps × segundos) |
-| **Editar un video existente, sin personas ni marcas** | `seedance25-r2v --task editing` | Cambió un viñedo a nieve conservando encuadre [verificado 2026-09-16] | `flux3-edit` | Pasar `--duration`/`--aspect` (el CLI los rechaza: el proveedor fuerza auto) [contrato] |
-| **Editar un video con personas o marcas** | `flux3-edit` | USD 0,03/s, conserva movimiento y encuadre [contrato] [verificado]; sin filtro tipo Seedance observado [verificado] | Wan 3.0 r2v usando el video como referencia (no es edición) | Seedance (filtro ByteDance, cobrado) [verificado] |
-| **Extender un video** | `seedance25-r2v --task extension` (sin personas/marcas) | Continuó el movimiento y reveló los Andes [verificado 2026-09-16] | `flux3-extend` (origen **con audio**; entrega sólo la continuación) | `flux3-extend` sobre un clip sin pista de audio: 422 tras encolar [verificado]; el CLI lo revisa con ffprobe [contrato] |
+| **Editar un video existente** | `seedance25-r2v --task editing` | Cambió un viñedo a nieve conservando encuadre [verificado 2026-09-16] | `flux3-edit` (también si Seedance rechaza) | Pasar `--duration`/`--aspect` (el CLI los rechaza: el proveedor fuerza auto) [contrato]; con personas o marcas, gastar el clip completo sin una prueba corta: posible rechazo cobrado [verificado 2026-09-16] |
+| **Editar un video con personas o marcas, sin arriesgar un rechazo cobrado** | `flux3-edit` | USD 0,03/s, conserva movimiento y encuadre [contrato] [verificado]; sin rechazos como los de Seedance observados [verificado] | Wan 3.0 r2v usando el video como referencia (no es edición); `seedance25-r2v --task editing` presupuestando el posible rechazo cobrado: dos casos medidos [verificado 2026-09-16], producción del operador con personas y marcas sin problema [operador, 2026-10-04] | Asumir que Seedance siempre rechaza o que nunca rechaza: qué lo dispara [sin dato] |
+| **Extender un video** | `seedance25-r2v --task extension` (con personas o marcas, presupuestar un posible rechazo cobrado) | Continuó el movimiento y reveló los Andes [verificado 2026-09-16] | `flux3-extend` (origen **con audio**; entrega sólo la continuación) | `flux3-extend` sobre un clip sin pista de audio: 422 tras encolar [verificado]; el CLI lo revisa con ffprobe [contrato] |
 | **Muchas referencias multimodales** | `seedance25-r2v` (30 img · 10 video · 10 audio) | Mayor cupo [contrato] | `wan3-r2v` (10/5/5) · `h3*-r2v` (9/3/3) · `seedance20-r2v` (9/3/3, video sólo guía) | Enviar sólo audio: exige al menos una imagen o video [contrato] |
 | **Video basado en una página web o un documento** | `wan3-r2v --thinking --web-url` / `--file` | Único con esa entrada [contrato]; `--web-url` verificado sobre efeoncepro.com [verificado 2026-09-16] | Escribir el guion a mano y usar t2v | Esperar un teaser narrativo sin prompt con guion: salió animación de la portada [verificado]; `--file` sin corrida real [sin dato] |
-| **Consistencia de personaje/producto entre tomas** | Referencias (r2v) en Seedance 2.5 / Wan 3.0 / H3 | Único camino operativo hoy [contrato] | LoRA de H3 (postergada [decisión]); Higgsfield Soul ID (otro carril, skill motion-design-studio) | Seedance con rostros reales (filtro) [verificado] |
+| **Consistencia de personaje/producto entre tomas** | Referencias (r2v) en Seedance 2.5 / Wan 3.0 / H3 | Único camino operativo hoy [contrato] | LoRA de H3 (postergada [decisión]); Higgsfield Soul ID (otro carril, skill motion-design-studio) | Dar por seguro Seedance con rostros reales sin prueba corta: un rechazo cobrado medido [verificado 2026-09-16], aunque el operador ha producido con personas reales sin problema [operador, 2026-10-04] |
 | **Sólo mover la cámara con la escena quieta** | `h3max-camera` | [contrato] | — | — |
 | **Diálogo con lip sync** | Seedance 2.x (diálogo entre comillas) o Flux 3 | Declarado [oficial] | Wan 3.0 (declarado, lip sync débil según terceros) [tercero] | Prometer diálogo en español sin probarlo (fal dice "inglés principal" para Flux 3) [oficial] |
 | **Video con residencia de procesamiento en EE. UU.** | `seedance20-us-*` | "US hosted version" [oficial]; +20 % por token y techo 720p [contrato] | — | Elegirla por calidad: no hay diferencia declarada [oficial] |
 | **Prompt exacto, sin reinterpretación** | `wan3-* --no-prompt-expansion` o H3 base `--prompt-expansion disabled` | [contrato] | — | H3 Max/Turbo: expansión obligatoria (el CLI envía `balanced`) [contrato] |
 | **Video sin audio** | `--no-audio` en Seedance, Flux 3 y Wan | [contrato] | Quitar la pista en post | H3: **no tiene toggle y siempre entrega audio** [contrato] |
 | 🔴 **Una pieza social en 4:5** (el formato principal de los estáticos aprobados de Efeonce) | Generar en **`3:4`** (1080×1440) con el motor que pida la toma y **recortar a 1080×1350** en post | **Ningún motor de video del carril soporta 4:5** — medido en los cinco: Seedance 2.5, Seedance 2.0, Wan 3.0, Flux 3 y H3; todos ofrecen `3:4` como lo más cercano [verificado 2026-09-22] | Entregar sólo 9:16 y 1:1 y declarar el 4:5 fuera del set, si el brief lo permite | Recortar sin medir antes que las franjas sacrificadas estén vacías; y subir un 3:4 donde la plataforma espera 4:5: **ella** recorta y decide dónde |
-| **Reiluminar un video** | Ninguno conectado | Estudio de mercado en §10.3: todo **sin verificar en vivo** | ID-V2V Relight (reilumina un cuadro y lo propaga) o Beeble SwitchX [sin verificar en vivo] | Prometer relight de video con Seedance por prompt sin probarlo (filtro de personas y marcas) [verificado 2026-09-16 para el filtro] |
+| **Reiluminar un video** | Ninguno conectado | Estudio de mercado en §10.3: todo **sin verificar en vivo** | ID-V2V Relight (reilumina un cuadro y lo propaga) o Beeble SwitchX [sin verificar en vivo] | Prometer relight de video con Seedance por prompt sin probarlo (y con personas o marcas, posible rechazo cobrado) [verificado 2026-09-16 para los rechazos] |
 | **Stream en tiempo real dirigido** | Ninguno operable | `h3max-director` exige cliente realtime AsyncAPI, no cola [contrato] [oficial] | — | Intentarlo con el CLI (se detiene) [contrato] |
 
 **Audio generado = provisional.** Seedance, Wan, Flux 3 y H3 generan audio; si la pieza tiene diseño sonoro, reemplázalo en post. [decisión]
@@ -232,8 +233,8 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | | MiniMax H3 base/Max/Turbo · `h3-t2v`, `h3max-t2v`, `h3turbo-t2v` | [verificado 2026-09-16] | no | base 0,06 (768P) · 0,13 (2K reesc.); Max 0,04 · 0,08; Turbo 0,02 · 0,04 | audio siempre, sin toggle |
 | | Gemini Omni 1.1 · `ai:omni` modo texto | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 (output nominal) | 3–10 s; 16:9/9:16 |
 | | Higgsfield API · Kling 3.0 std/pro/4K/Turbo, Kling 2.6, LTX 2.5, PixVerse 6, Happy Horse, Hailuo 2.3, Wan 2.6/2.7, H3 2K | [contrato] (sólo `--estimate`) | no | por `--estimate` (§5.8) | ninguna capacidad de video corrida en salida |
-| `gen.i2v` | Seedance 2.5 · `seedance25-i2v` | [verificado 2026-09-16]; 1080×1920 entregado 2026-09-22 | no | 0,473 · 1,164 | filtro de personas reales y marcas, cobrado |
-| | Seedance 2.0 · `seedance20-*-i2v` | [verificado 2026-09-16] | no | ídem t2v | ídem filtro |
+| `gen.i2v` | Seedance 2.5 · `seedance25-i2v` | [verificado 2026-09-16]; 1080×1920 entregado 2026-09-22 | no | 0,473 · 1,164 | posible rechazo cobrado con personas reales o marcas (riesgo puntual, no sistemático) |
+| | Seedance 2.0 · `seedance20-*-i2v` | [verificado 2026-09-16] | no | ídem t2v | ídem riesgo |
 | | Flux 3 · `flux3-i2v` (+ draft → `flux3-enhance`) | [verificado 2026-09-16] | no | 0,17 · 0,29 | enhance publicado [sin dato] |
 | | Wan 3.0 / Prime · `wan3-i2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 | prompt opcional |
 | | H3 base/Max/Turbo · `h3-i2v`, `h3max-i2v`, `h3turbo-i2v` | [verificado 2026-09-16] | no | ídem t2v | Max #1 AA imagen a video con audio [tercero] |
@@ -241,7 +242,7 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | | Higgsfield API · `hf-kling3-*-i2v`, `hf-kling25turbo-i2v`, `hf-seedance*-i2v`, `hf-wan3-i2v` | [contrato] | no | `--estimate` | |
 | `gen.r2v` | Seedance 2.5 · `seedance25-r2v` (30 img · 10 video · 10 audio) | [verificado 2026-09-16]; 1080p 2026-09-22 | no | 0,473 · 1,164 (menos con video de referencia, §4.2) | el que más referencias acepta |
 | | Seedance 2.0 · `seedance20-*-r2v` (9/3/3, video sólo guía) | [verificado 2026-09-16] | no | ídem | |
-| | Wan 3.0 / Prime · `wan3-r2v` (10/5/5) | [verificado 2026-09-16] | no | 0,10 · 0,20 | sin filtro de personas reales observado |
+| | Wan 3.0 / Prime · `wan3-r2v` (10/5/5) | [verificado 2026-09-16] | no | 0,10 · 0,20 | sin rechazo por personas reales observado |
 | | H3 base/Max · `h3-r2v`, `h3max-r2v` (9/3/3) | [verificado 2026-09-16]; CMP-001 2026-09-22 | no | ídem t2v | sin `--aspect` sale 1920×1080 horizontal |
 | | Gemini Omni 1.1 · modo referencias (10 img · 3 video) | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | |
 | | Higgsfield API · `hf-seedance*-r2v`, `hf-wan3-r2v`, `hf-grok-video15-r2v`; Kling `elements` vía `--input` | [contrato] | no | `--estimate` | `elements` = candidato a consistencia de cast |
@@ -254,7 +255,7 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | | Higgsfield Cinema Studio 4.0 (cámara, lente, rig de luz) | [mcp], fuera del catálogo de API | no | [sin dato] | |
 | `gen.source-doc` | Wan 3.0 · `wan3-r2v --thinking --web-url` / `--file` | web [verificado 2026-09-16]; `--file` [sin dato] | no | 0,10 · 0,20 | exige guion en el prompt |
 | `gen.multishot` | Seedance 2.0 (multi-shot declarado [oficial]); Wan 3.0 (puede cortar en 30 s [tercero]); Kling 3 `multi_prompt` vía Higgsfield [contrato] | [sin dato] como operación medida | no | según familia | |
-| `time.extend` | Seedance 2.5 · `seedance25-r2v --task extension` | [verificado 2026-09-16] | no | 0,473 · 1,164 (+ entrada) | sin personas ni marcas |
+| `time.extend` | Seedance 2.5 · `seedance25-r2v --task extension` | [verificado 2026-09-16] | no | 0,473 · 1,164 (+ entrada) | con personas o marcas, posible rechazo cobrado |
 | | Flux 3 · `flux3-extend` (+ draft) | [verificado 2026-09-16] | no | 0,41 · 0,53 | origen con audio; entrega sólo la continuación |
 | | Gemini Omni 1.1 · modo extender | [verificado 2026-09-24, 360p → 6 s] | no | 0,101 · 0,152 | aspecto heredado |
 | | Higgsfield API · `hf-seedance25-extend` | [contrato] | no | `--estimate` | |
@@ -269,7 +270,7 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | `edit.zone` | `pnpm ai:inpaint video` + Flux 3 · `fal:flux3-edit` (máscara fija o cajas por keyframes) | [verificado 2026-09-16] | ✅ **sí**, 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`): 5 s cámara quieta, 120 cuadros PASS, deriva 11,16/255 (umbral 12) | 0,03 (720p) | único canario de video; cámara quieta |
 | | `pnpm ai:inpaint video` + `fal:seedance25-edit` (+ estrategia `first-frame`) | [contrato] (`verifiedAt: null` en el adaptador) | no | tokens de Seedance | nunca corrido |
 | `edit.global` | Flux 3 · `flux3-edit` | [verificado 2026-09-16] | no (sólo dentro de `edit.zone`) | 0,03 (720p) | sale a 720p |
-| | Seedance 2.5 · `seedance25-r2v --task editing` | [verificado 2026-09-16] | no | ≈ 0,284 con video de referencia (720p) | filtro cobrado |
+| | Seedance 2.5 · `seedance25-r2v --task editing` | [verificado 2026-09-16] | no | ≈ 0,284 con video de referencia (720p) | posible rechazo cobrado con personas o marcas (puntual) |
 | | Gemini Omni 1.1 · modo editar | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 | cadena stateful sin probar |
 | | Higgsfield API · `hf-seedance25-edit` | [contrato] | no | `--estimate` | |
 | | Magnific `video_modify` (Aleph 2, Seedance 2/2.5, Omni, H3, Grok) | [mcp] | no | créditos Magnific [sin dato USD] | |
@@ -479,7 +480,7 @@ Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `
 
 Todo [contrato] (OpenAPI de fal 2026-09-16), salvo la ficha de Lite [oficial]. ModelArk (ByteDance directo) documenta capacidades de Pro que fal **no expone**: fondo transparente en imagen a imagen, edición por `<point>`/`<bbox>` y trazos, 1.5K al precio de 1K [oficial]; si fal respeta `<point>`/`<bbox>` en Pro Edit vía prompt [sin dato].
 
-**Políticas de contenido.** Safety checker activo por defecto; apagarlo exige autorización de cuenta [oficial]. Filtro de marcas y personas reales en Seedream **imagen**: [sin dato] (el filtro medido es de Seedance video). Licencia: Lite "Commercial use permitted under partner agreement" [oficial]; Pro [sin dato].
+**Políticas de contenido.** Safety checker activo por defecto; apagarlo exige autorización de cuenta [oficial]. Rechazos por marcas o personas reales en Seedream **imagen**: [sin dato] (los dos rechazos medidos son de Seedance video, en casos puntuales). Licencia: Lite "Commercial use permitted under partner agreement" [oficial]; Pro [sin dato].
 
 **Precio y estimación** [oficial, fichas fal 2026-09-16]:
 
@@ -527,8 +528,8 @@ pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --size auto_2K --
 
 **Qué es.** Sucesor de Seedance 2.0 con arquitectura conjunta audio-video, 30 s en una pasada y hasta 50 referencias multimodales [oficial fal]. Presentado 2026-06-23, lanzado 2026-07-31 en Jimeng/Doubao [tercero]; llegada a fal [sin dato]. "~20 % mejor adherencia" según ByteDance [oficial].
 
-**Cuándo SÍ.** Toma hero realista sostenida; tomas de 15 a 30 s; muchas referencias (30/10/10); **editar** (`--task editing`) o **extender** (`--task extension`) un video sin personas ni marcas; diálogo con lip sync (entre comillas) [oficial].
-**Cuándo NO.** Personas reales o marcas/logotipos en referencias o en el video de origen (filtro ByteDance, rechazo **cobrado**) [verificado]; 4K (techo 1080p, no verificado) [contrato]; multi-shot con cortes (se vende como toma continua) [oficial]; texto fino, geometría exacta de producto, objetos pequeños persistentes [tercero]; prompts que acumulan cámara + caminata + gestos + luz + dos hablantes (el lip sync pierde prioridad) [tercero].
+**Cuándo SÍ.** Toma hero realista sostenida; tomas de 15 a 30 s; muchas referencias (30/10/10); **editar** (`--task editing`) o **extender** (`--task extension`) un video, también con personas o marcas, presupuestando el posible rechazo (ver **Contenido**); diálogo con lip sync (entre comillas) [oficial].
+**Cuándo NO.** Ir directo al final con personas reales o marcas/logotipos sin una prueba corta y a baja resolución: el rechazo, si llega, es tras encolar y **cobrado** [verificado 2026-09-16] (riesgo puntual, ver **Contenido**); 4K (techo 1080p, no verificado) [contrato]; multi-shot con cortes (se vende como toma continua) [oficial]; texto fino, geometría exacta de producto, objetos pequeños persistentes [tercero]; prompts que acumulan cámara + caminata + gestos + luz + dos hablantes (el lip sync pierde prioridad) [tercero].
 
 **Capacidades y límites** [contrato salvo indicación].
 - Duración 4–30 s o `auto` (texto). Resolución 480p/720p/1080p. Aspecto `auto, 21:9, 16:9, 4:3, 1:1, 3:4, 9:16`. `--bitrate`. Audio apagable (`--no-audio`). 24 fps [oficial].
@@ -539,7 +540,7 @@ pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --size auto_2K --
 - **1080p: contradicción.** El OpenAPI lo ofrece y fal lo cobra (~1,164/s), pero la tabla de resoluciones de la ficha lista sólo 480p/720p [oficial]; prensa dice 4K nativo 10 bits [tercero]; otros terceros dicen tope nativo 720p y 1080p reescalado [tercero]. Nuestras corridas fueron a 480p [verificado]. **1080p de 2.5: ENTREGA verificada [2026-09-22], nitidez nativa sin dato.** Dos corridas a 1080p devolvieron 1080×1920. Falta comparar detalle contra 720p para saber si es nativo o reescalado — eso sí se hace con una prueba de 5 s, no con la toma hero.
 - Capacidades anunciadas que fal **no** expone: referencias de modelos 3D blancos, edición local de zonas, video largo beta hasta 3 min, color 10 bits [tercero].
 
-**Contenido.** Filtros de rostros, marcas de agua C2PA y detección de personajes con copyright [tercero]. Rechazo medido con `422 content_policy_violation` / `partner_validation_failed` **después de encolar, cobrado**: isotipo Efeonce ("potential copyright violation") y video de barista ("likenesses of real people") [verificado 2026-09-16]. Uso comercial "Commercial use", estado Partner [oficial]; derechos de ByteDance sobre la salida [sin dato].
+**Contenido.** Filtros de rostros, marcas de agua C2PA y detección de personajes con copyright [tercero]. Rechazo medido con `422 content_policy_violation` / `partner_validation_failed` **después de encolar, cobrado**: isotipo Efeonce ("potential copyright violation") y video de barista ("likenesses of real people") [verificado 2026-09-16]. **No es un filtro sistemático:** las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22] y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]; qué dispara el rechazo: [sin dato]. Con personas o marcas: probar primero corto y a baja resolución, presupuestar el intento cobrado y tener Flux 3 / Wan 3.0 como alternativa si rechaza. Uso comercial "Commercial use", estado Partner [oficial]; derechos de ByteDance sobre la salida [sin dato].
 
 **Precio y estimación.**
 
@@ -569,7 +570,7 @@ pnpm ai:fal --capability seedance25-r2v --task editing --video clip.mp4 --prompt
 pnpm ai:fal --capability seedance25-r2v --task extension --video clip.mp4 --prompt "Continúa @Video1: <qué pasa después>" --duration 8 --out ai-generations/2026-09-16_mi-pieza/sd25-extension.mp4
 ```
 
-**Trampas.** Rechazo de contenido cobrado; r2v reference > 15 min de latencia (usa `--detach`) [verificado]; `--seed` sólo lo acepta `seedance25-r2v`; en t2v/i2v (y en 2.0) el CLI lo rechaza en local desde 2026-09-16 [contrato]. Con `--duration auto` o sin `--duration`, la estimación previa usa el máximo del contrato (30 s en 2.5): pasa `--duration` para que no te pida `--yes` de más [contrato].
+**Trampas.** Rechazo de contenido cobrado cuando ocurre (puntual, condiciones [sin dato]); r2v reference > 15 min de latencia (usa `--detach`) [verificado]; `--seed` sólo lo acepta `seedance25-r2v`; en t2v/i2v (y en 2.0) el CLI lo rechaza en local desde 2026-09-16 [contrato]. Con `--duration auto` o sin `--duration`, la estimación previa usa el máximo del contrato (30 s en 2.5): pasa `--duration` para que no te pida `--yes` de más [contrato].
 **Estado.** Las 3 verificadas 2026-09-16 (480p); `editing` y `extension` verificadas [verificado].
 **Fuentes.** V1, V2, V32–V38, R1 (§12).
 
@@ -587,7 +588,7 @@ pnpm ai:fal --capability seedance25-r2v --task extension --video clip.mp4 --prom
 | us | `seedance20-us-t2v`, `-i2v`, `-r2v` | 720p | Sí | 0,0168 (+20 %) | **Sólo** si un cliente exige procesamiento en EE. UU. [oficial] |
 
 **Cuándo SÍ.** 4K (base); multi-shot con cortes dentro de una generación de hasta 15 s [oficial]; transición primer/último cuadro; exploración barata con look Seedance (mini).
-**Cuándo NO.** Más de 15 s; editar o extender (r2v 2.0 **no** tiene `--task`: el video sólo guía) [contrato]; personas reales o marcas (mismo filtro: ByteDance no acepta rostros humanos realistas como origen y bloquea copyright en todos sus canales empresariales) [tercero] [verificado]; `us` por calidad.
+**Cuándo NO.** Más de 15 s; editar o extender (r2v 2.0 **no** tiene `--task`: el video sólo guía) [contrato]; ir directo al final con personas reales o marcas sin prueba corta (mismo riesgo que 2.5: dos rechazos cobrados medidos [verificado 2026-09-16]; prensa dice que ByteDance no acepta rostros humanos realistas como origen y bloquea copyright en sus canales empresariales [tercero], pero el operador ha producido en fal con personas y marcas reales sin problema [operador, 2026-10-04]); `us` por calidad.
 
 **Capacidades y límites** [contrato]. Duración 4–15 s o `auto`. Resolución base 480p/720p/1080p/4k; fast/mini/us 480p/720p. Aspecto como 2.5. r2v: 9 imágenes, 3 videos (suma 2–15 s, < 50 MB, ~480p–720p), 3 audios (suma ≤ 15 s), 12 archivos; referencia visual obligatoria. `--end-image` en i2v. 24 fps. Lip sync en 8+ idiomas [tercero]. La ficha de fal de 2.0 dice "hasta 720p", desactualizada frente al OpenAPI y la corrida 4K [oficial] [verificado]; si el 4K es nativo o reescalado [sin dato]. Términos de residencia de `us` [sin dato].
 
@@ -614,7 +615,7 @@ pnpm ai:fal --capability seedance20-fast-i2v --image plate.png --end-image final
 pnpm ai:fal --capability seedance20-r2v --image personaje.png --video movimiento.mp4 --prompt "@Image1 se mueve como @Video1" --duration 8 --resolution 720p --out ai-generations/2026-09-16_mi-pieza/sd20-r2v.mp4
 ```
 
-**Trampas.** `--bitrate` en mini lo rechaza el CLI [contrato]; `--task` en 2.0 lo rechaza el CLI [contrato]; filtro de contenido cobrado [verificado].
+**Trampas.** `--bitrate` en mini lo rechaza el CLI [contrato]; `--task` en 2.0 lo rechaza el CLI [contrato]; rechazo de contenido cobrado cuando ocurre (puntual, condiciones [sin dato]) [verificado 2026-09-16].
 **Estado.** Las 12 verificadas 2026-09-16 [contrato].
 **Fuentes.** V3–V6, V34, V39, V43–V46 (§12).
 
@@ -717,7 +718,7 @@ pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 100 --
 - extend: `--video` con **pista de audio** (< 50 MB, < 15 s); usa hasta 4 s de video y audio como contexto; `--duration` = segundos nuevos (`auto` entregó 15 s); entrega **sólo la continuación**, une en post [oficial] [contrato] [verificado]. Enviar más de 4 s de origen no aporta contexto adicional (se deduce del límite oficial de 4 s).
 - 24 fps; audio con diálogo y lip sync; idiomas declarados por BFL incluyen español, pero fal dice "inglés principal": **contradicción**, prueba español antes de prometer diálogo [oficial].
 
-**Contenido y derechos.** Evaluación externa de riesgos NCII/CSAM antes del lanzamiento [oficial]. Política explícita sobre personas reales, marcas o menores [sin dato]; edit/extend con personas funcionaron sin filtro tipo Seedance [verificado]. BFL no reclama propiedad sobre la salida; si la entrada contiene material de terceros, explotarla puede requerir derechos que BFL no otorga [oficial]. fal: uso comercial permitido [oficial].
+**Contenido y derechos.** Evaluación externa de riesgos NCII/CSAM antes del lanzamiento [oficial]. Política explícita sobre personas reales, marcas o menores [sin dato]; edit/extend con personas funcionaron sin rechazos como los de Seedance [verificado]. BFL no reclama propiedad sobre la salida; si la entrada contiene material de terceros, explotarla puede requerir derechos que BFL no otorga [oficial]. fal: uso comercial permitido [oficial].
 
 **Precio y estimación — RIESGO ALTO.**
 
@@ -771,7 +772,7 @@ pnpm ai:fal --capability flux3-extend --video clip-con-audio.mp4 --prompt "<cóm
 
 El registro guarda 0,05/s para ambas y el manual dice "mismo precio": **incorrecto en fal**; Prime es ~36–40 % más cara. En Alibaba directo Prime 720P = 0,127199/s [oficial]; Picsart dice que Prime cuesta 1/3 de créditos [tercero, 2026-08-31]: el precio depende del canal.
 
-**Cuándo SÍ.** Toma larga hasta 30 s; video a partir de una **página web** o **documento** (único); consistencia por referencias (10/5/5) incluyendo replicar movimiento de cámara [oficial]; material con personas o marcas donde Seedance rechaza (sin filtro medido); texto a video con audio (#1 AA [tercero]); rostros humanos diversos con microexpresiones (declarado) [oficial]. Prime sólo si la latencia manda.
+**Cuándo SÍ.** Toma larga hasta 30 s; video a partir de una **página web** o **documento** (único); consistencia por referencias (10/5/5) incluyendo replicar movimiento de cámara [oficial]; alternativa con personas o marcas cuando Seedance rechaza (sin rechazo medido); texto a video con audio (#1 AA [tercero]); rostros humanos diversos con microexpresiones (declarado) [oficial]. Prime sólo si la latencia manda.
 **Cuándo NO.** Texto preciso en pantalla y textura de audio ("todavía no donde queremos") [oficial]; lip sync, manos o multitudes, prompts surrealistas o con varios sujetos [tercero]; un solo plano continuo de 30 s (puede cortar entre encuadres) [tercero]; edición, extensión o multi-shot controlado de Wan 3.0 (Alibaba los ofrece, **fal no los expone**) [oficial]; asumir que omitir `--resolution` da calidad final (el CLI envía 480p, el escalón más barato).
 
 **Capacidades y límites** [contrato salvo indicación].
@@ -945,13 +946,13 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.8 Editar video
 
-- **Sin personas ni marcas:** `seedance25-r2v --task editing`, costo = tokens de la salida + duración del video de entrada que cuenta para el cobro [oficial]; clip de 5 s a 720p con referencia de video ≈ 1,42 [cálculo con 0,2838/s; confírmalo con `--balance`].
-- **Con personas o marcas:** `flux3-edit` 10 s **0,30** (720p).
+- **Seedance:** `seedance25-r2v --task editing`, costo = tokens de la salida + duración del video de entrada que cuenta para el cobro [oficial]; clip de 5 s a 720p con referencia de video ≈ 1,42 [cálculo con 0,2838/s; confírmalo con `--balance`]. Con personas o marcas, sumar una prueba corta a baja resolución por el posible rechazo cobrado (riesgo puntual, §5.3).
+- **Flux 3 (alternativa si Seedance rechaza, o para no arriesgar el cobro):** `flux3-edit` 10 s **0,30** (720p).
 - **Editar sólo una ZONA y dejar el resto idéntico cuadro a cuadro:** `pnpm ai:inpaint video` (TASK-1965) sobre `flux3-edit` — normaliza la salida, aborta si el motor corrió el encuadre (deriva media de la zona protegida > 12/255), recompone cada cuadro y verifica delta 0 sobre PNG. Canario 5 s cámara quieta: 120 cuadros PASS, deriva 11,16/255, objeto estable, **0,15** [verificado 2026-10-02]. Manual: `docs/manual-de-uso/ai-tooling/editar-una-zona-de-un-video.md`.
 
 ### 6.9 Extender
 
-- `seedance25-r2v --task extension --duration 8` 720p ≈ **3,78** (sin personas ni marcas; sin `--aspect`).
+- `seedance25-r2v --task extension --duration 8` 720p ≈ **3,78** (con personas o marcas, presupuestar un posible rechazo cobrado; sin `--aspect`).
 - `flux3-extend --duration 5` 720p **2,05** publicado (origen con audio; une origen + continuación en post). Borrador: `flux3-extend-draft` 5 s 0,30 registro (publicado [sin dato]).
 
 ### 6.10 Referencias multimodales
@@ -967,7 +968,7 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.12 Consistencia de personaje o producto
 
-1. Hoy: referencias r2v con la misma hoja de personaje/producto en cada toma (`seedance25-r2v` si no hay rostros reales; `wan3-r2v` o `h3max-r2v` si los hay).
+1. Hoy: referencias r2v con la misma hoja de personaje/producto en cada toma (`seedance25-r2v`, también con rostros reales presupuestando un posible rechazo cobrado; `wan3-r2v` o `h3max-r2v` como alternativa si rechaza).
 2. Futuro: LoRA de H3 (postergada [decisión]; verificación mínima: entrenamiento t2v 100 steps **0,50** + inferencia).
 3. Otro carril: Higgsfield Soul ID (skill motion-design-studio). Kling elements: expuestos como campo `elements` en `hf-kling3-*` (Higgsfield API) vía `--input`, **sin corrida real**.
 
@@ -1084,7 +1085,7 @@ Manuales: [editar una zona de una imagen](../manual-de-uso/ai-tooling/editar-una
   pnpm ai:fal --capability seedance25-r2v --request-id <request_id> --out ai-generations/2026-09-16_mi-pieza/sd25.mp4
   ```
 
-- **Rechazos cobrados**: Seedance cobra aunque el filtro rechace después de encolar [verificado]. Revisa personas y marcas **antes**.
+- **Rechazos cobrados**: cuando Seedance rechaza después de encolar, igual cobra [verificado 2026-09-16]. Es un riesgo puntual con personas o marcas, no un filtro sistemático [operador, 2026-10-04]: prueba **antes** corto y a baja resolución, y ten Flux 3 / Wan 3.0 como alternativa.
 - **Estimación y confirmación en `ai:fal`** (desde 2026-09-16, commit `17196ead1`) [contrato]: antes de encolar el CLI imprime `$ costo estimado ≈ USD X · <base del cálculo>`.
   - Seedance: fórmula de tokens (área × segundos × 24 / 1024 × precio por 1.000 tokens de la API de pricing). Con `--duration auto` o sin `--duration` usa el máximo del contrato como cota superior (2.5 a 480p ≈ USD 6,45): pasa `--duration`.
   - H3 base/Max/Turbo, Wan 3.0/Prime y Flux 3 (final, draft, extend, edit): precio publicado por escalón de resolución; donde no hay escalón publicado (camera-controls, LoRA, enhance, extend draft, Turbo 480P) usa el precio de la API. Extend cobra los segundos nuevos de `--duration`; edit mide con `ffprobe` la duración del video de origen local.
@@ -1115,7 +1116,7 @@ motor sale del banco de TASK-1980.
 | | | | Flux 3 1080p: 2,5 × 1,45 | 3,83 | ≈ 5,5 |
 | `fotorrealista/persona-accion` · alta (≈ 13) | final 1080p | 2 × H3 Max Turbo 768P: 0,20 | H3 Max 1080P: 4 × 0,40 | 1,80 | ≈ 2,6 |
 | | | | Wan 3.0 1080p: 4 × 1,00 | 4,20 | ≈ 6,0 |
-| | | | Seedance 2.5 1080p: 4 × 5,20 (sin personas reales) | 21,00 | ≈ 30,0 |
+| | | | Seedance 2.5 1080p: 4 × 5,20 (con persona real, contar un posible rechazo cobrado) | 21,00 | ≈ 30,0 |
 | `personaje-3d/nexa` · alta, **3 tomas** con la misma ancla | final 720p | 1 × Seedance 2.0 mini 480p: 0,35 | Wan 3.0 r2v 720p: 3 tomas × 4 × 0,50 | 6,35 | ≈ 9,1 |
 | | | | Seedance 2.5 r2v 720p: 3 × 4 × 2,31 | 28,07 | ≈ 40,1 |
 | **Feature spotlight 15 s** (`demo-ui/con-persona`, [anexo](GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) §3.6): P2 5 s media · P5 4 s alta · P6 5 s propio · cierre | final 720p | 2 × H3 Max Turbo 768P: 0,20 | Wan 3.0 720p: P2 2,5 × 0,50 + P5 4 × 0,40 · P6 y cierre 0 | 3,05 | ≈ 4,4 |
@@ -1312,7 +1313,7 @@ inventó una ventana; el de estilos le cambió el color. Para un compuesto, el g
 | **LTX-2.3 Relight IC-LoRA** | Pesos abiertos | Relight, orientado a exteriores | [sin dato] | [sin dato] | Sin conectar [tercero] |
 | **Higgsfield Cinema Studio 4.0** (`cinematic_studio_video_4_0`) | **Sólo el MCP** de Higgsfield | `mode: video_edit` edita un video de referencia (cobrado por su duración); luz `light: preset\|custom\|user`, `light_id`, `light_custom` (rig ordenado: la primera fuente es la llave), además de cámara, lente, apertura, era, género y paleta [verificado 2026-10-03, listado del MCP] | [sin dato] | [sin dato] | **No está en nuestro catálogo de la API** (0 coincidencias) [verificado 2026-10-03]. Candidato a relight de video por rig, sin invocación |
 | **Magnific video relight** | MCP `video_relight` (`video_url` + `first_frame_url` o una creación; `lights` o `light_transfer_image`); app | Luces o imagen de transferencia | [sin dato] | [sin dato] | Sin invocación verificada (esquemas no cargaron) |
-| **Seedance 2.0 / 2.5** por prompt | `seedance25-r2v --task editing` (conectado) | Edición de video por instrucción; en Runware, `duration=auto` y la palabra «relight» en el prompt [tercero] | Tokens de Seedance (§4.2) | [sin dato] | Relight sin medir; filtro de personas y marcas cobrado [verificado 2026-09-16] |
+| **Seedance 2.0 / 2.5** por prompt | `seedance25-r2v --task editing` (conectado) | Edición de video por instrucción; en Runware, `duration=auto` y la palabra «relight» en el prompt [tercero] | Tokens de Seedance (§4.2) | [sin dato] | Relight sin medir; posible rechazo cobrado con personas o marcas (puntual) [verificado 2026-09-16] |
 | **CapCut AI Relight** | App | Relight de video; no nombra el modelo [tercero] | [sin dato] | [sin dato] | Sin API conocida |
 
 **Recomendación del estudio — NO medida todavía:**

@@ -20,8 +20,8 @@ Para generar desde la terminal, a traves de fal.ai:
   imagen, video con **LoRAs** y **entrenamiento de LoRAs** propias;
 - **video con Flux 3**: borrador barato que se mejora a version final, video desde texto, imagen, primer y ultimo
   cuadro o keyframes, y **video a video** (editar un clip o extenderlo);
-- **video a video con Seedance 2.5** (editar o extender un clip desde referencias), verificado el 2026-09-16 (sin
-  personas ni marcas: ver "Problemas comunes");
+- **video a video con Seedance 2.5** (editar o extender un clip desde referencias), verificado el 2026-09-16 (con
+  personas o marcas, presupuesta un posible rechazo cobrado: ver "Problemas comunes");
 - **video con Wan 3.0 y Wan 3.0 Prime**: desde texto, desde una imagen (con ultimo cuadro opcional) o desde
   referencias, de 2 a 30 s o con largo elegido por el modelo, y desde referencias puede **basarse en una pagina web
   o un documento**. Las 6 opciones estan verificadas (2026-09-16).
@@ -366,8 +366,9 @@ pnpm ai:fal --capability flux3-extend --video clip.mp4 --prompt "<como sigue la 
 #### Video a video con Seedance 2.5 (verificado 2026-09-16)
 
 Fal no tiene un endpoint "video a video" de Seedance: se hace con `seedance25-r2v` y `--task`. Las dos tareas se
-verificaron en real el 2026-09-16. ⚠️ El filtro de ByteDance rechaza marcas y personas reales **despues** de encolar y
-cobra el intento: usa material sin personas identificables ni marcas. Contrato leido del OpenAPI del proveedor:
+verificaron en real el 2026-09-16. ⚠️ Con marcas o personas reales, Seedance puede rechazar **despues** de encolar y
+cobrar el intento (dos casos medidos el 2026-09-16; no es sistemático: ver "Problemas comunes"). Prueba primero corto y
+a baja resolución antes del final. Contrato leido del OpenAPI del proveedor:
 
 Editar un clip (el proveedor fuerza duracion y aspecto a `auto`, asi que no pases `--duration` ni `--aspect`):
 
@@ -654,9 +655,14 @@ CLI trabaja con las dos.
 
 ### Seedance 2.5 rechaza el resultado con `content_policy_violation`
 
-El trabajo se encola (y se cobra) y ByteDance lo rechaza al final. Pasa con referencias que contienen marcas o logotipos
-("potential copyright violation") y con videos o imágenes de personas reales ("likenesses of real people"). Usa material
-sin personas identificables ni marcas, o edita con Flux 3 o Wan 3.0.
+El trabajo se encola (y se cobra) y ByteDance lo rechaza al final. Se midió en dos casos el 2026-09-16: una referencia
+con el isotipo de Efeonce ("potential copyright violation") y un video de un barista ("likenesses of real people").
+**No es un filtro sistemático:** las mascotas 3D de partner (Codex, Clawd, Gigi) pasaron sin rechazo el 2026-09-22, y
+el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema (2026-10-04). Qué dispara
+el rechazo no está medido.
+
+Qué hacer: con personas o marcas, Seedance sigue siendo una opción, pero presupuesta el posible rechazo cobrado (prueba
+primero corto y a baja resolución antes del final). Si rechaza, rehaz la toma con Flux 3 o Wan 3.0.
 
 ### Un video tarda más que la espera del CLI
 
