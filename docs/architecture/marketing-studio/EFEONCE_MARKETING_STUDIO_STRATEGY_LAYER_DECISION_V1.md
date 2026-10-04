@@ -381,3 +381,60 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
 - [ICP, buyer personas y JTBD](../../context/13_icp-buyer-personas-jtbd.md) · [HubSpot y bow-tie](../../context/11_hubspot-bowtie.md)
 - [Invariantes de superficie MCP](../agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md)
 - [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md) · TASK-1892 · TASK-1894 · TASK-1895 · TASK-1899 (en `docs/tasks/to-do/`)
+
+
+## 14. Precisión aceptada 2026-10-04 — flujo editorial en Marketing Studio
+
+**Status:** `Accepted` (2026-10-04). **Decider:** Julio Reyes, al ratificar «hagamos todos los ajustes»
+tras el análisis de ownership SEO/Studio/Insights. **Scope:** reconciliación del programa y contratos
+documentales, sin implementación, deploy, publicación ni nueva verificación runtime. Esta precisión
+complementa la decisión aceptada del 2026-09-26 y conserva sus texto/contexto históricos.
+
+El flujo editorial SEO se construye en **Marketing Studio**: plan, brief, trabajo/asignación, producción,
+QA, aprobación, calendario, evidencia observada de publicación e iteraciones. **SV360/Greenhouse** conserva
+captura, hechos y metodología SEO/AEO, acceso, gasto, cola priorizada y medición/outcomes. **Efeonce Insights**
+conserva snapshots de informe, render, grants y distribución; ningún flujo crea otro motor de informes.
+El CMS/Content Factory conserva su contrato y autoridad de write/readback: Studio lo integra por un
+adapter gobernado, no convierte una aprobación de trabajo en permiso automático para publicar.
+
+| Task existente | Dueño y contrato pendiente | Dependencia de foundation |
+|---|---|---|
+| TASK-1667 (EPIC-049) | Especialización editorial SEO: brief, draft/private CMS handoff, QA/aprobación/receipt y readback de publicación | TASK-1908 + TASK-1913; kernel/autoridad TASK-1894/1899 |
+| TASK-1668 (EPIC-022) | Indexación/outcome SEO desde referencias de publicación Studio; baseline/ventana/cobertura/metodología | GSC/rank y receipt1667; AEO/GA4 opcionales por eje, con degradación explícita |
+| TASK-1669 (EPIC-049) | Plan diario SEO advisory, consume cola1700 y estado Studio/outcome | TASK-1908 + TASK-1913/1914/1915; no segundo orquestador ni Nexa runtime |
+| TASK-1907 / 1912 | Plan de contenidos y UI consumidores de referencias/work/brief/QA | Foundation propia; no lifecycle ni reglas de negocio paralelos en la UI |
+| TASK-1909 / 1911 | Procedencia y aprendizaje/calendario con refs de ejecución y outcome | Consumer de hechos, no recálculo de métricas ni causalidad automática |
+
+### Invariantes de esta precisión
+
+- **Un lifecycle editorial:** reutilizar `studio.work_item*` de TASK-1913. No crear `seo_editorial_work_items`
+  ni endpoints Greenhouse para gobernar producción, QA o publicación. Iteración = nuevo trabajo Studio
+  referenciado al anterior. QA/estado de publicación especializado no sustituye la state machine genérica.
+- **Un registry/dispatcher:** TASK-1914/TASK-1915 poseen roles/runs/provider ports/programas. TASK-1669
+  especializa el rol SEO/AEO y su deliverable; no crea tablas de agentes, feedback o runtime en Greenhouse/Nexa.
+- **Una prioridad:** la secuencia del plan es subsecuencia en orden de `readSeoWorkQueue` (TASK-1700), con
+  versión/hash/as-of/expiry y `alsoSurfacedBy`. Aceptar en la cola no ejecuta trabajo; feedback usa su command.
+- **Referencias reproducibles:** sujeto durable y snapshot/item de decisión separados; datos actuales por lanes
+  autorizados; snapshots fechados sólo como evidencia de planificación. Nada de SQL entre Studio y SEO/AEO.
+- **Brief completo:** cinco insumos SEO (`fanOutSubQuestions`, `serpFormat`, `categoryAnswerPages`, `targetUrl`,
+  `requiredEntities`) con fuente/as-of; ausencia null/[] con razón; refresh/fix sin URL/owner bloquea handoff.
+  Intención declarada y estimada separadas; NULL no implica oportunidad. Consolidar es una acción explícita.
+- **CMS seguro:** un único adapter dueño, `ContentFactoryBrief.v1` donde aplique, handoff draft/private
+  idempotente; publish/timeout ambiguo bloquean. QA, approval humano, receipt y readback independientes;
+  en V1 el publish externo lo realiza el operador CMS. HTTP200/publicado no prueban indexación.
+- **Medición honesta:** D-3 para GSC; posición ponderada por impresiones; AEO por prompt/motor; métodos ETV
+  incompatibles no se comparan; baseline/cobertura ausentes no son cero ni éxito; GA4/HubSpot ausentes
+  hacen el loop de negocio explícitamente parcial; sin causalidad automática.
+- **Autoridad y paridad:** persona delegada/tenant/capability y clasificación de fuente se preservan; misma
+  lógica server-side por API/operations/MCP/UI. IA advisory, costo bounded y comandos mutantes del dueño
+  con sus gates. No nueva autorización para gasto, CMS publish, secrets, cron o release.
+
+### Estado de implementación y trazabilidad
+
+Los work items, roles/dispatcher y especializaciones continúan en `to-do`; no se cierra ninguna task
+por esta reasignación. TASK-1908 no queda bloqueada por outcome1668: puede planificar antes de medir;
+TASK-1915 no queda bloqueada por especialización1669. Las ramas futuras declaran dependencia por slice
+para evitar ciclos artificiales. No se crea una task nueva para el CMS: TASK-1667 conserva ese alcance.
+
+[Snapshots íntegros anteriores y manifiesto](../../audits/seo/editorial-history/2026-10-04/README.md)
+preservan las tres specs sustituidas byte-for-byte; son historia no ejecutable, no arquitectura vigente.

@@ -95,7 +95,9 @@ USD 50,00 a 42,29): USD 7,71 por 17 corridas, incluidas 3 rechazadas por filtro 
 la estimación por equivalencia de tokens de OpenArt, que **no sirve para presupuestar** (3 corridas 2.0 fast 4 s
 480p ≈ USD 1,37; 3 mini ≈ 0,85). **Filtro de ByteDance** (medido): rechaza **después de encolar** con 422
 `content_policy_violation` / `partner_validation_failed`; referencia con el isotipo de Efeonce → "potential copyright
-violation"; video con una persona → "likenesses of real people". Operación (`--balance`, `--detach`/`--status`,
+violation"; video con una persona → "likenesses of real people". Alcance: dos casos puntuales, no un filtro sistemático; el
+2026-09-22 las mascotas 3D de partner pasaron y [operador, 2026-10-04] hubo producción en fal con personas y marcas
+reales sin rechazo; las condiciones de disparo no están medidas. Operación (`--balance`, `--detach`/`--status`,
 espera de video 30 min): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` § "Cuentas, saldo y operación del
 CLI (2026-09-16)".
 
@@ -200,7 +202,7 @@ Fuentes del delta [consultadas 2026-09-16]:
 |---|---|---|---|
 | **Higgsfield** (agregador, MCP) | 30+ modelos bajo 1 sub + **Cinema Studio** (presets de cámara: dolly/crash-zoom/orbit/crane/pan/tilt/tracking + focal length + física óptica) + **Soul ID** (consistencia de personaje: 3-5 fotos, entrena 5-10min) + **LipSync** (+voz ElevenLabs) + upscaling; **MCP genera video desde Claude** + CLI | dependes de su plataforma/créditos | **default de producción cinematográfica IA** con control de cámara y personaje consistente; es la mano conectada |
 | **Runway Gen-4.5** | cine dirigido, tomas controladas, entiende **beats + coreografía de cámara** (pan/truck/handheld) | atado a su plataforma | tomas cinematográficas dirigidas con control fino |
-| **Seedance 2.0** (ByteDance) | briefs detallados, camera moves, hasta **9 imágenes + 3 videos + 3 audios**, native audio, multi-shot, 4–15 s | QA físico/anatomía/continuidad; audio nativo sujeto a policy; el filtro rechaza marcas y personas reales tras encolar (se cobra) | anuncios, social punchy y tomas dirigidas por referencias; directo BytePlus para volumen, Fal para gateway |
+| **Seedance 2.0** (ByteDance) | briefs detallados, camera moves, hasta **9 imágenes + 3 videos + 3 audios**, native audio, multi-shot, 4–15 s | QA físico/anatomía/continuidad; audio nativo sujeto a policy; riesgo de rechazo cobrado tras encolar, observado en casos puntuales con marca y persona (no sistemático; probar corto y a baja resolución, alternativa Flux 3 / Wan 3.0) | anuncios, social punchy y tomas dirigidas por referencias; directo BytePlus para volumen, Fal para gateway |
 | **Seedance 2.5** (ByteDance vía Fal) | T2V, I2V y R2V; 4–30 s; 480p/720p/1080p; audio nativo; R2V con hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, citables por posición | No hay 4K, máscaras, storyboard JSON, shots estructurados, stems ni seed de entrada en el OpenAPI actual; los claims de producto/API directa deben separarse | Fal provider-supported, Globe gated; usarlo solo con route card y evidencia exacta |
 | **Minimax H3** (vía Fal, `pnpm ai:fal`) | tres tiers: **Max Turbo** (0,0125 USD/s, divergencia rápida), **Max** (0,025/s; `camera-controls` mueve la cámara sobre una imagen congelada, hasta 12 keyframes), **base** (0,05/s, única H3 con 2K/4K); LoRA + entrenadores para marca/personaje; T2V/I2V/R2V (9 imágenes + 3 videos + 3 audios) | 5–15 s enteros; sin toggle de audio pero entrega audio; I2V sin aspect; LoRA/entrenadores sin verificar; `director` no operable por cola | exploración barata (Turbo 480P), cámara sobre KV aprobado (`h3max-camera`), 4K de hasta 15 s como alternativa a Seedance 2.0 base; verificado 2026-09-16 |
 | **Kling 3.0** (vía Higgsfield; vía fal = evaluado, no conectado) | **storyboarding multi-shot + Voice Binding** (voz consistente 6 cortes/5 idiomas), económico | control fino | narrativas multi-corte con voz consistente; económico |

@@ -91,6 +91,16 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-marketing-studio/SKILL.md` (UI aprobada «v2 · Claro y oscuro», tokens AXIS)
 - Skills de diseño: `info-architecture` (líder), `state-design`, `greenhouse-ux-writing`, `modern-ui`, `dataviz-design`, `product-design-loop`
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+La UI del flujo editorial y plan diario pertenece a Studio. Consume operations/DTOs de
+TASK-1667/TASK-1669 sobre work items TASK-1913 y lanes de seguimiento TASK-1908/outcomes1668.
+No crea reglas/lifecycle en componentes o en Greenhouse. Fases publicación observada, indexación
+y resultado se muestran separadas; pending/unknown/bloqueado y ausencia tienen copy explícito.
+El diseño y GVC deberán actualizarse durante implementación, manteniendo UI ready no.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -101,6 +111,8 @@ Reglas obligatorias:
 - `TASK-1908`: SEO/AEO; `TASK-1909`: procedencia y aceptación; `TASK-1910`: progreso y chequeo de destino; `TASK-1911`: experimentos y aprendizajes (cada sección se construye cuando su backend está en staging).
 
 ### Blocks / Impacts
+
+- TASK-1667/TASK-1669 como contratos backend consumidos cuando estén disponibles.
 
 - Cierre del Exit Criteria de EPIC-049 «toda operación de la UI tiene su endpoint» para la capa de estrategia.
 - Master flow de EPIC-049: nodos `MS-N3.10`, `MS-N11`, `MS-N12`.
@@ -351,6 +363,10 @@ no se duplica aquí. Reglas de ejecución:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Flujo editorial/brief/QA/receipt y plan diario consumen los commands/readers Studio 1667/1669/1913, sin lifecycle o prioridad paralelos en la UI.
+- [ ] Published_unverified/published_verified, indexación y outcome se muestran separados con origen/as-of/cobertura y estados desconocido/bloqueado/parcial.
+- [ ] Cambios de wireframe/flow y GVC prueban el recorrido editorial Studio cuando sus contratos estén disponibles; ningún fixture cuenta como rollout.
 
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact: flow`.
 - [ ] `UI ready` permanece `no` hasta que wireframe y `## UI/UX Contract` tengan mapeo, plan de evidencia y decision log conciliados con `v4 · Estrategia` aprobada; si pasa a `yes`, `pnpm task:lint --task TASK-1912` queda sin hallazgos.

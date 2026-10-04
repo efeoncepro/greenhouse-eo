@@ -164,7 +164,7 @@ snapshots de modelo rotan sin aviso.
 | Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida. Pro: tope 2048² (no 4K), JPEG por defecto (el CLI deriva el formato de la extensión de `--out`), USD 0,0675/0,135; Lite: más área, PNG, series con `max_images`, USD 0,035 |
 | Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 de 4 a 30 s y hasta 1080p (1080p sin verificar); 2.0 base de 4 a 15 s y única con 4K; presupuestar con `tokens = alto × ancho × segundos × 24 / 1024`; r2v exige imagen o video de referencia; el CLI valida límites antes de encolar |
 | Video desde primer/último cuadro o keyframes, borrador barato → final | `pnpm ai:fal --capability flux3-*` | Flux 3 es **video** en fal (no imagen); 12 endpoints verificados; draft (registrado USD 0,03/s; publicado 0,06/s, final 0,17/s a 720p) → `flux3-enhance --draft-cache` |
-| Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (verificados; el filtro de ByteDance rechaza marcas y personas reales y cobra el intento) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
+| Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (verificados; con marcas o personas reales puede rechazar después de encolar y cobrar el intento, en casos puntuales: probar corto y a baja resolución antes del final, y usar Flux 3 / Wan 3.0 si rechaza) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
 | Video de largo elegido por el modelo, o basado en una web o un documento | `pnpm ai:fal --capability wan3-*` / `wan3prime-*` | Wan 3.0: 2–30 s o `auto`, default del proveedor 1080p, el CLI envía 480p sin `--resolution` (USD 0,20/s base a 1080p, 0,28/s Prime; 480p 0,05/0,068); r2v con `--thinking --web-url`/`--file`; las 6 verificadas |
 
 ## Prompt Anatomy
@@ -582,6 +582,10 @@ Reglas operativas:
   de fal sí sirve** (`tokens = alto × ancho × segundos × 24 / 1024`, calza dentro de ~5 %).
   **Filtro de Seedance (ByteDance):** rechaza después de encolar (422 `content_policy_violation`) referencias con
   marcas (isotipo de Efeonce) o personas reales. Video a video con personas o marcas → Flux 3 edit/extend o Wan 3.0.
+  *Corrección 2026-10-04:* fueron dos rechazos puntuales, no un filtro sistemático; las mascotas 3D de partner pasaron
+  (2026-09-22) y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema
+  [operador, 2026-10-04]. Qué dispara el rechazo no está medido. Seedance sigue siendo candidato con personas y marcas:
+  presupuestar el posible rechazo cobrado (prueba corta a baja resolución) y tener Flux 3 / Wan 3.0 si rechaza.
 - **Nano Banana Pro:** nunca por fal (decisión del operador 2026-09-16). En Google, `gemini-3-pro-image` está
   disponible en Vertex pero ninguna superficie lo usa; el provider `google-gemini-image` corre Nano Banana 2
   (`gemini-3.1-flash-image`) y no hay CLI de Gemini Image (`pnpm ai:image` es sólo OpenAI). No cambiar

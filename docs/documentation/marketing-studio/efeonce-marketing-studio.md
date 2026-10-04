@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.4
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-03 por Claude (piezas nuevas en campañas gobernadas por OneDrive)
+> **Ultima actualizacion:** 2026-10-04 (ownership del flujo editorial SEO/AEO; sin implementación)
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -16,6 +16,19 @@ cualquier lugar y una API.
 
 Es un producto distinto de Greenhouse y también de Globe (Efeonce Creative Studio). Globe produce piezas;
 Marketing Studio organiza la campaña que las usa.
+
+
+## Flujo editorial SEO/AEO — alcance acordado, pendiente
+
+El flujo editorial se construirá en Marketing Studio: plan, brief, responsables, producción, revisión,
+calendario e iteraciones. Greenhouse / Search Visibility 360 conserva oportunidades, prioridad y medición;
+Efeonce Insights conserva los informes y su distribución.
+
+[TASK-1667](../../tasks/to-do/TASK-1667-growth-seo-editorial-work-item-content-factory-handoff.md) especializa
+el trabajo y handoff al CMS sobre las tareas de Studio; [TASK-1669](../../tasks/to-do/TASK-1669-growth-seo-agentic-daily-plan.md)
+especializa el plan SEO/AEO con agentes. Ambas están en diseño: los briefs/copys/calendario existentes no
+completan este circuito. Publicación observada, indexación y resultado medido se mostrarán como hechos distintos.
+No hay una segunda cola editorial en Greenhouse ni un segundo motor de informes en Studio.
 
 ## Qué muestra
 

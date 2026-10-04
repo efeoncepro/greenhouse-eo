@@ -107,8 +107,9 @@ El `final.mp4` pierde un poco por el codec: la verificacion exacta es sobre los 
 Con `--strategy first-frame` el comando edita primero un cuadro (`--frame-time`, default 0) con el pipeline de
 imagen y pasa ese cuadro editado como referencia al motor. Sirve cuando el objeto debe verse exactamente de una
 forma. Solo funciona con motores que reciben imagenes (`fal:seedance25-edit`); con `flux3-edit` el comando se niega.
-`fal:seedance25-edit` **no tiene canario propio todavia** y su filtro rechaza marcas y personas reales y cobra el
-intento (guia de seleccion, §6.8).
+`fal:seedance25-edit` **no tiene canario propio todavia** y, con marcas o personas reales, puede rechazar despues de
+encolar y cobrar el intento: es un riesgo puntual, no un filtro sistematico (guia de seleccion, §5.3 y §6.8).
+Presupuesta ese posible rechazo y ten `flux3-edit` como alternativa.
 
 ## Que no hacer
 
@@ -139,7 +140,8 @@ Para un agente que opera `pnpm ai:inpaint video` sin supervision continua. El co
 ```text
 ¿El cambio toca un logo, una marca o una persona real?
 ├─ logo/marca → NO con IA: se compone despues con el arte oficial
-└─ persona real o marca en cuadro → no usar seedance25-edit (su filtro las rechaza y cobra el intento)
+└─ persona real o marca en cuadro → seedance25-edit sirve, pero puede rechazar y cobrar el intento (riesgo puntual):
+   presupuestalo y, si rechaza, usa flux3-edit
 
 ¿El clip cumple el motor? fal:flux3-edit: MP4 ≤ 15 s y ≤ 50 MB  (fal:seedance25-edit: ≤ 30 s, sin canario propio)
 └─ no → cortar el clip antes; no hay otro camino verificado

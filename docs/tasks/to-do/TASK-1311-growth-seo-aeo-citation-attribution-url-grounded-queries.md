@@ -150,7 +150,7 @@ Reglas obligatorias (§15 + §1.1 — load-bearing):
 
 - Bloquea `TASK-1313` (`readPageVisibility360`/`readClusterVisibility360`) — consume el eje AEO por-URL que produce este reader.
 - Es la mitad AEO del "360 granular" (§15): sin la atribución URL-level, el cruce por-página no tiene lente de citabilidad.
-- **`TASK-1667`** (work item editorial): el eje de terceros es el insumo "páginas que hoy forman la respuesta de la categoría" que un brief necesita para no nacer ciego a su competencia.
+- **`TASK-1667`** (especialización editorial de Marketing Studio, EPIC-049): consume referencias del reader SEO/AEO de Greenhouse; el eje de terceros es el insumo "páginas que hoy forman la respuesta de la categoría" que un brief necesita para no nacer ciego a su competencia.
 
 ### Files owned
 

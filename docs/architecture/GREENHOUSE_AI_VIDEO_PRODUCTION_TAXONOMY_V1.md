@@ -133,9 +133,9 @@ un brief por tipo. Etiquetas: `[verificado]` corrida nuestra · `[tercero]` rank
 
 | id | Tipo | Qué lo define | Qué juzga la barra | Camino (propio primero) | Motores candidatos | Costo IA | Esfuerzo | Riesgos que ya conocemos |
 |---|---|---|---|---|---|---|---|---|
-| `fotorrealista` | hiperrealista live-action: personas, lugares, objetos reales | que parezca filmado | piel, manos, ojos, física, luz creíble, identidad estable | generativo; post propio (grade, overlay, reframe) | Veo 3.1 y Kling 3.0 [contrato, CLI de Higgsfield]; Seedance 2.5 [tercero: #1 OpenArt]; H3 Max [tercero: #1 AA imagen a video con audio]; Wan 3.0 [tercero: #1 AA texto a video] | alto | alto | valle inquietante; deriva de identidad; **personas reales: los motores ByteDance las rechazan y cobran** |
+| `fotorrealista` | hiperrealista live-action: personas, lugares, objetos reales | que parezca filmado | piel, manos, ojos, física, luz creíble, identidad estable | generativo; post propio (grade, overlay, reframe) | Veo 3.1 y Kling 3.0 [contrato, CLI de Higgsfield]; Seedance 2.5 [tercero: #1 OpenArt]; H3 Max [tercero: #1 AA imagen a video con audio]; Wan 3.0 [tercero: #1 AA texto a video] | alto | alto | valle inquietante; deriva de identidad; **personas reales: Seedance puede rechazar tras encolar y cobrar** (dos casos medidos, no sistemático: el operador ha producido con personas reales sin problema [operador, 2026-10-04]); probar corto antes del final |
 | `cine` | registro cine de marca: look cinematográfico, luz con carácter, Nexa protagonista | que se sienta película, no stock | composición, cámara y lente, luz como fenómeno de la escena, canon del registro cine | still aprobado primero (`foto:*`), después i2v; isotipo compuesto | Cinema Studio 3.0/4.0 (cámara, lente, era, rig de luz) [contrato]; Seedance 2.5 [tercero]; Veo 3.1 [contrato] | alto | alto | frontera del registro cine (sólo Nexa protagonista); el plate se regenera, no se relumina |
-| `producto` | producto o packshot en movimiento (real o 3D) | el objeto es la verdad | forma, material, color y marca **exactos** en todos los cuadros | still aprobado con kits → i2v o cámara sobre escena quieta; marca compuesta; variantes de producto por reemplazo | Seedance 2.x (retuvo el set desde un KV [verificado, Glitch]); `h3max-camera` (escena congelada, órbita) [verificado]; Flux 3 primer/último cuadro y keyframes [verificado]; Genjutsu reemplazo de objeto [contrato] | medio | medio | la marca no se anima dentro del plano generado; filtro ByteDance con marcas |
+| `producto` | producto o packshot en movimiento (real o 3D) | el objeto es la verdad | forma, material, color y marca **exactos** en todos los cuadros | still aprobado con kits → i2v o cámara sobre escena quieta; marca compuesta; variantes de producto por reemplazo | Seedance 2.x (retuvo el set desde un KV [verificado, Glitch]); `h3max-camera` (escena congelada, órbita) [verificado]; Flux 3 primer/último cuadro y keyframes [verificado]; Genjutsu reemplazo de objeto [contrato] | medio | medio | la marca no se anima dentro del plano generado; posible rechazo cobrado de Seedance con marcas (puntual; prueba corta primero) |
 | `ugc` | estilo creador: cámara en mano, auténtico, «grabado con el teléfono» | que parezca orgánico | naturalidad, **acción del sujeto** («vivo no es mover la cámara», caso Social Wall), ritmo de plataforma; el pulido bajo es intencional | generativo; subtítulos y cortes propios | Omni i2v (microescenas UGC publicadas, modelo anterior) [verificado]; Marketing Studio video [contrato]; Seedance 2.5, Kling 3.0, Veo 3.1 [contrato] | medio | bajo | persona real o voz real exige consentimiento; disclosure IA |
 | `personaje-3d` | personaje animado 3D: Nexa, Sparks, mascotas de partner, estilo clay | que el personaje sea siempre el mismo | identidad (proporción, emblema, vestuario) entre tomas y piezas; actuación | hoja de identidad (`pre.cast-sheet`) → r2v o i2v desde pose; previs en Blender si la cámara importa | Seedance 2.5 r2v (las mascotas de partner no se rechazaron [operador]); Wan 3.0 r2v y H3 r2v [verificado, contrato del endpoint]; Kling `elements` [contrato] | medio | alto | deriva de identidad; una mascota de partner en cuadro contamina el emblema del uniforme |
 | `animacion-2d` | ilustración o dibujo animado, estilo plano | que respete un estilo dibujado | consistencia del trazo y la paleta cuadro a cuadro | **propio primero**: animar las ilustraciones propias (HyperFrames, After Effects por handoff); IA sólo si el estilo tolera reinterpretación | `wan2_6` («estilizado»), `draw_to_video` [contrato]; [sin dato] sobre estilo propio | bajo a medio | medio | la IA redibuja el estilo; las ilustraciones de Efeonce son obra propia, no stock |
@@ -246,8 +246,8 @@ Por toma, no por pieza. Lista qué es **idéntico** (píxel o identidad) y qué 
 `desde-cero` (texto) · `kv-aprobado` (imagen ya aprobada con kits) · `render-previo` (un video generado que se edita o
 extiende) · `metraje-real` (filmado: personas, oficina, producto) · `previs-3d` (playblast de Blender u otro).
 
-**Por qué es una dimensión:** cambia las operaciones posibles y los riesgos. Sobre `metraje-real` con personas, los
-motores con filtro de personas reales no sirven; sobre `kv-aprobado`, la marca ya está resuelta en el primer cuadro y
+**Por qué es una dimensión:** cambia las operaciones posibles y los riesgos. Sobre `metraje-real` con personas, un
+motor que puede rechazar personas reales (Seedance, riesgo puntual) exige prueba corta y alternativa; sobre `kv-aprobado`, la marca ya está resuelta en el primer cuadro y
 no se anima dentro del plano generado.
 
 ### 3.5 Operaciones por fase: preproducción, producción y posproducción (vocabulario cerrado)
@@ -348,13 +348,13 @@ continuidad), `capture.real` (parte del material de Efeonce es grabado y entra a
 
 | Tipo | Quiénes | Cómo se elige | Cómo se mantiene la identidad entre tomas y piezas | Restricciones medidas |
 |---|---|---|---|---|
-| `persona-equipo` | personas reales de Efeonce | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; referencia de cara vigente según el roster | primer cuadro aprobado (i2v) o la misma referencia en cada toma (r2v) | **los motores ByteDance rechazan personas reales después de encolar y cobran** (guía §3) → usar los motores sin ese filtro; consentimiento de imagen y de voz (§3.11); vestir a una persona real exige foto de cuerpo entero |
+| `persona-equipo` | personas reales de Efeonce | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; referencia de cara vigente según el roster | primer cuadro aprobado (i2v) o la misma referencia en cada toma (r2v) | **Seedance rechazó una persona real después de encolar y cobró** [verificado 2026-09-16], pero no es sistemático: el operador ha producido con personas reales sin problema [operador, 2026-10-04] (guía §3) → presupuestar el posible rechazo (prueba corta a baja resolución) y tener Flux 3 / Wan 3.0 como alternativa; consentimiento de imagen y de voz (§3.11); vestir a una persona real exige foto de cuerpo entero |
 | `elenco-marca` | elenco ficticio (Hum, Karo, Sophia, Isabella, Antonio) | `EFEONCE_BRAND_CAST_V1.md`; grupos de 3 a 5 | igual que arriba; casting de campaña fijado en la ficha | — |
 | `nexa` | Nexa (identidad A) | home `ai-generations/_identidad-nexa/`; `NEXA_CHARACTER_BIBLE_FICHA_V1.md` | anclas + seis ángulos; detector de proporción del rostro `pnpm foto:rostro --persona nexa` aplicado a cuadros muestreados | registro cine sólo con Nexa protagonista; isotipo compuesto, nunca generado; la identidad B no entra como referencia |
 | `sparks` | Sparks de marca | canon de fotografía de marca | referencias por Spark | en cine, dos Sparks con referencia como máximo; el resto lejos y desenfocado |
-| `mascota-partner` | Clawd, Codex, Gigi | bibliotecas de poses del estudio que creó cada mascota | referencia de pose del estudio de origen | el filtro ByteDance **no** las rechazó [operador 2026-09-22]; **contaminan el emblema del uniforme** si aparecen en cuadro (canon) |
+| `mascota-partner` | Clawd, Codex, Gigi | bibliotecas de poses del estudio que creó cada mascota | referencia de pose del estudio de origen | Seedance **no** las rechazó [operador 2026-09-22]; **contaminan el emblema del uniforme** si aparecen en cuadro (canon) |
 | `objeto-producto` | logo 3D, prendas, merch, producto | kits de marca (`EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`) | el primer cuadro ya aprobado con los kits | **la marca no se anima dentro del plano generado: se compone**; planos cortos, movimiento contenido |
-| `cliente` **[agregado]** | talento, producto o marca del cliente | brief y derechos del cliente | referencias entregadas por el cliente | marcas → filtro ByteDance; derechos y uso según contrato del cliente |
+| `cliente` **[agregado]** | talento, producto o marca del cliente | brief y derechos del cliente | referencias entregadas por el cliente | marcas → posible rechazo cobrado en Seedance (riesgo puntual; prueba corta primero); derechos y uso según contrato del cliente |
 
 **Jerarquía para sostener identidad** (de más a menos probada):
 1. **Ancla única**: el mismo canónico (KV aprobado como primer cuadro o la misma hoja de referencia en r2v) en cada
@@ -417,7 +417,7 @@ Duración (por plataforma y por pieza), resolución de entrega, aspecto y fps. R
 | persona real (imagen) | consentimiento vigente para ese uso | `greenhouse-ai-creative-rights-governance` + `legal-privacy-ip-operator` |
 | voz real o clonada | consentimiento explícito de voz | ídem |
 | música | licencia o generación con términos comerciales del proveedor | ídem + `audio-studio` |
-| marcas de terceros | uso permitido; los filtros de algunos motores las rechazan y cobran | ídem |
+| marcas de terceros | uso permitido; algunos motores pueden rechazarlas y cobrar el intento (Seedance, en casos puntuales) | ídem |
 | disclosure IA | criterio de la campaña y de la plataforma | ídem |
 
 ### 3.12 Carril de ejecución **[agregado]**
@@ -503,7 +503,7 @@ más caro.
 | **C** cámara | fija | paneo o push simple | órbita o grúa | coreografía compleja o cámara en mano larga | `gen.camera` sobre escena quieta; previs 3D como referencia de movimiento |
 | **D** duración y continuidad | ≤ 5 s, una toma | ≤ 10 s | > 10 s o extensión | varias tomas que deben empalmar | tomas cortas y corte; handles planificados; extensión con costura medida |
 | **E** exactitud | nada exacto | marca compuesta después | objeto o producto exacto en cuadro | texto o UI diegéticos, o producto exacto en movimiento | componer en post (`finish.overlay`), primer cuadro aprobado, `edit.zone` |
-| **P** identidad | sin cast | extra sin identidad | cast de marca recurrente | persona real del equipo o del cliente | ancla única por toma; detector de identidad; evitar motores con filtro de personas reales |
+| **P** identidad | sin cast | extra sin identidad | cast de marca recurrente | persona real del equipo o del cliente | ancla única por toma; detector de identidad; con Seedance, presupuestar un posible rechazo cobrado y tener alternativa |
 
 **Puntaje** = R + I + F + C + D + E + P (0 a 21):
 
@@ -538,7 +538,7 @@ acá con evidencia. Un eje en 3 por sí solo ya justifica un piloto, aunque el p
    ├─ borrador ...... motor candidato a baja resolución o en draft
    └─ final/premium . motor que pasó el banco, a la resolución de entrega; premium exige prueba comparativa corta
 5. MOTOR (guía §4.3), filtrado por operación + tipo + restricciones duras:
-   personas reales → sin motores con filtro ByteDance · 4:5 → generar 3:4 y recortar · sin audio → no H3 ·
+   personas reales o marcas → Seedance con prueba corta y alternativa (rechazo cobrado posible) · 4:5 → generar 3:4 y recortar · sin audio → no H3 ·
    look de época/luz → en la generación; color → en post · propio primero en toda la post (§3.13)
 6. PRESUPUESTO (§4.2) → autorización del monto → producir según el método
 ```

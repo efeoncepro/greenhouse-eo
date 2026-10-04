@@ -337,12 +337,13 @@ visual; `--task` valida el valor y sólo lo acepta `seedance25-r2v`; `editing` y
 `editing` rechaza `--duration` y `--aspect`; `extension` rechaza `--aspect`.
 
 **Estado:** `seedance25-r2v` **verificado en real el 2026-09-16** en `reference`, `editing` (convirtió un viñedo en
-nieve conservando el encuadre) y `extension` (siguió el movimiento y reveló los Andes). Su filtro de contenido rechaza
-marcas y personas reales después de encolar y cobra el intento: ver §Filtro de contenido de Seedance.
+nieve conservando el encuadre) y `extension` (siguió el movimiento y reveló los Andes). En dos casos puntuales rechazó
+una marca y una persona real después de encolar y cobró el intento; no es un filtro sistemático: ver §Filtro de
+contenido de Seedance.
 
 **Elegir video a video:**
 
-| Necesidad | Flux 3 (verificado) | Seedance (verificado 2026-09-16; sin personas ni marcas) |
+| Necesidad | Flux 3 (verificado) | Seedance (verificado 2026-09-16; con personas o marcas, presupuestar un posible rechazo cobrado) |
 |---|---|---|
 | Editar un clip existente | `flux3-edit` (USD 0,03/s; conserva movimiento, timing y encuadre) | `seedance25-r2v --task editing` |
 | Extender un clip | `flux3-extend` (exige audio en el origen; entrega sólo la continuación; hasta 20 s nuevos) | `seedance25-r2v --task extension` (hasta 30 s) |
@@ -802,7 +803,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | Editar / guiar con video | Kling O3 `fal-ai/kling-video/o3/{standard,pro,4k}/video-to-video/edit` · `/reference` ✅ | revisado, no conectado; `keep_audio` |
 | Transferir movimiento | Kling V3 `fal-ai/kling-video/v3/{standard,pro}/motion-control` ✅ | imagen + video de movimiento; revisado, no conectado |
 | Editar / extender (registrado) | Flux 3 `blackforestlabs/flux-3/edit-video` · `/extend-video` (+ `/draft`) ✅ | verificado en real; extend exige audio en el origen y entrega sólo la continuación; ver §Flux 3 |
-| Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | verificado en real 2026-09-16 (filtro rechaza marcas y personas reales); no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
+| Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | verificado en real 2026-09-16 (posible rechazo cobrado con marcas o personas reales, puntual); no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
 | Render→real / restore | LTX 2.3 Quality: `render-to-real`, `deblur`, `colorization`, `day-to-night`, `decompression`, `water-simulation`, `instant-shave`, `cross-eyed` ✅ | familia de transforms LTX |
 | Upscale de video | `fal-ai/seedvr/upscale/video` 🔎 · Topaz-style upscalers 🔎 | |
 | Lipsync | `fal-ai/sync-lipsync` · `fal-ai/latentsync` · `fal-ai/musetalk` 🔎 | sincronía labial voz↔video |
@@ -906,10 +907,14 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 - Referencia medida por tanda de 3 corridas de 4 s a 480p: Seedance 2.0 fast ≈ USD 1,37 · mini ≈ 0,85.
 
 ### Filtro de contenido de Seedance (ByteDance)
-- Rechaza **después de encolar** (422 `content_policy_violation`, `partner_validation_failed`): referencias con marcas o
-  logotipos ("potential copyright violation") y videos o imágenes con personas reales ("likenesses of real people").
-- Para video a video con Seedance 2.5, partir de material sin personas identificables ni marcas; con personas, usar Flux 3
-  edit/extend o Wan 3.0.
+- Rechazos medidos **después de encolar**, cobrados (422 `content_policy_violation`, `partner_validation_failed`), en
+  dos casos del 2026-09-16: el isotipo de Efeonce ("potential copyright violation") y un video de barista ("likenesses
+  of real people").
+- **No es un filtro sistemático:** el 2026-09-22 las mascotas 3D de partner (Codex, Clawd, Gigi) pasaron sin rechazo, y
+  el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04].
+  Qué dispara el rechazo no está medido.
+- Seedance sigue siendo candidato con personas y marcas: presupuestar el posible rechazo cobrado (probar primero corto y
+  a baja resolución antes del final) y tener Flux 3 edit/extend o Wan 3.0 como alternativa si rechaza.
 
 ### Estado de verificación
 - **47 de 55 verificadas.** Sin verificar: 3 variantes LoRA de H3 y 4 entrenadores (postergados, abajo). No operable: H3 Director.

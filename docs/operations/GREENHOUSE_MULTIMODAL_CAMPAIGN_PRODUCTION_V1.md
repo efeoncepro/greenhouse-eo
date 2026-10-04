@@ -178,8 +178,10 @@ Google es más barato con la misma calidad). Los motores de video que sí operan
 out-of-band son Seedance, Minimax H3, Flux 3 y Wan 3.0. **Delta 2026-09-16:** el bloqueo por saldo agotado de ese
 mismo día quedó superado: el cliente usa dos cuentas de Fal, elige la de más saldo y cambia sola ante un 403 por
 saldo (`pnpm ai:fal --balance` muestra los saldos). El registro quedó con 47 de 55 capacidades verificadas, incluidas
-las de Wan 3.0 y Seedance. Ojo con Seedance 2.5 en video a video: su filtro rechaza marcas y personas reales
-**después** de encolar y cobra el intento; con personas o marcas, usar Flux 3 o Wan 3.0. Seedream 5 Pro en fal llega
+las de Wan 3.0 y Seedance. Ojo con Seedance 2.5 en video a video: con marcas o personas reales puede rechazar
+**después** de encolar y cobrar el intento (dos casos medidos el 2026-09-16; no es sistemático: el operador ha producido
+en fal con personas y marcas reales sin problema [operador, 2026-10-04]); probar primero corto y a baja resolución, y
+usar Flux 3 o Wan 3.0 si rechaza. Seedream 5 Pro en fal llega
 a 2048² (no a 4K) y entrega JPEG por defecto: si se necesita más área,
 Seedream 5 Lite la ofrece (hasta 4096² según su schema). Ver [catálogo Fal §Cuentas, saldo y operación del CLI](../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
 

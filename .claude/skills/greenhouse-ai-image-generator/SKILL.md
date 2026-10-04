@@ -222,7 +222,7 @@ interaction ID y retoma con `--status`/`--wait` sin enviar otro POST.
 | Toma larga (> 15 s) | `seedance25-*` (≤ 30) · `wan3-*` (≤ 30) · `flux3-*` (≤ 20) |
 | Cámara precisa sobre imagen fija | `h3max-camera` |
 | Principio y fin exactos / varios cuadros clave | `flux3-flf` · `wan3-i2v --end-image` · `seedance25-i2v --end-image` / `flux3-keyframes` (≤ 10) |
-| Editar o extender un video | sin personas ni marcas: `seedance25-r2v --task editing` o `--task extension` · con personas: `flux3-edit` / `flux3-extend` (origen con audio) |
+| Editar o extender un video | `seedance25-r2v --task editing` o `--task extension` (también con personas o marcas; presupuesta un posible rechazo cobrado) · alternativa si rechaza: `flux3-edit` / `flux3-extend` (origen con audio) |
 | Video basado en una web o documento | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` + prompt con guion |
 
 🔴 **fal cobra por escalón de resolución**: el precio del registro es el escalón **más bajo**. Wan 3.0 a 1080p
@@ -230,8 +230,8 @@ USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K 0,13/s (defa
 `--resolution` el CLI envía el escalón más barato y lo avisa); Flux 3
 publicado ≠ registrado (0,17/s final, 0,06 draft, 0,41 extend, el doble) → confirma con `--balance`. Seedance sí
 se estima con la fórmula de fal: `tokens = alto × ancho × segundos × 24 / 1024`; `costo = tokens × precio_por_1000
-/ 1000` (calzó con lo medido dentro de ~5 %; la equivalencia de OpenArt subestima ~2×). Filtro de Seedance:
-rechaza marcas y personas reales **después de cobrar**.
+/ 1000` (calzó con lo medido dentro de ~5 %; la equivalencia de OpenArt subestima ~2×). Rechazos de Seedance:
+riesgo observado en casos puntuales, **cobrado** (detalle abajo), no un filtro sistemático.
 
 ### Brechas conocidas de los CLIs (corregidas 2026-09-16, commit `17196ead1`; lo abierto al final)
 
@@ -967,8 +967,13 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   conocía la A). Un 422 de validación no prueba saldo.
 - **Sin esperar:** `--detach` encola y termina (imprime `request_id`, cuenta y comandos); `--status --request-id <id>`
   consulta una vez sin costo. Webhooks de fal no se usan en el CLI (exigen URL pública).
-- **Filtro de Seedance:** ByteDance rechaza tras encolar (y cobrar) referencias con marcas y material con personas reales.
-  Para video a video con personas, Flux 3 o Wan 3.0. Costo: la fórmula de tokens de fal
+- **Rechazos de Seedance (riesgo, no filtro sistemático):** el 2026-09-16 fal devolvió dos rechazos tras encolar y
+  cobrar (`422 content_policy_violation` / `partner_validation_failed`): el isotipo de Efeonce («potential copyright
+  violation») y un video de barista («likenesses of real people»). El 2026-09-22 las mascotas 3D de partner pasaron, y
+  [operador, 2026-10-04] el operador ha producido en fal videos Seedance con personas y marcas reales sin problema.
+  Las condiciones que disparan el rechazo no están medidas. Seedance sigue siendo candidato con personas o marcas:
+  prueba primero corto y a baja resolución, presupuesta el rechazo cobrado y ten Flux 3 o Wan 3.0 como alternativa si
+  rechaza. Costo: la fórmula de tokens de fal
   (`alto × ancho × segundos × 24 / 1024`) calzó con lo medido dentro de ~5 %; lo que subestimaba ~2× era la
   equivalencia de OpenArt (corregido 2026-09-16).
 - **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft V4.1 vía Higgsfield CLI: sesión resuelta el 2026-09-24 (CLI 1.1.26), la generación de un SVG real sigue sin corrida.

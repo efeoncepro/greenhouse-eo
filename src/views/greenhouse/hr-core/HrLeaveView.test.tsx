@@ -484,7 +484,7 @@ describe('HrLeaveView', () => {
         notes: 'Registro retroactivo'
       })
     })
-  }, 10000)
+  }, 30_000) // CI Deep: con coverage en el runner de 2 núcleos tarda ~10,5 s (2026-10-04); 10 s lo cortaba.
 
   it('explains proportional Chile vacation balances with carryover and rounded saldo actual', async () => {
     fetchMock.mockImplementation(async (input: RequestInfo | URL) => {

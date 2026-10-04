@@ -19,38 +19,28 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Diseño de la serie longitudinal; sin materializador/readers SEO de referrals. Conexión/reader TASK-1284 y desagregación por asistente en Insights TASK-1962 existentes; evidencia operativa histórica 02–03/10, no readback nuevo.`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `none`
+- Blocked by: `none` — consume el slice de conexión/reader entregado de TASK-1284; exige conexión válida de la organización, no el cierre de sus pendientes grader/reliability.
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-El módulo mide **si te citan** los motores de respuesta y **no mide si esa cita te trae gente**. No
-hay una sola línea que lea los referrals de `chatgpt.com`, `perplexity.ai`, `gemini.google.com` o
-`copilot.microsoft.com`. Esta task cierra la mitad de abajo del embudo AEO leyendo GA4 —que ya está
-conectado— y materializando una serie propia de tráfico atribuible a IA, por organización y por
-motor.
+Insights ya desagrega el tráfico GA4 de asistentes por ventana (`ga4AiFacts`, TASK-1962).
+Esta task entrega el complemento longitudinal SEO: serie diaria por organización y motor,
+materializador, reader/paridad y cobertura histórica sobre la conexión GA4 gobernada de TASK-1284.
+No vuelve a implementar OAuth ni reemplaza el informe que ya consume datos de primera parte.
 
 ## Why This Task Exists
 
-**La tesis del módulo es que el juego pasó de rankear #1 a ser la fuente citada.** Todo el motor AEO
-existe para medir la primera mitad de esa frase. La segunda mitad —qué pasa *después* de la cita— no
-se mide en ninguna parte.
-
-Consecuencia comercial concreta: hoy podemos decirle a un cliente *"te citan en el 40% de los
-prompts"* y no podemos decirle qué obtuvo por eso. Es el argumento que más le cuesta creer a un CFO,
-y es justo el que no tenemos. Peor: tampoco podemos detectar el caso inverso —**citas que suben y
-tráfico que no**— que es la señal de que la cita se está sirviendo sin click, exactamente el fenómeno
-que la industria mide como *zero-click*.
-
-**Por qué ahora y por qué barato.** El cliente GA4 ya existe (`src/lib/growth/ga4/`), la conexión por
-service account está resuelta y el módulo ya materializa series diarias con el mismo patrón
-(`seo_gsc_daily`). Esto no es una integración nueva: es una consulta de referrals sobre una fuente ya
-conectada, materializada con un patrón que el repo ya sabe operar.
+Leer referrals en una edición no equivale a disponer de una serie diaria persistida con ventanas,
+cobertura y seguimiento reutilizable por SEO. La conexión y el reader GA4 tienen código y evidencia
+histórica de canary/release 02–03/10; antes de capturar se verifica la conexión de la organización objetivo.
+Los pendientes de grader/conversiones/reliability de TASK-1284 no bloquean esta serie de sesiones/usuarios.
+Citas y referrals se comparan como observaciones separadas; no se atribuye causalidad ni se promete retorno.
 
 ## Goal
 
@@ -94,6 +84,8 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `TASK-1284` — slice de conexión/reader y resolver existente; dependencia de contrato entregada según evidencia histórica 02–03/10, no blocker por el cierre total. Sin conexión válida de la organización: `no_ga4_connection`, nunca cero.
+
 - `src/lib/growth/ga4/{api-client.ts,contracts.ts}` — el cliente GA4 ya existente.
 - `greenhouse_growth.seo_gsc_daily` — **precedente de diseño** (serie diaria anclada a `organization_id`, trigger no-delete), no dependencia de código.
 - `src/lib/growth/seo/gsc-daily-materializer.ts` + `gsc-history-bq-mirror.ts` — el patrón de materializador + espejo BQ a replicar.
@@ -103,7 +95,7 @@ Reglas obligatorias:
 
 - **El motor AEO** — gana su contraparte de resultado. Sin cruzar el boundary: composición en memoria.
 - **`TASK-1785`** — esta serie es `●` medida y debe emitir su lente por el mismo campo; coordinar el tipo.
-- **`TASK-1284`** (`growth-ga4-multitenant-connection-signal`) — es el carril de **conexión** GA4 multi-tenant; esta task **consume** esa conexión, no la construye. Declarar dependencia en Discovery y no duplicar el resolver de credenciales.
+- **`TASK-1284`** es una dependencia de conexión (declarada arriba), no una task bloqueada por esta señal. Se conserva su ownership del resolver.
 
 ### Files owned
 
@@ -119,16 +111,17 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Cliente GA4 (`src/lib/growth/ga4/api-client.ts`) y el carril de conexión multi-tenant (`TASK-1284`).
+- Cliente GA4 y dominio `src/lib/growth/analytics-ga4/**`: commands, conexión/reader y rutas existentes. Evidencia histórica de TASK-1284, sin nueva certificación multiorganización.
+- `src/lib/efeonce-insights/adapters/ga4-site-facts.ts` (`ga4AiFacts`, `aiSourceOf`) y `aeo-adapter.ts`: hechos de referrals por asistente en la ventana del informe. Coordinar la clasificación con este consumer; no mantener dos vocabularios incompatibles.
 - Patrón completo de serie diaria: `seo_gsc_daily` + materializador + espejo BQ + backfill resumible + split de lectura por cobertura (PG caliente / BQ histórico).
 - Motor AEO midiendo citas por motor, con `grader_*` y su boundary declarado.
 - Patrón de cron diario en `ops-worker` con flag subordinado.
 
 ### Gap
 
-- `grep -riE "chatgpt.com|perplexity.ai|ai_referral|ai_traffic" src/lib/growth/` → **cero**.
-- Ninguna task del backlog cubre la superficie: el barrido por `referral`/`referrer` no devolvió nada.
-- El módulo puede decir "te citan" y no "qué obtuviste", que es la mitad que paga la factura.
+- Serie longitudinal `src/lib/growth/seo/ai-referral/**`, materializador y readers propios no implementados.
+- Cobertura/ventanas/backfill y paridad de esa serie pendientes; el adapter de Insights no los sustituye.
+- Estado y autorización por organización se verifican antes de capture; evidencia histórica no acredita una conexión nueva.
 
 ## Modular Placement Contract
 

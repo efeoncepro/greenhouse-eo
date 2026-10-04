@@ -94,6 +94,15 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-marketing-studio/SKILL.md` (contrato de mantenimiento).
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` + `mcp-craft`.
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+Calendario/experimentos referencian el trabajo editorial TASK-1667/TASK-1913 y su publicación
+observada. Aprendizajes SEO usan outcomes TASK-1668 por referencia/as-of/metodología/cobertura;
+no recalculan GSC/rank/AEO/ETV ni deducen causalidad. La siguiente iteración es un work item
+Studio nuevo con parent/reason/evidence, nunca una producción o publicación automática.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -103,6 +112,8 @@ Reglas obligatorias:
 - `TASK-1899`: `T2` por MCP; `TASK-1905`: `channel_key` para el alcance.
 
 ### Blocks / Impacts
+
+- TASK-1667/TASK-1913 para calendario/iteración y TASK-1668 para aprendizaje medido.
 
 - `TASK-1909`: su contexto por campaña incluye aprendizajes `validated` con evidencia.
 - `TASK-1912`: pinta experimentos, biblioteca y calendario unificado.
@@ -339,6 +350,10 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Calendario editorial distingue planned/scheduled/observed desde evidencia 1667, sin marcar publicado por aprobación o draft privado.
+- [ ] Aprendizaje SEO referencia outcome1668 con as-of/método/cobertura y loop parcial si falta conversión; sin recálculo ni causalidad automática.
+- [ ] Iteración recomendada abre trabajo Studio por el command dueño con parent/reason/evidence; no autoedita contenido ni publica.
 
 - [ ] Un experimento sólo nace de una hipótesis del plan aprobado y con variantes de su campaña.
 - [ ] El resultado se captura desde readers de Studio con fuente y `dataThrough`, o como `manual` con método.

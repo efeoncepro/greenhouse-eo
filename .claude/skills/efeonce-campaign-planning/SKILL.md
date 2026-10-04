@@ -34,6 +34,18 @@ dónde vive el borrador del plan), **gana el ADR** y esta skill se corrige.
    escritura»: cada sección del plan → command/tool de Studio y su nivel de gobierno (T0/T1/T2).
 6. [`references/worked-example-cmp001.md`](references/worked-example-cmp001.md) — ejemplo trabajado sobre CMP-001.
 
+## Ownership editorial SEO (contrato vigente, runtime pendiente)
+
+El plan de contenidos vive en Studio y referencia brief/work/version de TASK-1667/TASK-1913;
+SEO/AEO entra por TASK-1908 desde SV360 con fuente/as-of/metodología. El plan diario TASK-1669
+especializa el registry/dispatcher TASK-1914/1915 y conserva el orden de la cola TASK-1700.
+QA/aprobación, publicación observada, indexación y outcome son estados separados: publicación
+se gobierna en Studio/CMS; medición TASK-1668 se lee de Greenhouse; aprendizaje/calendario
+TASK-1911 se alimenta por refs. Informes emitidos/render/distribución siguen en Insights.
+No duplicar lifecycle editorial ni prioridad en Greenhouse o componentes UI, no convertir plan
+aprobado en publicación. Tasks1667/1668/1669 siguen to-do, según ADR de estrategia §14 Accepted
+2026-10-04; la documentación no certifica tools nuevas ni rollout.
+
 ## Entradas
 
 | Entrada | Obligatoria | Cómo se obtiene si falta |

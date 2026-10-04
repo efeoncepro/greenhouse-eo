@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — Ownership editorial y de informes SEO
+
+- El flujo editorial pertenece a Marketing Studio: TASK-1667/1669 → EPIC-049; TASK-1668 conserva medición/outcomes en EPIC-022. La auditoría técnica y su distribución especializada pertenecen a Insights: TASK-1672/1673 → EPIC-045, reusando renderer y transporte existentes.
+- [Mapa vigente y tareas pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md), arquitectura, criterios e índices reconciliados. GA4 TASK-1284 y referrals TASK-1787 distinguen código/evidencia histórica existente de sus pendientes reales. TASK-1284 pasa a in-progress con evidencia fechada y pendientes explícitos. Sin código, tareas nuevas, cierre de implementación ni cambio de runtime.
+
 ## 2026-10-04 — SEO: reconciliación documental de EPIC-022
 
 - Censo de 84 hijas (43 complete, 3 en curso, 38 to-do), estados TASK-1655/1670/1671/1672/1805 e índices conciliados. Flag de hallazgos y selectores Improved ETV revalidados en worker activo; pendientes conductuales conservados.
@@ -611,13 +616,3 @@ primer plano oscuro como lecho. Se creó el repo taller `efeoncepro/efeonce-bran
 `EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1`, TASK-1925) para sacar la producción de marca de Greenhouse sin reactivar
 Globe. AXIS publicó `v0.3.9`: `efeonce.surface-composition` 0.1.2 (uso propuesta/brochure, portada y cierre, layouts de
 `proposal-cinematic`, documento brochure).
-
-## 2026-09-27 — Iconografía: IA, social y staff (D26)
-
-El operador aprobó 19 íconos nuevos de la línea gráfica («Subelos todos a excepción del hoodie de trazo que no parece
-un hoodie»): 9 de Trazo (ia, composer, buscador, influencer, prensa, social, multimedia, assets, staff-gorra) y 10 de
-Plastilina con su volumen (chispa, prompt, barra-busqueda, aro-de-luz, television, like, galeria, biblioteca, hoodie,
-gorra). El Trazo `staff-hoodie` no entró. El set queda en 36 Trazo + 43 Plastilina = 79 glifos y 43 volúmenes, publicados
-en AXIS con el tag `v0.6.0` (`axis-graphic-line` 0.6.0, `axis-brand-assets` 0.3.4); Greenhouse fija axis-graphic-line
-0.6.0 y axis-brand-assets 0.3.4. Documentado en el ADR (delta D26), el manual §14, la doc funcional 1.11, el manual de
-uso 1.9 y las skills `efeonce-graphic-line` y `axis-design-system`.

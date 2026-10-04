@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Diseño; inventario de tarjetas con isotipo aprobado por el operador el 2026-10-03`
+- Status real: `Diseño; inventario de tarjetas aprobado 2026-10-03. Slice 6 reformulado 2026-10-04: backend compartido de audit facts + binding exacto de corrida para tarjeta mensual y especialización TASK-1672. Adapter SEO no consume readSiteAuditReport y request no tiene selector explícito de run; no implementado.`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1990` (canales de plataforma y glifo por métrica); Slice 2 (citado dentro del AI Overview) bloqueado por `TASK-1993`; Slice 7 (competidores) bloqueado por decisión explícita del operador
+- Blocked by: `TASK-1990` sólo slices/presentación que necesitan nuevos canales/glifos; contrato backend de auditoría del Slice 6 puede avanzar con readers vigentes sin la tarjeta de canal. Slice 2 espera `TASK-1993`; Slice 7 espera decisión explícita del operador.
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -54,7 +54,7 @@ El tablero `Cifras-Canal-Inventario` del canvas <https://claude.ai/artifact/9q7n
   sólo toma `organic_etv`.
 - **Enlaces y autoridad:** `readBacklinkProfile` (`src/lib/growth/seo/backlinks/reader.ts`).
 - **Salud técnica:** `readSiteAuditReport` (`src/lib/growth/seo/site-audit/reader.ts`), con el gate
-  `GROWTH_SEO_SITE_FINDINGS_ENABLED`; el artefacto de la auditoría es de TASK-1672.
+  `GROWTH_SEO_SITE_FINDINGS_ENABLED`; el backend común y binding de corrida son de este Slice 6. El detalle técnico/plan/render de la edición es de TASK-1672, hija de EPIC-045.
 - **Visibilidad por URL:** `readUrlVisibility` (`src/lib/growth/seo/url-visibility/reader.ts`).
 - **Competidores en tus keywords:** `readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`) y la cobertura de
   competidores (`src/lib/growth/seo/competitor-coverage.ts`). El contrato de contenido la declara `policy_blocked`
@@ -121,11 +121,12 @@ Reglas obligatorias:
 - `TASK-1996`: tableros de búsqueda con canal y glifo.
 - `TASK-1901`: comparte `src/lib/efeonce-insights/adapters/seo-adapter.ts`; quien tome la segunda revisa los cambios
   de la primera antes de empezar (sin ejecución en paralelo sobre el mismo archivo).
-- `TASK-1672`: la tarjeta de salud técnica usa el mismo reader y gate que el artefacto (Delta 2026-10-03 en esa task).
+- `TASK-1672` (EPIC-045): depende sólo del contrato backend de auditoría de este Slice 6, no de las otras cifras ni del render de la tarjeta de canal. UI/plan/catálogos/Think pertenecen a 1672; ambas proyecciones comparten reader, binding, frescura y gates, sin otro snapshot.
 
 ### Files owned
 
-- `src/lib/efeonce-insights/adapters/seo-adapter.ts`
+- `src/lib/efeonce-insights/adapters/seo-adapter.ts` y adapter de auditoría compartido si el detalle exige separación
+- `src/lib/efeonce-insights/contracts/request.ts`, evidence/validación y normalización de commands sólo para selector/binding compatible de auditoría (Slice 6)
 - `src/lib/efeonce-insights/adapters/adapters.test.ts`
 - `src/lib/efeonce-insights/presentation/content-contract.ts`
 - `src/lib/efeonce-insights/editorial/criterion-figures.ts`
@@ -148,6 +149,7 @@ Reglas obligatorias:
 ### Gap
 
 - Ninguno de esos datos llega como hecho de Insights.
+- `InsightRequestV1` no tiene selector explícito de audit run; falta binding tenant-safe de corrida, fecha y versión para el detalle técnico. Inspección local 2026-10-04.
 - No hay reader dueño del top-N del SERP agregado por ventana.
 - No existe la captura de «citado dentro del AI Overview» (TASK-1993).
 - No hay decisión registrada sobre competidores frente al cliente.
@@ -174,7 +176,7 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- Contrato existente a respetar: `EvidenceFactV1`, `seo_report_adapter` vigente, readers SEO listados
+- Contrato existente a respetar: `EvidenceFactV1`, `InsightRequestV1`, `seo_report_adapter` vigente, readers SEO listados y `readSiteAuditReport(seoTargetId, auditRunId?)`
 - Contrato nuevo o modificado: hechos `serp.ai_overview_keywords`, `serp_feature.<tipo>`, `serp.ai_overview_cited`, `serp_platform.<plataforma>`, `keyword_movement.<new|up|down|lost>`, `paid_etv`, `backlinks.<referring_domains|domain_rank>`, `site_health.<score|broken_pages>`, `url_visibility.<n>`, `competitor.<n>` (sólo con decisión); reader nuevo `readSerpTopResultsForWindow`
 - Backward compatibility: `compatible` — hechos aditivos
 - Full API parity: `los hechos viajan por el contrato de evidencia; el reader nuevo vive en el dominio SEO y queda disponible para otros consumers`
@@ -190,7 +192,9 @@ Reglas obligatorias:
   - sin decisión del operador, ningún hecho de competidor llega al snapshot;
   - los dominios del top-N se agregan por plataforma sólo con `channelForDomain`; el resto se agrega como «otros sitios».
 - Write-target allowlist: `N/A — sólo lectura`
-- Tenant/space boundary: `seo_targets.organization_id de la organización autorizada`
+- Tenant/space boundary: `seo_targets.organization_id de la organización autorizada`; selector de auditoría debe resolver target/run pertenecientes a esa org; un run ajeno falla cerrado.
+- Binding del Slice 6: selector compatible/versión de request, identidad de run/target/captureDate, alcance y referencias de detalle se sellan en la evidencia Insights. No seleccionar latest después del sellado ni persistir un snapshot técnico paralelo.
+- Idempotencia del binding: request hash incluye selector/run/versión; cambio de run no reutiliza una edición ya emitida con la misma key.
 - Idempotency/concurrency: `determinista por ventana`
 - Audit/outbox/history: `sin eventos nuevos`
 
@@ -266,11 +270,14 @@ Reglas obligatorias:
 - Dominios que enlazan y domain rank (glifo `enlace`) desde `readBacklinkProfile`; top URLs por tráfico estimado
   (glifo `web`) desde `readUrlVisibility`.
 
-### Slice 6 — Salud técnica
+### Slice 6 — Contrato/backend de auditoría y tarjeta de salud
 
-- Puntaje de salud y páginas rotas (glifo `checklist` o el que fije TASK-1990) desde `readSiteAuditReport`, con el gate
-  `GROWTH_SEO_SITE_FINDINGS_ENABLED` y la frescura de la auditoría; la tarjeta remite al artefacto de TASK-1672 cuando
-  exista.
+- Backend compartido: consumir `readSiteAuditReport` con target y corrida explícita tenant-safe; producir facts/proyección client-safe de salud y hallazgos/alcance/URLs/referencias necesarios para el detalle de TASK-1672.
+- Extensión compatible de selector/request y binding run→evidencia/edición con organización/target/run/fecha/versión. El request hash preserva la identidad; nunca actualizar una edición sellada con latest. Definir shape y límites en Discovery, sin tabla/snapshot adicional.
+- Frescura, gate `GROWTH_SEO_SITE_FINDINGS_ENABLED`, estado de la corrida y procedencia se validan en productor/adapter; sin diagnóstico elegible se rechaza el artefacto técnico y no se emiten valores inventados. Hallazgos no verificados mantienen razón y alcance sitio/página; costos/tier/cupo/IDs proveedor quedan fuera de la proyección cliente.
+- Este contrato básico no depende de nuevos canales/glifos de TASK-1990 ni de los otros slices; se puede entregar antes de la tarjeta y desbloquea la especialización UI/plan/render de TASK-1672.
+- Tarjeta mensual: puntaje y páginas rotas (glifo que fije TASK-1990), con el mismo binding/reader/gate/frescura; remite a la edición técnica cuando exista. No sustituye detalle ni exige cerrar TASK-1672 para emitir una tarjeta honesta.
+- No mapping de páginas/renderer/entrypoint UI en este slice; 1672 posee la especialización, 1673 selección/distribución sobre 1848.
 
 ### Slice 7 — Competidores en tus keywords (sólo con decisión del operador)
 
@@ -313,8 +320,8 @@ Nombres finales de hechos y de reglas se fijan en Discovery; el criterio es la r
 
 ### Slice ordering hard rule
 
-- TASK-1990 en develop antes de cualquier slice con canal nuevo.
-- Slices 1, 3, 4, 5 y 6 son independientes entre sí; Slice 2 espera a TASK-1993; Slice 7 espera la decisión; Slice 8
+- TASK-1990 en develop antes de presentación con canal/glifo nuevo; no condiciona el backend del Slice 6 sin esas figuras.
+- Slices 1, 3, 4, 5 y contrato backend 6 son independientes entre sí; la tarjeta 6 espera su glifo, Slice 2 espera a TASK-1993; Slice 7 espera la decisión; Slice 8
   cierra después de los anteriores que se entreguen.
 - Ningún slice toca `seo-adapter.ts` mientras TASK-1901 esté en curso sobre el mismo archivo.
 
@@ -359,6 +366,10 @@ Nombres finales de hechos y de reglas se fijan en Discovery; el criterio es la r
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Slice 6: selector/binding compatible de organización/target/run/fecha/versión implementado; run ajeno rechazado, request hash distingue corridas y una edición sellada no cambia a latest.
+- [ ] Slice 6: contrato compartido de salud/hallazgos/alcance/URLs y referencias client-safe desde reader dueño; absence/stale/partial/no verificado conservan semántica, sin SQL/snapshot paralelo ni costos/tier/cupo/IDs internos.
+- [ ] Backend audit desbloquea TASK-1672 sin exigir los demás slices ni la tarjeta de canal; tarjeta y detalle consumen el mismo binding y método, con pruebas de no duplicar hechos/edición.
 
 - [ ] El adapter SEO emite keywords con AI Overview y bloques del SERP contando sólo días medidos (test con un día sin medición).
 - [ ] Existe `readSerpTopResultsForWindow` en `src/lib/growth/seo/` y el adapter emite plataformas que rankean con su canal (test).

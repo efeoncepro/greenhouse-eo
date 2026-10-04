@@ -129,15 +129,19 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 ### Already exists
 
-- `src/lib/growth/ai-visibility/report/short-link.ts`.
-- `src/lib/growth/ai-visibility/report/snapshot.ts`.
-- `src/lib/email/delivery.ts`.
-- `src/lib/email/resend-reconciliation.ts`.
-- `src/lib/notifications/notification-service.ts`.
+Inspección local 2026-10-04 y evidencia fechada de los criterios de esta task:
+
+- `src/lib/efeonce-insights/sharing/{commands,store,public,token}.ts`: grants múltiples por edición, digest-only, TTL/cuota, revocación y lectura client-safe.
+- `src/lib/efeonce-insights/delivery/{commands,dispatch,store}.ts`: App interno, destinatarios canónicos, idempotencia de payload, reconciliación, transporte Email existente.
+- `src/lib/efeonce-insights/schedules/**`: generación/render draft_for_review, sin emisión/envío automático.
+- Web Think TASK-1875 y catálogos/render de Insights, disponibles según auditoría de cierre 04/10.
+- Sharing/emisión ON desde 28/09; delivery/schedules ON desde 02/10, flags Vercel Production revalidados 04/10. No nuevo envío/canary en este ajuste.
 
 ### Gap
 
-El Grader tiene un enlace activo por reporte y estado especializado; no cubre los grants independientes, el output set ni la recurrencia de Insights. Reusar su tabla o su token como OAuth ampliaría privilegios y acoplaría dominios. Evidencia local 2026-09-08; disponibilidad live no verificada en esta planificación.
+Infraestructura general ya implementada. Siguen abiertos los criterios de integración portal/Hub/canales/preferencias, canary App humano y negativos MCP registrados en Status/Acceptance; activación no los certifica.
+
+TASK-1672/1673 son hijas de EPIC-045 para la especialización técnica SEO: detalle y binding run→edición, luego selección/distribución con estos commands. No crean otro token store/sender/ledger ni cierran esta task por transitividad. La evidencia genérica de grants/delivery se reutiliza como cobertura; los negativos del caso técnico y la revisión humana se verifican en TASK-1673.
 
 ## Modular Placement Contract
 
@@ -268,11 +272,11 @@ ledger. Federación en `efeonce-mcp` y release a producción: cerrados el mismo 
 
 ### Slice 2 — Entrega durable
 
-- Intent con autoridad ligada a versión/destinatarios/outputs, EmailType y seed disabled, clasificación sensible, sendEmail y tracking de enlaces deshabilitado. Dedupe antes de crear grants; persistencia de bearer sólo cifrada/efímera si necesaria para retry. Reconciliación antes de reenviar un timeout ambiguo.
+- Intent con autoridad ligada a versión/destinatarios/outputs, EmailType y seed disabled, clasificación sensible, sendEmail y tracking de enlaces deshabilitado. Dedupe antes de crear grants; bearer sólo en memoria durante el envío, jamás persistido (ni cifrado); sólo digest en grants. Reconciliación antes de reenviar un timeout ambiguo.
 
 ### Slice 3 — Schedules y paridad
 
-- Schedule con ventana/zona/lateness/catch-up y autorización revocable. Ocurrencia única, generación draft por defecto, autoemit/send sólo por autorización durable explícita; no nuevo cron por cliente. Commands App/Ecosystem/MCP y adapters para TASK-1673.
+- Schedule con ventana/zona/lateness/catch-up y autorización revocable. Ocurrencia única y generación/render draft_for_review; nunca autoemit/send en el contrato implementado. Writes App internos, Ecosystem/MCP sólo lectores de schedules; sharing conserva su matriz propia. Sin cron por cliente. TASK-1673 consume distribución existente.
 
 ### Slice 4 — Conformance y rollout
 
@@ -308,7 +312,7 @@ Respetar Blocked by; sólo preparación documental puede anteceder dependencias.
 
 ### Feature flags / cutover
 
-INSIGHTS_SHARING_ENABLED, INSIGHTS_DELIVERY_ENABLED e INSIGHTS_SCHEDULES_ENABLED propuestos default false; EmailType config disabled por separado. Registrar flags/env/DB policy con dueño y consumidores reales; no interpretar NODE_ENV como entorno.
+INSIGHTS_SHARING_ENABLED, INSIGHTS_DELIVERY_ENABLED e INSIGHTS_SCHEDULES_ENABLED existentes, default false; activación vigente en Status/ledger. EmailType config conserva su gate separado. Registrar flags/env/DB policy con dueño y consumidores reales; no interpretar NODE_ENV como entorno.
 
 ### Rollback plan per slice
 
@@ -351,7 +355,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Manual operativo incluye y prueba aprobación por versión/destinatario, revocación, retry ambiguo, accepted frente a delivered y pausa de schedule; fixtures sanitizados y negativos de permiso/tenant por MCP. — **Parcial:** manual `operar-efeonce-insights-api-mcp.md` v1.5 con las recetas; la federación ya existe (gateway 1.7.0). Falta ejecutar los negativos de permiso/tenant por MCP, que exigen una sesión humana PKCE contra `mcp.efeonce.org` (no disponible en sesión no interactiva 2026-09-28).
 
 - [x] Dos grants activos de una edición se revocan individualmente; token desconocido/expirado/revocado no revela identidad ni datos del cliente. — Verificado: `sharing.live.test.ts` (PG real) + reader 404/410 anti-oracle (`sharing.test.ts`).
-- [x] Sólo digest persistido; tests de logs/outbox/analytics/referrer/HTML verifican ausencia de bearer fuera de respuesta autorizada y del carril cifrado efímero. — Verificado: fila sin bearer (live), outbox sin token/digest, scrub Sentry de path/breadcrumbs/spans (`sentry-server-event-scrub.test.ts`); el HTML es de Think (TASK-1875).
+- [x] Sólo digest persistido; tests de logs/outbox/analytics/referrer/HTML verifican ausencia de bearer fuera de respuesta autorizada y memoria efímera del envío; no se persiste cifrado. — Verificado: fila sin bearer (live), outbox sin token/digest, scrub Sentry de path/breadcrumbs/spans (`sentry-server-event-scrub.test.ts`); el HTML es de Think (TASK-1875).
 - [x] Revocación corta siguiente acceso y descarga sin caché/CDN/storage bypass; archivo ya descargado se declara irrevocable. — Verificado en código/tests: gate por request antes de leer bytes, `private, no-store`, sin URL de storage; lo descargado se declara irrevocable. Runtime: canary staging.
 - [x] Token no autoriza biblioteca, otra edición, otro tenant, más módulos ni OAuth/MCP; organización suspendida o edición retirada falla cerrada. — Verificado: el grant resuelve una edición; org suspendida, módulo retirado o edición retirada ⇒ 404/410 (`sharing.test.ts`).
 - [x] requestDelivery requiere capability interna y aprobación ligada a payload; cliente puede compartir enlace pero no usar Efeonce como relay arbitrario. — Verificado: `insights.delivery.send` sin scope `own`; request_hash ligado a versión+destinatarios+modalidad+asunto; sólo personas activas de la org (`delivery.test.ts`).

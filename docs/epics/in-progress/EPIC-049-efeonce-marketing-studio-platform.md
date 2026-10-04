@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. TASK-1894 Entregables A (puerta de ingreso) y B (commands de escritura, revisión y tres estados; API 1.4.0) en producción de Studio desde 2026-10-02; gateway v1.10.0 con las escrituras en el manifiesto pero sin federar; capabilities de escritura en Greenhouse `develop`, sin release a producción; Entregable C (corte de CMP-001…005 a Studio) diferido por el operador. Siguen TASK-1892, 1894 (Entregable C), 1895, 1897, 1898 y 1899 (métricas, corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do. ADR de operación híbrida con agentes aceptado el 2026-09-26 (work items, registro de roles, despachador Claude/OpenAI, evals y costo por rol); sus tasks TASK-1913…1916 están en to-do.`
+- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. TASK-1894 Entregables A (puerta de ingreso) y B (commands de escritura, revisión y tres estados; API 1.4.0) en producción de Studio desde 2026-10-02; gateway v1.10.0 con las escrituras en el manifiesto pero sin federar; capabilities de escritura en Greenhouse `develop`, sin release a producción; Entregable C (corte de CMP-001…005 a Studio) diferido por el operador. Siguen TASK-1892, 1894 (Entregable C), 1895, 1897, 1898 y 1899 (métricas, corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do. ADR de operación híbrida con agentes aceptado el 2026-09-26 (work items, registro de roles, despachador Claude/OpenAI, evals y costo por rol); sus tasks TASK-1913…1916 están en to-do. El flujo editorial SEO/AEO pertenece a Studio por decisión del operador del 2026-10-04: TASK-1667 y TASK-1669 se trasladan desde EPIC-022, en diseño. Censo: 25 hijas, 5 complete, 1 in-progress y 19 to-do.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -77,6 +77,8 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 ## Child Tasks
 
+**Censo 2026-10-04: 25 hijas directas; 5 complete, 1 in-progress y 19 to-do.** El traslado de TASK-1667/1669 cambia ownership, no acredita implementación.
+
 Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 · 1899 (ambas consumen los commands de 1894) → 1897 (cuando convenga) → 1898 al final.
 
 Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
@@ -108,6 +110,16 @@ Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 
 - `TASK-1914` — To-do. Registro de roles de agente: tarjetas versionadas sin sintaxis de proveedor, compilador portable con `cardDigest`, lista blanca de tools aplicada en Studio y en el gateway, modos, kill switch y política por organización; cinco tarjetas iniciales y tres skills de rol nuevas (copywriter, QA creativo y de marca, analista de desempeño); capability `marketing_studio.agent_role.manage`. Depende de 1894, 1899 y 1913.
 - `TASK-1915` — To-do. Despachador en Cloud Run con contrato único de corrida, ledger con idempotencia por corrida lógica y lectura antes de reintentar, reserva de costo, adaptadores `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk` y `openai-responses` detrás de flags, modo interactivo registrado, programas `T2` e identidad de servicio `T0`/`T1`; confirmación `T2` sólo desde token sin `act`. Depende de 1913, 1914 y 1899; segundo plano delegado bloqueado por TASK-1917 (EPIC-044 U22).
 - `TASK-1916` — To-do. Evals por rol × runtime × modelo con rúbrica objetiva + humana (sin autocalificación), compuerta de autonomía, catálogo de precios y costo normalizado, métricas por rol y señales, runtime por defecto por rol decidido como `T2`; capability `marketing_studio.agent_eval.grade`. Depende de 1914, 1913 y 1915.
+
+
+### Flujo editorial SEO/AEO — decisión 2026-10-04
+
+- [TASK-1667](../../tasks/to-do/TASK-1667-growth-seo-editorial-work-item-content-factory-handoff.md) — To-do. Especialización editorial sobre el plan y los work items de Studio: brief SEO/AEO, QA y handoff CMS gobernado con evidencia de publicación. Reusa TASK-1907/1908/1913; no crea un ciclo editorial en Greenhouse.
+- [TASK-1669](../../tasks/to-do/TASK-1669-growth-seo-agentic-daily-plan.md) — To-do. Plan editorial SEO/AEO y roles de agente sobre los commands y dispatcher de Studio (TASK-1909/1914/1915); preserva el orden de la cola SEO TASK-1700. No crea otro runtime de agentes.
+- [TASK-1668](../../tasks/to-do/TASK-1668-growth-seo-editorial-qa-outcome-iteration-loop.md) sigue siendo hija de EPIC-022: contrato de outcomes y medición SEO desde evidencia de publicación de Studio. La producción, revisión y calendario pertenecen a este epic; las métricas y sus fórmulas permanecen en Greenhouse.
+- TASK-1911 conserva aprendizajes y calendario; TASK-1912 consume los backends por sección. Informes y su distribución pertenecen a EPIC-045, incluidas TASK-1672/1673; Studio guarda referencias, no otro motor de informes.
+
+[Reparto y trabajo pendiente](../../audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). Los requisitos se redistribuyen sin cerrar tareas ni declarar disponible el circuito editorial.
 
 ## Delta 2026-09-26 — decisiones del operador sobre la capa de estrategia y la operación con agentes
 

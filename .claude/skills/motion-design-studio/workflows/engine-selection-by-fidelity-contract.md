@@ -39,7 +39,7 @@ Etiquetas: [verificado] corrida real 2026-09-16 · [oficial] fal/fabricante · [
 | **Cámara** precisa sobre una imagen fija | `h3max-camera` (≤ 12 keyframes; empezar y terminar en el encuadre original [oficial]) | — | La escena queda congelada: si el sujeto debe actuar, no sirve |
 | **Inicio y fin** exactos | `flux3-flf` (ambos obligatorios) | `wan3-i2v --end-image` · `seedance25-i2v --end-image` · `h3*-i2v --end-image` | Flux 3 flf no acepta `auto` |
 | Pasar por **varios cuadros clave** | `flux3-keyframes` (1–10 `--keyframe img@frame_index`) | — | fal expone índice de cuadro; timestamps en segundos sólo en BFL directo |
-| **Editar** un video con referencias admisibles por la ruta vigente | `seedance25-r2v --task editing --video` | `flux3-edit` | Filtro de ByteDance cobra el rechazo |
+| **Editar** un video con referencias admisibles por la ruta vigente | `seedance25-r2v --task editing --video` | `flux3-edit` | Riesgo de rechazo cobrado tras encolar (casos puntuales, condiciones sin medir): probar corto y a baja resolución |
 | **Editar** un video con referencias que otra ruta rechazó | `flux3-edit` (USD 0,03/s, conserva movimiento y encuadre; salida 720p) | — | Si conserva el audio: sin dato |
 | **Editar sólo una ZONA** y dejar el resto idéntico cuadro a cuadro | `pnpm ai:inpaint video` sobre `flux3-edit` (TASK-1965) | `fal:seedance25-edit` (sin canario; admite cuadro de referencia `first-frame`) | Aborta si el motor corrió el encuadre (deriva media > 12/255); recompone cada cuadro y verifica delta 0 sobre PNG; copia el audio del original. Canario 5 s cámara quieta: PASS, deriva 11,16 [verificado 2026-10-02] |
 | **Reiluminar** un video existente | — (**ningún motor conectado**, as-of 2026-10-03) | candidatos sin verificar: ID-V2V Relight y lightx (fal), Beeble SwitchX, Runway Aleph 2.0, Higgsfield Cinema Studio 4.0 (MCP, fuera del catálogo de API), Magnific `video_relight` (MCP) | No prometas relight; estado y método en `../modules/11_VFX_COMPOSITING.md` §6b |
@@ -161,9 +161,9 @@ La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16;
 - **Costo:** la equivalencia de tokens de OpenArt subestima ~2× y **no sirve para presupuestar**; la fórmula de fal
   (`alto × ancho × segundos × 24 / 1024`, ver §Costo por resolución) calzó sólo en las pruebas cortas citadas; no generalizar a SKY V11 ni a R2V con entradas. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
   ≈ USD 0,85. La tanda completa de verificación (17 corridas, incluidas 3 rechazadas) costó USD 7,71.
-- **Filtro de contenido de ByteDance:** rechaza **después de encolar, y se cobra** (422 `content_policy_violation`,
+- **Rechazos de contenido de ByteDance (casos puntuales):** cuando rechaza, lo hace **después de encolar, y se cobra** (422 `content_policy_violation`,
   `partner_validation_failed`). Casos medidos: referencia con el isotipo de Efeonce → "potential copyright violation";
-  video con una persona → "likenesses of real people". Estos rechazos son evidencia de esas rutas/fechas, no una prohibición universal inferida: SKY posterior produjo marca con Seedance. Verifica políticas y derechos de la ruta concreta; no evadas un rechazo ni repitas a ciegas.
+  video con una persona → "likenesses of real people". Estos rechazos son evidencia de esas rutas/fechas, no una prohibición universal inferida: SKY posterior produjo marca con Seedance, el 2026-09-22 las mascotas 3D de partner (Codex, Clawd, Gigi) pasaron y [operador, 2026-10-04] el operador ha producido en fal videos Seedance con personas y marcas reales sin problema. Las condiciones que disparan el rechazo no están medidas: Seedance sigue siendo candidato con personas o marcas; presupuesta el posible rechazo cobrado (primero corto y a baja resolución) y ten Flux 3 o Wan 3.0 como alternativa. Verifica políticas y derechos de la ruta concreta; no evadas un rechazo ni repitas a ciegas.
 
 **Criterio de elección:** toma larga (más de 15 s) → **2.5**; entrega en **4K** → **2.0 base**; exploración barata
 de movimiento o actuación → **2.0 `mini`/`fast` a 480p**, y subir de tier sólo con el take aprobado. Catálogo
@@ -331,7 +331,7 @@ opciones con estado distinto:
 | Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Endpoints verificados en real 2026-09-16 (`reference` incluido) | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
 | Usar un video como **referencia** junto a imágenes y audio | `wan3-r2v` / `wan3prime-r2v` (se cita como `Video 1`) | Endpoint **verificado** en real 2026-09-16; topes leídos del OpenAPI | Hasta 5 videos ≤ 15 s en total, ≥ 16 fps; genera una toma nueva, no edita el clip |
 
-**Rechazos observados:** pruebas2026-09-16 devolvieron rechazo cobrado tras encolar algunas referencias de marcas/personas. Es evidencia específica, no veto universal; SKY posterior produjo marca. Verifica políticas/derechos del endpoint y no evadas ni repitas un rechazo. Flux3 edit/extend o Wan3 R2V tienen contratos distintos: Wan3 no exponía edición en fal en esa revisión, aunque tuviera ranking de edición.
+**Rechazos observados:** pruebas2026-09-16 devolvieron rechazo cobrado tras encolar algunas referencias de marcas/personas. Es evidencia específica, no veto universal; SKY posterior produjo marca. Verifica políticas/derechos del endpoint, presupuesta el posible rechazo cobrado (prueba corta y a baja resolución) y no evadas ni repitas un rechazo. Flux3 edit/extend o Wan3 R2V tienen contratos distintos: Wan3 no exponía edición en fal en esa revisión, aunque tuviera ranking de edición.
 
 ## Candidatos evaluados, no conectados (revisión 2026-09-16)
 

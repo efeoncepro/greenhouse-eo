@@ -119,8 +119,10 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 
 - 🔴 **El precio del registro es el escalón MÁS BARATO, no el de tu resolución.** Sin `--resolution`
   el CLI envía el escalón más barato y lo avisa. Presupuesta por la que vas a pedir.
-- 🔴 **Un filtro puede rechazar DESPUÉS de encolar y cobrar igual** (ByteDance con marcas y personas
-  reales). Si hay marca en cuadro, o eliges el motor sin filtro, o sondas barato primero.
+- 🔴 **Un filtro puede rechazar DESPUÉS de encolar y cobrar igual** (Seedance en fal, 2026-09-16: isotipo de
+  Efeonce y un video con persona). Es un riesgo puntual, no un veto: otras corridas con personas y marcas reales
+  pasaron [operador, 2026-10-04] y las condiciones de disparo no están medidas. Sonda corto y barato primero y ten
+  una alternativa lista si rechaza.
 - 🔴 **«Verificado» no es «verificado a tu resolución».** Una familia puede estar verificada a 480p y
   su 1080p ser reescalado o no estar probado. La ficha lo dice; el titular no.
 - 🔴 **El mejor modelo para generar puede ser el peor para editar con máscara.** GPT Image 2.5 Sunburst

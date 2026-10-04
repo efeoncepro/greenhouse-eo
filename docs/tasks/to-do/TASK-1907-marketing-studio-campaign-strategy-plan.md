@@ -124,6 +124,14 @@ Reglas obligatorias:
   común de un command»; `docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md` §«Aprobación».
 - `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md` §8 (contrato del brief ampliado; convención de nombres de archivo).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+El plan de contenidos referencia trabajo/brief editorial de Studio (TASK-1667/TASK-1913), con
+versión y sujeto SV360 desde TASK-1908; no crea una segunda cola ni lifecycle editorial. El plan
+puede existir antes de producir o medir: 1667/1668 son consumers posteriores, no blockers de foundation.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -136,6 +144,8 @@ Reglas obligatorias:
 - `TASK-1906`: modelo de cliente publicado (la aprobación exige referencias resueltas).
 
 ### Blocks / Impacts
+
+- TASK-1667/TASK-1913 (work editorial) y TASK-1669 (plan diario).
 
 - `TASK-1908` (plan SEO/AEO): agrega su bloque a la versión del plan y su chequeo al `dryRun` de aprobación.
 - `TASK-1909` (IA): el borrador de plan por agente usa estos commands; la procedencia se engancha a ellos.
@@ -465,6 +475,9 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] El ítem de contenido referencia brief/work/version Studio (TASK-1667/TASK-1913) y evidencia SEO de TASK-1908; no duplica lifecycle ni prioridad SV360.
+- [ ] Un contenido planeado no se representa publicado/medido por tener un vínculo o versión aprobada; conserva observación y cobertura separadas.
 
 - [ ] Existen las tablas del plan y del programa con trigger de inmutabilidad probado.
 - [ ] Una campaña tiene como máximo un borrador y una versión aprobada vigente; editar tras aprobar crea borrador nuevo con ids estables.

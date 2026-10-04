@@ -116,6 +116,15 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-1892-marketing-studio-greenhouse-metrics.md` (consumer, bindings, ventana fija).
 - `docs/tasks/to-do/TASK-1861-aeo-grader-mcp-operability.md` (fuente futura más rica para AEO; no bloquea).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+La conexión sirve al flujo editorial y al plan diario Studio (TASK-1667/TASK-1669). Consume la
+cola TASK-1700 conservando orden/version/hash/as-of/expiry y sujeto durable más snapshot de decisión;
+expone refs para los cinco insumos del brief sin inventar ausencias. Outcome TASK-1668 se integra
+cuando exista: es dependencia opcional por eje de seguimiento, nunca un blocker para planificar.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -126,6 +135,8 @@ Reglas obligatorias:
 - Greenhouse SEO: lanes `/api/platform/ecosystem/growth/seo/{keyword-opportunities,keyword-market-data,rank-evolution,url-visibility,performance,visibility-360,dual-lens-visibility,grounded-queries,keywords}` y command `track_seo_keywords`/`untrack_seo_keywords` (TASK-1308/1659).
 
 ### Blocks / Impacts
+
+- TASK-1667 y TASK-1669 (contexto); TASK-1668 se consume cuando exista, sin bloquear foundation.
 
 - `TASK-1909` (IA): el brief SEO/AEO por agente parte de los objetivos y snapshots de esta task.
 - `TASK-1912` (UI): pinta el bloque, el seguimiento y el estado de las propuestas.
@@ -438,6 +449,10 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] El contexto editorial/daily-plan preserva orden, priorityScoreVersion, inputSnapshotHash, expiry, sujeto durable y alsoSurfacedBy de TASK-1700, sin recalcular prioridad.
+- [ ] Las referencias de fanOutSubQuestions/serpFormat/categoryAnswerPages/targetUrl/requiredEntities conservan fuente/as-of y null/[]+razón; 1667 valida el brief ejecutable.
+- [ ] Outcomes de TASK-1668 se consumen por lane cuando existan; planificación no depende de outcome ni crea un ciclo con TASK-1667.
 
 - [ ] Studio captura snapshots desde lanes org-visibles con su consumer y los guarda tal cual, con `data_through` y metodología.
 - [ ] Un snapshot no se puede modificar ni borrar (trigger).

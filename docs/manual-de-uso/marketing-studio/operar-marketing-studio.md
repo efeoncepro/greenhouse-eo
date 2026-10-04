@@ -7,6 +7,17 @@
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
+
+## Dónde vivirá el flujo editorial SEO/AEO
+
+**Acordado el 2026-10-04, pendiente de implementación:** el plan, brief, asignación, revisión y calendario
+editorial vivirán en Studio. Consulta las oportunidades y resultados en Greenhouse / Search Visibility 360,
+y los informes en Efeonce Insights. Studio conservará las referencias que conectan ese trabajo con su evidencia.
+
+El flujo completo aún no tiene pasos operativos disponibles: [TASK-1667](../../tasks/to-do/TASK-1667-growth-seo-editorial-work-item-content-factory-handoff.md)
+y [TASK-1669](../../tasks/to-do/TASK-1669-growth-seo-agentic-daily-plan.md) están en diseño. Un borrador enviado
+al CMS no prueba publicación; una publicación no prueba indexación ni resultados.
+
 ## Para qué sirve
 
 Revisar el estado de las campañas y preparar la pauta, actualizar Studio cuando cambian los datos en OneDrive,

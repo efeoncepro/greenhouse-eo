@@ -86,13 +86,15 @@ cada task. No trasladar automáticamente a otro modelo una implementación que y
 ### Reglas compartidas de ejecución y revisión
 
 Estas reglas aplican también a las matrices de [SEO](../in-progress/EPIC-022-growth-seo-search-visibility-360-module.md#ejecución-con-claude-y-codex)
-e [Insights](EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex).
+e [Insights](../in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex).
 
 - **Codex · GPT-6 Astra:** límites de autoridad, contratos fundacionales, idempotencia/concurrencia,
   cambios de amplio impacto y cutovers. **Codex · GPT-5.6 Sol:** integraciones delimitadas, readers,
   correcciones y cierres operativos sobre contratos existentes.
 - **Claude · Opus 5:** UI, formularios, composición editorial, gráficos, motion, responsive y revisión
-  visual. **Claude · Fable 5.1:** orquestación transversal de horizonte largo; asignado aquí a TASK-1669.
+  visual. **Claude · Fable 5.1:** orquestación transversal de horizonte largo; la especialización editorial
+  TASK-1669 pertenece a [Marketing Studio / EPIC-049](../in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
+  desde el reparto del 2026-10-04, sobre su dispatcher existente. Esta matriz sólo coordina revisión.
 - `high` y `xhigh` son el esfuerzo recomendado de la sesión, no la prioridad P1/P2 de la task. No usar
   `max` por defecto: escalar sólo ante un problema difícil no resuelto y registrar el motivo. No fallback
   silencioso a otro modelo; dejar el modelo/effort efectivamente usado en el plan y handoff de la task.

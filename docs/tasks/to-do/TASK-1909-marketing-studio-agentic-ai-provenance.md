@@ -50,11 +50,13 @@ follow-up sobre los mismos commands.
 
 ## Why This Task Exists
 
-- Los agentes leen 12 tools `studio.*` pero no pueden redactar un plan, un copy por canal ni un informe que quede
-  registrado con su procedencia (ADR de capa de estrategia §1). La skill `efeonce-campaign-planning` produce documentos
-  sueltos que nadie puede auditar.
+- El catálogo Studio ya tiene operaciones de lectura/escritura de brief/copy; todavía falta que el plan
+  agéntico, QA e informe con procedencia/aceptación específica queden registrados. El inventario actual
+  se deriva de `packages/contracts/src/operations.ts`, no de las 12 tools históricas. Las salidas
+  interactivas de `efeonce-campaign-planning` no equivalen por sí solas a entregables durables
+  con el registro de procedencia/aceptación de esta task (ADR de capa de estrategia §1).
 - El ADR decide **agentes primero** (§3.3 opción B), procedencia obligatoria e inmutable, copy aceptado que no se
-  reescribe, y control de costo (§4.6). Nada de eso existe.
+  reescribe, y control de costo (§4.6). La especialización de procedencia/aceptación sigue pendiente.
 - Sin validadores deterministas, un agente no puede comprobar antes de escribir que un copy cabe en su plataforma o que
   una pieza tiene el formato y los derechos del canal; el error se descubriría al publicar.
 
@@ -111,6 +113,15 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-1903-efeonce-insights-editorial-agent.md` (patrón de agente que propone y persona que acepta por
   campo en Insights; referencia de método, no dependencia).
 
+## Contrato editorial SEO reconciliado — 2026-10-04
+
+La procedencia se aplica a brief/deliverable editorial TASK-1667 y al plan advisory TASK-1669
+mediante el modelo común, sin otra tabla de agentes o runtime. QA creativo y aceptación del
+borrador no reemplazan el QA CMS, approval/publicación observada de 1667 ni la medición de 1668.
+El informe semanal es lectura/síntesis; emisiones multiformato y distribución siguen en Insights.
+
+Canon: ADR de estrategia Studio §14. Esta precisión documental no implementa ni cierra esta task.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -123,6 +134,8 @@ Reglas obligatorias:
   (aprendizajes validados), `TASK-1892`/`TASK-1910` (métricas para el informe semanal).
 
 ### Blocks / Impacts
+
+- TASK-1667/TASK-1669 (procedencia/aceptación); Efeonce Insights conserva emisión y entrega.
 
 - `TASK-1911`: el contexto consume aprendizajes validados.
 - `TASK-1912`: muestra procedencia, aceptación y hallazgos de QA.
@@ -404,6 +417,9 @@ Capabilities: T0 `.campaign.read` / `studio:read`; T1 `.campaign.write` / `studi
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Borradores/entregables 1667/1669 reutilizan provenance y aceptación comunes; aprobar copy no marca QA CMS/publicación/indexación/outcome.
+- [ ] Síntesis semanal consume evidencia canónica; si produce informe emitido/distribuido, usa Efeonce Insights, sin renderer/sender paralelo.
 
 - [ ] Toda escritura por MCP con texto sin `provenance` responde `422 provenance_required` (con el flag ON).
 - [ ] `provenance_record` no se puede modificar; los eventos son append-only.

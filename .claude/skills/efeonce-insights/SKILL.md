@@ -128,6 +128,8 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 ## Routing
 
+- **Auditoría técnica SEO (ownership 2026-10-04):** TASK-1672/1673 son hijas de EPIC-045. Backend/facts/binding de corrida: TASK-1992 Slice 6, independiente de la tarjeta de canal; UI/plan/catálogos/web especializado: TASK-1672; selección/share/delivery: TASK-1673 sobre TASK-1848. Todo sigue pendiente de implementación; el adapter SEO aún no lee site audit. No crear renderer/print route/snapshot/grant store/sender SEO. Compartir reutiliza múltiples grants y digest-only (no recuperar bearer anterior por run); enviar es App interno, MCP/Ecosystem read. Ver arquitectura §2 y ledger.
+
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
 - Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs).
   Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos (+
