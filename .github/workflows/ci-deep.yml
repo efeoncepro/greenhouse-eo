@@ -88,9 +88,12 @@ jobs:
         run: pnpm test:coverage
         # Instrumented full suite (~9.8k tests, 2026-07-18) exceeds 10 minutes on
         # the 2-core runner: the old timeout killed a healthy run at exactly
-        # start+10:00 (release 9f00a1715) leaving the summary as n/a. Headroom
-        # bounded by the job-level 20-minute limit.
-        timeout-minutes: 17
+        # start+10:00 (release 9f00a1715) leaving the summary as n/a.
+        # 2026-10-04: 17 → 21. The step had grown to 15–16 min (releases
+        # fe261ca27, 36a73e7b7) and the batch of ea4fdcb5e crossed 17 twice
+        # (runner capacity, not a failing test). Headroom bounded by the
+        # job-level 25-minute limit (setup takes ~3 min).
+        timeout-minutes: 21
 
       - name: Test observability summary
         if: always()

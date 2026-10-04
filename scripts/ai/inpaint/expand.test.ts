@@ -122,5 +122,5 @@ describe('pnpm ai:inpaint expand', () => {
     expect(result.manifest.candidates[0].verdict).toBe('PASS')
     expect(pixel(final, 100, scene.top + 200)).toEqual(pixel(source, 100, 200)) // interior intacto
     expect(pixel(final, 100, 10)).toEqual([48, 160, 96]) // área nueva = lo que generó el modelo
-  })
+  }, 30_000) // Procesa imágenes reales: con coverage en el runner de 2 núcleos tarda ~15 s (2026-10-04), al filo del global.
 })
