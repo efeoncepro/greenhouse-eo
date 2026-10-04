@@ -1,3 +1,4 @@
+import type { GrowthInputBehaviorFactory } from './input-behavior-adapter'
 /**
  * TASK-1231 — Growth Forms portable renderer · motor framework-light.
  *
@@ -39,6 +40,8 @@ import { TurnstileTokenClient } from './turnstile'
 import { resolveValidatorName, validateFormValue } from '@/lib/growth/forms/validators/core'
 
 export interface FormRendererOptions {
+  /** Opt-in portable editing adapter. No change to backend validation or public contracts. */
+  inputBehaviors?: GrowthInputBehaviorFactory
   root: HTMLElement
   contract: RenderContract
   api: RendererApiConfig
@@ -674,11 +677,11 @@ export class FormRenderer {
         } else {
           labelEl.appendChild(
             el(
-                this.doc,
-                'span',
-                { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
-                this.fieldIconGlyph(field.presentation.icon)
-              )
+              this.doc,
+              'span',
+              { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
+              this.fieldIconGlyph(field.presentation.icon)
+            )
           )
         }
       }
@@ -1690,15 +1693,22 @@ export class FormRenderer {
     const input = el(this.doc, 'input', { ...common, type: 'tel', class: 'ghf-input ghf-tel-input' })
 
     if (field.placeholder) input.setAttribute('placeholder', field.placeholder)
+    const behaviorFor = (country: string) => this.opts.inputBehaviors?.(field, country)
+    const initialBehavior = behaviorFor(initialCountry)
     const national = nationalFromStored(this.fieldStr(field.key), initialCountry)
 
-    input.value = national ? formatNationalPhoneDisplay(national, initialCountry) : ''
+    input.value = initialBehavior
+      ? initialBehavior.resolve(this.fieldStr(field.key), 'blur').display
+      : national
+        ? formatNationalPhoneDisplay(national, initialCountry)
+        : ''
 
     const recompute = (countryOverride?: string) => {
       const country = (countryOverride ?? this.telCountry.get(field.key) ?? initialCountry).toUpperCase()
+      const behavior = behaviorFor(country)
       const digits = stripNationalDigits(input.value)
 
-      this.values[field.key] = toE164(country, digits)
+      this.values[field.key] = behavior ? (behavior.resolve(input.value).value ?? input.value) : toE164(country, digits)
     }
 
     select.addEventListener('change', () => {
@@ -1707,14 +1717,42 @@ export class FormRenderer {
       this.telCountry.set(field.key, next)
       const digits = stripNationalDigits(input.value)
 
-      input.value = digits ? formatNationalPhoneDisplay(digits, next) : ''
+      const behavior = behaviorFor(next)
+
+      input.value = behavior
+        ? behavior.resolve(input.value, 'blur').display
+        : digits
+          ? formatNationalPhoneDisplay(digits, next)
+          : ''
       recompute(next)
       this.liveStatus(field)
       this.onFieldEdited()
       this.onValueChange(field)
     })
 
+    let composing = false
+
+    if (initialBehavior) {
+      input.addEventListener('compositionstart', () => {
+        composing = true
+      })
+      input.addEventListener('compositionend', () => {
+        composing = false
+        input.dispatchEvent(new Event('input'))
+      })
+    }
+
     input.addEventListener('input', () => {
+      if (behaviorFor(this.telCountry.get(field.key) ?? initialCountry)) {
+        if (composing) return
+        recompute()
+        this.maybeStart()
+        this.liveStatus(field)
+        this.onFieldEdited()
+
+        return
+      }
+
       // Pegado de un número con +CC → detectar país y reflejarlo en el selector.
       const parsed = parseE164(input.value)
 
@@ -1739,7 +1777,10 @@ export class FormRenderer {
       const country = this.telCountry.get(field.key) ?? initialCountry
       const digits = stripNationalDigits(input.value)
 
-      if (digits) input.value = formatNationalPhoneDisplay(digits, country)
+      const behavior = behaviorFor(country)
+
+      if (behavior) input.value = behavior.resolve(input.value, 'blur').display
+      else if (digits) input.value = formatNationalPhoneDisplay(digits, country)
       recompute(country)
       this.revalidateField(field)
     })
@@ -2154,9 +2195,24 @@ export class FormRenderer {
   /** Cablea inputs de texto con máscara forgiving + timing 3-stage. */
   private wireText(field: RendererFieldDefinition, input: HTMLInputElement | HTMLTextAreaElement): void {
     const mask = maskOpsFor(field)
+    const behavior = this.opts.inputBehaviors?.(field)
+    let composing = false
+
+    if (behavior) {
+      input.addEventListener('compositionstart', () => {
+        composing = true
+      })
+      input.addEventListener('compositionend', () => {
+        composing = false
+        input.dispatchEvent(new Event('input'))
+      })
+    }
 
     input.addEventListener('input', () => {
-      this.values[field.key] = mask.toStored(input.value)
+      if (behavior && composing) return
+      this.values[field.key] = behavior
+        ? (behavior.resolve(input.value).value ?? input.value)
+        : mask.toStored(input.value)
       this.maybeStart()
       // Validación reactiva live (success ✓ inmediato, error diferido). Reemplaza el
       // Stage-3 "solo si ya erró": ahora el feedback es reactivo desde que se tipea.
@@ -2172,12 +2228,13 @@ export class FormRenderer {
 
       // Aplica máscara de display al salir (evita saltos de cursor mientras tipea).
       if (input instanceof HTMLInputElement) {
-        const display = mask.toDisplay(this.values[field.key] as string)
+        const resolved = behavior?.resolve(input.value, 'blur')
+        const display = resolved?.display ?? mask.toDisplay(this.values[field.key] as string)
 
         if (display !== input.value) input.value = display
         // Re-almacena desde el display normalizado. Idempotente para rut/phone
         // (stored→display→stored = stored) y deja la URL con scheme ya antepuesto.
-        this.values[field.key] = mask.toStored(input.value)
+        this.values[field.key] = resolved ? (resolved.value ?? input.value) : mask.toStored(input.value)
       }
 
       this.revalidateField(field)

@@ -1028,3 +1028,15 @@ Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
 [SEO](https://axis.efeonce.org/references/seo-iconography/),
 [Autoridad](https://axis.efeonce.org/references/authority-iconography/).
 No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+## Próxima adopción: entradas especializadas
+
+Source AXIS `a0c6130` (entradas) y `6fff346` (assets) en `main`; primitives 0.5.0 todavía **sin publicar**.
+El catálogo `/input-phone` entrega 245 países/territorios en este corte, localizado y con lista opcional
+por consumidor; `PhoneField.countrySearch` permite explorar listas amplias. No instalar 0.5.0 hasta
+verificar release, tarball e instalación privada. La tabla publicada de arriba conserva primitives 0.4.0.
+
+Growth Forms tiene un adapter opt-in local, verificado contra los exports compilados reales. No activa
+embeds, no cambia pins y no sustituye el selector de 18 países. El owner AXIS debe publicar la versión
+exacta; el owner Growth Forms debe fijarla, mapear su catálogo si corresponde y ejecutar el piloto en
+host con payloads/errores/consentimiento intactos. [Decisión, prueba reproducible y gates del consumidor](../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).

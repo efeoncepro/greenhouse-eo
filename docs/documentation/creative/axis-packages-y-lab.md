@@ -95,3 +95,19 @@ La autoridad de implementación vive en [AXIS](https://github.com/efeoncepro/axi
 [decisión de plataforma compartida](../../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md).
 La [guía operativa de recursos](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/axis-resource-workflow.md)
 explica cómo seguir estos contratos sin duplicar sus catálogos.
+
+## Entradas especializadas y Growth Forms (04/10/2026)
+
+En `main` de AXIS para primitives 0.5.0: teléfono con país, correo sin máscara, URL,
+RUT/documentos y decimales exactos. El Lab permite probarlos en Field/Input; el package comparte el
+comportamiento entre HTML y React. La versión publicada sigue siendo 0.4.0 hasta su próxima release.
+
+El ejemplo telefónico ofrece 245 países y territorios con búsqueda por nombre o prefijo. El catálogo
+se localiza desde metadatos del package; cada producto puede declarar una lista acotada. País/teléfono,
+correo/URL y RUT/importe se alinean por filas y pasan a una columna en móvil. El formato ayuda a escribir:
+un número posible no acredita que exista o pertenezca a la persona, y un RUT formateado no valida su dígito.
+
+Growth Forms tiene un adapter optativo local, sin cambiar sus formularios activos, pins ni validación de
+servidor. Su selector conserva 18 países; no añade automáticamente el catálogo de AXIS ni recibe el suyo
+desde el Lab. La ampliación exige una adopción explícita del motor.
+[Ownership, verificación y promoción](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).

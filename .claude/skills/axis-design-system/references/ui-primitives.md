@@ -2,7 +2,8 @@
 
 ## Current source and release boundary
 
-Verified source: AXIS `df2de617a9a2033049c5a889f487e970de85a345`, 2026-10-04. These are independent package versions, not a single
+Published forms baseline: AXIS `df2de617a9a2033049c5a889f487e970de85a345`, 2026-10-04. Specialized
+inputs have a later source cut below. These are independent package versions, not a single
 version to apply to every dependency:
 
 | Package | Compatible version | Owns |
@@ -112,3 +113,32 @@ are not Linux baselines. Persistence, permissions, retries and draft/navigation 
 
 Date/file controls and multiselect Combobox are outside this delivery. Published packages do not authorize
 replacing Greenhouse's existing MUI controls: record reuse/extend/adapt and verify the product boundary first.
+
+## Specialized inputs · source 0.5.0 (not published)
+
+Source `a0c6130` is pushed to AXIS `main`; `6fff346` synchronizes Lab asset references. This does not
+publish primitives 0.5.0 or prove consumer adoption. The new pure `/input-behavior` and separate
+`/input-phone` exports accompany React `PhoneField`, `EmailField`, `UrlField`, `DocumentField`, `RutField`
+and `DecimalField`. Canonical API: AXIS `packages/primitives/README.md`.
+
+- Keep editable `display` separate from canonical `value: string | null`; preserve incomplete/invalid
+  text. Format on blur, leave IME composition intact, and let the product reset controlled state.
+  `ready` is formatting readiness, never server validation, number ownership or deliverability.
+- Email has no mask and preserves case/aliases. RUT formatting does not validate its checksum; URL
+  normalization is not destination/SSRF policy. Decimal uses an explicit locale and exact strings.
+- Use `phoneCountryOptions(locale, allowlist?)` from `/input-phone`, not copied country tables. It
+  localizes/sorts metadata countries with `Intl.DisplayNames`/`Intl.Collator`; the current dependency
+  supplies 245 countries/territories. An optional nonempty, unique supported-country list narrows the
+  selector explicitly; locale does not choose a country or impose a submission allowlist.
+- `PhoneField` takes controlled `country`/`onCountryChange`, `countries` and `countryLabel`. For long
+  lists pass `countrySearch: {emptyMessage, invalidMessage, placeholder?}` to enable search by name or
+  calling code; without it the selector remains `Select`. Keep accessible copy product-owned.
+- Compose matching fields in shared grid rows so wrapped help does not misalign independently stacked
+  columns. The Lab demonstrates the package; do not copy its layout as component implementation.
+
+Growth Forms has a local injected opt-in port, without activation or pin/theme changes. Its legacy
+selector still derives 18 country prefixes from `CALLING_CODES`; it does not inherit AXIS's catalog.
+That list is not a strict allowlist for explicit international `+` values. Catalog adoption requires
+an explicit product decision and server/payload/host verification; follow the
+[Growth Forms decision](../../../../docs/architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+Promotion requires an exact published package and consumer evidence.

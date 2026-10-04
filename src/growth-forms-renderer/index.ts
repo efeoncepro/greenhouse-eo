@@ -14,3 +14,6 @@ export type { RenderContract } from './contract'
 import { defineGreenhouseFormElement } from './element'
 
 defineGreenhouseFormElement()
+
+export { createAxisGrowthInputFactory } from './input-behavior-adapter'
+export type { GrowthInputBehavior, GrowthInputBehaviorFactory } from './input-behavior-adapter'

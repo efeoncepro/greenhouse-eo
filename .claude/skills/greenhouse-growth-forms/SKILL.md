@@ -22,6 +22,26 @@ hold business logic, mapping, secrets or PII.
 > the admin cockpit, Nexa, MCP and any host are all **clients of the same contract**. Never build
 > form behavior into a single UI/host.
 
+## AXIS input behavior (2026-10-04)
+
+El adapter opt-in `inputBehaviors` comparte formato, nunca autoridad de validación. Cargar
+[decisión de adopción](../../../docs/architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+AXIS `a0c6130` está en `main` (ajuste de assets `6fff346`); primitives 0.5.0 sigue sin publicar.
+El port del renderer es local y no está activado: no cambiar pins/hosts ni inferir adopción desde el Lab.
+`display` es texto editable y `value` puede ser null: conservar/rechazar, nunca vaciar ni truncar.
+Formato al salir; no transformar durante IME. El producto conserva reset y validación de servidor;
+`ready` no prueba validez de negocio. Correo sin máscara, preservando alias y mayúsculas; RUT sin
+verificación de dígito. Teléfono/URL/correo/RUT son mappings explícitos; moneda y documentos de otros
+países requieren contrato. Configurar `inputBehaviors` antes de conectar el custom element.
+
+El selector vigente deriva **18 países/prefijos** de `CALLING_CODES` en
+`src/lib/growth/forms/validators/phone.ts`; no es una allowlist estricta de números internacionales con
+`+`. AXIS ofrece `phoneCountryOptions(locale, allowlist?)` en `/input-phone` (245 países/territorios en
+la metadata actual), pero ni el port ni el host amplían el catálogo automáticamente. Para adoptarlo,
+definir cobertura de producto, consumir el helper publicado y verificar payload/validación del motor.
+No copiar tablas ni imponer 245 como constante eterna. `PhoneField.countrySearch` habilita búsqueda
+React con mensajes explícitos; no introduce React ni ese control en el web component de Growth Forms.
+
 ## When to invoke
 
 - Authoring/lifecycle of forms (draft → review → publish → deprecate → archive), versions, copy.

@@ -130,3 +130,36 @@ Consulta [evidencia y límites de QA](../../audits/2026-10-04-axis-buttons-relea
 Para integrar sin rediseñar: usa los roles y el CSS del package, no colores o menús copiados del Lab.
 La [evidencia de formularios](../../audits/2026-10-04-axis-forms-release.md) distingue pruebas locales,
 publicación y adopción. Prueba lectores de pantalla, autofill y dispositivos reales en el producto consumidor.
+
+
+## Probar y adoptar entradas especializadas
+
+La implementación está en `main` de AXIS para primitives 0.5.0; confirma su publicación en el
+[runbook](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#próxima-adopción-entradas-especializadas)
+antes de instalar. El Lab usa el workspace y puede mostrar una API aún no publicada.
+
+1. En el Lab local del checkout AXIS, abre `/patterns/efeonce.input/` o Field y busca «Entradas con contexto».
+   La [ruta pública Input](https://axis.efeonce.org/patterns/efeonce.input/) depende del despliegue del Lab;
+   comprueba el corte antes de asumir que incluye las nuevas entradas.
+   Busca un país por nombre o prefijo, elígelo y pega un teléfono nacional o con `+` internacional.
+   Sal del campo para revisar formato; «Ver valores del ejemplo» permite comprobar el dato normalizado.
+   Los datos de la demostración no se guardan ni se envían.
+2. Prueba correo con alias, URL, RUT e importe. Conserva el texto incompleto para poder corregirlo;
+   el producto valida la admisibilidad. No conviertas un importe exacto a `Number` ni supongas que
+   formatear el RUT comprueba su dígito.
+3. En React usa los campos especializados desde `/react`: ya componen etiqueta, control y mensaje,
+   por lo que no se envuelven en otro `Field`. Importa `/forms.css`. En modo controlado conserva
+   `display` para edición y consume `value` para normalización, comprobando su estado y posible `null`.
+4. Para `PhoneField`, obtiene la lista con `phoneCountryOptions('es')` desde `/input-phone`;
+   pasa una lista explícita de códigos como segundo argumento sólo cuando el producto deba acotarla.
+   Define país, `countryLabel`, `onCountryChange` y, para listas extensas, `countrySearch` con
+   `emptyMessage`, `invalidMessage` y placeholder localizados. La lista completa tiene 245 entradas
+   en este corte; no dupliques los nombres ni los prefijos dentro del producto.
+5. En HTML sin React usa los behaviors y `bindInputBehavior` desde `/input-behavior`, y el teléfono
+   desde `/input-phone`. El binder ayuda a editar; el consumidor serializa y valida el valor.
+   Verifica pegar, borrar, IME, reset, disabled/readOnly, teclado, lector de pantalla y móvil.
+
+En Growth Forms esto requiere el adapter propio: sus 18 países actuales no se amplían automáticamente.
+La inyección optativa de formato no es un reemplazo del renderer ni activa el cambio en los formularios
+publicados. Sigue la [decisión de adopción y su prueba local](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md)
+antes de cambiar versiones, catálogo o embeds.
