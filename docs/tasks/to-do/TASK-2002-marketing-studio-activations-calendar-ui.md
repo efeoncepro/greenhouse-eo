@@ -4,6 +4,18 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
+
+- **Regla:** esta UI no tiene lógica propia: cada acción que muestra (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución, ver la tracking URL) es un command o reader de TASK-2001 con ruta `/api/v1`, entrada en
+  el registro con **tool** (exclusión sólo para transporte o metadatos, nunca para una capacidad de negocio) y **tool
+  federada y operable por Efeonce MCP**, lecturas **y escrituras**, con la identidad delegada de la persona
+  (mecánica de TASK-1899: clase `efeonce.mcp.marketing_studio.write`, canje por capability, `dryRun` → confirmación en
+  `T2`). La UI es un cliente más de esos commands.
+- **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
+  —leer, planificar o editar, y confirmar las `T2`— y la evidencia queda registrada. Manual servido
+  (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
+- **Consecuencia de orden:** TASK-1899 va antes; sin su carril de escritura delegada esta task no puede cumplir la regla.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -234,6 +246,7 @@ Reglas obligatorias:
 ### Slice 3 — Hoja y acciones
 
 - `ActivationSheet` con evidencia, reproductor, editar/reprogramar/cancelar; bandeja de ejecución sin activación con vincular y crear.
+- Bloque **Tracking URL** en la hoja: la URL generada por TASK-2001 con botón copiar, sus parámetros legibles y las advertencias `tracking_missing` / `tracking_mismatch` / `tracking_frozen`; la UI nunca arma ni edita UTM.
 
 ### Slice 4 — Evidencia
 
@@ -293,6 +306,8 @@ Ver wireframe y flow de esta task.
 - [ ] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver.
 - [ ] Copy en `apps/web/src/copy.ts` con test; sin voseo.
 - [ ] Sin scroll horizontal de página en 1440 y 390; capturas y scorecard registrados.
+- [ ] La hoja muestra la tracking URL de la activación (copiar) y sus advertencias; ninguna UTM se construye en el cliente.
+- [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada).
 - [ ] `pnpm check` y `pnpm build` de Studio verdes.
 
 ## Verification

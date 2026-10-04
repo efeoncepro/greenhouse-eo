@@ -4,6 +4,18 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
+
+- **Regla:** todo lo que esta task implemente nace con command o reader en `packages/domain`, ruta `/api/v1`, entrada en
+  el registro con **tool** (exclusión sólo para transporte o metadatos, nunca para una capacidad de negocio) y **tool
+  federada y operable por Efeonce MCP**, lecturas **y escrituras**, con la identidad delegada de la persona
+  (mecánica de TASK-1899: clase `efeonce.mcp.marketing_studio.write`, canje por capability, `dryRun` → confirmación en
+  `T2`). La UI es un cliente más de esos commands.
+- **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
+  —leer, planificar o editar, y confirmar las `T2`— y la evidencia queda registrada. Manual servido
+  (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
+- **Consecuencia de orden:** TASK-1899 va antes; sin su carril de escritura delegada esta task no puede cumplir la regla.
+
 ## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
 
 - Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md): cada activación expone su **tracking URL** generada con la convención (`utm_content` = id de la activación, `utm_id` = id de la campaña); la evidencia de ejecución compara la URL publicada con la generada (sin UTM o con otra = advertencia).
@@ -26,7 +38,7 @@
 - Status real: `Diseno — creada 2026-10-04 por decisión del operador (ADR de estrategia §15: el calendario es de Studio; la ejecución es evidencia); ningún slice empezado`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1905 Slices 1–2 (catálogo de canales con channel_key y semilla de §15). Las escrituras por MCP esperan TASK-1899 (como todo command de Studio); la evidencia de paid desde Meta/LinkedIn llega con TASK-1910`
+- Blocked by: `TASK-1899 (escritura delegada por MCP: sin ella esta task no puede cerrar con sus escrituras operables por MCP) · TASK-1905 (catálogo de canales con channel_key, valores UTM por canal y semilla de §15). La evidencia de paid desde Meta/LinkedIn llega con TASK-1910`
 - Branch: `efeonce-marketing-studio main (migraciones, dominio, worker, rutas, registro, manifiesto) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (sync del manifiesto); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -287,6 +299,22 @@ plataforma y cuenta, y la fecha programada cae dentro de la tolerancia del canal
 - `listCampaignActivations`, `getActivation`, `listUnlinkedExecutions`; `getCalendarRange` desde activaciones con filtros
   por dimensión; ítems de atención; health profundo.
 
+### Slice 4b — Tracking URL por activación ([RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md) §Origen y ciclo de vida)
+
+- `buildTrackingUrl(activation, catalogVersion)` pura en `packages/domain/src/activations/tracking.ts`: `utm_source`,
+  `utm_medium`, `utm_source_platform` y modo de etiquetado desde el catálogo; `utm_campaign` (slug congelado) y `utm_id`
+  desde la campaña; `utm_content` = id público de la activación `ACT-######`; `utm_term`, `utm_creative_format` y
+  `utm_marketing_tactic` desde anuncio, placement/pieza y audiencia; `null` se omite.
+- Slug de campaña: se genera en `createCampaign` y se congela con la primera activación con evidencia; migración que
+  agrega `campaign.utm_campaign_slug` y lo rellena para CMP-001…005 con revisión de una persona.
+- Snapshot en la activación (`tracking_url`, `tracking_params`, `catalog_version`); se regenera mientras no haya
+  evidencia y se congela después (`tracking_frozen`).
+- Validación: destino `https` en dominios propios de la organización; destino sin `utm_*` (`destination_has_tracking`);
+  vocabulario cerrado.
+- Comparación con lo publicado: la evidencia de ejecución extrae los enlaces del post o del anuncio y marca
+  `tracking_missing` / `tracking_mismatch` como advertencias en la activación y en «Hoy».
+- Operación `previewTrackingUrl` (T0) y campo `tracking` en `getActivation` / `listCampaignActivations`.
+
 ### Slice 5 — Registro, manifiesto y backfill
 
 - Operaciones con `riskTier`, tools y exclusiones; manifiesto; API minor; backfill de los 6 posts con confirmación.
@@ -362,7 +390,10 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 - [ ] Lo programado sin activación aparece como `execution_without_activation` en «Hoy» y en `listUnlinkedExecutions`.
 - [ ] `studio.calendar.get` devuelve activaciones con sus dimensiones y estado, filtrables; posts actuales siguen visibles durante la convivencia.
 - [ ] Los 6 posts existentes quedan como evidencia, vinculados a activaciones confirmadas por una persona.
+- [ ] Cada activación tiene su tracking URL generada sólo por `buildTrackingUrl`; tests de determinismo, omisión de `null`, modo `auto` de Google Ads, validación de destino y congelamiento con evidencia.
+- [ ] `tracking_missing` y `tracking_mismatch` aparecen al comparar con lo publicado (fixture de un post de Metricool sin UTM y otro con UTM distinta).
 - [ ] Registro, manifiesto, paridad y leak test verdes; `pnpm check` y `pnpm build` de Studio verdes.
+- [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado.
 
 ## Verification
 

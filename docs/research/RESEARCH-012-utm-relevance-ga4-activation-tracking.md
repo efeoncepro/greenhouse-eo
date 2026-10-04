@@ -130,6 +130,59 @@ y el warehouse: cuestan cero y conservan el dato.
 - Instagram orgánico sólo admite un enlace (bio): la activación genera su URL, y el link-in-bio rota o se usa una
   landing con la UTM de la activación vigente.
 
+## Origen y ciclo de vida de cada valor (especificación)
+
+Decisión del operador (2026-10-04): las UTM se generan en Studio, en un solo lugar, a partir de datos gobernados. Esta
+sección es la especificación que implementan TASK-1905 (catálogo) y TASK-2001 (activaciones).
+
+**Una sola función.** `buildTrackingUrl(activation, catalogVersion)` en `packages/domain` (pura y determinista: mismos
+insumos, misma URL). La usan el command que planifica la activación, el preview de la UI, el MCP y la comparación con
+lo publicado. Nadie concatena UTM fuera de ella (ni la UI, ni un agente, ni una CLI).
+
+| Valor | Dónde nace | Quién lo fija | Cuándo cambia |
+|---|---|---|---|
+| `utm_source` | catálogo de canales: plataforma de aparición del `channel_key` | persona con `marketing_studio.catalog.manage`, por versión del catálogo con fuente y fecha | sólo con una versión nueva del catálogo; la activación conserva la versión con que se generó |
+| `utm_medium` | catálogo: derivado de modalidad × familia (`paid_social`, `social`, `cpc`, `display`, `paid_video`, `email`…) | ídem | ídem |
+| `utm_source_platform` | catálogo: plataforma de **compra** (`meta_ads`, `google_ads`, `linkedin_ads`, `dv360`, `chatgpt_ads`…); vacío en organic | ídem | ídem |
+| `utm_campaign` | campaña: slug generado al crear la campaña desde id + nombre (`cmp-001-lo-que-la-ia-dice-de-ti`; minúsculas, ASCII, guiones, ≤ 60) | `createCampaign` | **se congela** con la primera activación con evidencia de ejecución: renombrar la campaña no parte los datos de GA4 en dos |
+| `utm_id` | campaña: `campaign_id` (`CMP-001`) | sistema | nunca |
+| `utm_content` | activación: id público `ACT-######` (ancho mínimo 6, sin truncar al crecer) | sistema al crear la activación | nunca |
+| `utm_term` | anuncio: keyword (search) o clave de audiencia (paid social); se omite si es `null` | persona al configurar el anuncio | mientras la activación no tenga evidencia de ejecución |
+| `utm_creative_format` | placement + formato de la pieza (`reel`, `story`, `feed_4x5`, `feed_1x1`, `video_16x9`, `carousel`, `text`) | sistema | ídem |
+| `utm_marketing_tactic` | temperatura de la audiencia (fría → `prospecting`; tibia/caliente → `retargeting`) o campaña Always On → `always_on`; se omite si no se sabe | sistema | ídem |
+| URL de destino | activación (o el destino por defecto de la campaña) | persona | ídem |
+
+**Modo de etiquetado por canal** (dato del catálogo): `utm` (por defecto), `auto` (Google Ads: auto-tagging, la URL sale
+sin UTM y el join usa la integración de Google Ads con GA4) o `auto_plus_full_utm` (sólo si se decide etiquetar Google Ads
+completo; nunca parcial).
+
+**Reglas de validación** (al generar; error del command si fallan):
+
+- El destino es `https` y su dominio está en la lista de dominios propios de la organización; nunca un enlace interno con
+  UTM.
+- El destino no trae ya parámetros `utm_*` (error `destination_has_tracking`; Studio no mezcla dos etiquetados).
+- Todos los valores salen de vocabulario cerrado (catálogo y enumeraciones); minúsculas y guion bajo.
+- Compatibilidad con GA4: una función pura `expectedGa4Channel(source, medium)` replica las reglas del agrupamiento por
+  defecto; un test del catálogo exige que cada canal caiga en su canal GA4 esperado (paid social → Paid Social, organic
+  social → Organic Social, paid search → Paid Search, display → Display, email → Email) o declare explícitamente su
+  `ga4_custom_group` (Community, Messaging, QR/OOH). Ningún canal termina en Unassigned por descuido.
+
+**Ciclo de vida en la activación:**
+
+- La URL generada se guarda como **snapshot** (`tracking_url` + parámetros + versión del catálogo) en la activación.
+- Mientras la activación no tenga evidencia de ejecución, editarla regenera el snapshot.
+- Con evidencia (programada o publicada), el snapshot **se congela**: cambiar la activación no altera la URL ya
+  distribuida (advertencia `tracking_frozen`); si hace falta otra URL, se crea otra activación.
+- Al llegar la evidencia, Studio compara la URL publicada con el snapshot: sin UTM → `tracking_missing`; con valores
+  distintos → `tracking_mismatch` (lista de parámetros). Ambas son advertencias visibles en «Hoy» y en la activación.
+
+**Lo que ya existe** (anuncios importados con `utm` escrito a mano en el catálogo de OneDrive): no se sobrescribe. Un
+reporte compara la UTM existente con la que generaría Studio y una persona decide en el backfill revisado de TASK-1905.
+
+**Operable por API y MCP:** `previewTrackingUrl` (T0, para ver la URL antes de planificar), el campo `tracking` en
+`getActivation` / `listCampaignActivations` y los valores UTM en la lectura del catálogo; los mismos datos para la UI,
+la API y los agentes.
+
 ## Qué cambia en las tasks
 
 - **TASK-1905:** el catálogo de canales guarda, por canal, el `utm_source` y el `utm_medium` derivados (dato versionado,

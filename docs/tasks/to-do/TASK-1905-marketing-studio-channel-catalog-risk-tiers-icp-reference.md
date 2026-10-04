@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
+
+- **Regla:** todo lo que esta task implemente nace con command o reader en `packages/domain`, ruta `/api/v1`, entrada en
+  el registro con **tool** (exclusión sólo para transporte o metadatos, nunca para una capacidad de negocio) y **tool
+  federada y operable por Efeonce MCP**, lecturas **y escrituras**, con la identidad delegada de la persona
+  (mecánica de TASK-1899: clase `efeonce.mcp.marketing_studio.write`, canje por capability, `dryRun` → confirmación en
+  `T2`). La UI es un cliente más de esos commands.
+- **Cierre:** la task no se cierra hasta que una **sesión MCP real** (token Entra humano) ejecuta cada operación nueva
+  —leer, planificar o editar, y confirmar las `T2`— y la evidencia queda registrada. Manual servido
+  (`docs/mcp/skills/marketing-studio/SKILL.md`) actualizado con las tools nuevas.
+- **Consecuencia de orden:** TASK-1899 va antes; sin su carril de escritura delegada esta task no puede cumplir la regla.
+
 ## Delta 2026-10-04 — UTM derivadas de la activación (RESEARCH-012)
 
 - Por [RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md) (UTM con GA4, 2026-10-04): cada canal del catálogo guarda su `utm_source` y su `utm_medium` derivados (compatibles con el agrupamiento por defecto de GA4; dato versionado con fuente y fecha) y la plataforma de compra para `utm_source_platform`.
@@ -379,6 +391,14 @@ Reglas obligatorias:
   de lectura). Cada límite, formato y objetivo lleva `source_url` (documentación oficial de la plataforma) y `verified_on`;
   lo no verificable queda `NULL`. La semilla la carga `pnpm channels:seed --version 1 --apply` (dry-run por defecto) y
   queda `published` con `published_by` = persona que corrió el comando.
+- **Valores de medición por canal** ([RESEARCH-012](../../research/RESEARCH-012-utm-relevance-ga4-activation-tracking.md) §Origen y ciclo de vida): cada canal de la
+  versión guarda `utm_source` (plataforma de aparición), `utm_medium` (derivado de modalidad × familia), plataforma de
+  compra para `utm_source_platform` (paid), modo de etiquetado `utm | auto | auto_plus_full_utm` (Google Ads = `auto`) y,
+  si no calza en un canal por defecto de GA4, `ga4_custom_group`. Función pura `expectedGa4Channel(source, medium)` que
+  replica el agrupamiento por defecto de GA4 (fuente: documentación de Google, as of 2026-10-04) y test que exige que cada
+  canal caiga en su canal GA4 esperado o declare su grupo propio.
+- Reporte de la semilla: compara el `utm` escrito a mano en los anuncios existentes con lo que generaría el catálogo y lo
+  deja para el backfill revisado (nunca sobrescribe).
 - `validateChannelKey` rechaza claves con sufijo de código de país ISO 3166-1 alfa-2 o de idioma (`_cl`, `_mx`, `_es`,
   `_en`…) y claves fuera de `^[a-z][a-z0-9_]{2,47}$`.
 
@@ -621,6 +641,9 @@ Nombres finales se confirman con `mcp-craft` en el Slice 5; cualquier cambio se 
 ## Acceptance Criteria
 
 - [ ] Toda entrada de `operations.ts` declara `riskTier` y el manifiesto lo exporta por tool.
+- [ ] Cada canal de la semilla tiene `utm_source`, `utm_medium`, modo de etiquetado y (en paid) plataforma de compra; el test `expectedGa4Channel` pasa para todos o el canal declara `ga4_custom_group`; ningún canal cae en Unassigned.
+- [ ] La lectura del catálogo (API y tool MCP) expone los valores de medición por canal y versión.
+- [ ] Cada operación nueva de esta task (lecturas y escrituras del catálogo) se ejecutó en una sesión MCP real con identidad delegada, con evidencia registrada.
 - [ ] El test de paridad falla (visto con un caso inyectado) en cada uno de los cinco casos del Slice 1.
 - [ ] Un `T2` sin digest responde `428 confirmation_required` por API y por MCP.
 - [ ] La versión 1 del catálogo está `published` en staging y production; cada límite, formato y objetivo tiene `source_url` y `verified_on` o vale `NULL`.

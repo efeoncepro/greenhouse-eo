@@ -542,6 +542,14 @@ slug de la campaña, `utm_id` = id de la campaña, `utm_content` = id de la acti
 de compra en paid. Google Ads con auto-tagging (sin UTM o con el set completo, nunca parcial); nunca UTM en enlaces
 internos; lo que GA4 no tiene como canal se resuelve con un custom channel group, no inventando mediums.
 
+**Origen de cada UTM.** Una sola función de dominio (`buildTrackingUrl`) genera la URL de cada activación; el origen,
+el responsable y el ciclo de vida de cada valor (catálogo → campaña → activación; snapshot que se congela con la primera
+evidencia de ejecución; comparación con lo publicado) están especificados en RESEARCH-012 §Origen y ciclo de vida.
+
+**Operación por MCP obligatoria** (operador, 2026-10-04). Refuerza §4.1: ninguna capacidad de taxonomía, activaciones,
+calendario o UTM se da por terminada sin su tool federada y operable por Efeonce MCP, escrituras incluidas, con la
+identidad delegada de la persona (TASK-1899), verificada en una sesión MCP real.
+
 **Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
 plataforma de compra o aparición, sin mercado ni buying method; placements y formatos como datos del canal), registra
 `content source` en la pieza y agrega `buying method` y `deal type` al anuncio (`ad_configuration`) y a la línea de
