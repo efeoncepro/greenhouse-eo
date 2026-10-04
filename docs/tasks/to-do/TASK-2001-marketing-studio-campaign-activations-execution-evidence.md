@@ -43,10 +43,6 @@ Decidido por el operador sobre la dirección visual v3 de TASK-2002 ([canvas «E
 - El reader expone por activación paid: fechas planificadas, fechas configuradas en la herramienta, inicio y fin observados
   y el id de la campaña en la herramienta, para que la UI pinte plan, herramienta y entrega como tres capas.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
-
 ## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
 
 El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es agent-friendly y que todo lo de EPIC-049
@@ -59,6 +55,19 @@ siguen por CLI/UI. La implementa Codex.
 **Sin bloqueo** (revisión de Codex aceptada por el operador, 2026-10-04): esta task **no espera** a TASK-2003. Se
 construye en paralelo (API, CLI y UI) con todas sus tools en el manifiesto; sus escrituras se federan por MCP en cuanto
 TASK-2003 esté vivo.
+
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
 
 ## Delta 2026-10-04 — Full API Parity y operación por MCP obligatorias (decisión del operador)
 
