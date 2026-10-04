@@ -141,6 +141,8 @@ Operación híbrida con agentes (ADR 2026-09-26; ruta corregida tras retirada), 
 - `TASK-2002` — To-do. Calendario de activaciones en la UI: filtros por dimensión, tarjetas con pieza y estado de ejecución, hoja de detalle y bandeja de ejecución sin activación. Bloqueada por TASK-2001 y por la dirección visual v3.
 - `TASK-2003` — To-do (la implementa Codex). Núcleo de escritura por MCP con identidad delegada: scope de escritura en Entra, canje por capability exacta en Greenhouse, Studio registra a la persona vía MCP como autora, gateway federa las escrituras `T1`. Sin aprobaciones (`T2` siguen por CLI/UI; su confirmación queda en TASK-1899, retirada). Corre en paralelo: no bloquea TASK-1905/2001/2002; federa sus escrituras cuando esté vivo.
 - `TASK-2004` — To-do. AXIS: isotipos de plataforma en negativo, logotipo de Metricool en negativo e isotipos de Facebook y Threads en `@efeoncepro/axis-brand-assets`, para el calendario de TASK-2002 en tema oscuro. No bloquea la ruta: el calendario puede arrancar con los isotipos en color.
+- `TASK-2005` — To-do. Contrato de la siguiente iteración del calendario: comentarios, lote, exportar y feed iCal, vista de cliente, feriados y fechas comerciales, identidad de campaña y propuestas de agente. Bloqueada por TASK-2001.
+- `TASK-2006` — To-do. UI de la siguiente iteración (canvas v3.3 aprobado, UI ready yes). Bloqueada por TASK-2002 y TASK-2005.
 
 
 ### Flujo editorial SEO/AEO — decisión 2026-10-04
