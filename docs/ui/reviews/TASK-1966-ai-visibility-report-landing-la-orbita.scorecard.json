@@ -1,0 +1,89 @@
+{
+  "task": "TASK-1966",
+  "surface": "think.brand-visibility.landing",
+  "verdict": "pass-visual; published-production",
+  "reviewedAt": "2026-10-03",
+  "reviewer": "Codex: revisión visual propia; publicación aceptada por el operador 2026-10-03",
+  "evidence": {
+    "dossier": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md",
+    "desktop": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg",
+    "mobile": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-390.jpg",
+    "production": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/production/metrics.json"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Pregunta y respuesta dominantes; CTA separado y formulario inmediatamente después. Un h1, respuesta 4,27× en desktop y 3,09× en móvil.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/metrics.json"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Lockup oficial de 34 px en escritorio y 24 px en 390; eslogan al 64 % del logo. En 360 el lockup baja a 22,52 px para caber.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/metrics.json"
+    },
+    "rhythm": {
+      "score": 4.4,
+      "rationale": "Hero oscuro, formulario, framework claro, muestra y firma: secuencia legible. El framework ocupa cinco tarjetas consecutivas en móvil.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg",
+      "nextAction": "Revisar una lectura más compacta del framework móvil con datos de uso, preservando las cinco capas."
+    },
+    "density": {
+      "score": 4.3,
+      "rationale": "CTA e inicio de formulario visibles en 390×844. Formulario real cargado en producción; narrativa inferior conserva bastante texto.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-390.jpg",
+      "nextAction": "Optimizar densidad sólo con evidencia de uso en una task posterior."
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "La órbita aporta profundidad al hero sin sumar otra figura. Las secciones inferiores quedan planas; tarjeta del formulario conserva su elevación.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "Se retiraron degradés, retícula, barras inventadas y órbita extra del preview. Cada tarjeta inferior contiene una unidad semántica y no cambia el flujo.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "visualImpact": {
+      "score": 4.7,
+      "rationale": "Averígualo y la esfera Engine forman el gesto dominante; la órbita ocupa el lado derecho sin cruzar copy en cinco anchos.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Poppins para lectura y Bricolage para la voz; fuentes locales. El acento Engine no aparece en texto menor de 24 px.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Roles Engine documentados; navy plano, papel claro y texto legible. Se eliminaron gradientes teal/amarillos ajenos a esta aplicación.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/metrics.json"
+    },
+    "iconography": {
+      "score": 4.6,
+      "rationale": "Glifos oficiales Trazo del framework y del preview; grupo de motores conserva sus marcas y sus nombres accesibles.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "Sin scroll horizontal ni imágenes rotas en 1440, 1280, 430, 390 y 360. En móvil se acota la órbita y el lockup conserva proporción.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/metrics.json"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Ampliación pedida por el operador: entrada oficial AXIS de 2 s, una reproducción y cuadro final fijo; CSS sin JS añadido. Entrada/final desktop y móvil observados, reducido inmediato sin animaciones. No se midió frame pacing.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/motion/motion-metrics.json"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Composición pregunta/respuesta de la dirección aprobada; lockup y órbita iguales byte a byte a AXIS brand-assets 0.4.10. No se realizó pixel diff contra canvas.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Hero propio de La órbita con lockup de producto y firma Efeonce. Las tarjetas inferiores heredadas se mantienen por su papel explicativo.",
+      "evidence": "docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/full-1440.jpg"
+    }
+  },
+  "average": 4.529,
+  "notes": "Landing publicada en Think f4426d2 y verificada por CUA en 1440/1280/390; Vercel READY. Formulario real cargado, sin envío ni evaluación del panel de análisis. Verificador CLI no ejecutado; equivalentes de navegación y geometría verificados mediante CUA. No reporte web, correo ni PDF."
+}

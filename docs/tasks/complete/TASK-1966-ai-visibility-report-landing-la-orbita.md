@@ -6,24 +6,31 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
-- UI impact: `layout`
+- UI impact: `motion`
 - UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1966-ai-visibility-report-landing-la-orbita.md`
 - Flow: `none`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseño cerrado sobre el artboard aprobado (2026-09-29) + decisión de nombre del operador (2026-10-02); listo para implementar en local.`
+- Status real: `Landing aprobada, publicada y verificada en producción 2026-10-03: Think f4426d2, Vercel READY. Formulario cargado; sin envío real, fuera de alcance.`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
-- Branch: `efeonce-think main local (push = deploy de producción en Vercel, sólo con aprobación explícita); Greenhouse develop para docs; sin worktrees`
+- Branch: `efeonce-think codex/ai-visibility-landing-release desde origin/main; commit aislado f4426d2 empujado a main con autorización; Greenhouse develop sólo docs locales`
+
+## Refinamiento posterior · 2026-10-04 (local)
+
+El operador autorizó las seis mejoras UX de la landing y la revisión de movimiento continuo.
+La publicación y el cierre del 03/10 corresponden a la versión anterior; no acreditan este delta.
+Implementación y QA del refinamiento: [dossier](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md).
+Think `09e1976` comprometido y empujado a `origin/main` con autorización el 04/10. Pendientes para este delta: verificar despliegue, activar el orden gobernado del formulario y readback live.
 
 ## Summary
 
@@ -94,6 +101,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `efeonce-think:src/pages/brand-visibility/index.astro`
+- `efeonce-think:src/lib/ai-visibility-landing-tokens.ts`
 - `efeonce-think:src/components/EfeonceSlogan.astro`
 - `efeonce-think:src/components/BrandVisibilityFormDock.astro` (sólo estilos de la tarjeta)
 - `efeonce-think:public/branding/products/*` (assets copiados)
@@ -160,7 +168,7 @@ Reglas obligatorias:
 - Long content: la respuesta usa `clamp()` y no corta «Averígualo»; el lead se ajusta en líneas.
 - Mobile / compact: composición mobile-first a 390 px (wireframe).
 - Keyboard / focus: CTA y enlaces con foco visible; orden encabezado → CTA → formulario.
-- Reduced motion: la página no agrega movimiento; el ancla salta sin desplazamiento suave.
+- Reduced motion: la órbita muestra el cuadro final; el ancla salta sin desplazamiento suave.
 
 ### Interaction contract
 
@@ -174,13 +182,13 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
-- Motion primitive: `CSS`
-- Enter / exit: ninguno nuevo; la órbita es estática.
+- Motion primitive: `CSS` oficial de AXIS (snapshot con hash en Think)
+- Enter / exit: entrada de la órbita finita (2 s), cuadro final fijo; salida ninguna.
 - Layout morph: ninguno.
 - Stagger: ninguno.
 - Timing / easing token: transiciones de color de hover del CSS existente.
 - Reduced-motion fallback: `scroll-behavior: auto` con movimiento reducido.
-- Non-goal motion: animar la órbita (la órbita animada sale del paquete AXIS y no entra en esta task).
+- Non-goal motion: escena de lupa GSAP, animación del texto, iconos, parallax y loops. Pedido del 2026-10-03 amplía la landing a motion oficial de la órbita.
 
 ### Implementation mapping
 
@@ -324,35 +332,37 @@ También se puede promover el deployment anterior en Vercel (`efeonce-think`, sc
 
 ## Acceptance Criteria
 
-- [ ] El encabezado muestra el lockup oficial `ai-visibility-report-lockup-negative.svg`, byte a byte igual al de `@efeoncepro/axis-brand-assets` 0.4.10.
-- [ ] Ningún texto visible de la landing dice «Brand Visibility Grader»; `<title>` y JSON-LD usan «Efeonce AI Visibility Report».
-- [ ] La URL sigue siendo `/brand-visibility` y el canonical no cambia.
-- [ ] El hero tiene un solo `h1` con la pregunta y la respuesta; la respuesta mide ≥ 3× la pregunta en 1440 y en 390.
-- [ ] Hay exactamente una órbita en la página y su caja no se intersecta con el texto del hero en 1440, 1280 y 390.
-- [ ] No existen `HeroAnswerLens`, `.snapshot-orbit` ni el eyebrow amarillo.
-- [ ] El pie muestra el logo de Efeonce con «Empower your Engine» debajo, al 64 % del ancho del logo.
-- [ ] El acento Engine no aparece en texto menor a 24 px.
-- [ ] `<greenhouse-form>` sigue presente con el mismo `form-key` y `surface`.
-- [ ] Sin scroll horizontal (`scrollWidth <= clientWidth`) en 1440, 1280 y 390.
-- [ ] `UI ready` es `yes` y `pnpm task:lint --task TASK-1966` pasa sin hallazgos.
-- [ ] Capturas desktop y 390 px miradas y scorecard ≥ 4,2 de promedio.
+- [x] El encabezado muestra el lockup oficial `ai-visibility-report-lockup-negative.svg`, byte a byte igual al de `@efeoncepro/axis-brand-assets` 0.4.10.
+- [x] Ningún texto visible de la landing dice «Brand Visibility Grader»; `<title>` y JSON-LD usan «Efeonce AI Visibility Report».
+- [x] La URL sigue siendo `/brand-visibility` y el canonical no cambia.
+- [x] El hero tiene un solo `h1` con la pregunta y la respuesta; la respuesta mide ≥ 3× la pregunta en 1440 y en 390.
+- [x] Hay exactamente una órbita en la página y la caja de su círculo visible no se intersecta con el texto del hero en 1440, 1280 y 390.
+- [x] No existen `HeroAnswerLens`, `.snapshot-orbit` ni el eyebrow amarillo.
+- [x] El pie muestra el logo de Efeonce con «Empower your Engine» debajo, al 64 % del ancho del logo.
+- [x] El acento Engine no aparece en texto menor a 24 px.
+- [x] `<greenhouse-form>` sigue presente con el mismo `form-key` y `surface`.
+- [x] Sin scroll horizontal (`scrollWidth <= clientWidth`) en 1440, 1280 y 390.
+- [x] `UI ready` es `yes` y `pnpm task:lint --task TASK-1966` pasa sin hallazgos (2026-10-03: 0 errores, 0 warnings).
+- [x] Capturas desktop y 390 px miradas y scorecard ≥ 4,2 de promedio (gate vigente más estricto: promedio 4,53, piso 4,3; revisión propia; operador aceptó y autorizó publicación el 2026-10-03).
+
+Evidencia de los criterios visuales: [dossier local](../../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md), `metrics.json` y hashes. La caja transparente del SVG no se cuenta como el círculo visible.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-1966` (Greenhouse)
 - `efeonce-think`: `pnpm build` y `pnpm check` [verificar el script de tipos en `package.json`]
-- `node scripts/verify-brand-visibility-landing.mjs http://localhost:4321/brand-visibility task-1966`
+- `node scripts/verify-brand-visibility-landing.mjs http://localhost:4331/brand-visibility task-1966 (extendido; no ejecutado en esta corrida, ver equivalente CUA en dossier)`
 - Checklist `references/qa-checklist.md` de la skill `efeonce-graphic-line`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] el deploy de producción de `efeonce-think` se hizo con aprobación del operador, o la task queda `code complete, rollout pendiente`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (1938 y 1332/1338 fuera; formulario gobernado conservado)
+- [x] el deploy de producción de `efeonce-think` se hizo con aprobación del operador, o la task queda `code complete, rollout pendiente`
 
 ## Follow-ups
 
@@ -362,3 +372,33 @@ También se puede promover el deployment anterior en Vercel (`efeonce-think`, sc
 ## Delta 2026-10-02
 
 - Decisión del operador: la landing se llama **Efeonce AI Visibility Report** y lleva ese logo (antes, según el ADR y el artboard, «Efeonce AEO Assessment»).
+
+## Delta 2026-10-03 — Primero la landing
+
+- Alcance confirmado por el operador: landing. Se preservaron cambios locales previos de `index.astro` y `EfeonceSlogan`; este último no fue editado por Codex.
+- Se completó la paleta Engine inferior, lockup en el preview, eliminación de estilos de órbita/barras heredados, ancho del logo móvil y espacio previo al formulario. CTA con destino/foco correctos; scroll inmediato.
+- Build y type-check pasan; capturas y geometría CUA en 1440/1280/430/390/360. Verificador reusable extendido y revisado sintácticamente; no corrido con Chromium en esta sesión.
+- CDP identifica CORS `MissingAllowOriginHeader` en la carga del formulario desde localhost. No se cambió el backend ni CORS, no se hizo submit. Aceptación visual del operador y deploy/readback autorizados siguen pendientes.
+- TASK-1938 (PDF) y TASK-1332/1338 (reporte web) mantienen su alcance; no se tocaron sus runtimes.
+
+## Delta 2026-10-03 — Motion ligero en la landing
+
+- El operador pidió adaptar la animación anterior o evaluar su peso. Preview local: órbita oficial animada por CSS de AXIS, una reproducción de 2 s, sin escena de lupa ni bucles GSAP. Aceptación de esta adaptación reducida pendiente.
+- `EngineHeroOrbit.astro` + `engine-orbit-motion.ts`; 3004 bytes SVG/CSS (938 gzip local), cero JS de motion añadido. No se midieron FPS ni batería del diseño anterior.
+- Entrada/final en 1440/390, reducido final inmediato; geometría 360/430/1280 sin overflow ni cruce. Build y type-check pasan. Contrato y evidencia en el Motion doc declarado.
+
+### Ajuste del pie — 2026-10-03
+
+Por corrección del operador, el eslogan se acerca al logo: se elimina la suma accidental del gap global (8,8 px) y se ajusta la caja de texto. Se mantiene el margen canónico de 1,35 cuerpos y ancho 64 %. Verificado en 1440/390: separación entre cajas 14,37 px; capturas en el dossier `slogan/`. Cambio CSS local, sin publicación.
+
+### Pie con AEO — 2026-10-03
+
+Propuesta aprobada por el operador: reemplazar «Método de análisis» por logo oficial AEO pequeño, pregunta y enlace al servicio (`https://efeoncepro.com/aeo-2/`, destino verificado vivo). Efeonce sigue firmando; AEO ocupa una columna de contexto. Pesos del pie aligerados a 600/400/500 y título legal en caja normal, con foco visible. CUA en 1440/390 sin overflow, SVG oficial cargado; build y tipos pasan. Evidencia `footer-aeo/` del dossier. Local, sin commit/push/deploy.
+
+## Publicación aprobada — 2026-10-03
+
+- Operador: «Ok, empujemos». Se publicó únicamente la landing y 18 archivos de dependencias/verificación; los 13 commits locales de otras corridas no se empujaron. Checkout aislado `/tmp/efeonce-think-landing-release-20261003`, rama `codex/ai-visibility-landing-release`, baseline `be8d484`.
+- Commit/remote main: `f4426d24836fb84ff2a4da695f868ea924a26ec1`. Vercel `dpl_U5u9LKwxMffHxZPBkEukTnUXgWAG`, target `production`, `READY`; status GitHub Vercel success asociado al mismo SHA. No workflow GitHub Actions aplicable ni orchestrator Greenhouse: Think tiene auto-deploy propio.
+- Build y tipos del checkout aislado pasan (110 archivos, 0 errores, 0 warnings, 15 hints). Primera compilación con symlink de dependencias falló; se instaló el lockfile congelado y se validó con dependencias propias. `diff --check` pasa para código; el lockup SVG oficial conserva un espacio final de fábrica para mantener identidad byte a byte.
+- CUA sobre `https://think.efeoncepro.com/brand-visibility`: 1440/1280/390, sin overflow ni cruce órbita/copy, un h1 y una órbita, assets cargados; CTA enfoca encabezado del formulario y conserva hash. Formulario real cargado (primer paso Entrega), mismo form-key/surface; no submit. Pie AEO visible y enlace correcto. Capturas y métricas en el dossier `production/`.
+- Main local del checkout original conserva los 13 commits y el WIP; ahora diverge del remote. Integrar este commit aislado antes de su próximo push; no reset/rebase realizado en la rama compartida. Servidor temporal detenido. Docs Greenhouse locales, sin push.

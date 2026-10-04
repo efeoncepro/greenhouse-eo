@@ -12,7 +12,7 @@
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 
-**Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
+**AI Visibility Report (04/10):** UX/motion Think `09e1976` empujado a main; 84 tests y build PASS. [Evidencia](docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Operador/release: verificar despliegue, activar formulario y readback.
 
 **Inpainting (03/10):** [TASK-1973](docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md) complete local (sin push). Pendiente: Slice 2 en TASK-1925; BFL FLUX Tools cuando el operador cree la cuenta.
 

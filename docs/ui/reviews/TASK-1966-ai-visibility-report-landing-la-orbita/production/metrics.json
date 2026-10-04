@@ -1,0 +1,38 @@
+[
+  {
+    "aeoHref": "https://efeoncepro.com/aeo-2/",
+    "answerQuestionRatio": 4.273504273504273,
+    "broken": [],
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formLoaded": true,
+    "h1Count": 1,
+    "intersections": [],
+    "orbitCount": 1,
+    "overflow": 0,
+    "width": 1440
+  },
+  {
+    "aeoHref": "https://efeoncepro.com/aeo-2/",
+    "answerQuestionRatio": 4.278846153846154,
+    "broken": [],
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formLoaded": true,
+    "h1Count": 1,
+    "intersections": [],
+    "orbitCount": 1,
+    "overflow": 0,
+    "width": 1280
+  },
+  {
+    "aeoHref": "https://efeoncepro.com/aeo-2/",
+    "answerQuestionRatio": 3.090909090909091,
+    "broken": [],
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formLoaded": true,
+    "h1Count": 1,
+    "intersections": [],
+    "orbitCount": 1,
+    "overflow": 0,
+    "width": 390
+  }
+]

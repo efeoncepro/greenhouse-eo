@@ -21,8 +21,8 @@ La [consulta de demanda con la CLI gobernada de DataForSEO](../research/2026-09-
 ## Decision
 
 1. **Efeonce AEO** es el nombre canónico de la **capacidad** de Efeonce para visibilidad y optimización de marca en respuestas y búsqueda con IA. Se escribe con la masterbrand al frente; `AEO` funciona como señal de categoría. No es una product brand independiente ni reemplaza a Efeonce como relación comercial.
-2. **Efeonce AEO Assessment** es el nombre destinado al **diagnóstico público**. `Assessment` describe la experiencia y no crea una segunda marca. Hasta que el copy y el runtime se actualicen y verifiquen, los rótulos hoy publicados deben describirse como estado actual, no como si esta decisión ya estuviera desplegada.
-3. **Efeonce AI Visibility Report** es el nombre destinado al **entregable compartible** del diagnóstico. El informe debe mantener atribución clara a Efeonce y conservar el contrato técnico de reporte vigente.
+2. **Efeonce AI Visibility Report** nombra también la **landing pública del diagnóstico** (`/brand-visibility`), por decisión explícita del operador del 2026-10-02, reafirmada el 2026-10-03. Lleva el lockup del Report. **Efeonce AEO Assessment** conserva su identidad aprobada, pero no es el rótulo de esta landing. El branding se publicó y verificó en producción el 2026-10-03 (TASK-1966, Think `f4426d2`).
+3. **Efeonce AI Visibility Report** nombra el **entregable compartible** y su landing de entrada. El informe debe mantener atribución clara a Efeonce y conservar el contrato técnico de reporte vigente.
 4. **Search Visibility 360** conserva su significado como oferta/capa más amplia de SEO y AEO. Un assessment AEO puede ser su puerta de entrada; no renombra el módulo `growth.seo` ni fusiona mediciones SEO y AEO.
 5. En el glosario interno vigente, **AEO = AI Engine Optimization**. En comunicación externa se puede usar la sigla con una explicación clara de la capacidad —visibilidad de marca en búsqueda y respuestas de IA— sin exigir al prospecto conocer una expansión particular de la sigla. No prometer presencia, citación, tráfico ni brand lift garantizados.
 6. **AI Visibility Grader**, **Brand Visibility Grader** y **AEO Grader** se preservan como aliases históricos o técnicos para búsqueda, trazabilidad, rutas, identificadores, runbooks y evidencia previa. **Surround Discovery Audit** se conserva como propuesta/metodología histórica donde esté documentada; no se usa como requisito de comprensión del diagnóstico público. Un alias no se transforma por esta decisión en una oferta vigente separada.
@@ -64,7 +64,7 @@ Esta es una decisión de **nomenclatura y arquitectura de marca**, no un cambio 
 | **Efeonce \| SV360** (Search Visibility 360) | la capacidad completa de producto SEO + AEO |
 | **Efeonce \| AEO** | la capacidad de visibilidad de marca en respuestas de IA |
 | **Efeonce \| AEO Assessment** | el proceso en el que se evalúa la marca (el diagnóstico) |
-| **Efeonce \| AI Visibility Report** | el entregable |
+| **Efeonce \| AI Visibility Report** | el entregable y, desde la decisión del 2026-10-02, su landing de entrada |
 
 El operador corrigió el nombre del proceso a **Efeonce AEO Assessment** (no «AI Assessment»).
 
@@ -78,6 +78,10 @@ El operador corrigió el nombre del proceso a **Efeonce AEO Assessment** (no «A
 
 **Canon visual del AI Visibility Report (2026-09-29).** Vive en AXIS desde el tag `v0.3.30`: página del Lab `https://axis.efeonce.org/references/ai-visibility-report/` y contrato `efeonce.ai-visibility-report` 0.1.0 (`candidate`, `@efeoncepro/axis-ui-contracts` 0.3.30), con el token `aiVisibilityReport` en `@efeoncepro/axis-tokens` 0.3.30. Greenhouse lo adopta en TASK-1938; hasta entonces fija el juego 0.3.29.
 
+
+## Delta 2026-10-02 — Landing con el nombre del Report
+
+El operador eligió «Efeonce AI Visibility Report» y su lockup para la landing. La ejecución local y la evidencia pertenecen a TASK-1966; la URL, los aliases técnicos y el contrato del formulario se conservan. El alcance confirmado el 2026-10-03 es primero la landing: no certifica cambio en el reporte web, correo ni PDF.
 
 ## Delta 2026-10-03 — En el copy, la marca es Efeonce y el servicio es «Efeonce | AEO»
 
