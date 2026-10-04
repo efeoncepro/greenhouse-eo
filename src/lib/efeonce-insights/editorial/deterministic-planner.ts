@@ -16,6 +16,7 @@ import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
 import { hasFigurePage } from '../render/figure-slots'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
+import { consolidateMethodology } from '../presentation/methodology'
 
 const MODULE_TITLES: Record<InsightModule, string> = {
   seo: GH_INSIGHTS.modules.seo.title,
@@ -974,7 +975,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1962 — plan de acción determinista desde fuentes dueñas (hoy, la cola SEO); sin contrato v2, vacío como antes.
     actions: editorialV2 ? actionsFor(snapshot.facts, input.locale) : [],
     limits: limitsFor(snapshot.rejections),
-    methodology: unique(snapshot.sources.map(source => methodologyFor(source, input.locale))),
+    methodology: consolidateMethodology(unique(snapshot.sources.map(source => methodologyFor(source, input.locale))), input.locale),
     references,
     // TASK-1888 — campos v2: sólo con el contrato encendido; un plan v1 no los trae.
     ...(editorialV2

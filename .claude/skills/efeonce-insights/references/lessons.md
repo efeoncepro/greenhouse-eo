@@ -566,3 +566,11 @@ running»). Regla: parar el servidor de fixtures antes de levantar el de staging
   (`<prefijo>-stat-channel`), que apunta al `<img>` interno.
 - **2026-10-03 — Mirar la hoja aprobada antes de ubicar un elemento nuevo.** Puse la línea de contexto bajo el nombre;
   la hoja la tenía bajo la cifra, en 12 px y en tinta. Exportar el tablero del canvas al repo primero lo habría evitado.
+- **2026-10-04 — Una fuente sellada por ventana repetía el origen y desbordaba «Cómo se midió».** El canary de producción
+  de Berel (SEO + AEO con comparación) congeló 9 líneas de metodología —Search Console y posiciones aparecían dos veces,
+  una por período— y la página A4 admite 8: `report_pdf` quedó `semantic_rejected` (`too_many_items`). Los previews
+  locales no lo mostraban porque no comparaban ventanas. Regla: la metodología se agrupa por origen con todas sus fechas
+  («cortes al 31 de agosto y al 29 de septiembre de 2026», `presentation/methodology.ts`); el planner la aplica al
+  congelar y los mappers al componer (idempotente), así los planes ya congelados también renderizan. Para reproducir un
+  rechazo de producción: cargar edición, snapshot y plan con los stores (la instancia es única) y llamar al mapper +
+  `composeArtifact` en local con los bytes del logo; `failureDetail` del run viene vacío.

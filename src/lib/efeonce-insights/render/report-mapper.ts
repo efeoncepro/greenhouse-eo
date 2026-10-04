@@ -56,6 +56,7 @@ import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf 
 import { withDedupedLimits } from './plan-limits'
 import { channelForDomain } from '../contracts/channels'
 import { metricGlyphOf } from '../presentation/metric-glyphs'
+import { consolidateMethodology } from '../presentation/methodology'
 
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
 /**
@@ -540,7 +541,7 @@ export const buildInsightReportPlanInput = ({
           cause: rejectIfLonger(entry.cause, BUDGET.limitCause, 'limit.cause')
         })),
         methodologyLabel: L.howMeasured,
-        methodology: frozen.methodology.length > 0 ? frozen.methodology : [GH_INSIGHTS.methodology.fallback]
+        methodology: frozen.methodology.length > 0 ? consolidateMethodology(frozen.methodology, frozen.locale) : [GH_INSIGHTS.methodology.fallback]
       }
     }
   }))

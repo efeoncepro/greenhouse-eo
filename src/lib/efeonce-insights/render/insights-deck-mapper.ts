@@ -41,6 +41,7 @@ import { channelNameOf, channelsOf, coverPage } from './cover'
 import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
+import { consolidateMethodology } from '../presentation/methodology'
 
 /** Capacidades declaradas por las plantillas del catálogo (`*.slots.json`). Son del molde. */
 const CAPACITY = { points: 4, limits: 6, chapterContents: 9 } as const
@@ -278,7 +279,7 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
   })
 
   const allLimits = limitEntriesOf(frozen.limits)
-  const methodText = frozen.methodology.length > 0 ? frozen.methodology.join(' ') : GH_INSIGHTS.methodology.fallback
+  const methodText = frozen.methodology.length > 0 ? consolidateMethodology(frozen.methodology, frozen.locale).join(' ') : GH_INSIGHTS.methodology.fallback
   // La franja admite una o dos frases; una metodología más larga vive completa en el informe A4.
   const method = methodText.length <= BUDGET.method ? { label: L.howMeasured, text: methodText } : null
 
