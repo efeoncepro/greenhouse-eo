@@ -1,6 +1,6 @@
 # El AI Visibility / AEO Grader como lead magnet (growth loop real)
 
-> **Naming vigente:** la puerta de entrada pública es **Efeonce AEO Assessment**, dentro de la capacidad **Efeonce AEO**; el output compartible es **Efeonce AI Visibility Report**. El título de este archivo y `AEO Grader` son aliases técnicos/históricos. El siguiente servicio amplio es **Search Visibility 360**. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+> **Naming vigente:** la puerta de entrada pública es **Efeonce AEO Assessment**, dentro del servicio **Efeonce | AEO** (con barra; en copy habla Efeonce, nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); el output compartible es **Efeonce AI Visibility Report**. El título de este archivo y `AEO Grader` son aliases técnicos/históricos. El siguiente servicio amplio es **Search Visibility 360**. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 > El grader es el caso vivo del playbook "lanzar un lead magnet" (`../modules/08` B).
 > Fuente: `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`

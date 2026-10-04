@@ -159,6 +159,12 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 - Voz: es-CL neutro, natural para audiencia LATAM/internacional. Para craft fino de copy →
   `copywriting` + su sistema de voz Efeonce. Para reglas de tono del portal → `greenhouse-ux-writing`
   (pero eso es copy de producto, no social).
+- **Quién habla en el caption (operador, 2026-10-03):** la marca es **Efeonce** («en Efeonce…»); el servicio se
+  escribe **Efeonce | AEO**, con barra: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO y con los Sparks,
+  nuestros agentes». Nunca «Así lo trabajamos en Efeonce AEO» ni «Efeonce AEO» como emisor. Assessment y AI Visibility
+  Report conservan su nombre. Caso: copies IG/LinkedIn del spot «Los Sparks» (CMP001-08), en
+  `ai-generations/2026-10-03_sparks-aeo-60s/final/redes/COPY-REDES.md`; el video conserva «Efeonce AEO» por decisión
+  del operador. Detalle: `copywriting` → `efeonce/EFEONCE_VOICE_SYSTEM.md` §Quién habla.
 - Ilustraciones/personajes propietarios (`characters/greenhouse-*.png`, Nexa) = obra del equipo
   creativo, NO stock. Úsalas con criterio de marca; producción visual nueva → generadores (§tooling).
 

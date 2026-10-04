@@ -151,7 +151,7 @@ texto durante el movimiento.
 
 ### Telón de entrada
 
-Pantalla azul con logo cliente, invitación, botón **Haz click aquí**, firma oficial Efeonce AEO
+Pantalla azul con logo cliente, invitación, botón **Haz click aquí**, firma oficial Efeonce | AEO
 y burbuja URL. Native `dialog`, formulario `method=dialog` como salida sin JS y apertura modal
 cuando hay JS. La bienvenida sólo corresponde al ingreso al primer paso; no a cada navegación,
 Back, cambio de artifact o deep link. `sessionStorage` recuerda la entrada por ruta/caso y sesión;
@@ -171,7 +171,7 @@ finalizar, navegación cancela/limpia listeners. El telón no bloquea impresión
 
 ## 7. Marca, medios y distribución
 
-Logo cliente verificado; lockup **Efeonce AEO** oficial de AXIS, no reconstrucción tipográfica.
+Logo cliente verificado; lockup **Efeonce | AEO** oficial de AXIS, no reconstrucción tipográfica.
 Consultar `efeonce-graphic-line`/`axis-design-system`; burbuja URL sólo acompañada de logo,
 según contrato de firma, nunca marca inventada o asset generado. El disclaimer de demostración
 vive en el cierre/footer de la experiencia. Mantener personalización y legibilidad en móvil.

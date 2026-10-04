@@ -235,6 +235,41 @@ STUDIO_IT_PG_URL="postgres://marketing_studio_staging_app@127.0.0.1:15433/market
 - Rollback: flags off + redeploy; pause jobs; delete the bucket notification; `media:ingest --revert-provider --apply`;
   `migrate down` only with no `gcs` version (the Down aborts otherwise).
 
+## New concept with finals in an OneDrive-governed campaign (TASK-1893 regime; verified 2026-10-03, CMP-001)
+
+For a campaign with `source_of_truth = 'onedrive'` a new concept does **not** enter by `createAssetVersion`: it enters
+by OneDrive + catalog + import + ingest. Case: spot «Los Sparks» (49,6 s, 16:9) → concept CMP001-08 in CMP-001.
+
+1. Copy the finals to OneDrive `Alineación/5. Contenidos/15. Paid Media/03. Finales/<CMP-### - Name>/` with canonical
+   names, e.g. `02 - Videos/16x9/CMP001-08 - Los Sparks - 16x9.mp4`, `01 - Imagenes/{4x5,9x16,16x9}/CMP001-08 - Los
+   Sparks portada - <ratio>.png`.
+2. Add assets (each with sha256, bytes, dimensions) and copies (`campaigns[].copies`) to
+   `01. Recursos/Campaign Manager/CATALOGO-DATOS.json`. Back it up first; keep `indent=2`, `ensure_ascii=False`. The
+   concept title comes from its first asset.
+3. Check that the live campaign states in the DB equal `scripts/seeds/campaign-registry.json` (else the import reverts them).
+4. Import, dry-run then apply:
+   ```bash
+   STUDIO_PG_HOST=127.0.0.1 STUDIO_PG_PORT=<proxy port> STUDIO_PG_DATABASE=marketing_studio \
+   STUDIO_PG_USER=marketing_studio_app STUDIO_PG_SSL=false \
+   STUDIO_PG_PASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-app-password)" \
+     pnpm import:catalog --catalog "<…>/Campaign Manager/CATALOGO-DATOS.json" [--apply]
+   ```
+5. Ingest with ADC impersonating `marketing-studio-ingest@efeonce-group.iam.gserviceaccount.com` (temporary 0600 file in
+   the scratchpad, `GOOGLE_APPLICATION_CREDENTIALS` only for this command, deleted afterwards; never touch the default
+   ADC or IAM):
+   ```bash
+   pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals --campaign CMP-001 --apply
+   ```
+6. The worker generates renditions on `OBJECT_FINALIZE` (3 per image, 6 per video). A transient `media_object_pending`
+   that resolves itself is not an error: check renditions by DB/API before retrying.
+7. Record the rows in the campaign's `ASSETS.md` (`Alineación/2. Campañas/CMP-001_la-ia-dice-de-ti/ASSETS.md`).
+
+Result 2026-10-03: apply concept +1, assets +5, versions +5, copies +2; readback by API CMP-001 = 8 concepts, 33 assets
+(28 images, 5 videos), 50 copies; the 5 versions `gcs`, `review_state` `imported` (approval is a separate human step).
+Copy fixes: edit the text in the catalog and re-run `import:catalog --apply` (upsert by `copy_id`, no duplicates);
+`updated: N` counts every touched row, so verify the field with a read. Stale proxy ⇒ `ECONNRESET`: start a new
+one on another port.
+
 ## Ingest door: uploads and review (TASK-1894 Entregable A, in production since 2026-10-02)
 
 Live flags: `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` `true` staging (`…-staging-00003-2h9`) + prod (`…-00002-hzn`, image

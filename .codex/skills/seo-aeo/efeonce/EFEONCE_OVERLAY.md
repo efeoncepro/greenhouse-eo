@@ -1,6 +1,6 @@
 # Overlay Efeonce / efeoncepro.com
 
-> **Nomenclatura vigente:** capacidad **Efeonce AEO**; diagnóstico público **Efeonce AEO Assessment**; entregable **Efeonce AI Visibility Report**. `AI Visibility Grader` en este archivo nombra el motor/alias histórico. **Search Visibility 360** sigue siendo la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+> **Nomenclatura vigente:** servicio **Efeonce | AEO** (con barra; en copy habla Efeonce, nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); diagnóstico público **Efeonce AEO Assessment**; entregable **Efeonce AI Visibility Report**. `AI Visibility Grader` en este archivo nombra el motor/alias histórico. **Search Visibility 360** sigue siendo la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 >
 > **Submarcas de producto con logo (2026-09-29):** **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son submarcas de producto de Efeonce con logos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29); acompañan a Efeonce y nunca firman solas. Referencia visual: Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). ADR de naming §Delta 2026-09-29; uso visual en la skill `efeonce-graphic-line`.
 

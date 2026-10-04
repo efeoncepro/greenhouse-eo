@@ -1,6 +1,6 @@
 # Overlay Efeonce — el ecosistema de contenidos real
 
-> **Naming AEO para contenido:** **Efeonce AEO** es la capacidad de marca, **Efeonce AEO Assessment** el diagnóstico público y **Efeonce AI Visibility Report** su informe. `AI Visibility Grader`/`AEO Grader` quedan como aliases técnicos e históricos; **Search Visibility 360** conserva el servicio SEO + AEO amplio. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+> **Naming AEO para contenido:** **Efeonce | AEO** es el servicio (con barra; en el contenido habla Efeonce, nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03), **Efeonce AEO Assessment** el diagnóstico público y **Efeonce AI Visibility Report** su informe. `AI Visibility Grader`/`AEO Grader` quedan como aliases técnicos e históricos; **Search Visibility 360** conserva el servicio SEO + AEO amplio. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 El studio es genérico y reutilizable, pero Efeonce tiene un **motor de contenidos concreto**. Este overlay ancla las superficies, el motor y las reglas reales. La **doctrina de marca/voz/ICP/bow-tie NO se decide aquí** — es de `efeonce-agency` + `commercial-expert` + `docs/context/`. Aquí se opera el content engine sobre esa doctrina.
 

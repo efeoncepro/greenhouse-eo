@@ -1,6 +1,6 @@
 # Overlay Efeonce — GTM aterrizado en el negocio real
 
-> **Naming vigente del wedge AEO:** usar **Efeonce AEO** para la capacidad, **Efeonce AEO Assessment** para el diagnóstico público y **Efeonce AI Visibility Report** para el entregable. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos. La expansión puede conducir a **Search Visibility 360**, oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+> **Naming vigente del wedge AEO:** usar **Efeonce | AEO** (con barra) para el servicio —la marca que habla es Efeonce, nunca «Efeonce AEO» (delta 2026-10-03)—, **Efeonce AEO Assessment** para el diagnóstico público y **Efeonce AI Visibility Report** para el entregable. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos. La expansión puede conducir a **Search Visibility 360**, oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 La skill es genérica, pero el GTM de Efeonce tiene una doctrina **vinculante** y un ecosistema concreto. Este overlay los ancla. **La doctrina (ASaaS/bow-tie/ICP/4-productos) manda; GTM orquesta dentro, no la sobrescribe.**
 

@@ -22,7 +22,16 @@ description: >-
 
 ## Nombre comercial vigente
 
-La capacidad se llama **Efeonce AEO**; el diagnóstico público, **Efeonce AEO Assessment**; el entregable, **Efeonce AI Visibility Report**. **Search Visibility 360** conserva el alcance más amplio de SEO + AEO. Usar **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader** sólo como aliases técnicos o históricos al localizar el motor y sus documentos. El diagnóstico debe acumular reconocimiento para la masterbrand Efeonce; no depende de posicionar primero una metodología interna. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+El servicio se llama **Efeonce | AEO** (con barra, como su lockup); el diagnóstico público, **Efeonce AEO Assessment**; el entregable, **Efeonce AI Visibility Report**. **Search Visibility 360** conserva el alcance más amplio de SEO + AEO. Usar **AI Visibility Grader**, **Brand Visibility Grader** o **AEO Grader** sólo como aliases técnicos o históricos al localizar el motor y sus documentos. El diagnóstico debe acumular reconocimiento para la masterbrand Efeonce; no depende de posicionar primero una metodología interna. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+
+> **Delta 2026-10-03 — quién habla en el copy (corrección del operador):** «Mi marca no se llama Efeonce AEO sino
+> Efeonce. Efeonce | AEO es el servicio». En propuestas, posts, correos, landings y guiones habla **Efeonce**
+> («en Efeonce…», primera persona plural institucional) y el servicio se nombra **Efeonce | AEO**, con barra:
+> «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO y con los Sparks, nuestros agentes». Nunca «Así lo
+> trabajamos en Efeonce AEO» ni «Efeonce AEO» como emisor o marca. **Efeonce AEO Assessment** y **Efeonce AI
+> Visibility Report** (y su landing) conservan su nombre. Caso fuente: copies de Instagram y LinkedIn del spot «Los
+> Sparks» (CMP001-08, CMP-001), corregidos en `ai-generations/2026-10-03_sparks-aeo-60s/final/redes/COPY-REDES.md`; el
+> video publicado conserva «Efeonce AEO» en subtítulos y voz por decisión del operador (no se re-renderiza).
 
 Las cuatro son **submarcas de producto de Efeonce** con logos oficiales (aprobadas el 2026-09-29): **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report**, en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29). Acompañan a Efeonce en un lockup y nunca firman solas; referencia visual en el Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). Canon: ADR de naming §Delta 2026-09-29.
 

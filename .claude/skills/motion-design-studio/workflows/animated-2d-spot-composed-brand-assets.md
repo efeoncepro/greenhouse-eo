@@ -5,7 +5,9 @@
 > gitignored; commits `eb08704da` v1 voz/mezcla, `178c73c6c` v2, `81b171fc6` cierre) · historia y decisiones en
 > `PREPRODUCCION.md` §11–12 del run · retrospectiva del caso:
 > [`docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md`](../../../../docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md).
-> Aprobación creativa ≠ licencia de música confirmada [pendiente] ≠ publicación.
+> Aprobación creativa ≠ licencia de música confirmada [pendiente] ≠ publicación. Distribución del caso (2026-10-03):
+> concepto CMP001-08 «Los Sparks» en Marketing Studio y posts programados en Metricool (IG 05-oct, LinkedIn 08-oct,
+> `PENDING`, no publicado); registro en `final/redes/PROGRAMACION.md` del run (ver §9).
 
 El método transversal (orden de preproducción, gates, estados) vive en el
 [método operativo](../../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) y sus
@@ -63,6 +65,10 @@ fidelidad → cuadros clave → piloto). En este tipo de pieza, dos decisiones s
 - **Copy de oferta.** Antes de escribir la VO de una capacidad comercial, carga la skill dueña (en el caso:
   `seo-aeo`, `seo-aeo-practice`) y el canon del personaje (`docs/operations/brand-characters/SPARKS_V1.md`). La v1
   del caso tuvo que reescribirse porque la premisa contradecía la oferta.
+- **Naming del servicio.** Guion, subtítulos y copy nombran el servicio como **«Efeonce | AEO»** (con barra) y la
+  marca que habla es **Efeonce** («En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO…»). Se fija aquí, antes
+  de grabar la voz y quemar subtítulos. Caso fuente: la voz y los subtítulos de «Los Sparks» dicen «Efeonce AEO»; el
+  operador lo corrigió en los copies de redes y decidió no re-renderizar el video.
 
 ### 1. Cuadros clave por toma (inicio y fin)
 
@@ -161,6 +167,22 @@ con eslogan queda sin voz** y la cama corta en seco al entrar el logo.
 - `corte/ensamblar-v2.py`: video mudo + overlays con `enable=between` + master; versiones con y sin subtítulos.
   `overlay` necesita `shortest=1` y `-t` explícito o el video se alarga.
 
+### 9. Distribución: Studio → Metricool
+
+Sólo con autorización de publicación explícita; aprobar la pieza no la da.
+
+1. **Marketing Studio:** registrar el concepto y sus piezas en la campaña. Caso: CMP001-08 «Los Sparks» de CMP-001
+   (always-on AEO, `source_of_truth onedrive`): finales en OneDrive `15. Paid Media/03. Finales/CMP-001 - Lo que la IA
+   dice de ti/`, entradas en `CATALOGO-DATOS.json` → `pnpm import:catalog --apply` →
+   `pnpm media:ingest --campaign CMP-001 --apply`; filas `CMP-001-SP-01…05`; orgánico; versiones `imported` sin
+   aprobar; copies «propuesta». Operación: skill [`efeonce-marketing-studio`](../../efeonce-marketing-studio/SKILL.md).
+2. **Metricool:** un post por red con portada por red (Instagram: video 16:9 con intro muda de «gira la pantalla» y
+   portada **4:5**; LinkedIn: 16:9 con portada 16:9), horario por cruce de mejores horas con la cola y **readback por
+   SHA-256** de la media re-alojada (caso: 4 de 4 idénticos). Receta y schema MCP observado:
+   [`video-delivery-metricool.md`](../../social-media-studio/references/video-delivery-metricool.md).
+3. **Declarar lo humano:** enlace de la bio de Instagram, comprobar la publicación después de la hora (`PENDING` ≠
+   publicado), aprobación de versiones en Studio y licencia de la música antes de pauta.
+
 ## Plantilla de prompt (H3 i2v, estructura del caso)
 
 ```text
@@ -177,6 +199,7 @@ mirrored: <invariante de orientación: anillo, accesorio y lado>.
 
 - [ ] Elenco correcto para el papel; personajes nuevos aprobados antes de los cuadros clave.
 - [ ] VO escrita después de cargar la skill dueña de la oferta y el canon del personaje; sin promesas de resultado.
+- [ ] Guion, subtítulos y copy nombran el servicio «Efeonce | AEO» y hablan como Efeonce, antes de grabar la voz.
 - [ ] Cada cuadro clave: mascota desde SVG, sin espejar, `merge-zonas` = 0 px fuera; aprobado por el operador.
 - [ ] Piloto de la toma de riesgo aprobado antes de producir el resto.
 - [ ] Cada toma revisada contra sus cuadros: sin texto, paleta fija, mascotas de frente, sin salto de eje.
@@ -186,6 +209,8 @@ mirrored: <invariante de orientación: anillo, accesorio y lado>.
 - [ ] Cuadros revisados al **100 %** antes de entregar (el caso entregó placeholders y una pregunta fuera de su
       burbuja que estaban desde la v1).
 - [ ] Declarado lo no verificado: sin escucha propia ni ASR, el texto dicho lo valida la escucha del operador.
+- [ ] Si se distribuye: pieza registrada en Studio; un post por red con su portada; readback por SHA-256; `PENDING`
+      reportado como programado, no publicado.
 
 ## Qué NO hacer / trampas
 

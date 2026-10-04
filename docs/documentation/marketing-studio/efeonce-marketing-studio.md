@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894 Entregable B)
+> **Ultima actualizacion:** 2026-10-03 por Claude (piezas nuevas en campañas gobernadas por OneDrive)
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -130,6 +130,11 @@ nombre de alguien que tenga el permiso de aprobar, y queda registrada con esa pe
 
 Hoy los datos de las cinco campañas reales (CMP-001 a CMP-005) se importan desde el Campaign Manager de OneDrive y
 del registro de campañas. Reimportar no duplica nada: si nada cambió, no se agrega ninguna fila.
+
+Por eso, en esas campañas una pieza nueva (también un video) entra por el mismo camino: el final se guarda en
+OneDrive, se anota en el catálogo, se reimporta y su original se copia al almacén de Studio, que genera solo las
+imágenes livianas. La versión entra importada, no aprobada. Así se sumó el 2026-10-03 el spot «Los Sparks» a CMP-001
+como un concepto nuevo. Corregir un copy en el catálogo y reimportar lo actualiza sin duplicarlo.
 
 ## Quién gobierna cada campaña: Studio u OneDrive
 
