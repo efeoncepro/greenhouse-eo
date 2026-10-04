@@ -1,5 +1,13 @@
 # TASK-1938 — Informe PDF del Grader de visibilidad en IA con «La órbita»
 
+## Delta 2026-10-03 (noche) — el ops-worker no compilaba con el manifest de assets
+
+- Desde `6ebf3d519`, `report-pdf-primitives.tsx` importa `public/branding/pdf/ai-visibility-assets.manifest.json`, que
+  esbuild resuelve en el stage builder del ops-worker; ese stage no copiaba `public/`, y cuatro deploys de `develop`
+  fallaron con «Could not resolve». Corregido en `f31f57d86` (`services/ops-worker/Dockerfile` copia el manifest al
+  builder; el runtime ya copiaba `public/branding`). Si el manifest cambia de ruta, actualizar esa línea. — por trabajo
+  en TASK-1975
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
