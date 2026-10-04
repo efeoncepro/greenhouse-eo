@@ -1,5 +1,22 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Delta 2026-10-04 — botones portables y líneas de negocio
+
+Primer release de `@efeoncepro/axis-ui-primitives@0.1.0` (AXIS `1bccb3f`, tag `v0.3.43`),
+con tokens 0.3.43 y contracts/registry 0.4.0. Release `37221054045` success e instalación privada
+limpia verificados. HTML/CSS funciona sin React (`npm install --omit=peer`); los cinco componentes
+`/react` funcionan con React/React DOM 18.3.1 y los recorridos del Lab con React 19.
+`/button.css` se importa desde el package, y Poppins desde el pipeline del consumidor.
+
+`line` es opcional y sólo altera tono brand; neutral/destructivo conservan función. No actualizar
+pins ni reemplazar MUI/Vuexy sólo por disponibilidad. La instalación con el usuario operador
+no prueba permisos `GITHUB_TOKEN` de otros repositorios para este package nuevo. Los consumidores
+conservan sus pins y fixtures de status/progress; adoptar botones exige evidencia propia y rollback.
+Parche documental actual: primitives 0.1.1 y registry 0.4.1 (`31b146e`, tag v0.4.1);
+API/CSS sin cambios, instalación privada repetida y verificada.
+[Evidencia, versiones y alcance](../audits/2026-10-04-axis-buttons-release.md).
+
+
 ## Corte de distribución — 2026-10-04
 
 Para descubrir y componer: [manual de AXIS](../manual-de-uso/creative/descubrir-y-componer-con-axis.md).

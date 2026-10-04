@@ -1508,3 +1508,13 @@ Assessment, AI Visibility Report e Insights. Recorrido, reglas y pendientes: nor
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de
 opción a canon.
+
+## Botones de marca del Lab AXIS (2026-10-04)
+
+Aplicación: CTA y acciones en superficies de marca; componente portable optativo, no recolor de
+interfaces existentes. `line` identifica el contexto de negocio y `tone` conserva la función.
+Usar para una acción de esa línea; evitar mezclar varios acentos principales en la misma jerarquía.
+Radio/medidas comunes, loader orbital y flecha opcional. Fuente y ejemplos: [lab-components.md](lab-components.md).
+Verificado contra: axis-design-system@1bccb3f — 2026-10-04; adopción de productos separada.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).

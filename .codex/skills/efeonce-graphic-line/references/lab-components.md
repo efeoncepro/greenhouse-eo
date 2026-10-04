@@ -69,3 +69,35 @@ inferir adopción de Greenhouse ni un release npm. La búsqueda se construye des
 no necesita una base de datos de catálogo.
 
 Evidencia final de push/CI/deploy: `docs/audits/2026-10-04-axis-documentation-closure.md` en Greenhouse. Readback público HTTP 200 en Insights, Iconography y Agents confirma `LabHeading`, `--lab-font-display` y Bricolage.
+
+## Botones: loader orbital y flecha con movimiento (2026-10-04)
+
+Corrección explícita del operador en el Lab: el loader de `efeonce.button` usa La órbita;
+el CTA puede desplazar su flecha en hover/foco. `axis-ui-primitives` se publicó por primera vez
+en 0.1.0 (tag v0.3.43); no implica adopción en Greenhouse. El indicador compacto hereda la tinta del botón:
+anillo fijo + estela corta constante + una esfera que recorre; no expresa porcentaje.
+`axisButton.loader` posee geometría óptica/timing y HTML/React comparten el mismo modelo.
+`arrowMotion="nudge"` es opt-in y exige una flecha final de avance o externa; sólo mueve el
+ícono, no el texto o el ancho. Respeta RTL, inactividad y reduced motion; con movimiento reducido
+la órbita queda quieta pero conserva su anatomía y `aria-busy`. El Lab ofrece ejemplo estático,
+ejemplo animado y configurador; el consumidor conecta la acción real.
+
+## Línea de negocio y controles compuestos (2026-10-04)
+
+`line: default | growth | brand | engine | voice | revenue-hubspot | revenue-salesforce`
+es independiente de `tone`. La galería muestra las seis líneas en papel/navy, y el configurador
+combina contexto, función, apariencia y tamaño. Los colores salen de `efeonceGraphicLine.lines`
+y la tinta/hover se verifica a 4.5:1. Neutral y peligro no se recolorean por línea.
+
+El package `/react` suma ButtonGroup, ToggleButton, MenuButton y SplitButton. El Lab los hidrata
+y prueba de verdad: estado seleccionado, formulario nativo, carga/foco, menú por teclado y
+acción principal/alternativas. Catálogo de 26 íconos funcionales Tabler; no son Trazo/Plastilina.
+El release inicial y su instalación privada se verificaron; la adopción del producto es independiente. Guía: AXIS `/docs/buttons/`.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+Versión actual de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
+Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.

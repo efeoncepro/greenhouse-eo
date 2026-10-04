@@ -111,3 +111,34 @@ suite (`apps/lab/src/test/e2e/editorial-typography.spec.ts`) enumerates built ro
 verify the font actually paints glyphs, plus specimen isolation. The 65-route / 132-check baseline from
 2026-10-04 is evidence of that revision, not a substitute for rerunning after a typography change.
 CI, public deployment, private package publication and consumer adoption are four separate readbacks.
+
+## Native buttons (private distribution, 2026-10-04)
+
+The `efeonce.button` 1.0.0 candidate contract now has a portable implementation in
+`@efeoncepro/axis-ui-primitives` (initial private release 0.1.0 verified from GitHub Packages, tag v0.3.43).
+Use `buttonHtml` plus `/button.css`, or `Button` from `/react`; the default entry has no React dependency.
+`axisButton` tokens own the 0.75rem radius, sizes and accessible light/dark palettes.
+Five appearances (`solid`, `outline`, `soft`, `ghost`, `link`), three tones/sizes, leading/trailing/only icons,
+CTA arrows, loading/disabled and full width compose through `resolveButton`. Keep actions as native buttons
+and navigation as anchors; icon-only always carries `label`. The consumer connects events, async progress
+and focus recovery. Do not recreate the Lab CSS or SVGs. Use the AXIS package README
+`packages/primitives/README.md` and `/docs/buttons/`; the Lab `/patterns/efeonce.button/` consumes the package.
+The registry advertises its imports under `adopt-efeonce-button`; it is not a checkout composer CLI.
+Before installing remotely, verify a compatible tokens/contracts/registry/primitives release and repository
+package access. This source change does not update Greenhouse, Globe or Studio pins.
+
+Button loading now uses a compact orbit (fixed ring, moving sphere and short trail), not a CSS spinner.
+`arrowMotion: "nudge"` opts into a trailing-arrow shift on hover/focus; default `none`.
+The resolver requires a direction arrow. RTL, disabled/loading and reduced motion are handled
+in the shared package. Values live in `axisButton.loader`/`arrowMotion`; initial registry installation is verified; consumer adoption is separate.
+
+Optional business-line context: `line` uses default/growth/brand/engine/voice/revenue-hubspot/revenue-salesforce.
+Only brand tone changes; neutral/danger keep meaning. `/react` also exports ButtonGroup, ToggleButton,
+MenuButton and SplitButton. The Lab hydrates real React; browser gates cover forms, state, focus,
+menu keyboard/typeahead/dismissal and split actions. `buttonOptions.icons` lists 26 functional icons.
+Native ARIA, form attributes and focus handlers are forwarded. Publication and opt-in product adoption
+remain separate from local package implementation.
+
+Current verified distribution: primitives 0.1.1, registry 0.4.1, tokens 0.3.43, contracts 0.4.0
+(AXIS 31b146e, v0.4.1). HTML-only npm consumers can use `--omit=peer`; React consumers install
+React/React DOM explicitly. The documentation patch changes no button API/CSS.

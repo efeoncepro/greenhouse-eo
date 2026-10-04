@@ -1,6 +1,6 @@
 # Handoff activo
 
-**AXIS (04/10):** `aee99d2` pushed; CI y Lab verificados. [Docs/skills y pendientes](docs/audits/2026-10-04-axis-documentation-closure.md). Siguiente: release privado de logos/capacidades y adopción por consumidores.
+**AXIS (04/10):** botones por línea, órbita y controles React publicados; [evidencia y adopción pendiente](docs/audits/2026-10-04-axis-buttons-release.md). [Cierre de recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
 
 Staging: ISSUE-178 resuelto.
 

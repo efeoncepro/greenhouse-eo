@@ -370,3 +370,18 @@ No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
 Fuentes ejecutables: `apps/lab/src/test/unit/editorial-typography.test.ts`,
 `apps/lab/src/test/e2e/editorial-typography.spec.ts`, tests de logos/iconografía y
 `apps/lab/scripts/check-agent-capabilities.mjs`. Guía: [lab-components.md](lab-components.md).
+
+## Botones AXIS por línea (2026-10-04)
+
+- Texto normal/hover ≥4.5:1 por línea y superficie; neutral/destructivo invariantes.
+- Radio 12px, target ≥44px, label accesible también en icon-only, foco visible sin recorte.
+- Loading orbital conserva ancho/nombre y bloquea acción; reduced motion detiene órbita/flecha.
+- React hidratado: formulario nativo, refs, toggles controlados/locales, menú con flechas,
+  Home/End, typeahead, Escape/Tab, acción deshabilitada, cierre exterior y foco recuperado.
+- Split: acción principal independiente del menú; portal dentro de viewport de 320px y RTL.
+- Gates `buttons.spec.ts` y `buttons-react.spec.ts` de AXIS, además de build/typecheck/test/lint.
+- Verificar package instalado desde registry antes de afirmar distribución; no inferir adopción.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).

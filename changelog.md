@@ -7,7 +7,9 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-10-04 — AXIS: recursos, agentes y tipografía editorial
+## 2026-10-04 — AXIS: recursos, agentes, tipografía y botones
+
+- Familia portable de botones publicada: seis contextos de negocio separados de tonos funcionales, loader orbital, CTA opcional, 26 íconos y grupos/toggles/menús/split React. Instalación privada y Lab verificados; pins consumidores sin cambios. [Release y evidencia](docs/audits/2026-10-04-axis-buttons-release.md).
 
 - Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
 

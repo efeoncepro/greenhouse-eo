@@ -1375,3 +1375,26 @@ ayudan a encontrar el recurso; los packages poseen valores, archivos y funciones
 Un preview no demuestra que exista un adapter en el consumidor. Una versión workspace no prueba
 publicación: resolver la versión instalable mediante el runbook de consumo privado.
 Tipografía y componentes propios del Lab: [lab-components.md](lab-components.md).
+
+## Botones portables: axis-ui-primitives (2026-10-04)
+
+Versiones del release inicial: tokens 0.3.43, contracts/registry 0.4.0, primitives 0.1.0.
+Release inicial v0.3.43 e instalación desde GitHub Packages verificados (run 37221054045). Contrato `efeonce.button` 1.0.0 candidate.
+`axisButton` posee radio, paletas, líneas, tamaños, loader orbital y movimiento de flecha.
+`resolveButton`, `buttonOptions`, `buttonHtml`, `buttonAttributes`, `buttonPreviewHtml`,
+`buttonCss`, `ButtonValidationError`, `validateButtonMenu`, `validateButtonGroupLabel` están
+en la entrada portable de primitives; CSS en `/button.css`. `/react` exporta Button, ButtonGroup,
+ToggleButton, MenuButton, SplitButton; React y React DOM 18+ son peers opcionales sólo allí.
+
+`line` deriva sus seis claves del canon, sólo afecta tone brand. `arrowMotion: none | nudge`
+exige flecha final. Carga orbital conserva label y ancho. MenuButton admite acciones planas con
+id único, label, icon, disabled y tone; errores `MENU_ITEMS_REQUIRED`, `MENU_ITEM_ID`,
+`GROUP_LABEL_REQUIRED`. Catálogo y API completos en AXIS `packages/primitives/README.md`.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+Versión actual de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
+Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.

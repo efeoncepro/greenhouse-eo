@@ -475,3 +475,19 @@ Las restricciones previas de clientes y badges internos se conservan. Total: 52 
 
 Estado de distribución: `axis-graphic-line` 0.17.0 publicado; nuevas exports de logos en fuente
 `axis-brand-assets` 0.4.18 pendientes de un nuevo release. No actualizar pins de consumidores por inferencia.
+
+## 2026-10-04 — Familia de botones, órbita y contexto de negocio
+
+Operador: loader con La órbita, CTA con flecha animada opcional, completar variantes y
+patrones compuestos, analizar adaptación por línea de negocio. Implementación: contexto
+optativo `line`, separado del tono funcional; seis líneas del canon, neutral/peligro invariantes.
+HTML/CSS portable, React opcional, 26 íconos funcionales y grupos/toggles/menús/split en el Lab.
+Release inicial v0.3.43 success (run 37221054045), instalación privada y Lab público verificados; adopción de productos separada.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+Versión actual de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
+Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.

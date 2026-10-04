@@ -875,3 +875,21 @@ La voz editorial usa Bricolage de `efeonceGraphicLine.type.answer.family` median
 No se corrige página por página ni con un selector global que cambie los ejemplos: el componente posee
 la familia y el layout carga la fuente una vez. Las muestras de producto, métricas y specimens respetan
 sus contratos. El gate comprueba la fuente efectiva, no solo que el CSS declare Bricolage.
+
+### Loader de botones AXIS (operador, 2026-10-04)
+
+En `efeonce.button`, carga = La órbita compacta con anillo fijo y una esfera con estela corta que recorre. Es actividad indeterminada, nunca un dato ni un arco que se llena. Usa tinta del botón para contraste; reduced motion conserva una órbita quieta. La flecha CTA puede avanzar con `arrowMotion="nudge"` en hover/foco, sin mover texto/ancho. Implementación y límites en [lab-components.md](lab-components.md). Esta autorización no despliega cambios en las UI de productos.
+
+### Botones por línea de negocio (2026-10-04)
+
+La petición del operador se resuelve con contexto optativo `line`, separado de la función `tone`.
+Growth, Brand, Engine, Voice y Revenue (HubSpot/Salesforce) cambian sólo el acento de acciones
+de marca. Neutral y peligro mantienen su significado. Conviene en una landing o flujo de esa línea;
+no justifica recolorear todo Greenhouse o asociar un color de marca a éxito/error. Radio, tipografía,
+estados y accesibilidad son compartidos. Si un acento no admite texto AA, usar la otra variante
+canónica de esa línea, nunca un color inventado. Ejemplo: `line="engine" tone="brand"` para
+«Solicitar propuesta»; `tone="danger"` conserva peligro incluso con `line="engine"`.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
