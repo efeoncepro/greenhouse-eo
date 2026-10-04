@@ -113,7 +113,9 @@ Se conserva el `Shell` de v2 (rail de 80 px con Hoy · Campañas · Calendario �
 | `blog.tab.before` · `blog.tab.after` | «Antes de publicar» · «Después de publicar» | pestañas de la hoja de blog |
 | `blog.draftLink` | «Borrador en Content Hub» + isotipo de Notion | enlace externo en la cabecera |
 | `blog.dim.cms` · `blog.dim.site` | «CMS» · «Sitio» | dimensiones de la cabecera |
-| `blog.gate.progress(ok,total)` | «{ok} de {total}» · «controles en verde · faltan {n} para autorizar» | gate |
+| `blog.gate.progress(ok,total)` | «{ok} de {total}» · «controles en verde · {n} avisos» | gate |
+| `blog.gate.warnOnly` | «El gate avisa, no bloquea: se puede autorizar con avisos y quedan registrados en la autorización.» | gate |
+| `blog.ai.panel(cluster)` | «Medido · panel del clúster {nombre}» | motores de IA |
 | `blog.fanout.covered` · `blog.fanout.missing` | «Cubierta» · «Falta H2» | chips del fan-out |
 | `blog.data.estimated` · `blog.data.measured` · `blog.data.none` | «Estimado · tercero» · «Medido» · «no medido» | honestidad del dato |
 | `blog.ai.cited` · `blog.ai.mentioned` · `blog.ai.absent` · `blog.ai.unmeasured` | «Citada» · «Mencionada» · «No aparece» · «Sin medir» | estado por motor de IA |

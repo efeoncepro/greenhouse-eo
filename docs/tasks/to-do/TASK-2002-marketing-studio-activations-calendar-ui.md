@@ -20,8 +20,10 @@ incorporados. Renders: `approved-v32-blogpre*.webp` y `approved-v32-blogpost*.we
 - Studio no publica: registra la autorización y lee la evidencia; el contrato de datos está en el delta «(blog)» de
   TASK-2001. El dossier SEO/AEO y su medición quedan como follow-up de contrato, así que esta UI muestra esas secciones
   vacías («no medido») hasta que exista.
-- Pendientes del operador: fuente principal de volumen (Semrush o SV360), panel de prompts por campaña o por clúster, y
-  si el gate bloquea la autorización o sólo avisa.
+- Decidido por el operador: volumen y dificultad desde el **SV360** («Estimado · SV360 · Chile · [fecha]»); panel de
+  prompts **por clúster temático** («Medido · panel del clúster [nombre]»); el gate **sólo avisa** («N de 18 · M avisos»
+  y «El gate avisa, no bloquea: se puede autorizar con avisos y quedan registrados en la autorización»). Renders
+  actualizados.
 
 ## Delta 2026-10-04 (posterior) — dirección visual aprobada
 
