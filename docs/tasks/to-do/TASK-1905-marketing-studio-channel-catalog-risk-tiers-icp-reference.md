@@ -6,6 +6,20 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — taxonomía de canales decidida por el operador
+
+- El ADR de estrategia §15 fija la semilla del catálogo: cuatro dimensiones independientes (**modalidad** `paid` ·
+  `organic` · `owned` · `earned`; **familia** Social · Search · Display · Video · Email · Messaging · Web & Content ·
+  Community · Creators & Influencers · PR & Media · Audio · OOH/DOOH; **plataforma** de compra y de aparición;
+  **placement**), más **cuenta / voz** y **mercado** como atributos de la activación, no del canal.
+- Decisiones que cambian la semilla de §4.2: AEO dentro de Search (placement «respuestas IA»); **ChatGPT Ads = paid
+  search**; perfil personal de LinkedIn = cuenta de LinkedIn orgánico (no un canal aparte); Display no es variante de
+  social (Audience Network es un placement de Meta); **UGC es content source de la pieza**, no canal.
+- Nombres en el spanglish del equipo (Paid, Organic, Owned, Earned, Social, Search, Display, Feed, Reels, SERP…).
+- La entidad *activación* (campaña obligatoria, campañas **Always On**, punto vs franja en el calendario,
+  descubrimiento de lo agendado en Metricool y vínculo con la versión de la pieza) no es de esta task: nace en una task
+  nueva de EPIC-049.
+
 ## Delta 2026-10-02
 
 - **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`, manifiesto de 44 tools); Entregable C

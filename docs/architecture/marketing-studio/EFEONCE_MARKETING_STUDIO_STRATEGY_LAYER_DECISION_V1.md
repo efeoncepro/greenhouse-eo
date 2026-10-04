@@ -438,3 +438,70 @@ para evitar ciclos artificiales. No se crea una task nueva para el CMS: TASK-166
 
 [Snapshots íntegros anteriores y manifiesto](../../audits/seo/editorial-history/2026-10-04/README.md)
 preservan las tres specs sustituidas byte-for-byte; son historia no ejecutable, no arquitectura vigente.
+
+## 15. Precisión aceptada 2026-10-04 — taxonomía de canales y activaciones
+
+Decisión del operador (Julio Reyes, 2026-10-04), redactada por Claude. Precisa §4.2 (catálogo de canales); no cambia
+ninguna otra decisión. Los nombres van en el spanglish que usa el equipo de marketing: los términos de industria se
+dejan en inglés.
+
+**La campaña es el objeto canónico.** Todo lo que se publica, se pauta, se envía o se mide en un canal es una
+**activación** de una campaña: un post orgánico, un anuncio dentro de un flight, un envío de email, un artículo del
+blog, una colaboración con un creator. **No existe activación sin campaña.** El contenido permanente se modela como
+campaña **Always On** (p. ej. «Marca Efeonce · Always On · Q4 2026»), con la misma estructura que cualquier otra.
+
+**Cuatro dimensiones independientes** (antes mezcladas en el texto libre `channel`):
+
+| Dimensión | Pregunta | Valores semilla |
+|---|---|---|
+| **Modalidad** | ¿Cómo se gana la atención? | `paid` · `organic` (perfiles propios en plataformas de terceros) · `owned` (lo que se controla completo) · `earned` (lo que otros dicen o hacen por la marca) |
+| **Familia** | ¿Qué tipo de medio? | Social · Search · Display · Video (incl. CTV/OTT) · Email · Messaging · Web & Content · Community · Creators & Influencers · PR & Media · Audio · OOH/DOOH |
+| **Plataforma** | ¿Dónde aparece? | Google · Bing · Instagram · Facebook · Threads · LinkedIn · TikTok · YouTube · X · Reddit · WhatsApp · ChatGPT · Gemini · Perplexity · Spotify · sitio web · HubSpot (email)… |
+| **Placement** | ¿En qué lugar exacto? | Feed · Stories · Reels · SERP · AI Overviews / AI Mode · respuestas IA · Shopping · Discover · Performance Max · Audience Network · inbox… |
+
+Más dos atributos de la activación que **no** son canal: **cuenta / voz** (página de Efeonce, perfil personal de Julio,
+cuenta publicitaria de Meta, handle del creator) y **mercado** (país e idioma; §4.2 ya prohíbe codificarlo en el canal).
+
+**Plataforma de compra ≠ plataforma de aparición.** En paid, la compra se hace en una plataforma (Meta Ads, Google Ads,
+Microsoft Ads, LinkedIn Ads, TikTok Ads, ChatGPT Ads) y aparece en una o varias: una campaña de Meta Ads sale en
+Instagram, Facebook y Threads. El catálogo modela ambas.
+
+**Combinaciones de referencia:**
+
+| Modalidad | Familia | Plataformas | Nota |
+|---|---|---|---|
+| paid | Social | Meta Ads (Instagram, Facebook, Threads), LinkedIn Ads, TikTok Ads, Reddit Ads | Audience Network es un *placement* de Meta, no Display |
+| paid | Search | Google Ads, Microsoft Ads (Bing), **ChatGPT Ads** | Los anuncios en respuestas de IA son paid search (decisión del operador); disponibilidad por mercado y formato se verifican con fuente y fecha al sembrar |
+| paid | Display | Google Display Network, programática | Display **no** es una variante de social |
+| paid | Video | YouTube (Google Ads), CTV/OTT | — |
+| paid | Creators & Influencers | Partnership Ads / Spark Ads / whitelisting | Anuncio pagado con la identidad del creator: cuenta = handle del creator |
+| organic | Social | Instagram, Facebook, Threads, LinkedIn, TikTok, YouTube, X | Lo que hoy se agenda en Metricool; el perfil personal de LinkedIn es una **cuenta** de LinkedIn orgánico, no otro canal |
+| organic | Search | Google y Bing (SEO); ChatGPT, Gemini, Perplexity, AI Overviews (AEO) | AEO vive dentro de Search, placement «respuestas IA» |
+| organic | Community | Comunidades de terceros (Reddit, grupos de LinkedIn, foros) | La marca participa con su cuenta |
+| owned | Web & Content | Blog, landings, `think.efeoncepro.com` | — |
+| owned | Email | HubSpot | — |
+| owned | Community | Comunidades propias (WhatsApp Community, Slack, Discord, Circle) | — |
+| owned | Messaging | WhatsApp Business | — |
+| earned | PR & Media | Medios, podcasts, menciones | Se mide, no se programa |
+| earned | Search | Citas y menciones en respuestas de IA | La evidencia viene de Search Visibility 360 por lane, nunca por SQL |
+| earned | Creators & Influencers | Seeding / gifting sin pago, menciones espontáneas | — |
+
+**Comunidades, influencers y UGC:**
+
+- **Community** es una familia: `owned` cuando la comunidad es nuestra; `organic` cuando la marca participa en una
+  ajena; lo que la comunidad dice sola es `earned`.
+- **Creators & Influencers** es una familia cuya modalidad depende del trato: colaboración pagada en el perfil del
+  creator o Partnership Ads = `paid`; seeding o gifting sin pago y menciones espontáneas = `earned`.
+- **UGC no es un canal: es el origen de la pieza.** Una pieza UGC puede salir como paid (anuncio con contenido de
+  cliente o de creator) o como organic (repost). Se registra en la pieza como **content source** (`brand` · `creator` ·
+  `ugc` · `ai_generated`), junto a sus derechos de uso (`rights.licenseKind`), nunca dentro de `channel_key`.
+
+**Calendario.** Cada activación lleva campaña, modalidad, familia, plataforma, placement, cuenta, mercado, pieza(s) en
+su versión exacta y copy. Una activación orgánica es un **punto** (fecha y hora); una pagada es una **franja** (el
+flight). El calendario se filtra por las cuatro dimensiones. Una publicación agendada en una herramienta externa
+(Metricool) que no tenga campaña se muestra en «Hoy» como **pendiente de asignar**, nunca invisible.
+
+**Implementación.** TASK-1905 siembra el catálogo con estas dimensiones (`channel_key` = modalidad × familia ×
+plataforma de compra o aparición, sin mercado; placements y formatos como datos del canal) y registra `content source`
+en la pieza. La entidad *activación*, el descubrimiento de lo agendado en Metricool y el vínculo activación ↔ versión
+de pieza quedan para una task nueva de EPIC-049 (por crear). Nada de esto está en runtime todavía.
