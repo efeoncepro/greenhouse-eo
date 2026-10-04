@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-10-03",
+  "sellado": "2026-10-04",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -336,31 +336,31 @@
     },
     "ai-generations/_identidad-elenco/hum/hum-frente.png": {
       "rol": "elenco:hum",
-      "sha256": "7ee0892973ea5d95005a731fbb972d449266c793a941701c0aaea10f04967213"
+      "sha256": "4eac0c491fb6a4e459f9eeee68cc6e9ae80984f71458c0a036282a60494a3af4"
     },
     "ai-generations/_identidad-elenco/hum/hum-elegida.png": {
       "rol": "elenco:hum",
-      "sha256": "b87203efdb0388aa077af4231bbfb2da9fc41c72dae577c64e8c3cb85cbfa6d1"
+      "sha256": "4637a575d912c5a49a32702d6c704117f35482dd57a021bd9c0d7fcc672d0fac"
     },
     "ai-generations/_identidad-elenco/hum/hum-cuerpo.png": {
       "rol": "elenco:hum/cuerpo",
-      "sha256": "a7e9b8b1471b1d0f735219e6f59b125caf1f8375374d34854015316958fb8377"
+      "sha256": "5f0068633e1d1a52f9d2542cd7478c5cb3e10af277df7bf59d1b4e665d77dc3c"
     },
     "ai-generations/_identidad-elenco/hum/hum-45-izq.png": {
       "rol": "elenco:hum/45-izq",
-      "sha256": "464a0947e232191306813e143e468e9be3546e29e3135b52befaa3b0e0fc6adc"
+      "sha256": "dc73b686ab912e06654096e6c8903d51ab9a10efac3087e330d53d7c9ae6a8f5"
     },
     "ai-generations/_identidad-elenco/hum/hum-45-der.png": {
       "rol": "elenco:hum/45-der",
-      "sha256": "3b5dee69bb61d27fc1081337a1bbd8f0d8384af72f555417321744dc76e5ef52"
+      "sha256": "0e97d5c61aa52857aeb9f60d85c93f55b43faf937fa0979038c9b44764b7dea7"
     },
     "ai-generations/_identidad-elenco/hum/hum-perfil-izq.png": {
       "rol": "elenco:hum/perfil-izq",
-      "sha256": "45105067edb1964231a8e9b27551b261e15b170d7f6aa9288f2fcf4690c1cb37"
+      "sha256": "f700b19969082396a13037ef4c7ab7460197e0e910ef7d3c76a0f6b70244085e"
     },
     "ai-generations/_identidad-elenco/hum/hum-perfil-der.png": {
       "rol": "elenco:hum/perfil-der",
-      "sha256": "f445da8f3cfeef861f2a890d819016ab9ef6ccfc6f60eadd069309758b054649"
+      "sha256": "5f7bd9fa49f4d2be79673745dc636fe2bfd0ec8cd43ba0d1c9849bf10b8a8874"
     },
     "ai-generations/_identidad-elenco/karo/karo-frente.png": {
       "rol": "elenco:karo",

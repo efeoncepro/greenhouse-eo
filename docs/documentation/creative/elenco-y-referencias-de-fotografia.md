@@ -28,7 +28,7 @@ servicio de Efeonce y la representa cuando hace falta mostrar a alguien trabajan
 
 | Personaje | Quién es | Línea | Rol que interpreta | Cómo es |
 |---|---|---|---|---|
-| **Hum** | 33 años, venezolana | Growth (crecimiento y medición) | Estratega de crecimiento y medición | Pelo negro largo con ondas y un piercing plateado en la nariz. Su carácter todavía no está definido en la ficha |
+| **Hum** | 33 años, venezolana | Growth (crecimiento y medición) | Estratega de crecimiento y medición | Bob liso casi negro a los hombros, con raya al centro, y un piercing plateado en la nariz. Serena y analítica, escucha antes de proponer (las dos cosas aprobadas el 2026-10-04) |
 | **Karolyne «Karo»** | 28 años, venezolana | Brand (servicios creativos) | Directora de arte y creadora de contenido | Rizos cobrizos largos, aros dorados y labial rosado. Coqueta en el gesto (sonrisa ladeada, mirada pícara), social; presenta y convence |
 | **Sophia** | 31 años, venezolana, hermana mayor de Karo | Engine (web, SEO/AEO y analítica) | Estratega SEO/AEO y analítica web | Bob rizado castaño oscuro y lentes de montura dorada fina. Seria, analítica, sonrisa contenida |
 | **Isabella** | 27 años, colombiana (Barranquilla) | Voice (medios y distribución) | Especialista de medios pagados y distribución | Rizos apretados y pecas suaves. Energía alta, gesticula al explicar, ríe fácil |

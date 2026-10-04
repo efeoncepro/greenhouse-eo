@@ -110,7 +110,7 @@ en el roster del equipo real** y no cambia nada de su identidad.
 | Rostro | Óvalo redondeado, mejillas suaves, mentón redondeado |
 | Ojos y cejas | Ligeramente almendrados, café oscuro; cejas oscuras de arco suave |
 | Piel | Blanca con subtono cálido y rubor natural |
-| Pelo | Castaño muy oscuro, casi negro (el catálogo dice *very dark brown*), largo hasta el pecho, raya al lado, capas que enmarcan la cara y ondas sueltas |
+| Pelo | Castaño muy oscuro, casi negro, **liso, en un bob largo que termina justo sobre los hombros**, puntas rectas apenas hacia adentro, raya al centro, sin ondas ni capas **[decisión del operador, 2026-10-04]** (antes: largo hasta el pecho con ondas y raya al lado, ver §5) |
 | Cuerpo | 1,70 m, complexión media con curvas moderadas: ni voluptuosa ni plana |
 | Carácter | Serena y analítica, escucha antes de proponer **[decisión del operador, 2026-10-04]**: «voy con tu recomendación» |
 | Firma propia | *Piercing* pequeño plateado en la nariz |
@@ -192,14 +192,15 @@ vestuario en palabras: si calla, lo decide la referencia.
 
 El modelo fusiona a personas parecidas. A primera vista los separa: Karo, rizos 3A–3B cobrizos largos, aros dorados
 medianos y labial rosado · Sophia, bob rizado castaño oscuro a la mandíbula y lentes de montura metálica dorada fina ·
-Hum, pelo largo casi negro con ondas y *piercing* plateado en la nariz · Isabella, rizos 3C–4A y pecas suaves en nariz y
+Hum, bob liso casi negro a los hombros con raya al centro y *piercing* plateado en la nariz · Isabella, rizos 3C–4A y pecas suaves en nariz y
 pómulos · Antonio, pelo negro liso peinado atrás, barba de 3–5 mm y sin lentes. Cada pareja de riesgo tiene separadores
 que se declaran en el bloque y se revisan en la hoja de contacto:
 
 | Pareja | Riesgo | Separadores |
 |---|---|---|
 | Karo ↔ Sophia | Hermanas: el modelo las vuelve una | Largo del pelo, lentes, gesto (pícara vs contenida) |
-| Hum ↔ Nexa | Treintañeras de pelo oscuro | *Piercing* en la nariz de Hum; delineado alado y anillo de plata de Nexa. **[propuesta]** La forma de la cara ya no separa: desde el 2026-10-03 el bloque de Nexa también la describe como óvalo suave, así que el separador lo cargan los accesorios y el pelo |
+| Hum ↔ Nexa | Treintañeras de pelo oscuro y cara de óvalo suave | **El pelo [decisión del operador, 2026-10-04]**: Hum, bob liso a los hombros con raya al centro; Nexa, melena larga ondulada bajo los hombros. Se lee a distancia de grupo, donde los accesorios no se ven. Además: piel clara de subtono cálido (Hum) vs oliva (Nexa), *piercing* de Hum, delineado alado de Nexa. La forma de la cara no separa (las dos son óvalo suave) |
+| Hum ↔ Sophia | Las dos con bob | Textura y largo: Hum liso a los hombros con raya al centro; Sophia rizada a la mandíbula, con lentes dorados |
 | Hum ↔ Humberly | Personaje inspirado en una persona real | Hum nunca se presenta como Humberly ni con su cargo; en piezas con el equipo real, Humberly sale con su identidad del roster |
 | Antonio ↔ Julio | Latinos con barba, 35 y 37 | Lentes, canas, barba larga y pelo rizado de Julio; Antonio sin lentes, pelo liso negro, barba corta |
 | Isabella ↔ Karo | Rizos | Textura (4A vs 3A), color de pelo y piel |
