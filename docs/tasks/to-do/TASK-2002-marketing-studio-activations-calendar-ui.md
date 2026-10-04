@@ -1,5 +1,28 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-04 (blog) — hoja de blog con SEO y AEO
+
+El operador revisó en el canvas (página `v3.2 · Planificar y operar`) las hojas «Blog · antes de publicar» y «Blog ·
+después de publicar», pidió ajustes por comentario (CMS del cliente, enlace al borrador y legibilidad) y quedaron
+incorporados. Renders: `approved-v32-blogpre*.webp` y `approved-v32-blogpost*.webp`. Decisiones:
+
+- La hoja de blog tiene dos pestañas de trabajo: **Antes de publicar** (gate de publicación arriba con «N de 18» y lo que
+  falta; búsqueda e intención; metadata y snippet; fan-out y citabilidad; E-E-A-T y schema; enlaces y CTA) y **Después
+  de publicar** (publicación e indexación; Search Console de 28 días; visibilidad en motores de IA; tráfico y
+  conversión; frescura).
+- La cabecera muestra **CMS** (el del cliente: WordPress, Drupal, Webflow, Modyo, HubSpot CMS u otro) separado de
+  **Sitio**, y el enlace **«Borrador en Content Hub»** con el isotipo de Notion, porque los borradores se escriben ahí.
+- Lectura antes que texto: indicadores en tarjetas con número grande, chips de estado (verde/ámbar con ícono, nunca sólo
+  color), tablas enmarcadas con números alineados a la derecha y explicaciones de método plegadas («Cómo se obtiene»,
+  «Cómo se mide»).
+- Cada dato lleva su honestidad: «Estimado · tercero» con fuente y fecha, «Medido» para Search Console, el AI Visibility
+  Grader y GA4, y «no medido» si no hay dato. «Sin medir» es distinto de «No aparece».
+- Studio no publica: registra la autorización y lee la evidencia; el contrato de datos está en el delta «(blog)» de
+  TASK-2001. El dossier SEO/AEO y su medición quedan como follow-up de contrato, así que esta UI muestra esas secciones
+  vacías («no medido») hasta que exista.
+- Pendientes del operador: fuente principal de volumen (Semrush o SV360), panel de prompts por campaña o por clúster, y
+  si el gate bloquea la autorización o sólo avisa.
+
 ## Delta 2026-10-04 (posterior) — dirección visual aprobada
 
 El operador aprobó el 2026-10-04 todas las páginas del canvas — `v3 · Calendario de activaciones`, `v3.1 · Línea de

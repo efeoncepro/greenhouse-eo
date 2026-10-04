@@ -56,7 +56,9 @@ horas con sus tarjetas y aviso si dos salen a la misma hora.
 «Mostrar todas» o cambiar la escala.
 
 **H. Revisar un email, un blogpost o una landing.** Tarjeta owned → hoja con vista previa (email en claro con bandeja,
-escritorio y móvil; blog y landing en navegador) y su evidencia (HubSpot; web según TASK-2001).
+escritorio y móvil; blog y landing en navegador) y su evidencia (HubSpot; web según TASK-2001). En blog, la hoja abre en «Antes de publicar»
+(gate, dossier SEO/AEO) y pasa a «Después de publicar» al observarse la publicación; «Borrador en Content Hub» abre
+Notion en otra pestaña y la hoja queda abierta.
 
 ## Superficies superpuestas
 

@@ -29,6 +29,8 @@
 | `approved-v3-day.webp` · `approved-v3-popover.webp` | `V3-Day` · `V3-Popover` | vista Día y detalle del día |
 | `approved-v3-states32.webp` · `approved-v3-a11y.webp` | `V3-States32` · `V3-A11y` | carga, primer uso, pieza no lista, mercado y hora local; contrato de teclado y lector |
 | `approved-v3-sheetemail.webp` | `V3-SheetEmail` | hoja de una activación de email |
+| `approved-v32-blogpre.webp` · `approved-v32-blogpre-dark.webp` | `V3-BlogPre` (1440×3020) | hoja de blog «Antes de publicar»: gate, búsqueda, metadata, fan-out, E-E-A-T, enlaces; CMS, Sitio y «Borrador en Content Hub» |
+| `approved-v32-blogpost.webp` · `approved-v32-blogpost-dark.webp` | `V3-BlogPost` (1440×1840) | hoja de blog «Después de publicar»: publicación e indexación, Search Console, motores de IA, tráfico, frescura |
 | `approved-v3-mob*.webp` | `V3-MobWeek`, `V3-MobFilters`, `V3-MobSheet`, `V3-MobPaid`, `V3-MobSheetEmail` | móvil 390×844 |
 
 ## Brief
@@ -108,6 +110,14 @@ Se conserva el `Shell` de v2 (rail de 80 px con Hoy · Campañas · Calendario �
 | `execution.ended(range)` | «Finalizada · {rango}» | chip paid |
 | `execution.overdue` | «Vencida» | chip; «Sin entrega observada» en paid |
 | `execution.cancelled` | «Cancelada» | chip |
+| `blog.tab.before` · `blog.tab.after` | «Antes de publicar» · «Después de publicar» | pestañas de la hoja de blog |
+| `blog.draftLink` | «Borrador en Content Hub» + isotipo de Notion | enlace externo en la cabecera |
+| `blog.dim.cms` · `blog.dim.site` | «CMS» · «Sitio» | dimensiones de la cabecera |
+| `blog.gate.progress(ok,total)` | «{ok} de {total}» · «controles en verde · faltan {n} para autorizar» | gate |
+| `blog.fanout.covered` · `blog.fanout.missing` | «Cubierta» · «Falta H2» | chips del fan-out |
+| `blog.data.estimated` · `blog.data.measured` · `blog.data.none` | «Estimado · tercero» · «Medido» · «no medido» | honestidad del dato |
+| `blog.ai.cited` · `blog.ai.mentioned` · `blog.ai.absent` · `blog.ai.unmeasured` | «Citada» · «Mencionada» · «No aparece» · «Sin medir» | estado por motor de IA |
+| `blog.cms.noReader` | «Si no tiene lector conectado, la evidencia sale de la URL pública y una persona confirma la fecha.» | «Cómo se obtiene» |
 | `activations.unlinkedTitle` | «Ejecución sin activación» | lateral |
 | `activations.unlinkedHint` | «Programado en una herramienta sin plan en Studio. Vincúlalo a una activación o crea una.» | lateral |
 | `activations.plan` | «Planificar activación» | CTA y título del formulario |
@@ -188,6 +198,7 @@ Studio es una app aparte: la evidencia se produce con Playwright (Chrome) contra
 - Alternatives considered: (a) espejo de Metricool — descartado (el calendario es de Studio); (b) Gantt por plataforma en la semana — reemplazado por la línea de tiempo de v3.1 (ejes fijos, escala, grupos plegables); (c) canvas libre con pan/zoom — descartado (pierde el eje de tiempo, cuesta con teclado y no se enlaza a una fecha); (d) baldosa blanca para los isotipos en oscuro — reemplazada por negativos; (e) tres tarjetas por día en el mes — se muestran dos y «+N» desde la tercera.
 - Why this pattern: plan y ejecución se leen juntos sin abrir las herramientas; la densidad se controla con filtros, «+N», vista Día y línea de tiempo.
 - Reuse / extend / new primitive: extiende grilla, tarjetas, lateral y `Shell`; reusa `Sheet`/`ConfirmDialog`; `PiecePreview` y `PlatformTimeline` nacen como componentes de Studio.
+- Blog (2026-10-04): hoja con pestañas «Antes / Después de publicar», tarjetas de indicador en vez de pares etiqueta-texto, chips de estado y método plegado; CMS del cliente y borrador en Notion en la cabecera. Alternativa descartada: lista de etiqueta y texto (densa, difícil de escanear).
 - Open risks: depende de TASK-2001 (reader con `delivering`/`ended`, avisos, eventos y mercado) y TASK-1905 (catálogo); la evidencia de la web necesita el lector de WordPress decidido en TASK-2001; isotipos en negativo hasta TASK-2004.
 
 ## Acceptance Checklist
