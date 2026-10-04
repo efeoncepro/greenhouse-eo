@@ -283,3 +283,10 @@ only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:
   not pushed; branch `task-1894-entregable-b` preview; API 1.4.0, 44 tools; migration `1790967435017` on both DBs;
   sandbox `CMP-900`). Greenhouse `9d0d698d4` (two write capabilities, `develop` only). Gateway change prepared, not
   synced. Entregable C deferred.
+- 2026-10-03 — Data operation (outside a task): spot «Los Sparks» (49,6 s, 16:9) loaded to CMP-001 «Lo que la IA dice de
+  ti» as concept CMP001-08 by the TASK-1893 regime (CMP-001 is `onedrive`): OneDrive finals → `CATALOGO-DATOS.json` →
+  `import:catalog --apply` (concept +1, assets +5, versions +5, copies +2) → `media:ingest --campaign CMP-001 --apply`
+  → worker renditions → `ASSETS.md`. CMP-001 now 8 concepts, 33 assets (28 images, 5 videos), 50 copies; the 5 versions
+  `gcs`, `imported` (approval pending, human). Organic piece (paid not authorized until the music license); organic
+  destination `https://think.efeoncepro.com/brand-visibility`; copies «propuesta». Recipe: `operations.md` §New concept
+  with finals in an OneDrive-governed campaign.

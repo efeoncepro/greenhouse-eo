@@ -33,23 +33,30 @@ const collect = (value: unknown, found: Set<string>): void => {
 }
 
 /**
- * Canales que miden los gráficos dados, en el orden canónico del registro de canales. `google_ai_overview`
- * comparte isotipo con Google: en una fila de logos se muestra una vez.
+ * Canales que miden los gráficos y los tableros de cifras dados, en el orden canónico del registro de canales. AI Overview
+ * tiene isotipo propio desde el 2026-10-03 (la lupa): ya no se colapsa en Google. Con `factsById`, las cifras de los
+ * tableros aportan el `channelId` de su hecho (operador, 2026-10-04: un capítulo de motores muestra todos sus motores).
  */
-export const channelsOf = (chapters: readonly PlanChapterV1[]): InsightChannelId[] => {
+export const channelsOf = (chapters: readonly PlanChapterV1[], factsById?: ReadonlyMap<string, { channelId?: string }>): InsightChannelId[] => {
   const found = new Set<string>()
 
-  for (const chapter of chapters) collect(chapter.charts, found)
+  for (const chapter of chapters) {
+    collect(chapter.charts, found)
 
-  if (found.has('google_ai_overview')) {
-    found.delete('google_ai_overview')
-    found.add('google')
+    for (const stat of chapter.stats ?? []) {
+      for (const item of stat.items) {
+        const channelId = factsById?.get(item.factId)?.channelId
+
+        if (channelId) found.add(channelId)
+      }
+    }
   }
 
   return INSIGHT_CHANNEL_IDS.filter(id => found.has(id))
 }
 
-export const channelNameOf = (id: InsightChannelId): string => GH_INSIGHTS.channels[id] ?? id
+/** El nombre de AXIS («AI Overview»), el mismo que llevan las tarjetas con isotipo; si no, el del vocabulario. */
+export const channelNameOf = (id: InsightChannelId): string => GH_INSIGHTS.stat.channelNames[id] ?? GH_INSIGHTS.channels[id] ?? id
 
 export interface CoverCommon {
   editionLabel: string

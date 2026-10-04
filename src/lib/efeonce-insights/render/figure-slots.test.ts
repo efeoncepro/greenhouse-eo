@@ -299,9 +299,33 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     expect((carded!.body as { donutCenter: unknown }).donutCenter).toEqual({ value: '38 %', label: 'chatgpt' })
   })
 
+  it('dona: una parte con valor que redondea a 0 se lee «<1 %», nunca «0 %» (caso real Berel 2026-09)', () => {
+    const byId = facts([['chatgpt', 1648], ['gemini', 30], ['otros', 8]])
+    const [slide] = buildFigureSlides(donut(['chatgpt', 'gemini', 'otros']), byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect((slide!.body as { donutParts: Array<{ share: string }> }).donutParts.map(part => part.share)).toEqual(['98 %', '2 %', '<1 %'])
+  })
+
   it('una dona con 1 parte o con más de 3 no se emite', () => {
     expect(buildFigureSlides(donut(['a']), facts([['a', 3]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
     expect(buildFigureSlides(donut(['a', 'b', 'c', 'd']), facts([['a', 1], ['b', 1], ['c', 1], ['d', 1]]), undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toEqual([])
+  })
+
+  it('hasFigurePage: waffle, dona y apiladas con hechos suficientes tienen página; sin hechos, no', async () => {
+    const { hasFigurePage } = await import('./figure-slots')
+
+    const stacked = spec({
+      chartId: 'chart.seo.stacked.site-engagement', family: 'bar_stacked', dimensionLabels: ['agosto de 2026', 'septiembre de 2026'],
+      series: [
+        { seriesId: 'engaged', label: 'Con interacción', factIds: ['e0', 'e1'], unit: 'count' },
+        { seriesId: 'unengaged', label: 'Sin interacción', factIds: ['u0', 'u1'], unit: 'count' }
+      ]
+    })
+
+    expect(hasFigurePage(waffle(['positivas', 'neutras']), facts([['positivas', 5], ['neutras', 3]]))).toBe(true)
+    expect(hasFigurePage(donut(['chatgpt', 'gemini']), facts([['chatgpt', 19], ['gemini', 12]]))).toBe(true)
+    expect(hasFigurePage(stacked, facts([['e0', 530], ['u0', 490], ['e1', 772], ['u1', 512]]))).toBe(true)
+    expect(hasFigurePage(donut(['chatgpt', 'gemini']), facts([]))).toBe(false)
   })
 
   it('apiladas: segmento base abajo, total por período, participación base y anotación de la variación base', () => {
@@ -359,5 +383,34 @@ describe('TASK-1975 — cascada, waffle, dona, apiladas y cifras', () => {
     const stat = { figureId: 's', question: 'value_change', title: 't', items: [{ itemId: 'c', label: 'Tráfico orgánico estimado mensual', factId: 'c', comparisonFactId: null, direction: null, estimated: false }] } as never
 
     expect(() => buildStatSlides(stat, byId, undefined, [], 'es-CL', FIGURE_CAPACITY.report)).toThrow(/4 palabras/)
+  })
+})
+
+
+describe('TASK-1990 — cifras con canal en el PDF y el deck', () => {
+  const f = (factId: string, metricId: string, source: string, channelId?: string) =>
+    [factId, { factId, value: 40, unit: 'percent', label: metricId, metricId, module: 'aeo', source, evidenceRef: 'e', ...(channelId ? { channelId } : {}), window: { start: '2026-09-01', endExclusive: '2026-10-01' } }] as const
+
+  const stat = (ids: string[]) => ({
+    figureId: 'stats.x', question: 'value_change', title: 'Cifras del período', note: null,
+    items: ids.map(id => ({ itemId: id, label: 'Cifra', factId: id, comparisonFactId: null, direction: 'higher_is_better', estimated: false }))
+  }) as never
+
+  it('una celda lleva canal o ícono, nunca los dos; el canal va en el título o en las celdas, nunca en los dos', async () => {
+    const { buildStatSlides } = await import('./figure-slots')
+
+    const engines = new Map([f('a', 'mention_rate.openai', 'greenhouse_growth.grader_runs', 'chatgpt'), f('b', 'mention_rate.gemini', 'greenhouse_growth.grader_runs', 'gemini')]) as never
+    const [mixed] = buildStatSlides(stat(['a', 'b']), engines, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+    const mixedBody = mixed!.body as { statItems: Array<Record<string, unknown>>; titleChannels?: unknown }
+
+    expect(mixedBody.titleChannels).toBeUndefined()
+    expect(mixedBody.statItems.map(cell => [cell.channel, cell.icon])).toEqual([['chatgpt', undefined], ['gemini', undefined]])
+
+    const seo = new Map([f('c', 'clicks', 'greenhouse_growth.seo_gsc_daily'), f('i', 'impressions', 'greenhouse_growth.seo_gsc_daily')]) as never
+    const [single] = buildStatSlides(stat(['c', 'i']), seo, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+    const singleBody = single!.body as { statItems: Array<Record<string, unknown>>; titleChannels?: unknown }
+
+    expect(singleBody.titleChannels).toEqual([{ channelId: 'google_search_console' }])
+    expect(singleBody.statItems.every(cell => cell.channel === undefined)).toBe(true)
   })
 })

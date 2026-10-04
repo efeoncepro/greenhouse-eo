@@ -236,7 +236,7 @@ operativo, la elegibilidad social y sus planos de medición viven en PDR-018, no
 | Nested Loops™ | "Cada fase construye sobre la anterior." | Propuestas. |
 | ICO | "Ves en tiempo real qué pasa con tu marketing." | Diferenciador en pitches. Onboarding. |
 | **Ecosistema de producto** (Greenhouse + Kortex + Verk) | "Tienes login a tres plataformas donde ves tu operación, tu CRM y tu contenido en tiempo real. Cada ciclo el sistema se vuelve más valioso." | Demo en pitch. Ecosystem Tour. Switching cost. Referrals. |
-| **Efeonce AEO** | "Descubre cómo aparece tu marca en respuestas de IA y qué conviene mejorar." El diagnóstico es **Efeonce AEO Assessment** y el entregable **Efeonce AI Visibility Report**. | Puerta de entrada de marca; [naming canónico](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md). |
+| **Efeonce \| AEO** (servicio) | "Descubre cómo aparece tu marca en respuestas de IA y qué conviene mejorar." El diagnóstico es **Efeonce AEO Assessment** y el entregable **Efeonce AI Visibility Report**. | Puerta de entrada de marca; [naming canónico](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md). |
 | Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
 
 ---
@@ -272,6 +272,7 @@ operativo, la elegibilidad social y sus planos de medición viven en PDR-018, no
 6. Tono **"tú"** siempre. "Usted" solo en contratos, legales y procurement.
 7. **Beneficios primero, nombres después.**
 8. La Experiencia Efeonce se comunica como mecanismo, no como adjetivo: operación + software + aprendizaje + red + memoria. Si no puedes nombrar el mecanismo, no uses "ecosistema".
+9. **Quien habla es Efeonce; los servicios se nombran con barra** (corrección del operador, 2026-10-03: «Mi marca no se llama Efeonce AEO sino Efeonce. Efeonce | AEO es el servicio»). Correcto: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO y con los Sparks, nuestros agentes». Incorrecto: «Así lo trabajamos en Efeonce AEO» o «Efeonce AEO» como emisor. Los productos conservan su nombre (**Efeonce AEO Assessment**, **Efeonce AI Visibility Report**); el copy se alinea con los lockups con barra (**Efeonce | SV360**, **Efeonce | AEO**…). Caso fuente: copies del spot «Los Sparks» (CMP001-08).
 
 ---
 

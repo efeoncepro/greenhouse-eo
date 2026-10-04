@@ -1,0 +1,201 @@
+{
+  "desktop": {
+    "footer": {
+      "bottom": 900.203125,
+      "height": 241.4140625,
+      "left": 0,
+      "right": 1440,
+      "top": 658.7890625,
+      "width": 1440,
+      "x": 0,
+      "y": 658.7890625
+    },
+    "height": 900,
+    "items": [
+      {
+        "box": {
+          "bottom": 763.1875,
+          "height": 10.640625,
+          "left": 151.859375,
+          "right": 271.703125,
+          "top": 752.546875,
+          "width": 119.84375,
+          "x": 151.859375,
+          "y": 752.546875
+        },
+        "class": "footer-slogan",
+        "complete": false,
+        "href": null,
+        "outline": "rgba(255, 255, 255, 0.5) none 3px",
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 707.2421875,
+          "height": 13.0546875,
+          "left": 399.7578125,
+          "right": 796.8671875,
+          "top": 694.1875,
+          "width": 397.109375,
+          "x": 399.7578125,
+          "y": 694.1875
+        },
+        "class": "report-footer-kicker",
+        "complete": false,
+        "href": null,
+        "outline": "rgba(255, 255, 255, 0.74) none 3px",
+        "weight": "600"
+      },
+      {
+        "box": {
+          "bottom": 735.875,
+          "height": 20.953125,
+          "left": 399.7578125,
+          "right": 796.8671875,
+          "top": 714.921875,
+          "width": 397.109375,
+          "x": 399.7578125,
+          "y": 714.921875
+        },
+        "class": "report-footer-strong",
+        "complete": false,
+        "href": null,
+        "outline": "rgba(255, 255, 255, 0.62) none 3px",
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 722.1875,
+          "height": 28,
+          "left": 853.0625,
+          "right": 932.0625,
+          "top": 694.1875,
+          "width": 79,
+          "x": 853.0625,
+          "y": 694.1875
+        },
+        "class": "footer-aeo-logo",
+        "complete": true,
+        "href": null,
+        "outline": "rgba(255, 255, 255, 0.49) none 3px",
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 789.5546875,
+          "height": 24.5,
+          "left": 853.0625,
+          "right": 1084.6484375,
+          "top": 765.0546875,
+          "width": 231.5859375,
+          "x": 853.0625,
+          "y": 765.0546875
+        },
+        "class": "report-footer-link",
+        "complete": false,
+        "href": "https://efeoncepro.com/aeo-2/",
+        "outline": "rgb(255, 255, 255) solid 2px",
+        "weight": "500"
+      }
+    ],
+    "overflow": 0,
+    "width": 1440
+  },
+  "mobile": {
+    "footer": {
+      "bottom": 844.1640625,
+      "height": 650.5078125,
+      "left": 0,
+      "right": 390,
+      "top": 193.65625,
+      "width": 390,
+      "x": 0,
+      "y": 193.65625
+    },
+    "height": 844,
+    "items": [
+      {
+        "box": {
+          "bottom": 305.25,
+          "height": 10.640625,
+          "left": 135.078125,
+          "right": 254.921875,
+          "top": 294.609375,
+          "width": 119.84375,
+          "x": 135.078125,
+          "y": 294.609375
+        },
+        "class": "footer-slogan",
+        "complete": false,
+        "href": null,
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 368.1015625,
+          "height": 13.0546875,
+          "left": 96.90625,
+          "right": 293.0859375,
+          "top": 355.046875,
+          "width": 196.1796875,
+          "x": 96.90625,
+          "y": 355.046875
+        },
+        "class": "report-footer-kicker",
+        "complete": false,
+        "href": null,
+        "weight": "600"
+      },
+      {
+        "box": {
+          "bottom": 396.734375,
+          "height": 20.953125,
+          "left": 96.90625,
+          "right": 293.0859375,
+          "top": 375.78125,
+          "width": 196.1796875,
+          "x": 96.90625,
+          "y": 375.78125
+        },
+        "class": "report-footer-strong",
+        "complete": false,
+        "href": null,
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 495.484375,
+          "height": 28,
+          "left": 155.5,
+          "right": 234.5,
+          "top": 467.484375,
+          "width": 79,
+          "x": 155.5,
+          "y": 467.484375
+        },
+        "class": "footer-aeo-logo",
+        "complete": true,
+        "href": null,
+        "weight": "400"
+      },
+      {
+        "box": {
+          "bottom": 583.8046875,
+          "height": 24.5,
+          "left": 79.203125,
+          "right": 310.7890625,
+          "top": 559.3046875,
+          "width": 231.5859375,
+          "x": 79.203125,
+          "y": 559.3046875
+        },
+        "class": "report-footer-link",
+        "complete": false,
+        "href": "https://efeoncepro.com/aeo-2/",
+        "weight": "500"
+      }
+    ],
+    "overflow": 0,
+    "width": 390
+  }
+}

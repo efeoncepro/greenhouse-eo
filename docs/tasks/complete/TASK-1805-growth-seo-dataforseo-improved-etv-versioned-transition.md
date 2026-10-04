@@ -6,6 +6,8 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+
 ## Status
 
 - Lifecycle: `complete`
@@ -21,7 +23,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `COMPLETE 2026-09-03: foundation desplegada en producción (release 5ec4cf769977, run 33698245254); selectores legacy explícitos vivos en Vercel y ops-worker con readback; lanes de producción sirven etvMethodology; gateway sincronizado. Improved NO activado. Follow-up post-release con condición: contract de schema (docs/tasks/pending-migrations/)`
+- Status real: `Complete: foundation versionada desplegada desde 03/09 (5ec4cf769977). TASK-1806 completó después el contract de schema y el cutover a improved_layout_clickstream_v2 (bda12be7e33a); ambos selectores improved en la revisión activa del worker, leídos 04/10. Los criterios/deltas legacy de esta foundation son evidencia de su entrega histórica, no configuración vigente.`
 - Rank: `1`
 - Domain: `growth|seo|data|integration`
 - External deadline: `2026-11-01T00:00:00Z; legacy deja de estar disponible como opt-out`

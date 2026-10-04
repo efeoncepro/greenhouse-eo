@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-01 por Claude (TASK-1670)
-> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670)
+> **Ultima actualizacion:** 2026-10-04 por Codex (activación documentada desde 02/09; flag revalidado en worker activo).
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §10.6 (Delta 2026-09-01)
 
 # Hallazgos de sitio en la Auditoría SEO (Growth)
@@ -29,36 +29,11 @@ vende como SEO **y** AEO, y hasta acá sólo miraba la mitad.
 
 ---
 
-## 🔴 Estado real: la capacidad está APAGADA
+## Estado de disponibilidad (reconciliado 04/10)
 
-**Al 2026-09-01 esto es `code complete, rollout pendiente`.** El motor que hace las revisiones está
-construido, verificado contra sitios reales y publicado en `develop`, pero el interruptor
-(`GROWTH_SEO_SITE_FINDINGS_ENABLED`) **nace apagado** y no se prende todavía.
+El flag de hallazgos está ON desde 02/09 y se revalidó el 04/10 en `ops-worker-00762-njg` (100% tráfico, Ready). La activación ya ocurrió. Readback PG 04/10: corrida `seoar-c9cb9376-6c0a-40e9-8aee-bf258bed1b38` del 28/09, `succeeded`, con 2 hallazgos de alcance sitio. Confirma persistencia; falta contrastar su precisión contra el sitio y verificar `seo.audit.stuck_tasks`. Un collect vacío no demuestra los evaluadores. [Evidencia](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 
-**Mientras siga apagado, nada de lo que este documento describe le llega a un usuario del portal.** Un
-sitio que bloquea a los rastreadores de IA **sigue** puntuando 95 de 100 en la pantalla de Auditoría y
-sigue presentándose como sano. El punto ciego lo cierra el encendido verificado en producción, no el
-hecho de que el código exista.
-
-**Por qué está apagado** — no es cautela genérica, es una incompatibilidad concreta con la pantalla
-actual: la Auditoría cuenta "páginas afectadas" y **ordena la lista por ese número**. Un hallazgo del
-dominio se rotularía "1 página afectada" —lo cual es falso, afecta al sitio entero— y quedaría hundido
-debajo de 400 imágenes sin texto alternativo. Prenderlo antes de tener una pantalla que sepa leer el
-alcance correcto convertiría el hallazgo más caro del informe en el menos visible.
-
-**Qué falta para prenderlo:** que se **despliegue** la superficie que sabe renderizar hallazgos de dominio.
-
-Al 2026-09-01 esa pantalla ya está **construida** (`TASK-1671`): la auditoría gana una sección propia,
-"Acceso y presentación del sitio", entre la salud y la lista de problemas, donde cada hallazgo dice
-"Todo el sitio" en vez de un conteo de páginas y nombra dónde se detectó. Pero construida no es lo mismo
-que desplegada: el código todavía no está en ningún servidor. Lo que falta es el despliegue, después el
-encendido del interruptor, y recién ahí una auditoría real contrastada contra el `robots.txt` verdadero
-del cliente.
-
-> Detalle técnico: fila de `GROWTH_SEO_SITE_FINDINGS_ENABLED` en
-> [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md), con la secuencia exacta
-> del encendido. El interruptor vive **sólo en el ops-worker** (es el único que ejecuta las revisiones);
-> en el portal es inerte.
+La superficie de TASK-1671 diferencia hallazgos de todo el sitio de problemas por página. La falta de una verificación se presenta con su razón; no se considera sano un sitio por no tener medición.
 
 ---
 

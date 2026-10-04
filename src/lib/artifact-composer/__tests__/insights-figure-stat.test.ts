@@ -164,7 +164,7 @@ describe('cifras: la retícula sale de la cantidad y nada se trunca', () => {
   it.each(CASES)('$name: sin dato no lleva píldora y «Menor es mejor» sólo donde viene', async c => {
     const items = itemsOf(fixtureOf(c)).slice(0, 3)
 
-    const noData: StatItem = { icon: 'clicks', name: 'Clics', value: '—', noData: 'Sin dato en septiembre de 2026' }
+    const noData: StatItem = { metricIcon: 'clic', name: 'Clics', value: '—', noData: 'Sin dato en septiembre de 2026' }
 
     const result = await render(c, withItems(c, [noData, ...items.slice(1)]))
 
@@ -175,6 +175,19 @@ describe('cifras: la retícula sale de la cantidad y nada se trunca', () => {
     const withLower = await render(c, withItems(c, itemsOf(fixtureOf(c)).slice(3, 6)))
 
     expect(withLower.lower).toEqual([true, false, false])
+  }, 60_000)
+
+  // TASK-1996 — en el deck la cifra única baja por ancho visible; antes, «770.462» se rechazaba a 112 px.
+  it('deck: una cifra única de 7, 9 u 11 caracteres cabe bajando de tamaño (sin recortar)', async () => {
+    const c = CASES[1]
+    const [first] = itemsOf(fixtureOf(c))
+
+    for (const value of ['770.462', '1.234.567', '12.345.678']) {
+      expect((await render(c, withItems(c, [{ ...first!, value }]))).fits, value).toBe(true)
+    }
+
+    // Sin escalón (12 caracteres, el máximo del contrato) el encaje sigue rechazando.
+    expect((await render(c, withItems(c, [{ ...first!, value: '1.234.567,89' }]))).fits).toBe(false)
   }, 60_000)
 
   it.each(CASES)('$name: una cifra más ancha que su celda se rechaza en el encaje (nunca se recorta en silencio)', async c => {

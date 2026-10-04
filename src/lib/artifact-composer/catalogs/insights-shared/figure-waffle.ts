@@ -22,7 +22,7 @@ import { FigureDataError } from './figure-svg'
 
 export type WaffleRole = 'opportunity' | 'absence'
 
-export type WaffleTone = 'current' | 'opportunity' | 'prior' | 'step' | 'absence'
+export type WaffleTone = 'current' | 'opportunity' | 'prior' | 'step' | 'muted' | 'absence'
 
 export interface WafflePartInput {
   label: string
@@ -69,15 +69,18 @@ export const DECK_WAFFLE_BOX: WaffleBox = {
 const WAFFLE_MIN_PARTS = 2
 const WAFFLE_MAX_PARTS = 4
 
-/** Orden de los tonos sin rol (canvas): actual, oportunidad, anterior y, si hay cuarta parte, paso. */
-const ORDER_TONES: readonly WaffleTone[] = ['current', 'opportunity', 'prior', 'step']
+/**
+ * Orden de los tonos sin rol: actual, anterior, paso y, si hay cuarta parte, gris medio. El coral de oportunidad es SÓLO de
+ * una parte que lo declara (operador, 2026-10-04: por orden pintaba de «oportunidad» lo que no lo era).
+ */
+const ORDER_TONES: readonly WaffleTone[] = ['current', 'prior', 'step', 'muted']
 
 const esc = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 /**
- * Tono de cada parte. Con una parte de oportunidad declarada, el coral es sólo suyo y las demás siguen actual →
- * anterior → paso. A lo más una oportunidad y una ausencia, y la ausencia es la última: si no, falla cerrado.
+ * Tono de cada parte. El coral es sólo de la parte que declara oportunidad; las demás siguen actual → anterior → paso →
+ * gris medio. A lo más una oportunidad y una ausencia, y la ausencia es la última: si no, falla cerrado.
  */
 export const waffleTones = (parts: readonly WafflePartInput[]): WaffleTone[] => {
   if (parts.length < WAFFLE_MIN_PARTS || parts.length > WAFFLE_MAX_PARTS) {
@@ -94,7 +97,7 @@ export const waffleTones = (parts: readonly WafflePartInput[]): WaffleTone[] => 
     throw new FigureDataError('La parte de ausencia va siempre al final del waffle: se lee como lo que falta.')
   }
 
-  const sequence = opportunities === 1 ? ORDER_TONES.filter(tone => tone !== 'opportunity') : ORDER_TONES
+  const sequence = ORDER_TONES
   let next = 0
 
   return parts.map(part => {

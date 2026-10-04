@@ -1,0 +1,119 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-10-04T09:55:40.267Z",
+  "run": "ai-generations/2026-10-04_hum-pelo",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-04_hum-pelo",
+  "totalBytes": 42892729,
+  "fileCount": 18,
+  "files": [
+    {
+      "path": "anterior/hum-45-der.png",
+      "sizeBytes": 1595944,
+      "sha256": "3b5dee69bb61d27fc1081337a1bbd8f0d8384af72f555417321744dc76e5ef52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-45-der.png"
+    },
+    {
+      "path": "anterior/hum-45-izq.png",
+      "sizeBytes": 1551449,
+      "sha256": "464a0947e232191306813e143e468e9be3546e29e3135b52befaa3b0e0fc6adc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-45-izq.png"
+    },
+    {
+      "path": "anterior/hum-ancla-hd.png",
+      "sizeBytes": 8680291,
+      "sha256": "da5ef1254c15f3b97aba56fef511c12915ba68361043514e2585524e1b7e9a1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-ancla-hd.png"
+    },
+    {
+      "path": "anterior/hum-cuerpo.png",
+      "sizeBytes": 1801893,
+      "sha256": "a7e9b8b1471b1d0f735219e6f59b125caf1f8375374d34854015316958fb8377",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-cuerpo.png"
+    },
+    {
+      "path": "anterior/hum-elegida.png",
+      "sizeBytes": 2125768,
+      "sha256": "b87203efdb0388aa077af4231bbfb2da9fc41c72dae577c64e8c3cb85cbfa6d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-elegida.png"
+    },
+    {
+      "path": "anterior/hum-frente.png",
+      "sizeBytes": 1579134,
+      "sha256": "7ee0892973ea5d95005a731fbb972d449266c793a941701c0aaea10f04967213",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-frente.png"
+    },
+    {
+      "path": "anterior/hum-perfil-der.png",
+      "sizeBytes": 1540449,
+      "sha256": "f445da8f3cfeef861f2a890d819016ab9ef6ccfc6f60eadd069309758b054649",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-perfil-der.png"
+    },
+    {
+      "path": "anterior/hum-perfil-izq.png",
+      "sizeBytes": 1537463,
+      "sha256": "45105067edb1964231a8e9b27551b261e15b170d7f6aa9288f2fcf4690c1cb37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/anterior/hum-perfil-izq.png"
+    },
+    {
+      "path": "elegida/hum-elegida-lob-a.png",
+      "sizeBytes": 1960780,
+      "sha256": "4637a575d912c5a49a32702d6c704117f35482dd57a021bd9c0d7fcc672d0fac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/elegida/hum-elegida-lob-a.png"
+    },
+    {
+      "path": "elegida/hum-elegida-lob-b.png",
+      "sizeBytes": 1957105,
+      "sha256": "28e1f8fd53e637b4eef1e8134e1c9e3b937c149ecc66476c726971484102e4b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/elegida/hum-elegida-lob-b.png"
+    },
+    {
+      "path": "elegida/hum-elegida-recogido-a.png",
+      "sizeBytes": 1950019,
+      "sha256": "0774bdf88fdf91e779a812f78ee8dac48890a8e1a93aaa87ec64b1bbf1d7789a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/elegida/hum-elegida-recogido-a.png"
+    },
+    {
+      "path": "vistas/hum-45-der.png",
+      "sizeBytes": 1407002,
+      "sha256": "0e97d5c61aa52857aeb9f60d85c93f55b43faf937fa0979038c9b44764b7dea7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-45-der.png"
+    },
+    {
+      "path": "vistas/hum-45-izq.png",
+      "sizeBytes": 1394067,
+      "sha256": "dc73b686ab912e06654096e6c8903d51ab9a10efac3087e330d53d7c9ae6a8f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-45-izq.png"
+    },
+    {
+      "path": "vistas/hum-ancla-hd.png",
+      "sizeBytes": 7942279,
+      "sha256": "3b6d3efd1d4962b8285d646856d4ab9062e3c7e005dc7cca5bb53dcca2a963e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-ancla-hd.png"
+    },
+    {
+      "path": "vistas/hum-cuerpo.png",
+      "sizeBytes": 1665578,
+      "sha256": "5f0068633e1d1a52f9d2542cd7478c5cb3e10af277df7bf59d1b4e665d77dc3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-cuerpo.png"
+    },
+    {
+      "path": "vistas/hum-frente.png",
+      "sizeBytes": 1452396,
+      "sha256": "4eac0c491fb6a4e459f9eeee68cc6e9ae80984f71458c0a036282a60494a3af4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-frente.png"
+    },
+    {
+      "path": "vistas/hum-perfil-der.png",
+      "sizeBytes": 1397780,
+      "sha256": "5f7bd9fa49f4d2be79673745dc636fe2bfd0ec8cd43ba0d1c9849bf10b8a8874",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-perfil-der.png"
+    },
+    {
+      "path": "vistas/hum-perfil-izq.png",
+      "sizeBytes": 1353332,
+      "sha256": "f700b19969082396a13037ef4c7ab7460197e0e910ef7d3c76a0f6b70244085e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-04_hum-pelo/vistas/hum-perfil-izq.png"
+    }
+  ]
+}

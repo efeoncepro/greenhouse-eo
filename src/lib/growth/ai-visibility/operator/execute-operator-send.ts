@@ -25,6 +25,7 @@ import { buildPublicReportUrl, getLatestReportTokenForRun } from '../hubspot/rep
 import { buildAiVisibilityReportAttachment } from '../public-delivery/email/build-report-attachment'
 import type { GraderReportSeverity } from '../report/contracts'
 import { buildReportHeader } from '../report/report-header'
+import { readAiVisibilityReportPdfPresentationContext } from '../report/pdf-presentation-context'
 import { readPublicGraderReport, type PublishedSnapshot } from '../report/snapshot'
 import { buildOperatorCrossSellPayload } from './hubspot-cross-sell-mapper'
 import { getOrganizationCommercialFacts, type OrganizationCommercialFacts } from './organization-commercial-facts'
@@ -87,7 +88,14 @@ const runEmailStep = async (ctx: SendContext): Promise<StepOutcome> => {
   const model = modelFromPublicReport(ctx.snapshot.publicReport, 'attachment')
   const header = buildReportHeader({ organizationName: ctx.organizationName, asOf: ctx.snapshot.asOf })
 
-  const attachment = await buildAiVisibilityReportAttachment({ publicReport: ctx.snapshot.publicReport, header })
+  const pdfPresentationContext = await readAiVisibilityReportPdfPresentationContext({
+    runId: ctx.snapshot.runId,
+    locale: ctx.snapshot.publicReport.provenance.market?.locale,
+    asOf: ctx.snapshot.asOf,
+    knownOrganization: ctx.org
+  })
+
+  const attachment = await buildAiVisibilityReportAttachment({ publicReport: ctx.snapshot.publicReport, header, context: pdfPresentationContext })
 
   const insight: AiVisibilityReportEmailInsight | null = (() => {
     const detection = model.primaryGap?.title ?? model.recommendations[0]?.title ?? null

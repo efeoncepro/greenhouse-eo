@@ -17,7 +17,7 @@ description: >-
 
 # HubSpot Solutions Partner — operador de la práctica
 
-> **Naming de la cuña AEO de Efeonce:** capacidad **Efeonce AEO**; diagnóstico público **Efeonce AEO Assessment**; entregable compartible **Efeonce AI Visibility Report**. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos al buscar evidencias e integraciones. **Search Visibility 360** es la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
+> **Naming de la cuña AEO de Efeonce:** servicio **Efeonce | AEO** (con barra; nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); diagnóstico público **Efeonce AEO Assessment**; entregable compartible **Efeonce AI Visibility Report**. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos al buscar evidencias e integraciones. **Search Visibility 360** es la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce.
 Si la pregunta es "cómo configuro una property en nuestro portal" → `hubspot-as-a-service` + el runbook de operación directa.

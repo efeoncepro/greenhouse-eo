@@ -1,0 +1,57 @@
+{
+  "synthetic": true,
+  "locale": "es",
+  "audience": "client",
+  "fixture": "es-client",
+  "bytes": 226826,
+  "pages": 6,
+  "pageSizes": [
+    {
+      "page": 1,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 2,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 3,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 4,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 5,
+      "width": 595.280029,
+      "height": 841.890015
+    },
+    {
+      "page": 6,
+      "width": 595.280029,
+      "height": 841.890015
+    }
+  ],
+  "pdfSha256": "e251756b2e4011065321d23d6dac645081e79a40fb154379f43cf1a3c589b03b",
+  "modelSha256": "a2520d64b77a8ef2698bf6033a2b94023263ea7e8455f9ff3b49f49ee8f6708f",
+  "header": {
+    "organizationName": "Globe",
+    "reportDate": "19 may 2026",
+    "periodLabel": "4 – 19 de mayo de 2026"
+  },
+  "links": [
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "https://efeoncepro.com",
+    "mailto:jreyes@efeoncepro.com"
+  ],
+  "outsideLinks": [],
+  "outsidePage": [],
+  "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nTXSDIY+Poppins-Medium                CID TrueType      Identity-H       yes yes yes     12  0\nAGUQDS+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     14  0\nZSTPBD+AIVisibilityBricolage-740     CID TrueType      Identity-H       yes yes yes     15  0\nNDBFOF+Poppins-Regular               CID TrueType      Identity-H       yes yes yes     16  0\nMYDXYO+AIVisibilityBricolage-760     CID TrueType      Identity-H       yes yes yes     31  0\nNGVHYK+AIVisibilityBricolage-320     CID TrueType      Identity-H       yes yes yes     32  0\nTFIFGY+AIVisibilityBricolage-720     CID TrueType      Identity-H       yes yes yes     44  0\nUEHHYD+AIVisibilityBricolage-700     CID TrueType      Identity-H       yes yes yes     49  0\nNTOEXD+Poppins-Light                 CID TrueType      Identity-H       yes yes yes     83  0\nKAUONN+Poppins-ExtraBoldItalic       CID TrueType      Identity-H       yes yes yes     86  0\nTWKXWT+Poppins-ExtraBold             CID TrueType      Identity-H       yes yes yes     87  0\nOMMNXX+Poppins-BlackItalic           CID TrueType      Identity-H       yes yes yes     88  0\n"
+}

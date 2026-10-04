@@ -9,6 +9,7 @@
 // runtime can <Image src=...> them.
 //
 // Run on demand: pnpm tsx scripts/build-pdf-brand-assets.ts
+// TASK-1938 report only: pnpm tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report
 //
 // Re-run only when sub-brand logos change. Output is committed.
 
@@ -64,6 +65,14 @@ const REPORT_ASSETS: PublicAssetSpec[] = [
 ]
 
 const main = async () => {
+  if (process.argv.includes('--ai-visibility-report')) {
+    const { buildAiVisibilityPdfBrandAssets } = await import('./pdf/ai-visibility-brand-assets')
+
+    await buildAiVisibilityPdfBrandAssets()
+
+    return
+  }
+
   mkdirSync(OUT, { recursive: true })
 
   console.log('[brand-assets] Converting sub-brand SVGs to PNG...')

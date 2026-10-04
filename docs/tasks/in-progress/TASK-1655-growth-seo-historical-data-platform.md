@@ -65,6 +65,8 @@ en la query de recurrencia, con archivo dual-store como decisión probable, nunc
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -80,7 +82,7 @@ en la query de recurrencia, con archivo dual-store como decisión probable, nunc
 - Motion: `none`
 - Backend impact: `sync`
 - Epic: `EPIC-022`
-- Status real: `Diseño`
+- Status real: `Slices 1–4 entregadas; backfill histórico completo el 07/08: Berel 487 días y Efeonce 474 con datos. Pendiente: export nativo de Berel o bloqueo con owner/siguiente paso, paridad MCP de commands y verificación de retención. Esa evidencia BQ es histórica, sin revalidación hoy; no reiniciar el backfill como trabajo sin hacer.`
 - Rank: `TBD`
 - Domain: `growth|seo|data`
 - Blocked by: `none`
@@ -189,7 +191,7 @@ Reglas obligatorias:
 - Familia `labs` en el allowlist DataForSEO (`dataforseo-families.ts`).
 - Entitlement chokepoint `enforceSeoRunEntitlement` + spend ledger.
 
-### Gap
+### Gap inicial (antes de las slices 1–4; pendientes vigentes en Status real)
 
 - `seo_gsc_daily` no tiene mirror BQ ni política de retención; crece sin techo en OLTP.
 - Ningún reader GSC sirve más allá de lo que PG tenga.
@@ -240,7 +242,7 @@ Reglas obligatorias:
 ### Runtime evidence
 
 - Paridad PG↔BQ verificada con datos reales (2026-08-01: 6.582 filas / 450 clics / wpos 6,4601 idénticos).
-- Smoke backfill 31/31 días; corrida completa 16 meses en curso (resumible).
+- Smoke inicial 31/31 días; corrida completa concluida el 07/08, ver «Acceptance criteria additions» (Berel 487/487, Efeonce 474 días con datos).
 - Sandbox `historical_serps` verificado ANTES de gastar (granularidad dispersa); seed real: 4 keywords con historia, re-corrida idempotente $0.
 - `pnpm worker:runtime-deps-gate` + `worker:build-contract-gate` verdes (el batch es worker-bundled).
 
@@ -371,14 +373,14 @@ patrón fuente en `rank-history-bq-mirror.ts`. Puntos load-bearing:
 
 ## Acceptance Criteria
 
-- [ ] `greenhouse_growth_analytics.seo_gsc_history` existe, particionada por fecha + clustered por org, poblada por MERGE idempotente (nunca DELETE by source).
-- [ ] Backfill ejecutado para TODAS las orgs con `seo_v2`; profundidad ≥6 meses (objetivo 16) verificada con `SELECT MIN(capture_date)` por org.
-- [ ] `readSeoPerformance` sirve rango > ventana caliente desde BQ con `source='bigquery'`; shape y honestidad (`null` ≠ 0) idénticos.
-- [ ] Paridad de posición: fórmula ponderada del mirror == fórmula de `read-overview-kpis` sobre el mismo día (test con datos reales).
-- [ ] Semilla `historical_serps` aplicada con marca de procedencia y granularidad declarada; gasto registrado en el ledger.
-- [ ] Export nativo activo en la propiedad de Berel O bloqueo documentado con owner y siguiente paso.
-- [ ] MCP tools de los commands nuevos registradas en el mismo PR.
-- [ ] Cloud SQL no creció más allá de la ventana caliente (política de retención declarada).
+- [x] `greenhouse_growth_analytics.seo_gsc_history` existe, particionada por fecha + clustered por org, poblada por MERGE idempotente (nunca DELETE by source). **Evidencia histórica:** 07/08: tabla creada, particionada/clustered; mirror MERGE implementado, Slice 1.
+- [x] Backfill ejecutado para TODAS las orgs con `seo_v2`; profundidad ≥6 meses (objetivo 16) verificada con `SELECT MIN(capture_date)` por org. **Evidencia histórica:** 07/08: cohorte entonces elegible Berel + Efeonce; 487/474 días con datos y fechas mínimas registradas en Acceptance criteria additions. No certifica organizaciones incorporadas después.
+- [x] `readSeoPerformance` sirve rango > ventana caliente desde BQ con `source='bigquery'`; shape y honestidad (`null` ≠ 0) idénticos. **Evidencia histórica:** 07/08: lectura por cobertura y 180 días solicitados, 179 servidos desde BQ; paridad de shape. Sin canary nuevo hoy.
+- [x] Paridad de posición: fórmula ponderada del mirror == fórmula de `read-overview-kpis` sobre el mismo día (test con datos reales). **Evidencia histórica:** 07/08: día 01/08, 6.582 filas, 450 clics, wpos 6,4601 idénticos PG/BQ.
+- [x] Semilla `historical_serps` aplicada con marca de procedencia y granularidad declarada; gasto registrado en el ledger. **Evidencia histórica:** 07/08: 4 keywords, fechas reales dispersas, procedencia labs-hist; corrida ~$0.20 y repetición already_seeded/$0.
+- [ ] Export nativo activo en la propiedad de Berel O bloqueo documentado con owner y siguiente paso. **Pendiente:** sin activación ni owner/siguiente paso de bloqueo completo certificados en esta revisión.
+- [ ] MCP tools de los commands nuevos registradas en el mismo PR. **Pendiente:** commands de operador aún declarados como follow-up; no se convierte esa excepción en criterio cumplido.
+- [ ] Cloud SQL no creció más allá de la ventana caliente (política de retención declarada). **Pendiente:** política descrita; falta medición vigente, sin ejecutar purge.
 
 ## Verification
 
@@ -389,11 +391,11 @@ patrón fuente en `rank-history-bq-mirror.ts`. Puntos load-bearing:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado + archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` actualizado
-- [ ] Delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4 (el carril GSC ahora tiene su mirror + política de retención)
-- [ ] Runbook en `docs/manual-de-uso/growth/`
+- [x] `Lifecycle` sincronizado + archivo en carpeta correcta — comprobado en reconciliación 04/10; task conserva in-progress.
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados — comprobado en reconciliación 04/10; task conserva in-progress.
+- [x] `Handoff.md` actualizado — comprobado en reconciliación 04/10; task conserva in-progress.
+- [x] Delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4 (el carril GSC ahora tiene su mirror + política de retención) — comprobado en reconciliación 04/10; task conserva in-progress.
+- [x] Runbook en `docs/manual-de-uso/growth/` — comprobado en reconciliación 04/10; task conserva in-progress.
 - [ ] Chequeo de impacto cruzado: TASK-1306/1307/1310 (sus specs citan "5 días"/"no_data como primera pantalla" — actualizar)
 
 ## Follow-ups

@@ -7,7 +7,7 @@
 - Reversibility: two-way-but-slow; los snapshots emitidos y archivos ya distribuidos no se reescriben.
 - Confidence: alta en ownership y reuso; media en capacidad y costo hasta benchmark.
 - Validated as of: 2026-09-15 — decisión validada con rollout real de la foundation en staging y producción (canarios por lane app y ecosystem, gateway federado desplegado); los deltas de diseño posteriores (vista web en Think) siguen sin código.
-- Program: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+- Program: [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 - Technical contract: [arquitectura](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
 
 ## Context

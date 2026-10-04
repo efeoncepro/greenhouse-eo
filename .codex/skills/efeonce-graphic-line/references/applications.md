@@ -540,14 +540,24 @@ oscuro de la línea, la negativa.
 
 | Superficie | ¿Lleva la marca? | Estado | Dónde |
 |---|---|---|---|
-| Landing del AEO Assessment («¿Te recomiendan las IA? / Averígualo») | sí | aprobada en el canvas; no implementada | canvas «Marcas SEO y AEO de Efeonce» |
+| Landing del AI Visibility Report («¿Te recomiendan las IA? / Averígualo») | sí, lockup del Report por decisión del operador (2026-10-02) | publicada y verificada en producción (2026-10-03), Think `f4426d2` | TASK-1966; canvas «Marcas SEO y AEO de Efeonce» |
 | Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine); canónica en AXIS desde `v0.3.30`: la órbita de la portada dice la gravedad | canvas; Lab `/references/ai-visibility-report/`; receta `aiVisibilityReportOrbitSvg` |
 | Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
-| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); el renderer está por implementar y pasa a la paleta Engine | TASK-1938 (dueña del cambio y de la adopción de AXIS 0.3.30) |
+| PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); renderer Engine implementado y validado localmente 2026-10-03; rollout pendiente | TASK-1938; dossier de diez PDFs y 24 comparaciones |
+
+**Landing (2026-10-03):** Engine, lockup oficial de `axis-brand-assets` 0.4.10, una órbita (entrada CSS oficial de AXIS de 2 s, final fijo; ampliación pedida el 2026-10-03), Trazo y firma «Empower your Engine». Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md`; firma compactada por corrección del operador (2026-10-03), sin sumar gap del contenedor al margen canónico del eslogan; el formulario local está bloqueado por CORS, sin envío ni deploy. Esto no certifica la página del informe ni el PDF.
+
+**Siguiente paso del pie (operador, 2026-10-03):** el bloque del método se reemplaza por el SVG oficial `aeo-logo-negative.svg` pequeño y enlace a `https://efeoncepro.com/aeo-2/` (destino verificado). AEO es contexto del servicio en una columna separada, no firma ni lockup compuesto; Efeonce conserva la firma principal. Título legal 600 en caja normal, copyright 400 y enlace 500. Aplicación local revisada en 1440/390; evidencia `footer-aeo/` del dossier, sin deploy.
+
+**Revisión de motion de la landing (operador, 2026-10-04):** la entrada de 2 s se percibe demasiado estática. Propuesta local en Think: una órbita oficial continua y tarjetas conceptuales de respuestas que se relevan, con pausa, suspensión fuera de pantalla/pestaña y fallback reducido/sin JS. El ciclo de 12 s es candidato de superficie, no canon AXIS. Dirección y evidencia en `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`; sin publicación ni aprobación visual de esta nueva versión.
+
+**Refinamiento UX local (2026-10-04):** el operador pidió ejecutar las seis mejoras del resto de la landing: muestra ampliable del PDF real con datos sintéticos, formulario marca primero desde su contrato gobernado, método de cinco niveles desplegable y liderado por preguntas en español, menor peso tipográfico, aclaraciones de entrega/acceso y CTA final al formulario. Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md`. Commit + push de la iteración autorizados el 04/10: Think `09e1976` confirmado en `origin/main`; despliegue/readback y activación de la nueva versión del formulario pendientes.
+
+**Registro de publicación B3c (2026-10-03):** el operador autorizó el push; landing y pie AEO publicados en Think `f4426d2`, Vercel READY. Formulario cargado y CUA 1440/1280/390 sin overflow; sin envío. Los estados locales del registro anterior son históricos. Evidencia en el dossier TASK-1966, `production/`.
 
 Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
 por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
-2026-09-29, AXIS `main` `7f9c8bb`); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Referencia visual en el Lab de AXIS
+2026-09-29, AXIS `main` `7f9c8bb`); Ese registro antecede a la adopción local; ver estado vigente de TASK-1938 a continuación. Referencia visual en el Lab de AXIS
 `/references/seo-aeo/` (JSON `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md`; publicados el
 2026-09-29). Norma: manual §7.2.
 
@@ -561,8 +571,9 @@ su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del 
 (`axis-graphic-line` 0.13.0) lleva además el **camino recorrido** desde las 12, en el color del nivel (§3.4). Página canónica:
 [axis.efeonce.org/references/ai-visibility-report/](https://axis.efeonce.org/references/ai-visibility-report/) (JSON
 `/references/ai-visibility-report.json`); guía `docs/agent-composition/ai-visibility-report.md`; dirección de
-Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. Greenhouse fija
-todavía AXIS 0.3.29: la adopción y el renderer son de TASK-1938.
+Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. La adopción local y el renderer se registran en TASK-1938; el estado de publicación se verifica por separado.
+
+**Aplicación PDF verificada localmente (2026-10-03):** TASK-1938 conserva react-pdf, snapshot, métricas y flujo de envío. Usa tokens `0.3.41`, contracts `0.3.40` y brand-assets `0.4.15`, sin bump de paquetes; la anatomía editorial faltante sale de una extensión generada en AXIS y sellada en el consumidor, todavía sin publicar. Seis variantes normales ES/EN/PT-BR × cliente/prospecto, seis A4; nombres largos se miden con la fuente real y el contenido extenso continúa sin truncarse. Diez PDFs auditados, contraste y 24 comparaciones color/gris en `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`. Recursos oficiales y seis pesos estáticos: `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`; registro aditivo. Redes: el PNG oficial incluye el disco, se muestra completo a 40 px, sin doble reducción. Corrección posterior de anotaciones (03/10): el chip de período centra el texto en un contenedor independiente; las versiones de metodología se presentan como números, nunca como IDs técnicos. Pie interior confirmado: organización/período, burbuja URL y folio, sin lockup Insights. Eslogan Engine al 64 %, divisor canónico 11,263 em. Tipos, build y 108 pruebas focales PASS; desincronización de metadata Manzanitas corregida con autorización del operador (check de 49 archivos y siete tests PASS; suite general no repetida). **Code complete local, rollout pendiente**, no acredita envío ni publicación.
 
 ### B4. Deck de Insights y correo de aviso
 

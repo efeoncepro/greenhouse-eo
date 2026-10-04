@@ -1,5 +1,12 @@
 # TASK-1902 — Efeonce Insights: páginas de medidor y mapa de calor
 
+## Delta 2026-10-03 (TASK-1975)
+
+- La cascada en el PDF y el deck ya existe y es de TASK-1975 (`report-figure-waterfall`, `insights-figure-waterfall`,
+  geometría en `catalogs/insights-shared/figure-waterfall.ts`), en producción desde el release `36a73e7b7e19`. Esta task
+  conserva medidor y mapa de calor y coordina `FigureKind`, el registry y los frames del gate visual para ellos:
+  `PDF_FIGURE_FAMILIES` hoy incluye `waterfall`, `waffle`, `donut` y `bar_stacked`. — cerrado por trabajo en TASK-1975
+
 ## Delta 2026-10-02 (TASK-1962)
 
 - TASK-1962: «qué explica el cambio» hoy sale como comparación agrupada porque la cascada (`waterfall`) no tiene página PDF; cuando exista, las causas SEO pueden pasar a cascada sin evidencia nueva (la suma por consulta es exactamente el total de clics). — por trabajo en TASK-1962

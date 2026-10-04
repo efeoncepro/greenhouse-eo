@@ -208,7 +208,21 @@ export const GH_INSIGHTS = {
     chatgpt: 'ChatGPT',
     gemini: 'Gemini',
     claude: 'Claude',
-    perplexity: 'Perplexity'
+    perplexity: 'Perplexity',
+    // TASK-1990 — los nombres visibles de las demás plataformas del contrato AXIS (`AXIS_PLATFORM_ASSETS[].name`).
+    google_search_console: 'Search Console',
+    google_analytics: 'Google Analytics',
+    google_ads: 'Google Ads',
+    bing: 'Bing',
+    youtube: 'YouTube',
+    reddit: 'Reddit',
+    wikipedia: 'Wikipedia',
+    linkedin: 'LinkedIn',
+    instagram: 'Instagram',
+    tiktok: 'TikTok',
+    meta: 'Meta',
+    frameio: 'Frame.io',
+    greenhouse: 'Greenhouse'
   } as Readonly<Record<string, string>>,
 
   /**
@@ -338,7 +352,8 @@ export const GH_INSIGHTS = {
     /** La métrica bajo el nombre del canal, por métrica o por familia (`mention_rate.openai` → `mention_rate`). */
     channelContext: {
       mention_rate: 'de las respuestas menciona la marca',
-      ai_sessions: 'visitas desde el asistente'
+      ai_sessions: 'visitas desde el asistente',
+      ai_source: 'visitas desde el asistente'
     } as Readonly<Record<string, string>>
   },
 
@@ -523,6 +538,8 @@ export const GH_INSIGHTS = {
    * edita (acuerdo entre sesiones del 2026-09-25).
    */
   catalog: {
+    /** Participación de una parte con valor que redondea a 0: nunca «0 %». */
+    shareUnderOne: '<1 %',
     product: 'Insights',
     editionKind: 'Informe mensual',
     readingEyebrow: 'Lectura de Efeonce',

@@ -1,17 +1,9 @@
 # Efeonce Insights — Architecture V1
 
-> Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
-> staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
-> y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
-> y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
-> la vista web compartida en Think está en producción desde el 2026-09-28 (TASK-1875 complete, §14.10) y la UI del portal sigue
-> pendiente (TASK-1849); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
-> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6); el criterio de
-> selección de figuras, la tarjeta de cifra y las páginas PDF de cascada, waffle, dona y barras apiladas están **code
-> complete, rollout pendiente** (TASK-1974 + TASK-1975, §14.12 y §15). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
-> rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
+> Status: **En ejecución, actualizado 2026-10-04.** Foundation/render/catálogos/editorial v2/shared web y criterio de figuras publicados; modelo web vigente **1.4** (release `36a73e7b7e19`). Generación, render, IA, editorial v2, sharing, emisión, correo y recurrencias ON en Vercel Production (readback 04/10). TASK-1957/1962 desplegadas, cierre pendiente; TASK-1975 espera revisión y promoción de fixes posteriores. Portal (TASK-1849), jerarquía cliente (TASK-1958), canales y expansión de evidencia siguen abiertos.
+> [Auditoría de cierre](../audits/insights/2026-10-04-epic-045-closure-review.md). Los deltas fechados de §14 conservan historia; no sustituyen este estado vigente.
 > Owner: Platform + Client Experience.
-> [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+> [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
 ## 1. Producto y alcance inicial
 
@@ -1451,7 +1443,7 @@ respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y
 4. Push del `main` de Think (despliega producción).
 5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.
 
-### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (code complete local, 2026-10-02)
+### 14.11 Estado de TASK-1957 — contrato de presentación apto para cliente (desplegado; cierre pendiente, 2026-10-04)
 
 **Decisión.** La frontera entre evidencia interna y documento de cliente tiene dueño y gate. El vocabulario de cara al
 lector (fuente, unidad, corte, ventana, título) vive en `src/lib/efeonce-insights/presentation/vocabulary.ts` y lo
@@ -1481,11 +1473,9 @@ lectora (`greenhouse_growth.seo_gsc_daily`) aunque su contrato decía «fuente l
 - **Título por defecto**: «Módulo · mes» (`defaultReportTitle`), no `Insights ico 2026-08-01–2026-09-01`. Los
   informes ya creados conservan su título: no existe comando de renombre.
 
-Estado: commit local `c56f62d09` sin push; 280 pruebas, typecheck, lint e `insights:canvas-fidelity` verdes; planes
-regenerados de Berel y Sky sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2 en
-producción, regenerar con `revise` las ediciones internas antes de emitir, y TASK-1958 (jerarquía visual).
+Estado: implementación inicial `c56f62d09`, incluida en `fe261ca2745f` y conservada en `36a73e7b7e19`; 116 pruebas focales PASS el 04/10. Modelo vigente 1.4. Pendiente: canary de los campos/gate client-fit en una edición nueva, aceptación del criterio AEO/copy y TASK-1958; no otro release del contrato. La lectura acotada del 04/10 no encontró planes congelados de ediciones creadas después del release.
 
-### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (code complete, rollout pendiente, 2026-10-03)
+### 14.12 Estado de TASK-1974 + TASK-1975 — criterio de selección y páginas de figura nuevas (en producción, 2026-10-03)
 
 **Qué hace.** El planner elige la figura por la pregunta del lector
 ([criterio](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md)), abre cada capítulo con la tarjeta de cifra y los catálogos
@@ -1506,21 +1496,23 @@ PDF y deck dibujan cascada, waffle, dona, barras apiladas y la tarjeta. El contr
   `BASELINE_DELTAS.md`); vista previa real de septiembre 2026 con `scripts/insights/preview-edition.ts --editorial-v2`
   (Berel 22 páginas + 18 láminas; Sky 10 + 8). Think: `test:insights` 25/25, `verify:insights`, `audit:insights-a11y`
   AA y `build` verdes.
-- **No verificado con datos reales.** La dona de fuentes IA y las barras apiladas de GA4: GA4 no corre en local; están
-  probadas con fixtures.
+- **Verificado con datos reales de GA4 (2026-10-03).** Vista previa de Berel (`EO-INS-000027`, 26 páginas + 20
+  láminas) con la conexión GA4 activa de la organización: barras apiladas de sesiones con interacción (p. 8) y dona de
+  sesiones desde asistentes de IA (p. 17, ChatGPT 1.648 de 1.686). La revisión destapó dos defectos, corregidos: una
+  parte con valor que redondea a 0 % ahora se lee «<1 %» (`shareLabel` en `figure-slots.ts`, copy
+  `catalog.shareUnderOne`) y la cifra se une a su unidad con espacio duro en los slots del PDF y el deck
+  (`bindUnitSpaces` en `composition-helpers.ts`: «(−17,0 %)» ya no deja el «%» solo en la línea siguiente; es
+  presentación, el plan sellado no cambia). Evidencia en `docs/ui/reviews/TASK-1975-efeonce-insights-new-figure-pages/`.
 
-**Rollout pendiente (nada aplicado; todo es local sin push).**
+**Rollout aplicado.** AXIS `v0.3.42` publicado (paquetes + axis.efeonce.org); Think `0c5701a` en producción; Greenhouse
+en producción con el release `36a73e7b7e19` (orquestador `37158679961`, PR #250, manifest `released`, watchdog OK).
+Ningún flag nuevo: el render ya estaba encendido. Las ediciones internas de Berel y Sky se revisan antes de compartirlas
+(la emisión está encendida en producción desde el 2026-09-28; el gate humano es esa revisión).
 
-1. AXIS: push a `main` (despliega axis.efeonce.org) y tag `v0.3.42` (publica los paquetes), con OK del operador.
-2. Think: push a `main` (despliega producción) antes o junto con el release de Greenhouse, con OK del operador.
-3. Greenhouse: push de `develop` → staging → release a producción por el control plane (Job `artifact-worker`).
-   TASK-1974 y TASK-1975 salen en el mismo release; las ediciones internas de Berel y Sky se revisan antes de compartir.
-4. Staging: verificar dona y barras apiladas con datos GA4 reales.
-5. Gate de cierre: `pnpm test` completo y `pnpm build` (este, con autorización del operador).
-
-**Abierto.** Color por orden en waffle y dona cuando la parte no declara rol (el plan aún no declara `role`). Las
-tarjetas con isotipo de canal (AI Overview, ChatGPT, Gemini, Perplexity) son una **propuesta** del canvas, no aprobada
-ni implementada.
+**Resuelto el 2026-10-04 (operador).** Color por rol, nunca por orden: las partes sin rol van actual → anterior → paso y
+el coral queda sólo para una oportunidad declarada (`figure-donut.ts`, `figure-waffle.ts`). Glifos Trazo e isotipos en
+cifras, filas, leyendas y aperturas, tableros por motor y por asistente: criterio §11 y §15 «Isotipo de canal en la
+tarjeta» (TASK-1990/TASK-1996).
 
 
 ## 15. Contrato de contenido del informe (TASK-1962)
@@ -1624,7 +1616,8 @@ del render, que rechazan con causa (`InsightsRenderRejectedError`) en vez de dib
 - **Barras apiladas:** el total del período es la suma de sus segmentos (hasta 4).
 - **Tarjeta:** hasta 6 cifras por página en A4 y deck (`FIGURE_CAPACITY`), con más en páginas equilibradas seguidas;
   un nombre de más de 3 palabras o 24 caracteres se rechaza. La cifra principal del deck se mide por ancho visible
-  (sin espacios ni signo).
+  (sin espacios ni signo). La cifra única de la lámina de cifras también: baja de 112 a 96, 80 o 66 px según sus
+  caracteres visibles (`deckSingleStatHook`, TASK-1996); con 12 el encaje rechaza con causa.
 
 **Tono semántico de la variación, por fondo.** Verde si el cambio es mejor, rojo si es peor y gris si es neutro, con la
 dirección declarada por métrica (`METRIC_DIRECTIONS` en `editorial/figure-selection.ts`; «Menor es mejor» se imprime
@@ -1644,12 +1637,24 @@ agosto de 2026») y sus piezas `comparison {display, period}`, `firstPeriod` («
 cual; nunca calcula la variación, su tono ni el período. La resolución es `statItemView` (`presentation/stat-card.ts`),
 la misma para PDF, deck y web.
 
+**Isotipo de canal en la tarjeta (TASK-1990/1996, aditivo en 1.4).** La plataforma de una cifra sale del hecho sellado
+(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 19 ids de
+`INSIGHT_CHANNEL_IDS`, igual a `AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain`
+traduce un dominio citado a su plataforma. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
+Search Console primero) y cada celda conserva su ícono. Tablero que mezcla motores de respuesta: cada celda trae
+`channel {platform, name}` y `context` (la métrica bajo la cifra). Isotipo o ícono, nunca los dos; título o celdas,
+nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Cada cifra
+sin plataforma trae `metricIcon` (glifo Trazo de AXIS, `presentation/metric-glyphs.ts`; seis glifos nuevos D31 en
+axis-graphic-line 0.16.0), el mismo en cifras, comparación, metas, filas de tabla (A4) y Think. Un capítulo puede traer
+varios tableros: el principal, visitas por asistente (con período anterior) y mención por motor (tasas iguales);
+criterio §11.
+
 **Motion de la tarjeta, sólo en el Live.** En Think la cifra recorre del valor anterior al actual (`count`) y después la
 variación pasa de gris a su tono y el triángulo entra en su dirección; con `prefers-reduced-motion` se muestra el estado
 final. El PDF A4 y el deck son estáticos. Contrato:
 [`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md).
 
-**Criterio de selección (aprobado 2026-10-03; code complete en TASK-1974 + TASK-1975, rollout pendiente, §14.12).** Qué
+**Criterio de selección (aprobado 2026-10-03; en producción por TASK-1974 + TASK-1975, release `36a73e7b7e19`, §14.12).** Qué
 familia usar para cada dato lo decide
 [`EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`](EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md); la matriz de
 arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
@@ -1661,5 +1666,5 @@ arriba sólo dice qué familias tienen evidencia. Tres reglas, en este orden:
 
 Orden del capítulo: cifras → metas → evolución → explicación → composición → subconjunto → comparación.
 
-**Pendiente de render:** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
+**Pendiente de render (TASK-1958):** los catálogos PDF (`insights-report`, `insights-deck`) no dibujan todavía el plan de acción
 ni la petición (sólo la decisión); Think sí. La página de plan en los PDF queda como follow-up de UI.

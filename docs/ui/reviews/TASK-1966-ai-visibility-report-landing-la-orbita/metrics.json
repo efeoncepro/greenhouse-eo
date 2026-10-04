@@ -1,0 +1,122 @@
+[
+  {
+    "answerSize": "128px",
+    "brokenImages": [],
+    "engineText": [],
+    "footerLogoWidth": 187.2578125,
+    "footerSloganWidth": 119.84375,
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formState": "No pudimos cargar el formulario. Intenta de nuevo.\n\nReintentar",
+    "headingCount": 1,
+    "logoHeight": 34,
+    "oldVisibleName": false,
+    "orbitCount": 1,
+    "questionSize": "29.952px",
+    "ring": {
+      "bottom": 494.345703125,
+      "left": 1068.765625,
+      "right": 1410.90625,
+      "top": 152.205078125
+    },
+    "scrollWidth": 1440,
+    "surface": "fhsf-ai-visibility-grader",
+    "textIntersections": [],
+    "width": 1440
+  },
+  {
+    "answerSize": "113.92px",
+    "brokenImages": [],
+    "engineText": [],
+    "footerLogoWidth": 187.2578125,
+    "footerSloganWidth": 119.84375,
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formState": "No pudimos cargar el formulario. Intenta de nuevo.\n\nReintentar",
+    "headingCount": 1,
+    "logoHeight": 34,
+    "oldVisibleName": false,
+    "orbitCount": 1,
+    "questionSize": "26.624px",
+    "ring": {
+      "bottom": 439.415380859375,
+      "left": 950.0111328125,
+      "right": 1254.1373046875,
+      "top": 135.289208984375
+    },
+    "scrollWidth": 1280,
+    "surface": "fhsf-ai-visibility-grader",
+    "textIntersections": [],
+    "width": 1280
+  },
+  {
+    "answerSize": "68px",
+    "brokenImages": [],
+    "engineText": [],
+    "footerLogoWidth": 187.2578125,
+    "footerSloganWidth": 119.84375,
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formState": "No pudimos cargar el formulario. Intenta de nuevo.\n\nReintentar",
+    "headingCount": 1,
+    "logoHeight": 23.9921875,
+    "oldVisibleName": false,
+    "orbitCount": 1,
+    "questionSize": "22px",
+    "ring": {
+      "bottom": 245.4375,
+      "left": 227.3671875,
+      "right": 402.8671875,
+      "top": 69.9375
+    },
+    "scrollWidth": 390,
+    "surface": "fhsf-ai-visibility-grader",
+    "textIntersections": [],
+    "width": 390
+  },
+  {
+    "answerSize": "68px",
+    "brokenImages": [],
+    "engineText": [],
+    "footerLogoWidth": 187.2578125,
+    "footerSloganWidth": 119.84375,
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formState": "No pudimos cargar el formulario. Intenta de nuevo.\n\nReintentar",
+    "headingCount": 1,
+    "logoHeight": 22.5234375,
+    "oldVisibleName": false,
+    "orbitCount": 1,
+    "questionSize": "22px",
+    "ring": {
+      "bottom": 230.25,
+      "left": 209.875,
+      "right": 371.875,
+      "top": 68.25
+    },
+    "scrollWidth": 360,
+    "surface": "fhsf-ai-visibility-grader",
+    "textIntersections": [],
+    "width": 360
+  },
+  {
+    "answerSize": "68px",
+    "brokenImages": [],
+    "engineText": [],
+    "footerLogoWidth": 187.2578125,
+    "footerSloganWidth": 119.84375,
+    "formKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+    "formState": "No pudimos cargar el formulario. Intenta de nuevo.\n\nReintentar",
+    "headingCount": 1,
+    "logoHeight": 23.9921875,
+    "oldVisibleName": false,
+    "orbitCount": 1,
+    "questionSize": "22px",
+    "ring": {
+      "bottom": 265.6875,
+      "left": 250.6875,
+      "right": 444.1875,
+      "top": 72.1875
+    },
+    "scrollWidth": 430,
+    "surface": "fhsf-ai-visibility-grader",
+    "textIntersections": [],
+    "width": 430
+  }
+]

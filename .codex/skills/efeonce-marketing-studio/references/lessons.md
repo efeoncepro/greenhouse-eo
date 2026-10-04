@@ -177,3 +177,22 @@
   running the gateway sync («Merge Without Review») were blocked by the classifier (the gateway one even though the
   operator had authorized PR and merge); the work was left on a pushed branch + preview and a prepared isolated change. Rule: ask for the external-mutation authorization at the
   start, or plan the hand-off to the operator from the beginning.
+
+## 2026-10-03 — A video into an OneDrive-governed campaign (CMP-001 «Los Sparks»)
+
+- **The importer takes the concept title from the concept's first asset.** Rule: name the first asset of a new concept
+  correctly in `CATALOGO-DATOS.json` (CMP001-08 «Los Sparks» came out right because its first asset did).
+- **The catalog is JSON with 2-space indentation.** A script rewrite with indentation 1 produced a giant diff and had to
+  be redone. Rule: back up the file first; rewrite with `indent=2` and `ensure_ascii=False`.
+- **An import can revert live campaign states.** Rule: before `import:catalog --apply`, compare the live campaign states
+  in the DB with `scripts/seeds/campaign-registry.json`; apply only when they match (verified for CMP-001 on 2026-10-03).
+- **A stale Cloud SQL proxy answers `ECONNRESET`.** Rule: start a fresh `cloud-sql-proxy` on another port and point
+  `STUDIO_PG_PORT` to it; do not debug credentials first.
+- **`media:ingest` needs ADC impersonating `marketing-studio-ingest@efeonce-group.iam.gserviceaccount.com`.** Rule: a
+  temporary impersonated ADC file in the scratchpad (mode 0600), `GOOGLE_APPLICATION_CREDENTIALS` set only for that
+  command, file deleted afterwards. Never modify the default ADC or IAM.
+- **A transient `media_object_pending` on one object resolved itself** (same race as the 2026-09-26 first ingest). Rule:
+  check renditions in the DB/API before retrying anything.
+- **Re-importing corrects copy text without duplicates** (copies upsert by `copy_id`; verified 2026-10-03 fixing the
+  service name in two copies). The import report prints `updated: N` for every row it touches, changed or not. Rule:
+  never read `updated: N` as "everything changed"; verify the specific field with a read.

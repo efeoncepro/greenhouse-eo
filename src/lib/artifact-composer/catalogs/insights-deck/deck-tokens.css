@@ -304,6 +304,8 @@
   --axis-deck-role-accentAlt-rgb: var(--axis-deck-violet-550-rgb);
   --axis-deck-role-accentDeep: var(--axis-deck-teal-550);
   --axis-deck-role-accentDeep-rgb: var(--axis-deck-teal-550-rgb);
+  --axis-deck-role-channelDisc: var(--axis-ppt-neutral-50);
+  --axis-deck-role-channelDisc-rgb: var(--axis-ppt-neutral-50-rgb);
   --axis-deck-role-dataAbsenceFillOnPaper: var(--axis-deck-slate-75);
   --axis-deck-role-dataAbsenceFillOnPaper-rgb: var(--axis-deck-slate-75-rgb);
   --axis-deck-role-dataAbsenceOnNavy: var(--axis-deck-ice-200);

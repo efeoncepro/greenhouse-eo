@@ -36,7 +36,7 @@ import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatFactValue } from '../editorial/format'
-import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
+import { bindUnitSpaces, chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
 import { chapterFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
@@ -259,11 +259,11 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
         ...(chapter.opening
           ? { chapterLead: rejectIfLonger(chapter.opening.text, BUDGET.chapterLead, `${chapter.chapterId}.opening`) }
           : {}),
-        ...(channelsOf([chapter]).length > 0
+        ...(channelsOf([chapter], factsById).length > 0
           ? {
               measuredChannels: {
                 label: L.measuredIn,
-                channels: channelsOf([chapter]).map(channelId => ({ channelId, name: channelNameOf(channelId) }))
+                channels: channelsOf([chapter], factsById).map(channelId => ({ channelId, name: channelNameOf(channelId) }))
               }
             }
           : {})
@@ -375,7 +375,7 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
       if (FOLIO_TYPES.has(slide.contentType)) Object.assign(slots, { footerEdition, folio: { page: pad2(i + 1), total } })
       if (slide.contentType === 'insights-chapter') slots.pageFolio = pad2(i + 1)
 
-      return { ...slide, slideId: `slide-${pad2(i + 1)}`, slots }
+      return { ...slide, slideId: `slide-${pad2(i + 1)}`, slots: bindUnitSpaces(slots) }
     }) as CompositionSlideInput[]
   }
 }

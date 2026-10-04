@@ -1,4 +1,4 @@
-# Copy para redes — spot Sparks × Efeonce AEO (propuesta 2026-10-03)
+# Copy para redes — spot Sparks × Efeonce | AEO (propuesta 2026-10-03)
 
 Voz institucional Efeonce (página, no Julio). Español neutro, tuteo, sin voseo. Estructura: tensión (pregunta de la
 portada) → qué hacemos (mecanismo, con los Sparks supervisados) → honestidad de la práctica (sin prometer aparición en
@@ -13,7 +13,7 @@ Le preguntan a la IA por tu categoría. ¿Te nombra a ti o a tu competencia?
 
 En el video, Tomás pregunta por el mejor software de flotas en Chile. La respuesta nombra a todos, menos a su marca.
 
-Así lo trabajamos en Efeonce AEO, con los Sparks, nuestros agentes:
+En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO y con los Sparks, nuestros agentes:
 
 1. Medimos cómo te describen las IA: qué fuentes leen y quién aparece en tu lugar.
 2. Ordenamos lo que falta: contenido claro, una marca bien definida y fuentes que te respalden.
@@ -33,7 +33,7 @@ Un cliente potencial le pregunta a ChatGPT, Gemini o Perplexity por el mejor pro
 
 Así abre nuestro nuevo spot: Tomás, marketer, pregunta por el mejor software de gestión de flotas en Chile. La IA responde con su competencia.
 
-Lo que muestra el video es lo que hacemos en Efeonce AEO:
+Lo que muestra el video es lo que hacemos en Efeonce con nuestro servicio Efeonce | AEO:
 
 → Medimos cómo te describen los motores de respuesta: qué fuentes leen y quién aparece en tu lugar.
 → Ordenamos lo que falta para que una IA pueda citarte: contenido claro, una marca bien definida y fuentes que te respalden.

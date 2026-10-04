@@ -234,6 +234,12 @@
               "quote",
               "eye-off"
             ]
+          },
+          "channel": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-stat-channel",
+            "notes": "TASK-1996: plataforma de la parte (asistente o motor) → su isotipo oficial (AXIS_PLATFORM_ASSETS). Reemplaza al ícono; sin isotipo conocido se quita el disco y queda el nombre."
           }
         }
       },

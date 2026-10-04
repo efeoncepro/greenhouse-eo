@@ -1,5 +1,28 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-04 · TASK-1996 · Tres trampas al publicar y commitear los glifos.** (1) El release de AXIS exige que el tag
+  coincida con la versión de un paquete: `v0.4.18` para `axis-graphic-line` 0.16.0 falló («Ningún paquete está en
+  0.4.18»); el tag correcto fue `v0.16.0`. (2) Greenhouse fija `axis-graphic-line` 0.11.0 por brand-surfaces y Manzanitas:
+  subirlo para leer glifos nuevos cambiaría otros renders; los trazos se sellan en `metric-glyphs.axis.json` con test.
+  (3) En zsh, `git add $P` con una lista multilínea no separa palabras; usar `--pathspec-from-file`. Un `index.lock` sin
+  proceso git vivo es huérfano. Regla: commitear con `--pathspec-from-file` las rutas propias cuando el índice compartido
+  tiene cambios preparados de otra sesión.
+- **2026-10-04 · Estado desplegado frente a cierre.** Síntoma: `Status real`, epic y referencias activas seguían declarando contratos locales y flags OFF tras #248/#250. Regla: contrastar snapshots de código de releases squash por blobs, flags exactos y alias actual; registrar canary y aprobación por separado. Las previews sobre planes anteriores no prueban generación productiva de una edición nueva. Gcloud con reautenticación requerida no permite afirmar salud actual del worker; preservar la limitación.
+
+- **2026-10-03 · TASK-1975 · GA4 sólo se ve en local con su flag y su OAuth, y los datos reales destaparon dos fallas
+  de lectura.** Síntoma: la vista previa local devolvía `disabled` y luego `query_failed` para GA4, así que la dona de
+  sesiones desde IA y las apiladas sólo se habían probado con fixtures. El lector exige `GROWTH_GA4_ENABLED=true` más
+  `GOOGLE_GA4_OAUTH_CLIENT_ID` y `GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` (se toman del env de staging de Vercel en un
+  archivo temporal privado que se borra en el acto). Con datos reales de Berel: (1) una parte de 8 sesiones sobre 1.686
+  se leía «0 %», ahora «<1 %» (`shareLabel`); (2) el lead «(−17,0 %)» partía la línea entre la cifra y el «%», ahora los
+  mappers unen cifra y «%»/«pp» con espacio duro en los slots (`bindUnitSpaces`; presentación, el plan sellado no
+  cambia). Regla: una figura alimentada por un productor externo no está verificada hasta verla con SU fuente real, y el
+  porcentaje redondeado nunca puede decir 0 de algo que existe.
+  **Segunda vuelta (misma noche):** el «<1 %» pasó todos los tests de `figure-slots` y rompió el render: el validador de
+  la dona del compositor parsea la participación impresa y «<1» sumaba 1 («suman 101, no 100»). Un cambio en un texto
+  que el compositor vuelve a leer se prueba componiendo la página, no sólo armando los slots; y el estado de un flag se
+  lee en `FEATURE_FLAG_STATE_LEDGER.md`, no en el texto de esta skill (afirmé «emisión apagada» cuando lleva ON desde el
+  28/09).
 - **2026-10-03 · TASK-1975 · La vista previa con datos reales encontró seis fallas que ninguna prueba vio.** Síntoma
   (`preview-edition.ts --editorial-v2` sobre Berel y Sky, septiembre 2026, con todos los tests verdes): (1) la leyenda de
   las barras de composición medía 36 caracteres (la serie llevaba el título) y el PDF de Berel no componía; (2) la nota

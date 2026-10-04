@@ -25,6 +25,8 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+> **Reconciliación 2026-10-04:** [Evidencia y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Los deltas anteriores conservan su fecha; no sustituyen el Status real vigente.
+
 ## Status
 
 - Lifecycle: `complete`
@@ -40,7 +42,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Code complete; el flip del flag de TASK-1670 sigue pendiente y con el flag OFF el punto ciego SIGUE ABIERTO`
+- Status real: `Complete: superficie con alcance sitio/página implementada y release documentado junto a TASK-1670. El flip ya ocurrió; worker activo ops-worker-00762-njg con flag true (04/10). Se comprobaron 2 hallazgos de sitio persistidos en PG (28/09); sin nueva revisión visual ni contraste de precisión.`
 - Rank: `TBD`
 - Domain: `growth|ui`
 - Blocked by: `none`
@@ -647,11 +649,11 @@ va a creerle al PDF.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `Lifecycle` sincronizado: `complete`, reconciliación documental 04/10.
+- [x] Archivo en `complete/`, comprobado 04/10.
+- [x] `docs/tasks/README.md` sincronizado en la reconciliación 04/10.
+- [x] `Handoff.md` enlaza la reconciliación 04/10.
+- [x] `changelog.md` registra la reconciliación 04/10.
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 actualizado con el tratamiento de alcance

@@ -10,6 +10,7 @@ import { isReportEmailDeliveryEnabled } from '@/lib/growth/ai-visibility/flags'
 import { getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
 import { getGraderLeadForHandoff } from '@/lib/growth/ai-visibility/public-intake/store'
 import { buildReportHeader } from '@/lib/growth/ai-visibility/report/report-header'
+import { readAiVisibilityReportPdfPresentationContext } from '@/lib/growth/ai-visibility/report/pdf-presentation-context'
 import { resolvePreferredReportUrl } from '@/lib/growth/ai-visibility/report/short-link'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
@@ -119,7 +120,13 @@ export const dispatchAiVisibilityReportEmail = async (runId: string): Promise<Re
     const organizationName = lead.brandName
     const header = buildReportHeader({ organizationName, asOf: snapshot.asOf })
 
-    const attachment = await buildAiVisibilityReportAttachment({ publicReport: snapshot.publicReport, header })
+    const pdfPresentationContext = await readAiVisibilityReportPdfPresentationContext({
+      runId: snapshot.runId,
+      locale: snapshot.publicReport.provenance.market?.locale,
+      asOf: snapshot.asOf
+    })
+
+    const attachment = await buildAiVisibilityReportAttachment({ publicReport: snapshot.publicReport, header, context: pdfPresentationContext })
 
     // TASK-1330 — URL de share preferida (corta si el flag ON + link activo; si no, larga).
     const reportUrl = await resolvePreferredReportUrl({ reportId: snapshot.reportId, reportToken })

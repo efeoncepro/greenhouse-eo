@@ -119,8 +119,8 @@ the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
   tables, limits), actions (no ownerRef), limits, methodology, references (no evidenceRef), facts (`display` formatted
   per locale, value, unit, observation, source, asOf, `absentReason: 'no_data'` when value is null). Never
   authoringMode, modelId, prompts, history or actor ids.
-- **`InsightWebModelV1` 1.1 (TASK-1875, 2026-09-28; code complete locally, not deployed) — additive over 1.0.**
-  `INSIGHT_WEB_MODEL_VERSION = '1.1'`; Greenhouse always emits `'1.1'`, a 1.0 consumer ignores the new fields and Think
+- **`InsightWebModelV1` 1.1 (TASK-1875, historical additive version; published in `6ea157e6e641` 02/10, current version 1.4) — additive over 1.0.**
+  `INSIGHT_WEB_MODEL_VERSION = '1.1'`; At introduction Greenhouse emitted `'1.1'`; it now emits `'1.4'`, a 1.0 consumer ignores the new fields and Think
   accepts any `/^1\.\d+$/`. All new fields are optional and come only from a sealed editorial v2 plan (TASK-1888):
   - `chart.derived?.funnelStepRates?: Array<{ stageId, display: string | null }>` — computed by `deriveChart` with the
     SAME `funnelGeometry` (`@/lib/artifact-composer/pure`) the PDFs use, formatted with `formatFactValue(rate, 'percent',
@@ -320,14 +320,14 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   ref `asset-ref:org-logo:<id>` (`render/cover.ts` `orgLogoRef`); bytes arrive through `ComposeOptions.externalAssets`.
   The worker reads them with `readOrganizationLogoForRender` (only the attached logo of THAT org, image, ≤ 2 MB, access
   log). No bytes ⇒ fail closed; non-embeddable logo ⇒ `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
-- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. Since TASK-1975 (local, 2026-10-03) the
+- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. Since TASK-1975 (published in `36a73e7b7e19`, 2026-10-03) the
   variation value is `<direction>[:<tone>]` with a SEMANTIC tone (`better` green, `worse` red, `neutral` gray; see
   § Contrato de render de las figuras nuevas); before it, `worse` painted gray.
 - **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
   visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).
 
 
-## Client-fit presentation (TASK-1957 — code complete local 2026-10-02)
+## Client-fit presentation (TASK-1957 — deployed; closure pending, 2026-10-04)
 
 - `InsightWebModelV1` **1.2** (aditivo): `InsightWebFactV1.source` = nombre legible (vocabulario común con el PDF;
   hasta 1.1 viajaba la tabla lectora), `unitLabel`, `asOfLabel`; `InsightWebChartV1.unitLabel`;
@@ -378,7 +378,7 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   exportan con `pnpm insights:think-icons` desde `@efeoncepro/axis-brand-assets`; nunca se copian ni se arman a mano.
   Reservado: `ai_visibility_report` (enlazar el entregable cuando exista el vínculo) y portadas PDF/deck.
 
-## Contrato de contenido y su mantenimiento (TASK-1962 — en código local 2026-10-02)
+## Contrato de contenido y su mantenimiento (TASK-1962 — desplegado en fe261ca2745f; cierre pendiente)
 
 - **Qué dice un informe**: ocho preguntas del cliente en `presentation/content-contract.ts` (resultado, causas,
   competencia, trabajo entregado, recomendaciones, peticiones, medición, límites), con veredicto por módulo
@@ -405,11 +405,11 @@ Verified against code on 2026-09-25. Detail: architecture §14.9.
   OFF ⇒ silencio (sin límite); lo leen Vercel y `ops-worker`.
 - **Línea semanal**: la lectura usa sólo bloques completos de 7 días como extremos.
 
-## Criterio de selección de gráficos (2026-10-03, decidido; implementado por TASK-1974 + TASK-1975, code complete local)
+## Criterio de selección de gráficos (2026-10-03, decidido; implementado por TASK-1974 + TASK-1975, en producción)
 
 Aprobado y canonizado por el operador el 2026-10-03. Canon técnico (fuente única; esto es su resumen operativo):
 `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`. Implementado por **TASK-1974** (planner, contrato,
-modelo web) y **TASK-1975** (páginas, tarjeta, diseño), ambas code complete local el 2026-10-03, sin desplegar.
+modelo web) y **TASK-1975** (páginas, tarjeta, diseño), publicadas el 2026-10-03 en `36a73e7b7e19`; TASK-1974 complete, TASK-1975 pendiente de revisión y fixes posteriores.
 
 - **Principio**: un gráfico es un argumento que responde UNA pregunta del lector; la familia se elige por la pregunta, no
   por la forma del dato ni por costumbre. Si la barra explica el dato, se queda; si otra figura lo explica igual o mejor,
@@ -440,13 +440,13 @@ modelo web) y **TASK-1975** (páginas, tarjeta, diseño), ambas code complete lo
 - **Reglas duras heredadas** (`dataviz-design`): barras desde 0; nunca torta de más de 3 porciones; nunca 3D; nunca doble
   eje; nunca el color como única codificación; embudo sólo con etapas estrictamente ordenadas que pierden gente
   (clics de Search Console → sesiones de GA4 NO lo es: Berel septiembre 2026, 13.606 clics vs 43.949 sesiones).
-- **Implementado (local, 2026-10-03)** — el criterio es regla con pruebas, SÓLO en planes con editorial v2:
+- **Implementado y publicado (`36a73e7b7e19`, 2026-10-03)** — el criterio es regla con pruebas, SÓLO en planes con editorial v2:
   `ChartSpecV1.question` + `QUESTION_FAMILIES` (§ abajo), selección en `editorial/figure-selection.ts`, productores en
   `editorial/criterion-figures.ts`, deduplicación `duplicated_fact`, matriz `family_evidence_matrix_v3` (dona y
   apiladas con evidencia GA4), tarjeta de cifra en el plan + modelo web 1.4 + `insights-report` + `insights-deck` + Think,
   y página PDF/lámina para cascada, waffle, dona y apiladas. Orden del capítulo: cifras → metas → evolución → explicación
   → composición → comparación (`FIGURE_QUESTIONS` en ese orden; `orderByQuestion`).
-- **Sin verificar con datos reales**: dona de fuentes IA y apiladas de GA4 (GA4 no corre en local; probadas con fixtures).
+- **Datos reales verificados en preview local 03/10**: Berel, dona de fuentes IA y apiladas GA4 (dossier TASK-1975). No es prueba de una edición nueva generada por producción; readback post-release pendiente.
 - **Plan sellado antes del criterio** no trae `question` ni `stats`: valida igual y sigue con la regla de hoy (§ Render
   contract y `ChartScaleV1.perDimension` en § Client-fit). Una edición sellada nunca cambia de figuras.
 
@@ -535,3 +535,24 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
 - **Tono por fondo**: papel (A4, Live) = píldora teñida con texto en tono (variante A); navy (deck) = sin píldora
   rellena, tono sólo en el triángulo y la cifra en `navyLead` (variante C). Triángulo de puntas redondeadas en todas las
   superficies. Roles `deltaBetter/WorseOnPaper`, `deltaBetter/WorseOnNavy`, `dataStepOnPaper/OnNavy`.
+
+### Glifos, isotipos y tableros por plataforma (TASK-1990/1996 — code complete en develop 2026-10-04)
+
+- **Plataformas:** `INSIGHT_CHANNEL_IDS` = las 19 de `AXIS_PLATFORM_ASSETS` (test de deriva contra el paquete instalado);
+  `channelForDomain(domain)` traduce un dominio citado (youtube.com, reddit.com, *.wikipedia.org, linkedin.com,
+  instagram.com, tiktok.com, facebook.com → meta). Los 19 isotipos están copiados en `catalogs/insights-*/assets/channels/`
+  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`).
+- **`metricIcon`:** glifo Trazo de la métrica (`presentation/metric-glyphs.ts`, `metricGlyphOf`), resuelto por
+  `statItemView` y aditivo en el modelo web 1.4. Nunca junto a `channel`. Catálogo: campo `metricIcon` con resolver
+  `*-metric-icon` en cifras, comparación, metas (A4 y deck) y tabla (A4); trazos sellados en
+  `insights-shared/metric-glyphs.axis.json` (axis-graphic-line 0.16.0; Greenhouse sigue fijando 0.11.0 por otras
+  superficies). Columnas: `glyph` por categoría (SVG del hook), sin glifo para «Sin clasificar».
+- **Reglas de plataforma (`statBoardChannelsOf`):** ≥2 motores/asistentes distintos ⇒ isotipo por celda (una celda sin
+  plataforma, como «Otros asistentes», queda con su nombre); si no, cualquier cifra sin plataforma apaga los isotipos;
+  si todas comparten plataformas (≤3), van en el título. Filas de tabla: isotipo si la tabla mezcla plataformas o es un
+  dominio citado; si toda la tabla es de una plataforma, glifo (`rowMarkOf`).
+- **Tableros extra del capítulo AEO:** `assistantStatFigureFor` (visitas por asistente, sólo si los asistentes con isotipo
+  tienen período anterior; si no, la dona) y `engineStatFigureFor` (mención por motor, sólo si todas las tasas son
+  iguales; si varían, barras por canal). `chapter.stats` puede traer varios tableros.
+- **Color por rol:** partes sin rol actual → anterior → paso (→ gris medio en waffle); coral sólo con rol declarado.
+

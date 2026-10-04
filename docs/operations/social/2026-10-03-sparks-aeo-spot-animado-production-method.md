@@ -1,4 +1,4 @@
-# Sparks × Efeonce AEO — primer spot animado 2D de marca propia — 2026-10-03
+# Los Sparks (servicio Efeonce | AEO) — primer spot animado 2D de marca propia — 2026-10-03
 
 **Aplicación reusable:** [método de producción y posproducción de video](../creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md)
 y el workflow de la skill `motion-design-studio`
@@ -8,13 +8,40 @@ Esta retrospectiva conserva la evidencia del caso; el método vive allá y no se
 **Documentación funcional:** [Spot animado 2D de Efeonce](../../documentation/creative/spot-animado-2d.md) ·
 **Manual:** [Producir un spot animado 2D](../../manual-de-uso/creative/producir-spot-animado.md).
 
+## Delta 2026-10-03 — distribución (Marketing Studio + Metricool) y naming
+
+- **Marketing Studio.** El spot entró como concepto **CMP001-08 «Los Sparks»** de CMP-001 (always-on AEO,
+  `source_of_truth onedrive`): finales en OneDrive `15. Paid Media/03. Finales/CMP-001 - Lo que la IA dice de ti/`,
+  entradas en `CATALOGO-DATOS.json` → `pnpm import:catalog --apply` → `pnpm media:ingest --campaign CMP-001 --apply`;
+  filas `CMP-001-SP-01…05` en el `ASSETS.md` de la campaña. Orgánico (la pauta espera la licencia de la música de
+  Stable Audio); versiones `imported` sin aprobar; copies en estado «propuesta». Operación de Studio:
+  [skill `efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md).
+- **Metricool (marca Efeonce Group `3961547`, `America/Santiago`).** Instagram `efeoncepro`: REEL con
+  `showReelOnFeed`, lun 05-oct-2026 14:00, ID `387560819`, UUID `213403842407255251`; video 16:9 con intro muda de
+  «gira la pantalla» (52,6 s) y portada **4:5** (regla del operador: en Instagram la portada de un video 16:9 es la
+  4:5). LinkedIn página Efeonce: POST, jue 08-oct-2026 11:00, ID `387560873`, UUID `-1362316842369790950`; video
+  16:9 (49,6 s) y portada 16:9. Estado `PENDING` = programado, no publicado.
+- **Horarios:** cruce de mejores horas con la cola. IG lunes 14 h (índice 317, máximo semanal, día libre); LinkedIn
+  jueves 11 h (índice 2790), porque martes 06 y viernes 09 ya tenían post a las 11:00.
+- **Readback:** Metricool re-alojó la media en `static.metricool.com/planner/202610/…` y los 4 archivos descargados
+  (2 MP4, 2 PNG) tienen SHA-256 idéntico a los finales; el texto devuelto es idéntico al copy aprobado. Registro:
+  `ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md`. Receta y schema MCP observado ese día:
+  [entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md).
+- **Naming (corrección del operador):** «Mi marca no se llama Efeonce AEO sino Efeonce. Efeonce | AEO es el
+  servicio». Los copies se corrigieron: la marca que habla es Efeonce y el servicio se escribe «Efeonce | AEO». La
+  voz y los subtítulos quemados del video dicen «Efeonce AEO» y el operador decidió no re-renderizar; cuando este
+  registro cita la pieza, cita lo que la pieza dice.
+- **Pendientes humanos:** enlace de la bio de Instagram (el copy dice «Link en la bio»), comprobar la publicación
+  después de la hora y aprobar las versiones en Studio.
+
 ## Estado
 
 - **v2 aprobada por el operador (Julio Reyes) el 2026-10-03:** «Quedó genial… Muy bueno».
 - Archivo: `ai-generations/2026-10-03_sparks-aeo-60s/final/v2/sparks-aeo-v2-1080-es.mp4` y su versión
   `-sin-subtitulos`. 16:9, 1920×1080, 24 fps, **49,6 s**. Master −16 LUFS / −1 dBTP.
-- **Sin publicar.** La aprobación es de la pieza, no de su publicación ni de su uso en pauta.
-- En curso (fuera de esta retrospectiva): publicación del elenco 2D en AXIS y variantes para redes (ver
+- **Programado, todavía sin publicar** (ver el delta de distribución): Instagram 05-oct y LinkedIn 08-oct, orgánico.
+  La aprobación de la pieza no autorizó su publicación; la programación tuvo autorización propia en el chat. Sin pauta.
+- En curso (fuera de esta retrospectiva): publicación del elenco 2D en AXIS (ver
   [Pendientes](#pendientes-y-límites-honestos)).
 
 ## Qué se pidió
@@ -26,8 +53,9 @@ modelo de video sólo al cerrar la preproducción.
 La pieza resultante es un **explainer animado 2D**: Tomás, marketer ficticio de Andina Cargo (cliente en la
 ficción), le pregunta a una IA por «el mejor software de gestión de flotas en Chile» y la IA nombra a la competencia.
 Sale un Spark del portal, Tomás da la señal a los cuatro Sparks, investigan fuentes, ordenan contenido y entidades,
-reportan; Tomás aprueba, vuelve a preguntar y la IA nombra a Andina Cargo con su fuente. Cierre con placa Efeonce
-AEO + AI Visibility Report y el reveal del logo Efeonce con eslogan.
+reportan; Tomás aprueba, vuelve a preguntar y la IA nombra a Andina Cargo con su fuente. Cierre con placa del servicio
+Efeonce | AEO + AI Visibility Report (la voz y el subtítulo de la pieza dicen «Efeonce AEO») y el reveal del logo
+Efeonce con eslogan.
 
 ## Qué tipo de animación es
 
@@ -59,6 +87,8 @@ Híbrido de cuatro capas; **lo de marca se compone, nunca se genera**:
    **sin voz**.
 10. **Excepciones al canon sonoro aceptadas por el operador:** registro de energía debajo de una locución (la norma
     lo prohíbe) y licencia comercial de Stable Audio aún sin confirmar con legal.
+11. **Naming (posterior a la aprobación):** la marca es Efeonce; «Efeonce | AEO» es el servicio. Corregido en los
+    copies de redes, no en el video (no se re-renderizó).
 
 ## Línea de tiempo de rondas
 
@@ -72,7 +102,7 @@ Híbrido de cuatro capas; **lo de marca se compone, nunca se genera**:
 | Piloto H3 | S3 primero (autorizado USD 0,72) y S3 v2 | Se autorizó la producción completa |
 | Tomas H3 | S1–S9 | S1 y S8 rehechas (texto ilegible); S6 rehecha (se fue al verde) |
 | v1 | Corte mudo con placas provisorias, placas 1080, VO Andre `eleven_v4`, SFX sintetizados, subtítulos quemados + SRT, mezcla | 59,96 s. Llega al operador con marcadores de marca y burbuja desbordada |
-| Feedback v1 | «va muy lento…», marcas reales, zoom de S2 fluido, guion fiel a Efeonce AEO, cama punk | Se carga `seo-aeo`, `seo-aeo-practice` y el canon de los Sparks antes de reescribir |
+| Feedback v1 | «va muy lento…», marcas reales, zoom de S2 fluido, guion fiel al servicio Efeonce | AEO, cama punk | Se carga `seo-aeo`, `seo-aeo-practice` y el canon de los Sparks antes de reescribir |
 | v2 | Un solo mapa de tiempos re-tima video, voz, efectos y subtítulos; pantallas S2/S9 dibujadas desde el vector; cama punk desde la pieza de energía oficial | 46,5 s; el logo sonoro intermedio se quita (chocaba con la voz) |
 | Cierre | Placa animada (6,54 s) con Sparks escalonados, logo AEO y logo del Report; reveal del logo Efeonce sin voz; cama +2 compases | **49,6 s, aprobada** |
 
@@ -155,10 +185,11 @@ Lo que falta decirle al operador, sin suavizar:
 - **Prueba de reconocimiento del elenco 2D** pendiente.
 - **Derechos del elenco 2D** pendientes.
 - **Publicación del elenco 2D en AXIS** (packages + Lab): en curso.
-- **Variantes para redes, en curso:** portada Instagram 4:5 y portada LinkedIn 16:9 de alto impacto; versión
-  Instagram con pantalla negra muda inicial y animación vectorial de un teléfono genérico (sin botones, no iPhone)
-  con flechas de girar la pantalla.
-- **Publicación:** no hay. Destino (orgánico, landing o pauta) no está fijado en este registro.
+- **Variantes para redes: entregadas y programadas** (delta de distribución): portada Instagram 4:5, portada
+  LinkedIn 16:9 y versión Instagram con pantalla negra muda inicial y animación vectorial de un teléfono genérico
+  (sin botones, no iPhone) con flechas de girar la pantalla.
+- **Publicación:** orgánica, programada (`PENDING`) en Instagram y LinkedIn; comprobarla después de la hora. Pauta,
+  en espera de la licencia de la música. Enlace de la bio de Instagram y aprobación de versiones en Studio, pendientes.
 
 ## Rutas y commits
 

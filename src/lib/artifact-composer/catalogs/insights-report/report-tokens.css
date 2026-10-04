@@ -304,6 +304,8 @@
   --axis-report-role-accentAlt-rgb: var(--axis-deck-violet-550-rgb);
   --axis-report-role-accentDeep: var(--axis-deck-teal-550);
   --axis-report-role-accentDeep-rgb: var(--axis-deck-teal-550-rgb);
+  --axis-report-role-channelDisc: var(--axis-ppt-neutral-50);
+  --axis-report-role-channelDisc-rgb: var(--axis-ppt-neutral-50-rgb);
   --axis-report-role-dataAbsenceFillOnPaper: var(--axis-deck-slate-75);
   --axis-report-role-dataAbsenceFillOnPaper-rgb: var(--axis-deck-slate-75-rgb);
   --axis-report-role-dataAbsenceOnNavy: var(--axis-deck-ice-200);

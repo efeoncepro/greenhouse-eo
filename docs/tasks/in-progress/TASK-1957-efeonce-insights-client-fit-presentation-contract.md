@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Code complete local (Slices 1–6 + correcciones de figuras y puntaje del Grader); gate de cierre verde en 0256d818f: pnpm build exit 0 y pnpm test 17561 passed / 0 failed (2026-10-02). Pendiente: release, canary 1.2 en producción, revise de ediciones internas y aprobación del copy de límites`
+- Status real: `Desplegado en producción: contrato presente en release fe261ca2745f (2026-10-03), conservado en 36a73e7b7e19; modelo vigente 1.4. Pruebas focales 116/116 PASS (2026-10-04). Cierre pendiente: prueba productiva del contenido/gate, revisión de la desviación del criterio AEO y copy de límites; no hay plan congelado de una edición creada después del release en el readback acotado del 2026-10-04.`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery`
 - Blocked by: `none`
@@ -111,7 +111,7 @@ Reglas obligatorias:
 
 - `.claude/skills/efeonce-insights/SKILL.md` y `references/{program-ledger,contracts,lessons}.md` (contrato de la skill:
   cada hija la actualiza al cerrar).
-- `docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md`
+- `docs/epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md`
 - `src/lib/copy/insights.ts` (`GH_INSIGHTS`: `sources`, `units`, `rejections`, `document`) — fuente única de copy.
 
 ## Dependencies & Impact
@@ -393,7 +393,7 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
 - [ ] Ningún gráfico emitido tiene todos sus valores iguales sin comparación con cambio; la presencia AEO se grafica como proporción con «n de m». *(La primera mitad está cumplida y probada. La segunda se resolvió distinto: «n de m» sólo comparte figura con el mismo total y el empate se dice en una frase — ver Delta 2026-10-02; queda sin tildar hasta que el operador acepte el cambio.)*
 - [x] Posición media nunca se emite como barras desde cero.
 - [x] El gate corre en CI sobre fixtures derivados y antes de emitir una edición cliente. *(Vive en `commands/lifecycle.ts::issueInsightEdition`, no en `plan-validation.ts`: necesita el título del informe y el modelo proyectado, que la validación del plan no conoce.)*
-- [ ] Canary productivo 1.2 verde y registrado en el ledger de tiempos o en la task.
+- [ ] Canary productivo del modelo vigente 1.4 verifica los campos y el gate aportados por 1.2; resultado registrado en la task o auditoría. El release ya ocurrió; falta el comportamiento autenticado, no otro cambio de versión.
 - [x] Skill `efeonce-insights` actualizada (ledger, contracts, lessons) y espejada a `.codex/`.
 
 ## Verification
@@ -473,3 +473,10 @@ valor inicial lo fija el agente en Discovery con los datos reales de Berel y Sky
   el operador antes del release.
 - ¿Las dimensiones de puntaje en cero del Grader se explican en el informe (lectura) o sólo van al respaldo? Inicial:
   respaldo; `TASK-1903` puede promoverlas con interpretación.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.
+- El canary de cierre debe verificar el modelo vigente 1.4 y los campos/gate aportados por 1.2; no se debe exigir que el número de versión vuelva a 1.2.

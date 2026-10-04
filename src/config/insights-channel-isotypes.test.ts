@@ -24,6 +24,12 @@ describe('isotipos de canal de los catálogos de Insights = AXIS_PLATFORM_ASSETS
     expect(copy.equals(source)).toBe(true)
   })
 
+  it('los 19 isotipos de AXIS están en el catálogo (uno por canal de INSIGHT_CHANNEL_IDS)', async () => {
+    const { INSIGHT_CHANNEL_IDS } = await import('@/lib/efeonce-insights/contracts/channels')
+
+    expect(Object.keys(CHANNEL_ISOTYPES).sort()).toEqual([...INSIGHT_CHANNEL_IDS].sort())
+  })
+
   it('AI Overview usa su lupa en color, no la G de Google', () => {
     expect(CHANNEL_ISOTYPES.google_ai_overview).toBe('assets/channels/google-ai-overview.svg')
   })

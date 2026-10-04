@@ -1,12 +1,18 @@
 # Handoff activo
 
+**SEO:** [EPIC-022, 04/10](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
+
+**Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».
+
+**PDF AI Visibility Report (03/10):** [TASK-1938](docs/tasks/in-progress/TASK-1938-ai-visibility-report-pdf-la-orbita.md) code complete local en develop; [dossier con PDFs y 24 comparaciones](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md). Engine/órbita, fuentes y logos oficiales, ES/EN/PT-BR y cierres por audiencia; métricas y envío preservados. 108 focales, TypeScript y build PASS; 18.148 tests generales PASS en la corrida anterior; único fallo Manzanitas corregido por autorización del operador (metadata de versión, check de 49 archivos y siete tests PASS; suite general no repetida). Rollout pendiente, sin push/envíos. Web/print conservan su diseño.
+
 **Marca → escala (03/10):** [dirección aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md), local sin commit/push; [revisión y pendientes](docs/audits/strategy/2026-10-03-brand-decisions-scalable-execution.md).
 
-**Insights: criterio de figuras (03/10):** [TASK-1974](docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md) y [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) in-progress (Claude), local en develop, sin push. Slice 1 de 1975 (diseño de la tarjeta, tonos semánticos, tokens y norma) aprobado y versionado en `81e50977b`. Orden: 1974 Slices 1–5 → 1975 Slices 2–6; las dos salen en el mismo release, con Think desplegado antes o junto.
+**Insights: criterio de figuras (03/10):** en producción (release `36a73e7b7e19`). [TASK-1974](docs/tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md) complete; [TASK-1975](docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md) espera revisión de Berel/Sky y promoción/verificación de fixes posteriores (`<1 %`, encaje de unidad). Abierto: color por rol de parte en waffle y dona.
 
 **Login V4 (02/10):** TASK-1963/1964 in-progress en develop y staging; pendientes en el `Status real` de cada task.
 
-**Landing AI Visibility Report (02/10, noche):** [TASK-1966](docs/tasks/in-progress/TASK-1966-ai-visibility-report-landing-la-orbita.md) in-progress (Claude). Repo `efeonce-think` `main` local: renombre a «Efeonce AI Visibility Report», lockup oficial y hero «La órbita» línea Engine. **No pushear `efeonce-think`**: push a `main` = deploy de producción; requiere aprobación del operador.
+**AI Visibility Report (04/10):** UX/motion Think `09e1976` empujado a main; 84 tests y build PASS. [Evidencia](docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Operador/release: verificar despliegue, activar formulario y readback.
 
 **Inpainting (03/10):** [TASK-1973](docs/tasks/complete/TASK-1973-ai-inpaint-editing-techniques.md) complete local (sin push). Pendiente: Slice 2 en TASK-1925; BFL FLUX Tools cuando el operador cree la cuenta.
 
@@ -21,9 +27,9 @@ task explícita de Kortex en `to-do` ni `in-progress`. Una reactivación requier
 Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y total GCP CLP 237.068,14/mes
 (rango 230k–245k) son **modelos**, no ahorro realizado; confirmar con ventanas post-corte. [Runbook](docs/architecture/kortex/operations/runbook.md) · [auditoría](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
 
-**Insights: qué dice el informe (02/10):** [TASK-1962](docs/tasks/in-progress/TASK-1962-efeonce-insights-report-content-contract.md) code complete local, sin push; va en el release de TASK-1957 y Think se empuja después.
+**Insights: contenido y client-fit (04/10):** TASK-1957/1962 desplegadas; modelo 1.4, 116 pruebas PASS. TASK-1962 espera verificar una edición nueva en producción. [Evidencia y pendientes](docs/audits/insights/2026-10-04-epic-045-closure-review.md).
 
-**Insights apto para cliente (02/10):** [TASK-1957](docs/tasks/in-progress/TASK-1957-efeonce-insights-client-fit-presentation-contract.md) code complete local (Slices 1–6, sin push): vocabulario único web/PDF, modelo web 1.2, límites de lector, elegibilidad de figuras, roles, gate client-fit que bloquea emitir a cliente e indicadores AEO estándar (Share of Model, Share of Voice, tasa de mención, citas). Falta `pnpm build` autorizado, release y canary. [TASK-1958](docs/tasks/to-do/TASK-1958-efeonce-insights-client-fit-hierarchy.md) (jerarquía Think/PDF) bloqueada por 1957. Ninguna edición de cliente se emite antes de cerrar ambas.
+**Insights apto para cliente:** TASK-1957 pendiente de canary/aceptación; TASK-1958 conserva jerarquía Think/PDF, plan y petición en PDF. Ninguna edición de cliente se emite antes de cerrar TASK-1957/1958 y de su revisión humana. El build/release de los contratos ya ocurrió.
 
 **Release 02/10 (`6ea157e6e641`, PR #247, run `37003281899`):** develop→main `released` 12:04Z; watchdog ok 6/6; canary prod web Insights 1.1 (crear→leer `modelVersion=1.1`→revocar). Migración TASK-1950 aplicada antes del merge. `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Production + EmailTypes de Insights ON (redeploy `dpl_B1v1vReWS44UYMi7u9LHKqSPpJ7K`); falta canary con sesión humana (lane `app`). `BRAND_RENDER_ENABLED` sigue OFF en prod (canary Proposal pendiente). [Tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
 
@@ -60,9 +66,9 @@ TASK-1863: staging; main retenido.
 
 **Glitch Flash (28/09):** primer Glitch lanzado con la nueva línea (Flash · Claude Sonnet 5.5: 4 redes vía Metricool + post 251941 en el blog). AXIS `v0.3.24` publicado; Greenhouse lo consume y el Composer compone el Flash (en `origin/develop` hasta `24b165816`, CI 9/9 verde). **Cierre de pendientes (noche):** ruta productiva TASK-1921 acepta el Flash (`c43862008`); muletilla del video como dato (`video.closingLine`), licencia `press` gobernada sólo en el Flash y numeración contra lo publicado — `pnpm glitch:editions`: última #17, **próxima semanal #18** (`05e75f0ed`); Content Factory con `kind: glitchDrop`, botones, caption de embed, tabla stripes y fix `wp_slash()` del write path (`c6f076e9f`). **AXIS 0.3.25 publicado** (29/09, junto al release de Manzanitas); Greenhouse fija 0.3.28 (`44f8db3f0`) y `glitch.css` lee `trail.contexts` (`76376274a`). **Pendiente del operador:** (2) taller de motion: rama local `feat/glitch-flash-motion` (`8061c93`, `ce63091`) con `closingLine` y el Flash en motion — PROPUESTA sin aprobar; el manifiesto Flash de Greenhouse hoy rechaza `video`, decidir cuál manda; (3) artifact-worker staging con plantillas `Flash*` + smoke real. Bitácora: [`2026-09-28-glitch-flash-sonnet-55-production-method.md`](docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md).
 
-**Insights emisión/envíos (28/09):** `INSIGHTS_ISSUANCE_ENABLED` está **ON en Vercel Production** (valor exacto `true`) en `greenhouse-onfkul43q` / `dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`, Ready y con alias `greenhouse.efeoncepro.com`. Canary secuencial sólo sobre Greenhouse Demo: ecosystem verificó `insed-5cbe87ef…` `ready_for_review` + `deck_pdf` completado (`irun-5995b21e…`), y la sesión humana App de Julio emitió con HTTP 200; readback ecosystem `issued`. No se tocó ninguna edición de cliente real. La condición de audiencias de EPIC-046 P01 quedó cubierta por TASK-1852 (personas y servicios definidos); resta apertura humana. [TASK-1848](docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) sigue in-progress: sharing ON; delivery y schedules OFF.
+**Insights emisión/envíos:** emisión ON en producción desde 28/09; correo y recurrencias desde 02/10. Estado y canaries en [`FEATURE_FLAG_STATE_LEDGER.md`](docs/operations/FEATURE_FLAG_STATE_LEDGER.md); [TASK-1848](docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) sigue in-progress.
 
-**Insights web en Think (28/09):** [TASK-1875](docs/tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) **complete**. Informe live en producción (`think.efeoncepro.com/insights/r/<token>`) y muestra pública para clientes (`/insights/muestra`); sharing ON en producción con canary verde; WAF con excepción de Think. Pendiente fuera de la task: el próximo release de Greenhouse lleva `InsightWebModelV1` 1.1 (hoy en staging). Idea del operador en evaluación: recomendación contextual de cross-selling en el informe (no carrusel), sin task todavía.
+**Insights web en Think (28/09):** [TASK-1875](docs/tasks/complete/TASK-1875-efeonce-insights-shared-web-render-think.md) complete; producción sirve el modelo web 1.4 desde el release `36a73e7b7e19`. Idea en evaluación: cross-selling contextual en el informe, sin task.
 
 **Rutas públicas / conexiones PG (28/09):** [TASK-1876](docs/tasks/in-progress/TASK-1876-public-route-connection-exhaustion-guard.md) rollout de staging completo y verificado (WAF sin drift, alerta `num_backends > 85`, `roles/monitoring.viewer`, ráfaga: 20×404 + 10×429 del borde, pico 26 → 6 en 1 min). **Próximo paso ≥ 2026-10-05:** revisar 7 días de logs de la regla de producción en Vercel Firewall y pasarla a `enforce` ([manual §3](docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md)); eso resuelve ISSUE-174. Excepción de Think transferida a TASK-1875.
 
@@ -88,9 +94,9 @@ TASK-1863: staging; main retenido.
 
 **Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
 
-**Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). Siguen TASK-1889 (catálogos) y TASK-1903 (agente redactor).
+**Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). TASK-1889 complete; sigue TASK-1903 (agente redactor).
 
-**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emitir/compartir OFF; siguen TASK-1901/1902.
+**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emisión/sharing ON desde 28/09; siguen TASK-1901/1902.
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
@@ -157,7 +163,7 @@ beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente 
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights (estado actualizado 28/09):** generación, render, editorial v2, IA, sharing y emisión están ON en Production; delivery y schedules siguen OFF. TASK-1875 está complete; 1849/1876 siguen abiertas. **TASK-1847:** complete y en producción desde 24/09 (`ebb9212a32ce`), con renders productivos verificados.
+**Efeonce Insights (estado reconciliado 04/10):** generación, render, editorial v2, IA, sharing y emisión están ON en Production; delivery y schedules ON desde 02/10. TASK-1875 está complete; 1849/1876 siguen abiertas. **TASK-1847:** complete y en producción desde 24/09 (`ebb9212a32ce`), con renders productivos verificados.
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);

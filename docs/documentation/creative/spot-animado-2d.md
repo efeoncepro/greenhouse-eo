@@ -1,21 +1,22 @@
 # Spot animado 2D de Efeonce — Animación de marca con personajes y assets compuestos
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-03 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude
-> **Estado:** primer caso aprobado por el operador el 2026-10-03 («Sparks × Efeonce AEO», v2); sin publicar
+> **Ultima actualizacion:** 2026-10-04 por Claude
+> **Estado:** primer caso aprobado por el operador el 2026-10-03 («Los Sparks», servicio Efeonce | AEO, v2); registrado en Marketing Studio y programado en Metricool para el 05-oct (Instagram) y el 08-oct (LinkedIn); todavía sin publicar
 > **Documentacion tecnica:** [Método de producción y posproducción de video](../../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) · [Workflow de la skill `motion-design-studio`: spot animado 2D con assets de marca compuestos](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) · [Taxonomía de video con IA](../../architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) · [ADR del pipeline de video](../../architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md)
 > **Manual de uso:** [Producir un spot animado 2D](../../manual-de-uso/creative/producir-spot-animado.md)
-> **Caso fuente:** [Retrospectiva Sparks × Efeonce AEO](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md)
+> **Caso fuente:** [Retrospectiva de «Los Sparks»](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md) · [Entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md)
 
 ## Qué es
 
 Un **spot animado 2D** es un video corto de marca propia de Efeonce, en dibujo animado, que cuenta una historia con
-personajes para explicar una capacidad o un servicio. El primer caso, «Sparks × Efeonce AEO», muestra a un marketer
+personajes para explicar una capacidad o un servicio. El primer caso, «Los Sparks», muestra a un marketer
 que le pregunta a una IA por su categoría, ve que la IA nombra a la competencia y, con los Sparks (los agentes de
-Efeonce) trabajando bajo su dirección, logra que la IA tenga con qué nombrar a su marca. Cierra con Efeonce AEO, el
-AI Visibility Report y el logo de Efeonce.
+Efeonce) trabajando bajo su dirección, logra que la IA tenga con qué nombrar a su marca. Cierra con el servicio
+Efeonce | AEO, el AI Visibility Report y el logo de Efeonce. (La voz y los subtítulos de esa pieza dicen «Efeonce AEO»;
+el nombre correcto del servicio es «Efeonce | AEO» y se corrigió en los textos de redes, no en el video.)
 
 Formato del primer caso: 16:9, 1920×1080, 24 fps, 49,6 s, con locución, subtítulos, música y efectos.
 
@@ -41,7 +42,7 @@ La regla más importante: **lo de marca se compone, nunca se genera.**
 | Se compone (exacto, desde el archivo oficial) | Lo genera la IA |
 |---|---|
 | Los Sparks, desde su dibujo oficial; nunca se espejan | Personajes del elenco 2D y fondos |
-| Logos de Efeonce, Efeonce AEO y AI Visibility Report | Luz, volumen y profundidad |
+| Logos de Efeonce, del servicio Efeonce \| AEO y del AI Visibility Report | Luz, volumen y profundidad |
 | Pantallas de chat, preguntas, respuestas y marcas en pantalla | El movimiento entre cuadros clave |
 | Subtítulos y textos | — |
 | Kit sonoro oficial de la marca | Locución (voz de librería) y arreglo musical a partir del material oficial |
@@ -75,6 +76,7 @@ El video tampoco escribe texto: el pedido a la IA lo prohíbe, porque si no apar
 | 6. Tomas | Todas las tomas de video | Revisión del agente; se rehacen las fallidas |
 | 7. Corte y audio | Montaje, locución, música, efectos, subtítulos, mezcla | El operador escucha y aprueba (el agente no escucha) |
 | 8. Entrega y variantes | Versión con y sin subtítulos, SRT; variantes por red | El operador; publicar es otra autorización |
+| 9. Distribución | Registro de la pieza en su campaña de Marketing Studio y un post por red en Metricool, cada uno con su portada | El operador autoriza programar; las versiones se aprueban en Studio |
 
 Todo gasto con IA se pide con un **estimado previo** y una autorización explícita.
 
@@ -88,8 +90,11 @@ Todo gasto con IA se pide con un **estimado previo** y una autorización explíc
   una IA.
 - **El logo final respira sin voz.** La frase de cierre va sobre la placa anterior.
 - **Las marcas de la competencia son inventadas** y se revisa que no exista una empresa con ese nombre.
+- **La marca que habla es Efeonce; el servicio se escribe «Efeonce | AEO».** Vale para guion, subtítulos y textos de
+  redes, y se revisa antes de grabar la voz: en el primer caso se corrigió sólo en los textos de redes porque el video
+  ya estaba aprobado.
 
-> Detalle técnico: [naming de Efeonce AEO](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) · [retrospectiva, decisiones del operador](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md#decisiones-del-operador-citadas-o-parafraseadas-desde-el-inventario)
+> Detalle técnico: [naming del servicio Efeonce | AEO](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) · [retrospectiva, decisiones del operador](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md#decisiones-del-operador-citadas-o-parafraseadas-desde-el-inventario)
 
 ## Cuánto cuesta (caso fuente)
 
@@ -97,6 +102,21 @@ El primer spot costó **USD 4,78 en fal** (video y música), cuadros clave dentr
 tope de referencia de ~USD 8. Es una referencia, no una tarifa: cada pieza se estima antes.
 
 > Detalle técnico: [retrospectiva, costos](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md#costos)
+
+## Cómo se distribuye
+
+Después de aprobada la pieza, y sólo con autorización para publicarla:
+
+1. **Marketing Studio:** la pieza se registra como concepto dentro de su campaña. El primer caso es el concepto
+   CMP001-08 «Los Sparks» de la campaña CMP-001 (siempre activa, sobre AEO), en orgánico.
+2. **Metricool:** un post por red, cada uno con su portada. En Instagram, un video horizontal (16:9) lleva una portada
+   vertical 4:5 y una intro muda que invita a girar el teléfono; en LinkedIn, video y portada 16:9.
+3. **Comprobación:** se compara que los archivos que Metricool guardó sean idénticos a los finales (en el primer caso,
+   4 de 4) y que el texto sea el aprobado.
+
+«Programado» no es «publicado»: la publicación se confirma mirando el post después de la hora.
+
+> Detalle técnico: [entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md) · [retrospectiva, delta de distribución](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md)
 
 ## Límites
 
@@ -110,15 +130,17 @@ tope de referencia de ~USD 8. Es una referencia, no una tarifa: cada pieza se es
 
 ## Pendientes
 
-Lo que hoy sigue abierto (estado al 2026-10-03):
+Lo que hoy sigue abierto (estado al 2026-10-04):
 
 - **Licencia comercial de Stable Audio** (el arreglo musical) sin confirmar con legal.
 - **Excepción al canon sonoro:** el primer caso usa el registro de energía debajo de la locución, cosa que la
   [identidad sonora](identidad-sonora-efeonce.md) no permite. Fue una excepción aceptada por el operador para esa pieza.
 - **Prueba de reconocimiento del elenco 2D** y **derechos del elenco** pendientes.
 - **Publicación del elenco 2D en AXIS:** en curso.
-- **Variantes de redes, en curso:** portada Instagram 4:5, portada LinkedIn 16:9 y una versión Instagram con
-  pantalla negra muda al inicio y la animación de un teléfono genérico que invita a girar la pantalla.
-- **Sin publicar.** Aprobar la pieza no autoriza publicarla ni usarla en pauta.
+- **Variantes de redes: entregadas y programadas** (portada Instagram 4:5, portada LinkedIn 16:9 y versión Instagram
+  con intro muda que invita a girar la pantalla).
+- **Programado, todavía sin publicar** (Instagram 05-oct, LinkedIn 08-oct). Falta el enlace de la bio de Instagram,
+  comprobar la publicación después de la hora y aprobar las versiones en Marketing Studio. Sin pauta hasta confirmar
+  la licencia de la música.
 
 > Detalle técnico: [retrospectiva, pendientes y límites honestos](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md#pendientes-y-límites-honestos)

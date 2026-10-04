@@ -1,0 +1,7 @@
+{
+  "nft": ".next-local/build-20261003195800-7390/server/app/api/public/growth/ai-visibility/report/[token]/pdf/route.js.nft.json",
+  "expectedAssetsAndFonts": 53,
+  "missing": [],
+  "tracedFiles": 636,
+  "totalTracedBytes": 33742036
+}

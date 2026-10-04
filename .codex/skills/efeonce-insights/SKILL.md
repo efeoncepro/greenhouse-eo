@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975, code complete local 2026-10-03, not deployed), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975 and channel isotypes TASK-1990/1996, in production since release `36a73e7b7e19` on 2026-10-03), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -25,7 +25,7 @@ it without repeating what already cost a day*. It grows with every task: see the
    rollback, deploy traps.
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
 7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
-   (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates in production; 20 + 17 locally with TASK-1975 — stat card, waterfall, waffle, donut, stacked —, family → page,
+   (ids, rules, where it applies and where it is missing), the A4/deck report (20 + 17 templates published with TASK-1975 — stat card, waterfall, waffle, donut, stacked —, family → page,
    variation rule, data roles, cover), the live Think report (anatomy, 1.0 vs 1.1, presentation mode, states, motion,
    print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: the AXIS Lab
    page `https://axis.efeonce.org/references/insights/`, published 2026-09-28 (AXIS main `3dfbf0e`; agent data at
@@ -82,7 +82,7 @@ it without repeating what already cost a day*. It grows with every task: see the
   caption the common name, never the first tied fact); essentials and the thesis cite only findings (target met or
   missed, a change that prints, a unique superlative or a tie), never a bare value nor a 0,0 % change; the first
   reading of every chapter is its main finding. Sealed editions are immutable, so a fix applies to new editions only.
-- **Figure selection (TASK-1974, code complete local; applies only to plans built with editorial v2)**: the reader's
+- **Figure selection (TASK-1974, complete and published in `36a73e7b7e19`; applies only to plans built with editorial v2)**: the reader's
   question picks the family (`ChartSpecV1.question` + `QUESTION_FAMILIES`; an incoherent pair does not validate), one
   current-period fact feeds ONE figure of the chapter (`duplicated_fact`; only waterfall totals are anchors), and the
   stat card lives in `chapter.stats`, outside the 15 families. A stat name has ≤ 3 words and ≤ 24 characters: the
@@ -96,7 +96,7 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
-  Think consumes it server-side as `InsightWebModelV1` (`modelVersion` `'1.0'` or `'1.1'`; 1.1 is additive — optional
+  Think consumes it server-side as `InsightWebModelV1` (current `modelVersion` `'1.4'`; supports the 1.x family; 1.1 introduced additive optional
   editorial v2 fields + client logo — so a 1.0 consumer still works; client-facing projection only). Think's server
   reads are exempted from the `/api/public` edge limit only by its key header `x-efeonce-think-key`, never by raising
   the limit. NEVER probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting
@@ -109,11 +109,11 @@ it without repeating what already cost a day*. It grows with every task: see the
   revokes its grant and a retry issues a new one with a per-attempt correlation (`…:aN`). Accepted ≠ delivered ≠ read.
   The link email uses the token-sensitive EmailType: its grant is issued in the same transaction that claims the
   `email_deliveries` row. EmailTypes are seeded OFF (the config table fails open without a row).
-- **TASK-1848 state (2026-09-28):** in production since release `bda1cf2cd938`. `INSIGHTS_SHARING_ENABLED` is ON in
+- **TASK-1848 state (updated 2026-10-03):** in production since release `bda1cf2cd938`. `INSIGHTS_SHARING_ENABLED` is ON in
   Vercel Production since 2026-09-28 (redeploy `dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`, prod canary on synthetic
-  `EO-INS-000014` green) now that the Think reader (TASK-1875, complete) exists; delivery, schedules and issuance stay
-  OFF in production (ON in staging). Production serves `InsightWebModelV1` 1.0; 1.1 is staging-only until the next
-  Greenhouse release. Gateway `efeonce-mcp` 1.7.0 federated the 7 tools
+  `EO-INS-000014` green) now that the Think reader (TASK-1875, complete) exists; issuance ON in Vercel Production since 2026-09-28 and delivery + schedules since 2026-10-02 (see
+  `FEATURE_FLAG_STATE_LEDGER.md`, the source of truth for flag state). Production serves `InsightWebModelV1` 1.4 since
+  release `36a73e7b7e19` (2026-10-03). Gateway `efeonce-mcp` 1.7.0 federated the 7 tools
   (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
   reads use the base scope; sending email and scheduling do not exist over MCP.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
@@ -133,11 +133,11 @@ it without repeating what already cost a day*. It grows with every task: see the
   Elegir, agregar o cambiar una figura del informe → `references/contracts.md` § Criterio de selección de gráficos (+
   § Pregunta de la figura, § Tarjeta de cifra, § Modelo web 1.4, § Contrato de render de las figuras nuevas) +
   `docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md` (decidido 2026-10-03; implementado por TASK-1974
-  planner/contrato/modelo web y TASK-1975 páginas/tarjeta/diseño, **code complete local, sin desplegar**: rollout
+  planner/contrato/modelo web y TASK-1975 páginas/tarjeta/diseño, **en producción desde `36a73e7b7e19`**; historial del rollout
   AXIS → Think → Greenhouse en `references/operations.md` § TASK-1974 / TASK-1975).
   Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
   2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
-  and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/delivery/schedules stay OFF in Production, sharing ON
+  and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance ON in Production since 2026-09-28, delivery/schedules since 2026-10-02, sharing ON
   there since 2026-09-28 (TASK-1875 complete); see
   `references/contracts.md` § Editorial contract v2 and `references/program-ledger.md`).
   Premium A4/deck templates → TASK-1889 (complete 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt; see
@@ -170,9 +170,8 @@ it without repeating what already cost a day*. It grows with every task: see the
   + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
   `axis-design-system`. Boundary (binding, **changed by the operator on 2026-10-03**): AXIS is the home of the Insights
   design system — brand files (`insights-{logo,isotype,lockup}-*`, `axis-brand-assets`), data-color tokens
-  `efeonceInsights`, contracts (`efeonce.insights-stat-card` 0.1.0 `candidate`) and the Lab reference; Greenhouse
-  catalogs and Think are its consumers and keep the templates. That AXIS work is LOCAL (AXIS `main` unpushed, tag
-  `v0.3.42` pending). Think still copies the tokens and chart geometry is still duplicated: adopt the package / extract,
+  `efeonceInsights`, contracts (`efeonce.insights-stat-card` 0.2.0 `candidate`) and the Lab reference; Greenhouse
+  catalogs and Think are its consumers and keep the templates. AXIS `v0.3.42` was published for the 03/10 release; the local-only statement is superseded. Think still copies the tokens and chart geometry is still duplicated: adopt the package / extract,
   never fix a copy inline. The PDF/deck covers and chapter openings show a TYPE
   version (Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking —spaced capitals, not true small caps—,
   `.brand-product` / `.product`), not the official `insights-lockup-*` file; on the navy covers that word is painted in
@@ -188,7 +187,7 @@ it without repeating what already cost a day*. It grows with every task: see the
   reason), the navy primary CTA and the agenda card are canon; the Insights header, «Lo esencial del mes», its measure
   orbit (with the travelled path, decided the same day) and the decision card belong to this email only. «Suscribirme»
   is retired. Greenhouse has **not** adopted it: `src/emails/InsightsEditionDeliveryEmail.tsx` and `EmailLayout.tsx`
-  are unchanged and pin the older AXIS set. Open tension with TASK-1764 (footer policy). Route: `greenhouse-email`
+  are unchanged and pin the older AXIS set. Purpose/footer exception decided 29/09: `relationship_transactional`, exception `efeonce-insights-delivery`; implementation still pending. Route: `greenhouse-email`
   («Delta 2026-09-29»), `efeonce-graphic-line` → `applications.md` §C4, [`references/ui-and-brand.md`](references/ui-and-brand.md) §5.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

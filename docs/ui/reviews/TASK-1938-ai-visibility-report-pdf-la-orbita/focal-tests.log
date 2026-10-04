@@ -1,0 +1,8 @@
+
+ RUN  v4.1.0 /Users/jreye/Documents/greenhouse-eo
+
+
+ Test Files  13 passed | 1 skipped (14)
+      Tests  108 passed | 10 skipped (118)
+   Start at  16:59:55
+   Duration  30.67s (transform 10.20s, setup 12.92s, import 26.25s, tests 12.49s, environment 2.81s)

@@ -1,6 +1,6 @@
-# Brand Visibility Landing
+# AI Visibility Report — landing
 
-> **Nombre público canónico (2026-09-29):** **Efeonce AEO Assessment**, dentro de **Efeonce AEO**; su salida es el **Efeonce AI Visibility Report**. `Brand Visibility` es el nombre histórico de la landing y el slug vigente, no una marca de producto separada. Este documento describe el contenido publicado antes del cambio de naming; la aplicación del copy al runtime Think requiere una edición y verificación propias. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+> **Nombre público canónico (decisión 2026-10-02):** **Efeonce AI Visibility Report**, con su lockup oficial y la línea Engine. Publicada y verificada en producción el 2026-10-03: Think `f4426d2`, Vercel READY, formulario cargado; sin envío de prueba. La evidencia productiva histórica de este documento no certifica este branding. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) · [Revisión local](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md).
 
 ## Estado verificado 2026-07-27
 
@@ -49,17 +49,9 @@ La frase guia del framework es:
 
 ### Hero
 
-Promesa:
+Composición publicada: «¿Te recomiendan las IA?» / **«Averígualo»**, con esfera Engine, una órbita oficial con entrada CSS de 2 s y cuadro final fijo, fila de motores y CTA «Empezar mi análisis» al formulario. El CTA deja foco en su encabezado; sin desplazamiento animado.
 
-`Mide como los motores de respuesta entienden y recomiendan tu marca.`
-
-La bajada explica que el sistema analiza presencia, citabilidad y operabilidad
-en motores de respuesta y superficies generativas de busqueda. El grupo de
-logos aterriza la categoria: ChatGPT, Gemini, Claude, Perplexity/otros motores y
-Google como superficie de busqueda.
-
-La animacion de lupa/lente es el asset principal. Su escala y respiracion forman
-parte del patron; no se considera decoracion reemplazable.
+Lockup `Efeonce | AI Visibility Report` en el encabezado. Framework y preview en papel con tinta Engine e íconos Trazo; Efeonce firma con «Empower your Engine» al 64 % del ancho del logo. Assets sin modificar desde AXIS brand-assets 0.4.10; tokens centralizados en `src/lib/ai-visibility-landing-tokens.ts`.
 
 ### Formulario
 
@@ -120,9 +112,10 @@ venir de jerarquia, iconografia, ritmo y preview, no de nombres opacos.
 ## Dependencias Think
 
 - `src/pages/brand-visibility/index.astro`
-- `src/components/HeroAnswerLens.astro`
+- `src/lib/ai-visibility-landing-tokens.ts`
+- `src/components/EfeonceSlogan.astro`
 - `src/components/BrandVisibilityFormDock.astro`
-- `src/components/EngineAvatarGroup.astro`
+- `src/components/primitives/EngineAvatarGroup.astro`
 - `src/pages/brand-visibility/r/[token].astro`
 
 ## Copy guidelines
@@ -142,3 +135,13 @@ venir de jerarquia, iconografia, ritmo y preview, no de nombres opacos.
 Al cierre del 2026-07-05 la landing esta live, el submit real genera run y el
 handoff abre el reporte. El pendiente conocido no pertenece a la UI: TASK-1341
 debe proteger runtime config de DataForSEO/Google AI Overview en `ops-worker`.
+
+## Validación local 2026-10-03
+
+Build y tipos pasan; cinco anchos sin overflow, una órbita, assets iguales a AXIS y foco verificado por CUA. El formulario externo falla en localhost por `MissingAllowOriginHeader`; no se amplió CORS ni se hizo submit. El reporte web/PDF y el panel de análisis quedan fuera. TASK-1966 sigue in-progress con aceptación y rollout pendientes.
+
+Motion local posterior: [contrato y evidencia](../ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md); fallback de movimiento reducido verificado, sin JS de motion añadido.
+
+## Iteración UX y motion 2026-10-04
+
+Think `09e1976` empujado a `origin/main` por autorización del operador: órbita continua con pausa, muestra real ampliable del PDF, método desplegable, jerarquía más ligera, aclaraciones de entrega y CTA final. El contrato marca primero está implementado en Greenhouse y probado en QA, sin activar. [Evidencia y activación](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Los estados de las secciones anteriores son históricos; el despliegue y readback de esta iteración aún no están verificados.

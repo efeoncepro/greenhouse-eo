@@ -1,12 +1,14 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.20
+> **Version:** 1.21
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1806 cutover: desde el 2026-09-03 el módulo sirve la fórmula nueva del proveedor (`improved_layout_clickstream_v2`); las cifras de tráfico estimado bajan ≈ 60 % respecto a las anteriores por cambio de fórmula, no por pérdida real; la historia desde julio 2026 está recomputada y antes es aproximación calibrada; cada cifra sigue declarando `etvMethodology`; delta previo TASK-1806 evaluación: comparación acotada y pagada sobre tres dominios, sin efecto visible hasta el cutover; delta previo TASK-1805: cada cifra de tráfico estimado declara la fórmula del proveedor con que se calculó (`etvMethodology`, sección «Metodología detrás del tráfico estimado (ETV)»); hoy todo se sirve en `legacy_static_v1`, una lectura sirve una sola fórmula, y pedir una fórmula que el sujeto no tiene responde `not_available_for_method`, nunca cero; el cambio a improved lo decide TASK-1806; delta previo TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-10-04 por Codex: censo y estados reconciliados; hallazgos ON y selectores ETV improved verificados en worker activo. Avances de 03/09 y anteriores: evidencia histórica en tasks y arquitectura.
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
 
-> **Relación de nombres vigente:** **Efeonce AEO** es la capacidad de IA y su diagnóstico público **Efeonce AEO Assessment**; el **AI Visibility Grader** sigue siendo el motor técnico hermano del SEO. **Search Visibility 360** permanece como oferta amplia de búsqueda clásica + IA. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+> **Relación de nombres vigente:** **Efeonce | AEO** es el servicio de visibilidad en IA y su diagnóstico público **Efeonce | AI Visibility Report**; el **AI Visibility Grader** sigue siendo el motor técnico hermano del SEO. **Search Visibility 360** permanece como oferta amplia de búsqueda clásica + IA. [ADR de naming](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+
+> **Reconciliación 04/10:** [EPIC-022 y pendientes](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md): 84 hijas, 41 abiertas. TASK-1655 entregó las slices 1–4; backfill histórico completo el 07/08; export nativo/paridad/retención pendientes. Hallazgos de sitio ON e Improved ETV en el worker activo, revalidados 04/10; las tareas completas de CLI no implican push/deploy.
 
 ## Que es
 
@@ -400,7 +402,7 @@ Lo siguiente aún no está construido (las series que ya se llenan: Search Conso
 
 | Falta | Task que lo trae |
 |---|---|
-| Semilla histórica de posiciones (DataForSEO Labs) + export nativo GSC→BQ por cliente | TASK-1655 (Slices 4-5) |
+| Completar export nativo GSC→BQ, paridad MCP y verificación de retención (mirror/backfill/reader/semilla ya entregados) | TASK-1655 (cierre de Slices 2 y 5) |
 
 ### La pantalla ancla: Rendimiento en el tiempo (TASK-1307, 2026-08-07)
 

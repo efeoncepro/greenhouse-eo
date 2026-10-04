@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `Code complete local 2026-10-02 (Slices 1–6, commits 873b66e60…35e7f9f69 en develop + efeonce-think 70785c1/58df9e9); rollout pendiente: release de Greenhouse junto con TASK-1957 y push de efeonce-think después`
+- Status real: `Desplegado en producción desde release fe261ca2745f (2026-10-03), conservado en 36a73e7b7e19; Think main 0c5701a consume el modelo vigente 1.4. Criterios funcionales implementados; 116 pruebas focales PASS (2026-10-04). Candidata a cierre tras probar el contenido de una edición nueva en el runtime desplegado y registrar la revisión prevista; no existe plan congelado post-release en el readback acotado. No falta otro release de este contrato.`
 - Rank: `TBD`
 - Domain: `insights|growth`
 - Blocked by: `none`
@@ -207,10 +207,10 @@ Revisión del operador 2026-10-02 sobre los previews reales de Berel y Sky:
 
 - [x] Source of truth, contract surface and consumers are named with real paths or objects.
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se completa al final. Esta task no crea tablas.
+- [x] Allowlist de tablas nuevas: no aplica; este contrato no introduce tablas de escritura del dominio. La migración de categoría del Grader es de su dominio dueño, no un store de Insights.
 - [x] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — reader de causas ejercitado contra PG real (Berel, 0,5 s, suma = total de clics del informe).
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Errores, aislamiento y proyección pública conservan el contrato canónico; revisión de `commands/lifecycle.ts`, `sharing/web-model.ts` y readers dueños, con 116 pruebas focales PASS el 2026-10-04. El smoke productivo sigue pendiente y no se infiere de estas pruebas.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -401,3 +401,10 @@ Sky Blog: conectar Search Console del blog, set de keywords y competidores (oper
   (−13,5 %), 1.686 visitas desde IA (+23,4 %), ChatGPT 1.648 de 1.686; plan válido (`validateEditorialPlan` sin errores).
 - Rollout: Vercel staging/Production ya tienen flag y OAuth (TASK-1284); `ops-worker` lo declara en `deploy.sh` y
   necesita su deploy para las ediciones programadas. Release a producción pendiente junto con el resto de TASK-1962.
+
+
+## Delta 2026-10-04 — auditoría de cierre
+
+- Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
+- Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.
+- Los siete criterios funcionales siguen cumplidos. El siguiente paso es una edición nueva interna en producción, lectura del modelo 1.4 y revisión prevista antes de emitir/compartir. No se creó ni emitió una edición en esta auditoría.

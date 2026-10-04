@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-02 por Claude (TASK-1894: subir y revisar finales; proporciones con decimales; editar una campaña gobernada por Studio, probado en staging)
+> **Ultima actualizacion:** 2026-10-03 por Claude (agregar un concepto nuevo con video a una campaña gobernada por OneDrive; caso CMP-001 «Los Sparks»)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -85,6 +85,49 @@ pieza (los videos, con un fotograma). Hay que generarlas cuando entran piezas nu
 2. Revisa el resumen (cuántas piezas procesaría) y repite con `--apply`.
 3. Es seguro repetirlo: lo que ya existe no se vuelve a generar.
 4. Abre la campaña en la web y confirma que las piezas nuevas se ven.
+
+## Paso a paso: agregar un concepto nuevo a una campaña gobernada por OneDrive
+
+Sirve para sumar un concepto con sus finales (imágenes o video) a una campaña cuyos datos manda OneDrive (hoy
+CMP-001 a CMP-005). En esas campañas el concepto no se crea desde Studio: entra por OneDrive, el catálogo, el import y
+la ingesta de originales. Así se cargó el 2026-10-03 el spot «Los Sparks» (49,6 s, 16:9) en CMP-001 como concepto
+CMP001-08.
+
+1. **Copia los finales a OneDrive** con nombre canónico, en
+   `Alineación/5. Contenidos/15. Paid Media/03. Finales/<CMP-### - Nombre>/`. Por ejemplo
+   `02 - Videos/16x9/CMP001-08 - Los Sparks - 16x9.mp4` y
+   `01 - Imagenes/4x5/CMP001-08 - Los Sparks portada - 4x5.png` (igual para 9x16 y 16x9).
+2. **Agrega las piezas y los copys al catálogo** `01. Recursos/Campaign Manager/CATALOGO-DATOS.json`: cada pieza con
+   su huella sha256, su peso en bytes y sus dimensiones; los copys en `campaigns[].copies`. Antes, haz una copia de
+   respaldo del archivo. Si lo editas con un script, conserva la indentación de 2 espacios y los acentos tal cual
+   (`indent=2`, `ensure_ascii=False`); otra indentación genera un cambio gigante.
+3. **Nombra bien la primera pieza del concepto:** Studio toma de ella el título del concepto.
+4. **Compara los estados de las campañas** en la base con `scripts/seeds/campaign-registry.json`. Si no coinciden,
+   detente: el import revertiría lo que cambió en la base.
+5. **Corre el import** sin `--apply`, lee el resumen y repite con `--apply` (pasos de
+   [actualizar datos desde OneDrive](#paso-a-paso-actualizar-datos-desde-onedrive)). Contra producción usa
+   `STUDIO_PG_DATABASE=marketing_studio`, `STUDIO_PG_USER=marketing_studio_app`, `STUDIO_PG_SSL=false` y la contraseña
+   del secreto `marketing-studio-pg-app-password`, leída en la misma línea, nunca impresa.
+6. **Sube los originales al almacén de Studio:**
+   ```bash
+   pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals --campaign CMP-001 --apply
+   ```
+   Necesita credenciales de Google que actúen como la cuenta de ingesta
+   (`marketing-studio-ingest@efeonce-group.iam.gserviceaccount.com`). Usa un archivo de credenciales temporal, sólo
+   para este comando, y bórralo después. No cambies tus credenciales por defecto ni los permisos de la nube.
+7. **Espera las imágenes livianas:** Studio las genera solo al recibir cada original (3 por imagen, 6 por video).
+   Confírmalas en la web o por la API antes de reintentar nada.
+8. **Registra las piezas** en el `ASSETS.md` de la campaña (`Alineación/2. Campañas/<carpeta de la campaña>/ASSETS.md`).
+9. Las versiones nuevas quedan **importadas**, no aprobadas: aprobar es un paso aparte de una persona.
+
+**Corregir un copy después:** cambia el texto en el catálogo y vuelve a correr el import con `--apply`. El copy se
+actualiza sin duplicarse.
+
+| Síntoma | Qué hacer |
+|---|---|
+| El import responde `ECONNRESET` | El túnel a la base quedó viejo. Abre uno nuevo en otro puerto y apunta `STUDIO_PG_PORT` a ese puerto. |
+| El resumen dice `updated: N` con muchas filas | Cuenta todas las filas que el import tocó, cambien o no. Confirma el dato puntual con una lectura. |
+| Un original queda un rato en `media_object_pending` | Es pasajero: el aviso llegó antes que el registro. Espera y revisa las imágenes antes de reintentar. |
 
 ## Subir un final a Studio
 

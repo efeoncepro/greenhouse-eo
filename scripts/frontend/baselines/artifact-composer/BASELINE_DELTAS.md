@@ -1,5 +1,32 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-04 (z) — TASK-1996: glifos Trazo en las métricas, isotipos en filas y leyendas, color por rol
+
+<!-- sealed-by-freeze: aff661687e0ee890445c4f29f4e889b1eaad4da21ea3eb718d61ca365ee6cb85 -->
+
+Pedido del operador el 2026-10-04 («los íconos e isotipos ayudan a reducir la carga cognitiva», «lo que no exista, créalo»;
+color por rol, nunca por orden). Cambios de plantilla:
+
+- Las cifras, la comparación y las metas cambian los íconos Tabler de la métrica por glifos Trazo de AXIS (campo
+  `metricIcon`, resolver `*-metric-icon`, trazos sellados en `insights-shared/metric-glyphs.axis.json`, axis-graphic-line
+  0.16.0; seis glifos nuevos D31: clic, impresión, CTR, posición, visita y cita).
+- La tabla A4 marca cada fila con el isotipo de su plataforma (motor, asistente o dominio citado) o el glifo de su métrica.
+- La leyenda de la dona lleva el isotipo de la parte que es una plataforma (campo `channel`).
+- Partes sin rol en dona y waffle: actual → anterior → paso (→ gris medio en el waffle); el coral sólo con rol de
+  oportunidad declarado. En el probe de la dona, la 2.ª parte pasa del coral al teal de «anterior».
+- El campo `channel` de la dona y `glyph` de las columnas no cambian el probe de columnas (su ejemplo no los trae).
+
+Frames que cambian (existían):
+- `templates-insights-report/ReportFigureStatPage.png` — cambia: glifo Trazo de la métrica en cada celda
+- `templates-insights-deck/InsightsFigureStatSlide.png` — cambia: lo mismo en la lámina navy
+- `templates-insights-report/ReportFigureComparisonPage.png` — cambia: glifo Trazo en cada fila de métrica
+- `templates-insights-deck/InsightsFigureComparisonSlide.png` — cambia: lo mismo en el deck
+- `templates-insights-report/ReportFigureTargetsPage.png` — cambia: glifo Trazo en cada fila de meta
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — cambia: lo mismo en el deck
+- `templates-insights-report/ReportTablePage.png` — cambia: la fila del probe lleva su marca
+- `templates-insights-report/ReportFigureDonutPage.png` — cambia: la 2.ª parte sin rol pasa del coral al teal de «anterior»
+- `templates-insights-deck/InsightsFigureDonutSlide.png` — cambia: lo mismo en el deck
+
 ## 2026-10-03 (y) — TASK-1996: la cifra única del deck baja de 128 a 112 px
 
 <!-- sealed-by-freeze: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
@@ -47,7 +74,7 @@ Además, el isotipo de AI Overview pasa de la G de Google a su lupa con el degra
 
 Las cinco figuras del criterio de selección (aprobado el 2026-10-03) tienen página A4 y lámina 16:9; las hojas aprobadas
 del canvas las miden a ≤ 1 % (`pnpm insights:canvas-fidelity`: cascada 0,59 % / 0,54 %, waffle 0,03 % / 0,01 %, dona
-0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,17 %). Los frames nuevos son el probe de cada plantilla (los
+0,11 % / 0,02 %, apiladas 0,09 % / 0,16 %, cifras 0,05 % / 0,53 %; la cifra del deck decía 0,17 % por error y se corrigió el 2026-10-03 contra `fidelity.json`). Los frames nuevos son el probe de cada plantilla (los
 `example` de su `slots.json`, sacados de la hoja aprobada).
 
 Frames nuevos:
@@ -1227,7 +1254,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: f4ed2a48ea6c6195eb4a38aefb204cbb3504045a81160d296d88419e4d65fc3d -->
+<!-- manifest-digest: aff661687e0ee890445c4f29f4e889b1eaad4da21ea3eb718d61ca365ee6cb85 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

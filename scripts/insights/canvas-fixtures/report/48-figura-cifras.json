@@ -16,7 +16,7 @@
     "statCount": "6 cifras",
     "statItems": [
       {
-        "icon": "clicks",
+        "metricIcon": "clic",
         "name": "Clics",
         "value": "13.606",
         "trend": "down:worse",
@@ -24,7 +24,7 @@
         "versus": "vs <strong>16.390</strong> en agosto 2026"
       },
       {
-        "icon": "impressions",
+        "metricIcon": "impresion",
         "name": "Impresiones",
         "value": "770.462",
         "trend": "down:worse",
@@ -32,7 +32,7 @@
         "versus": "vs <strong>868.507</strong> en agosto 2026"
       },
       {
-        "icon": "ctr",
+        "metricIcon": "ctr",
         "name": "CTR",
         "value": "1,8",
         "suffix": "%",
@@ -41,7 +41,7 @@
         "versus": "vs <strong>1,9 %</strong> en agosto 2026"
       },
       {
-        "icon": "search",
+        "metricIcon": "posicion",
         "name": "Posición media",
         "prefix": "#",
         "value": "6,9",
@@ -51,7 +51,7 @@
         "lowerIsBetter": "Menor es mejor"
       },
       {
-        "icon": "search",
+        "metricIcon": "posicion",
         "name": "Primera página",
         "value": "15",
         "unitLabel": "de 31 keywords",
@@ -60,7 +60,7 @@
         "versus": "vs <strong>21</strong> en agosto 2026"
       },
       {
-        "icon": "trend",
+        "metricIcon": "visita",
         "name": "Tráfico estimado",
         "estimated": "Estimado",
         "value": "130.166",

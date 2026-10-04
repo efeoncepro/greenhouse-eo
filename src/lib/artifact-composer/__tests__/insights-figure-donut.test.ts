@@ -103,11 +103,31 @@ describe('porciones de la dona', () => {
       )
     ).toThrow(FigureDataError)
   })
+
+  it('«<1 %» vale 0 en la suma y sólo se acepta para una parte con cuenta y menos del 1 % (caso real Berel 2026-09)', () => {
+    const real = [
+      { label: 'ChatGPT', count: '1.648', share: '98 %' },
+      { label: 'Gemini', count: '30', share: '2 %' },
+      { label: 'Otros asistentes', count: '8', share: '<1 %' }
+    ]
+
+    expect(donutSlices(real, REPORT_DONUT_BOX)).toHaveLength(3)
+    expect(() => donutSlices([...real.slice(0, 2), { label: 'Otros asistentes', count: '0', share: '<1 %' }], REPORT_DONUT_BOX)).toThrow(FigureDataError)
+    expect(() =>
+      donutSlices(
+        [
+          { label: 'A', count: '90', share: '90 %' },
+          { label: 'B', count: '10', share: '<1 %' }
+        ],
+        REPORT_DONUT_BOX
+      )
+    ).toThrow(FigureDataError)
+  })
 })
 
 describe('tonos de las partes', () => {
-  it('sin rol, por orden: actual → oportunidad → anterior', () => {
-    expect(donutTones([{ label: 'a' }, { label: 'b' }, { label: 'c' }])).toEqual(['current', 'opportunity', 'prior'])
+  it('sin rol, por orden: actual → anterior → paso (el coral sólo con rol de oportunidad)', () => {
+    expect(donutTones([{ label: 'a' }, { label: 'b' }, { label: 'c' }])).toEqual(['current', 'prior', 'step'])
   })
 
   it('un rol declarado manda y las demás toman los tonos libres', () => {

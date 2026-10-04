@@ -1,0 +1,302 @@
+                                                                               Assessment as of May 19, 2026
+
+
+
+
+Globe
+Data as of May 19, 2026
+
+
+
+
+                                           63    out of 100
+
+                                                  Needs work
+
+
+
+
+                          0–39 Critical      40–69 Needs work          70–100 Optimal
+
+
+
+V ER D I C T
+
+
+
+
+They find you, but rarely cite you.
+                             AEO Assessment result · Evaluated across 4 answer engines · 24 questions · response
+                             coverage is not verified
+                                                                            W HAT T O DO
+
+
+
+
+What matters most today
+     MA I N G A P · CI TATI O N Q UA LI TY 32/1 00                                          Critical
+
+
+
+     They mention you, but don't cite you.
+     32% of answers with a citation point to your site. The most cited source is g2.com (third
+     party, 18 of 45 citations).
+
+
+
+
+Priority plan
+Moves prioritized according to the gaps in this report.
+
+
+
+1         Earn credible citations                    Critical
+
+          Earn trustworthy third-party mentions through digital PR and keep your own sources fresh.
+               Moves Citation quality · today 32/100 · 15% of the score
+
+
+
+
+2         Own your category                    Needs work
+
+          Publish a category explainer, a comparison page and profiles on third-party directories.
+               Moves Category ownership · today 54/100 · 15% of the score
+
+
+
+
+3         Cover purchase intent                      Needs work
+
+          Add pricing, implementation and use-case content, with proof.
+               Moves Purchase intent · today 45/100 · 5% of the score
+
+
+
+
+Globe · Assessment as of May 19, 2026                                                            02 / 06
+                                                                       W HY I T HA PPENS
+
+
+
+
+Seven dimensions, weighted
+Each dimension adds to the score by its weight; severity uses the same scale as the cover.
+
+
+                                                                                                       72/100
+     AI visibility · 25%
+                                                                                                       Optimal
+
+
+                                                                                                       68/100
+     Identity clarity · 15%
+                                                                                                   Needs work
+
+
+                                                                                                       54/100
+     Category ownership · 15%
+                                                                                                   Needs work
+
+
+                                                                                                       63/100
+     Share of voice · 15%
+                                                                                                   Needs work
+
+
+                                                                                                       32/100
+     Citation quality · 15%
+                                                                                                        Critical
+
+
+                                                                                                             —
+     Message alignment · 10%
+                                                                                                       No data
+
+
+                                                                                                       45/100
+     Purchase intent · 5%
+                                                                                                   Needs work
+
+
+
+
+Presence quality
+Showing up is not enough: what matters is whether they cite you, how they describe you and
+where.
+
+
+         Citation share                      Sentiment                         Prominence
+
+
+
+   32%                                  Neutral                            #2
+   32 of 100 answers with a citation                                       Your best position in the
+   point to your site.                  Positive 38% · Neutral 45% ·       answer; average #3
+                                        Negative 17%
+
+
+
+
+Globe · Assessment as of May 19, 2026                                                                  03 / 06
+                                                                              W HE RE YOU STA ND
+
+
+
+
+Levels to exist on an agentic web
+Perception · do they mention you? (levels 01, 02, 03 and 05)   Operability · can they use you? (04)
+
+
+          Level 01 · Perception
+          Be Found
+          Do you exist for AI?
+                                                                                                      72      Optimal
+
+
+
+
+          Level 02 · Perception
+          Be Readable
+          Can it read you without guessing?
+                                                                                                 51        Needs work
+
+
+
+
+          Level 03 · Perception
+          Be Correct
+          Is what it says about you true?
+                                                                                                      —       No data
+
+
+
+
+          Level 04 · Operability
+          Be Actionable                                                                               Not measured yet
+          Can they use you, not just cite you?
+
+
+          Level 05 · Perception
+          Be Intrinsic
+          Are you the default?
+                                                                                                59         Needs work
+
+
+
+
+Engine by engine
+Where presence drops most: Perplexity (58%) · Claude (71%).
+
+                                                                                                                   75%
+       ChatGPT
+                                                                                                                 18 of 24
+
+
+                                                                                                                    71%
+       Claude
+                                                                                                                 17 of 24
+
+
+                                                                                                                   79%
+       Gemini
+                                                                                                                 19 of 24
+
+
+                                                                                                                   58%
+       Perplexity
+                                                                                                                 14 of 24
+
+
+                                                                                                                      —
+       Google AI Overview
+                                                                                                           Not evaluated
+
+
+
+
+Globe · Assessment as of May 19, 2026                                                                           04 / 06
+                                                                        M ARK ET AND SOUR CES
+
+
+
+
+Share of voice
+Your share of mentions against other brands (144 mentions in total).
+
+                                                                                                                  33%
+Competidor A
+                                                                                                          48 mentions
+
+                                                                                                                  29%
+Competidor B
+                                                                                                          41 mentions
+
+                                                                                                                  22%
+Your brand
+                                                                                                          32 mentions
+
+                                                                                                                     16%
+Competidor C
+                                                                                                          23 mentions
+
+
+
+
+Sources behind the answer
+The domains engines cite in the sample (45 citations).
+
+                                                                                                                      18
+g2.com
+                                                                                                             Third party
+
+                                                                                                                      11
+reddit.com
+                                                                                                          Community
+
+                                                                                                                      9
+globe.com
+                                                                                                               Your site
+
+                                                                                                                       7
+competidor-a.com
+                                                                                                             Competitor
+
+
+
+
+   Provenance and methodology
+
+        Data as of                      Questions               Score version                Question pack
+        May 19, 2026                    24                      2                            2.3.1
+
+   A sampled, AI-assisted assessment. It does not guarantee positions or outcomes; it reflects a sample of answers
+   on the date of the analysis.
+
+
+
+
+Globe · Assessment as of May 19, 2026                                                                          05 / 06
+                       Shall we talk?
+
+
+Whenever you like
+  We'll show you what to move first to raise your score, and
+            how to measure it month by month.
+
+
+
+                       Book a meeting →
+
+                Pick a time at efeoncepro.com/contacto
+
+
+
+
+                     Empower your Engine
+
+
+
+
+                          Efeonce Group SpA
+

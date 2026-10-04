@@ -200,6 +200,30 @@
               "down",
               "flat"
             ]
+          },
+          "glyph": {
+            "type": "enum",
+            "required": false,
+            "values": [
+              "clic",
+              "impresion",
+              "ctr",
+              "posicion",
+              "keyword",
+              "visita",
+              "ia",
+              "cita",
+              "enlace",
+              "competencia",
+              "medicion",
+              "reloj",
+              "checklist",
+              "reunion",
+              "assets",
+              "social",
+              "prensa",
+              "web"
+            ]
           }
         }
       },

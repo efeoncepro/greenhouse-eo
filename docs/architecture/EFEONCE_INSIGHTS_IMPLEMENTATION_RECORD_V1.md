@@ -952,7 +952,7 @@ reliability (módulo `insights`); ambas deben estar en `ok` (steady 0).
 - Manual: [docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md](../manual-de-uso/insights/operar-efeonce-insights-api-mcp.md).
 - Task: [TASK-1845](../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md)
   (§Rollout evidence 2026-09-15); dependientes TASK-1846, 1847, 1848, 1849, 1875 en `docs/tasks/to-do/`.
-- Epic: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md); master UI flow
+- Epic: [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md); master UI flow
   [docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md](../ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md).
 - Skills: local `.claude/skills/efeonce-insights/SKILL.md` (= `.codex/…`); servida
   `docs/mcp/skills/efeonce-insights/SKILL.md`; `efeonce-mcp-platform` para federación.

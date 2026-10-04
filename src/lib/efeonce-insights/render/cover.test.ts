@@ -42,8 +42,12 @@ const plan = (over: Partial<EditorialPlanV1>): EditorialPlanV1 =>
   ({ planVersion: 'editorial_plan_v1', locale: 'es-CL', executiveSummary: [], chapters: [{ ...aeoChapter, charts: [] }], actions: [], limits: [], methodology: [], references: [], ...over }) as EditorialPlanV1
 
 describe('portada sellada → plantilla (TASK-1889)', () => {
-  it('los canales salen de los gráficos, en orden canónico, con AI Overview colapsado en Google', () => {
-    expect(channelsOf([aeoChapter])).toEqual(['google', 'chatgpt', 'perplexity'])
+  it('los canales salen de los gráficos y los tableros, en orden canónico; AI Overview con su propio isotipo', () => {
+    expect(channelsOf([aeoChapter])).toEqual(['google_ai_overview', 'chatgpt', 'perplexity'])
+
+    const withStats = { ...aeoChapter, charts: [], stats: [{ figureId: 's', question: 'value_change', title: 't', items: [{ itemId: 'g', label: 'Gemini', factId: 'g1', comparisonFactId: null, direction: null, estimated: false }] }] } as unknown as PlanChapterV1
+
+    expect(channelsOf([withStats], new Map([['g1', { channelId: 'gemini' }]]))).toEqual(['gemini'])
   })
 
   it('sin portada sellada (plan v1), navy sin logo', () => {
@@ -62,7 +66,7 @@ describe('portada sellada → plantilla (TASK-1889)', () => {
     expect(cover.contentType).toBe('report-cover-light')
     expect(cover.slots).toMatchObject({
       scopeLines: ['Motores de respuesta: si la IA menciona la marca.'],
-      channels: [{ channelId: 'google' }, { channelId: 'chatgpt' }, { channelId: 'perplexity' }],
+      channels: [{ channelId: 'google_ai_overview' }, { channelId: 'chatgpt' }, { channelId: 'perplexity' }],
       preparedFor: { logo: 'asset-ref:org-logo:asset-1' }
     })
   })

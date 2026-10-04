@@ -7,6 +7,34 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-04 — SEO: reconciliación documental de EPIC-022
+
+- Censo de 84 hijas (43 complete, 3 en curso, 38 to-do), estados TASK-1655/1670/1671/1672/1805 e índices conciliados. Flag de hallazgos y selectores Improved ETV revalidados en worker activo; pendientes conductuales conservados.
+- [Evidencia y límites](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Sin cierres de tasks, cambio de configuración, calls pagadas, backfill ni emisión de informes.
+
+## 2026-10-04 — Spot «Los Sparks»: Studio, Metricool y naming «Efeonce | AEO»
+
+- Spot cargado en Marketing Studio como CMP001-08 de CMP-001 (orgánico) y programado en Metricool: IG lun 05-oct 14:00 (portada 4:5), LinkedIn jue 08-oct 11:00; media re-alojada con SHA-256 idéntico.
+- Operador: la marca es Efeonce y el servicio «Efeonce | AEO» (con barra). Regla en el [ADR de naming](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md), skills de copy/AEO/social y `docs/context/`; recetas de Studio y Metricool documentadas.
+
+## 2026-10-04 — Insights: reconciliación de estado y revisión de cierre
+
+- EPIC-045 sincronizado a `in-progress`; 24 hijas (7 complete, 6 en curso, 11 to-do). Contratos TASK-1957/1962 desplegados, modelo vigente 1.4 y ocho flags Production exactos ON. Índices, arquitectura y skill espejo actualizados; historial conservado.
+- [Auditoría](docs/audits/insights/2026-10-04-epic-045-closure-review.md): 116 pruebas PASS; sin planes post-release en la lectura acotada. TASK-1962 candidata a cierre tras verificación productiva; las seis hijas en curso conservan sus pendientes. Sin cierres de tasks, cambios runtime ni envíos.
+
+## 2026-10-03 — Efeonce Insights: figuras nuevas en producción y cierre de TASK-1974
+
+- Release `36a73e7b7e19`: el planificador elige la figura por la pregunta; PDF y deck tienen página de cifras, cascada,
+  waffle, dona y barras apiladas; tarjeta con isotipo del canal; Think `0c5701a`; AXIS `v0.3.42`.
+- Verificación con GA4 real de Berel: apiladas y dona correctas. Dos correcciones: una parte que redondea a 0 % se lee
+  «<1 %» y la cifra queda unida a «%»/«pp» con espacio duro en los slots del PDF y el deck. El blanco del disco de canal
+  pasa al rol `channelDisc`. TASK-1974 complete; TASK-1975 espera la revisión del operador.
+
+## 2026-10-03 — AI Visibility Report PDF: refresh local
+
+- TASK-1938: mismo motor y snapshot; seis páginas Engine con órbita, logos oficiales y cierres de cliente/prospecto, en ES/EN/PT-BR. Texto largo conserva contenido con continuación; fuentes registradas de forma aditiva. Las RRSS oficiales se muestran completas a su escala y el eslogan mantiene sus tres pesos.
+- [Dossier](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md): diez PDFs auditados, 24 comparaciones color/gris, 108 pruebas focales, TypeScript y build PASS. Fallo de metadata Manzanitas corregido en un commit separado; siete tests y sincronización PASS. Code complete local; rollout, revisión del adjunto real y paridad web/print pendientes. Sin push ni envío real.
+
 ## 2026-10-03 — Elenco 2D de Efeonce canonizado
 
 - [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
@@ -593,70 +621,3 @@ gorra). El Trazo `staff-hoodie` no entró. El set queda en 36 Trazo + 43 Plastil
 en AXIS con el tag `v0.6.0` (`axis-graphic-line` 0.6.0, `axis-brand-assets` 0.3.4); Greenhouse fija axis-graphic-line
 0.6.0 y axis-brand-assets 0.3.4. Documentado en el ADR (delta D26), el manual §14, la doc funcional 1.11, el manual de
 uso 1.9 y las skills `efeonce-graphic-line` y `axis-design-system`.
-
-## 2026-09-27 — «La órbita» por superficie en el Artifact Composer (TASK-1919) y `foto:isotipo` (TASK-1920)
-
-Las 20 recetas aprobadas de la línea gráfica por superficie son plantillas del Artifact Composer en tres catálogos
-nuevos: `graphic-line-deck` (PDF 16:9, seis láminas), `graphic-line-stills` (heros web, el teléfono por ancho, caminero,
-último cuadro del loop y storyboard de motion) y `graphic-line-overlays` (capas de video en PNG con alfa). Una pieza sale
-entera de un intent con `pnpm brand:compose` (mapper puro `src/lib/brand-surfaces`: exige receta aprobada y valida con el
-contrato AXIS); opciones y pendientes fallan con `recipe-not-approved` y el video queda en motion
-(`recipe-outside-composer`). Motor domain-free: fondo transparente por plantilla, gate de tinta ponderado por alfa y fix
-de slots anidados; pintores de selección y CTA inyectados. `pnpm brand:tokens [--check]` y gate propio
-`pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; la deriva global de 60 frames es previa,
-ISSUE-122). Greenhouse fija AXIS `v0.3.8` (`efeonce.surface-composition` 0.1.1) y depende de `axis-graphic-line`.
-`pnpm foto:isotipo` compone el isotipo oficial sobre la prenda cuando `foto:emblema` muestra otro (TASK-1920). Local en
-`develop`, sin push; ruta productiva en TASK-1921. Docs: ADR del composer, runbook del gate, norma por superficie §2.1,
-índice de la línea, runbook AXIS, doc funcional 1.10, manual de uso 1.1 y skills `efeonce-graphic-line`, `deck-studio`,
-`motion-design-studio` y `efeonce-advertising-creative`.
-
-## 2026-09-27 — Iconografía: 30 íconos de oficio (D25)
-
-El operador aprobó 30 glifos nuevos, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de
-La órbita» (sección 7): 15 de Trazo (correo, `llamada`, calendario, reunión, objetivo, presentación, contrato, checklist,
-código, base de datos, nube, integración, seguridad, ubicación, reloj) y 15 de Plastilina (lápiz a estrella), éstos
-también en volumen. El set queda en 27 Trazo + 33 Plastilina = 60 glifos y 33 PNG de volumen, publicados en AXIS con el
-tag v0.5.0 (`axis-graphic-line` 0.5.0, `axis-brand-assets` 0.3.3; `axis-tokens` sigue en 0.3.7); el Lab muestra el
-catálogo completo. Reglas nuevas: claves únicas entre voces y Trazo sin arcos elípticos. Documentado en la skill
-`efeonce-graphic-line` (iconography §13, ledger, lecciones), manual §14, ADR, doc funcional 1.9 y manual de uso 1.8;
-Greenhouse ya fija `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3.
-
-## 2026-09-27 — Línea gráfica de Glitch: sub-línea de «La órbita», sólo para Glitch
-
-Nace la norma [`GLITCH_GRAPHIC_LINE_V1.md`](docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) y su
-ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md). Aplica **sólo a
-Glitch**, el magazine semanal: hereda de La órbita la gramática, la esfera única, el fondo, Bricolage + Poppins, la firma
-de Efeonce y los íconos, y agrega lo exclusivo de Glitch (manzana, verde `#6ec207`, falla en bytes, Guttery, cabecera
-«EDICIÓN #N»), que nunca va en piezas de Efeonce. El operador aprobó el sistema de portada A/B/C con regla de rotación,
-la lámina interior con su variante de noticia 1 y la contraportada; lente, blog, vlog, reel y tarjetas finales quedan en
-propuesta. El flujo de composición (valores en AXIS, catálogo `glitch-edition` del Artifact Composer, overlays
-HyperFrames con alfa) queda `Proposed`, sin tasks. Doc funcional y manual de uso nuevos; remisión en el manual de La
-órbita §7. AXIS en rama `feat/glitch-line`, sin publicar; sin cambios de código en Greenhouse.
-
-## 2026-09-27 — Iconografía: Plastilina en volumen canónica (D24) y el Trazo sin rasgo propio (D23)
-
-El operador canonizó la tercera capa de la iconografía: **Plastilina en volumen**, cada glifo de Plastilina en arcilla
-mate inflada, generado desde su vector aprobado (GPT Image 2.5 Sunburst editando el ícono plano) y entregado como PNG
-con alfa. Complementa al plano: sólo en momentos protagonistas, uno por pieza, desde 160 px; nunca en listas, contenido
-de deck, dashboards ni UI. En AXIS `main` (c18e3d3): tokens `efeonceGraphicLine.icons.volume` (axis-tokens 0.3.7),
-los 18 PNG sellados en `@efeoncepro/axis-brand-assets` 0.3.2 (`volumeIconUrl`), `pnpm icons:volume -- refs|key|check|publish`
-y la sección `#volumen` del Lab con su bloque en `/references/iconography.json`; publicados con el tag v0.3.7 (tokens 0.3.7, brand-assets 0.3.2).
-Lecciones: el extruido en Blender quedó plano y se rechazó; `ai:image:rmbg` rellena los calados, así que el alfa se saca
-por color contra el fondo liso; el QA compara silueta, calados y piezas con el plano y avisa sin rechazar. D23: «El corte»
-en el Trazo se descartó; el Trazo queda funcional y la distinción la carga Plastilina. Skill `efeonce-graphic-line`,
-skills vecinas, manual, ADR, doc funcional y manual de uso al día. Corrida: `ai-generations/2026-09-27_plastilina-3d-gpt/`.
-
-## 2026-09-27 — La órbita se compone por superficie
-
-Nace la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md):
-recetas aprobadas, opciones, rechazos, firma y reglas para web, DOOH, pDOOH, motion, producción audiovisual y deck, más
-la tabla de contradicciones del inventario y cómo quedaron. El operador aprobó las recetas de deck `proposal-cinematic`
-(servicios creativos, web, carrera de Nexa, RevOps, AEO y líneas de servicio con Nexa, cuyas cinco esferas son luz de
-la foto) y `method-staircase` (BeX), amplió el registro cine a `proposal-cinematic` con personas del equipo en su
-uniforme por registro, dejó el acento fuera del texto menor de 24 px y aprobó el 1:1 ajustado en el canvas (su salida
-de `sinValidar` va con TASK-1918). El canvas del equipo se separó en una página por superficie, cada una con su lámina
-guía. Manual de la línea §10.0, lenguaje fotográfico v1.6, doc funcional 1.7, manual de uso nuevo y skills
-`efeonce-graphic-line`, `deck-studio`, `motion-design-studio`, `efeonce-advertising-creative` y `design-studio` al día.
-El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface:resolve`, tokens
-`efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
-código en Greenhouse.

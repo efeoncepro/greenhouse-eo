@@ -29,17 +29,17 @@
     {
       "reference": "Deck-Cifras",
       "template": "InsightsFigureStatSlide",
-      "changed": 4875,
+      "changed": 5018,
       "total": 921600,
-      "ratio": 0.005289713541666667,
+      "ratio": 0.0054448784722222225,
       "pass": true
     },
     {
       "reference": "Deck-Comparacion",
       "template": "InsightsFigureComparisonSlide",
-      "changed": 862,
+      "changed": 1094,
       "total": 921600,
-      "ratio": 0.0009353298611111111,
+      "ratio": 0.0011870659722222222,
       "pass": true
     },
     {
@@ -69,9 +69,9 @@
     {
       "reference": "Deck-Metas",
       "template": "InsightsFigureTargetsSlide",
-      "changed": 1769,
+      "changed": 1990,
       "total": 921600,
-      "ratio": 0.0019194878472222222,
+      "ratio": 0.0021592881944444446,
       "pass": true
     },
     {
@@ -149,9 +149,9 @@
     {
       "reference": "Premium-Cifras",
       "template": "ReportFigureStatPage",
-      "changed": 449,
+      "changed": 598,
       "total": 891662,
-      "ratio": 0.0005035540372921578,
+      "ratio": 0.0006706577155917825,
       "pass": true
     },
     {
@@ -173,9 +173,9 @@
     {
       "reference": "Premium-Evidencia",
       "template": "ReportFigureComparisonPage",
-      "changed": 3918,
+      "changed": 4024,
       "total": 891662,
-      "ratio": 0.004394041688442481,
+      "ratio": 0.00451292081528651,
       "pass": true
     },
     {
@@ -197,9 +197,9 @@
     {
       "reference": "Premium-Metas",
       "template": "ReportFigureTargetsPage",
-      "changed": 2993,
+      "changed": 3138,
       "total": 891662,
-      "ratio": 0.003356653081548838,
+      "ratio": 0.0035192707550618955,
       "pass": true
     },
     {

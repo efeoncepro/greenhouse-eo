@@ -1,8 +1,16 @@
 # Producción y posproducción de video: método de principio a fin
 
+## Delta 2026-10-03 (tarde) — distribución y naming del servicio
+
+- **Fuente:** distribución del spot «Los Sparks» (concepto CMP001-08 de CMP-001): registro en Marketing Studio y
+  programación en Metricool (Instagram 05-oct 14:00, LinkedIn 08-oct 11:00; `PENDING`, no publicado). Registro:
+  `ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md`.
+- **Qué cambia:** el método suma un paso final de [distribución](#distribución-studio--metricool) (Studio →
+  Metricool) y una [regla de naming](#naming-del-servicio-en-guion-subtítulos-y-copy) para guion, subtítulos y copy.
+
 ## Delta 2026-10-03 — preproducción transversal y spot animado 2D
 
-- **Fuente:** spot animado 2D «Sparks × Efeonce AEO», v2 aprobada por el operador el 2026-10-03 (49,6 s, 16:9,
+- **Fuente:** spot animado 2D «Los Sparks» (servicio Efeonce | AEO), v2 aprobada por el operador el 2026-10-03 (49,6 s, 16:9,
   1920×1080, 24 fps). Hechos en `ai-generations/2026-10-03_sparks-aeo-60s/INVENTARIO-DE-HECHOS.md` y `PREPRODUCCION.md`
   §11–12; historia del caso en la
   [retrospectiva](../social/2026-10-03-sparks-aeo-spot-animado-production-method.md).
@@ -21,7 +29,7 @@
 ## Decisión operativa
 
 - **Status:** Accepted — método documental solicitado por el operador el 2026-09-24; no implementación de plataforma.
-- **Date / Validated as of:** 2026-09-24; delta 2026-10-03 (preproducción transversal, spot animado 2D).
+- **Date / Validated as of:** 2026-09-24; delta 2026-10-03 (preproducción transversal, spot animado 2D; distribución Studio → Metricool y naming del servicio).
 - **Owner:** Creative Studio / Motion Design Studio; Audio Studio posee el oficio sonoro.
 - **Scope:** ejecución por agentes de video generado, filmado, animado o híbrido; preproducción, producción, posproducción y entrega.
 - **Reversibility:** alta; companions versionados, fuentes y entregas preservadas.
@@ -72,6 +80,8 @@ Capas documentales: [descripción funcional](../../documentation/creative-produc
 | Consultar herramientas/endpoints | [STUDIO_TOOLING](../../../.codex/skills/motion-design-studio/efeonce/STUDIO_TOOLING.md), con verificación vigente antes de usarlos |
 | Película generativa con cartelas locales | [Receta específica](../../../.codex/skills/motion-design-studio/workflows/generative-film-with-approved-title-overlays.md) |
 | Spot animado 2D con mascotas/logos compuestos | [Receta específica](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) |
+| Registrar la pieza en la campaña | Skill [`efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md) |
+| Programar video con portada por red | [Entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md) |
 
 ## Unidad de trabajo y estados
 
@@ -105,6 +115,7 @@ aprueba una variante. Reusar autorización previa compatible, identificando a qu
 | 10. Sonorizar | Música continua adecuada al corte; SFX por causa, peso y jerarquía | Cue sheet real, stems limpios, mezcla, mediciones y escucha separadas |
 | 11. Finalizar | Restauración sólo si mejora; overlays limpios; color y exports | Prueba A/B antes del metraje completo; masters/derivados con metadata y cuadros verificados |
 | 12. Entregar/aprender | Abrir el archivo final, reportar límites, archivar fuentes y decisiones | Manifest de entrega, aprobación exacta o pendiente, costos reconciliados y aprendizaje reusable |
+| 13. Distribuir (si hay autorización) | Registrar concepto y piezas en Marketing Studio; programar un post por red en Metricool | Filas de la campaña en Studio; IDs/UUID por red, portada por red, readback por SHA-256 y `PROGRAMACION.md` |
 
 El diseño sonoro comienza en el guion, pero su generación/mezcla final sigue el corte real. Si luego cambia
 la imagen, invalida los cues afectados y revisa la sincronía; no reutilices ciegamente el reporte anterior.
@@ -149,6 +160,29 @@ por solicitud en fal y Higgsfield, verificado 2026-10-03).
 | Subtítulos | Cues desde la voz real; sin libass, cada cue como PNG transparente superpuesto; SRT y SDH aparte | `corte/subtitulos-v2.cjs` |
 | Audio | Música derivada del kit oficial con balance por bandas medido antes de mostrarla; mezcla con sidechain; nivel por destino (−14 LUFS video/redes) | Medios 21 % contra ~35 % → EQ; master v2 a −16, redes re-masterizadas a −14 |
 | Revisión | Cuadros al 100 % en cada pantalla con texto; cero placeholders; declarar lo no verificado (sin ASR ni escucha propia) | Placeholders y texto fuera de burbuja llegaron a la v1 |
+
+## Naming del servicio en guion, subtítulos y copy
+
+El guion, los subtítulos y el copy nombran el servicio como **«Efeonce | AEO»** (con barra) y **la marca que habla es
+Efeonce** (por ejemplo: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO…»). Nunca «Efeonce AEO» como si
+fuera la marca. Se revisa en la etapa 2, antes de grabar voz o quemar subtítulos, porque corregirlo después obliga a
+re-renderizar. Caso fuente: en el spot «Los Sparks» la voz y los subtítulos quemados dicen «Efeonce AEO»; el
+operador corrigió el naming en los copies de redes y decidió no re-renderizar el video.
+
+## Distribución: Studio → Metricool
+
+Paso final, sólo con autorización de publicación explícita (aprobar la pieza no la da):
+
+1. **Marketing Studio:** registrar el concepto y sus piezas en la campaña (en el caso, CMP001-08 de CMP-001, finales
+   en OneDrive e ingesta con `pnpm import:catalog --apply` y `pnpm media:ingest --campaign <campaña> --apply`).
+   Operación en la skill [`efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md).
+   Las versiones quedan `imported` hasta que alguien las apruebe en Studio.
+2. **Metricool:** un post por red, con su portada propia (en Instagram, un video 16:9 lleva portada 4:5; LinkedIn,
+   16:9), horario por cruce de mejores horas con la cola y **readback por SHA-256** de la media re-alojada contra los
+   finales. Receta y schema MCP vigente en
+   [entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md).
+3. **Cierre honesto:** `PENDING` es programado, no publicado; declarar lo que queda en manos humanas (bio, aprobación
+   en Studio, comprobación posterior a la hora, licencias para pauta).
 
 ## Gates proporcionales y recuperación
 

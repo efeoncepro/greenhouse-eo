@@ -40,7 +40,7 @@ explicitar criterio editorial y conservar la fecha autorizada.
 `getBestTimeToPostByNetwork` devolvió horas parciales del día solicitado; ampliar la ventana y filtrar
 por día antes de escoger el máximo. `getScheduledPosts` también puede devolver elementos adicionales:
 no interpretar una consulta estrecha vacía como ausencia definitiva. Ampliar la ventana, revisar `extendedRange`
-si el schema lo ofrece y filtrar localmente por `publicationDate`, zona, marca y provider. Comparar
+si el schema lo ofrece (el 2026-10-03 no lo aceptaba como string; ver la receta de ese día) y filtrar localmente por `publicationDate`, zona, marca y provider. Comparar
 concepto/copy, media y fecha para detectar duplicados. Una entrada `autolistData` sin ID de post
 ni contenido concreto representa una autolista, no prueba de un post ya programado. Un composer
 abierto sin guardar tampoco es un post. Ante respuesta incierta de creación, leer la cola antes de
@@ -167,6 +167,48 @@ corrida, no valores por defecto: resolver siempre marca y cuenta con `getBrandSe
    explícita en el chat. Pedir esa instrucción antes de llegar al paso, no reintentar ni rodearlo.
 5. Espaciar las horas entre redes de la misma marca (en el caso, 16:15 / 16:20 / 16:25 / 16:30) y mostrar los copys
    al operador **antes** de programar.
+
+### Receta verificada: video 16:9 en Instagram y LinkedIn con portada por red (2026-10-03)
+
+Caso: spot animado «Los Sparks» (concepto CMP001-08 de CMP-001, always-on AEO). Registro:
+`ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md`; bitácora
+`docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md`. Los IDs son **evidencia** de esa
+corrida, no valores por defecto: resolver marca y cuentas con `getBrandSettings` (marca `3961547`, zona
+`America/Santiago`).
+
+| Red | Forma y hora | ID / UUID | Media | Portada (`videoThumbnailUrl`) |
+|---|---|---|---|---|
+| Instagram `efeoncepro` | REEL con `showReelOnFeed`, lun 05-oct-2026 14:00 | `387560819` / `213403842407255251` | 16:9 con intro muda de «gira la pantalla», 52,6 s | **4:5** (1080×1350) |
+| LinkedIn página (`urn:li:organization:20503593`) | POST, jue 08-oct-2026 11:00 | `387560873` / `-1362316842369790950` | 16:9, 49,6 s | 16:9 (1920×1080) |
+
+1. **Antes de Metricool, Marketing Studio.** El spot se registró primero como concepto y piezas de la campaña en
+   Studio (operación en la skill [`efeonce-marketing-studio`](../../efeonce-marketing-studio/SKILL.md)); Metricool
+   programa lo que ya tiene registro. Las versiones siguen `imported` sin aprobar en Studio: programar no las aprueba.
+2. **Portada por red.** Regla del operador: **en Instagram, la portada de un video 16:9 es la 4:5**; LinkedIn lleva
+   su portada 16:9. Un post por red, porque difieren media, portada, copy y hora.
+3. **Horario.** `getBestTimeToPostByNetwork` por red cruzado con `getScheduledPosts` de la marca. IG lunes 14 h
+   (índice 317, máximo semanal, día libre). LinkedIn jueves 11 h (índice 2790): martes 06 y viernes 09 ya tenían un
+   post a las 11:00. El índice es intensidad relativa, no pronóstico.
+4. **Schema observado ese día** (cambió respecto de corridas anteriores; descubrirlo siempre antes de escribir):
+   - `getScheduledPosts` exige `brandId`, `fromDate` y `toDate` como fecha-hora ISO **con offset**
+     (`2026-10-03T00:00:00-03:00`). Una fecha sola o sin offset falla con «could not be parsed at index 10/19».
+     No aceptó `extendedRange` como string.
+   - `getBestTimeToPostByNetwork` exige `brandId`, `socialNetwork`, `fromDate` y `toDate`, también con offset.
+   - `createScheduledPost` exige `blogId`, `date` **con offset** (`2026-10-05T14:00:00-03:00`; sin offset falla igual)
+     e `info` como JSON serializado, cuyo `publicationDate` va con `dateTime` **sin** offset más `timezone`.
+   - La cola incluye entradas `autolistData` sin ID: son la autolista, no posts.
+5. **Transporte.** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/cmp-001-sparks/v1-*` con `content-type`
+   explícito y HTTP 200 por URL antes de crear los posts.
+6. **Readback por SHA-256.** Metricool re-alojó todo en `static.metricool.com/planner/202610/…`; los cuatro archivos
+   descargados (2 MP4, 2 PNG) tienen **SHA-256 idéntico** a los finales: no recodificó. Con video y portada el hash
+   fue prueba suficiente (igual que en CMP-003); si un día no coincide, volver a la firma de imagen del 2026-09-19
+   antes de suponer un archivo equivocado. El texto devuelto por la creación fue idéntico al copy aprobado.
+7. **Pendientes humanos declarados:** el enlace de la bio de Instagram (el copy dice «Link en la bio» y la bio no se
+   tocó); comprobar la publicación después de la hora (`PENDING` ≠ publicado); aprobar las versiones en Studio. Sin
+   pauta hasta confirmar la licencia de la música de Stable Audio.
+
+Naming en el copy: la marca que habla es **Efeonce** y el servicio se escribe **«Efeonce | AEO»**. El video del caso
+dice «Efeonce AEO» en voz y subtítulos quemados y no se re-renderizó; la corrección vive en los copies.
 
 ## 4. Readback, evidencia y cierre
 

@@ -362,6 +362,9 @@ body { background: var(--axis-deck-role-navy); }
 
 .fig-dimension { font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-deck-role-navyInk); }
 
+/* TASK-1996 — glifo Trazo de la categoría sobre su etiqueta (en reposo). */
+.fig-dimension-glyph { fill: none; stroke: var(--axis-deck-role-navyMuted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
 .fig-delta { font-family: var(--axis-deck-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-deck-role-navyAccent); }
 
 .fig-delta--plain { fill: var(--axis-deck-role-dataPriorOnNavy); }

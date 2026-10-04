@@ -1,0 +1,296 @@
+{
+  "desktop": [
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "0.963335",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "1px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "scrollY": 0,
+      "width": 1440
+    },
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "0.993467",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "0.997601px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "scrollY": 0,
+      "width": 1440
+    },
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "0.999622",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "0.982732px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "scrollY": 0,
+      "width": 1440
+    },
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "0.950071px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "scrollY": 0,
+      "width": 1440
+    },
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "0.893652px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "0",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "scrollY": 0,
+      "width": 1440
+    },
+    {
+      "parts": [
+        {
+          "animation": "axis-orbit-halo",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "halo"
+        },
+        {
+          "animation": "axis-orbit-ring",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "ring"
+        },
+        {
+          "animation": "axis-orbit-arc",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "arc"
+        },
+        {
+          "animation": "axis-orbit-sphere",
+          "dash": "0px",
+          "opacity": "1",
+          "part": "sphere"
+        }
+      ],
+      "scrollWidth": 1440,
+      "width": 1440
+    }
+  ],
+  "mobileIntro": {
+    "orbit": {
+      "bottom": 267.375,
+      "height": 219.375,
+      "left": 120.1171875,
+      "right": 510.1171875,
+      "top": 48,
+      "width": 390,
+      "x": 120.1171875,
+      "y": 48
+    },
+    "parts": [
+      {
+        "animation": "axis-orbit-halo",
+        "opacity": "0",
+        "part": "halo"
+      },
+      {
+        "animation": "axis-orbit-ring",
+        "opacity": "0.963349",
+        "part": "ring"
+      },
+      {
+        "animation": "axis-orbit-arc",
+        "opacity": "1",
+        "part": "arc"
+      },
+      {
+        "animation": "axis-orbit-sphere",
+        "opacity": "0",
+        "part": "sphere"
+      }
+    ],
+    "scrollWidth": 390,
+    "width": 390
+  },
+  "mobileFinal": {
+    "h1": 1,
+    "orbits": 1,
+    "parts": [
+      {
+        "animation": "axis-orbit-halo",
+        "dash": "0px",
+        "duration": "0.8s",
+        "iterations": "1",
+        "opacity": "1",
+        "part": "halo"
+      },
+      {
+        "animation": "axis-orbit-ring",
+        "dash": "0px",
+        "duration": "0.5s",
+        "iterations": "1",
+        "opacity": "1",
+        "part": "ring"
+      },
+      {
+        "animation": "axis-orbit-arc",
+        "dash": "0px",
+        "duration": "1s",
+        "iterations": "1",
+        "opacity": "1",
+        "part": "arc"
+      },
+      {
+        "animation": "axis-orbit-sphere",
+        "dash": "0px",
+        "duration": "0.3s",
+        "iterations": "1",
+        "opacity": "1",
+        "part": "sphere"
+      }
+    ],
+    "scrollWidth": 390,
+    "width": 390
+  },
+  "reducedMotion": {
+    "parts": [
+      {
+        "animation": "none",
+        "dashArray": "none",
+        "opacity": "1",
+        "part": "halo"
+      },
+      {
+        "animation": "none",
+        "dashArray": "none",
+        "opacity": "1",
+        "part": "ring"
+      },
+      {
+        "animation": "none",
+        "dashArray": "none",
+        "opacity": "1",
+        "part": "arc"
+      },
+      {
+        "animation": "none",
+        "dashArray": "none",
+        "opacity": "1",
+        "part": "sphere"
+      }
+    ],
+    "reduced": true,
+    "scrollWidth": 390,
+    "width": 390
+  }
+}

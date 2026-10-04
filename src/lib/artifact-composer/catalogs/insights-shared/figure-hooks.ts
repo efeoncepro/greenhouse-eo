@@ -76,6 +76,32 @@ export const deckFigureSizeClass = (text: string): string | null => {
   return length <= 3 ? 'fig-number--lg' : length <= 4 ? 'fig-number--md' : null
 }
 
+/**
+ * TASK-1996 — la cifra ÚNICA de la lámina de cifras del deck baja de tamaño por ancho visible (prefijo + valor + sufijo,
+ * sin espacios ni signo). A 112 px caben 6 caracteres («13.606»); «770.462» se salía del encaje. Escalones fijos, no una
+ * medición del DOM, para que macOS y el Chromium de Linux de CI elijan lo mismo. Más de 11 caracteres no tiene escalón: el
+ * encaje sigue siendo el juez y rechaza con causa (nunca se recorta).
+ */
+export const deckSingleStatSizeClass = (text: string): string | null => {
+  const length = [...text.replace(/\s/g, '').replace(/^[+\-−]/, '')].length
+
+  return length <= 6 ? null : length === 7 ? 'stat-cell--md' : length <= 9 ? 'stat-cell--sm' : length <= 11 ? 'stat-cell--xs' : null
+}
+
+export const deckSingleStatHook: CatalogLayoutHook = async page => {
+  const text = await page.evaluate(() => {
+    const cells = document.querySelectorAll('.stat-grid > .stat-cell')
+
+    if (cells.length !== 1) return ''
+
+    return ['.stat-prefix', '.stat-value', '.stat-suffix'].map(selector => cells[0]!.querySelector(selector)?.textContent ?? '').join('')
+  })
+
+  const sizeClass = deckSingleStatSizeClass(text)
+
+  if (sizeClass) await page.evaluate(cls => document.querySelector('.stat-grid > .stat-cell')?.classList.add(cls), sizeClass)
+}
+
 export const withDeckFigureSize = (inner?: CatalogLayoutHook): CatalogLayoutHook => async (page, slide, deckPlan) => {
   const sizeClass = deckFigureSizeClass(String(slide.slots.keyFigure ?? ''))
 

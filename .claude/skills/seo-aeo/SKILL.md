@@ -15,7 +15,7 @@ description: >-
 
 # SEO + AEO/GEO — Skill operativa 2026
 
-> **Naming Efeonce (2026-09-29):** **Efeonce AEO** = capacidad; **Efeonce AEO Assessment** = diagnóstico público; **Efeonce AI Visibility Report** = informe compartible. **Search Visibility 360** conserva la oferta amplia SEO + AEO. `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` son aliases técnicos/históricos para encontrar motor, rutas y contratos. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`; detalle técnico: `efeonce/AI_VISIBILITY_GRADER.md`.
+> **Naming Efeonce (2026-09-29):** **Efeonce | AEO** = servicio (con barra; en copy habla Efeonce, nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); **Efeonce AEO Assessment** = diagnóstico público; **Efeonce AI Visibility Report** = informe compartible. **Search Visibility 360** conserva la oferta amplia SEO + AEO. `AI Visibility Grader`, `Brand Visibility Grader` y `AEO Grader` son aliases técnicos/históricos para encontrar motor, rutas y contratos. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`; detalle técnico: `efeonce/AI_VISIBILITY_GRADER.md`.
 >
 > **Submarcas de producto con logo (2026-09-29):** **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** son submarcas de producto de Efeonce con logos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29); acompañan a Efeonce y nunca firman solas. Referencia visual: Lab de AXIS `https://axis.efeonce.org/references/seo-aeo/` (publicados el 2026-09-29; responden 200). ADR de naming §Delta 2026-09-29; uso visual en la skill `efeonce-graphic-line`.
 >

@@ -38,7 +38,7 @@ describe('waffle por unidad', () => {
 
     expect(cellsOf(figure.svg)).toHaveLength(8)
     expect(cellsOf(figure.svg).filter(cell => cell.includes('waffle-tone--current'))).toHaveLength(5)
-    expect(cellsOf(figure.svg).filter(cell => cell.includes('waffle-tone--opportunity'))).toHaveLength(3)
+    expect(cellsOf(figure.svg).filter(cell => cell.includes('waffle-tone--prior'))).toHaveLength(3)
 
     // Hasta 30 unidades, 5 columnas; el cuadro no se infla más allá del techo de la caja.
     expect(figure.columns).toBe(5)
@@ -80,7 +80,7 @@ describe('waffle por unidad', () => {
   it('sin rol, el tono sale del orden; con oportunidad declarada, el coral es sólo suyo', () => {
     const plain = ['A', 'B', 'C', 'D'].map(label => ({ label, count: '1' }))
 
-    expect(waffleTones(plain)).toEqual(['current', 'opportunity', 'prior', 'step'])
+    expect(waffleTones(plain)).toEqual(['current', 'prior', 'step', 'muted'])
     expect(waffleTones(canvasParts)).toEqual(['current', 'opportunity', 'prior', 'absence'])
     expect(
       waffleTones([

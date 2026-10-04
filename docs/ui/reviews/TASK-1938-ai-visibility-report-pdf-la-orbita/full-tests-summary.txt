@@ -1,0 +1,26 @@
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| scripts/manzanitas/__tests__/manzanitas-tokens-sync.test.ts > manzanitas tokens (pnpm manzanitas:tokens) > every committed output is exactly what the pinned AXIS packages compile to (same check as --check)
+AssertionError: src/lib/artifact-composer/catalogs/manzanitas/manzanitas-tokens.json: corre pnpm manzanitas:tokens: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ scripts/manzanitas/__tests__/manzanitas-tokens-sync.test.ts:19:145
+     17|   it('every committed output is exactly what the pinned AXIS packages …
+     18|     for (const [file, bytes] of buildManzanitasOutputs()) {
+     19|       expect(fs.existsSync(file) && fs.readFileSync(file).equals(bytes…
+       |                                                                                                                                                 ^
+     20|     }
+     21|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1982 passed | 67 skipped (2050)
+      Tests  1 failed | 18148 passed | 286 skipped (18435)
+   Start at  16:55:46
+   Duration  508.74s (transform 52.16s, setup 352.27s, import 263.47s, tests 161.79s, environment 44.15s)

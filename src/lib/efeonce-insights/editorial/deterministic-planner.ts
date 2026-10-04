@@ -8,7 +8,7 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
 import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanChapterV1, type PlanClaimV1, type PlanCoverV1, type PlanFigureReadingV1, type PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { compositionChartsFor, statFigureFor, statReading, subsetChartsFor, withQuestion } from './criterion-figures'
+import { assistantStatFigureFor, compositionChartsFor, engineStatFigureFor, statFigureFor, statReading, subsetChartsFor, withQuestion } from './criterion-figures'
 import { canProduceFamily } from './family-evidence-matrix'
 import { orderByQuestion } from './figure-selection'
 import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, LINE_MIN_POINTS, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
@@ -860,7 +860,13 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // Las barras apiladas toman sus segmentos y el total: la tarjeta no los repite.
     const subset = editorialV2 ? subsetChartsFor(moduleKey, facts, byId, input.locale) : { charts: [], taken: new Set<string>() }
     const stat = editorialV2 ? statFigureFor({ moduleKey, facts, byId, targetMetrics, takenFactIds: subset.taken }) : null
-    const inStat = new Set([...(stat?.items.map(item => item.factId) ?? []), ...subset.taken])
+    // TASK-1990/1996 — tableros con isotipo por celda: mención por motor y visitas por asistente (con período anterior).
+    const assistants = editorialV2 ? assistantStatFigureFor(moduleKey, facts, byId) : null
+    const engines = editorialV2 ? engineStatFigureFor(moduleKey, facts, byId, new Set([...(stat?.items.map(item => item.factId) ?? []), ...subset.taken])) : null
+    const stats = [stat, assistants, engines].filter((figure): figure is NonNullable<typeof figure> => figure !== null)
+    // El tablero por motor sólo existe cuando todas las tasas son iguales: no hay barras que dibujar y la frase uniforme
+    // («…en el 33,3 % de las respuestas de cada motor») sigue siendo su lectura. Sus hechos siguen ese camino.
+    const inStat = new Set([...[stat, assistants].flatMap(figure => figure?.items.map(item => item.factId) ?? []), ...subset.taken])
 
     // TASK-1957 — las dimensiones internas del Grader (claridad de entidad, dominio de categoría…) son lecturas del
     // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
@@ -886,7 +892,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       // El tono y el tipo de fuente son partes de un todo: van en su figura de composición (`compositionChartsFor`, TASK-1974).
       if (fact.metricId.startsWith('source_type.') || fact.metricId.startsWith('sentiment.') || fact.metricId.startsWith('cited_source.')) continue
       if (inStat.has(fact.factId) || targetMetrics.has(fact.metricId)) continue
-      // Con v2 las visitas por asistente son la figura de composición de su total (`compositionChartsFor`).
+      // Con v2 las visitas por asistente son la figura de composición de su total (`compositionChartsFor`) o su tablero.
       if (editorialV2 && fact.metricId.startsWith('ai_source.')) continue
 
       const key = chartGroupKeyOf(moduleKey, fact)
@@ -916,7 +922,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1957 — roles: hallazgos materiales arriba, el resto respaldo. Las frases de figuras descartadas abren la lista.
     const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? [])]
 
-    charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? [...compositionChartsFor(moduleKey, facts, null), ...subset.charts] : []))
+    charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? [...compositionChartsFor(moduleKey, facts, null, { aiSourceAsCards: assistants !== null }), ...subset.charts] : []))
 
     if (editorialV2) {
       // TASK-1974 — una métrica con meta va SÓLO en bullet (la meta gana, regla 2): su línea mensual repetiría el hecho
@@ -927,7 +933,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
 
     // TASK-1974 — cada figura declara su pregunta y el capítulo sigue el orden del criterio (§5.2).
     const ordered = editorialV2 ? orderByQuestion(charts.map(withQuestion)) : charts
-    const statReadings = stat ? ((reading => (reading ? [reading] : []))(statReading(stat, byId, input.locale))) : []
+    const statReadings = stats.flatMap(figure => ((reading => (reading ? [reading] : []))(statReading(figure, byId, input.locale))))
 
     if (claims[0]) summary.push({ ...claims[0], claimId: `summary.${claims[0].claimId}` })
 
@@ -936,7 +942,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       module: moduleKey,
       title: MODULE_TITLES[moduleKey],
       claims,
-      ...(stat ? { stats: [stat] } : {}),
+      ...(stats.length > 0 ? { stats } : {}),
       charts: ordered,
       // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
       tables: [

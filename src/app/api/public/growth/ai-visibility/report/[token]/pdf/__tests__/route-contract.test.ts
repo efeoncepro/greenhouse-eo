@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SAMPLE_PUBLIC_REPORT } from '@/components/growth/ai-visibility/report-artifact/fixtures'
+import { buildAiVisibilityReportAttachment } from '@/lib/growth/ai-visibility/public-delivery/email/build-report-attachment'
+import { readAiVisibilityReportPdfPresentationContext } from '@/lib/growth/ai-visibility/report/pdf-presentation-context'
 
 const guard = { allowed: true }
 
@@ -32,6 +34,10 @@ vi.mock('@/lib/growth/ai-visibility/report/snapshot', () => ({
   readPublicGraderReport: async () => snapshotState.value,
 }))
 
+vi.mock('@/lib/growth/ai-visibility/report/pdf-presentation-context', () => ({
+  readAiVisibilityReportPdfPresentationContext: vi.fn(async () => ({ audience: 'prospect', audienceSource: 'public_intake' }))
+}))
+
 vi.mock('@/lib/growth/ai-visibility/public-delivery/email/build-report-attachment', () => ({
   buildAiVisibilityReportAttachment: vi.fn(async () => attachment),
 }))
@@ -44,6 +50,7 @@ const callGet = async (token = 'grt-deadbeef') => {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks()
   guard.allowed = true
   snapshotState.value = {
     reportId: 'grpt-1',
@@ -64,6 +71,14 @@ describe('GET /report/[token]/pdf — descarga portable pública', () => {
     expect(res.headers.get('content-type')).toBe('application/pdf')
     expect(res.headers.get('content-disposition')).toBe('attachment; filename="informe-visibilidad-ia-globe.pdf"')
     expect(res.headers.get('x-content-type-options')).toBe('nosniff')
+    expect(readAiVisibilityReportPdfPresentationContext).toHaveBeenCalledWith({
+      runId: 'run-1',
+      locale: SAMPLE_PUBLIC_REPORT.provenance.market?.locale,
+      asOf: '2026-05-20T12:00:00.000Z'
+    })
+    expect(buildAiVisibilityReportAttachment).toHaveBeenCalledWith(expect.objectContaining({
+      context: { audience: 'prospect', audienceSource: 'public_intake' }
+    }))
 
     const text = Buffer.from(await res.arrayBuffer()).toString('latin1')
 
@@ -76,6 +91,8 @@ describe('GET /report/[token]/pdf — descarga portable pública', () => {
 
     expect(res.status).toBe(429)
     expect(res.headers.get('content-type')).toContain('application/json')
+    expect(readAiVisibilityReportPdfPresentationContext).not.toHaveBeenCalled()
+    expect(buildAiVisibilityReportAttachment).not.toHaveBeenCalled()
   })
 
   it('token inexistente/expirado → 404 indistinto', async () => {
@@ -83,5 +100,7 @@ describe('GET /report/[token]/pdf — descarga portable pública', () => {
     const res = await callGet('grt-missing')
 
     expect(res.status).toBe(404)
+    expect(readAiVisibilityReportPdfPresentationContext).not.toHaveBeenCalled()
+    expect(buildAiVisibilityReportAttachment).not.toHaveBeenCalled()
   })
 })

@@ -14,7 +14,9 @@ habla; luego aplica la voz correcta, ubica el copy en su runtime y respeta las s
 - **Julio:** piezas con byline/speaker Julio, Marketing con Manzanitas, LinkedIn, keynote,
   newsletter, podcast o thought leadership personal → `JULIO_REYES_VOICE_SYSTEM.md`.
 - **Efeonce:** landings, páginas institucionales, UI, producto, emails del sistema, propuestas,
-  políticas, documentación y artículos sin byline personal → `EFEONCE_VOICE_SYSTEM.md`.
+  políticas, documentación y artículos sin byline personal → `EFEONCE_VOICE_SYSTEM.md`. El emisor es
+  **Efeonce**; los servicios se nombran con barra (**Efeonce | AEO**), nunca «Efeonce AEO» como marca
+  (§Quién habla y cómo se nombran los servicios, delta 2026-10-03).
 - **Híbrido firmado por Julio:** Julio narra; hechos se atribuyen; la doctrina organizacional se
   marca como `En Efeonce...`. Nunca cambiar de speaker de forma invisible.
 - **Otra persona:** no usar a Julio como voz humana genérica.

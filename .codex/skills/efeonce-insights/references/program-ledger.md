@@ -3,20 +3,25 @@
 The single place where a session learns **what exists, where it runs and what the next task inherits**.
 One section per task. Update yours at closure (Skill Maintenance Contract); append to "Sessions" as you go.
 
+**Estado reconciliado 2026-10-04:** 24 hijas (7 complete, 6 in-progress, 11 to-do). [Auditoría de cierre](../../../../docs/audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques y sesiones fechados conservan historia; esta tabla y los deltas nuevos prevalecen. Despliegue no implica aprobación del cliente ni cierre de task.
+
 | Task | Scope | Lifecycle | Live where | Closed on |
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — sharing/issuance ON; delivery/schedules OFF in production** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON; Production sharing ON since TASK-1875 (`greenhouse-cssemzyzb`) and issuance ON since 2026-09-28 (`greenhouse-onfkul43q`), delivery/schedules OFF; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), ISSUE-174 follow-up, MCP negatives need a human session | 2026-09-28 |
-| TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
-| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **complete** (2026-09-28, closure `df6f37ccd`) | Think `main` `544ecd4` (production); Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
+| TASK-1848 | Sharing, email delivery and schedules | **in-progress — sharing/issuance/delivery/schedules ON** | Vercel Production flags exactos ON verificados 04/10; delivery/schedules activados 02/10. Canary humano App/MCP, portal/Hub/correo/guard pendientes | — |
+| TASK-1849 | Library, builder, review and portal/email experience | to-do; backend base disponible | Sin UI de biblioteca; sin blocker backend formal | — |
+| TASK-1875 | Shared web report in Think | **complete** | Think main `0c5701a`; Greenhouse modelo 1.4 publicado con `36a73e7b7e19`; sharing ON | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
-| TASK-1957 | Client-fit presentation contract: shared vocabulary, web model 1.2, editorial selection, chart eligibility, client-fit gate | **in-progress — code complete local (`c56f62d09`), release + canary pending** | local only (not pushed) | — |
+| TASK-1957 | Client-fit presentation contract | **in-progress — desplegado; canary/aceptación pendientes** | Contrato en `fe261ca2745f`, conservado en `36a73e7b7e19`; 116 pruebas focales PASS 04/10; sin plan congelado post-release en lectura acotada | — |
 | TASK-1958 | Client-fit visual hierarchy in Think and PDF (findings rows, backing table, scope) | to-do (blocked by 1957) | — | — |
-| TASK-1974 | Criterio de selección de figuras en el planner: pregunta → familia, tarjeta de cifra en el plan (`chapter.stats`), un dato una figura (`duplicated_fact`), modelo web 1.4, matriz v3 (dona y apiladas con evidencia GA4) | **in-progress — code complete local, rollout pendiente** (sale en el MISMO release que TASK-1975) | local only: `develop` de greenhouse-eo sin push (`38d78fa93`, `4b825e3d3`, `3d8bea818`, `908ebff1e`) | — |
-| TASK-1975 | Páginas A4 y láminas de cifras, cascada, waffle, dona y apiladas; tono semántico de la variación; triángulo redondeado; motion de la tarjeta en el Live; tokens y contrato en AXIS | **in-progress — code complete local, rollout pendiente** | local only: greenhouse-eo `develop` sin push (`81e50977b` … `256547db9`), efeonce-think `main` local sin push (`cd8cda5`, `0fb8254`), axis-design-system `main` local sin push ni tag (`e7f1653`, `c272c20`, `a141aaf`, `b4b699a` + un commit de motion en curso) | — |
+| TASK-1962 | Contrato de contenido (8 preguntas), causas SEO, entrega ICO, acciones/peticiones y GA4 | **in-progress — desplegado; candidata a cierre tras verificación productiva** | `fe261ca2745f` y `36a73e7b7e19`; Think `0c5701a`, modelo 1.4; 116 pruebas focales PASS 04/10 | — |
+| TASK-1974 | Criterio de selección de figuras en el planner: pregunta → familia, tarjeta de cifra en el plan (`chapter.stats`), un dato una figura (`duplicated_fact`), modelo web 1.4, matriz v3 (dona y apiladas con evidencia GA4) | **complete 2026-10-03** — en producción (release `36a73e7b7e19`, orquestador `37158679961`, PR #250) | Vercel + Job `artifact-worker` (render) + Think `0c5701a` | — |
+| TASK-1975 | Páginas A4/deck y Think de cifra, cascada, waffle, dona y apiladas | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; revisión Berel/Sky, promoción de fixes posteriores y decisión de color pendientes | — |
+| TASK-1990 | Contrato de tarjeta por canal | **in-progress — base en producción; Slice 1 local** | `36a73e7b7e19`; `03e19f3ee` (19 plataformas/channelForDomain) pendiente de promover; metricIcon/visitas por asistente pendientes | — |
+| TASK-1996 | Render de tarjeta con isotipo y glifos Trazo | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; cifra única adaptable local en `03e19f3ee`; glifos y 10 isotipos sin productor pendientes | — |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -220,9 +225,11 @@ preventivas**. Queda acá como gap conocido, no como deuda silenciosa.
 tiene pipeline PDF); la dedupe de `plan.limits` ya la entregó TASK-1846; los umbrales de calidad declarados
 (4,2/3) eran inoperantes frente a los que el gate tiene fijos (4,5/4).
 
-## TASK-1848 — sharing, delivery, schedules (in-progress; sharing ON, delivery/schedules OFF in production)
+## TASK-1848 — sharing, delivery, schedules (in-progress; sharing/issuance/delivery/schedules ON)
 
-**Delta 2026-09-28 (issuance activation).** Production sharing and issuance are ON; delivery and schedules remain
+**Estado 04/10:** los cuatro flags están ON en Vercel Production; el canary App/MCP y las dependencias de producto siguen abiertos (tabla actual y auditoría).
+
+**Delta histórico 2026-09-28 (issuance activation).** Production sharing and issuance are ON; delivery and schedules remain
 OFF. Issuance deployment `greenhouse-onfkul43q` (`dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`) is Ready and aliased to
 `greenhouse.efeoncepro.com`. Sequential Greenhouse Demo canary: ecosystem verified `ready_for_review` + completed
 `deck_pdf`; the authenticated human App lane issued `insed-5cbe87ef…` with HTTP 200; ecosystem readback confirmed
@@ -565,13 +572,13 @@ producción antes de compartir con clientes. Sin flag propio.
 
 **Hand-off planificado:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura.
 
-## TASK-1957 — contrato de presentación apto para cliente (in-progress; code complete local)
+## TASK-1957 — contrato de presentación apto para cliente (desplegado; cierre pendiente)
 
 Origen: el operador revisó el informe live con las ediciones internas reales de Berel (`EO-INS-000027`) y Sky
 (`EO-INS-000029`) renderizadas en local (2026-10-02) y encontró tablas internas como fuente, unidades en código,
 límites con diagnóstico interno y duplicados, recital de cifras, gráficos sin información y falta de jerarquía.
 
-Construido (commit `c56f62d09`, local, sin push):
+Construido inicialmente en `c56f62d09`; publicado en `fe261ca2745f` y conservado en `36a73e7b7e19`:
 - `src/lib/efeonce-insights/presentation/vocabulary.ts`: `sourceLabelOf`/`sourcesLabelOf`, `unitLabelOf`,
   `asOfLabelOf`, `windowLabelOf`, `defaultReportTitle`. Web y PDF los comparten (`figure-slots.sourcesOf` delega).
 - Modelo web **1.2** aditivo: `source` legible, `unitLabel`/`asOfLabel` en hechos, `unitLabel` en figuras, `role`
@@ -584,14 +591,20 @@ Construido (commit `c56f62d09`, local, sin push):
   audiencia cliente y rechaza con `not_ready` + `details.reason=client_fit`.
 
 Verificado: 280 pruebas, typecheck, lint, `insights:canvas-fidelity` sin cambios; planes regenerados de Berel y Sky
-sobre su evidencia sellada validan y pasan el gate. Pendiente: release, canary 1.2, regenerar (revise) las ediciones
-internas, y TASK-1958 para la jerarquía visual (Think todavía imprime `spec.unit` y fechas cortas propias).
+sobre su evidencia sellada validan y pasan el gate. Revalidación 04/10: 116 pruebas focales PASS. Pendiente: canary de los campos/gate sobre el modelo vigente 1.4, aceptación del criterio AEO/copy y TASK-1958. No falta el release del contrato.
 
-## TASK-1974 — el planner aplica el criterio de selección (in-progress; code complete local, rollout pendiente)
+## TASK-1962 — contrato de contenido del informe (desplegado; cierre pendiente)
+
+- Registro de ocho preguntas, test de cobertura, causas SEO, piezas entregadas ICO, acciones sólo de la cola propia, peticiones de Search Console/GA4 y decisiones de contenido en la proyección web; contratos en `references/contracts.md`.
+- Desplegado en `fe261ca2745f` (run `37093141725`, #248); vigente en `36a73e7b7e19` (#250). Los siete archivos principales contrastados son idénticos entre ese release y el árbol auditado. Think main `0c5701a` consume 1.4, que incluye los campos de 1.3.
+- 04/10: 116 pruebas focales PASS. Readback de la base compartida: sin plan congelado de edición creada después del merge #248. La consulta se limita a ediciones con snapshot y plan; no prueba que no existan borradores sin ellos.
+- Candidata más próxima al cierre: verificar una edición nueva en el runtime publicado y registrar la revisión prevista. TASK-1958 conserva plan/petición en PDF y jerarquía; TASK-1903 conserva interpretación por agente. No se creó, emitió ni envió una edición en esta auditoría.
+
+## TASK-1974 — el planner aplica el criterio de selección (complete 2026-10-03; en producción)
 
 Origen: el criterio de selección de figuras aprobado y canonizado por el operador el 2026-10-03
 (`docs/architecture/EFEONCE_INSIGHTS_CHART_SELECTION_CRITERIA_V1.md`, resumen en [`contracts.md`](contracts.md)
-§ Criterio de selección de gráficos). Task: `docs/tasks/in-progress/TASK-1974-efeonce-insights-figure-selection-planner.md`.
+§ Criterio de selección de gráficos). Task: `docs/tasks/complete/TASK-1974-efeonce-insights-figure-selection-planner.md`.
 
 Construido (local, `develop` sin push):
 - **Slice 1** `38d78fa93` — `ChartSpecV1.question` (`FIGURE_QUESTIONS`, `QUESTION_FAMILIES`, `isFigureQuestion` en
@@ -614,75 +627,31 @@ Construido (local, `develop` sin push):
 - Ajustes de TASK-1975 sobre el planner (`592fbde4b`): la cascada trae su propia lectura (aporte de la consulta que más
   cambió) y `withDriverReadings` agrega las lecturas de figuras sin lectura genérica (antes se perdían).
 
-Dónde corre: **en ningún runtime**. Todo local. Los planes sellados antes no traen `question` ni `stats` y validan igual
-(el criterio no se re-juzga sobre ellos).
+Dónde corre: **en producción desde el 2026-10-03.** AXIS `v0.3.42` publicado (paquetes + axis.efeonce.org), Think
+`0c5701a` y Greenhouse release `36a73e7b7e19` (orquestador `37158679961`, manifest `released`, watchdog OK). Ningún flag
+nuevo. Ninguna edición sellada cambia: el render compone el plan congelado, así que sólo las ediciones NUEVAS traen las
+páginas nuevas.
 
-Dejado fuera / abierto: color por orden en waffle y dona sin rol de parte (el plan aún no declara `role`, decisión
-pendiente del operador); dona y apiladas NO verificadas con datos GA4 reales (GA4 no corre en local; probadas con
-fixtures). La fila de la matriz para `waterfall` y `waffle` todavía dice «Sólo web: sin página PDF» en su texto de
-evidencia, aunque TASK-1975 les dio página: es texto descriptivo, no el predicado (`hasPdfFigurePage`).
+Verificado después del release (2026-10-03): vista previa de Berel `EO-INS-000027` con la conexión GA4 real (26 páginas +
+20 láminas): apiladas de sesiones p. 8 y dona de sesiones desde IA p. 17. Dos correcciones salieron de esa revisión:
+`8e4fbac7b` (una parte que redondea a 0 % se lee «<1 %») y `bindUnitSpaces` (cifra y «%»/«pp» unidos con espacio duro en
+los slots del PDF y el deck). El blanco del disco de canal pasó al rol `channelDisc` de `editorial-roles.json`.
+Fidelidad y gate visual corridos de nuevo: mismos valores, 37 frames a 0 px. Think: `test:insights` 25/25,
+`verify:insights` verde, `audit:insights-a11y` AA en 1440 y 390.
 
-**Hand-off:** sale en el mismo release que TASK-1975 (ver su sección y [`operations.md`](operations.md) § TASK-1974 /
-TASK-1975). Gate de cierre pendiente: `pnpm test` completo y `pnpm build` (este último con autorización del operador).
-
-## TASK-1975 — páginas de las figuras nuevas y tarjeta de cifra (in-progress; code complete local, rollout pendiente)
-
-Task: `docs/tasks/in-progress/TASK-1975-efeonce-insights-new-figure-pages.md`. Dirección aprobada
-`docs/ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md` (canvas
-<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>, hojas `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/{Premium,Deck}-Cifras.png`),
-wireframe `docs/ui/wireframes/TASK-1975-efeonce-insights-new-figure-pages.md`, motion
-`docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`.
-
-Construido en greenhouse-eo (local, sin push): `81e50977b` (Slice 1 aprobado: dirección, tokens y norma de tarjetas con
-gráficos), `44a490df5` (tonos semánticos mejor/peor/neutro + roles AXIS `dataStepOnPaper/OnNavy`,
-`deltaBetter/WorseOnPaper/OnNavy`), `2334d21a8` (`waffleUnitGeometry` en el motor, copy de las figuras nuevas, comparable
-de la tarjeta), `dc2a92f62` (Slices 2–4: 10 plantillas `report-figure-{stat,waterfall,waffle,donut,stacked}` +
-`insights-figure-{…}`, geometría `insights-shared/figure-{waterfall,waffle,donut,stacked}.ts`, `FigureKind` +
-`FIGURE_CAPACITY` ampliados, `PDF_FIGURE_FAMILIES` suma `waterfall`, `waffle`, `donut`, `bar_stacked`,
-`chapterFigureSlides` compartido por los dos mappers, `buildStatSlides`, fixtures `canvas-fixtures/{report,deck}/44–48`),
-`0b0233de3` (triángulo redondeado en todas las figuras; navy = variante C), `1ed956d44` (contrato de motion + modelo web
-con `parts` y `count`), `592fbde4b` (las seis fallas de la vista previa real), `45fecefe2` («Primer período medido» y
-`comparison {display, period}`), `256547db9` (baseline del gate visual, sección (v) de `BASELINE_DELTAS.md`).
-
-Construido en Think (local, `main` sin push; push = deploy de producción): `cd8cda5` (modelo 1.4,
-`src/components/insights/StatCard.astro` como `<dl>`, retícula por cantidad y una columna a 390 px, waffle por unidad en
-`insights-chart-geometry.ts`, tokens copiados de AXIS `efeonceInsights`), `0fb8254` («vs» con la cifra en negrita y
-resaltada durante el recorrido; «Primer período medido» del modelo). `pnpm test:insights` 25/25, `verify:insights` verde,
-`audit:insights-a11y` AA, `build` ok; capturas en `efeonce-think/.captures/task-1975-slice5/`.
-
-Construido en AXIS (local, `main` sin push ni tag): `e7f1653` (tokens `efeonceInsights` en `@efeoncepro/axis-tokens`
-0.3.42 + contrato `efeonce.insights-stat-card` 0.1.0 `candidate` en `@efeoncepro/axis-ui-contracts` 0.3.42), `c272c20`
-(Lab `/references/insights/` con la tarjeta y los roles; se retira la regla «AXIS no publica UI ni contratos de
-Insights»), `a141aaf` (mismas columnas en A4, deck y web), `b4b699a` (triángulo redondeado y tratamiento por fondo), más
-un commit en curso con el motion de la tarjeta.
-
-Verificado (local): `pnpm insights:canvas-fidelity` 31 hojas dentro del umbral (nuevas 0,01–0,59 %; `Deck-Agrupadas` con
-su excepción aprobada, 2,2 % bajo techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 37 frames a 0 px; vista
-previa real septiembre 2026 con `preview-edition.ts --editorial-v2`: Berel 22 páginas + 18 láminas (cifras SEO 6, línea
-semanal, cascada, barras de páginas, cifras AEO, waffle de tono, barras de tipo de fuente), Sky 10 + 8 (cifras de
-producción, una figura de bullets con 3 metas), sin figuras omitidas.
-
-Dónde corre: **en ningún runtime**. Ninguna edición sellada cambia: el render compone el plan congelado, así que sólo
-las ediciones NUEVAS (planes armados con el criterio) traen las páginas nuevas.
-
-Dejado fuera:
-- **Tarjetas con isotipo de canal** (AI Overview, ChatGPT, Gemini, Perplexity): propuesta en el canvas (tableros
-  `Premium-Cifras-Canal`, `Deck-Cifras-Canal`, `Cifras-Canal-Norma`), **pendiente de aprobación**, no implementada.
-- Color por rol de parte en waffle y dona (hoy por orden; el plan no declara `role`): decisión pendiente.
-- Dona de fuentes IA y apiladas de GA4 sin verificar con datos reales.
-- Gate de cierre: `pnpm test` completo y `pnpm build` (con autorización del operador).
-
-**Rollout pendiente (nada hecho; cada paso con OK del operador):** (1) AXIS push a `main` (despliega axis.efeonce.org) +
-tag `v0.3.42` (publica paquetes); (2) Think push a `main` (deploy de producción) ANTES o junto con el release de
-Greenhouse; (3) Greenhouse push de `develop` → staging → release por el control plane (Job `artifact-worker` compartido),
-con las ediciones internas de Berel y Sky revisadas antes de compartir; (4) verificar en staging dona y apiladas con
-datos GA4 reales. Detalle en [`operations.md`](operations.md) § TASK-1974 / TASK-1975.
+Abierto: revisión del operador de Berel/Sky, promoción/verificación de fixes posteriores al release y el
+color por rol de parte en waffle y dona (hoy por orden: en la dona real de Berel, Gemini sale con el color de
+«oportunidad»). Las tarjetas con isotipo de canal se aprobaron e implementaron en TASK-1990/TASK-1996.
 
 **Hand-off:** TASK-1958 (jerarquía visual en Think y PDF) hereda la tarjeta y el orden del capítulo; la adopción del
 paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan para el operador.
 
 ## Sessions (append as you go; newest first)
 
+- 2026-10-04 · Claude («Canvas tarjeta cifra») · pedido del operador: aprovechar íconos e isotipos. AXIS `axis-graphic-line` 0.16.0 (tag `v0.16.0`, seis glifos D31); Greenhouse `6656fe1d0` (metricIcon, tableros por motor y asistente, isotipos en filas/leyendas/aperturas, 19 isotipos, color por rol, gate sección (z)); Think `fd83a3b` en producción. Falta release de Greenhouse y canary del contrato.
+- 2026-10-04 · Codex · reconciliación documental y revisión de cierre: releases #248/#250 y runs success; alias Vercel Production READY; ocho flags INSIGHTS exactos ON; 116 pruebas PASS; lectura de PG sin planes congelados post-release. Cloud Run no se revalidó por reautenticación requerida de gcloud. Ninguna hija cerrada sin evidencia faltante; epic sincronizado a in-progress. Auditoría: `docs/audits/insights/2026-10-04-epic-045-closure-review.md`.
+
+- 2026-10-03 (noche) · Claude · release `36a73e7b7e19` en producción (TASK-1974/1975 + isotipos de canal TASK-1990/1996; AXIS `v0.3.42`; Think `0c5701a`). GA4 real verificado en Berel; correcciones «<1 %» y espacio duro entre cifra y unidad; rol `channelDisc`. TASK-1974 cerrada; TASK-1975 espera la revisión del operador. Después, en develop: TASK-1990 Slice 1 (19 plataformas contra `AXIS_PLATFORM_ASSETS`, `channelForDomain`, invariantes del tablero probados en el resolver) y TASK-1996 cifra única adaptativa del deck (`deckSingleStatHook`).
 - 2026-10-03 · Claude · TASK-1974 + TASK-1975 code complete local en tres repos (greenhouse-eo `develop`, efeonce-think `main`, axis-design-system `main`; nada empujado): criterio de selección en el planner, tarjeta de cifra, cinco páginas nuevas, tono semántico, triángulo redondeado, motion del Live y AXIS como casa del sistema de diseño de Insights. Vista previa real de Berel y Sky (septiembre 2026) encontró seis fallas, corregidas en `592fbde4b`. Rollout pendiente (AXIS → Think → Greenhouse).
 - 2026-10-02 · Claude («Sesión nocturna» b41c67) · release develop→main `6ea157e6e641` (web 1.1 en producción, canary verde; `INSIGHTS_DELIVERY/SCHEDULES_ENABLED` ON en Vercel Production + EmailTypes ON); revisión del informe live con datos reales en local (mock del lector + Think dev); TASK-1957/1958 creadas; TASK-1957 implementada local.
 
@@ -846,5 +815,7 @@ paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan 
   usa la lupa para AI Overview.
 - **Evidencia real:** Berel A4 (Search Console y Google en el título del capítulo SEO) y Sky deck (Greenhouse en el
   título del capítulo ICO), en `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/`.
+- **En producción desde 2026-10-03:** release `36a73e7b7e19-1131bf79-869b-4bf8-9bda-1928c8afda39` (run `37158679961`,
+  PR #250, junto con TASK-1974/1975); Think `0c5701a` antes. Watchdog `ok` 6/6.
 - **Pendiente:** glifos Trazo para clics, impresiones, CTR y posición (para retirar Tabler), los 10 isotipos sin
-  productor (entran con TASK-1991/1992), `channelForDomain` y la validación del plan (TASK-1990), y el release.
+  productor (entran con TASK-1991/1992), promoción de `channelForDomain`/vocabulario y cifra adaptativa (`03e19f3ee`, ya hechos en develop). El canal no es campo autorado: la validación vive en el resolver, no falta agregarla al plan. Decisión de visitas por asistente y `metricIcon` pendientes.

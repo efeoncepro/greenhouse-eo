@@ -6,9 +6,8 @@
  * cierra el RENDER PDF:
  *  - no-leak: recorre el árbol de elementos del documento y verifica que NO
  *    aparezca ninguna string internal-only (providerFindings/accuracyFindings/
- *    raw text marcados con "INTERNAL"). El componente se autora inline (sin
- *    sub-componentes que reciban el modelo crudo) → el walk colecta todas las
- *    strings visibles sin ejecutar primitivas de react-pdf.
+ *    raw text marcados con "INTERNAL"). El walk ejecuta los componentes locales puros y colecta las strings
+ *    visibles sin ejecutar primitivas de react-pdf.
  *  - disclosure: el variant attachment NO muestra trend ni narrativa por motor.
  *  - render smoke: `renderToBuffer` produce un PDF real no vacío (fuentes +
  *    assets resueltos), garantizando que el árbol efectivamente renderiza.
@@ -18,15 +17,17 @@ import { isValidElement, type ReactNode } from 'react'
 
 import { describe, expect, it } from 'vitest'
 
-import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
-
 import AiVisibilityReportPdf from '../pdf/AiVisibilityReportPdf'
 import { renderAiVisibilityReportPdf } from '../pdf/render-ai-visibility-report-pdf'
 import { SAMPLE_PUBLIC_REPORT } from '../fixtures'
 import { modelFromPublicReport } from '../model'
 import type { ReportHeader } from '../web/AiVisibilityReportArtifact'
 
-const HEADER: ReportHeader = { organizationName: 'Globe', reportDate: '19 may 2026', periodLabel: '4 – 19 de mayo de 2026' }
+const HEADER: ReportHeader = {
+  organizationName: 'Globe',
+  reportDate: '19 may 2026',
+  periodLabel: '4 – 19 de mayo de 2026'
+}
 
 // Strings internal-only que NUNCA deben aparecer en el PDF público (attachment).
 const INTERNAL_LEAK_STRINGS = [
@@ -36,7 +37,7 @@ const INTERNAL_LEAK_STRINGS = [
   'Confusión de identidad'
 ]
 
-/** Colecta todas las strings/números del árbol de elementos (sin ejecutar componentes). */
+/** Colecta todas las strings/números del árbol de elementos (resolviendo los componentes locales puros). */
 const collectStrings = (node: ReactNode, out: string[]): void => {
   if (node === null || node === undefined || typeof node === 'boolean') return
 
@@ -53,6 +54,13 @@ const collectStrings = (node: ReactNode, out: string[]): void => {
   }
 
   if (isValidElement(node)) {
+    if (typeof node.type === 'function') {
+      // PDF-local components are pure; inspect their rendered text, not just passed children.
+      collectStrings((node.type as (props: unknown) => ReactNode)(node.props), out)
+
+      return
+    }
+
     collectStrings((node.props as { children?: ReactNode }).children, out)
   }
 }
@@ -74,8 +82,8 @@ describe('AiVisibilityReportPdf — no-leak + render', () => {
   it('renderiza contenido público-safe esperado (marca, motores, competidores)', () => {
     expect(text).toContain('Globe')
     expect(text).toContain('Competidor A')
-    expect(text).toContain(GH_GROWTH_AI_VISIBILITY.provider_label.gemini)
-    expect(text).toContain(GH_GROWTH_AI_VISIBILITY.provider_label.perplexity)
+    expect(text).toContain('Gemini')
+    expect(text).toContain('Perplexity')
   })
 
   it('respeta la disclosure del attachment (sin tendencia)', () => {

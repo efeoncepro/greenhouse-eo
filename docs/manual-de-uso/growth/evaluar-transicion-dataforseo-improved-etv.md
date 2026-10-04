@@ -324,14 +324,13 @@ Pasos hechos, en orden; cada uno con su readback:
    `legacy_static_v1`; improved restaurado + redeploy → improved otra vez. Ninguna fila se borró ni se reescribió.
 5. **Producción.** PR #218 `develop→main` squash-mergeado (`main=bda12be7e33af93906805054146c5e17a8b9c328`); build
    de Vercel Production con los selectores improved horneados; orquestador `production-release.yml`
-   `release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z)` (release_id / run id se completan al dispatch). Producción Vercel sirve improved
-   desde el `READY` de ese release; hasta entonces los lanes de producción siguen en `legacy_static_v1`.
+   `release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z)` (release ejecutado). Producción Vercel sirve improved
+   desde el `READY` de ese release; antes de ese READY los lanes de producción servían `legacy_static_v1`.
 6. **Señal `seo.etv_methodology.drift`:** `warning` mientras las filas contractuales del 27–29/08 sigan dentro de la
    ventana de 7 días; esperado `ok` cuando el worker escriba su primera fila explícita improved (cron 16/17). Un
    `error` sí bloquea.
 
-Readback pendiente al cierre de este runbook: lanes de **producción** de Berel sirviendo improved tras el `READY`
-del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z).
+Readback de producción completado el 03/09 a las 13:15:26Z (TASK-1806): lanes de Berel sirven improved tras el release `bda12be7e33a`. Run `33758619690` reconsultado el 04/10: completed/success. Ambos selectores improved del worker revalidados el 04/10; no se repitió el canary de Vercel ni el shadow.
 
 ## Rollback vigente
 

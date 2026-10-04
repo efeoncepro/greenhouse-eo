@@ -7,7 +7,7 @@
 > grupos de 3 a 5 con cualquier combinación de elenco, Nexa y Julio, sin elenco obligatorio; la prenda se elige por quien
 > la viste; Julio 37 resuelto; aros de Isabella alineados al catálogo; cómo sumar un personaje nuevo)
 > **Estado:** Elenco listo: los cinco personajes ficticios tienen set v3, cuerpo extendido y medido, registrados en
-> `ELENCO`, sellados en el lock y publicados en el canon (§8). El carácter de Hum sigue sin decisión del operador.
+> `ELENCO`, sellados en el lock y publicados en el canon (§8). El carácter de Hum lo aprobó el operador el 2026-10-04.
 > **Documentacion relacionada:** [Equipo real (roster)](./EFEONCE_TEAM_ROSTER_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) (§2 casting, delta 2026-10-02 casting de campaña) · [Registro cine](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) · [Casebook cine](./EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) (filas 21–25, elenco en grupo) · [Kit de prendas](../../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md) (§Delta 2026-10-03) · [Contrato de selección de referencias](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · Catálogo `ELENCO` en [`scripts/foto/build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs) · Referencias `ai-generations/_identidad-elenco/` · Evidencia `ai-generations/2026-10-02_elenco-efeonce/` · [Elenco 2D](../brand-characters/EFEONCE_2D_CAST_V1.md) (otro canon: el grupo de compra del cliente, dibujado)
 
 Convenciones: **[decisión del operador]** · **[propuesta]** (rasgo agregado por Claude; se ajusta si el operador
@@ -33,7 +33,7 @@ grupos (§7b).
 | Clave | Quién | Tipo | Edad · origen | Silueta | Línea (`efeonceGraphicLine.lines`) | Rol que interpreta | Carácter |
 |---|---|---|---|---|---|---|---|
 | `julio` | Julio Reyes | **real** | 37 · venezolano | `hombre` | `growth` (Growth Strategy & Measurement) | Él mismo: Managing & GTM Director | Persona real: su identidad y su gesto salen de sus referencias aprobadas (roster) |
-| `hum` | Hum | ficticio (inspirada en la descripción de Humberly, sin su foto) | 33 · venezolana | `mujer` | `growth` (Growth Strategy & Measurement) | Estratega de crecimiento y medición | **[propuesta]** serena y analítica, escucha antes de proponer |
+| `hum` | Hum | ficticio (inspirada en la descripción de Humberly, sin su foto) | 33 · venezolana | `mujer` | `growth` (Growth Strategy & Measurement) | Estratega de crecimiento y medición | serena y analítica, escucha antes de proponer **[decisión del operador, 2026-10-04]** |
 | `karo` | Karolyne «Karo» | ficticio | 28 · venezolana | `mujer` | `brand` (Creative Services) | Directora de arte y creadora de contenido | Coqueta en el **gesto**, no en el cuerpo: sonrisa ladeada, mirada pícara. Social, presenta, convence |
 | `sophia` | Sophia | ficticio | 31 · venezolana, hermana mayor de Karo | `mujer` | `engine` (Web, infraestructura, SEO y medición) | Estratega SEO/AEO y analítica web | Seria, analítica; sonrisa contenida de boca cerrada |
 | `isabella` | Isabella | ficticio | 27 · colombiana (Barranquilla) | `mujer` | `voice` (Media & Distribution) | Especialista de medios pagados y distribución | Energía alta, gesticula al explicar, ríe fácil |
@@ -43,7 +43,7 @@ grupos (§7b).
 nacionalidades y las edades propuestas quedan aceptadas. Los roles de los ficticios los asigna Claude por línea de
 servicio, a pedido del operador («dales tú rol basado en las líneas de negocio»). Julio tiene **37 años, con canas
 prematuras** (corrección del operador; ver §6). La `silueta` decide qué vista puesta de la prenda le toca (§7c). El
-carácter de Hum no lo definió el operador: la línea de arriba es una propuesta **[pendiente]**.
+carácter de Hum lo aprobó el operador el 2026-10-04 («voy con tu recomendación»): era la propuesta de la tabla.
 
 Lógica del reparto **[propuesta]**: cada línea tiene una cara. Las hermanas cubren el par creativo/analítico (`brand` y
 `engine`), que es la tensión natural entre esas dos líneas y se puede contar en una pieza. Las personas reales aparecen
@@ -110,9 +110,9 @@ en el roster del equipo real** y no cambia nada de su identidad.
 | Rostro | Óvalo redondeado, mejillas suaves, mentón redondeado |
 | Ojos y cejas | Ligeramente almendrados, café oscuro; cejas oscuras de arco suave |
 | Piel | Blanca con subtono cálido y rubor natural |
-| Pelo | Castaño muy oscuro, casi negro (el catálogo dice *very dark brown*), largo hasta el pecho, raya al lado, capas que enmarcan la cara y ondas sueltas |
+| Pelo | Castaño muy oscuro, casi negro, **liso, en un bob largo que termina justo sobre los hombros**, puntas rectas apenas hacia adentro, raya al centro, sin ondas ni capas **[decisión del operador, 2026-10-04]** (antes: largo hasta el pecho con ondas y raya al lado, ver §5) |
 | Cuerpo | 1,70 m, complexión media con curvas moderadas: ni voluptuosa ni plana |
-| Carácter | **[propuesta]** Serena y analítica, escucha antes de proponer |
+| Carácter | Serena y analítica, escucha antes de proponer **[decisión del operador, 2026-10-04]**: «voy con tu recomendación» |
 | Firma propia | *Piercing* pequeño plateado en la nariz |
 
 Candidatas en `ai-generations/2026-10-02_elenco-efeonce/hum/`, encuadre de tres cuartos (cabeza a medio muslo) para
@@ -192,14 +192,15 @@ vestuario en palabras: si calla, lo decide la referencia.
 
 El modelo fusiona a personas parecidas. A primera vista los separa: Karo, rizos 3A–3B cobrizos largos, aros dorados
 medianos y labial rosado · Sophia, bob rizado castaño oscuro a la mandíbula y lentes de montura metálica dorada fina ·
-Hum, pelo largo casi negro con ondas y *piercing* plateado en la nariz · Isabella, rizos 3C–4A y pecas suaves en nariz y
+Hum, bob liso casi negro a los hombros con raya al centro y *piercing* plateado en la nariz · Isabella, rizos 3C–4A y pecas suaves en nariz y
 pómulos · Antonio, pelo negro liso peinado atrás, barba de 3–5 mm y sin lentes. Cada pareja de riesgo tiene separadores
 que se declaran en el bloque y se revisan en la hoja de contacto:
 
 | Pareja | Riesgo | Separadores |
 |---|---|---|
 | Karo ↔ Sophia | Hermanas: el modelo las vuelve una | Largo del pelo, lentes, gesto (pícara vs contenida) |
-| Hum ↔ Nexa | Treintañeras de pelo oscuro | *Piercing* en la nariz de Hum; delineado alado y anillo de plata de Nexa. **[propuesta]** La forma de la cara ya no separa: desde el 2026-10-03 el bloque de Nexa también la describe como óvalo suave, así que el separador lo cargan los accesorios y el pelo |
+| Hum ↔ Nexa | Treintañeras de pelo oscuro y cara de óvalo suave | **El pelo [decisión del operador, 2026-10-04]**: Hum, bob liso a los hombros con raya al centro; Nexa, melena larga ondulada bajo los hombros. Se lee a distancia de grupo, donde los accesorios no se ven. Además: piel clara de subtono cálido (Hum) vs oliva (Nexa), *piercing* de Hum, delineado alado de Nexa. La forma de la cara no separa (las dos son óvalo suave) |
+| Hum ↔ Sophia | Las dos con bob | Textura y largo: Hum liso a los hombros con raya al centro; Sophia rizada a la mandíbula, con lentes dorados |
 | Hum ↔ Humberly | Personaje inspirado en una persona real | Hum nunca se presenta como Humberly ni con su cargo; en piezas con el equipo real, Humberly sale con su identidad del roster |
 | Antonio ↔ Julio | Latinos con barba, 35 y 37 | Lentes, canas, barba larga y pelo rizado de Julio; Antonio sin lentes, pelo liso negro, barba corta |
 | Isabella ↔ Karo | Rizos | Textura (4A vs 3A), color de pelo y piel |

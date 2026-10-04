@@ -1416,12 +1416,18 @@ const RENDERABLE_LOGO_MAX_BYTES = 2 * 1024 * 1024
 export const readOrganizationLogoForRender = async ({
   organizationId,
   assetId,
-  accessMetadata
+  accessMetadata,
+  purpose = 'insights_render_cover'
 }: {
   organizationId: string
   assetId: string
   accessMetadata?: Record<string, unknown>
+  purpose?: 'insights_render_cover' | 'ai_visibility_report_cover'
 }) => {
+  if (purpose !== 'insights_render_cover' && purpose !== 'ai_visibility_report_cover') {
+    throw new Error('organization_logo_invalid_render_purpose')
+  }
+
   const asset = await getAssetById(assetId)
 
   if (
@@ -1448,7 +1454,7 @@ export const readOrganizationLogoForRender = async ({
     assetId,
     action: 'download',
     actorUserId: null,
-    metadata: { ...accessMetadata, purpose: 'insights_render_cover', ownerAggregateType: asset.ownerAggregateType, ownerAggregateId: organizationId }
+    metadata: { ...accessMetadata, purpose, ownerAggregateType: asset.ownerAggregateType, ownerAggregateId: organizationId }
   })
 
   return {

@@ -102,6 +102,83 @@ export const statFigureFor = ({ moduleKey, facts, byId, targetMetrics, takenFact
   }
 }
 
+/** Nombre del canal en una celda con isotipo, como lo nombra AXIS («AI Overview», «ChatGPT»). */
+const channelLabelOf = (fact: EvidenceFactV1): string | null => {
+  const name = fact.channelId ? GH_INSIGHTS.stat.channelNames[fact.channelId] ?? GH_INSIGHTS.channels[fact.channelId] : fact.label
+
+  return name && name.split(/\s+/).length <= STAT_LABEL_MAX_WORDS && name.length <= STAT_LABEL_MAX_CHARS ? name : null
+}
+
+const statItemOf = (fact: EvidenceFactV1, label: string, byId: Map<string, EvidenceFactV1>): PlanStatItemV1 => {
+  const previous = fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined
+
+  return {
+    itemId: fact.metricId,
+    label,
+    factId: fact.factId,
+    comparisonFactId: previous ? previous.factId : null,
+    direction: metricDirectionOf(fact),
+    estimated: fact.observation === 'estimated'
+  }
+}
+
+/** Orden de los motores en el tablero por motor. */
+const ENGINE_ORDER = ['google_ai_overview', 'chatgpt', 'gemini', 'perplexity', 'claude']
+
+/**
+ * TASK-1990/1996 — «¿cuánto me menciona cada motor?» cuando todos los motores dan la MISMA tasa: no hay barras que
+ * comparar (la figura sin varianza se descarta), pero el lector igual ve cada motor con su isotipo y su tasa (operador,
+ * 2026-10-04: el informe hablaba de motores sin mostrarlos). Si las tasas varían, la comparación va en barras por canal.
+ */
+export const engineStatFigureFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, takenFactIds: ReadonlySet<string>): PlanStatFigureV1 | null => {
+  if (moduleKey !== 'aeo') return null
+
+  const rank = (fact: EvidenceFactV1) => (ENGINE_ORDER.indexOf(fact.channelId ?? '') === -1 ? ENGINE_ORDER.length : ENGINE_ORDER.indexOf(fact.channelId ?? ''))
+
+  const engines = facts
+    .filter(fact => fact.metricId.startsWith('mention_rate.') && fact.channelId && fact.value !== null && !takenFactIds.has(fact.factId) && channelLabelOf(fact))
+    .sort((a, b) => rank(a) - rank(b))
+
+  if (engines.length < 2 || new Set(engines.map(fact => fact.value)).size > 1) return null
+
+  return {
+    figureId: 'stats.aeo.engines',
+    question: 'value_change',
+    title: GH_INSIGHTS.aeoFamilyTitles.mention_rate ?? GH_INSIGHTS.stat.figureTitle,
+    items: engines.map(fact => statItemOf(fact, channelLabelOf(fact)!, byId))
+  }
+}
+
+/**
+ * TASK-1990/1996 — visitas desde cada asistente de IA (GA4): tarjetas con su isotipo cuando los asistentes tienen período
+ * anterior (la variación por asistente es la noticia); en el primer período medido, la dona (decisión del operador,
+ * 2026-10-04). «Otros asistentes» va al final, con su nombre y sin isotipo.
+ */
+export const assistantStatFigureFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>): PlanStatFigureV1 | null => {
+  if (moduleKey !== 'aeo') return null
+
+  const parts = facts
+    .filter(fact => fact.metricId.startsWith('ai_source.') && fact.value !== null && fact.value > 0)
+    .sort((a, b) => (a.metricId === 'ai_source.other' ? 1 : 0) - (b.metricId === 'ai_source.other' ? 1 : 0) || b.value! - a.value!)
+
+  const named = parts.filter(fact => fact.channelId)
+
+  const comparable = (fact: EvidenceFactV1) => {
+    const previous = fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined
+
+    return previous !== undefined && previous.value !== null
+  }
+
+  if (parts.length < 2 || named.length === 0 || !named.every(comparable) || parts.some(fact => !channelLabelOf(fact))) return null
+
+  return {
+    figureId: 'stats.aeo.assistants',
+    question: 'value_change',
+    title: GH_INSIGHTS.aeoFamilyTitles.ai_source ?? GH_INSIGHTS.stat.figureTitle,
+    items: parts.map(fact => statItemOf(fact, channelLabelOf(fact)!, byId))
+  }
+}
+
 /**
  * Lectura de la tarjeta: la conclusión es el cambio de la PRIMERA cifra que cambió en lo impreso (la de resultado, por
  * el orden de la tarjeta), en la misma frase que el resto del informe usa para ese hecho. Sin cambios impresos, la
@@ -162,7 +239,12 @@ const compositionSpec = (chartId: string, family: Extract<FigureFamily, 'waffle'
  * Todas las partes con valor entran, «sin clasificar» incluida: una composición sin una de sus partes describe otro
  * todo (Berel septiembre: 5 tipos de fuente → barras ordenadas, criterio §7).
  */
-export const compositionChartsFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], previousFamily: FigureFamily | null): ChartSpecV1[] => {
+export const compositionChartsFor = (
+  moduleKey: InsightModule,
+  facts: EvidenceFactV1[],
+  previousFamily: FigureFamily | null,
+  options: { aiSourceAsCards?: boolean } = {}
+): ChartSpecV1[] => {
   if (moduleKey !== 'aeo') return []
 
   const charts: ChartSpecV1[] = []
@@ -179,7 +261,8 @@ export const compositionChartsFor = (moduleKey: InsightModule, facts: EvidenceFa
   // Una dona exige que las partes SUMEN el total: si no (snapshot anterior al adapter v2), barras ordenadas.
   const aiFamily = sourceFamily === 'donut' && total && sourceSum !== total.value ? (canProduceFamily('bar', moduleKey) ? 'bar' : undefined) : sourceFamily
 
-  if (aiFamily === 'donut' || aiFamily === 'bar') {
+  // Con período anterior por asistente, las visitas van en tarjetas (`assistantStatFigureFor`), no en dona.
+  if (!options.aiSourceAsCards && (aiFamily === 'donut' || aiFamily === 'bar')) {
     const ordered = [...sources].sort((a, b) => (a.metricId === 'ai_source.other' ? 1 : 0) - (b.metricId === 'ai_source.other' ? 1 : 0) || b.value! - a.value!)
     const spec = compositionSpec(`chart.aeo.${aiFamily === 'bar' ? 'parts' : aiFamily}.ai-source`, aiFamily, GH_INSIGHTS.aeoFamilyTitles.ai_source ?? GH_INSIGHTS.metrics.ai_sessions!, ordered)
 

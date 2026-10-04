@@ -1,18 +1,19 @@
 # Producir un spot animado 2D — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-03 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude
+> **Ultima actualizacion:** 2026-10-04 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (video animado con personajes)
 > **Ruta en portal:** no aplica — se opera desde una corrida en `ai-generations/<fecha>_<slug>/` con las CLIs `pnpm ai:image` y `pnpm ai:fal` y scripts propios
-> **Estado:** primer caso aprobado por el operador el 2026-10-03 (Sparks × Efeonce AEO, v2); sin publicar
-> **Documentacion relacionada:** [Método de producción y posproducción de video](../../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) · [Workflow: spot animado 2D con assets de marca compuestos](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) · [Documentación funcional](../../documentation/creative/spot-animado-2d.md) · [Retrospectiva del caso fuente](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md) · [Clasificar y planificar una pieza de video](../creative-production/clasificar-y-planificar-una-pieza-de-video.md)
+> **Estado:** primer caso aprobado por el operador el 2026-10-03 («Los Sparks», servicio Efeonce | AEO, v2); registrado en Marketing Studio y programado en Metricool (Instagram 05-oct, LinkedIn 08-oct), todavía sin publicar
+> **Documentacion relacionada:** [Método de producción y posproducción de video](../../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) · [Workflow: spot animado 2D con assets de marca compuestos](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) · [Documentación funcional](../../documentation/creative/spot-animado-2d.md) · [Retrospectiva del caso fuente](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md) · [Clasificar y planificar una pieza de video](../creative-production/clasificar-y-planificar-una-pieza-de-video.md) · [Entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md)
 
 ## Para qué sirve
 
 Este manual explica cómo llevar un **spot animado 2D de marca propia** desde el brief hasta la entrega: preproducción,
-cuadros clave, piloto, tomas, corte, audio, subtítulos, entrega y variantes por red.
+cuadros clave, piloto, tomas, corte, audio, subtítulos, entrega, variantes por red y distribución (Marketing Studio y
+Metricool).
 
 Es el orden de trabajo. El **cómo técnico** (recetas de ffmpeg, mapa de tiempos, composición de los Sparks, mezcla)
 está en el [método transversal](../../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) y en
@@ -50,6 +51,10 @@ pendientes. El operador lo aprueba **antes** del storyboard.
 - **Cada toma dura como máximo 15 s** (tope por pedido en fal y en Higgsfield). Planifica escenas cortas.
 - Marcas de la competencia: invéntalas desde el principio y busca que no exista una empresa con ese nombre. No dejes
   marcadores del tipo «[Marca ficticia A]».
+- **Nombre del servicio:** en guion, subtítulos y copy, la marca que habla es **Efeonce** y el servicio se escribe
+  **«Efeonce | AEO»** (por ejemplo: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO…»). Revísalo aquí:
+  después de grabar la voz, corregirlo obliga a re-renderizar. En el caso fuente, la voz y los subtítulos dicen
+  «Efeonce AEO» y sólo se corrigieron los copies de redes.
 
 ### Paso 2 · Storyboard en canvas
 
@@ -114,9 +119,30 @@ pantallas de UI, el subtítulo sube para no tapar la barra de escritura. Detalle
 
 ### Paso 11 · Variantes por red
 
-Cada variante es un entregable propio con su aprobación. En el caso fuente están en curso: portada Instagram 4:5,
+Cada variante es un entregable propio con su aprobación. En el caso fuente se entregaron: portada Instagram 4:5,
 portada LinkedIn 16:9 y una versión Instagram con pantalla negra muda inicial y la animación vectorial de un teléfono
-genérico (sin botones, no iPhone) con flechas de girar la pantalla.
+genérico (sin botones, no iPhone) con flechas de girar la pantalla (52,6 s en total).
+
+### Paso 12 · Distribución (sólo con autorización de publicación)
+
+Aprobar la pieza no autoriza publicarla. Con la autorización explícita del operador en el chat:
+
+1. **Registra la pieza en Marketing Studio.** Concepto y piezas dentro de su campaña. En el caso fuente: concepto
+   CMP001-08 «Los Sparks» de CMP-001, finales en OneDrive, entradas en `CATALOGO-DATOS.json`, después
+   `pnpm import:catalog --apply` y `pnpm media:ingest --campaign CMP-001 --apply`. Las versiones quedan `imported`
+   hasta que alguien las apruebe en Studio. Detalle: skill
+   [`efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md).
+2. **Programa en Metricool un post por red, cada uno con su portada.** En Instagram, un video 16:9 lleva la portada
+   **4:5**; en LinkedIn, la 16:9. Elige la hora cruzando las mejores horas de cada red con lo que ya está programado.
+   En el caso fuente: Instagram lunes 05-oct 14:00 y LinkedIn jueves 08-oct 11:00.
+3. **Comprueba lo programado:** descarga la media que Metricool re-alojó y compara su SHA-256 con tus archivos finales
+   (en el caso, 4 de 4 idénticos); compara también el texto con el copy aprobado. Anota todo en
+   `final/redes/PROGRAMACION.md` de la corrida.
+4. **Deja anotado lo que queda en manos humanas:** el enlace de la bio de Instagram si el copy dice «Link en la bio»,
+   la comprobación después de la hora y la aprobación de versiones en Studio.
+
+Receta completa y campos de Metricool:
+[entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md).
 
 ## Qué significan los estados
 
@@ -127,7 +153,9 @@ genérico (sin botones, no iPhone) con flechas de girar la pantalla.
 | Producción autorizada | El piloto convenció; se pueden generar todas las tomas |
 | Corte entregado | Hay video con audio; falta la escucha y la aprobación del operador |
 | Aprobado | El operador aprobó la pieza (caso fuente: v2, 2026-10-03) |
-| Publicado | Otra autorización, aparte de la aprobación; el caso fuente no lo está |
+| Registrado en Studio | La pieza está en su campaña de Marketing Studio; sus versiones siguen `imported` hasta aprobarlas allí |
+| Programado (`PENDING`) | Metricool tiene el post con fecha; todavía no salió (caso fuente: IG 05-oct, LinkedIn 08-oct) |
+| Publicado | Sólo se confirma leyendo el post después de la hora; necesita su propia autorización |
 
 ## Qué no hacer
 
@@ -140,7 +168,9 @@ genérico (sin botones, no iPhone) con flechas de girar la pantalla.
 - **No** pongas voz encima del reveal del logo.
 - **No** declares el audio verificado: sin escucha propia ni ASR, sólo el operador lo confirma.
 - **No** gastes sin estimado y autorización previa.
-- **No** publiques: aprobar la pieza no es autorizar su publicación.
+- **No** publiques ni programes sin autorización explícita: aprobar la pieza no es autorizar su publicación.
+- **No** escribas «Efeonce AEO» como si fuera la marca: la marca es Efeonce y el servicio, «Efeonce | AEO».
+- **No** des por publicado un post `PENDING`.
 
 ## Problemas comunes
 
@@ -161,6 +191,8 @@ genérico (sin botones, no iPhone) con flechas de girar la pantalla.
 | Se pierde un canal al mezclar con sharp | `removeAlpha` al final del pipeline | Mezcla manual |
 | Error de límite con SVG grande | Densidad alta | `limitInputPixels:false` |
 | Un texto se sale de su burbuja | No se miró al 100 % | Revisar cuadros al 100 % antes de entregar |
+| Metricool responde «could not be parsed at index 10/19» | Fecha sin hora o sin offset | Usar fecha-hora ISO con offset (`2026-10-05T14:00:00-03:00`), también en `date` al crear |
+| La cola de Metricool trae entradas sin ID | Son la autolista (`autolistData`) | No contarlas como posts programados |
 
 ## Pendientes y límites honestos
 
@@ -170,12 +202,14 @@ genérico (sin botones, no iPhone) con flechas de girar la pantalla.
   [identidad sonora](usar-identidad-sonora-efeonce.md) no permite. No es una regla nueva.
 - **Prueba de reconocimiento del elenco 2D** y **derechos del elenco** pendientes.
 - **Publicación del elenco 2D en AXIS:** en curso.
-- **Variantes de redes** (portada IG 4:5, portada LinkedIn 16:9, intro muda con teléfono para Instagram): en curso.
+- **Variantes de redes:** entregadas y programadas. Falta el enlace de la bio de Instagram, comprobar la publicación
+  después de la hora y aprobar las versiones en Studio. Sin pauta hasta confirmar la licencia de la música.
 
 ## Referencias técnicas
 
 - [Método de producción y posproducción de video](../../operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md)
 - [Workflow `animated-2d-spot-composed-brand-assets`](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md)
+- [Entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md) · skill [`efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md)
 - [Taxonomía de video con IA](../../architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) · [ADR del pipeline de video](../../architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md) · [Guía de selección de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
 - [Elenco 2D](../../operations/brand-characters/EFEONCE_2D_CAST_V1.md) · [Sparks](../../operations/brand-characters/SPARKS_V1.md) · [Identidad sonora](../../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md)
 - Caso fuente: [retrospectiva](../../operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md) y la corrida `ai-generations/2026-10-03_sparks-aeo-60s/` (`PREPRODUCCION.md` §11–12, `INVENTARIO-DE-HECHOS.md`)

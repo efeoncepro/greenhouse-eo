@@ -8,7 +8,7 @@
  * con una no hay composición que leer y con más el ángulo se estima mal. Todo lo ilegible falla cerrado.
  *
  * El color no vive acá: el SVG sólo lleva clases (`fig-donut-*`) y cada plantilla las pinta con sus roles. El tono de
- * cada parte sale de su rol declarado (`opportunity`, `absence`) o, sin rol, del orden actual → oportunidad → anterior.
+ * cada parte sale de su rol declarado (`opportunity`, `absence`) o, sin rol, del orden actual → anterior → paso.
  */
 
 import type { CatalogLayoutHook } from '../../catalog'
@@ -23,7 +23,7 @@ export type DonutPartIcon = (typeof DONUT_PART_ICONS)[number]
 
 export type DonutRole = 'opportunity' | 'absence'
 
-export type DonutTone = 'current' | 'opportunity' | 'prior' | 'absence'
+export type DonutTone = 'current' | 'opportunity' | 'prior' | 'step' | 'absence'
 
 export interface DonutPartInput {
   label: string
@@ -97,8 +97,8 @@ const esc = (text: string): string =>
 const c1 = (value: number): string => value.toFixed(1)
 
 /**
- * Tono de cada parte. Un rol declarado manda; las partes sin rol toman, en orden, los tonos que ningún rol ocupó
- * (actual → oportunidad → anterior). Dos oportunidades o dos ausencias no se distinguen: falla cerrado. Una dona sólo
+ * Tono de cada parte. Un rol declarado manda; las partes sin rol toman, en orden, actual → anterior → paso. El coral de
+ * oportunidad es SÓLO de una parte que lo declara (operador, 2026-10-04: por orden pintaba a Gemini de «oportunidad»). Dos oportunidades o dos ausencias no se distinguen: falla cerrado. Una dona sólo
  * de ausencia no dice nada.
  */
 export const donutTones = (parts: readonly Pick<DonutPartInput, 'role' | 'label'>[]): DonutTone[] => {
@@ -114,8 +114,7 @@ export const donutTones = (parts: readonly Pick<DonutPartInput, 'role' | 'label'
 
   if (parts.every(part => part.role === 'absence')) throw new FigureDataError('Una dona sólo de ausencia no tiene composición que leer.')
 
-  const taken = new Set(parts.map(part => part.role).filter(Boolean))
-  const free = (['current', 'opportunity', 'prior'] as const).filter(tone => !taken.has(tone as DonutRole))
+  const free = ['current', 'prior', 'step'] as const
   let next = 0
 
   return parts.map(part => part.role ?? free[next++]!)
@@ -152,17 +151,21 @@ export const donutSlices = (parts: readonly DonutPartInput[], box: DonutBox): Do
 
   const total = counts.reduce<number>((sum, count) => sum + count!, 0)
 
-  // La participación impresa es derivada (restos mayores): nunca se aleja un punto entero de la cuenta.
-  parts.forEach((part, index) => {
-    const printed = parsePrintedNumber(part.share)
-    const exact = (counts[index]! / total) * 100
+  // La participación impresa es derivada (restos mayores): nunca se aleja un punto entero de la cuenta. Una parte que
+  // redondea a 0 se imprime «<1 %» (TASK-1975): vale 0 en la suma y exige una cuenta mayor que 0 y menor que el 1 %.
+  const printedShareOf = (share: string): number | null => (/^<\s*1(\s|%|$)/.test(share.trim()) ? 0 : parsePrintedNumber(share))
 
-    if (printed === null || Math.abs(printed - exact) >= 1) {
+  parts.forEach((part, index) => {
+    const printed = printedShareOf(part.share)
+    const exact = (counts[index]! / total) * 100
+    const underOne = /^</.test(part.share.trim())
+
+    if (printed === null || Math.abs(printed - exact) >= 1 || (underOne && !(exact > 0 && exact < 1))) {
       throw new FigureDataError(`La participación «${part.share}» de «${part.label}» no corresponde a su cuenta (${part.count} de ${total}).`)
     }
   })
 
-  const printedSum = parts.reduce((sum, part) => sum + parsePrintedNumber(part.share)!, 0)
+  const printedSum = parts.reduce((sum, part) => sum + printedShareOf(part.share)!, 0)
 
   if (Math.round(printedSum) !== 100) throw new FigureDataError(`Las participaciones de la dona suman ${printedSum}, no 100.`)
 

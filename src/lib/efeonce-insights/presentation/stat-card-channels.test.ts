@@ -75,3 +75,61 @@ describe('isotipos de la tarjeta de cifra', () => {
     expect([view.label, view.channel, view.context]).toEqual(['Mención en ChatGPT', null, null])
   })
 })
+
+/**
+ * TASK-1990 — las reglas del contrato AXIS 0.2.0 (canal o glifo, nunca los dos; con canal, la celda se nombra por el canal
+ * y la métrica va en `context`; sin canal no hay `context`; el canal va en el título o en las celdas, nunca en los dos; un
+ * tablero de una sola plataforma la declara en el título). El canal no lo escribe nadie: lo resuelve `statItemView` desde
+ * el hecho sellado, así que las reglas se prueban sobre el resolver con todas las mezclas de fuentes, no en
+ * `plan-validation.ts` (no hay campo de plan que un autor pueda poner mal).
+ */
+describe('reglas del contrato AXIS sobre cualquier tablero', () => {
+  const SOURCES: Array<[string, string, EvidenceFactV1['channelId']?]> = [
+    ['clicks', 'greenhouse_growth.seo_gsc_daily'],
+    ['sessions', 'ga4:sessions'],
+    ['ai_sessions.chatgpt', 'ga4:ai_source', 'chatgpt'],
+    ['otd', 'ico_engine.metrics'],
+    ['mention_rate.openai', 'greenhouse_growth.grader_runs', 'chatgpt'],
+    ['mention_rate.gemini', 'greenhouse_growth.grader_runs', 'gemini'],
+    ['mention_rate.google_ai_overview', 'greenhouse_growth.grader_runs', 'google_ai_overview'],
+    ['new_keywords', 'greenhouse_growth.keyword_snapshot']
+  ]
+
+  const boards: number[][] = []
+
+  for (let mask = 1; mask < 1 << SOURCES.length; mask++) {
+    const picked = SOURCES.map((_, index) => index).filter(index => mask & (1 << index))
+
+    if (picked.length <= 6) boards.push(picked)
+  }
+
+  it.each([['todas las mezclas de hasta 6 cifras', boards]])('%s', (_, combos) => {
+    for (const picked of combos as number[][]) {
+      const facts = picked.map(index => fact(`f${index}`, SOURCES[index]![0], SOURCES[index]![1], SOURCES[index]![2]))
+      const byId = new Map(facts.map(f => [f.factId, f]))
+      const board = statBoardChannelsOf(facts)
+      const views = facts.map(f => statItemView(item(f, 'Cifra'), byId, 'es-CL', board)!)
+      const where = picked.map(index => SOURCES[index]![0]).join(' + ')
+
+      // El canal va en el título o en las celdas, nunca en los dos.
+      expect(board.title.length > 0 && board.perCell, where).toBe(false)
+
+      for (const view of views) {
+        // Con canal: la celda se nombra por el canal y la métrica va en context. Sin canal: sin context.
+        if (view.channel) expect([view.label, view.context !== null], where).toEqual([view.channel.name, true])
+        else expect(view.context, where).toBeNull()
+        // Una celda con canal sólo existe en un tablero por celda.
+        if (view.channel) expect(board.perCell, where).toBe(true)
+      }
+
+      // Un tablero de una sola plataforma la declara en el título y ninguna celda la repite.
+      const platforms = new Set(facts.map(statPlatformOf))
+
+      if (platforms.size === 1 && !platforms.has(null)) {
+        expect(board.title, where).toEqual([...platforms])
+        expect(views.every(view => view.channel === null), where).toBe(true)
+      }
+    }
+  })
+})
+

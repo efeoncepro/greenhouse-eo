@@ -1,6 +1,6 @@
 # Efeonce Insights — marca, informe y UI (cómo se ve y dónde vive)
 
-> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`; las piezas de TASK-1974/1975 —tarjeta de cifra, cinco páginas nuevas, tono por fondo, AXIS como casa del sistema de diseño— el 2026-10-03, todas **locales sin desplegar** en los tres repos; y el 2026-09-30 para las láminas del deck SEO/AEO de §7.8; efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
+> Estado reconciliado 2026-10-04 contra código de releases #248/#250, Think remote main `0c5701a`, alias Production READY y flags Vercel. Modelo vigente 1.4; TASK-1974 complete, TASK-1975 y tarjetas base publicadas; revisión humana y correcciones posteriores pendientes. Evidencia y límites en `docs/audits/insights/2026-10-04-epic-045-closure-review.md`.
 > Este archivo describe lo que EXISTE. Donde algo falta, está en §7 «Gaps» y no se decide aquí: esas decisiones son del
 > operador.
 
@@ -14,7 +14,7 @@
   para agentes `…/insights.json.ts`, guía `docs/agent-composition/insights.md`. **El ejemplo vivo del producto es la
   muestra `https://think.efeoncepro.com/insights/muestra`.**
 - Es una página de **referencia**: muestra la marca, sus aplicaciones aprobadas, las secciones del informe y la UI del
-  informe live como documentación con datos de muestra. **No** publica componentes ni contratos nuevos. (Cambió el 2026-10-03, ver §1: la sección de la tarjeta de cifra existe en AXIS local, sin publicar.)
+  informe live como documentación con datos de muestra. **No** publica componentes ni contratos nuevos. (Cambió el 2026-10-03, ver §1: la sección y el contrato de la tarjeta se publicaron con AXIS v0.3.42.)
 - Antes de ella, el Lab sólo tenía las láminas 7.1 «Insights: informe» y 7.2 «Insights: plan, cierre, deck y correo»
   dentro de `/references/graphic-line/` (capítulo 9 «Pruebas en producto», datos en
   `apps/lab/src/data/graphic-line-elements.json`), marcadas «prueba de diseño, cifras de muestra». Siguen siendo
@@ -29,11 +29,8 @@
   referencia del Lab `/references/insights/`. Greenhouse (PDF A4 y deck) y Think (informe live) son sus consumidores.
   Se retiró la regla anterior «AXIS no publica UI ni contratos de Insights» (AXIS `c272c20`: Lab, JSON, guía, README de
   composición y `docs/ARCHITECTURE.md` § Efeonce Insights).
-- **Estado: local, sin publicar.** AXIS `main` local (`e7f1653`, `c272c20`, `a141aaf`, `b4b699a` + un commit de motion
-  en curso), sin push ni tag: tokens `efeonceInsights` en `@efeoncepro/axis-tokens` 0.3.42 y contrato
-  `efeonce.insights-stat-card` 0.1.0 `candidate` en `@efeoncepro/axis-ui-contracts` 0.3.42. Publicar = push a `main`
-  (despliega axis.efeonce.org) + tag `v0.3.42`, con OK del operador. Mientras tanto la página publicada es la del
-  2026-09-28 (§0), sin la tarjeta.
+- **Estado: publicado para el release del 03/10.** AXIS `v0.3.42`: tokens `efeonceInsights`, contrato `efeonce.insights-stat-card` 0.2.0 `candidate`, isotipos en brand-assets 0.4.15. Publicación del paquete y adopción del consumidor son evidencias distintas; Think main `0c5701a` consume la tarjeta.
+
 - Lo que sigue siendo de los consumidores: las plantillas y su geometría de dibujo (Greenhouse
   `catalogs/insights-*`, Think `src/components/insights/*`). Las hojas aprobadas con cifras reales de un cliente se
   quedan en Greenhouse como evidencia y **no** se copian al Lab público.
@@ -114,10 +111,10 @@ lámina, sin cambiar la ficha; la plantilla todavía no lo dibuja, TASK-1949 Sli
 portal y MCP. Greenhouse fijaba `@efeoncepro/axis-brand-assets` 0.3.5 al escribir esto; al 2026-09-29 fija 0.4.5, que
 ya trae los archivos de Insights (ninguna de estas superficies los usa todavía).
 
-## 3. Informe PDF (Artifact Composer; en producción, emisión OFF)
+## 3. Informe PDF (Artifact Composer; base publicada; emisión ON con gate humano)
 
 **A4 `insights-report`** — 794 × 1123 px (`catalogs/insights-report/registry.json`), 15 plantillas `built` + 5 de
-TASK-1975 (locales, sin desplegar; al final de la tabla) = 20:
+TASK-1975 (publicadas en `36a73e7b7e19`; al final de la tabla) = 20:
 
 | Plantilla | contentType | Para qué |
 | --- | --- | --- |
@@ -144,28 +141,19 @@ TASK-1975 (locales, sin desplegar; al final de la tabla) = 20:
 
 **Deck `insights-deck`** — 1280 × 720, 12 plantillas: `InsightsCoverSlide` (siempre navy), `Summary`, `Chapter`,
 `Narrative`, `Reading`, `Plan`, `Limits`, `BackCover` y las cuatro `InsightsFigure{Comparison,Columns,Targets,Trend}Slide`;
-TASK-1975 suma (local) `InsightsFigure{Stat,Waterfall,Waffle,Donut,Stacked}Slide` (cifras 3×2, todas en navy) = 17.
+TASK-1975 suma (publicado) `InsightsFigure{Stat,Waterfall,Waffle,Donut,Stacked}Slide` (cifras 3×2, todas en navy) = 17.
 **Sin** portada clara (`render/insights-deck-mapper.ts:185`, `light: null`), sin índice y sin tabla.
 
 **Compartidos** `catalogs/insights-shared/`: `figure-svg.ts` (geometría pura de columnas y líneas), `figure-hooks.ts`,
 `editorial-resolvers.ts`, `channels.ts`, `layout-hooks.ts`. Roles de color: `brand-packs/axis/editorial-roles.json`
 (un color de dato se pide por lo que la serie ES —actual, anterior, oportunidad, ausencia— y por el fondo).
 
-> **TASK-1975 (local, sin desplegar)** amplía este párrafo: `waterfall`, `waffle`, `donut` y `bar_stacked` tienen página
+> **TASK-1975 (publicado en `36a73e7b7e19`)** amplía este párrafo: `waterfall`, `waffle`, `donut` y `bar_stacked` tienen página
 > (`PDF_FIGURE_FAMILIES`), la tarjeta de cifra (`chapter.stats`) abre el capítulo, y el orden de páginas es el del
 > criterio (`chapterFigureSlides`). Reglas y rechazos en [`contracts.md`](contracts.md) § Contrato de render de las
-> figuras nuevas. El texto de abajo describe el runtime desplegado hoy.
+> figuras nuevas. El texto de abajo incorpora las familias publicadas.
 
-**Familias → página** (`src/lib/efeonce-insights/render/figure-slots.ts`): `bar_grouped` con dimensiones que son
-métricas → Comparison; `bar` o `bar_grouped` con canales → Columns; `bullet` → Targets; `line` → Trend. Las otras 11
-familias del contrato (`contracts/chart-spec.ts`: `bar_stacked`, `pie`, `donut`, `scatter`, `waterfall`, `funnel`,
-`gauge`, `heatmap`, `waffle`, `venn_two`, `upset`) se **rechazan con causa** en el PDF, nunca se dibujan en una
-plantilla ajena. Productor real hoy: `bar`, `bar_grouped`, `line`, `bullet` (matriz
-`editorial/family-evidence-matrix.ts`, tabla en `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §familia ×
-evidencia). Capacidad por página: A4 5 métricas / 6 grupos / 6 filas de bullet; deck 4 / 4 / 5 (`FIGURE_CAPACITY`).
-El canvas aprobado sí dibujó páginas para las demás familias (`Premium-Apiladas`, `-Cascada`, `-Donut`, …): son
-referencia, no plantillas. Pendientes: TASK-1901 (evidencia más rica por familia) y TASK-1902 (páginas de medidor y
-mapa de calor), ambas `to-do`.
+**Familias → página** (`render/figure-slots.ts`): `bar`/`bar_grouped` → comparación o columnas según dimensión; `bullet` → metas; `line` → tendencia; `waterfall` → cascada; `waffle` → waffle; `pie`/`donut` → dona; `bar_stacked` → apiladas. La tarjeta vive en `chapter.stats`, fuera de las 15 familias. `scatter`, `funnel`, `gauge`, `heatmap`, `venn_two`, `upset` siguen rechazados con causa en PDF/deck; TASK-1902 conserva medidor/mapa de calor. La elegibilidad de productores se lee en `family_evidence_matrix_v3`, no se deduce de que una página exista.
 
 **Regla de variación** (`editorial-resolvers.ts`, `DELTA_VALUES` / `parseDelta`): el valor llega como
 `<dirección>[:<tono>]`. La **dirección** (`up`/`down`/`flat`) es la del valor y decide el triángulo; el **tono**
@@ -198,15 +186,11 @@ con «Logo del cliente»). Operación y trampas: `operations.md` § TASK-1889 y 
 
 ## 4. Informe live en Think (TASK-1875 complete; producción)
 
-**Modelo.** `InsightWebModelV1` 1.1 (Greenhouse `d45fc780f`, aditivo) sólo en staging; producción sirve 1.0. Think
-acepta ambos por una sola puerta, `acceptSharedEdition` (`efeonce-think/src/lib/insights-accept.ts`), que usan por
+**Modelo publicado vigente (04/10).** `InsightWebModelV1` 1.4; las ediciones selladas conservan su versión. Think
+acepta las versiones 1.x por una sola puerta, `acceptSharedEdition` (`efeonce-think/src/lib/insights-accept.ts`), que usan por
 igual las respuestas reales y los fixtures de desarrollo.
 
-> **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
-> capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
-> paso de cada capítulo, sin «Qué mide este informe», sin «Cómo lo mediremos / Qué necesitamos», sin logo del cliente
-> y sin tasas del embudo. Eso llega con el modelo 1.1 (en staging) en el próximo release de Greenhouse; la muestra ya
-> lo enseña.
+> **Cierre pendiente:** verificar contenido y gate en una edición nueva del runtime publicado (TASK-1957/1962). Los campos aditivos de decisión, capítulos, alcance, acciones y cifras ya están publicados; no falta otro release del contrato.
 
 **Rutas** (repo `efeonce-think`, un solo render: `src/components/insights/InsightReport.astro`, `mode="shared"` o
 `mode="sample"`):
@@ -358,14 +342,12 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 2. *(Cerrado: al 2026-09-29 Greenhouse fija `axis-brand-assets` 0.4.5, que ya trae los archivos de Insights; que
    una superficie los use sigue siendo el gap 1.)*
 3. Roles de datos y geometría de gráficos duplicados en dos consumidores; ya produjeron una divergencia de color
-   (resuelta en Think `b3c5820`, §1). Con TASK-1975 los roles viven como token `efeonceInsights` en AXIS (local, sin
-   publicar), pero Think todavía los copia y Greenhouse los resuelve con su `editorial-roles.json`.
+   (resuelta en Think `b3c5820`, §1). Con TASK-1975 los roles viven como token `efeonceInsights` en AXIS v0.3.42 (publicado), pero Think todavía los copia y Greenhouse los resuelve con su `editorial-roles.json`.
 4. Drift en AXIS: la tabla del README raíz y `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») no
    reflejan `axis-brand-assets` 0.4.0 (25 SVG).
 5. *(Cerrado el 2026-09-28: la página del Lab `/references/insights/` se publicó, AXIS main `3dfbf0e`. Se conserva el
    número para no romper las referencias a §7.7.)*
-6. Producción sirve el modelo web 1.0: decisión, aperturas y lecturas de capítulo, «Qué mide este informe», «Cómo lo
-   mediremos / Qué necesitamos», logo del cliente y tasas del embudo esperan el próximo release de Greenhouse (§4).
+6. *(Cerrado como gap de despliegue: modelo web vigente 1.4 publicado en `36a73e7b7e19`, incluye los campos de 1.1–1.3. La revisión de edición nueva y la jerarquía cliente siguen en TASK-1957/1958/1962.)*
 7. **Decisión abierta — acento de «INSIGHTS» en las portadas navy del PDF.** En la portada A4
    (`report-editorial.css:51`) y en la del deck (`insights-deck/insights-cover.html:40`) la palabra va pintada en el
    acento (`navyAccent` = teal-500, 12 px) y con proporciones propias (Efeonce 32 px, aire 16, filete 1 × 24 al 26 %).
@@ -375,7 +357,7 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 8. **Láminas de marca que prometen formatos de Insights (deck SEO/AEO, 2026-09-30, TASK-1949).** Las recetas
    `content-report-formats` («¿Cómo te llega? Como la necesites.»: correo, web y celular, presentación destacada, PDF A4
    y deck 16:9) y `content-committee-deck` («¿Y el PPT del comité? Ya está.»: modo presentación, deck, PDF) prometen
-   formatos. Estado verificado el 2026-09-30 contra el ledger de flags: web y celular **vivo** (producción sirve el
+   formatos. Estado histórico del 2026-09-30 (superado por el delta siguiente) contra el ledger de flags: web y celular **vivo** (producción sirve el
    modelo 1.0; el 1.1 sale con el próximo release), PDF A4 **vivo**, deck 16:9 **vivo**, modo presentación
    **desplegado** sin probar con una edición real sobre el modelo 1.0, **correo que llega solo NO vivo**
    (`INSIGHTS_DELIVERY_ENABLED` / `INSIGHTS_SCHEDULES_ENABLED` OFF; TASK-1944 bloqueada por TASK-1774). Ningún cliente
@@ -389,3 +371,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    (<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>). **No implementada**; no la construyas sin la decisión.
 10. **Color por rol de parte en waffle y dona.** Hoy el color va por orden de las partes; el plan aún no declara `role`
     de parte. Decisión pendiente del operador.
+
+
+## Delta 2026-10-04 — disponibilidad y límites de cierre
+
+Web/PDF/deck y tarjeta base se publicaron; los campos 1.1–1.3 forman parte del modelo vigente 1.4. Correo y recurrencias tienen flags ON desde 02/10 (Vercel revalidado 04/10), pero una recurrencia sólo crea borrador/render: no entrega automáticamente una edición. El diseño aprobado del correo sigue pendiente en TASK-1944/1774; no declarar «correo que llega solo» desde el estado de flags. La base compartida no ofrece planes congelados de ediciones creadas después del release #248 en el readback acotado. Conserva la revisión de Berel/Sky y el canary de contenido como pendientes, además de TASK-1958 para la jerarquía y plan/petición en PDF.

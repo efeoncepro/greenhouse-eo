@@ -114,10 +114,10 @@ y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENAB
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
-DataForSEO: ETV `improved_layout_clickstream_v2`; CLI 1.1.0 URL/host: ADR operador; AI/DB: TASK-1651.
+SEO: [estado vigente](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 
-Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
+Insights: [estado y cierre de EPIC-045](docs/audits/insights/2026-10-04-epic-045-closure-review.md).
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).
 Fotografía Efeonce: [Design Studio](.codex/skills/design-studio/references/efeonce-photographic-language.md)

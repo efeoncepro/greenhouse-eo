@@ -79,6 +79,20 @@ creencias contra el status quo de la industria (`../modules/04`).
   quieras.» y el eslogan firma debajo. Norma: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`
   §4.6.
 
+## Quién habla y cómo se nombran los servicios (delta 2026-10-03)
+
+Corrección del operador: «Mi marca no se llama Efeonce AEO sino Efeonce. Efeonce | AEO es el servicio».
+
+- **Habla Efeonce**, en primera persona plural institucional: «en Efeonce…», «lo que hacemos en Efeonce…».
+- **El servicio se escribe con barra**, como su lockup: **Efeonce | AEO** (igual que **Efeonce | SV360**). Ejemplos
+  aprobados: «En Efeonce lo resolvemos con nuestro servicio Efeonce | AEO y con los Sparks, nuestros agentes» · «lo que
+  hacemos en Efeonce con nuestro servicio Efeonce | AEO».
+- **Nunca** «Así lo trabajamos en Efeonce AEO» ni «Efeonce AEO» como marca, emisor o servicio sin barra.
+- Los productos conservan su nombre: **Efeonce AEO Assessment** y **Efeonce AI Visibility Report** (y su landing).
+- Caso fuente: copies de Instagram y LinkedIn del spot «Los Sparks» (CMP001-08, CMP-001) en
+  `ai-generations/2026-10-03_sparks-aeo-60s/final/redes/COPY-REDES.md`. El video publicado conserva «Efeonce AEO» en
+  subtítulos y voz por decisión del operador; no se re-renderiza ni se toma como ejemplo para copy nuevo.
+
 ## Banco de pares pregunta–respuesta aprobados (línea gráfica «La órbita»)
 
 La voz de la línea gráfica es **pregunta real del cliente → respuesta de 1–3 palabras** que cierra con la esfera (se
@@ -137,6 +151,7 @@ prueba con fuente en la lámina o en la siguiente. Un par nuevo se propone como 
 - **NUNCA** decorar/rellenar: cada oración tiene un trabajo (obsesión por concisión, `../modules/07`).
 - **NUNCA** afirmar sin prueba (obsesión por la prueba es parte de la voz).
 - **NUNCA** voseo/modismos argentinos; tuteo es-CL neutro.
+- **NUNCA** escribir «Efeonce AEO» como marca o emisor: habla Efeonce y el servicio es **Efeonce | AEO** (§Quién habla).
 - **NUNCA** usar `con manzanitas`, `te lo explico con manitas` u otros running motifs de Julio en
   copy institucional o de terceros, salvo cita textual atribuida.
 - **SIEMPRE** validar el wording final de superficies de producto con `greenhouse-ux-writing`.

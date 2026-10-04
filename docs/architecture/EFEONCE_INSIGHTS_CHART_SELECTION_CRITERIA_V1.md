@@ -13,7 +13,7 @@
 - Validated as of: 2026-10-03 — caso de referencia medido con el código en producción (septiembre 2026 contra agosto,
   Berel y Sky) y vista previa real con el criterio implementado en local (`scripts/insights/preview-edition.ts
   --editorial-v2`).
-- Program: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+- Program: [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 - Technical contract: [arquitectura](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §15 («Familias de gráfico (matriz v2)») ·
   [ADR del dominio](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md).
 - Skills: `efeonce-insights` (operación del dominio) y `dataviz-design` (dueña de las reglas duras de visualización
@@ -192,7 +192,7 @@ de clics). El gate se suma a los existentes del dominio (consistencia del contra
   §15 + fila en [`DECISIONS_INDEX.md`](DECISIONS_INDEX.md).
 - **Sistema de diseño:** AXIS es su casa (decisión del operador, 2026-10-03): tokens `efeonceInsights`
   (`@efeoncepro/axis-tokens`), contrato `efeonce.insights-stat-card` (`@efeoncepro/axis-ui-contracts`) y la referencia
-  del Lab `/references/insights/`. Versión 0.3.42, local sin publicar (arquitectura §6.4 y §14.12).
+  del Lab `/references/insights/`. Versión 0.3.42 publicada (tag verificado 04/10) (arquitectura §6.4 y §14.12).
 - **Dirección visual y motion de la tarjeta:**
   [`TASK-1975-efeonce-insights-stat-card-direction.md`](../ui/visual-directions/TASK-1975-efeonce-insights-stat-card-direction.md)
   y [`TASK-1975-efeonce-insights-stat-card-motion.md`](../ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md)
@@ -201,12 +201,36 @@ de clics). El gate se suma a los existentes del dominio (consistencia del contra
 - **Documentación funcional:** `docs/documentation/insights/efeonce-insights-dominio-ediciones.md`.
 - **Manual de uso:** `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`.
 
-## 11. Propuesta pendiente: tarjetas con isotipo de canal
+## 11. Tarjetas con isotipo de canal (vigente desde 2026-10-03)
 
-**Propuesta, no vigente ni implementada.** Tarjetas de cifra que llevan el isotipo del canal medido (AI Overview,
-ChatGPT, Gemini, Perplexity), dibujadas en los tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y
-`Cifras-Canal-Norma` del canvas de la tarjeta. Espera aprobación del operador; hasta entonces la tarjeta de §5.1 no lleva
-isotipo de canal.
+**Aprobada por el operador el 2026-10-03** (canvas de la tarjeta, tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal`,
+`Cifras-Canal-Norma` y `Cifras-Canal-Inventario`) y **en producción** desde el release `36a73e7b7e19` (TASK-1990 contrato,
+TASK-1996 render). Contrato de AXIS: `efeonce.insights-stat-card` 0.2.0; isotipos: `AXIS_PLATFORM_ASSETS` de
+`@efeoncepro/axis-brand-assets` (19 plataformas, el mismo vocabulario que `INSIGHT_CHANNEL_IDS`).
 
-También pendiente de decisión: el color por orden de las partes en waffle y dona cuando la parte no declara rol (el plan
-aún no declara `role`).
+- **De dónde sale la plataforma.** Del hecho sellado, nunca de un autor: la fuente manda sobre el canal (Search Console,
+  GA4 e ICO tienen su isotipo aunque midan Google); si no, el `channelId` del hecho. Una sola resolución para PDF, deck y
+  web: `presentation/stat-card.ts` (`statPlatformOf`, `statBoardChannelsOf`, `statItemView`).
+- **Dónde va.** Si todas las cifras del tablero salen de las mismas plataformas (hasta 3), los isotipos van una vez junto
+  al título (Search Console primero) y cada celda conserva su ícono. Si el tablero mezcla motores de respuesta, cada
+  celda lleva el isotipo de su canal, se nombra por el canal y la métrica va debajo de la cifra. Si alguna cifra no tiene
+  plataforma conocida, no se dibuja ningún isotipo: el título no afirma una fuente que no es.
+- **Nunca los dos.** Una celda lleva isotipo o ícono; el canal va en el título o en las celdas. Estas reglas se cumplen
+  por construcción y se prueban sobre el resolver con todas las mezclas de fuentes (`stat-card-channels.test.ts`) y sobre
+  las páginas (`figure-slots.test.ts`).
+- **Visitas por asistente de IA (GA4)** (operador, 2026-10-04): **tarjetas** con el isotipo de cada asistente cuando los
+  asistentes con isotipo tienen período anterior (la variación por asistente es la noticia); **dona** en el primer período
+  medido. «Otros asistentes» va al final, con su nombre y sin isotipo. Un mismo hecho nunca en las dos (`duplicated_fact`).
+  Productor: `assistantStatFigureFor`.
+- **Mención por motor** (operador, 2026-10-04): si las tasas varían, barras por canal (comparación, §5); si todos los
+  motores dan la MISMA tasa (no hay barras que comparar), un tablero con una tarjeta por motor y su isotipo, y la frase
+  uniforme sigue siendo la lectura. Productor: `engineStatFigureFor`.
+- **Glifos e isotipos en todo el informe** (operador, 2026-10-04: «los íconos e isotipos ayudan a reducir la carga
+  cognitiva»): cada cifra, fila de comparación, meta y fila de tabla lleva el glifo Trazo de su métrica (`metricIcon`,
+  `presentation/metric-glyphs.ts`) o el isotipo de su plataforma, nunca los dos; una tabla de una sola plataforma lleva
+  glifos (repetir el mismo isotipo no dice nada); la leyenda de la dona lleva el isotipo de la parte que es una
+  plataforma; las columnas de categorías llevan su glifo; «Medimos la marca en» incluye los motores de los tableros.
+
+**Color por rol, nunca por orden** (operador, 2026-10-04). Las partes sin rol declarado en dona y waffle van actual →
+anterior → paso (→ gris medio en el waffle); el coral de «oportunidad» y el gris rayado de «ausencia» sólo aparecen
+cuando la parte de verdad lo es. La identidad de cada parte la da su isotipo, no su color.

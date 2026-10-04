@@ -1,0 +1,313 @@
+                                                                        Diagnóstico de 19 de mai. de 2026
+
+
+
+
+Globe
+Dados de 19 de mai. de 2026
+
+
+
+
+                                         63     de 100
+
+                                                Atenção
+
+
+
+
+                          0–39 Crítico      40–69 Atenção         70–100 Ótimo
+
+
+
+V ER E D I T O
+
+
+
+
+Encontram você, mas quase não citam
+você.
+                          Resultado do AEO Assessment · Avaliado em 4 motores de resposta · 24 perguntas ·
+                          cobertura de respostas não verificada
+                                                                            O Q UE FA ZER
+
+
+
+
+O que mais pesa hoje
+     PR I N C I PA L L ACU NA · QU ALI D AD E D AS CI TAÇ ÕES 32/1 00                       Crítico
+
+
+
+     Mencionam você, mas não citam.
+     32% das respostas com citação apontam para o seu site. A fonte mais citada é g2.com
+     (terceiros, 18 de 45 citações).
+
+
+
+
+Plano prioritário
+Movimentos priorizados conforme as lacunas do relatório.
+
+
+
+1         Conquiste citações confiáveis                         Crítico
+
+          Conquiste menções externas confiáveis com PR digital e mantenha suas fontes próprias
+          atualizadas.
+               Move Qualidade das citações · hoje 32/100 · peso de 15% na pontuação
+
+
+
+
+2         Domine sua categoria                     Atenção
+
+          Publique um explainer da categoria, uma página comparativa e perfis em diretórios de
+          terceiros.
+               Move Domínio da categoria · hoje 54/100 · peso de 15% na pontuação
+
+
+
+
+3         Cubra a intenção de compra                          Atenção
+
+          Adicione conteúdo de preços, implementação e casos de uso, com provas.
+               Move Intenção de compra · hoje 45/100 · peso de 5% na pontuação
+
+
+
+
+Globe · Diagnóstico de 19 de mai. de
+                                                                                                02 / 06
+2026
+                                                                     POR QU E A CONT EC E
+
+
+
+
+Sete dimensões, com seu peso
+Cada dimensão soma à pontuação conforme seu peso; a gravidade usa a mesma escala da
+capa.
+
+
+                                                                                                     72/100
+     Visibilidade em IA · 25%
+                                                                                                       Ótimo
+
+
+                                                                                                     68/100
+     Clareza de identidade · 15%
+                                                                                                     Atenção
+
+
+                                                                                                     54/100
+     Domínio da categoria · 15%
+                                                                                                     Atenção
+
+
+                                                                                                     63/100
+     Participação de voz · 15%
+                                                                                                     Atenção
+
+
+                                                                                                     32/100
+     Qualidade das citações · 15%
+                                                                                                      Crítico
+
+
+                                                                                                          —
+    Alinhamento da mensagem · 10%
+                                                                                                    Sem dado
+
+
+                                                                                                     45/100
+     Intenção de compra · 5%
+                                                                                                     Atenção
+
+
+
+
+Qualidade da presença
+Não basta aparecer: importa se citam você, como descrevem você e em que lugar.
+
+
+        Share de citações                  Sentimento                           Proeminência
+
+
+
+   32%                                 Neutro                               #2
+   32 de 100 respostas com                                                  Sua melhor posição na
+   citação apontam para o seu          Positivo 38% · Neutro 45% ·          resposta; média #3
+   site.                               Negativo 17%
+
+
+
+
+Globe · Diagnóstico de 19 de mai. de
+                                                                                                     03 / 06
+2026
+                                                                            ONDE VO CÊ EST Á
+
+
+
+
+Níveis para existir em uma internet de agentes
+Percepção · mencionam você? (níveis 01, 02, 03 e 05)   Operabilidade · podem usar você? (04)
+
+
+          Nível 01 · Percepção
+          Ser encontrado · Be Found
+          Você existe para a IA?
+                                                                                                72       Ótimo
+
+
+
+
+          Nível 02 · Percepção
+          Ser entendido · Be Readable
+          Ela consegue ler você sem adivinhar?
+                                                                                               51      Atenção
+
+
+
+
+          Nível 03 · Percepção
+          Ser bem representado · Be Correct
+          O que ela diz sobre você é verdade?
+                                                                                               —      Sem dado
+
+
+
+
+          Nível 04 · Operabilidade
+          Ser acionável · Be Actionable                                                        Ainda não medido
+          Podem usar você, não só citar?
+
+
+          Nível 05 · Percepção
+          Ser o preferido · Be Intrinsic
+          Você é o padrão?
+                                                                                               59      Atenção
+
+
+
+
+Motor por motor
+Onde mais se perde presença: Perplexity (58%) · Claude (71%).
+
+                                                                                                            75%
+       ChatGPT
+                                                                                                         18 de 24
+
+
+                                                                                                             71%
+       Claude
+                                                                                                         17 de 24
+
+
+                                                                                                            79%
+       Gemini
+                                                                                                         19 de 24
+
+
+                                                                                                            58%
+       Perplexity
+                                                                                                         14 de 24
+
+
+                                                                                                              —
+       Google AI Overview
+                                                                                                     Não avaliado
+
+
+
+
+Globe · Diagnóstico de 19 de mai. de
+                                                                                                         04 / 06
+2026
+                                                                        M ERCADO E FO NT ES
+
+
+
+
+Participação de voz
+Quanto das menções você ocupa frente a outras marcas (144 menções no total).
+
+                                                                                                               33%
+Competidor A
+                                                                                                     48 menções
+
+                                                                                                               29%
+Competidor B
+                                                                                                      41 menções
+
+                                                                                                               22%
+Sua marca
+                                                                                                      32 menções
+
+                                                                                                                16%
+Competidor C
+                                                                                                      23 menções
+
+
+
+
+Fontes que sustentam a resposta
+Os domínios que os motores citam na amostra (45 citações).
+
+                                                                                                                  18
+g2.com
+                                                                                                         Terceiros
+
+                                                                                                                   11
+reddit.com
+                                                                                                     Comunidade
+
+                                                                                                                   9
+globe.com
+                                                                                                             Seu site
+
+                                                                                                                   7
+competidor-a.com
+                                                                                                     Concorrente
+
+
+
+
+   Procedência e metodologia
+
+        Dados de                       Perguntas             Versão da pontuação         Pacote de perguntas
+        19 de mai. de 2026             24                    2                           2.3.1
+
+   Diagnóstico baseado em uma amostra e assistido por IA. Não garante posições nem resultados; reflete uma
+   amostra de respostas na data da análise.
+
+
+
+
+Globe · Diagnóstico de 19 de mai. de
+                                                                                                         05 / 06
+2026
+              Vamos conversar?
+
+
+Quando quiser
+Mostramos o que mover primeiro para aumentar sua
+      pontuação, e como medi-la mês a mês.
+
+
+
+               Agende uma reunião →
+
+         Escolha o horário em efeoncepro.com/contacto
+
+
+
+
+                  Empower your Engine
+
+
+
+
+                      Efeonce Group SpA
+
