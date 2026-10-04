@@ -595,3 +595,13 @@ Detalle: [contrato funcional](../../documentation/marketing-studio/catalogo-cana
 [verificación local previa](../../audits/marketing-studio/TASK-1905-local-verification.md) y
 [release autorizado](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md). La
 [CLI HTTP local](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) materializa API-first sin agregar autoridad.
+
+### Precisión de implementación 2026-10-04 — activaciones y blog
+
+Los Delta del operador en TASK-2001 precisan §15: paid delivering/ended observados; tolerancia 0 días; mercado por
+activación y zona IANA de cuenta; CMS del cliente y sitio separados; Notion sólo como draft_url. Sin reader CMS,
+URL pública más fecha confirmada por una persona, con evento, puede establecer publicación. El freeze de tracking
+ocurre con publicación/entrega, no con mera programación. La implementación local y límites de rollout están en
+[arquitectura](EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-04--task-2001-implementada-localmente).
+El follow-up SEO/AEO conserva SV360 estimado, panel IA por clúster y gate informativo con autorización personal que
+registra avisos. No altera la prohibición de publicar desde Studio en TASK-2001.

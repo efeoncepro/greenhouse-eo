@@ -409,3 +409,17 @@ Evidence: `docs/audits/marketing-studio/TASK-1905-local-verification.md`,
 `docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`.
 Manuals: `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md` and `operar-por-cli-api.md`.
 TASK-1905 is not complete merely because Studio was released or the local CLI works.
+
+## TASK-2001 — local implementation, rollout pending (2026-10-04)
+
+Commits Studio 39a74c0 → 78205fb → af608a8 → 9bc974e → acdf30f → 946fda4, then final backfill/contract cut. API 1.7.0,
+75 tools, 80 HTTP operations. Local PostgreSQL validates every slice; web build and Greenhouse HTTP CLI smoke are in
+`docs/audits/marketing-studio/TASK-2001-local-verification.md`. No push/deploy/provider canary or real backfill.
+
+Owned CMS is per client account/site; WP is first reader, public URL + person date is fallback. Notion draft is link-only.
+Paid states require observed delivery, tolerance is 0 days. Tracking freezes on publication/delivery; reviewed slugs for
+old campaigns precede their activations. Import skips posts of activated campaigns; legacy data survives rollback.
+
+Pending owners: Studio operator for migration/config/jobs/backfill; Greenhouse integration owner for HubSpot email lane;
+TASK-2003 for person-delegated T1 and MCP sync/canary. UI remains TASK-2002. SEO/AEO blog follow-up has no reserved ID:
+SV360 estimates with provenance/date, cluster prompt panel, advisory gate with person-attributed warnings at authorization.

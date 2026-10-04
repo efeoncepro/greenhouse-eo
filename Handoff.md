@@ -1,5 +1,7 @@
 # Handoff activo
 
+**TASK-2001 (04/10):** código local hasta Studio `4094da0`, API 1.7.0/75 tools; 276 tests + 7 gates, build y 31 checks CLI con Postgres PASS. [QA y pendientes](docs/audits/marketing-studio/TASK-2001-local-verification.md). Flags OFF, sin push; falta puerto HubSpot owner, rollout/backfill real y canary delegado TASK-2003.
+
 **Marketing Studio — cierre 04/10:** main `74073de`, API 1.6.0/59 tools y catálogo v1/52 canales desplegados; worker `/health` verificado. `pnpm studio` disponible localmente en Greenhouse: API-only, cargas/descargas, copys/canales y dryRun por defecto; 18 tests y lectura/dryRun autenticados PASS. [Cierre y evidencias](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md). Pendientes: backfill humano de 134 registros (`efeonce_operations`), ICP 1906/1892 y autoridad de catálogo; MCP write retirado como requisito (1899), sin federación nueva. Greenhouse/gateway sin release. Video 1998/1999 sigue completo; estado de 1894 en [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
 **Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.

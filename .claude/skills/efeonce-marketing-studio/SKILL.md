@@ -379,3 +379,11 @@ fail closed until TASK-1906 + TASK-1892 provide the authorized consumer. TASK-20
 retired. No T1 federation is claimed before real delegated
 authority is verified. T2 remains operator CLI. Gateway/Greenhouse rollout and legacy backfill are pending. Evidence and limits:
 `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md` in Greenhouse.
+
+## TASK-2001 local contract (2026-10-04)
+
+Activation plans, execution evidence, owned client CMS/Notion-link handling, deterministic tracking and reviewed legacy
+backfill are implemented locally with flags OFF. Every operation has a tool; current local inventory is 75 tools / 80 HTTP
+operations. Use Greenhouse `pnpm studio` against the chosen origin to discover schemas; input defaults are optional.
+Person-only T1 operations (publication confirmation, old campaign slug, legacy backfill) reject service bearers and await
+TASK-2003 for human HTTP/MCP authority. Production/MCP availability is separate; see program-ledger and runtime handoff.

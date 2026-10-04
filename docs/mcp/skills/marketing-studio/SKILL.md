@@ -174,3 +174,25 @@ The current catalog separates paid/organic/owned/earned modality, family, buying
 placements and formats; spec version, provenance and verification date belong with decisions. Do not collapse
 buying and appearance platforms into a single label or infer a market/account from the channel key. API availability,
 local-client support and real MCP delegation are separate facts; approvals remain in the authorized operator lane.
+
+## Activation plan and execution evidence
+
+Discover availability before using these tools. A declared API capability is not proof that this connection can invoke it.
+Use `studio.activation.accounts.list` and `studio.campaign.activations.list` with their cursors. `studio.activation.get`
+returns the plan, exact asset versions, local account time, execution evidence, warnings and actor-attributed events.
+
+Use `studio.activation.plan`, `.update`, `.reschedule` and `.cancel` with the required revisions and dry-run first.
+Rescheduling changes the plan only. Publication and paid delivery require observed evidence; elapsed time is not proof.
+Unlinked observations come from `studio.execution.unlinked.list`; link/unlink using `studio.activation.execution.link`
+and `.unlink`, including both revisions. `studio.activation.from_execution` can prefill from tool evidence but requires
+an explicit campaign and exact pieces before creating a plan. Never infer campaign identity from post text.
+
+`studio.activation.tracking.preview` derives catalog-based parameters. Before an activation id exists, the result can
+require that id and omit the final URL. Read the created activation for its snapshot. Missing or mismatched published
+tracking produces warnings; published or delivery evidence freezes attribution. Do not concatenate tags yourself.
+
+An owned site declares its CMS separately from its domain. A Notion draft link is stored only; these operations do not
+read or write Notion. Without a CMS reader, public URL evidence needs a person-confirmed publication date before the
+activation becomes published. `studio.activation.publication.confirm`, `studio.campaign.tracking_slug.set` and
+`studio.execution.legacy.backfill` require a person; a service identity cannot impersonate one. Backfill preserves old
+observations and requires separate confirmation of activation plans. These tools do not publish content or authorize spend.

@@ -248,3 +248,23 @@ escritura general ni autoridad de catálogo. [Pasos, credenciales y límites](..
 Verificación del cliente: 18 tests locales, descubrimiento de 64 operaciones HTTP, lecturas autenticadas y carga
 real en dry-run. Las pruebas de transferencia aplicada fueron locales; no acreditan un upload productivo aplicado
 por esta CLI. [Evidencia CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+## Activaciones y evidencia — candidato local del 04/10
+
+La activación describe una salida de una campaña, incluida una campaña Always On. La persona elige cuenta, mercado,
+canal, pieza/versiones, copy y fecha o franja. La programación observada se compara con ese plan; si se retrasa, se
+muestra la diferencia. Reprogramar en Studio no cambia la herramienta. Published, En curso y Finalizada necesitan
+fecha de publicación o entrega real; vencer una fecha sólo produce overdue.
+
+La evidencia sin plan aparece como ejecución sin activación. Se puede vincular o crear un plan desde sus datos,
+confirmando campaña y piezas. Los avisos y el historial vienen del servidor. Un enlace publicado sin el tracking
+previsto genera un aviso; cuando se publica o entrega, ese tracking queda congelado.
+
+En blog, la cuenta owned identifica CMS y dominio del cliente. Notion se muestra como enlace al borrador, sin acceso
+al contenido. Un reader CMS puede observar publicación; si no existe, Studio comprueba la URL pública y una persona
+confirma la fecha. No basta un HTTP 200. La confirmación queda identificada en el historial.
+
+Estas capacidades están verificadas localmente con flags OFF por defecto; no están disponibles por inferencia en
+producción ni en una conexión MCP. [Manual de operación](../../manual-de-uso/marketing-studio/operar-por-cli-api.md)
+y [QA](../../audits/marketing-studio/TASK-2001-local-verification.md). Dossier SEO/AEO, autorización para publicar y
+métricas posteriores pertenecen a un follow-up independiente.

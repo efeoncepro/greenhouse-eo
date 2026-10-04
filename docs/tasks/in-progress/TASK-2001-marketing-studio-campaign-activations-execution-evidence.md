@@ -128,7 +128,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `En ejecución local — preflight y coordinación completados; Slice 1 verificado (schema + Always On); Slice 2 verificado; Slice 3 verificado local; Slice 4 y delta blog verificados; Slice 4b en construcción; sin push, migración remota ni rollout`
+- Status real: `Implementación local verificada hasta Studio 4094da0 — slices 1–5 y delta blog, API/CLI/contratos MCP; 276 tests + 7 gates y build PASS. Flags OFF; pendientes puerto HubSpot owner, migraciones/bindings/backfill reales y canary delegado TASK-2003. Sin push ni rollout`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -352,22 +352,22 @@ plataforma y cuenta, y la fecha programada cae dentro de la tolerancia del canal
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada en el allowlist del dominio donde exista: `N/A`.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Toda tabla nueva queda declarada en el allowlist del dominio donde exista: `N/A`.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `packages/domain/src/activations`, no en la UI.
-- [ ] Activación modelada como recurso con commands, no como handler de pantalla.
-- [ ] Reads como readers canónicos; writes con `Idempotency-Key`, `If-Match`, capability fina, auditoría, errores canónicos y observabilidad.
-- [ ] Sin capability nueva (usa `.campaign.read` / `.campaign.write`); si el Plan decide una propia, va con grant y coverage test en el mismo PR.
-- [ ] Camino programático: `/api/v1` + tools MCP (lectura federada; escritura con TASK-1899).
-- [ ] Writes aptos para `propose → confirm → execute` (`dryRun` en cada command).
-- [ ] Un primitive, muchos consumers: calendario, Hoy, MCP, plan de contenidos y UI leen el mismo reader.
+- [x] Lógica en `packages/domain/src/activations`, no en la UI.
+- [x] Activación modelada como recurso con commands, no como handler de pantalla.
+- [x] Reads como readers canónicos; writes con `Idempotency-Key`, `If-Match`, capability fina, auditoría, errores canónicos y observabilidad.
+- [x] Sin capability nueva (usa `.campaign.read` / `.campaign.write`); si el Plan decide una propia, va con grant y coverage test en el mismo PR.
+- [x] Camino programático: `/api/v1`, CLI y tools MCP declaradas, paridad local PASS. Federación y escritura delegada real pendientes de TASK-2003; TASK-1899 está retirada.
+- [x] Writes aptos para `propose → confirm → execute` (`dryRun` en cada command).
+- [x] Un primitive, muchos consumers: calendario, Hoy, MCP, plan de contenidos y UI leen el mismo reader.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -485,18 +485,30 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 
 ## Acceptance Criteria
 
-- [ ] Una activación no se puede crear sin campaña ni con un `channel_key` fuera del catálogo; las campañas Always On existen.
-- [ ] El estado de ejecución se calcula para los seis casos con tests y nunca se persiste.
-- [ ] El descubrimiento trae lo programado en Metricool de las marcas permitidas, idempotente, sin crear activaciones.
-- [ ] Lo programado sin activación aparece como `execution_without_activation` en «Hoy» y en `listUnlinkedExecutions`.
-- [ ] `studio.calendar.get` devuelve activaciones con sus dimensiones y estado, filtrables; posts actuales siguen visibles durante la convivencia.
-- [ ] Los 6 posts existentes quedan como evidencia, vinculados a activaciones confirmadas por una persona.
-- [ ] Cada activación tiene su tracking URL generada sólo por `buildTrackingUrl`; tests de determinismo, omisión de `null`, modo `auto` de Google Ads, validación de destino y congelamiento con evidencia.
-- [ ] `tracking_missing` y `tracking_mismatch` aparecen al comparar con lo publicado (fixture de un post de Metricool sin UTM y otro con UTM distinta).
-- [ ] Registro, manifiesto, paridad y leak test verdes; `pnpm check` y `pnpm build` de Studio verdes.
-- [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado.
+- [x] Una activación no se puede crear sin campaña ni con un `channel_key` fuera del catálogo; las campañas Always On existen.
+- [x] El estado de ejecución se calcula para los ocho casos del delta (incluye delivering/ended), con tests y nunca se persiste.
+- [ ] El descubrimiento trae lo programado en Metricool de las marcas permitidas, idempotente, sin crear activaciones. Implementación/fixtures/PG PASS; falta canary con proveedor real y bindings autorizados.
+- [x] Lo programado sin activación aparece como `execution_without_activation` en «Hoy» y en `listUnlinkedExecutions`.
+- [x] `studio.calendar.get` devuelve activaciones con sus dimensiones y estado, filtrables; posts actuales siguen visibles durante la convivencia.
+- [ ] Los 6 posts existentes quedan como evidencia, vinculados a activaciones confirmadas por una persona. Seis fixtures + dry-run/apply/replay + convivencia PASS en PG; datos reales pendientes de rollout revisado.
+- [x] Cada activación tiene su tracking URL generada sólo por `buildTrackingUrl`; tests de determinismo, omisión de `null`, modo `auto` de Google Ads, validación de destino y congelamiento con evidencia.
+- [x] `tracking_missing` y `tracking_mismatch` aparecen al comparar con lo publicado (fixture de un post de Metricool sin UTM y otro con UTM distinta).
+- [x] Registro, manifiesto, paridad y leak test verdes; `pnpm check` y `pnpm build` de Studio verdes.
+- [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado. Contratos/manual PASS local; sesión delegada depende de TASK-2003.
 
 ## Verification
+
+### Cierre del corte local — 2026-10-04
+
+[Dossier de QA y límites](../../audits/marketing-studio/TASK-2001-local-verification.md). Los checks marcados corresponden al contrato/código local; los criterios de runtime permanecen abiertos. TASK continúa in-progress.
+
+- Tracking `946fda4`: buildTrackingUrl puro desde catálogo, cuenta, mercado y versiones exactas; destino autorizado, omisión null, auto-tagging, slug estable, revisión personal de slug legacy antes de activaciones y freeze con evidencia. Check 273 + 7 gates; migración up/down/up en PG PASS.
+- Corte final `4094da0`: backfill de evidencia conservando origen/fechas y seis posts, sin activar ni emparejar automáticamente; requiere persona y revisiones. Import ON respeta campañas con activaciones, OFF conserva legacy. Accounts paginadas, piezas imported visibles con aviso de no aprobación.
+- CLI HTTP existente de Greenhouse, sin cambios en su implementación: 31 comprobaciones contra Next production build local y Postgres real, incluyendo dry-run/apply/replay, lectura/edición/reprogramación, link/unlink/from_execution, calendario/atención, paginación y denegaciones por persona/organización. Los schemas de entrada OpenAPI/MCP ahora conservan defaults opcionales de Zod.
+- Studio `pnpm check`: 276 tests + 7 gates PASS, todos los carriles PG habilitados, cero skips; `pnpm build` PASS. Cinco migraciones up/down/up PASS. `pnpm studio:test`: 18 PASS; manifest de manuales: 34 PASS.
+- 75 tools / 80 operaciones; API 1.7.0. CLI y registro comparten capacidades; HTTP de persona y MCP delegado pendientes de TASK-2003. No se suplanta persona con token de servicio.
+- Owned HubSpot: adapter consumidor implementado; el endpoint/consumer/binding de Greenhouse y su canary no están entregados. No se declara operativo email. WP y fallback público probados con fixtures; ningún proveedor real consultado.
+- No push, migraciones remotas, backfill real, scheduler/deploy, cambios de flags remotos ni UI. Flags OFF por defecto; próximos pasos y rollback en runtime handoff.
 
 ### Delta blog — evidencia local 2026-10-04
 
@@ -505,7 +517,7 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 - PostgreSQL real local: migración owned-blog up/down/up PASS; una URL 200 sin fecha permanece overdue; servicio y fecha futura rechazados; dry-run, replay y confirmación humana comprobados. WordPress con URL 404 no aporta publicación.
 - `pnpm check` PASS: 268 tests y 7 gates, todos los carriles Postgres habilitados, cero skips. Sin lectura real de proveedores, push ni rollout.
 - Decisiones adicionales del operador conservadas en `3b5c97091`: SV360 estimado con fuente/fecha, panel IA por clúster y gate que sólo avisa. Pertenecen al follow-up SEO/AEO; no se implementa su autorización ni medición aquí.
-- Próximo: tracking, compatibilidad/backfill y verificación de la CLI HTTP `pnpm studio` de Greenhouse contra el contrato nuevo. Confirmación por HTTP con persona depende del carril TASK-2003; no se transforma un bearer de servicio en persona.
+- Tracking, compatibilidad/backfill y CLI completados localmente en los cortes siguientes; confirmación por HTTP con persona sigue pendiente del carril TASK-2003.
 
 ### Slice 4 — evidencia local 2026-10-04
 
@@ -544,13 +556,13 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Skill `efeonce-marketing-studio`, arquitectura, manual servido y manual de uso actualizados
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Skill `efeonce-marketing-studio`, arquitectura, manual servido y manual de uso actualizados
 
 ## Follow-ups
 
@@ -559,8 +571,9 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 - Contrato SEO/AEO del blog (`backend-data`, sin ID reservado): dossier y gate antes de publicar, y lector de Search
   Console, panel del AI Visibility Grader y GA4 después de publicar. Ver el delta «(blog)» de 2026-10-04.
 
-## Open Questions
+## Decisiones resueltas y pendientes de runtime
 
-1. ¿Activaciones escribibles en campañas `onedrive` (recomendado: sí, no son territorio del import)?
-2. ¿Se acepta el emparejamiento automático con coincidencia única + UTM/cuenta, o todo vínculo lo hace una persona?
-3. Tolerancia por defecto entre fecha planificada y programada (propuesta: ±15 min en organic social).
+1. Activaciones en campañas `onedrive`: sí; pertenecen a Studio. Import no sobreescribe su evidencia.
+2. Auto-link sólo con coincidencia única por campaña UTM + cuenta/plataforma + tolerancia; el backfill y unlink humano excluyen auto-link. Ambigüedad permanece sin vincular.
+3. Tolerancia: 15 min orgánico, 0 días por extremo paid en hora local de la cuenta, versionada con catálogo.
+4. Pendientes: puerto owned HubSpot de Greenhouse, configuración/release autorizado, backfill real revisado y canary MCP delegado con TASK-2003. No bloquean el commit local; sí impiden declarar cierre operativo.

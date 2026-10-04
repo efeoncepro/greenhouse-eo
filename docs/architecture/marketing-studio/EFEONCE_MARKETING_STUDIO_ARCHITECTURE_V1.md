@@ -919,3 +919,40 @@ con TASK-2003 en paralelo para MCP T1 y sus dependencias propias.
 - Registro de campañas: [`EFEONCE_CAMPAIGN_REGISTRY_V1.md`](../../operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md)
 - Manifiesto de pauta: [`EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md`](../../operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md)
 - Precedente de repo hermano gobernado desde Greenhouse: [`creative-studio/`](../creative-studio/)
+
+## Delta 2026-10-04 — TASK-2001 implementada localmente
+
+Implementa la decisión de activaciones de Strategy Layer §15 y los Delta de TASK-2001. API 1.7.0:
+80 operaciones, 75 tools; todavía no desplegada ni federada. [Verificación local](../../audits/marketing-studio/TASK-2001-local-verification.md).
+
+- `campaign.kind` admite campaign/always_on. `activation` es el plan de Studio, obligatorio dentro de una campaña,
+  con cuenta/mercado y versiones exactas; `execution_record` conserva evidencia del proveedor; `activation_event`
+  es append-only con persona/agente/regla. Relaciones compuestas impiden cruzar organización, campaña o cuenta.
+- Estado calculado: planned, scheduled, scheduled_off_plan, published (organic/owned), delivering/ended (paid),
+  overdue y cancelled. El paso del tiempo nunca demuestra publicación ni entrega. Tolerancia del catálogo:
+  15 minutos para puntos; 0 días por extremo para franjas, fechas locales de la cuenta IANA.
+- Mercado pertenece a la activación. Cuenta devuelve CMS y sitio por separado; horas de cuenta y Santiago en readers.
+  Las vistas reciben avisos de aprobación, versión diferente, colisión, herramienta desactualizada y tracking.
+- Planificar/editar/reprogramar son commands separados con dryRun, revisión/idempotencia y eventos. Reprogramar sólo
+  mueve el plan. Crear desde ejecución devuelve procedencia tool y exige campaña/piezas. Cancelar preserva evidencia.
+- Toda operación aparece en operations.ts/OpenAPI/manifiesto. Los schemas de request usan Zod input; los defaults
+  del servidor no son campos obligatorios para CLI/MCP. Las respuestas mantienen el schema de output.
+- `buildTrackingUrl` es la única derivación de activaciones: catálogo fijado, slug de campaña, id público de activación
+  de ancho mínimo 6 sin truncar, anuncio/audiencia y formato exacto. Dominio propio desde config del operador por org;
+  HTTPS, sin credenciales ni UTM preexistente. Auto-tagging y canal sin tracking externo no reciben UTM manual.
+  Sin destino devuelve null; antes de asignar ACT devuelve params y requiresActivationId. No reserva ids en una lectura.
+- Snapshot se regenera al editar antes de evidencia publicada/entrega y luego se congela, junto al slug de campaña;
+  la Delta vigente prevalece sobre el freeze por evidencia sólo programada del research original. Las campañas nuevas
+  generan slug al crearse; las antiguas requieren revisión personal antes de sus activaciones. Nunca reescribe UTM importada.
+- Owned: HubSpot se lee mediante puerto del owner Greenhouse (org + portal + respuesta completa); WordPress lee REST
+  público del sitio del cliente autorizado. Sin reader CMS se revisa URL pública: HTTP, robots, canonical y sitemap.
+  La fecha confirmada por persona vive separada de published_at; `publication_confirmed` registra confirmed_by desde
+  identidad autenticada. HTTP 200 por sí solo no publica. `draft_url` de Notion sólo se guarda y devuelve.
+- Public fetch: binding server-side por organización/proveedor/cuenta, sólo HTTPS, sin redirects/credenciales, DNS
+  público fijado en la conexión, límites de tiempo/tamaño/paginación. Registrar una cuenta no otorga permiso de lectura.
+- Backfill conserva identidad legacy y observation_source, fechas y observaciones, sin crear/vincular planes; una persona
+  usa createActivationFromExecution. Import deja de tocar posts de campañas activadas con flag ON; OFF conserva el reader
+  antiguo. `scheduled_post` se mantiene hasta el contract post-release. Cada lista paginada devuelve nextCursor.
+
+El dossier/gate/medición SEO-AEO del blog es follow-up backend-data sin ID. SV360 estimado con fuente/fecha, panel IA
+por clúster versionado y autorización con avisos abiertos quedan en ese follow-up; no se implementan ni bloquean 2001.

@@ -197,3 +197,56 @@ Evidencia del 04/10: 18 tests y ESLint PASS; `doctor`, catálogo v1 con 52 canal
 real en dry-run verificados contra producción. Upload aplicado, transferencia GCS y reanudación de confirmación
 se probaron con HTTP local/fetch controlado. No se aplicó una carga productiva desde este cliente ni se habilitó
 ningún permiso nuevo. [Dossier](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+## Activaciones — TASK-2001, contrato local 1.7.0
+
+Verificado con Studio local y PostgreSQL real: **75 tools / 80 operaciones**, 31 comprobaciones HTTP de CLI. El
+contrato productivo anterior no cambia hasta release. Usa `--base-url` del entorno autorizado; los ejemplos siguientes
+requieren sus flags y una credencial con studio:read/studio:write. No envíes tokens como parámetros.
+
+```bash
+pnpm studio list --filter activation
+pnpm studio describe studio.activation.plan
+pnpm studio call studio.activation.accounts.list --param limit=100
+pnpm studio call studio.activation.accounts.list --param cursor='<nextCursor>'
+pnpm studio call studio.campaign.activations.list --param campaignId=CMP-001 --param market=CL
+pnpm studio call studio.execution.unlinked.list
+pnpm studio call studio.activation.get --param activationId=ACT-000001
+pnpm studio call studio.activation.plan --param campaignId=CMP-001 --file plan.json
+pnpm studio call studio.activation.plan --param campaignId=CMP-001 --file plan.json --apply --key '<llave-estable>'
+pnpm studio call studio.activation.update --param activationId=ACT-000001 --file patch.json --if-match 1
+pnpm studio call studio.activation.reschedule --param activationId=ACT-000001 --file fecha.json --if-match 1
+```
+
+`plan.json` incluye accountId, channelKey, catalogVersion, market, kind, plannedAt (punto) o plannedStartOn/plannedEndOn
+(franja), y assetVersions con assetId/versionNo. Para blog añade draftUrl de Notion; cms/siteOrigin se registran en la
+cuenta, no en el plan. Usa `describe` para los campos opcionales y límites. Los campos con default no son obligatorios.
+Revisar el dry-run y agregar `--apply` aplica la misma operación. Reschedule/cancel nunca programan ni cancelan en el proveedor.
+
+`studio.activation.tracking.preview` acepta campaignId, accountId, channelKey, catalogVersion y, si existen, destinationUrl,
+placementKey, formatKey, adConfigurationId o assetId/versionNo. Canal/formato provienen del catálogo. Antes de crear el
+id ACT devuelve params y requiresActivationId; la URL completa se lee en la activación creada. No inventes un id.
+El destino debe pertenecer a dominios autorizados de la organización y venir sin UTM. Sin destino registrado devuelve null.
+
+Para vincular/desvincular usa `studio.activation.execution.link` / `.unlink`: activationId, If-Match de la activación y
+body con recordId/recordRevision. Para crear desde evidencia usa `studio.activation.from_execution`, recordId e If-Match
+de esa evidencia: sin plan y en dry-run devuelve la precarga; aplicar exige campaignId y plan completo. Relee después.
+
+### Backfill revisado y operaciones de persona
+
+1. Registrar cuentas con `studio.activation.account.upsert`; no conecta ni concede acceso a proveedores.
+2. Leer `studio.campaign.posts.list` y sus revisiones. `studio.execution.legacy.backfill` recibe campaignId, revisión de
+   campaña y body `{ "accountId": "…", "posts": [{ "postId": "…", "revision": 1 }] }`. Dry-run conserva el origen y las
+   fechas para revisión. Apply sólo migra evidencia; devuelve recordId, no crea activaciones.
+3. Usar from_execution para revisar cada plan y pieza antes de aplicarlo. Preservar las llaves para reintentar y los posts
+   originales. En producción los seis posts siguen pendientes de autorización; la prueba local usó seis fixtures.
+
+Backfill, `studio.campaign.tracking_slug.set` (body slug, antes de activaciones) y
+`studio.activation.publication.confirm` (body recordId/recordRevision/publishedAt) son T1 con requiresPerson. La CLI HTTP
+los descubre y transporta, pero un bearer de servicio es rechazado. El carril humano HTTP/MCP depende de TASK-2003.
+Mientras tanto, una persona autorizada dispone del CLI local del repositorio de Studio (`pnpm studio:write <operationId>`),
+que usa los mismos commands y acceso PostgreSQL gobernado. No transforma el bearer de Greenhouse en persona.
+
+La confirmación de publicación requiere evidencia pública reciente (máximo dos horas) y URL 200, misma cuenta y sitio,
+revisiones vigentes y fecha no posterior a la observación; el actor sale de la identidad. Conserva la fecha observada del
+CMS separada de la confirmada. Los avisos de robots/canonical/sitemap no inventan un gate SEO ni una autorización para publicar.

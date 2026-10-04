@@ -686,3 +686,27 @@ se probaron con servidor local controlado; no se afirma carga aplicada en produc
 La CLI HTTP y las CLIs de mantenimiento del repo Studio son carriles distintos: el bearer existente de cargas no
 concede `studio:write` general, y el catálogo global responde403 con bearer de servicio. Seed/backfill siguen siendo
 mantenimiento autorizado por operador en Studio. Las cinco campañas OneDrive conservan su frontera de escritura.
+
+## Candidato local TASK-2001 — 2026-10-04
+
+**Sin push, deploy ni cambios de datos remotos.** Studio main incorpora slices hasta 4094da0, incluyendo el corte final de
+backfill/contrato documentado en [QA local](../../audits/marketing-studio/TASK-2001-local-verification.md). API 1.7.0,
+75 tools/80 operaciones; el runtime productivo verificado arriba conserva su versión anterior. La UI TASK-2002 no fue implementada.
+
+Orden de rollout, sólo con autorización: cinco migraciones aditivas (`1791149145299`, `1791149983810`, `1791150800150`,
+`1791151430000`, `1791151780000`) → configurar bindings/dominios → worker/readback → revisar slugs antiguos y backfill
+→ web con flag → canary de lectura/escritura → sync/federación y canary con TASK-2003. Conservar scheduled_post;
+[retiro diferido](../../tasks/pending-migrations/README.md) no se ejecuta con este release.
+
+| Config | Default / dueño / verificación pendiente |
+| --- | --- |
+| STUDIO_ACTIVATIONS_ENABLED | false, runtime web y CLIs/domain; activar sólo después de migrar. OFF vuelve al calendario legacy. |
+| MEDIA_WORKER_METRICOOL_DISCOVERY_ENABLED | false en deploy.sh; bindings intersectan METRICOOL_BLOG_IDS. Job /jobs/metricool-discovery. |
+| MEDIA_WORKER_OWNED_READBACK_ENABLED | false en deploy.sh; job /jobs/owned-readback. |
+| STUDIO_EXECUTION_BINDINGS | [] en deploy.sh; owner registra organizationId/provider/providerAccountRef. Para WordPress/other el ref es el origen HTTPS del sitio del cliente. Registro de cuenta no amplía esta autorización. |
+| STUDIO_TRACKING_DOMAINS | {} por defecto, objeto org→lista de hostnames exactos (sin wildcard). Owner confirma dominios propios; nunca los toma del body del cliente. |
+| HubSpot readback | Puerto de Greenhouse con identidad de consumer, org/portal y complete=true; endpoint/credencial del owner siguen pendientes. Config ausente falla cerrado. No existe canary HubSpot en esta entrega. |
+
+Los jobs registran worker_run y cada cuenta su frescura. El health profundo añade activations_overdue y frescura de
+descubrimiento/owned. Incluir permisos, canary tenant deny y fallos de proveedor antes de encender. Rollback: flags OFF;
+migrate down sólo sin datos protegidos. Las bases de prueba fueron Postgres local descartable, nunca staging/prod.

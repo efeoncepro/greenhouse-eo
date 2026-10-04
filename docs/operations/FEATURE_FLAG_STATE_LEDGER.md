@@ -777,3 +777,14 @@ Este ledger es **doc viva**. Al cerrar una task con flag:
 4. Refresca el snapshot completo periódicamente con `pnpm flags:audit` (que hace `vercel env pull` y lee VALORES; con `env ls` el snapshot vuelve a mentir sobre el valor).
 
 **YA IMPLEMENTADO** (era un follow-up y dejó de serlo): `pnpm flags:audit` cruza los flags de código vs Vercel y resalte "en staging pero no en prod" / "en código pero sin registrar acá" — automatizaría la detección de deuda. Si se materializa, este doc se vuelve el output humano de ese script.
+
+## TASK-2001 — flags espejo de Studio, candidato local 2026-10-04
+
+| Flag | Owner | Default / estado verificado | Acción pendiente |
+| --- | --- | --- | --- |
+| STUDIO_ACTIVATIONS_ENABLED | TASK-2001, Studio web/domain/CLI | OFF por default; ON/OFF probado sólo local. Sin inspección/cambio de Vercel remoto. | Migraciones, cuentas, tracking y backfill revisado; redeploy/canary autorizado. |
+| MEDIA_WORKER_METRICOOL_DISCOVERY_ENABLED | TASK-2001, deploy.sh de Studio | false explícito en fuente; sin deploy remoto. | Bindings + allowlist de marcas, scheduler y canary. |
+| MEDIA_WORKER_OWNED_READBACK_ENABLED | TASK-2001, deploy.sh de Studio | false explícito en fuente; sin deploy remoto. | Sitios/CMS autorizados y puerto HubSpot del owner, scheduler/canary. |
+
+Son flags del repo hermano, no env vars de Greenhouse. Contrato/config/rollback:
+[handoff de Studio](marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#candidato-local-task-2001--2026-10-04).

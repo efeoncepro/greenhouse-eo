@@ -36,4 +36,6 @@ Implementación local no equivale a task complete: migraciones staging/prod, sch
 
 Slices 1–4 PASS en Studio: 39a74c0, 78205fb, af608a8, 9bc974e. Último check: 264 tests + 7 gates, todos los carriles PostgreSQL habilitados, cero skips.
 
-Delta blog recibido durante ejecución: CMS y dominio pertenecen a la cuenta owned del cliente; draft_url sólo se guarda/devuelve. Añadir slice de URL pública y confirmación personal de fecha, con herramienta MCP y evento confirmed_by. WordPress se generaliza a sitios del cliente autorizados. Dossier/gate/medición SEO-AEO fuera de alcance, follow-up sin ID. Se conserva íntegro el bloque del operador y sus referencias aprobadas de TASK-2002 (60ef4e26c).
+Delta blog recibido durante ejecución: CMS y dominio pertenecen a la cuenta owned del cliente; draft_url sólo se guarda/devuelve. Implementado slice de URL pública y confirmación personal de fecha, con herramienta MCP y evento confirmed_by. WordPress se generaliza a sitios del cliente autorizados. Dossier/gate/medición SEO-AEO fuera de alcance, follow-up sin ID. Se conserva íntegro el bloque del operador y sus referencias aprobadas de TASK-2002 (60ef4e26c).
+
+Corte local final: tracking `946fda4`, backfill/CLI `4094da0`; 276 tests + 7 gates, build y 31 checks CLI con PG real PASS. Cinco migraciones up/down/up. [QA](../../audits/marketing-studio/TASK-2001-local-verification.md). No se declara runtime completo: endpoint owned HubSpot del owner y carril delegado TASK-2003 pendientes, además del rollout autorizado.

@@ -250,7 +250,7 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 
 ## Entry points ejecutables
 
-- **Marketing Studio:** `pnpm studio` consume su API; [manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md). DryRun por defecto; autoridad remota, sin SQL.
+- **Studio:** `pnpm studio`: API y activaciones; [manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md). DryRun; autoridad remota, sin SQL.
 
 - **GCP local multi-proyecto:** mantener `default` en `efeonce-group` y usar la configuración nombrada `globe` para `efeonce-globe`; preferir `gcloud --configuration=globe ... --project=efeonce-globe` para no mutar el contexto compartido. No sustituye IAM ni cambia la postura runtime. Detalle operativo: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
 - **Gcloud local para agentes:** ante solicitud explícita, invocar la skill espejo `greenhouse-gcloud-auth-playwright` y ejecutar `pnpm gcloud:auth:playwright -- --force`; el runner completa CLI + ADC con Playwright y verifica `gcloud-auth-preflight.sh`. La credencial queda en `.auth/` ignorada por Git con `0600`; no hay scheduler, deploy ni cambio de postura runtime.
