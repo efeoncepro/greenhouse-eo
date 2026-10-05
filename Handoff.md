@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Identidad del portal (05/10, Codex):** Efeonce en el menú (logo/isotipo), Greenhouse en ambos footers con tema claro/oscuro; cambio local autorizado por el operador. Canon y assets existentes preservados. Validación y capturas: [dossier](docs/audits/ui/2026-10-05-portal-brand-chrome.md). Commit y push a `develop` autorizados (05/10); sin deploy verificado.
+
 **TASK-2007 (05/10, Codex):** mejoras AXIS implementadas localmente en `../axis-design-system`: opciones con media/grupos, Combobox remoto recuperable, feedback/superficies, MultiSelect, tabs/colección, fecha/rango y archivo. Preview `http://127.0.0.1:4337/references/product/`; [task](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md) y dossier AXIS `docs/quality/product-primitives.md`. Publicado previamente: tokens0.5.1 ≠ primitives0.5.0; exports nuevas sin publicar. Sin pins ni runtime de Growth modificados. Suite global detenida por hash preexistente de AI Visibility Report en tokens; no tocar ese WIP. QA: 28/28 nuevos journeys, build/typecheck, 36 unit, 191 contracts, 14 registry y 4 agent PASS. Regresión amplia 194/196 con dos timeouts de navegación; rerun focal 4/4. AT físico y release pendientes. Dossier con evidencia.
 
 **TASK-2002 (04–05/10, Claude):** calendario v3 de Studio en producción, sólo lectura (`d0ec7e0`, Vercel `otc14ubb7`); diálogos de escritura verificados en local, deshabilitados hasta TASK-1898/2003. Pendientes y dependencias en la [task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).

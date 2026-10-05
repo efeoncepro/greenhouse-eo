@@ -79,6 +79,21 @@ automatically creates a product brand or a business line.
 7. Greenhouse is the operational/customer control plane and may be part of an offer without becoming the seller of
    every service.
 
+### Aplicación 2026-10-05 — identidad del chrome de Greenhouse
+
+Decisión explícita del operador: Efeonce firma la navegación y Greenhouse identifica la plataforma en el footer.
+Aplica al portal interno y cliente, en los layouts Vuexy vertical y horizontal:
+
+- Menú expandido y cabecera horizontal: logo Efeonce oficial; menú colapsado: isotipo Efeonce oficial.
+- Lateral navy: assets negativos blancos, incluso con el contenido en tema claro.
+- Footer del portal: logo Greenhouse sin claim, azul en tema claro y blanco en tema oscuro.
+- El texto alternativo identifica la marca pintada. El nombre del producto, rutas, metadata y permisos siguen
+  siendo Greenhouse; este cambio no renombra el producto ni altera los documentos institucionales.
+- Reusar el registro de assets y los adapters Vuexy existentes; no reconstruir SVG ni crear otro shell.
+
+Esta aplicación actualiza la regla anterior «Greenhouse en toda navegación de la app» de `DESIGN.md` y sus
+invariantes. Los SVG Efeonce locales deben conservar la paridad con `@efeoncepro/axis-brand-assets`.
+
 ## 5. Commercial data contract
 
 Commercial records should preserve the layers instead of using a single “business unit” label:

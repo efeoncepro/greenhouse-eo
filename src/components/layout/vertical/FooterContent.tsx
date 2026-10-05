@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { useColorScheme } from '@mui/material/styles'
+
 import classnames from 'classnames'
 import { useLocale } from 'next-intl'
 
@@ -17,6 +19,8 @@ const INTERNAL_ROUTE_PREFIXES = ['/agency', '/finance', '/hr', '/people', '/deli
 
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()
+  const { mode, systemMode } = useColorScheme()
+  const isDark = (mode === 'system' ? systemMode : mode) === 'dark'
   const { client: GH_CLIENT_NAV } = getGreenhouseNavigationCopy(useLocale())
   const pathname = usePathname() ?? ''
   const isInternalRoute = INTERNAL_ROUTE_PREFIXES.some(prefix => pathname.startsWith(prefix))
@@ -24,7 +28,9 @@ const FooterContent = () => {
   if (isInternalRoute) {
     return (
       <div className={classnames(verticalLayoutClasses.footerContent, 'flex items-center gap-3')}>
-        <BrandWordmark brand='efeonce' height={14} sx={{ opacity: 0.7 }} />
+        <span data-capture='portal-footer-brand'>
+          <BrandWordmark brand='greenhouse' negative={isDark} height={14} sx={{ opacity: 0.7 }} />
+        </span>
         <span className='text-textSecondary' style={{ fontSize: '0.75rem' }}>
           {`© ${new Date().getFullYear()} · Efeonce Group`}
         </span>
@@ -34,8 +40,10 @@ const FooterContent = () => {
 
   return (
     <div className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
-      <div className='flex items-center gap-3'>
-        <BrandWordmark brand='efeonce' height={16} sx={{ opacity: 0.85 }} />
+      <div className='flex items-center flex-wrap gap-3'>
+        <span data-capture='portal-footer-brand'>
+          <BrandWordmark brand='greenhouse' negative={isDark} height={16} sx={{ opacity: 0.85 }} />
+        </span>
         <span className='text-textSecondary' style={{ fontSize: '0.8125rem' }}>
           {`© ${new Date().getFullYear()} · ${GH_MESSAGES.footer}`}
         </span>

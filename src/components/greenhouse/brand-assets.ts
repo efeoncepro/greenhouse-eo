@@ -17,6 +17,11 @@ const normalizeBrand = (value: string) =>
     .trim()
 
 const brandAssetRegistry: Record<string, BrandAssetEntry> = {
+  greenhouse: {
+    label: 'Greenhouse',
+    wordmarkSrc: '/images/greenhouse/SVG/greenhouse-blue.svg',
+    negativeWordmarkSrc: '/images/greenhouse/SVG/negative-sin-claim.svg'
+  },
   globe: {
     label: 'Globe',
     wordmarkSrc: '/branding/SVG/globe-full.svg',

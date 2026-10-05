@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { useColorScheme } from '@mui/material/styles'
+
 import classnames from 'classnames'
 import { useLocale } from 'next-intl'
 
@@ -14,12 +16,16 @@ import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useHorizontalNav()
+  const { mode, systemMode } = useColorScheme()
+  const isDark = (mode === 'system' ? systemMode : mode) === 'dark'
   const { client: GH_CLIENT_NAV } = getGreenhouseNavigationCopy(useLocale())
 
   return (
     <div className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
-      <div className='flex items-center gap-3'>
-        <BrandWordmark brand='efeonce' height={16} sx={{ opacity: 0.85 }} />
+      <div className='flex items-center flex-wrap gap-3'>
+        <span data-capture='portal-footer-brand'>
+          <BrandWordmark brand='greenhouse' negative={isDark} height={16} sx={{ opacity: 0.85 }} />
+        </span>
         <span className='text-textSecondary' style={{ fontSize: '0.8125rem' }}>
           {`© ${new Date().getFullYear()} · ${GH_MESSAGES.footer}`}
         </span>
