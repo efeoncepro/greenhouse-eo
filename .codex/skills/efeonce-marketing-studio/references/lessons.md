@@ -315,3 +315,26 @@
 - **Import estático de SVG en Turbopack llega como string o `StaticImageData`.** Regla: leerlo con `srcOf`
   (reafirma la lección del 2026-10-04).
 - **El generador del canvas (`gen.py`) es la fuente exacta de medidas** para revisar fidelidad contra la dirección v3.
+
+## 2026-10-05 — TASK-2002 filtros v3.4, formulario y fecha/hora v3.5
+
+- **Un menú propio dentro de un `<label>` se reabre al elegir.** Síntoma: en el formulario, un clic en una opción del
+  `Select` (`write/parts.tsx`) cerraba el menú y el `<label>` que envuelve el campo reactivaba el botón, que lo volvía a
+  abrir. Regla: `preventDefault` en el clic del menú (y Esc cierra el menú, no el formulario).
+- **Popovers dentro de un contenedor con scroll o de un modal quedan recortados.** El selector de fecha se cortaba en el
+  modal de Reprogramar y en el scroll del formulario. Regla: sacarlo con portal a `body` y posición fija, y abrir hacia
+  donde cabe completo; en teléfono, hoja inferior.
+- **Conteo por faceta = los OTROS filtros aplicados sobre una lectura sin filtros.** Contar sobre la lectura ya
+  filtrada deja en cero todo lo que no está elegido. Regla: una segunda lectura del período sin filtros y, por opción,
+  aplicar los demás filtros (`facetCounts`/`facetTotal` en `model.ts`); hereda el tope de 200 del calendario.
+- **El período del mes empieza en la grilla, no en el día 1.** Textos como «Con activaciones en {mes}» o «No hay
+  activaciones en México en octubre» toman el mes del primer día de la grilla si se derivan del período (que suele caer
+  en el mes anterior). Regla: usar el mes ancla (el mes mirado) para textos «en {mes}».
+- **El lint del compilador de React prohíbe leer refs durante el render.** Regla: desestructurar lo que devuelve el
+  hook en vez de leer `ref.current` en el render.
+- **Paquetes de GitHub Packages en local:** `NODE_AUTH_TOKEN=$(gh auth token) pnpm install` (reafirma la lección del
+  2026-09-25; se necesitó para subir a AXIS 0.4.21).
+- **Commit con índice temporal también en AXIS.** `packages/tokens/src/tokens.ts` y otros archivos tenían trabajo sin
+  commitear de otra sesión; el release `3c8a6dd` llevó sólo la línea propia por índice temporal. Un test de tokens («AI
+  Visibility Report … source hashes») falla en el árbol de trabajo por ese trabajo ajeno, no por el cambio (reafirma la
+  regla de `GIT_INDEX_FILE` de arriba).

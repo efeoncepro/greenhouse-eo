@@ -462,14 +462,49 @@ Rollback: pause discovery job, flags OFF through versioned deploy config and red
 - Diálogos: en modo `open` no se montan. Hace falta un actor con permiso (en la sesión fuente: `operator_cli` temporal
   en `apps/web/src/server/runtime.ts`). **Requiere autorización explícita del operador en el chat** (el clasificador lo
   bloquea como debilitamiento de seguridad), nunca se commitea y se revierte al terminar.
+- Desde `1f003c1` (2026-10-05) hay una alternativa sin tocar código: las dos variables de la ventana temporal
+  (`STUDIO_OPEN_WRITE_UNTIL`, `STUDIO_OPEN_WRITE_ORGS`, ver la sección siguiente) como variables **temporales** del
+  servidor local. Aprobar sigue exigiendo persona (`operator_cli`).
 - La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`) en el entorno local; sin él responde
-  422 `tracking_destination_invalid`. En la sesión fuente se agregó a `.claude/launch.json` y se revirtió.
+  422 `tracking_destination_invalid`.
+- Dónde van las variables temporales: en una configuración `studio-2002-local` (:3102) de `.claude/launch.json` de
+  **greenhouse-eo** (el que usa `preview_start`). Se agregan para la prueba y **se revierten al terminar**; el archivo
+  versionado tiene la configuración `studio-2002-local` (:3102, Postgres local 127.0.0.1:55461, `STUDIO_ACCESS_MODE=open`)
+  sin esas variables. Verificado el 2026-10-05: con `STUDIO_OPEN_WRITE_UNTIL`/`STUDIO_OPEN_WRITE_ORGS` agregadas allí
+  se montan los diálogos y las escrituras con `?dryRun=true` responden 200.
 - Recorrido verificado: planificar (vista previa 200 → 201, abre la hoja nueva), editar (PATCH 200), reprogramar,
   cancelar, vincular, crear desde ejecución (201); la bandeja «Ejecución sin activación» baja su conteo.
 - Al revertir el actor: ningún diálogo se monta y `POST …/cancel` responde 403 `write_not_allowed`.
 - Tras `pnpm install`, reiniciar el servidor de desarrollo.
 - Gates antes de push: `pnpm check` + `pnpm --filter @studio/web build`.
 
-**Producción:** `https://studio.efeonce.org/calendar` → 200, calendario v3 en **solo lectura** (`STUDIO_ACCESS_MODE=open`).
-Botones de escritura `aria-disabled` con su motivo; cualquier escritura por API responde 403 `write_not_allowed`
-(esperado, no es un incidente). Las escrituras web llegan con TASK-1898; por MCP con TASK-2003.
+**Producción:** `https://studio.efeonce.org/calendar` → 200, calendario v3 (`STUDIO_ACCESS_MODE=open`). Sin ventana
+temporal de escritura vigente es **solo lectura**: botones `aria-disabled` con su motivo, pastilla «Solo lectura», y
+cualquier escritura por API responde 403 `write_not_allowed` (esperado, no es un incidente). Del 2026-10-05 al
+2026-10-12T10:00Z rige la ventana de la sección siguiente para la org Efeonce. Las escrituras web con persona llegan con
+TASK-1898; por MCP con TASK-2003.
+
+## Ventana temporal de escritura en modo open (Studio `1f003c1`, 2026-10-05)
+
+Para qué: probar las escrituras de la UI en producción antes del login TASK-1898. Decisión del operador 2026-10-05
+(eligió «Producción abierta» entre preview protegido / local / producción abierta). Código: `apps/web/src/server/runtime.ts`,
+test `open-write-window.test.ts`.
+
+- **Cómo funciona:** con `STUDIO_ACCESS_MODE=open`, si `STUDIO_OPEN_WRITE_UNTIL` (ISO, como máximo 7 días adelante; si es
+  más, se ignora) y `STUDIO_OPEN_WRITE_ORGS` (ids `org-…`) son ambas válidas, el modo open resuelve el actor `api_client`
+  id `open-write-window` con scopes `studio:read` + `studio:write`, sólo para esas organizaciones: escrituras T1
+  (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución). **Aprobar sigue exigiendo persona**
+  (`operator_cli`). Al vencer la fecha, o sin ambas variables válidas, vuelve a solo lectura **sin redeploy**.
+- **Estado vigente (Vercel `efeonce-marketing-studio`, sólo Production):** `STUDIO_OPEN_WRITE_UNTIL=2026-10-12T10:00:00Z`
+  (07:00 de Chile del lunes 12-oct) y `STUDIO_OPEN_WRITE_ORGS=org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
+- **Riesgo:** mientras esté abierta, cualquiera con el link puede escribir en la org Efeonce, y el audit registra
+  `api_client:open-write-window`, no una persona.
+- **Verificar que está abierta** (sin escribir nada real):
+  - `GET https://studio.efeonce.org/api/v1/activations/{id}` → `permissions.writable=true`.
+  - Una escritura con `?dryRun=true` (verificado: cancel de ACT-000001 → 200, nada escrito).
+  - En la UI, sin pastilla «Solo lectura» y con los diálogos montados.
+- **Cerrar:** vence sola en la fecha. Para cerrarla antes (lo pide el operador o llega TASK-1898): borrar las dos
+  variables en Vercel Production o poner `STUDIO_OPEN_WRITE_UNTIL` en una fecha pasada. Verificar el cierre con el mismo
+  `GET` (`permissions.writable=false`) y que una escritura con `?dryRun=true` responda 403 `write_not_allowed`.
+- **Nunca** abrirla por más de 7 días (el código lo ignora), ni para orgs de clientes sin decisión del operador, ni
+  dejarla como sustituto del login.

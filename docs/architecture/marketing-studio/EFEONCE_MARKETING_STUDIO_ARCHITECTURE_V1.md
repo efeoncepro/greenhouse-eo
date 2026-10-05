@@ -355,12 +355,33 @@ activaciones y las otras capacidades conservan sus tareas. Contrato vigente:
 
 | Modo (`STUDIO_ACCESS_MODE`) | Comportamiento | Estado |
 |---|---|---|
-| `open` | Lecturas abiertas sin login, por decisión del operador (2026-09-25). Sin escrituras HTTP. `X-Robots-Tag: noindex, nofollow` + `robots.txt` disallow. | **Vigente** |
+| `open` | Lecturas abiertas sin login, por decisión del operador (2026-09-25). Sin escrituras HTTP, salvo la ventana temporal de escritura descrita abajo (vigente hasta el 2026-10-12). `X-Robots-Tag: noindex, nofollow` + `robots.txt` disallow. | **Vigente** |
 | `efeonce_id` | Login first-party con `auth.efeonce.org` (Efeonce ID, relying party). La API exige sesión o bearer de `api_client`; organización derivada del actor. Hoy falla cerrado. | TASK-1898, **última del programa** por decisión del operador |
 
 Riesgo aceptado del modo `open`: cualquiera con la URL ve presupuestos propuestos, copys y audiencias. Se revierte
 cambiando el modo cuando exista el relying party. Aun en `open`, cada reader recibe un `Actor`
 (`{ kind: 'anonymous_open' }`), para que activar `efeonce_id` sea configuración y no refactor.
+
+**Ventana temporal de escritura en modo `open` (decisión temporal del operador, 2026-10-05).** Para probar las
+escrituras de la UI de TASK-2002 en producción antes del login de TASK-1898, el operador eligió «Producción abierta»
+(entre preview protegido, local y producción abierta). Contrato (Studio `1f003c1`, `apps/web/src/server/runtime.ts`,
+test `open-write-window.test.ts`):
+
+- Dos variables, ambas obligatorias: `STUDIO_OPEN_WRITE_UNTIL` (instante ISO; a más de **7 días** hacia adelante se
+  ignora) y `STUDIO_OPEN_WRITE_ORGS` (ids canónicos `org-…`).
+- Con ambas válidas y antes del vencimiento, el modo `open` resuelve el actor `api_client` con id `open-write-window`,
+  scopes `studio:read` + `studio:write`, limitado a esas organizaciones. Habilita las escrituras T1 (planificar,
+  editar, reprogramar, cancelar, vincular y crear desde ejecución). **Aprobar sigue exigiendo persona**
+  (`operator_cli`).
+- Al vencer, o si falta o no es válida alguna variable, vuelve a solo lectura sin redeploy.
+- Producción (Vercel `efeonce-marketing-studio`, sólo Production): hasta `2026-10-12T10:00:00Z`, sólo la organización
+  Efeonce (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`).
+
+Riesgo aceptado: mientras esté abierta, cualquiera con el link puede escribir en la organización Efeonce, y el audit
+registra `api_client:open-write-window`, no una persona. Retiro: al llegar TASK-1898 (login), o antes si el operador lo
+pide (borrar las dos variables o poner una fecha pasada). No es un modo de acceso nuevo: `STUDIO_ACCESS_MODE` sigue
+en `open`. Estado y rollback:
+[runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
 
 **Bearer de servicio (TASK-1890).** `Authorization: Bearer mst_…` (47 caracteres) resuelve un `studio.api_client`
 activo (se guarda sólo el sha256; scope `studio:read`, único valor admitido hoy) con sus `organization_ids`. Un token
@@ -973,7 +994,8 @@ y [alcance/aceptación](../../tasks/in-progress/TASK-2001-marketing-studio-campa
 
 UI de `/calendar` sobre el reader y los commands de TASK-2001, fiel 1:1 a la dirección visual v3 aprobada (canvas
 `https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi`; el generador del canvas es la fuente exacta de medidas para
-revisar fidelidad). En producción en solo lectura; las escrituras web dependen de TASK-1898. Wireframe y flujo:
+revisar fidelidad). En producción; las escrituras web dependen de TASK-1898 y, hasta el 2026-10-12, se prueban con la
+ventana temporal de escritura del modo `open` (§5). Wireframe y flujo:
 [`TASK-2002-marketing-studio-activations-calendar.md`](../../ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md),
 [`TASK-2002-marketing-studio-activations-calendar-flow.md`](../../ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md).
 
@@ -1011,7 +1033,8 @@ revisar fidelidad). En producción en solo lectura; las escrituras web dependen 
 - **Montaje por URL:** `?action=plan|edit|reschedule|cancel|link|from` + `activation`/`record`. `ActionLayer` (server)
   carga catálogo publicado, cuentas, campañas y candidatas y **sólo se monta si el actor puede escribir**. En modo
   `open` los botones quedan `aria-disabled` con su motivo y la API responde 403 `write_not_allowed` (el actor anónimo
-  no escribe ni siquiera `dryRun`).
+  no escribe ni siquiera `dryRun`). Mientras la ventana temporal de escritura (§5) está abierta, el actor
+  `open-write-window` sí puede escribir en la organización habilitada y los diálogos se montan.
 - `write/client.ts`: un `fetch` literal por operación del registro. `operations-parity.test.ts` exige `method` literal y
   ruta template estática con nombres de parámetro exactos (`campaignId`, `activationId`, `recordId`).
 - **dryRun → apply:** cada intento usa una `Idempotency-Key` nueva (`web-<uuid>`) e `If-Match` con la revisión; la vista
@@ -1034,3 +1057,30 @@ lectura (ver [runtime handoff](../../operations/marketing-studio/MARKETING_STUDI
 (TASK-2003); hojas de email y landing (contrato owned del reader, en curso); hoja de blog (TASK-1667/1669); trimestre,
 «Más tarde», lote y similares (TASK-2005/2006); release de las capabilities `marketing_studio.asset.write` /
 `campaign.write` (en develop, espera decisión del operador).
+
+**Etapa 2026-10-05 (tarde) — filtros v3.4, formulario y fecha/hora v3.5.** Direcciones v3.4 (filtros) y v3.5 (fecha y
+hora) aprobadas por el operador en el canvas el 2026-10-05.
+
+- **Dimensiones en español** (`c767283`): Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña, Estado; los valores
+  de marketing siguen en inglés (Paid, Organic, Owned, Earned, Social, Web & Content, Placement).
+  `SERVED_MARKETS = ['CL','MX','CO','PE','US']` en `components/activations/model.ts`, compartido por filtro y
+  formulario; se suma cualquier mercado que aparezca en los datos. Deuda: la lista debe salir de la configuración de
+  la organización.
+- **Menús de filtro** (`bef0ecf`): `FilterMenu.tsx` en vez de select nativo, `flags.ts` (banderas circle-flags, MIT),
+  `Flag` en `icons.tsx`, `facetCounts`/`facetTotal` en `model.ts`. El conteo por opción son las activaciones del
+  período visible con los **otros** filtros aplicados, sobre una segunda lectura del período sin filtros (mismo tope de
+  200). Plataforma separa «Con cuenta conectada» (elegibles) de «Sin cuenta conectada» (`appearancePlatforms` de canales
+  activos con etiqueta en Studio; visibles, no elegibles). En móvil, la hoja de filtros es una lista por filtro.
+- **Campos de selección del formulario** (`e656f2a`): `Select` en `write/parts.tsx` con la misma fila del menú; el
+  clic en una opción hace `preventDefault` porque el campo vive dentro de un `<label>` y reabría el menú.
+- **Fecha, hora e inicio/fin** (`5d962c4`): `write/datetime.tsx` (`DatePicker`, `TimePicker`, `RangePicker`) reemplaza
+  `DateTimeField` (eliminado) en `PlanDrawer` y `RescheduleDialog`. Los días con activaciones de la cuenta elegida y
+  los flights de la campaña salen de `GET /api/v1/calendar` (`readCalendar` en `write/client.ts`), excluyendo la
+  propia activación. La hora ocupada avisa en ámbar y no bloquea. El selector flota sobre la página (portal a
+  `body`, posición fija); en teléfono es hoja inferior.
+- Isotipo de X desde `@efeoncepro/axis-brand-assets` 0.4.21 (`6dddbfa`).
+
+Pendiente de esta etapa: motion y rendimiento percibido (~8 lecturas en cadena en `page.tsx`; `router.push` recarga
+todo el RSC sin estado pendiente; sin View Transitions ni feedback de escritura), mercados desde configuración,
+plataformas del catálogo sin etiqueta en Studio y conteos con el tope de 200. Detalle en
+[runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).

@@ -205,6 +205,11 @@ runtime, memory or delegated authority.
 
 - **Access mode** `STUDIO_ACCESS_MODE`: `open` (current; reads without login, `noindex`) or `efeonce_id`, which
   **fails closed (401)** until TASK-1898 (login is last by operator decision).
+- **Temporary write window in open mode** (`1f003c1`, operator decision 2026-10-05): `STUDIO_OPEN_WRITE_UNTIL` (ISO,
+  ≤ 7 days ahead) + `STUDIO_OPEN_WRITE_ORGS` (`org-…`) ⇒ actor `api_client` `open-write-window` with `studio:read` +
+  `studio:write` for those orgs only (T1 writes; approving still needs a person). Expired/absent ⇒ read-only without
+  redeploy. Production: Efeonce org until 2026-10-12T10:00Z; anyone with the link can write and the audit shows
+  `api_client:open-write-window`, not a person. Retire with TASK-1898 or on request (`operations.md`).
 - **Service bearer**: `Authorization: Bearer mst_…` (47 chars, `^mst_[A-Za-z0-9_-]{43}$`) → `api_client` actor
   (only the sha256 is stored; scope `studio:read`; `organization_ids`). A malformed/unknown/revoked token is
   **401 even in open mode** — a broken token never degrades to anonymous. No header ⇒ the actor of the current mode.

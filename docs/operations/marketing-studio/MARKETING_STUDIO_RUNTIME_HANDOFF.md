@@ -11,7 +11,7 @@ fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/U
 > **Tipo:** runbook operativo
 > **Versión:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-05 por Claude — calendario de activaciones TASK-2002 en producción en solo lectura (Studio `main` `d0ec7e0`). Anterior, 2026-10-04: rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
+> **Última actualización:** 2026-10-05 (tarde) por Claude — TASK-2002: filtros v3.4, formulario y fecha/hora v3.5 en producción (Studio `main` `5d962c4`) y ventana temporal de escritura en modo `open` hasta el 2026-10-12T10:00Z. Antes, 2026-10-05: calendario en producción en solo lectura (`d0ec7e0`). Anterior, 2026-10-04: rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -108,6 +108,8 @@ Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets version
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry (configurado 2026-09-26) | igual (environment `preview` se deriva de `VERCEL_ENV`) |
 | `SENTRY_AUTH_TOKEN` | token de source maps (encrypted; **sin configurar**: el build no sube source maps) | igual |
 | `STUDIO_MEDIA_BUCKET` | `efeonce-marketing-studio-media` (sonda del health profundo; si falta se deduce de las renditions) | `efeonce-marketing-studio-media-staging` |
+| `STUDIO_OPEN_WRITE_UNTIL` | `2026-10-12T10:00:00Z` (ventana temporal de escritura, TASK-2002; retirar con TASK-1898) | sin definir |
+| `STUDIO_OPEN_WRITE_ORGS` | `org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce) | sin definir |
 
 Opcional: `STUDIO_PG_MAX_CONNECTIONS` (pool por instancia; por defecto 3 en Vercel, 5 fuera). Cambiar una variable
 exige redeploy.
@@ -767,17 +769,21 @@ permanecen null hasta una lectura nueva. No usar los resultados locales como cer
 
 ## TASK-2002 — calendario de activaciones, estado al 2026-10-05
 
-UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y composición:
+UI del calendario (`/calendar`) en producción. Desde el 2026-10-05 (tarde) **acepta escrituras T1 de la organización
+Efeonce** por la ventana temporal de escritura del modo `open`, que vence el **2026-10-12T10:00:00Z** (ver abajo);
+fuera de ella rige solo lectura. Contrato y composición:
 [arquitectura, Delta 2026-10-05](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-05--task-2002-calendario-de-activaciones).
 
 | Pieza | Estado verificado |
 | --- | --- |
 | Código | Studio `main`: push `aa6fa07..10513ef` (incluyó 4 commits locales de Codex: `e62b5e3`, `055860d`, `ade6765`, `f72e408`) y `10513ef..d0ec7e0`. Commits de la etapa: `f7b9790` (Mes/Semana), `dc579e4` (Día), `c201fb4` (Línea de tiempo), `7bde589` (Paid + is-today), `acea0dc` (Hoja), `ff74abf` (Popover), `00a51e5` (estados), `c2014ba` (diálogos), `fce8d99` (ajustes tras verificar), `10513ef` (formatos), `d0ec7e0` (A11y/States32/MobFilters); antes `985354b`, `036dbd6`, `0856ee0`, `e90fb6e`, `ea93590`. |
-| Deploy | Vercel Production Ready (`otc14ubb7`). |
-| Envs (Production, por nombre) | `STUDIO_ACTIVATIONS_ENABLED=true`, `STUDIO_ACCESS_MODE=open`, `STUDIO_TRACKING_DOMAINS` presente. |
+| Código (2026-10-05, tarde) | Studio `main`: `c767283` (dimensiones en español; `SERVED_MARKETS` CL·MX·CO·PE·US), `1f003c1` (ventana temporal de escritura en modo `open`, `server/runtime.ts` + `open-write-window.test.ts`), `bef0ecf` (menús de filtro v3.4: `FilterMenu.tsx`, `flags.ts`, conteos por opción), `e656f2a` (campos de selección del formulario con el menú v3.4), `6dddbfa` (isotipo de X desde AXIS 0.4.21), `5d962c4` (fecha, hora e inicio/fin v3.5: `write/datetime.tsx`, reemplaza `DateTimeField`). |
+| Deploy | Vercel Production Ready (`otc14ubb7`). Después, en orden: `kc4tcvuod` (`3048f96`), `phmizd8u0` (`1f003c1`), `kr5mfmw19` (`bef0ecf`), `b53xls9w2` (`6dddbfa`, incluye `e656f2a`), `p1ng5wy75` (`5d962c4`). |
+| Envs (Production, por nombre) | `STUDIO_ACTIVATIONS_ENABLED=true`, `STUDIO_ACCESS_MODE=open`, `STUDIO_TRACKING_DOMAINS` presente. Desde 2026-10-05 (sólo Production): `STUDIO_OPEN_WRITE_UNTIL=2026-10-12T10:00:00Z` (07:00 de Chile del lunes 12 de octubre) y `STUDIO_OPEN_WRITE_ORGS=org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce). |
 | Gates | `pnpm check` completo (gates, lint, manifiesto MCP, typecheck, tests de todos los paquetes) y `pnpm --filter @studio/web build` verdes antes de cada push; tests web 22/22 (incluye paridad UI↔API). |
-| Producción | `studio.efeonce.org/calendar` 200 con el calendario v3 en solo lectura. Datos reales: 3 activaciones en octubre, **50 ejecuciones sin activación** (tope `limit: 50` de la consulta; podrían ser más) y todas las piezas importadas «Pieza sin aprobar». |
-| Escrituras | En producción no se montan diálogos: en modo `open` los botones quedan `aria-disabled` y la API responde 403 `write_not_allowed` (verificado con `POST …/cancel`). `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401). |
+| Producción | `studio.efeonce.org/calendar` 200 con el calendario v3 (en solo lectura al release del 2026-10-04). Datos reales: 3 activaciones en octubre, **50 ejecuciones sin activación** (tope `limit: 50` de la consulta; podrían ser más) y todas las piezas importadas «Pieza sin aprobar». |
+| Escrituras | Hasta el 2026-10-05: en modo `open` los botones quedaban `aria-disabled` y la API respondía 403 `write_not_allowed` (verificado con `POST …/cancel`). Con la ventana abierta (2026-10-05): `permissions.writable=true`, `cancel` con `dryRun=true` 200 en ACT-000001 (no se escribió nada real) y sin pastilla «Solo lectura». Aprobar sigue exigiendo persona (`operator_cli`). `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401). |
+| Verificación en producción (2026-10-05, tarde) | Menús: Plataforma con LinkedIn e Instagram conectadas y el resto «Sin cuenta conectada»; Mercado con banderas; México en cero → calendario vacío explicado. Formulario: X con su logo; elegir LinkedIn cierra el menú. Fecha: punto en el único día con activación de la cuenta; «Mañana» → mar 6 oct 2026. Hora: «1830» → 18:30 · Santiago. `pnpm check` y `pnpm --filter @studio/web build` verdes antes de cada push. |
 | Verificación local de escrituras | Postgres 18 descartable (`127.0.0.1:55461/marketing_studio`), servidor `studio-2002-local` :3102, actor `operator_cli` temporal en `runtime.ts` **autorizado por el operador**, no commiteado y revertido. Planificar (vista previa 200 → 201, hoja nueva ACT-000008), editar (PATCH 200), reprogramar, cancelar, vincular, crear desde ejecución (201, ACT-000009); bandeja de 3 a 1. `STUDIO_TRACKING_DOMAINS` agregado y revertido en `.claude/launch.json`. |
 | Greenhouse | TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados y diferencias pendientes con su dependencia. |
 | Hojas email/web (2026-10-05) | Studio `3048f96` (push `1f2a0ef..3048f96`, Vercel Production Ready `kc4tcvuod`): `OwnedSheet.tsx` + `DeviceViews.tsx` sobre `ActivationDto.email`/`web` (API 1.9.0, `1f2a0ef`, que salió en el mismo deploy). Producción: `GET /api/v1/calendar` ya trae las claves `email`/`web` (null en las 6 activaciones, todas sociales); hoja social ACT-000001 sin regresión. Verificación de las hojas sólo en local con datos de prueba en la base descartable (migración `1791155100000_owned-email-providers` aplicada allí; email en ACT-001012, landing en ACT-001013). |
@@ -786,7 +792,13 @@ UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y c
 
 | Qué | Depende de |
 | --- | --- |
-| Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895) |
+| Escrituras en la web de producción (definitivas, con persona en el audit) | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Mientras tanto, ventana temporal hasta 2026-10-12T10:00Z |
+| Retirar la ventana temporal de escritura | Al llegar TASK-1898 o al vencer el 2026-10-12 (borrar las dos variables; ver abajo) |
+| Motion y rendimiento percibido (operador: 3/5, «tarda un poco y motion casi inexistente») | Sin task todavía. Diagnóstico: ~8 lecturas en cadena en `page.tsx`; `router.push` recarga todo el RSC sin estado pendiente; sólo `--motion-fast`/`--motion-standard`; sin View Transitions, salidas ni feedback de escritura. Plan: (1) medir y acelerar lo percibido (paralelizar, Suspense, caché del catálogo, prefetch, `useTransition`); (2) sistema de motion desde `axisMotion`, diseñado primero en el canvas («v3.6 · Motion (para aprobar)») |
+| Mercados del filtro y del formulario desde la configuración de la organización (hoy `SERVED_MARKETS` en el código web) | Deuda declarada; necesario cuando Studio tenga otros clientes |
+| Plataformas del catálogo sin etiqueta en Studio (Discord, Slack, foros, Circle…) no aparecen en el filtro | Etiquetas en Studio |
+| Conteos del filtro limitados por el tope de 200 activaciones del período | Es el mismo tope de lectura del calendario; sin task |
+| Comentario del operador en V3-Popover («no se implementó») | Respondido: está implementado; se ofreció marcar el número del día como clickeable (círculo al pasar el mouse). Espera respuesta |
 | Escrituras por MCP | TASK-2003 (T1 delegado) |
 | Datos reales en las hojas de email/landing (UI hecha, `3048f96`) | Publicar el lado Greenhouse de los readers (metadata y métricas HubSpot/Resend) + readback |
 | Hoja de blog (V3-BlogPre/BlogPost) | TASK-1667/1669 (hoy «no medido») |
@@ -795,7 +807,23 @@ UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y c
 | V3-Gantt, V3-Later, V3-Quarter, V3-SheetMore, V3-Bulk | TASK-2005/2006 |
 | Capabilities `marketing_studio.asset.write` / `campaign.write` | En develop (`9d0d698d4`); release a producción espera decisión del operador |
 
+**Ventana temporal de escritura (abierta 2026-10-05, vence 2026-10-12T10:00:00Z).** Decisión temporal del operador
+para probar las escrituras de la UI antes de TASK-1898 (contrato en
+[arquitectura §5](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#5-acceso)). Mientras
+esté abierta, cualquiera con el link puede escribir en la organización Efeonce y el audit registra
+`api_client:open-write-window`, no una persona.
+
+- **Vencimiento solo:** al pasar `STUDIO_OPEN_WRITE_UNTIL` vuelve a solo lectura sin redeploy. Después hay que borrar igual las dos variables para no dejar configuración muerta.
+- **Cerrar antes de tiempo:** en Vercel `efeonce-marketing-studio` → Production, borrar `STUDIO_OPEN_WRITE_UNTIL` y
+  `STUDIO_OPEN_WRITE_ORGS` (o poner en `STUDIO_OPEN_WRITE_UNTIL` una fecha pasada) **y redeploy**: cambiar una
+  variable de Vercel exige redeploy para tomar el valor nuevo (ver «Variables en Vercel»).
+- **Verificar el cierre (resultado esperado):** el reader devuelve `permissions.writable=false`, vuelve la pastilla «Solo lectura» y
+  `POST …/cancel` con `dryRun=true` responde 403 `write_not_allowed`.
+- **No extender** con una fecha a más de 7 días: se ignora y la ventana queda cerrada.
+
 **Trampas de operación (para la próxima sesión).**
+
+- Instalar dependencias de GitHub Packages en local: `NODE_AUTH_TOKEN=$(gh auth token) pnpm install`.
 
 - Para ver los diálogos en local hace falta un actor con permiso: en modo `open` el actor anónimo no escribe ni en
   `dryRun`. Pedir autorización explícita al operador (el clasificador lo bloquea como debilitamiento de seguridad) y

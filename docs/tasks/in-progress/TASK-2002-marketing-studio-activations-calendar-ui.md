@@ -1,5 +1,69 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-05 (tarde) — filtros v3.4, formulario, fecha y hora v3.5 y ventana de escritura
+
+**Commits y deploys.** Studio `main` (push a `main` = producción), en orden: `c767283` (dimensiones en español y
+mercados), `1f003c1` (ventana temporal de escritura), `bef0ecf` (menús de filtro v3.4), `e656f2a` (campos de selección
+del formulario), `6dddbfa` (isotipo de X desde AXIS 0.4.21, TASK-2004) y `5d962c4` (fecha, hora e inicio/fin v3.5).
+Vercel Production Ready: `phmizd8u0` (`1f003c1`), `kr5mfmw19` (`bef0ecf`), `b53xls9w2` (`6dddbfa`, incluye `e656f2a`) y
+`p1ng5wy75` (`5d962c4`). `pnpm check` y `pnpm --filter @studio/web build` verdes antes de cada push.
+
+**Qué se ve.**
+
+- **Filtros en español:** Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña y Estado; los valores de marketing
+  siguen en inglés (Paid, Organic, Owned, Earned, Social, Web & Content, Placement). Mercados atendidos por Efeonce
+  (`SERVED_MARKETS`: CL, MX, CO, PE, US) en filtro y formulario (se quitó AR del formulario), más cualquier mercado que
+  aparezca en los datos.
+- **Menús de filtro (v3.4):** menú propio en vez de select nativo, con conteo por opción (activaciones del período
+  visible con los otros filtros aplicados), cero atenuado pero elegible, lo elegido en cero sube a «Elegido», teclado
+  ↑ ↓ Inicio Fin Enter Esc y búsqueda en Plataforma, Cuenta y Campaña. Plataforma separa «Con cuenta conectada»
+  (elegibles) de «Sin cuenta conectada» (visibles, no elegibles); Familia se agrupa «Con/Sin activaciones en {mes}»;
+  Cuenta lleva el dueño y la red o herramienta de pauta; Mercado lleva bandera en círculo. Un calendario vacío por un
+  filtro de lugar lo explica («No hay activaciones en México en octubre») y ofrece quitarlo. En móvil, la hoja de
+  filtros es una lista por filtro con grupos y conteos (reemplaza V3-MobFilters).
+- **Formulario:** los campos de selección usan la misma fila del menú (check, ícono, nombre, bajada), búsqueda con más
+  de 8 opciones, teclado y Esc que cierra el menú y no el formulario; «Sin especificar» elegible en Placement y Formato.
+  Se corrigió que un clic en una opción reabriera el menú (el campo vive dentro de un `<label>`).
+- **Fecha y hora (v3.5):** fecha con atajos (Hoy, Mañana, Próx. lunes), pasados atenuados y puntos en los días con
+  activaciones de la cuenta elegida; hora escrita («1830») o por franjas de 30 min (07:00–22:30), con aviso ámbar que
+  nombra la pieza si la cuenta ya tiene otra a esa hora (no bloquea); inicio y fin de paid en un selector de dos meses
+  con el flight de la campaña marcado, atajos y total de días. Flota sobre la página y se abre hacia donde cabe; en
+  teléfono es hoja inferior con celdas de 44 px. Reemplaza `DateTimeField` en Planificar y Reprogramar.
+- **Isotipo de X** desde AXIS (antes caía a la letra).
+
+**Verificación en producción.** Menús: Plataforma con LinkedIn e Instagram conectadas y el resto sin cuenta; Mercado
+con banderas; México en cero → vacío explicado. Formulario: X con su logo; elegir LinkedIn cierra el menú. Fecha: punto
+en el único día con activación de la cuenta; «Mañana» → mar 6 oct 2026. Hora: «1830» → 18:30 · Santiago.
+
+**Decisiones del operador (2026-10-05).** Aprobó en el canvas las páginas «v3.4 · Filtros» (10 tableros; pidió banderas
+en círculo, hechas) y «v3.5 · Fecha y hora» (10 tableros). En V3-Popover comentó «no se implementó»: se respondió en el
+hilo que sí está (se abre con el número del día o «+N más») y se ofreció marcar el número como clickeable; espera su
+respuesta.
+
+**Ventana temporal de escritura.** Para probar las escrituras de la UI antes del login (TASK-1898), el operador eligió
+«Producción abierta». Con `STUDIO_OPEN_WRITE_UNTIL` (ISO, máximo 7 días adelante) y `STUDIO_OPEN_WRITE_ORGS` válidas,
+el modo `open` resuelve el actor `api_client` `open-write-window` con `studio:read` + `studio:write` sólo para esas
+organizaciones: planificar, editar, reprogramar, cancelar, vincular y crear desde ejecución. Aprobar sigue exigiendo
+persona. En producción vence el **2026-10-12T10:00:00Z** (07:00 de Chile) y cubre sólo la organización Efeonce.
+Verificado: `permissions.writable=true`, `cancel` con `dryRun=true` 200 en ACT-000001 (sin escribir nada real) y sin
+pastilla «Solo lectura». **Riesgo:** mientras esté abierta, cualquiera con el link escribe en la organización Efeonce y
+el audit registra `api_client:open-write-window`, no una persona. **Retiro:** al vencer vuelve sola a solo lectura sin
+redeploy; se retira al llegar TASK-1898 o antes si el operador lo pide (borrar las dos variables o poner una fecha
+pasada). Detalle: [arquitectura §5](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#5-acceso)
+y [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
+
+**Pendientes.**
+
+- **Motion y rendimiento percibido:** el operador calificó la experiencia 3/5 («tarda un poco y motion casi
+  inexistente»). Diagnóstico: ~8 lecturas en cadena en `page.tsx`; `router.push` recarga todo el RSC sin estado
+  pendiente; sólo `--motion-fast`/`--motion-standard`; sin View Transitions, salidas ni feedback de escritura. Plan:
+  medir y acelerar lo percibido (paralelizar, Suspense, caché del catálogo, prefetch, `useTransition`) y luego un
+  sistema de motion desde `axisMotion`, diseñado primero en el canvas («v3.6 · Motion (para aprobar)»). Aún sin task.
+- **Mercados desde la configuración de la organización:** hoy la lista vive en el código web (deuda declarada).
+- **Plataformas del catálogo sin etiqueta en Studio** (Discord, Slack, foros, Circle…) no aparecen en el filtro.
+- **Conteos del filtro** sujetos al tope de 200 activaciones del período, como el calendario.
+- Escrituras reales en producción (más allá del `dryRun` verificado) y su equivalente por MCP siguen sin probarse.
+
 ## Delta 2026-10-05 — hojas de email y página web en producción
 
 Studio `3048f96` (push `1f2a0ef..3048f96`, Vercel Production Ready `kc4tcvuod`) construye las hojas sobre el contrato
@@ -34,9 +98,11 @@ generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a s
 |---|---|---|
 | ~~Hoja de email (V3-SheetEmail, MobSheetEmail)~~ | **Hecha el 2026-10-05** (`3048f96`) sobre el contrato `1f2a0ef` | Datos reales cuando se publique el lado Greenhouse del contrato |
 | Hoja de blog (V3-BlogPre, V3-BlogPost): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces (la landing con formulario de V3-OwnedFormats quedó **hecha el 2026-10-05**, `3048f96`) | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
+| Filtros y formulario con menús v3.4 y fecha/hora v3.5 | **Hechos el 2026-10-05** (`bef0ecf`, `e656f2a`, `5d962c4`). Quedan: mercados desde la configuración de la organización, plataformas del catálogo sin etiqueta en Studio y conteos con el tope de 200 | Deuda de configuración y etiquetas; sin task |
+| Motion y rendimiento percibido (operador: 3/5) | ~8 lecturas en cadena en `page.tsx`, `router.push` sin estado pendiente, sin View Transitions ni feedback de escritura | Dirección «v3.6 · Motion» en el canvas y luego implementación; sin task todavía |
 | Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
 | Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
-| Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed` | Se habilitan solos cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código |
+| Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed`. **2026-10-05:** habilitados temporalmente en producción para la organización Efeonce por la ventana de escritura (`1f003c1`, vence 2026-10-12T10:00Z); verificado sólo con `cancel` en `dryRun`. Fecha y hora con los selectores v3.5 (`5d962c4`) | Se habilitan de forma definitiva cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código. La ventana se retira al llegar TASK-1898 |
 
 **Rollout 2026-10-04:** Studio `main` publicado (`aa6fa07..10513ef` y `10513ef..d0ec7e0`), Vercel Production Ready
 (`otc14ubb7`), `STUDIO_ACTIVATIONS_ENABLED=true` en Production: `studio.efeonce.org/calendar` sirve el calendario v3
@@ -179,7 +245,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Lectura implementada y verificada en local (Studio 985354b · 036dbd6 · 0856ee0 · e90fb6e, sin push): mes, semana, día, línea de tiempo, pauta, hoja, bandeja, pestaña de campaña, móvil, carga y teclado; 18 capturas after-* y scorecard 4,38. Pendiente: escrituras (formularios y diálogos) bloqueadas hasta TASK-1898/2003, popover «+N», hoja de filtros móvil, pnpm check/build con el árbol de Codex en curso, sesión MCP real y rollout`
+- Status real: `En producción (Studio 5d962c4, deploy p1ng5wy75): calendario v3, hojas email/web, filtros v3.4 y fecha/hora v3.5. Escrituras T1 habilitadas sólo para Efeonce por la ventana temporal hasta 2026-10-12T10:00Z (verificado con cancel en dryRun). Pendiente: escrituras definitivas con TASK-1898, sesión MCP real (TASK-2003), motion y rendimiento percibido, mercados desde configuración, plataformas sin etiqueta y datos reales de email/web`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
@@ -449,14 +515,14 @@ Ver wireframe y flow de esta task.
 ## Acceptance Criteria
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, wireframe y flow existentes; `UI ready` pasa a `yes` sólo con la dirección v3 aprobada y `pnpm task:lint --task TASK-2002` sin hallazgos.
-- [x] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL.
+- [x] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL. _(2026-10-05: menús v3.4 con conteo por opción, en producción desde `kr5mfmw19`; verificado Plataforma, Mercado con banderas y México en cero con vacío explicado.)_
 - [x] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada. _(2026-10-04: pieza, plataforma, hora y estado con texto, y ninguna «Publicada» sin `publishedAt` — verificado en las 18 activaciones; la cuenta va en la etiqueta accesible y en la hoja, pero no se ve en la tarjeta compacta del mes.)_
-- [x] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver. _(2026-10-04: verificado en local con escrituras reales — 3 → 1 al vincular y crear desde ejecución; en producción queda deshabilitado hasta que exista un actor con permiso.)_ _(2026-10-04: la bandeja lista lo programado sin activación con su conteo; «Vincular» y «Crear activación» se muestran con `aria-disabled` y la razón, porque en modo abierto no hay actor con permiso de escritura hasta TASK-1898/TASK-2003.)_
+- [x] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver. _(2026-10-04: verificado en local con escrituras reales — 3 → 1 al vincular y crear desde ejecución; en producción queda deshabilitado hasta que exista un actor con permiso.)_ _(2026-10-05: con la ventana temporal de escritura la bandeja queda habilitada en producción para Efeonce, pero vincular y crear desde ejecución no se probaron allí; sólo `cancel` en `dryRun`.)_ _(2026-10-04: la bandeja lista lo programado sin activación con su conteo; «Vincular» y «Crear activación» se muestran con `aria-disabled` y la razón, porque en modo abierto no hay actor con permiso de escritura hasta TASK-1898/TASK-2003.)_
 - [x] Copy en `apps/web/src/copy.ts` con test; sin voseo.
 - [x] Sin scroll horizontal de página en 1440 y 390; capturas y scorecard registrados.
 - [x] La hoja muestra la tracking URL de la activación (copiar) y sus advertencias; ninguna UTM se construye en el cliente.
-- [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada). _(Pendiente de TASK-2003.)_
-- [x] `pnpm check` y `pnpm build` de Studio verdes. _(2026-10-04: `pnpm check` completo y `pnpm --filter @studio/web build` verdes antes de cada push.)_ _(2026-10-04: typecheck, lint y 22 tests de `@studio/web` verdes; el `pnpm check` completo falla por el trabajo en curso de Codex en `packages/domain` (delta de email), ajeno a esta task. Se corre de nuevo cuando ese trabajo esté commiteado.)_
+- [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada). _(Pendiente de TASK-2003. La ventana temporal de escritura del 2026-10-05 no cuenta: es la web en modo `open`, sin identidad delegada.)_
+- [x] `pnpm check` y `pnpm build` de Studio verdes. _(2026-10-05: verdes antes de cada push de `c767283` a `5d962c4`.)_ _(2026-10-04: `pnpm check` completo y `pnpm --filter @studio/web build` verdes antes de cada push.)_ _(2026-10-04: typecheck, lint y 22 tests de `@studio/web` verdes; el `pnpm check` completo falla por el trabajo en curso de Codex en `packages/domain` (delta de email), ajeno a esta task. Se corre de nuevo cuando ese trabajo esté commiteado.)_
 
 ## Verification
 

@@ -11,6 +11,7 @@
 - Primitive decision: `extend` — se extienden el calendario mensual vigente, `.chip`, `.seg`, `.pill`, `.callout-*`, el `Shell` (rail, topbar, ⌘K, switch de tema); `Sheet` y `ConfirmDialog` de TASK-1895 (si no existen, esta task los crea con su contrato).
 - UI ready target: `yes` — dirección aprobada y conciliada con este documento.
 - Implementation status (2026-10-05, Claude): en producción en solo lectura; escrituras code complete y verificadas en local, deshabilitadas hasta TASK-1898. Ver [Conciliación con lo implementado](#conciliación-con-lo-implementado-2026-10-05).
+- Delta 2026-10-05 (tarde, Claude): menús de filtro v3.4 y selectores de fecha, hora e inicio/fin v3.5 aprobados e implementados en producción; escrituras web habilitadas por una ventana temporal hasta el 2026-10-12 10:00Z. Ver [Delta 2026-10-05 — v3.4 y v3.5](#delta-2026-10-05--menús-de-filtro-v34-y-selectores-de-fecha-y-hora-v35).
 
 ### Fuentes visuales aprobadas (`docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/`)
 
@@ -250,12 +251,71 @@ fuente exacta de medidas. Detalle técnico en el
 |---|---|
 | Escrituras en producción | Login Efeonce ID TASK-1898 (bloqueada por TASK-1834 y TASK-1895) |
 | Escrituras por MCP | TASK-2003 |
-| `V3-SheetEmail` / `V3-MobSheetEmail` (De, Asunto, Preheader, Audiencia, Escritorio/Móvil/Bandeja, después del envío) | Contrato de email owned en el reader (encargado a Codex el 2026-10-05) |
-| `V3-OwnedFormats` (landing: destino de N activaciones, formulario conectado) | Mismo encargo |
+| ~~`V3-SheetEmail` / `V3-MobSheetEmail`~~ | **Hechas el 2026-10-05** (Studio `3048f96`) sobre el contrato `1f2a0ef`; datos reales cuando se publique el lado Greenhouse del contrato |
+| ~~`V3-OwnedFormats` (landing)~~ | **Hecha el 2026-10-05** (Studio `3048f96`); mismo pendiente de datos |
 | `V3-BlogPre` / `V3-BlogPost` (dossier SEO/AEO) | TASK-1667/1669; hoy «no medido» |
 | «Línea de tiempo» como tercera opción del selector en Semana | Desvío deliberado: `V3-Week` no daba entrada; decide el operador |
 | Encabezado global (lockup y riel) | Fuera de TASK-2002 |
 | `V3-Gantt` (reemplazado por la línea de tiempo v3.1), `V3-Later`, `V3-Quarter`, `V3-SheetMore`, `V3-Bulk` | TASK-2005/2006 |
+
+## Delta 2026-10-05 — menús de filtro v3.4 y selectores de fecha y hora v3.5
+
+Dos ampliaciones de la dirección v3, diseñadas en el canvas de Claude Design
+(https://claude.ai/code/artifact/620101d2-adae-4a0b-930c-7d38dbd6c8e1) y **aprobadas por el operador el 2026-10-05**.
+Ambas están en producción (Studio `main`: `c767283`, `bef0ecf`, `e656f2a`, `6dddbfa`, `5d962c4`). Cada página tiene 10
+tableros (cada uno en claro y oscuro).
+
+### Tableros aprobados
+
+| Página del canvas | Tablero | Qué fija |
+|---|---|---|
+| `v3.4 · Filtros` | `V3-FilterMenus` | barra de filtros con nombres en español (Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña, Estado); sin valor sólo el nombre, con valor «Filtro: valor» en azul; cabe en una línea a 1440 sin filtros |
+| `v3.4 · Filtros` | `V3-FilterOpen` | menú abierto: fila con check, ícono, nombre, bajada y conteo; búsqueda en Plataforma, Cuenta y Campaña; banderas en círculo para Mercado (pedido del operador) |
+| `v3.4 · Filtros` | `V3-FilterStates` | estados del menú: cero atenuado y elegible, «Elegido» arriba cuando lo elegido está en cero, «Con cuenta conectada» / «Sin cuenta conectada» en Plataforma, «Con / Sin activaciones en {mes}» en Familia, calendario vacío por filtro de lugar («No hay activaciones en México en octubre» + quitar el filtro) |
+| `v3.4 · Filtros` | `V3-MobFilterList` | móvil: hoja de filtros como lista con un renglón por filtro |
+| `v3.4 · Filtros` | `V3-MobFilterDrill` | móvil: al tocar un filtro se abre su lista (drill-in) con los mismos grupos y conteos |
+| `v3.5 · Fecha y hora` | `V3-DateOpen` | campo «jue 15 oct 2026 · en 10 días»; atajos Hoy / Mañana / Próx. lunes; hoy marcado; pasados atenuados; hasta 3 puntos en días con activaciones de la cuenta elegida |
+| `v3.5 · Fecha y hora` | `V3-TimeOpen` | hora escrita («1830» / «18:30») o por franjas de 30 min (07:00–22:30); hora ocupada por otra activación de la cuenta en ámbar, con aviso que nombra la pieza, sin bloquear |
+| `v3.5 · Fecha y hora` | `V3-RangeOpen` | inicio y fin (paid) en un selector de dos meses, rango pintado, flight de la campaña bajo los días, atajos 1 semana / 2 semanas / Todo el mes / Hasta el fin del flight, total de días |
+| `v3.5 · Fecha y hora` | `V3-MobDate` | móvil: fecha en hoja inferior con título, celdas de 44 px y «Elegir …» |
+| `v3.5 · Fecha y hora` | `V3-MobTime` | móvil: hora en hoja inferior con el mismo patrón |
+
+### Qué reemplazan
+
+- El **`<select>` nativo** de los filtros del calendario → `FilterMenu` (menú propio). En el formulario, el `Select` de
+  `write/parts.tsx` adopta la misma fila (check, ícono, nombre, bajada), búsqueda con más de 8 opciones y teclado;
+  «Sin especificar» elegible en Placement y Formato (`allowEmpty`). Íconos: familia, isotipo de plataforma (X desde
+  `@efeoncepro/axis-brand-assets` 0.4.21), avatar de cuenta con su red o herramienta, bandera del mercado.
+- La **fecha y hora nativas** (`DateTimeField`, eliminado) → `DatePicker`, `TimePicker` y `RangePicker`
+  (`write/datetime.tsx`) en `PlanDrawer` y `RescheduleDialog`. Los puntos, la hora ocupada y el flight salen de
+  `GET /api/v1/calendar` con la cuenta (excluye la propia activación) y de sus `flights`.
+- **`V3-MobFilters`** (chips agrupados en la hoja) → `V3-MobFilterList` + `V3-MobFilterDrill` (lista con drill-in).
+- Etiquetas de dimensión del Copy Ledger: pasan a español (Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña,
+  Estado); los valores de `channels.modality.*` y `channels.family.*` siguen en inglés. «Todos» en Mercado y Estado,
+  «Todas» en el resto. Mercados: `SERVED_MARKETS = CL, MX, CO, PE, US` (compartido con el formulario; se quitó AR) más
+  los que aparezcan en los datos.
+
+### Reglas de interacción
+
+- **Conteo por opción:** activaciones del período visible con los **otros** filtros aplicados (segunda lectura del
+  período sin filtros; mismo tope de 200 del calendario). La lista es estable: las opciones no desaparecen.
+- **Teclado:** ↑ ↓ Inicio Fin Entrar Esc en menús y selectores. **Esc cierra sólo el menú o selector abierto**, nunca
+  el formulario ni el diálogo que lo contiene.
+- **Portal y posición fija:** menús y selectores se montan en `body` con posición fija y se abren **hacia donde caben
+  completos**; el modal de Reprogramar y el scroll del formulario no los recortan.
+- **Teléfono:** menús y selectores se abren como **hoja inferior** con título, objetivos de 44 px y un botón
+  «Elegir …» que confirma.
+- **Avisos que no bloquean:** la hora ocupada se informa en ámbar y deja guardar.
+- El clic en una opción no debe reactivar el `<label>` que envuelve el campo (`preventDefault` en el clic del menú;
+  corregido en `e656f2a`).
+
+### Pendientes de esta ampliación
+
+- Plataformas del catálogo sin etiqueta en Studio (Discord, Slack, foros, Circle…) no aparecen en «Sin cuenta conectada».
+- Mercados desde la configuración de la organización (hoy en el código web).
+- Conteos con el tope de 200 activaciones del período.
+- Motion y rapidez percibida: calificados 3/5 por el operador; se diseñarán primero en el canvas («v3.6 · Motion», para
+  aprobar). Sin task todavía.
 
 ## Acceptance Checklist
 

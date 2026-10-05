@@ -1,9 +1,9 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-05 por Claude: uso del calendario de activaciones (TASK-2002, solo lectura) y cómo serán sus escrituras; se conservan catálogo, CLI HTTP y los procedimientos de cargas, edición y video anteriores.
+> **Ultima actualizacion:** 2026-10-05 por Claude: filtros del calendario con menús (buscar, teclado, conteos, «Sin cuenta conectada»), planificar/editar/reprogramar con los nuevos campos y selectores de fecha, hora e inicio/fin, uso en móvil y ventana temporal de escritura en producción hasta el 2026-10-12 07:00 de Chile (TASK-2002). Antes ese día: uso del calendario de activaciones en solo lectura; se conservan catálogo, CLI HTTP y los procedimientos de cargas, edición y video anteriores.
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) · [Arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Documentacion funcional:** [Efeonce Marketing Studio — Gestión de campañas](../../documentation/marketing-studio/efeonce-marketing-studio.md)
 
@@ -26,7 +26,9 @@ Studio por Efeonce MCP.
 
 ## Antes de empezar
 
-- **Para mirar:** abre `https://studio.efeonce.org`. No pide inicio de sesión y es sólo de lectura.
+- **Para mirar:** abre `https://studio.efeonce.org`. No pide inicio de sesión y, por regla general, es sólo de lectura.
+  Excepción: hasta el 2026-10-12 a las 07:00 de Chile se puede escribir en el calendario de la organización Efeonce
+  (ver [Ventana temporal de escritura](#ventana-temporal-de-escritura-hasta-el-2026-10-12)).
 - **Para actualizar datos, imágenes o tokens** (tareas de operador técnico) necesitas:
   - acceso al OneDrive de Efeonce (carpeta `5. Contenidos`, Campaign Manager);
   - el repo `efeonce-marketing-studio` clonado e instalado (`NODE_AUTH_TOKEN="$(gh auth token)" pnpm install`);
@@ -71,17 +73,19 @@ Studio por Efeonce MCP.
 ## Usar el calendario de activaciones
 
 El calendario (`https://studio.efeonce.org/calendar`) muestra qué sale, dónde y cuándo, y lo compara con lo que
-Metricool o HubSpot muestran que se programó o salió. Hoy es **de solo lectura**: puedes mirar, filtrar y abrir
-todo, pero los botones de escritura están deshabilitados (ver [Planificar y editar: cómo será](#planificar-y-editar-cómo-será)).
+Metricool o HubSpot muestran que se programó o salió. Puedes mirar, filtrar y abrir todo. Hasta el 2026-10-12 a las
+07:00 de Chile también puedes planificar, editar, reprogramar, cancelar y vincular desde la web, gracias a una
+[ventana temporal de escritura](#ventana-temporal-de-escritura-hasta-el-2026-10-12); después los botones vuelven a
+quedar deshabilitados hasta que exista el inicio de sesión.
 
 ### Paso a paso: revisar el mes o la semana
 
 1. Entra a **Calendario**. Abre en el mes vigente. Usa **‹ ›** para cambiar de período y **Hoy** para volver.
 2. Elige la vista en el selector: **Mes**, **Semana**, **Día** o **Línea de tiempo**. Para ver sólo pauta, filtra
-   **Modality: Paid** (es la vista Paid).
-3. Filtra con los chips de arriba: **Modality**, **Family**, **Platform**, **Account**, **Mercado**, **Campaña** y
-   **Estado**. Un chip activo se pinta en azul y dice «Dimensión: valor». El lector de pantalla anuncia «Mostrando N
-   activaciones» cada vez que cambias un filtro.
+   **Modalidad: Paid** (es la vista Paid).
+3. Filtra con los filtros de arriba: **Modalidad**, **Familia**, **Plataforma**, **Cuenta**, **Mercado**, **Campaña** y
+   **Estado** (ver [Paso a paso: usar los filtros](#paso-a-paso-usar-los-filtros)). Un filtro activo se pinta en azul y
+   dice «Filtro: valor». El lector de pantalla anuncia «Mostrando N activaciones» cada vez que cambias un filtro.
 4. Copia la dirección de la página si quieres compartir lo que estás viendo: la vista, el período y los filtros
    quedan en el enlace.
 5. Lee las franjas de pauta: **rayada** es «propuesto, sin aprobar»; **sólida** es «aprobado». Nunca leas una franja
@@ -91,6 +95,27 @@ todo, pero los botones de escritura están deshabilitados (ver [Planificar y edi
 
 En el celular: la semana es una lista por día; el botón **Filtros · N** abre la hoja de filtros, y su botón **Ver N
 activaciones** te dice cuántas quedarán antes de aplicarlos.
+
+### Paso a paso: usar los filtros
+
+1. Haz clic en el filtro (por ejemplo **Plataforma**). Se abre un menú con todas sus opciones.
+2. En **Plataforma**, **Cuenta** y **Campaña** puedes escribir arriba para buscar.
+3. Con el teclado: **↑ ↓** recorren la lista, **Inicio** y **Fin** van a la primera y a la última opción, **Entrar** elige
+   y **Esc** cierra el menú.
+4. Lee el **número** de cada opción: es cuántas activaciones del período que estás mirando quedarían si la eliges, con
+   los otros filtros que ya aplicaste. Un número en **gris** (cero) significa que hoy no hay nada con esa combinación;
+   puedes elegirla igual, y si lo haces aparece arriba, en el grupo «Elegido».
+5. En **Plataforma**, el grupo «Con cuenta conectada» se puede elegir. El grupo «Sin cuenta conectada» muestra
+   plataformas del catálogo que todavía no tienen una cuenta registrada en Studio: se ven, pero no se pueden elegir.
+6. En **Familia**, las opciones vienen separadas en «Con activaciones en {mes}» y «Sin activaciones en {mes}». En
+   **Cuenta**, debajo del nombre aparece la red o la herramienta de pauta (por ejemplo LinkedIn Ads). En **Mercado**,
+   cada país lleva su bandera.
+7. Para **quitar un filtro**, abre ese filtro y elige «Todas» (o «Todos» en Mercado y Estado). Si el calendario quedó
+   vacío por un filtro de mercado, plataforma o cuenta, verás una frase como «No hay activaciones en México en octubre»
+   con un botón para quitar ese filtro.
+
+**En el celular:** toca **Filtros · N**. La hoja muestra un renglón por filtro; toca uno para abrir su lista, con los
+mismos grupos y números que en escritorio. Al terminar, toca **Ver N activaciones**.
 
 ### Paso a paso: abrir el detalle de un día
 
@@ -110,7 +135,7 @@ activaciones** te dice cuántas quedarán antes de aplicarlos.
 
 ### Paso a paso: revisar la pauta (Paid)
 
-1. Filtra **Modality: Paid**.
+1. Filtra **Modalidad: Paid**.
 2. Lee el resumen por campaña: cuántas líneas hay en cada estado, con la peor primero.
 3. En cada línea compara el **plan** («Plan · 1–7 oct»), las **fechas en la herramienta** (rayado) y la **entrega
    observada** (sólido). Una marca como «+1 d» indica que difieren; «Sin entrega observada» indica que la herramienta
@@ -125,27 +150,72 @@ activaciones** te dice cuántas quedarán antes de aplicarlos.
 4. Por defecto está activo **Sólo filas con actividad**; desactívalo para ver todas las filas. El pie dice cuántos
    grupos están sin actividad.
 
-### Planificar y editar: cómo será
+### Ventana temporal de escritura (hasta el 2026-10-12)
 
-Los botones **Planificar activación**, **Editar**, **Reprogramar**, **Cancelar**, **Vincular** y **Crear activación**
-(desde una ejecución) se ven, pero hoy están deshabilitados con su motivo. Se habilitan cuando exista el inicio de
-sesión con la cuenta Efeonce (TASK-1898). Ya se probaron de punta a punta en un entorno local; así funcionarán:
+Desde el 2026-10-05, por decisión del operador, la web de producción permite escribir en el calendario de la
+organización Efeonce para poder probar las escrituras antes de que exista el inicio de sesión. Antes de usarla:
 
-- **Planificar activación:** completa campaña, canal (modality, family, plataforma, placement), cuenta (la lista
-  muestra sólo cuentas de ese canal), mercado, pieza y versión, formato, copy, y la fecha y hora en la zona de la
-  cuenta (en pauta, inicio y fin). La tracking URL la arma Studio; no la escribas a mano. Studio valida contra el
-  catálogo antes de guardar y te dice qué corregir. Al guardar, se abre la hoja de la activación nueva.
-- **Editar:** el mismo formulario con los datos de la activación.
-- **Reprogramar:** elige la nueva fecha. El diálogo te dice en qué estado quedará (por ejemplo «Pasará a «Fuera de
-  plan · −1 d»»). Studio **no** mueve la publicación en la herramienta: muévela también allá.
+- **Vence sola el 2026-10-12 a las 07:00 de Chile.** Desde ese momento los botones vuelven a quedar deshabilitados, sin
+  que nadie tenga que hacer nada. El operador puede cerrarla antes.
+- **Cualquiera que tenga el enlace puede escribir** mientras está abierta. No compartas el enlace fuera del equipo.
+- **El historial no guarda tu nombre:** cada cambio queda a nombre de la ventana (`open-write-window`). Si el cambio es
+  importante, avisa al equipo qué hiciste.
+- **No sirve para aprobar.** Aprobar sigue siendo una decisión de una persona desde la consola del equipo.
+- Sólo vale para la organización Efeonce.
+
+La ventana se retira cuando llegue el inicio de sesión con la cuenta Efeonce (TASK-1898). Por agentes (MCP), las
+escrituras dependen de TASK-2003.
+
+### Paso a paso: planificar una activación
+
+1. Presiona **+ Planificar activación** en el encabezado del calendario.
+2. Completa campaña y canal. Cada lista abre un menú con ícono por opción (la familia, el logo de la plataforma, el
+   avatar de la cuenta con su red o herramienta, la bandera del mercado). Si la lista tiene más de 8 opciones, escribe
+   para buscar. La lista de cuentas muestra sólo las que corresponden al canal elegido. En **Placement** y **Formato**
+   puedes dejar «Sin especificar».
+3. Elige pieza, versión y copy.
+4. Elige la **fecha**: abre el campo y usa los atajos **Hoy**, **Mañana** o **Próx. lunes**, o toca un día. Los
+   **puntos** bajo un día (hasta 3) indican que la cuenta ya tiene otras activaciones ese día. Los días pasados se ven
+   atenuados. El campo te confirma la fecha y cuánto falta, por ejemplo «jue 15 oct 2026 · en 10 días».
+5. Elige la **hora**: escríbela («1830» o «18:30») o elígela en la lista de franjas de 30 minutos (07:00 a 22:30). La
+   hora es la de la zona de la cuenta. Si la hora se pinta en **ámbar**, la cuenta ya tiene otra activación a esa hora
+   ese día y el aviso dice cuál; puedes seguir si es lo que quieres, porque el aviso no bloquea.
+6. Si es **pauta**, en vez de fecha y hora eliges **inicio y fin** en un solo selector con dos meses a la vista.
+   Marca el inicio y el fin, o usa los atajos **1 semana**, **2 semanas**, **Todo el mes** o **Hasta el fin del
+   flight**. Debajo de los días se marca el flight de la campaña y el selector muestra el total de días.
+7. Revisa la tracking URL que arma Studio (no la escribas a mano) y lo que dice la validación del catálogo.
+8. Guarda. Se abre la hoja de la activación nueva.
+
+Con el teclado, **Esc** cierra el menú o el selector que tengas abierto, no el formulario.
+
+### Paso a paso: editar y reprogramar
+
+- **Editar:** en la hoja de la activación, presiona **Editar**. Es el mismo formulario, con los mismos menús y
+  selectores, ya completo con los datos de la activación.
+- **Reprogramar:** presiona **Reprogramar** y elige la nueva fecha y hora con los mismos selectores (o inicio y fin, si
+  es pauta). El selector se abre por encima del diálogo, así que se ve completo. El diálogo te dice en qué estado
+  quedará (por ejemplo «Pasará a «Fuera de plan · −1 d»»). Studio **no** mueve la publicación en la herramienta:
+  muévela también allá.
 - **Cancelar:** confirma en el diálogo. La evidencia de la herramienta se conserva.
 - **Vincular:** en «Ejecución sin activación», elige una candidata. Studio propone publicaciones de la misma
   plataforma en ±14 días, con la misma cuenta primero y la razón.
 - **Crear activación desde una ejecución:** los campos que vienen de la herramienta dicen «De Metricool» y la cuenta
   queda bloqueada; tú eliges campaña y pieza.
 
-Mientras tanto, si necesitas escribir, usa la [CLI HTTP](operar-por-cli-api.md) con credenciales que tengan permiso.
-Por agentes (MCP), las escrituras dependen de TASK-2003.
+**En el celular**, los selectores de fecha y hora se abren como una hoja que sube desde abajo, con título y botones
+grandes (44 px). Elige y confirma con el botón **Elegir …** del pie.
+
+### Si los botones de escritura están deshabilitados
+
+Los botones **Planificar activación**, **Editar**, **Reprogramar**, **Cancelar**, **Vincular** y **Crear activación**
+se ven siempre, pero pueden estar deshabilitados. Cada uno dice el motivo. Las causas posibles:
+
+1. **La ventana temporal ya venció** (después del 2026-10-12 a las 07:00 de Chile) o el operador la cerró antes. La web
+   volvió a ser de solo lectura y el encabezado muestra **Solo lectura**. Es lo esperado hasta el inicio de sesión
+   (TASK-1898).
+2. **La campaña no es de la organización Efeonce.** La ventana sólo abre la escritura para Efeonce.
+
+Si necesitas escribir igual, usa la [CLI HTTP](operar-por-cli-api.md) con credenciales que tengan permiso.
 
 ### Qué no hacer en el calendario
 
@@ -153,6 +223,12 @@ Por agentes (MCP), las escrituras dependen de TASK-2003.
 - No asumas que reprogramar en Studio mueve la publicación en Metricool u otra herramienta.
 - No tomes «50 ejecuciones sin activación» como el total: es el tope de la consulta y podrían ser más.
 - No confundas «Sin evidencia en X» con una falla: sólo dice que la herramienta todavía no la muestra.
+- No leas un número en gris de un filtro como un error: sólo dice que no hay activaciones con esa combinación.
+- No tomes el número de un filtro como un total absoluto: cuenta sobre las primeras 200 activaciones del período.
+- No compartas el enlace de Studio fuera del equipo mientras la ventana de escritura esté abierta: cualquiera con el
+  enlace puede escribir.
+- No hagas cambios importantes en la ventana sin avisar al equipo: el historial no guarda tu nombre.
+- No ignores el aviso de hora en ámbar sin leerlo: no bloquea, pero dice que esa cuenta ya sale a esa hora.
 
 ## Paso a paso: actualizar datos desde OneDrive
 
@@ -504,8 +580,15 @@ con otra integración.
 | El deployment queda `BLOCKED` | El autor del commit no está vinculado al team de Vercel; usa `jreyes@efeonce.cl` como email del repo. |
 | Falla `pnpm install` en Vercel | `NODE_AUTH_TOKEN` debe tener sólo el token de GitHub Packages, no el `.npmrc` completo. |
 | El agente responde `authorization_denied` | Tu usuario no tiene el permiso de lectura de Studio (roles administración, cuentas u operaciones). |
-| En el calendario, los botones Planificar, Editar, Reprogramar, Cancelar, Vincular o Crear activación están deshabilitados | Es esperado: la web es de solo lectura hasta el inicio de sesión Efeonce (TASK-1898). Cada botón deshabilitado indica su motivo. Para escribir hoy, usa la [CLI HTTP](operar-por-cli-api.md) con credenciales con permiso. |
-| Una escritura a la API responde **403** `write_not_allowed` | El acceso abierto no tiene una persona identificada y no escribe, ni siquiera en vista previa. No es un error del calendario. |
+| En el calendario, los botones Planificar, Editar, Reprogramar, Cancelar, Vincular o Crear activación están deshabilitados | La ventana temporal de escritura venció (2026-10-12, 07:00 de Chile) o se cerró antes, o la campaña no es de Efeonce. Cada botón deshabilitado indica su motivo. Ver [Si los botones de escritura están deshabilitados](#si-los-botones-de-escritura-están-deshabilitados). |
+| Una escritura a la API responde **403** `write_not_allowed` | Fuera de la ventana temporal, el acceso abierto no tiene una persona identificada y no escribe, ni siquiera en vista previa. No es un error del calendario. |
+| Una opción de un filtro tiene el número en gris | Con los otros filtros aplicados, no hay activaciones de esa opción en el período. Puedes elegirla igual. |
+| No puedo elegir una plataforma del filtro | Está en el grupo «Sin cuenta conectada»: todavía no hay una cuenta registrada en Studio para esa plataforma. |
+| No encuentro Discord, Slack, foros o Circle en el filtro de Plataforma | Todavía no aparecen: son plataformas del catálogo sin etiqueta en Studio. |
+| No encuentro un mercado | La lista trae Chile, México, Colombia, Perú, Estados Unidos y los mercados que ya aparecen en los datos. Que sea configurable por organización está pendiente. |
+| El calendario dice «No hay activaciones en México en octubre» (u otro lugar) | Un filtro de mercado, plataforma o cuenta dejó el mes vacío. Usa el botón para quitar ese filtro. |
+| Presioné Esc y no se cerró el formulario | Es a propósito: Esc cierra sólo el menú o el selector abierto, para que no pierdas lo que llevas escrito. |
+| La hora se pintó en ámbar | La cuenta ya tiene otra activación a esa hora ese día; el aviso nombra la pieza. Cambia la hora o sigue si es lo que quieres. |
 | La bandeja dice **50** ejecuciones sin activación | 50 es el tope de la consulta; puede haber más. Vincúlalas o crea sus activaciones cuando la escritura esté habilitada. |
 | Todas las tarjetas dicen «Pieza sin aprobar» | Es lo esperado en las piezas importadas desde OneDrive: entran importadas, no aprobadas. |
 | Una herramienta aparece en amarillo en la barra inferior | Su última lectura está atrasada. Espera la próxima lectura antes de concluir que algo no salió. |

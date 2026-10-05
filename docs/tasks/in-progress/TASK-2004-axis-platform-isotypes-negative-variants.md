@@ -6,6 +6,22 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-05 — isotipo de X en `axis-brand-assets` 0.4.21 (Claude)
+
+- **Hecho:** isotipo de X y su negativo. Procedencia: `@iconify/json` `simple-icons:x` (CC0, Simple Icons 15.21.0),
+  `currentColor` fijado en `#000`; el negativo se deriva con `scripts/platform-negatives.mjs` (`#000` → `#FFFFFF`).
+  Ambos sellados. `efeonceInsights.statCard.channel.platforms` suma `x` (paridad con `AXIS_PLATFORM_ASSETS`). El Lab
+  sirve las copias y cita 0.4.21.
+- **Release:** AXIS `3c8a6dd`, `@efeoncepro/axis-brand-assets` 0.4.21 y `@efeoncepro/axis-tokens` 0.5.2 (tag
+  `v0.4.21`, workflow «Release UI packages» run `37300257277` verde). El commit se hizo con índice temporal porque
+  había trabajo sin commitear de otra sesión en `packages/tokens/src/tokens.ts` y otros archivos; sólo se llevó la línea
+  propia. El test de tokens «AI Visibility Report … source hashes» falla en el árbol de trabajo por ese trabajo ajeno,
+  no por este cambio.
+- **Consumidor:** Marketing Studio (TASK-2002) lo usa desde `6dddbfa` (`platforms.tsx` y catálogo 0.4.21 en
+  `pnpm-workspace.yaml`); X caía a la letra inicial y ahora muestra su isotipo. En producción desde el deploy
+  `b53xls9w2`.
+- **Pendiente (sin cambio):** isotipo de Microsoft Advertising y logotipo de Metricool en negativo.
+
 ## Delta 2026-10-04 — publicado en `axis-brand-assets` 0.4.20 (Claude, a pedido del operador)
 
 - **Hecho:** negativos sellados de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, derivados por
@@ -35,7 +51,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `Publicado en axis-brand-assets 0.4.20 (2026-10-04): negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads; Facebook y Threads en color. Pendiente: Microsoft Advertising y el logotipo de Metricool en negativo`
+- Status real: `Publicado en axis-brand-assets 0.4.20 (2026-10-04): negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads; Facebook y Threads en color. 0.4.21 (2026-10-05): X en color y en negativo. Pendiente: Microsoft Advertising y el logotipo de Metricool en negativo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`

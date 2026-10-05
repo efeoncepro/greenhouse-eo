@@ -37,7 +37,7 @@ old local/not-pushed/pending-rollout snapshots; do not replay completed migratio
 | TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
 | TASK-1905 | Versioned channels, taxonomy/UTM, governance, transactional validation, alias/backfill, campaign audiences and ICP references | **in progress** — Studio deployed; Greenhouse capability, real ICP, MCP and human-reviewed backfill pending | API 1.6.0, 59 tools; catalog v1 / 52 channels, warn / ICP false |
 | TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | in-progress: Studio aa6fa07 deployed; email/owned/delegated MCP pending | TASK-2001 release 2026-10-04 |
-| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | **in progress** (2026-10-05) — calendario v3 + diálogos de escritura + hojas email/landing en producción; escrituras web esperan TASK-1898, MCP TASK-2003; hoja de blog pendiente (ver §TASK-2002 v3) | `studio.efeonce.org/calendar` solo lectura (Studio `3048f96`, Vercel `kc4tcvuod`) |
+| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | **in progress** (2026-10-05) — calendario v3 + diálogos de escritura + hojas email/landing + menús de filtro v3.4 + selectores de fecha/hora v3.5 en producción; escrituras web abiertas sólo por la ventana temporal `open-write-window` (vence 2026-10-12T10:00Z, org Efeonce) hasta TASK-1898; MCP TASK-2003; hoja de blog y motion pendientes (ver §TASK-2002 v3) | `studio.efeonce.org/calendar` (Studio `5d962c4`, Vercel `p1ng5wy75`); escritura T1 temporal para la org Efeonce |
 | TASK-2003 | MCP delegated-writes core (agent-friendly): Entra write scope, Greenhouse exchange per exact capability (asset.download/asset.write/campaign.write), Studio delegated actor (person via MCP), gateway federates `T1` writes; no `T2`/approvals (TASK-1899 retired 2026-10-04) | to-do (Codex implements) | — |
 | TASK-1899 | Withdrawn by the operator 2026-10-04; local implementation reverted; no automatic resume or development prerequisite | to-do (withdrawn; not executable) | No rollout |
 
@@ -478,11 +478,45 @@ Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1
 - **Greenhouse:** TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados (tarjeta con cuenta,
   bandeja baja el conteo, `pnpm check`/build) y diferencias pendientes con su dependencia.
 
+### 2026-10-05 — filtros v3.4, ventana temporal de escritura, formulario y fecha/hora v3.5
+
+Canvas `https://claude.ai/code/artifact/620101d2-adae-4a0b-930c-7d38dbd6c8e1`: páginas «v3.4 · Filtros (para aprobar)»
+(V3-FilterMenus, V3-FilterOpen, V3-FilterStates, V3-MobFilterList, V3-MobFilterDrill; claro/oscuro) y «v3.5 · Fecha y
+hora (para aprobar)» (V3-DateOpen, V3-TimeOpen, V3-RangeOpen, V3-MobDate, V3-MobTime), ambas aprobadas por el operador
+2026-10-05 (en v3.4 pidió banderas en círculo; hechas).
+
+| Commit Studio | Qué |
+|---|---|
+| `c767283` | Dimensiones en español (Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña, Estado; valores de marketing siguen en inglés: Paid, Organic, Owned, Earned, Social, Web & Content, Placement). `SERVED_MARKETS = ['CL','MX','CO','PE','US']` en `model.ts`, compartido por filtro y formulario de planificar (se quitó AR del formulario); se suma cualquier mercado presente en los datos. «Todos» para Mercado/Estado, «Todas» para el resto |
+| `1f003c1` | Ventana temporal de escritura en modo `open` con cierre automático (`apps/web/src/server/runtime.ts`, test `open-write-window.test.ts`). Decisión del operador 2026-10-05 («Producción abierta» entre preview protegido / local / producción abierta) para probar las escrituras de la UI antes del login TASK-1898. Detalle y cierre en `operations.md` |
+| `bef0ecf` | Menús de filtro v3.4: `FilterMenu.tsx` (menú propio, no select nativo), `flags.ts` (banderas circle-flags MIT, sin la máscara del set por ids repetidos), `Flag` en `icons.tsx`, `facetCounts`/`facetTotal` en `model.ts`. Conteo por opción = activaciones del período visible con los OTROS filtros aplicados (segunda lectura del período sin filtros; tope 200). Cero atenuado y elegible; lo elegido en cero sube a «Elegido». Teclado ↑ ↓ Inicio Fin Enter Esc; búsqueda en Plataforma, Cuenta, Campaña. Plataforma: «Con cuenta conectada» (se eligen) / «Sin cuenta conectada» (appearancePlatforms de canales activos con etiqueta; se ven, no se eligen). Familia: «Con/Sin activaciones en {mes}» (mes mirado). Cuenta: dueño + red o herramienta de pauta. Vacío por filtro de lugar: «No hay activaciones en México en octubre» + quitar filtro. Móvil: la hoja de filtros pasó de chips a lista por filtro (reemplaza V3-MobFilters) |
+| `e656f2a` | `Select` de `write/parts.tsx` con el menú v3.4: misma fila (check, ícono, nombre, bajada), búsqueda con más de 8 opciones, teclado; Esc cierra el menú y no el formulario; «Sin especificar» elegible en Placement y Formato (`allowEmpty`). Bug corregido: el `<label>` reabría el menú (ver `lessons.md`) |
+| `6dddbfa` | Isotipo de X desde AXIS 0.4.21 (`platforms.tsx`, catálogo `pnpm-workspace.yaml` 0.4.21); antes caía a la letra |
+| `5d962c4` | Selectores v3.5 en `write/datetime.tsx` (`DatePicker`, `TimePicker`, `RangePicker`) + `readCalendar` en `write/client.ts`; reemplazan `DateTimeField` nativo (eliminado) en `PlanDrawer` y `RescheduleDialog`. Fecha «jue 15 oct 2026 · en 10 días», atajos Hoy/Mañana/Próx. lunes, puntos (hasta 3) en días con activaciones de la cuenta (GET `/api/v1/calendar` con `account`, excluye la propia). Hora: escribir «1830»/«18:30» o franjas de 30 min 07:00–22:30; hora ocupada en ámbar con aviso que nombra la pieza, no bloquea. Inicio y fin (paid): dos meses, rango pintado, flight de la campaña bajo los días, atajos 1 semana / 2 semanas / Todo el mes / Hasta el fin del flight. Flota con portal a `body` y posición fija, abre hacia donde cabe; teléfono: hoja inferior, celdas de 44 px |
+
+- **Deploys Vercel Production Ready, en orden:** `kc4tcvuod` (`3048f96`, anterior), `phmizd8u0` (`1f003c1`), `kr5mfmw19`
+  (`bef0ecf`), `b53xls9w2` (`6dddbfa`, incluye `e656f2a`), `p1ng5wy75` (`5d962c4`).
+- **Producción verificada:** Plataforma con LinkedIn/Instagram conectadas y el resto sin cuenta; Mercado con banderas;
+  México en cero → vacío explicado; formulario (X con logo, elegir LinkedIn cierra el menú); fecha (punto en el único día
+  de la cuenta, «Mañana» → mar 6 oct 2026); hora («1830» → 18:30 · Santiago). Ventana: `permissions.writable=true`,
+  cancel con `dryRun=true` 200 en ACT-000001 (nada escrito), sin pastilla «Solo lectura».
+- **Gates:** `pnpm check` y `pnpm --filter @studio/web build` verdes antes de cada push.
+- **AXIS:** `3c8a6dd` — `@efeoncepro/axis-brand-assets` 0.4.21 + `@efeoncepro/axis-tokens` 0.5.2 (isotipo de X y su
+  negativo; tag `v0.4.21`, run 37300257277 verde).
+- **Canvas V3-Popover:** el operador comentó «no se implementó»; respondido en el hilo: sí está (se abre con el número del
+  día o «+N más»); se ofreció hacer más visible que el número es clicable (círculo al pasar el mouse) — pendiente de su
+  respuesta.
+
 **Pendiente (no está hecho):**
 
 | Qué | Depende de |
 |---|---|
-| Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Verificado: `/login` y `/api/auth/session` 404; `efeonce_id` falla cerrado (401) |
+| Escrituras en la web de producción con persona | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Verificado: `/login` y `/api/auth/session` 404; `efeonce_id` falla cerrado (401). Mientras tanto, ventana temporal `open-write-window` (ver §2026-10-05 abajo) |
+| Retirar la ventana temporal de escritura | Vence sola 2026-10-12T10:00Z (sin redeploy); retirar antes si el operador lo pide o al llegar TASK-1898 (borrar `STUDIO_OPEN_WRITE_UNTIL`/`STUDIO_OPEN_WRITE_ORGS` o poner fecha pasada) |
+| Motion y rendimiento percibido (operador: 3/5, «tarda un poco y motion casi inexistente») | Sin task todavía. Plan: (1) medir y acelerar lo percibido (~8 lecturas en cadena en `page.tsx`; `router.push` recarga todo el RSC sin estado pendiente → paralelizar, Suspense, caché del catálogo, prefetch, `useTransition`); (2) sistema de motion desde `axisMotion`, diseñado primero en el canvas («v3.6 · Motion (para aprobar)») y luego implementado. Hay un prompt entregado para una sesión nueva |
+| Mercados desde la configuración de la organización | Deuda: `SERVED_MARKETS = ['CL','MX','CO','PE','US']` vive en `apps/web/src/components/activations/model.ts`; Studio tendrá otros clientes con otros mercados |
+| Plataformas del catálogo sin etiqueta en Studio (Discord, Slack, foros, Circle…) | No aparecen en el filtro Plataforma hasta tener etiqueta |
+| Conteos del filtro con más de 200 activaciones en el período | Los conteos usan el mismo tope de 200 del calendario |
 | Escrituras por MCP | TASK-2003 (T1 delegado) |
 | Datos reales en las hojas de email/landing | Publicar el lado Greenhouse del contrato de Codex (metadata y métricas HubSpot/Resend) + readback; hoy no hay activaciones de email ni web en producción |
 | Hoja de blog (V3-BlogPre/BlogPost): dossier SEO/AEO | TASK-1667/1669 (hoy «no medido») |
@@ -493,3 +527,4 @@ Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1
 
 - 2026-10-05 — TASK-2002 v3 + diálogos en producción (solo lectura); escrituras web/MCP y hojas email/landing/blog pendientes según la tabla.
 - 2026-10-05 — hojas de email y página web en producción (`3048f96`) sobre el contrato `1f2a0ef`; verificadas en local con datos de prueba; en producción `email`/`web` llegan null (6 activaciones, todas sociales). Pendiente: lado Greenhouse del contrato y hoja de blog.
+- 2026-10-05 — filtros v3.4 (`bef0ecf`), dimensiones en español y mercados servidos (`c767283`), ventana temporal de escritura `open-write-window` (`1f003c1`; Production hasta 2026-10-12T10:00Z, org Efeonce), `Select` del formulario (`e656f2a`), isotipo de X AXIS 0.4.21 (`6dddbfa`) y fecha/hora v3.5 (`5d962c4`) en producción (último deploy `p1ng5wy75`). Pendiente: motion/rendimiento (sin task), retirar la ventana, mercados desde configuración, plataformas sin etiqueta, tope de 200 en conteos.

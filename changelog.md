@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-05 — TASK-2002: filtros, formulario, fecha y hora (v3.4/v3.5) y ventana de escritura temporal
+
+- Studio `c767283`…`5d962c4` en producción: filtros en español con menú propio (lista estable, conteo del período, cero elegible, plataformas con y sin cuenta, banderas de los cinco mercados), formulario con el mismo menú y selectores de fecha, hora e inicio/fin (puntos por día de la cuenta, hora ocupada con aviso, flight de la campaña). AXIS 0.4.21 suma el isotipo de X. Ventana de escritura en modo open para Efeonce hasta 2026-10-12T10:00Z (decisión del operador; vuelve sola a solo lectura). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
+
 ## 2026-10-05 — títulos de pestaña del portal (local)
 
 - Título general `Efeonce | Greenhouse`; acceso, proyectos y resumen de finanzas usan Efeonce primero y etiquetas ES/EN. Copy centralizado, sin plantilla global que duplique marcas. ESLint y TypeScript PASS. Commit y push a `develop` autorizados; despliegue no verificado. [Detalle](docs/audits/ui/2026-10-05-portal-metadata.md).
@@ -491,32 +495,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   gates verdes; sin push ni release (pendiente de autorización del operador).
 - Abierto: numeración de ediciones (el blog ya publicó «#16» y «#17»), plantillas Flash en el Composer, chip
   «LA NOTICIA» en las plantillas `CoverPhoto`/`BlogBannerPhoto`/`BlogSquarePhoto`, licencia de imágenes de terceros.
-
-## 2026-09-28 — Informe live de Efeonce Insights en Think y muestra pública para clientes (TASK-1875)
-
-- `think.efeoncepro.com/insights/r/<token>` está en producción (Think `bbf8522`): el informe compartido de Insights
-  en dirección «tablero de respuestas» (portada con la respuesta y una órbita, hallazgos que se abren como evidencia,
-  escenas narradas, las 15 familias de gráfico, plan, modo presentación, impresión de respaldo, es-CL/en-US).
-- Muestra pública para clientes en `think.efeoncepro.com/insights/muestra`: mismo render con datos de ejemplo y una
-  marca ficticia, aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`.
-- Greenhouse (staging): `InsightWebModelV1` 1.1 aditivo (editorial v2, tasas del embudo, logo del cliente por
-  `/api/public/insights/shared/[token]/logo`) y excepción del guard del borde para Think por `x-efeonce-think-key`.
-- Verificado: canary sintético en staging (200 con cabeceras, PDF por el proxy, 410 tras revocar, 404 desconocido);
-  contraste AA y teclado en 1440/390. Producción de Greenhouse y `INSIGHTS_SHARING_ENABLED` siguen pendientes del
-  operador.
-
-## 2026-09-28 — Rutas públicas: guard en el Firewall de Vercel y conexiones de Vercel acotadas (TASK-1876, staging verificado)
-
-- Reglas versionadas del Firewall de Vercel para `/api/public/**` (20 req/10 s por IP; enforce en staging/preview,
-  observe en producción) en `src/lib/security/public-burst-guard/firewall-rules.ts`, sync con `pnpm security:public-burst-guard`.
-- Las sesiones PostgreSQL de Vercel piden `idle_session_timeout=60s`; el rol `greenhouse_app` conserva 5 min por
-  los workers. La señal de saturación lee el pico de 24 h de `num_backends` de Cloud SQL. Staging verificado con ráfaga controlada (`pnpm security:public-burst-guard:verify`); alerta
-  `num_backends > 85` activa. Producción en `observe` hasta el cutover (ISSUE-174 mitigado).
-
-## 2026-09-28 — Los slots de datos del deck «La órbita» se ligan desde Greenhouse (TASK-1930, parcial)
-
-- `bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`) llena logo del cliente (Account
-  360, variante oscura), cifras con evidencia `measured`, casos, testimonios y logos de terceros sólo con evidencia
-  `attested` y documento, y las láminas de muestra SEO/AEO; deja rastro por slot y falla cerrado. Montos siguen en
-  `[MONTO]` y equipo sin ligar hasta TASK-1417/TASK-1418. CLI: `pnpm brand:deck-plan -- --bind`.
-- `validateDeckPlan` acepta una lista de cifras en un slot `metric` (antes rechazaba las cuatro de `decision-case.stats`).

@@ -10,6 +10,7 @@
 - Siguiente iteración (trimestre, historial, comentarios, lote, exportar, vista de cliente, propuesta por agente):
   TASK-2005 (contrato) y TASK-2006 (UI).
 - Estado (2026-10-05, Claude): en producción en solo lectura; ver [Flujos implementados](#flujos-implementados-2026-10-05).
+- Delta 2026-10-05 (tarde, Claude): filtros v3.4 y selectores de fecha y hora v3.5 en producción; escrituras web habilitadas por ventana temporal hasta 2026-10-12 10:00Z. Ver [Delta 2026-10-05 — filtros v3.4 y selectores v3.5](#delta-2026-10-05--filtros-v34-y-selectores-v35).
 
 ## Rutas y estado en la URL
 
@@ -66,6 +67,37 @@ botones quedan `aria-disabled` con su motivo y la API responde 403 `write_not_al
 
 Paridad: `write/client.ts` hace un `fetch` literal por operación del registro y `operations-parity.test.ts` lo exige.
 Las escrituras por MCP dependen de TASK-2003.
+
+## Delta 2026-10-05 — filtros v3.4 y selectores v3.5
+
+Tableros aprobados por el operador el 2026-10-05 (canvas https://claude.ai/code/artifact/620101d2-adae-4a0b-930c-7d38dbd6c8e1):
+v3.4 `V3-FilterMenus`, `V3-FilterOpen`, `V3-FilterStates`, `V3-MobFilterList`, `V3-MobFilterDrill`; v3.5 `V3-DateOpen`,
+`V3-TimeOpen`, `V3-RangeOpen`, `V3-MobDate`, `V3-MobTime`. Detalle y qué reemplazan en el
+[wireframe](../wireframes/TASK-2002-marketing-studio-activations-calendar.md#delta-2026-10-05--menús-de-filtro-v34-y-selectores-de-fecha-y-hora-v35).
+
+**Recorrido A (filtrar).** Filtro → menú propio (portal a `body`, posición fija, se abre hacia donde cabe) → buscar
+(Plataforma, Cuenta, Campaña) o recorrer con ↑ ↓ Inicio Fin → Entrar elige y escribe el filtro en la URL → la grilla se
+recarga con «Mostrando N activaciones» → Esc cierra el menú y devuelve el foco al filtro. Cada opción muestra el conteo
+con los otros filtros aplicados; cero se ve atenuado y es elegible (sube a «Elegido»). En Plataforma, «Sin cuenta
+conectada» se ve y no se elige. Vacío por filtro de lugar → «No hay activaciones en {lugar} en {mes}» + quitar el filtro.
+En móvil: «Filtros · N» → hoja con lista por filtro (`V3-MobFilterList`) → tocar un filtro abre su lista
+(`V3-MobFilterDrill`) → «Ver N activaciones». Reemplaza la hoja de chips de `V3-MobFilters`.
+
+**Recorridos C y D (fecha, hora, inicio y fin).** En `PlanDrawer` (planificar, editar, crear desde ejecución) y
+`RescheduleDialog`, los campos nativos se reemplazan por `DatePicker`, `TimePicker` y `RangePicker`:
+- Fecha: atajos Hoy / Mañana / Próx. lunes, hasta 3 puntos por día con activaciones de la cuenta elegida.
+- Hora: escrita o por franjas de 30 min (07:00–22:30); hora ocupada en ámbar con la pieza nombrada, sin bloquear.
+- Inicio y fin (paid): dos meses, flight de la campaña bajo los días, atajos 1 semana / 2 semanas / Todo el mes /
+  Hasta el fin del flight, total de días.
+
+**Superposición.** Menú o selector sobre formulario o diálogo: **Esc cierra sólo el menú o el selector**; el
+formulario o diálogo sigue abierto con su foco. El selector flota fuera del diálogo (portal) para no recortarse. En
+teléfono es una hoja inferior con título, celdas de 44 px y «Elegir …» que confirma y vuelve al formulario.
+
+**Estado de escritura.** Desde el 2026-10-05 los recorridos B, C y D están habilitados en producción por una ventana
+temporal (`STUDIO_OPEN_WRITE_UNTIL=2026-10-12T10:00:00Z`, sólo la organización Efeonce, actor `api_client`
+`open-write-window`; aprobar sigue exigiendo persona). Al vencer, la UI vuelve sola a botones `aria-disabled` con su
+motivo, sin redeploy. Retiro definitivo con TASK-1898.
 
 ## Recorridos
 

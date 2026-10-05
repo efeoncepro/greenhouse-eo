@@ -23,7 +23,7 @@ only; never write values here.
 | `apps/web/src/app/robots.ts` + `layout.tsx` `robots:{index:false}` | Disallow all + noindex (open mode) |
 | `apps/web/src/app/api/v1/**/route.ts` | 17 route handlers, one per registry operation (see `contracts.md`) |
 | `apps/web/src/server/api.ts` | `handle()` adapter: correlation id, actor, `organizationId` narrowing, error classification, `Cache-Control: no-store` |
-| `apps/web/src/server/runtime.ts` | One DB handle per function instance, Google auth client, `accessMode()`, `resolveRequestActor()` (bearer → api_client; no header → mode actor), `configureMediaUrls(STUDIO_MEDIA_URL_SECRET)` |
+| `apps/web/src/server/runtime.ts` | One DB handle per function instance, Google auth client, `accessMode()`, `resolveRequestActor()` (bearer → api_client; no header → mode actor; in `open` mode with a valid temporary write window → `api_client` `open-write-window`, `1f003c1`, test `open-write-window.test.ts`), `configureMediaUrls(STUDIO_MEDIA_URL_SECRET)` |
 | `apps/web/src/server/collect.ts` | Server-side collection helpers for pages |
 | `apps/web/src/server/operations-parity.test.ts` | Route handlers ↔ registry parity (both directions) |
 | `apps/web/src/components/*` | `Shell`, `Nav`, `CommandPalette` (⌘K), `PiecesWorkspace`, `MediaImage` (one retry, then «Vista previa no disponible»), `MediaPlanView`, `Pipeline`, `ThemeToggle`, `theme.ts` (cookie `studio-theme`) |
@@ -129,6 +129,7 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `STUDIO_PG_SSL` | `true` to force SSL |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT_EMAIL` | WIF impersonation (else ADC) |
 | `STUDIO_ACCESS_MODE` | unset/`open` or `efeonce_id` (fails closed until TASK-1898) |
+| `STUDIO_OPEN_WRITE_UNTIL`, `STUDIO_OPEN_WRITE_ORGS` | Temporary write window in `open` mode (ISO ≤ 7 days ahead; `org-…` ids); both valid ⇒ T1 writes for those orgs as `api_client:open-write-window`; expired/absent ⇒ read-only without redeploy (`1f003c1`; see `operations.md`) |
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` (prod; OpenAPI `servers`) |
 | `STUDIO_MEDIA_URL_SECRET` | HMAC secret for media links (≥ 32 chars, sensitive, different per environment); absent ⇒ fallback `/renditions/{id}` |
 | `NODE_AUTH_TOKEN` | Read token for the AXIS package registry (only the `_authToken`) |
@@ -227,7 +228,7 @@ All paths below are in Studio unless marked Greenhouse.
 
 - TASK-2001 rollout 2026-10-04: discovery scheduler enabled; activation/discovery flags versioned in deploy.sh, two existing Metricool brand bindings; tracking domain allowlist per organization. No new secrets or IAM grants. See release audit for exact runtime pointers.
 
-## TASK-2002 — mapa del calendario de activaciones (Studio `apps/web/src`, producción `d0ec7e0`, 2026-10-05)
+## TASK-2002 — mapa del calendario de activaciones (Studio `apps/web/src`, producción `5d962c4`, 2026-10-05)
 
 | Ruta | Responsabilidad |
 |---|---|
@@ -241,10 +242,12 @@ All paths below are in Studio unless marked Greenhouse.
 | `components/activations/ExecutionChip.tsx`, `DayPopover.tsx` | Chip de estado con isotipo de la herramienta; popover del día (`pop`) |
 | `components/activations/SidePanels.tsx` | `UnlinkedExecutions`, `UndatedPanel`, `CalendarLegend`, `CalendarStatusBar`, `FreshnessNotice`, `ToolLine`, `dayRange` |
 | `components/activations/PieceStage.tsx` + `stage-model.ts` | Preview por formato (escenario 320 px: video, carrusel, horizontal, grupo por proporción); `stage-model.ts` es módulo **sin directiva** compartido server/client |
-| `components/activations/ActivationFilters.tsx`, `GridKeys.tsx`, `LockedAction.tsx` | Filtros por dimensión (móvil «Ver N activaciones»), teclado de la grilla (Entrar abre el popover), acción bloqueada `aria-disabled` con motivo |
-| `components/activations/icons.tsx`, `platforms.tsx`, `model.ts` | `Glyph`, `PieceThumb`, `AccountAvatar`; marcas de plataforma (AXIS `@efeoncepro/axis-brand-assets` 0.4.20); `flightBands`, `isoWeek`, `unlinkedByDay` |
-| `components/activations/write/client.ts` | Cliente de escritura: un `fetch` literal por operación del registro (ver `contracts.md`) |
-| `components/activations/write/{parts,PlanDrawer,RescheduleDialog,CancelDialog,LinkDialog}.tsx` | `PlanDrawer` modos plan/edit/from sobre `PlanActivationBody`; reprogramar, cancelar (alertdialog), vincular |
+| `components/activations/ActivationFilters.tsx`, `GridKeys.tsx`, `LockedAction.tsx` | Filtros por dimensión (móvil «Ver N activaciones»; desde `bef0ecf` lista por filtro con grupos y conteos), teclado de la grilla (Entrar abre el popover), acción bloqueada `aria-disabled` con motivo |
+| `components/activations/FilterMenu.tsx`, `flags.ts` | Menú de filtro v3.4 (menú propio, no select nativo; conteos por opción, grupos, búsqueda, teclado ↑ ↓ Inicio Fin Enter Esc); banderas circle-flags (MIT) para Mercado (`bef0ecf`) |
+| `components/activations/icons.tsx`, `platforms.tsx`, `model.ts` | `Glyph`, `PieceThumb`, `AccountAvatar`, `Flag`; marcas de plataforma (AXIS `@efeoncepro/axis-brand-assets` 0.4.21, incluye X desde `6dddbfa`); `flightBands`, `isoWeek`, `unlinkedByDay`, `SERVED_MARKETS` (`['CL','MX','CO','PE','US']`, filtro + formulario; deuda: debe salir de la configuración de la org), `facetCounts`/`facetTotal` |
+| `components/activations/write/client.ts` | Cliente de escritura: un `fetch` literal por operación del registro (ver `contracts.md`); `readCalendar` (GET `/api/v1/calendar` con `account`) para los puntos y horas ocupadas de los selectores (`5d962c4`) |
+| `components/activations/write/{parts,PlanDrawer,RescheduleDialog,CancelDialog,LinkDialog}.tsx` | `PlanDrawer` modos plan/edit/from sobre `PlanActivationBody`; reprogramar, cancelar (alertdialog), vincular. `parts.tsx` `Select` usa el menú v3.4 (búsqueda con más de 8 opciones, `allowEmpty` para «Sin especificar»; `e656f2a`) |
+| `components/activations/write/datetime.tsx` | `DatePicker`, `TimePicker`, `RangePicker` v3.5 (portal a `body`, posición fija, abre hacia donde cabe; hoja inferior en teléfono); reemplazan `DateTimeField` nativo, eliminado (`5d962c4`) |
 | `components/activations/write/ActionLayer.tsx` | Servidor: carga catálogo publicado, cuentas, campañas y candidatas; **sólo se monta si el actor puede escribir** |
 | `components/Shell.tsx` | Props `statusBar` (barra inferior propia del calendario reemplaza la del portal) y `readOnly` («Solo lectura» en el encabezado) |
 | `copy.ts` (`COPY.activations.*`: write, stage, timeline, paid, daySide, bar, legend, …), `styles/app.css` (bloques TASK-2002 v3) | Copy visible y estilos; usar la clase `is-today`, nunca `today` |
@@ -254,5 +257,6 @@ All paths below are in Studio unless marked Greenhouse.
   `modality|family|platform|account|market|campaign|status`. La acción vive en la URL; tras aplicar navega a la hoja
   (plantilla `__ID__`) y hace `router.refresh()`.
 - **Envs (sólo nombres):** `STUDIO_ACTIVATIONS_ENABLED` (apagado ⇒ `LegacyCalendar`), `STUDIO_ACCESS_MODE` (`open` ⇒
-  botones `aria-disabled` y API 403 `write_not_allowed`), `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`; sin él la vista
-  previa del plan responde 422 `tracking_destination_invalid`). Los tres presentes en Production.
+  botones `aria-disabled` y API 403 `write_not_allowed`, salvo ventana `STUDIO_OPEN_WRITE_UNTIL` + `STUDIO_OPEN_WRITE_ORGS` vigente), `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`; sin él la vista
+  previa del plan responde 422 `tracking_destination_invalid`). Los tres presentes en Production; las dos de la
+  ventana, sólo en Production hasta 2026-10-12T10:00Z.
