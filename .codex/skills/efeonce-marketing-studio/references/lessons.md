@@ -338,3 +338,21 @@
   commitear de otra sesión; el release `3c8a6dd` llevó sólo la línea propia por índice temporal. Un test de tokens («AI
   Visibility Report … source hashes») falla en el árbol de trabajo por ese trabajo ajeno, no por el cambio (reafirma la
   regla de `GIT_INDEX_FILE` de arriba).
+
+## 2026-10-05 — TASK-2002 rendimiento y motion
+
+- **El RSC del mes lo inflaba la bandeja lateral**, no la grilla: 50 tarjetas con el post entero (~150 de 226 KB) aunque
+  el CSS lo cortaba a 2 líneas. Regla: medir el payload por bloque antes de optimizar lecturas.
+- **Next 16 prefetchea sólo hasta `loading.tsx` en rutas dinámicas**, también con `router.prefetch`; para traer la página
+  hay que pasar `{ kind: 'full' }` (tipado como `PrefetchKind`). Ese prefetch vive `staleTimes.static`.
+- **Una entrada `animation-fill-mode: both` retiene `transform`** y le gana al estilo inline del arrastre: la hoja no
+  sigue el dedo. Regla: entradas con `backwards`, salidas con `both`.
+- **Fundidos secuenciados (sale, luego entra con retraso) dejan un cuadro vacío** visible a 25 fps. Regla: fundidos que
+  se cruzan sin hueco y `::view-transition-*(root)` sin animación para no dejar texto fantasma.
+- **Especificidad igual entre `.is-warm .sheet` y `.is-closing :is(.sheet)`** anuló la salida de la hoja que llegó tras
+  la provisional. Regla: `.is-warm:not(.is-closing)`.
+- **Velocidad de arrastre = promedio desde el inicio** cierra la hoja aunque el dedo se detenga; usar el último tramo.
+- **El lint del compilador de React (`react-hooks/immutability`) prohíbe escribir `ref.current.style` del argumento de un
+  hook**: pasar por una función de módulo. `react-hooks/refs`/orden: declarar callbacks antes de usarlos en hooks.
+- **Los clics capturados en un ancestro llegan antes que el `onClick` del `<Link>`**: para que un enlace maneje su
+  propia salida, marcarlo `data-nav-native`.

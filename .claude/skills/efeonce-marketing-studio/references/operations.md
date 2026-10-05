@@ -508,3 +508,16 @@ test `open-write-window.test.ts`.
   `GET` (`permissions.writable=false`) y que una escritura con `?dryRun=true` responda 403 `write_not_allowed`.
 - **Nunca** abrirla por más de 7 días (el código lo ignora), ni para orgs de clientes sin decisión del operador, ni
   dejarla como sustituto del login.
+
+## Verificar rendimiento y motion del calendario (TASK-2002, 2026-10-05)
+
+- **No compartas el `next dev` de otra sesión:** usa un build de producción propio (`pnpm --filter @studio/web build` +
+  `next start` en otro puerto) con una configuración temporal en `launch.json`; elimínala al terminar.
+- **Medir producción:** `curl -w '%{time_starttransfer} %{time_total} %{size_download}'` del documento y del RSC (`RSC: 1`;
+  en `next start` local hace falta `-L`). La navegación cliente se mide con Playwright observando URL/título.
+- **View Transitions:** envolver `document.startViewTransition` en `addInitScript` para registrar `types`; revisar
+  fotogramas del video (`ffmpeg … tile=6x3`) buscando cuadros vacíos o doble exposición.
+- **Escritura local:** `STUDIO_OPEN_WRITE_UNTIL`/`ORGS` y `STUDIO_TRACKING_DOMAINS` sólo en la configuración temporal;
+  reprogramar → Deshacer deja la activación como estaba (verificar `planned_at` en la base local).
+- **Integración del dominio:** crear una base desechable en el cluster local (`CREATE DATABASE …`), migrarla con
+  `node-pg-migrate` del paquete database y exportar `STUDIO_*_IT_PG_URL`; borrarla después. 3 tests fallan igual en HEAD.

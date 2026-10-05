@@ -260,3 +260,16 @@ All paths below are in Studio unless marked Greenhouse.
   botones `aria-disabled` y API 403 `write_not_allowed`, salvo ventana `STUDIO_OPEN_WRITE_UNTIL` + `STUDIO_OPEN_WRITE_ORGS` vigente), `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`; sin él la vista
   previa del plan responde 422 `tracking_destination_invalid`). Los tres presentes en Production; las dos de la
   ventana, sólo en Production hasta 2026-10-12T10:00Z.
+
+## TASK-2002 — rendimiento y motion (2026-10-05, local `7e081d0` + `11ec7fa`)
+
+| Ruta | Responsabilidad |
+|---|---|
+| `components/activations/CalendarNav.tsx` | Navegación del calendario en `useTransition` (`data-pending`, barra), hoja provisional, inferencia de transición, FLIP al filtrar, anillo de estado, halo de guardado, aviso (`NoticeHost`), `PrefetchNeighbors` (`kind: 'full'`), `CountText` |
+| `components/activations/transition-kind.ts` (+ test) | `transitionFor(from, to, today)`: `nav-forward`/`nav-back`/`view-in`/`view-out`/`filter`/null |
+| `components/activations/motion.ts` | `MOTION` (ms y curvas para JS), `usePresence` (salidas), `useDragToClose` (hojas móviles), `reducedMotion`, `exitDelay` |
+| `components/activations/feedback.ts` | Aviso de escritura (`notify`, `dismissNotice`), halo (`requestGlow`/`takeGlow`), `showDone` |
+| `styles/motion.css` | Todo el motion del calendario + alternativa reducida; se importa después de `app.css` |
+| `scripts/generate-theme.mjs` | Emite `--motion-instant…extended` y `--ease-emphasized/standard/exit/linear` desde `axisMotion` |
+| `packages/domain` readers | `getCalendarRange`, `listActivations`, `activationProjection` paralelizados; `loadChannelCatalog` con caché por versión publicada (`clearChannelCatalogCache`) |
+| `next.config.ts` | `experimental.staleTimes.static = 60` (prefetch manual vale 60 s) |

@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-05 — TASK-2002: calendario más rápido y sistema de motion v3.6 (local)
+
+- Studio `7e081d0` + `11ec7fa` sin push. Medido en producción: navegación congelada 0,36–1,4 s y RSC del mes 226 KB (la bandeja lateral pesaba ~150 KB). Lecturas en paralelo, catálogo en memoria, bandeja recortada (8 + «Ver las N restantes»), estado pendiente visible, hoja provisional y prefetch de períodos vecinos; local: render −30/−45 % y mes vecino sin petición.
+- Motion desde `axisMotion` aprobado en el canvas «v3.6»: View Transitions de mes y vista, FLIP al filtrar, entradas y salidas con origen, arrastrar para cerrar, check/halo/aviso con Deshacer; alternativa reducida por momento. [Contrato](docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md). Deploy con señal del operador.
+
 ## 2026-10-05 — Efeonce Factory: vía comercial On-Demand
 
 - Decisión explícita del operador: Factory convierte capacidad disponible en encargos con margen y caja adicional;
@@ -467,15 +472,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - AXIS `v0.3.27` (`6a1a912`): contrato 0.1.1, el carrusel empieza con su portada y termina con su contraportada.
 - Greenhouse: ADR, norma §14, doc funcional, manual y skills (`efeonce-graphic-line`, `axis-design-system`, espejo
   `.codex/`) al día. Greenhouse no fija estas versiones todavía.
-
-## 2026-09-28 — Glitch: pendientes del Flash cerrados (ruta productiva, muletilla, licencia, numeración, Content Factory)
-
-- TASK-1921 (`c43862008`): `planBrandRender` despacha con `planGlitchManifest`; el Flash sale por la ruta productiva
-  (carrusel de 3 láminas + sueltas; nunca overlays) con `BRAND_RENDER_ENABLED`, sin cambio de schema ni worker.
-- Composer (`05e75f0ed`): `video.closingLine` → slot `closingLine` de los overlays CTA; `license.kind: press` sólo en
-  el Flash con aprobación por pieza (`approvers.json`) y `licenseExceptions` en la procedencia; `pnpm glitch:editions`
-  y `glitch:compose --check-published` leen el blog: la próxima semanal es la **#18**. Gate visual sección (q).
-- Content Factory (`c6f076e9f`): `kind: glitchDrop` (serialización idéntica a WordPress), `buttons`, `embed.caption`,
-  `table.style: stripes`; fix del write path con `wp_slash()`.
-- AXIS 0.3.25 (estela por contexto + decisiones resueltas) y motion del Flash en el taller: commits locales, sin
-  publicar.

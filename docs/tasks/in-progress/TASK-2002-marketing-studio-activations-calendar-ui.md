@@ -1,5 +1,42 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-05 (noche) — rendimiento percibido y sistema de motion v3.6
+
+**Commits (Studio `main`, locales, sin push; producción sigue en `5d962c4`).** `7e081d0` rendimiento y `11ec7fa` motion.
+`pnpm check` y `pnpm --filter @studio/web build` verdes antes de cada commit. Push = deploy: espera la señal del operador.
+
+**Rendimiento (medido).** Producción antes: TTFB ~0,32 s (el esqueleto llega primero) y total 0,6–0,8 s el mes, 0,4 s la
+semana, 0,7–0,95 s con filtro; en navegación cliente la vista queda congelada sin señal 0,36–1,4 s (mes), 0,6–0,7 s
+(hoja) y 1,4 s (filtro). El RSC del mes pesa 226 KB (HTML 428 KB) y ~150 KB son la bandeja «Ejecución sin activación»
+(50 tarjetas con el post completo). Cambios:
+
+- Lecturas de la página en paralelo (antes ~8 en cadena); `getCalendarRange`, `listActivations` y `activationProjection`
+  paralelizan sus consultas (12 idas en serie → 3 rondas; con el pool de 3 de Vercel, ~4 oleadas).
+- Catálogo de canales en memoria por versión publicada (inmutable; clave con revisión y fecha de publicación).
+- Bandeja: texto recortado a las 2 líneas que ya mostraba y 8 ejecuciones con «Ver las N restantes». RSC del mes
+  proyectado sobre la respuesta real de producción: 226 → 111 KB (se confirma al desplegar).
+- Navegación en transición (`CalendarNav`): la vista anterior se queda y se atenúa si la espera pasa de 150 ms, con
+  barra de progreso; hoja provisional en el mismo cuadro del clic; prefetch completo (`kind: 'full'`) de los períodos
+  vecinos en reposo con `staleTimes.static` 60 s.
+- Local, build de producción (mediana): render 9,5–17,5 → 4,5–12 ms; mes siguiente sin petición al servidor; primera
+  señal visible ~30 ms tras el clic. El «después» de producción se mide tras el deploy.
+
+**Motion v3.6 (aprobado en el canvas, artifact `D6uwRFMzvnaHzGDtDLvxBi` v48).** Tokens desde `axisMotion` (75–600 ms y
+cuatro curvas) en `theme.generated.css`; `styles/motion.css` con alternativa reducida por momento; cambio de mes con
+dirección y Mes/Semana/Día que se acerca desde hoy (React `<ViewTransition>`); FLIP y contador al filtrar; hoja, drawer,
+diálogos, menús, selectores y popover con entrada y salida desde su origen; arrastrar para cerrar en hojas móviles;
+escritura con spinner diferido, check, halo y aviso con Ver y Deshacer (Deshacer sólo en reprogramar). Contrato y
+evidencia: [motion](../../ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md).
+
+**Verificación local.** Playwright sobre build de producción en `:3103` contra la base local desechable, claro, oscuro y
+390 px, con movimiento reducido emulado; videos revisados cuadro a cuadro (se corrigieron un cuadro vacío entre meses,
+la salida de la hoja tras la provisional y una hoja de filtros que no seguía el dedo). Escritura real con ventana
+temporal sólo en una configuración local propia, revertida: reprogramar → check → aviso → Deshacer restaura la fecha.
+3 tests de integración del dominio fallan igual en HEAD sin estos cambios (preexistentes).
+
+**Observado, fuera de alcance.** Si la vista previa del diálogo falla (p. ej. 422 `tracking_destination_invalid`), el
+botón queda en «Validando contra el catálogo…» sin mostrar el error.
+
 ## Delta 2026-10-05 (tarde) — filtros v3.4, formulario, fecha y hora v3.5 y ventana de escritura
 
 **Commits y deploys.** Studio `main` (push a `main` = producción), en orden: `c767283` (dimensiones en español y
@@ -54,11 +91,8 @@ y [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_H
 
 **Pendientes.**
 
-- **Motion y rendimiento percibido:** el operador calificó la experiencia 3/5 («tarda un poco y motion casi
-  inexistente»). Diagnóstico: ~8 lecturas en cadena en `page.tsx`; `router.push` recarga todo el RSC sin estado
-  pendiente; sólo `--motion-fast`/`--motion-standard`; sin View Transitions, salidas ni feedback de escritura. Plan:
-  medir y acelerar lo percibido (paralelizar, Suspense, caché del catálogo, prefetch, `useTransition`) y luego un
-  sistema de motion desde `axisMotion`, diseñado primero en el canvas («v3.6 · Motion (para aprobar)»). Aún sin task.
+- ~~**Motion y rendimiento percibido**~~ — implementado en local el 2026-10-05 (`7e081d0`, `11ec7fa`); ver el delta
+  de la noche. Falta el deploy (señal del operador) y medir el «después» en producción.
 - **Mercados desde la configuración de la organización:** hoy la lista vive en el código web (deuda declarada).
 - **Plataformas del catálogo sin etiqueta en Studio** (Discord, Slack, foros, Circle…) no aparecen en el filtro.
 - **Conteos del filtro** sujetos al tope de 200 activaciones del período, como el calendario.
@@ -99,7 +133,7 @@ generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a s
 | ~~Hoja de email (V3-SheetEmail, MobSheetEmail)~~ | **Hecha el 2026-10-05** (`3048f96`) sobre el contrato `1f2a0ef` | Datos reales cuando se publique el lado Greenhouse del contrato |
 | Hoja de blog (V3-BlogPre, V3-BlogPost): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces (la landing con formulario de V3-OwnedFormats quedó **hecha el 2026-10-05**, `3048f96`) | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
 | Filtros y formulario con menús v3.4 y fecha/hora v3.5 | **Hechos el 2026-10-05** (`bef0ecf`, `e656f2a`, `5d962c4`). Quedan: mercados desde la configuración de la organización, plataformas del catálogo sin etiqueta en Studio y conteos con el tope de 200 | Deuda de configuración y etiquetas; sin task |
-| Motion y rendimiento percibido (operador: 3/5) | ~8 lecturas en cadena en `page.tsx`, `router.push` sin estado pendiente, sin View Transitions ni feedback de escritura | Dirección «v3.6 · Motion» en el canvas y luego implementación; sin task todavía |
+| ~~Motion y rendimiento percibido (operador: 3/5)~~ | **Hecho en local el 2026-10-05** (`7e081d0`, `11ec7fa`) con la dirección «v3.6 · Motion» aprobada | Deploy con señal del operador y medición en producción |
 | Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
 | Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
 | Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed`. **2026-10-05:** habilitados temporalmente en producción para la organización Efeonce por la ventana de escritura (`1f003c1`, vence 2026-10-12T10:00Z); verificado sólo con `cancel` en `dryRun`. Fecha y hora con los selectores v3.5 (`5d962c4`) | Se habilitan de forma definitiva cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código. La ventana se retira al llegar TASK-1898 |
@@ -242,10 +276,10 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md`
 - Flow: `docs/ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `En producción (Studio 5d962c4, deploy p1ng5wy75): calendario v3, hojas email/web, filtros v3.4 y fecha/hora v3.5. Escrituras T1 habilitadas sólo para Efeonce por la ventana temporal hasta 2026-10-12T10:00Z (verificado con cancel en dryRun). Pendiente: escrituras definitivas con TASK-1898, sesión MCP real (TASK-2003), motion y rendimiento percibido, mercados desde configuración, plataformas sin etiqueta y datos reales de email/web`
+- Status real: `En producción (Studio 5d962c4, deploy p1ng5wy75): calendario v3, hojas email/web, filtros v3.4 y fecha/hora v3.5. Escrituras T1 habilitadas sólo para Efeonce por la ventana temporal hasta 2026-10-12T10:00Z. Local sin push: rendimiento percibido (7e081d0) y motion v3.6 (11ec7fa), verificados; deploy con señal del operador. Pendiente: escrituras definitivas con TASK-1898, sesión MCP real (TASK-2003), mercados desde configuración, plataformas sin etiqueta y datos reales de email/web`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`
@@ -384,12 +418,12 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
-- Motion primitive: `none`
-- Enter / exit: transición vigente de la hoja.
-- Layout morph: ninguno.
-- Stagger: ninguno.
-- Timing / easing token: el vigente de Studio.
-- Reduced-motion fallback: sin transición.
+- Motion primitive: sistema de motion v3.6 (`styles/motion.css` + `CalendarNav` + `<ViewTransition>`); contrato en el doc de motion.
+- Enter / exit: hoja 300/200 ms, menús y popover 200/150 ms desde su origen, aviso 200/150 ms.
+- Layout morph: View Transition por período (dirección) y por nivel de vista (acercar/alejar); FLIP al filtrar.
+- Stagger: filas en la primera carga, 30 ms (máx. 8).
+- Timing / easing token: `--motion-*` y `--ease-*` desde `axisMotion`.
+- Reduced-motion fallback: fundidos de 150 ms; sin FLIP, escalonado, halo ni anillo; el arrastre sigue funcionando.
 - Non-goal motion: arrastrar tarjetas para reprogramar (follow-up).
 
 ### Implementation mapping

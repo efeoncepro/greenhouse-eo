@@ -536,3 +536,16 @@ hora (para aprobar)» (V3-DateOpen, V3-TimeOpen, V3-RangeOpen, V3-MobDate, V3-Mo
 - 2026-10-05 — TASK-2002 v3 + diálogos en producción (solo lectura); escrituras web/MCP y hojas email/landing/blog pendientes según la tabla.
 - 2026-10-05 — hojas de email y página web en producción (`3048f96`) sobre el contrato `1f2a0ef`; verificadas en local con datos de prueba; en producción `email`/`web` llegan null (6 activaciones, todas sociales). Pendiente: lado Greenhouse del contrato y hoja de blog.
 - 2026-10-05 — filtros v3.4 (`bef0ecf`), dimensiones en español y mercados servidos (`c767283`), ventana temporal de escritura `open-write-window` (`1f003c1`; Production hasta 2026-10-12T10:00Z, org Efeonce), `Select` del formulario (`e656f2a`), isotipo de X AXIS 0.4.21 (`6dddbfa`) y fecha/hora v3.5 (`5d962c4`) en producción (último deploy `p1ng5wy75`). Pendiente: motion/rendimiento (sin task), retirar la ventana, mercados desde configuración, plataformas sin etiqueta, tope de 200 en conteos.
+
+## TASK-2002 — rendimiento percibido y motion v3.6 (sesión 2026-10-05, noche)
+
+- **Studio local, sin push:** `7e081d0` (rendimiento) y `11ec7fa` (motion). Producción sigue en `5d962c4`; push = deploy,
+  sólo con señal del operador.
+- **Dirección aprobada:** canvas Design `D6uwRFMzvnaHzGDtDLvxBi` v48, página «v3.6 · Motion (para aprobar)» (10 tableros:
+  sistema, navegar, superficies, respuesta, hoja móvil; claro/oscuro). Generador: scratchpad de la sesión (`gen_motion.py`).
+- **Medido antes (producción):** RSC del mes 226 KB (bandeja de 50 ejecuciones ≈ 150 KB); navegación cliente congelada
+  0,36–1,4 s (mes), 0,6–0,7 s (hoja), 1,4 s (filtro). **Después (local, build prod):** render −30/−45 %, mes vecino sin
+  petición, primera señal ~30 ms; RSC proyectado 111 KB. Producción «después»: pendiente de deploy.
+- **Pendiente:** deploy y medición en producción; anillo de cambio de estado con una lectura real; salida animada de los
+  selectores de fecha (hoy sólo entrada desde su origen); error de vista previa del diálogo que queda en «Validando…».
+- Contrato: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`; delta en TASK-2002.
