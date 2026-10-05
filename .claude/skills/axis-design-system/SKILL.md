@@ -60,6 +60,8 @@ compatible package set, ten form families, rich `Select` versus `NativeSelect`, 
 single-contour field focus, business-line palettes and consumer verification. `axis-ui-primitives` owns
 explicit HTML/CSS and optional React exports; the Lab demonstrates those exports, not a parallel component
 implementation. This availability does not migrate Greenhouse's MUI/Vuexy adapter or product pins.
+The same reference records product compositions and the approved Growth CTA/scheduler source
+(2026-10-05), both banner recipes and their release/adoption boundary.
 
 ### Tokens, contracts or registry
 

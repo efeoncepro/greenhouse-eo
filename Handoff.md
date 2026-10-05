@@ -1,5 +1,7 @@
 # Handoff activo
 
+**TASK-2007 (05/10, Codex):** producto, scheduler y Growth CTA AXIS aprobados visualmente; [estado, evidencia y pendientes](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md). Banners editorial/marca, anillo arriba/esfera al cierre, Bricolage400/700 opt-in y agenda dialog/inline. Preview `http://127.0.0.1:4340/references/growth-cta/#banners`; CTA40/40 + final4/4 PASS. Nuevos exports unreleased; release/instalación, AT físico y adopción Growth/hosts pendientes. Sin cambios consumidores. AXIS `447ea0c` enviado a main; CI en curso. Preservar WIP ajeno AI Visibility Report/tokens.
+
 **Títulos del portal (05/10, Codex):** `Efeonce | Greenhouse` por defecto; Acceder, Proyectos y Finanzas con Efeonce primero y locale ES/EN. Helper de copy compartido y labels de navegación reutilizados. ESLint y TypeScript PASS; [detalle](docs/audits/ui/2026-10-05-portal-metadata.md). Commit y push a `develop` autorizados (05/10); despliegue no verificado.
 
 **Identidad del portal (05/10, Codex):** Efeonce en el menú (logo/isotipo), Greenhouse en ambos footers con tema claro/oscuro; cambio local autorizado por el operador. Canon y assets existentes preservados. Validación y capturas: [dossier](docs/audits/ui/2026-10-05-portal-brand-chrome.md). Commit y push a `develop` autorizados (05/10); sin deploy verificado.
@@ -16,7 +18,7 @@
 **Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.
 
 
-**AXIS (04/10):** [distribución de colores, compactos y formularios](docs/audits/2026-10-04-axis-forms-release.md); foco único, iconos y Select enriquecido en primitives. Adopción y QA manual consumidor pendientes. [Inputs especializados](docs/audits/2026-10-04-axis-specialized-inputs.md): AXIS `6fff346` subido; primitives 0.5.0 publicado por el tag v0.4.20 (readback 05/10). Adapter Growth Forms opt-in, sin activar; siguiente: instalación/adopción de la versión exacta y piloto en host. [Botones](docs/audits/2026-10-04-axis-buttons-release.md) · [recursos y agentes](docs/audits/2026-10-04-axis-documentation-closure.md).
+**AXIS (04/10):** [distribución de Forms](docs/audits/2026-10-04-axis-forms-release.md) y [consumo](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Primitives 0.5.0 publicado por v0.4.20 (readback 05/10); inputs especializados y adapter Growth Forms opt-in. Instalación/adopción de nuevos exports y QA manual consumidor pendientes.
 
 Staging: ISSUE-178 resuelto.
 

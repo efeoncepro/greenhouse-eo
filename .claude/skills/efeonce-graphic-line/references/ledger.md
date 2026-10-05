@@ -614,3 +614,76 @@ del WIP de product primitives y AI Visibility Report. Instantánea de commit: bu
 suite global, design gate, agent gate y 37 pruebas de navegador PASS; 3 SKIP por API scoped ausente,
 con fallback probado. Registro completo en `docs/quality/scheduler.md`. Esta autorización no incluye
 publicación de versiones de packages ni adaptación de Growth Meetings.
+
+
+### 2026-10-05 — Rechazo de la demo presentada como avance de Growth CTA
+
+El operador solicita corregir la composición y aclarar si se trabajó Growth CTA. Se confirma que esta
+entrega sólo desarrolló primitives y una demo en AXIS: el renderer y motor de Growth CTA no se
+modificaron. Se corrigen separación/jerarquía en primitives y ejemplo, con revisión del borrador real.
+No atribuir adopción del producto a una demo de infraestructura. La corrección no hereda la aprobación
+visual del agendador; queda local y pendiente de revisión.
+
+
+### 2026-10-05 — Growth CTA en AXIS, reusable por sitio público y Think
+
+El operador solicita revisar todas las formas de render y crear la versión de la línea Efeonce en
+AXIS; pregunta expresamente por su reutilización fuera del Lab. Decisión: implementación visual
+portable en packages, referencia propia `/references/growth-cta/`, inventario de lo implementado
+y lo sólo declarado. La futura adopción se hace en el renderer compartido Growth CTA, manteniendo
+política y eventos bajo Growth. No se autorizan por inferencia publicación, conversión real ni
+migración de hosts. Esta candidata no hereda la aprobación visual del agendador.
+Verificado contra: axis-design-system@eeb24e2 + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — Rechazo visual de Growth CTA y dos formas de abrir la agenda
+
+«No tiene la forma y limpieza»; el operador pide premium/elegante/atractivo y rechaza el contenedor
+grueso del popup. Se revisan proporción, cierre, sombra, jerarquía y marco; se añade agenda modal
+o desplegada bajo el CTA para compararlas. La primera candidata queda rechazada visualmente; la
+segunda conserva estado pendiente, sin release ni adopción. Verificado contra:
+axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+### 2026-10-05 — El titular del CTA se conserva; faltan anillo y esfera
+
+El operador señala el hover editorial sin aire y las marcas ausentes. Aclara que la pregunta está
+bien donde está. Se revierte la propuesta de cambiarla a pregunta chica/respuesta nueva, se restaura
+el padding canónico y se prepara la variante explícita headlineMarks=ring-and-sphere conservando
+el texto. La esfera usa answerHtml del package gráfico; el último término y la esfera no se separan.
+Esta prueba local no es aprobación ni nueva regla general de voz.
+Verificado contra: axis-design-system@eeb24e2 + WIP local — 2026-10-05.
+
+
+2026-10-05 — Corrección explícita: el anillo NO acompaña la esfera en el titular grande. Va en
+el título superior («VISIBILIDAD EN IA»); la pregunta conserva la esfera al cierre. Se corrige el
+renderer de AXIS y se agrega una aserción de anatomía para no repetir la interpretación errónea.
+
+
+2026-10-05 — El operador autoriza construir las dos propuestas de banner («Vamos con los dos»):
+editorial compacto y de marca. Se materializan en las apariencias minimal/spotlight de inline_banner
+y se exponen juntas en el Lab. Se conserva la corrección anterior: anillo arriba y esfera al cierre.
+Pendientes de revisión visual; no se publica ni migra al consumidor por inferencia.
+
+
+2026-10-05 — A petición del operador se añade contraste de pesos Bricolage a los Growth CTA:
+introducción 400, idea principal 700. Misma pregunta, sin salto forzado ni nueva paleta. API
+opt-in del package aplicada en ambas recetas de banner y las demás muestras. Revisión visual
+pendiente; sin publicación.
+
+
+### 2026-10-05 — Aprobación integral y cierre documental autorizado
+
+El operador aprueba explícitamente la entrega final: «Aprobado todo, lanza subagentes y actualiza
+toda la documentación y los skills que correspondan, luego push». Esto supersede la aceptación
+pendiente de las revisiones históricas del producto y de Growth CTA. Aprobado: composición ligera,
+anillo en eyebrow y esfera al cierre del titular, banners editorial compacto/de marca y contraste
+Bricolage 400/700 mediante énfasis exacto opt-in; agenda modal e inline con estado conservado.
+No se aprobó la primera candidata rechazada ni la interpretación de anillo junto a esfera en el
+titular. Ambas se mantienen como historia para evitar repetirlas.
+
+Verificado contra source local AXIS sobre `3c8a6dd`: 40/40 journeys CTA y 4/4 recorridos finales,
+build/typecheck, 198 contracts, design/agent PASS; evidencia dueña en `docs/quality/growth-cta.md`.
+La autorización de commit/push no acredita release de packages, instalación privada de los nuevos
+exports ni adopción en Growth/sitio público/Think. Estado de esos planos permanece pendiente hasta
+su readback independiente; el push final lo registra el coordinador con su SHA real.

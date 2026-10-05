@@ -37,6 +37,24 @@ Read only the sources required by the change:
 Do not route this capability through `hubspot-greenhouse-integration`; that Cloud Run bridge owns a
 different CRM write/webhook contract.
 
+## AXIS visual composition — approved source, adoption pending (2026-10-05)
+
+The native AXIS scheduler was approved visually and its source pushed previously. Growth CTA's
+final AXIS presentation, including both banner recipes and `meetingPresentation: 'dialog' | 'inline'`,
+is now approved by the operator. The two surfaces share the same adapter and retained state; they
+never create another booking operation. Calendar cells show day number plus calendar/count and
+an explicit unavailable marker; fields retain labels/icons and confirmation celebrates only an
+explicit confirmed receipt, with static reduced-motion behavior.
+
+AXIS owns tokens and portable presentation (`axisScheduler`, `/scheduler`, `/growth-cta`); Growth
+Meetings retains its controller, config/availability/booking contracts, provider, CAPTCHA,
+idempotency and receipt-gated conversion. Current `src/growth-meeting-renderer` is unchanged:
+no adoption or public-host rollout is implied by approval or push. New composition exports require
+release/install and a separately verified adapter before replacing that renderer.
+Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live in sibling AXIS
+`SCHEDULER_COMPOSITION_DECISION_V1.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md` and their
+`docs/quality/` dossiers. Greenhouse continuity: TASK-2007.
+
 ## Operating loop
 
 1. **Resolve the boundary.** Identify whether the change belongs to provider policy, public transport,

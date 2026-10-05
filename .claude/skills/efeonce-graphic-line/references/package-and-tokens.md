@@ -1519,3 +1519,55 @@ No hay red, reserva ni medición en AXIS; el consumidor entrega snapshots y reci
 civil en zona IANA; confirmación nunca inferida de la selección. Capacidad `compose-scheduler`, Lab
 `/references/scheduler/`. Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
 Exports nuevos **sin publicar**, no incluidos por inferencia en primitives 0.5.0.
+
+
+## Growth CTA portable — aprobado visualmente, exports locales 2026-10-05
+
+`axisGrowthCta` deriva paletas de Forms/Growth, tipografía de La órbita y motion de AXIS.
+`GrowthCtaModel`, `validateGrowthCta`, `safeGrowthCtaUrl` y `resolveGrowthCtaAppearance` viven en
+contracts; `createGrowthCta` y `growth-cta.css` en el subpath `axis-ui-primitives/growth-cta`.
+DOM nativo; Lab React sólo para configuradores. El adapter monta Forms/Meetings con AbortSignal y
+disposer; el renderer conserva borrador, usa dialog nativo para la tarea de agenda, anchors reales
+para navegación y destruye recursos por instancia. No consulta APIs ni mide conversiones.
+`compose-growth-cta` es la entrada de registry; exports unreleased. Publicación e integración del
+renderer compartido `<greenhouse-cta>` preceden cualquier afirmación de adopción en sitio público/Think.
+Verificado contra: axis-design-system@eeb24e2 + candidato local — 2026-10-05. Guía de consumo y
+límites en `packages/primitives/README.md` y `docs/quality/growth-cta.md` de AXIS.
+
+
+Revisión Growth CTA (2026-10-05): `GrowthCtaModel.meetingPresentation` admite `dialog` (default)
+e `inline`; ambos montan el adapter de Meetings y conservan selección. `axisGrowthCta` posee ancho
+de panel/integrado, composición tipográfica, marco fino y opacidad de backdrop. Minimal sin caja
+ni sombra, cierre icon-only accesible y modal con calendario hasta el borde. La revisión final
+fue aprobada por el operador el 2026-10-05; la distribución sigue pendiente.
+Verificado contra: axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+Growth CTA, revisión de marcas (2026-10-05): `content.headlineMarks: 'ring-and-sphere'` es opt-in
+para la variante de titular preservado solicitada por el operador. `axisGrowthCta.eyebrowRing`
+centraliza la geometría del anillo, ubicado exclusivamente en el eyebrow superior; `answerHtml` de
+`axis-graphic-line` calcula la esfera y su espacio óptico. La última palabra y esfera quedan juntas.
+Primitives declara la dependencia de graphic-line; no se reimplementa su cálculo. El header funcional
+de agenda expandida omite ambas marcas. Posición aprobada el 2026-10-05; no modifica la receta
+general de voz ni la pregunta del CTA por inferencia.
+Verificado contra: axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+Growth CTA banners (2026-10-05): las recetas se consumen con `placement: 'inline_banner'` y
+`styleVariant: 'minimal' | 'spotlight'`. Proporciones en `axisGrowthCta.banner`, render nativo de
+primitives y comparación en `/references/growth-cta/#banners`. Comparten adapters de formulario
+y agenda modal/inferior; no duplican campañas ni lógica Growth. Recetas aprobadas visualmente
+el 2026-10-05, aún no distribuidas ni adoptadas.
+
+
+Growth CTA (2026-10-05): `content.headlineEmphasis` es una frase exacta y única dentro de
+`headline`, validada por contracts. Primitives conserva texto plano, strong semántico, anillo arriba
+y última palabra inseparable de la esfera. `axisGrowthCta.headlineLeadWeight` /
+`headlineEmphasisWeight` poseen 400/700. Sin énfasis explícito se conserva el peso anterior.
+
+
+Aprobación final del operador 2026-10-05: «Aprobado todo». La revisión aprobada está en source
+local sobre AXIS `3c8a6dd`; `createGrowthCta` y CSS siguen unreleased en el inventario de
+availability. No se deduce disponibilidad del nuevo subpath desde primitives 0.5.0. Antes de
+adoptar: release del set compatible, instalación limpia con export/CSS/dependencia graphic-line,
+adapter de Growth y prueba en cada host. QA vigente: AXIS `docs/quality/growth-cta.md`.

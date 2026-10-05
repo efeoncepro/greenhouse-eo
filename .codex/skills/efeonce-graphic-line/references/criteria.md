@@ -952,8 +952,8 @@ siguen ligados al control. Detalle técnico y límites: [lab-components.md](lab-
 Corrección del operador: un render funcional de Growth Meetings no acredita alineación con La órbita.
 Construir primero la composición en AXIS y revisar luego su adaptación. Reutilizar estructura y comportamiento
 no implica canonizar la paleta, tipografía o controles heredados. Aplicar los roles de marca y las primitives
-funcionales; no añadir una órbita decorativa al calendario. Esta dirección no certifica aceptación visual
-del candidato ni habilita la línea en el interior del portal Greenhouse.
+funcionales; no añadir una órbita decorativa al calendario. Esta dirección no habilita la línea en el interior del portal Greenhouse. El agendador fue
+aprobado visualmente por el operador el 2026-10-05; publicación y adaptación siguen separadas.
 Verificado contra: axis-design-system@8adedef + WIP local de scheduler — 2026-10-05.
 
 
@@ -964,7 +964,8 @@ parecer dos fechas. Día destacado, ícono de calendario + cantidad para disponi
 para ausencia, con leyenda (revisión posterior del operador sustituye el check y «disp.»); el panel de horas repite el total. No depender sólo del color.
 Motion con causalidad: dirección al cambiar mes/paso, respuesta de selección y contenido secuenciado,
 con contexto estable. Movimiento reducido, foco, interrupción y borrador son parte del comportamiento.
-Implementado localmente en axis-design-system@8adedef + WIP de scheduler; aceptación final pendiente.
+Implementado en AXIS; agendador aprobado visualmente el 2026-10-05. La evidencia histórica y
+el push del scheduler están en el ledger; no acredita adopción de Growth Meetings.
 
 
 ### 2026-10-05 — Revisión del agendador: íconos y Select canónico
@@ -985,3 +986,47 @@ editorial y comprobante separado con calendario/reloj/zona. Confeti breve y acot
 al confirmar, nunca en error o resultado ambiguo; no añadir órbitas decorativas. Movimiento reducido
 conserva el cierre estático, cancela y no reanuda el efecto. Llevar al cierre visible tras el submit
 sin robar foco si la persona ya está interactuando fuera. AXIS @8adedef + WIP local, sin release.
+
+
+## Growth CTA: ligereza y proporción — corrección del operador, 2026-10-05
+
+El operador rechaza la primera candidata por no tener la forma y limpieza de La órbita: el panel
+lateral estirado a todo el contenedor, la sombra rectangular y el marco grueso del popup se sienten
+pesados. Pide algo premium, elegante y atractivo. El criterio es de composición, no de añadir
+ornamentos: panel con ancho propio; minimal sin caja ni sombra; dominante tipográfica, aire útil,
+cierre discreto y un solo marco en el agendador. Agenda debe poder probarse en modal y desplegada
+hacia abajo. Ambas son opciones visuales de la misma acción; no implican dos operaciones de reserva.
+Revisión aprobada visualmente por el operador el 2026-10-05 («Aprobado todo»). Verificado contra:
+axis-design-system@eeb24e2 + revisión local Growth CTA — 2026-10-05.
+
+
+### Growth CTA: conservar la pregunta, incorporar las marcas — 2026-10-05
+
+El operador corrige la interpretación anterior: «en este caso la pregunta está bien donde está pero
+la esfera y el anillo deben estar». Se conserva texto, posición y protagonismo del titular; no se
+sustituye por un par nuevo como «Lo medimos». El operador precisa después que el anillo debe ir en el título superior (eyebrow) y la esfera
+al cierre del titular grande. Nunca ambas marcas en ese mismo titular. Esta aplicación quedó
+aprobada el 2026-10-05; no convierte la pregunta grande con esfera en regla general de La órbita. La receta usual sigue
+siendo pregunta Poppins/anillo y respuesta Bricolage/esfera.
+
+En el CTA editorial, nunca quitar el padding interno del botón canónico para alinearlo con el texto:
+el fondo de hover y la flecha necesitan ese aire en reposo, hover y foco.
+Verificado contra: axis-design-system@eeb24e2 + revisión local Growth CTA — 2026-10-05.
+
+
+### Growth CTA: dos banners — 2026-10-05
+
+El operador pide construir editorial compacto y de marca. Minimal usa menor altura, titular
+horizontal y reglas finas; spotlight conserva azul profundo, mayor escala y agrupa acción con nota.
+Anillo sólo en el título superior; esfera sólo al cierre del titular. En móvil las columnas se
+apilan. La acción conserva padding y movimiento canónicos. Se comparan ambas recetas en AXIS y quedaron aprobadas visualmente por el operador el
+2026-10-05. La aprobación no acredita publicación de packages ni migración de un consumidor.
+
+
+### Growth CTA: jerarquía dentro de Bricolage — 2026-10-05
+
+El operador pide contraste de pesos para guiar la lectura. En esta aplicación la introducción va
+en 400 y una única idea principal en 700, sin cambiar copy, tamaño o color dentro del titular.
+Ejemplo: «Cuando le preguntan a la IA,» introduce; «¿aparece tu marca?» concentra el énfasis.
+En agenda, «Una conversación.» introduce y «Tu próximo paso.» toma el peso. No se extrapola
+esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por palabras clave.

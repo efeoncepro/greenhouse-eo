@@ -142,3 +142,40 @@ That list is not a strict allowlist for explicit international `+` values. Catal
 an explicit product decision and server/payload/host verification; follow the
 [Growth Forms decision](../../../../docs/architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
 Promotion requires an exact published package and consumer evidence.
+
+
+## Product compositions and Growth CTA · approved source, 2026-10-05
+
+`TASK-2007` owns the local product primitives and the native AXIS scheduler/Growth CTA composition.
+Operator visual approval received on 2026-10-05 («Aprobado todo»); source observed on AXIS
+`3c8a6dd` plus local changes. New product exports and `/growth-cta` remain **unreleased** in
+`packages/registry/src/package-availability.ts`; approval, source push, package distribution and
+consumer adoption are separate planes. Do not infer those exports from primitives 0.5.0.
+
+- Product: remote/media/group options, feedback, Disclosure/Dialog/Complementary, MultiSelect,
+  Tabs/Pagination, DateField/DateRange and FileField; API and QA are in AXIS
+  `PRODUCT_PRIMITIVES_DECISION_V1.md` and `docs/quality/product-primitives.md`. Date/file controls
+  are now local source additions, superseding the earlier delivery boundary above. No rich editor,
+  universal drag-and-drop, DataGrid or multiselect Combobox was added.
+- Scheduler: native `/scheduler`, `axisScheduler`, model snapshots and actions. Consumer owns
+  availability, validation, CAPTCHA, booking and confirmed receipt. Details and evidence:
+  AXIS `SCHEDULER_COMPOSITION_DECISION_V1.md` and `docs/quality/scheduler.md`.
+- CTA: `/growth-cta` plus `/growth-cta.css`, `axisGrowthCta`, serializable `GrowthCtaModel`.
+  Three actual placements (`embedded`, `inline_banner`, `slide_in`), three appearances and five
+  actions. Form/meeting adapters own mounting/AbortSignal/disposal; Growth owns policy, campaigns,
+  network and measurement. Sticky banner, popup modal and floating button remain unimplemented.
+
+Approved banner recipes: `inline_banner/minimal` is compact editorial with fine rules;
+`inline_banner/spotlight` uses deep navy with larger headline and action/note grouped. Both stack
+in narrow containers. Opt-in `content.headlineMarks: 'ring-and-sphere'` puts ring only in eyebrow
+and sphere at headline end via `answerHtml` from `axis-graphic-line`. `content.headlineEmphasis`
+selects one exact phrase; Bricolage lead 400/main 700 derives from tokens without changing accessible
+copy. Keep canonical action padding in hover/focus. `meetingPresentation: 'dialog' | 'inline'`
+selects a visual surface of the same action and retained state; it is not another booking path.
+
+API and QA: AXIS `packages/primitives/README.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md`,
+`docs/quality/growth-cta.md`, `/references/growth-cta/#banners`. Final local CTA verification:
+40/40 journeys and 4/4 affected cases, build/typecheck, 198 contracts, design/agent PASS.
+AT physical/manual, exact release/install and consumer adaptation remain pending. Before adoption
+verify CSS and graphic-line dependency in an installed set, then policy/events/Shadow DOM/bundle
+in the Growth renderer and a freshly loaded host; no pins or theme changed here.

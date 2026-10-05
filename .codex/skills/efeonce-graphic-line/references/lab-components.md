@@ -192,3 +192,56 @@ validación de negocio, CAPTCHA y telemetría. No se migró el renderer de Green
 Verificado contra: axis-design-system@8adedef + cambios locales de scheduler — 2026-10-05. Código/API/QA
 en `packages/primitives/README.md`, `docs/architecture/SCHEDULER_COMPOSITION_DECISION_V1.md` y
 `docs/quality/scheduler.md`. Publicación pendiente; aceptación visual explícita recibida el 2026-10-05 («Bien, está aprobado...»).
+
+
+## Composición de consulta ≠ Growth CTA — corrección 2026-10-05
+
+La demo `/references/product/` ilustra primitives, no implementa el renderer Growth CTA. El operador
+rechazó controles pegados, cajas apiladas y copy técnico. Disclosure debe comunicar apertura mediante
+botón/chevron y separar su contenido; Dialog organiza título, contenido y cierre; Complementary
+conserva jerarquía de ayuda, sin competir como otra tarjeta. El ejemplo revisa el borrador real y lo
+conserva al cerrar. No describir esta demo como adopción de `src/growth-cta-renderer` ni como campaña
+conectada. Corrección local en AXIS aprobada por el operador el 2026-10-05 («Aprobado todo»);
+publicación de los exports y adopción pendientes.
+
+
+## Growth CTA real: presentación en packages — 2026-10-05
+
+El operador pide inventariar todas las formas del renderer y construir la versión Efeonce en AXIS.
+`/references/growth-cta/` consume `axis-ui-primitives/growth-cta`; no es la demo genérica de product.
+Tres presentaciones implementadas (embedded, inline_banner, slide_in), tres apariencias (default,
+spotlight, minimal), cinco acciones y estados de recuperación. Bricolage/Poppins, papel/navy y
+controles Growth; sin órbitas ornamentales. Sticky banner, popup modal y floating button están
+declarados en Growth pero no cuentan con comportamiento específico completo: se inventarían como
+pendientes. El diálogo del agendador no equivale a popup_modal.
+
+AXIS posee presentación; Growth conserva reglas, campañas, telemetría y operaciones. Publicar el
+package y adaptar el renderer compartido permitirá consumirlo en sitio público, Think y otros hosts
+mediante el mismo web component, sin copiar la UI del Lab. Esta entrega no realiza esa migración.
+Verificado contra: axis-design-system@eeb24e2 + candidato local — 2026-10-05. Fuente auditada:
+greenhouse-eo@c0f3d7ce, renderer 1.3.0. Decisión y evidencia en AXIS
+`GROWTH_CTA_COMPOSITION_DECISION_V1.md` y `docs/quality/growth-cta.md`. Aprobación visual explícita
+el 2026-10-05 («Aprobado todo»); release y adopción pendientes.
+
+
+Revisión de Growth CTA tras rechazo del operador (2026-10-05): panel con ancho propio, minimal
+sin caja/sombra, cierre discreto y modal ligero. En `/references/growth-cta/`, acción Abrir agendador
+y selector Agenda permiten comparar En ventana / Debajo del CTA. La selección se conserva al
+volver en ambos. Las revisiones finales quedaron aprobadas el 2026-10-05; la primera se conserva como rechazo
+histórico en el ledger.
+Verificado contra: axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+### Growth CTA aprobado: banners y lectura
+
+En `/references/growth-cta/#banners` se comparan las recetas `inline_banner/minimal` (editorial
+compacto, reglas finas) y `inline_banner/spotlight` (azul profundo, titular mayor, acción y nota
+agrupadas). El anillo pertenece exclusivamente al eyebrow superior; la esfera cierra el titular y
+permanece junto a su última palabra. `content.headlineEmphasis` identifica una frase exacta y única:
+Bricolage 400 introduce y 700 destaca la idea principal; se conserva el texto accesible completo.
+Agenda en diálogo o inline comparte adapter y selección; cerrar/reabrir no crea otra reserva.
+
+Estado: **aprobado visualmente por el operador el 2026-10-05**, source local sobre AXIS `3c8a6dd`.
+QA final: 40/40 journeys y 4/4 recorridos afectados tras el ajuste de wrapping; build/typecheck,
+198 tests de contracts y gates design/agent PASS. El dossier AXIS posee evidencia proporcional y
+límites; AT físico, publicación e instalación privada del nuevo export y adopción siguen pendientes.

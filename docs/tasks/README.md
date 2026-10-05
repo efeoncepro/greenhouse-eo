@@ -1,5 +1,7 @@
 # Task Index
 
+> [TASK-2007](in-progress/TASK-2007-axis-product-primitives.md): producto/Growth CTA AXIS aprobados; CTA40/40 + final4/4, producto/Forms200 PASS + 4/4 del harness corregido. Fuente AXIS `447ea0c`; publicación, AT manual y adopción pendientes.
+
 > **TASK-1899 retirada (04/10):** [decisión del operador](to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md). Implementación local revertida, sin rollout ni reanudación automática; deja de bloquear el desarrollo API/CLI/UI de Studio.
 
 

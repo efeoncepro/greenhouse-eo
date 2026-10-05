@@ -453,7 +453,7 @@ Verificar familia Bricolage en títulos/Poppins en controles, roles papel/navy y
 Probar calendario por teclado, mes vacío, recuperación y resultado ambiguo; cambio de receta conserva
 selección, foco y borrador. Confirmación sólo desde comprobante explícito del consumidor. No usar reservas
 reales para QA visual. API/QA: `docs/quality/scheduler.md` en AXIS; verificado contra @8adedef + WIP local,
-2026-10-05. Publicación y aceptación visual pendientes.
+2026-10-05. Agendador aprobado visualmente; publicación y adopción pendientes.
 
 
 Revisión de disponibilidad/motion (2026-10-05): comprobar día + calendario/cantidad, guion de
@@ -473,3 +473,24 @@ Confirmación celebratoria (2026-10-05): comprobar emblema y tres íconos del re
 una sola reproducción, cancelación de confeti al activar reduced motion y ningún reinicio por resize.
 Sólo desde `confirmed` con comprobante. Tras submit, título visible/foco; abandonar el traslado si
 el usuario interactúa fuera. Estado estático conserva toda la información. Evidencia en QA de AXIS.
+
+
+### Growth CTA — aprobación visual local, 2026-10-05
+
+Comparar las tres presentaciones reales × tres apariencias, las cinco acciones, superficies de host,
+contenedores 320/390/820/1440, copy extenso y visual ausente/fallido. Probar formulario con borrador
+retenido y cancelación de carga, diálogo de agenda con reapertura, panel no modal sin robo de foco,
+Escape/retorno, error/retry y reduced motion. Verificar anchors y aviso accesible de pestaña nueva.
+Vacío/retirado no pintan tarjeta; cerrar contenido no equivale a dismissed. Suite dedicada en AXIS
+`apps/lab/playwright.growth-cta.config.ts`; evidencia en `docs/quality/growth-cta.md`.
+No atribuir publicación o integración del engine a la referencia local.
+Verificado contra: axis-design-system@eeb24e2 + candidato local — 2026-10-05.
+
+
+Revisión aprobada el 2026-10-05 («Aprobado todo»), source sobre `3c8a6dd`: comprobar anillo sólo
+en eyebrow, esfera sólo al cierre del titular, última palabra inseparable de esfera y padding
+canónico del botón en reposo/hover/foco. Comparar ambos banners en 320/390/820/1440 px y claro/oscuro;
+énfasis exacto opt-in conserva copy y usa Bricolage 400/700, sin partir palabras ni forzar saltos.
+Agenda dialog/inline conserva selección y borrador. Evidencia: 40/40 journeys y 4/4 casos finales,
+build/typecheck, 198 contracts, design/agent PASS en el dossier AXIS. La aprobación visual no
+promueve lifecycle del contrato ni certifica AT físico, publicación o adopción.

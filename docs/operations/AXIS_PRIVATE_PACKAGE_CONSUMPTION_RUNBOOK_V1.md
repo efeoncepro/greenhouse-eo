@@ -1,5 +1,21 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
+
+El operador aprobó visualmente la entrega AXIS y autorizó documentación/skills y push.
+[Estado y evidencia](../tasks/in-progress/TASK-2007-axis-product-primitives.md) distingue source,
+distribución y adopción. Nuevo `/growth-cta`/CSS y product exports siguen **unreleased** en el
+inventario de availability; source aprobado no acredita tarball ni instalación privada. Scheduler
+ya tuvo push de fuente independiente; su distribución/adopción tampoco se infiere del push.
+
+AXIS posee presentación portable: banners minimal/spotlight, anillo en eyebrow y esfera al cierre,
+énfasis exacto Bricolage400/700, agenda dialog/inline. Growth conserva controller/policy/network,
+booking y medición. API y QA dueños están en AXIS `packages/primitives/README.md`, decisiones de
+Product/Scheduler/Growth CTA y dossiers `docs/quality/`. Antes de adopción: publicar set compatible,
+instalar y comprobar exports/CSS/graphic-line, adaptar renderer compartido y verificar cada host.
+Sin cambios de pins, theme, flags, campañas ni hosts en esta entrega. Las tablas históricas siguientes
+acreditan únicamente sus cortes fechados; no prueban exports posteriores.
+
 ## Distribución vigente — formularios y La órbita, 2026-10-04
 
 **Publicados e instalados desde GitHub Packages**: source `df2de61`, tag `v0.7.2`, release
