@@ -7,7 +7,7 @@ brand manager, sobre **las mismas campañas** que Marketing Studio (un aggregate
 ADR: [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md).
 Su roadmap de siete slices (vista y switch, receta de producción en el catálogo, hitos derivados, feedback anclado,
 referencias, chequeo de marca, regla de activación con versión aprobada) entra a este epic como tasks futuras; no se
-crearon tasks con esta decisión. Globe deja de usar «Creative Studio» como descriptor (delta en la decisión de nombre).
+crearon tasks con esta decisión. Globe es la otra parte de Creative Studio, su motor (hoy hibernado); juntar las piezas es trabajo posterior.
 
 ## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
 

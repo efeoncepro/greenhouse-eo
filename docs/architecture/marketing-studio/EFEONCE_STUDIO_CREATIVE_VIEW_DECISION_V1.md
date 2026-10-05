@@ -6,7 +6,7 @@
 > **Owner:** Efeonce Studio (Marketing Studio + Creative Studio)
 > **Epic:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
 > **Scope:** qué es Creative Studio, cómo se relaciona con Marketing Studio dentro de la misma plataforma, qué
-> datos y commands comparten, qué es nuevo del lado creativo y dónde queda la frontera con Globe. No crea tasks,
+> datos y commands comparten, qué es nuevo del lado creativo y cómo se relaciona con Globe, su motor de producción. No crea tasks,
 > rutas, tablas, capabilities ni tools: fija la forma que deben respetar las tasks que las construyan.
 > **Reversibility:** `two-way` para la forma de la UI (vista, switch, navegación). `two-way-but-slow` para lo que
 > nace en datos (receta de producción en el catálogo, referencias, chequeos de marca, comentarios): se agregan por
@@ -50,7 +50,8 @@ El operador definió el 2026-10-05:
 2. Es la **misma campaña** vista desde otra persona; no hay campañas propias de Creative Studio.
 3. Un plan de producción sin campaña de marketing será **excepcional**; la campaña es la unidad.
 4. La vista cubre la pieza **en todo su ciclo**, a producir y producida, no sólo la etapa de producción.
-5. **Globe es otra cosa:** el motor de producción. Hoy está hibernado y sujeto a una reestructuración.
+5. **Globe es el motor de producción** y también es parte de Creative Studio: no son excluyentes. Hoy está hibernado
+   y sujeto a una reestructuración; más adelante tocará juntar las piezas.
 
 ## 2. Decisión
 
@@ -152,24 +153,33 @@ registro de operaciones con su nivel y tool declarada o exclusión razonada:
 3. **Chequeo de marca por versión:** criterios con resultado y evidencia (línea gráfica, firma, contraste medido,
    uso del logo), según el brand pack del cliente. Es evidencia para quien aprueba, no una aprobación.
 
-### D8. Frontera con Globe y con cualquier motor de producción
+### D8. Globe es parte de Creative Studio: el motor
 
-Creative Studio **planifica, revisa y aprueba**; no genera. Globe es el motor de producción y hoy está hibernado
-(declaración del operador, 2026-10-05). Ningún motor (Globe cuando vuelva, un proveedor de IA, el equipo con sus
-herramientas o un tercero) se acopla a Creative Studio por fuera del contrato: todos entregan versiones por
-`createAssetVersion` con procedencia y derechos. Creative Studio no depende de que Globe exista.
+Creative Studio tiene dos piezas que no se excluyen: la **vista creativa** de Studio, que planifica, revisa y aprueba
+sobre las campañas, y **Globe**, el motor que produce. Globe hoy está hibernado y sujeto a una reestructuración
+(declaración del operador, 2026-10-05); juntar las dos piezas es trabajo posterior y tendrá su propia decisión.
+
+Mientras tanto, y para que la unión no obligue a rehacer nada:
+
+- La vista no espera a Globe: funciona con cualquier origen de la pieza (el equipo con sus herramientas, un proveedor
+  de IA, un tercero o Globe cuando vuelva).
+- Toda versión, la produzca quien la produzca, entra por `createAssetVersion` con procedencia y derechos. Ése es el
+  punto de unión con Globe hoy, no una frontera definitiva.
+- Cada pieza conserva su dueño de datos: la campaña, sus piezas, versiones, revisión y aprobación viven en Studio;
+  las corridas, intentos de proveedor, créditos y gobierno de generación viven en Globe. La unión las conecta por
+  contrato, no compartiendo tablas.
 
 ### D9. Nombres
 
 - **Creative Studio** nombra la vista creativa de Efeonce Studio; **Marketing Studio**, la de activación. Las dos
   conviven en `studio.efeonce.org`.
-- **Globe** se llama Globe y deja de usar «Creative Studio» como descriptor. Delta en la
+- **Creative Studio** abarca también a **Globe**, que conserva su nombre como el motor de producción. Delta en la
   [decisión de nombre](EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
 - Los identificadores técnicos no cambian: capabilities `marketing_studio.*`, tools `studio.*`, base
   `marketing_studio`, repo `efeonce-marketing-studio`. Nombran el dominio de la plataforma, no la vista.
-- **Lectura de documentos históricos:** en documentos anteriores al 2026-10-05, en `docs/architecture/creative-studio/`,
-  en los archivos `EFEONCE_CREATIVE_STUDIO_*` y en el modelo de negocio de `docs/business-models/creative-studio/`,
-  «Creative Studio» significa **Globe**. No se reescriben; esta regla los desambigua.
+- **Lectura de documentos previos:** en documentos anteriores al 2026-10-05, en `docs/architecture/creative-studio/`,
+  en los archivos `EFEONCE_CREATIVE_STUDIO_*` y en `docs/business-models/creative-studio/`, «Creative Studio» se
+  refiere a la parte de motor (Globe). Siguen siendo de Creative Studio; sólo no cubren la vista creativa de Studio.
 
 ## 3. Alternativas descartadas
 
@@ -181,7 +191,7 @@ herramientas o un tercero) se acopla a Creative Studio por fuera del contrato: t
 | Catálogo creativo propio de formatos | Duplicaría el catálogo de canales y su evidencia; un cambio de especificación habría que hacerlo dos veces |
 | Entidad «ronda» persistida | La ronda ya está en el historial de versiones y sus decisiones; guardarla aparte crea una segunda verdad |
 | Modelo de tareas propio de producción | Los work items ya cubren asignación a personas y agentes con revisión y traspaso |
-| Creative Studio como cara de Globe | Globe está hibernado y es un motor; atar la vista a su runtime la dejaría sin servicio y mezclaría registro con generación |
+| Construir la vista dentro del runtime de Globe ahora | Globe está hibernado y en reestructuración; la vista quedaría sin servicio. La unión llega después, por contrato |
 | Renombrar capabilities y tools a algo neutral | Migración de permisos y tokens sin beneficio para el usuario; los ids técnicos nombran el dominio |
 
 ## 4. Consecuencias
@@ -213,8 +223,8 @@ herramientas o un tercero) se acopla a Creative Studio por fuera del contrato: t
 - **Impacta a:** navegación y diseño de la UI de Studio; catálogo de canales (faceta nueva); registro de operaciones
   y test de paridad; skill `efeonce-marketing-studio`; decisión de nombre; contexto de producto
   (`docs/context/03_ecosistema-producto.md`); routers `CLAUDE.md` y `AGENTS.md`.
-- **No impacta:** Greenhouse (identidad, organizaciones, ICP), el gateway MCP más allá de declarar tools nuevas,
-  Globe.
+- **No impacta:** Greenhouse (identidad, organizaciones, ICP), el gateway MCP más allá de declarar tools nuevas.
+  Globe no cambia ahora; la unión con la vista es una decisión posterior.
 
 ## 7. Preguntas abiertas
 
@@ -226,7 +236,9 @@ herramientas o un tercero) se acopla a Creative Studio por fuera del contrato: t
    decide `creative-practice`.
 5. **Revisión del cliente.** Si el cliente comenta y aprueba desde Creative Studio. Hoy está fuera de alcance de
    Studio; abrirlo exige su propia decisión de acceso externo.
-6. **Plan de producción sin campaña.** El operador lo considera excepcional; si aparece un caso real se modela como
+6. **Unión con Globe.** Cómo se juntan las piezas cuando Globe salga de la reestructuración: si la vista dispara
+   corridas de Globe desde una pieza, cómo vuelven las versiones y cómo se ven costo y créditos en la vista.
+7. **Plan de producción sin campaña.** El operador lo considera excepcional; si aparece un caso real se modela como
    campaña de producción, no como entidad nueva.
 
 ## 8. Roadmap por slices
@@ -255,8 +267,9 @@ nuevos) y su revisión de paridad:
 - **NUNCA** persistir rondas o hitos que se pueden derivar; sólo se guardan los ajustes manuales.
 - **NUNCA** crear un catálogo de formatos paralelo: la receta de producción es una faceta del catálogo de canales.
 - **NUNCA** promover una referencia a versión o final.
-- **NUNCA** acoplar un motor de producción (Globe incluido) por fuera de `createAssetVersion`.
+- **NUNCA** hacer que la vista dependa de un motor de producción para funcionar; hasta la unión con Globe, toda
+  versión entra por `createAssetVersion` y nadie comparte tablas entre Studio y Globe.
 - **NUNCA** agregar una capacidad de cualquiera de las dos vistas sin command o reader, ruta `/api/v1` y entrada en
   el registro de operaciones.
 - **SIEMPRE** que el switch cambie de vista, conservar la campaña o pieza en foco.
-- **SIEMPRE** leer «Creative Studio» como Globe en los documentos históricos listados en D9.
+- **SIEMPRE** tratar la vista creativa y Globe como partes del mismo Creative Studio, no como productos excluyentes.

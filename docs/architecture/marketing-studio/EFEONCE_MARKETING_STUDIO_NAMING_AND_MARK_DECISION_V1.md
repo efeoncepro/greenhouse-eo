@@ -1,22 +1,21 @@
 # ADR — Efeonce Marketing Studio: «Studio» como nombre corto y su marca
 
-## Delta 2026-10-05 — «Creative Studio» pasa a nombrar la vista creativa de Studio
+## Delta 2026-10-05 — Creative Studio abarca la vista creativa de Studio y a Globe
 
 Decisión del operador, formalizada en [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md):
 
-- **Creative Studio** es la vista creativa de Efeonce Studio (`studio.efeonce.org`): las mismas campañas que
-  Marketing Studio, vistas desde el diseñador, el director de arte y el brand manager. Puede usarse como nombre en
-  superficies visibles.
-- **Globe** se llama Globe y deja de usar «Creative Studio» como descriptor. Es el motor de producción; según el
-  operador, hoy está hibernado y sujeto a una reestructuración.
-- Quedan sin efecto, por lo anterior, la regla 2 de la decisión («Creative Studio» sólo como descriptor de Globe y
-  nunca suelto) y el párrafo que permitía a la documentación técnica seguir usándolo para Globe hacia adelante.
-- En documentos anteriores a esta fecha, en `docs/architecture/creative-studio/`, en los archivos
-  `EFEONCE_CREATIVE_STUDIO_*` y en `docs/business-models/creative-studio/`, «Creative Studio» se lee como Globe. No se
-  reescriben.
+- **Creative Studio** tiene dos piezas que no se excluyen: la **vista creativa** de Efeonce Studio
+  (`studio.efeonce.org`), con las mismas campañas que Marketing Studio vistas desde el diseñador, el director de arte
+  y el brand manager, y **Globe**, su motor de producción. Más adelante tocará juntar las piezas.
+- **Globe** conserva su nombre. Según el operador, hoy está hibernado y sujeto a una reestructuración.
+- Queda sin efecto la regla 2 de la decisión en lo que prohibía usar «Creative Studio» como nombre suelto: ahora
+  nombra el producto que reúne la vista y el motor, y puede usarse en superficies visibles.
+- Los documentos anteriores a esta fecha, `docs/architecture/creative-studio/`, los archivos `EFEONCE_CREATIVE_STUDIO_*`
+  y `docs/business-models/creative-studio/` siguen siendo de Creative Studio: describen la parte de motor (Globe) y no
+  cubren la vista creativa. No se reescriben.
 - El inventario de superficies visibles con «Creative Studio» suelto (decks de propuesta y pilar de Creative
-  Workflows) ya no es una infracción por el nombre, pero hay que revisar a qué se refiere cada una: si describe la
-  oferta de servicios creativos o a Globe, se corrige antes de reutilizarla. Cada cambio se propone al operador.
+  Workflows) ya no es una infracción por el nombre. Antes de reutilizarlas conviene revisar que lo que prometen
+  calce con el producto actual (vista creativa más motor en reestructuración). Cada cambio se propone al operador.
 - Queda abierto si «Studio» a secas sigue siendo Marketing Studio o pasa a nombrar la plataforma con sus dos vistas,
   y la marca de Creative Studio (§7 del ADR de la vista). Mientras tanto, en superficies visibles cada vista se
   nombra completa.

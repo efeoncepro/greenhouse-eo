@@ -64,7 +64,7 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 ## Efeonce Globe — motor de producción creativa agentic (plataforma hermana)
 
-> **Nombres (delta 2026-10-05):** Globe se llama **Globe** y ya no usa «Creative Studio» como descriptor. **Creative Studio** es la vista creativa de Efeonce Studio (`studio.efeonce.org`): las mismas campañas que **Marketing Studio**, vistas desde el diseñador, el director de arte y el brand manager ([ADR de la vista](../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md), [decisión de nombre](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md)). En las secciones de Globe de este documento y en documentos previos, «Creative Studio» se lee como Globe.
+> **Nombres (delta 2026-10-05):** **Creative Studio** reúne dos piezas que no se excluyen: la vista creativa de Efeonce Studio (`studio.efeonce.org`), con las mismas campañas que **Marketing Studio** vistas desde el diseñador, el director de arte y el brand manager, y **Globe**, su motor de producción, que conserva su nombre. Más adelante se juntan ([ADR de la vista](../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md), [decisión de nombre](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md)). Esta sección describe la parte de motor.
 
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
 
@@ -165,7 +165,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 | **Loop Marketing** | Filosofía: crecimiento compuesto. | Thought leadership. |
 | **Nested Loops™** | Sistema estratégico Express→Tailor→Amplify→Evolve. | Propuestas. |
 | **ICO** | Sistema operativo transversal: gobernanza, métricas, quality gates. | Diferenciador en pitches. Onboarding. |
-| **Ecosistema de producto** | Greenhouse + Kortex + Verk + Efeonce Globe (motor de producción creativa; hibernado, packaging pendiente). Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
+| **Ecosistema de producto** | Greenhouse + Kortex + Verk + Efeonce Globe (motor de producción de Creative Studio; hibernado, packaging pendiente). Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
 | **Frameworks específicos** | Surround Discovery™ (S⁴: SENSE → SHAPE → SURFACE → SOLVE), AEO, CSC, Revenue Enabled. | Solo en profundidad técnica. Se traducen a beneficios. |
 
 **Cómo cobra vida la IP en Greenhouse:** Loop Marketing → ciclo completo visible en dashboards; ICO → métricas RpA/OTD%/FTR en el dashboard del cliente; Surround Discovery™ → embed card del Surround Map (vía Verk); Revenue Enabled → inteligencia financiera (revenue/costo/margen por cliente).

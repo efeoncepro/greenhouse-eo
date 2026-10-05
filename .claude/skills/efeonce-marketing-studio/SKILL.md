@@ -1,6 +1,6 @@
 ---
 name: efeonce-marketing-studio
-description: Operate and extend Efeonce Marketing Studio (studio.efeonce.org, repo efeoncepro/efeonce-marketing-studio, EPIC-049) — the API-first system of record for campaigns CMP-### (brief, concepts, pieces with versions and renditions, literal copy per channel, ad configurations, media plan, calendar, attention), the evolution of the Codex "Campaign Manager" HTML prototype in OneDrive. Use when touching the efeonce-marketing-studio repo, its /api/v1 contract or operations registry (packages/contracts/src/operations.ts), the studio.* MCP tools and their federation in efeonce-mcp (provider marketing-studio, MARKETING_STUDIO_PROVIDER_ENABLED), api_client bearer tokens (mst_…), the marketing_studio.campaign.* capabilities or the RFC 8693 exchange in Greenhouse, importing the catalog from OneDrive, generating renditions, adding an operation/tool, rolling out or rolling back Studio or its gateway provider, the API-only Greenhouse CLI `pnpm studio` (upload/download, copy and catalog operations), or any EPIC-049 task. Also covers Creative Studio, the creative view of the same campaigns (ADR 2026-10-05). NOT for Globe (production engine, use greenhouse-globe). Every EPIC-049 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Marketing Studio (studio.efeonce.org, repo efeoncepro/efeonce-marketing-studio, EPIC-049) — the API-first system of record for campaigns CMP-### (brief, concepts, pieces with versions and renditions, literal copy per channel, ad configurations, media plan, calendar, attention), the evolution of the Codex "Campaign Manager" HTML prototype in OneDrive. Use when touching the efeonce-marketing-studio repo, its /api/v1 contract or operations registry (packages/contracts/src/operations.ts), the studio.* MCP tools and their federation in efeonce-mcp (provider marketing-studio, MARKETING_STUDIO_PROVIDER_ENABLED), api_client bearer tokens (mst_…), the marketing_studio.campaign.* capabilities or the RFC 8693 exchange in Greenhouse, importing the catalog from OneDrive, generating renditions, adding an operation/tool, rolling out or rolling back Studio or its gateway provider, the API-only Greenhouse CLI `pnpm studio` (upload/download, copy and catalog operations), or any EPIC-049 task. Also covers Creative Studio, the creative view of the same campaigns (ADR 2026-10-05). Globe is the other part of Creative Studio, its production engine (use greenhouse-globe). Every EPIC-049 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Marketing Studio (living skill)
@@ -17,11 +17,12 @@ decisions). It is the productized evolution of the Codex "Campaign Manager" HTML
 > or piece. The authority over a «final» is creative (`approveAssetVersion`, `approveCreative`); the three campaign
 > states never collapse. Governing ADR: `docs/architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`.
 >
-> **Studio ≠ Globe.** Globe (repo `efeonce-globe`, skill `greenhouse-globe`) is the production engine, hibernated since
-> 2026-10-05 per the operator. Studio records, reviews and governs; it never generates media, and no engine couples to
-> it outside `createAssetVersion`. In docs dated before 2026-10-05, in `docs/architecture/creative-studio/` and in
-> `EFEONCE_CREATIVE_STUDIO_*` files, «Creative Studio» means **Globe**. Also distinct from the Higgsfield "marketing
-> studio" MCP tools.
+> **Globe is the engine of Creative Studio, not a separate world.** Creative Studio = the creative view in Studio
+> (plan, review, approve) + Globe (repo `efeonce-globe`, skill `greenhouse-globe`), the production engine, hibernated
+> and under restructuring since 2026-10-05 per the operator. Joining the two is later work with its own decision; until
+> then the view never depends on Globe, every version enters through `createAssetVersion`, and no tables are shared.
+> Pre-2026-10-05 docs, `docs/architecture/creative-studio/` and `EFEONCE_CREATIVE_STUDIO_*` describe the engine part.
+> Also distinct from the Higgsfield "marketing studio" MCP tools.
 
 This skill is the **accumulated operating knowledge of the program**, not a copy of the docs. The ADR and the
 architecture say what Studio *is*; this skill says what an agent must know to *work on it without repeating what
@@ -240,7 +241,7 @@ runtime, memory or delegated authority.
 
 ## Hard rules
 
-- **NUNCA** confuse Studio (Marketing Studio + Creative Studio) with Globe; in pre-2026-10-05 docs «Creative Studio» = Globe.
+- **NUNCA** treat the creative view and Globe as excluding products: both are Creative Studio. Route view work here and engine work to `greenhouse-globe`.
 - **NUNCA** give Creative Studio its own campaigns, concepts, pieces, schema or base, nor use the active view to grant
   or hide authority (ADR 2026-10-05). Rounds and production milestones are derived, never persisted (only manual
   overrides); the production recipe is a facet of the channel catalog, never a parallel catalog.
