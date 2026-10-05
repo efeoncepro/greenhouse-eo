@@ -1504,3 +1504,18 @@ Greenhouse conserva sus pins: adopción y migración del theme siguen separadas 
 Este release no incluye un nuevo `axis-brand-assets`; el catálogo `/logos` sigue necesitando publicación propia.
 
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Agendador nativo — candidato local, 2026-10-05
+
+Token `axisScheduler` en `axis-tokens`; tipos `SchedulerModel`/`SchedulerAction` y helpers
+`validateSchedulerModel`/`schedulerMonthDates` en contracts. Subpath
+`@efeoncepro/axis-ui-primitives/scheduler`: `createScheduler`, `resolveSchedulerRecipe` y los helpers
+reexportados. CSS `/scheduler.css` junto con `/forms.css` y `/button.css`. Cargar Bricolage/Poppins en el host.
+`createScheduler(host, snapshot, onAction)` devuelve `update(snapshot)` y `destroy()`.
+
+No hay red, reserva ni medición en AXIS; el consumidor entrega snapshots y recibe acciones. El estado
+`confirmed` exige comprobante propio; `ambiguous` no ofrece retry. Disponibilidad por ID de slot y fecha
+civil en zona IANA; confirmación nunca inferida de la selección. Capacidad `compose-scheduler`, Lab
+`/references/scheduler/`. Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+Exports nuevos **sin publicar**, no incluidos por inferencia en primitives 0.5.0.

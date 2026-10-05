@@ -445,3 +445,31 @@ ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo 
   los componentes en Greenhouse ni cambia la madurez candidate de los contratos.
 
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Agendador AXIS — candidato 2026-10-05
+
+Verificar familia Bricolage en títulos/Poppins en controles, roles papel/navy y selección con texto legible.
+Probar calendario por teclado, mes vacío, recuperación y resultado ambiguo; cambio de receta conserva
+selección, foco y borrador. Confirmación sólo desde comprobante explícito del consumidor. No usar reservas
+reales para QA visual. API/QA: `docs/quality/scheduler.md` en AXIS; verificado contra @8adedef + WIP local,
+2026-10-05. Publicación y aceptación visual pendientes.
+
+
+Revisión de disponibilidad/motion (2026-10-05): comprobar día + calendario/cantidad, guion de
+sin disponibilidad y leyenda, también a 320/390 px. El total excluye slots deshabilitados.
+Probar View Transitions scoped en navegador compatible y fallback donde no exista; nunca animar
+el documento anfitrión. Probar cambio rápido de mes/escenario sin callback viejo, reducción de
+movimiento en vivo, teclado y borrador al volver. Evidencia y límites en `docs/quality/scheduler.md`
+del checkout AXIS; @8adedef + WIP local, sin release.
+
+Revisión posterior: comprobar límites de cada celda a 820/640/390/320 px, apertura y selección del
+Select canónico por teclado, cuatro campos con íconos decorativos y labels persistentes. El preview
+usa el adapter React sólo para su configurador; scheduler sigue portable. Verificación en
+`docs/quality/scheduler.md` de AXIS, 2026-10-05.
+
+
+Confirmación celebratoria (2026-10-05): comprobar emblema y tres íconos del recibo, lectura en 320/390/820 px,
+una sola reproducción, cancelación de confeti al activar reduced motion y ningún reinicio por resize.
+Sólo desde `confirmed` con comprobante. Tras submit, título visible/foco; abandonar el traslado si
+el usuario interactúa fuera. Estado estático conserva toda la información. Evidencia en QA de AXIS.

@@ -945,3 +945,43 @@ adicional. No convertir cada campo en una pieza publicitaria. La ayuda, el error
 siguen ligados al control. Detalle técnico y límites: [lab-components.md](lab-components.md#formularios-portables--2026-10-04).
 
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### 2026-10-05 — Agendadores y superficies públicas de Efeonce
+
+Corrección del operador: un render funcional de Growth Meetings no acredita alineación con La órbita.
+Construir primero la composición en AXIS y revisar luego su adaptación. Reutilizar estructura y comportamiento
+no implica canonizar la paleta, tipografía o controles heredados. Aplicar los roles de marca y las primitives
+funcionales; no añadir una órbita decorativa al calendario. Esta dirección no certifica aceptación visual
+del candidato ni habilita la línea en el interior del portal Greenhouse.
+Verificado contra: axis-design-system@8adedef + WIP local de scheduler — 2026-10-05.
+
+
+### 2026-10-05 — Disponibilidad inequívoca y movimiento del agendador
+
+Corrección del operador sobre el candidato: el número del día y la cantidad de horarios no pueden
+parecer dos fechas. Día destacado, ícono de calendario + cantidad para disponibilidad y guion
+para ausencia, con leyenda (revisión posterior del operador sustituye el check y «disp.»); el panel de horas repite el total. No depender sólo del color.
+Motion con causalidad: dirección al cambiar mes/paso, respuesta de selección y contenido secuenciado,
+con contexto estable. Movimiento reducido, foco, interrupción y borrador son parte del comportamiento.
+Implementado localmente en axis-design-system@8adedef + WIP de scheduler; aceptación final pendiente.
+
+
+### 2026-10-05 — Revisión del agendador: íconos y Select canónico
+
+En celdas compactas, calendario y cantidad comparten una línea debajo del día. No usar check ni
+abreviatura «disp.»; conservar leyenda y nombre accesible completo. Verificar que el indicador
+quepa dentro de su celda en receta intermedia y móvil. Los campos usan `leadingIcon` del vocabulario
+funcional compartido (persona, correo, empresa), no pictogramas decorativos independientes.
+Los configuradores del Lab consumen Field/Select canónico; no un `<select>` suelto con CSS local.
+NativeSelect sigue siendo un fallback explícito, no una razón para sustituir menús canónicos.
+Verificado contra axis-design-system@8adedef + WIP local, sin publicación.
+
+
+### 2026-10-05 — Cierre celebratorio del agendador
+
+El operador rechaza una confirmación plana. Componer un emblema de celebración funcional, título
+editorial y comprobante separado con calendario/reloj/zona. Confeti breve y acotado, una sola vez
+al confirmar, nunca en error o resultado ambiguo; no añadir órbitas decorativas. Movimiento reducido
+conserva el cierre estático, cancela y no reanuda el efecto. Llevar al cierre visible tras el submit
+sin robar foco si la persona ya está interactuando fuera. AXIS @8adedef + WIP local, sin release.

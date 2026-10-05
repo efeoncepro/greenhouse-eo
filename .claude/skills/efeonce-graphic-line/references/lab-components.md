@@ -178,3 +178,17 @@ Versiones y entrada API: [package-and-tokens.md](package-and-tokens.md#distribuc
 Matriz y comandos: AXIS `docs/quality/forms.md`; los diez contratos siguen candidate.
 
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Agendador AXIS — 2026-10-05, candidato local
+
+Construido primero en AXIS por instrucción del operador, antes de adaptar Growth Meetings. La ruta
+`/references/scheduler/` consume `createScheduler` de `axis-ui-primitives/scheduler`, DOM nativo sin React
+obligatorio. Tres recetas por contenedor, calendario, horarios, datos y confirmación; los fixtures del Lab
+no reservan. Papel/navy y acento de La órbita desde `axisScheduler`, Bricolage editorial/Poppins funcional,
+campos y botones desde las primitives. Sin órbita decorativa. El consumidor conserva red, reservas,
+validación de negocio, CAPTCHA y telemetría. No se migró el renderer de Greenhouse.
+
+Verificado contra: axis-design-system@8adedef + cambios locales de scheduler — 2026-10-05. Código/API/QA
+en `packages/primitives/README.md`, `docs/architecture/SCHEDULER_COMPOSITION_DECISION_V1.md` y
+`docs/quality/scheduler.md`. Publicación pendiente; aceptación visual explícita recibida el 2026-10-05 («Bien, está aprobado...»).

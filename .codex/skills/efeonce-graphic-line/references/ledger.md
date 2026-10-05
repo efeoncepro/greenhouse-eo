@@ -562,3 +562,55 @@ Se conserva adopción Greenhouse `planned`, sin cambio de pins; lectores de pant
 físicos y baselines Linux pendientes. El catálogo de logos requiere otro release de brand-assets.
 
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### 2026-10-05 — Agendador: AXIS primero
+
+El operador señala que Growth Meetings no está adaptado a La órbita y autoriza construir primero en AXIS;
+la adaptación del consumidor se evalúa después. Se implementa la composición candidata en packages y Lab,
+con tokens y controles de la línea. Esta decisión autoriza implementación local, no aprobación visual,
+publicación ni migración de Greenhouse. Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — Revisión del agendador: disponibilidad y motion
+
+El operador valida la dirección visual y pide distinguir fecha/cantidad, señales explícitas de disponibilidad
+y transiciones más robustas. Se añaden check/cantidad etiquetada, guion/leyenda, total en horarios,
+View Transitions limitadas a la etapa y fallback Web Animations con reducción e interrupción.
+La validación de dirección no equivale a aceptación de esta revisión ni publicación.
+Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — El operador sustituye el check del calendario
+
+En la revisión anotada pide calendario en vez de check, corregir celdas estrechas, consumir el Select
+canónico y añadir íconos en campos. Se sustituye check/«disp.» por calendario + cantidad; el Lab pasa
+a Field/Select/Button canónico. El problema observado era un `<select>` suelto en la demo, no un
+defecto demostrado del Select. Campos con persona/correo/empresa del catálogo funcional Tabler.
+AXIS @8adedef + WIP local; revisión implementada sin release ni adaptación de Growth Meetings.
+
+
+### 2026-10-05 — Confirmación: celebración y comprobante
+
+El operador solicita más intención visual y celebración en «Ya tenemos un espacio». Implementación
+local: emblema Tabler confetti, tarjeta de fecha/hora/zona con íconos, burst acotado y único tras el
+comprobante. Reduced motion mantiene el resultado estático. Tokens y renderer en AXIS; sin reserva
+real ni cambio en Growth Meetings. Verificado @8adedef + WIP local, aceptación final pendiente.
+
+
+### 2026-10-05 — Agendador AXIS aprobado visualmente
+
+Aprobación explícita del operador: «Bien, está aprobado...», tras revisar calendario/disponibilidad,
+Select canónico, campos con íconos y confirmación celebratoria. La revisión visual actual queda
+aprobada; reemplaza el estado de aceptación pendiente de las entradas anteriores. Implementación
+local sobre AXIS @8adedef + WIP; huella y alcance en `docs/quality/scheduler.md` de AXIS. Publicación
+de packages/Lab y adaptación de Growth Meetings siguen pendientes, sin autorización de release inferida.
+
+
+### 2026-10-05 — Push del agendador autorizado
+
+El operador solicita «Push». Entrega AXIS `eeb24e2`: agendador aprobado y CI de su suite, aislados
+del WIP de product primitives y AI Visibility Report. Instantánea de commit: build, typecheck,
+suite global, design gate, agent gate y 37 pruebas de navegador PASS; 3 SKIP por API scoped ausente,
+con fallback probado. Registro completo en `docs/quality/scheduler.md`. Esta autorización no incluye
+publicación de versiones de packages ni adaptación de Growth Meetings.
