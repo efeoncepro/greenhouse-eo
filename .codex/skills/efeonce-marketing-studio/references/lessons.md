@@ -356,3 +356,12 @@
   hook**: pasar por una función de módulo. `react-hooks/refs`/orden: declarar callbacks antes de usarlos en hooks.
 - **Los clics capturados en un ancestro llegan antes que el `onClick` del `<Link>`**: para que un enlace maneje su
   propia salida, marcarlo `data-nav-native`.
+- **ISSUE-180 (2026-10-05): el pool `pg` no cierra conexiones en instancias congeladas de Vercel.** Más consultas en
+  paralelo + prefetch en reposo + medición con 20 navegadores agotaron el tope de 20 del rol web. Regla: `attachDatabasePool`
+  en el runtime web, pool de 2 en Vercel, prefetch sólo por intención, y jamás carga sintética contra producción.
+- **Rollback de Vercel reusa instancias congeladas** del deploy viejo: el Cloud SQL connector puede traer un certificado
+  efímero vencido (`ssl/tls alert bad certificate`). Redeploy fresco + promote las renueva.
+- **`@vercel/functions` 3.9.11 depende de `@vercel/oidc` 4.0.0** y rompe el `dependency-catalog-gate` (Studio fija 3.8.9):
+  usar 3.9.9 hasta migrar oidc a propósito.
+- **Avisar «no push» a una sesión no frena a las demás:** una sesión de branding empujó a `main` y desplegó el código en
+  espera. Con trabajo en producción pendiente, revertir en `main` o confirmar con `ListAgents` y todas las sesiones activas.

@@ -1,5 +1,19 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-05 (cierre) — deploy, incidente ISSUE-180 y corrección del pool
+
+**En producción:** Studio `3829a8b` (Vercel `3ai7wipv3`): rendimiento (`7e081d0`), motion v3.6 (`11ec7fa`), prefetch por
+intención (`6e6ba64`) y conexiones compatibles con Vercel Fluid (`3829a8b`: `attachDatabasePool`, 2 conexiones por
+instancia, 5 s de inactividad). **Medido en producción:** RSC del mes 226 → 95 KB (HTML 428 → 171 KB), hoja 242 →
+111 KB; render del mes 686 → 450 ms, con filtro 923 → 447 ms, mes siguiente 794 → 452 ms; navegación con un navegador:
+mes siguiente 80–210 ms, Semana 302 ms, hoja 508 ms, filtro 699 ms, siempre con señal visible desde el primer cuadro
+(antes 0,36–1,4 s congelado).
+
+**Incidente:** la primera medición con carga sintética (20 navegadores seguidos) más el prefetch en reposo agotó el tope
+de 20 conexiones del rol web: ~18 min de 500 intermitentes en páginas (13:50–14:08 UTC). Mitigado (rollback, redeploy
+fresco, sesiones inactivas liberadas) y corregido en `3829a8b`. Detalle: [ISSUE-180](../../issues/resolved/ISSUE-180-marketing-studio-pg-connections-exhausted-after-calendar-deploy.md).
+Pendientes derivados: pooler de conexiones (task aparte) y reintento ante `bad certificate` del connector.
+
 ## Delta 2026-10-05 (noche) — rendimiento percibido y sistema de motion v3.6
 
 **Commits (Studio `main`, locales, sin push; producción sigue en `5d962c4`).** `7e081d0` rendimiento y `11ec7fa` motion.
@@ -91,8 +105,7 @@ y [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_H
 
 **Pendientes.**
 
-- ~~**Motion y rendimiento percibido**~~ — implementado en local el 2026-10-05 (`7e081d0`, `11ec7fa`); ver el delta
-  de la noche. Falta el deploy (señal del operador) y medir el «después» en producción.
+- ~~**Motion y rendimiento percibido**~~ — en producción desde el 2026-10-05 (`3829a8b`); ver el delta de cierre.
 - **Mercados desde la configuración de la organización:** hoy la lista vive en el código web (deuda declarada).
 - **Plataformas del catálogo sin etiqueta en Studio** (Discord, Slack, foros, Circle…) no aparecen en el filtro.
 - **Conteos del filtro** sujetos al tope de 200 activaciones del período, como el calendario.
@@ -133,7 +146,7 @@ generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a s
 | ~~Hoja de email (V3-SheetEmail, MobSheetEmail)~~ | **Hecha el 2026-10-05** (`3048f96`) sobre el contrato `1f2a0ef` | Datos reales cuando se publique el lado Greenhouse del contrato |
 | Hoja de blog (V3-BlogPre, V3-BlogPost): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces (la landing con formulario de V3-OwnedFormats quedó **hecha el 2026-10-05**, `3048f96`) | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
 | Filtros y formulario con menús v3.4 y fecha/hora v3.5 | **Hechos el 2026-10-05** (`bef0ecf`, `e656f2a`, `5d962c4`). Quedan: mercados desde la configuración de la organización, plataformas del catálogo sin etiqueta en Studio y conteos con el tope de 200 | Deuda de configuración y etiquetas; sin task |
-| ~~Motion y rendimiento percibido (operador: 3/5)~~ | **Hecho en local el 2026-10-05** (`7e081d0`, `11ec7fa`) con la dirección «v3.6 · Motion» aprobada | Deploy con señal del operador y medición en producción |
+| ~~Motion y rendimiento percibido (operador: 3/5)~~ | **En producción el 2026-10-05** (`3829a8b`) con la dirección «v3.6 · Motion» aprobada, medido antes/después | — |
 | Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
 | Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
 | Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed`. **2026-10-05:** habilitados temporalmente en producción para la organización Efeonce por la ventana de escritura (`1f003c1`, vence 2026-10-12T10:00Z); verificado sólo con `cancel` en `dryRun`. Fecha y hora con los selectores v3.5 (`5d962c4`) | Se habilitan de forma definitiva cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código. La ventana se retira al llegar TASK-1898 |
@@ -279,7 +292,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-049`
-- Status real: `En producción (Studio 5d962c4, deploy p1ng5wy75): calendario v3, hojas email/web, filtros v3.4 y fecha/hora v3.5. Escrituras T1 habilitadas sólo para Efeonce por la ventana temporal hasta 2026-10-12T10:00Z. Local sin push: rendimiento percibido (7e081d0) y motion v3.6 (11ec7fa), verificados; deploy con señal del operador. Pendiente: escrituras definitivas con TASK-1898, sesión MCP real (TASK-2003), mercados desde configuración, plataformas sin etiqueta y datos reales de email/web`
+- Status real: `En producción (Studio 3829a8b, deploy 3ai7wipv3): calendario v3, hojas email/web, filtros v3.4, fecha/hora v3.5, rendimiento percibido y motion v3.6, con conexiones compatibles con Vercel Fluid (ISSUE-180 resuelto). Escrituras T1 habilitadas sólo para Efeonce por la ventana temporal hasta 2026-10-12T10:00Z. Pendiente: escrituras definitivas con TASK-1898, sesión MCP real (TASK-2003), pooler de conexiones, mercados desde configuración, plataformas sin etiqueta y datos reales de email/web`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-2001 (activaciones, evidencia, avisos, eventos y reader del calendario) · TASK-1895 si sus primitives Sheet/ConfirmDialog no existen aún (si no, esta task las crea con el mismo contrato)`

@@ -539,13 +539,15 @@ hora (para aprobar)» (V3-DateOpen, V3-TimeOpen, V3-RangeOpen, V3-MobDate, V3-Mo
 
 ## TASK-2002 — rendimiento percibido y motion v3.6 (sesión 2026-10-05, noche)
 
-- **Studio local, sin push:** `7e081d0` (rendimiento) y `11ec7fa` (motion). Producción sigue en `5d962c4`; push = deploy,
-  sólo con señal del operador.
+- **En producción (2026-10-05):** Studio `3829a8b`, Vercel `3ai7wipv3` = `7e081d0` (rendimiento) + `11ec7fa` (motion) +
+  `6e6ba64` (prefetch por intención) + `3829a8b` (pool compatible con Vercel Fluid). Incidente durante la verificación:
+  [ISSUE-180](../../../../docs/issues/resolved/ISSUE-180-marketing-studio-pg-connections-exhausted-after-calendar-deploy.md).
 - **Dirección aprobada:** canvas Design `D6uwRFMzvnaHzGDtDLvxBi` v48, página «v3.6 · Motion (para aprobar)» (10 tableros:
   sistema, navegar, superficies, respuesta, hoja móvil; claro/oscuro). Generador: scratchpad de la sesión (`gen_motion.py`).
 - **Medido antes (producción):** RSC del mes 226 KB (bandeja de 50 ejecuciones ≈ 150 KB); navegación cliente congelada
   0,36–1,4 s (mes), 0,6–0,7 s (hoja), 1,4 s (filtro). **Después (local, build prod):** render −30/−45 %, mes vecino sin
-  petición, primera señal ~30 ms; RSC proyectado 111 KB. Producción «después»: pendiente de deploy.
-- **Pendiente:** deploy y medición en producción; anillo de cambio de estado con una lectura real; salida animada de los
+  petición, primera señal ~30 ms. **Después (producción):** RSC del mes 95 KB, render del mes 450 ms, filtro 447 ms;
+  navegación real 80–700 ms con señal desde el primer cuadro.
+- **Pendiente:** pooler de conexiones (task aparte); reintento ante `bad certificate` del connector; anillo de cambio de estado con una lectura real; salida animada de los
   selectores de fecha (hoy sólo entrada desde su origen); error de vista previa del diálogo que queda en «Validando…».
 - Contrato: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`; delta en TASK-2002.

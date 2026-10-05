@@ -521,3 +521,12 @@ test `open-write-window.test.ts`.
   reprogramar → Deshacer deja la activación como estaba (verificar `planned_at` en la base local).
 - **Integración del dominio:** crear una base desechable en el cluster local (`CREATE DATABASE …`), migrarla con
   `node-pg-migrate` del paquete database y exportar `STUDIO_*_IT_PG_URL`; borrarla después. 3 tests fallan igual en HEAD.
+- **Nunca carga sintética contra producción de Studio** (ISSUE-180): medir con un navegador y vigilar las conexiones del
+  rol en paralelo, sólo lectura, desde el proxy de Greenhouse (`pnpm pg:connect`, misma instancia):
+  `select state, count(*), max(now()-state_change) from pg_stat_activity where usename='marketing_studio_app' group by 1`.
+  Sano: suben durante la navegación y vuelven a la base ~10 s después. Tope del rol: 20.
+- **Recuperación si se agota el rol:** liberar sólo sesiones `idle` de `marketing_studio_app` con más de 2–3 minutos
+  (`pg_terminate_backend`); las instancias reabren al necesitarlo. Un rollback de Vercel reactiva instancias viejas que
+  pueden fallar con `bad certificate`: preferir `vercel redeploy <deploy> --target production` + `vercel promote`.
+- Tras `vercel rollback`/`promote`, los pushes siguientes a `main` siguen promoviéndose a producción (visto el 2026-10-05):
+  cualquier push de otra sesión despliega todo `main`.

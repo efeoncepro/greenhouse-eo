@@ -2,8 +2,8 @@
 
 ## Contrato vigente · 2026-10-05
 
-- **Estado:** implementado y verificado en local (Studio `7e081d0` rendimiento + `11ec7fa` motion, sin push). Producción
-  sigue en `5d962c4` hasta la señal del operador.
+- **Estado:** en producción desde el 2026-10-05 (Studio `3829a8b`, deploy `3ai7wipv3`); el prefetch de períodos vecinos
+  es sólo por intención (`6e6ba64`) tras [ISSUE-180](../../issues/resolved/ISSUE-180-marketing-studio-pg-connections-exhausted-after-calendar-deploy.md).
 - **Dirección aprobada:** canvas Design «v3.6 · Motion (para aprobar)» (artifact `D6uwRFMzvnaHzGDtDLvxBi`, versión 48):
   tablero de sistema + tableros interactivos de navegación, superficies, respuesta y hoja móvil, en claro y oscuro.
   Aprobado por el operador el 2026-10-05 («Me gustan todos»).
@@ -13,7 +13,7 @@
 
 ## Meta
 
-- Status: `implemented` (local; despliegue pendiente de señal).
+- Status: `implemented` (producción, 2026-10-05).
 - Owner task: `TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI`.
 - Related wireframe: `docs/ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md`.
 - Related flow: `docs/ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md`.

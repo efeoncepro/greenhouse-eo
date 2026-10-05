@@ -273,3 +273,4 @@ All paths below are in Studio unless marked Greenhouse.
 | `scripts/generate-theme.mjs` | Emite `--motion-instant…extended` y `--ease-emphasized/standard/exit/linear` desde `axisMotion` |
 | `packages/domain` readers | `getCalendarRange`, `listActivations`, `activationProjection` paralelizados; `loadChannelCatalog` con caché por versión publicada (`clearChannelCatalogCache`) |
 | `next.config.ts` | `experimental.staleTimes.static = 60` (prefetch manual vale 60 s) |
+| `apps/web/src/server/runtime.ts` + `packages/database/src/connection.ts` | `attachDatabasePool(handle.pool)` (`@vercel/functions` 3.9.9; la 3.9.11 arrastra `@vercel/oidc` 4) para cerrar conexiones antes de congelar; en Vercel `maxConnections` 2 e `idleTimeoutMillis` 5 s; el handle expone `pool` (ISSUE-180) |

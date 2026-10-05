@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-179`
+`ISSUE-181`
 
 ## Open
 
@@ -122,6 +122,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-180` | [Marketing Studio agota las conexiones de su rol de base tras el deploy del calendario rápido](resolved/ISSUE-180-marketing-studio-pg-connections-exhausted-after-calendar-deploy.md) | producción (Studio) | 2026-10-05 | 2026-10-05 | `attachDatabasePool` + 2 conexiones por instancia en Vercel (`3829a8b`); prefetch por intención; sesiones inactivas liberadas. Misma clase que ISSUE-174. |
 | `ISSUE-178` | [Staging no compila al procesar Geist de Google Fonts](resolved/ISSUE-178-staging-build-google-font-query.md) | staging | 2026-10-04 | 2026-10-04 | Parser de URLs de Google Fonts en Turbopack. Fuentes locales versionadas + guard de integridad; staging READY y fuentes/login/sesión verificados. |
 | `ISSUE-177` | [Una función de Vercel puede superar los 250 MB y nada lo detecta antes del build remoto](resolved/ISSUE-177-vercel-function-size-no-local-gate.md) | staging | 2026-09-22 | 2026-09-22 | Valor importado del barrel del composer (Playwright + pdf-lib) y `fs` con ruta de runtime variable alcanzables por rutas de Vercel; sin gate antes del build remoto. Resuelto con la entrada `artifact-composer/pure`, la regla ESLint `no-worker-only-module-in-vercel-code`, `pnpm vercel:reachability-gate` (pre-push + CI), `pnpm vercel:function-size-gate` (CI tras el build) y la separación lectura/comandos de Insights |
 | `ISSUE-175` | [DataForSEO falla en ops-worker por login ausente](resolved/ISSUE-175-dataforseo-worker-login-missing.md) | staging + producción (worker compartido) | 2026-09-19 | 2026-09-19 | Faltaba `DATAFORSEO_API_LOGIN` en la revisión viva; restaurado en 00698 y canary succeeded (10 candidatos, USD 0.0132). Guard en TASK-1341 pendiente de rollout. |
