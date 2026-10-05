@@ -1,5 +1,17 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-05 — reader de hojas email y landing
+
+Extensión solicitada para V3-SheetEmail, MobSheetEmail y V3-OwnedFormats. UI TASK-2002 ya productiva según operador; Claude conserva calendario/hojas. API local 1.9.0: `ActivationDto.email` y `ActivationDto.web`, mismos readers HTTP/MCP/CLI, sin tocar UI. El alcance de entregados/aperturas/clics se amplía aquí **sólo a la última lectura**, sin series TASK-1892/1910.
+
+- [x] Remitente, copy literal + conteo + límites de catálogo, audiencias y métricas con fuente/fecha; null ausente, sin SQL Greenhouse desde Studio.
+- [x] Conteo de destinos aislado por organización y evidencia web; formulario **Growth Forms (id = form_key)**, validado contra reader público. El operador aclara Growth Forms → DB propia → HubSpot; no tratar HubSpot como proveedor del formulario ni exponer GUID de destino.
+- [x] Postgres real, `pnpm check`, build, pruebas owner/CLI y contrato OpenAPI/tool manifest. [Campos exactos, evidencia y exclusiones](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+- [x] Skill espejo y manual actualizados. Contrato aditivo sobre JSON existentes; sin migración.
+- [ ] Rollout/canary de esta extensión: pendiente, sin push autorizado. La disponibilidad de la UI productiva no certifica este DTO nuevo.
+
+No se incluyen datos sin fuente: conteo de contactos Resend (sólo API privada beta), series/tasas/usuarios únicos, leads/entregas de formularios ni destinos internos HubSpot. Se conserva contactCount para HubSpot; Resend devuelve null. Sin límite verificado en el catálogo, copyLimits null. Embeds dinámicos no observables o contrato público inaccesible dejan connectedForms null y estado honesto; no «false». Ver motivos y fuentes en el informe enlazado.
+
 ## Ajuste de alcance 2026-10-04 — conexiones y QA
 
 El operador confirma: conectar sólo Resend y HubSpot; preparar Marketing Cloud Engagement/Next sin conexión ni certificación live (no hay entorno de prueba). Blog: conectar sólo efeoncepro.com con WordPress, conservando CMS por cuenta y el fallback para otros CMS. Incluye QA de integración con UI TASK-2002 y CLI. TASK-2003 no se implementa en este paso. Nuevos cambios local-first, sin nuevo push hasta revisión del corte.
@@ -169,7 +181,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Greenhouse f08029b0f en develop/staging READY, owned OFF; Studio sigue local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. WP real 96 URLs y replay owned PG 113/0 cambios PASS; CLI y GVC básico PASS; navegación móvil Día→Línea de tiempo falla y se entrega a Claude. Faltan release/configuración owned y QA final UI de Claude; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
+- Status real: `TASK-2002 calendario productivo según operador; extensión de readers email/web API 1.9.0 implementada y validada localmente (296+7 Studio con PG 18.6, build; 12 owner +18 CLI Greenhouse). Contrato Growth Forms confirmado: DB propia y dispatcher HubSpot. UI no modificada. Nuevo rollout/push y configuración owned pendientes; no ampliar el estado live por inferencia. TASK-2003 conserva MCP delegado; TASK in-progress. Evidencia: TASK-2001-activation-reader-sheets-2026-10-05.md`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`

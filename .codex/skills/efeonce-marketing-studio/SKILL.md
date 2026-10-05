@@ -394,3 +394,13 @@ Resend tendrá el mayor volumen; también deben soportarse HubSpot, Salesforce M
 Adapters separados con cuenta/tenant y evidencia de envío/completitud, catálogo aditivo y mismas operaciones API/MCP/CLI.
 Reusar delivery/inbox/reconciliación de Greenhouse para Resend sólo con vínculo explícito a campaña; broadcast no basta.
 El corte 4094da0 no implementa la ampliación; no presentar enums/fixtures como conexiones operativas. Delta email de TASK-2001 gobierna la continuación.
+
+
+## Hojas de activación email/web (TASK-2001, 2026-10-05)
+
+API 1.9.0 local: `ActivationDto.email` y `web` comparten detalle/calendario/HTTP/MCP/CLI. Contrato y rollout en
+[references/contracts.md](references/contracts.md). Remitente/copy literal, límites del catálogo fijado y última
+lectura de audiencias/entregados/aperturas/clics con fuente/fecha. Null no es cero. El formulario de una landing
+es **Growth Forms**, `web.connectedForms[].id = form_key` público; las respuestas van a DB Greenhouse y después
+al dispatcher HubSpot. Jamás exponer su GUID de destino ni inferir entrega desde un embed. TASK-2002 UI queda
+con Claude; código validado local no implica reader actualizado en producción.

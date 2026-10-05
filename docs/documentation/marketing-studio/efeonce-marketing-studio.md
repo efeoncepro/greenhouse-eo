@@ -281,3 +281,19 @@ CMS usan URL pública y fecha confirmada por una persona. Notion sólo es refere
 
 Este contrato local no acredita habilitación en producción. [Conexiones y límites](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md)
 y [operación por CLI](../../manual-de-uso/marketing-studio/operar-por-cli-api.md).
+
+
+## Hojas de email y landing — contrato local 2026-10-05
+
+La lectura de email incorpora remitente, asunto y preheader exactamente como están en la herramienta, su
+conteo y los límites disponibles del catálogo, listas/segmentos y última lectura de entregados, aperturas y clics.
+Cada lectura conserva fuente y fecha; no equivale a una serie de rendimiento. Lista actual no equivale a
+personas que recibieron el envío. Un dato ausente no se muestra como cero.
+
+La landing informa cuántas otras activaciones de la organización apuntan a su URL exacta y conserva evidencia
+de URL/publicación. Un formulario conectado se identifica como Growth Forms con su identidad pública;
+las respuestas ingresan primero a Greenhouse y luego el dispatcher las entrega a HubSpot. La hoja no certifica
+esa entrega ni expone el destino interno de HubSpot. Sin vínculo comprobado queda desconocido.
+
+El calendario productivo de TASK-2002 se mantiene intacto. Esta ampliación aún requiere desplegar readers y
+realizar readback. [Campos y límites para las hojas](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).

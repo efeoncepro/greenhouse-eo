@@ -7,6 +7,65 @@ export class EmailEvidenceError extends Error {
   }
 }
 export type EmailProvider = 'hubspot' | 'resend'
+type Metric = {
+  value: number
+  source: string
+  observedAt: string
+  windowStartAt: string | null
+  windowEndAt: string | null
+}
+type Audience = {
+  kind: 'list' | 'segment'
+  id: string
+  name: string | null
+  role: 'include' | 'exclude'
+  source: string
+  observedAt: string
+  contactCount: Metric | null
+}
+type EmailDetails = {
+  source: string
+  observedAt: string
+  sender: { name: string | null; address: string | null; raw: string | null }
+  subject: string | null
+  preheader: string | null
+  audiences: Audience[] | null
+  delivered: Metric | null
+  opens: Metric | null
+  clicks: Metric | null
+}
+
+const metric = (
+  value: number | null | undefined,
+  source: string,
+  observedAt: string,
+  windowStartAt: string | null = null,
+  windowEndAt: string | null = null
+): Metric | null => (value == null ? null : { value, source, observedAt, windowStartAt, windowEndAt })
+
+// Resend's documented single mailbox format. Preserve the original even if it cannot be safely split.
+const sender = (raw: string | null | undefined): EmailDetails['sender'] => {
+  if (raw == null) return { name: null, address: null, raw: null }
+  const mailbox = /^([^<>\r\n]+) <([^<>\s@]+@[^<>\s@]+)>$/.exec(raw)
+
+  return { raw, name: mailbox?.[1] ?? null, address: mailbox?.[2] ?? (/^[^<>\s@]+@[^<>\s@]+$/.test(raw) ? raw : null) }
+}
+
+const count = z.number().int().nonnegative()
+const literal = z.string().nullish()
+
+const boundedFetch = (original: typeof fetch): typeof fetch => {
+  const deadline = Date.now() + 45000
+
+  return async (url, init) => {
+    const remaining = deadline - Date.now()
+
+    if (remaining <= 0) throw new EmailEvidenceError('provider_unavailable')
+
+    return original(url, { ...init, signal: AbortSignal.timeout(Math.min(remaining, 15000)) })
+  }
+}
+
 export type EmailEvidence = {
   id: string
   scheduledAt: string | null
@@ -17,6 +76,8 @@ export type EmailEvidence = {
   urls: string[]
   permalink: null
   emailEvidence: {
+    details: EmailDetails
+    observedAt: string
     kind: 'broadcast' | 'batch'
     completion: 'not_started' | 'partial' | 'complete' | 'unknown'
     sentCount: number | null
@@ -42,16 +103,31 @@ const requestJson = async (url: URL, token: string, fetcher: typeof fetch) => {
   if (!token) throw new EmailEvidenceError('not_configured')
 
   try {
-    const response = await fetcher(url, {
-      headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'Efeonce-Studio-Evidence/1.0' },
-      redirect: 'error',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15000)
-    })
+    // Detail/list/metrics fan-out remains GET-only. Honor short provider backoff within the page deadline.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const response = await fetcher(url, {
+        headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'Efeonce-Studio-Evidence/1.0' },
+        redirect: 'error',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(15000)
+      })
 
-    if (!response.ok) throw new EmailEvidenceError('provider_unavailable')
+      if (response.status === 429 && attempt < 2) {
+        const seconds = Number(response.headers.get('retry-after') ?? '1')
 
-    return (await response.json()) as unknown
+        if (!Number.isFinite(seconds) || seconds < 0 || seconds > 2)
+          throw new EmailEvidenceError('provider_unavailable')
+        await response.body?.cancel()
+        await new Promise(resolve => setTimeout(resolve, Math.max(250, seconds * 1000)))
+        continue
+      }
+
+      if (!response.ok) throw new EmailEvidenceError('provider_unavailable')
+
+      return (await response.json()) as unknown
+    }
+
+    throw new EmailEvidenceError('provider_unavailable')
   } catch (error) {
     throw error instanceof EmailEvidenceError ? error : new EmailEvidenceError('provider_unavailable')
   }
@@ -83,10 +159,12 @@ export const readResendEvidence = async (
   input: { token: string; cursor?: string | null; now?: Date },
   fetcher: typeof fetch = fetch
 ): Promise<EmailPage> => {
+  fetcher = boundedFetch(fetcher)
   const now = input.now ?? new Date()
+  const observedAt = now.toISOString()
   const url = new URL('https://api.resend.com/broadcasts')
 
-  url.searchParams.set('limit', '100')
+  url.searchParams.set('limit', '5')
   const after = cursor(input.cursor, /^[a-f0-9-]{36}$/i)
 
   if (after) url.searchParams.set('after', after)
@@ -98,7 +176,91 @@ export const readResendEvidence = async (
 
   const items: EmailEvidence[] = []
 
-  for (const item of page.data) {
+  const segments = new Map<string, Audience>()
+
+  for (const listed of page.data) {
+    const item = decode(
+      broadcast.extend({
+        from: literal,
+        subject: literal,
+        preview_text: literal,
+        segment_id: z.string().uuid().nullish(),
+        audience_id: z.string().uuid().nullish(),
+        created_at: literal
+      }),
+      await requestJson(new URL(`https://api.resend.com/broadcasts/${listed.id}`), input.token, fetcher)
+    )
+
+    if (item.id !== listed.id) throw new EmailEvidenceError('invalid_response')
+    const segmentId = item.segment_id ?? item.audience_id
+
+    if (segmentId && !segments.has(segmentId)) {
+      const segment = decode(
+        z.object({ id: z.string().uuid(), name: literal }),
+        await requestJson(new URL(`https://api.resend.com/segments/${segmentId}`), input.token, fetcher)
+      )
+
+      if (segment.id !== segmentId) throw new EmailEvidenceError('invalid_response')
+      // Aggregate size is private beta; do not enumerate recipients or substitute sentCount.
+      segments.set(segmentId, {
+        kind: 'segment',
+        id: segmentId,
+        name: segment.name ?? null,
+        role: 'include',
+        source: 'resend.segments',
+        observedAt,
+        contactCount: null
+      })
+    }
+
+    let delivered: Metric | null = null,
+      opens: Metric | null = null,
+      clicks: Metric | null = null
+    const start = timestamp(item.created_at)
+
+    if (start && Date.parse(start) > now.getTime()) throw new EmailEvidenceError('invalid_response')
+
+    if (start && ['sending', 'sent'].includes(item.status)) {
+      const metricsUrl = new URL('https://api.resend.com/emails/metrics')
+
+      metricsUrl.search = new URLSearchParams({
+        broadcast_id: item.id,
+        start_date: start,
+        end_date: observedAt,
+        metrics: 'delivered,opened,clicked'
+      }).toString()
+
+      const metrics = decode(
+        z.object({
+          start_date: z.string(),
+          end_date: z.string(),
+          totals: z.object({ delivered: count.nullish(), opened: count.nullish(), clicked: count.nullish() })
+        }),
+        await requestJson(metricsUrl, input.token, fetcher)
+      )
+
+      const from = timestamp(metrics.start_date),
+        to = timestamp(metrics.end_date)
+
+      if (!from || !to || Date.parse(from) > Date.parse(to) || Date.parse(to) > now.getTime())
+        throw new EmailEvidenceError('invalid_response')
+      delivered = metric(metrics.totals.delivered, 'resend.emails.metrics.delivered', observedAt, from, to)
+      opens = metric(metrics.totals.opened, 'resend.emails.metrics.opened', observedAt, from, to)
+      clicks = metric(metrics.totals.clicked, 'resend.emails.metrics.clicked', observedAt, from, to)
+    }
+
+    const details: EmailDetails = {
+      source: 'resend.broadcasts',
+      observedAt,
+      sender: sender(item.from),
+      subject: item.subject ?? null,
+      preheader: item.preview_text ?? null,
+      audiences: segmentId ? [segments.get(segmentId)!] : null,
+      delivered,
+      opens,
+      clicks
+    }
+
     const sent = timestamp(item.sent_at)
 
     if (sent && Date.parse(sent) > now.getTime()) throw new EmailEvidenceError('invalid_response')
@@ -114,6 +276,8 @@ export const readResendEvidence = async (
       urls: [],
       permalink: null,
       emailEvidence: {
+        details,
+        observedAt,
         kind: 'broadcast',
         completion: complete
           ? 'complete'
@@ -138,13 +302,32 @@ export const readResendEvidence = async (
 }
 
 const counters = z.object({
-  sent: z.number().int().nonnegative(),
-  selected: z.number().int().nonnegative(),
-  pending: z.number().int().nonnegative(),
-  notsent: z.number().int().nonnegative()
+  delivered: count.nullish(),
+  open: count.nullish(),
+  click: count.nullish(),
+  sent: count.nullish(),
+  selected: count.nullish(),
+  pending: count.nullish(),
+  notsent: count.nullish()
 })
 
 const marketingEmail = z.object({
+  from: z.object({ fromName: literal, replyTo: literal }).nullish(),
+  subject: literal,
+  content: z
+    .object({
+      widgets: z
+        .object({ preview_text: z.object({ body: z.object({ value: literal }).nullish() }).nullish() })
+        .nullish()
+    })
+    .nullish(),
+  to: z
+    .object({
+      contactIlsLists: z
+        .object({ include: z.array(numericId).nullish(), exclude: z.array(numericId).nullish() })
+        .nullish()
+    })
+    .nullish(),
   id: numericId,
   type: z.string(),
   state: z.string(),
@@ -161,17 +344,7 @@ export const readHubSpotEvidence = async (
   input: { token: string; portalId: string; cursor?: string | null; now?: Date },
   fetcher: typeof fetch = fetch
 ): Promise<EmailPage> => {
-  const deadline = Date.now() + 45000
-  const originalFetch = fetcher
-
-  fetcher = async (url, init) => {
-    const remaining = deadline - Date.now()
-
-    if (remaining <= 0) throw new EmailEvidenceError('provider_unavailable')
-
-    return originalFetch(url, { ...init, signal: AbortSignal.timeout(Math.min(remaining, 15000)) })
-  }
-
+  fetcher = boundedFetch(fetcher)
   const now = input.now ?? new Date()
 
   const identity = decode(
@@ -210,12 +383,62 @@ export const readHubSpotEvidence = async (
 
   const items: EmailEvidence[] = []
 
+  const lists = new Map<string, Omit<Audience, 'role'>>()
+
   for (const email of page.results) {
     if (email.type !== 'BATCH_EMAIL' || email.isTransactional) continue
+    const observedAt = now.toISOString()
+
+    const audiences: Audience[] | null =
+      Array.isArray(email.to?.contactIlsLists?.include) || Array.isArray(email.to?.contactIlsLists?.exclude) ? [] : null
+
+    for (const role of ['include', 'exclude'] as const)
+      for (const id of email.to?.contactIlsLists?.[role] ?? []) {
+        if (!lists.has(id)) {
+          const result = decode(
+            z.object({
+              list: z.object({
+                listId: numericId,
+                objectTypeId: z.literal('0-1'),
+                name: literal,
+                size: count.nullish()
+              })
+            }),
+            await requestJson(new URL(`https://api.hubapi.com/crm/v3/lists/${id}`), input.token, fetcher)
+          )
+
+          if (result.list.listId !== id) throw new EmailEvidenceError('invalid_response')
+          lists.set(id, {
+            kind: 'list',
+            id,
+            name: result.list.name ?? null,
+            source: 'hubspot.crm.lists',
+            observedAt,
+            contactCount: metric(result.list.size, 'hubspot.crm.lists.size', observedAt)
+          })
+        }
+
+        audiences!.push({ ...lists.get(id)!, role })
+      }
+
     const stats = email.stats?.counters
+
+    const details: EmailDetails = {
+      source: 'hubspot.marketing_emails',
+      observedAt,
+      // PublicEmailFromDetails: replyTo is the FROM address; customReplyTo is the override for replies.
+      sender: { name: email.from?.fromName ?? null, address: email.from?.replyTo ?? null, raw: null },
+      subject: email.subject ?? null,
+      preheader: email.content?.widgets?.preview_text?.body?.value ?? null,
+      audiences,
+      delivered: metric(stats?.delivered, 'hubspot.marketing_emails.stats.counters.delivered', observedAt),
+      opens: metric(stats?.open, 'hubspot.marketing_emails.stats.counters.open', observedAt),
+      clicks: metric(stats?.click, 'hubspot.marketing_emails.stats.counters.click', observedAt)
+    }
+
     const events = new Map<string, string>()
 
-    if (stats && stats.sent > 0) {
+    if (stats && stats.sent != null && stats.sent > 0) {
       const campaignIds = [
         ...new Set([
           ...(email.allEmailCampaignIds ?? []),
@@ -272,6 +495,9 @@ export const readHubSpotEvidence = async (
     const complete =
       email.state === 'PUBLISHED' &&
       stats &&
+      stats.sent != null &&
+      stats.selected != null &&
+      stats.notsent != null &&
       stats.sent > 0 &&
       stats.pending === 0 &&
       stats.selected === stats.sent + stats.notsent &&
@@ -291,10 +517,12 @@ export const readHubSpotEvidence = async (
       urls: [],
       permalink: null,
       emailEvidence: {
+        details,
+        observedAt,
         kind: 'batch',
         completion: complete
           ? 'complete'
-          : stats && stats.sent > 0
+          : stats && stats.sent != null && stats.sent > 0
             ? 'partial'
             : ['DRAFT', 'SCHEDULED', 'SCHEDULED_AB'].includes(email.state)
               ? 'not_started'

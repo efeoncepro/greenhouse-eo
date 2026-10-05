@@ -289,3 +289,18 @@ sin lector, `studio.activation.publication.confirm` requiere persona y fecha exp
 rechazada. draftUrl es una referencia Notion y ningún comando abre ni modifica ese borrador.
 
 [Evidencia, límites y rollout](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
+
+
+## Leer email, landing y Growth Forms (API 1.9.0; local, rollout pendiente)
+
+1. Seleccionar explícitamente el servidor y ejecutar `pnpm studio doctor`; verificar API 1.9.0 o superior.
+2. `pnpm studio describe studio.activation.get` y `pnpm studio call studio.activation.get --param activationId=ACT-000001`
+   (sustituir el ID por uno real autorizado). El resultado incluye `email` / `web` cuando existe la lectura.
+3. `pnpm studio call studio.calendar.get --param from=2026-10-01 --param to=2026-11-01` sirve los mismos campos;
+   seguir nextCursor para terminar el rango. No se requiere actualizar la CLI ni importar código de Studio.
+4. Leer fuente y observedAt de audiencias/métricas; null no es cero. copyLimits null significa que el catálogo
+   fijado no aporta límite, no que el copy sea válido sin restricción.
+5. En `web.connectedForms`, provider es `growth_forms` e id es el form_key público. `formReadStatus=unavailable`
+   exige revisar el aviso/reader y el contrato público; no cambiar el GUID HubSpot ni inferir envío de leads.
+
+[Tabla completa de campos y limitaciones](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).

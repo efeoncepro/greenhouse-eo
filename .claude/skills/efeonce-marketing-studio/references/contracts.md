@@ -417,3 +417,28 @@ signed URLs, files are private/no-overwrite, storage requests carry no Studio be
 was performed to verify this client. Canonical command examples: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`.
 
 - Verified production 2026-10-04: Studio aa6fa07 serves API 1.7.0,75 tools/80 HTTP and activation calendar; HTTP CLI discovers the contract unchanged. Person T1/MCP federation remains pending TASK-2003. Runtime receipt: docs/audits/marketing-studio/TASK-2001-release-2026-10-04-checks.json.
+
+
+## Activation sheet reads — API 1.9.0 (local, 2026-10-05)
+
+75 tools / 80 HTTP operations, additive output of existing activation/calendar readers. `email` and `web` may
+be absent on old servers and are null when unavailable. Exact DTO handoff and evidence:
+`docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md` in Greenhouse.
+
+- `email.sender.{name,address,raw}`, `email.{subject,preheader}.{text,characterCount,copyLimits}`; metadata
+  source/observedAt at email root. Literal copy, Unicode codepoints, catalog version/scope preserved.
+- `email.audiences[]`: kind/id/name/role/source/observedAt/contactCount. Resend contactCount null (private beta
+  aggregate unavailable); HubSpot list.size current snapshot, never substitute selected/sent or add overlaps.
+- `email.scheduled.{value,source,observedAt}`; `email.sent.{completion,sentCount,lastSentAt,source,observedAt}`.
+- `email.{delivered,opens,clicks}` and audience contactCount: `{value,source,observedAt,windowStartAt,windowEndAt}`
+  or null. Latest snapshot only; totals per Resend broadcast/window, raw HubSpot counters, no unique-user claim.
+- `web.{url,destinationActivationCount,destinationCountedAt,publicUrlEvidence,publishedAt,publicationSource}`.
+  Exact destination URL, same org, other noncancelled activations in unarchived campaigns; no date-filter scope.
+- `web.connectedForms[] = {provider:'growth_forms',id,surfaceId,source,observedAt}`, where id is public form_key.
+  Validates real embed plus owner's public contract and surface/origin. `formReadStatus` verified/not_observed/
+  unavailable; null for legacy evidence. Never return a HubSpot destination GUID. Missing binding is unknown,
+  not false; dynamic forms without an observable binding remain null. Data flows DB Greenhouse → HubSpot under
+  Growth Forms owner, not Studio. No submission counts or delivery evidence in this DTO.
+
+No UI changes, new migration or default-ON flag. Repoll owned readers after authorized deployment; old evidence
+remains null until refreshed. External live certification is pending; MCP declaration does not prove federation.

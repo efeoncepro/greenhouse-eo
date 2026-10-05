@@ -196,3 +196,18 @@ read or write Notion. Without a CMS reader, public URL evidence needs a person-c
 activation becomes published. `studio.activation.publication.confirm`, `studio.campaign.tracking_slug.set` and
 `studio.execution.legacy.backfill` require a person; a service identity cannot impersonate one. Backfill preserves old
 observations and requires separate confirmation of activation plans. These tools do not publish content or authorize spend.
+
+
+## Email and web activation details
+
+When the server supports these fields, activation detail and calendar return `email` and `web`. Preserve literal
+`email.subject.text` and `email.preheader.text`; characterCount counts Unicode codepoints and copyLimits come
+from the activation's pinned catalog. Sender and audience metadata carry source/observedAt. Never sum list
+sizes into recipients. `email.delivered`, `opens`, `clicks` and audience contactCount are latest snapshots with
+value/source/observedAt and optional window bounds, not series or necessarily unique people. Null is absent.
+
+`web.destinationActivationCount` counts other noncancelled activations pointing to that exact URL within the
+organization, excluding archived campaigns. `web.connectedForms[].provider` is growth_forms and id is its
+public form_key. Do not confuse it with a downstream HubSpot delivery destination or claim lead delivery from
+an observed form. `formReadStatus=unavailable` is a reader warning; missing evidence is unknown, never false.
+Check the deployed schema and reader freshness; fields absent on older servers do not authorize substitutions.

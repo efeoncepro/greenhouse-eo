@@ -749,3 +749,13 @@ recursos compartidos: no equivale a ausencia de cambios fuera de Vercel staging.
 Main sin promoción; Studio/gateway sin push en este pase. Puerto email default OFF,
 consumer/binding y canary M2M autenticado aún pendientes.
 [Evidencia del pase](../../audits/marketing-studio/TASK-2001-greenhouse-staging-2026-10-04.md).
+
+
+## 2026-10-05 — readers de hojas email/web, local
+
+TASK-2002 está productiva según el operador; UI reservada a Claude e intacta. API 1.9.0 añade `email`/`web` al
+reader compartido, Growth Forms público validado y metadata/últimas métricas desde Resend/HubSpot por Greenhouse.
+[Handoff exacto y QA](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+Sin push/deploy ni cambios de flags; sin migración. Próximo paso autorizado: publicar ambos readers/manifiesto,
+verificar permisos de listas/metrics y configuración owned y ejecutar readback/canary API/CLI. Datos antiguos
+permanecen null hasta una lectura nueva. No usar los resultados locales como certificación de proveedores live.

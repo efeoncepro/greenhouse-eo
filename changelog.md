@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-05 — TASK-2007: primitivas de producto AXIS (local)
+
+Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset cancelable; feedback, disclosure, dialog y complementary con foco diferenciado; selección múltiple, tabs/paginación, fechas/rango y archivo nativos. Catálogo distingue releases observadas de exports locales. Composición `/references/product/`, pruebas y coste de bundle documentados en el repo AXIS. Sin publicar ni migrar consumidores. [Task](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md).
+
+
+## 2026-10-05 — TASK-2002: calendario de activaciones v3 en producción (sólo lectura)
+
+- Studio `main` `d0ec7e0`: `studio.efeonce.org/calendar` sigue la dirección v3 aprobada en Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover del día, estados, filtros móvil y preview por formato, con barra inferior propia de evidencia de ejecución. Diálogos de escritura (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución) verificados en local; en producción no se montan hasta que exista login (TASK-1898). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
+
+## 2026-10-05 — TASK-2001: lectores de hojas email y landing
+
+- Local: API 1.9.0 amplía ActivationDto con email literal/límites/audiencias/métricas y web con destinos/Growth Forms validado. UI intacta, null ausente, sin series ni SQL entre productos. Postgres/check/build/CLI PASS; rollout pendiente. [Contrato y evidencia](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
 
 ## 2026-10-04 — TASK-2002/2004: calendario de activaciones (lectura) e isotipos de plataforma en AXIS
 
@@ -558,27 +570,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   servicios creativos. Registra task IDs, USD 0,25402 conocidos incluyendo reintentos, defectos corregidos y una
   corrección de evidencia: las corridas de categoría no declararon `efeoncepro.com` como target y no prueban
   presencia o ausencia propia.
-
-## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
-
-- Catálogo compartido LATAM/PR/ES/US y packs es/en/pt-BR/fr; Google AI Mode usa location_code e idioma
-  explícitos, sin fallback US. Canary real: 22 éxitos y Cuba skip por falta de ubicación.
-- Mercados/competidores versionados, snapshots, lotes atómicos y matriz sin promedio; ubicación nativa
-  declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
-- Staging verificado en Vercel y worker `d86edb784`: 11 informes, Google 66/66; Sky PE parcial por
-  Perplexity. Migraciones/backfill aplicados, históricos preservados y main en espera. [Evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
-- Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
-  contrato AXIS y la receta aprobada antes de encolar, exige cada fuente como asset del uploader y es idempotente. Lo
-  llaman el lane App, el lane ecosystem y tres tools MCP (`request_brand_render`, `get_brand_render_request`,
-  `list_brand_render_requests`).
-- Tercer consumer del `artifact-worker` (La órbita y Glitch, seis catálogos), con despacho en el ops-worker, la señal
-  `brand.render.stuck_job` y `sharp` como dependencia de runtime. Flag `BRAND_RENDER_ENABLED` OFF en los tres runtimes:
-  code complete, rollout pendiente. En `develop`, sin promover a main.
-
-## 2026-09-28 — El plan de un deck se valida contra el catálogo de recetas (TASK-1929)
-
-- `pnpm brand:deck-plan -- --plan plan.json` valida el plan (recetas del catálogo por id): AXIS valida el documento
-  (portada, cierre, página de servicio, alternancia de foto) y el catálogo agrega pareja portada↔cierre, variantes
-  seguidas, plate repetido, slots y ritmo, sin duplicar códigos. `--propose` le pide al agente un plan validado que
-  falla cerrado; una persona confirma (TASK-1932 lo expone por API, Nexa y MCP). El catálogo de runtime se genera con
-  `pnpm brand:deck-recipes`.

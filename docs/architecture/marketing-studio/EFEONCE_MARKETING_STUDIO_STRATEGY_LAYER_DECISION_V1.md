@@ -649,3 +649,28 @@ no afirmar completitud. No se crean audiencias, envíos ni publicaciones.
 
 Fuentes verificadas 2026-10-04: [Resend broadcasts](https://resend.com/docs/api-reference/broadcasts/list-broadcasts),
 [HubSpot marketing emails](https://developers.hubspot.com/docs/api-reference/legacy/marketing/marketing-emails/get-email).
+
+
+## Delta 2026-10-05 — lectura de hojas owned (TASK-2001, Accepted)
+
+Decisión del operador: extender lectura de activaciones para hojas email y landing de TASK-2002, sin tocar UI.
+Contrato aditivo API 1.9.0, `ActivationDto.email` / `web`, registrado en operations y proyectado igual en detalle,
+calendario, HTTP, MCP y CLI. [Contrato exacto, fuentes y evidencia](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+
+Se conserva una sola lectura de metadata/métricas en `execution_record.email_evidence.details`; la completitud
+observada del envío no se revoca por un readback parcial. Los contadores posteriores sí refrescan aun publicado.
+Copy literal sin trim/normalización, conteo Unicode compartido con catálogo; límites salen del catálogo fijado,
+no de constantes. Audiencias incluyen/excluyen listas con size actual; no se suman como destinatarios.
+Resend obtiene totals por broadcast y ventana explícita; HubSpot stats + listas desde su reader dueño Greenhouse.
+No se crean series ni SQL entre productos. Null expresa ausencia; conteos privados beta no se suponen.
+
+Growth Forms es proveedor del formulario: identidad pública `form_key`. El flujo DB Greenhouse → dispatcher →
+HubSpot sigue siendo del owner y no se certifica a partir del embed. El lector URL valida markup explícito con
+el contrato público de Growth Forms, pin de origen canónico y comprobación de surface/origin/formKey; parse5
+excluye falsos embeds dentro de scripts/comentarios/templates. No GUID de destino ni PII en Studio. Sin binding
+comprobado: null + estado; fallo de comprobación produce aviso. No hay registro URL→form_key canónico disponible
+para evitar el readback del embed; si aparece, reabrir esta decisión para consumirlo por API.
+
+El conteo web es igualdad exacta de destination_url dentro de organización, excluye auto-referencia, canceladas
+y campañas archivadas, y es independiente del rango de calendario. No afirma publicación. JSON aditivo sin
+migración; flags existentes conservados OFF por defecto. Este corte está validado localmente; rollout pendiente.
