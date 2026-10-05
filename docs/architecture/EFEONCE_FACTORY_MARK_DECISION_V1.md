@@ -45,7 +45,7 @@ teamspace de Notion, sus bases de datos y un anuncio al equipo.
 
 Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
 [`scripts/brand/build-factory-logos.mjs`](../../scripts/brand/build-factory-logos.mjs), se publican selladas en
-`@efeoncepro/axis-brand-assets` 0.4.22 y nunca se editan a mano.
+`@efeoncepro/axis-brand-assets` 0.4.23 y nunca se editan a mano.
 
 ## Aplicación aprobada: Notion y el anuncio al equipo
 
