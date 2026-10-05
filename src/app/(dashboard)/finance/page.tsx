@@ -1,18 +1,22 @@
 import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
-
+import { getLocale } from 'next-intl/server'
 
 import FinanceDashboardView from '@views/greenhouse/finance/FinanceDashboardView'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { ROLE_CODES } from '@/config/role-codes'
 import { NexaContextScope } from '@/lib/nexa/nexa-page-context'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
+import { getPortalPageTitle } from '@/lib/copy/portal-metadata'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Finanzas — Greenhouse'
+export const generateMetadata = async (): Promise<Metadata> => {
+  const { internal } = getGreenhouseNavigationCopy(await getLocale())
+
+  return { title: getPortalPageTitle(internal.domainFinanzas.label) }
 }
 
 const FinanceDashboardPage = async () => {

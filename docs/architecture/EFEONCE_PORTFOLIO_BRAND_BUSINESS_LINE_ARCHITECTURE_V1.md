@@ -91,6 +91,13 @@ Aplica al portal interno y cliente, en los layouts Vuexy vertical y horizontal:
   siendo Greenhouse; este cambio no renombra el producto ni altera los documentos institucionales.
 - Reusar el registro de assets y los adapters Vuexy existentes; no reconstruir SVG ni crear otro shell.
 
+**Metadata del portal (aprobación posterior del operador, 2026-10-05):** título general
+`Efeonce | Greenhouse`; títulos contextuales `Efeonce | Acceder`, `Efeonce | Proyectos` y
+`Efeonce | Finanzas`, con etiquetas equivalentes en inglés según el locale. El helper compartido vive en
+`src/lib/copy/portal-metadata.ts`; los nombres de navegación se reutilizan del canon existente. Esta aplicación
+abarca el título raíz, login, listado/detalle de proyectos y resumen de finanzas. Los overrides de otras
+secciones mantienen su contrato vigente; no aplicar una plantilla global que duplique prefijos o sufijos.
+
 Esta aplicación actualiza la regla anterior «Greenhouse en toda navegación de la app» de `DESIGN.md` y sus
 invariantes. Los SVG Efeonce locales deben conservar la paridad con `@efeoncepro/axis-brand-assets`.
 

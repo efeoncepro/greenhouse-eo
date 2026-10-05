@@ -18,6 +18,7 @@ import { getSystemMode } from '@core/utils/serverHelpers'
 import { localeDirections } from '@/i18n/locales'
 
 import type { Locale } from '@/lib/copy'
+import { PORTAL_DEFAULT_TITLE } from '@/lib/copy/portal-metadata'
 
 // Style Imports
 import '@/app/globals.css'
@@ -57,7 +58,7 @@ const poppins = localFont({
 // Declararlo en ambos lados sirve /favicon.ico en 404 y deja al navegador mostrando el
 // ícono viejo cacheado antes de pintar el nuestro. Regenerar: pnpm branding:favicon
 export const metadata: Metadata = {
-  title: 'Greenhouse Portal',
+  title: PORTAL_DEFAULT_TITLE,
   description: 'Client portal for project visibility, delivery performance, and sprint health.'
 }
 

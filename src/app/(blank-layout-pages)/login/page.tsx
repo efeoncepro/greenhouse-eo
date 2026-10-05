@@ -2,6 +2,7 @@
 import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
+import { getLocale } from 'next-intl/server'
 
 // Component Imports
 import Login from '@views/Login'
@@ -13,13 +14,16 @@ import { getServerMode } from '@core/utils/serverHelpers'
 import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
 import { getOptionalServerSession } from '@/lib/auth/require-server-session'
 import { listActiveLoginAnnouncements } from '@/lib/login-announcements/reader'
+import { getPortalAccessMetadata } from '@/lib/copy/portal-metadata'
+import { defaultLocale, normalizeLocale } from '@/i18n/locales'
 
 // Depende de cookies/headers via NextAuth — siempre dynamic.
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Accede al portal de clientes Greenhouse de Efeonce.'
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = normalizeLocale(await getLocale()) ?? defaultLocale
+
+  return getPortalAccessMetadata(locale)
 }
 
 const LoginPage = async () => {
