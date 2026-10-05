@@ -140,3 +140,19 @@ El [delta aceptado de Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md#d
 sustituye el arranque limitado a contenido/diseño y dos ofertas de la aplicación anterior. Factory vende encargos
 On-Demand de las capacidades actuales de Efeonce, incluidas web, contenido, audiovisual y medios. Campaña y kit
 son ejemplos opcionales; cada práctica conserva ownership y economía.
+
+### Clasificación aceptada 2026-10-05 — Factory es la modalidad On-Demand
+
+Decisión del operador: **Efeonce Factory es la modalidad On-Demand de Efeonce**, es decir, la capa *Engagement* de §2
+con nombre propio. No es una business line, ni una product brand, ni una oferta: proyectos con inicio, fin, alcance y
+precio cerrados, de cualquier línea (Brand, Engine, Revenue, Voice…). Su contraparte es el engagement On-Going
+(retainer), que no lleva marca propia.
+
+- Se dice «un proyecto Factory de Engine» o «Brand On-Demand vía Factory». La línea dice qué se hace; Factory, cómo
+  se contrata.
+- Su marca lleva el acento Growth de la masterbrand porque cruza todas las líneas
+  ([marca de Factory](EFEONCE_FACTORY_MARK_DECISION_V1.md)). En el entregable de un proyecto Factory manda la
+  identidad de la línea dueña; Factory aparece como contexto en su variante neutra (blanca), nunca como un segundo
+  acento.
+- No crea business line, entidad, enum comercial ni pipeline CRM nuevos; la práctica dueña conserva ownership y
+  economía de cada encargo.

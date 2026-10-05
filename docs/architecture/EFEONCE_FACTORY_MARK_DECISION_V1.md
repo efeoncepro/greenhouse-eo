@@ -5,7 +5,9 @@
 - **Owner:** Efeonce Brand
 - **Scope:** la marca visual de [Efeonce Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) (logo, lockups,
   símbolo y su primera aplicación: Notion y el anuncio al equipo). No decide la clasificación de Factory en la
-  arquitectura de marca, ni precio, ni oferta.
+  arquitectura de marca (resuelta el mismo día: Factory es la modalidad On-Demand, capa Engagement del
+  [portafolio](EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md#clasificación-aceptada-2026-10-05--factory-es-la-modalidad-on-demand)),
+  ni precio, ni oferta.
 - **Reversibility:** two-way-but-slow. Los archivos se regeneran en minutos; una vez en Notion, cotizaciones y piezas
   comerciales, el cambio tiene inercia de marca.
 - **Confidence:** high en la forma: la eligió y ajustó el operador viéndola. Medium en el concepto: el logo dice
@@ -77,6 +79,8 @@ Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
 - **Riesgo conocido:** el logo estático no expresa el concepto («una necesidad, una entrega, cerrada»); lo carga la
   palabra. Se propuso expresarlo en movimiento (la esfera da una vuelta y se detiene, nunca como loader); no está
   construido.
+- **Acento en entregables:** un proyecto Factory de una línea lleva la identidad de esa línea; Factory va como contexto
+  en su variante blanca, para no sumar un segundo acento.
 - **Riesgo conocido:** «Factory» connota volumen y producción en serie; lo compensan el descriptor «On-Demand» y la
   ficha comercial.
 - **Pendiente:** las copias de los SVG de la familia en otros lugares (decks del composer, `efeonce-think`, Marketing
