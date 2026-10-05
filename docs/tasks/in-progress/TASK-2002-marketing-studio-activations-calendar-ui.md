@@ -1,5 +1,22 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-04 (revisión 1:1) — fidelidad a los tableros y lo pendiente
+
+Revisión 1:1 de cada tablero aprobado contra lo implementado (Studio local, commits `f7b9790`…`00a51e5`, sin push):
+Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover «+N», estados y sus versiones móviles quedaron fieles al
+generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a ser el filtro Modality: Paid sobre el mes
+(como en V3-Paid); el popover del día existe; la barra inferior del calendario muestra la evidencia por herramienta.
+
+**Queda distinto, para terminar cuando exista lo necesario:**
+
+| Diferencia | Por qué | Se termina con |
+|---|---|---|
+| Hoja de email (V3-SheetEmail, MobSheetEmail): De, Asunto, Preheader, Audiencia, conmutador Escritorio/Móvil/Bandeja y «Después del envío» | El reader de activaciones no entrega remitente, asunto, preheader ni audiencia; inventarlos violaría «null = ausente» | Contrato de email owned en el reader (TASK-2001 / línea owned email) |
+| Hoja de blog (V3-BlogPre, V3-BlogPost) y formatos owned (V3-OwnedFormats): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces, landing con formulario | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
+| Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
+| Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
+| Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | En construcción en esta misma task; en modo abierto la API rechaza toda escritura, así que siguen deshabilitados con su motivo hasta TASK-1898 (web) / TASK-2003 (MCP) | Este delta se actualiza al cerrarlos |
+
 ## Delta 2026-10-04 (implementación) — lectura completa en local
 
 Implementado en `efeonce-marketing-studio` (local, sin push) contra el contrato de TASK-2001, con Postgres 18 descartable
