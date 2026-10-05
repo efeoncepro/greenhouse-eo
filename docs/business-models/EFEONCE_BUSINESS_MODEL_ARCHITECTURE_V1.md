@@ -369,3 +369,18 @@ de los modelos que ya tienen una razón real para existir.
 > delivery, economía y riesgos cambian. Los tiers, pilotos y campañas son variantes comerciales; los créditos,
 > licencias y usage son submodelos cuando tienen lifecycle propio. Todo se consolida en una sola arquitectura
 > para operar, vender y levantar capital.**
+
+## Aplicación 2026-10-05 — Efeonce Factory
+
+[Factory](factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) es una vía comercial On-Demand que complementa los
+retainers con encargos rentables por sí mismos. La [decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md)
+fija empaque mínimo y venta en paralelo; el modelo `Approved for validation` posee cliente, cobro, costo completo,
+CX y activación. Las prácticas conservan ofertas y accountability. Campaña puntual y kit comercial son el
+packaging inicial; Factory no promueve los estados de otros modelos ni crea una plataforma por su nombre.
+
+### Aclaración aceptada 2026-10-05 — Factory transversal
+
+El [delta aceptado de Factory](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md#delta-aceptado-2026-10-05--alcance-transversal)
+sustituye el arranque limitado a contenido/diseño y dos ofertas de la aplicación anterior. Factory vende encargos
+On-Demand de las capacidades actuales de Efeonce, incluidas web, contenido, audiovisual y medios. Campaña y kit
+son ejemplos opcionales; cada práctica conserva ownership y economía.

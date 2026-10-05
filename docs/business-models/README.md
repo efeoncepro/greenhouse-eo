@@ -46,6 +46,16 @@ Campaign organiza delivery; no sustituye el contrato, pricing, capacidad ni life
 La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
 captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
+## Efeonce Factory — vía comercial On-Demand
+
+- [Decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).
+- [Business Model V1](factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md).
+- [Encargos transversales y ejemplos de empaque](../services/factory/README.md).
+
+Factory convierte capacidad disponible en encargos que sostienen su propia economía y generan caja adicional.
+Vía transversal a las capacidades actuales; empaque por oportunidad y venta en paralelo; las prácticas conservan ownership. Dirección aceptada el 2026-10-05;
+modelo `Approved for validation`, con capacidad, costing, condiciones de cobro y demanda aún por validar.
+
 ## Social Media
 
 - [`Efeonce Social Media — Business Model V1`](creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)

@@ -2,6 +2,8 @@
 
 ## Estado vigente para agentes
 
+[Factory](docs/services/factory/README.md).
+
 Studio: [readers y rollout TASK-2001](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
 
 Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).

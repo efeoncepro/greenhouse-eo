@@ -28,6 +28,21 @@ medir 24 meses de pipeline, win/loss, segmento, margen, demanda y expansión por
 
 ---
 
+## Efeonce Factory — vía On-Demand aceptada el 2026-10-05
+
+Factory complementa la base de retainers con encargos rentables por sí mismos y caja adicional. Empaque mínimo y
+venta en paralelo, con web, contenidos, audiovisual, medios y otras capacidades actuales. Campaña y kit son
+ejemplos opcionales; el alcance y equipo se configuran por oportunidad. Las cuatro entradas son licitaciones
+públicas, licitaciones privadas, prospección fría y paid media. Cada una converge en calificación, propuesta y
+activación del encargo; costo de adquisición, decisión y cobro se registran por separado. No cambia los
+porcentajes de motores ni supone conversión a retainer.
+
+La meta de caja, disponibilidad reportada, economics, OT/brief, CX y validación viven en el
+[Business Model Factory](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md); la
+[guía de encargos](../services/factory/README.md) orienta el empaque y la compra. La
+[decisión](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) está aceptada; pricing, plazos,
+capacidad y demanda se validan por oferta/encargo. No acredita billing ni workflow Factory implementados.
+
 ## Narrativa go-to-market Q4 2026 – Q3 2027
 
 **«Tu IA no conoce tu negocio»** es la plataforma narrativa integrada (orgánica y pagada) del período: Efeonce

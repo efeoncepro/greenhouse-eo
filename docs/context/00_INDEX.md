@@ -29,6 +29,7 @@
 | Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña; partnership/licensing desde el registry |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
+| Trabajar Efeonce Factory, venta rápida y encargos On-Demand | `08_estrategia-comercial` + [decisión Factory](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) + [modelo y validación](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) |
 | Conectar decisiones de marca con producción, automatización, escala o salida al mercado | `09_marca-agencia` + `14_modelo-negocio-asaas` + [`Decisiones de marca y ejecución escalable`](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md) |
 | Entender el panorama competitivo, el benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 | Impregnar cultura interna, hiring, onboarding, performance o rituales de equipo | `09_marca-agencia` + `docs/operations/EFEONCE_OPERATING_CODE_V1.md` |

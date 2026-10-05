@@ -12,6 +12,17 @@ description: >-
 
 # Efeonce Business Model Operator
 
+## Efeonce Factory — modelo vigente
+
+Para Factory, cargar la [decisión aceptada](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+el [Business Model](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) y la
+[guía de encargos y ejemplos](../../../docs/services/factory/README.md). Dirección comercial aceptada el 2026-10-05;
+modelo `Approved for validation`. Vía transversal a las capacidades actuales; empaque por oportunidad, margen standalone y caja
+adicional; preservar retainers y costo completo. La meta de cobros no es pricing, revenue observado ni capacidad
+confirmada. Billing/OT/brief/CX en Greenhouse requieren su unidad formal; no promover otros modelos por asociación.
+Entradas: licitaciones públicas, privadas, prospección fría y paid media. Medir costo, conversión y cobro por entrada;
+para licitaciones cargar `greenhouse-public-private-tenders` y conservar sus contratos.
+
 ## Dirección estratégica de marca y escala — 2026-10-03
 
 Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)

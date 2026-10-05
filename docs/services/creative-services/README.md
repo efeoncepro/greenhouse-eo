@@ -29,6 +29,14 @@ Globe / Creative Studio es una product brand y plataforma de producción creativ
 con workspace, memoria, provenance, operaciones generativas, métricas y governance; no reemplaza a la línea de
 negocio ni representa por sí solo toda la agencia creativa.
 
+### Compra On-Demand mediante Efeonce Factory
+
+[Efeonce Factory](../factory/README.md) es la vía comercial aceptada el 2026-10-05 para encargos acotados que
+generen margen y caja adicional. Es transversal; Creative Services aporta contenido, diseño y audiovisual.
+Campaña puntual y kit comercial son ejemplos opcionales de empaque, sin delimitar la vía.
+Creative Services conserva oficio y accountability; Factory no sustituye la operación recurrente de Social Media.
+Economics y activación en el [modelo Factory](../../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md).
+
 ## Catálogo inicial
 
 | Código | Servicio | Resultado controlable | Modalidad natural | Estado |

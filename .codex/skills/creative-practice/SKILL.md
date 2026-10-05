@@ -16,6 +16,17 @@ description: >-
 
 # Creative Practice — el negocio, no el oficio
 
+## Efeonce Factory — vía On-Demand 2026-10-05
+
+Factory es una vía transversal On-Demand; Creative Services aporta contenido, diseño y audiovisual.
+Campaña puntual y kit comercial son ejemplos opcionales; empaquetar por oportunidad y vender en paralelo.
+Cargar la [decisión](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+el [modelo económico](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) y las
+[fichas](../../../docs/services/factory/README.md). Creative Services conserva oficio, alcance y accountability;
+costear dirección, preventa, coordinación y QA junto con producción. La OT referencia el compromiso comercial;
+capacidad, derechos, revisiones, precio y cobro se fijan por encargo. No supone operación continua de redes,
+disponibilidad de Globe ni cambios runtime.
+
 ## Dirección estratégica de marca y escala — 2026-10-03
 
 Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)

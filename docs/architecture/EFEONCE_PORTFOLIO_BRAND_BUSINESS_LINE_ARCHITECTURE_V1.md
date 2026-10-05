@@ -125,3 +125,18 @@ providers must be corrected when they are current operating or commercial guidan
 identifiers may retain the old label when changing it would corrupt evidence; add a pointer to this decision instead.
 
 Canonical sources that describe the portfolio should link here rather than restating a competing taxonomy.
+
+## Aplicación 2026-10-05 — Efeonce Factory
+
+[Efeonce Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) nombra la vía comercial On-Demand aceptada
+por el operador. Efeonce conserva la relación contractual y las prácticas existentes conservan ownership de
+servicio/delivery/economics. Arranca con contenido y diseño dentro de Creative Services; ampliaciones requieren
+su práctica dueña. Su clasificación definitiva de marca e identidad visual permanecen abiertas. Esta vía no
+crea por inferencia business line, entidad, product brand, runtime, enum comercial ni pipeline CRM nuevos.
+
+### Aclaración aceptada 2026-10-05 — Factory transversal
+
+El [delta aceptado de Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md#delta-aceptado-2026-10-05--alcance-transversal)
+sustituye el arranque limitado a contenido/diseño y dos ofertas de la aplicación anterior. Factory vende encargos
+On-Demand de las capacidades actuales de Efeonce, incluidas web, contenido, audiovisual y medios. Campaña y kit
+son ejemplos opcionales; cada práctica conserva ownership y economía.

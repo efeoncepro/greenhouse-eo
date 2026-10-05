@@ -5,6 +5,15 @@ description: Business model design and audit for Efeonce offers, portfolio, deli
 
 # Claude routing companion
 
+For Efeonce Factory, load the [accepted commercial-route decision](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+the [current model](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) and
+[engagement guide and packaging examples](../../../docs/services/factory/README.md). Direction accepted 2026-10-05; model
+`Approved for validation`. Cross-practice route for current capabilities; package each opportunity while selling; standalone margin and additional cash,
+with retainer capacity and complete costs preserved. Collection targets are not prices or proven revenue/capacity.
+Greenhouse billing/OT/brief/CX implementation requires its own formal unit; other models retain their states.
+Acquisition: public tenders, private tenders, cold prospecting and paid media. Track cost, conversion and cash by entry;
+load `greenhouse-public-private-tenders` for tenders and preserve its contracts.
+
 The canonical operating skill is `.codex/skills/efeonce-business-model-operator/SKILL.md`.
 Its hardening set includes portfolio/capability model contracts, source catalog, acceptance criteria and
 blind-eval protocol.

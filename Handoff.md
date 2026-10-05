@@ -1,5 +1,10 @@
 # Handoff activo
 
+**Factory (05/10):** [canon local](docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md), vía
+transversal On-Demand. Commercial/Operations/Finance: capacidad, costing, cobro y oportunidades pendientes.
+Sin runtime/envíos; capas funcional/manual al implementar billing/OT/brief/CX (Product/Operations).
+Entradas: licitaciones públicas/privadas, prospección fría y paid media.
+
 **TASK-2007 (05/10, Codex):** producto, scheduler y Growth CTA AXIS aprobados visualmente; [estado, evidencia y pendientes](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md). Banners editorial/marca, anillo arriba/esfera al cierre, Bricolage400/700 opt-in y agenda dialog/inline. Preview `http://127.0.0.1:4340/references/growth-cta/#banners`; CTA40/40 + final4/4 PASS. Nuevos exports unreleased; release/instalación, AT físico y adopción Growth/hosts pendientes. Sin cambios consumidores. AXIS `447ea0c` enviado a main; CI en curso. Preservar WIP ajeno AI Visibility Report/tokens.
 
 **Títulos del portal (05/10, Codex):** `Efeonce | Greenhouse` por defecto; Acceder, Proyectos y Finanzas con Efeonce primero y locale ES/EN. Helper de copy compartido y labels de navegación reutilizados. ESLint y TypeScript PASS; [detalle](docs/audits/ui/2026-10-05-portal-metadata.md). Commit y push a `develop` autorizados (05/10); despliegue no verificado.
@@ -367,24 +372,9 @@ visible.
 
 **Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
 
-**Barrido documental del 2026-09-06 (posterior al release).** Tres agentes disjuntos actualizaron identidad, MCP/gateway y control plane de release: los dos docs funcionales y el manual de identidad pasan a estado de producción, el runbook del MCP documenta por primera vez que **el gateway se despliega por dispatch manual, nunca por push a `main`**, que su servicio Cloud Run vive en `southamerica-west1`, y la diferencia entre `GREENHOUSE_ECOSYSTEM_API_URL` (producción, la que usan los providers) y `GREENHOUSE_API_URL` (dev-greenhouse, fondeo Globe). El playbook de release suma el caso positivo del día y dos anti-patterns: pedir la autorización de mutaciones externas al EMPEZAR (costó 64 min con la evidencia ya verde) y no leer como drift un SHA distinto cuando los ÁRBOLES son idénticos.
+**MCP/release 06/09:** barrido documental y defectos del gateway conservados en [historia de septiembre](docs/operations/agent-context-history/handoff/2026-09.md).
 
-**Dos defectos encontrados por la verificación cruzada, ambos cerrados el mismo día.** (1) El gate de versión del gateway medía sólo las tools federadas: `efeonce-mcp` PR #4 (`5c28a7a`) lo cambia a medir el servidor construido; visto encenderse en los dos casos. (2) Al agregar `efeonce.mcp.identity.write` se cubrió el documento del RECURSO pero no el bloque del emisor NATIVO, así que el scope salía sólo cualificado y un cliente que armara su authorize desde discovery nunca lo habría pedido: `efeonce-mcp` PR #5, abierto, con test de regresión visto fallar sin el arreglo. ⚠️ Ese fix **no** agrega el scope a Entra, que el ADR del gateway prohíbe explícitamente.
-
-**TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
-Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
-[Mapa de construcción, pruebas y pendientes](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
-PR225 está certificado: main `08acfb2c6`, run `34000876213`, manifest released sin override.
-Canary MCP real: emisión, lectura propia, aislamiento y revocación en 6.633 s; refresh y rollback
-medidos. Piloto gv5, vencimiento original 2026-09-12T15:00Z, señales unaudited/mixed cero.
-El fix directo quedó promovido por PR226 a main `456d9accf`: release `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd`,
-run `34005056894` success, auth `00032-h45` Ready100% y cinco servicios con el SHA exacto.
-Flags OAuth/personas/interno ON; Microsoft visible y clic correcto en `/login` público a1440/390.
-Gateway `00036-5wc` sigue Ready100%, nativo/interno ON. Próximos pasos: reconciliar alcance del PR
-antes de promover (Claude añadió TASK1837 después del corte21aa), probar retorno humano `/auth/session`
-y logout; completar matrices externas/multicontexto y WebKit con los owners. No extender el piloto.
-El primer run `34004535327` quedó aborted por un deploy concurrente de develop; el retry se hizo sin bypass
-tras drenar esa carrera. No existe todavía un nuevo canary humano directo completo.
+**TASK-1836 / TASK-1831 (06/09):** [evidencia consolidada](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md); detalle y pendientes de aquella fecha conservados en [historia](docs/operations/agent-context-history/handoff/2026-09.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 

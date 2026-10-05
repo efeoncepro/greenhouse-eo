@@ -47,6 +47,13 @@ Cada servicio debe declarar como mínimo:
 9. continuidad, soporte, cadence y procedimiento de cambio;
 10. arquitectura, documentación funcional, manual y casos de referencia.
 
+## Vía comercial On-Demand: Efeonce Factory
+
+[Efeonce Factory](factory/README.md) permite comprar encargos acotados mediante empaque mínimo y cotización por
+alcance. Es transversal: web, contenido, audiovisual, medios y otras capacidades actuales; las prácticas conservan
+ownership. Campaña y kit son ejemplos opcionales. [Decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) el 2026-10-05;
+modelo `Approved for validation`, sin precio público ni capacidad runtime nueva.
+
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
