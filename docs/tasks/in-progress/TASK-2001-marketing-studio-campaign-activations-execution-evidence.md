@@ -169,7 +169,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-049`
-- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Nuevo corte local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. WP real 96 URLs y replay owned PG 113/0 cambios PASS; CLI y GVC básico PASS; navegación móvil Día→Línea de tiempo falla y se entrega a Claude. Faltan release/configuración owned y QA final UI de Claude; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
+- Status real: `Studio aa6fa07 desplegado; API 1.7.0, 75 tools/80 operaciones. Cinco migraciones staging/prod; seis activaciones CL revisadas y vinculadas, Metricool canary/scheduler PASS (62 observaciones, replay 0 cambios), CLI real PASS. Activaciones/discovery ON, owned OFF. Greenhouse f08029b0f en develop/staging READY, owned OFF; Studio sigue local: providers y evidencia completa/parcial e62b5e3, consumidor 055860d y puerto Greenhouse Resend/HubSpot implementados; canary readonly real PASS. WP real 96 URLs y replay owned PG 113/0 cambios PASS; CLI y GVC básico PASS; navegación móvil Día→Línea de tiempo falla y se entrega a Claude. Faltan release/configuración owned y QA final UI de Claude; Marketing Cloud sólo preparado por decisión del operador. MCP delegado sigue TASK-2003; TASK in-progress`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -540,6 +540,8 @@ subventana); el estado sale de la evidencia de la plataforma (TASK-1910); sin ev
 - [ ] Cada operación nueva (`planActivation`, `updateActivation`, `cancelActivation`, `linkExecution`, `unlinkExecution`, `createActivationFromExecution`, `previewTrackingUrl` y las lecturas) se ejecutó en una sesión MCP real con identidad delegada; manual servido actualizado. Contratos/manual PASS local; sesión delegada depende de TASK-2003.
 
 ## Verification
+
+Greenhouse enviado a `develop`: código `20f57c4cd`, corrección documental `f08029b0f`; Vercel staging READY, smoke 200/401, CI y cinco workflows de workers PASS. Owned OFF; canary M2M autenticado y main pendientes. [Evidencia staging](../../audits/marketing-studio/TASK-2001-greenhouse-staging-2026-10-04.md).
 
 ### Rollout autorizado — 2026-10-04
 

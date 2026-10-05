@@ -738,3 +738,14 @@ siguen pendientes de release. No modificar flags productivas ni afirmar owned op
 Marketing Cloud Engagement/Next preparados, sin entorno de prueba por decisión del operador. El worker mantiene
 owned OFF y deploy.sh conserva los knobs del endpoint y consumer; su configuración forma parte del próximo commit
 de rollout revisado. No hay pipeline alterno de envío ni importación de destinatarios.
+
+### TASK-2001 — Greenhouse en develop/staging (04/10, Codex)
+
+Greenhouse `20f57c4cd` y corrección documental `f08029b0f` enviados a develop.
+Staging `dpl_7Ms4ikwChYfdXerim1jwSBux22hs` READY, alias dev-greenhouse confirmado;
+health 200/ready, sesión 200 y puerto sin token 401. CI 37244791203 y cinco workflows
+de workers PASS; gates documentales corregidos PASS. Los workers de develop incluyen
+recursos compartidos: no equivale a ausencia de cambios fuera de Vercel staging.
+Main sin promoción; Studio/gateway sin push en este pase. Puerto email default OFF,
+consumer/binding y canary M2M autenticado aún pendientes.
+[Evidencia del pase](../../audits/marketing-studio/TASK-2001-greenhouse-staging-2026-10-04.md).
