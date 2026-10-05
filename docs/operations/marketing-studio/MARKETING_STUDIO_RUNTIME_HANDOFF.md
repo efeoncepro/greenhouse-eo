@@ -780,6 +780,7 @@ UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y c
 | Escrituras | En producción no se montan diálogos: en modo `open` los botones quedan `aria-disabled` y la API responde 403 `write_not_allowed` (verificado con `POST …/cancel`). `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401). |
 | Verificación local de escrituras | Postgres 18 descartable (`127.0.0.1:55461/marketing_studio`), servidor `studio-2002-local` :3102, actor `operator_cli` temporal en `runtime.ts` **autorizado por el operador**, no commiteado y revertido. Planificar (vista previa 200 → 201, hoja nueva ACT-000008), editar (PATCH 200), reprogramar, cancelar, vincular, crear desde ejecución (201, ACT-000009); bandeja de 3 a 1. `STUDIO_TRACKING_DOMAINS` agregado y revertido en `.claude/launch.json`. |
 | Greenhouse | TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados y diferencias pendientes con su dependencia. |
+| Hojas email/web (2026-10-05) | Studio `3048f96` (push `1f2a0ef..3048f96`, Vercel Production Ready `kc4tcvuod`): `OwnedSheet.tsx` + `DeviceViews.tsx` sobre `ActivationDto.email`/`web` (API 1.9.0, `1f2a0ef`, que salió en el mismo deploy). Producción: `GET /api/v1/calendar` ya trae las claves `email`/`web` (null en las 6 activaciones, todas sociales); hoja social ACT-000001 sin regresión. Verificación de las hojas sólo en local con datos de prueba en la base descartable (migración `1791155100000_owned-email-providers` aplicada allí; email en ACT-001012, landing en ACT-001013). |
 
 **Pendientes y dependencia.**
 
@@ -787,8 +788,7 @@ UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y c
 | --- | --- |
 | Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895) |
 | Escrituras por MCP | TASK-2003 (T1 delegado) |
-| Hoja de email (V3-SheetEmail, MobSheetEmail) | Contrato de email owned en el reader (encargado a Codex el 2026-10-05; ver la sección «readers de hojas email/web» de arriba) |
-| Landing (V3-OwnedFormats) | Mismo encargo |
+| Datos reales en las hojas de email/landing (UI hecha, `3048f96`) | Publicar el lado Greenhouse de los readers (metadata y métricas HubSpot/Resend) + readback |
 | Hoja de blog (V3-BlogPre/BlogPost) | TASK-1667/1669 (hoy «no medido») |
 | «Línea de tiempo» en el selector de Semana | Decisión del operador (desvío deliberado) |
 | Encabezado global (lockup y riel) | Fuera de TASK-2002 |

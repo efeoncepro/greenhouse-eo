@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-05 por Claude: calendario de activaciones TASK-2002 en producción en solo lectura (vistas, hoja, formatos, avisos y diálogos de escritura aún deshabilitados). Se conservan las entradas del 2026-10-04 (catálogo TASK-1905, CLI HTTP, video TASK-1998/1999) y el contrato local de hojas email/landing.
+> **Ultima actualizacion:** 2026-10-05 por Claude: hojas de email y página web del calendario en producción (TASK-2002). Antes ese día: calendario de activaciones en producción en solo lectura (vistas, hoja, formatos, avisos y diálogos de escritura aún deshabilitados). Se conservan las entradas del 2026-10-04 (catálogo TASK-1905, CLI HTTP, video TASK-1998/1999) y el contrato local de hojas email/landing.
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -194,8 +194,7 @@ Cómo funcionarán (ya probado de punta a punta en un entorno local con un permi
 |---|---|
 | Escribir desde la web en producción | Inicio de sesión Efeonce ID (TASK-1898) |
 | Escribir por agentes (MCP) | TASK-2003 |
-| Hoja de un email (remitente, asunto, preheader, audiencia, vistas escritorio/móvil/bandeja, después del envío) | Contrato de email en el lector de activaciones, en curso (ver [Hojas de email y landing](#hojas-de-email-y-landing--contrato-local-2026-10-05)) |
-| Hoja de una landing (cuántas activaciones apuntan a ella, formulario conectado) | El mismo contrato |
+| Datos reales en las hojas de email y de página web | Publicar el lado Greenhouse de la lectura (datos y métricas desde HubSpot/Resend); mientras tanto dicen «Sin dato en la fuente» (ver [Hojas de email y landing](#hojas-de-email-y-landing--contrato-local-2026-10-05)) |
 | Hoja de un blog (dossier SEO/AEO) | TASK-1667 / TASK-1669; hoy se ve como «no medido» |
 | «Línea de tiempo» como opción del selector en la vista Semana | Decisión del operador: la dirección aprobada no la incluía ahí |
 | Trimestre, «Más tarde», acciones en lote y otras alternativas | TASK-2005 / TASK-2006 |
@@ -430,3 +429,11 @@ esa entrega ni expone el destino interno de HubSpot. Sin vínculo comprobado que
 
 El calendario productivo de TASK-2002 se mantiene intacto. Esta ampliación aún requiere desplegar readers y
 realizar readback. [Campos y límites para las hojas](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+
+**En la hoja (desde el 2026-10-05, en producción).** Al abrir una activación de email se ven el remitente, el asunto y
+el preheader tal como están en la herramienta, con su conteo de caracteres (si el catálogo no fija límite se ve
+`n / —`), la audiencia con sus contactos y lo que excluye, y la vista previa en Escritorio, Móvil o Bandeja (en el
+teléfono se ven juntas la bandeja y el email). La evidencia dice cuándo quedó programado, si se envió y, después del
+envío, entregados, aperturas y clics. Al abrir una página web se ven su vista previa en Escritorio o Móvil y una
+lista: de cuántas activaciones es destino, si tiene formulario conectado, si la URL responde y cuándo se publicó.
+Lo que la fuente no trae dice «Sin dato en la fuente»; nunca se completa con un ejemplo ni con cero.

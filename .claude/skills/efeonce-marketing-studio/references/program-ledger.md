@@ -37,7 +37,7 @@ old local/not-pushed/pending-rollout snapshots; do not replay completed migratio
 | TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
 | TASK-1905 | Versioned channels, taxonomy/UTM, governance, transactional validation, alias/backfill, campaign audiences and ICP references | **in progress** — Studio deployed; Greenhouse capability, real ICP, MCP and human-reviewed backfill pending | API 1.6.0, 59 tools; catalog v1 / 52 channels, warn / ICP false |
 | TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | in-progress: Studio aa6fa07 deployed; email/owned/delegated MCP pending | TASK-2001 release 2026-10-04 |
-| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | **in progress** (2026-10-05) — calendario v3 + diálogos de escritura en producción; escrituras web esperan TASK-1898, MCP TASK-2003; hojas email/landing/blog pendientes (ver §TASK-2002 v3) | `studio.efeonce.org/calendar` solo lectura (Studio `d0ec7e0`, Vercel `otc14ubb7`) |
+| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | **in progress** (2026-10-05) — calendario v3 + diálogos de escritura + hojas email/landing en producción; escrituras web esperan TASK-1898, MCP TASK-2003; hoja de blog pendiente (ver §TASK-2002 v3) | `studio.efeonce.org/calendar` solo lectura (Studio `3048f96`, Vercel `kc4tcvuod`) |
 | TASK-2003 | MCP delegated-writes core (agent-friendly): Entra write scope, Greenhouse exchange per exact capability (asset.download/asset.write/campaign.write), Studio delegated actor (person via MCP), gateway federates `T1` writes; no `T2`/approvals (TASK-1899 retired 2026-10-04) | to-do (Codex implements) | — |
 | TASK-1899 | Withdrawn by the operator 2026-10-04; local implementation reverted; no automatic resume or development prerequisite | to-do (withdrawn; not executable) | No rollout |
 
@@ -461,6 +461,7 @@ Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1
 | Mes, Semana, Día, Línea de tiempo, Paid (filtro Modality: Paid sobre el mes; `view=paid` alias), Hoja, Popover del día, Estados, A11y, Filtros móvil, Formatos | Studio `f7b9790` (Mes/Semana), `dc579e4` (Día), `c201fb4` (Línea de tiempo), `7bde589` (Paid + `is-today`), `acea0dc` (Hoja), `ff74abf` (Popover), `00a51e5` (estados), `10513ef` (formatos), `d0ec7e0` (A11y/States32/MobFilters); antes `985354b`, `036dbd6`, `0856ee0`, `e90fb6e`, `ea93590` | Producción, solo lectura |
 | Barra inferior propia (`Shell statusBar`) + «Solo lectura» en el encabezado (`Shell readOnly`) | mismos commits | Producción |
 | Diálogos v3.2: `PlanDrawer` (plan/edit/from), `RescheduleDialog`, `CancelDialog`, `LinkDialog`, crear desde ejecución | `c2014ba` (diálogos), `fce8d99` (ajustes tras verificar) | Código en producción; **no se montan** en modo `open` (sin actor con permiso) |
+| Hojas de email (V3-SheetEmail, MobSheetEmail) y página web (V3-OwnedFormats landing): `OwnedSheet.tsx` (`EmailBlock`, `EmailEvidence`, `WebBlock`) + `DeviceViews.tsx` (Escritorio/Móvil/Bandeja; en móvil se apilan) sobre `ActivationDto.email`/`web` de Codex (`1f2a0ef`, API 1.9.0) | `3048f96` (push `1f2a0ef..3048f96`, Vercel `kc4tcvuod`) | Producción; muestran «Sin dato en la fuente» hasta que se publique el lado Greenhouse del contrato (HubSpot/Resend). Sin límite de asunto/preheader en el catálogo → `n / —` |
 
 - **Rollout:** Studio `main` push `aa6fa07..10513ef` (incluyó 4 commits locales de Codex: `e62b5e3`, `055860d`,
   `ade6765`, `f72e408`) y `10513ef..d0ec7e0`. Vercel Production Ready (`otc14ubb7`). En Production:
@@ -483,8 +484,7 @@ Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1
 |---|---|
 | Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Verificado: `/login` y `/api/auth/session` 404; `efeonce_id` falla cerrado (401) |
 | Escrituras por MCP | TASK-2003 (T1 delegado) |
-| Hoja de email (V3-SheetEmail, MobSheetEmail): De, Asunto, Preheader, Audiencia, Escritorio/Móvil/Bandeja, después del envío | Contrato de email owned en el reader (pedido a Codex el 2026-10-05; Codex trabajando en contracts/domain) |
-| Landing (V3-OwnedFormats): destino de N activaciones, formulario conectado | Mismo encargo a Codex |
+| Datos reales en las hojas de email/landing | Publicar el lado Greenhouse del contrato de Codex (metadata y métricas HubSpot/Resend) + readback; hoy no hay activaciones de email ni web en producción |
 | Hoja de blog (V3-BlogPre/BlogPost): dossier SEO/AEO | TASK-1667/1669 (hoy «no medido») |
 | «Línea de tiempo» como tercera opción del selector en Semana | Desvío deliberado (V3-Week no daba entrada); decisión del operador |
 | Encabezado global (lockup y riel) | Fuera de TASK-2002 |
@@ -492,3 +492,4 @@ Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1
 | Capabilities `marketing_studio.asset.write`/`campaign.write` | En develop (`9d0d698d4`); release a producción espera decisión del operador |
 
 - 2026-10-05 — TASK-2002 v3 + diálogos en producción (solo lectura); escrituras web/MCP y hojas email/landing/blog pendientes según la tabla.
+- 2026-10-05 — hojas de email y página web en producción (`3048f96`) sobre el contrato `1f2a0ef`; verificadas en local con datos de prueba; en producción `email`/`web` llegan null (6 activaciones, todas sociales). Pendiente: lado Greenhouse del contrato y hoja de blog.

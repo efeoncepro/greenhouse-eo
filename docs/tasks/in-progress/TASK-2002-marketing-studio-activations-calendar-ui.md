@@ -1,5 +1,26 @@
 # TASK-2002 — Marketing Studio: calendario de activaciones y ejecución en la UI
 
+## Delta 2026-10-05 — hojas de email y página web en producción
+
+Studio `3048f96` (push `1f2a0ef..3048f96`, Vercel Production Ready `kc4tcvuod`) construye las hojas sobre el contrato
+de lectura de Codex (`1f2a0ef`, API 1.9.0, [campos](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md)):
+
+- **Email (V3-SheetEmail, MobSheetEmail):** De, Asunto y Preheader literales con conteo contra el catálogo (sin
+  límite en el catálogo se muestra `n / —`, nunca uno inventado), Audiencia (listas/segmentos con contactos y
+  exclusiones), vista previa Escritorio · Móvil · Bandeja (en el teléfono se apilan bandeja y email), evidencia
+  programado/enviado/después del envío (entregados, aperturas, clics con su ventana).
+- **Página web (V3-OwnedFormats, landing):** vista previa Escritorio · Móvil y lista con destino de N activaciones,
+  formulario conectado (Growth Forms leído en la página publicada; `not_observed`/`unavailable` dicho como tal),
+  URL en línea con HTTP y fecha de revisión, fecha de publicación observada o confirmada. El aviso
+  `growth_forms_unavailable` vive en la lista y no se repite como recuadro.
+- `null` se muestra «Sin dato en la fuente». Componentes `OwnedSheet.tsx` y `DeviceViews.tsx`.
+- **Verificación:** local con datos de prueba en la base desechable (email de ACT-001012 y landing de ACT-001013),
+  claro/oscuro y 390 px, conmutador probado; `pnpm check` y `pnpm --filter @studio/web build` verdes. En producción
+  la API ya entrega `email`/`web` (null en las 6 activaciones, todas sociales); hoja social ACT-000001 sin regresión.
+- **Pendiente:** el lado Greenhouse del contrato (metadata y métricas desde HubSpot/Resend) no está publicado; hasta
+  entonces las activaciones existentes muestran «Sin dato en la fuente». No hay aún activaciones de email ni web en
+  producción.
+
 ## Delta 2026-10-04 (revisión 1:1) — fidelidad a los tableros y lo pendiente
 
 Revisión 1:1 de cada tablero aprobado contra lo implementado (Studio local, commits `f7b9790`…`00a51e5`, sin push):
@@ -11,8 +32,8 @@ generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a s
 
 | Diferencia | Por qué | Se termina con |
 |---|---|---|
-| Hoja de email (V3-SheetEmail, MobSheetEmail): De, Asunto, Preheader, Audiencia, conmutador Escritorio/Móvil/Bandeja y «Después del envío» | El reader de activaciones no entrega remitente, asunto, preheader ni audiencia; inventarlos violaría «null = ausente» | Contrato de email owned en el reader (TASK-2001 / línea owned email) |
-| Hoja de blog (V3-BlogPre, V3-BlogPost) y formatos owned (V3-OwnedFormats): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces, landing con formulario | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
+| ~~Hoja de email (V3-SheetEmail, MobSheetEmail)~~ | **Hecha el 2026-10-05** (`3048f96`) sobre el contrato `1f2a0ef` | Datos reales cuando se publique el lado Greenhouse del contrato |
+| Hoja de blog (V3-BlogPre, V3-BlogPost): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces (la landing con formulario de V3-OwnedFormats quedó **hecha el 2026-10-05**, `3048f96`) | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
 | Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
 | Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
 | Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed` | Se habilitan solos cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código |
