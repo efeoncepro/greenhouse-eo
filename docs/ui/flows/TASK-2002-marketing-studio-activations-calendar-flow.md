@@ -9,6 +9,7 @@
 - Contrato: TASK-2001 (activaciones, evidencia de ejecución, descubrimiento de Metricool, reader del calendario).
 - Siguiente iteración (trimestre, historial, comentarios, lote, exportar, vista de cliente, propuesta por agente):
   TASK-2005 (contrato) y TASK-2006 (UI).
+- Estado (2026-10-05, Claude): en producción en solo lectura; ver [Flujos implementados](#flujos-implementados-2026-10-05).
 
 ## Rutas y estado en la URL
 
@@ -22,6 +23,49 @@
 | Activación abierta | `&activation=<activationId>` (deep link; la hoja se abre al cargar) |
 | Formulario | `&plan=1` (nueva) · `&activation=<id>&edit=1` · `&execution=<executionId>&create=1` (desde ejecución) |
 | Pestaña de campaña | `/campaigns/CMP-###?tab=calendar` + los mismos parámetros, con la campaña fijada |
+
+## Flujos implementados (2026-10-05)
+
+La tabla anterior es el diseño. Lo implementado (en producción en solo lectura, Studio `main` `d0ec7e0`) usa esta URL:
+
+| Estado | URL real |
+|---|---|
+| Vista | `/calendar?view=month\|week\|day\|timeline\|paid` + `date` / `month` (`view=paid` es alias del filtro `modality=paid` sobre el mes) |
+| Línea de tiempo | `&scale=day\|week\|month`; `&rows=all` muestra todas las filas (por defecto «Sólo filas con actividad») |
+| Filtros | `&modality=…&family=…&platform=…&account=…&market=…&campaign=…&status=…` |
+| Paid: línea elegida | `&line=<id>` (abre su «Evidencia de ejecución» en el costado) |
+| Detalle del día | `&pop=YYYY-MM-DD` |
+| Hoja de activación | `&activation=<id>` |
+| Acción de escritura | `&action=plan\|edit\|reschedule\|cancel\|link\|from` + `activation` o `record` según la acción |
+
+**Detalle del día.** El número del día o «+N más» abren `?pop=`; con el foco en el día, Entrar lo abre. Muestra la
+lista del día, los flights en curso y «Abrir vista Día». Esc o ✕ lo cierran y el foco vuelve a la celda.
+
+**Acciones de escritura.** La acción vive en la URL. `ActionLayer` (servidor) carga catálogo publicado, cuentas,
+campañas y candidatas y **sólo se monta si el actor puede escribir**. En producción (modo `open`) no se monta: los
+botones quedan `aria-disabled` con su motivo y la API responde 403 `write_not_allowed`. Cuando se monta:
+
+1. El formulario o diálogo envía primero una **vista previa** (`dryRun`, con `Idempotency-Key` nueva e `If-Match` con
+   la revisión) y muestra los hallazgos del catálogo con texto legible.
+2. **Aplicar** envía la misma operación con otra clave de idempotencia.
+3. Después de aplicar, la UI **navega a la hoja de la activación** (plantilla de URL con `__ID__`) y hace
+   `router.refresh()`.
+
+**Estado de cada recorrido.**
+
+| Recorrido | Estado |
+|---|---|
+| A. Revisar la semana | En producción (lectura) |
+| B. Resolver una ejecución sin activación | Diálogos `LinkDialog` y «Crear desde ejecución» code complete y verificados en local (la bandeja bajó de 3 a 1); deshabilitados en producción hasta TASK-1898 |
+| C. Atender una vencida o fuera de plan | `RescheduleDialog` (dice en qué estado quedará y que Studio no mueve la herramienta) y `CancelDialog` verificados en local; deshabilitados en producción |
+| D. Planificar | `PlanDrawer` verificado en local (vista previa 200 → 201 y apertura de la hoja nueva); deshabilitado en producción |
+| E. Revisar la pauta | En producción (lectura) como filtro Paid; «Editar» deshabilitado en producción |
+| F. Revisar un día cargado | En producción |
+| G. Ver por plataforma | En producción |
+| H. Email, blogpost o landing | Pendiente: email y landing esperan el contrato owned del reader; blog espera TASK-1667/1669 |
+
+Paridad: `write/client.ts` hace un `fetch` literal por operación del registro y `operations-parity.test.ts` lo exige.
+Las escrituras por MCP dependen de TASK-2003.
 
 ## Recorridos
 

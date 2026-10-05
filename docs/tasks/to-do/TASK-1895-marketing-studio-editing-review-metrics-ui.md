@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- **TASK-2002 construyó piezas reutilizables para la edición en la UI de Studio:** formulario `PlanDrawer`
+  (modos plan / edit / from), `RescheduleDialog`, `CancelDialog`, `LinkDialog`, cliente de escritura con `Idempotency-Key`
+  e `If-Match`, errores `StudioApiError` y el patrón de acción en la URL (`?action=…`) con `ActionLayer` montado sólo si el
+  actor puede escribir. Reutilizarlos antes de crear diálogos nuevos (`apps/web/src/components/activations/write/`).
+
 ## Delta 2026-10-04
 
 - **Reproducción de video sale de esta task:** TASK-1998 (derivado `playback`, transporte `302` a URL firmada V4 y

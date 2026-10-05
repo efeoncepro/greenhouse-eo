@@ -286,3 +286,32 @@
   read `typeof src === 'string' ? src : src.src`.
 - 2026-10-04: an AXIS release tag publishes every package version on `main` not yet in the registry, including other
   sessions' bumps. List HEAD versions vs registry before tagging; never move a pushed tag — release the next version.
+
+## 2026-10-05 — TASK-2002 calendario v3 y diálogos de escritura
+
+- **Clase global `.today` choca con el calendario.** La grilla de la página Hoy usa `.today` (`display:grid`, 2
+  columnas) y deformaba cualquier `today` del calendario. Regla: usar `is-today`.
+- **Un server component no puede pasar funciones a un client component** (`afterHref`). Regla: pasar una plantilla de
+  URL con `__ID__` y resolverla en el cliente.
+- **Un server component no puede llamar funciones de un módulo `'use client'`** (`stageMode`). Regla: helpers
+  compartidos en un módulo sin directiva (`stage-model.ts`).
+- **Hijos de un flex en columna con overflow se encogen a 0 de alto** (el escenario dentro de `.sheet-body`). Regla:
+  `flex-shrink: 0`.
+- **Lint `react-hooks/set-state-in-effect`.** No resetear estado síncrono en efectos; guardar el resultado con la clave
+  de la entrada que lo produjo y derivarlo al renderizar.
+- **Test de paridad UI↔API.** Todo `fetch` de mutación en archivos cliente lleva `method` literal y ruta template
+  estática con parámetros de nombre exacto (`campaignId`, `activationId`, `recordId`); si no, `operations-parity.test.ts` falla.
+- **El Write tool convirtió un escape de espacio duro en el carácter literal** → `no-irregular-whitespace`. Regla:
+  escribir el escape, no el carácter.
+- **En modo `open` el actor anónimo no escribe ni siquiera `dryRun`** (`handleWrite` rechaza antes de mirar el cuerpo).
+  Para ver diálogos en local hace falta un actor con permiso: pedir autorización explícita al operador (el
+  clasificador lo bloquea como debilitamiento de seguridad), no commitear y revertir.
+- **La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS`** (`{org:[dominios]}`) o devuelve 422
+  `tracking_destination_invalid`.
+- **La regla del validador no basta para filtrar cuentas del formulario.** Una cuenta de pauta (LinkedIn Ads, platform
+  `linkedin`) aparecía en orgánico. Regla: filtrar además por la herramienta del canal (paid → `buyingPlatform`, resto →
+  `readbackProvider` si no es `none`).
+- **Reiniciar el servidor de desarrollo después de `pnpm install`** (factories de módulo rotas; reafirma la lección del 2026-10-04).
+- **Import estático de SVG en Turbopack llega como string o `StaticImageData`.** Regla: leerlo con `srcOf`
+  (reafirma la lección del 2026-10-04).
+- **El generador del canvas (`gen.py`) es la fuente exacta de medidas** para revisar fidelidad contra la dirección v3.

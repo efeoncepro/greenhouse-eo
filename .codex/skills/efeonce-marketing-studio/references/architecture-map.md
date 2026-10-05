@@ -226,3 +226,33 @@ All paths below are in Studio unless marked Greenhouse.
   `docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`: verification evidence and runtime limits.
 
 - TASK-2001 rollout 2026-10-04: discovery scheduler enabled; activation/discovery flags versioned in deploy.sh, two existing Metricool brand bindings; tracking domain allowlist per organization. No new secrets or IAM grants. See release audit for exact runtime pointers.
+
+## TASK-2002 — mapa del calendario de activaciones (Studio `apps/web/src`, producción `d0ec7e0`, 2026-10-05)
+
+| Ruta | Responsabilidad |
+|---|---|
+| `app/calendar/page.tsx`, `app/calendar/loading.tsx` | Página del calendario (lee los readers de TASK-2001; nunca calcula un estado de ejecución) y esqueleto de carga |
+| `components/activations/MonthGrid.tsx` | Mes: franjas paid desde `data.flights` (`budgetStatus` proposed rayada / approved sólida), aviso «N sin activación» por día |
+| `components/activations/WeekView.tsx`, `DayView.tsx` (+ `DaySide`) | Semana (carril PAID, franjas mañana/tarde/noche, línea de ahora) y Día (06:00–23:00, «Resumen del día», «Horas por cuenta») |
+| `components/activations/TimelineView.tsx` (+ `TimelineTools`), `TimelineFoldAll.tsx` | Línea de tiempo por plataforma/cuenta/línea, escala Día/Semana/Mes, «Plegar todo» |
+| `components/activations/PaidView.tsx` | Paid = filtro Modality: Paid sobre el mes; resumen por campaña, plan vs fechas en la herramienta vs entrega observada |
+| `components/activations/ActivationSheet.tsx`, `SheetFrame.tsx` | Hoja de la activación (dimensiones, pieza, copy contra límite del canal, avisos, evidencia, tracking URL, historial) |
+| `components/activations/ActivationCard.tsx` | Tarjeta compact/rich/mobile, `EvidenceLine`, `TimeAside`, `PieceBadge` |
+| `components/activations/ExecutionChip.tsx`, `DayPopover.tsx` | Chip de estado con isotipo de la herramienta; popover del día (`pop`) |
+| `components/activations/SidePanels.tsx` | `UnlinkedExecutions`, `UndatedPanel`, `CalendarLegend`, `CalendarStatusBar`, `FreshnessNotice`, `ToolLine`, `dayRange` |
+| `components/activations/PieceStage.tsx` + `stage-model.ts` | Preview por formato (escenario 320 px: video, carrusel, horizontal, grupo por proporción); `stage-model.ts` es módulo **sin directiva** compartido server/client |
+| `components/activations/ActivationFilters.tsx`, `GridKeys.tsx`, `LockedAction.tsx` | Filtros por dimensión (móvil «Ver N activaciones»), teclado de la grilla (Entrar abre el popover), acción bloqueada `aria-disabled` con motivo |
+| `components/activations/icons.tsx`, `platforms.tsx`, `model.ts` | `Glyph`, `PieceThumb`, `AccountAvatar`; marcas de plataforma (AXIS `@efeoncepro/axis-brand-assets` 0.4.20); `flightBands`, `isoWeek`, `unlinkedByDay` |
+| `components/activations/write/client.ts` | Cliente de escritura: un `fetch` literal por operación del registro (ver `contracts.md`) |
+| `components/activations/write/{parts,PlanDrawer,RescheduleDialog,CancelDialog,LinkDialog}.tsx` | `PlanDrawer` modos plan/edit/from sobre `PlanActivationBody`; reprogramar, cancelar (alertdialog), vincular |
+| `components/activations/write/ActionLayer.tsx` | Servidor: carga catálogo publicado, cuentas, campañas y candidatas; **sólo se monta si el actor puede escribir** |
+| `components/Shell.tsx` | Props `statusBar` (barra inferior propia del calendario reemplaza la del portal) y `readOnly` («Solo lectura» en el encabezado) |
+| `copy.ts` (`COPY.activations.*`: write, stage, timeline, paid, daySide, bar, legend, …), `styles/app.css` (bloques TASK-2002 v3) | Copy visible y estilos; usar la clase `is-today`, nunca `today` |
+
+- **Parámetros de URL del calendario:** `view` (month|week|day|timeline|paid), `date`, `month`, `scale`, `rows`, `line`,
+  `pop`, `action` (plan|edit|reschedule|cancel|link|from), `record`, `activation`, filtros
+  `modality|family|platform|account|market|campaign|status`. La acción vive en la URL; tras aplicar navega a la hoja
+  (plantilla `__ID__`) y hace `router.refresh()`.
+- **Envs (sólo nombres):** `STUDIO_ACTIVATIONS_ENABLED` (apagado ⇒ `LegacyCalendar`), `STUDIO_ACCESS_MODE` (`open` ⇒
+  botones `aria-disabled` y API 403 `write_not_allowed`), `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`; sin él la vista
+  previa del plan responde 422 `tracking_destination_invalid`). Los tres presentes en Production.

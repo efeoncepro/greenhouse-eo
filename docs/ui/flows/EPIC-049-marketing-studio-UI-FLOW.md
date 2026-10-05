@@ -188,7 +188,7 @@ el master flow; `MS-N3` se descompone en subnodos y se agregan `MS-N8…MS-N10`.
 | `MS-N3.9` | Hoja de revisión de tres estados + historial | `?review=creative\|media\|launch` (se consume) | TASK-1895 sobre TASK-1894 | diseño |
 | `MS-N3.x` | Superpuestas: `Sheet`, `ConfirmDialog`, `ConflictDialog`, `UploadVersionDialog`, `WriteGateNotice` | sin URL | TASK-1895 | diseño |
 | `MS-N4` | Calendario global (vuelos por semana, posts vencidos a verificar), Piezas globales, Medios globales | `/calendar?month=YYYY-MM`, `/library`, `/media` | TASK-1887 | en vivo |
-| `MS-N4` (calendario de activaciones) | Calendario de Studio con filtros por modality/family/platform/account, estados de ejecución, hoja de activación y bandeja «Ejecución sin activación» (ADR de estrategia §15) | `/calendar?month=…&view=week&modality=…&activation=…` | TASK-2001 + TASK-2002 | diseño |
+| `MS-N4` (calendario de activaciones) | Calendario de Studio con filtros por modality/family/platform/account/mercado, estados de ejecución, vistas Mes · Semana · Día · Línea de tiempo · Paid, hoja de activación con preview por formato, detalle del día y bandeja «Ejecución sin activación» (ADR de estrategia §15). Reemplaza al calendario mensual de TASK-1887 en `/calendar` | `/calendar?view=month\|week\|day\|timeline\|paid&date=…&month=…&scale=…&rows=…&line=…&pop=…&activation=…&action=…&record=…` + filtros | TASK-2001 + TASK-2002 | en vivo en solo lectura (verificado 04–05/10); escrituras code complete, deshabilitadas hasta TASK-1898; MCP TASK-2003; hojas email/landing/blog pendientes ([flow](TASK-2002-marketing-studio-activations-calendar-flow.md#flujos-implementados-2026-10-05)) |
 | `MS-N5` | Búsqueda ⌘K | overlay global | TASK-1887 | en vivo |
 | `MS-N6` | Login Efeonce ID (redirect), callback, **sin acceso**, **control de cuenta / salir** | `/auth/login`, `/auth/callback`, `POST /auth/logout` | TASK-1898 (runtime) + delta de UI en TASK-1895 | diseño |
 | `MS-N7` | Agentes por Efeonce MCP (tools `studio.*`) | `mcp.efeonce.org/mcp` | TASK-1890 (manifiesto) + TASK-1891 (federación) | diseño; no es superficie visual |
@@ -398,7 +398,7 @@ incidente en V1: el aviso llega a quien opera, no a quien lee.
 | `/` | — | `MS-N1` | lectura | sesión |
 | `/campaigns` | `filter=all\|pending\|production\|blocked` | `MS-N2` | lectura | sesión |
 | `/campaigns/[campaignId]` | `tab=brief\|pieces\|copies\|ads\|media\|calendar\|results` (sin `tab` = `pieces`), `piece={assetId}`, `review=creative\|media\|launch`, `#copyId` | `MS-N3` | lectura + razón | sesión; edición según proyección |
-| `/calendar` | `month=YYYY-MM` (inválido → mes vigente en `America/Santiago`) | `MS-N4` | lectura | sesión |
+| `/calendar` | `month=YYYY-MM` (inválido → mes vigente en `America/Santiago`); desde TASK-2002 además `view`, `date`, `scale`, `rows`, `line`, `pop`, `activation`, `action`, `record` y filtros | `MS-N4` | lectura (acciones de escritura `aria-disabled`) | sesión |
 | `/library` | — | `MS-N4` | lectura | sesión |
 | `/media` | — | `MS-N4` | lectura | sesión |
 | `/auth/login` | `returnTo` relativo | `MS-N6` | no existe | 302 al emisor |

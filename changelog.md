@@ -11,7 +11,6 @@
 
 Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset cancelable; feedback, disclosure, dialog y complementary con foco diferenciado; selección múltiple, tabs/paginación, fechas/rango y archivo nativos. Catálogo distingue releases observadas de exports locales. Composición `/references/product/`, pruebas y coste de bundle documentados en el repo AXIS. Sin publicar ni migrar consumidores. [Task](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md).
 
-
 ## 2026-10-05 — TASK-2002: calendario de activaciones v3 en producción (sólo lectura)
 
 - Studio `main` `d0ec7e0`: `studio.efeonce.org/calendar` sigue la dirección v3 aprobada en Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover del día, estados, filtros móvil y preview por formato, con barra inferior propia de evidencia de ejecución. Diálogos de escritura (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución) verificados en local; en producción no se montan hasta que exista login (TASK-1898). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
@@ -517,56 +516,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   marcador `sealed-by-freeze`, acepta sólo los frames que ella nombra, falla cerrado listando los demás y la sella al
   promover. Regla en `scripts/artifact-composer/baseline-deltas-ledger.ts` (+ test);
   [runbook §5](docs/operations/runbooks/composer-visual-gate.md). Las 44 secciones previas quedan `legacy-2026-09-28`.
-
-## 2026-09-28 — Las nueve láminas SEO/AEO del deck «La órbita» componen (TASK-1934)
-
-- El catálogo de recetas pasa de 69 a 78, todas con plantilla en `graphic-line-deck` sobre AXIS `axis-tokens` 0.3.23 /
-  `axis-ui-contracts` 0.3.21 (releases aditivos `v0.3.22` y `v0.3.23`). Siete plantillas nuevas y dos propuestas SEO sobre
-  plantillas existentes; gate de La órbita en 73 frames a 0 px, aprobados a ojo por el operador.
-- `validateDeckPlan`: `variant-both-in-deck` reemplaza a `variant-adjacent` (dos variantes nunca en el mismo deck),
-  `figure-source-missing` nuevo y `next-steps-after-diagnosis` por familia. Cifras con fuente, datos de muestra marcados e
-  interfaz de IA genérica quedan cubiertos por tests.
-- La portada «Tu squad.» tiene plate propio (CR4) y un brochure de Creative Services ya no repite plate; la plantilla
-  cine recupera la nota «Sin promesas de ranking».
-
-## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
-
-- La CLI llega a `1.0.0` con SemVer propio, historial append-only, digest de fuentes gobernadas, `version` visible
-  y un bump automatizado. `local:check` bloquea mejoras sin versión y registro; los recibos JSON llevan
-  `cliVersion`. [Contrato técnico](docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
-- `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
-  por query/dispositivo. Exporta raw + JSON/CSV y separa orgánico, mención, enlace AI, cita AI y Shopping opcional;
-  explicita depth y frescura sin fabricar posiciones. `quick organic` ya transmite target/depth/AI Overview.
-- Organic Live Advanced se serializa a una task por request. El artefacto agrega diagnóstico por request, omite
-  filas de tasks fallidas y separa carga AI solicitada de frescura realmente devuelta. El canary desktop/mobile
-  completó dos tasks `20000` por USD 0,0055 reales frente a USD 0,016 estimados.
-
-- Delta: `pnpm dataforseo -- research` encadena minería Labs, gobernanza explícita de finalistas, enriquecimiento
-  SERP Standard y una matriz JSON/CSV con intención, cobertura, competidores, features, PAA, citas y procedencia.
-  Pagina y reanuda por checkpoint sin recomprar pasos; `keyword_ideas` y AI Overview quedan opt-in.
-
-- `pnpm dataforseo -- ai-research` ejecuta paneles versionados para Responses, Scraper, AI Keyword Data y Mentions,
-  separa API de consumer surface y normaliza citas, fan-out, entidades, modelos, costo y evidencia.
-
-- TASK-1651-A amplía el allowlist gobernado a `ai_optimization`: 53 rutas de LLM Responses, LLM Scraper,
-  AI Keyword Data y LLM Mentions quedan operables desde la CLI. GET de modelos/catálogos/polling es gratuito
-  y no exige organización; todo POST real exige organización, entitlement, estimación, ceiling y ledger AEO.
-  El CHECK quedó aplicado y validado. Un canary API con techo USD 0,012 costó USD 0,0101 y dejó una llamada
-  `consumer=aeo` en el ledger; repetirlo con `--resume` tuvo costo incremental cero y no elevó `call_count`.
-
-- `pnpm dataforseo` descubre 545 endpoints oficiales y separa los 320 ejecutables bajo el allowlist vigente de los
-  que sólo se pueden consultar en catálogo. Incluye presets diarios, payload por archivo/JSON/stdin, lifecycle async,
-  preview por defecto, techo de costo, salida machine-readable y el transporte canónico para GET/POST.
-- Un registro generado documenta las 225 rutas `catalog_only` sin habilitarlas: 216 rutas de producto con propósito
-  eventual y gate por familia, más 9 rutas de infraestructura/plantillas que no son capabilities. Prioriza Content
-  Analysis para brand monitoring y Business Data acotada para SEO local/reputación; Keywords Data queda condicional
-  y Merchant/App Data esperan un caso real.
-- Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
-  (USD 0,002), todos con task `20000`; `serp-compare` reutilizó cada captura para dos entidades y completó el panel
-  desktop/mobile por USD 0,0055, manteniendo separados orgánico, mención, enlace, cita y frescura. Commit local;
-  sin push, deploy ni cambio de flags.
-- La [auditoría transversal](docs/audits/seo/2026-09-28-dataforseo-cli-production-validation.md) consolida además
-  las pruebas de Falabella, Paris, `agencia seo en chile`, `agencia creativa en chile` y el research productivo de
-  servicios creativos. Registra task IDs, USD 0,25402 conocidos incluyendo reintentos, defectos corregidos y una
-  corrección de evidencia: las corridas de categoría no declararon `efeoncepro.com` como target y no prueban
-  presencia o ausencia propia.

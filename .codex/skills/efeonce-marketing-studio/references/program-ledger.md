@@ -37,7 +37,7 @@ old local/not-pushed/pending-rollout snapshots; do not replay completed migratio
 | TASK-1999 | Video player in the piece inspector (feed + 9:16 story, native controls, no autoplay), every piece per format in the board, duration, ghost cell → other kind | **complete 2026-10-04** | Studio prod (`35093c3`, `c52eb4a`); CMP001-08 master + Instagram version visible and playable |
 | TASK-1905 | Versioned channels, taxonomy/UTM, governance, transactional validation, alias/backfill, campaign audiences and ICP references | **in progress** — Studio deployed; Greenhouse capability, real ICP, MCP and human-reviewed backfill pending | API 1.6.0, 59 tools; catalog v1 / 52 channels, warn / ICP false |
 | TASK-2001 | Activations: a campaign's concrete output on a channel (campaign required, Always On campaigns, modality × family × platform × placement, account, market, exact piece version, planned date); execution evidence (Metricool, later ad platforms) attached, never the plan; computed status planned/scheduled/scheduled_off_plan/published/overdue/cancelled; Metricool discovery; «ejecución sin activación» in Hoy; the calendar reads activations (strategy ADR §15) | in-progress: Studio aa6fa07 deployed; email/owned/delegated MCP pending | TASK-2001 release 2026-10-04 |
-| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | to-do (blocked by TASK-2001 + direction v3) | — |
+| TASK-2002 | Activations calendar UI: filters by dimension, cards with piece + execution status, activation sheet, unlinked-executions tray | **in progress** (2026-10-05) — calendario v3 + diálogos de escritura en producción; escrituras web esperan TASK-1898, MCP TASK-2003; hojas email/landing/blog pendientes (ver §TASK-2002 v3) | `studio.efeonce.org/calendar` solo lectura (Studio `d0ec7e0`, Vercel `otc14ubb7`) |
 | TASK-2003 | MCP delegated-writes core (agent-friendly): Entra write scope, Greenhouse exchange per exact capability (asset.download/asset.write/campaign.write), Studio delegated actor (person via MCP), gateway federates `T1` writes; no `T2`/approvals (TASK-1899 retired 2026-10-04) | to-do (Codex implements) | — |
 | TASK-1899 | Withdrawn by the operator 2026-10-04; local implementation reverted; no automatic resume or development prerequisite | to-do (withdrawn; not executable) | No rollout |
 
@@ -450,3 +450,45 @@ Greenhouse/gateway unchanged by release; delegated T1 TASK-2003, UI TASK-2002, o
   copied read-only plus local-only sample activations (never written to staging/production).
 - Pending: write UI, «+N» popover, mobile filter sheet, blog SEO/AEO sections (no contract), `pnpm check`/`build` once
   Codex's in-flight domain work is committed, real MCP session, push and rollout.
+
+## TASK-2002 v3 — calendario de activaciones fiel a la dirección v3 + diálogos (2026-10-04/05)
+
+Supera la sección anterior (read side local). Fuente de diseño: canvas v3/v3.1/v3.2
+`https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi`, revisado tablero por tablero (V3-*) hasta coincidir 1:1.
+
+| Superficie | Entregado | Estado |
+|---|---|---|
+| Mes, Semana, Día, Línea de tiempo, Paid (filtro Modality: Paid sobre el mes; `view=paid` alias), Hoja, Popover del día, Estados, A11y, Filtros móvil, Formatos | Studio `f7b9790` (Mes/Semana), `dc579e4` (Día), `c201fb4` (Línea de tiempo), `7bde589` (Paid + `is-today`), `acea0dc` (Hoja), `ff74abf` (Popover), `00a51e5` (estados), `10513ef` (formatos), `d0ec7e0` (A11y/States32/MobFilters); antes `985354b`, `036dbd6`, `0856ee0`, `e90fb6e`, `ea93590` | Producción, solo lectura |
+| Barra inferior propia (`Shell statusBar`) + «Solo lectura» en el encabezado (`Shell readOnly`) | mismos commits | Producción |
+| Diálogos v3.2: `PlanDrawer` (plan/edit/from), `RescheduleDialog`, `CancelDialog`, `LinkDialog`, crear desde ejecución | `c2014ba` (diálogos), `fce8d99` (ajustes tras verificar) | Código en producción; **no se montan** en modo `open` (sin actor con permiso) |
+
+- **Rollout:** Studio `main` push `aa6fa07..10513ef` (incluyó 4 commits locales de Codex: `e62b5e3`, `055860d`,
+  `ade6765`, `f72e408`) y `10513ef..d0ec7e0`. Vercel Production Ready (`otc14ubb7`). En Production:
+  `STUDIO_ACTIVATIONS_ENABLED=true`, `STUDIO_ACCESS_MODE=open`, `STUDIO_TRACKING_DOMAINS` presente.
+- **Producción verificada:** `studio.efeonce.org/calendar` 200 con el calendario v3 en solo lectura; datos reales: 3
+  activaciones en octubre, **50 ejecuciones sin activación** (tope de la consulta `limit: 50`; podrían ser más) y todas
+  las piezas importadas aparecen «Pieza sin aprobar».
+- **Escrituras verificadas sólo en local** (Postgres 18 descartable `127.0.0.1:55461/marketing_studio`, servidor
+  `studio-2002-local` :3102) con un actor `operator_cli` temporal en `runtime.ts` **autorizado por el operador**, no
+  commiteado y revertido: planificar (vista previa 200 → 201, abre ACT-000008), editar (PATCH 200), reprogramar, cancelar,
+  vincular, crear desde ejecución (201, ACT-000009); la bandeja bajó de 3 a 1. Con el actor revertido ningún diálogo se
+  monta y `POST …/cancel` responde 403 `write_not_allowed`.
+- **Gates:** `pnpm check` completo y `pnpm --filter @studio/web build` verdes antes de cada push; tests web 22/22 (incluye paridad).
+- **Greenhouse:** TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados (tarjeta con cuenta,
+  bandeja baja el conteo, `pnpm check`/build) y diferencias pendientes con su dependencia.
+
+**Pendiente (no está hecho):**
+
+| Qué | Depende de |
+|---|---|
+| Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Verificado: `/login` y `/api/auth/session` 404; `efeonce_id` falla cerrado (401) |
+| Escrituras por MCP | TASK-2003 (T1 delegado) |
+| Hoja de email (V3-SheetEmail, MobSheetEmail): De, Asunto, Preheader, Audiencia, Escritorio/Móvil/Bandeja, después del envío | Contrato de email owned en el reader (pedido a Codex el 2026-10-05; Codex trabajando en contracts/domain) |
+| Landing (V3-OwnedFormats): destino de N activaciones, formulario conectado | Mismo encargo a Codex |
+| Hoja de blog (V3-BlogPre/BlogPost): dossier SEO/AEO | TASK-1667/1669 (hoy «no medido») |
+| «Línea de tiempo» como tercera opción del selector en Semana | Desvío deliberado (V3-Week no daba entrada); decisión del operador |
+| Encabezado global (lockup y riel) | Fuera de TASK-2002 |
+| V3-Gantt (reemplazada por la línea de tiempo v3.1), V3-Later, V3-Quarter, V3-SheetMore, V3-Bulk | TASK-2005/2006, fuera de alcance |
+| Capabilities `marketing_studio.asset.write`/`campaign.write` | En develop (`9d0d698d4`); release a producción espera decisión del operador |
+
+- 2026-10-05 — TASK-2002 v3 + diálogos en producción (solo lectura); escrituras web/MCP y hojas email/landing/blog pendientes según la tabla.

@@ -442,3 +442,23 @@ be absent on old servers and are null when unavailable. Exact DTO handoff and ev
 
 No UI changes, new migration or default-ON flag. Repoll owned readers after authorized deployment; old evidence
 remains null until refreshed. External live certification is pending; MCP declaration does not prove federation.
+
+
+## Cómo consume el contrato la UI del calendario (TASK-2002, Studio `d0ec7e0`, 2026-10-05)
+
+La UI es un cliente más del registro de operaciones (paridad UI↔API).
+
+- **Un `fetch` literal por operación** en `apps/web/src/components/activations/write/client.ts`.
+  `operations-parity.test.ts` exige en archivos cliente `method` literal y ruta template estática con nombres de
+  parámetro exactos (`campaignId`, `activationId`, `recordId`).
+- **Escrituras:** `Idempotency-Key` nueva por intento (`web-<uuid>`), `If-Match` con la revisión; primero vista previa
+  con `dryRun` (los hallazgos del catálogo se muestran con texto legible por código) y la aplicación usa **otra** clave.
+  Errores con forma canónica (`StudioApiError`: message/code/actionable/reason).
+- **Tracking:** la URL se muestra tal como la devuelve `GET /api/v1/campaigns/{id}/tracking/preview`; la UI nunca arma UTM.
+- **Conteo de filtros móvil** («Ver N activaciones»): mismo reader `GET /api/v1/calendar` con el borrador de filtros.
+- **Formatos de la pieza:** tipo, medidas, póster y reproducción se leen con `getAsset` en el servidor.
+- **Límite de copy en la hoja:** `getChannel` → `copyLimits` (primaryText).
+- **Cuentas del formulario:** regla del validador (appearancePlatforms / buyingPlatform) **y** herramienta del canal
+  (paid → `buyingPlatform`, resto → `readbackProvider` si no es `none`). Fecha/hora en la zona de la cuenta (`toZonedIso`).
+- **Autoridad:** en modo `open` el actor anónimo no escribe ni siquiera `dryRun` (403 `write_not_allowed`); los diálogos
+  no se montan sin actor con permiso. Escrituras web esperan TASK-1898; por MCP, TASK-2003.

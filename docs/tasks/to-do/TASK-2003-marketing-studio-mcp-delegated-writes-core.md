@@ -4,6 +4,14 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- TASK-2002 dejó en producción de Studio la UI de escritura del calendario sobre las mismas operaciones del registro:
+  cliente `apps/web/src/components/activations/write/client.ts` con un `fetch` literal por operación (paridad UI↔API
+  exigida por `operations-parity.test.ts`), `Idempotency-Key` nueva por intento, `If-Match` con la revisión y vista previa
+  con `dryRun`. Las escrituras MCP de esta task deben cubrir esas mismas operaciones (plan, edit, reprogramar, cancelar,
+  vincular, crear desde ejecución).
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -338,6 +338,11 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   No mapping was guessed or applied. Publishing a catalog is not revalidation or migration of existing records.
 - TASK-1905 stays in progress with these cross-runtime dependencies. Details and historical delivery evidence:
   `references/program-ledger.md`.
+- **2026-10-05 — TASK-2002 (in progress):** calendario de activaciones v3 + diálogos de escritura en producción
+  (Studio `d0ec7e0`), `studio.efeonce.org/calendar` en **solo lectura** (modo `open`: diálogos sin montar, API 403
+  `write_not_allowed`). Escrituras web esperan TASK-1898 y por MCP TASK-2003; hojas email/landing esperan el contrato
+  owned de Codex y la de blog TASK-1667/1669. Mapa, contrato de consumo, verificación local y trampas: secciones
+  TASK-2002 de cada `references/*.md`.
 
 ## Routing
 

@@ -13,9 +13,9 @@ El release de Studio del mismo día es independiente y se documenta con su alcan
 
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.12
+> **Versión:** 1.13
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
+> **Última actualización:** 2026-10-05 por Claude: Delta TASK-2002 (calendario de activaciones en producción en solo lectura; composición, montaje de acciones por URL, paridad UI↔API, dryRun→apply, formatos vía `getAsset`, `Shell statusBar`). Anterior, 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -776,7 +776,7 @@ las campañas existentes); TASK-1898 (persona por sesión) y TASK-2003 (federaci
 - Diseño aprobado por el operador el 2026-09-25 (artifact «v2 · Claro y oscuro»).
 - Tema generado desde `@efeoncepro/axis-tokens@0.2.5` (`apps/web/scripts/generate-theme.mjs` → `theme.generated.css`); `theme:check` en el typecheck falla si el paquete y el CSS divergen. Roles de superficie por tema (app, chrome, inset, card, elev, selected) sobre los valores AXIS.
 - Claro/oscuro con switch; preferencia en la cookie `studio-theme`, leída en el servidor (sin parpadeo). Poppins (display) y Geist (texto) vía `next/font`.
-- Pantallas: Hoy (decisiones), Campañas (hero + tarjetas con pista de tres estados), espacio de campaña (piezas concepto × formato con inspector y preview; copys; anuncios; medios; calendario), Calendario mensual (vuelos por semana, posts vencidos a verificar), Piezas (`/library`) y Medios. Búsqueda ⌘K. Bajo 860 px, navegación inferior.
+- Pantallas: Hoy (decisiones), Campañas (hero + tarjetas con pista de tres estados), espacio de campaña (piezas concepto × formato con inspector y preview; copys; anuncios; medios; calendario), Calendario de activaciones (`/calendar`, TASK-2002: Mes, Semana, Día, Línea de tiempo y Paid, hoja y popover del día; ver [Delta 2026-10-05](#delta-2026-10-05--task-2002-calendario-de-activaciones)), Piezas (`/library`) y Medios. Búsqueda ⌘K. Bajo 860 px, navegación inferior.
 - **Vista previa por formato:** 9:16 se muestra como story; 1:1, 4:5 y 16:9 en tarjeta de feed con su proporción real (antes un `max-height` de 320 px recortaba).
 - **Video (TASK-1999):** `MediaVideo` reproduce `Asset.playback` en la tarjeta de feed o en la story con controles nativos, póster del segundo 1, `preload=metadata`, `playsInline` y sin autoplay ni loop; sin `playback` muestra el cuadro con una nota y, si falla, «No se pudo cargar el video.» con «Reintentar». En la story las capas no capturan clics y dejan libre la franja de controles. El tablero dibuja todas las piezas de cada concepto × tipo × formato (con la etiqueta de variante y la duración en los videos), y el hueco de un formato que sólo existe en el otro tipo lleva a esa pieza («Ver video» / «Ver imagen»).
 - Logos oficiales (`public/brand/`) copiados de `greenhouse-eo/public/branding/`.
@@ -896,6 +896,7 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1895 | UI de edición, revisión y métricas | To-do |
 | TASK-1899 | Diseño histórico de escrituras y confirmación MCP | Retirada 2026-10-04, sin rollout; no es prerrequisito API/CLI/UI |
 | TASK-1905 | Catálogo, validación, alias/backfill, audiencias y referencias ICP | Studio desplegado; Greenhouse/MCP/ICP y backfill pendientes |
+| TASK-2002 | Calendario de activaciones (UI) | En producción en solo lectura (verificado en la sesión del 04–05/10); escrituras web esperan TASK-1898 |
 | TASK-2003 | Identidad delegada y escrituras MCP T1 | Carril paralelo pendiente; no bloquea producto |
 | TASK-1897 | Revocar `CONNECT` de PUBLIC en `greenhouse_app` | To-do |
 | TASK-1898 | Login con Efeonce ID | To-do, última |
@@ -966,3 +967,70 @@ una campaña completa. El corte 4094da0 tiene consumidor HubSpot, no estos cuatr
 
 [Decisión y fronteras](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#delta-de-decisión-2026-10-04--email-con-varios-proveedores)
 y [alcance/aceptación](../../tasks/in-progress/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md#delta-2026-10-04-email--resend-principal-y-varios-proveedores).
+
+
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+UI de `/calendar` sobre el reader y los commands de TASK-2001, fiel 1:1 a la dirección visual v3 aprobada (canvas
+`https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi`; el generador del canvas es la fuente exacta de medidas para
+revisar fidelidad). En producción en solo lectura; las escrituras web dependen de TASK-1898. Wireframe y flujo:
+[`TASK-2002-marketing-studio-activations-calendar.md`](../../ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md),
+[`TASK-2002-marketing-studio-activations-calendar-flow.md`](../../ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md).
+
+**Composición (`apps/web/src`).**
+
+- Ruta `app/calendar/page.tsx` (+ `loading.tsx`). Estado en la URL: `view` (`month|week|day|timeline|paid`), `date`,
+  `month`, `scale`, `rows`, `line`, `pop`, `action`, `record`, `activation` y filtros
+  `modality|family|platform|account|market|campaign|status`. `view=paid` es alias: Paid es el filtro
+  `modality=paid` sobre el mes, como en el tablero.
+- Vistas en `components/activations/`: `MonthGrid`, `WeekView`, `DayView` (+ `DaySide`), `TimelineView`
+  (+ `TimelineTools`, `TimelineFoldAll`), `PaidView`. Tarjeta `ActivationCard` (compact/rich/mobile, `EvidenceLine`,
+  `TimeAside`, `PieceBadge`) y `ExecutionChip`. Laterales y barra en `SidePanels` (`UnlinkedExecutions`,
+  `UndatedPanel`, `CalendarLegend`, `CalendarStatusBar`, `FreshnessNotice`, `ToolLine`). Hoja `ActivationSheet`
+  sobre `SheetFrame`; popover del día `DayPopover` (`?pop=YYYY-MM-DD`); filtros `ActivationFilters`; teclado
+  `GridKeys`; acciones bloqueadas `LockedAction`; isotipos/miniaturas en `icons.tsx` y `platforms.tsx`; derivaciones
+  puras en `model.ts` (`flightBands`, `isoWeek`, `unlinkedByDay`).
+- Franja paid desde el **flight del plan de medios** (`data.flights`, `budgetStatus`: proposed → rayada «propuesto, sin
+  aprobar»; approved → sólida «aprobado»; none → sin frase). «N sin activación» por día usa el día local de Santiago.
+- `Shell` gana `statusBar` (el calendario reemplaza la barra del portal por la suya: «Plan de Studio · Evidencia de
+  ejecución:» + herramientas + hora de Santiago) y `readOnly` (la píldora «Solo lectura» pasa al encabezado). Copy en
+  `copy.ts` (`COPY.activations.*`: write, stage, timeline, paid, daySide, bar, legend…); estilos en `styles/app.css`
+  (bloques TASK-2002 v3). Isotipos desde `@efeoncepro/axis-brand-assets` 0.4.20 (Metricool on-black; sitio web con el
+  isotipo de Efeonce).
+- **Preview por formato** (`PieceStage` + `stage-model.ts`): escenario de 320 px para video (`MediaVideo` con la versión
+  de reproducción y póster), carrusel, imagen horizontal y grupo de recursos por proporción. Tipo, medidas, póster y
+  reproducción se leen con `getAsset` en el servidor. Los helpers de modo viven en un módulo sin directiva para que el
+  server component pueda llamarlos.
+- Límite de copy en la hoja: `getChannel` → `copyLimits` (primaryText) del catálogo de canales.
+
+**Escrituras y paridad UI↔API.**
+
+- `components/activations/write/`: `PlanDrawer` (modos plan/edit/from sobre `PlanActivationBody`), `RescheduleDialog`,
+  `CancelDialog` (alertdialog), `LinkDialog` (candidatas ±14 días misma plataforma, misma cuenta primero, con razón) y
+  `ActionLayer`.
+- **Montaje por URL:** `?action=plan|edit|reschedule|cancel|link|from` + `activation`/`record`. `ActionLayer` (server)
+  carga catálogo publicado, cuentas, campañas y candidatas y **sólo se monta si el actor puede escribir**. En modo
+  `open` los botones quedan `aria-disabled` con su motivo y la API responde 403 `write_not_allowed` (el actor anónimo
+  no escribe ni siquiera `dryRun`).
+- `write/client.ts`: un `fetch` literal por operación del registro. `operations-parity.test.ts` exige `method` literal y
+  ruta template estática con nombres de parámetro exactos (`campaignId`, `activationId`, `recordId`).
+- **dryRun → apply:** cada intento usa una `Idempotency-Key` nueva (`web-<uuid>`) e `If-Match` con la revisión; la vista
+  previa va con `dryRun` y la aplicación con otra clave. Errores con forma canónica (`StudioApiError`:
+  message/code/actionable/reason); los hallazgos del catálogo se muestran con texto legible por código.
+- Cuentas del formulario: regla del validador (appearancePlatforms / buyingPlatform) **y** herramienta del canal (paid →
+  `buyingPlatform`; resto → `readbackProvider` si no es `none`). Fecha/hora en la zona de la cuenta (`toZonedIso`) o
+  inicio/fin en paid. Tracking URL tal como la devuelve `GET /api/v1/campaigns/{id}/tracking/preview`: la UI nunca arma
+  UTM. La vista previa requiere `STUDIO_TRACKING_DOMAINS`; sin él responde 422 `tracking_destination_invalid`.
+- Tras aplicar: navega a la hoja de la activación (plantilla de URL con `__ID__`, porque un server component no puede
+  pasar funciones a un client component) y `router.refresh()`.
+
+**Verificación.** Escrituras reales sólo en local (Postgres descartable, actor temporal autorizado por el operador, no
+commiteado y revertido): planificar, editar, reprogramar, cancelar, vincular y crear desde ejecución; la bandeja bajó de
+3 a 1. Con el actor revertido ningún diálogo se monta y `POST …/cancel` responde 403. `pnpm check` y
+`pnpm --filter @studio/web build` verdes; tests web 22/22. Producción: `studio.efeonce.org/calendar` 200 en solo
+lectura (ver [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05)).
+
+**Pendiente.** Escrituras web en producción (TASK-1898, bloqueada por TASK-1834 y TASK-1895); escrituras MCP
+(TASK-2003); hojas de email y landing (contrato owned del reader, en curso); hoja de blog (TASK-1667/1669); trimestre,
+«Más tarde», lote y similares (TASK-2005/2006); release de las capabilities `marketing_studio.asset.write` /
+`campaign.write` (en develop, espera decisión del operador).

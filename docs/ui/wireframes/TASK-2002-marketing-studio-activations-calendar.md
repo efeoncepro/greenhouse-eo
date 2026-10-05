@@ -10,6 +10,7 @@
 - Copy source: `apps/web/src/copy.ts` del repo `efeonce-marketing-studio` (namespaces `activations`, `execution`, `channels`, `calendar`), cubierto por `copy.test.ts`.
 - Primitive decision: `extend` — se extienden el calendario mensual vigente, `.chip`, `.seg`, `.pill`, `.callout-*`, el `Shell` (rail, topbar, ⌘K, switch de tema); `Sheet` y `ConfirmDialog` de TASK-1895 (si no existen, esta task los crea con su contrato).
 - UI ready target: `yes` — dirección aprobada y conciliada con este documento.
+- Implementation status (2026-10-05, Claude): en producción en solo lectura; escrituras code complete y verificadas en local, deshabilitadas hasta TASK-1898. Ver [Conciliación con lo implementado](#conciliación-con-lo-implementado-2026-10-05).
 
 ### Fuentes visuales aprobadas (`docs/ui/visual-sources/TASK-2002-marketing-studio-activations-calendar/`)
 
@@ -202,6 +203,59 @@ Studio es una app aparte: la evidencia se produce con Playwright (Chrome) contra
 - Reuse / extend / new primitive: extiende grilla, tarjetas, lateral y `Shell`; reusa `Sheet`/`ConfirmDialog`; `PiecePreview` y `PlatformTimeline` nacen como componentes de Studio.
 - Blog (2026-10-04): hoja con pestañas «Antes / Después de publicar», tarjetas de indicador en vez de pares etiqueta-texto, chips de estado y método plegado; CMS del cliente y borrador en Notion en la cabecera. Alternativa descartada: lista de etiqueta y texto (densa, difícil de escanear).
 - Open risks: depende de TASK-2001 (reader con `delivering`/`ended`, avisos, eventos y mercado) y TASK-1905 (catálogo); la evidencia de la web necesita el lector de WordPress decidido en TASK-2001; isotipos en negativo hasta TASK-2004.
+
+## Conciliación con lo implementado (2026-10-05)
+
+Estado: **en producción en solo lectura** (`studio.efeonce.org/calendar`, Studio `main` `d0ec7e0`). Se revisó tablero por
+tablero (`V3-*`) contra lo implementado y se corrigió hasta coincidir; el generador del canvas (`gen.py`) fue la
+fuente exacta de medidas. Detalle técnico en el
+[Delta TASK-2002 de la arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-05--task-2002-calendario-de-activaciones).
+
+### Desvíos resueltos (ahora coinciden con el tablero)
+
+| Tablero | Qué se ajustó |
+|---|---|
+| `V3-Month` | Fila de título única (H1, ‹ ›, Hoy, «N activaciones», selector, «+ Planificar activación»); chips «Dimensión» sin valor y «Dimensión: valor» en azul, separador antes de Campaña y Estado («Campaña: Todas» / «Estado: Todos»); franja paid encima de los números de día desde el flight del plan de medios (rayada «propuesto, sin aprobar», sólida «aprobado», sin frase si no hay presupuesto), texto completo en su primera semana y corto en las demás; hoy en círculo azul + «Hoy»; «N sin activación» por día local de Santiago; tarjeta compacta con miniatura 20, hora, isotipo, cuenta y chip a lo ancho con el isotipo de la herramienta junto a «Programada»; «Sin fechas» con candado en «Pauta bloqueada»; leyenda. |
+| Barra de estado | El calendario reemplaza la barra del portal (`Shell statusBar`): «Plan de Studio · Evidencia de ejecución:» + herramientas (atrasadas en amarillo; varias atrasadas en una frase; más de dos al día se resumen) + «Hora de Santiago · …». «Solo lectura» pasa al encabezado (`Shell readOnly`). En móvil, la frescura va sobre la grilla. |
+| `V3-Week` / `V3-MobWeek` | Número grande y «JUE · HOY», carril PAID, franjas 06–12 · 12–18 · 18–24, línea «HH:MM · ahora», tarjeta rica con línea de evidencia («Metricool · publicada 11:00» / «Sin evidencia en X» / «Aún sin programar»). Móvil: «5 – 11 oct», selector + «Filtros · N», banner «N ejecuciones sin activación · Revisar», franja y lista por día. |
+| `V3-Day` | Grilla 06:00–23:00, franja paid arriba, tarjetas lado a lado si se tocan, aviso de misma hora (misma cuenta en rojo), «Resumen del día» y «Horas por cuenta». |
+| `V3-Timeline` | Grupos plegables (orgánico/owned por cuenta; paid por plataforma de compra y línea), columna de hoy y línea de ahora, pauta como barras por estado, ejecución sin activación en su fila, escala Día/Semana/Mes, «Sólo filas con actividad» (`rows=all` muestra todas), «Plegar todo», pie con grupos sin actividad. |
+| `V3-Paid` / `V3-MobPaid` | Paid es el filtro Modality: Paid sobre el mes (`view=paid` queda como alias); resumen por campaña (peor estado primero); por línea plan «Plan · 1–7 oct», herramienta rayada, entrega sólida (terminada en verde), «+1 d», «Sin entrega observada»; costado de evidencia de la línea elegida (`line`) y «Cómo se lee». Móvil: tarjetas con nota y mini línea del mes. |
+| `V3-Sheet` / `V3-MobSheet` | Campaña + ACT, «Pieza · Plataforma Placement», chips de dimensión (Mercado sólo si no es CL), pieza con estado/fecha/versión, copy literal con conteo contra `copyLimits` del catálogo, avisos con título y qué hacer, evidencia con logotipo y «leído hace X», tracking URL, historial. Móvil: «‹ Activación ⋯», «Programada en la herramienta», pie Editar/Reprogramar. |
+| `V3-Popover` | Número del día y «+N más» abren `?pop=YYYY-MM-DD`; lista, flights en curso, «Abrir vista Día»; Esc/✕ devuelven el foco a la celda. |
+| `V3-States` / `V3-States32` | Vacío con filtros; error con «Tus filtros se conservan» + Reintentar; primer uso con Planificar; carga con esqueleto y «Sigue cargando…» a los 10 s; «Pieza sin aprobar» junto al estado; ciudad + hora de Santiago si la cuenta opera en otra zona. |
+| `V3-A11y` | Entrar abre el popover del día (antes el atajo buscaba una clase vieja y no hacía nada); anuncio en vivo «Mostrando N activaciones» al filtrar. |
+| `V3-MobFilters` | «Ver N activaciones» cuenta con el mismo reader (`GET /api/v1/calendar` con el borrador). |
+| `V3-Formats` | Escenario de 320 px: video con controles y póster, carrusel (flechas, «2 / 4», siguiente asomando, miniaturas, «Cada diapositiva con su versión»), horizontal a todo el ancho, grupo por proporción («Horizontal 16:9 · N»); vertical al costado de los datos. |
+| `V3-Plan` · `V3-EditPaid` · `V3-FromExec` · `V3-Reprogram` · `V3-Unlinked` · cancelar | `PlanDrawer` (plan/edit/from), `RescheduleDialog`, `CancelDialog` (alertdialog), `LinkDialog`; código y verificación local completos, deshabilitados en producción (ver abajo). |
+| Isotipos | Metricool sobre círculo negro; sitio web con el isotipo de Efeonce; `@efeoncepro/axis-brand-assets` 0.4.20. |
+
+### Diferencias con la sección «Implementation Mapping» de arriba
+
+- **URL real:** `view` (`month|week|day|timeline|paid`), `date`, `month`, `scale`, `rows`, `line`, `pop`, `action`
+  (`plan|edit|reschedule|cancel|link|from`), `record`, `activation` y filtros `modality|family|platform|account|market|campaign|status`.
+  No se usan `?week=` ni `?day=`.
+- **Componentes reales:** `MonthGrid`, `WeekView`, `DayView`, `TimelineView`, `PaidView`, `ActivationCard`,
+  `ExecutionChip`, `SidePanels`, `ActivationSheet` + `SheetFrame`, `DayPopover`, `PieceStage`, `ActivationFilters`,
+  `GridKeys`, `LockedAction` y `write/*`. La hoja y los diálogos son de Studio; no dependen de un `Sheet`/`ConfirmDialog`
+  de TASK-1895.
+- **Permisos:** en modo `open` las acciones quedan visibles y `aria-disabled` con su motivo; `ActionLayer` sólo se
+  monta si el actor puede escribir.
+- La pestaña Calendario de la campaña (`/campaigns/CMP-###?tab=calendar`) no formó parte de lo verificado en esta
+  etapa.
+
+### Desvíos que quedan
+
+| Qué | Depende de |
+|---|---|
+| Escrituras en producción | Login Efeonce ID TASK-1898 (bloqueada por TASK-1834 y TASK-1895) |
+| Escrituras por MCP | TASK-2003 |
+| `V3-SheetEmail` / `V3-MobSheetEmail` (De, Asunto, Preheader, Audiencia, Escritorio/Móvil/Bandeja, después del envío) | Contrato de email owned en el reader (encargado a Codex el 2026-10-05) |
+| `V3-OwnedFormats` (landing: destino de N activaciones, formulario conectado) | Mismo encargo |
+| `V3-BlogPre` / `V3-BlogPost` (dossier SEO/AEO) | TASK-1667/1669; hoy «no medido» |
+| «Línea de tiempo» como tercera opción del selector en Semana | Desvío deliberado: `V3-Week` no daba entrada; decide el operador |
+| Encabezado global (lockup y riel) | Fuera de TASK-2002 |
+| `V3-Gantt` (reemplazado por la línea de tiempo v3.1), `V3-Later`, `V3-Quarter`, `V3-SheetMore`, `V3-Bulk` | TASK-2005/2006 |
 
 ## Acceptance Checklist
 

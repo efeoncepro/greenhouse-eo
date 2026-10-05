@@ -451,3 +451,25 @@ Actual production: aa6fa07, API 1.7.0/75 tools/80 HTTP, worker 00005-wc5 (stagin
 Greenhouse `pnpm studio doctor`, `call getCalendarRange --param from=2026-09-01 --param to=2026-11-01 --param market=CL`, `call getActivation --param activationId=ACT-000001`, `call listUnlinkedExecutions` verified in production with the existing authorized read credential. Person-only commands still need TASK-2003 for delegated HTTP/MCP.
 
 Rollback: pause discovery job, flags OFF through versioned deploy config and redeploy; preserve schema and legacy rows. Prior web dpl_61kJPNWNXabGYetKC6dxwch2s2uW, prior worker 00004-j4h. Never migrate down with protected evidence. Audit: docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md.
+
+## Verificar el calendario de activaciones (TASK-2002, 2026-10-05)
+
+**Local** (Studio): servidor `studio-2002-local` en `:3102` contra Postgres 18 local **descartable**
+`127.0.0.1:55461/marketing_studio` (nunca staging/producción para escrituras de prueba).
+
+- Lectura: abrir `/calendar` y recorrer `view=month|week|day|timeline|paid`, `?pop=YYYY-MM-DD`, la hoja y los estados.
+  Para revisar fidelidad, las medidas exactas salen del generador del canvas (`gen.py`), no de la captura.
+- Diálogos: en modo `open` no se montan. Hace falta un actor con permiso (en la sesión fuente: `operator_cli` temporal
+  en `apps/web/src/server/runtime.ts`). **Requiere autorización explícita del operador en el chat** (el clasificador lo
+  bloquea como debilitamiento de seguridad), nunca se commitea y se revierte al terminar.
+- La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`) en el entorno local; sin él responde
+  422 `tracking_destination_invalid`. En la sesión fuente se agregó a `.claude/launch.json` y se revirtió.
+- Recorrido verificado: planificar (vista previa 200 → 201, abre la hoja nueva), editar (PATCH 200), reprogramar,
+  cancelar, vincular, crear desde ejecución (201); la bandeja «Ejecución sin activación» baja su conteo.
+- Al revertir el actor: ningún diálogo se monta y `POST …/cancel` responde 403 `write_not_allowed`.
+- Tras `pnpm install`, reiniciar el servidor de desarrollo.
+- Gates antes de push: `pnpm check` + `pnpm --filter @studio/web build`.
+
+**Producción:** `https://studio.efeonce.org/calendar` → 200, calendario v3 en **solo lectura** (`STUDIO_ACCESS_MODE=open`).
+Botones de escritura `aria-disabled` con su motivo; cualquier escritura por API responde 403 `write_not_allowed`
+(esperado, no es un incidente). Las escrituras web llegan con TASK-1898; por MCP con TASK-2003.

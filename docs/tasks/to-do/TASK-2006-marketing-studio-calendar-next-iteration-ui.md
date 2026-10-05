@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- TASK-2002 está en producción de Studio en sólo lectura (`main` `d0ec7e0`) con fidelidad 1:1 a la dirección v3.
+  Quedaron fuera de su alcance y para TASK-2005/2006: V3-Gantt (reemplazada por la línea de tiempo v3.1), V3-Later,
+  V3-Quarter, V3-SheetMore y V3-Bulk. Desvío deliberado: «Línea de tiempo» no es tercera opción del selector en Semana
+  (V3-Week no daba entrada); queda a decisión del operador.
+
 ## Status
 
 - Lifecycle: `to-do`

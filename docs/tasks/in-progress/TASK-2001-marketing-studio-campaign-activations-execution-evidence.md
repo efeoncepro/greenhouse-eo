@@ -1,5 +1,12 @@
 # TASK-2001 — Marketing Studio: activaciones de campaña y evidencia de ejecución
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- La UI de TASK-2002 consume el contrato de activaciones de esta task en producción de Studio (`main` `d0ec7e0`,
+  `/calendar` 200 en sólo lectura); el reader devolvió 50 ejecuciones sin activación, el tope `limit: 50` (podrían ser más).
+- Huecos de datos pedidos desde TASK-2002 (2026-10-05): contrato de email owned para la hoja de email (De, Asunto,
+  Preheader, Audiencia, vistas, después del envío) y landing (destino de N activaciones, formulario conectado).
+
 ## Delta 2026-10-05 — reader de hojas email y landing
 
 Extensión solicitada para V3-SheetEmail, MobSheetEmail y V3-OwnedFormats. UI TASK-2002 ya productiva según operador; Claude conserva calendario/hojas. API local 1.9.0: `ActivationDto.email` y `ActivationDto.web`, mismos readers HTTP/MCP/CLI, sin tocar UI. El alcance de entregados/aperturas/clics se amplía aquí **sólo a la última lectura**, sin series TASK-1892/1910.

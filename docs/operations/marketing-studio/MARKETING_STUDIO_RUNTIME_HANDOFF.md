@@ -9,9 +9,9 @@ fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/U
 
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-04 — rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
+> **Última actualización:** 2026-10-05 por Claude — calendario de activaciones TASK-2002 en producción en solo lectura (Studio `main` `d0ec7e0`). Anterior, 2026-10-04: rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -19,6 +19,10 @@ fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/U
 Este documento dice **cómo operar** Studio. El porqué y los contratos viven en la arquitectura; no se repiten acá.
 
 ## Estado vivo verificado (2026-10-04, después del release)
+
+> Actualización 2026-10-05: Studio `main` avanzó a `d0ec7e0` con el calendario de TASK-2002 (Vercel Production Ready
+> `otc14ubb7`). La tabla de abajo conserva el estado del release del 04/10; lo nuevo está en
+> [TASK-2002 — calendario de activaciones, estado al 2026-10-05](#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
 
 Fuente: [release autorizado de Studio](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md) y
 [readback estructurado](../../audits/marketing-studio/TASK-2001-release-2026-10-04-checks.json).
@@ -759,3 +763,47 @@ reader compartido, Growth Forms público validado y metadata/últimas métricas 
 Sin push/deploy ni cambios de flags; sin migración. Próximo paso autorizado: publicar ambos readers/manifiesto,
 verificar permisos de listas/metrics y configuración owned y ejecutar readback/canary API/CLI. Datos antiguos
 permanecen null hasta una lectura nueva. No usar los resultados locales como certificación de proveedores live.
+
+
+## TASK-2002 — calendario de activaciones, estado al 2026-10-05
+
+UI del calendario (`/calendar`) en producción en **solo lectura**. Contrato y composición:
+[arquitectura, Delta 2026-10-05](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-05--task-2002-calendario-de-activaciones).
+
+| Pieza | Estado verificado |
+| --- | --- |
+| Código | Studio `main`: push `aa6fa07..10513ef` (incluyó 4 commits locales de Codex: `e62b5e3`, `055860d`, `ade6765`, `f72e408`) y `10513ef..d0ec7e0`. Commits de la etapa: `f7b9790` (Mes/Semana), `dc579e4` (Día), `c201fb4` (Línea de tiempo), `7bde589` (Paid + is-today), `acea0dc` (Hoja), `ff74abf` (Popover), `00a51e5` (estados), `c2014ba` (diálogos), `fce8d99` (ajustes tras verificar), `10513ef` (formatos), `d0ec7e0` (A11y/States32/MobFilters); antes `985354b`, `036dbd6`, `0856ee0`, `e90fb6e`, `ea93590`. |
+| Deploy | Vercel Production Ready (`otc14ubb7`). |
+| Envs (Production, por nombre) | `STUDIO_ACTIVATIONS_ENABLED=true`, `STUDIO_ACCESS_MODE=open`, `STUDIO_TRACKING_DOMAINS` presente. |
+| Gates | `pnpm check` completo (gates, lint, manifiesto MCP, typecheck, tests de todos los paquetes) y `pnpm --filter @studio/web build` verdes antes de cada push; tests web 22/22 (incluye paridad UI↔API). |
+| Producción | `studio.efeonce.org/calendar` 200 con el calendario v3 en solo lectura. Datos reales: 3 activaciones en octubre, **50 ejecuciones sin activación** (tope `limit: 50` de la consulta; podrían ser más) y todas las piezas importadas «Pieza sin aprobar». |
+| Escrituras | En producción no se montan diálogos: en modo `open` los botones quedan `aria-disabled` y la API responde 403 `write_not_allowed` (verificado con `POST …/cancel`). `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401). |
+| Verificación local de escrituras | Postgres 18 descartable (`127.0.0.1:55461/marketing_studio`), servidor `studio-2002-local` :3102, actor `operator_cli` temporal en `runtime.ts` **autorizado por el operador**, no commiteado y revertido. Planificar (vista previa 200 → 201, hoja nueva ACT-000008), editar (PATCH 200), reprogramar, cancelar, vincular, crear desde ejecución (201, ACT-000009); bandeja de 3 a 1. `STUDIO_TRACKING_DOMAINS` agregado y revertido en `.claude/launch.json`. |
+| Greenhouse | TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados y diferencias pendientes con su dependencia. |
+
+**Pendientes y dependencia.**
+
+| Qué | Depende de |
+| --- | --- |
+| Escrituras en la web de producción | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895) |
+| Escrituras por MCP | TASK-2003 (T1 delegado) |
+| Hoja de email (V3-SheetEmail, MobSheetEmail) | Contrato de email owned en el reader (encargado a Codex el 2026-10-05; ver la sección «readers de hojas email/web» de arriba) |
+| Landing (V3-OwnedFormats) | Mismo encargo |
+| Hoja de blog (V3-BlogPre/BlogPost) | TASK-1667/1669 (hoy «no medido») |
+| «Línea de tiempo» en el selector de Semana | Decisión del operador (desvío deliberado) |
+| Encabezado global (lockup y riel) | Fuera de TASK-2002 |
+| V3-Gantt, V3-Later, V3-Quarter, V3-SheetMore, V3-Bulk | TASK-2005/2006 |
+| Capabilities `marketing_studio.asset.write` / `campaign.write` | En develop (`9d0d698d4`); release a producción espera decisión del operador |
+
+**Trampas de operación (para la próxima sesión).**
+
+- Para ver los diálogos en local hace falta un actor con permiso: en modo `open` el actor anónimo no escribe ni en
+  `dryRun`. Pedir autorización explícita al operador (el clasificador lo bloquea como debilitamiento de seguridad) y
+  revertir al terminar.
+- La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`) o devuelve 422
+  `tracking_destination_invalid`.
+- Reiniciar el servidor de desarrollo después de `pnpm install` (factories de módulo rotas).
+- La clase global `.today` de la página Hoy choca con el calendario: usar `is-today`.
+
+**Rollback.** Esta etapa no documentó un procedimiento propio. Rigen la sección «Rollback» general de este runbook y
+el rollback de activaciones de TASK-2001 descrito arriba (flags OFF/redeploy, sin migración down).
