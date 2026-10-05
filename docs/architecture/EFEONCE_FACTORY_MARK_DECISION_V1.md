@@ -24,10 +24,12 @@ teamspace de Notion, sus bases de datos y un anuncio al equipo.
    de la palabra con la esfera a la 1:30 en el acento **Growth** (`#0e8c82` sobre papel, `#36c8bf` sobre oscuro), el de
    la marca madre: Factory es una vía de Efeonce, no una línea de servicio. Mismo método que la familia
    ([Marketing Studio](marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md), SV360, AEO).
-2. **Terminaciones del anillo concéntricas a la esfera.** A pedido del operador («ajusta las terminaciones»), el corte
-   alrededor de la esfera es un círculo concéntrico a ella: el aire entre anillo y esfera queda parejo por dentro y por
-   fuera, como el planeta del logo de Efeonce. El resto de la familia usa un corte recto. **Es la única diferencia y es
-   aprobada**; llevar a SV360, AEO y Marketing Studio a la misma terminación es una decisión aparte, no tomada.
+2. **Terminaciones del anillo concéntricas a la esfera, en toda la familia.** A pedido del operador («ajusta las
+   terminaciones»), el corte alrededor de la esfera es un círculo concéntrico a ella: el aire entre anillo y esfera queda
+   parejo por dentro y por fuera, como el planeta del logo de Efeonce. Nació en Factory y el mismo día el operador la
+   extendió a la familia («la familia debería tener esas terminaciones»): SV360, AEO, AEO Assessment, AI Visibility
+   Report, Insights y Marketing Studio se regeneraron con el mismo corte (viewBox, esfera y anillo iguales; sólo cambian
+   los extremos). Todos los generadores toman el anillo de [`scripts/brand/orbit-ring.mjs`](../../scripts/brand/orbit-ring.mjs).
 3. **Símbolo: la F rodeada por la órbita.** Es el avatar del teamspace de Notion, el favicon y la barra colapsada.
 
 | Pieza | Archivo (`factory-*`) | Dónde va |
@@ -77,4 +79,5 @@ Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
   construido.
 - **Riesgo conocido:** «Factory» connota volumen y producción en serie; lo compensan el descriptor «On-Demand» y la
   ficha comercial.
-- **Pendiente:** decidir si la familia adopta las terminaciones concéntricas.
+- **Pendiente:** las copias de los SVG de la familia en otros lugares (decks del composer, `efeonce-think`, Marketing
+  Studio) siguen con el corte recto hasta que se actualicen; el deck exige rebaseline del visual gate.

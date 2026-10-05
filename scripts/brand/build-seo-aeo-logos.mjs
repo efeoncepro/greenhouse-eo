@@ -25,6 +25,8 @@ import { fileURLToPath } from 'node:url'
 import * as fontkit from 'fontkit'
 import { efeonceGraphicLine as GL } from '@efeoncepro/axis-tokens'
 
+import { orbitRingPath } from './orbit-ring.mjs'
+
 const here = path.dirname(fileURLToPath(import.meta.url))
 const FONTS = path.resolve(here, '../../src/assets/fonts')
 const EFEONCE_ASSETS = path.resolve(here, '../../node_modules/@efeoncepro/axis-brand-assets/assets')
@@ -102,14 +104,7 @@ function build(mark) {
   return { ink, rings, right: x - TRACKING, top, bottom }
 }
 
-function ringPath(o) {
-  const cut = Math.asin((o.sphereR + o.knock) / (2 * o.r)) * 2
-  const p = t => [o.cx + o.r * Math.sin(t), o.cy + o.r * Math.cos(t)]
-  const [sx, sy] = p(o.a + cut)
-  const [ex, ey] = p(o.a - cut + 2 * Math.PI)
-
-  return `M${f(sx)} ${f(sy)}A${f(o.r)} ${f(o.r)} 0 1 0 ${f(ex)} ${f(ey)}`
-}
+const ringPath = o => orbitRingPath({ cx: o.cx, cy: o.cy, r: o.r, stroke: o.stroke, a: o.a, sphereR: o.sphereR, knock: o.knock })
 
 function svg(b, { ink, accent }, label, isotype = false) {
   let minX = 0
@@ -126,7 +121,7 @@ function svg(b, { ink, accent }, label, isotype = false) {
   }
 
   const word = isotype ? '' : `<path fill="${ink}" d="${b.ink.join(' ')}"/>`
-  const rings = b.rings.map(o => `<path fill="none" stroke="${ink}" stroke-width="${o.stroke}" d="${ringPath(o)}"/><circle fill="${accent}" cx="${f(o.sx)}" cy="${f(o.sy)}" r="${o.sphereR}"/>`).join('')
+  const rings = b.rings.map(o => `<path fill="${ink}" d="${ringPath(o)}"/><circle fill="${accent}" cx="${f(o.sx)}" cy="${f(o.sy)}" r="${o.sphereR}"/>`).join('')
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f(maxX - minX)} ${f(top - bottom)}" role="img" aria-label="${label}"><g transform="translate(${f(-minX)} ${f(top)}) scale(1 -1)">${word}${rings}</g></svg>\n`
 }

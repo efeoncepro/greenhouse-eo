@@ -5,9 +5,7 @@
  *
  * La regla de la familia: «la órbita vive en la O». «Factory» en Poppins Bold, pasado a contornos con fontkit; la «o»
  * se reemplaza por un anillo fino en la tinta de la palabra con la esfera a la 1:30 en el acento Growth. Mismo método
- * que build-marketing-studio-logos.mjs, con una diferencia aprobada el mismo día: las TERMINACIONES del anillo. El
- * corte alrededor de la esfera es un círculo concéntrico a ella (aire parejo entre anillo y esfera, como el planeta del
- * logo de Efeonce), no el corte recto del resto de la familia; por eso el anillo se dibuja como forma rellena.
+ * que build-marketing-studio-logos.mjs; el anillo, con sus terminaciones concéntricas a la esfera, sale de orbit-ring.mjs.
  *
  * Piezas (cada una en `positive`, `negative` y `white`):
  *  - `factory-logo`: la palabra sola, en tinta.
@@ -29,6 +27,8 @@ import { fileURLToPath } from 'node:url'
 
 import * as fontkit from 'fontkit'
 import { efeonceGraphicLine as GL } from '@efeoncepro/axis-tokens'
+
+import { orbitRingPath } from './orbit-ring.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const FONTS = path.resolve(here, '../../src/assets/fonts')
@@ -95,19 +95,7 @@ function word(runs) {
   return { ink, rings, right: x - TRACKING, top, bottom }
 }
 
-// Terminaciones (2026-10-05): el anillo es una corona rellena a la que se le resta un círculo concéntrico a la esfera,
-// de radio esfera + aire. Los extremos quedan cóncavos y el aire entre anillo y esfera es parejo por dentro y por fuera.
-function ringPath(o) {
-  const ro = o.r + ORBIT.stroke / 2
-  const ri = o.r - ORBIT.stroke / 2
-  const k = ORBIT.sphereR + ORBIT.knock
-  const half = rho => Math.acos((rho * rho + o.r * o.r - k * k) / (2 * rho * o.r))
-  const p = (rho, t) => `${f(o.cx + rho * Math.sin(t))} ${f(o.cy + rho * Math.cos(t))}`
-  const to = half(ro)
-  const ti = half(ri)
-
-  return `M${p(ro, o.a + to)}A${f(ro)} ${f(ro)} 0 1 0 ${p(ro, o.a - to)}A${k} ${k} 0 0 1 ${p(ri, o.a - ti)}A${f(ri)} ${f(ri)} 0 1 1 ${p(ri, o.a + ti)}A${k} ${k} 0 0 1 ${p(ro, o.a + to)}Z`
-}
+const ringPath = o => orbitRingPath({ cx: o.cx, cy: o.cy, r: o.r, stroke: ORBIT.stroke, a: o.a, sphereR: ORBIT.sphereR, knock: ORBIT.knock })
 
 const ringMarkup = (o, ink, accent) =>
   `<path fill="${ink}" d="${ringPath(o)}"/><circle fill="${accent}" cx="${f(o.sx)}" cy="${f(o.sy)}" r="${ORBIT.sphereR}"/>`

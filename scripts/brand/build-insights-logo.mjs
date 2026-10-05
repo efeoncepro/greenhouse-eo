@@ -22,6 +22,8 @@ import { fileURLToPath } from 'node:url'
 
 import * as fontkit from 'fontkit'
 
+import { orbitRingPath } from './orbit-ring.mjs'
+
 const here = path.dirname(fileURLToPath(import.meta.url))
 const FONT = path.resolve(here, '../../src/assets/fonts/Poppins-Bold.ttf')
 const outDir = process.argv[2]
@@ -64,18 +66,14 @@ const rad = (SPHERE_ANGLE * Math.PI) / 180
 const sphereCx = ringCx + RING_R * Math.sin(rad)
 const sphereCy = RING_CY + RING_R * Math.cos(rad)
 
-// Anillo con corte: arco que empieza y termina donde el círculo de corte cruza la línea media del anillo.
-const cutHalf = Math.asin((SPHERE_R + KNOCKOUT) / (2 * RING_R)) * 2
-const a0 = rad + cutHalf
-const a1 = rad - cutHalf + 2 * Math.PI
-const pt = a => [ringCx + RING_R * Math.sin(a), RING_CY + RING_R * Math.cos(a)]
-const [sx, sy] = pt(a0)
-const [ex, ey] = pt(a1)
+// Anillo con corte concéntrico a la esfera (orbit-ring.mjs); con KNOCKOUT negativo, anillo entero sin corte.
 const f = n => Number(n.toFixed(2))
 
 const ringPath = KNOCKOUT < 0
-  ? `M${f(ringCx - RING_R)} ${f(RING_CY)}a${RING_R} ${RING_R} 0 1 0 ${2 * RING_R} 0a${RING_R} ${RING_R} 0 1 0 ${-2 * RING_R} 0`
-  : `M${f(sx)} ${f(sy)}A${RING_R} ${RING_R} 0 1 0 ${f(ex)} ${f(ey)}`
+  ? null
+  : orbitRingPath({ cx: ringCx, cy: RING_CY, r: RING_R, stroke: RING_STROKE, a: rad, sphereR: SPHERE_R, knock: KNOCKOUT })
+
+const fullRing = `M${f(ringCx - RING_R)} ${f(RING_CY)}a${RING_R} ${RING_R} 0 1 0 ${2 * RING_R} 0a${RING_R} ${RING_R} 0 1 0 ${-2 * RING_R} 0`
 // En coordenadas de fuente y crece hacia arriba; el SVG se voltea con un transform de grupo.
 
 const wordRight = x
@@ -98,7 +96,7 @@ const build = (variant, kind, ink = INK[variant]) => {
 return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Efeonce Insights">
   <g transform="translate(${f(-minX)} ${f(top + pad)}) scale(1 -1)">
     <path fill="${ink}" d="${[stemPath, ...glyphs].join(' ')}"/>
-    <path fill="none" stroke="${ink}" stroke-width="${RING_STROKE}" stroke-linecap="butt" d="${ringPath}"/>
+    ${ringPath ? `<path fill="${ink}" d="${ringPath}"/>` : `<path fill="none" stroke="${ink}" stroke-width="${RING_STROKE}" d="${fullRing}"/>`}
     <circle fill="${accent}" cx="${f(sphereCx)}" cy="${f(sphereCy)}" r="${SPHERE_R}"/>
   </g>
 </svg>
