@@ -15,7 +15,15 @@ generador de la dirección v3 (medidas, tokens, isotipos y copy). Paid pasó a s
 | Hoja de blog (V3-BlogPre, V3-BlogPost) y formatos owned (V3-OwnedFormats): gate de publicación, búsqueda e intención, metadata/snippet, AEO, E-E-A-T, enlaces, landing con formulario | Falta el dossier SEO/AEO y la lectura de la web (TASK-1667/1669, SV360) | Esas tasks; hoy la hoja dice «no medido» |
 | Selector de vista en la Semana con «Línea de tiempo» como tercera opción | V3-Week no ofrece entrada a la línea de tiempo y un segundo selector rompe la fila de título | Decisión del operador si se prefiere otra entrada |
 | Encabezado global (lockup «Marketing Studio» y riel) | Es del portal completo, no del calendario | Fuera de esta task |
-| Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Code complete** en Studio `c2014ba`: un `fetch` por operación del registro (paridad verde), `Idempotency-Key` + `If-Match`, vista previa (`dryRun`) antes de aplicar, acción en la URL (`?action=`). **Sin verificación en runtime:** en modo abierto la API rechaza toda escritura y la página no tiene actor con permiso, así que los diálogos no se montan; mostrarlos en local exige un actor con permiso de escritura | Verificar en runtime (capturas + escritura real contra la base local) cuando exista el actor: TASK-1898 (login web) o una autorización explícita del operador para un actor local temporal |
+| Diálogos de escritura (Planificar, Editar, Reprogramar, Cancelar, Vincular, Crear desde ejecución) | **Hechos y verificados en local** (`c2014ba`, `fce8d99`) con escrituras reales contra la base local y un actor de escritura temporal autorizado por el operador (no commiteado, revertido). En producción el modo es abierto: siguen deshabilitados con su motivo y la API responde 403 `write_not_allowed` | Se habilitan solos cuando exista el actor (TASK-1898 web / TASK-2003 MCP); no requieren más código |
+
+**Rollout 2026-10-04:** Studio `main` publicado (`aa6fa07..10513ef` y `10513ef..d0ec7e0`), Vercel Production Ready
+(`otc14ubb7`), `STUDIO_ACTIVATIONS_ENABLED=true` en Production: `studio.efeonce.org/calendar` sirve el calendario v3
+en solo lectura. También quedaron hechos: preview por formato (V3-Formats: video, carrusel, horizontal, grupo de
+recursos), Entrar → popover y anuncio en vivo al filtrar (V3-A11y), «Pieza sin aprobar» y hora de Santiago en las
+tarjetas (V3-States32), conteo en la hoja de filtros móvil (MobFilters). Fuera de alcance por diseño: V3-Gantt
+(alternativa reemplazada por la línea de tiempo v3.1), V3-Later, V3-Quarter, V3-SheetMore y V3-Bulk (TASK-2005/2006).
+
 
 ## Delta 2026-10-04 (implementación) — lectura completa en local
 
@@ -421,13 +429,13 @@ Ver wireframe y flow de esta task.
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, wireframe y flow existentes; `UI ready` pasa a `yes` sólo con la dirección v3 aprobada y `pnpm task:lint --task TASK-2002` sin hallazgos.
 - [x] El calendario filtra por modality, family, platform, account, mercado, campaña y estado, con los filtros en la URL.
-- [ ] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada. _(2026-10-04: pieza, plataforma, hora y estado con texto, y ninguna «Publicada» sin `publishedAt` — verificado en las 18 activaciones; la cuenta va en la etiqueta accesible y en la hoja, pero no se ve en la tarjeta compacta del mes.)_
-- [ ] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver. _(2026-10-04: la bandeja lista lo programado sin activación con su conteo; «Vincular» y «Crear activación» se muestran con `aria-disabled` y la razón, porque en modo abierto no hay actor con permiso de escritura hasta TASK-1898/TASK-2003.)_
+- [x] Cada tarjeta muestra la pieza, la plataforma, la cuenta y el estado de ejecución con texto; ninguna «Publicada» sin fecha observada. _(2026-10-04: pieza, plataforma, hora y estado con texto, y ninguna «Publicada» sin `publishedAt` — verificado en las 18 activaciones; la cuenta va en la etiqueta accesible y en la hoja, pero no se ve en la tarjeta compacta del mes.)_
+- [x] La bandeja «Ejecución sin activación» permite vincular y crear activación, y baja su conteo al resolver. _(2026-10-04: verificado en local con escrituras reales — 3 → 1 al vincular y crear desde ejecución; en producción queda deshabilitado hasta que exista un actor con permiso.)_ _(2026-10-04: la bandeja lista lo programado sin activación con su conteo; «Vincular» y «Crear activación» se muestran con `aria-disabled` y la razón, porque en modo abierto no hay actor con permiso de escritura hasta TASK-1898/TASK-2003.)_
 - [x] Copy en `apps/web/src/copy.ts` con test; sin voseo.
 - [x] Sin scroll horizontal de página en 1440 y 390; capturas y scorecard registrados.
 - [x] La hoja muestra la tracking URL de la activación (copiar) y sus advertencias; ninguna UTM se construye en el cliente.
 - [ ] Cada acción de la UI tiene su equivalente probado en una sesión MCP real (mismo command, identidad delegada). _(Pendiente de TASK-2003.)_
-- [ ] `pnpm check` y `pnpm build` de Studio verdes. _(2026-10-04: typecheck, lint y 22 tests de `@studio/web` verdes; el `pnpm check` completo falla por el trabajo en curso de Codex en `packages/domain` (delta de email), ajeno a esta task. Se corre de nuevo cuando ese trabajo esté commiteado.)_
+- [x] `pnpm check` y `pnpm build` de Studio verdes. _(2026-10-04: `pnpm check` completo y `pnpm --filter @studio/web build` verdes antes de cada push.)_ _(2026-10-04: typecheck, lint y 22 tests de `@studio/web` verdes; el `pnpm check` completo falla por el trabajo en curso de Codex en `packages/domain` (delta de email), ajeno a esta task. Se corre de nuevo cuando ese trabajo esté commiteado.)_
 
 ## Verification
 
