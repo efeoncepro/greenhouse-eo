@@ -10,6 +10,7 @@
 - **Confidence:** high en la decisión del operador; medium en el encaje operativo; demanda y economía pendientes.
 - **Validated as of:** 2026-10-05, conversación del operador y revisión documental; sin certificación runtime.
 - **Autoridad:** instrucción explícita de Julio Reyes: «Ok, canonicemos esto, Efeonce Factory será la nueva vía».
+- **Marca:** resuelta el 2026-10-05 en [la decisión de marca de Factory](EFEONCE_FACTORY_MARK_DECISION_V1.md) (la órbita en la «o», acento Growth, la F como símbolo). La clasificación de Factory en la arquitectura de marca sigue abierta.
 
 > **Lectura vigente:** el [delta aceptado de alcance transversal](#delta-aceptado-2026-10-05--alcance-transversal)
 > sustituye el arranque a Creative Services/dos ofertas; el [delta de entradas](#delta-aceptado-2026-10-05--cuatro-entradas-comerciales)
