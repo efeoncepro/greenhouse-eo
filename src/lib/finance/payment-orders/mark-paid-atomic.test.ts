@@ -71,14 +71,16 @@ const buildFakeClient = (sequence: FakeClientCallSequence) => {
 
       if (sql.includes('FROM greenhouse_finance.accounts')) {
         return {
-          rows: [{
-            account_id: params[0] ?? 'santander-clp',
-            currency: 'CLP',
-            instrument_category: 'bank_account',
-            provider_slug: 'santander',
-            is_active: true,
-            default_for: ['payroll']
-          }],
+          rows: [
+            {
+              account_id: params[0] ?? 'santander-clp',
+              currency: 'CLP',
+              instrument_category: 'bank_account',
+              provider_slug: 'santander',
+              is_active: true,
+              default_for: ['payroll']
+            }
+          ],
           rowCount: 1
         }
       }
@@ -144,14 +146,16 @@ const baseLineRow = {
 }
 
 const activeSourceAccountResponse = (accountId: unknown = 'santander-clp') => ({
-  rows: [{
-    account_id: accountId,
-    currency: 'CLP',
-    instrument_category: 'bank_account',
-    provider_slug: 'santander',
-    is_active: true,
-    default_for: ['payroll']
-  }],
+  rows: [
+    {
+      account_id: accountId,
+      currency: 'CLP',
+      instrument_category: 'bank_account',
+      provider_slug: 'santander',
+      is_active: true,
+      default_for: ['payroll']
+    }
+  ],
   rowCount: 1
 })
 
@@ -235,6 +239,29 @@ afterEach(() => {
 })
 
 describe('markPaymentOrderPaidAtomic', () => {
+  it.each([
+    { amount: '500', obligation_amount: '1000', currency: 'CLP', obligation_currency: 'CLP' },
+    { amount: '1000', obligation_amount: '1000', currency: 'USD', obligation_currency: 'CLP' },
+    { amount: '0', obligation_amount: '0', currency: 'CLP', obligation_currency: 'CLP' }
+  ])('blocks imported partial/incorrect contractor settlement before ledger and paid event', async fields => {
+    const fake = buildFakeClient({
+      selectForUpdate: { rows: [baseOrderRow], rowCount: 1 },
+      updatePaymentOrders: { rows: [{ ...baseOrderRow, state: 'paid' }], rowCount: 1 },
+      updateLines: { rows: [{ obligation_id: 'pob-test-001' }] },
+      selectLinesForExecution: {
+        rows: [{ ...baseLineRow, ...fields, source_kind: 'contractor_payable', source_ref: 'cpay-fixture' }]
+      }
+    })
+
+    mocks.withTransaction.mockImplementation(fn => fn(fake.client))
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'finance' })).rejects.toMatchObject({
+      code: 'contractor_partial_payment_unsupported'
+    })
+    expect(mocks.recordExpensePayment).not.toHaveBeenCalled()
+    expect(mocks.publishOutboxEvent).not.toHaveBeenCalled()
+    // The audit is part of the same transaction and is rolled back on rejection.
+  })
+
   it('happy path: state transition + expense_payment + audit + outbox dentro de la misma tx', async () => {
     setupHappyPath()
 
@@ -257,15 +284,15 @@ describe('markPaymentOrderPaidAtomic', () => {
   })
 
   it('rechaza orderId vacio (validation)', async () => {
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: '', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderValidationError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: '', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderValidationError
+    )
   })
 
   it('rechaza paidBy vacio (validation)', async () => {
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: '' })
-    ).rejects.toBeInstanceOf(PaymentOrderValidationError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: '' })).rejects.toBeInstanceOf(
+      PaymentOrderValidationError
+    )
   })
 
   it('lanza 404 si order no existe', async () => {
@@ -277,9 +304,9 @@ describe('markPaymentOrderPaidAtomic', () => {
       return fn(c)
     })
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-missing', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderValidationError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-missing', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderValidationError
+    )
   })
 
   it('lanza conflict si state no es submitted', async () => {
@@ -294,9 +321,9 @@ describe('markPaymentOrderPaidAtomic', () => {
       return fn(c)
     })
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderConflictError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderConflictError
+    )
   })
 
   it('lanza source_account_required si source_account_id NULL (slice 1 hard-gate)', async () => {
@@ -311,9 +338,9 @@ describe('markPaymentOrderPaidAtomic', () => {
       return fn(c)
     })
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderMissingSourceAccountError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-x', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderMissingSourceAccountError
+    )
   })
 
   it('lanza out_of_scope_v1 cuando line es non-payroll (rollback)', async () => {
@@ -350,9 +377,7 @@ describe('markPaymentOrderPaidAtomic', () => {
       occurredAt: '2026-05-02T00:00:00Z'
     })
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })
-    ).rejects.toMatchObject({
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })).rejects.toMatchObject({
       code: 'settlement_blocked',
       reason: 'out_of_scope_v1'
     })
@@ -393,9 +418,9 @@ describe('markPaymentOrderPaidAtomic', () => {
       socialSecuritySkipped: true
     })
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderExpenseUnresolvedError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderExpenseUnresolvedError
+    )
 
     expect(mocks.materializePayrollExpensesForExportedPeriod).toHaveBeenCalledOnce()
   })
@@ -429,9 +454,7 @@ describe('markPaymentOrderPaidAtomic', () => {
       new Error('INSERT has more target columns than expressions')
     )
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })
-    ).rejects.toMatchObject({
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })).rejects.toMatchObject({
       code: 'settlement_blocked',
       reason: 'materializer_dead_letter'
     })
@@ -443,9 +466,9 @@ describe('markPaymentOrderPaidAtomic', () => {
       new Error('CHECK constraint expense_payments_account_required_after_cutover')
     )
 
-    await expect(
-      markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })
-    ).rejects.toBeInstanceOf(PaymentOrderSettlementBlockedError)
+    await expect(markPaymentOrderPaidAtomic({ orderId: 'por-test-001', paidBy: 'user-x' })).rejects.toBeInstanceOf(
+      PaymentOrderSettlementBlockedError
+    )
   })
 
   it('idempotencia: line con expense_payment_id ya existente se skipea silenciosa', async () => {

@@ -4,10 +4,17 @@ vi.mock('server-only', () => ({}))
 
 const mockListPayableIds = vi.fn()
 const mockMarkPaid = vi.fn()
+const mockMarkOrder = vi.fn()
 const mockCapture = vi.fn()
+const cascadeClient = { query: vi.fn() }
+
+vi.mock('@/lib/db', () => ({
+  withGreenhousePostgresTransaction: async (fn: (client: unknown) => Promise<unknown>) => fn(cascadeClient)
+}))
 
 vi.mock('@/lib/contractor-engagements/payables/store', () => ({
   listPayableIdsByPaymentOrderForPaidCascade: (...args: unknown[]) => mockListPayableIds(...args),
+  markPayablePaymentOrderCreated: (...args: unknown[]) => mockMarkOrder(...args),
   markPayablePaid: (...args: unknown[]) => mockMarkPaid(...args)
 }))
 
@@ -20,6 +27,7 @@ import { contractorPayablePaidCascadeProjection as projection } from './contract
 describe('contractorPayablePaidCascadeProjection (TASK-981)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockMarkOrder.mockResolvedValue({ status: 'payment_order_created' })
   })
 
   it('declares the canonical trigger + finance domain + retries', () => {
@@ -63,6 +71,7 @@ describe('contractorPayablePaidCascadeProjection (TASK-981)', () => {
       { orderId: 'po-1', paidAt: '2026-06-01T12:00:00Z' }
     )
 
+    expect(mockMarkOrder).toHaveBeenCalledTimes(2)
     expect(mockMarkPaid).toHaveBeenCalledTimes(2)
     expect(mockMarkPaid).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -70,11 +79,10 @@ describe('contractorPayablePaidCascadeProjection (TASK-981)', () => {
         paymentOrderId: 'po-1',
         paidAt: '2026-06-01T12:00:00Z',
         actorUserId: 'system:contractor-payable-paid-cascade'
-      })
+      }),
+      cascadeClient
     )
-    expect(mockMarkPaid).toHaveBeenCalledWith(
-      expect.objectContaining({ contractorPayableId: 'cpay-2' })
-    )
+    expect(mockMarkPaid).toHaveBeenCalledWith(expect.objectContaining({ contractorPayableId: 'cpay-2' }), cascadeClient)
     expect(res).toContain('2 contractor payable(s) marked paid')
   })
 
@@ -84,7 +92,7 @@ describe('contractorPayablePaidCascadeProjection (TASK-981)', () => {
 
     await projection.refresh({ entityType: 'payment_order', entityId: 'po-1' }, { orderId: 'po-1' })
 
-    expect(mockMarkPaid).toHaveBeenCalledWith(expect.objectContaining({ paidAt: null }))
+    expect(mockMarkPaid).toHaveBeenCalledWith(expect.objectContaining({ paidAt: null }), cascadeClient)
   })
 
   it('one failing payable does not block the others; captures + re-throws for retry', async () => {

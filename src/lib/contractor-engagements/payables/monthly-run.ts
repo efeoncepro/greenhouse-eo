@@ -9,6 +9,7 @@ import {
 import { query, withGreenhousePostgresTransaction } from '@/lib/db'
 import { createPaymentOrderFromObligations } from '@/lib/finance/payment-orders/create-from-obligations'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { ContractorEngagementValidationError } from '../errors'
 
 import { markPayablePaymentOrderCreated } from './store'
 import {
@@ -59,6 +60,7 @@ type SweptObligationRow = {
   currency: string
   amount: string
   due_date: string | null
+  obligation_status: string
 }
 
 export interface MonthlyContractorPaymentRunGroup {
@@ -98,6 +100,7 @@ const SWEEP_SQL = `
     o.source_ref AS contractor_payable_id,
     o.currency,
     o.amount::text AS amount,
+    o.status AS obligation_status,
     o.due_date
   FROM greenhouse_finance.payment_obligations o
   LEFT JOIN greenhouse_finance.payment_order_lines pol
@@ -172,6 +175,15 @@ export const prepareMonthlyContractorPaymentRun = async (
   )
 
   const swept = await query<SweptObligationRow>(SWEEP_SQL, [cutoffDate])
+
+  if (swept.some(row => row.obligation_status === 'partially_paid')) {
+    throw new ContractorEngagementValidationError(
+      'Hay cobros contractor pagados parcialmente. Finanzas debe revisar su saldo antes de preparar la corrida.',
+      'contractor_partial_payment_unsupported',
+      409
+    )
+  }
+
   const byCurrency = groupRowsByCurrency(swept)
   const { groups, totalsByCurrency } = buildGroups(byCurrency)
   const payablesIncluded = new Set(swept.map(r => r.contractor_payable_id)).size

@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-05 — Contractors: integridad de envíos y pagos (ISSUE-179, TASK-2009/2010)
+
+- Correcciones comunes de fechas, monto acordado, adjuntos por período/owner y reintentos atómicos; órdenes y cascade coherentes, sin parciales contractor. Revisiones adicionales cubren concurrencia, snapshot de tarifa y precisión de cantidades.
+- 333 pruebas focales, TypeScript/lint/build/workers y PostgreSQL local aislado PASS; suite global 18.014 PASS, un fallo ajeno de SVG AXIS y 48 skipped. [Auditoría](docs/audits/payroll/CONTRACTOR_FLOW_PRE_RELEASE_AUDIT_2026-10-05.md). Release, canary y recovery pendientes; sin push, deploy ni operaciones financieras reales.
+
 ## 2026-10-05 — Efeonce Factory: su marca y la aplicación en Notion
 
 - Aprobada la ruta A: «Factory» en Poppins Bold con la órbita en su «o», esfera en Growth, la F en órbita como símbolo; terminaciones del anillo concéntricas a la esfera (única diferencia con la familia). ADR [`EFEONCE_FACTORY_MARK_DECISION_V1.md`](docs/architecture/EFEONCE_FACTORY_MARK_DECISION_V1.md).
@@ -457,24 +462,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - Roster del equipo en la fotografía de marca y seis identidades nuevas en `foto:prompt`, aprobadas por el operador.
 - El vestuario del equipo lo decide la línea de la pieza (hoodie en Servicios creativos; bomber o softshell en las líneas
   de negocio): `foto:prompt` lo exige con `linea` en la ficha, y el polo debajo de la chaqueta ya no cuenta como mezcla de registros.
-
-## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
-
-- `1050036e8`: catálogos `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG), 18 plantillas para las 26 piezas
-  aprobadas; `pnpm manzanitas:tokens [--check]` (49 salidas desde `manzanitasRegister`) y `pnpm manzanitas:compose`
-  (intent del contrato `efeonce.manzanitas-register` 0.2.0 → PDF, PNG y procedencia sin reloj). Gráficos pintados con
-  `manzanitasChartSvg` y sus chequeos; Lente y órbita del paso con `axis-graphic-line`.
-- Fallan cerradas (el motor mide el recorte): respuesta en una línea y sin pisar «Desliza»; pregunta en una línea donde
-  hay contenido fijo bajo la voz. Eslogan de los cierres debajo del logo al 64 % de su ancho (regla del 2026-09-29).
-- Gate visual `--catalog=manzanitas`: 18 frames congelados. Carruseles aprobados por el operador; TASK-1939 cerrada el
-  2026-09-29 con `pnpm test` completo y `pnpm build` en verde sobre `814255694`.
-
-## 2026-09-28 — Marketing con Manzanitas publicado en AXIS (TASK-1936)
-
-- AXIS `v0.3.26` (`aca07c2`): `axis-tokens` 0.3.26 exporta `manzanitasRegister` (registro que complementa La órbita,
-  hereda por referencia, aislado de Glitch); `axis-ui-contracts` 0.3.24 exporta `efeonce.manzanitas-register` 0.1.0
-  (`pnpm manzanitas:resolve`, 45 códigos, `pending-decision`); `axis-graphic-line` 0.10.0 agrega `/charts` (9 gráficos
-  calculados desde el dato); `axis-brand-assets` 0.4.1 sella `AXIS_MANZANITAS_ASSETS`. Lab `/references/manzanitas/`.
-- AXIS `v0.3.27` (`6a1a912`): contrato 0.1.1, el carrusel empieza con su portada y termina con su contraportada.
-- Greenhouse: ADR, norma §14, doc funcional, manual y skills (`efeonce-graphic-line`, `axis-design-system`, espejo
-  `.codex/`) al día. Greenhouse no fija estas versiones todavía.

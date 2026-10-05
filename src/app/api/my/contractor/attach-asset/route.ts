@@ -119,6 +119,7 @@ export async function POST(request: Request) {
       artifactKind: DEFAULT_ARTIFACT_KIND[role],
       source: 'contractor_upload',
       countryCode: engagement.countryCode,
+      ownerMemberId: memberId,
       actorUserId: tenant.userId
     })
 

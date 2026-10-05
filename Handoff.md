@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
+
 **Factory (05/10):** [canon local](docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md), vía
 transversal On-Demand. Commercial/Operations/Finance: capacidad, costing, cobro y oportunidades pendientes.
 Sin runtime/envíos; capas funcional/manual al implementar billing/OT/brief/CX (Product/Operations).

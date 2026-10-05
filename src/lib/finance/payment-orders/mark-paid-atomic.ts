@@ -66,6 +66,8 @@ interface LineForExecution extends Record<string, unknown> {
   line_id: string
   obligation_id: string
   amount: number | string
+  obligation_amount: number | string
+  obligation_currency: string
   currency: string
   state: string
   expense_payment_id: string | null
@@ -104,9 +106,7 @@ const toNum = (v: unknown): number => {
   return 0
 }
 
-const parseYearMonthFromPeriodId = (
-  periodId: string | null
-): { year: number; month: number } | null => {
+const parseYearMonthFromPeriodId = (periodId: string | null): { year: number; month: number } | null => {
   if (!periodId) return null
 
   const match = periodId.match(/(\d{4})-(\d{1,2})/)
@@ -127,10 +127,7 @@ const parseYearMonthFromPeriodId = (
  * `greenhouse_finance.expenses` con la convencion canonica:
  * `(payroll_period_id, member_id, expense_type='payroll', source_type='payroll_generated')`.
  */
-const resolvePayrollExpenseIdInTx = async (
-  client: PoolClient,
-  line: LineForExecution
-): Promise<string | null> => {
+const resolvePayrollExpenseIdInTx = async (client: PoolClient, line: LineForExecution): Promise<string | null> => {
   if (line.source_kind !== 'payroll') return null
   if (line.obligation_kind !== 'employee_net_pay') return null
   if (line.beneficiary_type !== 'member') return null
@@ -166,10 +163,7 @@ const isContractorSettlementLine = (line: LineForExecution): boolean =>
  * (= the line's `source_ref`). The expense is materialized reactively when the
  * payable reaches `ready_for_finance` (Slice 2).
  */
-const resolveContractorExpenseIdInTx = async (
-  client: PoolClient,
-  line: LineForExecution
-): Promise<string | null> => {
+const resolveContractorExpenseIdInTx = async (client: PoolClient, line: LineForExecution): Promise<string | null> => {
   if (!line.source_ref) return null
 
   const result = await client.query<{ expense_id: string }>(
@@ -314,12 +308,12 @@ export async function markPaymentOrderPaidAtomic(
         toState: 'paid',
         actorUserId: input.paidBy,
         reason: 'mark_paid_atomic',
-          metadata: {
-            externalReference: input.externalReference ?? null,
-            sourceAccountId: order.sourceAccountId,
-            treasurySourcePolicy: sourcePolicy.snapshot,
-            path: 'atomic'
-          }
+        metadata: {
+          externalReference: input.externalReference ?? null,
+          sourceAccountId: order.sourceAccountId,
+          treasurySourcePolicy: sourcePolicy.snapshot,
+          path: 'atomic'
+        }
       },
       client
     )
@@ -359,7 +353,7 @@ export async function markPaymentOrderPaidAtomic(
       `SELECT l.line_id, l.obligation_id, l.amount, l.currency, l.state,
               l.expense_payment_id,
               o.beneficiary_type, o.beneficiary_id, o.obligation_kind,
-              o.source_kind, o.source_ref, o.period_id
+              o.source_kind, o.source_ref, o.period_id, o.amount AS obligation_amount, o.currency AS obligation_currency
          FROM greenhouse_finance.payment_order_lines l
          JOIN greenhouse_finance.payment_obligations o
            ON o.obligation_id = l.obligation_id
@@ -367,22 +361,32 @@ export async function markPaymentOrderPaidAtomic(
       [input.orderId]
     )
 
-    const paymentDate = order.paidAt
-      ? order.paidAt.slice(0, 10)
-      : new Date().toISOString().slice(0, 10)
+    const paymentDate = order.paidAt ? order.paidAt.slice(0, 10) : new Date().toISOString().slice(0, 10)
 
     const expensePaymentIds: string[] = []
     const settlementGroupIds: string[] = []
 
     for (const line of linesForExecution.rows) {
+      if (
+        line.source_kind === 'contractor_payable' &&
+        (toNum(line.amount) <= 0 ||
+          toNum(line.amount) !== toNum(line.obligation_amount) ||
+          line.currency !== line.obligation_currency)
+      ) {
+        throw new PaymentOrderValidationError(
+          'El pago contractor debe cubrir la obligación completa en su moneda.',
+          'contractor_partial_payment_unsupported',
+          409
+        )
+      }
+
       // Idempotency: si la line ya quedo wired en una corrida previa
       // (e.g. recovery slice 8), skip silencioso.
       if (line.expense_payment_id) continue
 
       // V1 cubre payroll/employee_net_pay + contractor (TASK-977, detrás de flag).
       // Lines fuera de scope: throw + rollback.
-      const isPayrollLine =
-        line.source_kind === 'payroll' && line.obligation_kind === 'employee_net_pay'
+      const isPayrollLine = line.source_kind === 'payroll' && line.obligation_kind === 'employee_net_pay'
 
       const isContractorLine = isContractorSettlementLine(line)
 
@@ -414,12 +418,7 @@ export async function markPaymentOrderPaidAtomic(
         }
 
         if (!expenseId) {
-          throw new PaymentOrderExpenseUnresolvedError(
-            input.orderId,
-            line.line_id,
-            line.period_id,
-            line.beneficiary_id
-          )
+          throw new PaymentOrderExpenseUnresolvedError(input.orderId, line.line_id, line.period_id, line.beneficiary_id)
         }
       } else {
         // Resolver expense por (period_id, member_id).
@@ -475,8 +474,7 @@ export async function markPaymentOrderPaidAtomic(
             paymentAccountId: order.sourceAccountId ?? null,
             paymentSource: isContractorLine ? 'contractor_system' : 'payroll_system',
             settlementConfig: sourcePolicy.settlementConfig,
-            reference:
-              order.externalReference ?? `order:${order.orderId}/line:${line.line_id}`,
+            reference: order.externalReference ?? `order:${order.orderId}/line:${line.line_id}`,
             actorUserId: input.paidBy,
             paymentOrderLineId: line.line_id,
             notes: `TASK-765 atomic mark-paid from order ${order.orderId}`

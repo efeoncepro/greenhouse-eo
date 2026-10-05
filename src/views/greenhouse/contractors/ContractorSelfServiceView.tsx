@@ -20,6 +20,7 @@ import CustomChip from '@core/components/mui/Chip'
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
 import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
+import { GH_CONTRACTOR_SUBMISSIONS as CS } from '@/lib/copy/contractor-submissions'
 import { formatCurrency } from '@/lib/format'
 import type { CurrencyCode } from '@/lib/format'
 import type {
@@ -207,10 +208,16 @@ const SupportUploaderPanel = ({
     setError(null)
 
     try {
+      if (!scenario.supportSubmissionId) throw new Error(CS.prepareFirst)
+
       const response = await fetch('/api/my/contractor/attach-asset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assetId: value.assetId, assetRole })
+        body: JSON.stringify({
+          assetId: value.assetId,
+          assetRole,
+          contractorWorkSubmissionId: scenario.supportSubmissionId
+        })
       })
 
       if (!response.ok) {
@@ -318,7 +325,13 @@ const SupportUploaderPanel = ({
                   </Typography>
                 </Box>
               </Stack>
-              <CustomChip round='true' size='small' variant='tonal' color={toneToColor[item.tone]} label={item.status} />
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color={toneToColor[item.tone]}
+                label={item.status}
+              />
             </Stack>
           ))}
         </Stack>
@@ -417,7 +430,21 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
       return
     }
 
-    setComposerOpen(true)
+    if (scenario.kind === 'honorarios_ready') {
+      setComposerOpen(true)
+
+      return
+    }
+
+    const target =
+      scenario.kind === 'paid'
+        ? 'contractor-remittances'
+        : scenario.kind === 'closure_pending'
+          ? 'contractor-pending'
+          : 'contractor-submissions'
+
+    document.getElementById(target)?.focus()
+    document.getElementById(target)?.scrollIntoView({ behavior: 'auto', block: 'start' })
   }
 
   return (
@@ -436,6 +463,11 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
       ) : null}
 
       <HeroPanel scenario={scenario} onPrimaryAction={handlePrimaryAction} />
+      {['paid', 'submitted_review'].includes(scenario.kind) ? (
+        <Button variant='tonal' onClick={() => setComposerOpen(true)}>
+          {CS.newSubmission}
+        </Button>
+      ) : null}
 
       <Grid container spacing={6}>
         {scenario.kpis.map(kpi => (
@@ -462,7 +494,11 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
                 <OperationalSignalList items={blockerSignals} columns={{ xs: 1, md: 2 }} />
               </OperationalPanel>
             ) : null}
-            {scenario.closureVisible ? <ContractorClosureSidecar scenario={scenario} /> : null}
+            {scenario.closureVisible ? (
+              <Box id='contractor-pending' tabIndex={-1}>
+                <ContractorClosureSidecar scenario={scenario} />
+              </Box>
+            ) : null}
             <SupportUploaderPanel scenario={scenario} onAttached={refetch} />
             <SubmissionDraftPanel scenario={scenario} />
           </Stack>
@@ -507,56 +543,59 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
         </Grid>
       </Grid>
 
-      <OperationalPanel title='Historial de envíos' icon='tabler-history' iconColor='secondary'>
-        {scenario.submissions.length > 0 ? (
-          <Stack spacing={3}>
-            {scenario.submissions.map(submission => (
-              <Stack
-                key={submission.id}
-                direction={{ xs: 'column', md: 'row' }}
-                spacing={3}
-                alignItems={{ xs: 'flex-start', md: 'center' }}
-                justifyContent='space-between'
-                sx={theme => ({
-                  border: `1px solid ${theme.palette.divider}`,
-                  borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-                  p: 4
-                })}
-              >
-                <Box>
-                  <Typography variant='subtitle1'>{submission.title}</Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    {submission.id} · {submission.period}
+      <Box id='contractor-submissions' tabIndex={-1}>
+        <OperationalPanel title='Historial de envíos' icon='tabler-history' iconColor='secondary'>
+          {scenario.submissions.length > 0 ? (
+            <Stack spacing={3}>
+              {scenario.submissions.map(submission => (
+                <Stack
+                  key={submission.id}
+                  direction={{ xs: 'column', md: 'row' }}
+                  spacing={3}
+                  alignItems={{ xs: 'flex-start', md: 'center' }}
+                  justifyContent='space-between'
+                  sx={theme => ({
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+                    p: 4
+                  })}
+                >
+                  <Box>
+                    <Typography variant='subtitle1'>{submission.title}</Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {submission.id} · {submission.period}
+                    </Typography>
+                  </Box>
+                  <Typography variant='subtitle1' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {formatSubmissionAmount(submission.amount, submission.currency)}
                   </Typography>
-                </Box>
-                <Typography variant='subtitle1' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatSubmissionAmount(submission.amount, submission.currency)}
-                </Typography>
-                <CustomChip
-                  round='true'
-                  size='small'
-                  variant='tonal'
-                  color={toneToColor[submission.tone]}
-                  label={submission.status}
-                />
-                <Typography variant='body2' color='text.secondary'>
-                  {submission.nextAction}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        ) : (
-          <Alert severity='info' icon={<i className='tabler-file-plus' />} role='status'>
-            Aún no hay envíos para este periodo.
-          </Alert>
-        )}
-      </OperationalPanel>
-
-      <RemittanceAdviceSection
-        items={scenario.paidRemittances}
-        audience='self'
-        endpointBase='/api/my/contractor/remittance'
-      />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color={toneToColor[submission.tone]}
+                    label={submission.status}
+                  />
+                  <Typography variant='body2' color='text.secondary'>
+                    {submission.nextAction}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          ) : (
+            <Alert severity='info' icon={<i className='tabler-file-plus' />} role='status'>
+              Aún no hay envíos para este periodo.
+            </Alert>
+          )}
+        </OperationalPanel>
+      </Box>
+      <Box id='contractor-remittances' tabIndex={-1}>
+        <RemittanceAdviceSection
+          items={scenario.paidRemittances}
+          audience='self'
+          endpointBase='/api/my/contractor/remittance'
+        />
+      </Box>
 
       <ContractorSubmissionComposer
         open={composerOpen}

@@ -16,6 +16,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_CONTRACTOR_SUBMISSIONS as CS } from '@/lib/copy/contractor-submissions'
 import type { ContractorSelfServiceScenario } from '@/lib/contractor-engagements/projection-types'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -33,63 +34,52 @@ const resolveSubmissionType = (paymentModel: string): 'milestone' | 'deliverable
 const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: ContractorDisputeResponseProps) => {
   const [correctedEvidence, setCorrectedEvidence] = useState<UploadedFileValue | null>(null)
   const [responseNote, setResponseNote] = useState('')
+  const [attemptKey, setAttemptKey] = useState(() => crypto.randomUUID())
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const dispute = scenario.blockers.find(blocker => blocker.responsable === 'Contractor') ?? scenario.blockers[0]
   const observedEvidence = scenario.supportItems.find(item => item.tone === 'error' || item.status === 'Observada')
 
-  // V1 mapping: there is no dedicated "respond dispute" endpoint. Responding to an
-  // observation = attach corrected evidence (attach-asset, role 'work_evidence') +
-  // create & submit a NEW work submission, which re-opens operational review. This
-  // never creates a Finance obligation — Finance only acts after HR approval +
-  // payable readiness downstream.
   const handleRespond = async () => {
     setIsSaving(true)
     setError(null)
 
     try {
+      if (!scenario.supportSubmissionId) throw new Error(CS.prepareFirst)
+
       const response = await fetch('/api/my/contractor/work-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          idempotencyKey: attemptKey,
+          contractorWorkSubmissionId: scenario.supportSubmissionId,
+          evidenceAssetId: correctedEvidence?.assetId ?? null,
+          title: responseNote.trim() || null,
           submissionType: resolveSubmissionType(scenario.paymentModel),
-          servicePeriodStart: scenario.servicePeriod || null,
-          currency: scenario.currency,
           submit: true
         })
       })
 
-      const payload = (await response.json().catch(() => null)) as
-        | { submission?: { contractorWorkSubmissionId?: string }; error?: string }
-        | null
+      const payload = (await response.json().catch(() => null)) as {
+        submission?: { contractorWorkSubmissionId?: string }
+        error?: string
+      } | null
 
       if (!response.ok || !payload?.submission) {
         throw new Error(payload?.error || 'No pudimos enviar tu respuesta. Intenta de nuevo.')
       }
 
-      if (correctedEvidence?.assetId) {
-        const attachResponse = await fetch('/api/my/contractor/attach-asset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assetId: correctedEvidence.assetId,
-            assetRole: 'work_evidence',
-            contractorWorkSubmissionId: payload.submission.contractorWorkSubmissionId
-          })
-        })
-
-        if (!attachResponse.ok) {
-          const attachPayload = (await attachResponse.json().catch(() => null)) as { error?: string } | null
-
-          throw new Error(attachPayload?.error || 'No pudimos adjuntar la evidencia corregida. Intenta de nuevo.')
-        }
-      }
+      setCorrectedEvidence(null)
+      setResponseNote('')
+      setAttemptKey(crypto.randomUUID())
 
       onResponded()
       onClose()
     } catch (respondError) {
-      setError(respondError instanceof Error ? respondError.message : 'No pudimos enviar tu respuesta. Intenta de nuevo.')
+      setError(
+        respondError instanceof Error ? respondError.message : 'No pudimos enviar tu respuesta. Intenta de nuevo.'
+      )
     } finally {
       setIsSaving(false)
     }
@@ -101,6 +91,7 @@ const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: Con
       open={open}
       onClose={onClose}
       PaperProps={{
+        'aria-label': CS.responseTitle,
         sx: {
           width: { xs: '100%', sm: 540, lg: 620 }
         }
@@ -120,14 +111,43 @@ const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: Con
             </Button>
           </Stack>
 
-          <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>
+          <Alert
+            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+            severity='warning'
+            icon={<i className='tabler-alert-triangle' />}
+          >
             Mientras la observación esté abierta, el pago no avanza.
           </Alert>
+
+          {error ? (
+            <Alert
+              sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+              severity='error'
+              icon={<i className='tabler-alert-triangle' />}
+            >
+              {error}
+            </Alert>
+          ) : null}
         </Stack>
 
         <Divider />
 
-        <Stack spacing={5} sx={{ p: 6, flex: 1, overflowY: 'auto' }}>
+        <Stack
+          spacing={5}
+          role='region'
+          aria-label={CS.responseRegion}
+          tabIndex={0}
+          sx={{
+            p: 6,
+            flex: 1,
+            overflowY: 'auto',
+            '& input:focus-visible, & textarea:focus-visible': {
+              outline: '2px solid',
+              outlineColor: 'primary.main',
+              outlineOffset: 2
+            }
+          }}
+        >
           <Stack
             spacing={3}
             sx={theme => ({
@@ -138,7 +158,9 @@ const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: Con
           >
             <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='flex-start'>
               <Box>
-                <Typography variant='subtitle1'>{dispute?.title ?? 'Observación abierta'}</Typography>
+                <Typography variant='subtitle1' color='text.primary'>
+                  {dispute?.title ?? 'Observación abierta'}
+                </Typography>
                 <Typography variant='body2' color='text.secondary'>
                   {dispute?.detail ?? 'El revisor solicitó información adicional antes de aprobar el envío.'}
                 </Typography>
@@ -189,15 +211,13 @@ const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: Con
             metadataLabel={`${scenario.engagementPublicId} dispute response`}
           />
 
-          <Alert severity='info' icon={<i className='tabler-info-circle' />}>
+          <Alert
+            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+            severity='info'
+            icon={<i className='tabler-info-circle' />}
+          >
             La respuesta vuelve a dejar el caso en revisión operacional. No crea una obligación con Finance todavía.
           </Alert>
-
-          {error ? (
-            <Alert severity='error' icon={<i className='tabler-alert-triangle' />}>
-              {error}
-            </Alert>
-          ) : null}
         </Stack>
 
         <Divider />
@@ -209,7 +229,9 @@ const ContractorDisputeResponse = ({ open, scenario, onClose, onResponded }: Con
           <Button
             variant='contained'
             disabled={isSaving}
-            startIcon={isSaving ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-message-reply' />}
+            startIcon={
+              isSaving ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-message-reply' />
+            }
             onClick={handleRespond}
           >
             Responder observación

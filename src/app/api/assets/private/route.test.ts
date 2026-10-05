@@ -7,7 +7,9 @@ const mockResolveCurrentHrMemberId = vi.fn()
 vi.mock('@/lib/tenant/authorization', () => ({
   requireTenantContext: (...args: unknown[]) => mockRequireTenantContext(...args),
   hasRoleCode: vi.fn(() => false),
-  hasRouteGroup: vi.fn((tenant: { routeGroups?: string[] }, group: string) => tenant.routeGroups?.includes(group) ?? false)
+  hasRouteGroup: vi.fn(
+    (tenant: { routeGroups?: string[] }, group: string) => tenant.routeGroups?.includes(group) ?? false
+  )
 }))
 
 vi.mock('@/lib/storage/greenhouse-assets', () => ({
@@ -99,6 +101,39 @@ describe('POST /api/assets/private', () => {
   })
 
   // ── TASK-1399 — Proposal Studio: el binario del RFP entra por HTTP ──────────
+  it.each(['contractor_invoice_draft', 'contractor_work_evidence_draft'])(
+    'rejects forged member ownership for %s',
+    async contextType => {
+      mockRequireTenantContext.mockResolvedValue({
+        tenant: { userId: 'own', memberId: 'own-member', routeGroups: [] },
+        unauthorizedResponse: null
+      })
+      const form = new FormData()
+
+      form.append('file', new File(['pdf'], 'invoice.pdf', { type: 'application/pdf' }))
+      form.append('contextType', contextType)
+      form.append('ownerMemberId', 'foreign-member')
+      const response = await POST(new Request('http://localhost/api/assets/private', { method: 'POST', body: form }))
+
+      expect(response.status).toBe(403)
+      expect(mockCreatePrivatePendingAsset).not.toHaveBeenCalled()
+    }
+  )
+
+  it('preserves explicit HR on-behalf upload for the contractor member', async () => {
+    const form = new FormData()
+
+    form.append('file', new File(['pdf'], 'invoice.pdf', { type: 'application/pdf' }))
+    form.append('contextType', 'contractor_invoice_draft')
+    form.append('ownerMemberId', 'contractor-member')
+    const response = await POST(new Request('http://localhost/api/assets/private', { method: 'POST', body: form }))
+
+    expect(response.status).toBe(201)
+    expect(mockCreatePrivatePendingAsset).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerMemberId: 'contractor-member' })
+    )
+  })
+
   //
   // Antes de esta task los contextos existían en el asset store (límite 50 MB, MIME docx/xlsx,
   // retención document_vault, scan gate) pero NO en la allowlist de esta ruta: todo upload de

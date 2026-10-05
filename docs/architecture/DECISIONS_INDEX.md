@@ -301,3 +301,7 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## AEO X-Ray — 2026-09-30
 
 - Accepted: [composición multipieza y sharing por edición](EFEONCE_AEO_XRAY_COMPOSITION_AND_SHARING_DECISION_V1.md). Goal del operador; AXIS composición, Greenhouse dominio, Think renderer. TASK-1950/1951; demo autónoma Think publicada y aceptada; integración gobernada Greenhouse pendiente.
+
+## Contractor integrity — 2026-10-05
+
+[Accepted decision](GREENHOUSE_CONTRACTOR_SUBMISSION_PAYMENT_INTEGRITY_DECISION_V1.md): own-lane money, evidence by period, atomic attempt replay, payment-order backlink and full contractor settlement; TASK-2009/2010. No rollout/data recovery applied.

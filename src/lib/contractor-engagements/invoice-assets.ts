@@ -15,10 +15,7 @@ import {
   isContractorInvoiceAssetSource,
   resolveFinalAttachContext
 } from './invoice-asset-contracts'
-import type {
-  AttachContractorInvoiceAssetInput,
-  ContractorInvoiceAsset
-} from './invoice-asset-contracts'
+import type { AttachContractorInvoiceAssetInput, ContractorInvoiceAsset } from './invoice-asset-contracts'
 
 interface ContractorInvoiceAssetRow {
   invoice_asset_id: string
@@ -38,12 +35,9 @@ interface ContractorInvoiceAssetRow {
 }
 
 const toRecord = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {}
+  value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 
-const toTimestamp = (value: string | Date): string =>
-  value instanceof Date ? value.toISOString() : String(value)
+const toTimestamp = (value: string | Date): string => (value instanceof Date ? value.toISOString() : String(value))
 
 const SELECT_COLUMNS = `
   invoice_asset_id, public_id, contractor_engagement_id, contractor_invoice_id,
@@ -51,9 +45,7 @@ const SELECT_COLUMNS = `
   country_code, uploaded_by_user_id, metadata_json, created_at
 `
 
-export const mapContractorInvoiceAsset = (
-  row: ContractorInvoiceAssetRow
-): ContractorInvoiceAsset => ({
+export const mapContractorInvoiceAsset = (row: ContractorInvoiceAssetRow): ContractorInvoiceAsset => ({
   invoiceAssetId: row.invoice_asset_id,
   publicId: row.public_id,
   contractorEngagementId: row.contractor_engagement_id,
@@ -96,20 +88,15 @@ export const listContractorInvoiceAssetsByEngagement = async (
  * link table is append-only; replacing a document = upload a new asset + a new row.
  */
 export const attachContractorInvoiceAsset = async (
-  input: AttachContractorInvoiceAssetInput
+  input: AttachContractorInvoiceAssetInput,
+  transactionClient?: PoolClient
 ): Promise<ContractorInvoiceAsset> => {
   if (!isContractorInvoiceAssetRole(input.assetRole)) {
-    throw new ContractorEngagementValidationError(
-      'asset_role inválido.',
-      'invalid_asset_role'
-    )
+    throw new ContractorEngagementValidationError('asset_role inválido.', 'invalid_asset_role')
   }
 
   if (!isContractorInvoiceArtifactKind(input.artifactKind)) {
-    throw new ContractorEngagementValidationError(
-      'artifact_kind inválido.',
-      'invalid_artifact_kind'
-    )
+    throw new ContractorEngagementValidationError('artifact_kind inválido.', 'invalid_artifact_kind')
   }
 
   if (!isContractorInvoiceAssetSource(input.source)) {
@@ -118,7 +105,10 @@ export const attachContractorInvoiceAsset = async (
 
   // Pre-flight: engagement must exist; asset must exist, not deleted, and be in a
   // contractor invoice context.
-  const engagementRows = await query<{ contractor_engagement_id: string }>(
+  const read = async <T extends Record<string, unknown>>(sql: string, params: unknown[]): Promise<T[]> =>
+    transactionClient ? (await transactionClient.query<T>(sql, params)).rows : query<T>(sql, params)
+
+  const engagementRows = await read<{ contractor_engagement_id: string }>(
     `SELECT contractor_engagement_id
      FROM greenhouse_hr.contractor_engagements
      WHERE contractor_engagement_id = $1`,
@@ -126,21 +116,13 @@ export const attachContractorInvoiceAsset = async (
   )
 
   if (!engagementRows[0]) {
-    throw new ContractorEngagementValidationError(
-      'El engagement contractor no existe.',
-      'engagement_not_found',
-      404
-    )
+    throw new ContractorEngagementValidationError('El engagement contractor no existe.', 'engagement_not_found', 404)
   }
 
-  const asset = await getAssetById(input.assetId)
+  const asset = await getAssetById(input.assetId, transactionClient)
 
   if (!asset) {
-    throw new ContractorEngagementValidationError(
-      'El asset no existe.',
-      'asset_not_found',
-      404
-    )
+    throw new ContractorEngagementValidationError('El asset no existe.', 'asset_not_found', 404)
   }
 
   if (asset.status === 'deleted') {
@@ -161,7 +143,126 @@ export const attachContractorInvoiceAsset = async (
     )
   }
 
-  return withGreenhousePostgresTransaction(async (client: PoolClient) => {
+  if (
+    input.source === 'contractor_upload' &&
+    (!input.ownerMemberId ||
+      asset.ownerMemberId !== input.ownerMemberId ||
+      ![
+        'contractor_invoice_draft',
+        'contractor_invoice',
+        'contractor_work_evidence_draft',
+        'contractor_work_evidence'
+      ].includes(asset.ownerAggregateType))
+  ) {
+    throw new ContractorEngagementValidationError('El documento no pertenece a tu cuenta.', 'asset_not_owned', 404)
+  }
+
+  const run = async (client: PoolClient) => {
+    // Lock order: submission, then asset (matches the self-service coordinator).
+    let period: { service_period_start: string | Date | null; service_period_end: string | Date | null } | null = null
+
+    if (input.contractorWorkSubmissionId) {
+      const rows = await client.query<{
+        contractor_engagement_id: string
+        service_period_start: string | Date | null
+        service_period_end: string | Date | null
+      }>(
+        `SELECT contractor_engagement_id, service_period_start, service_period_end
+          FROM greenhouse_hr.contractor_work_submissions WHERE contractor_work_submission_id = $1 FOR SHARE`,
+        [input.contractorWorkSubmissionId]
+      )
+
+      if (!rows.rows[0] || rows.rows[0].contractor_engagement_id !== input.contractorEngagementId) {
+        throw new ContractorEngagementValidationError(
+          'El envío no pertenece a esta contratación.',
+          'submission_not_owned',
+          404
+        )
+      }
+
+      period = rows.rows[0]
+    } else if (
+      input.source === 'contractor_upload' &&
+      ['invoice_pdf', 'tax_xml', 'work_evidence'].includes(input.assetRole)
+    ) {
+      throw new ContractorEngagementValidationError(
+        'Selecciona el envío que respalda este documento.',
+        'support_submission_required',
+        422
+      )
+    }
+
+    await client.query('SELECT asset_id FROM greenhouse_core.assets WHERE asset_id = $1 FOR UPDATE', [input.assetId])
+    const lockedAsset = await getAssetById(input.assetId, client)
+
+    if (
+      !lockedAsset ||
+      !['pending', 'attached'].includes(lockedAsset.status) ||
+      (input.source === 'contractor_upload' && lockedAsset.ownerMemberId !== input.ownerMemberId)
+    ) {
+      throw new ContractorEngagementValidationError(
+        'El documento no está disponible para adjuntar.',
+        'asset_not_available',
+        409
+      )
+    }
+
+    const lockedContext = resolveFinalAttachContext(lockedAsset.ownerAggregateType)
+
+    if (!lockedContext || lockedContext !== finalContext) {
+      throw new ContractorEngagementValidationError(
+        'El contexto del documento cambió. Vuelve a seleccionarlo.',
+        'asset_context_changed',
+        409
+      )
+    }
+
+    if (
+      (input.assetRole === 'work_evidence' && finalContext !== 'contractor_work_evidence') ||
+      (['invoice_pdf', 'tax_xml', 'tax_certificate'].includes(input.assetRole) &&
+        !['contractor_invoice', 'provider_invoice'].includes(finalContext))
+    ) {
+      throw new ContractorEngagementValidationError(
+        'El tipo de documento no corresponde al soporte requerido.',
+        'asset_role_context_mismatch',
+        422
+      )
+    }
+
+    const existing = await client.query<ContractorInvoiceAssetRow>(
+      `SELECT ${SELECT_COLUMNS} FROM greenhouse_hr.contractor_invoice_assets
+       WHERE contractor_engagement_id = $1 AND asset_id = $2`,
+      [input.contractorEngagementId, input.assetId]
+    )
+
+    if (existing.rows[0]) {
+      const link = mapContractorInvoiceAsset(existing.rows[0])
+
+      if (
+        link.contractorWorkSubmissionId !== (input.contractorWorkSubmissionId ?? null) ||
+        link.contractorInvoiceId !== (input.contractorInvoiceId ?? null) ||
+        link.assetRole !== input.assetRole
+      ) {
+        throw new ContractorEngagementValidationError(
+          'Este documento ya respalda otro envío. Adjunta el documento del nuevo período.',
+          'asset_already_linked',
+          409
+        )
+      }
+
+      return link
+    }
+
+    if (lockedAsset.status === 'attached') {
+      throw new ContractorEngagementValidationError(
+        'Este documento ya está registrado. Adjunta un documento nuevo.',
+        'asset_already_linked',
+        409
+      )
+    }
+
+    const date = (v: string | Date | null) => (v instanceof Date ? v.toISOString().slice(0, 10) : v)
+
     const result = await client.query<ContractorInvoiceAssetRow>(
       `INSERT INTO greenhouse_hr.contractor_invoice_assets (
          invoice_asset_id, public_id, contractor_engagement_id, contractor_invoice_id,
@@ -184,7 +285,15 @@ export const attachContractorInvoiceAsset = async (
         input.source,
         input.countryCode ?? null,
         input.actorUserId,
-        JSON.stringify(input.metadata ?? {})
+        JSON.stringify({
+          ...input.metadata,
+          ...(period
+            ? {
+                servicePeriodStart: date(period.service_period_start),
+                servicePeriodEnd: date(period.service_period_end)
+              }
+            : {})
+        })
       ]
     )
 
@@ -206,5 +315,7 @@ export const attachContractorInvoiceAsset = async (
     })
 
     return invoiceAsset
-  })
+  }
+
+  return transactionClient ? run(transactionClient) : withGreenhousePostgresTransaction(run)
 }

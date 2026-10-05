@@ -41,9 +41,7 @@ const DRAFT_CONTEXT_MAP: Record<DraftUploadContext, true> = {
   brand_render_source_draft: true
 }
 
-const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>(
-  Object.keys(DRAFT_CONTEXT_MAP) as DraftUploadContext[]
-)
+const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>(Object.keys(DRAFT_CONTEXT_MAP) as DraftUploadContext[])
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
   DRAFT_CONTEXT_VALUES.has(value as DraftUploadContext)
@@ -74,7 +72,11 @@ const canUploadForContext = ({
   }
 
   if (contextType === 'sample_sprint_report_draft') {
-    return hasRouteGroup(tenant, 'commercial') || hasRouteGroup(tenant, 'internal') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    return (
+      hasRouteGroup(tenant, 'commercial') ||
+      hasRouteGroup(tenant, 'internal') ||
+      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    )
   }
 
   // TASK-863 — resignation_letter_ratified_draft: HR route group + EFEONCE_ADMIN.
@@ -106,16 +108,18 @@ const canUploadForContext = ({
   // TASK-791 — provider invoices/statements: solo Finance/HR/admin (NO contractor).
   if (contextType === 'provider_invoice_draft') {
     return (
-      hasRouteGroup(tenant, 'finance') ||
-      hasRouteGroup(tenant, 'hr') ||
-      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+      hasRouteGroup(tenant, 'finance') || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
     )
   }
 
   // TASK-999 — organization logo draft upload. Apply/replacement is separately
   // gated by organization.brand_asset and the operating-entity guard.
   if (contextType === 'organization_logo_draft') {
-    return hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    return (
+      hasRouteGroup(tenant, 'internal') ||
+      hasRouteGroup(tenant, 'admin') ||
+      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    )
   }
 
   // TASK-354/1362 — documentos de candidato subidos on-behalf por equipo interno.
@@ -183,6 +187,26 @@ export async function POST(request: Request) {
       ? ownerMemberIdRaw || tenant.memberId || fallbackOwnerMemberId || null
       : ownerMemberIdRaw || null
 
+    const contractorContext =
+      contextTypeValue === 'contractor_invoice_draft' || contextTypeValue === 'contractor_work_evidence_draft'
+
+    const canUploadOnBehalf =
+      hasRouteGroup(tenant, 'hr') ||
+      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+      (contractorContext && hasRouteGroup(tenant, 'finance'))
+
+    if (
+      needsMemberOwner &&
+      ownerMemberIdRaw &&
+      ownerMemberIdRaw !== (tenant.memberId || fallbackOwnerMemberId) &&
+      !canUploadOnBehalf
+    ) {
+      return NextResponse.json(
+        { error: 'No puedes subir documentos para otra persona.', code: 'asset_owner_forbidden' },
+        { status: 403 }
+      )
+    }
+
     if (contextTypeValue === 'purchase_order_draft' && !ownerClientId) {
       return NextResponse.json({ error: 'ownerClientId is required for purchase order drafts.' }, { status: 400 })
     }
@@ -247,10 +271,7 @@ export async function POST(request: Request) {
         extra: { constraint }
       })
 
-      return NextResponse.json(
-        { error: 'El asset ya existe (conflicto de unicidad).' },
-        { status: 409 }
-      )
+      return NextResponse.json({ error: 'El asset ya existe (conflicto de unicidad).' }, { status: 409 })
     }
 
     if (pgCode === '23514') {
@@ -259,10 +280,7 @@ export async function POST(request: Request) {
         extra: { constraint }
       })
 
-      return NextResponse.json(
-        { error: 'Valor del asset no cumple las validaciones del catálogo.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Valor del asset no cumple las validaciones del catálogo.' }, { status: 400 })
     }
 
     if (message.startsWith('upload_failed:')) {
@@ -270,10 +288,7 @@ export async function POST(request: Request) {
         tags: { source: 'assets_private_upload', stage: 'gcs_upload_failed' }
       })
 
-      return NextResponse.json(
-        { error: 'No se pudo escribir el archivo en el bucket.' },
-        { status: 502 }
-      )
+      return NextResponse.json({ error: 'No se pudo escribir el archivo en el bucket.' }, { status: 502 })
     }
 
     captureWithDomain(error, 'identity', {

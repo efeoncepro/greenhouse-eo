@@ -1,8 +1,10 @@
 import 'server-only'
 
+import { withGreenhousePostgresTransaction } from '@/lib/db'
 import {
   listPayableIdsByPaymentOrderForPaidCascade,
-  markPayablePaid
+  markPayablePaid,
+  markPayablePaymentOrderCreated
 } from '@/lib/contractor-engagements/payables/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
@@ -29,7 +31,7 @@ const extractPaidAt = (payload: Record<string, unknown>): string | null => {
  *
  * Cierra el tramo final del lifecycle del contractor payable. Cuando Tesorería marca
  * la payment order como `paid` (settlement TASK-765/977), esta projection encuentra
- * los contractor payables enlazados a esa orden que siguen en `payment_order_created`
+ * los contractor payables por la obligación Finance (incluye vínculos históricos faltantes)
  * y los transiciona a `paid` vía el writer canonical `markPayablePaid`, que emite el
  * evento de dominio `workforce.contractor_payable.paid v1` por payable. Ese evento
  * dispara el envío del comprobante TASK-960 (consumer `contractor-payable-paid-email`).
@@ -39,7 +41,7 @@ const extractPaidAt = (payload: Record<string, unknown>): string | null => {
  * payslip-on-payment-paid — son ajenos), así que el payable nunca llegaba a `paid`.
  *
  * Idempotente + decoupled:
- *  - el reader filtra `status='payment_order_created'` en SQL → órdenes no-contractor
+ *  - el reader filtra estados pendientes por la obligación en SQL → órdenes no-contractor
  *    o payables ya pagados producen 0 filas (no-op limpio para órdenes ajenas)
  *  - markPayablePaid es no-op si el payable ya está `paid` (no re-emite el evento)
  *  - un payable que falla NO bloquea a los demás de la misma orden (se acumula y se
@@ -47,8 +49,7 @@ const extractPaidAt = (payload: Record<string, unknown>): string | null => {
  */
 export const contractorPayablePaidCascadeProjection: ProjectionDefinition = {
   name: 'contractor_payable_paid_cascade',
-  description:
-    'Transition linked contractor payables to paid when their payment order is marked paid (TASK-981).',
+  description: 'Transition linked contractor payables to paid when their payment order is marked paid (TASK-981).',
   domain: 'finance',
   triggerEvents: ['finance.payment_order.paid'],
   extractScope: payload => {
@@ -73,11 +74,20 @@ export const contractorPayablePaidCascadeProjection: ProjectionDefinition = {
 
     for (const contractorPayableId of payableIds) {
       try {
-        await markPayablePaid({
-          contractorPayableId,
-          actorUserId: CASCADE_ACTOR,
-          paidAt,
-          paymentOrderId: orderId
+        await withGreenhousePostgresTransaction(async client => {
+          await markPayablePaymentOrderCreated(
+            { contractorPayableId, paymentOrderId: orderId, actorUserId: CASCADE_ACTOR },
+            client
+          )
+          await markPayablePaid(
+            {
+              contractorPayableId,
+              actorUserId: CASCADE_ACTOR,
+              paidAt,
+              paymentOrderId: orderId
+            },
+            client
+          )
         })
         paid += 1
       } catch (err) {

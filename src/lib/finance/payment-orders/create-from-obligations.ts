@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { withTransaction } from '@/lib/db'
+import { markPayablePaymentOrderCreated } from '@/lib/contractor-engagements/payables/store'
 import { isFinanceMxnPaymentOrdersEnabled } from '@/lib/finance/multi-currency/flags'
 import { resolvePaymentRoute } from '@/lib/finance/payment-routing/resolve-route'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -14,10 +15,7 @@ import type {
   PaymentOrderCurrency,
   PaymentOrderPaymentMethod
 } from '@/types/payment-orders'
-import {
-  canCreatePaymentOrderFromObligationStatus,
-  type PaymentObligationStatus
-} from '@/types/payment-obligations'
+import { canCreatePaymentOrderFromObligationStatus, type PaymentObligationStatus } from '@/types/payment-obligations'
 
 import { assertPaymentOrderCashCurrency, PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
@@ -31,6 +29,8 @@ interface ObligationRefRow {
   beneficiary_id: string
   beneficiary_name: string | null
   obligation_kind: string
+  source_kind: string
+  source_ref: string | null
   status: string
   space_id: string | null
   period_id: string | null
@@ -124,7 +124,7 @@ export async function createPaymentOrderFromObligations(
     // 1. Fetch obligations + lock vivas
     const result = await c.query<ObligationRefRow>(
       `SELECT obligation_id, amount, currency, beneficiary_type, beneficiary_id,
-              beneficiary_name, obligation_kind, status, space_id, period_id,
+              beneficiary_name, obligation_kind, source_kind, source_ref, status, space_id, period_id,
               metadata_json
          FROM greenhouse_finance.payment_obligations
         WHERE obligation_id = ANY($1::text[])
@@ -144,15 +144,13 @@ export async function createPaymentOrderFromObligations(
     }
 
     // 2. Validar status: una orden nueva solo puede tomar obligaciones no lockeadas y por programar.
-    const blocked = result.rows.filter(r =>
-      !canCreatePaymentOrderFromObligationStatus(r.status as PaymentObligationStatus)
+    const blocked = result.rows.filter(
+      r => !canCreatePaymentOrderFromObligationStatus(r.status as PaymentObligationStatus)
     )
 
     if (blocked.length > 0) {
       throw new PaymentOrderConflictError(
-        `Obligations con status bloqueado: ${blocked
-          .map(r => `${r.obligation_id} (${r.status})`)
-          .join(', ')}`,
+        `Obligations con status bloqueado: ${blocked.map(r => `${r.obligation_id} (${r.status})`).join(', ')}`,
         'obligation_status_blocked'
       )
     }
@@ -239,6 +237,16 @@ export async function createPaymentOrderFromObligations(
 
       const isPartial = lineAmount < fullAmount
 
+      if (
+        row.source_kind === 'contractor_payable' &&
+        (isPartial || lineAmount <= 0 || row.status === 'partially_paid')
+      ) {
+        throw new PaymentOrderValidationError(
+          'Los cobros contractor requieren el pago completo de la obligación.',
+          'contractor_partial_payment_unsupported'
+        )
+      }
+
       totalAmount += lineAmount
 
       linePayloads.push({
@@ -256,15 +264,11 @@ export async function createPaymentOrderFromObligations(
     // 6. Resolver space_id + period_id desde las obligations si no fue dado
     const distinctSpaces = new Set(result.rows.map(r => r.space_id).filter(Boolean))
 
-    const spaceId =
-      input.spaceId ??
-      (distinctSpaces.size === 1 ? ([...distinctSpaces][0] as string) : null)
+    const spaceId = input.spaceId ?? (distinctSpaces.size === 1 ? ([...distinctSpaces][0] as string) : null)
 
     const distinctPeriods = new Set(result.rows.map(r => r.period_id).filter(Boolean))
 
-    const periodId =
-      input.periodId ??
-      (distinctPeriods.size === 1 ? ([...distinctPeriods][0] as string) : null)
+    const periodId = input.periodId ?? (distinctPeriods.size === 1 ? ([...distinctPeriods][0] as string) : null)
 
     // 6.5 TASK-749: Resolver routing por line desde el perfil activo del
     // beneficiary cuando el caller no provee processorSlug/paymentMethod.
@@ -286,9 +290,8 @@ export async function createPaymentOrderFromObligations(
           const metadata = row.metadata_json ?? {}
           const payrollVia = metadata.payrollVia === 'deel' ? 'deel' : null
 
-          const payRegime = metadata.payRegime === 'international' || metadata.payRegime === 'chile'
-            ? metadata.payRegime
-            : null
+          const payRegime =
+            metadata.payRegime === 'international' || metadata.payRegime === 'chile' ? metadata.payRegime : null
 
           const route = await resolvePaymentRoute(
             {
@@ -415,6 +418,20 @@ export async function createPaymentOrderFromObligations(
     }
 
     // 9. UPDATE obligations → 'scheduled' (declara intencion de pago)
+    for (const obligation of result.rows) {
+      if (obligation.source_kind === 'contractor_payable') {
+        if (!obligation.source_ref)
+          throw new PaymentOrderValidationError(
+            'La obligación contractor no tiene cobro de origen.',
+            'contractor_payable_ref_missing'
+          )
+        await markPayablePaymentOrderCreated(
+          { contractorPayableId: obligation.source_ref, paymentOrderId: orderId, actorUserId: input.createdBy },
+          c
+        )
+      }
+    }
+
     await c.query(
       `UPDATE greenhouse_finance.payment_obligations
           SET status = 'scheduled', updated_at = now()

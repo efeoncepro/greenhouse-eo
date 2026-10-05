@@ -18,13 +18,7 @@ export const CONTRACTOR_WORK_SUBMISSION_TYPES = [
 ] as const
 export type ContractorWorkSubmissionType = (typeof CONTRACTOR_WORK_SUBMISSION_TYPES)[number]
 
-export const CONTRACTOR_WORK_SUBMISSION_UNITS = [
-  'hours',
-  'days',
-  'milestone',
-  'deliverable',
-  'fixed'
-] as const
+export const CONTRACTOR_WORK_SUBMISSION_UNITS = ['hours', 'days', 'milestone', 'deliverable', 'fixed'] as const
 export type ContractorWorkSubmissionUnit = (typeof CONTRACTOR_WORK_SUBMISSION_UNITS)[number]
 
 export const CONTRACTOR_WORK_SUBMISSION_STATUSES = [
@@ -65,6 +59,8 @@ export interface ContractorWorkSubmission {
 }
 
 export interface CreateContractorWorkSubmissionInput {
+  /** Internal coordinator ID; never accepted directly from self-service callers. */
+  contractorWorkSubmissionId?: string
   contractorEngagementId: string
   submissionType: ContractorWorkSubmissionType
   title?: string | null
@@ -87,6 +83,8 @@ export interface UpdateContractorWorkSubmissionDraftInput {
   quantity?: number | null
   unit?: ContractorWorkSubmissionUnit | null
   grossAmount?: number | null
+  /** Internal agreement snapshot; refreshed with derived economics by the own-lane coordinator. */
+  rateAmountSnapshot?: number | null
   currency?: string | null
   metadataPatch?: Record<string, unknown>
   actorUserId: string

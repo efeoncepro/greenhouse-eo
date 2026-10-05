@@ -12,10 +12,9 @@ import { ContractorEngagementValidationError } from '../errors'
 import { isPostClosureLockedEngagementStatus } from '../state-machine'
 import { getContractorEngagementById } from '../store'
 
-import {
-  REVIEW_ACTION_TARGET,
-  assertValidWorkSubmissionTransition
-} from './state-machine'
+import { assertContractorServicePeriod } from './service-period'
+
+import { REVIEW_ACTION_TARGET, assertValidWorkSubmissionTransition } from './state-machine'
 import type {
   CancelContractorWorkSubmissionInput,
   ContractorWorkSubmission,
@@ -56,9 +55,7 @@ interface ContractorWorkSubmissionRow {
 }
 
 const toRecord = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {}
+  value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 
 const toNullableNumber = (value: string | number | null): number | null => {
   if (value === null) return null
@@ -79,9 +76,7 @@ const toTimestamp = (value: string | Date | null): string | null => {
   return value instanceof Date ? value.toISOString() : String(value)
 }
 
-export const mapContractorWorkSubmission = (
-  row: ContractorWorkSubmissionRow
-): ContractorWorkSubmission => ({
+export const mapContractorWorkSubmission = (row: ContractorWorkSubmissionRow): ContractorWorkSubmission => ({
   contractorWorkSubmissionId: row.contractor_work_submission_id,
   publicId: row.public_id,
   contractorEngagementId: row.contractor_engagement_id,
@@ -235,15 +230,7 @@ const appendWorkSubmissionEvent = async (
   client: PoolClient,
   params: {
     contractorWorkSubmissionId: string
-    eventType:
-      | 'created'
-      | 'submitted'
-      | 'approved'
-      | 'disputed'
-      | 'rejected'
-      | 'cancelled'
-      | 'consumed'
-      | 'updated'
+    eventType: 'created' | 'submitted' | 'approved' | 'disputed' | 'rejected' | 'cancelled' | 'consumed' | 'updated'
     fromStatus?: string | null
     toStatus?: string | null
     actorUserId: string
@@ -309,11 +296,7 @@ const lockWorkSubmission = async (
   )
 
   if (!result.rows[0]) {
-    throw new ContractorEngagementValidationError(
-      'La work submission no existe.',
-      'work_submission_not_found',
-      404
-    )
+    throw new ContractorEngagementValidationError('La work submission no existe.', 'work_submission_not_found', 404)
   }
 
   return mapContractorWorkSubmission(result.rows[0])
@@ -322,16 +305,15 @@ const lockWorkSubmission = async (
 // ── Commands ──────────────────────────────────────────────────────────────────
 
 export const createContractorWorkSubmission = async (
-  input: CreateContractorWorkSubmissionInput
+  input: CreateContractorWorkSubmissionInput,
+  client?: PoolClient
 ): Promise<ContractorWorkSubmission> => {
-  const engagement = await getContractorEngagementById(input.contractorEngagementId)
+  assertContractorServicePeriod(input.servicePeriodStart, input.servicePeriodEnd)
+
+  const engagement = await getContractorEngagementById(input.contractorEngagementId, client)
 
   if (!engagement) {
-    throw new ContractorEngagementValidationError(
-      'El engagement contractor no existe.',
-      'engagement_not_found',
-      404
-    )
+    throw new ContractorEngagementValidationError('El engagement contractor no existe.', 'engagement_not_found', 404)
   }
 
   // TASK-797 — bloquea nuevas work submissions una vez que el cierre arranca
@@ -361,7 +343,7 @@ export const createContractorWorkSubmission = async (
     }
   }
 
-  return withGreenhousePostgresTransaction(async (client) => {
+  const run = async (client: PoolClient) => {
     const result = await client.query<ContractorWorkSubmissionRow>(
       `INSERT INTO greenhouse_hr.contractor_work_submissions (
          contractor_work_submission_id, public_id, contractor_engagement_id, submission_type,
@@ -374,7 +356,7 @@ export const createContractorWorkSubmission = async (
        )
        RETURNING ${WORK_SUBMISSION_SELECT_COLUMNS}`,
       [
-        `cws-${randomUUID()}`,
+        input.contractorWorkSubmissionId ?? `cws-${randomUUID()}`,
         input.contractorEngagementId,
         input.submissionType,
         input.title ?? null,
@@ -401,13 +383,16 @@ export const createContractorWorkSubmission = async (
     })
 
     return submission
-  })
+  }
+
+  return client ? run(client) : withGreenhousePostgresTransaction(run)
 }
 
 export const updateContractorWorkSubmissionDraft = async (
-  input: UpdateContractorWorkSubmissionDraftInput
-): Promise<ContractorWorkSubmission> =>
-  withGreenhousePostgresTransaction(async (client) => {
+  input: UpdateContractorWorkSubmissionDraftInput,
+  client?: PoolClient
+): Promise<ContractorWorkSubmission> => {
+  const run = async (client: PoolClient) => {
     const current = await lockWorkSubmission(client, input.contractorWorkSubmissionId)
 
     if (current.status !== 'draft') {
@@ -417,6 +402,11 @@ export const updateContractorWorkSubmissionDraft = async (
         409
       )
     }
+
+    assertContractorServicePeriod(
+      input.servicePeriodStart === undefined ? current.servicePeriodStart : input.servicePeriodStart,
+      input.servicePeriodEnd === undefined ? current.servicePeriodEnd : input.servicePeriodEnd
+    )
 
     const sets: string[] = []
     const params: unknown[] = [input.contractorWorkSubmissionId]
@@ -432,10 +422,22 @@ export const updateContractorWorkSubmissionDraft = async (
     if (input.quantity !== undefined) push('quantity', input.quantity)
     if (input.unit !== undefined) push('unit', input.unit)
     if (input.grossAmount !== undefined) push('gross_amount', input.grossAmount)
+    if (input.rateAmountSnapshot !== undefined) push('rate_amount_snapshot', input.rateAmountSnapshot)
     if (input.currency !== undefined) push('currency', input.currency)
 
-    if (input.metadataPatch !== undefined) {
-      params.push(JSON.stringify(input.metadataPatch))
+    const periodChanged =
+      (input.servicePeriodStart !== undefined && input.servicePeriodStart !== current.servicePeriodStart) ||
+      (input.servicePeriodEnd !== undefined && input.servicePeriodEnd !== current.servicePeriodEnd)
+
+    if (input.metadataPatch !== undefined || periodChanged) {
+      params.push(
+        JSON.stringify({
+          ...input.metadataPatch,
+          ...(periodChanged || current.metadata.selfServicePeriodChanged === true
+            ? { selfServicePeriodChanged: true }
+            : {})
+        })
+      )
       sets.push(`metadata_json = metadata_json || $${params.length}::jsonb`)
     }
 
@@ -460,12 +462,16 @@ export const updateContractorWorkSubmissionDraft = async (
     })
 
     return updated
-  })
+  }
+
+  return client ? run(client) : withGreenhousePostgresTransaction(run)
+}
 
 export const submitContractorWorkSubmission = async (
-  input: SubmitContractorWorkSubmissionInput
-): Promise<ContractorWorkSubmission> =>
-  withGreenhousePostgresTransaction(async (client) => {
+  input: SubmitContractorWorkSubmissionInput,
+  client?: PoolClient
+): Promise<ContractorWorkSubmission> => {
+  const run = async (client: PoolClient) => {
     const current = await lockWorkSubmission(client, input.contractorWorkSubmissionId)
 
     if (current.status === 'submitted') {
@@ -492,15 +498,15 @@ export const submitContractorWorkSubmission = async (
       actorUserId: input.actorUserId
     })
 
-    await publishWorkSubmissionEvent(
-      client,
-      updated,
-      EVENT_TYPES.contractorWorkSubmissionSubmitted,
-      { fromStatus: current.status }
-    )
+    await publishWorkSubmissionEvent(client, updated, EVENT_TYPES.contractorWorkSubmissionSubmitted, {
+      fromStatus: current.status
+    })
 
     return updated
-  })
+  }
+
+  return client ? run(client) : withGreenhousePostgresTransaction(run)
+}
 
 const REVIEW_EVENT_BY_ACTION = {
   approve: EVENT_TYPES.contractorWorkSubmissionApproved,
@@ -511,7 +517,7 @@ const REVIEW_EVENT_BY_ACTION = {
 export const reviewContractorWorkSubmission = async (
   input: ReviewContractorWorkSubmissionInput
 ): Promise<ContractorWorkSubmission> =>
-  withGreenhousePostgresTransaction(async (client) => {
+  withGreenhousePostgresTransaction(async client => {
     const current = await lockWorkSubmission(client, input.contractorWorkSubmissionId)
     const targetStatus = REVIEW_ACTION_TARGET[input.action]
 
@@ -552,12 +558,7 @@ export const reviewContractorWorkSubmission = async (
 
     await appendWorkSubmissionEvent(client, {
       contractorWorkSubmissionId: updated.contractorWorkSubmissionId,
-      eventType:
-        input.action === 'approve'
-          ? 'approved'
-          : input.action === 'dispute'
-            ? 'disputed'
-            : 'rejected',
+      eventType: input.action === 'approve' ? 'approved' : input.action === 'dispute' ? 'disputed' : 'rejected',
       fromStatus: current.status,
       toStatus: updated.status,
       actorUserId: input.actorUserId,
@@ -575,7 +576,7 @@ export const reviewContractorWorkSubmission = async (
 export const cancelContractorWorkSubmission = async (
   input: CancelContractorWorkSubmissionInput
 ): Promise<ContractorWorkSubmission> =>
-  withGreenhousePostgresTransaction(async (client) => {
+  withGreenhousePostgresTransaction(async client => {
     const current = await lockWorkSubmission(client, input.contractorWorkSubmissionId)
 
     if (current.status === 'cancelled') {
@@ -611,12 +612,9 @@ export const cancelContractorWorkSubmission = async (
       reason: input.reason ?? null
     })
 
-    await publishWorkSubmissionEvent(
-      client,
-      updated,
-      EVENT_TYPES.contractorWorkSubmissionCancelled,
-      { fromStatus: current.status }
-    )
+    await publishWorkSubmissionEvent(client, updated, EVENT_TYPES.contractorWorkSubmissionCancelled, {
+      fromStatus: current.status
+    })
 
     return updated
   })
@@ -630,7 +628,7 @@ export const cancelContractorWorkSubmission = async (
 export const markContractorWorkSubmissionConsumed = async (
   input: MarkContractorWorkSubmissionConsumedInput
 ): Promise<ContractorWorkSubmission> =>
-  withGreenhousePostgresTransaction(async (client) => {
+  withGreenhousePostgresTransaction(async client => {
     const current = await lockWorkSubmission(client, input.contractorWorkSubmissionId)
 
     if (current.consumedByPayableId === input.payableId) {
