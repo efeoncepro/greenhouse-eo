@@ -1,5 +1,13 @@
 # Efeonce Marketing Studio — program ledger (EPIC-049)
 
+## Decisión 2026-10-05 — Creative Studio (vista creativa)
+
+Studio gains a twin view, **Creative Studio**, over the same campaigns (ADR
+`docs/architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`). Nothing implemented yet; the ADR's
+§8 lists seven slices (view + switch first, with no new data). Reuse before building: piece without version = to
+produce; `asset_version.review_state` + `approveAssetVersion` / `requestAssetVersionChanges`; `approveCreative`;
+work items for assignment; `channel_format` gains the production facet. Globe is hibernated and is not a dependency.
+
 ## Decisión vigente 2026-10-04 — TASK-1899 retirada
 
 El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula

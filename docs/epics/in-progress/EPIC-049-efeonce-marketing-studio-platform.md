@@ -1,5 +1,14 @@
 # EPIC-049 — Efeonce Marketing Studio: plataforma de campañas API-first
 
+## Decisión vigente 2026-10-05 — Creative Studio, vista creativa de las mismas campañas
+
+El operador decidió que Studio tiene una vista gemela, **Creative Studio**, para el diseñador, el director de arte y el
+brand manager, sobre **las mismas campañas** que Marketing Studio (un aggregate, dos vistas; la vista nunca autoriza).
+ADR: [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md).
+Su roadmap de siete slices (vista y switch, receta de producción en el catálogo, hitos derivados, feedback anclado,
+referencias, chequeo de marca, regla de activación con versión aprobada) entra a este epic como tasks futuras; no se
+crearon tasks con esta decisión. Globe deja de usar «Creative Studio» como descriptor (delta en la decisión de nombre).
+
 ## Decisión vigente 2026-10-04 (posterior) — escritura por MCP con TASK-2003
 
 El operador decidió (2026-10-04, después de retirar TASK-1899) que Efeonce es agent-friendly y que todo lo de EPIC-049

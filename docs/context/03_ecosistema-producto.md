@@ -1,6 +1,6 @@
 # 03 · Ecosistema de Producto
 
-> Regla maestra: **cada product brand o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub y admin donde todo converge.** Las plataformas verticales (Wave, Kortex, Verk y Efeonce Globe / Creative Studio) alimentan el hub sin depender de él para operar. Los productos nuevos nacen Agent Native y con Full API Parity. Globe es una product brand de producción creativa; no representa por sí sola toda la línea Creative Services ni toda la relación de agencia.
+> Regla maestra: **cada product brand o capability puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub y admin donde todo converge.** Las plataformas verticales (Wave, Kortex, Verk y Efeonce Globe) alimentan el hub sin depender de él para operar. Los productos nuevos nacen Agent Native y con Full API Parity. Globe es una product brand de producción creativa; no representa por sí sola toda la línea Creative Services ni toda la relación de agencia.
 
 > **Contrato operator-first:** la superficie operatoria vive en la product brand o Product Service (Wave, Reach, Globe y futuras capabilities); Greenhouse soporta la superficie ejecutiva, la memoria, el assurance y la coordinación. La adopción se espera primero en el operador-champion y se traduce después en sponsorship, compra recurrente y expansión. Canon: [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
@@ -21,7 +21,7 @@ Efeonce tiene cinco plataformas/product houses de software propietario, en disti
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
 | **Kortex** | CRM Intelligence Platform (sobre HubSpot) | Fase 1: clientes Efeonce Digital. Fase 2: agencias HubSpot (B2B2B) | B2B2B → HubSpot Marketplace | Operativo (validado en producción) |
 | **Verk** | Content + Distribution Operating System | Fase 1: interno. Fase 2: empresas con 20+ piezas/mes (B2B standalone) | B2B standalone | P0 en construcción |
-| **Efeonce Globe** *(Creative Studio)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Operativo internal-only en tres rutas; acceso comercial/cliente sigue gateado (EPIC-028) |
+| **Efeonce Globe** | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Hibernado desde el 2026-10-05 según el operador, sujeto a reestructuración (antes: internal-only en tres rutas); acceso comercial/cliente sigue gateado (EPIC-028) |
 | **Wave** | Capa de producto digital para Search Visibility, Web Experience, Measurement, Agent Systems y Automation | Fase 1: productos y servicios Efeonce. Fase 2: clientes con acceso gobernado a Product Services | Product house operada en modo managed, co-operated o client-operated según Product Service; Greenhouse administra el contexto transversal | Dirección propuesta; runtime/product platform propio pendiente de definición y validación (EPIC-037) |
 
 **Por qué cinco plataformas/product houses independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Wave y Globe no heredan el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
@@ -62,9 +62,9 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 ---
 
-## Efeonce Globe — Creative Studio de producción agentic (plataforma hermana)
+## Efeonce Globe — motor de producción creativa agentic (plataforma hermana)
 
-> **Nombres (2026-10-02):** hacia afuera, Globe se llama **Globe**; «Creative Studio» sólo lo acompaña como descriptor y nunca se abrevia a «Studio». «Studio» a secas es **Efeonce Marketing Studio**. Ver [ADR](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
+> **Nombres (delta 2026-10-05):** Globe se llama **Globe** y ya no usa «Creative Studio» como descriptor. **Creative Studio** es la vista creativa de Efeonce Studio (`studio.efeonce.org`): las mismas campañas que **Marketing Studio**, vistas desde el diseñador, el director de arte y el brand manager ([ADR de la vista](../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md), [decisión de nombre](../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md)). En las secciones de Globe de este documento y en documentos previos, «Creative Studio» se lee como Globe.
 
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
 
@@ -165,7 +165,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 | **Loop Marketing** | Filosofía: crecimiento compuesto. | Thought leadership. |
 | **Nested Loops™** | Sistema estratégico Express→Tailor→Amplify→Evolve. | Propuestas. |
 | **ICO** | Sistema operativo transversal: gobernanza, métricas, quality gates. | Diferenciador en pitches. Onboarding. |
-| **Ecosistema de producto** | Greenhouse + Kortex + Verk + Efeonce Globe (Creative Studio; nombre público/packaging pendiente). Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
+| **Ecosistema de producto** | Greenhouse + Kortex + Verk + Efeonce Globe (motor de producción creativa; hibernado, packaging pendiente). Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
 | **Frameworks específicos** | Surround Discovery™ (S⁴: SENSE → SHAPE → SURFACE → SOLVE), AEO, CSC, Revenue Enabled. | Solo en profundidad técnica. Se traducen a beneficios. |
 
 **Cómo cobra vida la IP en Greenhouse:** Loop Marketing → ciclo completo visible en dashboards; ICO → métricas RpA/OTD%/FTR en el dashboard del cliente; Surround Discovery™ → embed card del Surround Map (vía Verk); Revenue Enabled → inteligencia financiera (revenue/costo/margen por cliente).

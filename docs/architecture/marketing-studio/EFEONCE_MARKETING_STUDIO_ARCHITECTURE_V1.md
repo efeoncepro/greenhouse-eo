@@ -15,7 +15,7 @@ El release de Studio del mismo día es independiente y se documenta con su alcan
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
 > **Versión:** 1.13
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-05 por Claude: Delta TASK-2002 (calendario de activaciones en producción en solo lectura; composición, montaje de acciones por URL, paridad UI↔API, dryRun→apply, formatos vía `getAsset`, `Shell statusBar`). Anterior, 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
+> **Última actualización:** 2026-10-05 por Claude: ADR de la vista Creative Studio (§1.1, §8). Antes, el mismo día: Delta TASK-2002 (calendario de activaciones en producción en solo lectura; composición, montaje de acciones por URL, paridad UI↔API, dryRun→apply, formatos vía `getAsset`, `Shell statusBar`). Anterior, 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -52,6 +52,17 @@ Nace del prototipo local `ABRIR CAMPAIGN MANAGER.html` (Codex, OneDrive `5. Cont
 - **Globe.** Globe produce y gobierna piezas generadas. Studio consume esos assets por referencia o API y no reimplementa generación, rutas de modelos ni gobierno de derechos de generación.
 - **Greenhouse.** Organizaciones, clientes, identidad y acceso de personas siguen siendo de Greenhouse / Efeonce ID. Studio los recibe por API o por el canje de tokens; nunca por SQL.
 - **Un gestor de pauta en vivo.** Hasta que existan adapters con readback, Studio registra lo preparado y lo observado; no afirma que algo está publicado o activo por inferencia de fecha.
+
+## 1.1 Dos vistas: Marketing Studio y Creative Studio
+
+Decisión gobernante: [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md)
+(Accepted 2026-10-05). Studio tiene dos vistas sobre **el mismo aggregate**: Marketing Studio, desde quien activa
+(marketing, performance, marketing manager), y Creative Studio, desde el oficio (diseñador, director de arte, brand
+manager). Comparten campaña, brief, concepto, pieza, versión y copy, la API `/api/v1`, los commands y el registro de
+operaciones. La vista no autoriza; el switch conserva la campaña o pieza en foco. La autoridad de «final» es creativa
+(`approveAssetVersion`, `approveCreative`) y los tres estados siguen separados. Lo nuevo del lado creativo (receta de
+producción como faceta del catálogo, hitos derivados, referencias, feedback anclado, chequeo de marca) nace con
+paridad completa por tasks de EPIC-049. En este documento, «Studio» sin calificar se refiere a la plataforma.
 
 ## 2. Topología
 
@@ -801,6 +812,7 @@ las campañas existentes); TASK-1898 (persona por sesión) y TASK-2003 (federaci
 - **Vista previa por formato:** 9:16 se muestra como story; 1:1, 4:5 y 16:9 en tarjeta de feed con su proporción real (antes un `max-height` de 320 px recortaba).
 - **Video (TASK-1999):** `MediaVideo` reproduce `Asset.playback` en la tarjeta de feed o en la story con controles nativos, póster del segundo 1, `preload=metadata`, `playsInline` y sin autoplay ni loop; sin `playback` muestra el cuadro con una nota y, si falla, «No se pudo cargar el video.» con «Reintentar». En la story las capas no capturan clics y dejan libre la franja de controles. El tablero dibuja todas las piezas de cada concepto × tipo × formato (con la etiqueta de variante y la duración en los videos), y el hueco de un formato que sólo existe en el otro tipo lleva a esa pieza («Ver video» / «Ver imagen»).
 - Logos oficiales (`public/brand/`) copiados de `greenhouse-eo/public/branding/`.
+- **Vista Creative Studio (decidida 2026-10-05, sin implementar):** navegación propia sobre los mismos datos, switch que conserva el foco y vista en la URL; ver §1.1.
 - Flujo maestro y huecos conocidos (p. ej. `/library` no alcanzable a 390 px): `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`; la UI de edición es TASK-1895.
 
 ## 9. Observabilidad y operación (TASK-1896)
