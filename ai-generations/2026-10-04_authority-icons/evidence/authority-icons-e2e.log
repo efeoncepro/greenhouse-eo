@@ -1,0 +1,29 @@
+
+Running 8 tests using 5 workers
+
+(node:32190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32189) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (949ms)
+  ✓  3 [chromium] › src/test/e2e/authority-iconography.spec.ts:5:1 › Authority collection filters, scales, exports exact state and preserves mobile width (956ms)
+  ✓  4 [chromium] › src/test/e2e/seo-iconography.spec.ts:5:1 › SEO collection filters, scales, exports exact state and preserves mobile width (978ms)
+(node:32223) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32224) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [chromium] › src/test/e2e/lab.spec.ts:1606:1 › iconography reference renders both voices, filters and keeps a honest empty state (1.4s)
+  ✓  2 [mobile] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (1.6s)
+  ✓  8 [mobile] › src/test/e2e/authority-iconography.spec.ts:5:1 › Authority collection filters, scales, exports exact state and preserves mobile width (837ms)
+  ✓  6 [mobile] › src/test/e2e/seo-iconography.spec.ts:5:1 › SEO collection filters, scales, exports exact state and preserves mobile width (945ms)
+  ✓  7 [mobile] › src/test/e2e/lab.spec.ts:1606:1 › iconography reference renders both voices, filters and keeps a honest empty state (1.3s)
+
+  8 passed (3.7s)

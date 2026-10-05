@@ -123,6 +123,29 @@
         "127.0.0.1"
       ],
       "port": 4330
+    },
+    {
+      "name": "studio-2002-local",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "STUDIO_PG_HOST=127.0.0.1",
+        "STUDIO_PG_PORT=55461",
+        "STUDIO_PG_DATABASE=marketing_studio",
+        "STUDIO_PG_USER=postgres",
+        "STUDIO_PG_PASSWORD=local",
+        "STUDIO_PG_PASSWORD_SECRET_REF=",
+        "STUDIO_ACTIVATIONS_ENABLED=true",
+        "STUDIO_ACCESS_MODE=open",
+        "pnpm",
+        "--dir",
+        "../efeonce-marketing-studio/apps/web",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3102"
+      ],
+      "port": 3102
     }
   ]
 }

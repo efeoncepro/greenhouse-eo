@@ -1,0 +1,607 @@
+{
+  "schema": "axis.authority-iconography-export.v1",
+  "status": "candidate",
+  "revision": "r1-rounded",
+  "catalog": [
+    {
+      "key": "autoridad-dominio",
+      "label": "Autoridad de dominio",
+      "meaning": "Fortaleza estimada del dominio según una metodología declarada.",
+      "avoid": "DA de Moz, DR de Ahrefs y Authority Score de Semrush son métricas distintas; mostrar proveedor y fecha.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "autoridad-pagina",
+      "label": "Autoridad de página",
+      "meaning": "Fortaleza estimada de una URL individual.",
+      "avoid": "No equivale a autoridad de dominio. PA y UR conservan su proveedor, alcance y método.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "autoridad-marca",
+      "label": "Brand Authority",
+      "meaning": "Reconocimiento y credibilidad de una marca dentro de su categoría.",
+      "avoid": "Concepto compartido por SEO y AEO. No es DA, una mención aislada ni un score universal de IA. Si se usa Brand Authority de Moz, declarar ese proveedor y su método.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "backlink",
+      "label": "Backlink",
+      "meaning": "Enlace que llega desde otro sitio hacia una página.",
+      "avoid": "Un enlace entrante no equivale a un dominio referente único.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "dominios-referentes",
+      "label": "Dominios referentes",
+      "meaning": "Dominios únicos que enlazan al sitio o URL analizada.",
+      "avoid": "Varios enlaces desde el mismo dominio no se cuentan como varios dominios referentes.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "perfil-enlaces",
+      "label": "Perfil de enlaces",
+      "meaning": "Conjunto y distribución de los enlaces observados.",
+      "avoid": "El dibujo no codifica calidad ni un porcentaje; la evaluación necesita datos y criterios.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "anchor-text",
+      "label": "Anchor text",
+      "meaning": "Texto visible que sirve de ancla a un enlace.",
+      "avoid": "No representa la keyword objetivo ni demuestra relevancia por sí solo.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-nuevos",
+      "label": "Enlaces nuevos",
+      "meaning": "Enlaces detectados por primera vez dentro del periodo observado.",
+      "avoid": "Nuevo para el proveedor no prueba la fecha exacta de creación del enlace.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-perdidos",
+      "label": "Enlaces perdidos",
+      "meaning": "Enlaces que el proveedor dejó de observar en el periodo.",
+      "avoid": "La pérdida observada requiere verificación; no equivale automáticamente a una eliminación definitiva.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-rotos",
+      "label": "Enlaces rotos",
+      "meaning": "Enlaces cuyo destino falla o no entrega el contenido esperado.",
+      "avoid": "Un enlace roto y un backlink perdido son estados distintos.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "brecha-backlinks",
+      "label": "Brecha de backlinks",
+      "meaning": "Fuentes que enlazan a competidores y faltan en el perfil analizado.",
+      "avoid": "Una brecha es una oportunidad a evaluar, no una recomendación automática de adquisición.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "relevancia-tematica",
+      "label": "Relevancia temática",
+      "meaning": "Afinidad entre el tema de una fuente y el contenido al que enlaza.",
+      "avoid": "Relevancia temática no es una puntuación de autoridad ni una garantía de posicionamiento.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "riesgo-enlaces",
+      "label": "Riesgo del perfil",
+      "meaning": "Señales que requieren revisión del perfil de enlaces.",
+      "avoid": "Un score de spam o toxicidad no demuestra una penalización ni autoriza un disavow automático.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    }
+  ],
+  "files": [
+    {
+      "file": "authority-autoridad-dominio-rest-dark.svg",
+      "glyph": "autoridad-dominio",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-dominio-response-dark.svg",
+      "glyph": "autoridad-dominio",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-dominio-rest-light.svg",
+      "glyph": "autoridad-dominio",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-dominio-response-light.svg",
+      "glyph": "autoridad-dominio",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-pagina-rest-dark.svg",
+      "glyph": "autoridad-pagina",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-pagina-response-dark.svg",
+      "glyph": "autoridad-pagina",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-pagina-rest-light.svg",
+      "glyph": "autoridad-pagina",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-pagina-response-light.svg",
+      "glyph": "autoridad-pagina",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-marca-rest-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-marca-response-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-marca-rest-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-autoridad-marca-response-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-backlink-rest-dark.svg",
+      "glyph": "backlink",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-backlink-response-dark.svg",
+      "glyph": "backlink",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-backlink-rest-light.svg",
+      "glyph": "backlink",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-backlink-response-light.svg",
+      "glyph": "backlink",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-dominios-referentes-rest-dark.svg",
+      "glyph": "dominios-referentes",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-dominios-referentes-response-dark.svg",
+      "glyph": "dominios-referentes",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-dominios-referentes-rest-light.svg",
+      "glyph": "dominios-referentes",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-dominios-referentes-response-light.svg",
+      "glyph": "dominios-referentes",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-perfil-enlaces-rest-dark.svg",
+      "glyph": "perfil-enlaces",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-perfil-enlaces-response-dark.svg",
+      "glyph": "perfil-enlaces",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-perfil-enlaces-rest-light.svg",
+      "glyph": "perfil-enlaces",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-perfil-enlaces-response-light.svg",
+      "glyph": "perfil-enlaces",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-anchor-text-rest-dark.svg",
+      "glyph": "anchor-text",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-anchor-text-response-dark.svg",
+      "glyph": "anchor-text",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-anchor-text-rest-light.svg",
+      "glyph": "anchor-text",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-anchor-text-response-light.svg",
+      "glyph": "anchor-text",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-nuevos-rest-dark.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-nuevos-response-dark.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-nuevos-rest-light.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-nuevos-response-light.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-perdidos-rest-dark.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-perdidos-response-dark.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-perdidos-rest-light.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-perdidos-response-light.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-rotos-rest-dark.svg",
+      "glyph": "enlaces-rotos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-rotos-response-dark.svg",
+      "glyph": "enlaces-rotos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-rotos-rest-light.svg",
+      "glyph": "enlaces-rotos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-enlaces-rotos-response-light.svg",
+      "glyph": "enlaces-rotos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-brecha-backlinks-rest-dark.svg",
+      "glyph": "brecha-backlinks",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-brecha-backlinks-response-dark.svg",
+      "glyph": "brecha-backlinks",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-brecha-backlinks-rest-light.svg",
+      "glyph": "brecha-backlinks",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-brecha-backlinks-response-light.svg",
+      "glyph": "brecha-backlinks",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-relevancia-tematica-rest-dark.svg",
+      "glyph": "relevancia-tematica",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-relevancia-tematica-response-dark.svg",
+      "glyph": "relevancia-tematica",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-relevancia-tematica-rest-light.svg",
+      "glyph": "relevancia-tematica",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-relevancia-tematica-response-light.svg",
+      "glyph": "relevancia-tematica",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-riesgo-enlaces-rest-dark.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-riesgo-enlaces-response-dark.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-riesgo-enlaces-rest-light.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "authority-riesgo-enlaces-response-light.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    }
+  ]
+}

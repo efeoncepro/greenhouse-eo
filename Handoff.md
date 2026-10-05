@@ -4,6 +4,7 @@
 
 **TASK-2001 (04/10):** Greenhouse `20f57c4cd` enviado a develop; CI/staging en verificación, main pendiente. Studio `f72e408` local/API 1.8.0; owned productivo OFF. Resend/HubSpot/WP y replay PG PASS. Faltan configuración M2M y QA UI de Claude; Marketing Cloud preparado, MCP delegado TASK-2003. [Evidencia y pasos](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
 
+
 **Marketing Studio — cierre 04/10:** main `74073de`, API 1.6.0/59 tools y catálogo v1/52 canales desplegados; worker `/health` verificado. `pnpm studio` disponible localmente en Greenhouse: API-only, cargas/descargas, copys/canales y dryRun por defecto; 18 tests y lectura/dryRun autenticados PASS. [Cierre y evidencias](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md). Pendientes: backfill humano de 134 registros (`efeonce_operations`), ICP 1906/1892 y autoridad de catálogo; MCP write retirado como requisito (1899), sin federación nueva. Greenhouse/gateway sin release. Video 1998/1999 sigue completo; estado de 1894 en [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
 **Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.
@@ -13,7 +14,7 @@
 
 Staging: ISSUE-178 resuelto.
 
-**SEO / Studio / Insights (04/10):** [reparto y pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md). SEO: 80 hijas, 37 abiertas. Editorial en Studio, informes en Insights. Ajuste documental; implementación pendiente.
+**SEO / Studio / Insights (04/10):** [ownership](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md); [discovery1690](docs/audits/seo/2026-10-04-task-1690-discovery.md). UI por seleccionar; código pendiente.
 
 **Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».
 

@@ -112,6 +112,23 @@ alcance de esta task. Tres cosas sí la tocan:
 
 Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera del alcance de esta task.
 
+## Discovery vigente — 2026-10-04
+
+[Discovery consolidado](../../audits/seo/2026-10-04-task-1690-discovery.md), ejecutado con tres
+subagentes autorizados: contratos/data, fixtures/anti-regresión y UX/reuso. Decisión: clics y CTR
+de Search Console encabezan el Resumen; sin rank, el seguimiento se declara pendiente y **no**
+se sustituye por posición GSC. Rank-only y fallos parciales conservan sus regiones independientes.
+
+Las notas anteriores son historia: cola OFF y fallback local están supersedidos por el ledger ON
+del 29/08; el destacado consume orden canónico TASK-1700. `resolveActiveSeoTarget` ya usa
+`resolveUnambiguousSeoTarget` (ISSUE-153), sin elegir mercado al azar. El reader real es
+`readSeoOverviewKpis`; antes de componerlo hay que conservar ceros medidos en la ventana previa
+en su owner, porque hoy `hasAnyVolume` confunde cero real con ausencia. No recalcular en UI.
+
+Contrato aditivo y matriz ampliada documentados en el discovery. Baseline: 53 tests existentes
+PASS; sin matriz nueva, código, consulta PG, readback live o GVC nuevo. Propuesta Product Design
+pendiente de selección; consumer UI sigue como follow-up separado todavía sin ID.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -127,7 +144,7 @@ Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera de
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `Sin empezar` — ubicación in-progress y registro conciliados el 2026-09-09 al incluir el movimiento existente en el commit completo autorizado; sin evidencia nueva de implementación. Hallazgo medido en el cierre de TASK-1310
+- Status real: `Diseno` — discovery completado el 2026-10-04 y decisión de fuentes registrada; implementación pendiente, propuesta UI pendiente de selección. Baseline existente: 53 tests PASS; sin evidencia nueva de runtime.
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -217,6 +234,8 @@ Reglas obligatorias:
 
 - `src/lib/growth/seo/client/read-seo-client-surface.ts`
 - `src/lib/growth/seo/client/mock-surface.ts`
+- `src/lib/growth/seo/overview/read-overview-kpis.ts` + tests (discovery 2026-10-04:
+  preservar cero medido en ventana previa, usando cobertura y no volumen)
 - `src/lib/growth/seo/client/select-featured-series.ts` + su test (Slice 4: ordenar por clics en
   juego, no por mejor posición)
 - `src/app/(dashboard)/growth/seo/mockup/page.tsx` + `report/mockup/page.tsx` (selector `?fixture=`)
@@ -230,7 +249,7 @@ Reglas obligatorias:
 - `readSeoClientSurface(organizationId)` compone `readSeoOverviewConnection` + `resolveActiveSeoTargetId`
   + `readRankEvolution` + `readSeoAeoGap` con `Promise.allSettled` y expone `rankReaderFailed`/`gapReaderFailed`.
 - `readSeoOverviewConnection` resuelve `connected | not_connected | no_snapshots` **desde `seo_gsc_daily`**.
-- `readOverviewKpis` (`src/lib/growth/seo/overview/read-overview-kpis.ts`) ya suma `clicks`, calcula
+- `readSeoOverviewKpis` (`src/lib/growth/seo/overview/read-overview-kpis.ts`) ya suma `clicks`, calcula
   CTR como `SUM(clicks)/SUM(impressions)` del período y trae la ventana `previous` con `null` honesto
   cuando no hay período anterior con datos. **Ningún consumer cliente lo lee** (verificado).
 - `SEO_CLIENT_MOCK_SURFACE`: un único fixture poblado, consumido por las dos rutas `/mockup`.
@@ -242,8 +261,8 @@ Reglas obligatorias:
   la vista como ausencia genérica, y el consumer no tiene con qué nombrar la fuente faltante.
 - No existe fixture para: onboarding (GSC sí / rank no), muestra escasa, sin AEO, fallo parcial de un
   reader, ni locked. El arnés sólo puede exhibir el caso feliz.
-- `resolveActiveSeoTarget` hace `ORDER BY created_at DESC LIMIT 1`: hoy nadie tiene dos targets, así que
-  es correcto por suerte, no por diseño. Fuera de alcance acá; ver Follow-ups.
+- `resolveActiveSeoTarget` ya usa `resolveUnambiguousSeoTarget` (ISSUE-153); el wrapper por ID pierde
+  la razón de null. Falta distinguir sin configurar de mercado ambiguo, sin selector nuevo en esta task.
 
 ## Modular Placement Contract
 
@@ -354,7 +373,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Clics y CTR en la cara del cliente (Delta 2026-08-15)
 
-- `readSeoClientSurface` compone también `readOverviewKpis` y expone **clics** y **CTR** con su
+- `readSeoClientSurface` compone también `readSeoOverviewKpis` y expone **clics** y **CTR** con su
   comparación de ventana previa. Sin consultas nuevas: el reader ya existe, ya suma `clicks`, ya
   calcula CTR como razón de sumas y ya trae `previous`.
 - **CTR = `SUM(clicks)/SUM(impressions)` del período, NUNCA el promedio de los CTR diarios.** El
@@ -407,7 +426,7 @@ declara la cobertura.
 | Elegir "derivar de GSC" y que el número no coincida con el del cockpit operador | data quality | media | una sola derivación compartida; declarar la fuente junto al número | test de paridad operador↔cliente |
 | La cobertura se agrega al DTO y ningún consumer la usa | producto | media | el follow-up UI queda declarado y enlazado desde esta task | revisión al cierre |
 | Fixture con datos de un cliente real | privacidad | baja | dominios y keywords de ejemplo, revisados en review | code review |
-| CTR reimplementado en la superficie como promedio de CTR diarios | data quality | media | el cálculo se consume del reader, no se recalcula; test que compara contra `readOverviewKpis` | test de paridad |
+| CTR reimplementado en la superficie como promedio de CTR diarios | data quality | media | el cálculo se consume del reader, no se recalcula; test que compara contra `readSeoOverviewKpis` | test de paridad |
 | Delta de clics contra cero cuando no hay período previo | data quality | media | `previous: null` se rinde como "primer período con datos" | test del caso sin ventana previa |
 
 ### Feature flags / cutover
@@ -452,9 +471,10 @@ Ninguna.
 - [ ] Ninguna ausencia se rinde como `0` ni dos fuentes se promedian en un número.
 - [ ] El caso feliz (organización con ambas fuentes) no cambia: no-regresión verificada con sesión de
       cliente real.
-- [ ] La decisión sobre el origen del Resumen cuando falta rank queda escrita con su rationale.
+- [x] La decisión sobre el origen del Resumen cuando falta rank queda escrita con su rationale.
+      Evidencia: discovery 2026-10-04; clics/CTR GSC al frente y seguimiento rank pendiente explícito.
 - [ ] La superficie cliente muestra **clics** y **CTR** con comparación de ventana previa, tomados de
-      `readOverviewKpis`; el CTR es razón de sumas del período, nunca promedio de CTR diarios
+      `readSeoOverviewKpis`; el CTR es razón de sumas del período, nunca promedio de CTR diarios
       (verificado por test de paridad contra el reader).
 - [ ] Sin período anterior con datos, la superficie declara "primer período con datos" y **no** rinde
       un delta contra cero.
@@ -483,15 +503,14 @@ Ninguna.
 
 - **Consumer UI de la ausencia declarada** (`ui-ux`): cómo el Resumen rinde "el seguimiento de posición
   todavía no arrancó" sin leerse como error ni como cero. Bloqueado por esta task.
-- **Multi-target por organización**: `resolveActiveSeoTarget` toma el más reciente con `LIMIT 1`. Hoy
-  ninguna organización tiene dos, así que es correcto por suerte. Cuando exista la segunda, la superficie
-  debe declarar qué dominio muestra o dejar elegir.
+- **Selector de mercado/target**: la resolución canónica ya rechaza mercados ambiguos (ISSUE-153).
+  Esta task conserva la razón de ausencia; selección interactiva de mercado queda fuera de alcance.
 
 ## Open Questions
 
-1. Cuando hay GSC y no hay rank, ¿el Resumen deriva su posición media de Search Console o declara que el
-   seguimiento no arrancó? Propuesta: **declarar**, porque el retainer promete seguimiento de posición y
-   sustituirlo en silencio por otra fuente vuelve a mezclar señales — pero la decisión es de producto y
-   debe quedar escrita con su rationale, no inferida por quien tome la task.
+1. **Resuelta en discovery 2026-10-04:** cuando hay GSC sin rank, el Resumen muestra clics/CTR GSC y
+   declara seguimiento pendiente. No sustituye posición rank por GSC; rationale en discovery.
+2. Pendiente para el plan: umbrales de densidad/frescura y contrato de exposición compartida;
+   hoy sólo portal/mockups consumen el compositor. Propuesta visual pendiente de selección.
 2. ¿El estado `locked` merece fixture propio o basta con la ruta real sin `module_assignment`? Propuesta:
    fixture, para que el teaser sea revisable sin tocar entitlements de una organización real.

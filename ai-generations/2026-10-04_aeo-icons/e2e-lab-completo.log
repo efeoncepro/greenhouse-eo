@@ -1,0 +1,313 @@
+
+Running 80 tests using 5 workers
+
+(node:18611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18616) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 [chromium] › src/test/e2e/lab.spec.ts:12:1 › catalog exposes static pattern contracts (449ms)
+  ✓   5 [chromium] › src/test/e2e/lab.spec.ts:20:1 › pattern detail is keyboard reachable and responsive (485ms)
+  ✓   6 [chromium] › src/test/e2e/lab.spec.ts:27:1 › catalog search has an honest empty state (142ms)
+  ✓   7 [chromium] › src/test/e2e/lab.spec.ts:34:1 › migrated color reference is token-backed and public (140ms)
+  ✓   8 [chromium] › src/test/e2e/lab.spec.ts:40:1 › migrated typography reference exposes semantic roles (126ms)
+  ✓   3 [chromium] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (752ms)
+  ✓  11 [chromium] › src/test/e2e/lab.spec.ts:1137:1 › migrated geometry reference exposes spacing and radius roles (162ms)
+  ✓  12 [chromium] › src/test/e2e/lab.spec.ts:1144:1 › migrated elevation reference exposes semantic roles (150ms)
+  ✓  10 [chromium] › src/test/e2e/lab.spec.ts:1032:1 › creative typography reference keeps the selection composition ordered at 676 px (448ms)
+  ✓  14 [chromium] › src/test/e2e/lab.spec.ts:1161:1 › button reference exposes native controls and reduced-motion fallback (221ms)
+  ✓  13 [chromium] › src/test/e2e/lab.spec.ts:1151:1 › button reference preserves the full light/dark board without page overflow (292ms)
+  ✓  15 [chromium] › src/test/e2e/lab.spec.ts:1171:1 › chip reference preserves variants, feedback atoms and motion fallback (204ms)
+  ✓  16 [chromium] › src/test/e2e/lab.spec.ts:1185:1 › breadcrumbs reference preserves ports, semantic kinds and overflow interaction (405ms)
+  ✓  17 [chromium] › src/test/e2e/lab.spec.ts:1203:1 › floating surface reference preserves six variants, roles and reduced-motion fallback (296ms)
+  ✓   2 [chromium] › src/test/e2e/cast-photo.spec.ts:3:1 › photographic cast reference: the five with their views, Julio and Nexa with 25 expressions by group, no horizontal scroll (2.0s)
+  -  20 [chromium] › src/test/e2e/lab.spec.ts:1287:1 › loaders reference preserves all scenes and reduced motion on mobile
+  ✓  18 [chromium] › src/test/e2e/lab.spec.ts:1222:1 › motion reference preserves token scales, replay controls and final no-motion state (301ms)
+  ✓  19 [chromium] › src/test/e2e/lab.spec.ts:1268:1 › loaders reference exposes the twelve real scenes and states on desktop (266ms)
+  -  22 [chromium] › src/test/e2e/lab.spec.ts:1384:1 › disclosure reference preserves reduced motion and responsive semantics on mobile
+  -  24 [chromium] › src/test/e2e/lab.spec.ts:1478:1 › charts reference preserves composition captures, keyboard selection and reduced motion on mobile
+  ✓  21 [chromium] › src/test/e2e/lab.spec.ts:1334:1 › disclosure reference preserves Greenhouse triggers and interaction contracts on desktop (481ms)
+  ✓  23 [chromium] › src/test/e2e/lab.spec.ts:1445:1 › charts reference exposes the five real compositions and interactions on desktop (500ms)
+  ✓  25 [chromium] › src/test/e2e/lab.spec.ts:1510:1 › pure UI pattern references expose semantic fixtures (655ms)
+  ✓   1 [chromium] › src/test/e2e/cast-2d.spec.ts:3:1 › 2d cast reference: the four, views and expressions from the package, light and dark ground, no horizontal scroll (3.3s)
+  ✓  27 [chromium] › src/test/e2e/lab.spec.ts:1579:1 › graphic line page: no duplicated SVG ids, and in every sweep frame the light is concentric with its ring (614ms)
+  ✓   9 [chromium] › src/test/e2e/lab.spec.ts:47:1 › creative typography reference presents the public team guide without internal notes (3.0s)
+  ✘  31 [chromium] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll (255ms)
+  ✓  29 [chromium] › src/test/e2e/lab.spec.ts:1654:1 › manzanitas reference complements La órbita, recolors every accent with one selector and paints the nine charts from the package (775ms)
+(node:18692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  26 [chromium] › src/test/e2e/lab.spec.ts:1517:1 › graphic line reference renders the orbit, its tokens and the logo rules (1.8s)
+  ✓  32 [chromium] › src/test/e2e/lab.spec.ts:1768:1 › ai visibility report reference draws the four severity states live, switches pages by locale and audience, and has no horizontal scroll (874ms)
+  ✓  33 [chromium] › src/test/e2e/lab.spec.ts:1746:1 › seo/aeo reference shows the four sub-brands from the package in three variants, with no horizontal scroll (762ms)
+  ✓  30 [chromium] › src/test/e2e/lab.spec.ts:1624:1 › glitch reference says it applies only to Glitch, labels each status in text and has no horizontal scroll (1.9s)
+  ✓  36 [chromium] › src/test/e2e/lab.spec.ts:1862:1 › email reference renders the footer live from the package, swaps the slogan by line, switches the Insights boards and has no horizontal scroll (954ms)
+  ✓  37 [chromium] › src/test/e2e/lab.spec.ts:1943:1 › social profiles reference shows each network with its safe zones, the covers by network, the nine highlights and no horizontal scroll (2.1s)
+  ✓  39 [chromium] › src/test/e2e/nexa-suit.spec.ts:3:1 › nexa suit reference: only Nexa, only cine; views from the package, groups switch, masters listed, no horizontal scroll (920ms)
+  ✘  28 [chromium] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state (5.4s)
+(node:18708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  34 [chromium] › src/test/e2e/lab.spec.ts:1814:1 › surfaces reference lists the six surfaces, shows each recipe with its status in text and has no horizontal scroll (5.3s)
+(node:18725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  41 [mobile] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (1.1s)
+  ✓  38 [chromium] › src/test/e2e/lab.spec.ts:1976:1 › sparks reference shows the cast from the package, switches view groups, links the masters and has no horizontal scroll (3.9s)
+(node:18735) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  35 [chromium] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc (5.7s)
+  ✓  44 [mobile] › src/test/e2e/lab.spec.ts:12:1 › catalog exposes static pattern contracts (482ms)
+  ✓  40 [chromium] › src/test/e2e/nexa-suit.spec.ts:37:1 › nexa suit media resolve from the public bucket (2.8s)
+  ✓  45 [mobile] › src/test/e2e/lab.spec.ts:27:1 › catalog search has an honest empty state (251ms)
+(node:18755) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18759) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  46 [mobile] › src/test/e2e/lab.spec.ts:40:1 › migrated typography reference exposes semantic roles (224ms)
+  ✓  43 [mobile] › src/test/e2e/cast-photo.spec.ts:3:1 › photographic cast reference: the five with their views, Julio and Nexa with 25 expressions by group, no horizontal scroll (1.9s)
+  ✓  42 [mobile] › src/test/e2e/cast-2d.spec.ts:3:1 › 2d cast reference: the four, views and expressions from the package, light and dark ground, no horizontal scroll (1.8s)
+  -  50 [mobile] › src/test/e2e/lab.spec.ts:1032:1 › creative typography reference keeps the selection composition ordered at 676 px
+  ✓  47 [mobile] › src/test/e2e/lab.spec.ts:20:1 › pattern detail is keyboard reachable and responsive (678ms)
+  ✓  51 [mobile] › src/test/e2e/lab.spec.ts:1137:1 › migrated geometry reference exposes spacing and radius roles (354ms)
+  ✓  49 [mobile] › src/test/e2e/lab.spec.ts:34:1 › migrated color reference is token-backed and public (630ms)
+  ✓  52 [mobile] › src/test/e2e/lab.spec.ts:1144:1 › migrated elevation reference exposes semantic roles (289ms)
+  ✓  54 [mobile] › src/test/e2e/lab.spec.ts:1161:1 › button reference exposes native controls and reduced-motion fallback (432ms)
+  ✓  53 [mobile] › src/test/e2e/lab.spec.ts:1151:1 › button reference preserves the full light/dark board without page overflow (674ms)
+  ✓  55 [mobile] › src/test/e2e/lab.spec.ts:1171:1 › chip reference preserves variants, feedback atoms and motion fallback (528ms)
+  -  59 [mobile] › src/test/e2e/lab.spec.ts:1268:1 › loaders reference exposes the twelve real scenes and states on desktop
+  ✓  56 [mobile] › src/test/e2e/lab.spec.ts:1185:1 › breadcrumbs reference preserves ports, semantic kinds and overflow interaction (832ms)
+  ✓  57 [mobile] › src/test/e2e/lab.spec.ts:1203:1 › floating surface reference preserves six variants, roles and reduced-motion fallback (778ms)
+  -  61 [mobile] › src/test/e2e/lab.spec.ts:1334:1 › disclosure reference preserves Greenhouse triggers and interaction contracts on desktop
+  -  63 [mobile] › src/test/e2e/lab.spec.ts:1445:1 › charts reference exposes the five real compositions and interactions on desktop
+  ✓  58 [mobile] › src/test/e2e/lab.spec.ts:1222:1 › motion reference preserves token scales, replay controls and final no-motion state (817ms)
+  ✓  62 [mobile] › src/test/e2e/lab.spec.ts:1384:1 › disclosure reference preserves reduced motion and responsive semantics on mobile (936ms)
+  ✓  60 [mobile] › src/test/e2e/lab.spec.ts:1287:1 › loaders reference preserves all scenes and reduced motion on mobile (1.2s)
+  ✓  64 [mobile] › src/test/e2e/lab.spec.ts:1478:1 › charts reference preserves composition captures, keyboard selection and reduced motion on mobile (1.0s)
+  ✓  65 [mobile] › src/test/e2e/lab.spec.ts:1510:1 › pure UI pattern references expose semantic fixtures (1.3s)
+  ✓  48 [mobile] › src/test/e2e/lab.spec.ts:47:1 › creative typography reference presents the public team guide without internal notes (4.9s)
+  ✓  67 [mobile] › src/test/e2e/lab.spec.ts:1579:1 › graphic line page: no duplicated SVG ids, and in every sweep frame the light is concentric with its ring (1.9s)
+  ✓  69 [mobile] › src/test/e2e/lab.spec.ts:1624:1 › glitch reference says it applies only to Glitch, labels each status in text and has no horizontal scroll (1.3s)
+  ✘  71 [mobile] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll (599ms)
+(node:18869) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  70 [mobile] › src/test/e2e/lab.spec.ts:1654:1 › manzanitas reference complements La órbita, recolors every accent with one selector and paints the nine charts from the package (1.1s)
+  ✓  72 [mobile] › src/test/e2e/lab.spec.ts:1746:1 › seo/aeo reference shows the four sub-brands from the package in three variants, with no horizontal scroll (1.6s)
+  ✓  66 [mobile] › src/test/e2e/lab.spec.ts:1517:1 › graphic line reference renders the orbit, its tokens and the logo rules (5.2s)
+  ✓  73 [mobile] › src/test/e2e/lab.spec.ts:1768:1 › ai visibility report reference draws the four severity states live, switches pages by locale and audience, and has no horizontal scroll (2.0s)
+  ✘  68 [mobile] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state (5.6s)
+(node:18900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  74 [mobile] › src/test/e2e/lab.spec.ts:1814:1 › surfaces reference lists the six surfaces, shows each recipe with its status in text and has no horizontal scroll (3.9s)
+  ✓  76 [mobile] › src/test/e2e/lab.spec.ts:1862:1 › email reference renders the footer live from the package, swaps the slogan by line, switches the Insights boards and has no horizontal scroll (2.1s)
+  ✓  77 [mobile] › src/test/e2e/lab.spec.ts:1943:1 › social profiles reference shows each network with its safe zones, the covers by network, the nine highlights and no horizontal scroll (2.5s)
+  ✓  79 [mobile] › src/test/e2e/nexa-suit.spec.ts:3:1 › nexa suit reference: only Nexa, only cine; views from the package, groups switch, masters listed, no horizontal scroll (1.2s)
+  ✓  80 [mobile] › src/test/e2e/nexa-suit.spec.ts:37:1 › nexa suit media resolve from the public bucket (1.1s)
+  ✘  75 [mobile] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc (5.8s)
+  ✓  78 [mobile] › src/test/e2e/lab.spec.ts:1976:1 › sparks reference shows the cast from the package, switches view groups, links the masters and has no horizontal scroll (3.8s)
+
+
+  1) [chromium] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.ico-tile')
+    Expected: 88
+    Received: 99
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('.ico-tile')
+        14 × locator resolved to 99 elements
+           - unexpected value "99"
+
+
+      1607 |   await expect(page.getByRole('heading', { level: 1, name: /Dos voces, una esfera/ })).toBeVisible()
+      1608 |   await expect(page.locator('.ico-why-card')).toHaveCount(5)
+    > 1609 |   await expect(page.locator('.ico-tile')).toHaveCount(88)
+           |                                           ^
+      1610 |   await page.getByRole('button', { name: 'Plastilina', exact: true }).click()
+      1611 |   await expect(page.locator('.ico-tile:not([hidden])')).toHaveCount(49)
+      1612 |   await page.getByRole('button', { name: 'Papel' }).click()
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1609:43
+
+    Error Context: test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll 
+
+    Error: expect(received).toBeTruthy()
+
+    Received: ""
+
+      1705 |   await expect(page.locator('[data-ins-sample]')).toContainText('Greenhouse Demo')
+      1706 |   await expect(page.locator('[data-ins-asset]')).toHaveCount(6)
+    > 1707 |   for (const img of await page.locator('main img').all()) expect(await img.getAttribute('alt')).toBeTruthy()
+           |                                                                                                 ^
+      1708 |   const json = await (await page.request.get('/references/insights.json')).json()
+      1709 |   expect(json.schema).toBe('axis.efeonce-insights-reference.v2')
+      1710 |   expect(json.designSystem.home).toBe('AXIS')
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1707:97
+
+    Error Context: test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-dkr-open]')
+    Expected: 94
+    Received: 100
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('[data-dkr-open]')
+        14 × locator resolved to 100 elements
+           - unexpected value "100"
+
+
+      1836 | test('deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc', async ({ page }) => {
+      1837 |   await page.goto('/references/surfaces/deck/')
+    > 1838 |   await expect(page.locator('[data-dkr-open]')).toHaveCount(94)
+           |                                                 ^
+      1839 |   const dialog = page.locator('[data-dkr-dialog]')
+      1840 |
+      1841 |   await page.locator('[data-dkr-open="section-split"]').click()
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1838:49
+
+    Error Context: test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [mobile] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.ico-tile')
+    Expected: 88
+    Received: 99
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('.ico-tile')
+        14 × locator resolved to 99 elements
+           - unexpected value "99"
+
+
+      1607 |   await expect(page.getByRole('heading', { level: 1, name: /Dos voces, una esfera/ })).toBeVisible()
+      1608 |   await expect(page.locator('.ico-why-card')).toHaveCount(5)
+    > 1609 |   await expect(page.locator('.ico-tile')).toHaveCount(88)
+           |                                           ^
+      1610 |   await page.getByRole('button', { name: 'Plastilina', exact: true }).click()
+      1611 |   await expect(page.locator('.ico-tile:not([hidden])')).toHaveCount(49)
+      1612 |   await page.getByRole('button', { name: 'Papel' }).click()
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1609:43
+
+    Error Context: test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-mobile/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-iconography-reference--c9af1--keeps-a-honest-empty-state-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [mobile] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll 
+
+    Error: expect(received).toBeTruthy()
+
+    Received: ""
+
+      1705 |   await expect(page.locator('[data-ins-sample]')).toContainText('Greenhouse Demo')
+      1706 |   await expect(page.locator('[data-ins-asset]')).toHaveCount(6)
+    > 1707 |   for (const img of await page.locator('main img').all()) expect(await img.getAttribute('alt')).toBeTruthy()
+           |                                                                                                 ^
+      1708 |   const json = await (await page.request.get('/references/insights.json')).json()
+      1709 |   expect(json.schema).toBe('axis.efeonce-insights-reference.v2')
+      1710 |   expect(json.designSystem.home).toBe('AXIS')
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1707:97
+
+    Error Context: test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-mobile/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-insights-reference-sho-99923-ta-and-no-horizontal-scroll-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [mobile] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-dkr-open]')
+    Expected: 94
+    Received: 100
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('[data-dkr-open]')
+        14 × locator resolved to 100 elements
+           - unexpected value "100"
+
+
+      1836 | test('deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc', async ({ page }) => {
+      1837 |   await page.goto('/references/surfaces/deck/')
+    > 1838 |   await expect(page.locator('[data-dkr-open]')).toHaveCount(94)
+           |                                                 ^
+      1839 |   const dialog = page.locator('[data-dkr-dialog]')
+      1840 |
+      1841 |   await page.locator('[data-dkr-open="section-split"]').click()
+        at /Users/jreye/Documents/axis-design-system/apps/lab/src/test/e2e/lab.spec.ts:1838:49
+
+    Error Context: test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-mobile/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/lab-deck-slide-recipes-94--9c8b5-s-steps-and-closes-with-Esc-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state 
+    [chromium] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll 
+    [chromium] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc 
+    [mobile] › src/test/e2e/lab.spec.ts:1605:1 › iconography reference renders both voices, filters and keeps a honest empty state 
+    [mobile] › src/test/e2e/lab.spec.ts:1701:1 › insights reference shows the mark from the package, the report and the live UI, with sample data and no horizontal scroll 
+    [mobile] › src/test/e2e/lab.spec.ts:1836:1 › deck slide recipes: 94 cards by family, the enlarged view opens, deep-links, steps and closes with Esc 
+  7 skipped
+  67 passed (25.7s)
+undefined
+/Users/jreye/Documents/axis-design-system/apps/lab:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: playwright test

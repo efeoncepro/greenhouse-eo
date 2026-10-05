@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /Users/jreye/Documents/axis-design-system/apps/lab
+
+
+ Test Files  18 passed (18)
+      Tests  117 passed (117)
+   Start at  09:10:55
+   Duration  690ms (transform 2.27s, setup 0ms, import 3.56s, tests 332ms, environment 1ms)
+

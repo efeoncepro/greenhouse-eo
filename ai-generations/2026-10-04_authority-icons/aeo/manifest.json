@@ -1,0 +1,883 @@
+{
+  "schema": "axis.aeo-iconography-export.v1",
+  "status": "mixed",
+  "revision": "brand-authority-candidate",
+  "catalog": [
+    {
+      "key": "autoridad-marca",
+      "label": "Brand Authority",
+      "meaning": "Reconocimiento y credibilidad de una marca dentro de su categoría.",
+      "avoid": "Concepto compartido por SEO y AEO. No es DA, una mención aislada ni un score universal de IA. Si se usa Brand Authority de Moz, declarar ese proveedor y su método.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "respuesta-ia",
+      "label": "Respuesta de IA",
+      "meaning": "Respuesta entregada por el motor.",
+      "avoid": "No representa el campo donde se escribe el prompt.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "mencion-marca",
+      "label": "Mención de marca",
+      "meaning": "La marca aparece nombrada en la respuesta.",
+      "avoid": "Una mención no acredita una cita, un enlace ni una recomendación.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "fuente",
+      "label": "Fuente",
+      "meaning": "Página o documento que respalda información.",
+      "avoid": "No implica que el motor haya citado la fuente.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "entidad",
+      "label": "Entidad",
+      "meaning": "Marca, persona o producto con identidad y relaciones.",
+      "avoid": "No representa una red social ni un modelo de IA.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "atribucion",
+      "label": "Atribución",
+      "meaning": "A quién se reconoce como autor de una idea o información.",
+      "avoid": "Aparecer mencionado no demuestra que la autoría se atribuya correctamente.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "recomendacion-ia",
+      "label": "Recomendación",
+      "meaning": "Una opción elegida o recomendada dentro de la respuesta.",
+      "avoid": "No confundir con una mención neutral ni con una garantía de resultado.",
+      "group": "Presencia y evidencia",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "consultas-relacionadas",
+      "label": "Consultas relacionadas",
+      "meaning": "Una consulta se ramifica en búsquedas relacionadas.",
+      "avoid": "La ramificación documentada por Google no describe a todos los motores.",
+      "group": "Investigación y cobertura",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "recuperacion",
+      "label": "Recuperación de información",
+      "meaning": "Se localiza un pasaje relevante en una fuente.",
+      "avoid": "Recuperar información no demuestra que se cite o se recomiende.",
+      "group": "Investigación y cobertura",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "cobertura-preguntas",
+      "label": "Cobertura de preguntas",
+      "meaning": "Presencia observada dentro de un conjunto definido de preguntas.",
+      "avoid": "La figura no codifica un porcentaje: se acompaña del dato y su denominador.",
+      "group": "Investigación y cobertura",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "cobertura-motores",
+      "label": "Cobertura de motores",
+      "meaning": "Presencia observada en motores o superficies identificados.",
+      "avoid": "No suma ni promedia métricas de motores distintos; no sustituye sus isotipos.",
+      "group": "Investigación y cobertura",
+      "origin": "new",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "composer",
+      "label": "Prompt",
+      "meaning": "Consulta escrita en el composer.",
+      "avoid": "No es la respuesta del motor.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "buscador",
+      "label": "Búsqueda",
+      "meaning": "Búsqueda de información.",
+      "avoid": "No representa una plataforma concreta.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "cita",
+      "label": "Cita",
+      "meaning": "Referencia a una fuente dentro de la respuesta.",
+      "avoid": "Una mención de marca sin referencia no es una cita.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "contenido",
+      "label": "Contenido",
+      "meaning": "Producción y optimización de contenido.",
+      "avoid": "No garantiza citación.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlace",
+      "label": "Enlace",
+      "meaning": "Enlaces y referencias.",
+      "avoid": "Un enlace no es necesariamente una cita de IA.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "competencia",
+      "label": "Competencia",
+      "meaning": "Comparación entre marcas.",
+      "avoid": "La comparación necesita un conjunto y una metodología declarados.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "medicion",
+      "label": "Medición",
+      "meaning": "Medición y evolución.",
+      "avoid": "Ausencia de observaciones no equivale a cero.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "informe",
+      "label": "Informe",
+      "meaning": "Diagnóstico y reporte.",
+      "avoid": "Un snapshot no es un dato actual.",
+      "group": "Herramientas compartidas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    }
+  ],
+  "files": [
+    {
+      "file": "aeo-autoridad-marca-rest-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "aeo-autoridad-marca-response-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "aeo-autoridad-marca-rest-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "aeo-autoridad-marca-response-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "aeo-respuesta-ia-rest-dark.svg",
+      "glyph": "respuesta-ia",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-respuesta-ia-response-dark.svg",
+      "glyph": "respuesta-ia",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-respuesta-ia-rest-light.svg",
+      "glyph": "respuesta-ia",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-respuesta-ia-response-light.svg",
+      "glyph": "respuesta-ia",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-mencion-marca-rest-dark.svg",
+      "glyph": "mencion-marca",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-mencion-marca-response-dark.svg",
+      "glyph": "mencion-marca",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-mencion-marca-rest-light.svg",
+      "glyph": "mencion-marca",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-mencion-marca-response-light.svg",
+      "glyph": "mencion-marca",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-fuente-rest-dark.svg",
+      "glyph": "fuente",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-fuente-response-dark.svg",
+      "glyph": "fuente",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-fuente-rest-light.svg",
+      "glyph": "fuente",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-fuente-response-light.svg",
+      "glyph": "fuente",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-entidad-rest-dark.svg",
+      "glyph": "entidad",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-entidad-response-dark.svg",
+      "glyph": "entidad",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-entidad-rest-light.svg",
+      "glyph": "entidad",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-entidad-response-light.svg",
+      "glyph": "entidad",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-atribucion-rest-dark.svg",
+      "glyph": "atribucion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-atribucion-response-dark.svg",
+      "glyph": "atribucion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-atribucion-rest-light.svg",
+      "glyph": "atribucion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-atribucion-response-light.svg",
+      "glyph": "atribucion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recomendacion-ia-rest-dark.svg",
+      "glyph": "recomendacion-ia",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recomendacion-ia-response-dark.svg",
+      "glyph": "recomendacion-ia",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recomendacion-ia-rest-light.svg",
+      "glyph": "recomendacion-ia",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recomendacion-ia-response-light.svg",
+      "glyph": "recomendacion-ia",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-consultas-relacionadas-rest-dark.svg",
+      "glyph": "consultas-relacionadas",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-consultas-relacionadas-response-dark.svg",
+      "glyph": "consultas-relacionadas",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-consultas-relacionadas-rest-light.svg",
+      "glyph": "consultas-relacionadas",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-consultas-relacionadas-response-light.svg",
+      "glyph": "consultas-relacionadas",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recuperacion-rest-dark.svg",
+      "glyph": "recuperacion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recuperacion-response-dark.svg",
+      "glyph": "recuperacion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recuperacion-rest-light.svg",
+      "glyph": "recuperacion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-recuperacion-response-light.svg",
+      "glyph": "recuperacion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-preguntas-rest-dark.svg",
+      "glyph": "cobertura-preguntas",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-preguntas-response-dark.svg",
+      "glyph": "cobertura-preguntas",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-preguntas-rest-light.svg",
+      "glyph": "cobertura-preguntas",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-preguntas-response-light.svg",
+      "glyph": "cobertura-preguntas",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-motores-rest-dark.svg",
+      "glyph": "cobertura-motores",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-motores-response-dark.svg",
+      "glyph": "cobertura-motores",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-motores-rest-light.svg",
+      "glyph": "cobertura-motores",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cobertura-motores-response-light.svg",
+      "glyph": "cobertura-motores",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-composer-rest-dark.svg",
+      "glyph": "composer",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-composer-response-dark.svg",
+      "glyph": "composer",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-composer-rest-light.svg",
+      "glyph": "composer",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-composer-response-light.svg",
+      "glyph": "composer",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-buscador-rest-dark.svg",
+      "glyph": "buscador",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-buscador-response-dark.svg",
+      "glyph": "buscador",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-buscador-rest-light.svg",
+      "glyph": "buscador",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-buscador-response-light.svg",
+      "glyph": "buscador",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cita-rest-dark.svg",
+      "glyph": "cita",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cita-response-dark.svg",
+      "glyph": "cita",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cita-rest-light.svg",
+      "glyph": "cita",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-cita-response-light.svg",
+      "glyph": "cita",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-contenido-rest-dark.svg",
+      "glyph": "contenido",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-contenido-response-dark.svg",
+      "glyph": "contenido",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-contenido-rest-light.svg",
+      "glyph": "contenido",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-contenido-response-light.svg",
+      "glyph": "contenido",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-enlace-rest-dark.svg",
+      "glyph": "enlace",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-enlace-response-dark.svg",
+      "glyph": "enlace",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-enlace-rest-light.svg",
+      "glyph": "enlace",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-enlace-response-light.svg",
+      "glyph": "enlace",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-competencia-rest-dark.svg",
+      "glyph": "competencia",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-competencia-response-dark.svg",
+      "glyph": "competencia",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-competencia-rest-light.svg",
+      "glyph": "competencia",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-competencia-response-light.svg",
+      "glyph": "competencia",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-medicion-rest-dark.svg",
+      "glyph": "medicion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-medicion-response-dark.svg",
+      "glyph": "medicion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-medicion-rest-light.svg",
+      "glyph": "medicion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-medicion-response-light.svg",
+      "glyph": "medicion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-informe-rest-dark.svg",
+      "glyph": "informe",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-informe-response-dark.svg",
+      "glyph": "informe",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-informe-rest-light.svg",
+      "glyph": "informe",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "aeo-informe-response-light.svg",
+      "glyph": "informe",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+✔ AEO candidates keep margin and sphere clearance at regular and small optical widths (2.364166ms)
+✔ AEO preserves canonical bytes and keeps candidates outside the approved catalog (1.358958ms)
+✔ mention, citation and recommendation remain three separate concepts (0.065875ms)
+✔ candidate check inputs match package geometry exactly (1.717542ms)
+✔ the catalog holds the approved set: 50 stroke and 49 plastilina glyphs, unique keys (0.821209ms)
+✔ stroke glyphs: the sphere keeps 0.5 of air from every stroke at width 1.5 (sampled geometry) (1.773833ms)
+✔ stroke glyphs: every axis point stays inside the margin (the stroke edge may reach 1.25) (5.447709ms)
+✔ stroke optical width: 1.75 at 20 px or less, 1.5 between, capped at 4 px on screen above 64 (0.113416ms)
+✔ response draws one sphere in the accent of the piece line; rest draws none (0.218375ms)
+✔ a response below 20 px falls back to rest with a warning; plastilina below 32 px is refused (0.208459ms)
+✔ plastilina response knocks the sphere out of the body; gesture only where it is drawn, in ink (0.216916ms)
+✔ icons are decorative by default and named when labelled; unknown glyphs point to the method (0.066958ms)
+✔ the icon ground is #001a33 for every line (D21) and the voice follows the line (0.059125ms)
+✔ group audit: one voice, one response, no response when the piece already has a sphere (0.154291ms)
+✔ skewed orbit hero: object at rest, back half before it, front half and arc after, one sphere (0.394375ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 58.727834
