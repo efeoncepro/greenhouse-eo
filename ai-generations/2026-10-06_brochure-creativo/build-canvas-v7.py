@@ -171,7 +171,7 @@ S['A11-medicion'] = ("88 % de las entregas, a tiempo.", page("88 % de las entreg
 # 12 · Caso Sky (papel)
 S['A12-caso-sky'] = ("25 % menos de tiempo de producción.", page("25 % menos de tiempo de producción.",
   # Comentario del operador (2026-10-06): una foto que evoque a Sky, sin su logo ni su librea (el modelo nunca dibuja la marca del cliente).
-  f'<img src="{BL("fa686a24fdb09a1f91400c88ce24e052")}" alt="Desde la ventana de un avión, el ala corta el cielo sobre la cordillera de los Andes al amanecer; en la mesa, una tablet muestra una pieza de campaña" style="position: absolute; object-fit: cover; left: 760px; top: 0; width: 1160px; height: 1080px; object-position: 78% 50%">' +
+  f'<img src="{BL("fa686a24fdb09a1f91400c88ce24e052")}" alt="Desde la ventana de un avión, el ala corta el cielo sobre la cordillera de los Andes al amanecer; en la mesa, una tablet muestra una pieza de campaña" style="position: absolute; object-fit: cover; left: 0; top: 0; width: 1920px; height: 1080px; object-position: 50% 50%">' +  # a sangre: el panel la tapa a la izquierda, sin corte visible (operador)
   f'<div style="position: absolute; left: 0; top: 0; width: 1000px; height: 1080px; background: #f7f8f6; border-top-right-radius: 320px"></div>' +
   col(f'<div style="display: flex; align-items: center; gap: 22px"><img src="{BL(SKY_NAVY)}" alt="Sky Airline" style="width: 168px; height: 62px"><span style="font-family: {ST}; font-size: 15px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6d6777">Caso · 12 meses</span></div>' +
       headline(['25 % menos de', 'tiempo de', 'producción'], 92, PAPER, '; margin-top: 60px') +
@@ -383,10 +383,8 @@ def studio_component(src):
     for a, b in CAMPAIGN_IMG.items(): h = h.replace(a, b)
     for a, b in BLOBMAP.items(): h = h.replace(a, b)
     for a, b in TEXT: h = h.replace(a, b)
-    # el nombre del producto pasa a ser la marca Creative Studio (logo generado con el generador de Marketing Studio)
-    h = _re.sub(r'<span style="font-size: 13px; font-weight: 600; color: var\(--t1\); letter-spacing: 0.01em;">Marketing Studio</span>',
-                f'<sc-if value="{{{{isDark}}}}" hint-placeholder-val="{{{{false}}}}"><img src="/_blob/{CS_LOGO_DARK}" alt="Creative Studio" style="height: 15px; width: auto; display: block;"></sc-if>'
-                f'<sc-if value="{{{{isLight}}}}" hint-placeholder-val="{{{{true}}}}"><img src="/_blob/{CS_LOGO_LIGHT}" alt="Creative Studio" style="height: 15px; width: auto; display: block;"></sc-if>', h)
+    # Comentario del operador (2026-10-06): en las interfaces de Marketing Studio el nombre va en texto, sin la esfera;
+    # Creative Studio sigue el mismo patrón (el logo con la esfera queda para la lámina, fuera de la interfaz).
     h = h.replace('Marketing Studio', 'Creative Studio')
     h = _re.sub(r'href="Studio-[A-Za-z]+\.dc\.html"', 'href="#"', h)
     return h
