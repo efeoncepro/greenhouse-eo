@@ -443,8 +443,42 @@ def orbit5():
                  f'<div style="font-family: {ST}; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe4fa">{name}</div>'
                  f'<div style="font-family: {ST}; font-size: 26px; font-weight: 600; color: #ffffff">{label}</div></div>')
     return ring + scr + sats
+# Comentario del operador (2026-10-06): «aún más punch, la UI en perspectiva elegante con las herramientas, que no se
+# vea tan plana». La órbita y la interfaz quedan sobre un mismo plano inclinado en 3D, mirando hacia el texto: detrás,
+# en profundidad, la vista de campañas; adelante, la vista Hoy; y cada herramienta flota sobre el anillo a su propia
+# altura, unida a él por un hilo con su punto. Ningún texto cruza la órbita.
+PW, PH = 1300, 880            # plano 3D (coordenadas locales)
+P3X, P3Y = 1230, 545          # centro del plano en la lámina
+PRX, PRY = 560, 360           # órbita sobre el plano
+SATZ = [(-152, 120), (-38, 170), (32, 90), (150, 150)]   # (grados sobre el anillo, altura z)
+def orbit5_3d():
+    cx, cy = PW / 2, PH / 2
+    ring = (f'<svg width="{PW}" height="{PH}" viewBox="0 0 {PW} {PH}" style="position: absolute; left: 0; top: 0" aria-hidden="true">'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="{PRX}" ry="{PRY}" fill="none" stroke="#72ded8" stroke-opacity="0.42" stroke-width="2.5"></ellipse>'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="{PRX-80}" ry="{PRY-60}" fill="none" stroke="#72ded8" stroke-opacity="0.14" stroke-width="1.5"></ellipse>'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="{PRX+70}" ry="{PRY+55}" fill="none" stroke="#72ded8" stroke-opacity="0.08" stroke-width="1"></ellipse></svg>')
+    def scr(name, theme, sc, dx, dy, z, op, border):
+        w, h = 1440 * sc, 1100 * sc
+        return (f'<div style="position: absolute; left: {cx - w/2 + dx:.0f}px; top: {cy - h/2 + dy:.0f}px; width: {w:.0f}px; height: {h:.0f}px; transform: translateZ({z}px); opacity: {op}; overflow: hidden; border-radius: 16px; border: 2px solid {border}">'
+                f'<div style="width: 1440px; height: 1100px; transform-origin: 0 0; transform: scale({sc})"><dc-import name="{name}" theme="{theme}" hint-size="1440px,1100px"></dc-import></div></div>')
+    back = scr('CS-Campaigns', 'dark', 0.46, 190, -120, -180, 0.7, 'rgba(114, 222, 216, 0.30)')
+    front = scr('CS-Home', 'light', 0.52, -60, 50, 40, 1, 'rgba(255, 255, 255, 0.45)')
+    sats = ''
+    for (blob, name, label), (deg, z) in zip(APPS, SATZ):
+        r = math.radians(deg); x, y = cx + PRX * math.cos(r), cy + PRY * math.sin(r)
+        sats += f'<div style="position: absolute; left: {x-7:.0f}px; top: {y-7:.0f}px; width: 14px; height: 14px; border-radius: 50%; background: #72ded8"></div>'
+        sats += f'<div style="position: absolute; left: {x-1:.0f}px; top: {y:.0f}px; width: 2px; height: {z}px; background: rgba(114, 222, 216, 0.55); transform-origin: 50% 0; transform: rotateX(90deg)"></div>'
+        sats += (f'<div style="position: absolute; left: {x-70:.0f}px; top: {y-70:.0f}px; width: 140px; height: 140px; transform: translateZ({z}px); border-radius: 32px; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(114, 222, 216, 0.6)">'
+                 f'<img src="{BL(blob)}" alt="{name}" style="width: 80px; height: 80px; object-fit: contain"></div>')
+        ly = y - 70 - 78 if deg < 0 else y + 70 + 14
+        sats += (f'<div style="position: absolute; left: {x-150:.0f}px; top: {ly:.0f}px; width: 300px; transform: translateZ({z}px); text-align: center; display: flex; flex-direction: column; gap: 4px">'
+                 f'<div style="font-family: {ST}; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe4fa">{name}</div>'
+                 f'<div style="font-family: {ST}; font-size: 26px; font-weight: 600; color: #ffffff">{label}</div></div>')
+    plane = (f'<div style="position: absolute; left: {P3X - PW/2:.0f}px; top: {P3Y - PH/2:.0f}px; width: {PW}px; height: {PH}px; transform-style: preserve-3d; '
+             f'transform: scale(0.84) rotateX(20deg) rotateY(-17deg) rotateZ(2deg)">{ring}{back}{front}{sats}</div>')
+    return (f'<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; perspective: 2800px; perspective-origin: {P3X}px 500px; pointer-events: none">{plane}</div>')
 S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el trabajo? En vivo.",
-  orbit5() +
+  orbit5_3d() +
   col(eyebrow('Tu día a día con Efeonce', DARK) + f'<div style="margin-top: 70px">{pair("¿Cómo sigo el trabajo?", "En vivo", 128)}</div>' +
       body('Cada herramienta gira alrededor de tu marca y <b style="font-weight: 600">todo</b> llega a Creative Studio, a la vista y sin esperar el informe.', DARK, 24, 440, '; margin-top: 48px'), 120, 480) +
   bubble(DARK)))
