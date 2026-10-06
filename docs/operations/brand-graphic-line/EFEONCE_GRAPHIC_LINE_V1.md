@@ -177,6 +177,18 @@ Engine y Voice **conservan su color** (no cambian). Los valores viven en el toke
 `#091951`) y `accentOnLight` `#8E1B82` (7,5:1 sobre papel). El naranjo de HubSpot no se usa: choca con Globe y Reach y
 es el color del partner.
 
+**El acento de la línea es puntuación, no luz** (decisión del operador, 2026-10-06, sobre el deck HubSpot). El acento
+marca: la esfera, el anillo de la pregunta, el arco que mide, la palabra final del eslogan y, en la foto, **detalles
+mínimos** (unas pocas partículas, no más de una de cada veinte, o un objeto chico como un ícono). **Nunca es la luz de
+la escena:** en la foto, la luz es el azul de Efeonce (`photo-blue` `#0375DB`) con blanco frío, como pide §9; el acento
+no tiñe caras, prendas, haces ni fondos. Caso fuente: con el magenta de Revenue-HubSpot como luz ambiente, el deck se
+leía «rosado» de punta a punta. Se compararon tres versiones en la misma toma (A: magenta en todo; B: luz azul y magenta
+sólo como puntuación; C: Growth en todo) y el operador eligió **B**: la línea sigue reconocible sin teñir la pieza, y
+el acento aprobado no cambia. Aplica a todas las líneas con acento propio (Brand, Engine, Voice, Revenue), en cine y
+en cualquier registro. Fotos aprobadas antes de esta regla que la contradicen (por ejemplo RV1b, con la luz magenta)
+se reemplazan al reutilizarlas; las variantes B y C de esa toma quedaron en el banco de
+`ai-generations/2026-10-06_deck-hubspot/fotos/`.
+
 **Reglas:** una marca, un acento por pieza · el teal es sólo de Efeonce y nunca aparece en una pieza de producto ·
 el halo toma el color del acento · nunca dos acentos en la misma órbita · los valores son sRGB: la conversión a
 CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
