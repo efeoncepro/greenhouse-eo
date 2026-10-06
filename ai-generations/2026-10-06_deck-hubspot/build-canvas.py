@@ -12,18 +12,22 @@ BODY = [
  ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
  ("B18-creditos", "¿Se acumulan los créditos? No."),
  ("B22-automatizacion", "¿Workflow o agente? Según la tarea."),
+ ("B27-workflow-creditos", "¿Un workflow gasta créditos? Si usa IA."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
  ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
  ("B24-ley", "¿Cuándo rige la nueva ley? Diciembre."),
+ ("B25-residencia", "¿Dónde quedan mis datos? Fuera de Chile."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
  ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
+ ("B26-salida", "¿Y si mañana nos vamos? Te llevas todo."),
  ("B10-evaluacion", "¿Qué recibo primero? Una decisión."),
  ("B11-olas", "¿Sumo todos los agentes juntos? No, por olas."),
  ("B12-dia-a-dia", "¿Qué llega a producción? Lo que apruebes."),
  ("B13-adopcion", "¿Cómo aprende mi equipo? A su ritmo."),
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
  ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
+ ("B28-clientes", "¿Con quién trabajan? +90 empresas."),
 ]
 BROCHURE = [("B01-portada", "Portada · ¿Mi HubSpot puede hacer más? Mucho más.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
 PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Cómo vende más mi CRM? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por alcance."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
@@ -87,6 +91,7 @@ place(PROPUESTA, 'propuesta', 'Prop-')
 # Banco de fotos del deck (operador, 2026-10-06: «guarda las demás imágenes, nos pueden servir»). Plates limpios, sin
 # texto, en ai-generations/2026-10-06_deck-hubspot/fotos/plates/. En uso = la versión que lleva el deck (luz azul, B).
 BANCO = [
+  ('RG1b-regiones', 'Regiones de datos de HubSpot desde Santiago · Tierra de noche (EN USO, lámina de residencia)', '/_blob/86b13bd7da8f1c240ad2a3b7abf68f46'),
   ('HS3b-datos-con-permiso', 'Datos con permiso · esfera azul en la palma (EN USO, lámina Ley 21.719)', '/_blob/7130e114b287b3fdbb766c9225dde27b'),
   ('HS3-datos-con-permiso', 'Datos con permiso · primera toma (la esfera invade la columna del texto)', '/_blob/bbbd1f55d6cecc9b0480f4bacb481727'),
   ('HS1-crm-se-actualiza', 'HS1 · CRM que se actualiza solo · luz magenta (versión A)', '/_blob/627b8e13e3c7727a449553cb63a265f5'),

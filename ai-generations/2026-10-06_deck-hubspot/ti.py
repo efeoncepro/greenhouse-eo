@@ -1,3 +1,4 @@
+import json
 # Láminas para quien evalúa desde TI (operador, 2026-10-06): integraciones, automatización determinística y agéntica,
 # seguridad de la plataforma y la Ley 21.719. Se ejecuta al final de build-intents.py, con su `put` en el ámbito.
 # Datos de HubSpot y de la ley: verificados en fuente oficial (ver fotos/LEEME.md § Fuentes de las láminas de TI).
@@ -60,3 +61,55 @@ put('B24-ley', {"role": "section", "recipe": "section-cine", "layout": "purpose"
   "photo": {"register": "cine", "subject": "person", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS3b-datos-con-permiso.png",
             "alt": "Un líder de RevOps de Efeonce sostiene en la palma una esfera de luz azul que protege los datos de una persona"}})
 print('láminas de TI')
+
+# Segunda tanda para TI (operador, 2026-10-06): dónde quedan los datos, la salida, el consumo de un workflow y clientes.
+put('B25-residencia', {"role": "content", "recipe": "content-markets",
+  "voice": {"eyebrow": "Residencia de datos", "question": "¿Dónde quedan mis datos?", "answer": ["Fuera de", "Chile"]},
+  "body": "En una de las **cinco** regiones de HubSpot; también hay una en Australia. La ley lo permite con garantías: DPA y cláusulas contractuales.",
+  "photo": {"register": "puesta-en-escena", "subject": "place", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG1b-regiones.png",
+            "alt": "La Tierra de noche vista desde la órbita; desde Santiago salen cuatro arcos de luz azul hacia las regiones de datos de HubSpot en EE. UU., Canadá y Fráncfort"},
+  "markets": [
+    {"country": "EE. UU.", "city": "Región Oeste", "node": [833, 268], "side": "left"},
+    {"country": "EE. UU.", "city": "Región Este", "node": [1068, 283], "side": "right"},
+    {"country": "Canadá", "city": "Región Canadá", "node": [1167, 190], "side": "right"},
+    {"country": "Alemania", "city": "Fráncfort", "node": [1645, 205], "side": "left"},
+    {"country": "Chile", "city": "Tu operación", "node": [1012, 825], "side": "right"}]})
+
+put('B26-salida', {"role": "content", "recipe": "content-bullets",
+  "voice": {"eyebrow": "Sin amarras", "question": "¿Y si mañana nos vamos?", "answer": ["Te llevas todo"]},
+  "progress": {"sections": 4, "current": 3},
+  "items": [
+    {"title": "Tus datos, exportables", "desc": "Exportas registros y propiedades cuando quieras, sin pedirle permiso a nadie."},
+    {"title": "API con versiones estables", "desc": "Todo se lee por API, con versiones que HubSpot sostiene al menos 18 meses."},
+    {"title": "Lo borrado se recupera", "desc": "Hasta 90 días para restaurar registros eliminados, en todos los planes."},
+    {"title": "Tu arquitectura, escrita", "desc": "Modelo de datos, integraciones y workflows quedan documentados y son tuyos."}],
+  "selected": 3, "selection": {"target": "object", "label": "TI", "participantKind": "department"}})
+
+put('B27-workflow-creditos', {"role": "decision", "recipe": "decision-ai-market",
+  "voice": {"eyebrow": "Workflows y créditos", "question": "¿Un workflow gasta créditos?", "answer": ["Si usa IA"]},
+  "body": "Las reglas fijas no consumen. Cada acción de IA dentro de un workflow sí, y la **medimos** antes de activarla.",
+  "figures": [
+    {"value": "10", "label": "créditos por cada acción de IA en un workflow.", "detail": "Unos USD 0,10 por acción, al precio de lista.",
+     "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
+    {"value": "0", "label": "créditos gasta un workflow sin IA.", "detail": "Asignar, notificar o actualizar un registro no consume.",
+     "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
+    {"value": "300", "label": "acciones de IA al mes con los créditos de Pro.", "detail": "Pro incluye 3.000 créditos; Enterprise, 5.000.",
+     "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO}]})
+
+CL = 'src/lib/artifact-composer/catalogs/deck-axis/assets/clients/'
+put('B28-clientes', {"role": "content", "recipe": "content-clients",
+  "voice": {"eyebrow": "Clientes", "question": "¿Con quién trabajan?", "answer": ["+90", "empresas"]},
+  "progress": {"sections": 4, "current": 4},
+  "figures": [
+    {"value": "+127%", "label": "tráfico orgánico de Sky frente a LATAM Airlines", "source": "caso publicado de Sky Airlines"},
+    {"value": "+180%", "label": "ventas digitales de Bresler", "source": "caso publicado de Bresler"}],
+  "selected": 1,
+  "clients": [{"path": CL + f, "alt": a} for f, a in [
+    ("sky.svg", "Sky Airline"), ("berel.svg", "Berel"), ("bresler.svg", "Bresler"), ("carozzi.svg", "Carozzi"),
+    ("aguas-andinas.svg", "Aguas Andinas"), ("anam.svg", "ANAM"), ("marca-chile.svg", "Marca Chile"),
+    ("gobierno-santiago.svg", "Gobierno de Santiago"), ("universidad-temuco.svg", "Universidad Católica de Temuco")]],
+  "markets": {"title": "Operamos en", "text": "Chile, EE. UU., Colombia, México y Perú"},
+  "selection": {"target": "object", "label": "Efeonce", "participantKind": "department"}})
+d = json.load(open('intents/B28-clientes.json', encoding='utf-8')); d['theme'] = 'light'; d['line'] = 'growth'
+json.dump(d, open('intents/B28-clientes.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+print('láminas de TI, segunda tanda')

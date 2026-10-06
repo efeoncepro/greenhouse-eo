@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-ai-market",
+  "voice": {
+    "eyebrow": "Workflows y créditos",
+    "question": "¿Un workflow gasta créditos?",
+    "answer": [
+      "Si usa IA"
+    ]
+  },
+  "body": "Las reglas fijas no consumen. Cada acción de IA dentro de un workflow sí, y la **medimos** antes de activarla.",
+  "figures": [
+    {
+      "value": "10",
+      "label": "créditos por cada acción de IA en un workflow.",
+      "detail": "Unos USD 0,10 por acción, al precio de lista.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "0",
+      "label": "créditos gasta un workflow sin IA.",
+      "detail": "Asignar, notificar o actualizar un registro no consume.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "300",
+      "label": "acciones de IA al mes con los créditos de Pro.",
+      "detail": "Pro incluye 3.000 créditos; Enterprise, 5.000.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    }
+  ],
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}
