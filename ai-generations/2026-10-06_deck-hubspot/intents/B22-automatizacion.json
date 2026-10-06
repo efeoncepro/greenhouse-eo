@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "recipe": "method-staircase",
+  "voice": {
+    "eyebrow": "Automatización",
+    "question": "¿Workflow o agente?",
+    "answer": [
+      "Según",
+      "la tarea"
+    ]
+  },
+  "body": "Si la regla es fija, va un workflow: siempre igual y auditable. Donde hace falta criterio, un agente.",
+  "levels": [
+    {
+      "name": "Workflow",
+      "descriptor": "regla fija, mismo resultado"
+    },
+    {
+      "name": "Código propio",
+      "descriptor": "lógica a medida, versionada"
+    },
+    {
+      "name": "Agente sugiere",
+      "descriptor": "una persona decide"
+    },
+    {
+      "name": "Con aprobación",
+      "descriptor": "actúa tras tu visto bueno"
+    },
+    {
+      "name": "Con límites",
+      "descriptor": "actúa solo, con un tope"
+    }
+  ],
+  "note": "Cada escalón suma criterio y también supervisión.",
+  "selection": {
+    "target": "level",
+    "level": 1,
+    "label": "TI",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

@@ -18,6 +18,22 @@ Las versiones con luz magenta o teal se guardan como material, pero el deck usa 
 | `HS2c-datos-en-orden.png` | La misma toma | azul | Banco (la mano cruza el titular en `section-cine`) |
 | `HS2b-datos-en-orden.png` | La misma toma, sujeto a la derecha | magenta | Banco |
 | `HS2-datos-en-orden.png` | Primera versión | magenta | Banco (la red invade la columna de texto) |
+| `HS3b-datos-con-permiso.png` | Antonio sostiene en la palma una esfera de luz que protege los datos de una persona | azul + un punto magenta | **En uso** (lámina Ley 21.719) |
+| `HS3-datos-con-permiso.png` | La misma toma, primera versión | azul + un punto magenta | Banco (la esfera invade la columna del texto) |
 
 Antonio es del elenco ficticio de la línea Revenue (`EFEONCE_BRAND_CAST_V1.md`); nunca va con su nombre en pantalla.
 La líder de RevOps de la portada es casting de la receta RV1b, sin retrato ancla.
+
+## Fuentes de las láminas de TI (B21–B24, investigadas el 2026-10-06)
+
+- **Ley 21.719:** publicada en el Diario Oficial el 13-12-2024 (N° 44.023); rige el 1-12-2026. Multa gravísima hasta
+  20.000 UTM (art. 35). Derechos: acceso, rectificación, supresión, oposición, portabilidad y bloqueo. Fuente: LeyChile,
+  idNorma 1209272.
+- **HubSpot, seguridad:** SSO SAML y SCIM en Pro y Enterprise; 2FA obligatoria en planes pagos; Sensitive Data
+  (cifrado de aplicación) sólo en Enterprise; entrenamiento de IA con datos del cliente activado por defecto, se apaga en
+  Settings > AI; standard sandbox sólo en Enterprise; historial de cambios de workflows en Pro y Enterprise. Fuente:
+  knowledge.hubspot.com (artículos actualizados entre abril y septiembre de 2026).
+- **No afirmar:** ISO 27001/27017/27018/42001 de HubSpot (la ISO 27001 es de AWS), región de datos en LATAM (no existe)
+  ni un SLA de uptime con créditos (el 99,95 % es una meta de 2023).
+- **Integraciones:** MCP remoto GA desde el 13-04-2026; Data Hub con sync en uno o dos sentidos; NetSuite y Dynamics
+  con integración propia de HubSpot; SAP sólo por terceros.

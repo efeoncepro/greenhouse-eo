@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-difference",
+  "voice": {
+    "eyebrow": "Seguridad y accesos",
+    "question": "¿Quién ve mis datos?",
+    "answer": [
+      "Sólo quien",
+      "debe"
+    ]
+  },
+  "body": "HubSpot trae los controles; nosotros los **dejamos encendidos** y documentados antes del go-live.",
+  "alternative": {
+    "kicker": "HubSpot recién creado",
+    "title": "Controles por configurar"
+  },
+  "efeonce": {
+    "kicker": "HubSpot que entregamos",
+    "title": "Controles encendidos"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Usuarios creados a mano, uno por uno",
+      "efeonce": "SSO y altas desde tu directorio, con SCIM"
+    },
+    {
+      "alternative": "Todos ven todos los registros",
+      "efeonce": "Permisos por equipo y rol, documentados"
+    },
+    {
+      "alternative": "Datos sensibles en cualquier campo",
+      "efeonce": "Datos sensibles cifrados, en Enterprise"
+    },
+    {
+      "alternative": "La IA de HubSpot entrena con tus datos",
+      "efeonce": "Entrenamiento de IA apagado desde el día uno"
+    },
+    {
+      "alternative": "Cambios directo en producción",
+      "efeonce": "Sandbox, pruebas e historial de cada cambio"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y mi equipo de TI?",
+    "title": "Decide con nosotros",
+    "pillars": [
+      {
+        "title": "Identidad",
+        "description": "SSO y altas desde tu directorio"
+      },
+      {
+        "title": "Arquitectura",
+        "description": "Integraciones con dueño y registro"
+      },
+      {
+        "title": "Auditoría",
+        "description": "Accesos y cambios a la vista"
+      }
+    ]
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

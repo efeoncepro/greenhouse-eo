@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-platform-coexistence",
+  "voice": {
+    "eyebrow": "Integraciones",
+    "question": "¿Tengo que reemplazar mis sistemas?",
+    "answer": [
+      "No por",
+      "defecto"
+    ]
+  },
+  "body": "HubSpot se conecta con lo que ya funciona. Decidimos **sistema** por sistema qué se integra y qué se migra.",
+  "note": "Ejemplo ilustrativo · la decisión sale de tu inventario de sistemas",
+  "platforms": [
+    {
+      "icon": "data",
+      "base": "Tu operación",
+      "name": "Hoy",
+      "items": [
+        "ERP y facturación",
+        "BI y data warehouse",
+        "Correo, calendario y Teams",
+        "CRM y planillas actuales"
+      ]
+    },
+    {
+      "icon": "data",
+      "base": "HubSpot",
+      "name": "Smart CRM",
+      "items": [
+        "Data Hub · sync bidireccional",
+        "APIs, webhooks y objetos propios",
+        "Marketplace de apps",
+        "MCP para agentes"
+      ]
+    }
+  ],
+  "tableTitle": "Decisión por sistema",
+  "capabilities": [
+    {
+      "capability": "ERP: clientes, productos y facturas",
+      "verdict": "Integrar"
+    },
+    {
+      "capability": "Data warehouse y reportes",
+      "verdict": "Integrar"
+    },
+    {
+      "capability": "Correo y calendario de Microsoft 365",
+      "verdict": "Mantener"
+    },
+    {
+      "capability": "CRM anterior y su historial",
+      "verdict": "Migrar"
+    },
+    {
+      "capability": "Planillas de seguimiento comercial",
+      "verdict": "Retirar"
+    }
+  ],
+  "selectedCapability": 1,
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

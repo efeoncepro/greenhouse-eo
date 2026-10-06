@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Ley 21.719",
+    "question": "¿Cuándo rige la nueva ley?",
+    "answer": [
+      "Diciembre"
+    ]
+  },
+  "body": "Rige desde el **1 de diciembre de 2026**, con multas de hasta 20.000 UTM. Preparamos tu CRM para lo que exige.",
+  "pillars": [
+    {
+      "label": "Base legal",
+      "text": "cada contacto con su permiso y su propósito."
+    },
+    {
+      "label": "Derechos",
+      "text": "acceso, rectificación, supresión, oposición y portabilidad."
+    },
+    {
+      "label": "Seguridad",
+      "text": "accesos controlados y registro de cada cambio."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS3b-datos-con-permiso.png",
+    "alt": "Un líder de RevOps de Efeonce sostiene en la palma una esfera de luz azul que protege los datos de una persona"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

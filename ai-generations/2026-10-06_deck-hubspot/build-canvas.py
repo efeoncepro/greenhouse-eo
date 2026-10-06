@@ -6,12 +6,16 @@ BODY = [
  ("B03-uno", "¿Cuántos CRM necesito? Uno."),
  ("B19-crm-solo", "¿Sigo llenando el CRM? Ya no."),
  ("B20-datos", "¿Cómo escala mi CRM? Ordenado."),
+ ("B21-integraciones", "¿Tengo que reemplazar mis sistemas? No por defecto."),
  ("B04-encaje", "¿HubSpot o Salesforce? El que encaje."),
  ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
  ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
  ("B18-creditos", "¿Se acumulan los créditos? No."),
+ ("B22-automatizacion", "¿Workflow o agente? Según la tarea."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
+ ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
+ ("B24-ley", "¿Cuándo rige la nueva ley? Diciembre."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
  ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
  ("B10-evaluacion", "¿Qué recibo primero? Una decisión."),
@@ -83,6 +87,8 @@ place(PROPUESTA, 'propuesta', 'Prop-')
 # Banco de fotos del deck (operador, 2026-10-06: «guarda las demás imágenes, nos pueden servir»). Plates limpios, sin
 # texto, en ai-generations/2026-10-06_deck-hubspot/fotos/plates/. En uso = la versión que lleva el deck (luz azul, B).
 BANCO = [
+  ('HS3b-datos-con-permiso', 'Datos con permiso · esfera azul en la palma (EN USO, lámina Ley 21.719)', '/_blob/7130e114b287b3fdbb766c9225dde27b'),
+  ('HS3-datos-con-permiso', 'Datos con permiso · primera toma (la esfera invade la columna del texto)', '/_blob/bbbd1f55d6cecc9b0480f4bacb481727'),
   ('HS1-crm-se-actualiza', 'HS1 · CRM que se actualiza solo · luz magenta (versión A)', '/_blob/627b8e13e3c7727a449553cb63a265f5'),
   ('CMP-crm-B', 'CRM que se actualiza solo · luz azul + magenta de acento (B, EN USO)', '/_blob/740bfce76af2ab998900ec9a5e45dba3'),
   ('CMP-crm-C', 'CRM que se actualiza solo · luz teal (C; mancha abajo a la derecha)', '/_blob/65281bfecc373b87ce349ebd1a04402e'),
@@ -108,7 +114,7 @@ class Component extends DCLogic {{ renderVals() {{ return {{}}; }} }}
 idx = json.load(open(f'{ROOT}/project/canvas.json', encoding='utf-8'))
 old = set(idx.get('boards', {}))
 idx['boards'] = boards; idx['order'] = order
-idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}, {"id": "comparacion", "name": "Comparación de color"}, {"id": "banco", "name": "Banco de fotos"}]
+idx['pages'] = [{"id": "brochure", "name": f"Brochure · {len(BROCHURE)}"}, {"id": "propuesta", "name": f"Propuesta · {len(PROPUESTA)}"}, {"id": "comparacion", "name": "Comparación de color"}, {"id": "banco", "name": "Banco de fotos"}]
 idx['launch'] = {"view": "canvas", "page": "brochure"}
 idx['notes'] = {
   "t-brochure": {"kind": "title1", "maxW": 7920, "text": "HubSpot · brochure de servicios", "w": 240, "x": 0, "y": -300, "page": "brochure"},
