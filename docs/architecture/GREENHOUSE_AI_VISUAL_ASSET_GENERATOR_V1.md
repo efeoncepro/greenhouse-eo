@@ -1,5 +1,44 @@
 # Greenhouse AI Visual Asset Generator V1
 
+## Architecture Decision 2026-10-06 — Nano Banana 2.1 en CLI local
+
+- Status: Accepted — alcance local autorizado por el operador en esta conversación.
+- Owner: AI tooling.
+- Scope: `pnpm ai:nano`, `scripts/ai/nano-banana.ts`, `src/lib/ai/nano-banana-cli.ts`.
+- Reversibility: two-way; retirar el comando y sus dos módulos.
+- Confidence: alta para contrato local; evidencia por operación en el manual/auditoría.
+- Validated as of: 2026-10-06.
+
+### Context
+
+El operador pidió Nano Banana 2.1 en nuestra CLI y revisar cobertura. `ai:image` habla OpenAI y el
+helper Google del producto sólo ofrece generación básica. Google publica 2.1 con ID propio; cambiar
+la env del producto para probarlo ampliaría el alcance del pedido.
+
+### Decision
+
+Añadir una CLI Google directa, ADC/resolver canónico, modelo exacto `gemini-nano-banana-2.1`, región
+`global`, con `generateContent`, `streamGenerateContent` y `countTokens`. El contrato puro valida
+controles y medios; sesiones locales preservan partes/firma del proveedor sin pensamiento privado.
+Una llamada por invocación, sin fallback de modelo ni retries automáticos; salida/metadata privadas.
+
+### Alternatives Considered
+
+Cambiar el parser OpenAI o el default del runtime: descartados porque mezclan contratos y alcance.
+Fal/Globe: descartados por la decisión Google directo y el alcance de tooling del operador.
+
+### Consequences / Runtime Contract
+
+Generación/edición/fusión, búsqueda, 1K–4K y thinking quedan expuestos. Batch API, Interactions remota
+y máscaras PNG no quedan implementados. Coste visual nominal no es cota total; historial crece y
+requiere una sesión nueva al llegar a su límite. [Manual y matriz](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md).
+No cambia configuración/deploy/contrato del runtime ni disponibilidad de Globe.
+
+### Revisit When
+
+Cambien ID/precios/contrato; se necesiten Batch/Interactions; o se solicite migrar el runtime del producto.
+
+
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.27
 > **Creado:** 2026-04-07 por Claude (TASK-278)

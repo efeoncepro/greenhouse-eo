@@ -73,7 +73,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | Materialidad, atmósfera, look development, lotes baratos, capas editables | `pnpm ai:fal` (Seedream 5) | Rango de aspecto 1/16–16, Lite a USD 0,035, único con layerize [oficial] |
 | Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **sólo 1 de 44 verificada en real** (`hf-zimage-turbo`, 2026-09-17); las demás tienen precio y esquema validados pero **no salida**. Los créditos ya se cargaron [verificado 2026-09-22] (§5.8) |
 | Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; CLI **con sesión desde 2026-09-24**, salida SVG **sin corrida real** (§8.4). El Recraft de la **API** de Higgsfield (`hf-recraft41`): SVG **sin confirmar** (§5.8) |
-| Nano Banana 2 / Pro | Google directo (Vertex) | [decisión] nunca por fal; no hay CLI (§10) |
+| Nano Banana 2.1 / Pro | Google directo (Vertex) | [decisión] nunca por fal; 2.1 por `pnpm ai:nano`, Pro sin CLI (§10) |
 
 ### 2.2 Árbol
 
@@ -1238,6 +1238,7 @@ OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría
 
 | Carril | Motor | Estado | Regla |
 |---|---|---|---|
+| Google directo (Vertex `global`), CLI `pnpm ai:nano` | **Nano Banana 2.1** = `gemini-nano-banana-2.1` (default exacto del CLI) | Local: generación 1K y edición iterativa/stream/búsqueda 2K verificadas 2026-10-06; [manual](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) | Texto/edición/referencias/video/PDF, 1K–4K, 14 ratios, thinking, búsqueda web/imagen; Batch/Interactions remoto/máscaras no implementados. No cambia el runtime del producto ni Globe |
 | Google directo (Vertex, location `global`), runtime `generateImage` provider `google-gemini-image` | **Nano Banana 2** = `gemini-3.1-flash-image` (default del provider; sobrescribible con `GOOGLE_GEMINI_IMAGE_MODEL`) | En runtime del producto; **sin CLI** [contrato] | Cambiar la env cambia todo el carril del producto [contrato] |
 | Google directo (Vertex) | **Nano Banana Pro** = `gemini-3-pro-image` | Disponible (models.get OK 2026-09-16) pero **ninguna superficie lo usa**; `gemini-3.1-pro-image` responde 404 [verificado] | Siempre directo por Google, nunca por fal [decisión]; exponerlo es decisión pendiente |
 | Google directo (Cloud Interactions `global`) | **Gemini Omni 1.1 Flash** (`gemini-omni-1.1-flash-preview`) | `pnpm ai:omni` local, seis operaciones verificadas con MP4 reales el 2026-09-24; [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) | Directo por Google, nunca por fal; separado de Globe y del ID Developer `gemini-omni-1.1-flash` |

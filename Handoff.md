@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Nano 2.1:** `pnpm ai:nano` local.
+
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
 
 **Factory (05/10):** [canon local](docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md), vía
@@ -275,7 +277,7 @@ costo de 2.5 (ver changelog).
 **Gates:** test y build verdes. **Pendiente:** los dos entregables de Globe, **sin hacer
 por instrucción del operador** (hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
 
-**TASK-1844 COMPLETE (08/09):** producción y cierre preservados íntegros en el [archivo de septiembre](docs/operations/agent-context-history/handoff/2026-09.md); [manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
+**TASK-1844 COMPLETE (08/09):** producción/cierre en el [archivo](docs/operations/agent-context-history/handoff/2026-09.md); [manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió

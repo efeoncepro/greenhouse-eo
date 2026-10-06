@@ -307,6 +307,7 @@
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
+    "ai:nano": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/nano-banana.ts",
     "ai:fal": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts",
     "ai:omni": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",

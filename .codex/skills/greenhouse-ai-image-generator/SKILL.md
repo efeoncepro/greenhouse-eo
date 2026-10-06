@@ -111,7 +111,7 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 | Carril | Superficie | Motores |
 |---|---|---|
 | OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
-| Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
+| Google directo (Vertex, `global`) | `pnpm ai:nano` local; runtime `generateImage` independiente | CLI: **Nano Banana 2.1** (`gemini-nano-banana-2.1`, default). Runtime conserva Nano Banana 2; Pro sigue sin superficie. [Manual y cobertura](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) |
 | Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
@@ -162,8 +162,10 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 10. **¿Formato más extremo que 3:1?** → Seedream (aspecto 1/16–16). GPT Image tope 3:1.
 11. **¿Texto multilingüe dentro de la imagen, sólo para concepto?** → Seedream 5 Pro lo declara [oficial]; OpenAI no
     declara nada para 2.5. Igual va a composición determinística al release.
-12. **¿Continuidad con un carril `google-gemini-image` ya en producto?** → Nano Banana 2 por el runtime; no hay CLI y
-    no cambies `GOOGLE_GEMINI_IMAGE_MODEL` para probar Pro (cambia todo el carril).
+12. **¿Generar/editar con Nano Banana desde terminal?** → `pnpm ai:nano` (2.1 por defecto): referencias,
+    sesiones, búsqueda web/imagen, 1K–4K, thinking y streaming. `--dry-run` antes de gastar; `--yes` para
+    generar. Batch API, Interactions remoto y máscara PNG no están implementados. No cambies
+    `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: esa env gobierna el carril del producto, independiente del CLI.
 
 **Rankings: preséntalos con fecha y fuente, sin elegir uno como verdad.** OpenArt Arena imagen (2026-09-16):
 Seedream 5 Pro #1, GPT Image 2 #2, Nano Banana Pro #3. Arena y Artificial Analysis (2026-09-07/16): Sunburst y
