@@ -67,6 +67,14 @@ pantallas del producto: §2 sigue diciendo que un hero web va en A, B o C.
   login; el operador lo aceptó. La foto en registro B (`LG3e`) sí la lleva.
 - Fotos aprobadas: `LG1`, `LG2e` (cine) y `LG3e` (registro B), en `ai-generations/2026-10-02_login-escenario/`.
 
+## Delta 2026-10-06 — precedente acotado: extras del cliente en cine (SA1)
+
+**[decisión del operador, 2026-10-06]** La foto SA1 (lámina 19 del brochure Agencia Creativa) queda aprobada y en uso
+(«la 19 se ve muy bien, quiero mantenerla»). Es un **precedente acotado**, no una regla general de §2: extras del
+cliente ficticios, sin marca y vestidos en gris y carbón; en positivo (colaboran, nunca en su dolor); junto a una
+persona del roster con la prenda de su línea, con el hoodie como único azul; texto a la izquierda. Otra foto con
+personas del cliente fuera de ese caso sigue necesitando decisión del operador. Receta en `scripts/foto/cine-recetas.json`.
+
 ## Delta 2026-10-02 (b) — decisiones del operador tras la prueba ciega
 
 **[decisión del operador, 2026-10-02]** La prueba ciega del [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#prueba-ciega-del-2026-10-02--lo-que-aprendimos)
