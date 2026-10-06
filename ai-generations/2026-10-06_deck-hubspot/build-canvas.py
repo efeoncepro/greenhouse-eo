@@ -91,7 +91,8 @@ place(PROPUESTA, 'propuesta', 'Prop-')
 # Banco de fotos del deck (operador, 2026-10-06: «guarda las demás imágenes, nos pueden servir»). Plates limpios, sin
 # texto, en ai-generations/2026-10-06_deck-hubspot/fotos/plates/. En uso = la versión que lleva el deck (luz azul, B).
 BANCO = [
-  ('RG1b-regiones', 'Regiones de datos de HubSpot desde Santiago · Tierra de noche (EN USO, lámina de residencia)', '/_blob/86b13bd7da8f1c240ad2a3b7abf68f46'),
+  ('RG2b-mapa', 'Regiones de datos de HubSpot desde Santiago · mapa de puntos (EN USO, lámina de residencia)', '/_blob/8bb98a345611f531143bc00230897151'),
+  ('RG1b-regiones', 'Regiones de datos desde Santiago · Tierra de noche (descartada: se lee ovoide)', '/_blob/86b13bd7da8f1c240ad2a3b7abf68f46'),
   ('HS3b-datos-con-permiso', 'Datos con permiso · esfera azul en la palma (EN USO, lámina Ley 21.719)', '/_blob/7130e114b287b3fdbb766c9225dde27b'),
   ('HS3-datos-con-permiso', 'Datos con permiso · primera toma (la esfera invade la columna del texto)', '/_blob/bbbd1f55d6cecc9b0480f4bacb481727'),
   ('HS1-crm-se-actualiza', 'HS1 · CRM que se actualiza solo · luz magenta (versión A)', '/_blob/627b8e13e3c7727a449553cb63a265f5'),

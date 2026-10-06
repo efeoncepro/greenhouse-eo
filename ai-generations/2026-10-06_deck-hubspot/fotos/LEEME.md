@@ -20,7 +20,9 @@ Las versiones con luz magenta o teal se guardan como material, pero el deck usa 
 | `HS2-datos-en-orden.png` | Primera versión | magenta | Banco (la red invade la columna de texto) |
 | `HS3b-datos-con-permiso.png` | Antonio sostiene en la palma una esfera de luz que protege los datos de una persona | azul + un punto magenta | **En uso** (lámina Ley 21.719) |
 | `HS3-datos-con-permiso.png` | La misma toma, primera versión | azul + un punto magenta | Banco (la esfera invade la columna del texto) |
-| `RG1b-regiones.png` | La Tierra de noche desde la órbita; de Santiago salen cuatro arcos a las regiones de HubSpot (EE. UU. Oeste y Este, Canadá, Fráncfort). Nodos medidos en el plate (1792 × 1024) | azul + Santiago en magenta | **En uso** (lámina de residencia; registrado en `content-markets`) |
+| `RG1b-regiones.png` | La Tierra de noche desde la órbita; de Santiago salen cuatro arcos a las regiones de HubSpot (EE. UU. Oeste y Este, Canadá, Fráncfort). Nodos medidos en el plate (1792 × 1024) | azul + Santiago en magenta | Banco: el operador la leyó como un ovoide; reemplazada por RG2b |
+| `RG2b-mapa.png` | Mapa del mundo de puntos de luz; de Santiago salen cuatro arcos a Canadá, EE. UU. Este, Fráncfort y Australia. Nodos medidos (1792 × 1024) | azul + Santiago en magenta | **En uso** (lámina de residencia; registrado en `content-markets`) |
+| `RG2-mapa.png` | El mismo mapa, más a la izquierda | azul | Banco (pegado al titular) |
 | `RG1-regiones.png` | Primera versión | azul | Descartada: la Tierra salió ovalada y con un arco de más a Brasil |
 
 Antonio es del elenco ficticio de la línea Revenue (`EFEONCE_BRAND_CAST_V1.md`); nunca va con su nombre en pantalla.

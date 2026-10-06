@@ -23,7 +23,7 @@ import { listOf, sv360Frame } from './kit'
  * El tamaño en px de los plates aprobados de la lámina: los nodos se miden sobre el archivo y el plate va a sangre
  * (escalado al ancho, recortado al centro). TODO AXIS TASK-1949 / TASK-1931: sale del banco de plates.
  */
-const PLATE_SIZES: Record<string, [number, number]> = { 'MK2-mercados': [1536, 1024], 'RG1b-regiones': [1792, 1024] }
+const PLATE_SIZES: Record<string, [number, number]> = { 'MK2-mercados': [1536, 1024], 'RG1b-regiones': [1792, 1024], 'RG2-mapa': [1792, 1024], 'RG2b-mapa': [1792, 1024] }
 
 /** El aire entre el nodo y su etiqueta, y cuánto sube la etiqueta sobre el nodo (medido en la lámina aprobada). */
 const LABEL = { gapPx: 22, raisePx: 26 } as const

@@ -66,14 +66,14 @@ print('láminas de TI')
 put('B25-residencia', {"role": "content", "recipe": "content-markets",
   "voice": {"eyebrow": "Residencia de datos", "question": "¿Dónde están mis datos?", "answer": ["En Estados", "Unidos"]},
   "body": "HubSpot no tiene centro de datos en Chile; si prefieres, se mueven a Europa sin costo. La ley lo permite con **garantías**, que HubSpot firma en su DPA.",
-  "photo": {"register": "puesta-en-escena", "subject": "place", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG1b-regiones.png",
-            "alt": "La Tierra de noche vista desde la órbita; desde Santiago salen cuatro arcos de luz azul hacia las regiones de datos de HubSpot en EE. UU., Canadá y Fráncfort"},
+  "photo": {"register": "puesta-en-escena", "subject": "place", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png",
+            "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia"},
   "markets": [
-    {"country": "EE. UU.", "city": "Región Oeste", "node": [833, 268], "side": "left"},
-    {"country": "EE. UU.", "city": "Región Este", "node": [1068, 283], "side": "right"},
-    {"country": "Canadá", "city": "Región Canadá", "node": [1167, 190], "side": "right"},
-    {"country": "Alemania", "city": "Fráncfort", "node": [1645, 205], "side": "left"},
-    {"country": "Chile", "city": "Tu empresa", "node": [1012, 825], "side": "right"}]})
+    {"country": "Canadá", "city": "Región Canadá", "node": [990, 337], "side": "left"},
+    {"country": "EE. UU.", "city": "Región Este", "node": [977, 381], "side": "right"},
+    {"country": "Alemania", "city": "Fráncfort", "node": [1236, 337], "side": "right"},
+    {"country": "Australia", "city": "Región Australia", "node": [1691, 659], "side": "left"},
+    {"country": "Chile", "city": "Tu empresa", "node": [932, 660], "side": "left"}]})
 
 put('B26-salida', {"role": "content", "recipe": "content-bullets",
   "voice": {"eyebrow": "Sin amarras", "question": "¿Y si mañana nos vamos?", "answer": ["Te llevas todo"]},

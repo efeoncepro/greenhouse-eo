@@ -1,0 +1,7 @@
+A premium, minimal data-visualization image, 16:9, deep navy-black background (#050B1F) with a very faint blue vignette.
+
+On the RIGHT 62% of the frame sits a flat world map seen straight on (equirectangular projection, no tilt, no globe, no perspective, no curvature), drawn ONLY with a regular grid of tiny round dots of cool light: land is made of small dim blue-grey dots, the oceans are empty dark navy. The continents have their true, accurate shapes and proportions: North America, South America, Europe, Africa, Asia and Australia, all fully visible, nothing cropped. The map spans from the left edge of that right area to the right edge of the frame, vertically centered.
+
+Five places glow as compact bright points with a soft halo: Washington on the east coast of the United States, Montreal in eastern Canada, Frankfurt in Germany, Sydney in eastern Australia (azure-white, #0375DB with a white core), and Santiago in central Chile (a small magenta-pink point, #E86BD0, the only accent, lighting nothing around it). EXACTLY FIVE bright points. From Santiago leave EXACTLY FOUR thin, elegant arcs of azure light, softly glowing, curving above the map like flight paths: one to Washington, one to Montreal, one to Frankfurt and one to Sydney (this one crosses the Pacific to the west). No other arc, no other bright point.
+
+The LEFT 38% of the frame is empty deep navy space: no dots, no map, no objects. No text, no labels, no country borders, no grid lines, no logos. Clean, precise, high contrast, cool azure and white light only.
