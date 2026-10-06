@@ -17,7 +17,7 @@ BODY = [
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
  ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
 ]
-BROCHURE = [("B01-portada", "Portada · ¿Le saco todo a mi HubSpot? Todavía no.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
+BROCHURE = [("B01-portada", "Portada · ¿Mi HubSpot puede hacer más? Mucho más.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
 PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Cómo vende más mi CRM? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por alcance."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
 def slide_html(title, blob):
     if blob:

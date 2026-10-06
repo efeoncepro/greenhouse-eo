@@ -175,8 +175,8 @@ print(sorted(os.listdir('intents')))
 # ── Voz corregida (decisión del operador 2026-10-06): habla el cliente, en primera persona; cada par pasa las cinco
 #    pruebas de §4 de la línea gráfica (conversación, calce, autonomía, sustitución, prueba). ──
 VOICE = {
-  'B01-portada':      ('¿Le saco todo a mi HubSpot?', ['Todavía no']),
-  'P01-portada':      ('¿Le saco todo a mi HubSpot?', ['Todavía no']),
+  'B01-portada':      ('¿Mi HubSpot puede hacer más?', ['Mucho más']),
+  'P01-portada':      ('¿Mi HubSpot puede hacer más?', ['Mucho más']),
   'B02-propuesta':    ('¿Cómo vende más mi CRM?', ['Con agentes']),
   'B03-uno':          ('¿Cuántos CRM necesito?', ['Uno']),
   'B05-servicios':    ('¿Qué hacen en HubSpot?', ['Todo el ciclo']),
