@@ -4,8 +4,12 @@ blobs = json.load(open('blobs.json'))
 BODY = [
  ("B02-propuesta", "¿Cómo vende más mi CRM? Con agentes."),
  ("B03-uno", "¿Cuántos CRM necesito? Uno."),
+ ("B19-crm-solo", "¿Sigo llenando el CRM? Ya no."),
+ ("B20-datos", "¿Cómo escala mi CRM? Ordenado."),
  ("B04-encaje", "¿HubSpot o Salesforce? El que encaje."),
  ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
+ ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
+ ("B18-creditos", "¿Se acumulan los créditos? No."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
@@ -22,6 +26,16 @@ PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propues
 def slide_html(title, blob):
     if blob:
         inner = f'<img src="{blob}" alt="{title}" style="display: block; width: 1920px; height: 1080px">'
+        # Capas editables encima de la lámina: el badge Gold de HubSpot (readback 2026-10-06) en la portada.
+        # El sprocket 3D de HubSpot sobre la plataforma de la lámina de servicios (uso interno hasta aprobación de HubSpot).
+        if 'Todo el ciclo' in title:
+            inner = (f'<div style="position: relative; width: 1920px; height: 1080px">{inner}'
+                     f'<img src="/_blob/f38949bc9a2c2b3ce180e099e3209861" alt="Sprocket de HubSpot en 3D" '
+                     f'style="position: absolute; left: 1410px; top: 470px; width: 380px; height: 380px"></div>')
+        if title.startswith('Portada · '):
+            inner = (f'<div style="position: relative; width: 1920px; height: 1080px">{inner}'
+                     f'<img src="/_blob/bcf5db8eecf306118bffc3022384da7c" alt="HubSpot Solutions Partner · Gold" '
+                     f'style="position: absolute; left: 140px; top: 856px; width: 160px; height: 159px"></div>')
     else:
         inner = (f'<div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 140px; display: flex; flex-direction: column; justify-content: center; gap: 28px; '
                  f'background: #091951; color: #ffffff; font-family: \'Poppins\', system-ui, sans-serif">'
@@ -50,7 +64,7 @@ place(PROPUESTA, 'propuesta', 'Prop-')
 idx = json.load(open(f'{ROOT}/project/canvas.json', encoding='utf-8'))
 old = set(idx.get('boards', {}))
 idx['boards'] = boards; idx['order'] = order
-idx['pages'] = [{"id": "brochure", "name": "Brochure · 16"}, {"id": "propuesta", "name": "Propuesta · 17"}]
+idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}]
 idx['launch'] = {"view": "canvas", "page": "brochure"}
 idx['notes'] = {
   "t-brochure": {"kind": "title1", "maxW": 7920, "text": "HubSpot · brochure de servicios", "w": 240, "x": 0, "y": -300, "page": "brochure"},

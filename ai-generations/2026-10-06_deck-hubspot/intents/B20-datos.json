@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Datos y arquitectura",
+    "question": "¿Cómo escala mi CRM?",
+    "answer": [
+      "Ordenado"
+    ]
+  },
+  "body": "Antes de automatizar o sumar agentes, ponemos los datos **en orden** y el CRM sobre una base que crece.",
+  "pillars": [
+    {
+      "label": "Datos en orden",
+      "text": "duplicados fuera, propiedades con dueño y una sola fuente de verdad."
+    },
+    {
+      "label": "Modelo que escala",
+      "text": "objetos, asociaciones y pipelines pensados para crecer."
+    },
+    {
+      "label": "Integración gobernada",
+      "text": "cada sync con su dirección, su dueño y su registro de errores."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2b-datos-en-orden.png",
+    "alt": "Un líder de RevOps de Efeonce, con la chaqueta, levanta la mano y miles de partículas de datos en desorden se ordenan en una red de capas de luz que crece hacia el fondo"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Licencias con criterio",
+    "question": "¿Qué licencias de HubSpot compro?",
+    "answer": [
+      "Las que usas"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "Seats por rol",
+      "desc": "Contamos quién entra, a qué Hub y para qué antes de cotizar un solo seat."
+    },
+    {
+      "title": "El tier que usas hoy",
+      "desc": "Starter, Pro o Enterprise según tu operación actual, con la ruta de upgrade escrita."
+    },
+    {
+      "title": "Cada Hub con su caso de uso",
+      "desc": "Un Hub entra con su caso, su dueño y su fecha de puesta en marcha. Nada por si acaso."
+    },
+    {
+      "title": "Uso antes de renovar",
+      "desc": "Antes de cada renovación revisamos uso y adopción, y ajustamos lo que sobra."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

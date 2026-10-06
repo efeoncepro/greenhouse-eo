@@ -7,16 +7,20 @@
   "B16-contraportada": "/_blob/ea3b8bb594d6cae8832449f9b872bcba",
   "P01-portada": "/_blob/869231c5d7a2e9e823d5fde93769b01b",
   "P16-cotizacion": "/_blob/15606523acb8251a244c0226e381814d",
-  "B01-portada": "/_blob/d373d530723d97af33f79b80adb721c9",
+  "B01-portada": "/_blob/6fd8c87997b8a9c5b250ef49a7832d94",
   "P02-propuesta": "/_blob/21ddf48cd8261283990958ab3b0b095c",
   "B03-uno": "/_blob/6dc39bd5fbc1e51b1dfd95a99b794853",
   "B05-servicios": "/_blob/52465965d32c6331d4ea2fc3ee36da32",
   "B06-agentes": "/_blob/f2f5aa417980a19dc8bb3ce17ec3d6bd",
   "B07-aprobacion": "/_blob/7bea01d7a3e289a288bbb8c5f95cbd6a",
-  "B08-permiso": "/_blob/e5616e3875e669f2ffb831fb5efe28ef",
+  "B08-permiso": "/_blob/56f9540c9cbd27db3e65f27b1daa83be",
   "B09-migracion": "/_blob/e34ce8275df653bd27552a50db8e8eb8",
   "B12-dia-a-dia": "/_blob/564a55db257a50063a1f3b5e898d49f8",
   "B13-adopcion": "/_blob/07db9314b95d473c9ce368bf0f062fd3",
   "B14-operacion": "/_blob/2a6d06c6155daa49be5c64f285b42d02",
-  "P17-contraportada": "/_blob/3e746e84d90cb9e2d7fcbbc678d3c20e"
+  "P17-contraportada": "/_blob/3e746e84d90cb9e2d7fcbbc678d3c20e",
+  "B17-licencias": "/_blob/f4479520b7bcda9c23f34f89c9c7d56d",
+  "B18-creditos": "/_blob/8d647e7778b9155fd1efbe4a3128ef59",
+  "B19-crm-solo": "/_blob/5db5b6036652688f63dabdf3437ae95d",
+  "B20-datos": "/_blob/6aa21c84ec3027c492ae5f4ff16693d3"
 }

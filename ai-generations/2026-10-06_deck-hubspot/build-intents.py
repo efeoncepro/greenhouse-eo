@@ -200,3 +200,6 @@ for name, (q, a) in VOICE.items():
         d['voice']['answer'] = a
         json.dump(d, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 print('voz corregida')
+
+# Láminas nuevas del 2026-10-06 (licencias, créditos, CRM que se actualiza solo, datos y arquitectura)
+exec(open('nuevas.py', encoding='utf-8').read())
