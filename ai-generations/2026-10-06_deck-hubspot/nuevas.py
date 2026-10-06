@@ -14,16 +14,17 @@ put('B17-licencias', {"role": "content", "recipe": "content-bullets",
     {"title": "Uso antes de renovar", "desc": "Antes de cada renovación revisamos uso y adopción, y ajustamos lo que sobra."}],
   "selected": 3, "selection": {"target": "object", "label": "Cliente", "participantKind": "department"}})
 
-# La cifra del centro es la que responde la pregunta: 0 créditos pasan al mes siguiente.
+# Créditos con criterio (operador, 2026-10-06): la misma lógica que las licencias, no un dato suelto de HubSpot.
+# La cifra del centro responde la pregunta: lo que no usas vence, así que se compra más sólo con el consumo medido.
 put('B18-creditos', {"role": "decision", "recipe": "decision-ai-market",
-  "voice": {"eyebrow": "HubSpot Credits", "question": "¿Se acumulan los créditos?", "answer": ["No"]},
-  "body": "Los créditos son la moneda de los agentes de HubSpot. Customer Agent usa **50 por conversación resuelta**; Prospecting Agent, 100 por lead.",
+  "voice": {"eyebrow": "HubSpot Credits", "question": "¿Sumo más créditos?", "answer": ["Aún no"]},
+  "body": "Igual que con las licencias: primero medimos cuánto consume **cada agente**, y recién ahí sumas créditos.",
   "figures": [
-    {"value": "US$0,01", "label": "Cada crédito, en todos los planes.", "detail": "Capacidad extra: USD 10 por cada 1.000 créditos.",
+    {"value": "50", "label": "créditos por conversación que resuelve Customer Agent.", "detail": "Prospecting Agent usa 100 por lead: cada agente consume distinto.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
-    {"value": "0", "label": "Créditos que pasan al mes siguiente.", "detail": "Lo que no usas vence al cierre del período: por eso medimos el consumo de cada agente.",
+    {"value": "0", "label": "créditos pasan al mes siguiente.", "detail": "Lo que no usas vence: comprar de más es pagar por nada.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
-    {"value": "5.000", "label": "Cuatro Hubs Enterprise dan 5.000, no 20.000.", "detail": "No se suman entre Hubs: manda el plan más alto.",
+    {"value": "5.000", "label": "créditos al mes ya incluidos en Enterprise.", "detail": "Pro incluye 3.000. Con eso se parte.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO}]})
 
 put('B19-crm-solo', {"role": "proposal", "recipe": "proposal-cinematic", "layout": "hero",

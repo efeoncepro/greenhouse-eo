@@ -10,7 +10,7 @@ BODY = [
  ("B04-encaje", "¿HubSpot, Salesforce o Zoho? El que encaje."),
  ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
  ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
- ("B18-creditos", "¿Se acumulan los créditos? No."),
+ ("B18-creditos", "¿Sumo más créditos? Aún no."),
  ("B22-automatizacion", "¿Workflow o agente? Según la tarea."),
  ("B27-workflow-creditos", "¿Un workflow gasta créditos? Si usa IA."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
