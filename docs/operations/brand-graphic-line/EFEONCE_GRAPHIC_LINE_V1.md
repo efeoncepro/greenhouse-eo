@@ -189,6 +189,13 @@ en cualquier registro. Fotos aprobadas antes de esta regla que la contradicen (p
 se reemplazan al reutilizarlas; las variantes B y C de esa toma quedaron en el banco de
 `ai-generations/2026-10-06_deck-hubspot/fotos/`.
 
+**Estado en las láminas diseñadas (2026-10-06): pendiente, a propósito.** El compositor de decks
+(`src/lib/brand-surfaces/recipes/line-stage/`) todavía pinta con el acento el halo, la plataforma y los haces de
+31 recetas, porque así lo declaran los tokens AXIS (`stage.halo`, `platform.fill`, `platform.arc`, `beam`). Cambiarlo
+mueve todas las láminas aprobadas de todas las líneas y obliga a rebasar `composer:visual-gate`; el operador decidió no
+hacerlo como parche dentro del deck HubSpot. Se resuelve en AXIS (tokens de escenario con la luz en azul de Efeonce) y
+luego en el compositor, con rebaseline revisado. Hasta entonces la regla manda en la foto y en lo que se diseñe a mano.
+
 **Reglas:** una marca, un acento por pieza · el teal es sólo de Efeonce y nunca aparece en una pieza de producto ·
 el halo toma el color del acento · nunca dos acentos en la misma órbita · los valores son sRGB: la conversión a
 CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
