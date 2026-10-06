@@ -170,7 +170,8 @@ S['A11-medicion'] = ("88 % de las entregas, a tiempo.", page("88 % de las entreg
 
 # 12 · Caso Sky (papel)
 S['A12-caso-sky'] = ("25 % menos de tiempo de producción.", page("25 % menos de tiempo de producción.",
-  photo('L1', 'Un creativo de Efeonce revisa con lupa y marca con lápiz rojo las pruebas impresas de una campaña sobre la mesa de luz', 'left: 760px; top: 0; width: 1160px; height: 1080px; object-position: 60% 50%') +
+  # Comentario del operador (2026-10-06): una foto que evoque a Sky, sin su logo ni su librea (el modelo nunca dibuja la marca del cliente).
+  f'<img src="{BL("fa686a24fdb09a1f91400c88ce24e052")}" alt="Desde la ventana de un avión, el ala corta el cielo sobre la cordillera de los Andes al amanecer; en la mesa, una tablet muestra una pieza de campaña" style="position: absolute; object-fit: cover; left: 760px; top: 0; width: 1160px; height: 1080px; object-position: 78% 50%">' +
   f'<div style="position: absolute; left: 0; top: 0; width: 1000px; height: 1080px; background: #f7f8f6; border-top-right-radius: 320px"></div>' +
   col(f'<div style="display: flex; align-items: center; gap: 22px"><img src="{BL(SKY_NAVY)}" alt="Sky Airline" style="width: 168px; height: 62px"><span style="font-family: {ST}; font-size: 15px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6d6777">Caso · 12 meses</span></div>' +
       headline(['25 % menos de', 'tiempo de', 'producción'], 92, PAPER, '; margin-top: 60px') +

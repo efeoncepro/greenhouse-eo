@@ -1,0 +1,18 @@
+{
+ "id": "SK1-vuelo-amanecer",
+ "formato": "16:9",
+ "impacto": true,
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic still, an airline world without any brand): seen from inside a modern passenger jet, through a large cabin window, the wingtip of the aircraft cuts across the frame above the snow-capped Andes at golden dawn; a sea of clouds below, THE MOMENT: the sun breaks over the peaks at this exact second and its first ray hits the wingtip, painting the wing and the clouds in warm gold, the sky above fading into a deep clean blue. The wing and the fuselage are plain, with NO livery text, NO logo, NO airline name, NO registration letters, NO stripes of any brand. Everything lit lives in the RIGHT 60 % of the frame: the wingtip enters from the right edge; the LEFT 40 % of the frame is the soft, out-of-focus edge of the cabin wall and window frame, calm and dim. On the tray table at the bottom right, softly out of focus, a tablet glows with a campaign piece in a deep clean blue, the blue of the scene, with a hand resting beside it. Real photography, 35mm, genuine depth of field, fine sensor grain, rich contrast. No text, no letters, no numbers, no logos anywhere.",
+ "lecho": {
+  "objeto": "the soft out-of-focus lower edge of the cabin window frame, matte and dim",
+  "tono": "DARK"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "the soft, dim out-of-focus cabin wall on the left of the frame",
+   "tinta": "blanca"
+  }
+ }
+}
