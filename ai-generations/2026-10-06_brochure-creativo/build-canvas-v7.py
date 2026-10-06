@@ -418,26 +418,32 @@ def pair(q, a, px, t=DARK):
 # cada herramienta se montan sobre su borde superior: cada uno entra a la interfaz por una línea corta con su punto.
 APPS = [("a9fc2179296e7205eb0367774eba1c4c", "Microsoft Teams", "Nos reunimos"), ("496c456197a965130a04554201efb39a", "Notion", "Proyectos y tareas"),
         ("d8002281d17ca07eb3341e7c11720bb6", "Frame.io", "Revisas y apruebas"), ("35cb41c9c7535c3a833a3b0142ed1089", "Adobe", "Producimos")]
-SX, SY, SC = 740, 330, 0.74          # pantalla plana: 1066 × 814, sangra por abajo
-SW = 1440 * SC
-def dock():
-    out, slot = '', SW / 4
-    for i, (blob, name, label) in enumerate(APPS):
-        cx = SX + slot * (i + 0.5)
-        out += (f'<div style="position: absolute; left: {cx-150:.0f}px; top: 140px; width: 300px; text-align: center; display: flex; flex-direction: column; gap: 4px">'
-                f'<div style="font-family: {ST}; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe4fa">{name}</div>'
-                f'<div style="font-family: {ST}; font-size: 24px; font-weight: 600; color: #ffffff">{label}</div></div>'
-                f'<div style="position: absolute; left: {cx-56:.0f}px; top: 222px; width: 112px; height: 112px; border-radius: 28px; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(114, 222, 216, 0.35)">'
-                f'<img src="{BL(blob)}" alt="{name}" style="width: 62px; height: 62px; object-fit: contain"></div>'
-                f'<div style="position: absolute; left: {cx-1:.0f}px; top: 334px; width: 2px; height: 26px; background: rgba(114, 222, 216, 0.55)"></div>'
-                f'<div style="position: absolute; left: {cx-5:.0f}px; top: 356px; width: 10px; height: 10px; border-radius: 50%; background: #72ded8"></div>')
-    return out
-flat = (f'<div style="position: absolute; left: {SX}px; top: {SY}px; width: {SW:.0f}px; height: {1100*SC:.0f}px; overflow: hidden; border-radius: 18px 18px 0 0; border: 2px solid rgba(114, 222, 216, 0.35); border-bottom: none">'
-        f'<div style="width: 1440px; height: 1100px; transform-origin: 0 0; transform: scale({SC})"><dc-import name="CS-Home" theme="dark" hint-size="1440px,1100px"></dc-import></div></div>')
+# Comentario del operador (2026-10-06): «necesito más punch acá, mucho más». La órbita rodea la interfaz: la pantalla
+# de Creative Studio (modo claro, contrasta con el fondo) al centro de una órbita grande y las herramientas como satélites
+# sobre el anillo, con su etiqueta afuera. Ningún texto cruza la órbita.
+OCX, OCY, ORX, ORY = 1270, 590, 600, 410
+SC5 = 0.60; SW5, SH5 = 1440 * SC5, 1100 * SC5
+SAT = [(-148, 'above'), (-32, 'above'), (34, 'below'), (148, 'below')]
+def orbit5():
+    ring = (f'<svg width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; left: 0; top: 0" aria-hidden="true">'
+            f'<ellipse cx="{OCX}" cy="{OCY}" rx="{ORX}" ry="{ORY}" fill="none" stroke="#72ded8" stroke-opacity="0.30" stroke-width="2"></ellipse>'
+            f'<ellipse cx="{OCX}" cy="{OCY}" rx="{ORX-70}" ry="{ORY-55}" fill="none" stroke="#72ded8" stroke-opacity="0.12" stroke-width="1"></ellipse></svg>')
+    scr = (f'<div style="position: absolute; left: {OCX-SW5/2:.0f}px; top: {OCY-SH5/2:.0f}px; width: {SW5:.0f}px; height: {SH5:.0f}px; overflow: hidden; border-radius: 16px; border: 2px solid rgba(255, 255, 255, 0.35)">'
+           f'<div style="width: 1440px; height: 1100px; transform-origin: 0 0; transform: scale({SC5})"><dc-import name="CS-Home" theme="light" hint-size="1440px,1100px"></dc-import></div></div>')
+    sats = ''
+    for (blob, name, label), (deg, pos) in zip(APPS, SAT):
+        r = math.radians(deg); x, y = OCX + ORX * math.cos(r), OCY + ORY * math.sin(r)
+        sats += (f'<div style="position: absolute; left: {x-74:.0f}px; top: {y-74:.0f}px; width: 148px; height: 148px; border-radius: 34px; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(114, 222, 216, 0.55)">'
+                 f'<img src="{BL(blob)}" alt="{name}" style="width: 84px; height: 84px; object-fit: contain"></div>')
+        ly = y - 74 - 76 if pos == 'above' else y + 74 + 14
+        sats += (f'<div style="position: absolute; left: {x-150:.0f}px; top: {ly:.0f}px; width: 300px; text-align: center; display: flex; flex-direction: column; gap: 4px">'
+                 f'<div style="font-family: {ST}; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe4fa">{name}</div>'
+                 f'<div style="font-family: {ST}; font-size: 26px; font-weight: 600; color: #ffffff">{label}</div></div>')
+    return ring + scr + sats
 S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el trabajo? En vivo.",
-  flat + dock() +
+  orbit5() +
   col(eyebrow('Tu día a día con Efeonce', DARK) + f'<div style="margin-top: 70px">{pair("¿Cómo sigo el trabajo?", "En vivo", 128)}</div>' +
-      body('Cada cosa en su herramienta y <b style="font-weight: 600">todo</b> conectado a Creative Studio, a la vista y sin esperar el informe.', DARK, 24, 480, '; margin-top: 48px'), 120, 540) +
+      body('Cada herramienta gira alrededor de tu marca y <b style="font-weight: 600">todo</b> llega a Creative Studio, a la vista y sin esperar el informe.', DARK, 24, 440, '; margin-top: 48px'), 120, 480) +
   bubble(DARK)))
 
 def image_slide(title, blob):
