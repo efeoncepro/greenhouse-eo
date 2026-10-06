@@ -345,6 +345,7 @@ CAMPAIGN_IMG = {"a5168ac082211864d18a10b097e9c8ab": "56d30541a839f70bfb56677e15d
                 "77a8bc38ac27f223ccfb8a9b84658548": "c29542f2762a52af53f4ff99f9b6f807", "0a7bdcb5b7cda387bd7bc39ab2de73e3": "6b0a97bff08b5f11214165fcebdf04a0",
                 "8e4a5aea70e0949b09a5f2fb166c2a57": "46237be632a2c6986b02f844260822ed"}
 CS_LOGO_DARK = "5e65f8997f34dd0b81e3ab2b58a1281b"
+CS_LOGO_LIGHT = "141a7c747c9d9ca1057d0f5a5b9edf23"
 TEXT = [
  ("5 campañas · 52 piezas · 72 anuncios preparados · 0 lanzados", "5 campañas · 86 piezas · 72 anuncios preparados · 0 lanzados"),
  ("CMP-001 · SEO · AEO · TOFU", "CMP-101 · LANZAMIENTO · VOLTA"),
@@ -383,19 +384,20 @@ def studio_component(src):
     for a, b in TEXT: h = h.replace(a, b)
     # el nombre del producto pasa a ser la marca Creative Studio (logo generado con el generador de Marketing Studio)
     h = _re.sub(r'<span style="font-size: 13px; font-weight: 600; color: var\(--t1\); letter-spacing: 0.01em;">Marketing Studio</span>',
-                f'<img src="/_blob/{CS_LOGO_DARK}" alt="Creative Studio" style="height: 15px; width: auto; display: block;">', h)
+                f'<sc-if value="{{{{isDark}}}}" hint-placeholder-val="{{{{false}}}}"><img src="/_blob/{CS_LOGO_DARK}" alt="Creative Studio" style="height: 15px; width: auto; display: block;"></sc-if>'
+                f'<sc-if value="{{{{isLight}}}}" hint-placeholder-val="{{{{true}}}}"><img src="/_blob/{CS_LOGO_LIGHT}" alt="Creative Studio" style="height: 15px; width: auto; display: block;"></sc-if>', h)
     h = h.replace('Marketing Studio', 'Creative Studio')
     h = _re.sub(r'href="Studio-[A-Za-z]+\.dc\.html"', 'href="#"', h)
     return h
 COMPONENTS = {"CS-Campaigns.dc.html": studio_component('ui/src-Studio-Campaigns.dc.html'),
               "CS-Home.dc.html": studio_component('ui/src-Studio-Home.dc.html')}
-def screen(name, left, top, scale, rot, origin):
+def screen(name, left, top, scale, rot, origin, theme='dark'):
     w, h = 1440, 1100
     return (f'<div style="position: absolute; left: {left}px; top: {top}px; width: {w*scale:.0f}px; height: {h*scale:.0f}px; perspective: 2200px">'
             f'<div style="width: {w}px; height: {h}px; transform-origin: {origin}; transform: rotateY({rot}deg) scale({scale}); border-radius: 18px; overflow: hidden; border: 2px solid rgba(114, 222, 216, 0.28)">'
-            f'<dc-import name="{name}" theme="dark" hint-size="1440px,1100px"></dc-import></div></div>')
+            f'<dc-import name="{name}" theme="{theme}" hint-size="1440px,1100px"></dc-import></div></div>')
 S['P4-creative-studio'] = ("Tus campañas, a la vista.", page("Tus campañas, a la vista.",
-  screen('CS-Campaigns', 760, 110, 0.80, -16, '100% 50%') +
+  screen('CS-Campaigns', 760, 110, 0.80, -16, '100% 50%', 'light') +
   col('<img src="/_blob/8c5c29df9d9fb02d6e0f6410ace88d4e" alt="Efeonce | Creative Studio" style="height: 34px; width: auto; display: block">' + headline(['Tus campañas,', 'a la vista'], 104, DARK, '; margin-top: 64px') +
       body('Cada campaña con sus piezas y el estado de creatividad, medios y lanzamiento, en un solo lugar y al día.', DARK, 22, 520, '; margin-top: 40px') +
       f'<div style="margin-top: 44px; display: flex; flex-direction: column; gap: 14px; width: 520px">{svc("Campañas y piezas", "todo lo producido para tu marca, ordenado por campaña")}{svc("Estado en vivo", "qué está en producción, qué espera tu aprobación y qué ya salió")}</div>', 120, 580) +
