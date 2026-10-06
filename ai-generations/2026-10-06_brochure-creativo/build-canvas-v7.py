@@ -401,7 +401,7 @@ def screen(name, left, top, scale, rot, origin, theme='dark'):
             f'<dc-import name="{name}" theme="{theme}" hint-size="1440px,1100px"></dc-import></div></div>')
 S['P4-creative-studio'] = ("Tus campañas, a la vista.", page("Tus campañas, a la vista.",
   screen('CS-Campaigns', 760, 110, 0.80, -16, '100% 50%', 'light') +
-  col('<img src="/_blob/8c5c29df9d9fb02d6e0f6410ace88d4e" alt="Efeonce | Creative Studio" style="height: 34px; width: auto; display: block">' + headline(['Tus campañas,', 'a la vista'], 104, DARK, '; margin-top: 64px') +
+  col('<img src="/_blob/8c5c29df9d9fb02d6e0f6410ace88d4e" alt="Efeonce | Creative Studio" style="height: 34px; width: auto; display: block; align-self: flex-start">' + headline(['Tus campañas,', 'a la vista'], 104, DARK, '; margin-top: 64px') +
       body('Cada campaña con sus piezas y el estado de creatividad, medios y lanzamiento, en un solo lugar y al día.', DARK, 22, 520, '; margin-top: 40px') +
       f'<div style="margin-top: 44px; display: flex; flex-direction: column; gap: 14px; width: 520px">{svc("Campañas y piezas", "todo lo producido para tu marca, ordenado por campaña")}{svc("Estado en vivo", "qué está en producción, qué espera tu aprobación y qué ya salió")}</div>', 120, 580) +
   bubble(DARK)))
