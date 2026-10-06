@@ -318,7 +318,7 @@ S['P1-estudio'] = ("El estudio va donde estés.", page("El estudio va donde est�
       body('Crew, cámaras de cine, sonido e iluminación profesionales que arman un set completo en tu oficina, tu planta, tu tienda o en terreno. De una entrevista a una campaña.', DARK, 22, 540, '; margin-top: 40px') +
       f'<div style="margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; width: 600px">{svc("Run &amp; Gun", "lo capturamos en una jornada, con equipo actual")}{svc("Contenido y social", "lo planificamos, publicamos y medimos")}</div>', 120, 680) + bubble(DARK)))
 # HB1 derivó hacia el centro: la foto se corre 150 px y su borde se funde con su propio negro (#060910), sin velo.
-HBT = dict(DARK, bg='#060910')
+HBT = dict(DARK, bg='#080b12')
 S['P2-hibrido'] = ("Manos y modelos, en el mismo set.", page("Manos y modelos, en el mismo set.",
   f'<img src="{BL(PRB["HB1"])}" alt="Julio, con el hoodie de Efeonce, filma unos audífonos sobre un pedestal con una cámara de cine; una corriente de luz lleva la toma a una pantalla con cuatro variantes del producto, donde Nexa, con un Spark en el hombro, supervisa" style="position: absolute; left: 150px; top: 0; width: 1920px; height: 1080px; object-fit: cover; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 180px); mask-image: linear-gradient(to right, transparent 0, #000 180px)">' +
   col(eyebrow('Producción híbrida', DARK) + headline(['Manos y', 'modelos, en', 'el mismo set'], 92, DARK, '; margin-top: 64px') +

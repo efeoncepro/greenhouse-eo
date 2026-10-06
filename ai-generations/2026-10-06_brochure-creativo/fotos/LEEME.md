@@ -36,3 +36,9 @@ de mirada hacia el texto de `deck-seccion` hacía el mismo gesto en tres plates 
 acción: `RG1b-estudio-portatil` (filma en movimiento con el gimbal; P1) y `BS1c-del-manual-al-sistema` (mira hacia abajo
 mientras abre el manual; B4). `RG1` y `BS1b` quedan en el banco. Lección para el casebook: en una serie, la mirada hacia el
 texto se dosifica igual que el acento; repetida se lee como tic.
+
+**Identidad de Julio (comentario del operador, 2026-10-06):** en `HB1` la cara «se ve muy IA» y con la frente agrandada.
+Causa probable: el bloque IDENTITY insiste en «forehead tall and open, receding hairline» y el modelo lo exagera a
+distancia media. `HB1b-manos-y-modelos` lo contrarresta en la escena (frente moderada y entradas como en `julio-ap-04`, cara
+larga, lentes semi al aire, piel fotográfica sin suavizado) y acerca la cámara a 4,5 m. Candidato a fila del casebook y a
+revisar el bloque IDENTITY de Julio.
