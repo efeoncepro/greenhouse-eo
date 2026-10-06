@@ -1,34 +1,43 @@
 import json, os, sys
 ROOT = sys.argv[1]
 blobs = json.load(open('blobs.json'))
+# Orden por la compra real (operador, 2026-10-06): promesa → qué plataforma → qué hacemos y cómo se construye →
+# comprar con criterio → riesgos de TI → cómo trabajamos → prueba → cierre.
 BODY = [
+ # 1 · La promesa
  ("B02-propuesta", "¿Cómo vende más mi CRM? Con agentes."),
+ # 2 · Qué plataforma y por qué HubSpot
+ ("B04-encaje", "¿HubSpot, Salesforce o Zoho? El que encaje."),
  ("B03-uno", "¿Cuántos CRM necesito? Uno."),
  ("B19-crm-solo", "¿Sigo llenando el CRM? Ya no."),
+ # 3 · Qué hacemos y cómo se construye
+ ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
  ("B20-datos", "¿Cómo escala mi CRM? Ordenado."),
  ("B21-integraciones", "¿Tengo que reemplazar mis sistemas? No por defecto."),
- ("B04-encaje", "¿HubSpot, Salesforce o Zoho? El que encaje."),
- ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
- ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
- ("B18-creditos", "¿Cuántos créditos necesito? A medida."),
+ ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
  ("B22-automatizacion", "¿Workflow o agente? Según la tarea."),
  ("B27-workflow-creditos", "¿Un workflow gasta créditos? Si usa IA."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
- ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
+ # 4 · Comprar con criterio
+ ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
+ ("B18-creditos", "¿Cuántos créditos necesito? A medida."),
+ # 5 · Riesgos: lo que pregunta TI
  ("B24-ley", "¿Cuándo rige la nueva ley? Diciembre."),
+ ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
  ("B25-residencia", "¿Dónde están mis datos? En Estados Unidos."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
- ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
  ("B26-salida", "¿Y si mañana nos vamos? Te llevas todo."),
+ # 6 · Cómo trabajamos
  ("B10-evaluacion", "¿Qué recibo primero? Una decisión."),
  ("B11-olas", "¿Sumo todos los agentes juntos? No, por olas."),
  ("B12-dia-a-dia", "¿Qué llega a producción? Lo que apruebes."),
  ("B13-adopcion", "¿Cómo aprende mi equipo? A su ritmo."),
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
  ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
- ("B28-clientes", "¿Con quién trabajan? +90 empresas."),
+ # 7 · La prueba
  ("B29-caso-anam", "Caso ANAM · ¿Qué ganó su equipo? Tiempo."),
+ ("B28-clientes", "¿Con quién trabajan? +90 empresas."),
 ]
 # El brochure no lleva el detalle de olas ni el consumo de un workflow: quedan en la propuesta (operador, 2026-10-06).
 SOLO_PROPUESTA = {"B11-olas", "B27-workflow-creditos"}
