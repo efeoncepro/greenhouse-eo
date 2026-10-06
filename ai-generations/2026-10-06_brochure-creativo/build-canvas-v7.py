@@ -485,10 +485,17 @@ S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el 
 
 def image_slide(title, blob):
     return page(title, f'<img src="{BL(blob)}" alt="{title}" style="display: block; width: 1920px; height: 1080px">', DARK, False)
+# Pasada final de narrativa (operador, 2026-10-06): primero el mapa de las cuatro rutas y después cada capítulo, en el
+# mismo orden de las rutas (Creative Velocity → Brand Systems → Producción/IA). Las seis capacidades cierran el «qué»
+# y abren el «quién»: un solo equipo → personas reales → cómo trabajamos → Creative Studio → el día a día.
 ORDER = [("A01-portada", "Portada · ¿Mi equipo puede producir más? Mucho más.", 'png'), ("A02-promesa", None, 'hand'),
-         ("B1-escala", None, 'hand'), ("B2-formatos", None, 'hand'), ("B3-tiempo", None, 'hand'), ("B4-manual", None, 'hand'), ("B5-sistema", None, 'hand'), ("B6-prueba", None, 'hand'),
-         ("A03-rutas", None, 'hand'), ("A04-capacidades", None, 'hand'), ("P1-estudio", None, 'hand'), ("P2-hibrido", None, 'hand'), ("P3-herramientas", None, 'hand'), ("P4-creative-studio", None, 'hand'),
-         ("A05-equipo", "¿Quién trabaja en mi marca? Personas reales.", 'png'), ("A07-triptico", None, 'hand'), ("P5-dia-a-dia", None, 'hand'),
+         ("A03-rutas", None, 'hand'),
+         ("B1-escala", None, 'hand'), ("B2-formatos", None, 'hand'), ("B3-tiempo", None, 'hand'),
+         ("B4-manual", None, 'hand'), ("B5-sistema", None, 'hand'), ("B6-prueba", None, 'hand'),
+         ("P1-estudio", None, 'hand'), ("P2-hibrido", None, 'hand'), ("P3-herramientas", None, 'hand'),
+         ("A04-capacidades", None, 'hand'),
+         ("A05-equipo", "¿Quién trabaja en mi marca? Personas reales.", 'png'), ("A07-triptico", None, 'hand'),
+         ("P4-creative-studio", None, 'hand'), ("P5-dia-a-dia", None, 'hand'),
          ("A08-capacidad", None, 'hand'), ("A09-sprint", "¿Y si no me convence? Empiezas chico.", 'png'),
          ("A10-control", "¿Pierdo el control de mi marca? Nunca.", 'png'), ("A12-caso-sky", None, 'hand'), ("A13-testimonio", None, 'hand'),
          ("A14-clientes", None, 'hand'), ("A21-mercados", "¿Dónde trabajan? En cinco países.", 'png'), ("A15-siguiente", "¿Qué recibo primero? Un plan.", 'png'),
