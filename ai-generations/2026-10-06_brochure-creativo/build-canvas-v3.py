@@ -203,11 +203,14 @@ def cvphoto(key, alt):
     return f'<img src="{BL(CV[key])}" alt="{alt}" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">'
 def seal(label, text):
     return f'<div style="display: flex; flex-direction: column; gap: 6px"><div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa">{label}</div><div style="font-family: {ST}; font-size: 19px; font-weight: 500; color: #ffffff">{text}</div></div>'
+# CV1 derivó hacia el centro (falla 32): la foto se corre 150 px a la derecha y su borde se funde con el negro de la
+# propia foto (#020206), sin velo sobre las personas.
+B1T = dict(DARK, bg='#020206')
 S['B1-escala'] = ("El mismo equipo. Otra escala.", page("El mismo equipo. Otra escala.",
-  cvphoto('CV1', 'Nexa, Karo y Julio, con el hoodie de Efeonce, en diagonal hacia el fondo del estudio; una sola pieza de luz frente a Nexa se multiplica en una cinta de cientos de piezas con el mismo sistema que se aleja hacia la profundidad') +
+  f'<img src="{BL(CV["CV1"])}" alt="Nexa, Karo y Julio, con el hoodie de Efeonce, en diagonal hacia el fondo del estudio; una sola pieza de luz junto a Nexa se multiplica en una cinta de cientos de piezas con el mismo sistema que se aleja hacia la profundidad" style="position: absolute; left: 150px; top: 0; width: 1920px; height: 1080px; object-fit: cover; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 180px); mask-image: linear-gradient(to right, transparent 0, #000 180px)">' +
   col(eyebrow('Creative Velocity', DARK) + headline(['El mismo', 'equipo.', 'Otra escala'], 96, DARK, '; margin-top: 64px') +
       body('Aumentamos la capacidad de tu equipo de marketing con tecnología, personas y procesos probados, gobernados y medidos, sin perder consistencia de marca y acelerando el time-to-market.', DARK, 22, 520, '; margin-top: 36px') +
-      f'<div style="margin-top: 44px; display: flex; gap: 36px">{seal("Probado", "en Sky, 12 meses")}{seal("Gobernado", "apruebas tú")}{seal("Medido", "en tu portal")}</div>', 120, 540) + bubble(DARK)))
+      f'<div style="margin-top: 44px; display: flex; gap: 36px">{seal("Probado", "en Sky, 12 meses")}{seal("Gobernado", "apruebas tú")}{seal("Medido", "en tu portal")}</div>', 120, 540) + bubble(DARK), B1T))
 def speed(label, text):
     return f'<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 18px; border-top: 1px solid rgba(114, 222, 216, 0.16)"><div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa">{label}</div><div style="font-family: {ST}; font-size: 19px; font-weight: 400; color: #ffffff">{text}</div></div>'
 S['B2-formatos'] = ("Una campaña. 50 piezas. Una sola marca.", page("Una campaña. 50 piezas. Una sola marca.",
