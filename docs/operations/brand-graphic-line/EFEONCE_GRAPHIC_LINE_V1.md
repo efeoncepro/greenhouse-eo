@@ -223,8 +223,13 @@ lo hacen por tres causas: se escribe al revés (primero la respuesta con golpe, 
 el tope de tres palabras recorta la respuesta hasta que deja de responder, y el slot de voz es obligatorio en todas las
 recetas, así que el recurso se repite 16, 24 o 33 veces por deck.
 
-**Alcance:** decks, brochures y propuestas. En web, DOOH, motion, publicidad y social el par sigue siendo la voz por
-defecto, **una vez por pieza** (un hero, una pantalla, un anuncio); las cinco pruebas aplican igual a ese par.
+**Alcance: toda La órbita** (el operador lo confirmó el 2026-10-06 en la sesión de la línea gráfica, sobre una primera
+redacción que lo acotaba a decks). En decks, brochures y propuestas, el par va en una de cada tres láminas como máximo.
+En piezas de una pantalla (hero web, DOOH, motion, publicidad y social), la voz por defecto también es el titular de
+decisión, y el par se usa sólo cuando pasa las cinco pruebas; en una serie o campaña, la densidad se cuenta sobre la
+serie. Las piezas aprobadas con par se revisan con las cinco pruebas al reutilizarse. Llevar la regla a la norma de
+web, DOOH y motion (composición por superficie) y al gate de tres voces de publicidad (`foto:cta:gate`) es parte de la
+task de sistema; hasta entonces, esas normas siguen como están escritas.
 
 **Desde hoy, en decks y documentos:**
 
