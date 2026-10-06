@@ -893,7 +893,35 @@
         "El isotipo del uniforme siempre compuesto con pnpm foto:isotipo desde @efeoncepro/axis-brand-assets (negativo sobre prenda oscura), nunca el que dibuja el modelo; revisar antes con pnpm foto:emblema al 100 %."
       ],
       "notes": "Título previo: «✅ APROBADA · FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»». Desde el 2026-09-28 (TASK-1934, pedido del operador) lleva su plate propio CR4 «El squad te la entrega»: antes compartía CR2b con proposal-cinematic-creative y un brochure de Creative Services con las dos disparaba plate-repeated. «¿Quién crea mi contenido?» (25) sigue siendo el máximo aprobado; no alargar. Registro: portada de brochure con persona del equipo como protagonista; §2 del registro cine y el issue AXIS cine-requires-nexa-or-proposal sólo admiten Nexa o proposal-cinematic, así que el contrato hoy la rechazaría: el operador la aprobó y falta llevarlo al contrato (§16.6 #1, TASK-1927).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaBrand.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPortadaLineaBrand.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A01-portada · Brochure 01",
+          "board": "canvas Agencia Creativa (Design), lámina 01",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A01-portada/01-deck-cover-brochure.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A01-portada.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A01-portada.json"
+          },
+          "content": {
+            "eyebrow": "Brochure · Agencia Creativa",
+            "question": "¿Mi equipo puede producir más?",
+            "answer": "Mucho más",
+            "body": "**Seis** capacidades:\nSquad creativo · Brand systems · Campañas\nContenido y social · Audiovisual · Run & Gun"
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013).",
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+            "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja"
+          }
+        }
+      ]
     },
     {
       "id": "cover-brochure-line-engine",
@@ -2638,6 +2666,25 @@
             "notes": "Sin foto: la órbita gigante en el acento de la línea revenue-hubspot (alterna con la portada con foto B01)."
           },
           "fit": "Cabe en los slots de la receta sin cambios: layout «orbit» en la línea revenue-hubspot, con «¿Conversamos? Cuando quieras.» y el eslogan «Empower your Revenue» como firma. Alterna con la portada con foto (B01)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A16-contraportada · Brochure 27",
+          "board": "canvas Agencia Creativa (Design), lámina 27",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A16-contraportada/01-deck-close-brochure.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A16-contraportada.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A16-contraportada.json"
+          },
+          "content": {
+            "question": "¿Conversamos?",
+            "answer": "Cuando\nquieras"
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013)."
         }
       ]
     },
@@ -4612,7 +4659,30 @@
         "La órbita con satélites no lleva esfera (satellites-arc-no-sphere)."
       ],
       "notes": "En AXIS es content-team, pero el token y su referencia describen la versión anterior (D3-equipo: anillo con el squad como satélites, en render-src/deck-interior.mjs). El operador pidió «más impacto» y aprobó el 2026-09-27 la versión en fichas de vidrio (EQ-equipo-impacto): AXIS debe actualizar referencia y token. Hallazgo: el cargo del líder va en color.halo a 18 px; revisar contra D1 (acento sólo en 24 px o más).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckEquipo.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckEquipo.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A05-equipo · Brochure 14",
+          "board": "canvas Agencia Creativa (Design), lámina 14",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A05-equipo/01-deck-content-team.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A05-equipo.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A05-equipo.json"
+          },
+          "content": {
+            "eyebrow": "Tu equipo",
+            "question": "¿Quién trabaja en mi marca?",
+            "answer": "Personas\nreales",
+            "body": "Un squad que orbita tu marca y **un** solo interlocutor: tu Responsable de Cuenta."
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013)."
+        }
+      ]
     },
     {
       "id": "content-stack",
@@ -5488,6 +5558,26 @@
             "target": "object"
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Sólo en la propuesta: el costo no va en el brochure (decisión del operador). Montos [monto] por propuesta; el precio de los créditos extra (USD 10 por 1.000) sale del Rate Sheet de HubSpot."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A10-control · Brochure 21",
+          "board": "canvas Agencia Creativa (Design), lámina 21",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A10-control/01-deck-content-bullets.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A10-control.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A10-control.json"
+          },
+          "content": {
+            "eyebrow": "Tu marca, tus reglas",
+            "question": "¿Pierdo el control de mi marca?",
+            "answer": "Nunca"
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013)."
         }
       ]
     },
@@ -10802,7 +10892,35 @@
         "El acento nunca en texto menor de 24 px"
       ],
       "notes": "Versión sobria (más datos) de la propuesta creativa; la cine (`proposal-cinematic-creative`) es la de impacto y cambia la voz a «¿Tu marca en cada pantalla? En todas.». Id nuevo, sin plantilla en `pnpm brand:compose`. Igual que en AEO, el kicker de la primera tarjeta salió en el acento sobre papel a 15 px (contra D1): al componer, navy. La prueba de Sky se imprime sin su fuente en la lámina; la fuente viaja en el intent (`proof.source`) y queda por confirmar si debe verse. La foto T2 se aprobó en el tríptico con el emblema generado en la manga; no tiene versión con isotipo compuesto.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaCreativa.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaCreativa.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A09-sprint · Brochure 20",
+          "board": "canvas Agencia Creativa (Design), lámina 20",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A09-sprint/01-deck-proposal-service.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A09-sprint.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A09-sprint.json"
+          },
+          "content": {
+            "eyebrow": "Cómo empezar",
+            "question": "¿Y si no me convence?",
+            "answer": "Empiezas chico",
+            "body": "Un Creative Sprint pagado y acotado prueba el encaje con tu marca antes de sumar capacidad."
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013).",
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+            "alt": "Un creativo de Efeonce con polo cuelga pruebas impresas en una pared de referencias y mira hacia atrás sonriendo"
+          }
+        }
+      ]
     },
     {
       "id": "proposal-service-web",
@@ -13178,6 +13296,27 @@
             ]
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Fechas de la agenda de ejemplo (5–9 oct): se mueven al usar el deck (pendiente de DECISIONES.md)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A15-siguiente · Brochure 26",
+          "board": "canvas Agencia Creativa (Design), lámina 26",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A15-siguiente/01-deck-decision-next-steps.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A15-siguiente.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A15-siguiente.json"
+          },
+          "content": {
+            "eyebrow": "Próximos pasos",
+            "question": "¿Qué recibo primero?",
+            "answer": "Un plan",
+            "body": "Un diagnóstico con tu baseline y la fase que sigue."
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013)."
         }
       ]
     },
@@ -18469,6 +18608,32 @@
             "notes": "Mapa de puntos (1792 × 1024) con nodos medidos; azul y Santiago en magenta. RG1b (la Tierra desde la órbita) quedó en el banco porque se leía como un ovoide. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Uso distinto del de la receta, aprobado por el operador: los nodos no son mercados de EFEONCE_OPERATING_MARKETS sino cuatro regiones de datos de HubSpot (Canadá, EE. UU. Este, Fráncfort y Australia) y la empresa del cliente en Chile. La respuesta dice dónde están los datos, no dónde no están. El plate RG2b está registrado con sus nodos medidos (px del plate, 1792 × 1024) en PLATE_SIZES de src/lib/brand-surfaces/recipes/sv360/content-markets.ts: la receta sólo acepta plates medidos."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure de agencia creativa»; canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs, página «Agencia Creativa» · 27)",
+          "deck": "Agencia Creativa (línea brand)",
+          "line": "brand",
+          "slide": "A21-mercados · Brochure 25",
+          "board": "canvas Agencia Creativa (Design), lámina 25",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_brochure-creativo/out-v2/A21-mercados/01-deck-content-markets.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A21-mercados.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_brochure-creativo/intents-v2/A21-mercados.json"
+          },
+          "content": {
+            "eyebrow": "Mercados",
+            "question": "¿Dónde trabajan?",
+            "answer": "En cinco\npaíses",
+            "body": "Chile, Estados Unidos, Colombia, México y Perú, con **un solo equipo** y un solo interlocutor."
+          },
+          "fit": "Compuesta por el compositor con la receta tal cual (slots medidos contra maxChars al componer, 2026-10-06), en la línea Brand con el acento naranja sobre navy. Es uno de los 8 pares de pregunta y respuesta del brochure (8 de 27, en boca del cliente), dentro del tope de §4 de EFEONCE_GRAPHIC_LINE_V1 (delta 2026-10-06). Las otras 20 láminas del brochure están hechas a mano y quedan como candidatas a receta (TASK-2013).",
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+            "alt": "Las Américas de noche vistas desde la órbita; cinco puntos de luz azul unidos por arcos en Miami, Ciudad de México, Bogotá, Lima y Santiago"
+          }
         }
       ]
     }

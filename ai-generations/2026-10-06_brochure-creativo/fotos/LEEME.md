@@ -16,7 +16,7 @@ Fichas en `fichas/`, plates en `plates/` (fuera de git). Todas pasaron por `cine
 
 | Plate | Lámina | Estado | Por qué |
 |---|---|---|---|
-| `BS1b-del-manual-al-sistema` | B4 «Del manual al sistema.» | **En uso** | Karo con el manual cerrado; la identidad de una marca ficticia (dos cuadros) sube como sistema de luz; un solo punto naranja |
+| `BS1b-del-manual-al-sistema` | B4 «Del manual al sistema.» | Banco (reemplazada) | Karo con el manual cerrado; la identidad de una marca ficticia (dos cuadros) sube como sistema de luz; un solo punto naranja |
 | `BS1-del-manual-al-sistema` | — | Descartado | El modelo dibujó el isotipo de Efeonce como «marca ficticia» cuatro veces, con cuatro puntos naranjas (el modelo nunca dibuja la marca; un acento por pieza) |
 
 B6 «Este brochure es la prueba.» usa `assets/muro-la-orbita.jpg` (`build-muro.js`): 35 piezas reales aprobadas de La órbita
@@ -26,8 +26,8 @@ B6 «Este brochure es la prueba.» usa `assets/muro-la-orbita.jpg` (`build-muro.
 
 | Plate | Lámina | Estado | Por qué |
 |---|---|---|---|
-| `RG1-estudio-portatil` | P1 «El estudio va donde estés.» | **En uso** | Run & Gun como estudio portátil profesional en una bodega: gimbal, cámara cine, panel LED, tubos, road cases (equipo actual, nada vintage) |
-| `HB1-manos-y-modelos` | P2 «Manos y modelos, en el mismo set.» | **En uso** | Julio filma el producto real; la luz lleva la toma a cuatro variantes en pantalla; Nexa con el Spark de contenido supervisa. Derivó al centro: en la lámina se corre 150 px y se funde con su propio negro (#060910) |
+| `RG1-estudio-portatil` | P1 «El estudio va donde estés.» | Banco (reemplazada) | Run & Gun como estudio portátil profesional en una bodega: gimbal, cámara cine, panel LED, tubos, road cases (equipo actual, nada vintage) |
+| `HB1-manos-y-modelos` | P2 «Manos y modelos, en el mismo set.» | Banco (reemplazada) | Julio filma el producto real; la luz lleva la toma a cuatro variantes en pantalla; Nexa con el Spark de contenido supervisa. Derivó al centro: en la lámina se corre 150 px y se funde con su propio negro (#060910) |
 
 Revisión previa de `cine-reviewer`: la deriva de este brochure se explica por geometría (con 85 mm a 3–4 m la escena no cabe en la mitad derecha); se corrigió ordenando la escena en profundidad y alejando la cámara [inferencia, a medir en más plates].
 
@@ -57,3 +57,11 @@ en la lámina la foto se corre 130 px con el borde fundido a su negro (#060913).
 | `SA1-talento-adentro` | A19 «Tu equipo, con talento de Efeonce adentro.» | **En uso** | Karo arma la campaña del cliente en su mesa con dos personas de su equipo (extras sin marca, gris y carbón); una hoja de piezas de luz es la llave; el hoodie es el único azul. `cine-reviewer` corrigió antes de gastar: el monitor como llave anulaba la palanca `luz-motivada` y el acento quedaba de espaldas |
 
 El GAZE incondicional de `deck-seccion` se contradice desde la escena (mirada a la pieza, no al texto) para no repetir el tic de mirada de la serie; candidato a campo `mirada` en el compilador.
+
+## Estado final (canonización 2026-10-06)
+
+En uso: `CV1b` (B1), `CV2b` (B2), `CV3b` (B3), `BS1c` (B4), `RG1b` (P1), `HB2` (P2), `SK1` (A12, foto de lugar fuera del
+registro cine) y `SA1` (A19, **candidata**: extras del cliente con texto a la izquierda, sin decisión del operador). Las
+seis cine aprobadas están en `scripts/foto/cine-recetas.json`; las lecciones, en el casebook cine (fallas 36–43). `BS1b`,
+`RG1` y `HB1`/`HB1b` quedan en el banco. Ojo: el `RG1b` de esta corrida (estudio portátil) no es el `RG1b` del deck
+HubSpot (la Tierra desde la órbita).

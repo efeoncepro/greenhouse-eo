@@ -13,7 +13,7 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "deck SEO", "deck SV360". En marca
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "deck SEO", "deck SV360". En marca
   propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
   incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
   pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
@@ -204,6 +204,42 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **Largo de la respuesta por receta.** `section-cine` ≤ 9 caracteres en una línea; `proposal-cinematic` `hero` sólo
     respuestas cortas («Ya no», «Nunca»: con dos tramos se monta sobre la bajada); `decision-ai-market` ≤ 9 y una línea,
     y su centro no aguanta una cifra de cinco caracteres («5.000» se sale de la tarjeta).
+- **Brochure «Agencia Creativa» (aprobado 2026-10-06, TASK-2013).** El collateral vigente de Creative Services, bajo
+  el paraguas Agencia Creativa (PDR-004: «Tu equipo dirige. Nosotros producimos a escala»); **reemplaza** a la v1
+  «Servicios Creativos» (15 láminas, no vigente). 27 láminas en línea Brand (acento `#ff6500` sobre oscuro, `#bb1954`
+  sobre papel; un punto por foto, como puntuación). Orden: portada → mapa de las cuatro rutas (3) → capítulos en el
+  orden de las rutas (4–12: Creative Velocity, Brand Systems, Run & Gun, set híbrido, herramientas por etapa) → seis
+  capacidades (13) → personas, cómo trabajamos, Creative Studio y día a día (14–17) → cómo se compra, con el talento
+  embebido en la 19 (18–21) → prueba: caso y testimonio SKY, clientes, cinco países (22–25) → plan y contraportada.
+  Sólo **7 salen del Artifact Composer** (`cover-brochure`, `content-team`, `proposal-service`, `content-bullets`,
+  `content-markets`, `decision-next-steps`, `close-brochure`; `pnpm brand:compose` desde `intents-v2/`); las otras **20
+  son a mano** y quedan como candidatas a receta, no recetas (TASK-2013). **Canvas** (privado):
+  <https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs> (páginas «Agencia Creativa», «Interfaces · Creative Studio» con
+  `CS-Campaigns` y `CS-Home`, y «v1 · Servicios Creativos», histórica). **PDF** (16:9, 27 páginas): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`, copia en
+  `ai-generations/2026-10-06_brochure-creativo/`; builder `build-canvas-v7.py` en esa carpeta (láminas a mano,
+  componentes CS y `canvas.json`). **El PDF se rasteriza:** render local con el runtime real del canvas (`dc-runtime.js`
+  del tipo Design + un shim `support.js`), servidor estático que mapea `/_blob/<id>` a los assets bajados con
+  `Artifact read path=<id>`, captura Playwright 1920×1080 a `deviceScaleFactor` 2 en JPEG q88 y una imagen a sangre por
+  página. El PDF vectorial (`page.pdf` por lámina) dejaba un borde blanco y aplanaba el `preserve-3d` de la lámina 17;
+  el costo es que el texto no se puede seleccionar. Script:
+  `node ai-generations/2026-10-06_brochure-creativo/exp/render-pdf.mjs <render-dir> <salida.pdf>`. Uso comercial: skill `creative-practice`. **Lecciones de oficio
+  medidas en esta corrida:**
+  - **Voz.** 8 de 27 con par pregunta–respuesta (01, 14, 17, 20, 21, 25, 26, 27), todas en boca del cliente; el resto,
+    titular de decisión (delta §4 de `EFEONCE_GRAPHIC_LINE_V1`, como máximo 1 de cada 3, y TASK-2012). Seis de los ocho
+    van en el último tercio, donde están las objeciones y el cierre.
+  - **Interfaces con campañas ficticias.** Las láminas 16 y 17 usan las vistas reales del artifact de Marketing Studio,
+    renombradas Creative Studio, con campañas inventadas (CMP-101 Volta … CMP-105 Casa Mar; «Buenos días, Camila»).
+    Nunca campañas propias ni de clientes reales en una interfaz de brochure (operador). El encabezado lleva el lockup
+    «efeonce | Creative Studio» como la app real (positivo en claro, negativo en oscuro, 20 px).
+  - **Perspectiva 3D.** La 17 monta la vista Hoy y la órbita sobre un plano inclinado (`rotateX` 20°, `rotateY` −17°),
+    la vista Campañas detrás en profundidad y cuatro tiles de herramientas (Teams, Notion, Frame.io, Adobe) a distinta
+    altura z, con hilo y punto. Por esa lámina el PDF va raster.
+  - **Foto corrida con borde fundido.** Si el plate cine igual deriva al centro, en la lámina la foto se corre 130–150 px
+    a la derecha con el borde fundido a su propio negro; la causa y cómo evitarla en la ficha, en `design-studio`.
+  - **Narrativa: el mapa antes de los capítulos.** En la pasada final, los capítulos Creative Velocity y Brand Systems
+    iban antes de la lámina de las cuatro rutas que los presenta. Se movió el mapa a la 3 y los capítulos siguen el
+    orden de las rutas; las seis capacidades cierran el «qué» y abren el «quién».
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

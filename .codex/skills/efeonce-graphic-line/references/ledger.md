@@ -687,3 +687,21 @@ build/typecheck, 198 contracts, design/agent PASS; evidencia dueña en `docs/qua
 La autorización de commit/push no acredita release de packages, instalación privada de los nuevos
 exports ni adopción en Growth/sitio público/Think. Estado de esos planos permanece pendiente hasta
 su readback independiente; el push final lo registra el coordinador con su SHA real.
+
+### 2026-10-06 — Logo de Creative Studio (24 piezas)
+
+El operador pidió el logo de Creative Studio «exactamente el mismo de Marketing Studio o parecido pero con el color de
+la línea brand» y lo aprobó para AXIS con sus 24 piezas («Las 24 piezas»): 8 formas (`logo`, `lockup`,
+`short-lockup`, `compact`, `stacked-lockup`, `short-stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`,
+`creative-studio-<forma>-<variante>.svg`. Acento Brand: `#bb1954` sobre papel, `#ff6500` sobre navy. Generador
+Greenhouse `scripts/brand/build-creative-studio-logos.mjs` (copia del de Marketing Studio con `GL.lines` key `brand` y
+la palabra «Creative»; usa `orbit-ring.mjs` y las terminaciones concéntricas de la familia). Destino:
+`@efeoncepro/axis-brand-assets` 0.4.26 (AXIS `f4dd2fe` en `main`, tag `v0.4.26`, 2026-10-06). Quedan sólo en el
+paquete, como las de HubSpot: el índice de búsqueda del Lab pasaba de 399 KB a 416 KB (`AXIS_LOGO_EXCLUSIONS` las
+lista); entran al catálogo público al fragmentar el índice. **Regla de las piezas cortas:** las que dicen sólo
+«Studio» (`short-lockup`, `compact`, `short-stacked-lockup`, `isotype` S, `icon` con nave sobre «Studio») se parecen a
+las de Marketing Studio salvo por el acento; existen en el paquete, pero su uso visible queda sujeto a «Studio a secas
+es Marketing Studio» y a nombrar cada vista completa en superficies visibles (ADR `EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1`
+D9 y §7). Primer uso: encabezado de las interfaces del brochure Agencia Creativa (lockup «efeonce | Creative Studio»).
+Pendiente en el release AXIS: el README de `brand-assets` todavía dice que «Creative Studio» es sólo el descriptor de
+Globe.

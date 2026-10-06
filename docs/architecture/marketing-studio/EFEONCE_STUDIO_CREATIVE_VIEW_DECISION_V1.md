@@ -175,6 +175,10 @@ Mientras tanto, y para que la unión no obligue a rehacer nada:
   conviven en `studio.efeonce.org`.
 - **Creative Studio** abarca también a **Globe**, que conserva su nombre como el motor de producción. Delta en la
   [decisión de nombre](EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
+- **Marca de Creative Studio (aprobada el 2026-10-06):** la misma construcción que Marketing Studio, con «Creative» y
+  la esfera en el acento Brand; 24 piezas `creative-studio-*` en `@efeoncepro/axis-brand-assets` 0.4.26. Las piezas
+  cortas, que dicen sólo «Studio», van sólo donde el contexto ya dice Creative Studio. Delta en la
+  [decisión de nombre](EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
 - Los identificadores técnicos no cambian: capabilities `marketing_studio.*`, tools `studio.*`, base
   `marketing_studio`, repo `efeonce-marketing-studio`. Nombran el dominio de la plataforma, no la vista.
 - **Lectura de documentos previos:** en documentos anteriores al 2026-10-05, en `docs/architecture/creative-studio/`,
@@ -230,7 +234,7 @@ Mientras tanto, y para que la unión no obligue a rehacer nada:
 
 1. **«Studio» a secas.** ¿Pasa a nombrar la plataforma (Efeonce Studio, con dos vistas) o sigue siendo Marketing
    Studio? Recomendación: la plataforma. Afecta lockups, ícono y la decisión de marca del 2026-10-02.
-2. **Marca de Creative Studio.** Si lleva la órbita en la «o» con otro acento o comparte la de la plataforma.
+2. **Marca de Creative Studio.** Si lleva la órbita en la «o» con otro acento o comparte la de la plataforma. **Resuelta el 2026-10-06:** la órbita en la «o» con el acento Brand (D9).
 3. **Activación con versión no aprobada:** bloqueo duro o chequeo pendiente visible.
 4. **Límite de rondas por contrato.** Si Studio lo lleva (y avisa al pasarse) o queda en el SOW. Lo comercial lo
    decide `creative-practice`.

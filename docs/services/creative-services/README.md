@@ -168,6 +168,26 @@ intake → brief/inventory → diagnose → concept/design → produce → revie
 La oferta no incluye rondas ilimitadas. El SOW debe fijar rondas, owner de aprobación, canales/territorio/plazo de
 uso, adaptaciones incluidas, dependencias del cliente, derechos y change order.
 
+## Collateral comercial
+
+- **Brochure «Agencia Creativa»** (27 láminas, 16:9; aprobado por el operador el 2026-10-06,
+  [TASK-2013](../../tasks/to-do/TASK-2013-agencia-creativa-brochure-slide-recipe-candidates.md)): el collateral
+  vigente de la línea, bajo el paraguas de Agencia Creativa (PDR-004): «Tu equipo dirige. Nosotros producimos a
+  escala». Primero el mapa de las cuatro rutas (lámina 3), después un capítulo por ruta en ese orden, las seis
+  capacidades, el equipo, Creative Studio, cómo se compra, la prueba (caso SKY y clientes) y el cierre. PDF en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`; canvas privado en
+  <https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs> (página «Agencia Creativa»). **Reemplaza** a la v1 «Servicios
+  Creativos» (15 láminas, página «v1 · Servicios Creativos» del mismo canvas), que deja de ser vigente. **Antes de
+  usarlo con prospectos** falta verificar si las cifras del caso SKY («25 % menos de tiempo de producción») y su
+  testimonio requieren la misma autorización de cliente que el caso ANAM del brochure HubSpot. Uso comercial: skill
+  `creative-practice`; armado: skill `deck-studio`.
+- **Talento embebido (lámina 19; decisión del operador, 2026-10-06).** Cuando el comprador pide «staff augmentation»,
+  el brochure responde con talento creativo embebido con respaldo de Efeonce: la palabra del comprador va **sólo en el
+  eyebrow** («Talento embebido · Staff augmentation») y la oferta es la del
+  [Embedded Creative Pod](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md) (tres modalidades: remoto, embebido y
+  co-operado; fee mensual integral de §9). No abre Staff Augmentation puro —perfiles bajo dirección del cliente, sin
+  responsabilidad de entrega de Efeonce—: el brochure no lo ofrece y la tabla de «Separación de capas» no cambia.
+
 ## Estado y siguientes gates
 
 El catálogo es una base comercial para validación, no una autorización de venta general. Los gates pendientes son:

@@ -27,6 +27,30 @@ costear dirección, preventa, coordinación y QA junto con producción. La OT re
 capacidad, derechos, revisiones, precio y cobro se fijan por encargo. No supone operación continua de redes,
 disponibilidad de Globe ni cambios runtime.
 
+## Collateral vigente — brochure «Agencia Creativa» 2026-10-06
+
+El brochure aprobado de la línea es **«Agencia Creativa»** (27 láminas, 16:9; PDF en OneDrive
+`Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`, canvas privado
+<https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs>). La v1 «Servicios Creativos» (15 láminas) **no es vigente**: no
+se manda. Recorre mapa de rutas → un capítulo por ruta → seis capacidades → quién trabaja → cómo se compra → prueba
+(caso SKY) → plan. Ficha y pendientes: [README de Creative Services](../../../docs/services/creative-services/README.md#collateral-comercial);
+armado y lecciones: `deck-studio`. **Antes de llevarlo a un prospecto**, verificar si las cifras y el testimonio del
+caso SKY requieren autorización del cliente (pendiente abierto).
+
+**Cuando el comprador pide «staff augmentation»** (decisión del operador, 2026-10-06): no se le corrige la palabra ni
+se le venden perfiles sueltos. Se responde con la **lámina 19**, «Tu equipo, con talento de Efeonce adentro.»: talento
+creativo embebido con respaldo de Efeonce. Su palabra va **sólo en el eyebrow** («Talento embebido · Staff
+augmentation»).
+
+- **Tres modalidades** = las tres configuraciones del [Embedded Creative Pod](../../../docs/services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md) §4:
+  **Remoto** (con tus herramientas) · **Embebido** (en tu oficina) · **Co-operado** (adentro y en estudio).
+- **Cuatro diferencias:** **reemplazo sin vacío** · **calidad gobernada** · **un fee mensual** (sueldos, cargas,
+  licencias y equipo por cuenta de Efeonce: Fully Managed Creative Capacity, §9) · **tú diriges** (el cliente conserva
+  prioridad, contexto, aprobación y autoridad de marca; la dirección cotidiana del pod y la entrega siguen en Efeonce).
+- 🔴 **No abre Staff Augmentation puro** (perfiles bajo dirección del cliente, sin responsabilidad de entrega de
+  Efeonce): el brochure no lo promete. Se pricea como capacidad + gobierno + integración, nunca al rate de staff aug
+  (Embedded Pod §10).
+
 ## Dirección estratégica de marca y escala — 2026-10-03
 
 Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)

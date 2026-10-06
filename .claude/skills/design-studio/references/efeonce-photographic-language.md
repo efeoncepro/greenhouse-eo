@@ -137,6 +137,30 @@ Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el caseb
 `HS3b`, `HS4`, `HS5b`, `HS6b`, `CMP-crm-B`, `CMP-portada-B`, cada una con su `ojo`). Antes de partir de ellas lee la
 [sección del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
 deriva del objeto hacia la reserva, objeto al otro lado del sujeto, acento de un solo punto y tic de pose (fallas 32–35).
+**Brochure Agencia Creativa (2026-10-06):** seis plates cine aprobados (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`,
+`HB2`), la foto de lugar `SK1` (fuera del registro cine) y `SA1` como **candidata** (ver 5); fichas en git en `ai-generations/2026-10-06_brochure-creativo/fotos/fichas/`, plates fuera de
+git en `fotos/plates/`, banco y descartes en `fotos/LEEME.md`. Los seis plates cine son recetas de `cine-recetas.json` y las lecciones siguientes son las fallas 36–43 del
+[casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md); `SA1` sigue candidata (TASK-2013).
+1. **Deriva al centro por geometría.** Con 85 mm a 3–4 m la escena no cabe en la mitad derecha. Se ordena en
+   profundidad, con porcentaje de ancho por persona y una «banda de oscuridad vacía» entre el borde izquierdo y la
+   espalda, y se aleja la cámara; si igual deriva, la lámina corre la foto 130–150 px a la derecha con el borde fundido
+   a su propio negro.
+2. **La mirada al texto de `deck-seccion` se vuelve tic en serie** (operador: «ya van 3»). Se dosifica como el acento:
+   la escena la contradice a propósito (mirar la pieza, el manual o la cámara). Candidato: campo `mirada` en la ficha.
+3. **Identidad de Julio.** El bloque IDENTITY se exagera a distancia media («dos kilos de frente», «piel de IA»); por
+   pedido del operador va Antonio. Antonio es línea revenue y `foto:prompt` lo bloquea en `linea: brand`: la ficha HB2
+   va sin `linea`, por pedido explícito.
+4. **Con `luz-motivada`, un monitor como llave anula la palanca** (compila «never a monitor») y deja el acento de
+   espaldas: el fenómeno tiene que ser el servicio (SA1: hoja de piezas de luz sobre la mesa del cliente).
+5. **SA1 queda candidata, no receta cine.** Pone extras del cliente (ficticios, sin marca, en gris o carbón, nada azul,
+   para que el hoodie royal diga quién viene de afuera) con el texto a la izquierda; el §2 del registro cine no cubre el
+   caso y está en consulta con el operador. **Mientras tanto rige:** el cliente sale sólo en `panel-end` y nunca en su
+   dolor (SP1), y en las fotos de marca no hay personas fuera del roster. No partir de SA1 para otra pieza.
+6. **El modelo nunca dibuja marcas.** Dibujó el isotipo de Efeonce como «marca ficticia» (BS1, descartado); el muro de
+   la lámina 9 se compuso por máscara con 35 piezas reales porque el modelo reescribía sus textos; el logo de SKY va
+   compuesto sobre un avión sin librea (SK1).
+7. **Run & Gun con equipo moderno** (gimbal, cine, LED), nunca vintage.
+8. **Plastilina: la mano de «Aprobación» se leía mal** (fálica); se usa el lápiz.
 
 **Marcador rápido — estás en cine si se cumple todo esto:**
 

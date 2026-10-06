@@ -324,6 +324,66 @@
       "protagonista": "Líder RevOps (casting de RV1b, sin retrato ancla) con la softshell + tres Sparks",
       "porque": "El moño de luz del motor de revenue converge en un nudo junto a su mano y se abre otra vez hacia el frente: captar, cerrar y crecer en un flujo que ella dirige. El nudo es la llave, en azul #0375DB y blanco frío. Portada del brochure HubSpot, con la insignia Gold compuesta aparte.",
       "ojo": "Revisado al 100 % el 2026-10-06: el magenta viaja como muchas partículas a lo largo de las corrientes (la ficha pide ≤ 1 de cada 20), no como un solo punto; no ilumina la cara, la mano ni la chaqueta, que toman sólo luz fría. Las corrientes cruzan el tercio bajo de la reserva izquierda. En una receta nueva, un solo punto magenta que no ilumine nada. La líder es casting sin retrato ancla."
+    },
+    {
+      "id": "CV1b",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/CV1b-misma-escala.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/CV1b-misma-escala.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Nexa, Karo (elenco ficticio) y Julio (roster) con el hoodie, en diagonal hacia el fondo",
+      "porque": "El fenómeno es el servicio: una sola pieza de luz junto a Nexa se multiplica en una cinta de cientos de piezas con el mismo sistema que se aleja hacia la profundidad (la capacidad del equipo crece sin cambiar la marca). La cinta frente a los pechos es la llave. Lámina «El mismo equipo. Otra escala.» (Creative Velocity) del brochure Agencia Creativa (2026-10-06). Parte de C4S07.",
+      "ojo": "Derivó hacia el centro aunque la ficha deja la mitad izquierda vacía: con 85 mm a 3–4 m la escena no cabe en la mitad derecha (casebook, falla 36). En la lámina la foto se corre 150 px a la derecha y su borde se funde con su propio negro (#020206). Antes de partir de aquí, ordena la escena en profundidad, da a cada persona su porcentaje del ancho y aleja la cámara."
+    },
+    {
+      "id": "CV2b",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/CV2b-cincuenta-piezas.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/CV2b-cincuenta-piezas.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Karo (elenco ficticio) con el hoodie y la tablet con la pieza madre",
+      "porque": "Un muro gigante de unas cincuenta piezas de UNA campaña ficticia, todas en el mismo sistema, entra desde el borde derecho y se aleja en perspectiva; las últimas llegan como estelas de larga exposición. El muro es la llave. Lámina «Una campaña. 50 piezas. Una sola marca.» del brochure Agencia Creativa. Parte de C4BF3.",
+      "ojo": "Karo mira hacia el texto (la mirada que `deck-seccion` agrega siempre): en la serie del brochure se repitió en tres plates y el operador lo leyó como tic (casebook, falla 37). Antes de partir de aquí, cambia la mirada desde la escena. La campaña del muro es de una marca ficticia, como pide la ficha."
+    },
+    {
+      "id": "CV3b",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/CV3b-menos-tiempo.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/CV3b-menos-tiempo.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Nexa con el hoodie (expresión complicidad)",
+      "porque": "Una larga exposición de seis segundos: la producción entera pasa en estelas mientras ella y la pieza terminada quedan nítidas y quietas (se acelera el proceso, no se mueve la marca). La pantalla de la pieza es la llave. Lámina «Menos tiempo. La misma marca.» del brochure Agencia Creativa. Parte de C4S04.",
+      "ojo": "Elegida sobre CV3 por las estelas más largas (más impacto); CV3 queda en el banco como aprobable. Nexa mira hacia el texto: cuenta para la dosis de mirada de la serie (casebook, falla 37)."
+    },
+    {
+      "id": "BS1c",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/BS1c-del-manual-al-sistema.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/BS1c-del-manual-al-sistema.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Karo con el hoodie, mirando hacia abajo al manual",
+      "porque": "De un manual de marca cerrado y en sombra sube la identidad de una marca ficticia como un sistema ordenado de luz: marca, paleta, bloques de tipo, grilla y las primeras piezas (la marca deja el manual y se vuelve un sistema). El sistema de luz es la llave. Lámina «Del manual al sistema.» (Brand Systems) del brochure Agencia Creativa. Parte de CR4.",
+      "ojo": "Rehecha para cortar el tic de mirada: Karo mira el sistema, no el texto, y la escena contradice a propósito la mirada de `deck-seccion` (casebook, falla 37); BS1b queda en el banco. La marca es ficticia y no se parece al isotipo de Efeonce: en BS1 el modelo dibujó el isotipo de Efeonce cuatro veces como «marca ficticia» (casebook, falla 41)."
+    },
+    {
+      "id": "RG1b",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/RG1b-estudio-portatil.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/RG1b-estudio-portatil.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Karo con el hoodie, filmando en movimiento con el gimbal",
+      "porque": "Un estudio profesional completo de luz, desplegado desde unas pocas cajas en medio de una bodega oscura (Run & Gun: el estudio se arma donde está la historia). El soft box del panel LED más cercano es la llave. Lámina «El estudio va donde estés.» del brochure Agencia Creativa. Parte de C4S05.",
+      "ojo": "Rehecha para cortar el tic de mirada (Karo filma, no mira el texto); RG1 queda en el banco. Equipo actual, nunca vintage: gimbal de carbono, cámara cine full frame, paneles LED bicolor y tubos (casebook, falla 42). No es el RG1b de `content-markets` (la Tierra desde la órbita, en `PLATE_SIZES`): mismo nombre, otra foto."
+    },
+    {
+      "id": "HB2",
+      "ficha": "ai-generations/2026-10-06_brochure-creativo/fotos/fichas/HB2-mundo-hibrido.json",
+      "plate": "ai-generations/2026-10-06_brochure-creativo/fotos/plates/HB2-mundo-hibrido.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Antonio (elenco ficticio) opera la cámara con un Spark de reportes; Nexa dirige junto al Spark de contenido; más Sparks al fondo",
+      "porque": "Un set de producción virtual: el mundo generado por IA en un muro LED monumental ilumina a las personas, la cámara y el producto reales mientras los agentes trabajan junto a ellas (producción híbrida en la misma toma). El muro LED es la llave. Lámina «Manos y modelos, en el mismo set.» del brochure Agencia Creativa. Parte de NX7d.",
+      "ojo": "Antonio es de la línea Revenue y `foto:prompt` lo bloquea en una ficha `linea: brand`: por pedido explícito del operador la ficha va sin `linea` y el hoodie sale por su kit; no lo repitas sin ese pedido. Reemplaza a HB1 y HB1b (con Julio), que quedan en el banco por la identidad de Julio (casebook, falla 38). La cámara derivó a ≈ 28 % del ancho: en la lámina la foto se corre 130 px con el borde fundido a su negro (#060913)."
     }
   ]
 }

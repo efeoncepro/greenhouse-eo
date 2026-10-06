@@ -1,9 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.12
+> **Versión:** 1.13
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-06 por Claude (1.12: el deck HubSpot aprobado por el operador — brochure de 27
+> **Última actualización:** 2026-10-06 por Claude (1.13: el brochure Agencia Creativa aprobado por el operador — 27
+> láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
+> a receta sin promoverlas (TASK-2013); sección «El brochure Agencia Creativa».
+> Antes, el mismo día, 1.12: el deck HubSpot aprobado por el operador — brochure de 27
 > láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes, cada uno con su `fit`;
 > sección «El deck HubSpot» (TASK-1943).
 > Antes, 1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
@@ -298,6 +301,36 @@ del deck Salesforce se reutilizan con datos e íconos oficiales de HubSpot (`hub
 Los planes del brochure y de la propuesta validan con `pnpm brand:deck-plan -- --plan` sin errores ni avisos
 (secuencia, parejas, documento y plates; verificado el 2026-10-06 con planes armados desde los intents, sin slots; no
 quedaron como fixtures).
+
+## El brochure Agencia Creativa (aprobado el 2026-10-06)
+
+El brochure de la línea `brand` (tema oscuro, paraguas Agencia Creativa, PDR-004), aprobado por el operador el
+2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure
+de agencia creativa»): **27 láminas**, en el canvas
+[https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs](https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs) (página «Agencia
+Creativa»; «v1 · Servicios Creativos» no está vigente). Recorrido, PDF, reglas y pendientes:
+[norma §4.6, «Brochure Agencia Creativa»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+**Siete usos de recetas existentes** (`approvedUses`, `deck: "Agencia Creativa (línea brand)"`, cada uno con su
+`fit`), que componen con `pnpm brand:compose` desde su intent en `ai-generations/2026-10-06_brochure-creativo/intents-v2/`:
+
+| Lámina | Titular | id del catálogo | Receta AXIS del intent |
+|---|---|---|---|
+| 01 · A01 | ¿Mi equipo puede producir más? Mucho más. | `cover-brochure-line-brand` (plate `CR4`) | `cover-brochure` + `line` |
+| 14 · A05 | ¿Quién trabaja en mi marca? Personas reales. | `content-team` | `content-team` |
+| 20 · A09 | ¿Y si no me convence? Empiezas chico. | `proposal-service-creative` | `proposal-service` |
+| 21 · A10 | ¿Pierdo el control de mi marca? Nunca. | `content-bullets` | `content-bullets` |
+| 25 · A21 | ¿Dónde trabajan? En cinco países. | `content-markets` (plate `MK2-mercados`, del brochure SEO) | `content-markets` |
+| 26 · A15 | ¿Qué recibo primero? Un plan. | `decision-next-steps` | `decision-next-steps` |
+| 27 · A16 | ¿Conversamos? Cuando quieras. | `close-brochure-orbit` | `close-brochure` |
+
+Las siete salen del compositor con la receta tal cual (los slots se midieron contra `maxChars` al componer) y son siete
+de los ocho pares pregunta–respuesta del brochure; el octavo es la lámina 17, a mano.
+
+**Veinte láminas a mano, candidatas a receta.** Las otras 20 (02–13, 15–19 y 22–24) se hicieron a mano en
+`build-canvas-v7.py` y **quedan como candidatas** a receta del catálogo, **sin promoverlas ahora** (decisión del
+operador); las registra TASK-2013. Mientras no lo sean, no tienen id en este catálogo ni plantilla en el Artifact Composer:
+para reutilizarlas se parte del builder y del canvas.
 
 ## Anatomía de una receta (campos del JSON)
 

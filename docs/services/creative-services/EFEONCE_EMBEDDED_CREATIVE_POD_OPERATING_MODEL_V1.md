@@ -36,6 +36,18 @@ integración cultural y operativa
 
 Si una persona trabaja bajo dirección cotidiana del cliente y Efeonce sólo aporta disponibilidad, es Staff Augmentation. Si Efeonce diseña y dirige el sistema, es Embedded Managed Pod.
 
+### Delta 2026-10-06 — Cómo se vende hacia afuera (brochure Agencia Creativa, lámina 19)
+
+El comprador busca «staff augmentation». Por decisión del operador, el brochure aprobado usa esa palabra **sólo en el
+eyebrow** («Talento embebido · Staff augmentation») y vende este modelo: titular «Tu equipo, con talento de Efeonce
+adentro.»; bajada «Sumas el talento que tu equipo necesita, sin contratar, y con una agencia que responde por la
+entrega.»; las tres configuraciones de §4 como **Remoto** (con tus herramientas), **Embebido** (en tu oficina) y
+**Co-operado** (adentro y en estudio); y cuatro diferencias: reemplazo sin vacío, calidad gobernada, un fee mensual
+(sueldos, cargas, licencias y equipo por cuenta de Efeonce, §9) y «Tú diriges», que aquí significa que el cliente
+conserva prioridad, contexto, aprobación y autoridad de marca (§8 y §9), no la dirección cotidiana del pod. La regla no
+cambia: el cliente no compra personas sueltas y esto no es Staff Augmentation; la palabra del eyebrow es una decisión
+de reconocimiento, no de delivery model. Collateral: [README § Collateral comercial](README.md#collateral-comercial).
+
 ## 3. Por qué el fit cultural es una variable operativa
 
 El fit cultural no es un claim blando. Afecta:

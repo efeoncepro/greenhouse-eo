@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-10-06 por Claude (1.13: el deck HubSpot aprobado el 2026-10-06 como ejemplo de referencia — brochure de 27 y propuesta de 31 desde 33 usos de 28 recetas existentes, dónde están sus intents y cómo se arma el PDF, la insignia Gold con readback, el sprocket de uso interno, la autorización de ANAM pendiente; límites prácticos medidos (respuesta por receta, recetas sólo claras, `content-markets` con nodos medidos) y la deriva del objeto de luz en el cine, con remisión al casebook (TASK-1943). Antes, 1.12: el deck SEO/AEO (Search Visibility 360) — cómo componer y validar sus tres documentos (completo, brochure y propuesta) desde los intents y planes aprobados, qué slots opcionales usar (`productMark`, el eyebrow que cede su lugar al lockup, la bajada del equipo), qué no hacer y los problemas comunes (largos, `productMark`, una sola sección partida, marcas de muestra); 100 recetas, 94 con plantilla (TASK-1949). Antes, 1.11: la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto en el deck Salesforce; SF20 aprobada; largos de SF6 y SF7 aprobados; PDF de propuesta y de brochure con insignia. Antes, 1.10: las 94 recetas tienen plantilla — las cuatro de la segunda ronda Salesforce componen desde `f05c26e2f` —; los dos planes validan sin avisos; SF20 compuesta y pendiente del visto bueno; cómo regenerar el PDF de la propuesta sin insignia (TASK-1942). Antes, 1.9: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas 09, 13, 14 y 17 (94 recetas, 16 sin plantilla), los dos cierres con su plan validado (brochure y propuesta), el logo de 700 px sólo en la contraportada Salesforce y el servicio «Enablement conversacional». Antes, 1.8: el deck de práctica Salesforce — cómo armarlo en cinco actos, qué láminas son recetas nuevas (sin plantilla todavía) y cuáles son datos de recetas existentes, marcas de terceros con condición, badge de partner con readback, la pregunta abierta de portada y cierre, y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-10-06 por Claude (1.14: el brochure Agencia Creativa aprobado el 2026-10-06 como ejemplo de un brochure mixto — 7 láminas de recetas existentes y 20 a mano, candidatas a receta (TASK-2013); cómo se armó, cómo se arma su PDF raster desde el runtime del canvas y por qué; qué no hacer (campañas reales en una interfaz, par en todas las láminas, la misma mirada repetida en la serie de fotos). Antes, el mismo día, 1.13: el deck HubSpot aprobado el 2026-10-06 como ejemplo de referencia — brochure de 27 y propuesta de 31 desde 33 usos de 28 recetas existentes, dónde están sus intents y cómo se arma el PDF, la insignia Gold con readback, el sprocket de uso interno, la autorización de ANAM pendiente; límites prácticos medidos (respuesta por receta, recetas sólo claras, `content-markets` con nodos medidos) y la deriva del objeto de luz en el cine, con remisión al casebook (TASK-1943). Antes, 1.12: el deck SEO/AEO (Search Visibility 360) — cómo componer y validar sus tres documentos (completo, brochure y propuesta) desde los intents y planes aprobados, qué slots opcionales usar (`productMark`, el eyebrow que cede su lugar al lockup, la bajada del equipo), qué no hacer y los problemas comunes (largos, `productMark`, una sola sección partida, marcas de muestra); 100 recetas, 94 con plantilla (TASK-1949). Antes, 1.11: la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto en el deck Salesforce; SF20 aprobada; largos de SF6 y SF7 aprobados; PDF de propuesta y de brochure con insignia. Antes, 1.10: las 94 recetas tienen plantilla — las cuatro de la segunda ronda Salesforce componen desde `f05c26e2f` —; los dos planes validan sin avisos; SF20 compuesta y pendiente del visto bueno; cómo regenerar el PDF de la propuesta sin insignia (TASK-1942). Antes, 1.9: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas 09, 13, 14 y 17 (94 recetas, 16 sin plantilla), los dos cierres con su plan validado (brochure y propuesta), el logo de 700 px sólo en la contraportada Salesforce y el servicio «Enablement conversacional». Antes, 1.8: el deck de práctica Salesforce — cómo armarlo en cinco actos, qué láminas son recetas nuevas (sin plantilla todavía) y cuáles son datos de recetas existentes, marcas de terceros con condición, badge de partner con readback, la pregunta abierta de portada y cierre, y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 1.7: paso 5b — ligar los datos reales de los slots con `pnpm brand:deck-plan -- --bind` (logo del cliente desde Account 360, cifras, casos, testimonios y logos con evidencia de la propuesta, montos en `[MONTO]` y equipo pendiente), cómo leer la tabla de slots y sus motivos (TASK-1930). Antes, 1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -118,6 +118,8 @@ Criterios rápidos:
 - **Deck SEO/AEO** (Search Visibility 360, tres documentos aprobados el 2026-09-30): ver «El deck SEO/AEO», más abajo.
 - **Deck HubSpot** (brochure de 27 y propuesta de 31, aprobados el 2026-10-06): ver «El deck HubSpot», más abajo. Es el
   ejemplo de referencia más reciente de un deck armado **sólo con recetas existentes**.
+- **Brochure Agencia Creativa** (27 láminas, aprobado el 2026-10-06): ver «El brochure Agencia Creativa», más abajo. Es
+  el ejemplo de un brochure **mixto**: 7 láminas de recetas y 20 a mano.
 
 #### El deck de práctica Salesforce
 
@@ -308,6 +310,52 @@ Antes de enviarlo:
 - **Cine: el objeto de luz deriva hacia el texto.** Al generar un plate, el modelo corre el objeto de luz hacia la
   columna del titular. Antes de componer, mide dónde cayó contra la reserva de la receta; cómo corregirlo está en el
   [casebook del registro cine](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md), sección «Brochure de servicios HubSpot (2026-10-06)».
+
+#### El brochure Agencia Creativa
+
+El brochure de la línea `brand` (tema oscuro, paraguas Agencia Creativa) quedó aprobado por el operador el 2026-10-06:
+**27 láminas**. Recorrido, reglas y pendientes:
+[norma §4.6, «Brochure Agencia Creativa»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+A diferencia del deck HubSpot, **es mixto**: 7 láminas salen de recetas existentes y 20 se hicieron a mano en el canvas.
+
+**1. Las láminas de receta.** Son siete usos aprobados (`cover-brochure-line-brand`, `content-team`,
+`proposal-service-creative`, `content-bullets`, `content-markets`, `decision-next-steps` y `close-brochure-orbit`),
+con su intent en `ai-generations/2026-10-06_brochure-creativo/intents-v2/` (generados por `build-intents-v2.py`). Compón
+una así:
+
+```bash
+pnpm brand:compose -- --intent ai-generations/2026-10-06_brochure-creativo/intents-v2/A05-equipo.json --out <carpeta> --artifact-id ac-a05
+```
+
+**2. Las láminas a mano.** Las arma `build-canvas-v7.py` (todas las láminas a mano, los componentes `CS-Campaigns` y
+`CS-Home` de Creative Studio y `canvas.json`). **Son candidatas a receta, no recetas:** no tienen id en el catálogo ni
+plantilla; el operador decidió registrarlas sin promoverlas (TASK-2013). Si necesitas una, parte del builder.
+
+**3. El PDF.** Se arma por **render local raster**, no con el PDF vectorial:
+
+1. Se carga el canvas con su runtime real (`dc-runtime.js` del tipo Design, cargado por un shim `support.js`).
+2. Un servidor estático mapea `/_blob/<id>` a los assets bajados con `Artifact read path=<id>`.
+3. Playwright captura cada lámina a 1920 × 1080 con `deviceScaleFactor` 2, en JPEG q88.
+4. El PDF lleva una imagen a sangre por página.
+
+El vectorial (`page.pdf` por lámina) dejaba un borde blanco y aplanaba la perspectiva 3D (`transform-style:
+preserve-3d`) de la lámina 17. El costo del raster: **el texto no es seleccionable**. Lo arma
+`node ai-generations/2026-10-06_brochure-creativo/exp/render-pdf.mjs <render-dir> <salida.pdf>` (el encabezado del
+script dice qué lleva `<render-dir>`); si falta un asset, falla en vez de armar un PDF incompleto. El PDF entregado está en OneDrive:
+`Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf` (27 páginas, ~13,7 MB),
+con copia en `ai-generations/2026-10-06_brochure-creativo/`.
+
+**4. La voz.** Por defecto, el titular es una decisión; el par pregunta–respuesta es un recurso. En este brochure van 8
+pares de 27 (01, 14, 17, 20, 21, 25, 26 y 27), todos en boca del cliente y seis en el último tercio (objeciones y
+cierre): dentro del tope de ≤ 1 de cada 3 del [manual de la línea](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md), §4.
+
+Antes de enviarlo:
+
+- **Cifras del caso Sky** (lámina 22, «25 % menos de tiempo de producción»): verifica si aplica la misma regla de
+  autorización que en los casos de HubSpot y ANAM antes de usarlo con prospectos.
+- **Burbuja efeoncepro.com** sobre fotos casi negras: deja ver su recuadro navy (lámina 19 y otras). Sin corregir.
+- **Lámina 19 (talento embebido):** «Staff augmentation» va **sólo en el eyebrow**, como palabra del comprador. La
+  lámina vende talento creativo embebido con respaldo de Efeonce, no perfiles sueltos bajo dirección del cliente.
 
 ### Paso 4 · Revisa pares y ritmo
 
@@ -780,6 +828,15 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
   sprocket 3D de HubSpot en una pieza que salga de Efeonce.
 - **No compongas `decision-case` ni `content-clients` en la línea de un deck oscuro:** van como láminas de Efeonce, en
   claro y en la línea `growth`.
+- **No pongas campañas reales en una interfaz de brochure** (ni propias ni de clientes): las interfaces de Creative
+  Studio de las láminas 16 y 17 usan campañas ficticias (CMP-101 Volta, CMP-102 Nuvo, CMP-103 Ruta Sur, CMP-104 Aurea,
+  CMP-105 Casa Mar).
+- **No uses el par pregunta–respuesta en todas las láminas:** el titular de decisión es el defecto y el par, un recurso
+  (≤ 1 de cada 3).
+- **No repitas la misma mirada en la serie de fotos:** la mirada hacia el texto que agrega `deck-seccion`, repetida, se
+  lee como tic; contradícela desde la escena (mirar la pieza, el manual o la cámara). Ver el
+  [casebook del registro cine](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md), falla 37.
+- **No exportes a PDF vectorial una lámina con perspectiva 3D:** se aplana. Usa el render raster.
 
 ## Problemas comunes
 
@@ -826,6 +883,8 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 | En `decision-ai-market`, la cifra del centro se sale de la tarjeta | la cifra del centro tiene cinco caracteres («5.000») | en el centro, usa una cifra más corta |
 | AXIS rechaza `decision-case` o `content-clients` con `theme-invalid-for-recipe` (en oscuro) o `line-piece-keeps-efeonce-dark` (en claro con la línea del deck) | son recetas sólo claras y una pieza de línea que no sea `growth` debe ser oscura | compónla como lámina de Efeonce: `"theme": "light"`, `"line": "growth"` |
 | `content-markets` falla con «usa un plate con sus nodos medidos» | el plate no está en `PLATE_SIZES` | mide los nodos en píxeles del plate y registra el plate en `content-markets.ts` |
+| El PDF de un brochure sale con borde blanco o la lámina 3D sale plana | se exportó con el PDF vectorial (`page.pdf`) | rasteriza: captura a 1920 × 1080 con `deviceScaleFactor` 2 y una imagen a sangre por página (brochure Agencia Creativa) |
+| Una foto cine cae hacia el centro y tapa el titular | la escena no cabe en la mitad derecha con 85 mm a 3–4 m (casebook, falla 36) | regenera con la escena en profundidad y la cámara más lejos; si no, en la lámina corre la foto 130–150 px a la derecha con el borde fundido a su propio negro |
 | La lámina «quiénes somos» se ve con un velo oscuro | el velo viene horneado en el plate, no de la plantilla | pide el plate con la reserva izquierda, sin velo |
 
 ## Referencias técnicas
@@ -855,6 +914,9 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
   `ai-generations/2026-09-29_deck-seo-aeo-documentos/CANON-INVENTARIO.md` y `DECISIONES.md`.
 - Deck HubSpot: TASK-1943; pipeline en `ai-generations/2026-10-06_deck-hubspot/` (`build-intents.py`, `build-canvas.py`,
   `intents/`, `fotos/LEEME.md`, `exp/brochure-pdf.mjs`); canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU.
+- Brochure Agencia Creativa: pipeline en `ai-generations/2026-10-06_brochure-creativo/` (`build-canvas-v7.py`,
+  `build-intents-v2.py`, `intents-v2/`, `build-muro.js`, `fotos/LEEME.md`); canvas https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs;
+  candidatas a receta en TASK-2013.
 - Tasks: TASK-1927 (31 recetas: el marco, secciones clásica y partida, medida, tríptico, escalera y propuestas de
   cine; `complete`); TASK-1928 (las 38 restantes y la portada con selección; `complete`, en `develop`); ruta
   productiva gobernada, TASK-1921 (en curso, todavía no disponible); fotos idempotentes, TASK-1926; plan de deck

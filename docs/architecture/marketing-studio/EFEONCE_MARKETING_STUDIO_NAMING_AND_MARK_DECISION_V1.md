@@ -1,5 +1,32 @@
 # ADR — Efeonce Marketing Studio: «Studio» como nombre corto y su marca
 
+## Delta 2026-10-06 — marca de Creative Studio aprobada
+
+Pedido del operador: «créate el loguito de Creative Studio que va a ser exactamente el mismo de Marketing Studio o
+parecido pero con el color de la línea brand». Lo aprobó completo para AXIS («Las 24 piezas»), sabiendo que las piezas
+que dicen sólo «Studio» se parecen a las de Marketing Studio salvo por el acento. Responde la pregunta 2 del §7 del
+[ADR de la vista](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md).
+
+- **Construcción:** la misma de Marketing Studio (§«Marca de producto»: Poppins Bold, la órbita en la «o» de Studio,
+  terminaciones concéntricas de la familia), con la palabra «Creative» y la esfera en el acento **Brand**: `#bb1954`
+  sobre papel y `#ff6500` sobre navy.
+- **Archivos:** 24 SVG (8 piezas × positivo, negativo y blanco):
+  `creative-studio-{logo,lockup,short-lockup,compact,stacked-lockup,short-stacked-lockup,isotype,icon}-{positive,negative,white}.svg`,
+  en `@efeoncepro/axis-brand-assets` **0.4.26**. Los genera
+  [`scripts/brand/build-creative-studio-logos.mjs`](../../../scripts/brand/build-creative-studio-logos.mjs) (copia del de
+  Marketing Studio con la clave `brand` de `GL.lines`; usa `orbit-ring.mjs`); nunca se editan a mano. Estado al
+  2026-10-06: release AXIS `f4dd2fe` en `main` con tag `v0.4.26`; las 24 piezas quedan sólo en el paquete (el índice de
+  búsqueda del Lab pasaba de 399 KB a 416 KB; entran al catálogo público al fragmentarlo). Greenhouse sigue fijando
+  0.4.25 porque ningún consumer de runtime las usa todavía.
+- **Las piezas cortas sólo donde el contexto ya dice Creative Studio.** `short-lockup`, `compact`,
+  `short-stacked-lockup`, `isotype` (la S) e `icon` (la nave sobre «Studio») dicen sólo «Studio» y se distinguen de las
+  de Marketing Studio sólo por el acento. Siguen vigentes la regla 1 («Studio» a secas es Marketing Studio) y la de
+  nombrar cada vista completa en superficies visibles ([ADR de la vista](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md),
+  D9 y §4): por defecto va el `lockup` «efeonce | Creative Studio».
+- **Primer uso:** el encabezado de las interfaces de Creative Studio en el brochure Agencia Creativa (láminas 16 y 17),
+  como en la app de Marketing Studio: lockup positivo en claro, negativo en oscuro, 20 px.
+- El README de `axis-brand-assets` dejó de decir que «Creative Studio» es sólo el descriptor de Globe (AXIS `f4dd2fe`).
+
 ## Delta 2026-10-05 — Creative Studio abarca la vista creativa de Studio y a Globe
 
 Decisión del operador, formalizada en [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md):
@@ -20,7 +47,7 @@ Decisión del operador, formalizada en [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V
   y la marca de Creative Studio (§7 del ADR de la vista). Mientras tanto, en superficies visibles cada vista se
   nombra completa.
 
-- **Status:** Accepted (nombre y marca, 2026-10-02); regla 2 modificada por el delta del 2026-10-05
+- **Status:** Accepted (nombre y marca, 2026-10-02); regla 2 modificada por el delta del 2026-10-05; marca de Creative Studio aprobada en el delta del 2026-10-06
 - **Date:** 2026-10-02
 - **Owner:** Efeonce Brand / Product
 - **Scope:** cómo se nombra y abrevia Efeonce Marketing Studio frente a Efeonce Globe (Creative Studio), y el sistema de marca de producto que lo acompaña. No cambia rutas, dominios, código, datos ni contratos de API.

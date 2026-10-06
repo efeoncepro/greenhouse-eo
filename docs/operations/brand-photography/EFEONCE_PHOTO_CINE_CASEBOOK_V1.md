@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.3 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-06 por Claude (1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.4 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-06 por Claude (1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; siete recetas cine nuevas (`SA1` queda fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -55,7 +55,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -315,3 +315,51 @@ es del elenco ficticio (`EFEONCE_BRAND_CAST_V1.md`) y nunca va con su nombre en 
 **Pendientes del brochure que este casebook no resuelve:** la autorización de ANAM para las cifras del caso, la
 aprobación escrita de HubSpot para el sprocket 3D (va en el canvas, fuera del PDF), la lámina de equipo HubSpot con el
 plazo estándar de implementación (datos del operador) y el acento como luz en las láminas diseñadas (pasa por AXIS).
+
+## Brochure Agencia Creativa (2026-10-06) — lo que aprendimos
+
+Ocho fotos en registro cine del brochure Agencia Creativa (línea `brand`, tema oscuro), aprobado por el operador el
+2026-10-06 («Necesito canonizar esto, este es el brochure de agencia creativa»). Fichas en git, plates fuera de git, y
+banco con descartes: `ai-generations/2026-10-06_brochure-creativo/fotos/` (`fichas/`, `plates/`, `LEEME.md`). Las
+fichas pasaron por `cine-reviewer` antes y después de generar (según `LEEME.md`). Norma del
+deck: [composición por superficie §4.6, «Brochure Agencia Creativa»](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+**Plates en uso y su lámina.** Seis están en
+[`scripts/foto/cine-recetas.json`](../../../scripts/foto/cine-recetas.json) como recetas (con su `ojo`). **`SA1` no**: lleva
+extras del cliente con el texto a la izquierda, un caso que el §2 del registro no cubre y que el operador todavía no
+decidió (falla 40); queda como candidata en TASK-2013 y no se parte de ella. Todas las
+láminas son a mano (no salen de una receta del catálogo).
+
+| Plate (id de receta) | Lámina del brochure | Protagonista | Fenómeno = servicio | Parte de |
+|---|---|---|---|---|
+| `CV1b-misma-escala` (`CV1b`) | 04 «El mismo equipo. Otra escala.» | Nexa, Karo y Julio | una pieza de luz se multiplica en una cinta de cientos de piezas con el mismo sistema | `C4S07` |
+| `CV2b-cincuenta-piezas` (`CV2b`) | 05 «Una campaña. 50 piezas. Una sola marca.» | Karo, con la pieza madre en la tablet | un muro de unas cincuenta piezas de una campaña ficticia, todas en un sistema | `C4BF3` |
+| `CV3b-menos-tiempo` (`CV3b`) | 06 «Menos tiempo. La misma marca.» | Nexa | larga exposición de seis segundos: la producción pasa en estelas, ella y la pieza quedan quietas | `C4S04` |
+| `BS1c-del-manual-al-sistema` (`BS1c`) | 07 «Del manual al sistema.» | Karo, mirando el manual | de un manual cerrado sube la identidad de una marca ficticia como sistema de luz | `CR4` |
+| `RG1b-estudio-portatil` (`RG1b`) | 10 «El estudio va donde estés.» | Karo, filmando con el gimbal | un estudio profesional desplegado desde unas cajas en una bodega oscura | `C4S05` |
+| `HB2-mundo-hibrido` (`HB2`) | 11 «Manos y modelos, en el mismo set.» | Antonio, Nexa y Sparks | un muro LED con un mundo generado por IA ilumina a las personas, la cámara y el producto reales | `NX7d` |
+| `SK1-vuelo-amanecer` (`SK1`) | 22 caso Sky «25 % menos de tiempo de producción.» | — (ala de avión sin librea; logo de Sky compuesto aparte) | el primer rayo del sol sobre los Andes toca el ala | — |
+| `SA1-talento-adentro` (`SA1`) | 19 «Tu equipo, con talento de Efeonce adentro.» | Karo + dos extras del cliente | la campaña del cliente se arma en su mesa, entre las manos de su equipo y de Karo | `CR4` |
+
+Descartes y banco (`CV1`, `CV1c`, `CV2`, `CV3`, `BS1`, `BS1b`, `RG1`, `HB1`, `HB1b`) con su motivo en `LEEME.md`. `SK1`
+no es del registro cine (su ficha no declara `registro`, `alcance` ni persona): es una foto de lugar para el caso, sin
+marca, y no entra al índice de recetas cine. Karo y
+Antonio son del elenco ficticio (`EFEONCE_BRAND_CAST_V1.md`). `RG1b` de esta corrida no es el `RG1b` de
+`content-markets` (la Tierra desde la órbita, en `PLATE_SIZES`): mismo nombre, otra foto.
+
+**Ocho fallas nuevas, con su corrección.**
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 36 | **La escena deriva al centro** aunque la ficha deje la mitad izquierda vacía (variante de la falla 32) | Geometría: con 85 mm a 3–4 m de la cámara, la escena pedida no cabe en la mitad derecha del cuadro, y el modelo la acomoda hacia el centro (diagnóstico de `cine-reviewer`; [inferencia, a medir en más plates]) | Ordenar la escena **en profundidad** y darle a cada persona su **geografía**: porcentaje del ancho por persona y una «banda de oscuridad vacía» entre el borde izquierdo y la espalda; **alejar la cámara**. Si igual deriva, en la lámina la foto se corre 130–150 px a la derecha con el borde fundido a su propio negro (sin velo) | `CV1b` (150 px, `#020206`), `HB2` (130 px, `#060913`), `HB1` (banco) | ojo sobre el plate; `cine-reviewer` |
+| 37 | **La mirada hacia el texto se lee como tic** en una serie (operador: «estás tomando solo la referencia de Karo mirando hacia el lado y ya van 3») | La regla de mirada de `deck-seccion` es incondicional en el compilador (`build-prompt.mjs`, bloque GAZE): repetida en `CV2b`, `BS1b` y `RG1` dio el mismo gesto tres veces | La mirada hacia el texto **se dosifica como el acento**. La escena la contradice a propósito: mirar la pieza, el manual o la cámara (`BS1c` mira hacia abajo al manual; `RG1b` filma en movimiento; `SA1` mira la pieza). Candidato: un campo `mirada` en la ficha [no implementado] | `BS1b`→`BS1c`, `RG1`→`RG1b` | `cine-reviewer` sobre el conjunto del deck |
+| 38 | **La cara de Julio sale «muy IA» y con la frente agrandada** (operador: «dos kilos de frente», «piel de IA») | El bloque IDENTITY de Julio insiste en «forehead tall and open, receding hairline» y el modelo lo exagera a distancia media | `HB1b` lo contrarrestó desde la escena (frente moderada y entradas como en su referencia, piel fotográfica sin suavizado, cámara a 4,5 m), pero el operador pidió sacar a Julio y usar a Antonio (`HB2`). Antonio es de la línea Revenue: `foto:prompt` lo bloquea en `linea: brand`, así que la ficha `HB2` va sin `linea` **sólo por pedido explícito del operador**. Pendiente: revisar el bloque IDENTITY de Julio | `HB1` → `HB1b` → `HB2` | `foto:prompt` (línea); ojo al 100 % |
+| 39 | **Con `luz-motivada`, la palanca se anula y el acento queda de espaldas** | Un monitor como llave: la palanca compila «never a monitor», y la fuente elegida contradice la regla | **El fenómeno tiene que ser el servicio** y ser la llave: en `SA1`, una hoja baja de piezas de luz sobre la mesa del cliente, con el punto naranja en la pieza que Karo encaja | `SA1` (corregido por `cine-reviewer` antes de gastar) | `cine-reviewer` sobre la ficha |
+| 40 | **Personas del cliente en una sección cine** | El §2 del registro prevé al cliente sólo en la sección con el panel a la derecha; `SA1` lleva el panel a la izquierda y al cliente como extras | **Pendiente de decisión del operador.** Lo que se hizo en `SA1`: extras **ficticios, sin marca, en gris y carbón, nada azul**, para que el hoodie royal sea lo único que dice quién viene de afuera. El operador aprobó la lámina al pedir canonizar, pero no decidió el caso: hasta entonces `SA1` no entra al índice de recetas y no es precedente (candidata en TASK-2013) | `SA1` | `cine-reviewer`; decisión del operador |
+| 41 | **El modelo dibuja marcas** | Pedirle una «marca ficticia» lo llevó a dibujar el isotipo de Efeonce cuatro veces, con cuatro puntos naranjas; en un muro de piezas reales, reescribía los textos | **El modelo nunca dibuja una marca**: ni la de Efeonce, ni la del cliente, ni piezas reales. La marca ficticia se describe por formas que no se parecen al isotipo; el logo del cliente se compone desde su archivo (Sky en la lámina 22); un muro de piezas reales se **compone por máscara** (`assets/muro-la-orbita.jpg`, `build-muro.js`: 35 piezas de La órbita) | `BS1` (descartado) → `BS1b`/`BS1c`; muro de la lámina 09; `SK1` sin librea | ojo al 100 %; `cine-reviewer` |
+| 42 | **Equipo de producción vintage** en Run & Gun | [inferencia: el modelo asocia «equipo portátil» a equipo antiguo; el inventario registra la regla, no la toma que falló] | **Equipo actual, nunca vintage**: gimbal de carbono, cámara cine full frame, paneles LED bicolor, tubos LED de batería, road cases | `RG1`, `RG1b` | ojo sobre el plate |
+| 43 | **La mano de «Aprobación» en plastilina se lee mal** (fálica) — fuera de la foto, en la iconografía | El gesto de la mano en volumen | En el flujo de la lámina 12, «Aprobación» va con el **ícono de lápiz** | lámina 12 | ojo del operador |
+
+**Pendientes del brochure que este casebook no resuelve:** la confirmación del caso de las personas del cliente
+(falla 40), el bloque IDENTITY de Julio (falla 38), el campo `mirada` en el compilador (falla 37), y la burbuja
+efeoncepro.com, que sobre fotos casi negras deja ver su recuadro navy (lámina 19 y otras; sin corregir).
