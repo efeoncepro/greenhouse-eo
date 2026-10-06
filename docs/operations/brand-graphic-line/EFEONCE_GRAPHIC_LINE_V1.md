@@ -195,6 +195,74 @@ CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
 
 ## 4. La voz: pregunta y respuesta
 
+### Delta 2026-10-06 — La voz por defecto es la decisión; el par es un recurso (operador)
+
+**Decisión del operador (2026-10-06):** leída en secuencia, como la lee un cliente, la pregunta y respuesta en cada
+lámina **se vuelve absurda**. Las láminas se aprobaron una a una; el defecto sólo aparece al leer el deck entero. De
+96 pares revisados en los decks aprobados (SEO/AEO, Salesforce, HubSpot, recetas y pares por línea), los que fallan
+lo hacen por tres causas: se escribe al revés (primero la respuesta con golpe, después una pregunta que la habilite),
+el tope de tres palabras recorta la respuesta hasta que deja de responder, y el slot de voz es obligatorio en todas las
+recetas, así que el recurso se repite 16, 24 o 33 veces por deck.
+
+**Alcance:** decks, brochures y propuestas. En web, DOOH, motion, publicidad y social el par sigue siendo la voz por
+defecto, **una vez por pieza** (un hero, una pantalla, un anuncio); las cinco pruebas aplican igual a ese par.
+
+**Desde hoy, en decks y documentos:**
+
+1. **La voz por defecto de una lámina es un titular de decisión:** una afirmación corta, en Bricolage, cerrada con la
+   esfera. La identidad de la línea está en la respuesta con su esfera, el anillo y el foco, no en la pregunta.
+2. **El par pregunta–respuesta es un recurso escaso:** portada, aperturas de sección, objeciones reales y cierre;
+   alrededor de **una de cada tres láminas** como máximo, nunca todas.
+3. **Habla siempre el cliente.** La pregunta es suya, en primera persona («¿Cómo sé que funciona?»). Nunca Efeonce
+   preguntándose a sí misma («¿Cómo trabajamos?», «¿Qué hacemos en…?», «¿Quiénes somos?»).
+4. **Se aprueba leyendo la secuencia completa** en voz alta y en orden, no lámina por lámina.
+
+**Las cinco pruebas de un par** (sale sólo si pasa las cinco):
+
+| Prueba | Pregunta que se hace | Falla así |
+|---|---|---|
+| Conversación | ¿Un cliente lo diría tal cual en una reunión, y un consultor respondería así? | «¿Cuántos Salesforce tienes? Uno.» |
+| Calce | ¿La forma de la respuesta corresponde al tipo de pregunta? (tabla de abajo) | «¿Te encuentra la IA? Visible.» |
+| Autonomía | ¿La respuesta sola, como titular, dice algo? | «Así.» · «Por esto.» · «Uno.» |
+| Sustitución | ¿Una agencia competidora podría firmar el mismo par sin cambiar nada? | «¿Cómo crecemos? Con foco.» |
+| Prueba | ¿Lo que muestra la lámina demuestra la respuesta? | una respuesta que el visual no sostiene |
+
+**Calce por tipo de pregunta:**
+
+| Tipo | La respuesta | Calza | No calza |
+|---|---|---|---|
+| Abierta (qué, quién, dónde, cómo, cuánto) | llena el hueco | ¿Dónde busca tu cliente? **En la IA.** | ¿Cómo te ve la IA? **Mídelo.** |
+| Sí o no | sí o no con matiz: siempre · ahora sí · casi siempre · no por defecto · todavía no · cuando quieras | ¿Hay que migrar a Next? **No por defecto.** | ¿Tu Salesforce ya actúa? **Por ti.** |
+| Disyuntiva | elige o reformula | ¿Salesforce o HubSpot? **El que encaje.** | — |
+| Objeción («¿Y si…?») | despeja el riesgo | ¿Y si no funciona? **Empiezas chico.** | ¿Y el reporte del viernes? **Ya lo viste.** (acertijo sin contexto) |
+
+**Respuestas vacías aunque calcen:** las que señalan la lámina («Así», «Esto», «Ésta», «Este equipo», «Cinco temas»);
+los abstractos que cualquiera firmaría («Con foco», «Con método», «Con sistema», «La base», «En ciclo», «Crecer»); las
+promesas sin prueba («Marcas líderes», «Con lo mejor»).
+
+**Reglas de serie:** las preguntas siguen la compra real (problema → opciones → cómo funciona → riesgos → prueba →
+siguiente paso); el tipo de pregunta varía (nunca tres «¿Cómo…?» seguidas); tres palabras es lo deseable, no un tope
+que justifique recortar el sentido.
+
+**Pares aprobados que fallan las pruebas** (pendientes de reemplazo por el operador; se usan hasta entonces y la tabla
+de abajo los marca):
+Portada general «¿Qué hace Efeonce? Crecer.» (Efeonce se pregunta a sí misma y responde con un abstracto) ·
+Portada de propuesta «¿Cómo crecemos en 2027? Con foco.» (falla sustitución: «Con foco» lo firma cualquiera) ·
+Engine «¿Te encuentra la IA? Visible.» (sí o no sin calce; candidato: «Ahora sí.») · Revenue «¿Y el reporte del
+viernes? Ya lo viste.» (acertijo; candidatos: «¿Tus números están al día? Siempre.» · «¿Cuándo ves tu pipeline? En
+vivo.»). Pasan: Growth, Brand, Voice y la contraportada.
+
+**Estado de la implementación:** el contrato AXIS `efeonce.surface-composition` todavía exige pregunta y respuesta en
+toda lámina con voz y limita la respuesta a `type.answer.maxWords` (3). El cambio necesita, en el contrato: una voz
+`decision` sin pregunta con su propio tope de palabras (y otro para el par, para que el gate no recorte el sentido); la
+jerarquía del titular medida contra el eyebrow o la bajada, porque sin pregunta la regla 3× pierde su referencia; y
+reescribir la «base común» del deck de la [composición por superficie](./EFEONCE_SURFACE_COMPOSITION_V1.md), que hoy
+exige pregunta en toda lámina. Además, recetas y compositor, más un aviso en `pnpm brand:deck-plan` para lo que se puede detectar solo
+(sí o no sin calce, respuestas que señalan la lámina, preguntas en primera persona plural, densidad de pares). Hasta
+entonces, los decks se corrigen con pares que pasen las cinco pruebas.
+
+---
+
 Siempre hay dos voces, y a veces una tercera:
 
 | Voz | Tipo | Regla |
@@ -220,13 +288,13 @@ y se usan tal cual en las piezas que indica la tabla. Norma de uso, piezas y med
 
 | Pieza | Pregunta | Respuesta | Evidencia |
 |---|---|---|---|
-| Portada de brochure | ¿Qué hace Efeonce? | **Crecer.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
-| Portada de propuesta comercial | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
+| Portada de brochure *(reemplazo pendiente, delta 2026-10-06)* | ¿Qué hace Efeonce? | **Crecer.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
+| Portada de propuesta comercial *(reemplazo pendiente)* | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
 | Portada de brochure · Growth | ¿Lo medimos? | **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación |
 | Portada de brochure · Brand | ¿Quién crea mi contenido? | **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun |
-| Portada de brochure · Engine | ¿Te encuentra la IA? | **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización |
+| Portada de brochure · Engine *(reemplazo pendiente)* | ¿Te encuentra la IA? | **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización |
 | Portada de brochure · Voice | ¿Dónde invierto? | **Donde rinde.** | **Tres** soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media |
-| Portada de brochure · Revenue (HubSpot) | ¿Y el reporte del viernes? | **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes |
+| Portada de brochure · Revenue (HubSpot) *(reemplazo pendiente)* | ¿Y el reporte del viernes? | **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes |
 | Contraportada de brochure | ¿Conversamos? | **Cuando quieras.** | — (el eslogan firma debajo, §5) |
 
 - En las portadas por línea, el **anillo y la esfera toman el acento de la línea** (no el teal) y la evidencia lista
