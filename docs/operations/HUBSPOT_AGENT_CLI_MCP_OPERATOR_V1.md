@@ -1,19 +1,21 @@
 # HubSpot Agent CLI y MCP — selección del carril operativo
 
-> Estado local verificado: 2026-09-29. Este documento registra acceso del operador, no un runtime de Greenhouse ni un entitlement permanente de un portal cliente. Revalidar identidad, scopes y capacidad en cada sesión y antes de cada cambio.
+> Observaciones locales: 2026-09-29 y 2026-10-06. Este documento registra acceso del operador, no un runtime de Greenhouse ni un entitlement permanente de un portal cliente. Revalidar identidad, scopes y capacidad en cada sesión y antes de cada cambio.
 
 ## Carriles
 
-| Necesidad | Carril | Comprobación antes de operar |
-| --- | --- | --- |
-| Consulta o cambio puntual del CRM durante una conversación | Conector MCP de HubSpot (`hubspot:hubspot` en el router de skills) | Identidad y portal de la conexión activa, tool disponible, permiso efectivo y readback |
-| Inventario repetible, búsqueda encadenada, lotes o trabajo programado | HubSpot Agent CLI (`hubspot`) | `hubspot --version`, `hubspot whoami`, help del comando y lectura real en el portal destino |
-| CMS/Developer Projects | HubSpot developer CLI (`hs`) y canon de Kortex/CMS | Perfil explícito; sus credenciales no autentican automáticamente la Agent CLI |
-| Bridge Greenhouse, webhooks o sincronización | `hubspot-greenhouse-bridge` | Arquitectura y contrato de integración; no sustituirlo por un comando interactivo |
+| Necesidad                                                             | Carril                                                             | Comprobación antes de operar                                                                |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Consulta o cambio puntual del CRM durante una conversación            | Conector MCP de HubSpot (`hubspot:hubspot` en el router de skills) | Identidad y portal de la conexión activa, tool disponible, permiso efectivo y readback      |
+| Inventario repetible, búsqueda encadenada, lotes o trabajo programado | HubSpot Agent CLI (`hubspot`)                                      | `hubspot --version`, `hubspot whoami`, help del comando y lectura real en el portal destino |
+| CMS/Developer Projects                                                | HubSpot developer CLI (`hs`) y canon de Kortex/CMS                 | Perfil explícito; sus credenciales no autentican automáticamente la Agent CLI               |
+| Bridge Greenhouse, webhooks o sincronización                          | `hubspot-greenhouse-bridge`                                        | Arquitectura y contrato de integración; no sustituirlo por un comando interactivo           |
 
 CLI y MCP son rutas alternativas de operación directa cuando la operación está cubierta y autorizada. No comparten necesariamente sesión, portal, permisos ni superficie de comandos. Si una ruta falla o no tiene la capability, diagnosticarla y escoger explícitamente otra ruta con el mismo alcance aprobado; no cambiar de identidad, portal o autoridad por fallback silencioso. La decisión y la verificación viven en el change set, no en la herramienta.
 
 ## Estado observado en esta máquina y portal
+
+### 2026-09-29
 
 - Agent CLI oficial instalada en `~/.hubspot/bin/hubspot`; versión `0.15.0` (build 1250). El instalador verificó SHA-256 y agregó el directorio al `PATH` de `~/.zshrc`. Una shell no interactiva puede requerir la ruta absoluta.
 - `hubspot whoami` confirmó OAuth del usuario operador en **Kortex/Efeonce, portal `48713323`**, con 68 scopes efectivos, incluidos scopes CRM de escritura. Esto no prueba acceso a ANAM `19893546`. Los perfiles existentes de `hs` (`kortex-dev` y `anam-19893546`) son independientes.
@@ -23,6 +25,25 @@ CLI y MCP son rutas alternativas de operación directa cuando la operación est�
 - El conector MCP de HubSpot está disponible en esta sesión de Codex con tools de lectura y escritura CRM. Su portal y permisos efectivos se comprueban en la conexión, nunca se infieren del OAuth de la CLI.
 
 No guardar en el repo `~/.config/hubspot/auth.json`, service keys, OAuth codes ni salidas con registros personales. No imprimir tokens. La service key en `HUBSPOT_ACCESS_TOKEN` tiene prioridad sobre OAuth y puede carecer de auditoría por usuario: usarla sólo para una operación que la requiera, con scope y entorno controlados; retirarla al terminar. La existencia de la variable o un perfil `hs` no es prueba de que el comando pueda operar.
+
+### 2026-10-06 — segmentos por cohorte de prospección
+
+- Agent CLI `0.15.1` (build 1348) en la misma ruta. Portal verificado `48713323`; `segments create` expone
+  `--type`, `--filter`, `--list-type ACTIVE|STATIC`, `--file` y `--dry-run`, con scope `crm.lists.write`.
+- La CLI creó segmentos activos y leyó sus definiciones. `segments members-list` no admitió el OAuth de usuario;
+  la verificación completa de miembros se hizo mediante el conector MCP autenticado y CRM search por `ilsListIds`.
+  No cambiar a service key ni despertar Kortex sólo para sortear esa limitación de lectura.
+- La expresión de pertenencia nativa es `IN_LIST(list = <id>)`. Una creación con `ilsListIds` tratado como
+  propiedad ordinaria devolvió 502; se comprobó que no había creado la lista antes de cambiar la expresión.
+  La UI autenticada y el readback de CLI permitieron confirmar la sintaxis soportada.
+- Se preservaron 15 segmentos generales (144–158) y se verificaron 18 nuevos limitados a la investigación
+  (159–176): siete de empresas y once de contactos. Los derivados usan las cohortes base de empresas 119 y
+  contactos 118; los individuales con email añaden la cohorte 140. Cada rama OR conserva ambas restricciones.
+- Los 18 conjuntos coincidieron con sus esperados, sin miembros fuera del lote ni contactos ajenos al universo
+  individual con email. Los totales son una observación fechada; confirmar de nuevo antes de usar destinatarios.
+
+Caso, alcance y procedimiento: [manual de segmentación](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
+Evidencia agregada: [auditoría de la operación](../audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md).
 
 ## Procedimiento por operación
 
@@ -35,6 +56,24 @@ No guardar en el repo `~/.config/hubspot/auth.json`, service keys, OAuth codes n
 ### Propiedades
 
 `hubspot properties list/get` permite inventario. `create` define nombre interno, label, tipo, field type y grupo; `update` modifica label o grupo; hay comandos separados para opciones de enumeración. Antes de crear, aplicar el diccionario y el orden de decisión de [`revops-schema.md`](../../.codex/skills/hubspot-as-a-service/references/revops-schema.md). No crear por el nombre de un correo ni cambiar un tipo de dato suponiendo que `update` lo soporta. El primer write real de cada clase de operación requiere readback de la definición y de sus consumidores.
+
+### Segmentos y origen de la base
+
+Definir primero el universo: toda la base, una investigación o individuos con email de esa investigación.
+Los filtros por industria, tamaño y cargo sobre toda la base pueden incorporar datos antiguos. Para una cohorte,
+usar la pertenencia a una lista base verificada AND las propiedades existentes; un filtro por fecha de creación
+no sustituye el origen y excluiría cuentas preexistentes investigadas de nuevo.
+
+`segments create --dry-run` comprueba el payload sin crear. Tras una escritura autorizada, `segments get <id>
+--format json` debe confirmar tipo ACTIVE y expresión completa. La membresía requiere una lectura independiente
+de todos los registros, comparación exacta y negativos de fuga fuera del lote, incluidos los OR. Una cohorte
+estática fija el origen; la lista derivada activa puede cambiar por atributos dentro de ese origen y no incorpora
+automáticamente una ronda futura. Conservar los globales cuando el usuario pide ambos alcances.
+
+Para enriquecimiento y personalización, cargar
+[`prospecting-segmentation.md`](../../.codex/skills/hubspot-as-a-service/references/prospecting-segmentation.md).
+Fit, solicitud observada, vigencia, identidad y elegibilidad del email tienen evidencias distintas. Preparar
+segmentos no autoriza envíos, cambios de suscripciones, contactos de marketing ni activación de secuencias.
 
 ## Fuentes y límites
 

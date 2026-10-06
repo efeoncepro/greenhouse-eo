@@ -4,20 +4,20 @@
 
 For every requested field determine:
 
-| Dimension | Required decision |
-|---|---|
-| Business definition | What decision or workflow uses it? |
-| HubSpot object | contact, company, deal, ticket or custom object |
-| Standard reuse | Does a native property already satisfy it? |
-| Internal name | stable, lowercase and implementation-safe |
-| Field type | string, number, date, boolean, enumeration, owner, etc. |
-| Options | labels, internal values, ordering and deprecation policy |
-| Source | human, form, workflow, integration, calculated or imported |
-| Ownership | who maintains quality and approves changes |
-| Requiredness | stage/process where it becomes mandatory |
-| History/backfill | initial population and conflict rule |
-| Consumers | views, workflows, reports, integrations, agents |
-| Privacy | classification, retention and access |
+| Dimension           | Required decision                                          |
+| ------------------- | ---------------------------------------------------------- |
+| Business definition | What decision or workflow uses it?                         |
+| HubSpot object      | contact, company, deal, ticket or custom object            |
+| Standard reuse      | Does a native property already satisfy it?                 |
+| Internal name       | stable, lowercase and implementation-safe                  |
+| Field type          | string, number, date, boolean, enumeration, owner, etc.    |
+| Options             | labels, internal values, ordering and deprecation policy   |
+| Source              | human, form, workflow, integration, calculated or imported |
+| Ownership           | who maintains quality and approves changes                 |
+| Requiredness        | stage/process where it becomes mandatory                   |
+| History/backfill    | initial population and conflict rule                       |
+| Consumers           | views, workflows, reports, integrations, agents            |
+| Privacy             | classification, retention and access                       |
 
 ## RevOps discovery order
 
@@ -45,6 +45,31 @@ Do not start with dashboard widgets or property creation.
 - After create, do not treat an immediate CRM search miss as absence. Search indexing can lag while the unique constraint and direct object read are already authoritative; retry or use direct/list readback before any second create.
 - For Workflows v4 beta, `201`, `crmObjectCreationStatus=COMPLETE` and `isEnabled=true` prove only stored configuration. Require a real positive enrollment/action readback plus a negative path; if API-only turn-on does not execute, disable the workflow and verify through the authenticated editor/history before rollout.
 - Never use one parent-object create-record action when the target grain is one child per associated component. A Deal-to-Service workflow needs a deterministic line-item iterator and per-line-item idempotency seam; otherwise keep materialization in a governed integration/custom action.
+
+## Evidence-backed prospect enrichment and segment scope
+
+Use [prospecting-segmentation.md](prospecting-segmentation.md) for the cohort, native-list expression and
+membership verification contract. Existing properties describe the record; they do not replace research origin.
+
+- Freeze the source-to-record manifest and prestate before writes. Distinguish companies researched again from
+  companies created, contacts created from contacts reused, and source date from CRM create date.
+- Read the live property definition, writable state and enumeration values. Fill only supported values; preserve
+  existing facts unless a source justifies a correction and record `before → after`, source and uncertainty.
+- A published employee range can populate a compatible range property. Do not infer an exact headcount or choose
+  a narrower enumeration than the source supports. Company size and industry may qualify the associated account;
+  company headquarters must not be copied into a person's residence.
+- Resolve company identity and employment before propagating associated-account attributes. Hold ambiguous
+  homonyms, historical employment and shared addresses in explicit review cohorts.
+- Service fit is a commercial classification. A public request is observed intent with a source, date and state.
+  Neither proves personal interest, contracted services, budget, a live process or installed HubSpot.
+- Reuse a service-interest property only when its defined meaning supports the evidence and the use is explicit.
+  If a legacy mapping contains organization-level or historical requests, label derived segments accordingly and
+  read the original note before personalization. Do not silently present those values as personal declarations.
+- Never fill `servicios_contratados`, deal service composition, lifecycle or pipeline stage from prospect fit.
+  Do not manufacture SEO/AEO/GEO enum options to force an unsupported service into an existing field.
+- Confirm that the selected fields can express the requested scope. Otherwise keep a verified cohort list as the
+  origin boundary and use existing industry, size and role properties inside it; do not create custom schema by
+  default or insert all record IDs into every derived segment.
 
 ## Commercial pipeline governance contract
 

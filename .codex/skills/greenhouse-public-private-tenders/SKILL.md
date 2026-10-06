@@ -15,6 +15,8 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ## Cuándo invocar
 
 - Descubrir/filtrar oportunidades de compra pública o privada (radar comercial).
+- Calificar una solicitud pública de proveedor y preparar su abordaje según fecha, estado y rol →
+  `prospect-intent-segmentation.md`; la operación de cohortes/segmentos pertenece a `hubspot-as-a-service`.
 - Decidir si Efeonce participa: screening + **bid/no-bid con margen sobre loaded cost**.
 - Leer/entender bases (administrativas, técnicas, económicas), plazos, criterios y garantías.
 - Preparar el paquete de oferta (técnica + económica + administrativa) y su matriz de cumplimiento.
@@ -58,6 +60,7 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ├─ Estado rápido CRM/bid/postulación compartido .............. docs/commercial/tenders/LICITATION_CRM_REGISTER.md
 ├─ Vista transversal de deals activos ........................ docs/commercial/CRM_DEAL_REGISTER.md
 ├─ Promoción CRM común + priorización de cartera .............. crm-portfolio-operating-model.md
+├─ Señal explícita/histórica, comprador y abordaje por cohorte .. prospect-intent-segmentation.md
 ├─ Radar Wherex con CLI Playwright protegida .................. wherex-radar-chrome-playwright.md
 └─ OPERAR/EVOLUCIONAR el runtime SHIPPED (Proposal aggregate,
    render jobs, artifact-worker, agentes propose→confirm) ..... proposal-studio-runtime.md
@@ -115,6 +118,12 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
    plazo, postulación o resultado, actualiza el registro; nunca lo trates como source of truth.
    Si ya existe un Deal HubSpot, sincroniza también `docs/commercial/CRM_DEAL_REGISTER.md` usando el mismo
    `deal_id`; una oportunidad todavía en radar no entra al registro comercial general.
+   7 bis. **Fit, petición y vigencia son datos distintos.** Una contratación histórica, un cargo público o un
+   correo enriquecido no prueban compra abierta, autoridad ni permiso para enviar. Conserva fecha de señal,
+   fecha de verificación, plazo y estado por separado; no conviertas una petición CRM/Zoho/SEO/IA en demanda
+   HubSpot/AEO/GEO sin evidencia expresa. Para preparar personalización, delimita primero la cohorte autorizada
+   y después usa atributos; coordina una sola entrada por cuenta y entrega dudas/limitaciones al operador.
+   Método: `prospect-intent-segmentation.md`.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 

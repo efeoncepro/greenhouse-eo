@@ -1,6 +1,6 @@
 ---
 name: hubspot-as-a-service
-description: "Deliver and operate HubSpot as a managed client service across Smart CRM, Marketing/Content/AEO, Sales, Revenue lifecycle, Service/Customer Success/Delivery, Data/Integration, and Agent Hub/agentic operations. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
+description: 'Deliver and operate HubSpot as a managed client service across Smart CRM, Marketing/Content/AEO, Sales, Revenue lifecycle, Service/Customer Success/Delivery, Data/Integration, and Agent Hub/agentic operations. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation.'
 ---
 
 # HubSpot as a Service
@@ -40,6 +40,7 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
 3. Load only the workstream reference needed:
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
+   - Prospect enrichment, native segments and preparation for personalized email: [prospecting-segmentation.md](references/prospecting-segmentation.md). Declare whether the universe is the entire CRM or a verified research cohort before creating filters; an active attribute segment alone does not restrict source or freshness.
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
@@ -54,14 +55,15 @@ For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_R
 
 ## Boundary router
 
-| Need | Owner |
-|---|---|
-| Sell, scope, price, partner economics, HubSpot product narrative | `hubspot-solutions-partner` + `commercial-expert` |
-| Operate CRM records directly | HubSpot MCP connector (`hubspot:hubspot`) or Agent CLI (`hubspot`), chosen per operation using the operator runbook |
-| Greenhouse-to-HubSpot Cloud Run bridge, webhooks, secrets | `hubspot-greenhouse-bridge` |
-| HubSpot CMS/landing/theme implementation | `docs/architecture/kortex/hubspot-cms/` and the CMS runbook |
-| Public Efeonce HubSpot landing positioning | `docs/public-site/` + `efeonce-public-site-wordpress` |
-| Client RevOps, portal configuration, Customer Agent, QA and managed operation | **this skill** |
+| Need                                                                          | Owner                                                                                                                     |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Sell, scope, price, partner economics, HubSpot product narrative              | `hubspot-solutions-partner` + `commercial-expert`                                                                         |
+| Operate CRM records directly                                                  | HubSpot MCP connector (`hubspot:hubspot`) or Agent CLI (`hubspot`), chosen per operation using the operator runbook       |
+| Segment an approved research cohort for personalized outreach preparation     | **this skill** → `references/prospecting-segmentation.md`; commercial qualification remains owned by the service practice |
+| Greenhouse-to-HubSpot Cloud Run bridge, webhooks, secrets                     | `hubspot-greenhouse-bridge`                                                                                               |
+| HubSpot CMS/landing/theme implementation                                      | `docs/architecture/kortex/hubspot-cms/` and the CMS runbook                                                               |
+| Public Efeonce HubSpot landing positioning                                    | `docs/public-site/` + `efeonce-public-site-wordpress`                                                                     |
+| Client RevOps, portal configuration, Customer Agent, QA and managed operation | **this skill**                                                                                                            |
 
 Do not conflate portal IDs, OAuth apps, CLI profiles, private-app tokens, Kortex OAuth, or the Greenhouse bridge.
 
@@ -95,6 +97,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 ## Non-negotiable controls
 
 - Never create a property because an email names a field. Confirm object, internal name, type, options, source, owner, requiredness, backfill and downstream consumers.
+- Keep research origin, service fit, observed purchase intent and email eligibility separate. A fresh CRM create date does not prove current employment, a live purchase process or a deliverable address. Cohort segments must retain their origin restriction in every OR branch; preparing segments does not authorize sending email or activating workflows/sequences.
 - Never treat Customer Agent persona, knowledge, actions and handoff as one prompt. They are separate contracts.
 - Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or
   a workflow action that invokes an agent managed through Agent Hub/Agent Builder. Names and eligibility can change;

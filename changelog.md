@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-06 — Prospección HubSpot: cohortes y abordaje personalizados
+
+- Portal `48713323`: 15 segmentos globales conservados y 18 nuevos activos, con pertenencia obligatoria al lote antes de industria, país, tamaño o cargo. Lectura completa confirma conjuntos exactos y cero registros ajenos. 80 cuentas investigadas, 79 contactos nuevos; 61 individuales con email para preparación, no aprobación de envío.
+- Runbook Agent CLI/MCP, manual de cohortes, método de intención y skills HubSpot/licitaciones espejadas: `IN_LIST(list = ...)`, fit ≠ solicitud ≠ vigencia, persona ≠ buzón compartido, correo disponible ≠ envío validado. [Auditoría, pendientes y estrategia](docs/audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md). Sin nuevos schemas, outreach, workflows, runtime, commit o publicación en este cierre.
+
 ## 2026-10-05 — Contractors: integridad de envíos y pagos (ISSUE-179, TASK-2009/2010)
 
 - Correcciones comunes de fechas, monto acordado, adjuntos por período/owner y reintentos atómicos; órdenes y cascade coherentes, sin parciales contractor. Revisiones adicionales cubren concurrencia, snapshot de tarifa y precisión de cantidades.
@@ -451,14 +456,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - El avatar de la firma pasa a 130 px (la marca de área, a 106 px), a la altura del bloque de texto de al lado: AXIS `axis-tokens` y `axis-ui-contracts` 0.3.35 (tag `v0.3.35`), fijados en Greenhouse. Las 9 firmas, sus páginas y los zip de OneDrive quedaron regenerados; en pantallas angostas el correo se parte antes de la «@».
 - Nueve fondos de Teams aprobados en la oficina moderna de Efeonce (formato `teams` y logo 3D de letrero/escritorio en el catálogo de `foto:prompt`); la página del kit de cada persona suma los fondos. Portadas de redes: exploración parqueada.
 - Página «Tu avatar nuevo» por persona (`…/team/kit/<nombre-apellido>.html`, descarga en un clic y dónde cambiar la foto) y del equipo; avatar y zip de firma en la carpeta de cada persona del Kit media; aviso por TeamBot 1:1 y en EO Team.
-
-## 2026-09-29 — Manzanitas sin decisiones abiertas: AXIS v0.3.29 y el equipo real en las fotos
-
-- AXIS `v0.3.29` (`f722a6f`): `axis-tokens` 0.3.29 (`closeCopy`, `teamPeople`, `slogan.widthEmByWord`, órbita del paso;
-  sin `sloganPx`), `axis-ui-contracts` 0.3.29 (contrato 0.3.0: `close-copy-too-long`, `chart-labels-invalid`, eslogan desde
-  el logo en el manifiesto), `axis-graphic-line` 0.11.0 (Trazo `republicar` y `enviar`, 88 glifos; `/charts` lee los rótulos
-  del dato). Lab con la contraportada nueva y sin decisiones abiertas.
-- Greenhouse (`2c95e60b2`): pins, tokens recompilados sin drift, gate a 0 px; el catálogo lee eslogan y órbita del token.
-- Roster del equipo en la fotografía de marca y seis identidades nuevas en `foto:prompt`, aprobadas por el operador.
-- El vestuario del equipo lo decide la línea de la pieza (hoodie en Servicios creativos; bomber o softshell en las líneas
-  de negocio): `foto:prompt` lo exige con `linea` en la ficha, y el polo debajo de la chaqueta ya no cuenta como mezcla de registros.
