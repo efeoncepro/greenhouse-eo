@@ -8,9 +8,9 @@
   "recipe": "decision-case",
   "voice": {
     "eyebrow": "Caso de cliente",
-    "question": "¿Dónde ya funciona?",
+    "question": "¿Qué ganó su equipo?",
     "answer": [
-      "En ANAM"
+      "Tiempo"
     ]
   },
   "figures": [

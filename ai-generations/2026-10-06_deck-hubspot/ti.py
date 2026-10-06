@@ -127,7 +127,7 @@ json.dump(d, open('intents/B04-encaje.json', 'w', encoding='utf-8'), ensure_asci
 
 CASO = 'casos publicados de ANAM en efeoncepro.com, julio de 2026'
 put('B29-caso-anam', {"role": "decision", "recipe": "decision-case",
-  "voice": {"eyebrow": "Caso de cliente", "question": "¿Dónde ya funciona?", "answer": ["En ANAM"]},
+  "voice": {"eyebrow": "Caso de cliente", "question": "¿Qué ganó su equipo?", "answer": ["Tiempo"]},
   # Resultados que entregó el operador el 2026-10-06 (comentario en el canvas); el uso externo requiere el visto bueno de ANAM.
   "figures": [
     {"value": "−57 %", "label": "carga comercial", "source": "ANAM, 2026"},

@@ -28,7 +28,7 @@ BODY = [
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
  ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
  ("B28-clientes", "¿Con quién trabajan? +90 empresas."),
- ("B29-caso-anam", "¿Dónde ya funciona? En ANAM."),
+ ("B29-caso-anam", "Caso ANAM · ¿Qué ganó su equipo? Tiempo."),
 ]
 # El brochure no lleva el detalle de olas ni el consumo de un workflow: quedan en la propuesta (operador, 2026-10-06).
 SOLO_PROPUESTA = {"B11-olas", "B27-workflow-creditos"}
