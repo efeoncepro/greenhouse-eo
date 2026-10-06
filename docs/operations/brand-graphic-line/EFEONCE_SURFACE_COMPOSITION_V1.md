@@ -1570,8 +1570,9 @@ registra TASK-2013. Detalle en el [catálogo de recetas](./deck-recipes/README.m
   textos de las piezas; el logo de Sky se compone sobre una foto sin librea.
 
 **Ocho fotos** (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`, `HB2`, `SA1` en registro cine, y `SK1`, foto de lugar sin persona
-fuera del registro cine); las seis primeras quedan como recetas en `scripts/foto/cine-recetas.json`. `SA1` no entra al índice hasta que el operador decida el caso de las
-personas del cliente (candidata en TASK-2013). Las lecciones, en el
+fuera del registro cine); las siete primeras quedan como recetas en `scripts/foto/cine-recetas.json`. `SA1` entró al
+índice el 2026-10-06, aprobada por el operador («Pero la 19 se ve muy bien, quiero mantenerla»), como precedente
+acotado para las personas del cliente (ver abajo). Las lecciones, en el
 [casebook del registro cine](../brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md), «Brochure Agencia Creativa»
 (fallas 36 a 43).
 
@@ -1590,9 +1591,11 @@ personas del cliente (candidata en TASK-2013). Las lecciones, en el
 - **Burbuja efeoncepro.com** sobre fotos casi negras: deja ver su recuadro navy (lámina 19 y otras). Sin corregir.
 - **Cifras del caso Sky con prospectos:** verificar si aplica la misma regla de autorización que en los casos de
   HubSpot y ANAM.
-- **Personas del cliente como extras en una sección cine** (`SA1`): la letra del §2 del registro sólo prevé al cliente
-  con el panel a la derecha; pendiente de decisión del operador (aprobó la lámina al pedir canonizar). Hasta entonces
-  `SA1` no es receta cine.
+- ~~**Personas del cliente como extras en una sección cine** (`SA1`)~~ — **decidido (2026-10-06):** aprobada y en uso
+  (operador: «Pero la 19 se ve muy bien, quiero mantenerla»). Precedente acotado: extras del cliente ficticios, sin
+  marca, en gris y carbón, en positivo (colaborando, nunca en su dolor), junto a una protagonista del roster con su
+  prenda y con el hoodie como único azul. La regla general del §2 del registro cine para otros casos sigue abierta en
+  la sesión de línea gráfica.
 - **Las 20 láminas a mano** como recetas: TASK-2013.
 
 ---
@@ -1732,8 +1735,8 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   estándar de implementación, y el acento como luz en las láminas diseñadas (AXIS).
 - **Brochure Agencia Creativa aprobado (2026-10-06).** 27 láminas: 7 usos de recetas existentes y 20 a mano,
   candidatas a receta (TASK-2013); §4.6, «Brochure Agencia Creativa». **Falta:** los íconos Plastilina en reposo
-  (láminas 07, 08, 09 y 13), la burbuja URL sobre fotos casi negras, la regla de autorización de las cifras de Sky y la
-  confirmación de las personas del cliente en `SA1`.
+  (láminas 07, 08, 09 y 13), la burbuja URL sobre fotos casi negras, la regla de autorización de las cifras de Sky. `SA1`
+  (personas del cliente como extras) quedó aprobada por el operador el 2026-10-06.
 - **Portadas y contraportadas (2026-09-27):** aprobadas, descritas en §4.6 y con plantilla en el composer (TASK-1927).
   El marco clásico no entra al catálogo. Diferencias conocidas contra los prototipos, en §4.6. Preguntas abiertas en
   §6, filas 15 a 17 (la 18 y la 19 quedaron resueltas).

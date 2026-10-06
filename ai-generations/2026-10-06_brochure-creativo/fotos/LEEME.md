@@ -61,7 +61,7 @@ El GAZE incondicional de `deck-seccion` se contradice desde la escena (mirada a 
 ## Estado final (canonización 2026-10-06)
 
 En uso: `CV1b` (B1), `CV2b` (B2), `CV3b` (B3), `BS1c` (B4), `RG1b` (P1), `HB2` (P2), `SK1` (A12, foto de lugar fuera del
-registro cine) y `SA1` (A19, **candidata**: extras del cliente con texto a la izquierda, sin decisión del operador). Las
-seis cine aprobadas están en `scripts/foto/cine-recetas.json`; las lecciones, en el casebook cine (fallas 36–43). `BS1b`,
+registro cine) y `SA1` (A19, **aprobada** por el operador el 2026-10-06: «Pero la 19 se ve muy bien, quiero
+mantenerla»; precedente acotado de extras del cliente con texto a la izquierda). Las siete cine aprobadas están en `scripts/foto/cine-recetas.json`; las lecciones, en el casebook cine (fallas 36–43). `BS1b`,
 `RG1` y `HB1`/`HB1b` quedan en el banco. Ojo: el `RG1b` de esta corrida (estudio portátil) no es el `RG1b` del deck
 HubSpot (la Tierra desde la órbita).

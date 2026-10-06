@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Brochure canonizado en servicios y skills (2026-10-06); recetas y pendientes sin empezar`
+- Status real: `Brochure canonizado en servicios y skills (2026-10-06); Slice 4 hecho con SA1 aprobada por el operador; recetas y demás pendientes sin empezar`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -32,7 +32,8 @@ El operador aprobó el 2026-10-06 el brochure «Agencia Creativa» (27 láminas)
 servicios y skills quedó hecha ese día. De las 27 láminas, 7 salen del Artifact Composer con recetas existentes y 20
 están hechas a mano en el canvas: el operador decidió registrarlas como **candidatas** a receta, no promoverlas ahora.
 Esta task las promueve al catálogo del deck con su imagen de referencia en AXIS y cierra los pendientes abiertos del
-brochure (íconos, burbuja URL, foto SA1, autorización del caso SKY, lecciones de foto y naming en AXIS).
+brochure (íconos, burbuja URL, autorización del caso SKY, lecciones de foto y naming en AXIS); la foto SA1 quedó
+aprobada por el operador el 2026-10-06.
 
 ## Why This Task Exists
 
@@ -40,8 +41,8 @@ Mientras las 20 láminas vivan sólo en `build-canvas-v7.py` y en el canvas, nin
 `pnpm brand:deck-plan` no las conoce, no tienen `communicates`/`useWhen`/`avoidWhen` ni slots medidos, y el próximo
 agente las volvería a dibujar a mano. Además, al aprobar quedaron decisiones abiertas que hoy contradicen el canon en
 láminas concretas (íconos de plastilina en volumen y con esfera en contenido de deck, recuadro navy de la burbuja URL
-sobre fotos casi negras) y una foto (SA1) que pone personas fuera del roster en un caso que el registro cine no cubre.
-Si no se registran como trabajo exigible, el brochure se reutiliza con esos defectos.
+sobre fotos casi negras). La foto SA1, que pone extras del cliente en una sección cine, quedó aprobada por el operador
+el 2026-10-06 como precedente acotado. Si no se registran como trabajo exigible, el brochure se reutiliza con esos defectos.
 
 ## Goal
 
@@ -49,8 +50,8 @@ Si no se registran como trabajo exigible, el brochure se reutiliza con esos defe
   recetas existentes, cada una con su `fit`, su imagen de referencia en AXIS y su `referenceSource`.
 - El plan del brochure Agencia Creativa queda como fixture validado por `pnpm brand:deck-plan`.
 - Las láminas 3, 8, 12, 13 y las que lleven la burbuja URL sobre foto oscura quedan corregidas según el canon.
-- Las lecciones de foto del brochure entran al casebook cine y los plates aprobados a `cine-recetas.json`; SA1 sólo
-  si el operador lo aprueba.
+- Las lecciones de foto del brochure entran al casebook cine y los plates aprobados a `cine-recetas.json`, SA1
+  incluida (aprobada por el operador el 2026-10-06).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -145,7 +146,7 @@ Reglas obligatorias:
 - No hay fixture del plan del brochure.
 - Láminas 3, 8, 12 y 13 (posición; A03, B5, P3, A04) con íconos de plastilina en volumen y con esfera en contenido de deck.
 - Recuadro navy visible de la burbuja URL sobre fotos casi negras (lámina 19 y otras).
-- SA1 sin aprobación de receta cine (las lecciones ya son las fallas 36–43 del casebook y seis plates están en `cine-recetas.json` desde el 2026-10-06).
+- ~~SA1 sin aprobación de receta cine~~ — cerrado el 2026-10-06: el operador la aprobó y está en `cine-recetas.json` con los otros seis plates cine; las lecciones son las fallas 36–43 del casebook.
 - Sin verificación de la autorización de las cifras y el testimonio del caso SKY para prospectos.
 
 ## Modular Placement Contract
@@ -207,10 +208,11 @@ Reglas obligatorias:
 - Hecho el 2026-10-06: sección del brochure en el casebook cine (fallas 36–43).
 - Hecho el 2026-10-06: los seis plates cine aprobados (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`, `HB2`) como recetas en
   `scripts/foto/cine-recetas.json`, con su `ojo`; `SK1` es foto de lugar fuera del registro cine.
-- **SA1 queda candidata.** No es receta cine aprobada: el §2 del registro cine no cubre extras del cliente con texto a
-  la izquierda, y la sesión de línea gráfica lo lleva al operador. Mientras tanto rige: el cliente sale sólo en
-  `panel-end` y nunca en su dolor (SP1), y en las fotos de marca no hay personas fuera del roster. Si el operador la
-  rechaza, la lámina 19 cambia de foto y su imagen de referencia se toma con la nueva.
+- Hecho el 2026-10-06: **SA1 aprobada por el operador** («Pero la 19 se ve muy bien, quiero mantenerla») y agregada como receta en
+  `scripts/foto/cine-recetas.json`, con su `ojo`. Vale como precedente acotado: extras del cliente ficticios, sin marca,
+  en gris y carbón, en positivo (colaborando, nunca en su dolor), junto a una protagonista del roster con su prenda, y
+  con el hoodie como único azul. La regla general del §2 del registro cine para otros casos la sigue llevando la sesión
+  de línea gráfica (el texto del §2 no cambia). La lámina 19 conserva su foto y su imagen de referencia se toma con ella.
 
 ### Slice 5 — Pendientes comerciales y de marca
 
@@ -239,7 +241,7 @@ README del catálogo.
 
 - Slice 1 MUST ir antes del Slice 2: el operador ve el mapa antes de que nazcan recetas.
 - Slice 3 MUST ir antes de tomar las imágenes de referencia de las láminas 3, 8, 12, 13 y las que llevan la burbuja.
-- Slice 4 es independiente; la imagen de referencia de la lámina 19 espera la decisión sobre SA1.
+- Slice 4 es independiente; la imagen de referencia de la lámina 19 se toma con SA1 (aprobada el 2026-10-06).
 - Slice 5 es independiente.
 
 ### Risk matrix
@@ -248,7 +250,7 @@ README del catálogo.
 |---|---|---|---|---|
 | Una receta nueva duplica una existente | catálogo del deck | medium | Slice 1 mapea cada lámina contra las 100 recetas antes de crear | `pnpm brand:deck-plan` con avisos de receta duplicada o sin uso |
 | La corrección de la burbuja cambia láminas ya aprobadas de otros decks | Artifact Composer | medium | `pnpm composer:visual-gate` y rebaseline en sección sin sellar de `BASELINE_DELTAS.md`, mirado por el operador | visual gate distinto de cero |
-| SA1 se reutiliza antes de su aprobación | fotos de marca | low | marcada candidata en skills y casebook; no entra a `cine-recetas.json` sin aprobación | ficha que parte de SA1 |
+| SA1 se reutiliza fuera de su precedente acotado | fotos de marca | low | el `ojo` de la receta, el casebook (falla 40) y la skill `design-studio` fijan sus condiciones | ficha que parte de SA1 con extras con marca, en su dolor o con azul fuera del hoodie |
 | El brochure se manda a un prospecto con cifras SKY sin autorización | ventas | medium | pendiente visible en el README de servicios y en `creative-practice` | uso del PDF antes de cerrar el Slice 5 |
 
 ### Feature flags / cutover
@@ -275,7 +277,7 @@ README del catálogo.
 ### Out-of-band coordination required
 
 - Visto bueno del operador para el mapa del Slice 1, para las láminas corregidas y para cada push a `main` de AXIS.
-- Decisión del operador sobre SA1 (la lleva la sesión de línea gráfica) y sobre la autorización del caso SKY.
+- Decisión del operador sobre la autorización del caso SKY (la de SA1 quedó tomada el 2026-10-06).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -293,7 +295,7 @@ README del catálogo.
 - [ ] Las láminas 3, 8, 12 y 13 no usan plastilina en volumen y sus íconos van en reposo sin esfera; el operador las vio.
 - [ ] Ninguna lámina del brochure ni plantilla del compositor pinta un recuadro navy detrás de la burbuja URL, y la burbuja mide 4,5:1 bajo su caja.
 - [x] El casebook cine tiene la sección del brochure (fallas 36–43) y `cine-recetas.json` los seis plates cine aprobados (2026-10-06; `SK1` es foto de lugar fuera del registro cine).
-- [ ] SA1 tiene decisión del operador registrada (receta cine o reemplazo de la foto de la lámina 19).
+- [x] SA1 tiene decisión del operador registrada (receta cine o reemplazo de la foto de la lámina 19): aprobada y en uso el 2026-10-06 («Pero la 19 se ve muy bien, quiero mantenerla»); receta en `cine-recetas.json`.
 - [ ] La autorización del caso SKY para prospectos tiene respuesta registrada en el README de Creative Services.
 - [x] El README de `brand-assets` en AXIS ya no dice que «Creative Studio» es sólo el descriptor de Globe (AXIS `f4dd2fe`, 2026-10-06).
 
@@ -322,5 +324,5 @@ README del catálogo.
 
 ## Open Questions
 
-- ¿SA1 entra como receta cine o la lámina 19 cambia de foto? (decisión del operador, en curso con la sesión de línea gráfica).
+- ~~¿SA1 entra como receta cine o la lámina 19 cambia de foto?~~ — resuelta el 2026-10-06: entra como receta cine («Pero la 19 se ve muy bien, quiero mantenerla»), como precedente acotado.
 - ¿Las cifras y el testimonio del caso SKY requieren autorización del cliente, como el caso ANAM?

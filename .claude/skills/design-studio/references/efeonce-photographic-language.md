@@ -137,10 +137,10 @@ Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el caseb
 `HS3b`, `HS4`, `HS5b`, `HS6b`, `CMP-crm-B`, `CMP-portada-B`, cada una con su `ojo`). Antes de partir de ellas lee la
 [sección del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
 deriva del objeto hacia la reserva, objeto al otro lado del sujeto, acento de un solo punto y tic de pose (fallas 32–35).
-**Brochure Agencia Creativa (2026-10-06):** seis plates cine aprobados (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`,
-`HB2`), la foto de lugar `SK1` (fuera del registro cine) y `SA1` como **candidata** (ver 5); fichas en git en `ai-generations/2026-10-06_brochure-creativo/fotos/fichas/`, plates fuera de
-git en `fotos/plates/`, banco y descartes en `fotos/LEEME.md`. Los seis plates cine son recetas de `cine-recetas.json` y las lecciones siguientes son las fallas 36–43 del
-[casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md); `SA1` sigue candidata (TASK-2013).
+**Brochure Agencia Creativa (2026-10-06):** siete plates cine aprobados (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`,
+`HB2`, `SA1`; `SA1` como precedente acotado, ver 5) y la foto de lugar `SK1` (fuera del registro cine); fichas en git en `ai-generations/2026-10-06_brochure-creativo/fotos/fichas/`, plates fuera de
+git en `fotos/plates/`, banco y descartes en `fotos/LEEME.md`. Los siete plates cine son recetas de `cine-recetas.json` y las lecciones siguientes son las fallas 36–43 del
+[casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
 1. **Deriva al centro por geometría.** Con 85 mm a 3–4 m la escena no cabe en la mitad derecha. Se ordena en
    profundidad, con porcentaje de ancho por persona y una «banda de oscuridad vacía» entre el borde izquierdo y la
    espalda, y se aleja la cámara; si igual deriva, la lámina corre la foto 130–150 px a la derecha con el borde fundido
@@ -152,10 +152,12 @@ git en `fotos/plates/`, banco y descartes en `fotos/LEEME.md`. Los seis plates c
    va sin `linea`, por pedido explícito.
 4. **Con `luz-motivada`, un monitor como llave anula la palanca** (compila «never a monitor») y deja el acento de
    espaldas: el fenómeno tiene que ser el servicio (SA1: hoja de piezas de luz sobre la mesa del cliente).
-5. **SA1 queda candidata, no receta cine.** Pone extras del cliente (ficticios, sin marca, en gris o carbón, nada azul,
-   para que el hoodie royal diga quién viene de afuera) con el texto a la izquierda; el §2 del registro cine no cubre el
-   caso y está en consulta con el operador. **Mientras tanto rige:** el cliente sale sólo en `panel-end` y nunca en su
-   dolor (SP1), y en las fotos de marca no hay personas fuera del roster. No partir de SA1 para otra pieza.
+5. **SA1 aprobada como precedente acotado** (operador, 2026-10-06: «Pero la 19 se ve muy bien, quiero mantenerla»).
+   Vale sólo con sus condiciones: extras del cliente ficticios, sin marca, en gris y carbón, nada azul, en positivo
+   (colaborando, nunca en su dolor), junto a una protagonista del roster con su prenda, y con el hoodie royal como único
+   azul, lo que dice quién viene de afuera; texto a la izquierda. La regla general del §2 del registro cine para otros
+   casos la lleva la sesión de línea gráfica: fuera de este precedente, el cliente sale sólo en `panel-end` y nunca en
+   su dolor (SP1).
 6. **El modelo nunca dibuja marcas.** Dibujó el isotipo de Efeonce como «marca ficticia» (BS1, descartado); el muro de
    la lámina 9 se compuso por máscara con 35 piezas reales porque el modelo reescribía sus textos; el logo de SKY va
    compuesto sobre un avión sin librea (SK1).
