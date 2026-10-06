@@ -410,11 +410,26 @@ def tool(blob, name, label):
 def pair(q, a, px, t=DARK):
     return (f'<div style="display: flex; align-items: center; gap: 16px"><span style="width: 22px; height: 22px; border-radius: 50%; border: 4px solid {t["acc"]}; box-sizing: border-box; flex: none"></span>'
             f'<span style="font-family: {ST}; font-size: 36px; font-weight: 300; color: {t["ink"]}">{q}</span></div>' + headline([a], px, t, '; margin-top: 18px'))
+# Comentario del operador (2026-10-06): los logos de las herramientas estaban «sin chiste». Van como en la lámina
+# aprobada del día a día (DeckDiaADiaHerramientas): tiles de app blancos que flotan alrededor de la pantalla, unidos a ella.
+APPS = [("a9fc2179296e7205eb0367774eba1c4c", "Microsoft Teams", "Nos reunimos", 700, 130, 'center', (828, 194), (950, 300)),
+        ("496c456197a965130a04554201efb39a", "Notion", "Proyectos y tareas", 1640, 0, 'center', (1660, 128), (1540, 230)),
+        ("d8002281d17ca07eb3341e7c11720bb6", "Frame.io", "Revisas y apruebas", 1690, 560, 'center', (1690, 624), (1560, 560)),
+        ("35cb41c9c7535c3a833a3b0142ed1089", "Adobe", "Producimos", 680, 600, 'center', (808, 664), (950, 660))]
+def app_tile(blob, name, label, x, y, align, a, b):
+    lab_x = x - 71
+    return (f'<div style="position: absolute; left: {x}px; top: {y}px; width: 128px; height: 128px; border-radius: 30px; background: #ffffff; display: flex; align-items: center; justify-content: center">'
+            f'<img src="{BL(blob)}" alt="{name}" style="width: 70px; height: 70px; object-fit: contain"></div>'
+            f'<div style="position: absolute; left: {lab_x}px; top: {y + 146}px; width: 270px; text-align: center; display: flex; flex-direction: column; gap: 6px">'
+            f'<div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff">{name}</div>'
+            f'<div style="font-family: {ST}; font-size: 26px; font-weight: 600; color: #ffffff">{label}</div></div>')
+connectors = '<svg width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; left: 0; top: 0" aria-hidden="true">' + ''.join(
+    f'<path d="M{a[0]} {a[1]} C {(a[0]+b[0])/2:.0f} {a[1]}, {(a[0]+b[0])/2:.0f} {b[1]}, {b[0]} {b[1]}" fill="none" stroke="#72ded8" stroke-opacity="0.45" stroke-width="2"></path>'
+    for (_, _, _, _, _, _, a, b) in APPS) + '</svg>'
 S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el trabajo? En vivo.",
-  screen('CS-Home', 800, 140, 0.72, -12, '100% 50%') +
-  col(eyebrow('Tu día a día con Efeonce', DARK) + f'<div style="margin-top: 64px">{pair("¿Cómo sigo el trabajo?", "En vivo", 128)}</div>' +
-      body('Cada cosa en su herramienta y <b style="font-weight: 600">todo</b> a la vista en Creative Studio, sin esperar el informe.', DARK, 22, 520, '; margin-top: 36px') +
-      f'<div style="margin-top: 36px; width: 520px">{"".join(tool(*x) for x in TOOLS)}</div>', 120, 600) +
+  screen('CS-Home', 880, 210, 0.66, -12, '100% 50%') + connectors + ''.join(app_tile(*x) for x in APPS) +
+  col(eyebrow('Tu día a día con Efeonce', DARK) + f'<div style="margin-top: 70px">{pair("¿Cómo sigo el trabajo?", "En vivo", 128)}</div>' +
+      body('Cada cosa en su herramienta y <b style="font-weight: 600">todo</b> a la vista en Creative Studio, sin esperar el informe.', DARK, 24, 420, '; margin-top: 260px'), 120, 460) +
   bubble(DARK)))
 
 def image_slide(title, blob):
