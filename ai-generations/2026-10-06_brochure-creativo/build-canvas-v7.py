@@ -5,7 +5,7 @@ ROOT, IDX = sys.argv[1], sys.argv[2]
 BL = lambda i: f'/_blob/{i}'
 PNG = {"A01-portada": "737886447dec253149c28a72508abbdb", "A05-equipo": "2f13923f4d6593c5e7a33a7aed163c41",
        "A09-sprint": "549fca5e2991e6fbc2ad2ec528692922", "A10-control": "5cbceb0d1c9af2f91db4cfb14b299014",
-       "A15-siguiente": "3da123050fc4e7dc1585eb0fbb3e1f0e", "A16-contraportada": "21c038b003e51a3c1d03c8def359cd72"}
+       "A15-siguiente": "3da123050fc4e7dc1585eb0fbb3e1f0e", "A16-contraportada": "21c038b003e51a3c1d03c8def359cd72", "A21-mercados": "5952877b2198ac7fdc3d7819cec14ab9"}
 P = {"CR2b": "bc1e48c37b35623155baa76d2a3eec0c", "HW1": "95e465738c26b68ddc531b6d645141a0", "T1": "7f2f10fc6a432b216865e1ecfc19b45e",
      "T2": "8c12078f76f6ebb111a7e27f70a51755", "T3": "33e05f4e23fd82cf740f12a3ee627085", "H1b": "91feb5acd0d1d878e6213d6f31dcb763",
      "L1": "19326968ce6c4e2579e4a71debaff6c9"}
@@ -412,24 +412,30 @@ def pair(q, a, px, t=DARK):
             f'<span style="font-family: {ST}; font-size: 36px; font-weight: 300; color: {t["ink"]}">{q}</span></div>' + headline([a], px, t, '; margin-top: 18px'))
 # Comentario del operador (2026-10-06): los logos de las herramientas estaban «sin chiste». Van como en la lámina
 # aprobada del día a día (DeckDiaADiaHerramientas): tiles de app blancos que flotan alrededor de la pantalla, unidos a ella.
-APPS = [("a9fc2179296e7205eb0367774eba1c4c", "Microsoft Teams", "Nos reunimos", 700, 130, 'center', (828, 194), (950, 300)),
-        ("496c456197a965130a04554201efb39a", "Notion", "Proyectos y tareas", 1640, 0, 'center', (1660, 128), (1540, 230)),
-        ("d8002281d17ca07eb3341e7c11720bb6", "Frame.io", "Revisas y apruebas", 1690, 560, 'center', (1690, 624), (1560, 560)),
-        ("35cb41c9c7535c3a833a3b0142ed1089", "Adobe", "Producimos", 680, 600, 'center', (808, 664), (950, 660))]
-def app_tile(blob, name, label, x, y, align, a, b):
-    lab_x = x - 71
-    return (f'<div style="position: absolute; left: {x}px; top: {y}px; width: 128px; height: 128px; border-radius: 30px; background: #ffffff; display: flex; align-items: center; justify-content: center">'
-            f'<img src="{BL(blob)}" alt="{name}" style="width: 70px; height: 70px; object-fit: contain"></div>'
-            f'<div style="position: absolute; left: {lab_x}px; top: {y + 146}px; width: 270px; text-align: center; display: flex; flex-direction: column; gap: 6px">'
-            f'<div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff">{name}</div>'
-            f'<div style="font-family: {ST}; font-size: 26px; font-weight: 600; color: #ffffff">{label}</div></div>')
-connectors = '<svg width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; left: 0; top: 0" aria-hidden="true">' + ''.join(
-    f'<path d="M{a[0]} {a[1]} C {(a[0]+b[0])/2:.0f} {a[1]}, {(a[0]+b[0])/2:.0f} {b[1]}, {b[0]} {b[1]}" fill="none" stroke="#72ded8" stroke-opacity="0.45" stroke-width="2"></path>'
-    for (_, _, _, _, _, _, a, b) in APPS) + '</svg>'
+# Comentario del operador (2026-10-06): «todo está desconectado de la interfaz». La pantalla va plana y los tiles de
+# cada herramienta se montan sobre su borde superior: cada uno entra a la interfaz por una línea corta con su punto.
+APPS = [("a9fc2179296e7205eb0367774eba1c4c", "Microsoft Teams", "Nos reunimos"), ("496c456197a965130a04554201efb39a", "Notion", "Proyectos y tareas"),
+        ("d8002281d17ca07eb3341e7c11720bb6", "Frame.io", "Revisas y apruebas"), ("35cb41c9c7535c3a833a3b0142ed1089", "Adobe", "Producimos")]
+SX, SY, SC = 740, 330, 0.74          # pantalla plana: 1066 × 814, sangra por abajo
+SW = 1440 * SC
+def dock():
+    out, slot = '', SW / 4
+    for i, (blob, name, label) in enumerate(APPS):
+        cx = SX + slot * (i + 0.5)
+        out += (f'<div style="position: absolute; left: {cx-150:.0f}px; top: 140px; width: 300px; text-align: center; display: flex; flex-direction: column; gap: 4px">'
+                f'<div style="font-family: {ST}; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe4fa">{name}</div>'
+                f'<div style="font-family: {ST}; font-size: 24px; font-weight: 600; color: #ffffff">{label}</div></div>'
+                f'<div style="position: absolute; left: {cx-56:.0f}px; top: 222px; width: 112px; height: 112px; border-radius: 28px; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(114, 222, 216, 0.35)">'
+                f'<img src="{BL(blob)}" alt="{name}" style="width: 62px; height: 62px; object-fit: contain"></div>'
+                f'<div style="position: absolute; left: {cx-1:.0f}px; top: 334px; width: 2px; height: 26px; background: rgba(114, 222, 216, 0.55)"></div>'
+                f'<div style="position: absolute; left: {cx-5:.0f}px; top: 356px; width: 10px; height: 10px; border-radius: 50%; background: #72ded8"></div>')
+    return out
+flat = (f'<div style="position: absolute; left: {SX}px; top: {SY}px; width: {SW:.0f}px; height: {1100*SC:.0f}px; overflow: hidden; border-radius: 18px 18px 0 0; border: 2px solid rgba(114, 222, 216, 0.35); border-bottom: none">'
+        f'<div style="width: 1440px; height: 1100px; transform-origin: 0 0; transform: scale({SC})"><dc-import name="CS-Home" theme="dark" hint-size="1440px,1100px"></dc-import></div></div>')
 S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el trabajo? En vivo.",
-  screen('CS-Home', 880, 210, 0.66, -12, '100% 50%') + connectors + ''.join(app_tile(*x) for x in APPS) +
+  flat + dock() +
   col(eyebrow('Tu día a día con Efeonce', DARK) + f'<div style="margin-top: 70px">{pair("¿Cómo sigo el trabajo?", "En vivo", 128)}</div>' +
-      body('Cada cosa en su herramienta y <b style="font-weight: 600">todo</b> a la vista en Creative Studio, sin esperar el informe.', DARK, 24, 420, '; margin-top: 260px'), 120, 460) +
+      body('Cada cosa en su herramienta y <b style="font-weight: 600">todo</b> conectado a Creative Studio, a la vista y sin esperar el informe.', DARK, 24, 480, '; margin-top: 48px'), 120, 540) +
   bubble(DARK)))
 
 def image_slide(title, blob):
@@ -440,7 +446,7 @@ ORDER = [("A01-portada", "Portada · ¿Mi equipo puede producir más? Mucho más
          ("A05-equipo", "¿Quién trabaja en mi marca? Personas reales.", 'png'), ("A07-triptico", None, 'hand'), ("P5-dia-a-dia", None, 'hand'),
          ("A08-capacidad", None, 'hand'), ("A09-sprint", "¿Y si no me convence? Empiezas chico.", 'png'),
          ("A10-control", "¿Pierdo el control de mi marca? Nunca.", 'png'), ("A12-caso-sky", None, 'hand'), ("A13-testimonio", None, 'hand'),
-         ("A14-clientes", None, 'hand'), ("A15-siguiente", "¿Qué recibo primero? Un plan.", 'png'),
+         ("A14-clientes", None, 'hand'), ("A21-mercados", "¿Dónde trabajan? En cinco países.", 'png'), ("A15-siguiente", "¿Qué recibo primero? Un plan.", 'png'),
          ("A16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.", 'png')]
 idx = json.load(open(IDX, encoding='utf-8'))
 idx['boards'].pop('A11-medicion.dc.html', None)
@@ -448,7 +454,7 @@ idx['boards'].pop('A11-medicion.dc.html', None)
 idx['boards'].pop('A06-hibrido.dc.html', None)
 idx['order'] = [o for o in idx['order'] if o != 'A06-hibrido.dc.html']
 idx['order'] = [o for o in idx['order'] if o != 'A11-medicion.dc.html']
-idx['notes']['t2']['text'] = "Brochure · Agencia Creativa — 25 láminas"
+idx['notes']['t2']['text'] = "Brochure · Agencia Creativa — 26 láminas"
 written = []
 for i, (key, title, kind) in enumerate(ORDER):
     f = f'{key}.dc.html'
