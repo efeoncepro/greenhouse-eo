@@ -383,8 +383,12 @@ def studio_component(src):
     for a, b in CAMPAIGN_IMG.items(): h = h.replace(a, b)
     for a, b in BLOBMAP.items(): h = h.replace(a, b)
     for a, b in TEXT: h = h.replace(a, b)
-    # Comentario del operador (2026-10-06): en las interfaces de Marketing Studio el nombre va en texto, sin la esfera;
-    # Creative Studio sigue el mismo patrón (el logo con la esfera queda para la lámina, fuera de la interfaz).
+    # Comentario del operador (2026-10-06): el encabezado lleva el lockup de Creative Studio (generado con el mismo
+    # constructor del de Marketing Studio, línea brand), igual que la app real: positivo en claro, negativo en oscuro.
+    lock = ('<sc-if value="{{isDark}}" hint-placeholder-val="{{false}}"><img src="/_blob/8c5c29df9d9fb02d6e0f6410ace88d4e" alt="Efeonce | Creative Studio" style="height: 20px; width: auto; display: block;"></sc-if>'
+            '<sc-if value="{{isLight}}" hint-placeholder-val="{{true}}"><img src="/_blob/cc3c6fbe79f2a71f0e5d904846231b3b" alt="Efeonce | Creative Studio" style="height: 20px; width: auto; display: block;"></sc-if>')
+    h, n = _re.subn(r'<sc-if value="\{\{isDark\}\}"[^>]*><img[^>]*alt="Efeonce"[^>]*></sc-if><sc-if value="\{\{isLight\}\}"[^>]*><img[^>]*alt="Efeonce"[^>]*></sc-if><span style="width: 1px; height: 20px;[^"]*"></span><span[^>]*>Marketing Studio</span>', lambda m: lock, h)
+    assert n == 1, f'encabezado no encontrado en {src}'
     h = h.replace('Marketing Studio', 'Creative Studio')
     h = _re.sub(r'href="Studio-[A-Za-z]+\.dc\.html"', 'href="#"', h)
     return h
