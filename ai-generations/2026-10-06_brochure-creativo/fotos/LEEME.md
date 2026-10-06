@@ -11,3 +11,13 @@ Fichas en `fichas/`, plates en `plates/` (fuera de git). Todas pasaron por `cine
 | `CV2-cincuenta-piezas` | — | Banco | La tablet salió de dorso: se perdía la pieza madre |
 | `CV3b-menos-tiempo` | B3 «Menos tiempo. La misma marca.» | **En uso** | Estelas más largas que CV3 (más impacto) |
 | `CV3-menos-tiempo` | — | Banco (aprobable) | Estela suave |
+
+## Capítulo Brand Systems (2026-10-06)
+
+| Plate | Lámina | Estado | Por qué |
+|---|---|---|---|
+| `BS1b-del-manual-al-sistema` | B4 «Del manual al sistema.» | **En uso** | Karo con el manual cerrado; la identidad de una marca ficticia (dos cuadros) sube como sistema de luz; un solo punto naranja |
+| `BS1-del-manual-al-sistema` | — | Descartado | El modelo dibujó el isotipo de Efeonce como «marca ficticia» cuatro veces, con cuatro puntos naranjas (el modelo nunca dibuja la marca; un acento por pieza) |
+
+B6 «Este brochure es la prueba.» usa `assets/muro-la-orbita.jpg` (`build-muro.js`): 35 piezas reales aprobadas de La órbita
+(referencias del deck + uniforme, nave y logo 3D), sin láminas con personas reales del equipo ni piezas de clientes.
