@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Costo total",
+    "question": "¿Hay costos escondidos?",
+    "answer": [
+      "Ninguno"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 4
+  },
+  "items": [
+    {
+      "title": "Licencias HubSpot",
+      "desc": "Los seats y el tier que usas, ni uno más: USD [monto] al año."
+    },
+    {
+      "title": "Implementación",
+      "desc": "Por alcance y capacidad, nunca por horas: [monto] + IVA."
+    },
+    {
+      "title": "Operación gestionada",
+      "desc": "Mensual, con SLA y revisión trimestral: [monto] + IVA al mes."
+    },
+    {
+      "title": "Créditos de IA",
+      "desc": "Consumo medido por agente; lo extra cuesta USD 10 por cada 1.000 créditos."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

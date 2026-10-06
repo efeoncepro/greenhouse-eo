@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "role": "decision",
+  "recipe": "decision-case",
+  "voice": {
+    "eyebrow": "Caso publicado",
+    "question": "¿Dónde ya funciona?",
+    "answer": [
+      "En ANAM"
+    ]
+  },
+  "figures": [
+    {
+      "value": "23",
+      "label": "fuentes de conocimiento",
+      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+    },
+    {
+      "value": "356",
+      "label": "registros técnicos",
+      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+    },
+    {
+      "value": "5",
+      "label": "rutas de atención",
+      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+    },
+    {
+      "value": "34/34",
+      "label": "asociaciones verificadas",
+      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+    }
+  ],
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+    "alt": "ANAM"
+  },
+  "selected": 4,
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+    "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente"
+  },
+  "selection": {
+    "target": "object",
+    "label": "HubSpot",
+    "participantKind": "department"
+  },
+  "line": "growth",
+  "use": "brochure"
+}
