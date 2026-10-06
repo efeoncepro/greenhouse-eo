@@ -1,0 +1,44 @@
+{
+  "id": "HS6-una-decision",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "julio"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 80 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Behind him and to the right, filling the dark depth of the hall, hang dozens of faint, thin, tangled lines of dim blue light, branching in every direction like the possible routes of a business: options, all dim. The tangle stays far behind him, soft and out of focus, entirely inside the right 40 % of the frame, never in the left half of the frame. From that tangle, ONE single clean path of bright cool white-blue light (#0375DB) emerges from the tangle directly behind his right shoulder (the shoulder on the camera-left side), straight and decisive, comes forward over that shoulder and descends to his raised right hand; it never crosses his face or his chest, ending just beside his raised right hand in ONE compact bright knot of cool white light about 15 cm across, the brightest thing in the frame, which is held calmly open at chest height on the camera-left side of his body, his hand at about 66 % of the frame width and never further left than 62 %. His left arm hangs relaxed at his side, out of the action. At the tip of the bright path, beside his hand, ONE single tiny point glows magenta-pink (#E86BD0), the only accent in the frame; it lights nothing around it. His head stays almost frontal and his eyes turn toward the empty dark left of the frame, where the text will sit, with a calm, assured closed-mouth half-smile. The light of the bright path paints his face, hand and jacket. Thin haze catches the light. The LEFT 60% of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes. Rich contrast, no text, no letters, no numbers, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "julio"
+    }
+  ],
+  "linea": "revenue-hubspot",
+  "llave": {
+    "fuente": "the compact bright knot of cool white light at the tip of the path, beside his raised right hand",
+    "lado": "to his right side (camera-left), at chest height, below and to the side of his face",
+    "tamano": "about 15 cm across",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "a tangle of dozens of faint dim blue lines far behind, soft and out of focus",
+  "fenomeno": {
+    "que": "from a tangle of dim possible routes, one single bright path emerges and reaches his hand",
+    "esServicio": "evaluación inicial: una decisión con evidencia, no una recomendación por defecto"
+  }
+}

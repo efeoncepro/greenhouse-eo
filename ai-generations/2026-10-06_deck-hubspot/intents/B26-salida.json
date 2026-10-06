@@ -4,42 +4,36 @@
   "surface": "deck",
   "format": "16x9",
   "theme": "dark",
-  "role": "content",
-  "recipe": "content-bullets",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
   "voice": {
     "eyebrow": "Sin amarras",
     "question": "¿Y si mañana nos vamos?",
     "answer": [
-      "Te llevas todo"
+      "Con todo"
     ]
   },
-  "progress": {
-    "sections": 4,
-    "current": 3
-  },
-  "items": [
+  "body": "Tus datos son tuyos: entran a HubSpot con **orden** y salen igual de completos.",
+  "pillars": [
     {
-      "title": "Tus datos, exportables",
-      "desc": "Exportas registros y propiedades cuando quieras, sin pedirle permiso a nadie."
+      "label": "Exportables",
+      "text": "registros y propiedades cuando quieras."
     },
     {
-      "title": "API con versiones estables",
-      "desc": "Todo se lee por API, con versiones que HubSpot sostiene al menos 18 meses."
+      "label": "API estable",
+      "text": "versiones que HubSpot sostiene 18 meses."
     },
     {
-      "title": "Lo borrado se recupera",
-      "desc": "Hasta 90 días para restaurar registros eliminados, en todos los planes."
-    },
-    {
-      "title": "Tu arquitectura, escrita",
-      "desc": "Modelo de datos, integraciones y workflows quedan documentados y son tuyos."
+      "label": "Recuperables",
+      "text": "hasta 90 días para restaurar lo borrado."
     }
   ],
-  "selected": 3,
-  "selection": {
-    "target": "object",
-    "label": "TI",
-    "participantKind": "department"
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png",
+    "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara"
   },
   "line": "revenue-hubspot",
   "use": "brochure"

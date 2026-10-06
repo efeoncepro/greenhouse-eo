@@ -1,0 +1,44 @@
+{
+  "id": "HS4-te-llevas-todo",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "antonio"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 80 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. His right hand is extended forward and slightly to the camera-left side of his body at chest height, palm up, his forearm reaching toward the lens as if handing something over to the viewer; his left arm hangs relaxed at his side, out of the action. Resting on that open palm sits a translucent CUBE of glass and azure light (#0375DB), about 30 cm on each side; his hand is at about 68 % of the frame width and the cube's left edge never goes further left than 62 % of the frame width; between the left edge of the frame and the cube there is a wide band of empty darkness. The cube never covers his chest: the left side of his chest, where the jacket's mark is, stays fully visible. Inside the cube, tiny points and thin lines of cool white light are neatly stacked in ordered layers, like a whole database packed and ready to travel. The layers are abstract points and lines of light: no characters, no table cells, no icons, nothing legible. On one corner of the cube ONE single tiny point glows magenta-pink (#E86BD0), the only accent in the frame; it lights nothing around it. His head stays almost frontal and his eyes turn toward the empty dark left of the frame, where the text will sit, with a calm, generous closed-mouth half-smile. The light of the cube paints his face, hands and jacket. Thin haze catches the light. The LEFT 60% of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes. Rich contrast, no text, no letters, no numbers, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "linea": "revenue-hubspot",
+  "llave": {
+    "fuente": "the cool white-blue light of the glass cube resting on his extended right palm",
+    "lado": "to his right side (camera-left), at chest height, below and to the side of his face",
+    "tamano": "about 30 cm",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "a row of large cold blue practical lights far behind him on the right, melted into round bokeh, never in the left half of the frame",
+  "fenomeno": {
+    "que": "a whole database packed inside a glass cube of light that he hands over to the viewer",
+    "esServicio": "portabilidad: tus datos, exportables y tuyos si mañana te vas"
+  }
+}

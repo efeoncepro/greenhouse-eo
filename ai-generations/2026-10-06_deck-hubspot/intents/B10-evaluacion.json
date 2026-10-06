@@ -4,81 +4,37 @@
   "surface": "deck",
   "format": "16x9",
   "theme": "dark",
-  "role": "decision",
-  "use": "brochure",
-  "recipe": "decision-diagnosis-verdict",
-  "line": "revenue-hubspot",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
   "voice": {
-    "eyebrow": "Evaluación inicial · sin costo",
+    "eyebrow": "Evaluación sin costo",
     "question": "¿Qué recibo primero?",
     "answer": [
-      "Una",
-      "decisión"
+      "Evidencia"
     ]
   },
-  "body": "Una decisión informada, con **evidencia**, no una recomendación por defecto.",
-  "reportTitle": "Evaluación de encaje y arquitectura",
-  "reportSubtitle": "HubSpot · estado actual, encaje y roadmap",
-  "sampleMark": "Datos de muestra",
-  "modules": [
+  "body": "Una decisión sobre tu **plataforma**, no una recomendación por defecto.",
+  "pillars": [
     {
-      "kicker": "Estado actual",
-      "title": "Mapa de tu operación"
+      "label": "Encaje",
+      "text": "si HubSpot es tu plataforma, y con qué condición."
     },
     {
-      "kicker": "Veredicto",
-      "title": "Encaje de la plataforma"
+      "label": "Riesgos",
+      "text": "lo que hoy frena tu operación."
     },
     {
-      "kicker": "Riesgos",
-      "title": "Lo que hoy frena"
-    },
-    {
-      "kicker": "Evidencia",
-      "title": "Registro verificable"
-    },
-    {
-      "kicker": "Roadmap",
-      "title": "Plan por olas"
+      "label": "Roadmap",
+      "text": "un plan por olas, con su primer valor."
     }
   ],
-  "operationNodes": [
-    "Ventas",
-    "Servicio",
-    "Marketing",
-    "ERP",
-    "Web",
-    "Datos"
-  ],
-  "operationFootnote": "14 integraciones · 3 sin dueño",
-  "verdictOptions": [
-    "Fit",
-    "Fit condicionado",
-    "No fit"
-  ],
-  "selectedVerdict": 2,
-  "verdictCondition": "Condición: ordenar datos y consentimiento antes de automatizar",
-  "risks": [
-    "Duplicados en contactos",
-    "Workflows sin dueño",
-    "Propiedades sin gobierno"
-  ],
-  "recordText": "Cada hallazgo con su fuente: el portal, los datos y las entrevistas con tu equipo.",
-  "waves": [
-    {
-      "name": "Ola 1",
-      "title": "Datos y Smart CRM",
-      "kicker": "Base"
-    },
-    {
-      "name": "Ola 2",
-      "title": "Pipeline y servicio con SLA",
-      "kicker": "Primer valor"
-    },
-    {
-      "name": "Ola 3",
-      "title": "Customer Agent supervisado",
-      "kicker": "Agentes"
-    }
-  ]
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6b-una-decision.png",
+    "alt": "Julio Reyes, de Efeonce, sostiene en la palma el punto donde una maraña de rutas tenues se resuelve en un solo camino de luz"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
 }

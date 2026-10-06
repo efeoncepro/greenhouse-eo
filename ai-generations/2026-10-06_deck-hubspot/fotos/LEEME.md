@@ -41,3 +41,14 @@ La líder de RevOps de la portada es casting de la receta RV1b, sin retrato ancl
   ni un SLA de uptime con créditos (el 99,95 % es una meta de 2023).
 - **Integraciones:** MCP remoto GA desde el 13-04-2026; Data Hub con sync en uno o dos sentidos; NetSuite y Dynamics
   con integración propia de HubSpot; SAP sólo por terceros.
+
+## Cuarta tanda (2026-10-06): salida, licencias y evaluación pasan a cine
+
+| Plate | Escena | Estado |
+|---|---|---|
+| `HS4-te-llevas-todo.png` | Antonio extiende la palma con un cubo de luz que contiene la base de datos | **En uso** (lámina «Con todo») |
+| `HS5b-licencias-justas.png` | Nexa junto a una grilla de doce seats; tres se apagan | **En uso** (lámina «Nunca») |
+| `HS5c-licencias-justas.png` | La grilla detrás de Nexa, a la derecha | Banco (Nexa al centro tapa el titular) |
+| `HS5-licencias-justas.png` | Primera versión | Banco (la grilla cae detrás del titular) |
+| `HS6b-una-decision.png` | Julio sostiene el nudo donde una maraña de rutas se resuelve en un camino | **En uso** (lámina «Evidencia») |
+| `HS6-una-decision.png` | Primera versión | Banco (el nudo pisa la bajada) |

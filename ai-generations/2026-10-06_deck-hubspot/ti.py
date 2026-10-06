@@ -152,3 +152,31 @@ put('P-costo', {"role": "content", "recipe": "content-bullets",
 d = json.load(open('intents/B29-caso-anam.json', encoding='utf-8')); d['theme'] = 'light'; d['line'] = 'growth'
 json.dump(d, open('intents/B29-caso-anam.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 print('tercera tanda')
+
+# Cuarta tanda (operador, 2026-10-06): tres láminas pasan a cine — salida, licencias y la primera decisión.
+put('B26-salida', {"role": "section", "recipe": "section-cine", "layout": "purpose",
+  "voice": {"eyebrow": "Sin amarras", "question": "¿Y si mañana nos vamos?", "answer": ["Con todo"]},
+  "body": "Tus datos son tuyos: entran a HubSpot con **orden** y salen igual de completos.",
+  "pillars": [
+    {"label": "Exportables", "text": "registros y propiedades cuando quieras."},
+    {"label": "API estable", "text": "versiones que HubSpot sostiene 18 meses."},
+    {"label": "Recuperables", "text": "hasta 90 días para restaurar lo borrado."}],
+  "photo": {"register": "cine", "subject": "person", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png",
+            "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara"}})
+
+put('B17-licencias', {"role": "proposal", "recipe": "proposal-cinematic", "layout": "hero",
+  "voice": {"eyebrow": "Licencias con criterio", "question": "¿Compro licencias de más?", "answer": ["Nunca"]},
+  "body": "Seats por rol, el tier que tu operación necesita y uso revisado antes de cada renovación.",
+  "photo": {"register": "cine", "subject": "nexa", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+            "alt": "Nexa, con la chaqueta de Efeonce, junto a una grilla de doce seats de luz azul donde tres se apagan porque nadie los usa"}})
+
+put('B10-evaluacion', {"role": "section", "recipe": "section-cine", "layout": "purpose",
+  "voice": {"eyebrow": "Evaluación sin costo", "question": "¿Qué recibo primero?", "answer": ["Evidencia"]},
+  "body": "Una decisión sobre tu **plataforma**, no una recomendación por defecto.",
+  "pillars": [
+    {"label": "Encaje", "text": "si HubSpot es tu plataforma, y con qué condición."},
+    {"label": "Riesgos", "text": "lo que hoy frena tu operación."},
+    {"label": "Roadmap", "text": "un plan por olas, con su primer valor."}],
+  "photo": {"register": "cine", "subject": "person", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6b-una-decision.png",
+            "alt": "Julio Reyes, de Efeonce, sostiene en la palma el punto donde una maraña de rutas tenues se resuelve en un solo camino de luz"}})
+print('cuarta tanda')

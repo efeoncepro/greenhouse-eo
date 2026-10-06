@@ -20,16 +20,16 @@ BODY = [
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
  # 4 · Comprar con criterio
- ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
+ ("B17-licencias", "¿Compro licencias de más? Nunca."),
  ("B18-creditos", "¿Cuántos créditos necesito? A medida."),
  # 5 · Riesgos: lo que pregunta TI
  ("B24-ley", "¿Cuándo rige la nueva ley? Diciembre."),
  ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
  ("B25-residencia", "¿Dónde están mis datos? En Estados Unidos."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
- ("B26-salida", "¿Y si mañana nos vamos? Te llevas todo."),
+ ("B26-salida", "¿Y si mañana nos vamos? Con todo."),
  # 6 · Cómo trabajamos
- ("B10-evaluacion", "¿Qué recibo primero? Una decisión."),
+ ("B10-evaluacion", "¿Qué recibo primero? Evidencia."),
  ("B11-olas", "¿Sumo todos los agentes juntos? No, por olas."),
  ("B12-dia-a-dia", "¿Qué llega a producción? Lo que apruebes."),
  ("B13-adopcion", "¿Cómo aprende mi equipo? A su ritmo."),
@@ -103,6 +103,10 @@ place(PROPUESTA, 'propuesta', 'Prop-')
 # Banco de fotos del deck (operador, 2026-10-06: «guarda las demás imágenes, nos pueden servir»). Plates limpios, sin
 # texto, en ai-generations/2026-10-06_deck-hubspot/fotos/plates/. En uso = la versión que lleva el deck (luz azul, B).
 BANCO = [
+  ('HS4-te-llevas-todo', 'Te llevas todo · Antonio entrega un cubo de luz con los datos (EN USO)', '/_blob/2d5210a033a6f7caac956a91de63286d'),
+  ('HS5b-licencias-justas', 'Licencias justas · Nexa y doce seats, tres se apagan (EN USO)', '/_blob/a58862ced771c74c0ca6acb8f0bf5435'),
+  ('HS5c-licencias-justas', 'Licencias justas · grilla detrás de Nexa (banco)', '/_blob/c1f1b26dc149f6d9203f0bb4e9d64163'),
+  ('HS6b-una-decision', 'Una decisión · Julio y el camino que sale de la maraña (EN USO)', '/_blob/2c7075d9eccdc854ac7e8dcd94b8b2ce'),
   ('RG2b-mapa', 'Regiones de datos de HubSpot desde Santiago · mapa de puntos (EN USO, lámina de residencia)', '/_blob/8bb98a345611f531143bc00230897151'),
   ('RG1b-regiones', 'Regiones de datos desde Santiago · Tierra de noche (descartada: se lee ovoide)', '/_blob/86b13bd7da8f1c240ad2a3b7abf68f46'),
   ('HS3b-datos-con-permiso', 'Datos con permiso · esfera azul en la palma (EN USO, lámina Ley 21.719)', '/_blob/7130e114b287b3fdbb766c9225dde27b'),

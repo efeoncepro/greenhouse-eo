@@ -1,0 +1,45 @@
+{
+  "id": "HS5c-licencias-justas",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "complicidad"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): she stands just right of the center of the frame, her face at about 64 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. BEHIND her and to the RIGHT, between her and the right edge of the frame, floats a flat translucent GRID of TWELVE small square tiles of light, three rows of four, about as wide as her shoulders and no taller than her head; its left edge is at about 76 % of the frame width, its right edge near 96 %, its top edge below the level of her eyes. Nothing of the grid is on the camera-left side of her body. NINE tiles glow steady cool white-blue (#0375DB): they are in use. Exactly THREE tiles are switching off, dim and grey, almost dark: the LAST tile of the top row (far right), the THIRD tile of the bottom row, and the FIRST tile of the middle row, the one closest to her. Every other tile glows steady. Her left hand (on the camera-right side) is raised lightly open toward the FIRST tile of the middle row, the dim one closest to her, without touching it, as if she has just switched it off; her other arm rests relaxed at her side. The tiles are abstract light squares: no letters, no numbers, no icons, nothing legible. She looks straight into the lens with a calm, knowing half-smile. The light of the tiles paints her face and jacket; everything is cool azure and white light, the light of Efeonce; only ONE tiny point at the corner of the grid glows magenta-pink (#E86BD0) as the only accent, lighting nothing. Thin haze catches the light. The LEFT 52% of the frame is calm, deep dark studio space with only faint haze: no grid, no tiles, no objects. Rich contrast, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "proposal-cinematic",
+  "llave": {
+    "fuente": "the glowing grid of light tiles behind her on the right",
+    "lado": "behind her on the camera-right side, as a rim light",
+    "tamano": "about as wide as her shoulders",
+    "distancia": "about 80 cm from her face"
+  },
+  "fondo": "a row of large cold blue practical lights far behind, melted into round bokeh",
+  "fenomeno": {
+    "que": "of twelve license seats made of light, the three nobody uses switch off and only the used ones stay lit",
+    "esServicio": "licencias con criterio: sólo los seats y el tier que el cliente realmente usa"
+  },
+  "linea": "revenue-hubspot"
+}
