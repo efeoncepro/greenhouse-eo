@@ -236,11 +236,11 @@ S['B3-tiempo'] = ("Menos tiempo. La misma marca.", page("Menos tiempo. La misma 
   f'<div style="font-family: {ST}; font-size: 14px; font-weight: 400; line-height: 1.5; color: #cfe4fa">Caso publicado de Sky Airlines, métricas de entrega de 12 meses. El anillo es el tiempo de antes; el arco, el de ahora.</div></div>' + bubble(DARK)))
 
 # ── Capítulo Brand Systems (v4, operador 2026-10-06): cine + órbita monumental + muro de La órbita ──
-BSB = {"BS1": "907741a9a6b603feb3aa8e6a19aa9671", "MURO": "b0a82a12f14470b1b1ebfceb8a7a62ea",
+BSB = {"BS1": "0a8fe5472a5056cf1d1f7f3890341284", "MURO": "b0a82a12f14470b1b1ebfceb8a7a62ea",
        "encuadre": "482809ce29f3ffb82530ab89f36d8a80", "pluma": "a0b74ebd7b515d91c84c677aad468c22", "cuentagotas": "37e353c31212bb86708f72c698c4dd81",
        "escuadra": "0f41919f952da1f2e526bbc053de3c0a", "biblioteca": "5562bd3322807ca081c9b3d28a8c9ed4"}
 S['B4-manual'] = ("Del manual al sistema.", page("Del manual al sistema.",
-  f'<img src="{BL(BSB["BS1"])}" alt="Karo, directora de arte con el hoodie de Efeonce, apoya la mano sobre un manual de marca cerrado mientras desde sus páginas se levanta la identidad de una marca como un sistema de luz: marca, paleta, tipografía, grilla y las primeras piezas" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
+  f'<img src="{BL(BSB["BS1"])}" alt="Karo, directora de arte con el hoodie de Efeonce, abre un manual de marca y mira cómo desde sus páginas se levanta la identidad de una marca como un sistema de luz: marca, paleta, tipografía, grilla y las primeras piezas" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
   col(eyebrow('Brand Systems', DARK) + headline(['Del manual', 'al sistema'], 124, DARK, '; margin-top: 70px') +
       body('Posicionamiento, identidad verbal y visual, y las reglas para aplicarla, convertidos en un sistema que tu equipo usa todos los días.', DARK, 24, 600, '; margin-top: 44px') +
       f'<div style="margin-top: 48px; display: flex; flex-direction: column; gap: 6px"><div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa">Empieza con</div><div style="font-family: {ST}; font-size: 20px; font-weight: 500; color: #ffffff">Brand Diagnostic</div></div>', 120, 720) + bubble(DARK)))
@@ -313,9 +313,9 @@ def stage(n, ic, name, tools):
 def svc(label, text):
     return f'<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 16px; border-top: 1px solid rgba(114, 222, 216, 0.22)"><div style="font-family: {ID}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; line-height: 1; color: #ffffff">{label}</div><div style="font-family: {ST}; font-size: 18px; font-weight: 300; line-height: 1.4; color: #cfe4fa">{text}</div></div>'
 S['P1-estudio'] = ("El estudio va donde estés.", page("El estudio va donde estés.",
-  f'<img src="{BL(PRB["RG1"])}" alt="Karo, directora con el hoodie de Efeonce, sostiene una cámara de cine en un gimbal dentro de un estudio portátil armado en una bodega oscura: panel LED, tubos de luz, micrófono, silla de entrevista y road cases abiertos" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
-  col(eyebrow('Run &amp; Gun · contenido y social', DARK) + headline(['El estudio', 'va donde', 'estés'], 120, DARK, '; margin-top: 64px') +
-      body('Crew, cámaras de cine, sonido e iluminación profesionales que arman un set completo en tu oficina, tu planta, tu tienda o en terreno. De una entrevista a una campaña.', DARK, 22, 560, '; margin-top: 40px') +
+  f'<img src="{BL(PRB["RG1"])}" alt="Karo, directora con el hoodie de Efeonce, filma en movimiento con una cámara de cine en gimbal mientras un sonidista la sigue con el boom, dentro de un estudio portátil armado en una bodega oscura: panel LED, tubos de luz, silla de entrevista y road cases abiertos" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
+  col(eyebrow('Run &amp; Gun · contenido y social', DARK) + headline(['El estudio', 'va donde', 'estés'], 112, DARK, '; margin-top: 64px') +
+      body('Crew, cámaras de cine, sonido e iluminación profesionales que arman un set completo en tu oficina, tu planta, tu tienda o en terreno. De una entrevista a una campaña.', DARK, 22, 540, '; margin-top: 40px') +
       f'<div style="margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; width: 600px">{svc("Run &amp; Gun", "lo capturamos en una jornada, con equipo actual")}{svc("Contenido y social", "lo planificamos, publicamos y medimos")}</div>', 120, 680) + bubble(DARK)))
 # HB1 derivó hacia el centro: la foto se corre 150 px y su borde se funde con su propio negro (#060910), sin velo.
 HBT = dict(DARK, bg='#060910')

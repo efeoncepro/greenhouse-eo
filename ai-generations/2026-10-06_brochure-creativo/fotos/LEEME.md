@@ -30,3 +30,9 @@ B6 «Este brochure es la prueba.» usa `assets/muro-la-orbita.jpg` (`build-muro.
 | `HB1-manos-y-modelos` | P2 «Manos y modelos, en el mismo set.» | **En uso** | Julio filma el producto real; la luz lleva la toma a cuatro variantes en pantalla; Nexa con el Spark de contenido supervisa. Derivó al centro: en la lámina se corre 150 px y se funde con su propio negro (#060910) |
 
 Revisión previa de `cine-reviewer`: la deriva de este brochure se explica por geometría (con 85 mm a 3–4 m la escena no cabe en la mitad derecha); se corrigió ordenando la escena en profundidad y alejando la cámara [inferencia, a medir en más plates].
+
+**Cambio de pose (comentario del operador, 2026-10-06):** «se repite la referencia de Karo mirando hacia el lado». La regla
+de mirada hacia el texto de `deck-seccion` hacía el mismo gesto en tres plates (CV2b, BS1b, RG1). Se regeneraron con otra
+acción: `RG1b-estudio-portatil` (filma en movimiento con el gimbal; P1) y `BS1c-del-manual-al-sistema` (mira hacia abajo
+mientras abre el manual; B4). `RG1` y `BS1b` quedan en el banco. Lección para el casebook: en una serie, la mirada hacia el
+texto se dosifica igual que el acento; repetida se lee como tic.
