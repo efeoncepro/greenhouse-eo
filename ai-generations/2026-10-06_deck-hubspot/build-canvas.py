@@ -7,7 +7,7 @@ BODY = [
  ("B19-crm-solo", "¿Sigo llenando el CRM? Ya no."),
  ("B20-datos", "¿Cómo escala mi CRM? Ordenado."),
  ("B21-integraciones", "¿Tengo que reemplazar mis sistemas? No por defecto."),
- ("B04-encaje", "¿HubSpot o Salesforce? El que encaje."),
+ ("B04-encaje", "¿HubSpot, Salesforce o Zoho? El que encaje."),
  ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
  ("B17-licencias", "¿Qué licencias de HubSpot compro? Las que usas."),
  ("B18-creditos", "¿Se acumulan los créditos? No."),
@@ -28,9 +28,12 @@ BODY = [
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
  ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
  ("B28-clientes", "¿Con quién trabajan? +90 empresas."),
+ ("B29-caso-anam", "¿Dónde ya funciona? En ANAM."),
 ]
-BROCHURE = [("B01-portada", "Portada · ¿Mi HubSpot puede hacer más? Mucho más.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
-PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Cómo vende más mi CRM? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por alcance."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
+# El brochure no lleva el detalle de olas ni el consumo de un workflow: quedan en la propuesta (operador, 2026-10-06).
+SOLO_PROPUESTA = {"B11-olas", "B27-workflow-creditos"}
+BROCHURE = [("B01-portada", "Portada · ¿Mi HubSpot puede hacer más? Mucho más.")] + [(k, t) for k, t in BODY if k not in SOLO_PROPUESTA] + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
+PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Cómo vende más mi CRM? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P-costo", "¿Hay costos escondidos? Ninguno."), ("P16-cotizacion", "¿Cómo se cotiza? Por alcance."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
 def slide_html(title, blob):
     if blob:
         inner = f'<img src="{blob}" alt="{title}" style="display: block; width: 1920px; height: 1080px">'

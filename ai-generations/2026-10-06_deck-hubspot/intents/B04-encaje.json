@@ -10,7 +10,7 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Diagnóstico de encaje",
-    "question": "¿HubSpot o Salesforce?",
+    "question": "¿HubSpot, Salesforce o Zoho?",
     "answer": [
       "El que",
       "encaje"
@@ -22,7 +22,7 @@
     {
       "glyph": "embudo",
       "title": "HubSpot",
-      "description": "Crecimiento B2B, equipo mid-market, valor en semanas."
+      "description": "Mid-market y enterprise que quieren valor en semanas y un solo CRM."
     },
     {
       "glyph": "crm",
@@ -30,14 +30,14 @@
       "description": "Org compleja, gobierno enterprise, servicio a escala, varios países."
     },
     {
+      "glyph": "checklist",
+      "title": "Zoho",
+      "description": "Presupuesto de entrada y suite Zoho: si es lo tuyo, te lo decimos."
+    },
+    {
       "glyph": "integracion",
       "title": "Híbrida",
       "description": "Cada plataforma donde rinde mejor, conectadas."
-    },
-    {
-      "glyph": "checklist",
-      "title": "No avanzar",
-      "description": "Mantener lo que funciona y ordenar primero los datos."
     }
   ],
   "selectedVerdict": 1

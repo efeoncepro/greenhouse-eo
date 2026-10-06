@@ -1,6 +1,6 @@
 {
   "B02-propuesta": "/_blob/9b453ad84e79e15ff996dd53acfcd390",
-  "B04-encaje": "/_blob/497d23f56f5147846fb8c3822ba2f2f7",
+  "B04-encaje": "/_blob/6944aa8241c363e8f06f97c1f3b917d7",
   "B10-evaluacion": "/_blob/0d31b2020b5b349cc3e16bf9dd26f302",
   "B11-olas": "/_blob/b64de1224fff30807b246b56e835ae2b",
   "B15-medicion": "/_blob/bb5ee523b245add03a68dbafc04805ed",
@@ -25,10 +25,12 @@
   "B20-datos": "/_blob/efbe8fdbe33f80dbb3b373a2456041b8",
   "B21-integraciones": "/_blob/3a6745e838bc21dcc591f96f13e46b34",
   "B22-automatizacion": "/_blob/af3911439156e55bcce1550782e38842",
-  "B23-seguridad": "/_blob/06be8119116583b846f0860a0fca66d7",
+  "B23-seguridad": "/_blob/4caea3f4b2d8788fc9792d28549bab6f",
   "B24-ley": "/_blob/98a30cf18fadbb72f4907221410dcf10",
   "B25-residencia": "/_blob/846fb61e3c257853aec930a591409239",
   "B26-salida": "/_blob/8376c155ac6bf555741cb2ebeaae2da2",
   "B27-workflow-creditos": "/_blob/29c4bf8f752e392e06189ee0b9f767dd",
-  "B28-clientes": "/_blob/b572fbbf8f79fc86f31c7d2191ea7629"
+  "B28-clientes": "/_blob/b572fbbf8f79fc86f31c7d2191ea7629",
+  "B29-caso-anam": "/_blob/7388d02a011b4fd6b988a5a5b6f59d33",
+  "P-costo": "/_blob/5745979c9aca5d380d5318779ce7c15f"
 }

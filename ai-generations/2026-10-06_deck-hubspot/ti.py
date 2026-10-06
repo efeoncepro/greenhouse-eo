@@ -35,7 +35,7 @@ put('B22-automatizacion', {"role": "method", "recipe": "method-staircase",
 
 put('B23-seguridad', {"role": "decision", "recipe": "decision-difference",
   "voice": {"eyebrow": "Seguridad y accesos", "question": "¿Quién ve mis datos?", "answer": ["Sólo quien", "debe"]},
-  "body": "HubSpot trae los controles; nosotros los **dejamos encendidos** y documentados antes del go-live.",
+  "body": "HubSpot tiene SOC 2 Tipo II y SOC 3. Nosotros dejamos sus controles **encendidos** y documentados antes del go-live.",
   "alternative": {"kicker": "HubSpot recién creado", "title": "Controles por configurar"},
   "efeonce": {"kicker": "HubSpot que entregamos", "title": "Controles encendidos"},
   "versus": "vs",
@@ -113,3 +113,41 @@ put('B28-clientes', {"role": "content", "recipe": "content-clients",
 d = json.load(open('intents/B28-clientes.json', encoding='utf-8')); d['theme'] = 'light'; d['line'] = 'growth'
 json.dump(d, open('intents/B28-clientes.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 print('láminas de TI, segunda tanda')
+
+# Tercera tanda (operador, 2026-10-06): Zoho en la comparación, caso ANAM publicado y costo total sólo en la propuesta.
+d = json.load(open('intents/B04-encaje.json', encoding='utf-8'))
+d['voice']['question'] = '¿HubSpot, Salesforce o Zoho?'
+d['verdicts'] = [
+  {"glyph": "embudo", "title": "HubSpot", "description": "Mid-market y enterprise que quieren valor en semanas y un solo CRM."},
+  {"glyph": "crm", "title": "Salesforce", "description": "Org compleja, gobierno enterprise, servicio a escala, varios países."},
+  {"glyph": "checklist", "title": "Zoho", "description": "Presupuesto de entrada y suite Zoho: si es lo tuyo, te lo decimos."},
+  {"glyph": "integracion", "title": "Híbrida", "description": "Cada plataforma donde rinde mejor, conectadas."}]
+d['selectedVerdict'] = 1
+json.dump(d, open('intents/B04-encaje.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+
+CASO = 'casos publicados de ANAM en efeoncepro.com, julio de 2026'
+put('B29-caso-anam', {"role": "decision", "recipe": "decision-case",
+  "voice": {"eyebrow": "Caso publicado", "question": "¿Dónde ya funciona?", "answer": ["En ANAM"]},
+  "figures": [
+    {"value": "23", "label": "fuentes de conocimiento", "source": CASO},
+    {"value": "356", "label": "registros técnicos", "source": CASO},
+    {"value": "5", "label": "rutas de atención", "source": CASO},
+    {"value": "34/34", "label": "asociaciones verificadas", "source": CASO}],
+  "clientLogo": {"path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg", "alt": "ANAM"},
+  "selected": 4,
+  "photo": {"register": "documental", "subject": "person", "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+            "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente"},
+  "selection": {"target": "object", "label": "HubSpot", "participantKind": "department"}})
+
+put('P-costo', {"role": "content", "recipe": "content-bullets",
+  "voice": {"eyebrow": "Costo total", "question": "¿Hay costos escondidos?", "answer": ["Ninguno"]},
+  "progress": {"sections": 4, "current": 4},
+  "items": [
+    {"title": "Licencias HubSpot", "desc": "Los seats y el tier que usas, ni uno más: USD [monto] al año."},
+    {"title": "Implementación", "desc": "Por alcance y capacidad, nunca por horas: [monto] + IVA."},
+    {"title": "Operación gestionada", "desc": "Mensual, con SLA y revisión trimestral: [monto] + IVA al mes."},
+    {"title": "Créditos de IA", "desc": "Consumo medido por agente; lo extra cuesta USD 10 por cada 1.000 créditos."}],
+  "selected": 3, "selection": {"target": "object", "label": "Cliente", "participantKind": "department"}}, use='proposal')
+d = json.load(open('intents/B29-caso-anam.json', encoding='utf-8')); d['theme'] = 'light'; d['line'] = 'growth'
+json.dump(d, open('intents/B29-caso-anam.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+print('tercera tanda')
