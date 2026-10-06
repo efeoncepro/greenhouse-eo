@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-ai-market",
+  "voice": {
+    "eyebrow": "HubSpot Credits",
+    "question": "¿Se acumulan los créditos?",
+    "answer": [
+      "No"
+    ]
+  },
+  "body": "Los créditos son la moneda de los agentes de HubSpot. Customer Agent usa **50 por conversación resuelta**; Prospecting Agent, 100 por lead.",
+  "figures": [
+    {
+      "value": "US$0,01",
+      "label": "Cada crédito, en todos los planes.",
+      "detail": "Capacidad extra: USD 10 por cada 1.000 créditos.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "0",
+      "label": "Créditos que pasan al mes siguiente.",
+      "detail": "Lo que no usas vence al cierre del período: por eso medimos el consumo de cada agente.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "5.000",
+      "label": "Cuatro Hubs Enterprise dan 5.000, no 20.000.",
+      "detail": "No se suman entre Hubs: manda el plan más alto.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    }
+  ],
+  "line": "growth",
+  "use": "brochure"
+}

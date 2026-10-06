@@ -60,15 +60,34 @@ def place(slides, page, prefix):
         open(f'{ROOT}/project/{f}', 'w', encoding='utf-8').write(slide_html(title, blob))
         written.append(f)
 place(BROCHURE, 'brochure', '')
+
+# Comparación de color (operador, 2026-10-06): A actual (magenta en todo), B magenta sólo como puntuación con luz azul
+# de Efeonce en la foto, C Growth (teal). Filas = versiones; columnas = portada, CRM que se actualiza solo, créditos.
+COMPARACION = [
+  ('A', 'A · Actual: magenta en todo', ['/_blob/6fd8c87997b8a9c5b250ef49a7832d94', '/_blob/5db5b6036652688f63dabdf3437ae95d', '/_blob/8d647e7778b9155fd1efbe4a3128ef59']),
+  ('B', 'B · Magenta sólo como puntuación (luz azul de Efeonce)', ['/_blob/9b34ad27eca327982c950438e8f03771', '/_blob/7412006e4a2445c25522a95ffffbfdc5', '/_blob/8d647e7778b9155fd1efbe4a3128ef59']),
+  ('C', 'C · Growth (teal)', ['/_blob/3eb13409da79c64b900f8762e13faa1d', '/_blob/1bf960bc91ca2c5b13064c747941df02', '/_blob/33e028ff8b5a252f28a8a22fab442c72']),
+]
+COLS = ['portada', 'crm', 'creditos']
+CMP_NOTES = {}
+for r, (v, label, blobs_row) in enumerate(COMPARACION):
+    for c, blob in enumerate(blobs_row):
+        f = f'Cmp-{v}-{COLS[c]}.dc.html'
+        title = f'{label} · {COLS[c]}'
+        boards[f] = {"x": c * 2000, "y": r * 1500, "w": 1920, "h": 1080, "title": title, "page": "comparacion"}
+        order.append(f)
+        open(f'{ROOT}/project/{f}', 'w', encoding='utf-8').write(slide_html(title, blob))
+        written.append(f)
+    CMP_NOTES[f'cmp-{v}'] = {"kind": "title1", "maxW": 5920, "text": label, "w": 240, "x": 0, "y": r * 1500 - 300, "page": "comparacion"}
 place(PROPUESTA, 'propuesta', 'Prop-')
 idx = json.load(open(f'{ROOT}/project/canvas.json', encoding='utf-8'))
 old = set(idx.get('boards', {}))
 idx['boards'] = boards; idx['order'] = order
-idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}]
+idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}, {"id": "comparacion", "name": "Comparación de color"}]
 idx['launch'] = {"view": "canvas", "page": "brochure"}
 idx['notes'] = {
   "t-brochure": {"kind": "title1", "maxW": 7920, "text": "HubSpot · brochure de servicios", "w": 240, "x": 0, "y": -300, "page": "brochure"},
-  "t-propuesta": {"kind": "title1", "maxW": 7920, "text": "HubSpot · propuesta comercial", "w": 240, "x": 0, "y": -300, "page": "propuesta"}}
+  "t-propuesta": {"kind": "title1", "maxW": 7920, "text": "HubSpot · propuesta comercial", "w": 240, "x": 0, "y": -300, "page": "propuesta"}, **CMP_NOTES}
 json.dump(idx, open(f'{ROOT}/project/canvas.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 json.dump({"written": written, "removed": sorted(old - set(boards))}, open(f'{ROOT}/manifest.json', 'w'), indent=1)
 print(len(written), 'boards; removed', sorted(old - set(boards)))
