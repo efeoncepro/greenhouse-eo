@@ -1,0 +1,44 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "RG1-estudio-portatil",
+ "desde": "C4S05",
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo"
+  }
+ ],
+ "escena": "SCENE (cinematic, Hollywood behind-the-scenes still): a vast, dark logistics warehouse at night, tall shelving racks fading into black. Behind Karo and to the camera-right of her, between her body and the right edge of the frame, an Efeonce crew has unfolded a complete, professional PORTABLE STUDIO in the middle of the warehouse floor: two slim current-generation bi-colour LED panels with soft boxes on black C-stands, two slim battery LED tubes standing far behind her, cool white, melted into soft bokeh, a compact current-generation full-frame cinema camera with a matte black body on a carbon-fibre handheld gimbal, a boom microphone, and an empty interview chair with a wireless lavalier microphone clipped to it, all standing inside ONE sharp-edged volume of clean cool-white light that rises from the open road cases and is carved out of the dark warehouse, its edges legible in the haze: the studio unfolded out of the cases. On the floor beside the empty chair, at about 80 % of the frame width, three open hard-shell road cases with empty black foam cut-outs show it all arrived in a few cases. Everything is modern and minimal: no vintage equipment, no tungsten fresnels, no film cameras, no tangled cables. Karo, as in her reference, the director, stands inside the lit set beside the camera, framed from the waist up, wearing the Efeonce hoodie exactly as in its reference, one hand resting on the gimbal handle, the other arm relaxed; her left shoulder, the one toward the text, is at about 65 % of the frame width; between the left edge of the frame and her shoulder there is a wide band of empty darkness, and no part of the studio is visible to the left of her left shoulder; her head stays almost frontal and her eyes turn toward the empty dark left of the frame, where the text will sit, with focused, ready intent, lips closed. LIGHT: the soft box of the nearest LED panel is the only key light on her face, cool white, from the camera-right; NO fill light, the far side of her face in shadow with the nose shadow legible; the rest of the warehouse stays dark. REALISTIC ADULT PROPORTIONS: camera about five meters away at chest height, 85mm f/2. Thin haze catches the light. The LEFT 60 % of the frame is calm, deep dark space with only faint haze: no objects lit, no light shapes, nothing that glows; everything lit lives between her left shoulder and the right edge of the frame. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any brand on any equipment.",
+ "lecho": {
+  "objeto": "the near-black matte lid of an open road case right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the soft box of the nearest slim LED panel",
+  "lado": "from the camera-right, at face height",
+  "tamano": "a 60 cm soft box",
+  "distancia": "about one meter from her face"
+ },
+ "fondo": "tall warehouse shelving racks far behind, melting into black with a few cold practical lights as round bokeh",
+ "fenomeno": {
+  "que": "a complete professional studio of light carved out of a dark warehouse, unfolded from a few road cases",
+  "esServicio": "Run & Gun: un estudio profesional portátil que se arma donde está la historia, a cualquier escala"
+ }
+}

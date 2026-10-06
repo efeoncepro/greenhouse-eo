@@ -21,3 +21,12 @@ Fichas en `fichas/`, plates en `plates/` (fuera de git). Todas pasaron por `cine
 
 B6 «Este brochure es la prueba.» usa `assets/muro-la-orbita.jpg` (`build-muro.js`): 35 piezas reales aprobadas de La órbita
 (referencias del deck + uniforme, nave y logo 3D), sin láminas con personas reales del equipo ni piezas de clientes.
+
+## Capítulo Producción (2026-10-06)
+
+| Plate | Lámina | Estado | Por qué |
+|---|---|---|---|
+| `RG1-estudio-portatil` | P1 «El estudio va donde estés.» | **En uso** | Run & Gun como estudio portátil profesional en una bodega: gimbal, cámara cine, panel LED, tubos, road cases (equipo actual, nada vintage) |
+| `HB1-manos-y-modelos` | P2 «Manos y modelos, en el mismo set.» | **En uso** | Julio filma el producto real; la luz lleva la toma a cuatro variantes en pantalla; Nexa con el Spark de contenido supervisa. Derivó al centro: en la lámina se corre 150 px y se funde con su propio negro (#060910) |
+
+Revisión previa de `cine-reviewer`: la deriva de este brochure se explica por geometría (con 85 mm a 3–4 m la escena no cabe en la mitad derecha); se corrigió ordenando la escena en profundidad y alejando la cámara [inferencia, a medir en más plates].
