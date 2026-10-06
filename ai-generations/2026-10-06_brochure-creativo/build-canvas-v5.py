@@ -290,7 +290,7 @@ S['B6-prueba'] = ("Este brochure es la prueba.", page("Este brochure es la prueb
 # ── Capítulo Producción (v5, operador 2026-10-06): estudio portátil, set híbrido y flujo de herramientas ──
 PRB = {"prompt": "a1fa09eb62dfff712564171a794413f2", "camara": "ae80173a44c77f91fcaf568ee2c9687e", "galeria": "fc351bcb27f0969cd8dbb347a11b53fc",
        "pelicula": "64fc25954e203f75ae48935eaafe8a75", "spark": "142e771dabdb51d0ac0daf18f4c38f5e", "guardar": "fb5c78c3c4bc6c55954e659389132ea4",
-       "mano": "7305b16b9f5fc30cd18addcfe5d77153"}
+       "mano": "7305b16b9f5fc30cd18addcfe5d77153", "lapiz": "d394004adea977e358334b8f252f5321"}
 PRB.update(json.load(open('produccion-blobs.json')) if __import__('os').path.exists('produccion-blobs.json') else {})
 STAGES = [("prompt", "Idea y guion", ["Claude", "ChatGPT"]),
           ("camara", "Captura", ["Run &amp; Gun", "Cine digital"]),
@@ -298,7 +298,7 @@ STAGES = [("prompt", "Idea y guion", ["Claude", "ChatGPT"]),
           ("pelicula", "Video y motion", ["Seedance", "Kling", "Gemini", "Higgsfield"]),
           ("spark", "Agentes", ["Nexa", "Sparks"]),
           ("guardar", "Gobierno", ["Efeonce Globe", "Memoria de marca", "Derechos y procedencia"]),
-          ("mano", "Aprobación", ["Siempre humana"])]
+          ("lapiz", "Aprobación", ["Siempre humana"])]  # operador: la mano se leía mal; el lápiz es el visto bueno
 def chip(t, strong=False):
     c = '#ffffff' if strong else '#cfe4fa'
     return f'<span style="display: inline-block; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(114, 222, 216, 0.28); font-family: {ST}; font-size: 16px; font-weight: 500; color: {c}">{t}</span>'
