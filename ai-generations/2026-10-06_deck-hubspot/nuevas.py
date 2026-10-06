@@ -14,17 +14,17 @@ put('B17-licencias', {"role": "content", "recipe": "content-bullets",
     {"title": "Uso antes de renovar", "desc": "Antes de cada renovación revisamos uso y adopción, y ajustamos lo que sobra."}],
   "selected": 3, "selection": {"target": "object", "label": "Cliente", "participantKind": "department"}})
 
-# Créditos con criterio (operador, 2026-10-06): la misma lógica que las licencias, no un dato suelto de HubSpot.
-# La cifra del centro responde la pregunta: lo que no usas vence, así que se compra más sólo con el consumo medido.
+# Créditos con criterio (operador, 2026-10-06): las acciones clave de HubSpot consumen créditos sí o sí; el criterio es
+# asesorar CUÁNTOS necesita el cliente según lo que hará cada agente. La cifra del centro explica por qué «a medida».
 put('B18-creditos', {"role": "decision", "recipe": "decision-ai-market",
-  "voice": {"eyebrow": "HubSpot Credits", "question": "¿Sumo más créditos?", "answer": ["Aún no"]},
-  "body": "Igual que con las licencias: primero medimos cuánto consume **cada agente**, y recién ahí sumas créditos.",
+  "voice": {"eyebrow": "HubSpot Credits", "question": "¿Cuántos créditos necesito?", "answer": ["A medida"]},
+  "body": "Los agentes y la IA de HubSpot funcionan con créditos. Calculamos cuántos necesitas según lo que hará **cada agente**.",
   "figures": [
-    {"value": "50", "label": "créditos por conversación que resuelve Customer Agent.", "detail": "Prospecting Agent usa 100 por lead: cada agente consume distinto.",
+    {"value": "50", "label": "créditos por conversación que resuelve Customer Agent.", "detail": "Cada acción de IA en un workflow usa 10.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
-    {"value": "0", "label": "créditos pasan al mes siguiente.", "detail": "Lo que no usas vence: comprar de más es pagar por nada.",
+    {"value": "0", "label": "créditos pasan al mes siguiente.", "detail": "Por eso se calculan: ni de más, que vencen, ni de menos.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO},
-    {"value": "5.000", "label": "créditos al mes ya incluidos en Enterprise.", "detail": "Pro incluye 3.000. Con eso se parte.",
+    {"value": "100", "label": "créditos por cada lead que recomienda Prospecting Agent.", "detail": "Lo extra cuesta USD 10 por cada 1.000 créditos.",
      "source": "HubSpot", "year": "2026", "sourceLogo": HUBSPOT_LOGO}]})
 
 put('B19-crm-solo', {"role": "proposal", "recipe": "proposal-cinematic", "layout": "hero",

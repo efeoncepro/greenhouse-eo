@@ -8,17 +8,17 @@
   "recipe": "decision-ai-market",
   "voice": {
     "eyebrow": "HubSpot Credits",
-    "question": "¿Sumo más créditos?",
+    "question": "¿Cuántos créditos necesito?",
     "answer": [
-      "Aún no"
+      "A medida"
     ]
   },
-  "body": "Igual que con las licencias: primero medimos cuánto consume **cada agente**, y recién ahí sumas créditos.",
+  "body": "Los agentes y la IA de HubSpot funcionan con créditos. Calculamos cuántos necesitas según lo que hará **cada agente**.",
   "figures": [
     {
       "value": "50",
       "label": "créditos por conversación que resuelve Customer Agent.",
-      "detail": "Prospecting Agent usa 100 por lead: cada agente consume distinto.",
+      "detail": "Cada acción de IA en un workflow usa 10.",
       "source": "HubSpot",
       "year": "2026",
       "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
@@ -26,15 +26,15 @@
     {
       "value": "0",
       "label": "créditos pasan al mes siguiente.",
-      "detail": "Lo que no usas vence: comprar de más es pagar por nada.",
+      "detail": "Por eso se calculan: ni de más, que vencen, ni de menos.",
       "source": "HubSpot",
       "year": "2026",
       "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
     },
     {
-      "value": "5.000",
-      "label": "créditos al mes ya incluidos en Enterprise.",
-      "detail": "Pro incluye 3.000. Con eso se parte.",
+      "value": "100",
+      "label": "créditos por cada lead que recomienda Prospecting Agent.",
+      "detail": "Lo extra cuesta USD 10 por cada 1.000 créditos.",
       "source": "HubSpot",
       "year": "2026",
       "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
