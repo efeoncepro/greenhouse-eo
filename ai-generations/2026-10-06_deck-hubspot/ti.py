@@ -65,7 +65,7 @@ print('láminas de TI')
 # Segunda tanda para TI (operador, 2026-10-06): dónde quedan los datos, la salida, el consumo de un workflow y clientes.
 put('B25-residencia', {"role": "content", "recipe": "content-markets",
   "voice": {"eyebrow": "Residencia de datos", "question": "¿Dónde están mis datos?", "answer": ["En Estados", "Unidos"]},
-  "body": "HubSpot no tiene centro de datos en Chile; si prefieres, se mueven a Europa sin costo. La ley lo permite con **garantías**, que HubSpot firma en su DPA.",
+  "body": "HubSpot los guarda en **cinco** regiones: EE. UU. Este y Oeste, Canadá, Fráncfort y Australia. La ley lo permite con las garantías de su DPA.",
   "photo": {"register": "puesta-en-escena", "subject": "place", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png",
             "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia"},
   "markets": [
