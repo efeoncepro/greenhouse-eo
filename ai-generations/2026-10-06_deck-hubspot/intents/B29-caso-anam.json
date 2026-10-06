@@ -7,7 +7,7 @@
   "role": "decision",
   "recipe": "decision-case",
   "voice": {
-    "eyebrow": "Caso publicado",
+    "eyebrow": "Caso de cliente",
     "question": "¿Dónde ya funciona?",
     "answer": [
       "En ANAM"
@@ -15,23 +15,23 @@
   },
   "figures": [
     {
-      "value": "23",
-      "label": "fuentes de conocimiento",
-      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+      "value": "−57 %",
+      "label": "carga comercial",
+      "source": "ANAM, 2026"
     },
     {
-      "value": "356",
-      "label": "registros técnicos",
-      "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+      "value": "+32 %",
+      "label": "ventas en 7 meses",
+      "source": "ANAM, 2026"
     },
     {
       "value": "5",
-      "label": "rutas de atención",
+      "label": "rutas hacia una persona",
       "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
     },
     {
-      "value": "34/34",
-      "label": "asociaciones verificadas",
+      "value": "23",
+      "label": "fuentes de conocimiento",
       "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
     }
   ],
@@ -39,7 +39,7 @@
     "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
     "alt": "ANAM"
   },
-  "selected": 4,
+  "selected": 2,
   "photo": {
     "register": "documental",
     "subject": "person",

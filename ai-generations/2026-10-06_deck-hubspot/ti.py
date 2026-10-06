@@ -127,14 +127,15 @@ json.dump(d, open('intents/B04-encaje.json', 'w', encoding='utf-8'), ensure_asci
 
 CASO = 'casos publicados de ANAM en efeoncepro.com, julio de 2026'
 put('B29-caso-anam', {"role": "decision", "recipe": "decision-case",
-  "voice": {"eyebrow": "Caso publicado", "question": "¿Dónde ya funciona?", "answer": ["En ANAM"]},
+  "voice": {"eyebrow": "Caso de cliente", "question": "¿Dónde ya funciona?", "answer": ["En ANAM"]},
+  # Resultados que entregó el operador el 2026-10-06 (comentario en el canvas); el uso externo requiere el visto bueno de ANAM.
   "figures": [
-    {"value": "23", "label": "fuentes de conocimiento", "source": CASO},
-    {"value": "356", "label": "registros técnicos", "source": CASO},
-    {"value": "5", "label": "rutas de atención", "source": CASO},
-    {"value": "34/34", "label": "asociaciones verificadas", "source": CASO}],
+    {"value": "−57 %", "label": "carga comercial", "source": "ANAM, 2026"},
+    {"value": "+32 %", "label": "ventas en 7 meses", "source": "ANAM, 2026"},
+    {"value": "5", "label": "rutas hacia una persona", "source": CASO},
+    {"value": "23", "label": "fuentes de conocimiento", "source": CASO}],
   "clientLogo": {"path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg", "alt": "ANAM"},
-  "selected": 4,
+  "selected": 2,
   "photo": {"register": "documental", "subject": "person", "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
             "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente"},
   "selection": {"target": "object", "label": "HubSpot", "participantKind": "department"}})
