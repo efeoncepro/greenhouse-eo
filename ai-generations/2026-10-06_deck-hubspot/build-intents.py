@@ -204,3 +204,6 @@ print('voz corregida')
 
 # Láminas nuevas del 2026-10-06 (licencias, créditos, CRM que se actualiza solo, datos y arquitectura)
 exec(open('nuevas.py', encoding='utf-8').read())
+
+# Láminas para quien evalúa desde TI (2026-10-06): integraciones, automatización, seguridad y Ley 21.719
+exec(open('ti.py', encoding='utf-8').read())
