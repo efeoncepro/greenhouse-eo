@@ -483,6 +483,26 @@ S['P5-dia-a-dia'] = ("¿Cómo sigo el trabajo? En vivo.", page("¿Cómo sigo el 
       body('Cada herramienta gira alrededor de tu marca y <b style="font-weight: 600">todo</b> llega a Creative Studio, a la vista y sin esperar el informe.', DARK, 24, 440, '; margin-top: 48px'), 120, 480) +
   bubble(DARK)))
 
+# Staff augmentation creativo (operador, 2026-10-06: «haz Staff augmentation como indicas»). Es talento EMBEBIDO con
+# respaldo: la oferta dice «no es Staff Augmentation» de perfiles sueltos, así que la palabra del comprador va sólo en
+# el eyebrow y la lámina vende lo que Efeonce sí sostiene (reemplazo, calidad, fee único, tu dirección). Foto SA1: Karo
+# arma la campaña del cliente en su mesa, con su equipo; el hoodie es lo único que dice quién viene de afuera.
+SA1 = "7655e4b078b3223c0fb9b46db9c58f4d"
+SAT_T = dict(DARK, bg='#040507')
+def mini(label, text):
+    return (f'<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 14px; border-top: 1px solid rgba(114, 222, 216, 0.22)">'
+            f'<div style="font-family: {ST}; font-size: 20px; font-weight: 600; color: #ffffff">{label}</div>'
+            f'<div style="font-family: {ST}; font-size: 17px; font-weight: 300; line-height: 1.4; color: #cfe4fa">{text}</div></div>')
+S['A19-talento'] = ("Tu equipo, con talento de Efeonce adentro.", page("Tu equipo, con talento de Efeonce adentro.",
+  f'<img src="{BL(SA1)}" alt="Karo, con el hoodie de Efeonce, arma la campaña del cliente sobre su mesa junto a dos personas de su equipo de marketing; las piezas de luz las iluminan a los tres por igual" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
+  col(eyebrow('Talento embebido · Staff augmentation', DARK) + headline(['Tu equipo,', 'con talento de', 'Efeonce adentro'], 84, DARK, '; margin-top: 54px') +
+      body('Sumas el talento que tu equipo necesita, sin contratar, y con una agencia que responde por la entrega.', DARK, 22, 560, '; margin-top: 32px') +
+      f'<div style="margin-top: 36px; display: flex; gap: 34px">{seal("Remoto", "con tus herramientas")}{seal("Embebido", "en tu oficina")}{seal("Co-operado", "adentro y en estudio")}</div>' +
+      f'<div style="margin-top: 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; row-gap: 22px; width: 600px">'
+      f'{mini("Reemplazo sin vacío", "si alguien sale, entra otra persona con el contexto")}{mini("Calidad gobernada", "dirección creativa, QA y métricas de entrega")}'
+      f'{mini("Un fee mensual", "sueldos, cargas, licencias y equipo, por nuestra cuenta")}{mini("Tú diriges", "tu prioridad y tu aprobación mandan")}</div>', 110, 620) +
+  bubble(DARK), SAT_T))
+
 def image_slide(title, blob):
     return page(title, f'<img src="{BL(blob)}" alt="{title}" style="display: block; width: 1920px; height: 1080px">', DARK, False)
 # Pasada final de narrativa (operador, 2026-10-06): primero el mapa de las cuatro rutas y después cada capítulo, en el
@@ -496,7 +516,7 @@ ORDER = [("A01-portada", "Portada · ¿Mi equipo puede producir más? Mucho más
          ("A04-capacidades", None, 'hand'),
          ("A05-equipo", "¿Quién trabaja en mi marca? Personas reales.", 'png'), ("A07-triptico", None, 'hand'),
          ("P4-creative-studio", None, 'hand'), ("P5-dia-a-dia", None, 'hand'),
-         ("A08-capacidad", None, 'hand'), ("A09-sprint", "¿Y si no me convence? Empiezas chico.", 'png'),
+         ("A08-capacidad", None, 'hand'), ("A19-talento", None, 'hand'), ("A09-sprint", "¿Y si no me convence? Empiezas chico.", 'png'),
          ("A10-control", "¿Pierdo el control de mi marca? Nunca.", 'png'), ("A12-caso-sky", None, 'hand'), ("A13-testimonio", None, 'hand'),
          ("A14-clientes", None, 'hand'), ("A21-mercados", "¿Dónde trabajan? En cinco países.", 'png'), ("A15-siguiente", "¿Qué recibo primero? Un plan.", 'png'),
          ("A16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.", 'png')]
@@ -506,7 +526,7 @@ idx['boards'].pop('A11-medicion.dc.html', None)
 idx['boards'].pop('A06-hibrido.dc.html', None)
 idx['order'] = [o for o in idx['order'] if o != 'A06-hibrido.dc.html']
 idx['order'] = [o for o in idx['order'] if o != 'A11-medicion.dc.html']
-idx['notes']['t2']['text'] = "Brochure · Agencia Creativa — 26 láminas"
+idx['notes']['t2']['text'] = "Brochure · Agencia Creativa — 27 láminas"
 written = []
 for i, (key, title, kind) in enumerate(ORDER):
     f = f'{key}.dc.html'

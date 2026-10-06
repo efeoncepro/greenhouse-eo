@@ -49,3 +49,11 @@ ilumina a las personas, la cámara y el producto reales; Antonio opera la cámar
 dirige (Spark de contenido junto a su mano), más Sparks al fondo. Antonio es de la línea revenue: `foto:prompt` lo bloquea en
 una ficha `linea: brand`; por pedido explícito del operador la ficha va sin `linea` (hoodie por kit). La cámara derivó a ~28 %:
 en la lámina la foto se corre 130 px con el borde fundido a su negro (#060913). `HB1` y `HB1b` (con Julio) quedan en el banco.
+
+## Talento embebido / staff augmentation (2026-10-06)
+
+| Plate | Lámina | Estado | Por qué |
+|---|---|---|---|
+| `SA1-talento-adentro` | A19 «Tu equipo, con talento de Efeonce adentro.» | **En uso** | Karo arma la campaña del cliente en su mesa con dos personas de su equipo (extras sin marca, gris y carbón); una hoja de piezas de luz es la llave; el hoodie es el único azul. `cine-reviewer` corrigió antes de gastar: el monitor como llave anulaba la palanca `luz-motivada` y el acento quedaba de espaldas |
+
+El GAZE incondicional de `deck-seccion` se contradice desde la escena (mirada a la pieza, no al texto) para no repetir el tic de mirada de la serie; candidato a campo `mirada` en el compilador.
