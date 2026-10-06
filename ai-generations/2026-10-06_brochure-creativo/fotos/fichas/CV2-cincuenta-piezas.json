@@ -1,0 +1,45 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark studio space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "CV2-cincuenta-piezas",
+ "desde": "C4BF3",
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo"
+  }
+ ],
+ "escena": "SCENE (cinematic, a real long-exposure photograph of one night of campaign production inside a vast dark studio): behind her, a GIANT wall runs from the RIGHT edge of the frame, where its nearest and largest pieces are cut by the frame edge, and recedes in deep perspective toward a vanishing point hidden behind her body; no part of the wall is visible to the left of her left shoulder. It holds about FIFTY pieces of ONE campaign for a fictitious brand: vertical stories, square posts, wide banners, email headers, product cards and one billboard, every one in the SAME visual system (deep navy, white and cool blue, the same product photograph, the same diagonal composition), no letters, no numbers, no logos. During the exposure, the last pieces flew in from the deep dark background on the right, never from the left half of the frame and locked into place: they are long cool white-azure (#0375DB) motion streaks that end exactly in their slot of the grid, while the pieces already placed are perfectly aligned in one grid: the nearest ones, at the right edge, are crisp, and along the wall they fall progressively out of focus until the far end melts into bokeh behind her. Karo, as in her reference, the art director, stands perfectly still and SHARP with her face at about 72 % of the frame width, her left elbow never further left than 60 %, framed from the waist up, wearing the Efeonce hoodie exactly as in its reference, holding a tablet low, at the height of her stomach, centred on her body and below the chest mark, with both arms fully visible; on it, the master piece of the campaign; her head stays almost frontal and her eyes turn toward the empty dark left of the frame, where the text will sit, with a confident, slightly sideways half-smile; between the left edge of the frame and her body there is a wide band of empty darkness. On the master piece, ONE single tiny point glows vivid orange (#FF6500), the only accent in the frame; it lights nothing around it. The tablet is the key light on her face from below and the front, cool white; NO fill light, the far side of her face in shadow with the nose shadow legible. The wall never enters the left half of the frame. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm. Thin haze catches the streaks. The LEFT 60 % of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes, no streaks, no pieces; everything lit lives in the right 40 %. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any other brand.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a long production table right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the master piece glowing on her tablet",
+  "lado": "from below and the front, at chest height",
+  "tamano": "a tablet screen",
+  "distancia": "about forty centimetres from her face"
+ },
+ "primerPlano": "the dark out-of-focus corner of a second tablet on the table edge, cut by the frame at the bottom right, its black screen switched off, matte, with no reflection",
+ "fondo": "the far end of the wall of pieces melting into soft cool bokeh",
+ "fenomeno": {
+  "que": "about fifty pieces of one campaign lock into a perfectly consistent wall, the last ones arriving as long-exposure streaks",
+  "esServicio": "una campaña en todos sus formatos, a velocidad, con un solo sistema de marca"
+ }
+}
