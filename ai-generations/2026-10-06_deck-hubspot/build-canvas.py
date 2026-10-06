@@ -2,23 +2,23 @@ import json, os, sys
 ROOT = sys.argv[1]
 blobs = json.load(open('blobs.json'))
 BODY = [
- ("B02-propuesta", "¿Tu CRM vende contigo? Con agentes."),
- ("B03-uno", "¿Cuántos HubSpot tienes? Uno."),
+ ("B02-propuesta", "¿Cómo vende más mi CRM? Con agentes."),
+ ("B03-uno", "¿Cuántos CRM necesito? Uno."),
  ("B04-encaje", "¿HubSpot o Salesforce? El que encaje."),
- ("B05-servicios", "¿Qué hacemos en HubSpot? Todo el ciclo."),
+ ("B05-servicios", "¿Qué hacen en HubSpot? Todo el ciclo."),
  ("B06-agentes", "¿Quién responde por el agente? Una persona."),
- ("B07-aprobacion", "¿Dónde apruebas al agente? Donde trabajas."),
- ("B08-permiso", "¿Puedes contactar a ese cliente? Con permiso."),
- ("B09-migracion", "¿Cómo sabes que migró todo? Porque cuadra."),
- ("B10-evaluacion", "¿Qué recibes primero? Una decisión."),
- ("B11-olas", "¿Cómo se suma un agente? Por olas."),
- ("B12-dia-a-dia", "¿Cómo trabajamos contigo? Sin sorpresas."),
- ("B13-adopcion", "¿Cómo aprende tu equipo? A su ritmo."),
+ ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
+ ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
+ ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
+ ("B10-evaluacion", "¿Qué recibo primero? Una decisión."),
+ ("B11-olas", "¿Sumo todos los agentes juntos? No, por olas."),
+ ("B12-dia-a-dia", "¿Qué llega a producción? Lo que apruebes."),
+ ("B13-adopcion", "¿Cómo aprende mi equipo? A su ritmo."),
  ("B14-operacion", "¿Y después del go-live? Lo operamos."),
- ("B15-medicion", "¿Cómo sabes que funciona? Lo medimos."),
+ ("B15-medicion", "¿Cómo sé que funciona? Lo medimos."),
 ]
-BROCHURE = [("B01-portada", "Portada · ¿Tu HubSpot ya actúa? Por ti.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
-PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Tu CRM vende contigo? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por capacidad."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
+BROCHURE = [("B01-portada", "Portada · ¿Le saco todo a mi HubSpot? Todavía no.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
+PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Cómo vende más mi CRM? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por alcance."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
 def slide_html(title, blob):
     if blob:
         inner = f'<img src="{blob}" alt="{title}" style="display: block; width: 1920px; height: 1080px">'

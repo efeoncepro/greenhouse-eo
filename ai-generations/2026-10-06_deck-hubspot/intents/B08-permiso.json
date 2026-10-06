@@ -10,7 +10,7 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Smart CRM · identidad y consentimiento",
-    "question": "¿Puedes contactar a ese cliente?",
+    "question": "¿Puedo contactar a ese cliente?",
     "answer": [
       "Con",
       "permiso"

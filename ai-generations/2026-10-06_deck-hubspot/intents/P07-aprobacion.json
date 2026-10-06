@@ -10,7 +10,7 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Customer Agent · supervisión en vivo",
-    "question": "¿Dónde apruebas al agente?",
+    "question": "¿Dónde apruebo al agente?",
     "answer": [
       "Donde",
       "trabajas"

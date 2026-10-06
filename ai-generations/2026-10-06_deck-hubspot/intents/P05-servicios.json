@@ -8,7 +8,7 @@
   "recipe": "content-service-lanes",
   "voice": {
     "eyebrow": "Nuestros servicios HubSpot",
-    "question": "¿Qué hacemos en HubSpot?",
+    "question": "¿Qué hacen en HubSpot?",
     "answer": [
       "Todo el ciclo"
     ]

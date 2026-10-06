@@ -8,7 +8,7 @@
   "recipe": "content-one-platform",
   "voice": {
     "eyebrow": "HubSpot · RevOps y CRM",
-    "question": "¿Cuántos HubSpot tienes?",
+    "question": "¿Cuántos CRM necesito?",
     "answer": [
       "Uno"
     ]

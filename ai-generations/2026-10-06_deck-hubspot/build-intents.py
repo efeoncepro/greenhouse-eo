@@ -171,3 +171,32 @@ put('P17-contraportada', {"role": "close", "recipe": "close-proposal",
   "photo": {"register": "cine", "subject": "nexa", "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
             "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte"}}, use='proposal')
 print(sorted(os.listdir('intents')))
+
+# ── Voz corregida (decisión del operador 2026-10-06): habla el cliente, en primera persona; cada par pasa las cinco
+#    pruebas de §4 de la línea gráfica (conversación, calce, autonomía, sustitución, prueba). ──
+VOICE = {
+  'B01-portada':      ('¿Le saco todo a mi HubSpot?', ['Todavía no']),
+  'P01-portada':      ('¿Le saco todo a mi HubSpot?', ['Todavía no']),
+  'B02-propuesta':    ('¿Cómo vende más mi CRM?', ['Con agentes']),
+  'B03-uno':          ('¿Cuántos CRM necesito?', ['Uno']),
+  'B05-servicios':    ('¿Qué hacen en HubSpot?', ['Todo el ciclo']),
+  'B07-aprobacion':   ('¿Dónde apruebo al agente?', ['Donde', 'trabajas']),
+  'B08-permiso':      ('¿Puedo contactar a ese cliente?', ['Con', 'permiso']),
+  'B09-migracion':    ('¿Cómo sé que migró todo?', ['Porque', 'cuadra']),
+  'B10-evaluacion':   ('¿Qué recibo primero?', ['Una', 'decisión']),
+  'B11-olas':         ('¿Sumo todos los agentes juntos?', ['No, por', 'olas']),
+  'B12-dia-a-dia':    ('¿Qué llega a producción?', ['Lo que', 'apruebes']),
+  'B13-adopcion':     ('¿Cómo aprende mi equipo?', ['A su', 'ritmo']),
+  'B15-medicion':     ('¿Cómo sé que funciona?', ['Lo', 'medimos']),
+  'P16-cotizacion':   ('¿Cómo se cotiza?', ['Por alcance']),
+}
+for name, (q, a) in VOICE.items():
+    targets = [name] + ([f'P{name[1:3]}-{name[4:]}'] if name.startswith('B') and name not in ('B01-portada',) else [])
+    for t in targets:
+        path = f'intents/{t}.json'
+        if not os.path.exists(path): continue
+        d = json.load(open(path, encoding='utf-8'))
+        d['voice']['question'] = q
+        d['voice']['answer'] = a
+        json.dump(d, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+print('voz corregida')

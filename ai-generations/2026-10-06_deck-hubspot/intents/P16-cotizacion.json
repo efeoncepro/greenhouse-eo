@@ -12,8 +12,7 @@
     "eyebrow": "Inversión",
     "question": "¿Cómo se cotiza?",
     "answer": [
-      "Por",
-      "capacidad"
+      "Por alcance"
     ]
   },
   "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",

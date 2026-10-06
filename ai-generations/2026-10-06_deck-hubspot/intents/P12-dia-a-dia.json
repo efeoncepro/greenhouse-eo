@@ -10,10 +10,10 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Tu día a día con Efeonce",
-    "question": "¿Cómo trabajamos contigo?",
+    "question": "¿Qué llega a producción?",
     "answer": [
-      "Sin",
-      "sorpresas"
+      "Lo que",
+      "apruebes"
     ]
   },
   "body": "Nada llega a producción sin tu **aprobación**: lo pruebas en un sandbox de HubSpot y lo ves explicado en un video corto.",

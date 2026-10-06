@@ -10,9 +10,9 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Agent Hub · equipos híbridos",
-    "question": "¿Cómo se suma un agente?",
+    "question": "¿Sumo todos los agentes juntos?",
     "answer": [
-      "Por",
+      "No, por",
       "olas"
     ]
   },
