@@ -80,14 +80,39 @@ for r, (v, label, blobs_row) in enumerate(COMPARACION):
         written.append(f)
     CMP_NOTES[f'cmp-{v}'] = {"kind": "title1", "maxW": 5920, "text": label, "w": 240, "x": 0, "y": r * 1500 - 300, "page": "comparacion"}
 place(PROPUESTA, 'propuesta', 'Prop-')
+# Banco de fotos del deck (operador, 2026-10-06: «guarda las demás imágenes, nos pueden servir»). Plates limpios, sin
+# texto, en ai-generations/2026-10-06_deck-hubspot/fotos/plates/. En uso = la versión que lleva el deck (luz azul, B).
+BANCO = [
+  ('HS1-crm-se-actualiza', 'HS1 · CRM que se actualiza solo · luz magenta (versión A)', '/_blob/627b8e13e3c7727a449553cb63a265f5'),
+  ('CMP-crm-B', 'CRM que se actualiza solo · luz azul + magenta de acento (B, EN USO)', '/_blob/740bfce76af2ab998900ec9a5e45dba3'),
+  ('CMP-crm-C', 'CRM que se actualiza solo · luz teal (C; mancha abajo a la derecha)', '/_blob/65281bfecc373b87ce349ebd1a04402e'),
+  ('CMP-portada-B', 'Motor de revenue · luz azul + magenta de acento (B, EN USO en portada)', '/_blob/0803e35deb2f480ea40a6db131ebf436'),
+  ('CMP-portada-C', 'Motor de revenue · luz teal (C)', '/_blob/62c660958e03ad7924f8a373d0a8123b'),
+  ('HS2d-datos-en-orden', 'Datos en orden · luz azul, mano a la derecha (EN USO)', '/_blob/27d5415b95906a05c8d37560defdad53'),
+  ('HS2c-datos-en-orden', 'Datos en orden · luz azul (mano cruza el titular)', '/_blob/2b09b943e20c3fcee87689692d867aae'),
+  ('HS2b-datos-en-orden', 'Datos en orden · luz magenta, sujeto a la derecha (A)', '/_blob/5a8a2f81c6d183a519f6ebd1cd6b112b'),
+  ('HS2-datos-en-orden', 'Datos en orden · luz magenta, primera versión', '/_blob/aba2f8393adb0a80fe6597e95764d5df'),
+]
+for i, (key, title, blob) in enumerate(BANCO):
+    f = f'Banco-{key}.dc.html'
+    boards[f] = {"x": (i % 3) * 1872, "y": (i // 3) * 1150, "w": 1792, "h": 1024, "title": title, "page": "banco"}
+    order.append(f)
+    html = f'''<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>{title}</title><script src="./support.js"></script></head><body><x-dc><helmet><style>body{{margin:0;background:#091951}}</style></helmet><div style="width: 1792px; height: 1024px; overflow: hidden; background: #091951"><img src="{blob}" alt="{title}" style="display: block; width: 1792px; height: 1024px"></div></x-dc><script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":1792,"height":1024}}}}'>
+class Component extends DCLogic {{ renderVals() {{ return {{}}; }} }}
+</script></body></html>
+'''
+    open(f'{ROOT}/project/{f}', 'w', encoding='utf-8').write(html)
+    written.append(f)
+
 idx = json.load(open(f'{ROOT}/project/canvas.json', encoding='utf-8'))
 old = set(idx.get('boards', {}))
 idx['boards'] = boards; idx['order'] = order
-idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}, {"id": "comparacion", "name": "Comparación de color"}]
+idx['pages'] = [{"id": "brochure", "name": "Brochure · 20"}, {"id": "propuesta", "name": "Propuesta · 21"}, {"id": "comparacion", "name": "Comparación de color"}, {"id": "banco", "name": "Banco de fotos"}]
 idx['launch'] = {"view": "canvas", "page": "brochure"}
 idx['notes'] = {
   "t-brochure": {"kind": "title1", "maxW": 7920, "text": "HubSpot · brochure de servicios", "w": 240, "x": 0, "y": -300, "page": "brochure"},
-  "t-propuesta": {"kind": "title1", "maxW": 7920, "text": "HubSpot · propuesta comercial", "w": 240, "x": 0, "y": -300, "page": "propuesta"}, **CMP_NOTES}
+  "t-propuesta": {"kind": "title1", "maxW": 7920, "text": "HubSpot · propuesta comercial", "w": 240, "x": 0, "y": -300, "page": "propuesta"}, **CMP_NOTES, "t-banco": {"kind": "title1", "maxW": 5408, "text": "Banco de fotos del deck HubSpot", "w": 240, "x": 0, "y": -300, "page": "banco"}}
 json.dump(idx, open(f'{ROOT}/project/canvas.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 json.dump({"written": written, "removed": sorted(old - set(boards))}, open(f'{ROOT}/manifest.json', 'w'), indent=1)
 print(len(written), 'boards; removed', sorted(old - set(boards)))

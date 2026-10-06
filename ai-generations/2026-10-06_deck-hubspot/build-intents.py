@@ -10,6 +10,7 @@ def put(name, d, use='brochure'):
 c = ex('deck-cover-brochure-line-revenue-intent.json')
 c['voice'] = {'eyebrow': 'Brochure · Servicios HubSpot', 'question': '¿Tu HubSpot ya actúa?', 'answer': ['Por ti']}
 c['partnerMark'] = {"mode": "badge", "readbackRef": "hubspot-partner-readback-2026-10-06"}
+c['photo']['plateRef'] = 'ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-B.png'
 for k in BASE: c.pop(k, None)
 put('B01-portada', c)
 

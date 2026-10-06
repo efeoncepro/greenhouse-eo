@@ -29,7 +29,7 @@ put('B18-creditos', {"role": "decision", "recipe": "decision-ai-market",
 put('B19-crm-solo', {"role": "proposal", "recipe": "proposal-cinematic", "layout": "hero",
   "voice": {"eyebrow": "El nuevo Smart CRM", "question": "¿Sigo llenando el CRM?", "answer": ["Ya no"]},
   "body": "El CRM de HubSpot se llena con llamadas, emails y reuniones. Lo dejamos configurado y confiable.",
-  "photo": {"register": "cine", "subject": "nexa", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS1-crm-se-actualiza.png",
+  "photo": {"register": "cine", "subject": "nexa", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-B.png",
             "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara junto a un registro de cliente de luz que se llena solo con tres haces que vienen de una llamada, un email y una reunión"}})
 
 put('B20-datos', {"role": "section", "recipe": "section-cine", "layout": "purpose",
@@ -39,6 +39,6 @@ put('B20-datos', {"role": "section", "recipe": "section-cine", "layout": "purpos
     {"label": "Datos en orden", "text": "duplicados fuera, propiedades con dueño y una sola fuente de verdad."},
     {"label": "Modelo que escala", "text": "objetos, asociaciones y pipelines pensados para crecer."},
     {"label": "Integración gobernada", "text": "cada sync con su dirección, su dueño y su registro de errores."}],
-  "photo": {"register": "cine", "subject": "person", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2b-datos-en-orden.png",
+  "photo": {"register": "cine", "subject": "person", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png",
             "alt": "Un líder de RevOps de Efeonce, con la chaqueta, levanta la mano y miles de partículas de datos en desorden se ordenan en una red de capas de luz que crece hacia el fondo"}})
 print('láminas nuevas')
