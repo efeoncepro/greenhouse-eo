@@ -20,14 +20,14 @@
   },
   "figures": [
     {
-      "value": "+127%",
-      "label": "tráfico orgánico de Sky frente a LATAM Airlines",
-      "source": "caso publicado de Sky Airlines"
-    },
-    {
       "value": "+180%",
       "label": "ventas digitales de Bresler",
       "source": "caso publicado de Bresler"
+    },
+    {
+      "value": "+10",
+      "label": "años ejecutando en LATAM",
+      "source": "Efeonce, 2026"
     }
   ],
   "selected": 1,

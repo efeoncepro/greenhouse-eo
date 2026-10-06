@@ -101,8 +101,8 @@ put('B28-clientes', {"role": "content", "recipe": "content-clients",
   "voice": {"eyebrow": "Clientes", "question": "¿Con quién trabajan?", "answer": ["+90", "empresas"]},
   "progress": {"sections": 4, "current": 4},
   "figures": [
-    {"value": "+127%", "label": "tráfico orgánico de Sky frente a LATAM Airlines", "source": "caso publicado de Sky Airlines"},
-    {"value": "+180%", "label": "ventas digitales de Bresler", "source": "caso publicado de Bresler"}],
+    {"value": "+180%", "label": "ventas digitales de Bresler", "source": "caso publicado de Bresler"},
+    {"value": "+10", "label": "años ejecutando en LATAM", "source": "Efeonce, 2026"}],
   "selected": 1,
   "clients": [{"path": CL + f, "alt": a} for f, a in [
     ("sky.svg", "Sky Airline"), ("berel.svg", "Berel"), ("bresler.svg", "Bresler"), ("carozzi.svg", "Carozzi"),
