@@ -1,0 +1,83 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "use": "brochure",
+  "line": "growth",
+  "role": "content",
+  "recipe": "content-clients",
+  "voice": {
+    "eyebrow": "Clientes",
+    "question": "¿Quién confía en nosotros?",
+    "answer": [
+      "Marcas",
+      "líderes"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 4
+  },
+  "figures": [
+    {
+      "value": "+2.000",
+      "label": "piezas aprobadas para Sky en 12 meses",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    },
+    {
+      "value": "5",
+      "label": "mercados atendidos para Sky",
+      "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+    }
+  ],
+  "selected": 1,
+  "clients": [
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "alt": "Sky Airline"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+      "alt": "Berel"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+      "alt": "Bresler"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+      "alt": "Carozzi"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+      "alt": "Aguas Andinas"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+      "alt": "ANAM"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+      "alt": "Marca Chile"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+      "alt": "Gobierno de Santiago"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+      "alt": "Universidad Católica de Temuco"
+    }
+  ],
+  "markets": {
+    "title": "Operamos en",
+    "text": "Chile, EE. UU., Colombia, México y Perú"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Brand",
+    "participantKind": "department"
+  }
+}
