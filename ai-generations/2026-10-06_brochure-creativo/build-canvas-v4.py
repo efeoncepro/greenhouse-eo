@@ -274,13 +274,17 @@ S['B5-sistema'] = ("La aplica cualquiera. Sale igual.", page("La aplica cualquie
 
 def bfig(v, l):
     return f'<div style="display: flex; flex-direction: column; gap: 8px"><div style="font-family: {ID}; font-size: 72px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: #ffffff">{v}</div><div style="font-family: {ST}; font-size: 18px; font-weight: 400; line-height: 1.35; color: #cfe4fa">{l}</div></div>'
+def bget(t, d):
+    return f'<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 1px solid rgba(114, 222, 216, 0.22)"><div style="font-family: {ID}; font-size: 34px; font-weight: 740; letter-spacing: -0.02em; line-height: 1; color: #ffffff">{t}</div><div style="font-family: {ST}; font-size: 18px; font-weight: 300; line-height: 1.4; color: #cfe4fa">{d}</div></div>'
 S['B6-prueba'] = ("Este brochure es la prueba.", page("Este brochure es la prueba.",
   # Comentario del operador (2026-10-06): el muro en CSS 3D tapaba el texto. Ahora es una foto: las piezas reales se
   # componen determinísticas en el muro y el modelo sólo puso piso, reflejo y luz (fotos/muro/, MU1b).
   f'<img src="{BL("863cf51de22fe003405a81251138c9e9")}" alt="Un muro LED monumental en un estudio oscuro muestra 35 piezas reales de La órbita, la línea gráfica de Efeonce: portadas, propuestas, secciones, el uniforme bordado, la nave y el logo en 3D; su luz se refleja en el piso" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover">' +
   col(eyebrow('Brand Systems · la prueba', DARK) + headline(['Este brochure', 'es la prueba'], 100, DARK, '; margin-top: 70px') +
       body('Lo que hacemos por tu marca, lo hicimos primero con la nuestra: identidad, voz, composición, fotografía y reglas que revisan cada pieza antes de salir.', DARK, 22, 560, '; margin-top: 40px') +
-      f'<div style="margin-top: 56px; display: flex; gap: 52px">{bfig("69", "láminas<br>aprobadas")}{bfig("10", "kits de<br>marca")}{bfig("5", "líneas, cada una<br>con su acento")}</div>', 120, 720) +
+      # Comentario del operador (2026-10-06): «69 láminas · 10 kits · 5 líneas» no le dice nada al cliente. Va lo que recibe su marca.
+      f'<div style="margin-top: 52px; display: flex; flex-direction: column; gap: 10px"><div style="font-family: {ST}; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #cfe4fa">Lo mismo, para tu marca</div>'
+      f'<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; width: 700px">{bget("Identidad", "logo, color, tipografía y foto, con sus reglas")}{bget("Plantillas", "cada formato, listo para producir")}{bget("Aprobación", "reglas que revisan cada pieza antes de salir")}</div></div>', 120, 720) +
   bubble(DARK)))
 
 def image_slide(title, blob):
