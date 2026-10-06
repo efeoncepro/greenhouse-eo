@@ -64,8 +64,8 @@ print('láminas de TI')
 
 # Segunda tanda para TI (operador, 2026-10-06): dónde quedan los datos, la salida, el consumo de un workflow y clientes.
 put('B25-residencia', {"role": "content", "recipe": "content-markets",
-  "voice": {"eyebrow": "Residencia de datos", "question": "¿Dónde quedan mis datos?", "answer": ["Fuera de", "Chile"]},
-  "body": "En una de las **cinco** regiones de HubSpot; también hay una en Australia. La ley lo permite con garantías: DPA y cláusulas contractuales.",
+  "voice": {"eyebrow": "Residencia de datos", "question": "¿Dónde están mis datos?", "answer": ["En Estados", "Unidos"]},
+  "body": "HubSpot no tiene centro de datos en Chile; si prefieres, se mueven a Europa sin costo. La ley lo permite con **garantías**, que HubSpot firma en su DPA.",
   "photo": {"register": "puesta-en-escena", "subject": "place", "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG1b-regiones.png",
             "alt": "La Tierra de noche vista desde la órbita; desde Santiago salen cuatro arcos de luz azul hacia las regiones de datos de HubSpot en EE. UU., Canadá y Fráncfort"},
   "markets": [
@@ -73,7 +73,7 @@ put('B25-residencia', {"role": "content", "recipe": "content-markets",
     {"country": "EE. UU.", "city": "Región Este", "node": [1068, 283], "side": "right"},
     {"country": "Canadá", "city": "Región Canadá", "node": [1167, 190], "side": "right"},
     {"country": "Alemania", "city": "Fráncfort", "node": [1645, 205], "side": "left"},
-    {"country": "Chile", "city": "Tu operación", "node": [1012, 825], "side": "right"}]})
+    {"country": "Chile", "city": "Tu empresa", "node": [1012, 825], "side": "right"}]})
 
 put('B26-salida', {"role": "content", "recipe": "content-bullets",
   "voice": {"eyebrow": "Sin amarras", "question": "¿Y si mañana nos vamos?", "answer": ["Te llevas todo"]},

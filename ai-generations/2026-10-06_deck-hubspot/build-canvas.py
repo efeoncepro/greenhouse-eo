@@ -17,7 +17,7 @@ BODY = [
  ("B07-aprobacion", "¿Dónde apruebo al agente? Donde trabajas."),
  ("B23-seguridad", "¿Quién ve mis datos? Sólo quien debe."),
  ("B24-ley", "¿Cuándo rige la nueva ley? Diciembre."),
- ("B25-residencia", "¿Dónde quedan mis datos? Fuera de Chile."),
+ ("B25-residencia", "¿Dónde están mis datos? En Estados Unidos."),
  ("B08-permiso", "¿Puedo contactar a ese cliente? Con permiso."),
  ("B09-migracion", "¿Cómo sé que migró todo? Porque cuadra."),
  ("B26-salida", "¿Y si mañana nos vamos? Te llevas todo."),
