@@ -318,11 +318,11 @@ S['P1-estudio'] = ("El estudio va donde estés.", page("El estudio va donde est�
       body('Crew, cámaras de cine, sonido e iluminación profesionales que arman un set completo en tu oficina, tu planta, tu tienda o en terreno. De una entrevista a una campaña.', DARK, 22, 540, '; margin-top: 40px') +
       f'<div style="margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; width: 600px">{svc("Run &amp; Gun", "lo capturamos en una jornada, con equipo actual")}{svc("Contenido y social", "lo planificamos, publicamos y medimos")}</div>', 120, 680) + bubble(DARK)))
 # HB1 derivó hacia el centro: la foto se corre 150 px y su borde se funde con su propio negro (#060910), sin velo.
-HBT = dict(DARK, bg='#080b12')
+HBT = dict(DARK, bg='#060913')
 S['P2-hibrido'] = ("Manos y modelos, en el mismo set.", page("Manos y modelos, en el mismo set.",
-  f'<img src="{BL(PRB["HB1"])}" alt="Julio, con el hoodie de Efeonce, filma unos audífonos sobre un pedestal con una cámara de cine; una corriente de luz lleva la toma a una pantalla con cuatro variantes del producto, donde Nexa, con un Spark en el hombro, supervisa" style="position: absolute; left: 150px; top: 0; width: 1920px; height: 1080px; object-fit: cover; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 180px); mask-image: linear-gradient(to right, transparent 0, #000 180px)">' +
-  col(eyebrow('Producción híbrida', DARK) + headline(['Manos y', 'modelos, en', 'el mismo set'], 92, DARK, '; margin-top: 64px') +
-      body('El oficio y la IA en un mismo flujo: una toma real se convierte en todas sus variantes. Las personas dirigen, aprueban y responden por tu marca.', DARK, 22, 520, '; margin-top: 40px'), 120, 600) + bubble(DARK), HBT))
+  f'<img src="{BL(PRB["HB1"])}" alt="Escenario de producción virtual: un muro LED monumental muestra un mundo generado por IA para una campaña de audífonos y su luz ilumina a las personas reales; Antonio, con el hoodie de Efeonce, opera una cámara de cine con un Spark sobre el equipo, y Nexa dirige junto a otro Spark mientras más agentes trabajan al fondo" style="position: absolute; left: 130px; top: 0; width: 1920px; height: 1080px; object-fit: cover; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 160px); mask-image: linear-gradient(to right, transparent 0, #000 160px)">' +
+  col(eyebrow('Producción híbrida', DARK) + headline(['Manos y', 'modelos, en', 'el mismo set'], 80, DARK, '; margin-top: 60px') +
+      body('Lo que generan los agentes y lo que filman las personas, en la misma toma. Las personas dirigen, aprueban y responden por tu marca.', DARK, 21, 460, '; margin-top: 36px'), 120, 500) + bubble(DARK), HBT))
 
 S['P3-herramientas'] = ("La mejor herramienta para cada paso.", page("La mejor herramienta para cada paso.",
   col(eyebrow('Producción híbrida', DARK) + headline(['La mejor herramienta', 'para cada paso'], 100, DARK, '; margin-top: 64px'), 120, 1100) +

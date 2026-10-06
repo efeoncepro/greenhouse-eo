@@ -1,0 +1,57 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "HB2-mundo-hibrido",
+ "desde": "NX7d",
+ "identidad": [
+  {
+   "persona": "antonio"
+  },
+  {
+   "persona": "nexa"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "antonio"
+  },
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "nexa"
+  },
+  {
+   "objeto": "spark-contenido"
+  },
+  {
+   "objeto": "spark-reportes"
+  }
+ ],
+ "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast virtual-production stage at night where people and AI agents create a campaign together). THE WORLD: on the RIGHT side of the frame, a monumental curved LED volume wall begins at the right edge and curves away into the depth of the stage behind the people; it displays an AI-generated world for a campaign — a vast cool-blue glacier landscape under an aurora, with a giant floating pair of fictitious matte-black over-ear headphones — and it is the light of the whole scene. The nearest edge of the LED volume never comes further left than 58 % of the frame width; the LEFT 58 % of the frame is calm, deep dark empty stage floor and air with only faint haze: nothing lit, no screens, no people, no light shapes. THE PEOPLE AND AGENTS, in depth, all inside the right part of the frame: NEAREST, Antonio, as in his reference, wearing the Efeonce hoodie exactly as in its reference, operates a compact modern cinema camera on a dolly, framed from the waist up, his left shoulder at about 62 % of the frame width, his eyes on the camera's screen, calm and precise, not looking at the lens; between the left edge of the frame and his shoulder there is a wide band of empty darkness. In front of the LED wall, on a black pedestal, the real physical headphones sit lit by the wall, and the camera points at them: the real product and its generated world in one shot. DEEPER, Nexa, as in her reference, wearing the Efeonce hoodie exactly as in its reference, stands at the foot of the LED wall directing, one arm raised toward the wall, smaller and softer than Antonio, not looking at the lens; the Content Spark, exactly as in its reference, hovers beside her raised hand, as if placing the next element into the generated world; the Reporting Spark, exactly as in its reference, sits on the top of the camera rig next to Antonio. Far in the depth, three more small Sparks are tiny and out of focus near the LED wall, their LED eyes as glowing dots, working along it. THE PHENOMENON: the light of the AI-generated world on the LED volume falls on the real people, the real camera and the real product: what the agents generate lights what the people shoot. In the generated world, ONE single tiny point glows vivid orange (#FF6500) at the edge of the headphones, the only accent in the frame; it lights nothing around it. LIGHT: the LED volume is the only key light, cool blue-white, from the camera-right and behind; NO fill light, the far sides of the faces in deep shadow with legible shape. Real photographic skin with irregular pores and fine facial hair, no smoothing. Nobody looks at anybody else. REALISTIC ADULT PROPORTIONS: camera about five meters away at chest height, 50mm f/2.8, a wide, epic frame. Thin haze catches the light of the wall. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any brand on any equipment.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a long production table right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the monumental LED volume wall showing the AI-generated world",
+  "lado": "from the camera-right and behind",
+  "tamano": "a curved LED wall about ten meters wide",
+  "distancia": "about four meters from their faces"
+ },
+ "fondo": "the far curve of the LED volume and the dark rigging of the stage, melted into soft bokeh",
+ "fenomeno": {
+  "que": "the AI-generated world on an LED volume lights the real people, camera and product on the stage, while agents work beside the people",
+  "esServicio": "producción híbrida: lo que los agentes generan y lo que las personas filman, en la misma toma"
+ },
+ "primerPlano": "the dark out-of-focus corner of a camera case on the table edge, cut by the frame at the bottom right corner"
+}

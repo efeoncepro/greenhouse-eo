@@ -42,3 +42,10 @@ Causa probable: el bloque IDENTITY insiste en «forehead tall and open, receding
 distancia media. `HB1b-manos-y-modelos` lo contrarresta en la escena (frente moderada y entradas como en `julio-ap-04`, cara
 larga, lentes semi al aire, piel fotográfica sin suavizado) y acerca la cámara a 4,5 m. Candidato a fila del casebook y a
 revisar el bloque IDENTITY de Julio.
+
+**Set híbrido v2 (comentario del operador, 2026-10-06):** «quita mi foto y pon a Antonio… más punch, que muestre el mundo
+híbrido de agentes y personas». `HB2-mundo-hibrido` (P2): escenario de producción virtual; el mundo generado en un muro LED
+ilumina a las personas, la cámara y el producto reales; Antonio opera la cámara (Spark de reportes sobre el equipo), Nexa
+dirige (Spark de contenido junto a su mano), más Sparks al fondo. Antonio es de la línea revenue: `foto:prompt` lo bloquea en
+una ficha `linea: brand`; por pedido explícito del operador la ficha va sin `linea` (hoodie por kit). La cámara derivó a ~28 %:
+en la lámina la foto se corre 130 px con el borde fundido a su negro (#060913). `HB1` y `HB1b` (con Julio) quedan en el banco.
