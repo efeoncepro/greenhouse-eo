@@ -194,6 +194,11 @@ Si el deal es multi-hub, **exige la cotización oficial antes de prometer un nú
 - 🔴 **No hay rollover.** Los créditos no usados expiran al final del período.
 - Consumo: Data Agent 10/prompt (USD 0,10) · **Customer Agent 50/resolución (USD 0,50)** ·
   **Prospecting Agent 100/lead (USD 1,00)** · Content Agent 1.000/pieza (USD 10).
+- **Re-verificado 2026-10-06 contra el Rate Sheet** (brochure HubSpot, TASK-1943): Customer Agent 50 por conversación
+  resuelta · Prospecting 100 por lead · **acción de IA dentro de un workflow: 10** · USD 10 por 1.000 créditos extra ·
+  sin acumulación al mes siguiente · incluidos Pro 3.000 / Enterprise 5.000 · no se suman entre Hubs. En el brochure
+  los créditos se venden como **asesoría de cuántos necesita el cliente** («¿Cuántos créditos necesito? A medida.»),
+  nunca como «no compres».
 ✅ [KB — HubSpot credits & billing](https://knowledge.hubspot.com/account-management/understand-hubspot-credits-and-billing) (act. 2026-06-16)
 
 ### Outcome-based pricing ✅ — anunciado 2026-04-02, efectivo 2026-04-14
@@ -300,6 +305,22 @@ Cadencia fija: **2 releases mayores/año (marzo y septiembre)**, APIs con format
 Ciclo: 6 meses current → 12 meses supported → **a los 18 meses los builds fallan**.
 🔴 **2026-08-01**: fin de soporte de Projects 2025.1. 🔴 **2026-10-31**: sunset de Classic CRM cards.
 ✅ [developers.hubspot.com — Spring 2026 changelog](https://developers.hubspot.com/changelog/spring-2026-spotlight)
+
+### Lo que pregunta TI — as-of 2026-10-06 ✅ (verificado en fuentes oficiales para el brochure HubSpot, TASK-1943)
+- **Trust Center:** SOC 1 Tipo II, SOC 2 Tipo II, SOC 3, HIPAA (Enterprise + Sensitive Data), GDPR, CCPA y EU Cloud
+  Code of Conduct. 🔴 **No afirmar ISO 27001/27017/27018/42001 de HubSpot**: la ISO 27001 es del proveedor de nube
+  (ver Descalificadores). **Uptime 99,95 % es meta, no SLA con créditos.**
+- **Residencia:** cinco regiones (EE. UU. Este, EE. UU. Oeste, Canadá, UE-Fráncfort, Australia); **sin región en LATAM**;
+  la cuenta se asigna por IP; EE. UU. Este puede migrar a otra región sin costo. Detalle y límites en Descalificadores.
+- **Acceso:** SSO SAML y SCIM en Pro/Enterprise · 2FA obligatoria en planes pagos · Sensitive Data (cifrado de
+  aplicación) sólo Enterprise.
+- **IA:** el entrenamiento de IA con datos del cliente viene **activo por defecto** y se apaga en Settings > AI.
+- **Cambio y recuperación:** standard sandbox sólo Enterprise · historial de cambios de workflows en Pro/Enterprise ·
+  restaurar registros hasta 90 días.
+- **Integración:** API con versionado por fecha y soporte ≥ 18 meses · MCP remoto GA desde el 13-04-2026 · Data Hub
+  con sync en uno o dos sentidos.
+- **Ley 21.719 (Chile):** publicada 13-12-2024, **rige 1-12-2026**; multa gravísima hasta 20.000 UTM; derechos de
+  acceso, rectificación, supresión, oposición, portabilidad y bloqueo.
 
 ### Contexto financiero ✅ (Q1 2026, publicado 2026-05-07)
 Revenue **USD 881,0M** (+23%) · **299.458 clientes** · **ARPU USD 11.722/año** (+6%).
@@ -446,8 +467,8 @@ Zoho ≈ USD 118k · Pipedrive ≈ USD 98k · Odoo ≈ USD 100k.
 |---|---|---|
 | **Custom objects** | **10** máx. (aumentos se compran aparte) | El cliente modela >10 entidades propias (seguros, manufactura, logística, banca) |
 | **Sandbox** | **1**, máx. 200.000 registros/objeto; **el sync inicial trae solo 5.000 contactos** | Gobernanza formal de cambios (dev→QA→staging→prod) o auditoría regulatoria. **No puedes hacer UAT representativo** |
-| **ISO 27001** | ✅ **HubSpot NO lo reclama para sí mismo.** Su página dice que *la infraestructura cloud* (AWS) lo tiene. HubSpot tiene SOC 2 Type II y SOC 3 propios | El pliego exige ISO 27001 **del proveedor de software**. **Verifica en trust.hubspot.com bajo NDA. No lo afirmes** |
-| **Data residency** | US (East/West), Canadá, Australia, EU (Frankfurt). **NO hay LATAM, UK ni India.** Migración de una vía; **con HIPAA activo, nunca puedes migrar** | Requisito de localización (Brasil/LGPD, etc.) |
+| **ISO 27001** | ✅ **HubSpot NO lo reclama para sí mismo.** Su página dice que *la infraestructura cloud* (AWS) lo tiene. HubSpot tiene SOC 2 Type II y SOC 3 propios (re-verificado 2026-10-06: tampoco 27017/27018/42001; lo que sí tiene, en «Lo que pregunta TI») | El pliego exige ISO 27001 **del proveedor de software**. **Verifica en trust.hubspot.com bajo NDA. No lo afirmes** |
+| **Data residency** | US (East/West), Canadá, Australia, EU (Frankfurt). **NO hay LATAM, UK ni India.** Migración de una vía; **con HIPAA activo, nunca puedes migrar** (re-verificado 2026-10-06: cuenta asignada por IP; EE. UU. Este migra sin costo. Frente al cliente se dice dónde **están** los datos, «En Estados Unidos» + las cinco regiones, no «fuera de Chile») | Requisito de localización (Brasil/LGPD, etc.) |
 | **API** | Enterprise: 190 req/10s · 1M/día (add-on hasta 3M). 🔴 **Las apps públicas OAuth topan en 110 req/10s y el add-on NO levanta ese límite** | Sync bidireccional en tiempo real con ERP/core bancario |
 | **Permisos** | Teams + permission sets. ⚠️ **No hay role hierarchy ni territory management** como Salesforce | Organización matricial global con visibilidad por territorio |
 | **Config** | 1.000 custom properties/objeto · 100 deal pipelines · 300 teams · 200 calculated properties | Enterprise global con muchas BUs come 100 pipelines rápido |

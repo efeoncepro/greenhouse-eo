@@ -19,9 +19,18 @@ For human-agent team transformation, load
 `docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md`: portal configuration is only one
 part of workflow redesign, named human accountability, autonomy, handoffs, adoption, quality and cost. A first
 production team requires operator training and supervision capacity, not only an active agent toggle.
-Treat brochures as historical commercial input only; the review and quarantine rules live in
+Treat the brochures reviewed on 2026-07-26 as historical commercial input only; the review and quarantine rules live in
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
+The current collateral is the HubSpot services brochure approved by the operator on 2026-10-06 (TASK-1943; 27
+slides for mid-market/enterprise buyers comparing HubSpot with Salesforce or Zoho, with IT in the evaluation). PDF:
+OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`; private canvas:
+<https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU>. Its HubSpot facts were verified on 2026-10-06 and live in
+`hubspot-solutions-partner/SOURCES.md` (never claim ISO 27001/27017/27018/42001 for HubSpot or a LATAM data region).
+Sell credits as advice on **how many** the client needs, never as "don't buy". Before using it with prospects,
+ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the ANAM authorization control below);
+the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
+`hubspot-solutions-partner` § «Collateral comercial vigente».
 
 ## Provider-fit boundary
 

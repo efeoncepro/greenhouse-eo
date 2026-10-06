@@ -274,3 +274,44 @@ casebook. Si el revisor y el operador discrepan, **gana el operador** y la difer
 
 Cada consulta nueva que no esté cubierta se convierte en una fila de la tabla de fallas (síntoma, causa medida,
 corrección, caso, chequeo). Si la corrección es mecánica, se agrega al comando y la fila dice dónde.
+
+## Brochure de servicios HubSpot (2026-10-06) — lo que aprendimos
+
+Siete láminas en registro cine del brochure HubSpot (TASK-1943, línea `revenue-hubspot`, tema oscuro), cerrado y
+aprobado por el operador el 2026-10-06. Fichas, plates y banco con descartes:
+`ai-generations/2026-10-06_deck-hubspot/fotos/` (`fichas/`, `plates/`, `LEEME.md`). Todas las fichas pasaron por
+`cine-reviewer` antes de gastar.
+
+**Plates aprobados y su lámina.** Los siete primeros están en
+[`scripts/foto/cine-recetas.json`](../../../scripts/foto/cine-recetas.json) como recetas (con su `ojo`); `RG2b` no es
+cine.
+
+| Plate (id de receta) | Lámina del brochure | Receta de lámina | Protagonista | Fenómeno = servicio | Parte de |
+|---|---|---|---|---|---|
+| `CMP-portada-B` | B01 portada | `cover-brochure` | líder RevOps (casting de `RV1b`, sin retrato ancla) + tres Sparks; insignia Gold compuesta aparte | el moño de luz del motor de revenue converge en su mano y se abre hacia el frente | `RV1b` |
+| `CMP-crm-B` | B19 «Ya no» | `proposal-cinematic` hero | Nexa | una llamada, un email y una reunión llenan solas un registro de cliente de luz | `NX6b` |
+| `HS2d-datos-en-orden` (`HS2d`) | B20 «Ordenado» | `section-cine` purpose | Antonio | el desorden de partículas se ordena en una red de capas al pasar por su mano | `RV1b` |
+| `HS3b-datos-con-permiso` (`HS3b`) | B24 «Diciembre» (Ley 21.719) | `section-cine` purpose | Antonio, esfera en la palma | una esfera de luz protege los datos de una persona; lo que llega no entra | `RV1b` |
+| `HS4-te-llevas-todo` (`HS4`) | B26 «Con todo» (salida) | `section-cine` purpose | Antonio, cubo de datos | la base de datos entera en un cubo de luz que entrega al espectador | `RV1b` |
+| `HS5b-licencias-justas` (`HS5b`) | B17 «Nunca» (licencias) | `proposal-cinematic` hero | Nexa | de doce seats de luz se apagan los tres que nadie usa | `NX6b` |
+| `HS6b-una-decision` (`HS6b`) | B10 «Evidencia» | `section-cine` purpose | Julio (roster) | de una maraña de rutas sale un solo camino que llega a su mano | `RV1b` |
+| `RG2b-mapa` | B25 residencia | `content-markets` | — (**puesta en escena**, no cine) | mapa del mundo de puntos de luz; de Santiago salen cuatro arcos a regiones de HubSpot | — |
+
+`RG2b` está registrado con sus nodos medidos (px del plate, 1792 × 1024) en `PLATE_SIZES` de
+`src/lib/brand-surfaces/recipes/sv360/content-markets.ts`: esa receta sólo acepta plates con nodos medidos. `RG1b`
+(la Tierra desde la órbita) también está registrado, pero se descartó porque el operador la leyó como un ovoide. Antonio
+es del elenco ficticio (`EFEONCE_BRAND_CAST_V1.md`) y nunca va con su nombre en pantalla. Los descartes de cada toma
+(`HS2`–`HS2c`, `HS3`, `HS5`, `HS5c`, `HS6`, las versiones magenta y teal) quedan en el banco con su motivo en `LEEME.md`.
+
+**Cuatro fallas nuevas, con su corrección.**
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 32 | **El objeto de luz deriva hacia la reserva del texto** | El modelo corre el objeto de luz entre 8 y 30 puntos del ancho hacia la columna del titular. Medido (primera columna con luminancia > 150 en la banda del objeto): `HS3b` pedida ≥ 62 % → 45,4 %; `CMP-crm-B` 47 % → 39,4 %; `HS4` ≥ 62 % → 46,9 %; `HS5b` 62 % → 38,5 % (≈ 23 puntos); `HS6b` mano ≥ 70 % → borde del camino de luz a 40,5 %; `HS2d` red fuera del 52 % izquierdo → 40,5 % | Pedir el objeto más a la derecha **no basta** (HS5b siguió cayendo detrás del titular con 10 puntos de margen): la corrección confiable es **elegir la receta y el largo del titular según dónde cae el objeto** o ponerlo **al otro lado del sujeto** (fila 33). La deriva no es constante: mide el borde del objeto en el plate contra la reserva de la receta antes de componer | `HS3`→`HS3b`, `HS5`→`HS5b`, `CMP-crm-B` | ojo sobre el plate; `cine-reviewer` |
+| 33 | **El titular ancho no cabe entre el borde y el objeto** | La reserva que deja el objeto (después de la deriva) es más angosta que el titular de la receta. Límites observados en esta corrida: `section-cine` aguanta ≤ 9 caracteres en una línea («Ordenado», «Diciembre», «Con todo», «Evidencia»); el hero de `proposal-cinematic` sólo respuestas cortas («Ya no», «Nunca»): con dos tramos se monta sobre la bajada | Si la receta tiene titular ancho, el patrón es **objeto al otro lado del sujeto**: la persona queda junto a la reserva y el objeto detrás de ella, del lado del borde. Probado en `HS5c`: la grilla pasó detrás de Nexa, a la derecha, pero Nexa se corrió al centro y tapó el titular; por eso, con este patrón, la posición de la persona también se pide con margen [la corrección del margen es inferencia; no se volvió a generar]. Si no, se acorta la respuesta de la lámina | `HS5c` (banco) | composición de la lámina; `cine-reviewer` |
+| 34 | **El acento de la línea se usa como luz** | Las primeras tomas pedían el acento de la línea como luz de la escena: `HS1`, `HS2` y `HS2b` en magenta; `CMP-crm-C` y `CMP-portada-C` en teal. La regla vigente lo reserva para puntuación | **El acento es puntuación, no luz** (línea gráfica §2, delta 2026-10-06): luz azul `#0375DB` y blanco frío; **un solo punto magenta** `#E86BD0`, con la frase «the only accent in the frame; it lights nothing around it». Así salieron `HS3b`, `HS4`, `HS5b` y `HS6b`. `HS2d` (nodos magenta), `CMP-crm-B` (tres íconos) y `CMP-portada-B` (partículas) llevan un acento más repartido que no ilumina a la persona: aprobados, pero una receta nueva parte del punto único. Las versiones con luz magenta o teal quedan en el banco como material. En las láminas **diseñadas** el compositor sigue pintando halo, plataforma y haces con el acento: pendiente en AXIS a propósito | `HS1` (magenta) y `CMP-*-C` (teal) → versiones B | `cine-reviewer`; ojo al 100 % |
+| 35 | **Tic de pose repetida** | Cuatro de las siete fotos cine repiten «persona a la derecha + objeto de luz en la mano», tres con Antonio. `HS2d`, `HS3b`, `HS4` y `HS6b` parten de `RV1b` (campo `desde` de sus fichas) [verificado]; que la receta de partida empuje la pose es inferencia | Antes de partir de una de estas recetas para una pieza del mismo deck, **cambia la acción** (no sólo el objeto): otra relación del cuerpo con el fenómeno, otra persona del elenco o del roster. Señalado por `cine-reviewer`; el operador aprobó el brochure así | `HS2d`, `HS3b`, `HS4` (Antonio); `HS6b` (Julio) comparte la pose | `cine-reviewer` sobre el conjunto del deck, no foto por foto |
+
+**Pendientes del brochure que este casebook no resuelve:** la autorización de ANAM para las cifras del caso, la
+aprobación escrita de HubSpot para el sprocket 3D (va en el canvas, fuera del PDF), la lámina de equipo HubSpot con el
+plazo estándar de implementación (datos del operador) y el acento como luz en las láminas diseñadas (pasa por AXIS).

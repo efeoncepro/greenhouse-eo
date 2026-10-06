@@ -13,7 +13,7 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck SEO", "deck SV360". En marca
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "deck SEO", "deck SV360". En marca
   propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
   incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
   pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
@@ -181,6 +181,29 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   ni quitar; el contexto queda como registro en `DECISIONES.md`. Logos de clientes sólo con su autorización
   (TASK-1937). Anotaciones «de ejemplo» fuera de la lámina; una sola sección partida. Detalle: norma §4.6 «Deck SEO/AEO», manual «El deck SEO/AEO» y
   `efeonce-graphic-line` (`references/applications.md` §L); el uso comercial por objeción, en `seo-aeo-practice`.
+- **Brochure de servicios HubSpot (cerrado y aprobado 2026-10-06, TASK-1943).** El deck de referencia para
+  **mid-market y enterprise que comparan HubSpot con Salesforce o Zoho y que evalúa también TI**. 27 láminas en siete
+  actos ordenados **por la compra real**: promesa → qué plataforma (HubSpot/Salesforce/Zoho, un CRM, el CRM que se
+  actualiza solo) → qué hacemos y cómo se construye → comprar con criterio (licencias, créditos) → **lo que pregunta TI**
+  (Ley 21.719, seguridad, residencia de datos, permiso, salida) → cómo trabajamos → prueba (caso ANAM, clientes) →
+  cierre. Línea `revenue-hubspot` en oscuro; el caso ANAM (`decision-case`) y clientes (`content-clients`) son recetas
+  sólo `light` y se componen como láminas de Efeonce en línea `growth`. La **propuesta** (31) suma B11 olas, B27 consumo
+  de workflows y «¿Hay costos escondidos? Ninguno.» (montos `[monto]`); el costo no va en el brochure (operador).
+  **Canvas** (privado): <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU> (páginas «Brochure · 27», «Propuesta · 31»,
+  «Comparación de color», «Banco de fotos»). **PDF** (16:9): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`, armado con
+  `node ai-generations/2026-10-06_deck-hubspot/exp/brochure-pdf.mjs <brochure-files.json> <salida.pdf>` desde las
+  láminas del canvas verificadas por sha256 (portada con la insignia Gold; **sin** el sprocket 3D, de uso interno).
+  Pipeline: `ai-generations/2026-10-06_deck-hubspot/` (`build-intents.py`, `nuevas.py`, `ti.py`, `build-canvas.py`,
+  `fotos/LEEME.md` con banco y descartes). Pendientes antes de usarlo con prospectos y el uso comercial: skill
+  `hubspot-solutions-partner`. **Lecciones de oficio medidas en esta corrida:**
+  - **Voz.** El titular no repite lo que ya dice el logo («En ANAM» bajo el logo de ANAM se rechazó → «¿Qué ganó su
+    equipo? Tiempo.»). Se dice dónde **están** las cosas, no dónde no están («Fuera de Chile» se lee mal en Chile → «En
+    Estados Unidos» + las cinco regiones). Lo que se vende es asesoría, no una prohibición: «¿Cuántos créditos
+    necesito? A medida.», no «no compres».
+  - **Largo de la respuesta por receta.** `section-cine` ≤ 9 caracteres en una línea; `proposal-cinematic` `hero` sólo
+    respuestas cortas («Ya no», «Nunca»: con dos tramos se monta sobre la bajada); `decision-ai-market` ≤ 9 y una línea,
+    y su centro no aguanta una cifra de cinco caracteres («5.000» se sale de la tarjeta).
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

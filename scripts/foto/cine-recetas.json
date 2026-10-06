@@ -254,6 +254,76 @@
       "protagonista": "Directora de casting (ancla con piel v3) con el hoodie",
       "porque": "UNA órbita naranja cerrada de larga exposición con flash de segunda cortina rodea a la persona («ella dirige»); la esfera sobre la palma es la única llave y seis piezas de una campaña viajan congeladas sobre el anillo. Parte de NX6b.",
       "ojo": "Alcance producto (operador, 2026-10-03). Generada a 2560×1440: a 3840 la piel salió craquelada. La órbita ocupa ~27–93 % del ancho y se corta en 1440."
+    },
+    {
+      "id": "HS2d",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS2d-datos-en-orden.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Antonio (elenco ficticio, línea Revenue) con la softshell",
+      "porque": "El fenómeno es el servicio: las partículas en desorden se ordenan al pasar por su mano en una red de capas de luz que crece hacia el fondo (orden de los datos, CRM escalable). Luz azul #0375DB; mira al panel del texto. Lámina «Ordenado» (section-cine) del brochure HubSpot (2026-10-06).",
+      "ojo": "El acento son varios nodos magenta de la red (la ficha pide ≤ 1 de cada 20), no un solo punto: en una receta nueva pide un solo punto que no ilumine nada, como HS3b. Pose «persona a la derecha + objeto de luz en la mano»: cuatro de las siete fotos cine del brochure HubSpot la repiten (tres con Antonio), riesgo de tic señalado por cine-reviewer; cambia la acción antes de partir de aquí."
+    },
+    {
+      "id": "HS3b",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS3b-datos-con-permiso.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS3b-datos-con-permiso.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Antonio con la softshell, una esfera de luz en la palma",
+      "porque": "Una esfera de líneas de luz protege los datos de una persona; las partículas que la alcanzan se detienen sin entrar (datos con permiso, Ley 21.719). La esfera en la palma es la única llave; un solo punto magenta que no ilumina nada. Lámina «Diciembre» (section-cine) del brochure HubSpot.",
+      "ojo": "Deriva hacia la reserva: el borde de la esfera se pidió a ≥ 62 % del ancho y salió a ≈ 46 %; pide 8–12 puntos más a la derecha de lo que necesitas. Pose «persona a la derecha + objeto de luz en la mano»: cuatro de las siete fotos cine del brochure HubSpot la repiten (tres con Antonio), riesgo de tic señalado por cine-reviewer; cambia la acción antes de partir de aquí."
+    },
+    {
+      "id": "HS4",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS4-te-llevas-todo.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Antonio con la softshell, un cubo de luz en la palma extendida",
+      "porque": "Entrega al espectador un cubo de vidrio y luz con la base de datos ordenada adentro (portabilidad: tus datos, tuyos si mañana te vas). El cubo es la única llave; un solo punto magenta en una esquina, que no ilumina nada; la marca del pecho queda a la vista. Lámina «Con todo» (section-cine) del brochure HubSpot.",
+      "ojo": "Pose «persona a la derecha + objeto de luz en la mano»: cuatro de las siete fotos cine del brochure HubSpot la repiten (tres con Antonio), riesgo de tic señalado por cine-reviewer; cambia la acción antes de partir de aquí."
+    },
+    {
+      "id": "HS5b",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS5b-licencias-justas.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Nexa con la softshell (expresión complicidad)",
+      "porque": "De doce seats de luz se apagan los tres que nadie usa (licencias con criterio). La grilla junto a Nexa es la llave; ella mira al lente; un solo punto magenta en la esquina de la grilla, que no ilumina nada. Lámina «Nunca» (proposal-cinematic hero) del brochure HubSpot.",
+      "ojo": "La primera versión (HS5) pidió la grilla al 52 % y salió a ≈ 41 %, detrás del titular. En HS5c la grilla pasó detrás de Nexa, a la derecha, y Nexa se corrió al centro y tapó el titular. El hero de esta receta sólo aguanta respuestas cortas («Nunca»)."
+    },
+    {
+      "id": "HS6b",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS6b-una-decision.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6b-una-decision.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Julio (roster) con la softshell",
+      "porque": "De una maraña de rutas tenues sale UN camino brillante que llega al nudo junto a su mano (evaluación inicial: una decisión con evidencia, no una recomendación por defecto). El nudo es la llave; un solo punto magenta en la punta del camino, que no ilumina nada. Lámina «Evidencia» (section-cine) del brochure HubSpot.",
+      "ojo": "La primera versión (HS6) dejó el nudo sobre la bajada. Comparte con las tres fotos de Antonio la pose «persona a la derecha + objeto de luz en la mano», que repiten cuatro de las siete fotos cine del brochure HubSpot: riesgo de tic señalado por cine-reviewer; cambia la acción antes de partir de aquí."
+    },
+    {
+      "id": "CMP-crm-B",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/CMP-crm-B.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-B.png",
+      "formato": "16:9",
+      "alcance": "proposal-cinematic",
+      "protagonista": "Nexa con la softshell (expresión complicidad)",
+      "porque": "Tres corrientes —una llamada, un email y una reunión— llenan solas las filas de un registro de cliente hecho de luz: el CRM que se actualiza sin digitar. La tarjeta es la llave; ella no escribe y mira al lente. Lámina «Ya no» (proposal-cinematic hero) del brochure HubSpot.",
+      "ojo": "Deriva: el borde de la tarjeta se pidió al 47 % y salió a ≈ 39 %. El acento son tres íconos de neón magenta (teléfono, sobre, calendario), nítidos aunque la ficha los pedía fuera de foco: son tres fuentes pequeñas, no un solo punto; no iluminan la cara. Revisado al 100 % el 2026-10-06. En una receta nueva, un solo punto magenta que no ilumine nada."
+    },
+    {
+      "id": "CMP-portada-B",
+      "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/CMP-portada-B.json",
+      "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-B.png",
+      "formato": "16:9",
+      "alcance": "deck-portada",
+      "protagonista": "Líder RevOps (casting de RV1b, sin retrato ancla) con la softshell + tres Sparks",
+      "porque": "El moño de luz del motor de revenue converge en un nudo junto a su mano y se abre otra vez hacia el frente: captar, cerrar y crecer en un flujo que ella dirige. El nudo es la llave, en azul #0375DB y blanco frío. Portada del brochure HubSpot, con la insignia Gold compuesta aparte.",
+      "ojo": "Revisado al 100 % el 2026-10-06: el magenta viaja como muchas partículas a lo largo de las corrientes (la ficha pide ≤ 1 de cada 20), no como un solo punto; no ilumina la cara, la mano ni la chaqueta, que toman sólo luz fría. Las corrientes cruzan el tercio bajo de la reserva izquierda. En una receta nueva, un solo punto magenta que no ilumine nada. La líder es casting sin retrato ancla."
     }
   ]
 }

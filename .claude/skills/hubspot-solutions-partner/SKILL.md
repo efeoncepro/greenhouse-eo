@@ -45,10 +45,32 @@ resultados observables. Atribuir el término a HubSpot; no es producto, oferta p
 conserva las fuentes y separa narrativa de disponibilidad por portal.
 
 La evaluación inicial de fit/cotización es normalmente gratuita; un blueprint se cobra solo cuando deja un
-artefacto autónomo. Customer Agent es un caso de uso, no una familia raíz. El brochure es input histórico,
-no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
+artefacto autónomo. Customer Agent es un caso de uso, no una familia raíz. El brochure **anterior** es input
+histórico, no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
 la auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../../docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md)
-para separar capacidades reutilizables de claims, precios y disponibilidad que necesitan verificación vigente.
+para separar capacidades reutilizables de claims, precios y disponibilidad que necesitan verificación vigente. El
+collateral vigente es el brochure aprobado el 2026-10-06 (§ «Collateral comercial vigente»).
+
+### Collateral comercial vigente — brochure de servicios HubSpot (aprobado 2026-10-06, TASK-1943)
+
+- **Para quién:** mid-market y enterprise que comparan HubSpot con Salesforce o Zoho y donde TI también evalúa. 27
+  láminas en siete actos por la compra real; incluye lo que pregunta TI (Ley 21.719, seguridad, residencia, permiso,
+  salida). Estructura y armado: skill `deck-studio`.
+- **Dónde:** PDF en OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`;
+  canvas privado <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU> (brochure de 27 y propuesta de 31). La propuesta
+  suma «¿Hay costos escondidos? Ninguno.» con montos `[monto]` por propuesta; el costo no va en el brochure.
+- **Datos de HubSpot** del brochure: verificados el 2026-10-06 en `SOURCES.md` (§ «Lo que pregunta TI», créditos,
+  descalificadores). 🔴 Nunca ISO 27001 (ni 27017/27018/42001) de HubSpot ni región de datos en LATAM; el uptime
+  99,95 % es meta, no SLA. Se dice dónde **están** los datos («En Estados Unidos» + las cinco regiones).
+- **Créditos:** se venden como **asesoría de cuántos necesita el cliente** («¿Cuántos créditos necesito? A medida.»),
+  nunca como «no compres».
+- **Marca:** insignia Gold con readback `hubspot-partner-readback-2026-10-06` (portada del PDF). El sprocket 3D de
+  HubSpot es **sólo de uso interno** hasta aprobación escrita de HubSpot: está en el canvas, fuera del PDF. Sin
+  mascotas ni personajes de HubSpot.
+- **Pendientes (no resueltos; del operador):** (1) **autorización de ANAM** para −57 % de carga comercial y +32 % de
+  ventas en 7 meses (y cómo termina la frase): sin ella el brochure **no se usa con prospectos**; 5 rutas hacia una
+  persona y 23 fuentes sí están en el caso publicado; (2) aprobación escrita del sprocket; (3) lámina de equipo
+  HubSpot (nombres, cargos, certificaciones, fotos); (4) plazo estándar de implementación.
 
 ---
 
@@ -149,7 +171,9 @@ retainer de Managed CRM Ops.
     "Gold válido hasta enero 2027"; el gráfico de puntos antiguos dice que tu piso se disuelve en diciembre.
     Tampoco la muestres en piezas propias mientras el registro de partnerships tenga el tier sin revalidar: la
     firma de correo Efeonce v3.1 lleva el **logo oficial de marca** de HubSpot, no la insignia de tier
-    (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §10.2).
+    (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §10.2). Gold quedó leído el 2026-10-06
+    (readback `hubspot-partner-readback-2026-10-06`, `EFEONCE_PARTNERSHIP_REGISTRY_V1.md`) y la insignia va en el
+    brochure aprobado ese día; fuera de esa vigencia, repite la lectura antes de cada envío externo.
 12. **NUNCA** cierres un deal sin **deal registration** (es obligatorio y exclusivo) y sin la firma del cliente
     en el **Proof of Involvement**. Rige **Best Partner Wins**: quien obtiene la firma se lleva el crédito.
     Corta para los dos lados — puedes entrar a cuentas de otros, y otros pueden entrar a las tuyas.
@@ -216,7 +240,7 @@ Esta skill es **dominio**, no método. No duplica; compone.
 | **`hubspot-ops`** | **Las manos en el portal.** | Properties, pipelines, workflows, deal registration como objeto CRM, CLI `hs`. Esta skill dice *qué* registrar; `hubspot-ops` lo *escribe*. |
 | **`seo-aeo`** | **La visibilidad.** | Dueña del método AEO/GEO. La cuña de `modules/07` la **consume**, no la reimplementa. Se enchufa con el **AI Visibility Grader** ya construido (`src/lib/growth/ai-visibility/**`). |
 | **`research-benchmark-operator`** + `/deep-research` | **La evidencia.** | Todo refresh de `SOURCES.md` pasa por ahí. Esta skill **no guarda hechos de memoria**. |
-| **`deck-studio`** | **El deck.** | La propuesta y el pitch se componen ahí. Esta skill es *consumer*, no dueña. **La serie de contenido HubSpot de «La órbita» no existe todavía:** es [TASK-1943](../../../docs/tasks/to-do/TASK-1943-hubspot-deck-content-series.md), equivalente al deck de práctica Salesforce (TASK-1942), con logos e íconos oficiales de HubSpot, insignia de partner con su propio readback y sin mascota inventada. Hoy sólo existen la portada y la propuesta RevOps en `revenue-hubspot`. |
+| **`deck-studio`** | **El deck.** | La propuesta y el pitch se componen ahí. Esta skill es *consumer*, no dueña. **La serie de contenido HubSpot de «La órbita»** es [TASK-1943](../../../docs/tasks/in-progress/TASK-1943-hubspot-deck-content-series.md), equivalente al deck de práctica Salesforce (TASK-1942); su brochure de servicios quedó aprobado el 2026-10-06 (§ «Collateral comercial vigente»), con insignia Gold por readback y sin mascota de HubSpot. |
 | **`content-marketing-studio`** + **`digital-marketing`** | **Canal y contenido.** | Assets de captura (comparador, calculadora TCO, migration assessment). ⚠️ El overlay de `digital-marketing` todavía dice *"HubSpot es CRM-only, no asumas campañas"*: esa frontera quedó obsoleta y hay que corregirla — HubSpot ahora también es **producto vendible**. |
 | **`legal-privacy-ip-operator`** | **MSA / SOW / DPA.** | Y el marco de datos del mercado como **trigger de venta**, no solo como compliance. |
 | **`greenhouse-public-private-tenders`** | **Si el deal entra por licitación.** | El Proposal Studio ya existe y renderiza. |

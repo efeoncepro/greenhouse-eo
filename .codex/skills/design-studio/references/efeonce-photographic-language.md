@@ -118,7 +118,7 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
 
 🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
 El flujo: casebook → `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]`
-(`--listar` muestra las 12 recetas aprobadas de `scripts/foto/cine-recetas.json`; ninguna vertical todavía) → reescribe la
+(`--listar` muestra las recetas aprobadas de `scripts/foto/cine-recetas.json`: 32 al 2026-10-06; ninguna vertical todavía) → reescribe la
 escena marcada «REESCRIBIR» (`foto:generar` no gasta mientras siga así) y completa `__completar` y `__revisar` → campos
 cine: `llave { fuente, lado, distancia, tamano }`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance`
 (`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`;
@@ -133,6 +133,10 @@ hoodie conserva su royal del kit), aros de Nexa dorados y la reserva izquierda d
 `"reservas": {"texto": {"lado": "izquierda", …}}`. Los demás registros no cambian: si tocas `build-prompt.mjs`, corre
 `scripts/foto/regresion-prompt.mjs` antes (`--foto`) y después (`--comparar`).
 Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el casebook no cubre tu caso, agrégale la fila.
+**Brochure HubSpot (2026-10-06):** siete plates cine aprobados son recetas nuevas en `cine-recetas.json` (`HS2d`,
+`HS3b`, `HS4`, `HS5b`, `HS6b`, `CMP-crm-B`, `CMP-portada-B`, cada una con su `ojo`). Antes de partir de ellas lee la
+[sección del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
+deriva del objeto hacia la reserva, objeto al otro lado del sujeto, acento de un solo punto y tic de pose (fallas 32–35).
 
 **Marcador rápido — estás en cine si se cumple todo esto:**
 

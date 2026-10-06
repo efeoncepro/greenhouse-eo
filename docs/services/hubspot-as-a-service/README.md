@@ -50,7 +50,7 @@ Smart CRM es la base compartida; los seis Hubs, Agent Hub, workspaces, agentes, 
 superficies que se componen. **Un Hub, un workspace, un agente o un objeto CRM no equivale automáticamente a un
 servicio comercial.**
 
-La secuencia se adopta del brochure principal revisado, pero el material comercial es sólo insumo histórico. La
+La secuencia se adopta del brochure principal revisado (2026-07-26), pero ese material comercial es sólo insumo histórico; el collateral vigente es el de la sección «Collateral comercial». La
 auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md) registra
 qué se absorbió y qué claims, precios, nombres o capacidades no deben reutilizarse sin verificación.
 
@@ -92,6 +92,16 @@ incubación hasta contar con patrón, owner y prueba suficientes.
 El PDF se regenera desde el Markdown con `pnpm hubspot:glossary:render`. El
 renderer admite `--variant dark`, `--variant light` y `--variant orange`; el
 artefacto versionado usa `orange` por su contraste con la portada clara.
+
+## Collateral comercial
+
+- **Brochure de servicios HubSpot** (27 láminas, 16:9; cerrado y aprobado por el operador el 2026-10-06,
+  [TASK-1943](../../tasks/in-progress/TASK-1943-hubspot-deck-content-series.md)): para mid-market y enterprise que
+  comparan HubSpot con Salesforce o Zoho y que evalúa también TI. PDF en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`; canvas privado en
+  <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU>. Reemplaza al brochure auditado el 2026-07-26 como collateral
+  vigente. **Antes de usarlo con prospectos** falta la autorización de ANAM para las cifras −57 % y +32 % del caso.
+  Uso comercial y pendientes: skill `hubspot-solutions-partner`; armado: skill `deck-studio`.
 
 ## Contrato común de prestación
 

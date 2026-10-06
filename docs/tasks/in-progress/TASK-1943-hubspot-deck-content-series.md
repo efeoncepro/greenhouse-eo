@@ -1,5 +1,20 @@
 # TASK-1943 — Deck HubSpot de «La órbita»: la serie de contenido equivalente a la de Salesforce
 
+## Delta 2026-10-06 — el operador cerró y aprobó el brochure
+
+- **Aprobado** («Bien, queda aprobado» / «Este Brochure está cerrado»): brochure de **27** láminas y propuesta de **31**
+  en el canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU (fijado en la barra lateral del operador).
+  PDF: OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`.
+- La serie creció más allá de las recetas de Salesforce: láminas para quien evalúa desde TI (integraciones,
+  automatización, seguridad con SOC 2, Ley 21.719, residencia de datos, salida), licencias y créditos con criterio,
+  Zoho en la lámina de encaje, caso ANAM y clientes; siete láminas en registro cine. Pipeline y banco de fotos en
+  `ai-generations/2026-10-06_deck-hubspot/` (`fotos/LEEME.md` trae las fuentes de los datos de HubSpot).
+- **Pendiente antes de usarlo con prospectos:** autorización de ANAM para −57 % de carga comercial y +32 % de ventas
+  (entregados por el operador, fuera del artículo aprobado). El sprocket 3D sigue de uso interno (está en el canvas,
+  no en el PDF). Faltan datos del operador para una lámina de equipo HubSpot y un plazo estándar de implementación.
+- El acento como luz en las láminas diseñadas queda para la task de sistema de la línea gráfica (otra sesión), no
+  para esta.
+
 ## Delta 2026-09-29 — las recetas de práctica ya tienen plantilla (TASK-1942)
 
 - Las **16** recetas de práctica de TASK-1942 (no 12: cuatro nacieron al canonizar) tienen plantilla desde
@@ -27,7 +42,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno`
+- Status real: `Aprobado por el operador 2026-10-06; cierre documental en curso`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -234,12 +249,12 @@ o se decide con el operador.
 
 ## Acceptance Criteria
 
-- [ ] Los íconos y el logo de HubSpot usados tienen procedencia oficial registrada.
-- [ ] El badge HubSpot Solutions Partner sólo aparece con readback registrado; existe la variante sin badge.
-- [ ] El operador aprobó la serie HubSpot en el canvas «La órbita».
-- [ ] Cada lámina aprobada está en `approvedUses` de su receta de práctica, con su `fit`.
-- [ ] La norma §4.6 y el manual describen el deck HubSpot y ya no lo listan como pendiente.
-- [ ] Ninguna lámina lleva una mascota o personaje de HubSpot.
+- [x] Los íconos y el logo de HubSpot usados tienen procedencia oficial registrada.
+- [x] El badge HubSpot Solutions Partner sólo aparece con readback registrado; existe la variante sin badge.
+- [x] El operador aprobó la serie HubSpot en el canvas «La órbita».
+- [x] Cada lámina aprobada está en `approvedUses` de su receta de práctica, con su `fit`.
+- [x] La norma §4.6 y el manual describen el deck HubSpot y ya no lo listan como pendiente.
+- [x] Ninguna lámina lleva una mascota o personaje de HubSpot.
 
 ## Verification
 
@@ -254,9 +269,9 @@ o se decide con el operador.
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1942 recibió delta con los usos HubSpot de sus recetas de práctica
+- [x] TASK-1942 recibió delta con los usos HubSpot de sus recetas de práctica
 
 ## Follow-ups
 

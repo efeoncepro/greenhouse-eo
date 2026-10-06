@@ -1,9 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.11
+> **Versión:** 1.12
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-30 por Claude (1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
+> **Última actualización:** 2026-10-06 por Claude (1.12: el deck HubSpot aprobado por el operador — brochure de 27
+> láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes, cada uno con su `fit`;
+> sección «El deck HubSpot» (TASK-1943).
+> Antes, 1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
 > operador — seis recetas nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`,
 > `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`; 100 en el catálogo, 94 con
 > plantilla), `productMark` opcional, `requiredUnless` en el eyebrow de `proposal-cinematic-seo`/`-aeo`,
@@ -202,7 +205,7 @@ Las láminas 02 a 18 son las mismas en los dos; en un brochure evergreen se quit
 comparten su plate de catálogo (`plate-repeated`). **El logo de 700 px es sólo de la contraportada Salesforce**; las
 contraportadas del 2026-09-27 siguen con el logo a 500 px.
 
-**Deck HubSpot pendiente:** [TASK-1943](../../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md).
+**Deck HubSpot:** aprobado el 2026-10-06 con las mismas recetas de práctica; ver «El deck HubSpot», más abajo.
 
 ## El deck SEO/AEO (aprobado el 2026-09-30)
 
@@ -256,6 +259,45 @@ rotula ni los quita. En este deck, esa decisión manda sobre las reglas de recet
 ilustrativas». Contexto (sólo registro, en `DECISIONES.md`): las cifras reales de los casos no se han cargado; al
 2026-09-30 el correo de Insights que llega solo no está vivo y el modo presentación no se ha probado con una edición
 real. Los logos de BICECORP, Banco BICE y Berel siguen condicionados a su autorización (TASK-1937).
+
+## El deck HubSpot (aprobado el 2026-10-06)
+
+El deck de la práctica HubSpot (línea `revenue-hubspot`, tema oscuro), aprobado por el operador el 2026-10-06 («Bien,
+queda aprobado» · «Este Brochure está cerrado, canonízalo»): **brochure de 27 láminas** y **propuesta de 31**, en el
+canvas [https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU](https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU)
+(páginas «Brochure · 27» y «Propuesta · 31»). Siete actos: promesa → qué plataforma → qué hacemos y cómo se construye →
+comprar con criterio → lo que pregunta TI → cómo trabajamos → prueba → cierre. Recorrido, reglas y pendientes:
+[norma §4.6, «Deck HubSpot»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Task:
+[TASK-1943](../../../tasks/in-progress/TASK-1943-hubspot-deck-content-series.md).
+
+**Ninguna receta nueva.** Las 29 láminas distintas (más P02, que es el mismo intent que B02) son **33 usos aprobados en
+28 recetas existentes** (`approvedUses`, `deck: "HubSpot (línea revenue-hubspot)"`, cada uno con su `fit`). Todas
+componen con `pnpm brand:compose` desde su intent en `ai-generations/2026-10-06_deck-hubspot/intents/`; la portada
+aprobada sale de `comparacion/portada-B.json` con la insignia Gold superpuesta. Trece de las 16 recetas de práctica
+del deck Salesforce se reutilizan con datos e íconos oficiales de HubSpot (`hubspot-icon-*`,
+`@efeoncepro/axis-brand-assets` 0.4.25; no entran `content-season-launches`, `content-live-chat` ni
+`decision-diagnosis-verdict`). Las otras quince: las dos portadas y los dos cierres, `proposal-service-revops`,
+`proposal-cinematic-nexa` (dos usos), `section-cine-purpose` (cuatro), `decision-ai-market` (dos),
+`decision-difference`, `method-staircase`, `content-markets`, `decision-case`, `content-clients`, `content-bullets` y
+`content-pricing`.
+
+**Lo que dicen los `fit`** (detalle en cada uso):
+
+- **Dos largos pasan la receta, aprobados tal cual:** la pregunta de las dos portadas («¿Mi HubSpot puede hacer más?»,
+  28) contra 26 en `cover-brochure-line-revenue` y 24 en `cover-proposal-orbit`. Subir el máximo o acortar se decide
+  con el operador; hasta entonces, un plan que ligue esa pregunta falla con `slot-over-max-chars`.
+- **Usos fuera del propósito original, aprobados:** `section-cine-purpose` con pilares de datos, ley, salida y
+  evaluación (no los del Why de Efeonce) y con una persona del elenco sin Nexa (excepción del registro cine para
+  secciones); `content-markets` con regiones de datos de HubSpot en lugar de mercados de Efeonce; `decision-case` con
+  el plate T3-mide del tríptico en vez de una foto del caso.
+- **Recetas sólo claras:** `decision-case` y `content-clients` se componen como láminas de Efeonce en la línea
+  `growth` (el contrato `line-piece-keeps-efeonce-dark` no admite una pieza de línea clara).
+- **Insignia Gold = claim** con readback `hubspot-partner-readback-2026-10-06`; el sprocket 3D de HubSpot es de uso
+  interno (canvas, no PDF); sin mascotas de HubSpot.
+
+Los planes del brochure y de la propuesta validan con `pnpm brand:deck-plan -- --plan` sin errores ni avisos
+(secuencia, parejas, documento y plates; verificado el 2026-10-06 con planes armados desde los intents, sin slots; no
+quedaron como fixtures).
 
 ## Anatomía de una receta (campos del JSON)
 

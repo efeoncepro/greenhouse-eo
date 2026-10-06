@@ -1472,6 +1472,48 @@
             "Insignia «Salesforce Partner» autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear).",
             "Logo, íconos e insignia de Salesforce autorizados por Salesforce (misma declaración del operador)."
           ]
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B01-portada · Brochure 01",
+          "board": "canvas HubSpot (Design), Brochure 01",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/comparacion/out-portada-B/01-deck-cover-brochure.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/comparacion/portada-B.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/comparacion/portada-B.json"
+          },
+          "content": {
+            "eyebrow": "Brochure · Servicios HubSpot",
+            "question": "¿Mi HubSpot puede hacer más?",
+            "answer": "Mucho más",
+            "evidence": "**Seis** soluciones:\nMarketing y AEO · Ventas y pipeline\nRevenue lifecycle · Servicio\nDatos y CRM · Operación con agentes",
+            "line": "revenue-hubspot",
+            "partnerMark": {
+              "kind": "partner-badge",
+              "mode": "badge",
+              "alt": "HubSpot Solutions Partner · Gold",
+              "readbackRef": "hubspot-partner-readback-2026-10-06",
+              "position": "superpuesta en la aprobada: x 140, top 856, 160 × 159 px"
+            },
+            "column.topPx": 220
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-B.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/CMP-portada-B.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/CMP-portada-B.txt",
+            "alt": "Una líder de RevOps de Efeonce con la chaqueta dirige con la mano el nudo de un moño de luz magenta y azul, con agentes robot en el flujo",
+            "notes": "Líder de RevOps (casting de la receta RV1b, sin retrato ancla) con Sparks; luz azul de Efeonce y el magenta sólo como puntuación (comparación de color, versión B, 2026-10-06). Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Variante HubSpot de la portada de línea (acento revenue-hubspot) con el plate nuevo CMP-portada-B en lugar del RV1b del catálogo. La pregunta «¿Mi HubSpot puede hacer más?» mide 28 y la receta admite 26: aprobada tal cual; subir el máximo o acortar se decide con el operador (un plan que la ligue falla con slot-over-max-chars). Columna en 220. La lámina aprobada es la composición sin partnerMark (comparacion/portada-B.json) con la insignia Gold superpuesta en x 140, top 856, 160 × 159 px (build-canvas.py y exp/brochure-pdf.mjs). El intent intents/B01-portada.json pide la insignia por el slot partnerMark con su readbackRef; en el render de prueba out/B01-portada (con el plate anterior RV1b) el slot la puso en top 920 a 84 px de alto, que no es la medida aprobada: alinear el slot con la insignia aprobada antes de componer la portada sólo con el intent.",
+          "conditions": [
+            "Insignia HubSpot Solutions Partner Gold = claim con readback `hubspot-partner-readback-2026-10-06` (perfil público del Solutions Directory leído el 2026-10-06; insignia e íconos en @efeoncepro/axis-brand-assets 0.4.25). Repetir la lectura antes de cada envío externo fuera de su vigencia (docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).",
+            "Sin mascotas ni personajes de HubSpot."
+          ]
         }
       ]
     },
@@ -1676,6 +1718,40 @@
             "target": "client-logo"
           },
           "fit": "Aprobada tal cual por el operador. El máximo de answer se subió a 14 el 2026-09-30 (medido con el salto de línea, como lo mide validateDeckPlan). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "P01-portada · Propuesta 01",
+          "board": "canvas HubSpot (Design), Propuesta 01",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/P01-portada/01-deck-cover-proposal.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/P01-portada.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/P01-portada.json"
+          },
+          "content": {
+            "eyebrow": "Propuesta · Servicios HubSpot",
+            "question": "¿Mi HubSpot puede hacer más?",
+            "answer": "Mucho más",
+            "evidence": "Preparada para **[Cliente]** · Confidencial",
+            "clientName": "[Cliente]",
+            "selectionLabel": "Cliente",
+            "column.topPx": 220
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "client-logo"
+          },
+          "photo": {
+            "register": "none",
+            "plate": null,
+            "notes": "Sin foto: la portada de propuesta lleva el logo del cliente."
+          },
+          "fit": "Portada de propuesta sin foto, con el logo del cliente y la selección «Cliente». La pregunta «¿Mi HubSpot puede hacer más?» mide 28 y la receta admite 24: aprobada tal cual; subir el máximo o acortar se decide con el operador (un plan que la ligue falla con slot-over-max-chars). Columna en 220."
         }
       ]
     },
@@ -2536,6 +2612,32 @@
           "conditions": [
             "Sin marcas de terceros: no lleva insignia de partner (el slot partnerMark es sólo de la portada de línea y de la contraportada de propuesta)."
           ]
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B16-contraportada · Brochure 27",
+          "board": "canvas HubSpot (Design), Brochure 27",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B16-contraportada/01-deck-close-brochure.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B16-contraportada.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B16-contraportada.json"
+          },
+          "content": {
+            "question": "¿Conversamos?",
+            "answer": "Cuando\nquieras",
+            "sloganLineWord": "Revenue",
+            "line": "revenue-hubspot"
+          },
+          "photo": {
+            "register": "none",
+            "plate": null,
+            "notes": "Sin foto: la órbita gigante en el acento de la línea revenue-hubspot (alterna con la portada con foto B01)."
+          },
+          "fit": "Cabe en los slots de la receta sin cambios: layout «orbit» en la línea revenue-hubspot, con «¿Conversamos? Cuando quieras.» y el eslogan «Empower your Revenue» como firma. Alterna con la portada con foto (B01)."
         }
       ]
     },
@@ -2722,6 +2824,32 @@
           "conditions": [
             "Insignia «Salesforce Partner» autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear)."
           ]
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "P17-contraportada · Propuesta 31",
+          "board": "canvas HubSpot (Design), Propuesta 31",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/P17-contraportada/01-deck-close-proposal.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/P17-contraportada.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/P17-contraportada.json"
+          },
+          "content": {
+            "sloganLineWord": "Revenue"
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+            "ficha": "ai-generations/2026-09-27_brochure/fichas/BR3-contra-horizonte.json",
+            "prompt": "ai-generations/2026-09-27_brochure/prompts/BR3-contra-horizonte.txt",
+            "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte",
+            "notes": "El plate del catálogo de la receta, sin cambios."
+          },
+          "fit": "Cabe en los slots de la receta: «Empower your Revenue» en la línea revenue-hubspot con el plate BR3 del catálogo. Compuesta con la plantilla como está (logo a 500 px en top 230 y eslogan a 72 px en top 420, según el manifest del composer), sin la composición sloganBlock ni la insignia: el logo de 700 px es sólo de la contraportada Salesforce."
         }
       ]
     },
@@ -4181,7 +4309,181 @@
         "Ningún texto cruza la órbita ni al sujeto de la foto: si no cabe, se acorta la pregunta o la respuesta, no se mueve la órbita."
       ],
       "notes": "Receta nueva del 2026-09-27 (operador), pareja de «quiénes somos»; no existe en AXIS: id nuevo (distinto de `decision-why-us`, que es el muro de seis cifras de DeckPorQue). Los rótulos de los pilares van a 22 px en `color.halo` (teal claro): confirmar con el operador que el halo no cuenta como acento bajo D1; si cuenta, subirlos a 24 px o pasarlos a blanco. Mismo degradado lateral sobre el plate que «quiénes somos»: verificar que la columna se lea sin él.",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPorQue2.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPorQue2.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B20-datos · Brochure 07 · Propuesta 07",
+          "board": "canvas HubSpot (Design), Brochure 07, Propuesta 07",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B20-datos/01-deck-section-cine.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B20-datos.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B20-datos.json"
+          },
+          "content": {
+            "eyebrow": "Datos y arquitectura",
+            "question": "¿Cómo escala mi CRM?",
+            "answer": "Ordenado",
+            "evidence": "Antes de automatizar o sumar agentes, ponemos los datos **en orden** y el CRM sobre una base que crece.",
+            "pillars": [
+              {
+                "label": "Datos en orden",
+                "text": "duplicados fuera, propiedades con dueño y una sola fuente de verdad."
+              },
+              {
+                "label": "Modelo que escala",
+                "text": "objetos, asociaciones y pipelines pensados para crecer."
+              },
+              {
+                "label": "Integración gobernada",
+                "text": "cada sync con su dirección, su dueño y su registro de errores."
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS2d-datos-en-orden.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/HS2d-datos-en-orden.txt",
+            "alt": "Un líder de RevOps de Efeonce, con la chaqueta, levanta la mano y miles de partículas de datos en desorden se ordenan en una red de capas de luz que crece hacia el fondo",
+            "notes": "Antonio (elenco ficticio de la línea Revenue, nunca con su nombre en pantalla); mano al 63 % del ancho; luz azul y nodos magenta. Descartes HS2, HS2b y HS2c en el banco. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta de una línea (8 de 9). Uso fuera del propósito original de la receta: los pilares son de datos y arquitectura, no los del Why de Efeonce; aprobada así por el operador. Cine con una persona y sin Nexa, dentro de la excepción del registro cine para secciones."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B24-ley · Brochure 15 · Propuesta 16",
+          "board": "canvas HubSpot (Design), Brochure 15, Propuesta 16",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B24-ley/01-deck-section-cine.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B24-ley.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B24-ley.json"
+          },
+          "content": {
+            "eyebrow": "Ley 21.719",
+            "question": "¿Cuándo rige la nueva ley?",
+            "answer": "Diciembre",
+            "evidence": "Rige desde el **1 de diciembre de 2026**, con multas de hasta 20.000 UTM. Preparamos tu CRM para lo que exige.",
+            "pillars": [
+              {
+                "label": "Base legal",
+                "text": "cada contacto con su permiso y su propósito."
+              },
+              {
+                "label": "Derechos",
+                "text": "acceso, rectificación, supresión, oposición y portabilidad."
+              },
+              {
+                "label": "Seguridad",
+                "text": "accesos controlados y registro de cada cambio."
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS3b-datos-con-permiso.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS3b-datos-con-permiso.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/HS3b-datos-con-permiso.txt",
+            "alt": "Un líder de RevOps de Efeonce sostiene en la palma una esfera de luz azul que protege los datos de una persona",
+            "notes": "Antonio; luz azul y un solo punto magenta. Deriva medida: la esfera pedida al 62 % del ancho o más salió cerca del 46 %, hacia el texto. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta de una línea (9 de 9). Pilares de la Ley 21.719 (rige el 1-12-2026; multa hasta 20.000 UTM), no los del Why de Efeonce; aprobada así por el operador. Cine con una persona y sin Nexa, dentro de la excepción del registro cine para secciones."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B26-salida · Brochure 19 · Propuesta 20",
+          "board": "canvas HubSpot (Design), Brochure 19, Propuesta 20",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B26-salida/01-deck-section-cine.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B26-salida.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B26-salida.json"
+          },
+          "content": {
+            "eyebrow": "Sin amarras",
+            "question": "¿Y si mañana nos vamos?",
+            "answer": "Con todo",
+            "evidence": "Tus datos son tuyos: entran a HubSpot con **orden** y salen igual de completos.",
+            "pillars": [
+              {
+                "label": "Exportables",
+                "text": "registros y propiedades cuando quieras."
+              },
+              {
+                "label": "API estable",
+                "text": "versiones que HubSpot sostiene 18 meses."
+              },
+              {
+                "label": "Recuperables",
+                "text": "hasta 90 días para restaurar lo borrado."
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS4-te-llevas-todo.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/HS4-te-llevas-todo.txt",
+            "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara",
+            "notes": "Antonio, cubo de datos en la palma. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta de una línea (8 de 9). Pilares de salida (exportables, API estable, recuperables), no los del Why de Efeonce; aprobada así por el operador. Pasó de content-bullets a cine el 2026-10-06 (la versión anterior queda en out/B26-salida como descarte). Cine con una persona y sin Nexa, dentro de la excepción del registro cine para secciones."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B10-evaluacion · Brochure 20 · Propuesta 21",
+          "board": "canvas HubSpot (Design), Brochure 20, Propuesta 21",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B10-evaluacion/01-deck-section-cine.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B10-evaluacion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B10-evaluacion.json"
+          },
+          "content": {
+            "eyebrow": "Evaluación sin costo",
+            "question": "¿Qué recibo primero?",
+            "answer": "Evidencia",
+            "evidence": "Una decisión sobre tu **plataforma**, no una recomendación por defecto.",
+            "pillars": [
+              {
+                "label": "Encaje",
+                "text": "si HubSpot es tu plataforma, y con qué condición."
+              },
+              {
+                "label": "Riesgos",
+                "text": "lo que hoy frena tu operación."
+              },
+              {
+                "label": "Roadmap",
+                "text": "un plan por olas, con su primer valor."
+              }
+            ]
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6b-una-decision.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS6b-una-decision.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/HS6b-una-decision.txt",
+            "alt": "Julio Reyes, de Efeonce, sostiene en la palma el punto donde una maraña de rutas tenues se resuelve en un solo camino de luz",
+            "notes": "Julio, del roster del equipo. Descarte HS6 en el banco. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta de una línea (9 de 9). Uso fuera del propósito original de la receta: los tres pilares no son los del Why de Efeonce sino los de la evaluación (encaje, riesgos y roadmap); aprobada así por el operador. Pasó de content-bullets a cine el 2026-10-06 (la versión anterior queda en out/B10-evaluacion como descarte). Cine con una persona y sin Nexa, dentro de la excepción del registro cine para secciones."
+        }
+      ]
     },
     {
       "id": "content-team",
@@ -5142,6 +5444,50 @@
             "target": "object"
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "P-costo · Propuesta 29",
+          "board": "canvas HubSpot (Design), Propuesta 29",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/P-costo/01-deck-content-bullets.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/P-costo.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/P-costo.json"
+          },
+          "content": {
+            "eyebrow": "Costo total",
+            "question": "¿Hay costos escondidos?",
+            "answer": "Ninguno",
+            "items": [
+              {
+                "title": "Licencias HubSpot",
+                "desc": "Los seats y el tier que usas, ni uno más: USD [monto] al año."
+              },
+              {
+                "title": "Implementación",
+                "desc": "Por alcance y capacidad, nunca por horas: [monto] + IVA."
+              },
+              {
+                "title": "Operación gestionada",
+                "desc": "Mensual, con SLA y revisión trimestral: [monto] + IVA al mes."
+              },
+              {
+                "title": "Créditos de IA",
+                "desc": "Consumo medido por agente; lo extra cuesta USD 10 por cada 1.000 créditos."
+              }
+            ],
+            "selectedItem": 3
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Sólo en la propuesta: el costo no va en el brochure (decisión del operador). Montos [monto] por propuesta; el precio de los créditos extra (USD 10 por 1.000) sale del Rate Sheet de HubSpot."
         }
       ]
     },
@@ -7182,6 +7528,34 @@
             "target": "level"
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B22-automatizacion · Brochure 10 · Propuesta 10",
+          "board": "canvas HubSpot (Design), Brochure 10, Propuesta 10",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B22-automatizacion/01-deck-method-staircase.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B22-automatizacion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B22-automatizacion.json"
+          },
+          "content": {
+            "eyebrow": "Automatización",
+            "question": "¿Workflow o agente?",
+            "answer": "Según\nla tarea",
+            "body": "Si la regla es fija, va un workflow: siempre igual y auditable. Donde hace falta criterio, un agente.",
+            "note": "Cada escalón suma criterio y también supervisión.",
+            "selectedLevel": 1
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "TI",
+            "target": "level"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Cinco niveles de workflow a agente con límites; la nota dice que cada escalón suma supervisión. Selección «TI» en el primer peldaño."
         }
       ]
     },
@@ -7312,7 +7686,67 @@
         "Los mini robots agentes son el hilo visual entre láminas: no se agrandan (nunca más que la cabeza de Nexa)"
       ],
       "notes": "Receta AXIS `proposal-cinematic`, referencia `proposal-cinematic-nexa` (layout `hero`, contrato 0.1.2). En AXIS su rol es `proposal`; aquí va en la familia `method` porque es la tercera versión de fuerza híbrida (gráfica, escena y cine). Reemplaza a la carrera v1 (NX3), rechazada por la cámara pegada y el emblema inventado. Hoy `pnpm brand:compose` fija el contrato 0.1.1 y su builder exige 1–4 pasos y prueba con fuente: esta lámina no sale por la plantilla hasta integrar 0.1.2 (TASK-1927).",
-      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckHibridoCarreraLentes.jpg"
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckHibridoCarreraLentes.jpg",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B19-crm-solo · Brochure 05 · Propuesta 05",
+          "board": "canvas HubSpot (Design), Brochure 05, Propuesta 05",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B19-crm-solo/01-deck-proposal-cinematic.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B19-crm-solo.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B19-crm-solo.json"
+          },
+          "content": {
+            "eyebrow": "El nuevo Smart CRM",
+            "question": "¿Sigo llenando el CRM?",
+            "answer": "Ya no",
+            "body": "El CRM de HubSpot se llena con llamadas, emails y reuniones. Lo dejamos configurado y confiable."
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-B.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/CMP-crm-B.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/CMP-crm-B.txt",
+            "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara junto a un registro de cliente de luz que se llena solo con tres haces que vienen de una llamada, un email y una reunión",
+            "notes": "Nexa; luz azul e íconos magenta (versión B). Deriva medida: el objeto de luz pedido al 47 % del ancho salió cerca del 39 %, hacia el texto. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta corta (5 de 8): con dos tramos la respuesta se monta sobre la bajada. Nexa protagonista: dentro del registro cine de la receta."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B17-licencias · Brochure 13 · Propuesta 14",
+          "board": "canvas HubSpot (Design), Brochure 13, Propuesta 14",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B17-licencias/01-deck-proposal-cinematic.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B17-licencias.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B17-licencias.json"
+          },
+          "content": {
+            "eyebrow": "Licencias con criterio",
+            "question": "¿Compro licencias de más?",
+            "answer": "Nunca",
+            "body": "Seats por rol, el tier que tu operación necesita y uso revisado antes de cada renovación."
+          },
+          "photo": {
+            "register": "cine",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+            "ficha": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/HS5b-licencias-justas.json",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/prompts/HS5b-licencias-justas.txt",
+            "alt": "Nexa, con la chaqueta de Efeonce, junto a una grilla de doce seats de luz azul donde tres se apagan porque nadie los usa",
+            "notes": "Nexa y doce seats, tres apagados. Descartes HS5 y HS5c en el banco. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta corta de una palabra (5 de 8): con dos tramos la respuesta se monta sobre la bajada. Pasó de content-bullets a cine el 2026-10-06 (la versión anterior queda en out/B17-licencias como descarte). Nexa protagonista: dentro del registro cine de la receta."
+        }
+      ]
     },
     {
       "id": "method-surround-cycle",
@@ -7955,6 +8389,59 @@
             "target": "object"
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Cifras publicadas de Sky (+127 %) y Bresler (+180 %). La de Bresler (ventas digitales) no es de SEO: cambiarla por una de SEO publicada si existe (pendiente de DECISIONES.md)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "growth",
+          "slide": "B28-clientes · Brochure 26 · Propuesta 28",
+          "board": "canvas HubSpot (Design), Brochure 26, Propuesta 28",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B28-clientes/01-deck-content-clients.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B28-clientes.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B28-clientes.json"
+          },
+          "content": {
+            "eyebrow": "Clientes",
+            "question": "¿Con quién trabajan?",
+            "answer": "+90\nempresas",
+            "proofs": [
+              {
+                "value": "+180%",
+                "label": "ventas digitales de Bresler",
+                "source": "caso publicado de Bresler"
+              },
+              {
+                "value": "+10",
+                "label": "años ejecutando en LATAM",
+                "source": "Efeonce, 2026"
+              }
+            ],
+            "selectedProof": 1,
+            "logos": [
+              "Sky Airline",
+              "Berel",
+              "Bresler",
+              "Carozzi",
+              "Aguas Andinas",
+              "ANAM",
+              "Marca Chile",
+              "Gobierno de Santiago",
+              "Universidad Católica de Temuco"
+            ],
+            "markets": "Chile, EE. UU., Colombia, México y Perú"
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Efeonce",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Receta sólo clara: compuesta como lámina de Efeonce en la línea growth (theme light), porque el contrato line-piece-keeps-efeonce-dark obliga a que una pieza de línea sea oscura. Dos cifras con fuente: Bresler +180 % ventas digitales (caso publicado) y +10 años en LATAM; la de Sky (+127 %, SEO) salió de esta lámina.",
+          "conditions": [
+            "Logos de clientes sólo con su autorización de uso (regla de la receta; TASK-1937)."
+          ]
         }
       ]
     },
@@ -8601,6 +9088,70 @@
           "conditions": [
             "Logo de Berel: uso condicionado a la autorización del cliente (biblioteca de autorizaciones TASK-1937, primer caso pendiente). Procedencia del archivo en ai-generations/2026-09-29_deck-seo-aeo-documentos/logos/PROCEDENCIA.txt (Berel: deck-axis/assets/clients/berel.svg).",
             "Cifras de EJEMPLO: las cuatro son ilustrativas hasta que el operador pase las reales, con fuente, período, servicio y permiso de uso. La fuente provisoria «Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses» afirma algo que no es cierto hasta reemplazarla: ningún deck con esta lámina sale a un cliente."
+          ]
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "growth",
+          "slide": "B29-caso-anam · Brochure 25 · Propuesta 27",
+          "board": "canvas HubSpot (Design), Brochure 25, Propuesta 27",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B29-caso-anam/01-deck-decision-case.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B29-caso-anam.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B29-caso-anam.json"
+          },
+          "content": {
+            "eyebrow": "Caso de cliente",
+            "question": "¿Qué ganó su equipo?",
+            "answer": "Tiempo",
+            "clientLogo": {
+              "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+              "alt": "ANAM"
+            },
+            "stats": [
+              {
+                "value": "−57 %",
+                "label": "carga comercial",
+                "source": "ANAM, 2026"
+              },
+              {
+                "value": "+32 %",
+                "label": "ventas en 7 meses",
+                "source": "ANAM, 2026"
+              },
+              {
+                "value": "5",
+                "label": "rutas hacia una persona",
+                "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+              },
+              {
+                "value": "23",
+                "label": "fuentes de conocimiento",
+                "source": "casos publicados de ANAM en efeoncepro.com, julio de 2026"
+              }
+            ],
+            "selectedStat": 2
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "HubSpot",
+            "target": "object"
+          },
+          "photo": {
+            "register": "documental",
+            "plate": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+            "ficha": "ai-generations/2026-09-26_deck-triptico-v2/fichas/T3-mide.json",
+            "prompt": "ai-generations/2026-09-26_deck-triptico-v2/prompts/T3-mide.txt",
+            "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente",
+            "notes": "Plate del tríptico, no del caso (ver fit)."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Receta sólo clara: compuesta como lámina de Efeonce en la línea growth (theme light). El titular no repite lo que dice el logo de ANAM («En ANAM» rechazado → «¿Qué ganó su equipo? Tiempo.»). La foto es el plate T3-mide del tríptico (registro documental), no una foto del caso ni una imagen de ambiente asociada a ANAM, que es lo que pide la regla de la receta: aprobada así por el operador.",
+          "conditions": [
+            "−57 % de carga comercial y +32 % de ventas en 7 meses los entregó el operador y no están en el artículo aprobado por ANAM: pendiente la autorización de ANAM antes de usar el brochure con prospectos. 5 rutas hacia una persona y 23 fuentes sí están en el caso publicado (efeoncepro.com, julio de 2026).",
+            "Logo de ANAM sólo con su autorización de uso (TASK-1937)."
           ]
         }
       ]
@@ -9404,7 +9955,97 @@
         "Cada cifra lleva fuente y año visibles",
         "Máximo tres cifras"
       ],
-      "notes": "Aprobada el 2026-09-28. Fuentes: HubSpot (−27 %, 2026), McKinsey (50 %, 2025), SparkToro (<1 en 100, 2026), tal como las publica /aeo-2/. Logos: public/images/logos/axis/hubspot-logotype.svg y docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg; McKinsey como wordmark."
+      "notes": "Aprobada el 2026-09-28. Fuentes: HubSpot (−27 %, 2026), McKinsey (50 %, 2025), SparkToro (<1 en 100, 2026), tal como las publica /aeo-2/. Logos: public/images/logos/axis/hubspot-logotype.svg y docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg; McKinsey como wordmark.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B18-creditos · Brochure 14 · Propuesta 15",
+          "board": "canvas HubSpot (Design), Brochure 14, Propuesta 15",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B18-creditos/01-deck-decision-ai-market.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B18-creditos.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B18-creditos.json"
+          },
+          "content": {
+            "eyebrow": "HubSpot Credits",
+            "question": "¿Cuántos créditos necesito?",
+            "answer": "A medida",
+            "evidence": "Los agentes y la IA de HubSpot funcionan con créditos. Calculamos cuántos necesitas según lo que hará **cada agente**.",
+            "figures": [
+              {
+                "value": "50",
+                "label": "créditos por conversación que resuelve Customer Agent.",
+                "detail": "Cada acción de IA en un workflow usa 10.",
+                "source": "HubSpot",
+                "year": "2026"
+              },
+              {
+                "value": "0",
+                "label": "créditos pasan al mes siguiente.",
+                "detail": "Por eso se calculan: ni de más, que vencen, ni de menos.",
+                "source": "HubSpot",
+                "year": "2026"
+              },
+              {
+                "value": "100",
+                "label": "créditos por cada lead que recomienda Prospecting Agent.",
+                "detail": "Lo extra cuesta USD 10 por cada 1.000 créditos.",
+                "source": "HubSpot",
+                "year": "2026"
+              }
+            ]
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Respuesta de una línea (8 de 9). Tres cifras de HubSpot con fuente y año (Rate Sheet de créditos, 2026). El centro de la receta no aguanta una cifra de cinco caracteres («5.000» se sale de la tarjeta). Se vende como asesoría de cuántos créditos necesita el cliente, no como «no compres»."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B27-workflow-creditos · Propuesta 11",
+          "board": "canvas HubSpot (Design), Propuesta 11",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B27-workflow-creditos/01-deck-decision-ai-market.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B27-workflow-creditos.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B27-workflow-creditos.json"
+          },
+          "content": {
+            "eyebrow": "Workflows y créditos",
+            "question": "¿Un workflow gasta créditos?",
+            "answer": "Si usa IA",
+            "evidence": "Las reglas fijas no consumen. Cada acción de IA dentro de un workflow sí, y la **medimos** antes de activarla.",
+            "figures": [
+              {
+                "value": "10",
+                "label": "créditos por cada acción de IA en un workflow.",
+                "detail": "Unos USD 0,10 por acción, al precio de lista.",
+                "source": "HubSpot",
+                "year": "2026"
+              },
+              {
+                "value": "0",
+                "label": "créditos gasta un workflow sin IA.",
+                "detail": "Asignar, notificar o actualizar un registro no consume.",
+                "source": "HubSpot",
+                "year": "2026"
+              },
+              {
+                "value": "300",
+                "label": "acciones de IA al mes con los créditos de Pro.",
+                "detail": "Pro incluye 3.000 créditos; Enterprise, 5.000.",
+                "source": "HubSpot",
+                "year": "2026"
+              }
+            ]
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Sólo en la propuesta (decisión del operador, 2026-10-06). Respuesta de una línea (9 de 9); tres cifras de HubSpot con fuente y año."
+        }
+      ]
     },
     {
       "id": "decision-difference",
@@ -9591,7 +10232,30 @@
         "La alternativa siempre genérica",
         "Cinco filas alineadas"
       ],
-      "notes": "Aprobada el 2026-09-28. Tabla de /servicios/posicionamiento-seo/ («La diferencia») y objeción de /aeo-2/ («¿Y si esto lo hace mi propio equipo?»). Familia proof decidida por el operador."
+      "notes": "Aprobada el 2026-09-28. Tabla de /servicios/posicionamiento-seo/ («La diferencia») y objeción de /aeo-2/ («¿Y si esto lo hace mi propio equipo?»). Familia proof decidida por el operador.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B23-seguridad · Brochure 16 · Propuesta 17",
+          "board": "canvas HubSpot (Design), Brochure 16, Propuesta 17",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B23-seguridad/01-deck-decision-difference.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B23-seguridad.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B23-seguridad.json"
+          },
+          "content": {
+            "eyebrow": "Seguridad y accesos",
+            "question": "¿Quién ve mis datos?",
+            "answer": "Sólo quien\ndebe",
+            "evidence": "HubSpot tiene SOC 2 Tipo II y SOC 3. Nosotros dejamos sus controles **encendidos** y documentados antes del go-live."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Comparación con una alternativa genérica («HubSpot recién creado» frente a «HubSpot que entregamos»), cinco filas. Datos de HubSpot verificados el 2026-10-06 en fuentes oficiales (SOC 2 Tipo II y SOC 3; SSO y SCIM, Sensitive Data en Enterprise, entrenamiento de IA que se apaga). No afirmar ISO 27001 de HubSpot."
+        }
+      ]
     },
     {
       "id": "decision-traffic-to-revenue",
@@ -10504,6 +11168,41 @@
           "conditions": [
             "Fuera del recorrido del brochure: alternativa de SF6, nunca juntas."
           ]
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B02-propuesta · P02-propuesta · Brochure 02 · Propuesta 02",
+          "board": "canvas HubSpot (Design), Brochure 02, Propuesta 02",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B02-propuesta/01-deck-proposal-service.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B02-propuesta.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B02-propuesta.json"
+          },
+          "content": {
+            "eyebrow": "Nuestra propuesta · RevOps",
+            "question": "¿Cómo vende más mi CRM?",
+            "answer": "Con agentes",
+            "body": "HubSpot operado como servicio: de la evaluación a la operación gestionada, con agentes que trabajan dentro de tu CRM.",
+            "note": "Marketing, ventas, servicio, datos y Agent Hub."
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Cliente",
+            "target": "object"
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+            "ficha": "ai-generations/2026-09-26_web-hero/fichas/H1b-estratega-uniforme.json",
+            "prompt": "ai-generations/2026-09-26_web-hero/prompts/H1b-estratega-uniforme.txt",
+            "alt": "Una estratega de growth con el polo navy de Efeonce, de pie tras una mesa de nogal en el estudio de noche, justo después de salir en vivo una campaña",
+            "notes": "El plate de la lente que ya trae la receta."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. La misma lámina en el brochure (B02) y en la propuesta (P02: mismo intent con use proposal). Plate H1b del catálogo en la lente. No va junto a proposal-cinematic-revops (excluyentes); el plan del deck no la trae."
         }
       ]
     },
@@ -12017,6 +12716,39 @@
             "target": "object"
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2). Montos siempre [MONTO]."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "P16-cotizacion · Propuesta 30",
+          "board": "canvas HubSpot (Design), Propuesta 30",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/P16-cotizacion/01-deck-content-pricing.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/P16-cotizacion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/P16-cotizacion.json"
+          },
+          "content": {
+            "eyebrow": "Inversión",
+            "question": "¿Cómo se cotiza?",
+            "answer": "Por alcance",
+            "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",
+            "plans": [
+              "Blueprint",
+              "Proyecto",
+              "Operar"
+            ],
+            "amounts": "[MONTO]",
+            "recommendedPlan": 2
+          },
+          "selection": {
+            "kind": "collaborator",
+            "label": "Finanzas",
+            "target": "object"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Tres modos (Blueprint, Proyecto y Operar, el del centro recomendado), por alcance y capacidad, nunca por horas; montos [MONTO]; licencias y créditos de HubSpot aparte."
         }
       ]
     },
@@ -13042,7 +13774,30 @@
         "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Cinco áreas, cada una con su producto oficial: no se inventan nubes ni se agrupan productos que la cuenta no usa."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 03 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Selección con el contrato efeonce.collaboration-selection 0.3.0 (paintSelection). Reutilizable en HubSpot con los productos de HubSpot sólo con sus íconos oficiales (ver TASK del deck HubSpot)."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 03 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Selección con el contrato efeonce.collaboration-selection 0.3.0 (paintSelection). Reutilizable en HubSpot con los productos de HubSpot sólo con sus íconos oficiales (ver TASK del deck HubSpot).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B03-uno · Brochure 04 · Propuesta 04",
+          "board": "canvas HubSpot (Design), Brochure 04, Propuesta 04",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B03-uno/01-deck-content-one-platform.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B03-uno.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B03-uno.json"
+          },
+          "content": {
+            "eyebrow": "HubSpot · RevOps y CRM",
+            "question": "¿Cuántos CRM necesito?",
+            "answer": "Uno",
+            "evidence": "Conectamos marketing, ventas, servicio, revenue y datos sobre **un** Smart CRM: una sola operación alrededor del cliente."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Cinco áreas con su Hub (Marketing, Sales, Service, Revenue y Data Hub) e íconos oficiales de producto de HubSpot desde AXIS (hubspot-icon-*, @efeoncepro/axis-brand-assets 0.4.25)."
+        }
+      ]
     },
     {
       "id": "method-agent-supervisor",
@@ -13294,7 +14049,31 @@
         "Toda ficha de agente dice quién aprueba o qué nunca hace: un agente sin supervisión no se dibuja.",
         "Montos como [MONTO] si aparecen; el agente nunca cambia montos en el ejemplo aprobado."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 08 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Su «vívelo» es SF18 (content-day-live-approval, la aprobación en Slack). Reutilizable en HubSpot con el vocabulario de agentes de HubSpot (Breeze) y su ícono oficial, sólo si existe y se autoriza."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 08 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Su «vívelo» es SF18 (content-day-live-approval, la aprobación en Slack). Reutilizable en HubSpot con el vocabulario de agentes de HubSpot (Breeze) y su ícono oficial, sólo si existe y se autoriza.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B06-agentes · Brochure 11 · Propuesta 12",
+          "board": "canvas HubSpot (Design), Brochure 11, Propuesta 12",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B06-agentes/01-deck-method-agent-supervisor.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B06-agentes.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B06-agentes.json"
+          },
+          "content": {
+            "eyebrow": "Agent Hub · equipos híbridos",
+            "question": "¿Quién responde por el agente?",
+            "answer": "Una\npersona",
+            "evidence": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y **quién** lo aprueba.",
+            "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Tres fichas de agente con su supervisora (un rol, no una persona); nota de ejemplo."
+        }
+      ]
     },
     {
       "id": "decision-platform-coexistence",
@@ -13496,7 +14275,31 @@
         "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Los cinco veredictos son el vocabulario fijo; la lámina no recomienda un reemplazo completo por defecto."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 05 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). En la aprobada compara Marketing Cloud Engagement y Next; la receta sirve para cualquier par de generaciones de una plataforma. En HubSpot no hay par equivalente: no se reutiliza sin un caso real."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 05 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). En la aprobada compara Marketing Cloud Engagement y Next; la receta sirve para cualquier par de generaciones de una plataforma. En HubSpot no hay par equivalente: no se reutiliza sin un caso real.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B21-integraciones · Brochure 08 · Propuesta 08",
+          "board": "canvas HubSpot (Design), Brochure 08, Propuesta 08",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B21-integraciones/01-deck-decision-platform-coexistence.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B21-integraciones.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B21-integraciones.json"
+          },
+          "content": {
+            "eyebrow": "Integraciones",
+            "question": "¿Tengo que reemplazar mis sistemas?",
+            "answer": "No por\ndefecto",
+            "evidence": "HubSpot se conecta con lo que ya funciona. Decidimos **sistema** por sistema qué se integra y qué se migra.",
+            "note": "Ejemplo ilustrativo · la decisión sale de tu inventario de sistemas"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Dos plataformas (tu operación hoy y HubSpot Smart CRM) y cinco sistemas con veredictos del vocabulario fijo; «Integrar» se repite y no aparece «Modernizar» (la aprobada de Salesforce usa cada veredicto una vez). Nunca reemplazo por defecto; nota de ejemplo."
+        }
+      ]
     },
     {
       "id": "decision-provider-fit",
@@ -13660,7 +14463,31 @@
         "Íconos Trazo de AXIS (resolveIcon), nunca logos de los proveedores.",
         "El veredicto sale del diagnóstico: sin diagnóstico, la nota de ejemplo es obligatoria."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 04 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta compartida de la práctica RevOps & CRM: sirve igual en el deck HubSpot (HubSpot-first es uno de sus veredictos)."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 04 del deck Salesforce (acto II). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta compartida de la práctica RevOps & CRM: sirve igual en el deck HubSpot (HubSpot-first es uno de sus veredictos).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B04-encaje · Brochure 03 · Propuesta 03",
+          "board": "canvas HubSpot (Design), Brochure 03, Propuesta 03",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B04-encaje/01-deck-decision-provider-fit.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B04-encaje.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B04-encaje.json"
+          },
+          "content": {
+            "eyebrow": "Diagnóstico de encaje",
+            "question": "¿HubSpot, Salesforce o Zoho?",
+            "answer": "El que\nencaje",
+            "evidence": "No vendemos una plataforma: vendemos la **decisión**, con evidencia de tu operación.",
+            "note": "Ejemplo ilustrativo · el veredicto sale del diagnóstico"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Cuatro veredictos: HubSpot, Salesforce, Zoho e Híbrida (Zoho entra en la pregunta y en un veredicto, decisión de esta serie); HubSpot seleccionado. Nota de ejemplo obligatoria: el veredicto sale del diagnóstico."
+        }
+      ]
     },
     {
       "id": "content-service-lanes",
@@ -13830,7 +14657,32 @@
         "La mascota de Salesforce es un slot opcional, nunca un elemento fijo: la pieza de Agent Astro es una edición interpretativa (no el arte oficial) y va sólo por ruta local.",
         "Español neutro, sin voseo."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 06 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los carriles y los íconos oficiales de HubSpot; sin mascota (no hay mascota de HubSpot aprobada y no se inventa)."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 06 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los carriles y los íconos oficiales de HubSpot; sin mascota (no hay mascota de HubSpot aprobada y no se inventa).",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B05-servicios · Brochure 06 · Propuesta 06",
+          "board": "canvas HubSpot (Design), Brochure 06, Propuesta 06",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B05-servicios/01-deck-content-service-lanes.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B05-servicios.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B05-servicios.json"
+          },
+          "content": {
+            "eyebrow": "Nuestros servicios HubSpot",
+            "question": "¿Qué hacen en HubSpot?",
+            "answer": "Todo el ciclo"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Seis carriles de la oferta HubSpot con su Hub e íconos oficiales (hubspot-icon-*), cuatro fases; sin mascota. En el canvas, el sprocket 3D de HubSpot está superpuesto sobre la plataforma: uso interno hasta la aprobación escrita de HubSpot, fuera del PDF.",
+          "conditions": [
+            "Sprocket 3D de HubSpot: uso interno hasta la aprobación escrita de HubSpot; está en el canvas, nunca en el PDF ni en una pieza que salga de Efeonce."
+          ]
+        }
+      ]
     },
     {
       "id": "content-season-launches",
@@ -14219,7 +15071,31 @@
         "Toda activación usa un canal con permiso del perfil; ninguna activación sale de un canal marcado —.",
         "No es asesoría legal: la privacidad del cliente la revisa legal-privacy-ip-operator."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 11 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot con sus objetos de consentimiento y sus íconos oficiales, si existen y se autorizan."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 11 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve en HubSpot con sus objetos de consentimiento y sus íconos oficiales, si existen y se autorizan.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B08-permiso · Brochure 18 · Propuesta 19",
+          "board": "canvas HubSpot (Design), Brochure 18, Propuesta 19",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B08-permiso/01-deck-method-identity-consent.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B08-permiso.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B08-permiso.json"
+          },
+          "content": {
+            "eyebrow": "Smart CRM · identidad y consentimiento",
+            "question": "¿Puedo contactar a ese cliente?",
+            "answer": "Con\npermiso",
+            "evidence": "Unificar datos no da permiso para contactar: gobernamos **canal** y propósito antes de activar.",
+            "note": "Ejemplo ilustrativo · el diseño sale de tu inventario de datos"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Cinco fuentes, cuatro canales con su propósito y tres activaciones sólo por canal con permiso; nota de ejemplo."
+        }
+      ]
     },
     {
       "id": "method-migration-reconcile",
@@ -14384,7 +15260,31 @@
         "Los números cuadran: origen − duplicados = carga completa = los dos lados de la reconciliación (48.210 − 1.842 = 46.368 en la aprobada).",
         "Cifras de muestra siempre marcadas; con datos del cliente, sólo con evidencia (TASK-1930)."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 12 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve igual en HubSpot (el método de migración no depende del producto) cambiando el ícono por el oficial de HubSpot o sin ícono."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 12 del deck Salesforce (acto III). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Receta de la práctica: sirve igual en HubSpot (el método de migración no depende del producto) cambiando el ícono por el oficial de HubSpot o sin ícono.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B09-migracion · Brochure 09 · Propuesta 09",
+          "board": "canvas HubSpot (Design), Brochure 09, Propuesta 09",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B09-migracion/01-deck-method-migration-reconcile.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B09-migracion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B09-migracion.json"
+          },
+          "content": {
+            "eyebrow": "Migración a HubSpot",
+            "question": "¿Cómo sé que migró todo?",
+            "answer": "Porque\ncuadra",
+            "evidence": "Claves, duplicados, carga de prueba y **reconciliación** registro por registro, con vuelta atrás lista.",
+            "note": "Datos de muestra · cada migración define claves y reglas con tu equipo"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Datos de muestra marcados en la nota; la reconciliación cuadra (46.368 = 46.368) con rollback listo."
+        }
+      ]
     },
     {
       "id": "content-day-release-cycle",
@@ -14597,7 +15497,30 @@
         "Interfaces genéricas; sólo los isotipos son reales. No se recrea el diseño propietario de ninguna herramienta.",
         "El ciclo es fijo y siempre pasa por la aprobación del cliente antes de producción."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 15 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Decisión de la sesión del deck (DECISIONES.md, tanda 4): receta nueva y no datos de content-day-tools, porque reemplaza el panel de Greenhouse fijo de esa receta por la tarjeta del release (el panel ya aparece en SF11). Sale Frame.io; entran Teams, Notion, Loom y el sandbox. Sirve en HubSpot con el sandbox de HubSpot y su ícono oficial."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 15 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Decisión de la sesión del deck (DECISIONES.md, tanda 4): receta nueva y no datos de content-day-tools, porque reemplaza el panel de Greenhouse fijo de esa receta por la tarjeta del release (el panel ya aparece en SF11). Sale Frame.io; entran Teams, Notion, Loom y el sandbox. Sirve en HubSpot con el sandbox de HubSpot y su ícono oficial.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B12-dia-a-dia · Brochure 21 · Propuesta 23",
+          "board": "canvas HubSpot (Design), Brochure 21, Propuesta 23",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B12-dia-a-dia/01-deck-content-day-release-cycle.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B12-dia-a-dia.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B12-dia-a-dia.json"
+          },
+          "content": {
+            "eyebrow": "Tu día a día con Efeonce",
+            "question": "¿Qué llega a producción?",
+            "answer": "Lo que\napruebes",
+            "evidence": "Nada llega a producción sin tu **aprobación**: lo pruebas en un sandbox de HubSpot y lo ves explicado en un video corto."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Ciclo fijo con aprobación del cliente antes de producción, sandbox de HubSpot, Teams, Notion y Loom en el ciclo."
+        }
+      ]
     },
     {
       "id": "content-day-live-library",
@@ -14789,7 +15712,30 @@
         "Loom sólo porque está en el stack real de Efeonce (confirmado el 2026-09-29); si la cuenta no lo usa, la biblioteca va sin marca de herramienta.",
         "Datos de muestra siempre marcados."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 16 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los íconos oficiales de HubSpot. Falta dar de alta el isotipo de Loom en deck-axis/assets/tools/loom-isotype.svg al pasar al Composer."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 16 del deck Salesforce (acto IV). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template). Sirve en HubSpot con los íconos oficiales de HubSpot. Falta dar de alta el isotipo de Loom en deck-axis/assets/tools/loom-isotype.svg al pasar al Composer.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B13-adopcion · Brochure 22 · Propuesta 24",
+          "board": "canvas HubSpot (Design), Brochure 22, Propuesta 24",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B13-adopcion/01-deck-content-day-live-library.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B13-adopcion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B13-adopcion.json"
+          },
+          "content": {
+            "eyebrow": "Activación y adopción",
+            "question": "¿Cómo aprende mi equipo?",
+            "answer": "A su\nritmo",
+            "evidence": "Tutoriales cortos en video, grabados sobre **tu** HubSpot: responden «¿cómo hago…?» sin agendar una reunión."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Tutoriales por rol en Loom con «Datos de muestra» (dataOrigin illustrative)."
+        }
+      ]
     },
     {
       "id": "content-live-chat",
@@ -15233,6 +16179,28 @@
             ]
           },
           "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y cuerpo). Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        },
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B15-medicion · Brochure 24 · Propuesta 26",
+          "board": "canvas HubSpot (Design), Brochure 24, Propuesta 26",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B15-medicion/01-deck-content-measure-formulas.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B15-medicion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B15-medicion.json"
+          },
+          "content": {
+            "eyebrow": "Qué medimos",
+            "question": "¿Cómo sé que funciona?",
+            "answer": "Lo\nmedimos",
+            "evidence": "Cada métrica con su fórmula, su fuente y un **dueño**, desde el diagnóstico.",
+            "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Cinco métricas con fórmula, fuente y dueño (un rol); sin cifras de promesa."
         }
       ]
     },
@@ -15666,7 +16634,30 @@
         "Íconos oficiales de producto de Salesforce (logos/icon-*.svg, fuentes en logos/FUENTES.txt; en AXIS, AXIS_PARTNER_ASSETS) sólo donde se nombra ese producto, nunca como adorno ni en pasos, y sin recolorear. Uso autorizado por Salesforce (declarado por el operador el 2026-09-29, referencia `salesforce-partner-authorization-2026-09-29`; se recomienda archivar la copia escrita junto a ai-generations/2026-09-29_deck-salesforce/DECISIONES.md, sin bloquear). Los íconos de otro partner siguen sujetos a su propia autorización.",
         "Cada ola se prueba antes de la siguiente: los escalones son una progresión real, nunca una lista de servicios."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 14 del deck Salesforce (acto IV). Al canonizar, el operador decidió que no cabe en method-staircase y nace como receta propia (antes registrada como approvedUses de method-staircase, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. La una sola órbita es la trayectoria de luz (la lámina aprobada no lleva plataforma). Oferta transversal de transformación humano-agente: sirve en HubSpot con su ícono oficial o sin ícono."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 14 del deck Salesforce (acto IV). Al canonizar, el operador decidió que no cabe en method-staircase y nace como receta propia (antes registrada como approvedUses de method-staircase, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. La una sola órbita es la trayectoria de luz (la lámina aprobada no lleva plataforma). Oferta transversal de transformación humano-agente: sirve en HubSpot con su ícono oficial o sin ícono.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B11-olas · Propuesta 22",
+          "board": "canvas HubSpot (Design), Propuesta 22",
+          "document": "proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B11-olas/01-deck-method-waves.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B11-olas.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B11-olas.json"
+          },
+          "content": {
+            "eyebrow": "Agent Hub · equipos híbridos",
+            "question": "¿Sumo todos los agentes juntos?",
+            "answer": "No, por\nolas",
+            "evidence": "Primero el trabajo, después la tecnología: cada ola se **prueba** antes de pasar a la siguiente."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Sólo en la propuesta (decisión del operador, 2026-10-06): cuatro olas que se prueban, la primera seleccionada."
+        }
+      ]
     },
     {
       "id": "content-day-live-console",
@@ -15898,7 +16889,30 @@
         "Cifras de muestra siempre marcadas; con datos del cliente, sólo con evidencia (TASK-1930).",
         "Cada cifra dice de dónde sale (su detalle): sin detalle, no va."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 17 del deck Salesforce (acto IV). Al canonizar, el operador decidió que no cabe en content-day-live-results y nace como receta propia (antes registrada como approvedUses de content-day-live-results, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. Consola HTML propia en vez de la captura del panel de Greenhouse, la reunión de Teams y el reporte de content-day-live-results. Sirve en HubSpot con el ícono oficial de HubSpot o sin ícono, y en QBR con cifras reales con fuente."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 17 del deck Salesforce (acto IV). Al canonizar, el operador decidió que no cabe en content-day-live-results y nace como receta propia (antes registrada como approvedUses de content-day-live-results, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. Consola HTML propia en vez de la captura del panel de Greenhouse, la reunión de Teams y el reporte de content-day-live-results. Sirve en HubSpot con el ícono oficial de HubSpot o sin ícono, y en QBR con cifras reales con fuente.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B14-operacion · Brochure 23 · Propuesta 25",
+          "board": "canvas HubSpot (Design), Brochure 23, Propuesta 25",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B14-operacion/01-deck-content-day-live-console.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B14-operacion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B14-operacion.json"
+          },
+          "content": {
+            "eyebrow": "Operación gestionada",
+            "question": "¿Y después del go-live?",
+            "answer": "Lo\noperamos",
+            "evidence": "Releases, soporte, datos, permisos y agentes, con SLA y una revisión **trimestral** de valor."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Consola del mes con «Datos de muestra»; un control en curso."
+        }
+      ]
     },
     {
       "id": "content-day-live-approval",
@@ -16153,7 +17167,31 @@
         "El agente propone y una persona aprueba: el ciclo nunca se salta la aprobación y todo queda registrado.",
         "Montos como [MONTO]; el canal es el que usa la cuenta (Slack o Teams)."
       ],
-      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 09 del deck Salesforce (acto III). Al canonizar, el operador decidió que no cabe en content-day-live-progress y nace como receta propia (antes registrada como approvedUses de content-day-live-progress, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. Su modelo es method-agent-supervisor (lámina 08). Sirve en HubSpot con los agentes de HubSpot y su ícono oficial, sólo si existe y se autoriza."
+      "notes": "Aprobada por el operador el 2026-09-29 («Esto está aprobado todo, canonicemos»), lámina 09 del deck Salesforce (acto III). Al canonizar, el operador decidió que no cabe en content-day-live-progress y nace como receta propia (antes registrada como approvedUses de content-day-live-progress, que no cambia). Receta nueva: sin plantilla en el Artifact Composer todavía (el plan avisa recipe-without-template); de respuesta grande: entra a la auditoría 3× de rendered-audit.ts. Su modelo es method-agent-supervisor (lámina 08). Sirve en HubSpot con los agentes de HubSpot y su ícono oficial, sólo si existe y se autoriza.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B07-aprobacion · Brochure 12 · Propuesta 13",
+          "board": "canvas HubSpot (Design), Brochure 12, Propuesta 13",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B07-aprobacion/01-deck-content-day-live-approval.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B07-aprobacion.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B07-aprobacion.json"
+          },
+          "content": {
+            "eyebrow": "Customer Agent · supervisión en vivo",
+            "question": "¿Dónde apruebo al agente?",
+            "answer": "Donde\ntrabajas",
+            "evidence": "El agente propone con evidencia, tú **apruebas** en Teams y el cambio queda ejecutado y registrado.",
+            "note": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo"
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Customer Agent de Service Hub propone en Teams y la supervisora aprueba; monto en [MONTO]; nota de ejemplo."
+        }
+      ]
     },
     {
       "id": "content-brand-family",
@@ -17355,7 +18393,84 @@
         "Respuesta ≥ 3× la pregunta (128/40 = 3,2).",
         "Español neutro, sin voseo."
       ],
-      "notes": "Aprobada por el operador el 2026-09-30, lámina 28 del deck SEO/AEO completo (21 en brochure, 22 en propuesta). Decisión 12: los mercados (Chile, EE. UU., Colombia, México, Perú) de forma épica. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/28.jpg · brochure/20.jpg · propuesta/22.jpg."
+      "notes": "Aprobada por el operador el 2026-09-30, lámina 28 del deck SEO/AEO completo (21 en brochure, 22 en propuesta). Decisión 12: los mercados (Chile, EE. UU., Colombia, México, Perú) de forma épica. Receta nueva: sin plantilla en el Artifact Composer todavía (recipe-without-template; TASK-1949 Slice 2). Láminas aprobadas: out/slides/completo/28.jpg · brochure/20.jpg · propuesta/22.jpg.",
+      "approvedUses": [
+        {
+          "approvedAt": "2026-10-06",
+          "approvedBy": "operador, 2026-10-06 («Bien, queda aprobado» · «Este Brochure está cerrado, canonízalo»; canvas https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU, páginas «Brochure · 27» y «Propuesta · 31»)",
+          "deck": "HubSpot (línea revenue-hubspot)",
+          "line": "revenue-hubspot",
+          "slide": "B25-residencia · Brochure 17 · Propuesta 18",
+          "board": "canvas HubSpot (Design), Brochure 17, Propuesta 18",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-06_deck-hubspot/out/B25-residencia/01-deck-content-markets.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-06_deck-hubspot/intents/B25-residencia.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-06_deck-hubspot/intents/B25-residencia.json"
+          },
+          "content": {
+            "eyebrow": "Residencia de datos",
+            "question": "¿Dónde están mis datos?",
+            "answer": "En Estados\nUnidos",
+            "body": "HubSpot los guarda en **cinco** regiones: EE. UU. Este y Oeste, Canadá, Fráncfort y Australia. La ley lo permite con las garantías de su DPA.",
+            "markets": [
+              {
+                "country": "Canadá",
+                "city": "Región Canadá",
+                "node": [
+                  990,
+                  337
+                ],
+                "side": "left"
+              },
+              {
+                "country": "EE. UU.",
+                "city": "Región Este",
+                "node": [
+                  977,
+                  381
+                ],
+                "side": "right"
+              },
+              {
+                "country": "Alemania",
+                "city": "Fráncfort",
+                "node": [
+                  1236,
+                  337
+                ],
+                "side": "right"
+              },
+              {
+                "country": "Australia",
+                "city": "Región Australia",
+                "node": [
+                  1691,
+                  659
+                ],
+                "side": "left"
+              },
+              {
+                "country": "Chile",
+                "city": "Tu empresa",
+                "node": [
+                  932,
+                  660
+                ],
+                "side": "left"
+              }
+            ]
+          },
+          "photo": {
+            "register": "puesta-en-escena",
+            "plate": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png",
+            "prompt": "ai-generations/2026-10-06_deck-hubspot/fotos/fichas/RG2b-mapa.prompt.txt",
+            "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia",
+            "notes": "Mapa de puntos (1792 × 1024) con nodos medidos; azul y Santiago en magenta. RG1b (la Tierra desde la órbita) quedó en el banco porque se leía como un ovoide. Ruta local (ai-generations/**, fuera de git) hasta el banco de plates (TASK-1931); banco y descartes en ai-generations/2026-10-06_deck-hubspot/fotos/LEEME.md."
+          },
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Uso distinto del de la receta, aprobado por el operador: los nodos no son mercados de EFEONCE_OPERATING_MARKETS sino cuatro regiones de datos de HubSpot (Canadá, EE. UU. Este, Fráncfort y Australia) y la empresa del cliente en Chile. La respuesta dice dónde están los datos, no dónde no están. El plate RG2b está registrado con sus nodos medidos (px del plate, 1792 × 1024) en PLATE_SIZES de src/lib/brand-surfaces/recipes/sv360/content-markets.ts: la receta sólo acepta plates medidos."
+        }
+      ]
     }
   ]
 }
