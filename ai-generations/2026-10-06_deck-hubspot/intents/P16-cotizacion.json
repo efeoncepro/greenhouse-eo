@@ -1,0 +1,63 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cómo se cotiza?",
+    "answer": [
+      "Por",
+      "capacidad"
+    ]
+  },
+  "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",
+  "legal": "Valores netos + IVA. Licencias y créditos de HubSpot no incluidos.",
+  "period": "neto + IVA",
+  "recommended": 2,
+  "recommendedLabel": "Recomendado",
+  "plans": [
+    {
+      "name": "Blueprint",
+      "tagline": "Para decidir con datos",
+      "features": [
+        "Inventario del portal",
+        "Modelo objetivo",
+        "Roadmap por olas",
+        "Criterios de aceptación"
+      ]
+    },
+    {
+      "name": "Proyecto",
+      "tagline": "Para construir por fases",
+      "features": [
+        "Configuración y datos",
+        "Integraciones",
+        "Automatización y QA",
+        "Capacitación por rol",
+        "Documentación"
+      ]
+    },
+    {
+      "name": "Operar",
+      "tagline": "Para operar y crecer",
+      "features": [
+        "Releases con aprobación",
+        "Soporte con SLA",
+        "Agentes supervisados",
+        "Revisión trimestral de valor",
+        "Reporting mensual"
+      ]
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Finanzas",
+    "participantKind": "department"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-diagnosis-verdict",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Evaluación inicial · sin costo",
+    "question": "¿Qué recibes primero?",
+    "answer": [
+      "Una",
+      "decisión"
+    ]
+  },
+  "body": "Una decisión informada, con **evidencia**, no una recomendación por defecto.",
+  "reportTitle": "Evaluación de encaje y arquitectura",
+  "reportSubtitle": "HubSpot · estado actual, encaje y roadmap",
+  "sampleMark": "Datos de muestra",
+  "modules": [
+    {
+      "kicker": "Estado actual",
+      "title": "Mapa de tu operación"
+    },
+    {
+      "kicker": "Veredicto",
+      "title": "Encaje de la plataforma"
+    },
+    {
+      "kicker": "Riesgos",
+      "title": "Lo que hoy frena"
+    },
+    {
+      "kicker": "Evidencia",
+      "title": "Registro verificable"
+    },
+    {
+      "kicker": "Roadmap",
+      "title": "Plan por olas"
+    }
+  ],
+  "operationNodes": [
+    "Ventas",
+    "Servicio",
+    "Marketing",
+    "ERP",
+    "Web",
+    "Datos"
+  ],
+  "operationFootnote": "14 integraciones · 3 sin dueño",
+  "verdictOptions": [
+    "Fit",
+    "Fit condicionado",
+    "No fit"
+  ],
+  "selectedVerdict": 2,
+  "verdictCondition": "Condición: ordenar datos y consentimiento antes de automatizar",
+  "risks": [
+    "Duplicados en contactos",
+    "Workflows sin dueño",
+    "Propiedades sin gobierno"
+  ],
+  "recordText": "Cada hallazgo con su fuente: el portal, los datos y las entrevistas con tu equipo.",
+  "waves": [
+    {
+      "name": "Ola 1",
+      "title": "Datos y Smart CRM",
+      "kicker": "Base"
+    },
+    {
+      "name": "Ola 2",
+      "title": "Pipeline y servicio con SLA",
+      "kicker": "Primer valor"
+    },
+    {
+      "name": "Ola 3",
+      "title": "Customer Agent supervisado",
+      "kicker": "Agentes"
+    }
+  ]
+}

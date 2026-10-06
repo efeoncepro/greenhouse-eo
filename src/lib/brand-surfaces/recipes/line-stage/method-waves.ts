@@ -115,7 +115,7 @@ export const methodWaves: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const list = exactly<StepIntent>(intent.steps, steps.count, 'Los escalones (`steps`)')
   const selected = indexIn(intent.selectedStep, steps.count, 'El escalón por donde se empieza (`selectedStep`)')
   // El ícono de la cima es opcional: sólo el oficial del producto (nunca un Trazo), sujeto a la autorización de Salesforce.
-  const mark = intent.topMark === undefined || intent.topMark === null ? null : productIcon(intent.topMark, 'El ícono de la cima (`topMark`)')
+  const mark = intent.topMark === undefined || intent.topMark === null ? null : productIcon(intent.topMark, 'El ícono de la cima (`topMark`)', line)
 
   const leftOf = (i: number) => steps.xPx + i * (steps.widthPx + steps.gapPx)
   const heightOf = (i: number) => measured(steps.heightsPx[i], `la altura del escalón ${i + 1}`)

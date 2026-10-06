@@ -144,10 +144,10 @@ export const contentDayLiveApproval: RecipeBuilder = ({ intent, manifest, recipe
     throw new SurfacePieceError(`El canal (\`channel.tool\`) es uno de ${channel.options.join(' · ')}.`, 'invalid-intent')
   }
 
-  const channelIcon = ch.tool === 'slack' ? productIcon('slack', 'El canal (`channel.tool`)') : toolIsotype(ch.tool, 'El canal (`channel.tool`)')
+  const channelIcon = ch.tool === 'slack' ? productIcon('slack', 'El canal (`channel.tool`)', line) : toolIsotype(ch.tool, 'El canal (`channel.tool`)')
 
   const ag = (intent.agent ?? {}) as AgentIntent
-  const agentIcon = ag.icon === undefined ? null : productIcon(ag.icon, 'El avatar del agente (`agent.icon`)')
+  const agentIcon = ag.icon === undefined ? null : productIcon(ag.icon, 'El avatar del agente (`agent.icon`)', line)
   const said = req(intent.message, 'La propuesta del agente (`message`)')
 
   if (CURRENCY.test(said)) throw new SurfacePieceError('Los montos del mensaje van siempre como «[MONTO]» (`message`).', 'invalid-intent')
@@ -156,7 +156,7 @@ export const contentDayLiveApproval: RecipeBuilder = ({ intent, manifest, recipe
   const buttons = exactly<unknown>(intent.actions, actions.count, 'Los botones (`actions`)')
 
   const ex = (intent.executed ?? {}) as ExecutedIntent
-  const executedIcon = ex.icon === undefined ? null : productIcon(ex.icon, 'El producto donde se ejecuta (`executed.icon`)')
+  const executedIcon = ex.icon === undefined ? null : productIcon(ex.icon, 'El producto donde se ejecuta (`executed.icon`)', line)
   const executedText = req(ex.text, 'Lo ejecutado (`executed.text`)')
 
   if (!/registr/i.test(executedText) || !/aprob/i.test(executedText)) {

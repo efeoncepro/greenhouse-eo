@@ -1,0 +1,60 @@
+import json, os, sys
+ROOT = sys.argv[1]
+blobs = json.load(open('blobs.json'))
+BODY = [
+ ("B02-propuesta", "¿Tu CRM vende contigo? Con agentes."),
+ ("B03-uno", "¿Cuántos HubSpot tienes? Uno."),
+ ("B04-encaje", "¿HubSpot o Salesforce? El que encaje."),
+ ("B05-servicios", "¿Qué hacemos en HubSpot? Todo el ciclo."),
+ ("B06-agentes", "¿Quién responde por el agente? Una persona."),
+ ("B07-aprobacion", "¿Dónde apruebas al agente? Donde trabajas."),
+ ("B08-permiso", "¿Puedes contactar a ese cliente? Con permiso."),
+ ("B09-migracion", "¿Cómo sabes que migró todo? Porque cuadra."),
+ ("B10-evaluacion", "¿Qué recibes primero? Una decisión."),
+ ("B11-olas", "¿Cómo se suma un agente? Por olas."),
+ ("B12-dia-a-dia", "¿Cómo trabajamos contigo? Sin sorpresas."),
+ ("B13-adopcion", "¿Cómo aprende tu equipo? A su ritmo."),
+ ("B14-operacion", "¿Y después del go-live? Lo operamos."),
+ ("B15-medicion", "¿Cómo sabes que funciona? Lo medimos."),
+]
+BROCHURE = [("B01-portada", "Portada · ¿Tu HubSpot ya actúa? Por ti.")] + BODY + [("B16-contraportada", "Contraportada · ¿Conversamos? Cuando quieras.")]
+PROPUESTA = [("P01-portada", "Portada de propuesta · [Cliente]"), ("P02-propuesta", "¿Tu CRM vende contigo? Con agentes.")] + [(k, t) for k, t in BODY[1:]] + [("P16-cotizacion", "¿Cómo se cotiza? Por capacidad."), ("P17-contraportada", "Contraportada · Empower your Revenue")]
+def slide_html(title, blob):
+    if blob:
+        inner = f'<img src="{blob}" alt="{title}" style="display: block; width: 1920px; height: 1080px">'
+    else:
+        inner = (f'<div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 140px; display: flex; flex-direction: column; justify-content: center; gap: 28px; '
+                 f'background: #091951; color: #ffffff; font-family: \'Poppins\', system-ui, sans-serif">'
+                 f'<div style="font-size: 18px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #cfe4fa">En composición</div>'
+                 f'<div style="font-size: 64px; font-weight: 600; line-height: 1.1; max-width: 1400px">{title}</div>'
+                 f'<div style="font-size: 26px; font-weight: 300; color: #cfe4fa">Lleva los íconos oficiales de HubSpot: sale apenas se publique axis-brand-assets 0.4.25.</div></div>')
+    return f'''<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>{title}</title><script src="./support.js"></script></head><body><x-dc><helmet><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&amp;display=swap" rel="stylesheet"><style>body{{margin:0;background:#091951}}</style></helmet><div style="width: 1920px; height: 1080px; overflow: hidden; background: #091951">{inner}</div></x-dc><script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":1920,"height":1080}}}}'>
+class Component extends DCLogic {{ renderVals() {{ return {{}}; }} }}
+</script></body></html>
+'''
+boards, order, written = {}, [], []
+os.makedirs(f'{ROOT}/project', exist_ok=True)
+def place(slides, page, prefix):
+    for i, (key, title) in enumerate(slides):
+        f = 'Main.dc.html' if key == 'B01-portada' else f'{prefix}{key}.dc.html'
+        if f in boards: continue
+        blob = blobs.get(key) or (blobs.get('B' + key[1:]) if key.startswith('P') else None)
+        num = f'{i + 1:02d}'
+        boards[f] = {"x": (i % 4) * 2000, "y": (i // 4) * 1200, "w": 1920, "h": 1080, "title": f'{num} · {title}', "page": page}
+        order.append(f)
+        open(f'{ROOT}/project/{f}', 'w', encoding='utf-8').write(slide_html(title, blob))
+        written.append(f)
+place(BROCHURE, 'brochure', '')
+place(PROPUESTA, 'propuesta', 'Prop-')
+idx = json.load(open(f'{ROOT}/project/canvas.json', encoding='utf-8'))
+old = set(idx.get('boards', {}))
+idx['boards'] = boards; idx['order'] = order
+idx['pages'] = [{"id": "brochure", "name": "Brochure · 16"}, {"id": "propuesta", "name": "Propuesta · 17"}]
+idx['launch'] = {"view": "canvas", "page": "brochure"}
+idx['notes'] = {
+  "t-brochure": {"kind": "title1", "maxW": 7920, "text": "HubSpot · brochure de servicios", "w": 240, "x": 0, "y": -300, "page": "brochure"},
+  "t-propuesta": {"kind": "title1", "maxW": 7920, "text": "HubSpot · propuesta comercial", "w": 240, "x": 0, "y": -300, "page": "propuesta"}}
+json.dump(idx, open(f'{ROOT}/project/canvas.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+json.dump({"written": written, "removed": sorted(old - set(boards))}, open(f'{ROOT}/manifest.json', 'w'), indent=1)
+print(len(written), 'boards; removed', sorted(old - set(boards)))

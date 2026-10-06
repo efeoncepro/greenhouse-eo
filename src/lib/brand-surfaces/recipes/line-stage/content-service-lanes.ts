@@ -137,7 +137,7 @@ export const contentServiceLanes: RecipeBuilder = ({ intent, manifest, recipe })
     throw new SurfacePieceError(`Las cuatro fases suman ${phases.join('').length} caracteres: la tira termina antes de la mascota con ${PHASES_MAX_TOTAL_CHARS} como máximo.`, 'invalid-intent')
   }
 
-  const icons = lanes.map((lane, i) => productIcon(lane.icon, `El carril ${i + 1} (\`lanes[${i}].icon\`)`))
+  const icons = lanes.map((lane, i) => productIcon(lane.icon, `El carril ${i + 1} (\`lanes[${i}].icon\`)`, line))
   const mascot = mascotOf(intent.mascot, recipe.mascot as MascotTokens | undefined, 'csl')
   const { stage, platform } = stageLayers(manifest, recipe, line, 'csl')
 

@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-service-lanes",
+  "voice": {
+    "eyebrow": "Nuestros servicios HubSpot",
+    "question": "¿Qué hacemos en HubSpot?",
+    "answer": [
+      "Todo el ciclo"
+    ]
+  },
+  "lanes": [
+    {
+      "icon": "marketing",
+      "title": "Marketing, contenido y AEO",
+      "products": "Marketing Hub · Content Hub",
+      "description": "Demanda, campañas y atribución, visibles en buscadores y en la IA."
+    },
+    {
+      "icon": "sales",
+      "title": "Ventas y pipeline",
+      "products": "Sales Hub",
+      "description": "Pipeline priorizado, secuencias, forecast y la siguiente acción."
+    },
+    {
+      "icon": "revenue",
+      "title": "Revenue lifecycle",
+      "products": "Revenue Hub",
+      "description": "De la cotización al contrato, la renovación y la expansión."
+    },
+    {
+      "icon": "service",
+      "title": "Servicio y customer success",
+      "products": "Service Hub",
+      "description": "Tickets, SLA, knowledge y salud de cada cuenta."
+    },
+    {
+      "icon": "data",
+      "title": "Datos e integración",
+      "products": "Data Hub · Smart CRM",
+      "description": "Datos confiables y sincronizados para equipos y agentes."
+    },
+    {
+      "icon": "service",
+      "title": "Agentes y operación",
+      "products": "Agent Hub · Customer Agent",
+      "description": "Agentes con ficha, supervisión humana y consumo medido."
+    }
+  ],
+  "phases": [
+    "Evaluación sin costo",
+    "Blueprint e implementación",
+    "Optimización y adopción",
+    "Operación gestionada"
+  ],
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

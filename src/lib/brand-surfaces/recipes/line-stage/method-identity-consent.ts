@@ -30,6 +30,7 @@ import {
   lumVars,
   noteVars,
   productIcon,
+  productRoleIcon,
   reflectionVars,
   req,
   stageLayers,
@@ -98,9 +99,6 @@ type ActivationTokens = {
 type ChannelIntent = { channel?: unknown; purpose?: unknown; permitted?: unknown }
 type ActivationIntent = { icon?: unknown; title?: unknown; detail?: unknown; channel?: unknown }
 
-/** El producto de datos que resuelve la identidad: el ícono del perfil unificado (catálogo, `profileTitle`). */
-const PROFILE_PRODUCT = 'data-cloud'
-
 /** Las marcas del permiso, en el círculo del canal. */
 const GRANTED_MARK = '✓'
 const DENIED_MARK = '—'
@@ -157,10 +155,10 @@ export const methodIdentityConsent: RecipeBuilder = ({ intent, manifest, recipe 
 
     if (named) throw new SurfacePieceError(`La activación ${i + 1} nombra «${named}», un canal sin permiso: ninguna activación sale de un canal marcado —.`, 'invalid-intent')
 
-    return { icon: productIcon(a.icon, `La activación ${i + 1} (\`activations[${i}].icon\`)`), title, detail }
+    return { icon: productIcon(a.icon, `La activación ${i + 1} (\`activations[${i}].icon\`)`, line), title, detail }
   })
 
-  const profileIcon = productIcon(PROFILE_PRODUCT, 'El perfil unificado')
+  const profileIcon = productRoleIcon('profile', 'El perfil unificado', line)
   const { stage, platform } = stageLayers(manifest, recipe, line, 'mic')
 
   // Cada fuente manda su haz al perfil; del perfil sale uno a cada activación.

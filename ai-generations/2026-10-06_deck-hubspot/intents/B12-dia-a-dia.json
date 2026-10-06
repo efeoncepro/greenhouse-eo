@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-release-cycle",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo trabajamos contigo?",
+    "answer": [
+      "Sin",
+      "sorpresas"
+    ]
+  },
+  "body": "Nada llega a producción sin tu **aprobación**: lo pruebas en un sandbox de HubSpot y lo ves explicado en un video corto.",
+  "release": {
+    "kicker": "Release 14 · Service Hub",
+    "title": "Enrutamiento de tickets por prioridad",
+    "icon": "service",
+    "currentStep": 3,
+    "videoTool": "loom",
+    "videoDuration": "3:12",
+    "presenterInitials": "EF",
+    "videoCaption": "Qué cambia en tu Help Desk, en 3 minutos",
+    "approveCta": "Aprobar release"
+  },
+  "tools": [
+    {
+      "tool": "teams",
+      "kicker": "Microsoft Teams",
+      "label": "Nos hablamos"
+    },
+    {
+      "tool": "notion",
+      "kicker": "Notion",
+      "label": "Backlog y documentos"
+    },
+    {
+      "tool": "loom",
+      "kicker": "Loom",
+      "label": "Te lo mostramos"
+    },
+    {
+      "tool": "hs-icon:data",
+      "kicker": "HubSpot",
+      "label": "Pruebas en sandbox"
+    }
+  ]
+}

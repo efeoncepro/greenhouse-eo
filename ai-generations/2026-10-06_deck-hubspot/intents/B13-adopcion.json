@@ -1,0 +1,67 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-library",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Activación y adopción",
+    "question": "¿Cómo aprende tu equipo?",
+    "answer": [
+      "A su",
+      "ritmo"
+    ]
+  },
+  "body": "Tutoriales cortos en video, grabados sobre **tu** HubSpot: responden «¿cómo hago…?» sin agendar una reunión.",
+  "library": {
+    "tool": "loom",
+    "kicker": "En Loom · sobre tu portal",
+    "title": "Tutoriales de tu equipo"
+  },
+  "dataOrigin": "illustrative",
+  "sampleMark": "Datos de muestra",
+  "videos": [
+    {
+      "icon": "sales",
+      "role": "Ventas",
+      "title": "Cómo registrar un negocio",
+      "duration": "2:40"
+    },
+    {
+      "icon": "service",
+      "role": "Servicio",
+      "title": "Cerrar un ticket con knowledge",
+      "duration": "3:05"
+    },
+    {
+      "icon": "marketing",
+      "role": "Marketing",
+      "title": "Probar un workflow antes de activarlo",
+      "duration": "4:12"
+    },
+    {
+      "icon": "revenue",
+      "role": "Revenue",
+      "title": "Crear una cotización y su contrato",
+      "duration": "3:30"
+    }
+  ],
+  "stats": [
+    {
+      "value": "24",
+      "label": "tutoriales grabados"
+    },
+    {
+      "value": "3 min",
+      "label": "duración promedio"
+    },
+    {
+      "value": "Por rol",
+      "label": "ventas, servicio, marketing y revenue"
+    }
+  ]
+}

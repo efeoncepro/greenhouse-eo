@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-waves",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Agent Hub · equipos híbridos",
+    "question": "¿Cómo se suma un agente?",
+    "answer": [
+      "Por",
+      "olas"
+    ]
+  },
+  "body": "Primero el trabajo, después la tecnología: cada ola se **prueba** antes de pasar a la siguiente.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Blueprint",
+      "desc": "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía."
+    },
+    {
+      "kicker": "Primer valor",
+      "name": "Primer equipo híbrido",
+      "desc": "Un workflow real con supervisora nombrada, pruebas y producción acotada."
+    },
+    {
+      "kicker": "Escala",
+      "name": "Entre equipos",
+      "desc": "Se extiende a otros equipos con la misma ficha, rituales y evaluación."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Operación híbrida",
+      "desc": "Catálogo de workflows, revisión humana y costo por resultado válido."
+    }
+  ],
+  "selectedStep": 1
+}

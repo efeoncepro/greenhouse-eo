@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-one-platform",
+  "voice": {
+    "eyebrow": "HubSpot · RevOps y CRM",
+    "question": "¿Cuántos HubSpot tienes?",
+    "answer": [
+      "Uno"
+    ]
+  },
+  "body": "Conectamos marketing, ventas, servicio, revenue y datos sobre **un** Smart CRM: una sola operación alrededor del cliente.",
+  "workAreas": [
+    {
+      "icon": "marketing",
+      "area": "Marketing",
+      "product": "Marketing Hub"
+    },
+    {
+      "icon": "sales",
+      "area": "Ventas",
+      "product": "Sales Hub"
+    },
+    {
+      "icon": "service",
+      "area": "Servicio",
+      "product": "Service Hub"
+    },
+    {
+      "icon": "revenue",
+      "area": "Revenue",
+      "product": "Revenue Hub"
+    },
+    {
+      "icon": "data",
+      "area": "Datos",
+      "product": "Data Hub"
+    }
+  ],
+  "account": {
+    "name": "Tu cliente",
+    "initials": "TC",
+    "subtitle": "Un solo registro, todos los equipos",
+    "facts": [
+      {
+        "label": "Negocio",
+        "value": "En negociación"
+      },
+      {
+        "label": "Ticket abierto",
+        "value": "Dentro del SLA"
+      },
+      {
+        "label": "Secuencia",
+        "value": "Nurturing · paso 3"
+      },
+      {
+        "label": "Suscripción",
+        "value": "Email ✓ · SMS —"
+      }
+    ]
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

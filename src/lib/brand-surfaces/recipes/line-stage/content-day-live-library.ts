@@ -115,7 +115,7 @@ export const contentDayLiveLibrary: RecipeBuilder = ({ intent, manifest, recipe 
   const tool = l.tool === undefined ? null : toolIsotype(l.tool, 'La herramienta de la biblioteca (`library.tool`)')
   const sampleMark = sampleMarkOf(intent)
   const list = exactly<VideoIntent>(intent.videos, videos.count, 'Los videos (`videos`)')
-  const icons = list.map((video, i) => productIcon(video.icon, `El video ${i + 1} (\`videos[${i}].icon\`)`))
+  const icons = list.map((video, i) => productIcon(video.icon, `El video ${i + 1} (\`videos[${i}].icon\`)`, line))
   const figures = exactly<StatIntent>(intent.stats, stats.count, 'Las cifras (`stats`)')
 
   const { stage, platform } = stageLayers(manifest, recipe, line, 'cll')

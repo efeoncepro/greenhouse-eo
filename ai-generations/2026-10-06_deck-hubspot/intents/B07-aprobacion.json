@@ -1,0 +1,64 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-approval",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Customer Agent · supervisión en vivo",
+    "question": "¿Dónde apruebas al agente?",
+    "answer": [
+      "Donde",
+      "trabajas"
+    ]
+  },
+  "body": "El agente propone con evidencia, tú **apruebas** en Teams y el cambio queda ejecutado y registrado.",
+  "note": "Ejemplo ilustrativo · la política y los límites se definen con tu equipo",
+  "channel": {
+    "tool": "teams",
+    "name": "Servicio · aprobaciones"
+  },
+  "agent": {
+    "icon": "service",
+    "name": "Customer Agent",
+    "badge": "Service Hub"
+  },
+  "message": "Ticket **#4821**: el cliente pide reembolso de **[MONTO]**. Según la política 3.2 corresponde aprobarlo.",
+  "evidenceChips": [
+    "Historial del cliente",
+    "Política 3.2"
+  ],
+  "actions": [
+    "Aprobar",
+    "Editar",
+    "Rechazar"
+  ],
+  "executed": {
+    "icon": "service",
+    "title": "Ejecutado en Service Hub",
+    "text": "Reembolso aplicado, cliente notificado y registro de quién aprobó y cuándo."
+  },
+  "loop": [
+    {
+      "title": "Propone",
+      "detail": "El agente, con evidencia"
+    },
+    {
+      "title": "Apruebas",
+      "detail": "La supervisora, en Teams"
+    },
+    {
+      "title": "Ejecuta",
+      "detail": "En Service Hub"
+    },
+    {
+      "title": "Queda registrado",
+      "detail": "Auditoría completa"
+    }
+  ],
+  "currentLoopStep": 2
+}
