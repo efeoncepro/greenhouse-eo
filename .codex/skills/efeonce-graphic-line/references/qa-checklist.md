@@ -497,6 +497,11 @@ Agenda dialog/inline conserva selección y borrador. Evidencia: 40/40 journeys y
 build/typecheck, 198 contracts, design/agent PASS en el dossier AXIS. La aprobación visual no
 promueve lifecycle del contrato ni certifica AT físico, publicación o adopción.
 
+
+## Video player — candidato 2026-10-07
+
+Verificar reproducción real, continuidad de tiempo/volumen al cambiar skin, capítulos, subtítulos, velocidad, teclado, fullscreen, fallback sin JS, error/retry, menús abiertos, contraste por línea y 320/390/768/1440px. [Comandos y límites](video-player.md). No certificar PiP, AT físico o integración consumidora a partir del Lab. Verificado contra: axis-design-system@f4dd2fe + cambios locales — 2026-10-07.
+
 ## Rooms — aceptación del design system (2026-10-07)
 
 - [ ] Todas las superficies propias (editor, exploración, consola/audiencia) consumen La órbita; AXIS distribuye y no impone defaults visuales anteriores.
@@ -507,3 +512,10 @@ promueve lifecycle del contrato ni certifica AT físico, publicación o adopció
 - [ ] Capturas desktop/móvil e interacción revisadas por operador; decisión documental no presentada como aceptación de píxeles.
 
 Owner del consumidor: [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). Estos checks se ejecutarán al implementar Rooms.
+
+
+### Video · segunda iteración local, 2026-10-07
+
+Verificado contra: axis-design-system@f4dd2fe + cambios locales V2 — 2026-10-07. Contrato 0.2.0 candidate, sin publicar: transcripción buscable, miniaturas VTT, Review con editor/estados delegados, API update/seek/AbortSignal y adapter React. Marca integrada sin otra órbita sobre el contenido. Ver [API, criterio, evidencia y límites](video-player.md#segunda-iteración--autorización-del-operador-2026-10-07). Pruebas incluyen draft ante fallo, fuente nueva, mount cancelado, imagen de preview real y composición 320–1440px; adopción en productos y AT físico pendientes.
+
+- Video: verificar replay orbital con teclado/nombre accesible y reinicio con imagen; mirar fotogramas pintados durante un clip completo, luego replay y cambios de pestaña. Decoder/canvas, controles y screenshots son evidencias distintas; incidente de superficie azul no cerrado por short smoke. Estado en `video-player.md`.

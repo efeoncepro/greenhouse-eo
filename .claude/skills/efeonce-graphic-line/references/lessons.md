@@ -623,3 +623,13 @@
 
 Regla: al tocar cualquiera de estos puntos, corregir la fuente (código o doc), borrar la línea de aquí y anotarlo en el
 registro.
+
+### 2026-10-07 · Foco residual y autoocultado de video
+
+Verificado contra AXIS `f4dd2fe` + V4 local. `:focus-within` persistía tras Play y anulaba el fade de Media Chrome. Distinguir foco de teclado con `keyboardcontrol`; usar `autohideovercontrols` para puntero inmóvil, sin temporizador paralelo. Probar Play sin blur, subtítulos, fullscreen, hover inmóvil y menús abiertos. WebKit podía cerrar el menú por focusout antes del click de su header, enviando el gesto al video; prevenir `mousedown` del cierre preserva el click y su retorno de foco. Cancelar `pointerdown` suprime el click táctil y no sirve. Pruebas Chrome/WebKit pasan; no equivale a certificación física.
+
+### 2026-10-07 · Compacto no significa pegado al marco
+
+Una fila de controles reduce altura, pero necesita margen exterior además del padding de targets. En video embedded: 12 px de separación al marco, botones 44×44 y thumb con ≥9 px de aire frente a Play. En Media Chrome, un time-range estilizado como block no reparte gaps como el volume-range flex: medir el thumb real y usar padding del wrapper. Probar proporciones verticales y CSS del host (Think/WordPress), no sólo el ancho de viewport del Lab.
+
+- Video: un canvas con fotogramas y currentTime avanzando no prueba que el usuario vea imagen. Ante superficie azul, comparar captura pintada, decoder, video nativo y reproducción completa; conservar el incidente abierto si recargar sólo recupera. No añadir estilos o ciclos de reload sin causa comprobada. Replay es una acción orbital estática con nombre accesible, no un loader. Ver `video-player.md` (2026-10-07).

@@ -1571,3 +1571,13 @@ local sobre AXIS `3c8a6dd`; `createGrowthCta` y CSS siguen unreleased en el inve
 availability. No se deduce disponibilidad del nuevo subpath desde primitives 0.5.0. Antes de
 adoptar: release del set compatible, instalación limpia con export/CSS/dependencia graphic-line,
 adapter de Growth y prueba en cada host. QA vigente: AXIS `docs/quality/growth-cta.md`.
+
+
+## Video player — 2026-10-07, extensión local sin publicar
+
+`axisVideoPlayer`, `efeonce.video-player` 0.1.0 candidate y `/video-player` + `/video-player.css` de primitives. Media Chrome 4.19.3 fijado en el adapter browser; SSR y tokens permanecen portables. [Exports, modelo, estados, errores y guía canónica](video-player.md). Verificado contra: axis-design-system@f4dd2fe + cambios locales — 2026-10-07.
+
+
+### Video · segunda iteración local, 2026-10-07
+
+Verificado contra: axis-design-system@f4dd2fe + cambios locales V2 — 2026-10-07. Contrato 0.2.0 candidate, sin publicar: transcripción buscable, miniaturas VTT, Review con editor/estados delegados, API update/seek/AbortSignal y adapter React. Marca integrada sin otra órbita sobre el contenido. Ver [API, criterio, evidencia y límites](video-player.md#segunda-iteración--autorización-del-operador-2026-10-07). Pruebas incluyen draft ante fallo, fuente nueva, mount cancelado, imagen de preview real y composición 320–1440px; adopción en productos y AT físico pendientes.

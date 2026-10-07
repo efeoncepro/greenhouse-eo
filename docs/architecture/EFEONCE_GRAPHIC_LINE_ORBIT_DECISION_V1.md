@@ -314,6 +314,11 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
   Contrato AXIS `efeonce.email-signature` 0.3.0 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del
   Lab. Detalle en el manual §10.2.
 
+
+## Delta 2026-10-07 — Reproductor compartido, candidato
+
+El operador solicitó skins portables en AXIS para editorial, demos y revisión creativa. El candidato local Cinema/Editorial/Review usa tokens de La órbita y controles Media Chrome; no supone adopción de La órbita en el resto de Greenhouse. La decisión específica permanece Proposed en AXIS: `docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md`. [Estado y límites](../../.claude/skills/efeonce-graphic-line/references/video-player.md). Aceptación visual, distribución y adapters consumidores pendientes.
+
 ## Addendum 2026-10-07 — La órbita como design system de Efeonce Rooms
 
 **Accepted, instrucción explícita del operador:** «Sobre la estética y tipografía hay que ajustar todos los documentos porque efeonce-graphic-line es el nuevo design system».
@@ -321,3 +326,28 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 La órbita gobierna la totalidad de las superficies propias de Rooms: autoría, exploración, presentación, consola y evaluación. Bricolage editorial/Poppins funcional; paleta, componentes, iconografía y motion canónicos. AXIS es la infraestructura de distribución de ese sistema. La propuesta histórica Poppins/Geist para Rooms queda reemplazada. La composición específica sigue su revisión de píxeles; no se impone el formato pregunta/respuesta a las propuestas y no se altera el arte cliente.
 
 La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.
+
+
+### Delta video V2 — 2026-10-07, candidato local
+
+Implementación ampliada por instrucción del operador: transcripción, miniaturas, Review con editor/estados delegados y API DOM/React. La órbita aporta valores, posición real y carga funcional; conserva el contenido sin firma ni anillo añadidos. Contrato `efeonce.video-player` 0.2.0 candidate; decisión y evidencia en AXIS `docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md` y `docs/quality/video-player.md`. Sin release ni adopción automática; el fixture audiovisual conserva su autorización separada para publicación.
+
+### Delta video V3 — 2026-10-07, candidato local
+
+Por corrección explícita del operador, las geometrías Tabler se sustituyen por una familia original de 13 controles UI curvos dentro de primitives. El dock añade margen interior para separar los hover del borde, con altura reservada coherente en las tres skins y móvil. No promueve el catálogo Trazo/Plastilina. Detalle y evidencia en la referencia `efeonce-graphic-line/references/video-player.md` y QA del repo AXIS.
+
+### Delta video V4 — 2026-10-07, candidato local
+
+Conjunto autorizado por el operador: islas, translucidez, motion, búsqueda fina, Ajustes móvil, transcripción lateral y Review con navegación/anotación puntual. Contrato 0.3.0 candidate; datos, versión y persistencia siguen bajo autoridad del consumidor. Estado y QA en skill `efeonce-graphic-line/references/video-player.md`. Sin publicación ni adopción implícita.
+
+Video V4, corrección local del volumen (2026-10-07): insets del slider y densidad de controles por ancho del controller evitan desbordes al hover/foco. Tokens/renderer compartidos; detalle en la referencia de la skill `efeonce-graphic-line/references/video-player.md`. Sin publicación.
+
+Video V4, corrección local del autoocultado (2026-10-07): Cinema retira controles tras 3 s de inactividad durante reproducción, sin bloquearse por foco residual del clic. Subtítulos independientes; teclado deliberado y ajustes abiertos conservan controles. Detalle en `efeonce-graphic-line/references/video-player.md`. Candidato local, sin publicación.
+
+Video V4, detalle compacto/vertical (2026-10-07): timeline en cápsula con insets también en compacto, hover sin fondo rectangular y radios inferiores del video. Corrección compartida en AXIS, candidata local; referencia de la skill `efeonce-graphic-line/references/video-player.md`.
+
+Video 0.4.0 candidato (2026-10-07): presentación embedded/contextual independiente de skin. Cinema inserta sólo video por defecto, sin pie ni reserva inferior; Editorial/Review conservan contexto. Título siempre accesible y contexto opcional mediante contrato compartido. Autorización del operador «Ajustemos todo»; implementación local, sin publicación. Detalle en `efeonce-graphic-line/references/video-player.md`.
+
+Video 0.5.0 candidato local (2026-10-07): auditoría autorizada, compacto flotante con aire al marco y Play, búsqueda/captions, revisión protegida y extensiones explícitas. Primeras validaciones: Think y snapshot del último artículo público 251941, no adopción productiva. Estado/API/límites en `efeonce-graphic-line/references/video-player.md` y AXIS `docs/quality/video-player-0.5.0.md`. Sin publicación ni certificación física.
+
+Video, continuidad 2026-10-07: replay contenido en órbita canónica estática con nombre accesible; commit/push autorizado hacia ramas de revisión, sin publicación ni adopción productiva. El incidente intermitente de imagen azul en Think sigue abierto aunque una reproducción fresca completa pasa. Estado detallado: skill `efeonce-graphic-line/references/video-player.md` y QA AXIS `docs/quality/video-player-0.5.0.md`.

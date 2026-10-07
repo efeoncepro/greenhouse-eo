@@ -1479,3 +1479,34 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
 (D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
 muestra los 43 volúmenes. En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+
+
+
+## Reproductor de video — candidato local, 2026-10-07
+
+AXIS contiene las skins Cinema, Editorial y Review para los tres usos solicitados por el operador. Paleta/tipografía/carga desde tokens; el video conserva su composición. [API, muestra, estado y QA](../../../.claude/skills/efeonce-graphic-line/references/video-player.md). Sin aprobación visual ni publicación; cada producto integra su fuente de medios, acceso y flujo de revisión.
+
+
+### Delta video V2 — 2026-10-07, candidato local
+
+Implementación ampliada por instrucción del operador: transcripción, miniaturas, Review con editor/estados delegados y API DOM/React. La órbita aporta valores, posición real y carga funcional; conserva el contenido sin firma ni anillo añadidos. Contrato `efeonce.video-player` 0.2.0 candidate; decisión y evidencia en AXIS `docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md` y `docs/quality/video-player.md`. Sin release ni adopción automática; el fixture audiovisual conserva su autorización separada para publicación.
+
+### Delta video V3 — 2026-10-07, candidato local
+
+Por corrección explícita del operador, las geometrías Tabler se sustituyen por una familia original de 13 controles UI curvos dentro de primitives. El dock añade margen interior para separar los hover del borde, con altura reservada coherente en las tres skins y móvil. No promueve el catálogo Trazo/Plastilina. Detalle y evidencia en la referencia `efeonce-graphic-line/references/video-player.md` y QA del repo AXIS.
+
+### Delta video V4 — 2026-10-07, candidato local
+
+Conjunto autorizado por el operador: islas, translucidez con fallback sólido, motion desde tokens, búsqueda fina, Ajustes móvil, transcripción lateral y Review con navegación/anotación puntual. Contrato 0.3.0 candidate, fuente portable en AXIS; datos, versión y persistencia siguen bajo autoridad del consumidor. [Estado/API/QA](../../../.claude/skills/efeonce-graphic-line/references/video-player.md). Sin publicación ni adopción implícita.
+
+Video V4, corrección local del volumen (2026-10-07): insets del slider y densidad de controles por ancho del controller evitan desbordes al hover/foco. Tokens/renderer compartidos; detalle en la referencia de la skill `efeonce-graphic-line/references/video-player.md`. Sin publicación.
+
+Video V4, corrección local del autoocultado (2026-10-07): Cinema retira controles tras 3 s de inactividad durante reproducción, sin bloquearse por foco residual del clic. Subtítulos independientes; teclado deliberado y ajustes abiertos conservan controles. Detalle en `efeonce-graphic-line/references/video-player.md`. Candidato local, sin publicación.
+
+Video V4, detalle compacto/vertical (2026-10-07): timeline en cápsula con insets también en compacto, hover sin fondo rectangular y radios inferiores del video. Corrección compartida en AXIS, candidata local; referencia de la skill `efeonce-graphic-line/references/video-player.md`.
+
+Video 0.4.0 candidato (2026-10-07): presentación embedded/contextual independiente de skin. Cinema inserta sólo video por defecto, sin pie ni reserva inferior; Editorial/Review conservan contexto. Título siempre accesible y contexto opcional mediante contrato compartido. Autorización del operador «Ajustemos todo»; implementación local, sin publicación. Detalle en `efeonce-graphic-line/references/video-player.md`.
+
+Video 0.5.0 candidato local (2026-10-07): auditoría autorizada, compacto flotante con aire al marco y Play, búsqueda/captions, revisión protegida y extensiones explícitas. Primeras validaciones: Think y snapshot del último artículo público 251941, no adopción productiva. Estado/API/límites en `efeonce-graphic-line/references/video-player.md` y AXIS `docs/quality/video-player-0.5.0.md`. Sin publicación ni certificación física.
+
+Video, continuidad 2026-10-07: replay contenido en órbita canónica estática con nombre accesible; commit/push autorizado hacia ramas de revisión, sin publicación ni adopción productiva. El incidente intermitente de imagen azul en Think sigue abierto aunque una reproducción fresca completa pasa. Estado detallado: skill `efeonce-graphic-line/references/video-player.md` y QA AXIS `docs/quality/video-player-0.5.0.md`.

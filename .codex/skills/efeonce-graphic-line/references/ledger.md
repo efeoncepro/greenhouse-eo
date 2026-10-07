@@ -720,3 +720,41 @@ Globe.
 - Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
   línea Growth.
 - Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
+
+
+
+### 2026-10-07 — Skins de reproductor compartido
+
+El operador pidió crear en AXIS un reproductor portable para todo el ecosistema e invocar esta skill. Confirmó los tres usos: editorial, demos y revisión creativa. Se implementa un candidato Cinema/Editorial/Review; la elección de Media Chrome y la dirección visual son propuestas de implementación, no aprobación del operador. [Estado y fuentes](video-player.md). Sin commit/push/release/adopción. Verificado contra: axis-design-system@f4dd2fe + cambios locales — 2026-10-07.
+
+
+### 2026-10-07 — Segunda iteración del reproductor
+
+El operador autorizó implementar las seis mejoras propuestas («Vamos con todo») y aprovechar la skill sin forzar recursos. Candidato 0.2.0: Cinema/Editorial/Review diferenciados, timeline con capítulos/miniaturas/momentos, transcripción buscable, editor con confirmación asíncrona, estados del consumidor, actualización de media y adapter React. No se convierte esta autorización en aceptación de píxeles ni release. [Detalle](video-player.md). Verificado contra: axis-design-system@f4dd2fe + cambios locales V2 — 2026-10-07.
+
+
+### 2026-10-07 — Redondez del reproductor
+
+Decisión del operador: «En íconos y demás puede haber más redondez?». Se redondean los controles y contenedores del candidato local: geometrías funcionales Tabler originales con trazo de tokens, controles circulares, cápsulas y dock/campos suaves. No se cambia ni aprueba el catálogo de marca. [Detalle](video-player.md#redondez-solicitada--2026-10-07). Verificado contra AXIS `f4dd2fe` + V2 local — 2026-10-07.
+
+### 2026-10-07 — Rechazo de iconos de video y corrección V3
+
+El operador pidió geometrías nuevas de UI moderna con redondez y hover alejados del borde. Se sustituye la primera propuesta por 13 glifos originales del package y se añaden insets del dock en tokens. [Implementación y evidencia](video-player.md#corrección-v3--geometrías-propias-y-aire-interior). Sin aprobación visual ni release.
+
+### 2026-10-07 — Video V4, conjunto autorizado
+
+«Vamos con todos»: islas, profundidad, motion, timeline precisa, menú móvil y paneles Editorial/Review; señal puntual opt-in. Implementado en primitives, contrato 0.3.0 candidate y adapter DOM/React. [Estado y QA](video-player.md#v4--conjunto-autorizado-2026-10-07). Sin release ni aceptación visual implícita.
+
+### 2026-10-07 — Volumen expandido sin desborde
+
+Corrección del operador sobre V4: range con insets de tokens y clipping durante expansión; densidad por ancho real del controller evita empujar las otras islas. Regresión de extremos, foco y nueve anchos en las tres skins. [Detalle](video-player.md#corrección-del-volumen-expandido--2026-10-07). Candidato local.
+
+- 2026-10-07 · Corrección del operador: los controles persistentes tapan el video/subtítulos. Cinema debe ocultarlos tras inactividad sin quedar fijado por el clic en Play; teclado y menú abierto conservan acceso. Implementación candidata local en AXIS `f4dd2fe` + V4; detalle y evidencia en `references/video-player.md` y QA AXIS. Sin publicación.
+
+- 2026-10-07 · El operador señaló el timeline rectangular y el corte inferior del video vertical. Cinema compacto conserva cápsula/insets y radios inferiores del video; hover transparente sobre el target, énfasis sólo del riel. AXIS `f4dd2fe` + V4 local; detalle en `references/video-player.md`. Sin publicación.
+
+- 2026-10-07 · «Ajustemos todo»: el operador autoriza quitar espacio permanente en inserciones de blog. Contrato candidato 0.4.0 añade presentación embedded/contextual; Cinema sólo video por defecto, contexto opcional; Editorial/Review mantienen herramientas por defecto. Título accesible preservado, autoocultado en todos los tamaños y documentación del Lab plegada. AXIS local `f4dd2fe` + cambios; sin release.
+
+- 2026-10-07 · Video 0.5.0 local: auditoría implementada, barra compacta flotante y thumb separado de Play tras corrección del operador; Think + snapshot del último post público 251941. API/QA y límites en `references/video-player.md`. Sin publicación.
+
+- 2026-10-07 · El operador pide replay dentro de La órbita y autoriza «ve pusheando lo que llevas y documentando». Replay canónico estático y accesible implementado; ramas de revisión, sin release/deploy. Incidente de imagen azul reaparecido en Think sigue abierto: imágenes decodificadas no acreditan píxeles visibles. Detalle en `video-player.md` y QA AXIS.

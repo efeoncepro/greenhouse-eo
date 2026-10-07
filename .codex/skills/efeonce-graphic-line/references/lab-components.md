@@ -251,3 +251,13 @@ Estado: **aprobado visualmente por el operador el 2026-10-05**, source local sob
 QA final: 40/40 journeys y 4/4 recorridos afectados tras el ajuste de wrapping; build/typecheck,
 198 tests de contracts y gates design/agent PASS. El dossier AXIS posee evidencia proporcional y
 límites; AT físico, publicación e instalación privada del nuevo export y adopción siguen pendientes.
+
+
+## Reproductor de video — 2026-10-07, candidato local
+
+Tres skins portables Cinema/Editorial/Review, confirmadas como usos por el operador; aceptación visual pendiente. Lab consume el package, con papel/navy, seis líneas y controles reales. [API, límites y QA](video-player.md). Verificado contra: axis-design-system@f4dd2fe + cambios locales — 2026-10-07.
+
+
+### Video · segunda iteración local, 2026-10-07
+
+Verificado contra: axis-design-system@f4dd2fe + cambios locales V2 — 2026-10-07. Contrato 0.2.0 candidate, sin publicar: transcripción buscable, miniaturas VTT, Review con editor/estados delegados, API update/seek/AbortSignal y adapter React. Marca integrada sin otra órbita sobre el contenido. Ver [API, criterio, evidencia y límites](video-player.md#segunda-iteración--autorización-del-operador-2026-10-07). Pruebas incluyen draft ante fallo, fuente nueva, mount cancelado, imagen de preview real y composición 320–1440px; adopción en productos y AT físico pendientes.

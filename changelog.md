@@ -9,6 +9,12 @@
 
 ## 2026-10-07 — Rooms: La órbita y experiencias creativa/SEO-AEO
 
+**AXIS Video: candidato portable y validación consumidora (2026-10-07)**
+
+- Cinema/Editorial/Review y adapters DOM/React/Astro/Gutenberg candidatos, integración local Think y snapshot post 251941; replay orbital por solicitud del operador. Skill `efeonce-graphic-line` espejo y docs de marca/API/QA actualizados.
+- Commit/push autorizado en ramas de revisión. Incidente intermitente de imagen azul sigue abierto; reproducción fresca con captions y replay verificada, sin afirmar corrección de causa. Think usa link local; sin release de paquetes, deploy ni activación WordPress. Fuente viva: AXIS `docs/quality/video-player-0.5.0.md`.
+
+
 - Decisión explícita del operador: `efeonce-graphic-line` gobierna estética, tipografía, componentes, iconografía y motion de Rooms; Bricolage editorial/Poppins funcional, AXIS como distribución técnica. [Dossier](docs/architecture/rooms/README.md) y [EPIC-052](docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md) corregidos, incluida autoría/consola; arte cliente intacto y sin narrativa pregunta/respuesta obligatoria.
 - Alcance precisado por el operador: perfiles creativo y SEO/AEO de primera clase, combinables. Modelo de bloques/evidencia, continuidad nativa X-ray, experiencia y criterios de EPIC-052 actualizados; creatividad es el primer recorrido, no el límite de V1. Sin migración de Think/X-ray ni runtime nuevo.
 - ADR de marca con addendum, manuales, criterios/aplicación/QA y skill Codex/Claude sincronizados. Corrección documental; sin cambios de paquetes, implementación, publicación ni despliegue.

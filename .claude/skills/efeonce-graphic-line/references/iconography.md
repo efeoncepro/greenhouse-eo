@@ -574,3 +574,10 @@ Los 19 AEO, 37 SEO y 13 de Autoridad se superponen: Brand Authority es una sola 
 Descubrir, exportar o publicar un candidato no lo vuelve aprobado. La aprobación de las diez
 formas AEO se conserva; las doce SEO R2 y trece de autoridad requieren decisión visual.
 El cambio de descubrimiento `bf93d3a` no cambia el paquete publicado 0.17.0 ni sus renderers.
+
+
+### Controles funcionales de video — candidato local, 2026-10-07
+
+Familia funcional original de 13 glifos curvos, candidata y solicitada por el operador: play con vértices Bézier, pausa en cápsulas, altavoz de silueta suave, ondas por nivel, CC y PiP de radios amplios, fullscreen curvo y ajustes con mandos circulares. Catálogo único `packages/primitives/src/video-player-icons.ts`, compartido por skins y adapters mediante slots de Media Chrome. No es una promoción al catálogo canónico Trazo/Plastilina. El dock suma `dockInsetInline` de 16 px y `dockInsetBlock` de 12 px desde tokens. La reserva de altura incluye ambos márgenes verticales, también en Review y móvil; los fondos circulares de hover quedan dentro del panel y los targets siguen en 44 px. Se conserva la protección CSS `fill:none` ante el estilo de SVG del motor. Véase [video-player.md](video-player.md#corrección-v3--geometrías-propias-y-aire-interior). Sustituye la propuesta Tabler rechazada; candidato local, sin publicación.
+
+Video: replay añade un glifo curvo a la familia funcional candidata (14); se contiene en el SVG canónico de órbita de botones, sin animación de loader. Nombre accesible localizado obligatorio. Pedido explícito del operador, 2026-10-07; `video-player.md`.

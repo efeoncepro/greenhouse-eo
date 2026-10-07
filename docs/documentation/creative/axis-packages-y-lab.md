@@ -111,3 +111,10 @@ Growth Forms tiene un adapter optativo local, sin cambiar sus formularios activo
 servidor. Su selector conserva 18 países; no añade automáticamente el catálogo de AXIS ni recibe el suyo
 desde el Lab. La ampliación exige una adopción explícita del motor.
 [Ownership, verificación y promoción](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+
+
+## Video player — extensión candidata 2026-10-07
+
+Cinema presenta el contenido de forma inmersiva; Editorial mantiene controles y capítulos; Review añade momentos para revisar. Las skins comparten video y estado. El producto conserva permisos, streaming, comentarios y analítica. Código local en AXIS, sin adopción Greenhouse ni publicación privada. [Fuente y alcance](../../../.claude/skills/efeonce-graphic-line/references/video-player.md).
+
+Video, continuidad 2026-10-07: replay contenido en órbita canónica estática con nombre accesible; commit/push autorizado hacia ramas de revisión, sin publicación ni adopción productiva. El incidente intermitente de imagen azul en Think sigue abierto aunque una reproducción fresca completa pasa. Estado detallado: skill `efeonce-graphic-line/references/video-player.md` y QA AXIS `docs/quality/video-player-0.5.0.md`.

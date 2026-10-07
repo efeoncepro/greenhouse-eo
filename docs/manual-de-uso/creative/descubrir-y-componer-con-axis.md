@@ -163,3 +163,10 @@ En Growth Forms esto requiere el adapter propio: sus 18 países actuales no se a
 La inyección optativa de formato no es un reemplazo del renderer ni activa el cambio en los formularios
 publicados. Sigue la [decisión de adopción y su prueba local](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md)
 antes de cambiar versiones, catálogo o embeds.
+
+
+## Probar las skins de video candidatas — 2026-10-07
+
+En el checkout AXIS: compilar con `pnpm build`, iniciar `pnpm --filter @efeonce/axis-design-system-lab preview --host 127.0.0.1 --port 4348` y abrir `/references/video-player/`. Elegir skin, superficie y línea; reproducir, cambiar capítulos, subtítulos y velocidad. Review permite probar un timestamp sin guardar comentarios. Integración: `docs/agent-composition/video-player.md` en AXIS. No instalar una versión histórica suponiendo estos exports: siguen unreleased. [Estado y QA](../../../.claude/skills/efeonce-graphic-line/references/video-player.md).
+
+Video, continuidad 2026-10-07: replay contenido en órbita canónica estática con nombre accesible; commit/push autorizado hacia ramas de revisión, sin publicación ni adopción productiva. El incidente intermitente de imagen azul en Think sigue abierto aunque una reproducción fresca completa pasa. Estado detallado: skill `efeonce-graphic-line/references/video-player.md` y QA AXIS `docs/quality/video-player-0.5.0.md`.
