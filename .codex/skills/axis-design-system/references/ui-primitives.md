@@ -179,3 +179,25 @@ API and QA: AXIS `packages/primitives/README.md`, `GROWTH_CTA_COMPOSITION_DECISI
 AT physical/manual, exact release/install and consumer adaptation remain pending. Before adoption
 verify CSS and graphic-line dependency in an installed set, then policy/events/Shadow DOM/bundle
 in the Growth renderer and a freshly loaded host; no pins or theme changed here.
+
+## Portable video candidate · 2026-10-07
+
+`@efeoncepro/axis-ui-primitives/video-player` owns DOM/SSR; explicit `/video-player/react` and
+`/video-player/integrations` are optional. Always import `/video-player.css`. Tokens: `axisVideoPlayer`;
+contract: `efeonce.video-player` 0.5.0 candidate. Cinema/Editorial/Review share one implementation;
+`presentation: embedded | contextual` is independent of skin. No new player engine inside a consumer.
+
+Before adoption read AXIS `docs/agent-composition/video-player.md`,
+`docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md` and `docs/quality/video-player-0.5.0.md`.
+Visual decisions and operator corrections are tracked in
+[the graphic-line video reference](../../efeonce-graphic-line/references/video-player.md).
+Use token-owned 44px controls resilient to host resets, real caption tracks, automatic chrome hiding
+and a static orbital replay with accessible name; do not substitute a loader animation for replay.
+
+Source pushed to `codex/video-player-20261007` in AXIS/Think/WordPress/Greenhouse. Exports remain
+unreleased: the published version number alone does not imply availability. Think's local link fails
+on Vercel Preview; replace it only with a verified distribution pin before deploying. WordPress is an
+unactivated candidate block, not a live article change. The in-app blue-surface painting incident is
+still open despite passing fresh playback/decoded-frame checks; verify painted pixels across full
+playback, replay and tab changes before release. Preserve consumer authority for review, streaming,
+analytics consent and persistence. Push, visual acceptance and production adoption remain separate.

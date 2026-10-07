@@ -61,7 +61,8 @@ single-contour field focus, business-line palettes and consumer verification. `a
 explicit HTML/CSS and optional React exports; the Lab demonstrates those exports, not a parallel component
 implementation. This availability does not migrate Greenhouse's MUI/Vuexy adapter or product pins.
 The same reference records product compositions and the approved Growth CTA/scheduler source
-(2026-10-05), both banner recipes and their release/adoption boundary.
+(2026-10-05), both banner recipes and their release/adoption boundary. It also routes the portable video
+candidate (2026-10-07): Cinema/Editorial/Review, consumer previews and unresolved release blockers.
 
 ### Tokens, contracts or registry
 
