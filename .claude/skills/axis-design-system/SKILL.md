@@ -62,7 +62,7 @@ explicit HTML/CSS and optional React exports; the Lab demonstrates those exports
 implementation. This availability does not migrate Greenhouse's MUI/Vuexy adapter or product pins.
 The same reference records product compositions and the approved Growth CTA/scheduler source
 (2026-10-05), both banner recipes and their release/adoption boundary. It also routes the portable video
-release (2026-10-07): primitives 0.6.3, Cinema/Editorial/Review, Think registry adoption, WordPress
+release (2026-10-07): primitives 0.6.5, Cinema/Editorial/Review, Think registry adoption, WordPress
 candidate and the open intermittent in-app blue-paint incident. Package publication is not contract promotion
 or a claim of native/device/streaming certification.
 
@@ -889,6 +889,8 @@ by the canary. Artifacts may contain target SHA, package version, URL, assertion
 console/network diagnostics, but never cookies, authorization headers or secrets.
 
 ### Release and rollback
+
+For AXIS CI and package publication, use the [proportional verification contract](references/agent-consumption.md#ci-scope-and-release-proof). A green scoped run is not proof of omitted suites.
 
 Release evidence must include target SHA, package versions, CI/build run, image/deployment digest,
 active revision, smoke/health result, canary result and the previous known-good rollback target.

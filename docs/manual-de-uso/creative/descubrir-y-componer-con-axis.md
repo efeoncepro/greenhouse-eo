@@ -168,7 +168,7 @@ antes de cambiar versiones, catálogo o embeds.
 ## Integrar el reproductor publicado
 
 1. Comprueba acceso al registry privado y el [set publicado y sus pendientes](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07).
-   Instala `@efeoncepro/axis-ui-primitives@0.6.3` con pin exacto y conserva el lockfile. No uses `link:` a otro
+   Instala `@efeoncepro/axis-ui-primitives@0.6.5` con pin exacto y conserva el lockfile. No uses `link:` a otro
    checkout como mecanismo de distribución. La configuración del scope puede vivir en `.npmrc`; la credencial no.
 2. Importa la API desde `/video-player` y su CSS desde `/video-player.css`. React tiene el adapter
    `/video-player/react`; Astro renderiza HTML en servidor y lo hidrata en cliente. Sigue la

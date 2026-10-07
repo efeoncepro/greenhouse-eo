@@ -109,12 +109,33 @@ Editorial headings use `apps/lab/src/components/LabHeading.astro`, whose family 
 Do not apply a global Bricolage reset to product specimens: Insights stat values remain Poppins, and the
 Typography specimen retains its own families. A CSS family declaration alone does not prove the loaded font.
 
-Run the package build/typecheck/tests and `pnpm design:check`; for agent changes run `pnpm agent:check`.
+For runtime changes, run the package build/typecheck/tests and `pnpm design:check`; for agent changes run `pnpm agent:check`.
 Lab gates include unit tests and focused desktop/mobile E2E for the changed surface. The editorial typography
 suite (`apps/lab/src/test/e2e/editorial-typography.spec.ts`) enumerates built routes and uses Chrome CDP to
 verify the font actually paints glyphs, plus specimen isolation. The 65-route / 132-check baseline from
 2026-10-04 is evidence of that revision, not a substitute for rerunning after a typography change.
 CI, public deployment, private package publication and consumer adoption are four separate readbacks.
+
+## CI scope and release proof
+
+Decision accepted 2026-10-07; implementation locally validated, first remote verification pending.
+Canon: AXIS [CI decision](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/CI_COST_AND_VERIFICATION_DECISION_V1.md)
+and [verification/readback](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/ci-efficiency.md).
+
+- `scripts/ci-scope.mjs` owns selection. Admitted Markdown/static documentary evidence uses the fast path
+  without dependency/browser installation. Dedicated video changes run common checks plus video;
+  mapped families include cross-dependencies. Shared, unknown, workflow or invalid-diff changes run full.
+- Only superseded PR runs are canceled. Main uses per-SHA groups so a later docs push cannot cancel an
+  earlier code verification. Package publication is serialized and is not canceled by a later release.
+- Release always rebuilds, validates tag/package versions and checks the registry. It reuses individual
+  checks only from successful trusted same-repository CI `push/main` at the exact tag SHA, with matching
+  rebuilt package digest and explicit successful coverage. A scoped green run does not cover omitted suites.
+  Missing or mismatched proof means full release fallback; uncovered required suites still run.
+- Ubuntu 24.04 uses installed Google Chrome and prepares only needed engines; Chrome/WebKit coverage is
+  preserved. Official HTTPS Ubuntu mirrors and bounded timeouts limit installation stalls. pnpm caching
+  does not cache OS dependencies. Do not claim savings or remote timings before measuring actual runs.
+- `workflow_dispatch` requests a full audit; no additional scheduled cloud run is introduced. Known
+  product geometry failures remain open and must still fail the full check until fixed.
 
 ## Native buttons (distribution history, 2026-10-04)
 

@@ -747,7 +747,7 @@ Las primeras iteraciones locales quedaron superadas por la publicación descrita
 9. Los intentos v0.6.1/v0.6.2 no publicaron; v0.6.3 completó gates y publicó. La demora por suites repetidas
    y dependencias Ubuntu motivó revisar la eficiencia de CI; una simplificación completa no está implementada.
 
-### Distribución verificada — 2026-10-07
+### Corte histórico de distribución 0.6.3 — 2026-10-07
 
 Publicados primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0, fuente `7fb549a`,
 [release 37630788367 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367).
@@ -756,3 +756,18 @@ ambos Vercel Production Ready; Think usa registry, sin link local. WordPress per
 Contrato video 0.5.0 candidate; el estado de contrato no cambia por distribuir el paquete.
 El incidente azul sigue ABIERTO; AT/dispositivos físicos y streaming real no certificados.
 La referencia vigente y QA AXIS poseen evidencia y próximos pasos, sin duplicar todo el historial aquí.
+
+### Distribución vigente 0.6.5 — 2026-10-07
+
+Primitives 0.6.5 publicado; tokens 0.6.0, contracts 0.7.0 y contrato video 0.5.0 candidate conservan
+sus versiones. Fuente `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070).
+El patch distribuye la corrección de visibilidad de la órbita de replay cuando coexiste el CSS de botones.
+La corrección nació en fuente `419e3c657c23a46798db8fdf65e7c92909667d22`; el release 0.6.4
+[37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) falló sin publicar.
+El harness móvil esperaba un click hasta el final del clip y disparaba replay; la 0.6.5 verifica la pausa
+tras aparecer los controles. Evidencia AXIS: `docs/evidence/video-player-2026-10-07/mobile-pause-trace.json`.
+Suite local completa: 80 PASS y diez exclusiones existentes; focal móvil: 3/3 PASS. El core JS no cambia.
+Think consume 0.6.5 con pin/lockfile; SHA y despliegue se registran en el runbook, sin inferirlos del release.
+El bundle WordPress exige procedencia/hash del paquete instalado y continúa sin activar. La compatibilidad
+Ohio pertenece al adapter. Imagen azul y aviso WebKit ResizeObserver permanecen abiertos; pruebas de
+callbacks en memoria no certifican persistencia, dispositivos físicos, AT ni proveedor de streaming.

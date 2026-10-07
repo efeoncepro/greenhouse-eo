@@ -7,16 +7,16 @@ fechadas de releases anteriores describen sus propios cortes y no sustituyen est
 
 | Entrega | Evidencia / estado |
 | --- | --- |
-| Paquetes publicados | `@efeoncepro/axis-ui-primitives@0.6.3`, `@efeoncepro/axis-tokens@0.6.0`, `@efeoncepro/axis-ui-contracts@0.7.0` |
-| Publicación | [Release v0.6.3, run 37630788367](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367), SUCCESS; fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0` |
+| Paquetes publicados | `@efeoncepro/axis-ui-primitives@0.6.5`, `@efeoncepro/axis-tokens@0.6.0`, `@efeoncepro/axis-ui-contracts@0.7.0` |
+| Publicación | [Release v0.6.5, run 37669427070](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070), SUCCESS; fuente `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d` |
 | Verificación del tarball | Instalación limpia, exports DOM/React/integrations, SSR e igualdad byte a byte de JS/CSS con el build verificado: PASS |
-| AXIS | `main` `15b1898caee740c30e4edc126714066bd1cd1eda`; [Lab desplegado](https://axis.efeonce.org/references/video-player/) |
-| Think | `main` `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`; build/typecheck PASS y Vercel Production Ready; [demostración de integración](https://think.efeoncepro.com/preview/video-player) |
+| AXIS | `main` `d33ed9a44eafa70bc3b13f096c33917cf4ffc604`; [Lab desplegado](https://axis.efeonce.org/references/video-player/) |
+| Think | `main` `474250195059ad0db42ec3aa3f2d24ad60f3e7fc`; siete pruebas focales y build PASS; Vercel Production Ready `dpl_8oa3mZNZMXWL1xPup8WHLuWqbvef`; HTTP 200, medios/captions/miniaturas verificados; [demostración de integración](https://think.efeoncepro.com/preview/video-player) |
 | WordPress | Adapter `eo-axis-video` preparado; sin activación ni modificación del artículo público `251941` |
 
 ### Contrato de adopción
 
-- Cada producto fija una versión publicada y su lockfile. Think instala `0.6.3` desde GitHub Packages;
+- Cada producto fija una versión publicada y su lockfile. Think instala `0.6.5` desde GitHub Packages;
   no usa `link:`, una carpeta hermana ni una copia del renderer. Las actualizaciones requieren QA del host.
 - El scope `@efeoncepro` resuelve a `https://npm.pkg.github.com`. En Think, `NPM_RC` sensible está configurado
   para Production y Preview de `codex/video-player-20261007` desde el secreto vigente
@@ -39,7 +39,7 @@ no se copiará el core. La preview/lifecycle de Elementor necesita QA propia y n
 Gutenberg. La activación y la inserción en contenido real siguen siendo acciones posteriores.
 La compatibilidad de Ohio restaura únicamente el panel Review contextual que el tema ocultaba con una
 regla global sobre `aside`, conservando tabs móviles y embedded.
-Su bundle candidato se reconstruyó desde el package publicado 0.6.3: `size-report.json` registra versión,
+Su bundle candidato se reconstruyó desde el package publicado 0.6.5: `size-report.json` registra versión,
 procedencia y hashes de cada archivo. Esto no activa el plugin ni modifica el artículo.
 
 Replay, iconos, targets y estados compartidos conservan implementación única en las tres skins; una pestaña
@@ -47,12 +47,12 @@ abierta con JS anterior no acredita el estado del release. Antes de evaluar dife
 realmente cargado. Una prueba de paridad debe fallar si faltan medios/datos, sin completarlos en el harness.
 El [manual AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md#consumidores-y-paquete-standalone)
 y los README de cada adapter mantienen la API. La ampliación de datos no cambia el core. La colisión adicional con `button.css` sí requiere 0.6.4;
-[release 37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) en curso.
+[release 37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) falló en una prueba móvil de pausa (79 PASS, diez exclusiones existentes); no publicó. El trace confirmó un click tardío del harness tras autoocultado; 0.6.5 corrige la espera táctil y publica la corrección CSS, sin cambiar el core JavaScript.
 El aviso WebKit `ResizeObserver` en ajustes/velocidad sigue abierto; se registra, no se silencia.
 
 ### Evidencia y límites
 
-El release aprobó 78 pruebas de video y conservó 10 exclusiones intencionales, además de sus otros gates.
+El release aprobó 80 pruebas de video y conservó 10 exclusiones intencionales, además de sus otros gates.
 Publicación, CI general y despliegue son comprobaciones distintas. No se declara verde un CI posterior por
 heredar el resultado del release. [Dossier QA y pendientes](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/video-player-0.5.0.md).
 
@@ -64,6 +64,10 @@ en Greenhouse, Globe o Studio.
 [Funcionamiento](../documentation/creative/axis-packages-y-lab.md#reproductor-compartido) ·
 [Manual de integración](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado) ·
 [Historia documental preservada](../audits/2026-10-07-axis-video-documentation-history.md).
+
+### Iteración y costo
+
+CI proporcional implementado en AXIS `0706485`: documentación sin install/build/navegadores; cambios dedicados ejecutan sus familias; cambios compartidos o desconocidos ejecutan cobertura completa. Release reutiliza solamente gates de push/main exitoso con SHA exacto, cobertura y digest del build iguales; lo restante se ejecuta. PR obsoletas se cancelan; main conserva evidencia por SHA. No publicar una versión por cambios documentales. Primera ruta documental: [run 37672045123 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37672045123), 20 s de job / 23 s desde creación; sin install/build/navegadores. El primer reuso remoto de release sigue pendiente de una publicación real. [Contrato y medición](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/ci-efficiency.md).
 
 ## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
 

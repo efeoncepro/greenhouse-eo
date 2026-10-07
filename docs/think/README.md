@@ -39,8 +39,8 @@ Rooms incorporará la experiencia SEO/AEO de X-ray junto al perfil creativo medi
 
 ## Integración del reproductor AXIS
 
-Think consume `@efeoncepro/axis-ui-primitives@0.6.3` con pin/lockfile desde registry privado,
-sin dependencia de un checkout hermano. La ruta desplegada `/preview/video-player` es una demostración
+Think consume `@efeoncepro/axis-ui-primitives@0.6.5` con pin/lockfile desde registry privado,
+sin dependencia de un checkout hermano. La ruta `/preview/video-player` es una demostración
 de integración; no incorpora medios en informes de clientes. El adapter Astro vive en
 `efeonce-think/src/components/AxisVideoPlayer.astro`.
 [Versiones, QA y pendientes](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·

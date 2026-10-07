@@ -507,11 +507,12 @@ promueve lifecycle del contrato ni certifica AT físico, publicación o adopció
 - [ ] Review con guardado/resolución confirmados por consumidor, borrador protegido al fallar y puntos relativos al video.
 - [ ] Fallback nativo/SSR, carga, error/retry, velocidad, teclado, fullscreen, menús, contraste y reduced motion.
 - [ ] Instalación desde registry con pin/lockfile y CSS publicado; sin link a checkout hermano ni copia del Lab.
+- [ ] Replay orbital visible también con CSS de botones cargado (corrección 0.6.5); compatibilidad Ohio conserva selección de panel Review en móvil.
 
 Checklist para futuras integraciones, no resultados certificados. [Evidencia y límites](video-player.md#qa-al-continuar):
-release PASS y Think desplegado; WordPress sin activar; imagen azul intermitente ABIERTA.
+release 0.6.5 PASS y Think con pin/lockfile actualizado; verificar su despliegue en el runbook. WordPress sin activar; imagen azul intermitente ABIERTA.
 PiP, dispositivos físicos, tecnologías de asistencia y streaming real requieren evidencia propia.
-Verificado contra: AXIS release `7fb549a`, main documental `15b1898`; Think `cd428c7` — 2026-10-07.
+Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.
 
 ## Rooms — aceptación del design system (2026-10-07)
 

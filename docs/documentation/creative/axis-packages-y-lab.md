@@ -115,7 +115,7 @@ desde el Lab. La ampliación exige una adopción explícita del motor.
 
 ## Reproductor compartido
 
-AXIS distribuye el reproductor en `@efeoncepro/axis-ui-primitives@0.6.3`. Las tres skins comparten motor,
+AXIS distribuye el reproductor en `@efeoncepro/axis-ui-primitives@0.6.5`. Las tres skins comparten motor,
 estado y API; no son tres copias que cada plataforma deba mantener.
 
 | Skin | Función |

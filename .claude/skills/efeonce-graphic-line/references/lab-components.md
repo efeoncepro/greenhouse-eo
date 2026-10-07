@@ -257,9 +257,9 @@ límites; AT físico, publicación e instalación privada del nuevo export y ado
 
 [Lab público](https://axis.efeonce.org/references/video-player/) con Cinema/Editorial/Review,
 papel/navy, seis líneas, presentación embedded/contextual y controles reales del package.
-Primitives 0.6.3 está publicado; Think consume registry y está desplegado. Los selectores y la
+Primitives 0.6.5 está publicado; Think consume esa versión desde registry. Los selectores y la
 documentación plegable del Lab no forman parte del embed. WordPress sigue candidato sin activar.
 [API, criterio, evidencia y pendientes](video-player.md), incluido el incidente azul intermitente abierto.
 Publicación no es aceptación visual universal ni validación física/AT/streaming real.
 
-Verificado contra: AXIS release `7fb549a`, main documental `15b1898`; Think `cd428c7` — 2026-10-07.
+Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.

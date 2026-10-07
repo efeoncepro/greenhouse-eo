@@ -1577,9 +1577,9 @@ adapter de Growth y prueba en cada host. QA vigente: AXIS `docs/quality/growth-c
 
 `axisVideoPlayer`, contrato `efeonce.video-player` 0.5.0 candidate y entradas `/video-player`,
 `/video-player.css`, `/video-player/react`, `/video-player/integrations`. Distribución publicada:
-primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0; Media Chrome 4.19.3 en el adapter browser.
+primitives 0.6.5 / tokens 0.6.0 / contracts 0.7.0; Media Chrome 4.19.3 en el adapter browser.
 SSR y tokens permanecen portables; el consumidor importa CSS y no copia componentes del Lab.
 [API, evidencia, adopción Think y límites abiertos](video-player.md). Registry 0.7.2 mantiene
 inventario histórico, no acredita descubrimiento de estos exports.
 
-Verificado contra: AXIS release `7fb549a`, main documental `15b1898`; Think `cd428c7` — 2026-10-07.
+Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.

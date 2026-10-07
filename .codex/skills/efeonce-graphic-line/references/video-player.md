@@ -1,19 +1,19 @@
 # Reproductor de video Efeonce en AXIS
 
-> Verificado contra: AXIS release `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`, main documental `15b1898`; Think `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5` — 2026-10-07.
+> Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, main documental `d33ed9a`; Think `474250195059ad0db42ec3aa3f2d24ad60f3e7fc` — 2026-10-07.
 
 ## Distribución y adopción verificadas
 
 El operador autorizó los tres usos, publicar el paquete y llevar AXIS y Think a `main`.
-GitHub Packages publicó `@efeoncepro/axis-ui-primitives@0.6.3`, `axis-tokens@0.6.0` y
-`axis-ui-contracts@0.7.0`: [release 37630788367 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367).
+GitHub Packages publicó `@efeoncepro/axis-ui-primitives@0.6.5`, `axis-tokens@0.6.0` y
+`axis-ui-contracts@0.7.0`: [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070).
 Instalación limpia, exports DOM/React/integrations, SSR y comparación del JS/CSS instalado con el build verificado: PASS.
 El número del paquete, el contrato `efeonce.video-player` 0.5.0 (`candidate`) y la aceptación visual son estados distintos.
 
 | Superficie | Estado verificado |
 | --- | --- |
 | [AXIS Lab](https://axis.efeonce.org/references/video-player/) | `main`, Vercel Production Ready; demuestra el renderer del paquete |
-| [Think](https://think.efeoncepro.com/preview/video-player) | `main`, Vercel Production Ready; adapter Astro, pin exacto 0.6.3 y lockfile desde registry privado, sin `link:` ni copia del reproductor |
+| [Think](https://think.efeoncepro.com/preview/video-player) | `main`, Vercel Production Ready; adapter Astro, pin exacto 0.6.5 y lockfile desde registry privado, sin `link:` ni copia del reproductor |
 | WordPress | Bloque Gutenberg candidato y prueba con copia del artículo 251941; sin activación ni modificación del artículo público |
 | Otros productos | Sin adopción implícita; cada consumidor valida su integración antes de actualizar |
 
@@ -102,7 +102,7 @@ pendientes; la orientación de arquitectura no los ejecuta.
 Ejecutar la paridad focal de consumidores de AXIS; verificar datos de entrada antes de variar skins y exigir
 miniaturas cargadas, captions activos, capítulos navegables y replay orbital en cada skin/superficie.
 No ampliar a un release o CI completo cuando sólo cambia la conexión del consumidor.
-La colisión con `button.css` mostró otra limitación: un SVG presente puede estar oculto. Exigir órbita, anillo y esfera visibles en píxeles, cargando ambas hojas en ambos órdenes; el parche 0.6.4 explicita su display.
+La colisión con `button.css` mostró otra limitación: un SVG presente puede estar oculto. Exigir órbita, anillo y esfera visibles en píxeles, cargando ambas hojas en ambos órdenes; la corrección CSS se distribuye en 0.6.5 (0.6.4 no publicó).
 
 ## QA al continuar
 

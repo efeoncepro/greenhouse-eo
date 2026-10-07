@@ -1,7 +1,7 @@
 # Product UI primitives — consumption and verification
 ## Distribución verificada — 2026-10-07
 
-Publicado en GitHub Packages: `axis-ui-primitives@0.6.3`, `axis-tokens@0.6.0`, `axis-ui-contracts@0.7.0`. [Release v0.6.3](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367) SUCCESS, fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`. Instalación limpia, exports DOM/React/integrations, SSR y igualdad byte a byte del JS/CSS con el build verificado: PASS. Think fija registry + lockfile, sin `link:`; build y typecheck PASS, main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Vercel Production Ready en https://think.efeoncepro.com/preview/video-player. AXIS main y https://axis.efeonce.org/references/video-player/ desplegados.
+Publicado en GitHub Packages: `axis-ui-primitives@0.6.5`, `axis-tokens@0.6.0`, `axis-ui-contracts@0.7.0`. [Release v0.6.5](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) SUCCESS, fuente `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`. Instalación limpia, exports DOM/React/integrations, SSR y igualdad byte a byte del JS/CSS con el build verificado: PASS. Think fija registry + lockfile, sin `link:`; build y typecheck PASS, main `474250195059ad0db42ec3aa3f2d24ad60f3e7fc`, Vercel Production Ready en https://think.efeoncepro.com/preview/video-player. AXIS main y https://axis.efeonce.org/references/video-player/ desplegados.
 
 El incidente intermitente de pintura azul en sesiones antiguas del navegador integrado sigue ABIERTO; esta publicación no acredita su corrección. WordPress conserva bloque candidato sin activación ni modificación del artículo publicado. Dispositivos/AT físicos y streaming real mantienen sus gates. Registry empaquetado 0.7.2 conserva su inventario anterior; no inferir descubrimiento de video desde ese paquete histórico.
 
@@ -191,7 +191,7 @@ in the Growth renderer and a freshly loaded host; no pins or theme changed here.
 ## Portable video — published 2026-10-07
 
 `@efeoncepro/axis-ui-primitives/video-player` owns DOM/SSR; `/video-player/react` and
-`/video-player/integrations` are optional. Import `/video-player.css`. Published primitives 0.6.3
+`/video-player/integrations` are optional. Import `/video-player.css`. Published primitives 0.6.5
 uses tokens 0.6.0 and contracts 0.7.0; contract `efeonce.video-player` remains 0.5.0 candidate.
 Cinema/Editorial/Review share one implementation; `presentation: embedded | contextual` is independent.
 Think consumes an exact registry pin + lockfile, never a sibling checkout or vendored player in cloud.

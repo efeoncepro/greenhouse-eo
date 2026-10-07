@@ -576,9 +576,9 @@ formas AEO se conserva; las doce SEO R2 y trece de autoridad requieren decisión
 El cambio de descubrimiento `bf93d3a` no cambia el paquete publicado 0.17.0 ni sus renderers.
 
 
-### Controles funcionales de video — distribución 0.6.3, 2026-10-07
+### Controles funcionales de video — distribución vigente 0.6.5, 2026-10-07
 
-Familia funcional original de 14 glifos curvos, incluida en primitives 0.6.3: play Bézier,
+Familia funcional original de 14 glifos curvos, introducida en primitives 0.6.3 y conservada en 0.6.5: play Bézier,
 pausa en cápsulas, altavoz/ondas, CC, PiP, fullscreen, ajustes y replay. Catálogo único
 `packages/primitives/src/video-player-icons.ts`, compartido por skins/adapters mediante slots
 Media Chrome. Sustituye la propuesta Tabler rechazada; no promueve formas al catálogo de marca
@@ -586,5 +586,7 @@ Trazo/Plastilina. La protección CSS `fill:none`, targets 44×44 y márgenes des
 resets del host y mantienen los círculos de hover dentro del dock.
 
 Replay se contiene en la órbita canónica estática de botones, sin animación de loader y con
-nombre accesible localizado. [Criterio y límites vigentes](video-player.md#criterio-de-marca-e-interacción).
-Verificado contra: AXIS release `7fb549a`, main documental `15b1898` — 2026-10-07.
+nombre accesible localizado. La 0.6.5 evita que el CSS compartido de botones oculte esa órbita;
+comprobar su visibilidad real al cargar ambos estilos, no sólo la presencia del SVG en DOM.
+[Criterio y límites vigentes](video-player.md#criterio-de-marca-e-interacción).
+Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.
