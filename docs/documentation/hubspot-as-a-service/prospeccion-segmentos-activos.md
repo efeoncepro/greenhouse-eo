@@ -77,6 +77,14 @@ HubSpot generó una empresa vacía a partir del dominio del email, distinto del 
 y corrigió Primary hacia la entidad mexicana del deal; la empresa automática quedó secundaria y sin cohorte.
 Un dominio de email o una asociación automática no acreditan la entidad legal ni autorizan una fusión.
 
+### Reutilización comprobada — 2026-10-07
+
+[LIC-1169 Q4 Home Center](../../commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md) creó un
+Deal distinto usando Company/Contact existentes. No cambió cohortes, atributos ni reglas. El lector confirmó
+el contacto en 174/176 y la empresa en 177. Es comprobación individual, no un nuevo censo de los 19 segmentos;
+la tabla y sus conteos siguen fechados al 06/10. La nota conserva la solicitud Q4 y la responsabilidad del
+contacto aún por confirmar. Un nuevo proceso no convierte fit creativo en demanda HubSpot ni crea destinatarios nuevos.
+
 ## Cierre del alta y uso comercial
 
 El alta termina cuando se leen las propiedades escritas, la asociación correcta, las expresiones ACTIVE y la

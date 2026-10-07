@@ -63,6 +63,24 @@ Verificar Primary de contacto/deal tras el create: la automatización por domini
 empresa y marcarla como principal. Confirmar entidad legal antes de corregir; no borrar ni fusionar por dominio.
 Los cambios automáticos de lifecycle o pipeline no cambian la cohorte ni prueban cliente ganado.
 
+## 2 bis. Reutilizar registros en otra licitación
+
+Un ID de licitación distinto tiene su propio Deal. Reutilizar empresa/contacto no exige repetir el alta de
+prospecto: leer sus atributos, conservar la cohorte y comprobar las membresías que correspondan. No sumar
+otra cohorte sin ampliación autorizada ni volver a inscribir manualmente en listas históricas.
+
+Si el brief no identifica comprador, documentar al contacto reutilizado como contacto de relación y dejar
+su responsabilidad en ese proceso por confirmar. La intención específica va en la nota del nuevo Deal;
+no inventar cargo/interés HubSpot para que entre en otro segmento.
+
+Para verificar sólo un registro, añadir al lector MCP `hs_object_id EQ <ID>` junto a `ilsListIds IN [<segmento>]`.
+El resultado confirma esa pertenencia, no el total del segmento; no modifica filtros activos. Para un cambio
+de definición o una afirmación sobre toda la cohorte, seguir la comparación completa de la sección 4.
+
+Ejemplo 07/10: [LIC-1169 Q4](../../commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md) reutilizó
+los registros de Sika México. Se verificaron Contact 174/176 y Company 177, sin escrituras de propiedades/listas.
+Los totales y catálogo del 06/10 conservan su fecha: no se recontó toda la cohorte en este corte.
+
 ## 3. Componer o corregir filtros nativos activos
 
 ```sql

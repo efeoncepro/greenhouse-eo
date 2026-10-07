@@ -1,6 +1,6 @@
 # HubSpot Agent CLI y MCP — selección del carril operativo
 
-> Observaciones locales: 2026-09-29 y 2026-10-06. Este documento registra acceso del operador, no un runtime de Greenhouse ni un entitlement permanente de un portal cliente. Revalidar identidad, scopes y capacidad en cada sesión y antes de cada cambio.
+> Observaciones locales: 2026-09-29, 2026-10-06 y 2026-10-07. Este documento registra acceso del operador, no un runtime de Greenhouse ni un entitlement permanente de un portal cliente. Revalidar identidad, scopes y capacidad en cada sesión y antes de cada cambio.
 
 ## Carriles
 
@@ -75,6 +75,14 @@ Company, cohorte AND `industry IN ('BUILDING_MATERIALS', 'CHEMICALS')`. Contacto
 Propiedades existentes, Company/Contact separados; conservar multiselects. Verificar Primary tras automatización
 por dominio: un email subdominio puede generar otra Company. Cohorte explícita, fit e intención separados;
 no poblar cargo/interés incompatibles para provocar membresía. La evidencia individual se guarda fuera de Git.
+
+### 2026-10-07 — reutilización en Sika Q4
+
+La [admisión LIC-1169](../commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md) creó sólo Deal y
+nota usando registros existentes. Tras el readback inicial, `pipeline_bucket` derivó de Strategic Bets a Core
+Pipeline; `dealtype=newbusiness` y Primary mexicana se conservaron. La evidencia no identifica un workflow
+concreto ni acredita cliente existente. Contact 174/176 y Company 177 se comprobaron individualmente sin
+mutar atributos/listas ni recontar la base. Scope de cada lectura y valores propuestos/live quedan separados.
 
 ## Procedimiento por operación
 

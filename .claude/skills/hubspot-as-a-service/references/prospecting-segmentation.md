@@ -110,6 +110,23 @@ for a correctly property-driven ACTIVE segment.
 - New rounds require their own option/filter or an explicitly approved combined universe. Do not relabel the
   historical CRM or every future intake with `research_2026_10_06`. Preserve multiselect values when extending.
 
+## New opportunity on an existing prospect
+
+- A new tender Deal does not recreate Company/Contact or automatically establish a new research cohort.
+  Preserve supported cohort/type/fit values unless new evidence and the authorized scope require a change.
+  Record the new buying signal in its own Deal-associated note; do not force HubSpot intent from creative demand.
+- Reusing an associated contact means relationship context, not verified responsibility for the new process.
+  If the brief names no buyer, retain the role/authority gap in the note instead of inferring job title or decision power.
+- For an unchanged record, membership search combining `hs_object_id` and `ilsListIds` proves only that record's
+  membership in the specified segment. It is a reader, never a new ID-based segment expression. A filtered
+  result of one is not the segment total or an audit of its full recipient set; do not refresh dated totals from it.
+- Preserve legal Company Primary on Contact and Deal and record any automation drift. No manual list enrollment,
+  schema recreation or current-cohort relabeling is needed when the existing values already qualify.
+  New/changed rules or cohort-wide claims still require the complete-set verification below.
+
+Process-level CRM method: [tender portfolio companion](../../greenhouse-public-private-tenders/crm-portfolio-operating-model.md).
+Dated example: [Sika Q4 LIC-1169](../../../../docs/commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md).
+
 ## Independent verification
 
 - Read back ID, name, object type, ACTIVE type and complete expression. Preserve unrelated global definitions.

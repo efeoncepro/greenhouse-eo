@@ -28,6 +28,7 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
   LicitaLAB no es una fuente de RFP/RFQ privados.
 - Consultar el estado rápido de bid, CRM y postulación →
   `docs/commercial/tenders/LICITATION_CRM_REGISTER.md`; es un índice operativo, no una fuente de verdad.
+- Para otro RFP de una cuenta ya registrada, cargar `crm-portfolio-operating-model.md` → «Nuevo proceso de una cuenta ya registrada»: Deal por proceso, contactos reutilizados con autoridad explícita y handoff trazable.
 - Para una licitación ya promovida a Deal, consultar también `docs/commercial/CRM_DEAL_REGISTER.md`, la vista
   transversal de negocios activos.
 - Revisar Wherex mediante la CLI Playwright protegida, leyendo ficha y adjuntos antes de clasificar el fit → `wherex-radar-chrome-playwright.md`.

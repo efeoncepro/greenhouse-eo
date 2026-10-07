@@ -20,7 +20,7 @@ CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-HubSpot: [altas y segmentos activos](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md); verificar portal/permisos CLI y MCP.
+HubSpot: [altas/segmentos](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md). Skills HubSpot/licitaciones: reutilización y readback.
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 

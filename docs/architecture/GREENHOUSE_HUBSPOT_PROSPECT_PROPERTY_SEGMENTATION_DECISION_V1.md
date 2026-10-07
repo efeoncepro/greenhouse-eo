@@ -77,6 +77,14 @@ Procedimiento y estado verificado: [manual](../manual-de-uso/hubspot/segmentar-p
 [auditoría](../audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md).
 La skill dueña es `hubspot-as-a-service` → `references/prospecting-segmentation.md`, espejada en Codex/Claude.
 
+### Evidencia posterior sin cambio de decisión — 2026-10-07
+
+[Admisión LIC-1169](../commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md): nueva oportunidad
+con Company/Contact reutilizados, sin cambios de esquema, propiedades, cohortes o expresiones. Se leyó pertenencia
+individual Contact 174/176 y Company 177; no se volvió a enumerar toda la cohorte ni actualizar sus totales.
+La nota del Deal conserva la intención del proceso y la responsabilidad del contacto pendiente. Es aplicación
+del contrato existente, no ampliación del universo ni revisión de la decisión aceptada.
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

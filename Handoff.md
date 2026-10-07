@@ -8,6 +8,8 @@ AXIS Video: primitives 0.6.5 publicados (release 37669427070 SUCCESS); Think pin
 
 Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
 
+**[Sika/skills](docs/commercial/tenders/LICITATION_CRM_REGISTER.md)**.
+
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
 **Pibank:** [oferta híbrida](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md): ruta US$79.200; base US$4.500, 5 artículos/mes. AEO144/M2; PR M3/M8. PDF/Excel/Claude. Demanda intacta; precio propuesto. Corte09/10.

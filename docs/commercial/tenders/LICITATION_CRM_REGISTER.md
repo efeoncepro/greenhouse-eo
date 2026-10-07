@@ -5,12 +5,22 @@
 ## Alcance y corte
 
 - Inicio del registro operativo: **2026-08-28**.
-- Última actualización documentada: **2026-10-06, America/Santiago**.
+- Última actualización documentada: **2026-10-07, America/Santiago**.
 - Snapshot histórico 2026-09-01: 35 oportunidades revisadas (23 públicas y 12 privadas); 29 cuentan con Deal HubSpot verificado: 28 abiertos y uno `closedlost`.
 - El readback live del 2026-09-01 encontró 29 Deals de licitación abiertos: 28 pertenecen a esta admisión y uno corresponde al RFI CRM Mineduc `1588-33-RFI26`, anterior al corte de este registro.
 - Screening comparativo: [`LICITALAB_SCREENING_2026-08-28.md`](LICITALAB_SCREENING_2026-08-28.md).
 - El snapshot histórico previo identificó 99 deals vinculados a LicitaLAB en HubSpot. Esos registros **no fueron migrados ni enumerados aquí**; siguen consultándose en HubSpot.
 - Una fila en este archivo no demuestra que la oferta fue enviada. `Postulada` requiere comprobante, fecha/hora y fuente verificable.
+
+## Admisión Sika México Q4 Home Center — 2026-10-07
+
+[Workspace LIC-1169](sika-mexico-campana-q4-home-center-1169/README.md) · [Deal 65827529551](https://app.hubspot.com/contacts/48713323/record/0-3/65827529551?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1169). Distinta de LIC-1164. Brief de cinco páginas leído completo; dos frentes, 34 tiendas Home Depot, noviembre–diciembre, creatividad/medios geodirigidos/apoyo en tienda/medición y tres escenarios.
+
+Company existente `59084984648` Primary y contacto existente `253487637159` asociados; nota `118213040416` leída y asociada a los tres. Contacto de relación, responsable específico sin confirmar. Datos personales en CRM/OneDrive. `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`; segundo readback muestra `Core Pipeline` automático tras proponer `Strategic Bets`, sin acreditar cliente existente. Monto/cierre comercial vacíos; moneda sin acordar.
+
+Cierre en captura: 16/10/2026 19:00 sin zona visible. Cotización desglosada y presentación general obligatorias; pago según alta proveedor. Presupuesto, SKU, inventario, objetivo cuantitativo y ejecución/costeo pendientes. Datos sensibles sólo a seleccionada según brief; no garantizar incremento de venta. Membership actual del contacto ACTIVE 174/176 y Company 177 confirmado; atributos/cohorte preservados. Registro guardado localmente en OneDrive `Sika/3. Campaña Q4/CRM-REGISTRO-INTERNO.md`; sin comprobante de presentación.
+
+Chat de trabajo Q4: [Sika México · LIC-1169 · Campaña Q4 Home Center](codex://threads/01a11883-e170-7a00-8cbe-09a54ae2b0bc), abierto el 07/10 con brief, IDs y pendientes. Leer su estado antes de afirmar avance de propuesta; registro no demuestra entrega.
 
 ## Admisión Sika México — 2026-10-06
 

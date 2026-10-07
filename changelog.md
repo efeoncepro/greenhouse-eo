@@ -49,6 +49,8 @@
 
 ## 2026-10-06 — Prospección HubSpot: cohortes y abordaje personalizados
 
+- Admisión 07/10: [Sika México LIC-1169 Q4 Home Center](docs/commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md), brief completo y Deal `65827529551`/nota asociados a empresa/contacto existentes. 34 tiendas, dos frentes, escenarios; presupuesto y responsable pendientes. Segmentos 174/176/177 verificados sin cambiar atributos; bucket automático Core Pipeline tras Strategic Bets propuesto. Registro local OneDrive; sin oferta enviada. Continuidad en chat Q4 enlazada; método CRM y skills Codex/Claude aclaran reutilización, contacto sin autoridad confirmada y lectura individual frente a totales.
+
 - Continuidad de segmentos: [modelo funcional y catálogo exacto](docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md), manual con preview/MCP/diagnóstico, decisión y routers actualizados; skills HubSpot espejadas. Nueva lectura verifica 34 definiciones y 19 conjuntos, sin nuevas escrituras CRM.
 - Alta autorizada [Sika México LIC-1164](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md): empresa México, contacto y deal asociados con nota; Primary corregida tras automatización por dominio. Cohorte 81/81, 19 ACTIVE; 63 individuales y 51 creativos, nuevo 177 Química y materiales con una empresa. Conjuntos exactos y registro OneDrive; sin propuesta enviada.
 - Corte inicial histórico: portal `48713323`, 15 segmentos globales conservados y 18 nuevos activos, con pertenencia obligatoria al lote antes de industria, país, tamaño o cargo. Lectura completa confirma conjuntos exactos y cero registros ajenos. 80 cuentas investigadas, 79 contactos nuevos; 61 individuales con email para preparación, no aprobación de envío.
