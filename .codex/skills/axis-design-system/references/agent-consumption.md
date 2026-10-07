@@ -273,3 +273,21 @@ Each suite has its own Actions step and timing summary, sharing install/build pe
 benchmark this. Local 55-test gate and readback against real release 37696704305/CI 37696699810 passed;
 first future incremental publication still needs its own observed timing. Full CI for this control-plane
 change is separate from the already successful 0.6.6 release.
+
+
+### Continuous AXIS editing — operator default (2026-10-07)
+
+For frequent visual edits use `pnpm dev` in the active AXIS checkout, then the live Lab on port 4349
+(or `--port`). The supervisor builds packages once, then rebuilds changed packages and downstream
+workspace dependents; Astro reloads the Lab. It never installs, publishes, changes consumer pins or
+runs cloud CI. Static `astro preview` is for artifact verification, not the edit/review loop.
+
+Batch visual refinements into one deliverable. Do not bump versions, tag, or update every consumer
+for each visual approval. If publication/rollout is explicitly in the requested scope, finish it;
+otherwise close local review with focused validation and report its state. Keep production consumers
+on exact published versions. Restart dev after manifest/dependency changes to reload its graph.
+
+Canonical procedure: AXIS `docs/quality/continuous-development.md`; local command tests:
+`pnpm test:dev`. Release builds packages to compare the CI digest; the Lab is rebuilt only when
+browser gates remain. Astro check runs in typecheck, not again inside Lab test. No coverage reduction
+or cache-based success claim is permitted.

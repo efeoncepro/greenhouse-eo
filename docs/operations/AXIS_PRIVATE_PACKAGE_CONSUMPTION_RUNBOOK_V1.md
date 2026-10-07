@@ -1140,3 +1140,21 @@ Growth Forms tiene un adapter opt-in local, verificado contra los exports compil
 embeds, no cambia pins y no sustituye el selector de 18 países. El owner AXIS debe publicar la versión
 exacta; el owner Growth Forms debe fijarla, mapear su catálogo si corresponde y ejecutar el piloto en
 host con payloads/errores/consentimiento intactos. [Decisión, prueba reproducible y gates del consumidor](../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+
+
+## Iteración continua de AXIS — 2026-10-07
+
+Usar `pnpm dev` en el checkout AXIS activo para revisar ajustes; Lab vivo en 4349. Compila packages
+al iniciar y recompila sólo el paquete editado y sus dependientes al guardar, sin instalar, publicar ni
+cambiar pins. Astro usa su API pública para mantener el servidor bajo el supervisor en sesiones de agentes.
+Manifest/dependencias modificados requieren reiniciar para recargar el grafo. La preview estática queda
+para validar el build final. Canon: AXIS `docs/quality/continuous-development.md`.
+
+Agrupar revisión visual, commit/push y distribución por entrega. Una aprobación de apariencia no implica
+por sí sola publicar ni desplegar todos los consumidores; si el operador lo solicita expresamente,
+completar ese alcance. Producción sigue usando versiones exactas publicadas. El CI de distribución
+compila packages para comparar digest y sólo reconstruye el Lab si quedan browsers pendientes.
+
+Evidencia local: startup packages 6,9 s + Astro 898 ms; cambio CSS de primitives 1,3 s y lectura real en
+la pestaña sin reload manual. Marca de prueba retirada. 60 tests del tooling PASS. Estos tiempos no
+miden CI/cloud; no se inicia un release ficticio ni rollout de consumidores por optimizar este flujo.

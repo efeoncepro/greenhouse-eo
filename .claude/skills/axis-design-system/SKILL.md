@@ -46,6 +46,14 @@ canonical source:
 
 ## Choose the workflow
 
+### Frequent edits to AXIS
+
+Default to the live local loop (`pnpm dev` in AXIS), batch visual changes and validate the affected
+family. Visual approval alone does not trigger a package release or updates to every consumer.
+Complete publication/adoption when the operator explicitly includes them. See the continuous-editing
+section in [agent consumption](references/agent-consumption.md) and AXIS
+`docs/quality/continuous-development.md` for commands and boundaries.
+
 ### Discover and consume AXIS
 
 Start with [agent consumption](references/agent-consumption.md): public navigation and visual search,
