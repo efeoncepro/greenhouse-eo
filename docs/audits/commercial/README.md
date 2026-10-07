@@ -4,6 +4,13 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [Pibank — oferta híbrida, 07-10-2026](2026-10-07-pibank-oferta-hibrida.md) — base y activaciones, costos repartidos sin duplicación, selector, PDF y paquete para Claude; precios propuestos.
+
+- [Pibank — conexión demanda, plan y costo, 07-10-2026](2026-10-07-pibank-conexion-demanda-plan.md) — anexo sobre las 19 familias originales, escenarios mensuales, capacidad y fee interno propuesto; fuentes/modelo preservados.
+
+- [Pibank — integración de crecimiento v0.7, 07-10-2026](2026-10-07-pibank-integracion-crecimiento-v0.7.md) — hub/pilar, tools, comunidad, PR y eficiencia SEO–SEM; PDFs6/2p y paquete actual para Claude. Modelo v0.6 referencia; aporte/costeo ampliados pendientes.
+- [Pibank — fuentes para Claude v0.6.1, antecedente 07-10-2026](2026-10-07-pibank-fuentes-para-deck.md) — PDFs11/2p de la revisión anterior; preservados en histórico.
+
 - [Pibank — aprendizajes, docs y skills 06-10-2026](2026-10-06-pibank-aprendizajes-docs-skills.md) — transferencia del caso al método y procedimientos compartidos; sin elevar supuestos del cliente a políticas o resultados.
 - [Pibank — cierre de brechas v0.6](2026-10-06-pibank-brechas-cierre.md) — calendario, SEO/GEO+PR en Excel, capturas ampliadas y QA del paquete vigente; precio/roster y datos bancarios pendientes.
 - [Pibank — ampliación PR v0.5, histórica](2026-10-06-pibank-pr-autoridad.md) — planificación/editorial y PDFs del corte anterior, preservados para trazabilidad.

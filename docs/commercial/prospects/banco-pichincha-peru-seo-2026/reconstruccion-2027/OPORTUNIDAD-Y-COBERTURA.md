@@ -1,6 +1,8 @@
 # Pibank Perú · Oportunidad y cobertura para reconstruir el caso 2027
 
-**Reauditoría 06-10-2026 · Cuenta Soles · Perú/español · Sin compras nuevas.**
+**Reauditoría 06-10-2026 · Cuenta Soles · Perú/español · Sin compras nuevas en esta reauditoría.**
+
+**Nota de vigencia · 07-10-2026:** este documento conserva el diagnóstico de 4.855 filas/32 familias y sus conclusiones de aquella etapa. El research competitivo posterior y el costo conciliado están en [cierre v0.6](../research/pibank-gap-closure-2026-10-06/README.md): 19 representantes, seis directos por 3.740 búsquedas estimadas/mes; cuatro carriles separados. Cinco consultas/3.690, sus sensibilidades y el costo BBVA desconocido citado al cierre son estado histórico, no insumos o incertidumbre vigentes. Doce meses y PR/autoridad son decisiones posteriores del operador; la ampliación no demuestra por sí sola aporte incremental ni resuelve la cuantificación pedida por Jesús.
 
 La objeción de Julio es válida: **la tabla de 10/50/147 cuentas no justifica por sí sola un programa anual completo**. Modela un carril selectivo de adquisición con hipótesis, mientras el alcance propuesto incluye confianza, evaluación, apertura, activación, operación y AEO. El denominador de cinco representantes no puede presentarse como toda la oportunidad. Tampoco se corrige la brecha sumando 4.855 keywords o aumentando tasas de captura hasta sostener el alcance.
 
@@ -104,3 +106,11 @@ Frentes sustentados: coherencia entidad/producto; actualización YMYL de condici
 La conclusión es **PASS para reconstruir una propuesta competitiva, no PASS económico del alcance anual anterior**. Puede defenderse una intervención integrada por problemas y un horizonte de evaluación; su escala/inversión aún debe contrastarse con capacidad, tráfico elegible, fondeo y valoración. La nueva amplitud del mapa no autoriza un forecast mayor ni una promesa de 1% de las 15.200 cuentas.
 
 **Entrega:** CSV de oportunidades, auditoría de todas las keywords, dictamen de familias proveedor y cobertura de corpus; [validacion-demanda.json](validacion-demanda.json). Research/modelos/PDF anteriores preservados. Costo adicional de proveedor cero; la solicitud BBVA abortada y su costo desconocido siguen en el ledger anterior. Sin compras, publicación, CRM, Notion o comunicaciones externas.
+
+## Continuidad v0.6 para la presentación
+
+El nuevo panel directo parcial suma 3.740 estimadas/mes; 3.330 condicionales, 18.300 de productos rivales y 5.680 de educación/asistencia permanecen separados. Las 19 familias representativas no sustituyen el dictamen de las 32 familias de oportunidad ni convierten 2.278 observaciones/1.594 keywords en personas únicas. Captura reciente y fecha original del volumen son campos distintos. [Panel y metodología](../research/pibank-gap-closure-2026-10-06/README.md).
+
+El costo del intento BBVA se concilió posteriormente en US$0,132. Sus filas no recibidas siguen excluidas; la consulta alternativa con otro filtro no fue recuperación. El cierre posterior incorpora cinco llamadas por US$0,213552 y exposición conservadora US$1,568512, bajo el techo operativo US$2; la reauditoría descrita aquí no tuvo costo adicional y su evidencia original permanece intacta.
+
+La propuesta vigente incorpora doce meses y PR/autoridad por decisiones de Julio. El modelo de requisitos aún no cuantifica aporte estimado del programa completo ni del lanzamiento: esa brecha sigue abierta. Para armar el deck usar [números y rutas actuales](../README.md#numeros-vigentes-y-uso-en-el-deck) y el [caso v0.6](../BUSINESS-CASE-2027.md), no reutilizar la sensibilidad 33.210 o la tabla 10/50/147 como resultados esperados.

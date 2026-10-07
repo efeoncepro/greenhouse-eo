@@ -26,6 +26,12 @@
 
 ## 2026-10-06 — Pibank: caso de negocio, modelo y propuesta SEO/AEO
 
+- Oferta reforzada: AEO 24 preguntas/144 observaciones desde M2; PR gradual M3/M8 y refuerzos M6/M11; acuerdos de revisión y sensibilidad económica, con fee conservado. Modelo evolutivo sin cuota FAQ; PDF/Excel/Claude sincronizados. Híbrido 07-10: [base US$4.500 y activaciones](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md), catálogo, calendario, selector y PDF; hasta 5 artículos/mes incluidos; ruta recomendada US$79.200, integral US$89.200. Sesiones sustituidas por refuerzos PR; técnico/schema explícitos en base. Fee US$8.000 anterior sustituido; investigación/embudo intactos.
+
+- Conexión 07-10: [demanda, plan y costo](docs/audits/commercial/2026-10-07-pibank-conexion-demanda-plan.md), investigación/embudo originales intactos; anexo con 19 familias, capacidad y fee propuesto US$8.000/mes. Aporte global y aprobación económica pendientes.
+
+- Integración 07-10 v0.7: [hub, pilar, tools, comunidad, PR y eficiencia SEO–SEM](docs/audits/commercial/2026-10-07-pibank-integracion-crecimiento-v0.7.md), alcance candidato/calendario/matriz y brief para Claude. PDFs6/2p revisados; SEM sólo análisis/recomendaciones. Modelo v0.6 intacto como referencia previa; aporte y costeo ampliados pendientes. Sin envío. [Revisión v0.6.1 anterior](docs/audits/commercial/2026-10-07-pibank-fuentes-para-deck.md).
+
 - Aprendizajes del caso incorporados al método/manual/lectura funcional y skills de SEO/AEO, negocio, cliente, pricing, licitaciones, DataForSEO, reportes/decks, growth y PR; continuidad v0.6 corregida, historia preservada. [Mapa y verificación](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md). Preparación revisable, sin nuevos forecasts, precios, gasto o publicación.
 
 - Cierre v0.6: apertura M1, calculadora/fondeo M2, PR M3/M5/M8/M11; modelo integra1.216h y13costos por función,29pruebas nativas. Capturas competitivas ampliadas, costo BBVA conciliado y baseline de backlinks. PDFs revisados; precio/roster y datos bancarios pendientes. [Cierre de brechas](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md). Sin envío ni contacto a medios.

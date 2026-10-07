@@ -1,0 +1,143 @@
+{
+  "as_of": "2026-10-07",
+  "version": "v0.7",
+  "artifacts": [
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/01-Para-enviar/propuesta-tecnica-2027/Pibank-Propuesta-tecnica-2027.pdf",
+      "audience": "cliente - propuesta tecnica",
+      "pages": 6,
+      "sha256": "2d63b9cb75858f2e77d5d6771f8b073fabea83aaccae7ef2bbca0b4fbf1f55fd",
+      "bytes": 221893,
+      "status": "prepared_local_not_sent",
+      "version": "v0.7"
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/01-Para-enviar/propuesta-tecnica-2027/Pibank-Resumen-para-gerencia-2027.pdf",
+      "audience": "cliente - propuesta tecnica",
+      "pages": 2,
+      "sha256": "bb5671dc2bfcfbea4c491e9e410a24833854d8c33d48ef1982231d23034c183d",
+      "bytes": 84413,
+      "status": "prepared_local_not_sent",
+      "version": "v0.7"
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "audience": "interno",
+      "sha256": "d87c2aabdf7a3a04ff59a719c48a747ab19a3d689eaa14e6d22427d455f7207e",
+      "status": "reference_previous_scope_not_integrated_model",
+      "bytes": 59357,
+      "version": "v0.6"
+    }
+  ],
+  "send_status": "no_new_send",
+  "economic_offer": "pending_expanded_scope_cost_quote_roster_fee_and_bank_valuation",
+  "research_paid_calls_this_reconstruction": 5,
+  "historical_checks": {
+    "Pibank-Plan-anual-2027.pdf": "6f6a2eeada72ef7f7cc62eef17b3247847c70c78d3c40171b74cfc59b6bfb5b4",
+    "Pibank-Resumen-ejecutivo-anual-2027.pdf": "0fee43b438db7f286854166cec9f41e4f2616f8835681478f1ada92c4f39ac7a",
+    "Pibank-Plan-tecnico-editorial-2027.pdf": "84d33fc589ac4008f80949d2b2513e198ff7a8daaba7d005641fc6714132d841",
+    "PIBANK-PROPUESTA-ANUAL-2027.pdf": "a3dad0e4a5166a48883cbda40f0ed0e3712105bcb0effdc671559c3e4eb56913",
+    "Pibank-caso-negocio-anual-2027.xlsx": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a"
+  },
+  "validation": {
+    "demand_checks": "CSV consolidation,19families,complete new filters and 16local source links checked; prior15curation checks preserved",
+    "native_model_tests": 29,
+    "model_formula_count": 1303,
+    "model_formula_cache_errors": 0,
+    "pdf_ua_and_excel_desktop": "not_verified",
+    "model_checks": "v0.6_hash_integrity_rechecked_2026-10-07_without_recalculation",
+    "visual_model_pages": 11,
+    "historical_v0.6_visual_client_pages": 27,
+    "current_pdf_pages": 8,
+    "current_pdf_visual_review": "all_8_final_PDF_pages_reviewed_2026-10-07",
+    "current_pdf_fonts_loaded": true,
+    "current_pdf_overflow": 0,
+    "current_pdf_broken_images": 0,
+    "native_model_checks_as_of": "2026-10-06"
+  },
+  "scope": "annual_SEO_AEO_hub_tools_community_editorial_PR_and_SEM_efficiency_analysis",
+  "capacity": {
+    "base_hours": 1066,
+    "reserve_hours": 150,
+    "annual_hours": 1216,
+    "status": "previous_v0_6_scope_only_not_v0_7_capacity_or_cost",
+    "workbook_hours": 1216,
+    "workbook_scope": "combined_SEO_GEO_PR_13roles",
+    "integrated_v0_7_hours": null,
+    "integrated_v0_7_cost": null
+  },
+  "journalist_contacts_this_update": 0,
+  "research_paid_calls_this_gap_closure": 5,
+  "research_paid_cost_usd_this_gap_closure": 0.213552,
+  "research_total_confirmed_usd": 1.491372,
+  "research_conservative_total_including_prior_usd": 1.568512,
+  "previous_version_archive": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/historico-v0.6.1",
+  "current_external_conditions": "Bank definitions/baseline/events;expanded scope capacity/cost/fee;defensible integrated contribution and launch counterfactual pending.",
+  "previous_v0.5_PR_update_paid_calls": 0,
+  "historical_artifacts": [
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/historico-v0.6/Pibank-Presentacion-tecnica-2027.pdf",
+      "audience": "cliente - propuesta tecnica",
+      "pages": 14,
+      "sha256": "197538b9fc00e072193c38d8fba67b159b293c44420c90bbfa2925b2ec7e4853",
+      "bytes": 3361424,
+      "status": "historical_reference_not_current_deck"
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/historico-v0.6.1/Pibank-Propuesta-tecnica-2027.pdf",
+      "audience": "cliente - propuesta tecnica",
+      "pages": 11,
+      "sha256": "2ac8320d556e7d23c0d0b0c5c144b8d81db71b5054e7fb723642e61309ce01a1",
+      "bytes": 425275,
+      "status": "historical_reference_not_current_proposal",
+      "version": "v0.6.1"
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/historico-v0.6.1/Pibank-Resumen-para-gerencia-2027.pdf",
+      "audience": "cliente - propuesta tecnica",
+      "pages": 2,
+      "sha256": "5ffc818f70c711c48ad34fcac988a92fdbe8c4e18aa81c5bdff195cae512b5b2",
+      "bytes": 96102,
+      "status": "historical_reference_not_current_proposal",
+      "version": "v0.6.1"
+    }
+  ],
+  "model_version": "v0.6",
+  "model_evidence_as_of": "2026-10-06",
+  "research_paid_calls_this_documentary_revision": 0,
+  "deck_status": "Claude_to_prepare_from_current_brief",
+  "business_contribution_estimate": "pending_not_a_forecast",
+  "deck_brief": {
+    "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md",
+    "sha256": "25eb7268b72f9570f3ac9a831a9b3c8e3ab5871fc65afd88d976d32917ebd179",
+    "argument_order": "100_percent_provisional_bank_goal_first_partial_sensitivities_second"
+  },
+  "model_covers_integrated_scope": false,
+  "sem_role": "context_for_SEO_efficiency_analysis_and_recommendations_not_campaign_operations",
+  "current_strategy_sources": [
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md",
+      "sha256": "270f6ff96d7a4ce408b63dd3eb3b31741b810813f331aeaaed3704fbfbcddf68"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md",
+      "sha256": "235305329064150e376c0e9ef291bdf0a23d88ba4b3d67ffa5af302b1b4a8a1b"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/RESUMEN-PARA-GERENCIA.md",
+      "sha256": "b53f64325a83885b0f2438c4c9ddc857e29c1324f3733d7833296d2d62ca224d"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CALENDARIO-CRECIMIENTO-V0.7.csv",
+      "sha256": "1e3dbb23fb4b4e21f3f0a99cdafe2f0416b0e83f2a7ee7b57a3f3b233c0cbf2a"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/PLAN-DE-CONTENIDOS-V0.7.csv",
+      "sha256": "28485eeeb6b0e2de7879738df5890f94256e48efd3c6ef2b22ae2cc08651f84a"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/MATRIZ-CONTRIBUCION-MULTICANAL-V0.7.csv",
+      "sha256": "73326eb9666f7c5403616ef3c3c20aacd59db2f3d0df6680c7f58ccf73972b77"
+    }
+  ]
+}

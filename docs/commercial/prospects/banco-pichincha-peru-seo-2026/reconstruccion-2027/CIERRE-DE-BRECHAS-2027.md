@@ -1,4 +1,15 @@
-# Pibank · Cierre de brechas de preparación v0.6
+# Pibank · Cierre de brechas de preparación y revisión documental v0.6.1
+
+**Capacidad editorial vigente:** hasta cinco artículos al mes incluidos en base US$4.500; máximo 60 al año, sin suplemento editorial. Las 24 piezas del plan anterior son backlog inicial. Ruta gradual US$79.200/año; integral US$89.200. Mayor capacidad no modifica automáticamente la demanda ni la captación proyectada. [Oferta y calendario actual](oferta-hibrida/README.md).
+
+**Oferta comercial vigente · 07-10:** [modelo híbrido](oferta-hibrida/OFERTA-PARA-PIBANK.md): base US$4.500/mes más activaciones. Sustituye la recomendación fija de US$8.000; las rutas comparten la capacidad editorial incluida y difieren en herramientas y distribución. Investigación, embudo y volúmenes permanecen intactos. [Costeo y selector](oferta-hibrida/README.md).
+
+**Actualización 07-10 · Conexión de ejecución y costo:** el [anexo vigente](conexion-demanda-plan/README.md) conecta las 19 familias ya investigadas, conserva la meta de cuentas con fondos y el embudo, propone capacidad/fee y responsables. Sus escenarios de captura son hipótesis separadas; el modelo y los volúmenes originales permanecen intactos. Para el deck, leer también [el complemento para Claude](conexion-demanda-plan/PARA-CLAUDE.md). Las menciones siguientes a costeo pendiente describen el estado anterior; ahora hay una propuesta interna por validar.
+
+## Estado vigente v0.7 · integración del 07-10
+
+[Programa integrado](ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md), [brief Claude](BRIEF-PARA-DECK-VIGENTE.md), [calendario](CALENDARIO-CRECIMIENTO-V0.7.csv), [24 briefs](PLAN-DE-CONTENIDOS-V0.7.csv) y [matriz mensual](MATRIZ-CONTRIBUCION-MULTICANAL-V0.7.csv) reúnen pilar/hub,tools,comunidad,PR y eficiencia SEO–SEM. El modelo v0.6 permanece histórico de alcance anterior; no cubre la ampliación. Sus condiciones externas siguen abiertas y se agregan desarrollo, producción y comunidad por dimensionar. Estimación del aporte y nuevo costeo siguen pendientes. Los cierres/QA que siguen son evidencia fechada de etapas anteriores.
+
 
 06-10-2026. Preparación de la propuesta anual; estado local y revisable. No certifica adjudicación, costos reales, disponibilidad o resultados futuros.
 
@@ -14,6 +25,17 @@
 | Métricas/atribución ambiguas | Apertura validada, ventana fondeo propuesta30d, cohortes maduras, origen externo, conciliación, cobertura de eventos y contrafactual separados | Definidas para acuerdo; no equivalen a conversiones observadas |
 | Duplicidad entre contenidos, PR y conversiones | FAQ/entrega/paquete distintos; PR reutiliza recursos; cada cuenta una vez, origen y asistencia como dimensiones | Resuelta en alcance/modelo/medición |
 | Versiones desalineadas | v0.4 económica y v0.5 PDFs preservados; paquete vigente y manifests con hashes/QA de artefactos finales | Cierre local, sin envío |
+
+## Revisión documental 07-10-2026 · v0.6.1
+
+La tabla anterior conserva el cierre del 06-10. La revisión actual corrige rutas de la minuta, panel histórico de cinco consultas y uso de imágenes anteriores; el [brief para Claude](BRIEF-PARA-DECK-VIGENTE.md) gobierna el nuevo deck. Se mantienen doce meses y PR por instrucción de Julio, sin atribuir esas decisiones al banco.
+
+- Panel vigente: 19 representantes en cuatro carriles; seis directos suman 3.740 búsquedas estimadas/mes. No son visitas ni mercado completo.
+- Dos unidades explícitas: 760 aperturas → 38.000 visitas → 494 fondeadas, o 760 fondeadas → ~1.170 aperturas → ~58.462 visitas, con 2%/65% ilustrativos. No se adopta el 5% como forecast.
+- Comparativos con marcas M4–M7 requieren aprobación específica de Producto/Cumplimiento; alternativa general sin marcas dentro de las mismas 12 entregas. La aprobación está pendiente, no resuelta por esta documentación.
+- WordPress confirmado para el sitio público con [evidencia fechada](../research/CMS-PIBANK-2026-10-07.md); tecnología/acceso de registro no inferidos.
+- PDFs v0.6.1: propuesta 11 páginas y resumen 2; revisión visual de las 13 páginas finales y QA sin desbordes/imágenes rotas. Deck14 v0.6 archivado como antecedente; nuevo deck a cargo de Claude. [Manifest](delivery-manifest.json).
+- **Sigue pendiente estimar el aporte incremental del programa completo y cuantificar el contrafactual de lanzamiento.** Corregir fuentes no convierte requisitos inversos en resultados proyectados. Modelo/evidencia v0.6 conservados sin recálculo.
 
 ## Datos que aún requieren a sus dueños
 

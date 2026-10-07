@@ -1,6 +1,19 @@
 # Prospect Case · Banco Pichincha Perú
 
-**Corte vigente:** 06 de octubre de 2026 · **Uso interno** · **Responsable comercial:** Julio Reyes.
+## Estado vigente · oferta híbrida reforzada · 07-10-2026
+
+La [oferta híbrida](reconstruccion-2027/oferta-hibrida/OFERTA-PARA-PIBANK.md) y el [brief para Claude](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) gobiernan alcance, secuencia y precio: base US$4.500/mes, gradual US$79.200/año, integral US$89.200. Hasta cinco artículos/mes, mejoras según evidencia sin cuota FAQ, técnico/schema y panel AEO de 24 preguntas: 72 observaciones iniciales y 144/mes desde M2. Gradual: campañas PR M3/M8 y refuerzos M6/M11; comunidad desde M3, hub, calculadora y comparador. Sesiones digitales retiradas.
+
+SEO/AEO es evolutivo e incremental. SEM se analiza como palanca de eficiencia; no se añade operación publicitaria. [Método y capacidad](reconstruccion-2027/oferta-hibrida/AEO-Y-AUTORIDAD.md), [acuerdos](reconstruccion-2027/oferta-hibrida/ACUERDOS-DE-ENTREGA.md) y [costeo provisional](reconstruccion-2027/oferta-hibrida/README.md). La integral dimensiona 2.924h; costo SEO/redactor reservado no equivale a dedicación exclusiva.
+
+La meta es 15.200 cuentas con fondos; ~1,17m visitas es el requisito del embudo ilustrativo completo, no un forecast SEO. Investigación y modelos originales permanecen intactos. Los precios están propuestos; faltan validación de costos/roster reales, términos bancarios y contribución observada. Los conteos y fees del registro histórico siguiente no definen la oferta actual.
+
+## Registro del estado anterior v0.6.1 y antecedentes
+
+El registro que sigue conserva el corte anterior; sus cantidades/QA no gobiernan el alcance ampliado. No se altera la fuente de reunión ni las capturas originales.
+
+
+**Revisión de continuidad:** 07 de octubre de 2026 · evidencia original 06-10-2026 · **Uso interno** · **Responsable comercial:** Julio Reyes.
 **Decisión:** preparar propuesta técnica/caso de negocio para **Pibank Perú**, con servicio previsto para 2027. La solicitud está documentada; presupuesto, autoridad económica y adjudicación no están confirmados.
 **Estado vigente:** reunión celebrada y metodología comprendida por Jesús; información de proveedores hasta 09-10, gerencia semana del 19-10. [Minuta](MEETING-2026-10-06.md) y [caso de negocio 2027](BUSINESS-CASE-2027.md) gobiernan la preparación. US$38 millones es inferencia aritmética aceptada provisionalmente por Julio, no moneda confirmada por Jesús.
 
@@ -172,7 +185,7 @@ La reunión sigue agendada; el cambio de etapa no acredita una presentación ya 
 - [x] Reunión celebrada y fuente completa leída por MCP; [minuta](MEETING-2026-10-06.md).
 - [x] Foco Pibank, contexto de producto y calendario documentados; minuta §§1–4.
 - [x] Interpretación USD y límites conservados como hipótesis del operador; minuta §2.
-- [x] Caso v0.6 y propuesta anual para el banco; [caso](BUSINESS-CASE-2027.md) y [propuesta](reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md).
+- [x] Revisión documental v0.6.1 del caso y propuesta anual para el banco; [caso](BUSINESS-CASE-2027.md) y [propuesta](reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md).
 - [x] Research y diagnóstico público preparados; [ampliación inicial](research/PIBANK-RESEARCH-AMPLIADO-2026-10-06.md), [reauditoría](reconstruccion-2027/OPORTUNIDAD-Y-COBERTURA.md) y [capturas de cierre](research/pibank-gap-closure-2026-10-06/README.md). Estas últimas conservan 2.278 observaciones únicas, 1.594 keywords y 19 familias, con filtros y periodos explícitos; no TAM ni baseline privada.
 - [x] Modelo inverso y material técnico reconstruidos; [expediente](reconstruccion-2027/README.md) y [QA v0.6](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md): 10 hojas/29 pruebas nativas y PDFs de 11/2/14 páginas. Muestra DEV previa conservada; verificación local no acredita aceptación bancaria.
 - [ ] Revisión comercial humana/aceptación bancaria: pendientes; QA local no las sustituye.
@@ -184,4 +197,6 @@ La reunión sigue agendada; el cambio de etapa no acredita una presentación ya 
 
 **Historia de la reconstrucción:** Julio objetó el plan interno y el aporte modelado. Se retiró la tabla 10/50/147 del material cliente; aperturas y primer fondeo se separaron y el periodo de meta dejó de suponerse anual. Las 924h correspondían al alcance previo de SEO/GEO, conservado como antecedente.
 
-**Estado vigente v0.6:** 1.066h base + 150h reserva = 1.216h candidatas, con PR y 13 funciones incluidas. [Cierre de brechas](reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md), [QA](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md) y [retrospectiva](RETROSPECTIVA-2026-10-06.md) documentan alcance, pruebas, copias y conciliación de investigación. El costo conservador de datos es US$1,568512, bajo el techo operativo de US$2; no es presupuesto del banco ni fee del servicio. Propuesta y requisitos no certifican viabilidad económica, forecast ni precio. Roster, costos reales y acuerdos de datos/ejecución siguen pendientes.
+**Estado vigente v0.6:** 1.066h base + 150h reserva = 1.216h candidatas, con PR y 13 funciones incluidas. [Cierre de brechas](reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md), [QA](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md) y [retrospectiva](RETROSPECTIVA-2026-10-06.md) documentan alcance, pruebas, copias y conciliación de investigación. El costo conservador de datos es US$1,568512, bajo el techo operativo de US$2; no es presupuesto del banco ni fee del servicio. Propuesta y requisitos no certifican viabilidad económica, forecast ni precio. La cuantificación del aporte estimado a aperturas del programa completo y del lanzamiento sigue abierta; requisitos inversos no equivalen a esa estimación. Doce meses y PR son decisiones posteriores de Julio. [Brief vigente](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) y [números/rutas para el deck](README.md#numeros-vigentes-y-uso-en-el-deck) distinguen el panel actual de 19 representantes/directo parcial 3.740 del anterior de cinco/3.690. Roster, costos reales y acuerdos de datos/ejecución siguen pendientes.
+
+La revisión documental v0.6.1 tiene QA propio de propuesta/resumen PDF: 11/2 páginas, lectura visual de las 13 páginas finales y copias/hashes verificados. Capturas/Excel v0.6 conservados, sin recálculo; deck v0.6 de 14 láminas archivado histórico mientras Claude prepara el nuevo. Cuantificar aporte continúa pendiente.

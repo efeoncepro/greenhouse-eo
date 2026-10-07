@@ -1,55 +1,45 @@
 {
-  "pages": 11,
+  "pages": 6,
   "toc": [
     {
       "target": "seccion-1",
       "page": 1,
-      "title": "1. El objetivo: construir una fuente de captación para Pibank"
+      "title": "1. Objetivo y lógica del programa"
     },
     {
       "target": "seccion-2",
-      "page": 2,
-      "title": "1.1. Cómo habría sido acompañar el lanzamiento con SEO/GEO"
+      "page": 1,
+      "title": "2. Partir de la meta completa y calcular hacia atrás"
     },
     {
       "target": "seccion-3",
-      "page": 3,
-      "title": "2. Qué encontramos y dónde empezaremos"
+      "page": 2,
+      "title": "3. Arquitectura en WordPress: producto, hub y satélites"
     },
     {
       "target": "seccion-4",
-      "page": 5,
-      "title": "3. La recomendación: concentrar el trabajo en cinco decisiones"
+      "page": 3,
+      "title": "4. SEO/AEO como palanca de eficiencia para SEM"
     },
     {
       "target": "seccion-5",
-      "page": 5,
-      "title": "3.1. PR editorial para construir autoridad de marca y dominio"
+      "page": 3,
+      "title": "5. Comunidad y PR para relación y distribución"
     },
     {
       "target": "seccion-6",
-      "page": 6,
-      "title": "4. Alcance anual y entregables"
+      "page": 3,
+      "title": "6. Alcance candidato y secuencia anual"
     },
     {
       "target": "seccion-7",
-      "page": 7,
-      "title": "5. Cómo se desarrollará el año"
+      "page": 5,
+      "title": "7. Medición y acumulación de activos"
     },
     {
       "target": "seccion-8",
-      "page": 9,
-      "title": "6. Qué mediremos y cómo se relaciona con el negocio"
-    },
-    {
-      "target": "seccion-9",
-      "page": 9,
-      "title": "7. Equipo y coordinación con el banco"
-    },
-    {
-      "target": "seccion-10",
-      "page": 10,
-      "title": "8. Qué recibirá Pibank al terminar el programa"
+      "page": 5,
+      "title": "8. Equipo, inversión y decisión"
     }
   ],
   "fontsOk": true,

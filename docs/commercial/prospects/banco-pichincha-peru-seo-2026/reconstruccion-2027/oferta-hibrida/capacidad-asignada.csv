@@ -1,0 +1,292 @@
+work_id,work,cost_group,role_sku,month,base_hours,source_hours,capacity_basis,module,allocation_share,assigned_hours
+D01,Dirección mensual,direction,ECG-001,1,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,2,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,3,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,4,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,5,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,6,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,7,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,8,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,9,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,10,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,11,6,6.0,prior_plan,BASE,1,6.0
+D01,Dirección mensual,direction,ECG-001,12,6,6.0,prior_plan,BASE,1,6.0
+D02,Revisión trimestral,direction,ECG-001,3,8,8.0,prior_plan,BASE,1,8.0
+D02,Revisión trimestral,direction,ECG-001,6,8,8.0,prior_plan,BASE,1,8.0
+D02,Revisión trimestral,direction,ECG-001,9,8,8.0,prior_plan,BASE,1,8.0
+D02,Revisión trimestral,direction,ECG-001,12,8,8.0,prior_plan,BASE,1,8.0
+D03,Inicio,direction,ECG-001,1,4,4.0,prior_plan,BASE,1,4.0
+S01,SEO técnico inicial,seo,,1,32,32.0,prior_plan,BASE,1,32.0
+S02,SEO seguimiento,seo,,2,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,3,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,4,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,5,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,6,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,7,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,8,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,9,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,10,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,11,8,8.0,prior_plan,BASE,1,8.0
+S02,SEO seguimiento,seo,,12,8,8.0,prior_plan,BASE,1,8.0
+S03,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,1,12,8.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,2,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,3,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,4,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,5,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,6,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,7,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,8,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,9,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,10,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,11,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S04,"Panel AEO: 24 preguntas, tres superficies; baseline M1, dos cortes desde M2",seo,,12,12,4.0,expanded_AEO_12h_month_within_full_SEO_cost_reservation,BASE,1,12.0
+S05,Mejora inicial del pilar y recorrido al producto,seo,,1,24,24.0,prior_plan,BASE,1,24.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,2,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,3,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,4,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,5,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,6,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,7,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,8,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,9,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,10,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,11,6,6.0,prior_plan,BASE,1,6.0
+S06,Investigación y evolución de activos/recorridos según evidencia,seo,,12,6,6.0,prior_plan,BASE,1,6.0
+S07,Medición implementación,seo,,1,24,24.0,prior_plan,BASE,1,24.0
+S07,Medición implementación,seo,,2,24,24.0,prior_plan,BASE,1,24.0
+S08,Analítica e informe,seo,,2,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,3,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,4,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,5,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,6,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,7,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,8,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,9,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,10,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,11,6,6.0,prior_plan,BASE,1,6.0
+S08,Analítica e informe,seo,,12,6,6.0,prior_plan,BASE,1,6.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,1,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,2,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,3,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,4,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,5,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,6,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,7,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,8,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,9,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,10,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,11,4,4.0,prior_plan,BASE,1,4.0
+S09,"Eficiencia SEO–SEM, análisis",seo,,12,4,4.0,prior_plan,BASE,1,4.0
+S10,Datos para cuatro recursos PR,seo,,3,12,12.0,prior_plan,BASE,1,12.0
+S10,Datos para cuatro recursos PR,seo,,5,12,12.0,prior_plan,BASE,1,12.0
+S10,Datos para cuatro recursos PR,seo,,8,12,12.0,prior_plan,BASE,1,12.0
+S10,Datos para cuatro recursos PR,seo,,11,12,12.0,prior_plan,BASE,1,12.0
+S11,Método calculadora,seo,,1,8,8.0,prior_plan,BASE,1,8.0
+S12,Método comparador,seo,,3,10,10.0,prior_plan,BASE,1,10.0
+S12,Método comparador,seo,,4,10,10.0,prior_plan,BASE,1,10.0
+S13,Método planificador,seo,,5,6,6.0,prior_plan,BASE,1,6.0
+S13,Método planificador,seo,,6,6,6.0,prior_plan,BASE,1,6.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,1,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,2,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,3,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,4,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,5,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,6,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,7,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,8,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,9,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,10,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,11,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E01,"Hasta cinco artículos, investigación y redacción",writer,,12,60.0,24.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,60.0
+E02,Revisión artículos,writer,,1,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,2,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,3,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,4,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,5,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,6,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,7,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,8,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,9,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,10,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,11,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E02,Revisión artículos,writer,,12,15.0,6.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,15.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,1,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,2,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,3,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,4,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,5,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,6,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,7,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,8,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,9,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,10,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,11,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E03,Mejoras editoriales menores según evidencia; FAQ cuando corresponda,writer,,12,3,3.0,36h_annual_flexible_editorial_improvement_no_FAQ_quota,BASE,1,3.0
+E04,Newsletter,writer,,1,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,2,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,3,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,4,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,5,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,6,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,7,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,8,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,9,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,10,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,11,5,5.0,prior_plan,BASE,1,5.0
+E04,Newsletter,writer,,12,5,5.0,prior_plan,BASE,1,5.0
+E05,QA final entregas,writer,,1,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,2,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,3,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,4,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,5,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,6,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,7,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,8,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,9,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,10,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,11,4,4.0,prior_plan,BASE,1,4.0
+E05,QA final entregas,writer,,12,4,4.0,prior_plan,BASE,1,4.0
+E06,Revisión de fichas para refuerzo editorial y enlaces,writer,,3,4,4.0,prior_plan,BASE,1,4.0
+E06,Revisión de fichas para refuerzo editorial y enlaces,writer,,5,4,4.0,prior_plan,BASE,1,4.0
+E06,Revisión de fichas para refuerzo editorial y enlaces,writer,,8,4,4.0,prior_plan,BASE,1,4.0
+E06,Revisión de fichas para refuerzo editorial y enlaces,writer,,11,4,4.0,prior_plan,BASE,1,4.0
+G01,Diseño hub,designer,,1,20,20.0,prior_plan,HUB,1,20.0
+G02,Diseño comparador,designer,,3,10,10.0,prior_plan,COMPARADOR,1,10.0
+G02,Diseño comparador,designer,,4,10,10.0,prior_plan,COMPARADOR,1,10.0
+G03,Diseño planificador,designer,,5,8,8.0,prior_plan,PLANIFICADOR,1,8.0
+G03,Diseño planificador,designer,,6,8,8.0,prior_plan,PLANIFICADOR,1,8.0
+G04,Cuatro adaptaciones,designer,,1,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,2,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,3,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,4,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,5,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,6,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,7,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,8,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,9,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,10,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,11,8,8.0,prior_plan,COMUNIDAD,1,8.0
+G04,Cuatro adaptaciones,designer,,12,8,8.0,prior_plan,COMUNIDAD,1,8.0
+W01,WordPress hub,wordpress,ECG-012,1,40,40.0,prior_plan,HUB,1,40.0
+W02,Carga artículos,wordpress,ECG-012,1,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,2,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,3,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,4,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,5,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,6,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,7,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,8,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,9,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,10,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,11,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W02,Carga artículos,wordpress,ECG-012,12,5.0,2.0,five_articles_operator_capacity_same_effort_per_article,BASE,1,5.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,1,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,2,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,3,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,4,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,5,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,6,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,7,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,8,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,9,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,10,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,11,8,8.0,prior_plan,BASE,1,8.0
+W03,Implementación WordPress priorizada; hasta 8h/mes,wordpress,ECG-012,12,8,8.0,prior_plan,BASE,1,8.0
+T01,QA hub,development,ECG-015,2,20,20.0,prior_plan,HUB,1,20.0
+T02,Calculadora desarrollo y QA,development,ECG-015,2,32,32.0,prior_plan,CALCULADORA,1,32.0
+T03,Comparador desarrollo,development,ECG-015,3,30,30.0,prior_plan,COMPARADOR,1,30.0
+T03,Comparador desarrollo,development,ECG-015,4,30,30.0,prior_plan,COMPARADOR,1,30.0
+T04,Comparador QA,development,ECG-015,4,20,20.0,prior_plan,COMPARADOR,1,20.0
+T05,Planificador desarrollo,development,ECG-015,5,22,22.0,prior_plan,PLANIFICADOR,1,22.0
+T05,Planificador desarrollo,development,ECG-015,6,22,22.0,prior_plan,PLANIFICADOR,1,22.0
+T06,Planificador QA,development,ECG-015,6,16,16.0,prior_plan,PLANIFICADOR,1,16.0
+T07,Mantenimiento tools,development,ECG-015,3,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,4,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,5,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,6,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,7,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,8,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,9,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,10,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,11,4,4.0,prior_plan,CUIDADO,1,4.0
+T07,Mantenimiento tools,development,ECG-015,12,4,4.0,prior_plan,CUIDADO,1,4.0
+C01,Escucha y moderación,community,ECG-007,1,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,2,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,3,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,4,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,5,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,6,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,7,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,8,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,9,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,10,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,11,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C01,Escucha y moderación,community,ECG-007,12,16,16.0,prior_plan,COMUNIDAD,1,16.0
+C02,Newsletter técnica,automation,ECG-021,1,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,2,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,3,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,4,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,5,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,6,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,7,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,8,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,9,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,10,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,11,2,2.0,prior_plan,COMUNIDAD,1,2.0
+C02,Newsletter técnica,automation,ECG-021,12,2,2.0,prior_plan,COMUNIDAD,1,2.0
+P01,Mapa PR,pr,ECG-024,1,20,20.0,prior_plan,PR,1,20.0
+P02,Gestión PR,pr,ECG-024,2,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,3,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,4,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,5,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,6,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,7,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,8,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,9,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,10,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,11,8,8.0,prior_plan,PR,1,8.0
+P02,Gestión PR,pr,ECG-024,12,8,8.0,prior_plan,PR,1,8.0
+P03,Editorial PR,pr,ECG-024,1,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,2,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,3,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,4,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,5,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,6,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,7,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,8,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,9,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,10,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,11,5,5.0,prior_plan,PR,1,5.0
+P03,Editorial PR,pr,ECG-024,12,5,5.0,prior_plan,PR,1,5.0
+P04,Preparación vocería,pr,ECG-024,3,3,3.0,prior_plan,PR,1,3.0
+P04,Preparación vocería,pr,ECG-024,5,3,3.0,prior_plan,PR,1,3.0
+P04,Preparación vocería,pr,ECG-024,8,3,3.0,prior_plan,PR,1,3.0
+P04,Preparación vocería,pr,ECG-024,11,3,3.0,prior_plan,PR,1,3.0
+P05,QA/medición PR,pr,ECG-024,1,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,2,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,3,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,4,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,5,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,6,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,7,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,8,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,9,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,10,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,11,2,2.0,prior_plan,PR,1,2.0
+P05,QA/medición PR,pr,ECG-024,12,2,2.0,prior_plan,PR,1,2.0
+M01,Coordinación,coordination,ECG-016,1,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,2,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,3,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,4,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,5,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,6,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,7,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,8,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,9,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,10,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,11,6,6.0,prior_plan,BASE,1,6.0
+M01,Coordinación,coordination,ECG-016,12,6,6.0,prior_plan,BASE,1,6.0
+R01,"Refuerzo editorial: selección, gestiones, seguimiento y verificación",pr,ECG-024,2,20,0,new_PR_round_20h_replaces_sessions,REFUERZO_PR,1,20.0
+R01,"Refuerzo editorial: selección, gestiones, seguimiento y verificación",pr,ECG-024,4,20,0,new_PR_round_20h_replaces_sessions,REFUERZO_PR,1,20.0
+R01,"Refuerzo editorial: selección, gestiones, seguimiento y verificación",pr,ECG-024,7,20,0,new_PR_round_20h_replaces_sessions,REFUERZO_PR,1,20.0
+R01,"Refuerzo editorial: selección, gestiones, seguimiento y verificación",pr,ECG-024,10,20,0,new_PR_round_20h_replaces_sessions,REFUERZO_PR,1,20.0

@@ -1,5 +1,7 @@
 # Programa enfocado · Costeo y decisión interna
 
+> **Antecedente de alcance anterior.** Las cuotas FAQ, horas y precios del cuerpo no definen el servicio actual. Consultar [oferta híbrida](oferta-hibrida/README.md) y [operación evolutiva](oferta-hibrida/MODELO-EVOLUTIVO.md).
+
 **Uso interno · Hipótesis de capacidad · 06-10-2026.** Este documento no es una oferta económica. Horizonte: doce meses; Cuenta Soles, una marca, dominio principal y Perú/español. Las funciones del pod son compartidas, sin personas o disponibilidad confirmadas.
 
 ## Base SEO/GEO que sostiene la capacidad
@@ -22,7 +24,7 @@ La reserva se asigna a riesgos concretos: repetición de fuentes/condiciones, co
 
 ## Ampliación PR editorial solicitada
 
-El [plan de PR y autoridad](PLAN-PR-Y-AUTORIDAD-2027.md) añade cuatro campañas, doce ángulos, 48 propuestas individuales, cuatro sesiones de vocería y doce cortes de cobertura/enlaces. La hipótesis incremental es **252 h base + 40 h reserva = 292 h**: relaciones con medios 108+16, editorial PR 60+10, datos/método 48+8, vocería 12+2 y QA/medición 24+4. [Detalle por función](capacidad-pr-adicional.json) y [matriz incremental](capacidad-pr-adicional.csv).
+El [plan de PR y autoridad](PLAN-PR-Y-AUTORIDAD-2027.md) añade cuatro campañas, doce ángulos, 48 propuestas individuales, cuatro refuerzos de enlaces de vocería y doce cortes de cobertura/enlaces. La hipótesis incremental es **252 h base + 40 h reserva = 292 h**: relaciones con medios 108+16, editorial PR 60+10, datos/método 48+8, vocería 12+2 y QA/medición 24+4. [Detalle por función](capacidad-pr-adicional.json) y [matriz incremental](capacidad-pr-adicional.csv).
 
 El alcance combinado requiere **1.066 h base + 150 h reserva = 1.216 h anuales**; [matriz conjunta](capacidad-programa-con-pr.csv). No se absorbe PR en la reserva anterior ni se vuelve a cobrar la producción de páginas SEO. Es una estimación de planificación sin roster, tiempos medidos, disponibilidad ni precio aprobados. Excluye pauta, advertoriales, eventos, encuestas propias y gestión de crisis. Las publicaciones y enlaces dependen de cada medio.
 

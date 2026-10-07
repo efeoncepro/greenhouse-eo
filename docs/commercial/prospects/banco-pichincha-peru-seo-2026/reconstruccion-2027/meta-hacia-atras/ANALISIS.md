@@ -2,6 +2,10 @@
 
 06-10-2026. Análisis interno solicitado por Julio. **Calcula los requisitos para llegar a una meta; no pronostica que el programa los alcanzará.** Los PDFs/XLSX anteriores conservan sus versiones. Este análisis incorpora el 100% del objetivo monetario, que el último workbook sólo exploraba mediante bandas de cuentas.
 
+## Nota de vigencia · revisión documental 07-10-2026
+
+Este análisis y su `resultados.json` conservan los cálculos anteriores de cinco representantes/3.690 búsquedas estimadas mensuales y 33.210 de elegibilidad ilustrativa (=3.690×12×75%). No se recalculan aquí ni representan el panel v0.6. Para preparar el nuevo deck usar el [brief vigente](../BRIEF-PARA-DECK-VIGENTE.md), el [panel actual](../../research/pibank-gap-closure-2026-10-06/README.md) y la [matriz de números](../../README.md#numeros-vigentes-y-uso-en-el-deck): directo parcial 3.740/mes; con idéntico supuesto ilustrativo, 33.660 búsquedas proxy elegibles. Ninguna cifra es tráfico, personas, aporte estimado o forecast. La revisión documental v0.6.1 no actualiza el modelo ni los JSON históricos; la cuantificación de aporte sigue pendiente.
+
 ## 1. La primera decisión cambia todo el cálculo
 
 Usamos provisionalmente **US$38 millones** y **US$2.500 por cuenta**, interpretación autorizada por el operador y coherente con 15.200 × 2.500. Moneda y período siguen sin confirmación bancaria. Para comparar escala usamos doce meses de planificación; no asignamos retroactivamente 2027 a la meta declarada en la reunión.

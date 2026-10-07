@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-10-07",
+  "local_link_destinations": 433,
+  "missing_destinations": 0,
+  "brief_anchors_verified": 3,
+  "representatives": 19,
+  "lane_counts": {
+    "direct": 6,
+    "conditional": 4,
+    "competitor": 5,
+    "assisted": 4
+  },
+  "lane_monthly_proxy_volumes": {
+    "direct": 3740,
+    "conditional": 3330,
+    "competitor": 18300,
+    "assisted": 5680
+  },
+  "PDF_final_pages": 13,
+  "PDF_text_units_CMS_and_revision_checked": true,
+  "delivery_artifact_hashes_checked": 4,
+  "model_v0_6_hashes_unchanged": 9,
+  "bundle_files_checked": 28,
+  "bundle_sha256": "67a1707b0f1e357560fb65abfd2498f0316b139d47b7c9e2582969853f036c62",
+  "context_gate_errors": 0,
+  "context_gate_warnings": 0,
+  "documentation_closure_warnings": 0,
+  "whitespace_check": "pass_preserving_intentional_markdown_hard_breaks",
+  "bundle_current_path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/Pibank-Fuentes-para-Claude-2026-10-07-meta-completa.zip",
+  "full_goal_first_verified": true,
+  "workbook_initial_share": 0.01,
+  "workbook_initial_definition": "Aperturas",
+  "workbook_initial_accounts": 152
+}

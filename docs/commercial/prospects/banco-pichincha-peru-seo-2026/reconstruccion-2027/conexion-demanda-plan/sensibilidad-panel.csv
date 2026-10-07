@@ -1,0 +1,4 @@
+scenario,mature_capture_assumption,annual_visit_equivalents_test,annual_openings_test,annual_funded_test,competitor_visit_equivalents_test,status
+prudente,0.02,2993.2000000000003,59.864,38.9116,986.0,partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality
+trabajo,0.05,7483.0,149.66,97.27900000000001,2465.0,partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality
+expansion,0.1,14966.0,299.32,194.55800000000002,4930.0,partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality

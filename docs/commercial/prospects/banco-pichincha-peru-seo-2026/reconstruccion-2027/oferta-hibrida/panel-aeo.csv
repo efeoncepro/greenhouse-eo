@@ -1,0 +1,25 @@
+id,decision,tipo,pregunta_candidata,superficies,cortes_M1,cortes_M2_M12,estado
+AEO-01,rendimiento,generica,¿Cómo comparar el rendimiento neto de cuentas de ahorro en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-02,rendimiento,generica,¿Qué diferencia hay entre TREA y tasa de interés de una cuenta de ahorro?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-03,rendimiento,generica,¿Cómo calcular lo que gano al ahorrar en soles considerando comisiones y condiciones?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-04,rendimiento,pibank,¿Qué condiciones debo revisar para entender el rendimiento de la Cuenta Soles de Pibank?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-05,comparacion,competidor,¿Qué comparar entre una cuenta de ahorro de Interbank y Pibank en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-06,comparacion,competidor,¿Qué comparar entre una cuenta de ahorro de Scotiabank y Pibank en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-07,comparacion,competidor,¿Qué comparar entre una cuenta de ahorro de BCP y Pibank en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-08,comparacion,competidor,¿Qué comparar entre una cuenta de ahorro de BBVA y Pibank en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-09,confianza,generica,¿Cómo comprobar el respaldo de una cuenta de ahorro digital en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-10,confianza,generica,¿Qué revisar sobre la cobertura del Fondo de Seguro de Depósitos antes de elegir una cuenta?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-11,confianza,pibank,¿Qué relación tiene Pibank con Banco Pichincha Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-12,confianza,pibank,¿Dónde consultar las condiciones y documentos oficiales de la Cuenta Soles de Pibank?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-13,liquidez,generica,¿Qué diferencias hay entre ahorrar en una cuenta disponible y un depósito a plazo?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-14,liquidez,generica,¿Qué cuenta de ahorro permite disponer del dinero para imprevistos en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-15,liquidez,generica,¿Qué comisiones y límites de transferencia conviene revisar al elegir una cuenta de ahorro?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-16,liquidez,pibank,¿Cómo consultar las condiciones de disponibilidad y transferencias de Pibank Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-17,apertura,generica,¿Qué requisitos debo revisar para abrir una cuenta de ahorro digital en Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-18,apertura,generica,¿Qué pasos hay entre solicitar una cuenta digital y poder utilizarla?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-19,apertura,pibank,¿Cómo abrir una Cuenta Soles de Pibank desde sus canales oficiales?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-20,apertura,pibank,¿Dónde resolver dudas sobre la apertura de una cuenta en Pibank Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-21,fondeo,generica,¿Qué debo comprobar antes de hacer mi primera transferencia a una cuenta de ahorro?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-22,fondeo,generica,¿Cómo organizar aportes periódicos para alcanzar una meta de ahorro en soles?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-23,fondeo,pibank,¿Dónde encontrar instrucciones oficiales para realizar el primer depósito en Pibank Perú?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda
+AEO-24,fondeo,pibank,¿Qué debo revisar si mi primera transferencia a Pibank no aparece reflejada?,3,1,2,Propuesto; congelar version al inicio; no es evidencia observada ni volumen de busqueda

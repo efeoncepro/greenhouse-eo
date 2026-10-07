@@ -1,8 +1,14 @@
 # Pibank 2027 · PR editorial y autoridad
 
+**Alcance vigente de autoridad y técnica:** [SEO técnico/schema y refuerzos de enlaces](oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md). Se retiran las sesiones digitales y no se incorporan tutoriales. Gradual: dos campañas M3/M8 + dos refuerzos M6/M11; integral: cuatro campañas y cuatro refuerzos. Precios anuales intactos; técnico/schema dentro de base y 8h CMS/mes.
+
 **Frente integrado al programa anual de SEO/GEO · Efeonce para Pibank Perú · 06-10-2026.**
 
 La búsqueda necesita una propuesta clara en el sitio y referencias creíbles fuera de él. Incorporamos un frente de relaciones con medios para que Pibank sea una fuente reconocible sobre ahorro digital, rendimiento y disponibilidad del dinero. Buscaremos cobertura editorial, menciones y enlaces hacia recursos útiles de `pibank.pe`, conectados con el recorrido de apertura y primer fondeo.
+
+## Integración v0.7 · 07-10-2026
+
+Este frente se mantiene dentro de la [estrategia ampliada](ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md): pilar/hub, satélites, herramientas, comunidad y SEM. Campañas M3/M5/M8/M11 y sus recursos se coordinan con el [calendario v0.7](CALENDARIO-CRECIMIENTO-V0.7.csv). Comparador/planificador son funcionalidades nuevas por dimensionar; no se consideran incluidas en paquetes CMS previos. La comunidad comparte recursos; los refuerzos de enlaces son una capacidad PR distinta de las campañas y se registran por separado. Las cifras de cuatro campañas siguientes describen la ruta integral; la gradual contempla dos. Evitar duplicar contenidos, contactos o cuentas entre canales.
 
 ## 1. Partimos de presencia existente
 
@@ -36,6 +42,8 @@ Gestión y El Comercio comparten grupo editorial; contaremos dominios y grupos p
 | **Q3 · Separar ahorro del gasto** | Una herramienta para decidir qué parte del dinero debe permanecer disponible | Plantilla de ahorro ante ingresos extraordinarios y fondo para imprevistos; ejemplos ilustrativos, sin inventar conductas de clientes | Cuenta Soles y explicación del primer depósito |
 | **Q4 · Revisar decisiones de ahorro al cierre del año** | Actualización comparable de la muestra y aprendizajes del año | Segunda lectura del comparativo, manteniendo método; datos de uso agregados sólo si el banco los habilita y valida | Recursos de decisión y continuidad del ahorro |
 
+Los recursos que mencionen marcas o productos competidores requieren aprobación específica de Producto/Cumplimiento sobre comparabilidad, fuentes, fecha y afirmaciones. Si el banco no la concede, se utilizará una guía de criterios de ahorro sin marcas dentro de la entrega existente; no se presupone permiso ni se duplica contenido.
+
 Los temas se adaptarán al calendario y condiciones de 2027. Una campaña no obliga a crear una URL nueva: reutilizaremos la guía, calculadora y FAQ del plan SEO. Los cuatro paquetes PR agregan método, datos, versión portable y preparación de vocería; no cuentan otra vez esas páginas como entregas nuevas. Si una encuesta representativa o un estudio con datos privados resulta útil, se dimensionará antes de comprometerlo.
 
 Cada activo completará un contrato de utilidad citable: quién lo usaría, objeto reutilizable, evidencia y límites, explicación autocontenida, URL canónica estable en HTML, revisión de dos perfiles expertos y distribución por utilidad. El recurso central será accesible sin formulario y servirá aun sin logo ni CTA. La evidencia pública compilada se atribuirá a sus fuentes; el análisis propio no se presentará como encuesta de consumidores.
@@ -44,8 +52,8 @@ Cada activo completará un contrato de utilidad citable: quién lo usaría, obje
 
 - **M1:** inventario de cobertura/enlaces, mapa de los ocho medios, relación con Comunicaciones, ficha del vocero, protocolo de revisión y primer ángulo editorial.
 - **M3, M5, M8 y M11:** paquete de campaña trimestral: activo validado, metodología/fuentes, ficha de datos, material portable y preparación de vocero. La publicación sigue el [calendario integrado](CALENDARIO-INTEGRADO-2027.md): guía lista M3, calculadora mejorada M2, recurso de ahorro disponible M8 y actualización M11. Cada recurso debe estar implementado/verificado antes del contacto de su campaña.
-- **Cada mes:** un ángulo editorial preparado y cuatro propuestas individuales a periodistas seleccionados: **12 ángulos y 48 propuestas en el año**, una vez aprobados mensaje, destinatario y envío por el banco. Las propuestas incluyen fuente verificable, material útil y disponibilidad del vocero; no son notas idénticas enviadas en masa.
-- **Cada trimestre:** preparación de vocería y revisión de oportunidades de entrevistas, cobertura y enlaces obtenidos. Cuatro sesiones; entrevista concedida depende del medio.
+- **Por campaña integral:** tres ángulos editoriales preparados y doce propuestas individuales a periodistas seleccionados: **12 ángulos y 48 propuestas en el año**, una vez aprobados mensaje, destinatario y envío por el banco. Las propuestas incluyen fuente verificable, material útil y disponibilidad del vocero; no son notas idénticas enviadas en masa.
+- **Cada trimestre:** preparación de vocería y revisión de oportunidades de entrevistas, cobertura y enlaces obtenidos. Cuatro preparaciones internas de vocería; entrevista concedida depende del medio.
 - **Cada mes:** seguimiento de cobertura y enlaces: URL, fecha, objeto citado, precisión de marca/producto, destino, `rel`, fuente/grupo, indexabilidad observable y tráfico de referencia cuando haya medición.
 
 Se solicitarán correcciones de hechos o referencias cuando exista fundamento y coordinación con Comunicaciones. Si una redacción considera útil enlazar la fuente, podrá citar el recurso oficial; no se exige un enlace ni un atributo como condición de cobertura. La selección y publicación pertenecen al medio.
@@ -73,7 +81,7 @@ Un enlace editorial con `nofollow` y una mención sin enlace se registran como t
 
 La prioridad del frente es cobertura ganada. Si el banco decide contratar publirreportajes o Brand Voice, se presupuestarán como pauta separada y se identificarán como contenido patrocinado; no se contarán como cobertura editorial ganada ni se contratarán para comprar autoridad SEO. Google exige identificar los enlaces publicitarios con atributos adecuados. [Política oficial de enlaces](https://developers.google.com/search/docs/essentials/spam-policies#link-spam).
 
-Este alcance agrega dedicación de PR al programa SEO/GEO. El equipo y la inversión conjunta se dimensionarán con Operations/Finance antes de emitir la oferta económica. No incluye inversión en medios, encuesta de campo, evento físico, disponibilidad permanente del vocero ni gestión de crisis.
+Este alcance agrega dedicación de PR al programa SEO/GEO. El equipo y la inversión propuesta se detallan en la oferta híbrida vigente y se validan con Operations/Finance antes de contratar. No incluye inversión en medios, encuesta de campo, evento físico, disponibilidad permanente del vocero ni gestión de crisis.
 
 ## Fuentes de selección de medios
 

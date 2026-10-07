@@ -1,0 +1,233 @@
+{
+  "date": "2026-10-07",
+  "checks": [
+    {
+      "check": "Source preserved reconstruccion-2027/conexion-demanda-plan/costeo-interno.csv",
+      "pass": true
+    },
+    {
+      "check": "Source preserved reconstruccion-2027/conexion-demanda-plan/capacidad-por-mes.csv",
+      "pass": true
+    },
+    {
+      "check": "Source preserved reconstruccion-2027/conexion-demanda-plan/inputs.json",
+      "pass": true
+    },
+    {
+      "check": "Source preserved reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "pass": true
+    },
+    {
+      "check": "Source preserved research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+      "pass": true
+    },
+    {
+      "check": "Capacity assigned once",
+      "pass": true
+    },
+    {
+      "check": "SEO hiring fully reserved in base",
+      "pass": true
+    },
+    {
+      "check": "New cost reconciles capacity delta bajo",
+      "pass": true
+    },
+    {
+      "check": "New cost reconciles capacity delta central",
+      "pass": true
+    },
+    {
+      "check": "New cost reconciles capacity delta alto",
+      "pass": true
+    },
+    {
+      "check": "Writer cost reserved once in base",
+      "pass": true
+    },
+    {
+      "check": "No per article upsell",
+      "pass": true
+    },
+    {
+      "check": "Writer hours plus reserve within annual capacity",
+      "pass": true
+    },
+    {
+      "check": "SEO hours plus reserve within annual capacity",
+      "pass": true
+    },
+    {
+      "check": "FAQ quota removed in model",
+      "pass": true
+    },
+    {
+      "check": "Former FAQ provision reallocated",
+      "pass": true
+    },
+    {
+      "check": "Productive monthly capacity seo",
+      "pass": true
+    },
+    {
+      "check": "Productive monthly capacity writer",
+      "pass": true
+    },
+    {
+      "check": "Sessions removed from catalog and capacity",
+      "pass": true
+    },
+    {
+      "check": "PR reinforcement 20 hours each",
+      "pass": true
+    },
+    {
+      "check": "Gradual reinforcement starts M6 M11",
+      "pass": true
+    },
+    {
+      "check": "Gradual PR starts M3 M8",
+      "pass": true
+    },
+    {
+      "check": "AEO capacity 144 hours annual",
+      "pass": true
+    },
+    {
+      "check": "SEO expanded capacity 604 hours",
+      "pass": true
+    },
+    {
+      "check": "AEO panel 24 unique questions six decisions",
+      "pass": true
+    },
+    {
+      "check": "AEO 72 baseline 144 monthly 1656 annual",
+      "pass": true
+    },
+    {
+      "check": "Total base",
+      "pass": true
+    },
+    {
+      "check": "Scope base",
+      "pass": true
+    },
+    {
+      "check": "Margin base",
+      "pass": true
+    },
+    {
+      "check": "Total integral",
+      "pass": true
+    },
+    {
+      "check": "Scope integral",
+      "pass": true
+    },
+    {
+      "check": "Margin integral",
+      "pass": true
+    },
+    {
+      "check": "Total gradual",
+      "pass": true
+    },
+    {
+      "check": "Scope gradual",
+      "pass": true
+    },
+    {
+      "check": "Margin gradual",
+      "pass": true
+    },
+    {
+      "check": "Gradual peak after PR reinforcement rescheduling",
+      "pass": true
+    },
+    {
+      "check": "PR setup preserved with one activation",
+      "pass": true
+    },
+    {
+      "check": "No native formula errors",
+      "pass": true
+    },
+    {
+      "check": "Default budget",
+      "pass": true
+    },
+    {
+      "check": "Default control",
+      "pass": true
+    },
+    {
+      "check": "Default cost",
+      "pass": true
+    },
+    {
+      "check": "Default margin",
+      "pass": true
+    },
+    {
+      "check": "Base price proposed",
+      "pass": true
+    },
+    {
+      "check": "Discount sensitivity base high cost becomes negative",
+      "pass": true
+    },
+    {
+      "check": "Sensitivity 10pct base high reconciles",
+      "pass": true
+    },
+    {
+      "check": "Extra monthly cost sensitivity",
+      "pass": true
+    },
+    {
+      "check": "Recalculated no errors base",
+      "pass": true
+    },
+    {
+      "check": "Recalculated fee base",
+      "pass": true
+    },
+    {
+      "check": "Recalculated cost base",
+      "pass": true
+    },
+    {
+      "check": "Recalculated valid scope base",
+      "pass": true
+    },
+    {
+      "check": "Recalculated no errors integral",
+      "pass": true
+    },
+    {
+      "check": "Recalculated fee integral",
+      "pass": true
+    },
+    {
+      "check": "Recalculated cost integral",
+      "pass": true
+    },
+    {
+      "check": "Recalculated valid scope integral",
+      "pass": true
+    },
+    {
+      "check": "Recalculated no errors invalid",
+      "pass": true
+    },
+    {
+      "check": "Minimum activation detected",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "formula_count": 109,
+  "native_recalculation": "LibreOffice default and three alternate selections",
+  "excel_desktop": "not_operated"
+}

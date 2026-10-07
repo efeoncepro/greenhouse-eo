@@ -1,6 +1,19 @@
 # Sales Pod · Banco Pichincha Perú
 
-**Activación:** 28-09-2026 · **Corte vigente:** 06-10-2026 · **Owner:** Julio Reyes · **Modo:** operación asistida por demanda.
+## Estado vigente · oferta híbrida reforzada · 07-10-2026
+
+La [oferta híbrida](reconstruccion-2027/oferta-hibrida/OFERTA-PARA-PIBANK.md) y el [brief para Claude](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) gobiernan alcance, secuencia y precio: base US$4.500/mes, gradual US$79.200/año, integral US$89.200. Hasta cinco artículos/mes, mejoras según evidencia sin cuota FAQ, técnico/schema y panel AEO de 24 preguntas: 72 observaciones iniciales y 144/mes desde M2. Gradual: campañas PR M3/M8 y refuerzos M6/M11; comunidad desde M3, hub, calculadora y comparador. Sesiones digitales retiradas.
+
+SEO/AEO es evolutivo e incremental. SEM se analiza como palanca de eficiencia; no se añade operación publicitaria. [Método y capacidad](reconstruccion-2027/oferta-hibrida/AEO-Y-AUTORIDAD.md), [acuerdos](reconstruccion-2027/oferta-hibrida/ACUERDOS-DE-ENTREGA.md) y [costeo provisional](reconstruccion-2027/oferta-hibrida/README.md). La integral dimensiona 2.924h; costo SEO/redactor reservado no equivale a dedicación exclusiva.
+
+La meta es 15.200 cuentas con fondos; ~1,17m visitas es el requisito del embudo ilustrativo completo, no un forecast SEO. Investigación y modelos originales permanecen intactos. Los precios están propuestos; faltan validación de costos/roster reales, términos bancarios y contribución observada. Los conteos y fees del registro histórico siguiente no definen la oferta actual.
+
+## Registro del estado anterior v0.6.1 y antecedentes
+
+El registro que sigue conserva el corte anterior; sus cantidades/QA no gobiernan el alcance ampliado. No se altera la fuente de reunión ni las capturas originales.
+
+
+**Activación:** 28-09-2026 · **Revisión de continuidad:** 07-10-2026 · evidencia original 06-10 · **Owner:** Julio Reyes · **Modo:** operación asistida por demanda.
 **Antecedente:** [Agentic Revenue Operating Model V1](../../AGENTIC_REVENUE_OPERATING_MODEL_V1.md), especialmente §§5–7. El modelo general está propuesto para validación; este caso aplica sus responsabilidades sin afirmar un rollout de automatización.
 
 ## Mandato
@@ -33,14 +46,15 @@ Las funciones están asignadas. Julio autorizó subagentes y la preparación de 
 | BP-06 | Revisar respuesta o seguimiento | Julio | Envío real | Hecho: reunión aceptada por Jesús; Deal 65352884246 creado |
 | BP-06b | Enviar credenciales por correo a juan.vargas@pichincha.pe | Julio (+ Codex/Claude para borrador) | Material de antecedentes en banca | Pendiente; sin correo enviado a la fecha de corte |
 | BP-07 | Discovery y mapa de decisión | Julio | Respuesta positiva | Celebrada 06-10; pedido de propuesta documentado; budget/autoridad sin confirmar |
-| BP-08 | Brief/caso de negocio y plan | Julio + Codex | Reunión + hipótesis explícitas | v0.6; propuesta dirigida al banco y alcance enfocado en reconstruccion-2027/ |
+| BP-08 | Brief/caso de negocio y plan | Julio + Codex | Reunión + hipótesis explícitas | Revisión documental v0.6.1; capturas/modelo v0.6 conservados. Propuesta al banco y alcance enfocado en reconstruccion-2027/ |
 | BP-09 | Research demanda Pibank y diagnóstico público | SEO/AEO + Research | Dominio/producto correctos | Reauditoría 4.855 filas/32 familias y 51 FAQ; cierre competitivo de 2.278 observaciones únicas/1.594 keywords/19 familias, con cobertura por filtro y baseline de enlaces; sin agregado TAM ni forecast |
 | BP-10 | Modelo mensual editable y sensibilidad | Codex + Julio | Research; variables faltantes etiquetadas | Modelo inverso: aperturas/fondeadas, ventana y requisitos; 10 hojas y 29 pruebas nativas. Escenarios anteriores retirados del uso cliente |
 | BP-11 | Alcance/capacidad/cost-to-serve y fee | Julio + Práctica + Finance | Backlog + dependencias | 1.216h candidatas con PR ligadas a alcance; costos/roster/fee pendientes |
 | BP-12 | Demo Pibank + paquete ejecutivo/técnico | Práctica + Codex | Evidencia/alcance revisables | Propuesta, resumen y deck técnicos reconstruidos; demo DEV previa conservada; aprobación banco pendiente |
-| BP-13 | QA y revisión antes del 09-10 | Julio + Codex | Paquete final | Narrativa/alcance revisados; PDFs 11/2/14 páginas y modelo de 10 hojas/29 pruebas nativas, copias y hashes verificados localmente en v0.6; precio y banco pendientes |
+| BP-13 | QA y revisión antes del 09-10 | Julio + Codex | Paquete final | QA histórico v0.6: PDFs 11/2/14 páginas y modelo 10 hojas/29 pruebas nativas, copias/hashes verificados. Revisión documental v0.6.1: PDFs 11/2p revisados en sus 13 páginas finales, copias/hashes verificados; deck14 previo archivado histórico; precio y banco pendientes |
 | BP-14 | Enviar información al banco | Julio | Autorización de envío + material final | No enviado en esta actualización |
 | BP-15 | Preparar dudas para gerencia semana 19-10 | Julio + Codex | Feedback real | Pendiente; seguimiento final octubre eventual |
+| BP-16 | Cuantificar aporte estimado y ejercicio de lanzamiento | Práctica + Julio | Panel actual, alcance aprobado e hipótesis trazables; datos privados ausentes explícitos | Pendiente en v0.6; requisitos inversos no sustituyen estimación del programa completo. Preparar supuestos separados sin inventar baseline |
 
 ## Cadencia histórica de primer contacto, sin automatización
 
@@ -72,7 +86,7 @@ US$38m = 15.200 × US$2.500 es hipótesis provisional por Julio; el resumen Noti
 
 ## Antecedente anual v0.3 · 06-10-2026
 
-La reconstrucción v0.6 indicada en la cola y al final de este documento gobierna la oferta actual. Las referencias de esta sección conservan la preparación anterior; sus escenarios y capacidades no se reutilizan como recomendación vigente.
+La revisión documental v0.6.1 indicada en la cola y al final de este documento gobierna la preparación actual; modelo y capturas conservan v0.6. Las referencias de esta sección conservan la preparación anterior; sus escenarios y capacidades no se reutilizan como recomendación vigente.
 
 Leer [plan anual](propuesta-anual/ESTRATEGIA-Y-PLAN-ANUAL-2027.md), [research ampliado](research/PIBANK-RESEARCH-AMPLIADO-2026-10-06.md), [modelo](modelo-anual/README.md), [resumen](propuesta-anual/RESUMEN-EJECUTIVO-PIBANK-2027.md), [plan técnico](propuesta-anual/PLAN-TECNICO-EDITORIAL-2027.md), [capacidad interna](propuesta-anual/CAPACIDAD-Y-COSTEO-INTERNO.md) y demo candidata. Evidencia histórica e hipótesis del modelo separadas. CAC/ROI N/D; no prometer las bandas del 1/5/10% ni cobertura del resto de la meta.
 
@@ -82,6 +96,10 @@ Siguiente decisión: Julio revisa prioridades/capacidad anual; Operations/Financ
 
 [QA anual](../../../audits/commercial/2026-10-06-pibank-plan-anual-qa.md) · [manifiesto](propuesta-anual/delivery-manifest.json) · [QA demo DEV](demo/QA-DEV-2026-10-06.md). Versión semestral preservada en modelo/propuesta anteriores. BP-13 acredita verificación local proporcional; revisión humana y aceptación bancaria siguen pendientes. BP-14 sin envío. Sin nuevas comunicaciones, CRM/Notion actualizados o publicación.
 
-Reconstrucción anterior: [QA de su versión](../../../audits/commercial/2026-10-06-pibank-reconstruccion-qa.md). La oferta actual y sus copias se verifican en el [QA v0.6](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md) y el [manifiesto vigente](reconstruccion-2027/delivery-manifest.json).
+Reconstrucción anterior: [QA de su versión](../../../audits/commercial/2026-10-06-pibank-reconstruccion-qa.md). Los artefactos v0.6 y sus copias fueron verificados en el [QA v0.6](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md); consultar versión en el [manifiesto de entrega](reconstruccion-2027/delivery-manifest.json). Ese QA no acredita las nuevas exportaciones v0.6.1.
 
 Cierre v0.6: [calendario único](reconstruccion-2027/CALENDARIO-INTEGRADO-2027.md), [condiciones/aceptación](reconstruccion-2027/CONDICIONES-DE-EJECUCION-2027.md), [capturas ampliadas](research/pibank-gap-closure-2026-10-06/README.md). Excel integra PR y 13 costos por función; capacidad candidata de 1.216h, modelo de 10 hojas/29 pruebas nativas y PDFs de 11/2/14 páginas. Oferta económica pendiente de costos/roster, no de estructura del modelo. Investigación conciliada: US$0,132 de consulta abortada cobrada sin filas recuperables; cinco llamadas nuevas por US$0,213552; costo conservador total US$1,568512 bajo el techo operativo de US$2. Consulta alternativa BBVA y consulta abortada tienen filtros distintos; no se afirma recuperación de las filas faltantes. [Retrospectiva interna](RETROSPECTIVA-2026-10-06.md) conserva los aprendizajes; no acredita envío ni resultado del programa.
+
+**Aclaración para preparar el deck · 07-10-2026:** doce meses y PR/autoridad son decisiones posteriores de Julio, no errores contra el relato de la reunión. El panel actual tiene 19 representantes y subtotal directo parcial de 3.740 estimadas/mes; las cinco consultas/3.690 y 33.210 son contexto previo. [Matriz de números/rutas](README.md#numeros-vigentes-y-uso-en-el-deck). El siguiente trabajo de BP-16 debe responder al pedido de aporte estimado, sin presentar requisitos inversos como forecast ni sumar adquisición, asistencia, rivales y AEO como poblaciones distintas. Esta corrección de continuidad no acredita nuevos renders, modificaciones del workbook o envío a Claude/banco.
+
+[Brief del nuevo deck](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) y [CMS](research/CMS-PIBANK-2026-10-07.md) son rutas de preparación actual. La revisión documental v0.6.1 no modifica capturas/Excel ni sus hashes; el QA v0.6 no acredita los nuevos PDFs o deck.

@@ -8,7 +8,7 @@ Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbi
 
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
-**Pibank v0.6:** [caso y método](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md): SEO/GEO+PR1.216h; costos/roster/fee pendientes. Corte09/10.
+**Pibank:** [oferta híbrida](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md): ruta US$79.200; base US$4.500, 5 artículos/mes. AEO144/M2; PR M3/M8. PDF/Excel/Claude. Demanda intacta; precio propuesto. Corte09/10.
 
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
 

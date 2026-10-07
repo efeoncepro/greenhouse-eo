@@ -1,0 +1,58 @@
+scenario,family_id,family,lane,annual_visit_equivalents_test,openings_test,funded_test,ready_month,asset
+prudente,G01,Cuenta de ahorro,direct,498.8,9.976,6.484400000000001,1,Pilar
+prudente,G02,Intereses sobre ahorro,direct,31.919999999999998,0.6384,0.41496,2,Calculadora / ART-03
+prudente,G03,Comparar cuentas en Perú,direct,42.239999999999995,0.8447999999999999,0.5491199999999999,3,ART-05 / Comparador
+prudente,G04,Abrir una cuenta de ahorro,direct,36.12,0.7223999999999999,0.46956,1,ART-02
+prudente,G05,Costos de mantenimiento,direct,8.6,0.172,0.1118,1,Pilar
+prudente,G06,Requisitos de apertura,direct,8.6,0.172,0.1118,1,ART-02
+prudente,C01,Ahorro de alto rendimiento,conditional,243.2,4.864,3.1616,2,Pilar / ART-03
+prudente,C02,Cuenta digital,conditional,223.6,4.472,2.9068000000000005,1,Pilar / ART-02
+prudente,C03,Dónde ahorrar y ganar intereses,conditional,51.48,1.0295999999999998,0.66924,3,ART-05
+prudente,C04,Qué banco paga más intereses Perú,conditional,5.279999999999999,0.10559999999999999,0.06863999999999999,3,ART-05
+prudente,B01,Ahorro BCP,competitor,343.20000000000005,6.864000000000001,4.461600000000001,7,ART-13
+prudente,B02,Súper Tasa Interbank,competitor,174.8,3.4960000000000004,2.2724,5,ART-10
+prudente,B03,Power Scotiabank,competitor,93.6,1.8719999999999999,1.2167999999999999,6,ART-12
+prudente,B04,Cuenta digital Scotiabank,competitor,136.8,2.736,1.7784000000000002,6,ART-12
+prudente,B05,Cuenta digital BBVA,competitor,237.60000000000002,4.752000000000001,3.0888000000000004,8,ART-16
+prudente,E01,Entender TREA,assisted,498.8,9.976,6.484400000000001,1,ART-01
+prudente,E02,Seguro de depósitos,assisted,179.2,3.5839999999999996,2.3295999999999997,4,ART-08
+prudente,E03,Qué es cuenta de ahorro,assisted,101.47999999999999,2.0296,1.31924,1,Pilar
+prudente,E04,Cómo ahorrar dinero,assisted,77.88,1.5575999999999999,1.01244,3,ART-06
+trabajo,G01,Cuenta de ahorro,direct,1247.0,24.94,16.211000000000002,1,Pilar
+trabajo,G02,Intereses sobre ahorro,direct,79.8,1.596,1.0374,2,Calculadora / ART-03
+trabajo,G03,Comparar cuentas en Perú,direct,105.6,2.112,1.3728,3,ART-05 / Comparador
+trabajo,G04,Abrir una cuenta de ahorro,direct,90.3,1.806,1.1739000000000002,1,ART-02
+trabajo,G05,Costos de mantenimiento,direct,21.5,0.43,0.2795,1,Pilar
+trabajo,G06,Requisitos de apertura,direct,21.5,0.43,0.2795,1,ART-02
+trabajo,C01,Ahorro de alto rendimiento,conditional,608.0,12.16,7.904000000000001,2,Pilar / ART-03
+trabajo,C02,Cuenta digital,conditional,559.0,11.18,7.267,1,Pilar / ART-02
+trabajo,C03,Dónde ahorrar y ganar intereses,conditional,128.7,2.574,1.6731,3,ART-05
+trabajo,C04,Qué banco paga más intereses Perú,conditional,13.2,0.264,0.1716,3,ART-05
+trabajo,B01,Ahorro BCP,competitor,858.0,17.16,11.154,7,ART-13
+trabajo,B02,Súper Tasa Interbank,competitor,437.0,8.74,5.681,5,ART-10
+trabajo,B03,Power Scotiabank,competitor,234.0,4.68,3.042,6,ART-12
+trabajo,B04,Cuenta digital Scotiabank,competitor,342.0,6.84,4.446,6,ART-12
+trabajo,B05,Cuenta digital BBVA,competitor,594.0,11.88,7.722,8,ART-16
+trabajo,E01,Entender TREA,assisted,1247.0,24.94,16.211000000000002,1,ART-01
+trabajo,E02,Seguro de depósitos,assisted,448.0,8.96,5.824000000000001,4,ART-08
+trabajo,E03,Qué es cuenta de ahorro,assisted,253.7,5.074,3.2981,1,Pilar
+trabajo,E04,Cómo ahorrar dinero,assisted,194.7,3.8939999999999997,2.5311,3,ART-06
+expansion,G01,Cuenta de ahorro,direct,2494.0,49.88,32.422000000000004,1,Pilar
+expansion,G02,Intereses sobre ahorro,direct,159.6,3.192,2.0748,2,Calculadora / ART-03
+expansion,G03,Comparar cuentas en Perú,direct,211.2,4.224,2.7456,3,ART-05 / Comparador
+expansion,G04,Abrir una cuenta de ahorro,direct,180.6,3.612,2.3478000000000003,1,ART-02
+expansion,G05,Costos de mantenimiento,direct,43.0,0.86,0.559,1,Pilar
+expansion,G06,Requisitos de apertura,direct,43.0,0.86,0.559,1,ART-02
+expansion,C01,Ahorro de alto rendimiento,conditional,1216.0,24.32,15.808000000000002,2,Pilar / ART-03
+expansion,C02,Cuenta digital,conditional,1118.0,22.36,14.534,1,Pilar / ART-02
+expansion,C03,Dónde ahorrar y ganar intereses,conditional,257.4,5.148,3.3462,3,ART-05
+expansion,C04,Qué banco paga más intereses Perú,conditional,26.4,0.528,0.3432,3,ART-05
+expansion,B01,Ahorro BCP,competitor,1716.0,34.32,22.308,7,ART-13
+expansion,B02,Súper Tasa Interbank,competitor,874.0,17.48,11.362,5,ART-10
+expansion,B03,Power Scotiabank,competitor,468.0,9.36,6.084,6,ART-12
+expansion,B04,Cuenta digital Scotiabank,competitor,684.0,13.68,8.892,6,ART-12
+expansion,B05,Cuenta digital BBVA,competitor,1188.0,23.76,15.444,8,ART-16
+expansion,E01,Entender TREA,assisted,2494.0,49.88,32.422000000000004,1,ART-01
+expansion,E02,Seguro de depósitos,assisted,896.0,17.92,11.648000000000001,4,ART-08
+expansion,E03,Qué es cuenta de ahorro,assisted,507.4,10.148,6.5962,1,Pilar
+expansion,E04,Cómo ahorrar dinero,assisted,389.4,7.787999999999999,5.0622,3,ART-06

@@ -1,0 +1,4 @@
+scenario,original_calendar_visit_equivalents,proposed_calendar_visit_equivalents,difference_from_timing_only,funded_difference_test,status
+prudente,2993.2000000000003,3743.200000000002,750.0000000000018,9.750000000000025,same_sources_and_capture; shift_four_comparatives_and_support_slots; no_new_articles
+trabajo,7483.0,9358.0,1875.0,24.375,same_sources_and_capture; shift_four_comparatives_and_support_slots; no_new_articles
+expansion,14966.0,18716.0,3750.0,48.75,same_sources_and_capture; shift_four_comparatives_and_support_slots; no_new_articles

@@ -2,6 +2,12 @@
 
 06-10-2026, hora Chile; últimas consultas UTC 07-10. Investigación local por `pnpm dataforseo`, Perú 2604/es, org Efeonce autorizada. Se concilió el costo incierto antes de nuevas compras; no se usó transporte alternativo ni se repitió el request abortado.
 
+## Vigencia de este panel · aclaración 07-10-2026
+
+Éste es el panel integrado en v0.6, posterior al panel anual inicial de cinco consultas/3.690. Contiene 19 representantes: seis directos, cuatro condicionales, cinco rivales y cuatro asistidos. El subtotal directo **3.740/mes** es parcial; **7.070 = 3.740 + 3.330** mezcla directo y condicional, no representa adquisición genérica validada. No sumar los cuatro carriles como TAM o tráfico. La sensibilidad **33.210** del panel anterior no es un dato de este dataset.
+
+El inventario reauditorado de 4.855 filas/32 familias y este panel de 19 representantes tienen scopes distintos; no son versiones contradictorias ni registros que deban sumarse. [Continuidad para el deck](../../README.md#numeros-vigentes-y-uso-en-el-deck) identifica alcance anual/PR y la brecha abierta de aporte estimado, sin cambiar raws o métricas originales.
+
 ## Cobertura cerrada dentro de filtros
 
 | Banco | Nuevos registros retornados / total del filtro | Alcance |
@@ -30,3 +36,6 @@ No es Moz Domain Authority, Brand Authority ni Ahrefs Domain Rating. No es prueb
 ## Uso en la propuesta
 
 El [calendario](../../reconstruccion-2027/CALENDARIO-INTEGRADO-2027.md) lleva apertura M1 y calculadora/fondeo M2 antes de las comparaciones y PR M3/M5/M8/M11. El Excel incorpora las19 familias y el alcance SEO/GEO+PR, conservando el modelo de requisitos desde una meta. Las nuevas capturas mejoran cobertura y priorización; no generan un forecast de aperturas sin baseline propia y conversiones observadas.
+
+
+La corrección de continuidad corresponde a revisión documental v0.6.1; las capturas, raws y modelos no se recalculan. [Brief del nuevo deck](../../reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) y [CMS](../CMS-PIBANK-2026-10-07.md). El deck previo de 14 láminas conserva valor histórico, sin acreditar QA del nuevo.

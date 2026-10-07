@@ -1,6 +1,29 @@
 # Pibank · Condiciones concretas para ejecutar y evaluar
 
-Preparación interna v0.6, 06-10-2026. Responsables funcionales y plazos propuestos, por acordar con el banco; no son acuerdos alcanzados ni personas asignadas.
+**Acuerdos vigentes de compra/entrega:** [revisión, aceptación, reprogramación y traspaso](oferta-hibrida/ACUERDOS-DE-ENTREGA.md). Se añaden dos rondas por lote editorial, ventana bancaria propuesta de cinco días hábiles y corrección de errores sin doble cobro.
+
+**Alcance vigente de autoridad y técnica:** [SEO técnico/schema y refuerzos de enlaces](oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md). Se retiran las sesiones digitales y no se incorporan tutoriales. Gradual: dos campañas M3/M8 + dos refuerzos M6/M11; integral: cuatro campañas y cuatro refuerzos. Precios anuales intactos; técnico/schema dentro de base y 8h CMS/mes.
+
+**Capacidad editorial vigente:** hasta cinco artículos al mes incluidos en base US$4.500; máximo 60 al año, sin suplemento editorial. Las 24 piezas del plan anterior son backlog inicial. Ruta gradual US$79.200/año; integral US$89.200. Mayor capacidad no modifica automáticamente la demanda ni la captación proyectada. [Oferta y calendario actual](oferta-hibrida/README.md).
+
+**Oferta comercial vigente · 07-10:** [modelo híbrido](oferta-hibrida/OFERTA-PARA-PIBANK.md): base US$4.500/mes más activaciones. Sustituye la recomendación fija de US$8.000; las rutas comparten la capacidad editorial incluida y difieren en herramientas y distribución. Investigación, embudo y volúmenes permanecen intactos. [Costeo y selector](oferta-hibrida/README.md).
+
+**Actualización 07-10 · Conexión de ejecución y costo:** el [anexo vigente](conexion-demanda-plan/README.md) conecta las 19 familias ya investigadas, conserva la meta de cuentas con fondos y el embudo, propone capacidad/fee y responsables. Sus escenarios de captura son hipótesis separadas; el modelo y los volúmenes originales permanecen intactos. Para el deck, leer también [el complemento para Claude](conexion-demanda-plan/PARA-CLAUDE.md). Las menciones siguientes a costeo pendiente describen el estado anterior; ahora hay una propuesta interna por validar.
+
+Revisión documental interna v0.7, 07-10-2026; modelo/evidencia comercial v0.6 conservados para su alcance previo. Responsables funcionales y plazos propuestos, por acordar con el banco; no son acuerdos alcanzados ni personas asignadas.
+
+## Condiciones adicionales del programa integrado v0.7
+
+La [estrategia integrada](ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md) amplía el alcance con hub/tools, 24 artículos, comunidad y análisis de eficiencia SEO–SEM. El Excel v0.6 de 1.216h/13 funciones no costea esa ampliación. Su calendario sigue asociado al workbook; el vigente para el nuevo programa es [calendario v0.7](CALENDARIO-CRECIMIENTO-V0.7.csv).
+
+| Frente | Dueño funcional por acordar | Condición y evidencia |
+|---|---|---|
+| Hub y plantillas | TI/proveedor + Efeonce | Arquitectura/entorno/permisos; implementación con QA y mantenimiento |
+| Tools nuevas | Producto/Cumplimiento + desarrollo/QA | Método/fórmulas, fuentes, datos, accesibilidad, privacidad, eventos y presupuesto; no equivalen a un paquete CMS≤8h |
+| Comunidad | Marketing/Comunicaciones + owner operativo | Audiencia, valor recurrente, canal, consentimiento, moderación, envíos/sesiones y escalamiento acordados; no presuponer autorización para mensajes |
+| Eficiencia SEO–SEM | Analítica/Marketing + Efeonce | Acceso autorizado a resultados/definiciones de campañas, gasto y conversiones; recomendaciones sobre intención/destinos, sin asumir operación publicitaria |
+| Costeo ampliado | Efeonce Operations/Finance/Commercial | Desarrollo/editorial/adaptaciones/comunidad/análisis SEO–SEM/medición; costos compartidos sin duplicidad; nuevo roster/fee aprobados |
+| Contribución integrada | Analítica/Marketing/Onboarding + Efeonce | Matriz por origen/cohorte con referencia, deduplicación y madurez; campos vacíos N/D; no prometer 1,17m de visitas nuevas SEO |
 
 ## Arranque y aceptación
 
@@ -11,8 +34,9 @@ Preparación interna v0.6, 06-10-2026. Responsables funcionales y plazos propues
 | Condiciones financieras y revisores | Producto/Cumplimiento | Primera semana de M1; por lote | Cartilla/tarifario vigentes, fuente fechada y revisor. Propuesta: cinco días hábiles por revisión consolidada y dos rondas; no publicar un claim pendiente |
 | Analítica y continuidad web/registro | Analítica + equipo onboarding | Diccionario en M1; pruebas M1–M2 | Validación de eventos y cobertura entre etapas. Si el banco no habilita continuidad, informar tramos separados y no convertir clics en aperturas |
 | Resultados agregados y referencia | Analítica + Marketing | Definir en M1; primer corte mensual cuando exista dato | Agregados por origen/cohorte, conciliación y registro de campañas/tasas/releases. Ventana y reglas congeladas antes de comparar |
+| Comparativos con competidores M4–M7 | Producto/Cumplimiento + Comunicaciones | Antes del brief final y de publicar cada comparación | Aprobación específica de marcas, productos comparables, método, fuentes, fecha y claims. Si se rechaza el uso de marcas, guía de criterios sin marcas en el mismo lote; sin duplicar artículos ni presuponer la envolvente anterior de 12 entregas ni presuponer autorización |
 | Recursos PR, mensaje y vocero | Comunicaciones + Producto/Cumplimiento | Antes de cada campaña M3/M5/M8/M11 | Recurso publicado y comprobado; dossier, vocero y destinatarios/mensaje aprobados. Reprogramar salida si falta aprobación; no adelantar PR a un recurso incompleto |
-| Disponibilidad, costos y oferta | Efeonce Operations/Finance/Commercial | Antes de oferta económica vinculante | Asignación por función, 13 costos cargados, herramientas/terceros, margen y términos aprobados. No inferir salario, disponibilidad o fee desde horas candidatas |
+| Disponibilidad, costos y oferta | Efeonce Operations/Finance/Commercial | Antes de oferta económica vinculante | Asignación por función y costeo del alcance integrado; los 13 campos previos sólo cubren v0.6. Costos adicionales, herramientas/terceros, margen y términos aprobados. No inferir salario, disponibilidad o fee desde horas candidatas |
 | Valor bancario comparable | Finanzas/Tesorería | Para evaluar retorno, con corte acordado | Un método neto aprobado y horizonte; saldo bruto y TREA al ahorrista no son beneficio del banco. Sin criterio, reportar captación/calidad y dejar ROI como N/D |
 
 M1/M2/M3 son meses desde el inicio acordado. Enero/febrero/marzo sólo aplican si el arranque es enero de 2027. Un bloqueo se registra con dueño, dependencia, fecha y efecto en la entrega; la aprobación tardía no se cuenta como ejecución puntual ni resultado logrado.

@@ -1,5 +1,7 @@
 # Revisión interna de alcance · reconstrucción Pibank 2027
 
+> **Antecedente de alcance anterior.** Las cuotas FAQ, horas y precios del cuerpo no definen el servicio actual. Consultar [oferta híbrida](oferta-hibrida/README.md) y [operación evolutiva](oferta-hibrida/MODELO-EVOLUTIVO.md).
+
 **Uso interno Efeonce. 06-10-2026.** Este memo no forma parte del documento del cliente. Conserva las decisiones de reconstrucción y lo que debe reconciliarse antes de cotización. No autoriza implementación, contratación, publicación ni envío.
 
 ## Decisión comercial
@@ -28,7 +30,7 @@ Doce meses, una marca/producto inicial, un dominio, un mercado Perú/es-PE. La b
 | Paquetes técnicos |12| Cambio acotado CMS/configuración/plantilla, ** ≤ 8 h de implementación por paquete**, QA costeado aparte; publicación editorial incluida en su lane, sin dobleconteo |
 | Medición |1 diccionario + 1 tablero| Web/handoff y resultados agregados permitidos, definiciones y reconciliación; app/core conserva owner banco |
 | Panel GEO |12 preguntas × 3 superficies × 1 observación| 36 observaciones mensuales; país/idioma/método/modo/fecha preservados; baseline pendiente de ejecución |
-| PR editorial |4 campañas + 12 ángulos + 48 propuestas + 4 sesiones| Seguimiento mensual; cada contacto sujeto a autorización bancaria; cobertura/enlaces como objetivos, sin garantía |
+| PR editorial |4 campañas + 12 ángulos + 48 propuestas + 4 refuerzos de enlaces| Seguimiento mensual; cada contacto sujeto a autorización bancaria; cobertura/enlaces como objetivos, sin garantía |
 | Informes y revisiones |12 mensuales + 4 trimestrales| Aprendizaje, coordinación, prioridades y aceptación; no 192 observaciones ni ampliación multiengine automática |
 
 Los 12 recursos no se suman a 12 artículos y otros 12 hubs. Una entrega no puede contarse también como FAQ/paquete técnico. El brief define el alcance y el riesgo antes de producir. «Mejorar» implica cambio útil verificable; si la FAQ elegida ya está correcta, seleccionar otra prioridad del corpus o acordar el reemplazo del slot.

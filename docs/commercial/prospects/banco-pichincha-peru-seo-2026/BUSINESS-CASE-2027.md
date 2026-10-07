@@ -1,12 +1,25 @@
 # Pibank Perú · Caso de inversión y propuesta técnica 2027
 
-**Preparación v0.6 · Uso interno · 06-10-2026 · Owner comercial Julio Reyes.** Propuesta técnica dirigida al banco y modelo inverso de decisión. Doce meses de operación; no forecast, precio aprobado, rentabilidad o adjudicación acreditados.
+## Estado vigente · oferta híbrida reforzada · 07-10-2026
+
+La [oferta híbrida](reconstruccion-2027/oferta-hibrida/OFERTA-PARA-PIBANK.md) y el [brief para Claude](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) gobiernan alcance, secuencia y precio: base US$4.500/mes, gradual US$79.200/año, integral US$89.200. Hasta cinco artículos/mes, mejoras según evidencia sin cuota FAQ, técnico/schema y panel AEO de 24 preguntas: 72 observaciones iniciales y 144/mes desde M2. Gradual: campañas PR M3/M8 y refuerzos M6/M11; comunidad desde M3, hub, calculadora y comparador. Sesiones digitales retiradas.
+
+SEO/AEO es evolutivo e incremental. SEM se analiza como palanca de eficiencia; no se añade operación publicitaria. [Método y capacidad](reconstruccion-2027/oferta-hibrida/AEO-Y-AUTORIDAD.md), [acuerdos](reconstruccion-2027/oferta-hibrida/ACUERDOS-DE-ENTREGA.md) y [costeo provisional](reconstruccion-2027/oferta-hibrida/README.md). La integral dimensiona 2.924h; costo SEO/redactor reservado no equivale a dedicación exclusiva.
+
+La meta es 15.200 cuentas con fondos; ~1,17m visitas es el requisito del embudo ilustrativo completo, no un forecast SEO. Investigación y modelos originales permanecen intactos. Los precios están propuestos; faltan validación de costos/roster reales, términos bancarios y contribución observada. Los conteos y fees del registro histórico siguiente no definen la oferta actual.
+
+## Registro del estado anterior v0.6.1 y antecedentes
+
+El registro que sigue conserva el corte anterior; sus cantidades/QA no gobiernan el alcance ampliado. No se altera la fuente de reunión ni las capturas originales.
+
+
+**Revisión documental v0.6.1 · Uso interno · 07-10-2026 · Owner comercial Julio Reyes.** Modelo, capturas y QA previos conservan v0.6; esta revisión no los recalcula. Propuesta técnica dirigida al banco y modelo inverso de decisión. Doce meses de operación; no forecast, precio aprobado, rentabilidad o adjudicación acreditados.
 
 ## 1. La decisión que debe permitir la propuesta
 
 Contratar consultoría, implementación y contenido SEO/GEO para ayudar a descubrir, evaluar y abrir la Cuenta Soles Pibank. El banco define meta y valoración; el programa compromete entregas, responsabilidades y medición. La propuesta debe explicar a Jesús y gerencia qué cambia, qué se implementará, cómo observar el aporte y qué colaboración requiere.
 
-[Propuesta para Pibank](reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md) y [resumen para gerencia](reconstruccion-2027/RESUMEN-PARA-GERENCIA.md) son la narrativa vigente. [Expediente de reconstrucción](reconstruccion-2027/README.md) conserva el razonamiento y la evidencia.
+[Propuesta para Pibank](reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md) y [resumen para gerencia](reconstruccion-2027/RESUMEN-PARA-GERENCIA.md) son la narrativa vigente. [Expediente de reconstrucción](reconstruccion-2027/README.md) conserva el razonamiento y la evidencia. Para preparar la nueva presentación usar el [brief vigente](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) y el [diagnóstico CMS](research/CMS-PIBANK-2026-10-07.md); el deck de 14 láminas y su QA v0.6 son referencia histórica, no nueva exportación aprobada.
 
 ## 2. Correcciones materiales al caso anterior
 
@@ -24,7 +37,7 @@ La [reauditoría del corpus](reconstruccion-2027/OPORTUNIDAD-Y-COBERTURA.md) cla
 
 Foco: producto/uso, rendimiento y costos, apertura, fondeo/transferencias, identidad/confianza. Adquisición genérica, consideración de alternativa, marca, mejora de conversión, ayuda/activación y permanencia tienen datos y métricas separados. No atribuir captación a un carril por existir contenido. GEO registra presencia y exactitud por superficie, sin convertir citas en cuentas.
 
-**Exploración competitiva ampliada:** [evidencia consolidada](research/pibank-gap-closure-2026-10-06/README.md), 2.278 observaciones únicas banco/consulta/URL, 1.594 consultas y 19 familias. Interbank 342, Scotiabank 314 y BBVA 423 registros retornados: cobertura completa dentro de los filtros de producto/keyword acordados. BCP conserva captura anterior; no es censo de toda la demanda. Se concilió el request BBVA anterior USD0,132 sin repetirlo ni inventar sus filas. El panel genérico representativo de 7.070/mes y productos rivales 18.300/mes siguen como proxies con solapamiento, sin suma de marcas como captación genérica ni forecast. El Excel integra estas familias y sus requisitos, sin resultados fabricados.
+**Exploración competitiva ampliada:** [evidencia consolidada](research/pibank-gap-closure-2026-10-06/README.md), 2.278 observaciones únicas banco/consulta/URL, 1.594 consultas y 19 familias. Interbank 342, Scotiabank 314 y BBVA 423 registros retornados: cobertura completa dentro de los filtros de producto/keyword acordados. BCP conserva captura anterior; no es censo de toda la demanda. Se concilió el request BBVA anterior USD0,132 sin repetirlo ni inventar sus filas. El panel tiene seis representantes directos por 3.740 búsquedas estimadas/mes y cuatro condicionales por 3.330; 7.070 es la suma aritmética de esos dos carriles y no demanda directa elegible. Mantiene aparte cinco representantes rivales por 18.300/mes y cuatro educativos/asistidos por 5.680/mes. Estas canastas son proxies parciales con solapamiento; no sumar marcas o carriles como captación genérica, TAM, personas únicas ni forecast. El Excel integra estas familias y sus requisitos, sin resultados fabricados.
 
 Alcance anual candidato: diagnóstico/arquitectura y censo; **24 FAQ mejoradas; 12 entregas sustanciales, hasta seis destinos nuevos; 12 paquetes técnicos acotados; diccionario y tablero; 12 preguntas en tres superficies y 36 observaciones mensuales; 12 informes y cuatro revisiones trimestrales.** CMS/entornos autorizados, dos rondas consolidadas y sistemas bancarios bajo sus dueños. No sumar una FAQ como entrega sustancial o carga editorial como paquete técnico.
 
@@ -32,7 +45,14 @@ Capacidad interna: [1.066 h base + 150 h reserva = 1.216 h, incluyendo PR](recon
 
 ## 4. Modelo de decisión: objetivos posibles frente a requisitos
 
-[Modelo inverso](reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx) separa definición de cuenta, periodo, conversión, primer fondeo y valoración. La nueva herramienta no pronostica cuentas desde un panel parcial. Hace evaluable qué exige una contribución y qué inversión podría sostenerla.
+[Modelo inverso](reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx) separa definición de cuenta, periodo, conversión, primer fondeo y valoración. La nueva herramienta no pronostica cuentas desde un panel parcial. Hace evaluable qué exige una contribución y qué inversión podría sostenerla. **Brecha de respuesta a Jesús:** v0.6 aún no cuantifica el aporte estimado del programa completo ni del contrafactual de lanzamiento; los requisitos no sustituyen esa estimación. La siguiente versión deberá separar hipótesis por frente, cobertura y dependencias, sin fabricar baseline ni sumar carriles como audiencias independientes.
+
+**Punto de partida para Claude:** el [análisis desde la meta completa](reconstruccion-2027/meta-hacia-atras/ANALISIS.md)
+calculó el 100% monetario provisional: US$38m ÷ US$2.500 = 15.200 fondeadas; a 65% de fondeo y 2% de
+apertura exigiría ~23.385 aperturas y ~1.169.231 visitas. Son requisitos bajo supuestos, no aporte estimado
+SEO. **760 es sólo el 5%, no el resultado final; no hay una proyección de 762.** El workbook inicia en
+1%/Aperturas (152), un ejemplo editable que tampoco fija una meta. Presentar primero el 100% y luego
+las sensibilidades; el [brief](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) gobierna esa jerarquía.
 
 | Banda contextual de 15.200 | Aperturas del ejercicio | Visitas a 2% de prueba | Primer fondeo a 65% de prueba |
 | --- | ---: | ---: | ---: |
@@ -62,4 +82,4 @@ Preparación local: nueva narrativa, reauditoría, alcance y requisitos de decis
 
 [Plan anual de PR](reconstruccion-2027/PLAN-PR-Y-AUTORIDAD-2027.md): cuatro campañas con recursos citables, doce ángulos, 48 propuestas individuales y cuatro sesiones de vocería. Prioridad Gestión, El Comercio, RPP y Andina; segunda línea Semana Económica, Forbes Perú, Infobae Perú y La República. Objetivos de trabajo: 8–12 coberturas originales y 4–8 enlaces relevantes, sujetos a baseline y decisión editorial. Cobertura previa no se adjudica al programa. La autoridad se evalúa con menciones correctas, diversidad editorial, dominios referentes y resultados observables; scores DA/Brand Authority son auxiliares sin promesa de puntos.
 
-La matriz combinada y el Excel v0.6 integran PR adicional: 1.216 h, 13 costos reales por función, demanda y calendario. Apertura M1, calculadora/fondeo M2 y primera campaña M3; siguientes M5/M8/M11. [Condiciones de ejecución](reconstruccion-2027/CONDICIONES-DE-EJECUCION-2027.md) asignan responsables funcionales y plazos propuestos. Costos/fee, disponibilidad y criterios bancarios siguen por validar. Sin contacto a medios, envío, publicación ni escritura CRM.
+La matriz combinada y el Excel v0.6 integran PR adicional: 1.216 h, 13 campos de costo por función pendientes de importes reales, demanda y calendario. El horizonte de doce meses y PR corresponden a decisiones posteriores de Julio; no deben calificarse como desviaciones involuntarias de la reunión ni como aceptación bancaria. Apertura M1, calculadora/fondeo M2 y primera campaña M3; siguientes M5/M8/M11. [Condiciones de ejecución](reconstruccion-2027/CONDICIONES-DE-EJECUCION-2027.md) asignan responsables funcionales y plazos propuestos. Costos/fee, disponibilidad y criterios bancarios siguen por validar. Sin contacto a medios, envío, publicación ni escritura CRM.
