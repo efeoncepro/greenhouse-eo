@@ -1,5 +1,7 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
@@ -24,6 +26,18 @@ entendió la línea. Decide como el director de arte que la diseñó: cada eleme
 (lámina 5.6).
 
 ---
+
+## Rooms: design system de producto — 2026-10-07
+
+El operador corrigió la documentación: «efeonce-graphic-line es el nuevo design system». **La órbita gobierna estética, tipografía, componentes, iconografía y motion de Rooms**, incluida su administración. AXIS distribuye los tokens, contratos, componentes y assets; `axisTypography` Poppins/Geist no es la autoridad visual del nuevo consumidor.
+
+- Bricolage Grotesque para títulos/voz editorial desde `efeonceGraphicLine.type.answer.family`; Poppins para lectura, navegación, formularios, notas y evidencia desde `.type.text.family`. Pesos/tamaños según rol, sin convertir todos los títulos en la receta gráfica de respuesta corta.
+- Colores desde `efeonceGraphicLine` y `axisColorSystem`/`axisOrbitRamp`; controles de marca y estados de sus contratos. Iconografía del catálogo; no mezclar Glitch/Manzanitas ni usar volumen en UI.
+- La órbita rodea, mide o enfoca con propósito; el loading sigue el contrato del componente y no inventa progreso. Motion de marca y microinteracción mantienen sus fuentes distintas dentro del mismo sistema.
+- **Adoptar la línea no obliga a escribir propuestas como preguntas/respuestas.** El operador rechazó ese formato como dinámica general; títulos declarativos, método y demostraciones se componen según el contenido.
+- La marca de Rooms enmarca; las piezas del cliente mantienen su diseño. No aplicar fuentes/colores de Efeonce al arte importado.
+
+Ejemplo corregido: la consola Rooms usa encabezados Bricolage y notas/controles Poppins, no un theme heredado Poppins/Geist; el anuncio del cliente mostrado conserva sus fuentes. Motivo: coherencia de producto con el design system actual sin alterar la propuesta. [Dossier Rooms](../../../../docs/architecture/rooms/README.md). Decisión de sistema aceptada; composición renderizada y go de implementación pendientes.
 
 ## 1. La idea en una frase y el porqué
 

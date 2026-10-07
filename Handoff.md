@@ -1,4 +1,8 @@
-# Handoff activo
+# Handoff
+
+## 2026-10-07 — Continuidad activa
+
+Rooms: EPIC-052; La órbita gobierna todo el diseño (Bricolage/Poppins). Dossier y skill espejo corregidos; go pendiente.
 
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
@@ -386,16 +390,3 @@ visible.
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
 Notas del 02–05/09 archivadas en [2026-09](docs/operations/agent-context-history/handoff/2026-09.md). Siguen abiertas: TASK-1829/1830 (rollout pendiente; magic link muerto en prod), TASK-1349 (Finance), TASK-1814 y TASK-1815.
-
-## 2026-09-30 — Deck SEO/AEO: docs y skills (TASK-1949 Slice 4, Claude)
-
-Norma §4.6 v1.17, catálogo v1.11, manual v1.12, funcional 2.8, arquitectura 1.6 y cinco skills con espejo. Decisión del operador aplicada (datos tal cual, delta b de la task). `brand:compose` del documento SEO falla hoy en `section-cine` (`gl-px-bodyTop`) por el Slice 2 sin commitear.
-
-
-### AEO X-Ray — demo publicada y cierre documental (2026-09-30)
-
-Think `be8d484`: demo publicada y aceptada. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), [manual](docs/think/radiografia-aeo-manual.md) y [kit](docs/think/aeo-xray-nuevo-cliente.md).
-
-TASK-1950/1951: integración Greenhouse pendiente, sin promoción; `sample_` no acredita grant. Deal 65352884246 en `presentationscheduled` verificado; correo redactado, envío no verificado.
-
-Comercial: [demostración contextual](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md), propuesta.

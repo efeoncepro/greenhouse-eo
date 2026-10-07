@@ -66,7 +66,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-049` | `in-progress` | `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md` |
 | `EPIC-050` | `to-do` | `docs/epics/to-do/EPIC-050-creative-workbench-campaign-scale-production.md` |
 | `EPIC-051` | `to-do` | `docs/epics/to-do/EPIC-051-ai-video-production-cli-capabilities.md` |
+| `EPIC-052` | `to-do` | `docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-052`
+- `EPIC-053`

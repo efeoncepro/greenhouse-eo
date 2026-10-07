@@ -1,11 +1,17 @@
 # Componentes y patrones de marca en el Lab de AXIS
 
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
 > Verificado contra: axis-design-system@df2de61 — 2026-10-04. Componentes/navegación en `9eb3da9`, búsqueda en `d9c7e6e`, agentes en `060174c`; tipografía editorial en `aee99d2` (push, despliegue Vercel y CI `37216960966` verificados).
 
 El operador pidió renovar los componentes y patrones de AXIS con `efeonce-graphic-line`.
 La aplicación vive en el catálogo raíz y en `/patterns/*/`, como presentación de marca
 opt-in del Lab. No autoriza llevar La órbita a la interfaz de Greenhouse ni modificar
 la adopción o lifecycle de contratos compartidos.
+
+## Adopción Rooms — 2026-10-07
+
+El operador establece La órbita como design system de Rooms en autoría, exploración y presentación. Este consumidor debe mapear Bricolage editorial/Poppins funcional y los componentes de marca distribuidos por AXIS; no copiar el CSS del Lab ni heredar defaults Poppins/Geist. La [dirección Rooms](../../../../docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) fija sus roles. Es decisión documental, no adopción runtime ni cambio de madurez de componentes.
 
 ## Qué se implementó
 

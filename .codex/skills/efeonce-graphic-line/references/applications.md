@@ -1,5 +1,7 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
@@ -425,6 +427,16 @@ vale en toda aplicación:
 - **Fuente:** [ledger.md](ledger.md), 2026-10-02 (b); `docs/tasks/in-progress/TASK-1964-login-v4-premium-access-transition.md`.
 
 ---
+
+### A13. Efeonce Rooms — design system de producto (2026-10-07)
+
+- **Autoridad:** decisión explícita del operador; La órbita es el design system de Rooms, AXIS su distribución técnica.
+- **Superficies:** entrada, gestión de salas, editor, exploración, consola del champion, audiencia y evaluación; [dossier](../../../../docs/architecture/rooms/README.md), [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+- **Tipografía:** Bricolage editorial, Poppins funcional desde los roles de `efeonceGraphicLine.type`; ninguna base Geist ni Poppins para todos los títulos. Cada rol conserva peso/escala de su contrato.
+- **Composición:** escenario editorial dentro de La órbita; papel/navy, acentos y componentes canónicos; órbita con intención, iconos del catálogo, sin volumen en UI. No imponer el formato pregunta/respuesta al relato.
+- **Marca/cliente:** usar assets oficiales de Efeonce; logo Rooms todavía sin diseñar/aprobar. No modificar arte cliente ni sus fuentes. No añadir una firma gráfica a cada control como si fuera un anuncio.
+- **Producción y motion:** adapter nativo Rooms sobre packages, no copia de Lab; `efeonceGraphicLine.motion` para marca y `axisMotion`/contrato del componente para interacción. Pins, mappings y píxeles se validan al implementar.
+- **Estado/QA:** decisión de sistema aceptada; composición, runtime, GVC, fuente efectiva, accesibilidad y go final pendientes. Ningún cambio automático al theme de Greenhouse.
 
 ## B. Presentaciones e informes
 

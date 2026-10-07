@@ -1,5 +1,7 @@
 # Línea gráfica Efeonce — La órbita
 
+> **Decisión vigente 2026-10-07 — Rooms:** La órbita (`efeonce-graphic-line`) es su design system completo: Bricolage editorial/Poppins funcional, color, componentes, iconografía y motion. AXIS distribuye el sistema. Aplica a autoría, exploración y presentación; las piezas del cliente mantienen su diseño. [Dossier](../../architecture/rooms/README.md). La composición y runtime siguen pendientes; no se migra automáticamente Greenhouse ni se impone narrativa pregunta/respuesta.
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.20
 > **Creado:** 2026-09-25 por Claude

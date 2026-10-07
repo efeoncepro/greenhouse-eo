@@ -23,6 +23,8 @@ y la route-ownership matrix.
 
 ## Indice
 
+- [Efeonce Rooms — dirección vigente](../architecture/rooms/README.md): plataforma propia en `rooms.efeonce.org`, nombre, frontera y design system La órbita acordados; arquitectura/experiencia propuestas antes del go final. El [análisis inicial](creative-proposal-experience-stack-analysis-2026-10-07.md) queda como investigación histórica. Las rutas actuales de Insights y X-Ray conservan sus contratos hasta una migración explícita.
+
 - [Banco Pichincha / Pibank — continuidad comercial](../commercial/prospects/banco-pichincha-peru-seo-2026/README.md): muestra histórica y nuevo mandato 2027; no cambia el estado de publicación.
 
 - [Arquitectura de patrones UI Think](architecture-ui-patterns.md)

@@ -1,5 +1,7 @@
 # Línea gráfica Efeonce — La órbita · V1
 
+> **Decisión vigente 2026-10-07 — Rooms:** La órbita (`efeonce-graphic-line`) es su design system completo: Bricolage editorial/Poppins funcional, color, componentes, iconografía y motion. AXIS distribuye el sistema. Aplica a autoría, exploración y presentación; las piezas del cliente mantienen su diseño. [Dossier](../../architecture/rooms/README.md). La composición y runtime siguen pendientes; no se migra automáticamente Greenhouse ni se impone narrativa pregunta/respuesta.
+
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
 > **Versión:** 1.22
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
@@ -1477,4 +1479,3 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
 (D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
 muestra los 43 volúmenes. En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
-

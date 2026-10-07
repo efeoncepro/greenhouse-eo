@@ -1,5 +1,7 @@
 # Registro de decisiones y versiones
 
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964) — 2026-10-02 (últimas filas: el login V4
@@ -21,6 +23,7 @@
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-07 | «efeonce-graphic-line es el nuevo design system»: Rooms adopta La órbita en toda su UI, Bricolage editorial/Poppins funcional, componentes/color/iconografía/motion canónicos. AXIS distribuye; sustituida la base Poppins/Geist propuesta. Arte cliente intacto y sin imponer narrativa pregunta/respuesta. Dossier y EPIC-052 corregidos; sin implementación, pins, release ni migración automática de Greenhouse. |
 | 2026-09-25 | «La órbita» es la línea gráfica canónica de la marca propia Efeonce y su familia: rodea, mide y enfoca. |
 | 2026-09-26 | Efeonce firma todas las piezas; Globe, Wave, Reach y Greenhouse son contexto. Verk y Kortex quedan fuera por ahora. |
 | 2026-09-26 | La palabra del eslogan es de la línea de servicio: Growth (Efeonce/Greenhouse, «el producto que controla todo»), Brand (Globe), Engine (Wave), Voice (Reach), Revenue (RevOps). |
@@ -717,4 +720,3 @@ Globe.
 - Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
   línea Growth.
 - Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
-

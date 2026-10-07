@@ -313,3 +313,11 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
   La línea que termina en la esfera va una vez; los partners abren su propia zona con una regla fina **sin esfera**.
   Contrato AXIS `efeonce.email-signature` 0.3.0 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del
   Lab. Detalle en el manual §10.2.
+
+## Addendum 2026-10-07 — La órbita como design system de Efeonce Rooms
+
+**Accepted, instrucción explícita del operador:** «Sobre la estética y tipografía hay que ajustar todos los documentos porque efeonce-graphic-line es el nuevo design system».
+
+La órbita gobierna la totalidad de las superficies propias de Rooms: autoría, exploración, presentación, consola y evaluación. Bricolage editorial/Poppins funcional; paleta, componentes, iconografía y motion canónicos. AXIS es la infraestructura de distribución de ese sistema. La propuesta histórica Poppins/Geist para Rooms queda reemplazada. La composición específica sigue su revisión de píxeles; no se impone el formato pregunta/respuesta a las propuestas y no se altera el arte cliente.
+
+La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.

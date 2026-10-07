@@ -2,6 +2,8 @@
 
 ## Estado vigente para agentes
 
+[Rooms](docs/architecture/rooms/README.md): EPIC-052; La órbita; sin go.
+
 [Factory](docs/services/factory/README.md): On-Demand.
 
 Studio: [readers y rollout TASK-2001](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).

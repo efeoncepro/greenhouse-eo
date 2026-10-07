@@ -1,5 +1,7 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
+> Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
+
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
@@ -494,3 +496,14 @@ canónico del botón en reposo/hover/foco. Comparar ambos banners en 320/390/820
 Agenda dialog/inline conserva selección y borrador. Evidencia: 40/40 journeys y 4/4 casos finales,
 build/typecheck, 198 contracts, design/agent PASS en el dossier AXIS. La aprobación visual no
 promueve lifecycle del contrato ni certifica AT físico, publicación o adopción.
+
+## Rooms — aceptación del design system (2026-10-07)
+
+- [ ] Todas las superficies propias (editor, exploración, consola/audiencia) consumen La órbita; AXIS distribuye y no impone defaults visuales anteriores.
+- [ ] Bricolage editorial/Poppins funcional efectivos en navegador; fuentes y glifos comprobados, sin fallback a Geist ni pesos sintetizados.
+- [ ] Colores, iconografía, componentes y estados trazables a contratos; no HEX ni SVG improvisados, ni recursos exclusivos Glitch/Manzanitas.
+- [ ] Motion de marca desde sus recursos y `efeonceGraphicLine.motion`; interacción desde el componente/`axisMotion`, con reduced motion, foco y estados reales.
+- [ ] Relato libre de formato pregunta/respuesta obligatorio; piezas cliente intactas en fuentes, colores, ratios y composición.
+- [ ] Capturas desktop/móvil e interacción revisadas por operador; decisión documental no presentada como aceptación de píxeles.
+
+Owner del consumidor: [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). Estos checks se ejecutarán al implementar Rooms.
