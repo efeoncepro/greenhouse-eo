@@ -37,6 +37,15 @@ Rooms incorporará la experiencia SEO/AEO de X-ray junto al perfil creativo medi
 - **[AEO X-Ray — preparar otro cliente](aeo-xray-nuevo-cliente.md)** · [Manual operativo](../manual-de-uso/growth/aeo-xray.md) · [Handoff de publicación](aeo-xray-release-handoff.md)
 - Efeonce Insights — vista web compartida por token (decisión 2026-09-15; contrato en [arquitectura Insights §8](../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#8-acceso-web-compartido); render en TASK-1875 sobre `InsightWebModelV1` de TASK-1848). Patrón: [Shared Tokenized Report](architecture-ui-patterns.md#pattern-shared-tokenized-report-efeonce-insights); dossier visual en [`docs/ui/reviews/TASK-1875-…`](../ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/)
 
+## Integración del reproductor AXIS
+
+Think consume `@efeoncepro/axis-ui-primitives@0.6.3` con pin/lockfile desde registry privado,
+sin dependencia de un checkout hermano. La ruta desplegada `/preview/video-player` es una demostración
+de integración; no incorpora medios en informes de clientes. El adapter Astro vive en
+`efeonce-think/src/components/AxisVideoPlayer.astro`.
+[Versiones, QA y pendientes](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Manual de consumo](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado).
+
 ## Herramientas vivas en Think
 
 | Herramienta | Qué es | Ruta |

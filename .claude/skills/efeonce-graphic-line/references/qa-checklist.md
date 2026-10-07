@@ -497,6 +497,22 @@ Agenda dialog/inline conserva selección y borrador. Evidencia: 40/40 journeys y
 build/typecheck, 198 contracts, design/agent PASS en el dossier AXIS. La aprobación visual no
 promueve lifecycle del contrato ni certifica AT físico, publicación o adopción.
 
+
+## Video player — distribución publicada, 2026-10-07
+
+- [ ] Reproducción visible durante el clip completo, replay orbital y cambios de pestaña; no sólo decoder/canvas.
+- [ ] Targets, hover/insets, volumen, timeline y resets reales del host; proporciones 16:9, 9:16, 1:1 y 4:5 entre 320–1440px.
+- [ ] Embedded sin pie ni reserva permanente; overlay oculto tras inactividad y recuperable por puntero/toque/teclado.
+- [ ] Tracks/cues reales y multilínea, ajustes de captions, capítulos, miniaturas, transcripción y continuidad al cambiar skin.
+- [ ] Review con guardado/resolución confirmados por consumidor, borrador protegido al fallar y puntos relativos al video.
+- [ ] Fallback nativo/SSR, carga, error/retry, velocidad, teclado, fullscreen, menús, contraste y reduced motion.
+- [ ] Instalación desde registry con pin/lockfile y CSS publicado; sin link a checkout hermano ni copia del Lab.
+
+Checklist para futuras integraciones, no resultados certificados. [Evidencia y límites](video-player.md#qa-al-continuar):
+release PASS y Think desplegado; WordPress sin activar; imagen azul intermitente ABIERTA.
+PiP, dispositivos físicos, tecnologías de asistencia y streaming real requieren evidencia propia.
+Verificado contra: AXIS release `7fb549a`, main documental `15b1898`; Think `cd428c7` — 2026-10-07.
+
 ## Rooms — aceptación del design system (2026-10-07)
 
 - [ ] Todas las superficies propias (editor, exploración, consola/audiencia) consumen La órbita; AXIS distribuye y no impone defaults visuales anteriores.

@@ -574,3 +574,17 @@ Los 19 AEO, 37 SEO y 13 de Autoridad se superponen: Brand Authority es una sola 
 Descubrir, exportar o publicar un candidato no lo vuelve aprobado. La aprobación de las diez
 formas AEO se conserva; las doce SEO R2 y trece de autoridad requieren decisión visual.
 El cambio de descubrimiento `bf93d3a` no cambia el paquete publicado 0.17.0 ni sus renderers.
+
+
+### Controles funcionales de video — distribución 0.6.3, 2026-10-07
+
+Familia funcional original de 14 glifos curvos, incluida en primitives 0.6.3: play Bézier,
+pausa en cápsulas, altavoz/ondas, CC, PiP, fullscreen, ajustes y replay. Catálogo único
+`packages/primitives/src/video-player-icons.ts`, compartido por skins/adapters mediante slots
+Media Chrome. Sustituye la propuesta Tabler rechazada; no promueve formas al catálogo de marca
+Trazo/Plastilina. La protección CSS `fill:none`, targets 44×44 y márgenes desde tokens resisten
+resets del host y mantienen los círculos de hover dentro del dock.
+
+Replay se contiene en la órbita canónica estática de botones, sin animación de loader y con
+nombre accesible localizado. [Criterio y límites vigentes](video-player.md#criterio-de-marca-e-interacción).
+Verificado contra: AXIS release `7fb549a`, main documental `15b1898` — 2026-10-07.

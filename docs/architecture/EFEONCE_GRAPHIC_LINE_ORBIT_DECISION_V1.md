@@ -321,3 +321,20 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 La órbita gobierna la totalidad de las superficies propias de Rooms: autoría, exploración, presentación, consola y evaluación. Bricolage editorial/Poppins funcional; paleta, componentes, iconografía y motion canónicos. AXIS es la infraestructura de distribución de ese sistema. La propuesta histórica Poppins/Geist para Rooms queda reemplazada. La composición específica sigue su revisión de píxeles; no se impone el formato pregunta/respuesta a las propuestas y no se altera el arte cliente.
 
 La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.
+
+## Aplicación al reproductor compartido
+
+La órbita aporta tokens y geometría funcional a Cinema, Editorial y Review; no modifica el contenido del
+video ni exige una firma permanente. AXIS mantiene el renderer portable, controles curvos propios y replay
+dentro de la órbita estática. Cada host conserva medios, autoridad y persistencia; las presentaciones
+`embedded`/`contextual` y las skins son decisiones independientes del modelo.
+
+La decisión específica del componente vive en
+[AXIS, VIDEO_PLAYER_SKINS_DECISION_V1](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md)
+y conserva su estado **Proposed**; la publicación del package no cambia por sí sola el estado del ADR.
+Primitives `0.6.3` está publicado y Think lo consume; WordPress aún no está activado. Esto no promueve el
+catálogo Trazo/Plastilina ni migra la UI de Greenhouse.
+
+[Distribución, evidencias y pendientes](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Norma de aplicación](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#reproductor-de-video-compartido) ·
+[Historia conservada](../audits/2026-10-07-axis-video-documentation-history.md).

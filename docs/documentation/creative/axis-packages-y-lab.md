@@ -100,7 +100,7 @@ explica cómo seguir estos contratos sin duplicar sus catálogos.
 
 En `main` de AXIS para primitives 0.5.0: teléfono con país, correo sin máscara, URL,
 RUT/documentos y decimales exactos. El Lab permite probarlos en Field/Input; el package comparte el
-comportamiento entre HTML y React. La versión publicada sigue siendo 0.4.0 hasta su próxima release.
+comportamiento entre HTML y React. En ese corte la versión publicada era 0.4.0; la distribución posterior se consulta en el [runbook](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
 El ejemplo telefónico ofrece 245 países y territorios con búsqueda por nombre o prefijo. El catálogo
 se localiza desde metadatos del package; cada producto puede declarar una lista acotada. País/teléfono,
@@ -111,3 +111,35 @@ Growth Forms tiene un adapter optativo local, sin cambiar sus formularios activo
 servidor. Su selector conserva 18 países; no añade automáticamente el catálogo de AXIS ni recibe el suyo
 desde el Lab. La ampliación exige una adopción explícita del motor.
 [Ownership, verificación y promoción](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+
+
+## Reproductor compartido
+
+AXIS distribuye el reproductor en `@efeoncepro/axis-ui-primitives@0.6.3`. Las tres skins comparten motor,
+estado y API; no son tres copias que cada plataforma deba mantener.
+
+| Skin | Función |
+| --- | --- |
+| Cinema | Prioriza el video y los controles flotantes; útil para demos y contenido audiovisual. |
+| Editorial | Añade capítulos y transcripción navegable y buscable cuando el host aporta esos datos. |
+| Review | Añade observaciones temporales, puntos sobre el video y filtros de resolución; el host guarda los cambios autorizados. |
+
+La presentación es independiente de la skin: `embedded` ocupa sólo el área del video; `contextual` muestra
+el contexto asociado. Cinema usa `embedded` por defecto; Editorial y Review usan `contextual`. En embedded
+y Cinema, los controles se ocultan a los 3 segundos de inactividad durante reproducción; interacción de
+teclado deliberada y ajustes abiertos conservan su acceso. Los subtítulos permanecen independientes.
+
+Incluye controles redondeados, replay dentro de la órbita estática, volumen, velocidad, subtítulos y búsqueda
+precisa. Pantalla completa y PiP dependen de soporte del navegador. Miniaturas, capítulos y transcripción
+requieren datos reales; el reproductor no los genera. Controles nativos ofrecen respaldo si falla la mejora JS.
+La adaptación depende del contenedor: se verificaron anchos 320–1440 px y proporciones 16:9, 9:16, 1:1 y 4:5;
+son puntos de prueba, no límites máximos ni certificación física.
+
+Think consume el paquete publicado en [su demostración de integración](https://think.efeoncepro.com/preview/video-player).
+Esto no inserta videos en informes de clientes. El adapter WordPress permanece preparado sin activar ni modificar
+el blog público. El producto conserva hosting de medios, permisos, streaming, comentarios, progreso y analítica.
+El incidente de imagen azul intermitente en sesiones antiguas permanece abierto.
+
+[Versiones, evidencia y límites vigentes](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Manual](../../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado) ·
+[Historia de iteraciones](../../audits/2026-10-07-axis-video-documentation-history.md).

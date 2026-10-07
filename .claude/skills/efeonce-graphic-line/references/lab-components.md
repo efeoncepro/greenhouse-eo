@@ -251,3 +251,15 @@ Estado: **aprobado visualmente por el operador el 2026-10-05**, source local sob
 QA final: 40/40 journeys y 4/4 recorridos afectados tras el ajuste de wrapping; build/typecheck,
 198 tests de contracts y gates design/agent PASS. El dossier AXIS posee evidencia proporcional y
 límites; AT físico, publicación e instalación privada del nuevo export y adopción siguen pendientes.
+
+
+## Reproductor de video — publicado 2026-10-07
+
+[Lab público](https://axis.efeonce.org/references/video-player/) con Cinema/Editorial/Review,
+papel/navy, seis líneas, presentación embedded/contextual y controles reales del package.
+Primitives 0.6.3 está publicado; Think consume registry y está desplegado. Los selectores y la
+documentación plegable del Lab no forman parte del embed. WordPress sigue candidato sin activar.
+[API, criterio, evidencia y pendientes](video-player.md), incluido el incidente azul intermitente abierto.
+Publicación no es aceptación visual universal ni validación física/AT/streaming real.
+
+Verificado contra: AXIS release `7fb549a`, main documental `15b1898`; Think `cd428c7` — 2026-10-07.

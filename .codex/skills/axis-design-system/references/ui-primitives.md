@@ -1,6 +1,14 @@
 # Product UI primitives — consumption and verification
+## Distribución verificada — 2026-10-07
 
-## Current source and release boundary
+Publicado en GitHub Packages: `axis-ui-primitives@0.6.3`, `axis-tokens@0.6.0`, `axis-ui-contracts@0.7.0`. [Release v0.6.3](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367) SUCCESS, fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`. Instalación limpia, exports DOM/React/integrations, SSR y igualdad byte a byte del JS/CSS con el build verificado: PASS. Think fija registry + lockfile, sin `link:`; build y typecheck PASS, main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Vercel Production Ready en https://think.efeoncepro.com/preview/video-player. AXIS main y https://axis.efeonce.org/references/video-player/ desplegados.
+
+El incidente intermitente de pintura azul en sesiones antiguas del navegador integrado sigue ABIERTO; esta publicación no acredita su corrección. WordPress conserva bloque candidato sin activación ni modificación del artículo publicado. Dispositivos/AT físicos y streaming real mantienen sus gates. Registry empaquetado 0.7.2 conserva su inventario anterior; no inferir descubrimiento de video desde ese paquete histórico.
+
+Los estados de entrega anteriores conservan la historia; prevalece la distribución verificada anterior.
+
+
+## Forms baseline and release history — 2026-10-04
 
 Published forms baseline: AXIS `df2de617a9a2033049c5a889f487e970de85a345`, 2026-10-04. Specialized
 inputs have a later source cut below. These are independent package versions, not a single
@@ -179,3 +187,24 @@ API and QA: AXIS `packages/primitives/README.md`, `GROWTH_CTA_COMPOSITION_DECISI
 AT physical/manual, exact release/install and consumer adaptation remain pending. Before adoption
 verify CSS and graphic-line dependency in an installed set, then policy/events/Shadow DOM/bundle
 in the Growth renderer and a freshly loaded host; no pins or theme changed here.
+
+## Portable video — published 2026-10-07
+
+`@efeoncepro/axis-ui-primitives/video-player` owns DOM/SSR; `/video-player/react` and
+`/video-player/integrations` are optional. Import `/video-player.css`. Published primitives 0.6.3
+uses tokens 0.6.0 and contracts 0.7.0; contract `efeonce.video-player` remains 0.5.0 candidate.
+Cinema/Editorial/Review share one implementation; `presentation: embedded | contextual` is independent.
+Think consumes an exact registry pin + lockfile, never a sibling checkout or vendored player in cloud.
+
+Before adoption read AXIS `docs/agent-composition/video-player.md`,
+`docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md` and `docs/quality/video-player-0.5.0.md`.
+[The graphic-line reference](../../efeonce-graphic-line/references/video-player.md) owns current visual criteria,
+features, verified delivery and open limits. Use token-owned 44px controls resilient to host resets,
+real captions, automatic overlay hiding and static orbital replay with an accessible name.
+
+WordPress remains an unactivated candidate block. The in-app blue-paint incident remains open;
+fresh playback and decoded frames do not prove its resolution. Native adapters, physical AT/devices,
+streaming providers, review persistence and analytics consent remain consumer responsibilities.
+No new package release or full browser matrix is required for this documentation consolidation.
+
+Verified against AXIS release `7fb549a`, main documentation `15b1898`; Think `cd428c7` — 2026-10-07.

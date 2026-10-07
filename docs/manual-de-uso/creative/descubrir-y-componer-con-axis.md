@@ -163,3 +163,36 @@ En Growth Forms esto requiere el adapter propio: sus 18 países actuales no se a
 La inyección optativa de formato no es un reemplazo del renderer ni activa el cambio en los formularios
 publicados. Sigue la [decisión de adopción y su prueba local](../../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md)
 antes de cambiar versiones, catálogo o embeds.
+
+
+## Integrar el reproductor publicado
+
+1. Comprueba acceso al registry privado y el [set publicado y sus pendientes](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07).
+   Instala `@efeoncepro/axis-ui-primitives@0.6.3` con pin exacto y conserva el lockfile. No uses `link:` a otro
+   checkout como mecanismo de distribución. La configuración del scope puede vivir en `.npmrc`; la credencial no.
+2. Importa la API desde `/video-player` y su CSS desde `/video-player.css`. React tiene el adapter
+   `/video-player/react`; Astro renderiza HTML en servidor y lo hidrata en cliente. Sigue la
+   [guía técnica de AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md)
+   para montaje, actualización y destrucción; no copies el renderer del Lab.
+3. Aporta `id`, título accesible y fuente autorizada. Selecciona `skin` y `presentation` por separado.
+   Para insertar sólo video en un artículo usa `presentation: 'embedded'`; usa `contextual` cuando el producto
+   necesite título, capítulos, transcripción o revisión. Carga fuentes y CSS una sola vez en el host.
+4. Proporciona subtítulos WebVTT y, si corresponde, capítulos, transcripción y miniaturas. Verifica las respuestas
+   HTTP y CORS de medios/tracks; ofrecer el botón CC sin un track cargado no prueba subtítulos funcionales.
+   La calidad de streaming requiere variantes y un proveedor integrado; AXIS no inventa resoluciones disponibles.
+5. En Review conecta callbacks al asset y versión autorizados. Confirma persistencia antes de resolver el callback
+   y actualiza markers con la proyección del servidor. El ejemplo del Lab sólo guarda observaciones en memoria.
+6. Prueba en el host real: reproducción y replay, ocultamiento de controles, subtítulos, volumen, menús, teclado,
+   cambio de fuente, desmontaje y fallo de carga. Revisa tamaños estrechos/verticales y estilos globales del host.
+   Un build correcto o una captura del Lab no acredita la integración consumidora.
+7. Para actualizar, verifica el nuevo tarball y sus exports, cambia pin/lockfile, valida localmente y registra por
+   separado commit, push, publicación y despliegue. La suite aprobada de un release no demuestra un CI posterior.
+
+El [Lab publicado](https://axis.efeonce.org/references/video-player/) permite comparar las tres skins.
+Think ya usa el package en [su ruta de integración](https://think.efeoncepro.com/preview/video-player).
+El bloque WordPress sigue sin activar: probar un snapshot del artículo no es editar el artículo público.
+
+Si una sesión antigua muestra una imagen azul mientras el tiempo o los subtítulos avanzan, registra fuente,
+navegador, tiempo y reproducción fresca por separado. El incidente permanece abierto; recargar no constituye
+una corrección de causa raíz. Dispositivos físicos, tecnologías de asistencia y streaming real conservan sus
+validaciones pendientes. [Historia preservada](../../audits/2026-10-07-axis-video-documentation-history.md).

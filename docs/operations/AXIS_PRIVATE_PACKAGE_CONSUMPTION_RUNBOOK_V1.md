@@ -1,5 +1,46 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Reproductor publicado — estado verificado 2026-10-07
+
+La distribución privada del reproductor está publicada. Este bloque es el estado vigente; las tablas
+fechadas de releases anteriores describen sus propios cortes y no sustituyen estas versiones.
+
+| Entrega | Evidencia / estado |
+| --- | --- |
+| Paquetes publicados | `@efeoncepro/axis-ui-primitives@0.6.3`, `@efeoncepro/axis-tokens@0.6.0`, `@efeoncepro/axis-ui-contracts@0.7.0` |
+| Publicación | [Release v0.6.3, run 37630788367](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367), SUCCESS; fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0` |
+| Verificación del tarball | Instalación limpia, exports DOM/React/integrations, SSR e igualdad byte a byte de JS/CSS con el build verificado: PASS |
+| AXIS | `main` `15b1898caee740c30e4edc126714066bd1cd1eda`; [Lab desplegado](https://axis.efeonce.org/references/video-player/) |
+| Think | `main` `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`; build/typecheck PASS y Vercel Production Ready; [demostración de integración](https://think.efeoncepro.com/preview/video-player) |
+| WordPress | Adapter `eo-axis-video` preparado; sin activación ni modificación del artículo público `251941` |
+
+### Contrato de adopción
+
+- Cada producto fija una versión publicada y su lockfile. Think instala `0.6.3` desde GitHub Packages;
+  no usa `link:`, una carpeta hermana ni una copia del renderer. Las actualizaciones requieren QA del host.
+- El scope `@efeoncepro` resuelve a `https://npm.pkg.github.com`. En Think, `NPM_RC` sensible está configurado
+  para Production y Preview de `codex/video-player-20261007` desde el secreto vigente
+  `axis-packages-read-token`. Nunca guardar valores en código, logs ni documentación.
+- El package aporta presentación, ciclo de vida y callbacks; el host conserva medios, acceso, persistencia
+  de comentarios/progreso y analítica. [API de integración](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md).
+- El contrato `efeonce.video-player` conserva su versión propia `0.5.0`; no es el número del package.
+  El paquete registry `0.7.2` conserva su inventario anterior: no inferir descubrimiento de video desde él.
+
+### Evidencia y límites
+
+El release aprobó 78 pruebas de video y conservó 10 exclusiones intencionales, además de sus otros gates.
+Publicación, CI general y despliegue son comprobaciones distintas. No se declara verde un CI posterior por
+heredar el resultado del release. [Dossier QA y pendientes](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/video-player-0.5.0.md).
+
+Permanece **ABIERTO** el incidente de imagen azul intermitente en sesiones antiguas del navegador integrado:
+una sesión fresca satisfactoria no prueba su corrección. Dispositivos físicos, tecnologías de asistencia y
+streaming real requieren validación adicional. Publicar el package no activa WordPress ni adopta el componente
+en Greenhouse, Globe o Studio.
+
+[Funcionamiento](../documentation/creative/axis-packages-y-lab.md#reproductor-compartido) ·
+[Manual de integración](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado) ·
+[Historia documental preservada](../audits/2026-10-07-axis-video-documentation-history.md).
+
 ## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
 
 El operador aprobó visualmente la entrega AXIS y autorizó documentación/skills y push.
@@ -16,7 +57,7 @@ instalar y comprobar exports/CSS/graphic-line, adaptar renderer compartido y ver
 Sin cambios de pins, theme, flags, campañas ni hosts en esta entrega. Las tablas históricas siguientes
 acreditan únicamente sus cortes fechados; no prueban exports posteriores.
 
-## Distribución vigente — formularios y La órbita, 2026-10-04
+## Corte de distribución — formularios y La órbita, 2026-10-04
 
 **Publicados e instalados desde GitHub Packages**: source `df2de61`, tag `v0.7.2`, release
 `37239150937` SUCCESS. Instalaciones nuevas sin React y con React `18.3.1` / `19.2.7` PASS;
@@ -37,7 +78,7 @@ La evidencia y los pendientes de distribución se centralizan en el
 no una versión uniforme de todos los paquetes. La publicación no actualiza los consumidores.
 Greenhouse conserva los pins leídos en `package.json`: tokens `0.3.41`, contracts `0.3.40`, registry
 `0.3.1`, brand-assets `0.4.15` y graphic-line `0.11.0`; no incorpora primitives en este cambio.
-Las secciones fechadas posteriores de este runbook son historia cuando contradicen este corte.
+Las versiones de esta tabla pertenecen al corte del 4 de octubre; el bloque vigente del reproductor al inicio registra las publicaciones posteriores.
 
 ### Contrato de consumo de primitives
 

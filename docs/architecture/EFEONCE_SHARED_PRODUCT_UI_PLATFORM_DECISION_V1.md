@@ -79,6 +79,15 @@ Las versiones, pruebas y estados de publicación se registran en el
 [dossier](../audits/2026-10-04-axis-forms-release.md), no se infieren del código o del despliegue del Lab.
 Los diez contratos de formularios conservan lifecycle `candidate`; publicación no los promueve a `stable`.
 
+
+El reproductor compartido sigue esta separación: AXIS publica tokens, contrato y renderer con skins
+Cinema/Editorial/Review; Think consume `axis-ui-primitives@0.6.3` con pin y lockfile mediante su adapter
+Astro, sin checkout hermano. El bloque WordPress permanece candidato sin activación. El producto aporta
+medios, pistas, permisos y persistencia. La distribución y los pendientes, incluida la imagen azul
+intermitente, se verifican en el [runbook de consumo](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
+y en el [contrato del reproductor](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md).
+Esta adopción no certifica los demás consumidores ni cambia la decisión de gobierno de esta plataforma.
+
 ## Delta 2026-09-14 — intención portable de selección colaborativa
 
 AXIS incorpora `efeonce.collaboration-selection` `0.2.0` como contrato `candidate` para representar una

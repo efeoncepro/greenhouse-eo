@@ -1479,3 +1479,25 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
 (D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
 muestra los 43 volúmenes. En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+
+
+
+## Reproductor de video compartido
+
+Cinema, Editorial y Review son aplicaciones funcionales de La órbita distribuidas desde AXIS. Paleta,
+tipografía, motion y medidas proceden de tokens; la composición del video permanece bajo autoridad de su
+contenido. Los controles usan una familia UI curva propia, sin promoverla al catálogo Trazo/Plastilina.
+El replay se contiene en la órbita canónica estática y conserva nombre accesible; el motivo no añade una
+firma permanente ni un anillo decorativo sobre el video.
+
+`embedded` y `contextual` son presentaciones independientes de la skin. El diseño conserva aire entre controles
+y marco, adapta densidad al ancho del contenedor y separa subtítulos de controles transitorios. El host aporta
+medios, permisos, persistencia y datos de contexto; la identidad compartida no impone una implementación local
+por plataforma ni adopta La órbita automáticamente en Greenhouse.
+
+La implementación se distribuye en primitives `0.6.3`; Think ya consume esa versión publicada. WordPress
+mantiene un adapter candidato sin activación. La publicación no certifica la corrección del incidente de pintura
+azul en sesiones antiguas, dispositivos físicos/AT ni streaming real.
+[Estado y evidencia vigentes](../AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Skill de aplicación](../../../.claude/skills/efeonce-graphic-line/references/video-player.md) ·
+[Historia de iteraciones](../../audits/2026-10-07-axis-video-documentation-history.md).

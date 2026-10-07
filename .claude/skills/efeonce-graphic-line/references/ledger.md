@@ -720,3 +720,39 @@ Globe.
 - Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
   línea Growth.
 - Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
+
+
+
+### 2026-10-07 — Skins de reproductor compartido
+
+Registro histórico de decisiones; el estado vigente está en [video-player.md](video-player.md).
+Las primeras iteraciones locales quedaron superadas por la publicación descrita al final.
+
+1. El operador pidió un reproductor portable en AXIS y confirmó tres usos: editorial, demos y revisión creativa.
+   «Vamos con todo», aprovechando la skill sin forzar recursos, autorizó implementación; no certificación visual.
+2. Pidió redondez, rechazó la propuesta Tabler y solicitó geometrías nuevas de UI moderna: familia propia curva,
+   márgenes de hover, cápsulas y targets desde tokens; sin promoción al catálogo de marca.
+3. «Vamos con todos» autorizó islas flotantes, profundidad/motion, timeline precisa, menú móvil y paneles por uso.
+   Sus reportes corrigieron volumen desbordado, controles persistentes, corte inferior vertical y hover rectangular.
+4. «Ajustemos todo» autorizó presentación embedded/contextual: el blog ocupa sólo la caja del video;
+   contexto opcional, nombre accesible conservado y controles superpuestos autoocultables.
+5. «Hazlos todos» autorizó la auditoría; eligió Think y el último artículo público para validar integración.
+   Reset de Think, subtítulos y separación thumb/Play requirieron regresiones consumidoras, no sólo el Lab.
+6. Solicitó replay dentro de La órbita y autorizó documentar/pushear: acción estática, glifo curvo número 14,
+   nombre accesible. La imagen azul reapareció; nunca se cerró por decoder o por un smoke corto.
+7. Los pushes iniciales a `codex/video-player-20261007` no eran publicación. Think Preview falló por el link
+   local a AXIS; fuente inicial `8a1c206`, deployment `dpl_3MAWPHcmSmkFtnHtFc6iKhRCp6ed`.
+8. «El paquete de axis publicalo» autorizó la publicación; «Axis y think hay que pushear a main» autorizó
+   promoción. Se descartó vendorizar: cada producto consume versión publicada exacta y lockfile.
+9. Los intentos v0.6.1/v0.6.2 no publicaron; v0.6.3 completó gates y publicó. La demora por suites repetidas
+   y dependencias Ubuntu motivó revisar la eficiencia de CI; una simplificación completa no está implementada.
+
+### Distribución verificada — 2026-10-07
+
+Publicados primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0, fuente `7fb549a`,
+[release 37630788367 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367).
+Instalación limpia y exports/CSS/SSR verificados. AXIS `main` documental `15b1898` y Think `main` `cd428c7`,
+ambos Vercel Production Ready; Think usa registry, sin link local. WordPress permanece candidato sin activar.
+Contrato video 0.5.0 candidate; el estado de contrato no cambia por distribuir el paquete.
+El incidente azul sigue ABIERTO; AT/dispositivos físicos y streaming real no certificados.
+La referencia vigente y QA AXIS poseen evidencia y próximos pasos, sin duplicar todo el historial aquí.

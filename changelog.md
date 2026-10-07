@@ -7,7 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-10-07 — Rooms: La órbita y experiencias creativa/SEO-AEO
+## 2026-10-07 — Rooms y AXIS: experiencias y reproductor compartido
+
+**AXIS Video: publicación, adopción Think y documentación vigente (2026-10-07)**
+
+- Cinema/Editorial/Review publicados en primitives 0.6.3; AXIS y Think main desplegados. Think usa registry privado + lockfile. [Distribución y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+- Manuales y skills espejo separan contrato vigente de historia; controles integrados/contextuales, adapters y responsabilidades del consumidor documentados. Imagen azul intermitente abierta; WordPress preparado sin activación. Sin afirmar certificación física/AT/streaming.
 
 - Decisión explícita del operador: `efeonce-graphic-line` gobierna estética, tipografía, componentes, iconografía y motion de Rooms; Bricolage editorial/Poppins funcional, AXIS como distribución técnica. [Dossier](docs/architecture/rooms/README.md) y [EPIC-052](docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md) corregidos, incluida autoría/consola; arte cliente intacto y sin narrativa pregunta/respuesta obligatoria.
 - Alcance precisado por el operador: perfiles creativo y SEO/AEO de primera clase, combinables. Modelo de bloques/evidencia, continuidad nativa X-ray, experiencia y criterios de EPIC-052 actualizados; creatividad es el primer recorrido, no el límite de V1. Sin migración de Think/X-ray ni runtime nuevo.

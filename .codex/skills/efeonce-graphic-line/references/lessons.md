@@ -623,3 +623,28 @@
 
 Regla: al tocar cualquiera de estos puntos, corregir la fuente (código o doc), borrar la línea de aquí y anotarlo en el
 registro.
+
+### 2026-10-07 · Foco residual y autoocultado de video
+
+Verificado contra AXIS release `7fb549a` (primitives 0.6.3), 2026-10-07. `:focus-within` persistía tras Play y anulaba el fade de Media Chrome. Distinguir foco de teclado con `keyboardcontrol`; usar `autohideovercontrols` para puntero inmóvil, sin temporizador paralelo. Probar Play sin blur, subtítulos, fullscreen, hover inmóvil y menús abiertos. WebKit podía cerrar el menú por focusout antes del click de su header, enviando el gesto al video; prevenir `mousedown` del cierre preserva el click y su retorno de foco. Cancelar `pointerdown` suprime el click táctil y no sirve. Pruebas Chrome/WebKit pasan; no equivale a certificación física.
+
+### 2026-10-07 · Compacto no significa pegado al marco
+
+Una fila de controles reduce altura, pero necesita margen exterior además del padding de targets. En video embedded: 12 px de separación al marco, botones 44×44 y thumb con ≥9 px de aire frente a Play. En Media Chrome, un time-range estilizado como block no reparte gaps como el volume-range flex: medir el thumb real y usar padding del wrapper. Probar proporciones verticales y CSS del host (Think/WordPress), no sólo el ancho de viewport del Lab.
+
+- Video: un canvas con fotogramas y currentTime avanzando no prueba que el usuario vea imagen. Ante superficie azul, comparar captura pintada, decoder, video nativo y reproducción completa; conservar el incidente abierto si recargar sólo recupera. No añadir estilos o ciclos de reload sin causa comprobada. Replay es una acción orbital estática con nombre accesible, no un loader. Ver `video-player.md` (2026-10-07).
+
+### 2026-10-07 · Distribución compartida y costo de CI
+
+Síntoma: Think funcionaba localmente y fallaba en Vercel al resolver `/video-player`. Causa: `link:`
+a un checkout hermano ausente en cloud. Regla: paquete privado publicado, pin exacto + lockfile y credencial
+de lectura en el entorno de build; instalación limpia antes del push. No copiar/vendorear el reproductor
+ni confundir una preview local con un despliegue. Resuelto en Think `cd428c7`, primitives 0.6.3.
+
+Síntoma: publicación prolongada por reintentos y suites completas. Los primeros fallos fueron timeout de
+matrices agregadas y click tapado por header; después, instalación lenta de dependencias del runner Ubuntu.
+Regla: estabilizar casos locales, verificar exports baratos antes de navegador y distinguir CI, release y deploy
+por SHA. Documentación sola no justifica otro release. Reutilizar evidencia del mismo artefacto sería una mejora
+futura del pipeline, no una optimización ya entregada. No atribuir costo monetario sin medición.
+
+Verificado contra: release `37630788367` SUCCESS (`7fb549a`), main documental `15b1898` — 2026-10-07.

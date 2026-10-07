@@ -30,6 +30,11 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **Reproductor AXIS — adapter preparado, sin activación:** bloque `eo-axis-video` en
+  `efeonce-public-site-runtime/wp-content/plugins/eo-axis-video/`. La prueba del snapshot del artículo
+  `251941` no modificó el artículo público. [Estado y límites](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07)
+  y [manual de integración](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado).
+
 - **[Contacto — brief aprobado y datos institucionales](CONTACT_PAGE_REBUILD_BRIEF_V1.md)** — reconstrucción
   con motivos condicionales, reuniones, dirección y teléfonos verificados en las contraportadas; Estados Unidos
   incluido como mercado operativo. `TASK-1801` cerrada el 2026-09-15 por aprobación explícita de la landing pública;
