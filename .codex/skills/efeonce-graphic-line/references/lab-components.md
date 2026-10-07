@@ -263,3 +263,10 @@ documentación plegable del Lab no forman parte del embed. WordPress sigue candi
 Publicación no es aceptación visual universal ni validación física/AT/streaming real.
 
 Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.
+
+### Desplegables aprobados por defecto
+
+En UI de opciones finitas, reutilizar `Field` + `Select` de AXIS. Para Astro en el Lab,
+`LabSelect.astro` ofrece el mismo componente con SSR/hidratación. Nunca sustituirlo por un
+`<select>` con CSS propio por comodidad. La excepción nativa necesita motivo de plataforma
+o ausencia de hidratación. [Contrato y gate](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/LAB_APPROVED_CONTROLS_DECISION_V1.md).

@@ -76,6 +76,14 @@ focuses on a failed submission attempt; it is not an automatic alert on every ed
 
 ## Select, keyboard and popup ownership
 
+**Approved default (2026-10-07):** finite-choice product UI uses AXIS `Field` + `Select`.
+The AXIS Astro Lab uses `components/LabSelect.astro`, which SSR-renders and hydrates those same
+exports. Do not recreate the dropdown with bare `<select>` and local CSS. Native controls require
+a documented platform/no-hydration reason; existing Lab exceptions are frozen, not approval.
+The ordinary Lab test `approved-selects.test.ts` rejects new handwritten controls. Canon:
+[Lab approved controls](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/LAB_APPROVED_CONTROLS_DECISION_V1.md).
+
+
 `Select` renders native markup on the server and enhances after hydration. The visible trigger owns its
 Field name; a native select owns `name`, `form`, autocomplete, validation and FormData. The forwarded ref
 still reaches the select; focus redirects to the trigger. Use `onValueChange` or native `onChange` as documented.
