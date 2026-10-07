@@ -13,7 +13,7 @@ Estos wireframes son estructura dentro de **La órbita**: títulos y capítulos 
 │                                                              │
 │ Reto / contexto breve        ┌─────────────────────────────┐  │
 │ Concepto de la propuesta     │                             │  │
-│ Una promesa comprensible     │       PIEZA DOMINANTE        │  │
+│ Una promesa comprensible     │       PIEZA / DEMOSTRACIÓN        │  │
 │                             │       ratio preservado      │  │
 │ [Explorar propuesta]         │                             │  │
 │ Mapa · Preparar*             └─────────────────────────────┘  │
@@ -22,7 +22,7 @@ Estos wireframes son estructura dentro de **La órbita**: títulos y capítulos 
 * Preparar solo si el grant lo permite.
 ```
 
-La pieza está visible en el primer viewport; dimensiones exactas se resuelven con assets reales. La entrada no fuerza reproducción ni consume pantalla con un splash.
+La pieza o demostración SEO/AEO está visible en el primer viewport; dimensiones exactas se resuelven con assets reales. La entrada no fuerza reproducción ni consume pantalla con un splash.
 
 ## Explorar una pieza
 
@@ -80,10 +80,24 @@ El estado informa lo aplicado por audiencia, no solo lo solicitado. Una ventana 
 ┌ Sala · borrador/revisión ───────── Preview por rol · Publicar ┐
 │ Inventario       │ Escenario compartido     │ Propiedades    │
 │ Capítulos        │ con experiencia buyer    │ del elemento   │
-│ Piezas/variantes │                          │ Fundamento     │
+│ Bloques/piezas   │                          │ Fundamento     │
 │ Tours            │                          │ Evidencias     │
 ├ Cobertura: incluidos / pendientes / excluidos con razón ─────┤
 └─────────────────────────────────────────────────────────────┘
 ```
 
 La revisión de cobertura abre una lista legible, no solo un porcentaje. Publish permanece sujeto a permisos y validación; preview nunca se confunde con edición entregada.
+
+## SEO/AEO: leer y revelar el fundamento
+
+```text
+LECTURA                              RADIOGRAFÍA ACTIVADA
+┌ Contexto · pieza · edición ─────┐   ┌ ← Lectura ──────────────────────────┐
+│ Artículo / landing completo    │   │ Fragmento seleccionado │ Decisión │
+│ ancho editorial, marca cliente │ → │ y contexto editorial   │ Evidencia│
+│ [Ver radiografía]              │   │                        │ Fuente   │
+└────────────────────────────────┘   └─────────────────────────────────────┘
+       ↓ Derivados reales                     ↓ Plan / medición
+```
+
+La oportunidad puede abrir con un hallazgo/diagnóstico y su ámbito en lugar de un anuncio. En móvil, la radiografía abre panel tras seleccionar un bloque y restituye foco/posición al cerrar. Autoría incorpora bloques editoriales, fuentes, relaciones y planes junto al inventario multimedia. La consola muestra el mismo capítulo/selección y permite volver al tour. Contrato de datos y comportamiento: [perfiles](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md).

@@ -97,3 +97,7 @@ El operador acordó el nombre **Efeonce Rooms** y el destino `rooms.efeonce.org`
 ## Addendum 2026-10-07 — design system Rooms
 
 Por decisión explícita del operador, La órbita (`efeonce-graphic-line`) gobierna estética, tipografía, componentes, iconografía y motion de Rooms; AXIS distribuye el sistema. Bricolage editorial/Poppins funcional sustituye la propuesta anterior Poppins/Geist. Arte cliente preservado; composición renderizada y go de implementación pendientes. Ver [dirección vigente](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
+
+## Addendum 2026-10-07 — creatividad y SEO/AEO
+
+El operador explicita que Rooms sirve a ambas familias de propuestas. Creatividad es la primera experiencia materializada; SEO/AEO integra V1 como perfil nativo, con lectura editorial, radiografía, evidencia y plan/medición, combinable con medios creativos. El [contrato de perfiles](../rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) amplía el dossier y EPIC-052. Se conservan los runtimes/rutas actuales de X-ray y Think; adopción de contenido no equivale a migración de plataforma ni grants. Alcance confirmado, implementación pendiente.

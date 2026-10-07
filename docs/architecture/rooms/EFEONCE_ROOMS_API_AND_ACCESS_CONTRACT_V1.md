@@ -9,14 +9,17 @@ La API es la entrada al dominio. UI, CLI y MCP consumen las mismas operaciones, 
 | Familia candidata | Operaciones mínimas | Verificación |
 |---|---|---|
 | rooms | create, get, list, update, archive | Reader de estado y revisión |
-| content | importManifest, listAssets, arrange, updateNarrative, linkEvidence | Inventario completo, orden y asociaciones |
+| content | importManifest, listAssets, listBlocks, upsertBlock, arrange, updateNarrative, linkEvidence | Inventario de archivos/bloques, orden y asociaciones |
+| evidence | importSnapshot, get, list, validate | Fuente, ámbito, fecha, método, cobertura, estado y versión |
+| relations | upsert, list, delete | Anclas editoriales/técnicas y linaje dentro de la edición |
+| scenarios | evaluate, save | Modelo/fórmula acotados, unidades/supuestos y revisión; evaluar no altera la edición |
 | uploads | initiate, getStatus, complete, cancel | Bytes, hash, owner y validación real |
 | media | getStatus, retry, cancel, authorizeDelivery | Derivados ready y ámbito del ticket |
 | tours | create, update, get, list | Secuencia y referencias válidas |
 | notes | create, update, get, list, delete | Owner y audiencia de cada nota; denegación de notas ajenas |
 | editions | validate, publish, list, get | Snapshot, hash y política aplicada |
 | access | invite, listGrants, updateGrant, revoke | Permisos efectivos, expiración y auditoría |
-| questions | create, list, answer, resolve | Edición/pieza/ancla, autor y visibilidad |
+| questions | create, list, answer, resolve | Edición/bloque/pieza/ancla, autor y visibilidad |
 | steps | create, list, update | Responsable, fecha y estado explícitos |
 | exports | authorizeOriginalDownload | Archivo exacto y permiso separado |
 | presentation | prepare, startSession, endSession | Edición, recorrido y grants vigentes |
@@ -34,7 +37,11 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 
 | Entidad | Identidad y reglas |
 |---|---|
-| Room | organizationId, roomId, contexto, lifecycle, owner; referencias CRM opcionales |
+| Room | organizationId, roomId, contexto, profiles[], lifecycle, owner; referencias CRM opcionales |
+| ContentBlock | Tipo/schema versionados, contenido estructurado, anclas y referencias; perfiles combinables, sin scripts arbitrarios |
+| EvidenceSnapshot | Fuente, ámbito, fecha/período, método/versión, unidad, cobertura y estado del claim; inmutable al publicar |
+| ContentRelation | Origen/destino tipados y anclas estables; radiografía y linaje con validación de integridad |
+| ScenarioModel | Modelo versionado, inputs/supuestos, fórmulas permitidas y unidades; sin ejecución de código importado |
 | AssetVersion | bytes inmutables, checksum, tipo real, provenance, dimensiones/duración, estado |
 | Piece / Variant | Concepto y adaptación editorial; ratio declarado y medido, formato, canal |
 | Rendition | Derivado técnico versionado; no reemplaza ni inventa una adaptación |
@@ -46,7 +53,7 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 | Question / Step | Colaboración mutable, anclada a edición, con autores y visibilidad |
 | Session / Event | Sesión efímera y eventos mínimos, sin inferir comprensión o intención de compra |
 
-Índice narrativo e inventario son vistas diferentes del mismo material. Validación informa activos importados, incluidos, pendientes y excluidos con razón; las exclusiones requieren decisión editorial explícita. No publicar silenciosamente solo los primeros archivos o páginas.
+Índice narrativo e inventario son vistas diferentes del mismo material. Validación informa activos importados, incluidos, pendientes y excluidos con razón; las exclusiones requieren decisión editorial explícita. No publicar silenciosamente solo los primeros archivos o páginas. El manifest incluye bloques, relaciones, evidencias y versiones de perfiles; no convertir el artículo/diagnóstico en una imagen para eludir su estructura. Ver [perfiles y reglas de claims](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md).
 
 ## 3. Semántica de operaciones
 
@@ -82,6 +89,8 @@ Propuesta de lifecycle: draft → ready → published → archived; revocar acce
 
 ## 6. Pruebas de aceptación posteriores al go
 
-Misma fixture por UI, CLI y MCP: crear sala → subir imagen/audio/video/PDF → leer derivados → ordenar → publicar → invitar → leer como invitado → denegar notas ajenas → revocar → verificar nuevos accesos/tickets denegados. Probar aislamiento entre dos organizaciones, conflictos concurrentes, retries, payload inválido y revocación durante reproducción. Registrar la limitación temporal de tickets ya emitidos.
+Misma fixture por UI, CLI y MCP: crear sala → subir imagen/audio/video/PDF e importar artículo/diagnóstico/evidencia → leer derivados y bloques → vincular radiografía/linaje → configurar plan/escenario → ordenar → publicar → invitar → leer como invitado → denegar notas ajenas → revocar → verificar nuevos accesos/tickets denegados. Probar aislamiento entre dos organizaciones, conflictos concurrentes, retries, payload inválido y revocación durante reproducción. Registrar la limitación temporal de tickets ya emitidos.
 
 La paridad se demuestra con cambios persistidos y readback independiente; un inventario de tools o un mock no la acredita.
+
+La certificación repite el ciclo en perfil creativo, SEO/AEO y sala combinada. Probar referencias rotas, datos sin ámbito, simulación identificada, fuente caída, anclas tras revisión y esquema cliente inerte. Publish/readback deben devolver los mismos bloques y evidencias por UI/CLI/MCP; un enlace a Think no acredita esta paridad.

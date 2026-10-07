@@ -21,6 +21,8 @@ automático de toda guía o Pillar editorial.** El placement de Pillars se decid
 con [PDR-018](../public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
 y la route-ownership matrix.
 
+Rooms incorporará la experiencia SEO/AEO de X-ray junto al perfil creativo mediante contenido estructurado y un adapter gobernado. [Contrato y límites](../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md); no altera las rutas/muestras actuales ni acredita una migración ejecutada.
+
 ## Indice
 
 - [Efeonce Rooms — dirección vigente](../architecture/rooms/README.md): plataforma propia en `rooms.efeonce.org`, nombre, frontera y design system La órbita acordados; arquitectura/experiencia propuestas antes del go final. El [análisis inicial](creative-proposal-experience-stack-analysis-2026-10-07.md) queda como investigación histórica. Las rutas actuales de Insights y X-Ray conservan sus contratos hasta una migración explícita.

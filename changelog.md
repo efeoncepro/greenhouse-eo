@@ -7,9 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-10-07 — Rooms adopta La órbita como design system
+## 2026-10-07 — Rooms: La órbita y experiencias creativa/SEO-AEO
 
 - Decisión explícita del operador: `efeonce-graphic-line` gobierna estética, tipografía, componentes, iconografía y motion de Rooms; Bricolage editorial/Poppins funcional, AXIS como distribución técnica. [Dossier](docs/architecture/rooms/README.md) y [EPIC-052](docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md) corregidos, incluida autoría/consola; arte cliente intacto y sin narrativa pregunta/respuesta obligatoria.
+- Alcance precisado por el operador: perfiles creativo y SEO/AEO de primera clase, combinables. Modelo de bloques/evidencia, continuidad nativa X-ray, experiencia y criterios de EPIC-052 actualizados; creatividad es el primer recorrido, no el límite de V1. Sin migración de Think/X-ray ni runtime nuevo.
 - ADR de marca con addendum, manuales, criterios/aplicación/QA y skill Codex/Claude sincronizados. Corrección documental; sin cambios de paquetes, implementación, publicación ni despliegue.
 
 ## 2026-10-06 — Nano Banana 2.1 en CLI local

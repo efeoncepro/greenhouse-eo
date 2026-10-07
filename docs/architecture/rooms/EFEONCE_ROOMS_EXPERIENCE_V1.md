@@ -8,21 +8,21 @@ La órbita, gobernada por [efeonce-graphic-line](../../../.codex/skills/efeonce-
 
 ## 1. Promesa y modelo de interacción
 
-Una sala permite entender una propuesta, experimentar sus piezas y defenderla en una decisión de compra. La inmersión nace del protagonismo del trabajo, la continuidad entre vistas y la capacidad de inspeccionarlo. No depende de recorrer un escenario 3D ni de animaciones permanentes.
+Una sala permite entender una propuesta creativa, SEO/AEO o combinada, experimentar el trabajo y defenderlo en una decisión de compra. La inmersión nace del protagonismo del trabajo, la continuidad entre vistas y la capacidad de inspeccionarlo. No depende de recorrer un escenario 3D ni de animaciones permanentes.
 
 Tres experiencias sobre una edición coherente: **crear**, **explorar**, **presentar**. Evaluar y conversar acompañan la exploración; no son un cuarto sitio separado. El PDF técnico y el anexo gráfico conservan su autonomía y se enlazan a la sala cuando corresponda.
 
 ## 2. Llegada y primer contacto
 
-Tras el acceso autorizado, aparece el cliente, la propuesta y una pieza dominante real. Una frase sitúa el reto y la promesa; acción principal «Explorar propuesta», acceso secundario al PDF y mapa. El champion dispone de «Preparar presentación» según permiso. No autoplay audible ni introducción obligatoria.
+Tras el acceso autorizado, aparece el cliente, la propuesta y una pieza o demostración dominante real según el perfil. Una frase sitúa el reto y la promesa; acción principal «Explorar propuesta», acceso secundario al PDF y mapa. El champion dispone de «Preparar presentación» según permiso. No autoplay audible ni introducción obligatoria.
 
-El primer viewport ya contiene trabajo creativo. La marca Efeonce enmarca discretamente la experiencia; la identidad del cliente gobierna sus piezas. El regreso ofrece continuar en la última posición autorizada o empezar de nuevo, indicando la edición si cambió. Nada sustituye silenciosamente una versión presentada anteriormente.
+El primer viewport contiene trabajo creativo o un hallazgo/demostración SEO/AEO con su ámbito visible; no una portada vacía. La marca Efeonce enmarca discretamente la experiencia; la identidad del cliente gobierna sus piezas. El regreso ofrece continuar en la última posición autorizada o empezar de nuevo, indicando la edición si cambió. Nada sustituye silenciosamente una versión presentada anteriormente.
 
 ## 3. Narrativa y disponibilidad del material
 
-Recorrido recomendado: reto → idea → método → sistema creativo → aplicaciones → ejecución/técnica → próximos pasos. Es una plantilla editable, no una secuencia obligatoria para toda propuesta. El equipo puede empezar por una demostración y explicar el método después.
+Recorrido creativo recomendado: reto → idea → método → sistema creativo → aplicaciones → ejecución/técnica → próximos pasos. Para SEO/AEO: oportunidad → muestra → radiografía → distribución → plan/medición → decisión. Los [perfiles](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) definen la interacción especializada; una sala puede combinarlos. Es una plantilla editable, no una secuencia obligatoria para toda propuesta. El equipo puede empezar por una demostración y explicar el método después.
 
-Cada capítulo tiene una idea dominante, evidencia vinculada y piezas pertinentes. El mapa permite saltar y volver. La biblioteca conserva **todo el inventario autorizado**, con búsqueda/filtros por concepto, formato y tipo; el recorrido breve no elimina el resto. El editor muestra cobertura y exclusiones antes de publicar.
+Cada capítulo tiene una idea dominante, evidencia vinculada y piezas pertinentes. El mapa permite saltar y volver. La biblioteca conserva **todo el inventario autorizado**, con búsqueda/filtros por concepto, formato, tipo y perfil; incluye bloques editoriales, diagnósticos, planes y evidencia además de medios; el recorrido breve no elimina el resto. El editor muestra cobertura y exclusiones antes de publicar.
 
 ## 4. El escenario de piezas
 
@@ -73,7 +73,7 @@ El responsable comercial observa actividad verificable y asuntos abiertos. «Vio
 
 ## 9. Autoría y operación multicanal
 
-Inicio desde plantilla o manifest: contexto → inventario → agrupación de piezas/variantes → relato y método → tours → revisión de cobertura → preview por rol → publicación. Importar PDF completo conserva todas las páginas, aunque algunas no formen parte del tour principal.
+Inicio desde plantilla creativa, SEO/AEO o combinada, o manifest: contexto → inventario → agrupación de piezas/variantes → relato y método → tours → revisión de cobertura → preview por rol → publicación. Importar PDF completo conserva todas las páginas, aunque algunas no formen parte del tour principal.
 
 Editor desktop en tres zonas: inventario/estructura, escenario real y propiedades del elemento seleccionado. El centro usa el mismo renderer del comprador. Se puede plegar la edición y explorar en contexto, con una indicación inequívoca de preview. El estado de procesado y los errores viven junto al archivo, con reintento individual.
 
@@ -89,4 +89,10 @@ Carga lenta conserva poster y geometría, con progreso real cuando se conoce. Er
 
 ## 11. Verificación pendiente
 
-Probar con dos propuestas de marcas diferentes y el inventario completo de cada una. Un champion que no creó la sala debe poder preparar, presentar, responder abriendo una pieza y retornar sin asistencia. Validar desktop/móvil, todos los tipos de medios, pérdida de red, audio bloqueado y notas privadas ausentes del payload de audiencia. La aceptación visual requiere render real y revisión del operador.
+Probar con dos propuestas de marcas diferentes, una creativa y una SEO/AEO, con el inventario completo de cada una; añadir un tour combinado autorizado de una misma marca. Incluir lectura editorial, acoplamiento de radiografía, linaje, fuentes y plan/medición. Un champion que no creó la sala debe poder preparar, presentar, responder abriendo una pieza y retornar sin asistencia. Validar desktop/móvil, todos los tipos de medios, pérdida de red, audio bloqueado y notas privadas ausentes del payload de audiencia. La aceptación visual requiere render real y revisión del operador.
+
+## 12. Inmersión SEO/AEO
+
+El comprador lee una landing/artículo completo y luego activa «Ver radiografía». Seleccionar un fragmento revela la decisión editorial/técnica y la evidencia que la sostiene. Puede recorrer un derivado y volver al origen, inspeccionar el diagnóstico y entender qué se propone hacer y medir. La consola conserva capítulo, bloque, selección y scroll al volver al tour. El [contrato de perfiles](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) es dueño del detalle, los estados y la continuidad con AEO X-ray.
+
+Los datos se exploran como evidencia, con fuente/fecha/ámbito presentes. Un escenario permite revisar supuestos cuando existe un modelo autorizado; una cifra ilustrativa nunca se convierte en resultado medido. Esta experiencia comparte acceso, edición, presentación y evaluación con la creativa, sin obligar a pasar por una galería multimedia ni reconstruir el X-ray como PDF.

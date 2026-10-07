@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-[Rooms](docs/architecture/rooms/README.md): EPIC-052; La órbita; sin go.
+[Rooms](docs/architecture/rooms/README.md): creativo/SEO-AEO; sin go.
 
 [Factory](docs/services/factory/README.md): On-Demand.
 

@@ -10,7 +10,7 @@ Todos los flujos consumen el design system **La órbita** según la [dirección 
 
 ```mermaid
 flowchart LR
-  A[Crear contexto] --> B[Importar inventario]
+  A[Crear contexto y perfiles] --> B[Importar archivos y bloques]
   B --> C[Validar y procesar]
   C --> D[Componer relato y tours]
   D --> E[Revisar cobertura y permisos]
@@ -31,7 +31,7 @@ Guardar borrador no publica. Publicar no invita automáticamente. Una modificaci
 flowchart LR
   A[Acceso verificado] --> B[Entrada o continuar]
   B --> C[Relato / mapa / inventario]
-  C --> D[Pieza]
+  C --> D[Pieza / bloque / hallazgo]
   D --> E[Variante / detalle / contexto]
   D --> F[Fundamento / evidencia]
   F --> Q[Pregunta contextual]
@@ -40,7 +40,7 @@ flowchart LR
   D --> C
 ```
 
-Cada transición guarda origen de retorno dentro de la sesión. Deep link resuelve edición y asset autorizado; si no hay permiso, pide acceso sin revelar contenido protegido. Links obsoletos no redirigen a otra pieza silenciosamente.
+Cada transición guarda origen de retorno dentro de la sesión. Deep link resuelve edición y asset/bloque/ancla autorizado; si no hay permiso, pide acceso sin revelar contenido protegido. Links obsoletos no redirigen a otra pieza silenciosamente.
 
 ## 3. Preparar y presentar
 
@@ -55,6 +55,9 @@ Solo una consola controladora activa por sesión en V1; takeover explícito y se
 | Upload en curso | Progreso medido; cancelación; no «ready» anticipado |
 | Procesando | Estado por archivo/perfil; puede continuar autoría independiente |
 | Error de archivo | Motivo útil redactado, reintentar/reemplazar, referencias preservadas hasta decisión |
+| Evidencia incompleta o desactualizada | Mostrar fuente/fecha/ámbito y limitación; actualizar mediante revisión explícita, nunca en mitad del tour |
+| Relación de radiografía rota | Señalar origen/destino; bloquear publicación si es requerida; no apuntar a otro fragmento por aproximación |
+| Sin baseline / no medido | Estado explícito, no cero ni forecast automático |
 | Conflicto de revisión | Comparar revisión actual y cambios propios; no sobrescribir silenciosamente |
 | Media cargando | Poster estable y controles de espera; no pantalla negra ambigua |
 | Audio bloqueado | Acción visible en audiencia para habilitar; consola informa bloqueo |
@@ -70,4 +73,10 @@ Abrir panel mueve foco al encabezado/control adecuado; cerrar vuelve al disparad
 
 ## 6. Dependencias y alcance
 
-Wireframes y flujos dependen del mismo modelo edition/asset/grant. Cuestiones de invitación, retención, TTL y regiones pendientes de especificación ejecutable no bloquean esta revisión documental, pero deben resolverse antes del runtime. No incluir notificaciones o mensajes salientes automáticos sin política y autorización explícitas.
+Wireframes y flujos dependen del mismo modelo edition/block/evidence/asset/grant. Cuestiones de invitación, retención, TTL y regiones pendientes de especificación ejecutable no bloquean esta revisión documental, pero deben resolverse antes del runtime. No incluir notificaciones o mensajes salientes automáticos sin política y autorización explícitas.
+
+## 7. Recorrido SEO/AEO
+
+Oportunidad con fuente → lectura de muestra → seleccionar fragmento → abrir decisión/evidencia → volver al fragmento → explorar derivado → regresar al origen → plan/medición → siguiente paso. El mapa y tour admiten combinaciones con piezas creativas. Autoría valida bloques/relaciones/fuentes además de bytes; importar X-ray muestra cobertura y pérdidas antes de publicar.
+
+Consola/audiencia sincronizan únicamente la selección pública permitida, ancla y estado de vista; notas privadas siguen fuera del canal. Al abrir evidencia y volver se conserva escena, fragmento y scroll. Filtros/escenarios de exploración no mutan la edición; guardar requiere command y revisión. [Canon de perfiles](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md).

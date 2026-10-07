@@ -12,6 +12,10 @@
 
 ---
 
+## Continuidad propuesta en Rooms — 07/10/2026
+
+Rooms incorpora SEO/AEO como perfil nativo junto a propuestas creativas. El [contrato de perfiles](../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) conserva los trabajos de X-ray mediante un adapter de contenido versionado; lectura, radiografía y linaje son requisitos de aceptación. Esta decisión no migra ni altera el runtime, rutas, muestras o grants documentados aquí. Para el nuevo entorno Rooms rige La órbita/Bricolage/Poppins; la descripción visual histórica de Think no se hereda como design system. Implementación y mapping pendientes en EPIC-052.
+
 ## Extensión multipieza publicada — 30/09/2026
 
 La experiencia original se extiende con landing/artículo, iconografía editorial, exploración de valor,

@@ -1,5 +1,7 @@
 # Plataforma comercial — diseño de solución V1
 
+> **Alcance vigente 2026-10-07:** Rooms incluye perfiles creativo y SEO/AEO, combinables; la primera experiencia creativa de este antecedente no limita V1. Ver [contrato actual](../rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md).
+
 > **Corrección visual 2026-10-07:** para Rooms rige La órbita (`efeonce-graphic-line`), Bricolage editorial/Poppins funcional y componentes canónicos distribuidos por AXIS. Este antecedente no gobierna la estética actual; [dirección vigente](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
 
 > **Antecedente histórico, sustituido para trabajo nuevo por el [dossier Efeonce Rooms](../rooms/README.md), 2026-10-07.** Nombre y destino ya acordados: Efeonce Rooms / `rooms.efeonce.org`. El diseño consolidado continúa Proposed hasta el go final; este texto conserva la evolución previa.

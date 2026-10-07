@@ -1,7 +1,7 @@
 # Efeonce Rooms
 
 **Nombre y subdominio acordados:** Efeonce Rooms · `rooms.efeonce.org`.
-**Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
+**Propósito:** experiencia comercial y conversión de demanda; ayuda al comprador a comprender, evaluar y defender una solución. Sirve a propuestas creativas y SEO/AEO, combinables en una sala. Puede abrir conversaciones mediante muestras o diagnósticos personalizados.
 **Estado al 2026-10-07:** diseño para revisión antes del go final. No hay implementación, registro DNS, provisión ni despliegue verificados.
 
 **Programa:** [EPIC-052 — Efeonce Rooms](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md), `to-do`: quince unidades de planificación, sin tasks hijas registradas ni go de implementación. La épica es dueña de secuencia, dependencias y cierre; estos documentos conservan los contratos de producto/arquitectura.
@@ -14,6 +14,7 @@
 2. [Arquitectura de aplicación, medios y operación](EFEONCE_ROOMS_ARCHITECTURE_V1.md).
 3. [API, datos y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md).
 4. [Experiencia completa](EFEONCE_ROOMS_EXPERIENCE_V1.md).
+5. [Perfiles creativo y SEO/AEO; continuidad X-ray](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): bloques, evidencias, sala combinada y aceptación V1.
 
 ## Contratos de experiencia para revisión
 

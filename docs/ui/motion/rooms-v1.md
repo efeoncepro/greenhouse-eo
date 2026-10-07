@@ -23,6 +23,9 @@ Base de microinteracción verificada en tokens AXIS: duration instant 75 ms, sho
 | Siguiente escena | Continuidad breve de plano; corte permitido por tipo de contenido | standard/medium | Corte |
 | Cerrar detalle | Recuperar origen, posición y foco sin recorrer toda la página | medium | Restitución directa |
 | Carga de medios | Poster inmóvil; progreso solo si es medible | Estado, no cronómetro ficticio | Igual |
+| Lectura → radiografía | Mantener fragmento/origen; desplegar instrumento sin perder posición ni encoger texto hasta ilegibilidad | medium/long | Corte, ancla y foco preservados |
+| Fragmento → evidencia / derivado → origen | Indicar dirección y selección con etiquetas; énfasis breve y un solo destino activo | short/standard | Selección/etiqueta estáticas |
+| Cambio de filtro o escenario | Actualizar valores y unidades con estado explícito; sin contar desde cero ni simular resultados | standard | Cambio directo con resumen accesible |
 | Audio/video | Timeline y waveform siguen tiempo real del medio | Reloj del player | Contenido con controles; no autoplay |
 
 La duración de transición no retrasa la disponibilidad de un botón. La espera de red no se disfraza con una animación de duración fija. No hay audio de interfaz por defecto.
@@ -49,4 +52,4 @@ Sound/fullscreen requieren comportamiento real del navegador, sin garantías bas
 
 ## 6. Evidencia pendiente
 
-Grabar entrada, apertura/cierre de pieza, cambio de ratio, panel, comparación y retorno a tour en desktop y móvil. Repetir con reduced motion, teclado, video reproduciéndose y red degradada. Medir fluidez/INP y comprobar que no se modifica ni recorta la creatividad. La tabla es contrato propuesto, no evidencia de una animación ya validada.
+Grabar entrada, apertura/cierre de pieza, cambio de ratio, panel, comparación, lectura→radiografía, fragmento↔evidencia, linaje y retorno a tour en desktop y móvil. Repetir con reduced motion, teclado, video reproduciéndose y red degradada. Medir fluidez/INP y comprobar que no se modifica ni recorta la creatividad. La tabla es contrato propuesto, no evidencia de una animación ya validada.

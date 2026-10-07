@@ -25,12 +25,13 @@ Think se concibió para marketing, tools y lead magnets. Administrar esta nueva 
 | D4. Full API parity UI/CLI/MCP | Requisito explícito del operador, mantenido en este diseño |
 | D5. Stack, topología, modelo detallado, políticas propuestas y secuencia | Proposed en este ADR y documentos asociados, para el go final |
 | D6. Design system de Rooms: La órbita (`efeonce-graphic-line`) | Accepted 2026-10-07 por corrección explícita del operador; estética, tipografía, componentes, iconografía y motion, también en autoría/consola. AXIS lo distribuye. Composición específica y QA visual siguen pendientes |
+| D7. Rooms sirve a propuestas creativas y SEO/AEO, combinables en una sala | Accepted 2026-10-07 por aclaración explícita del operador; creatividad es el primer recorrido, no el límite del producto. Contratos especializados Proposed |
 
 La solicitud actual autoriza redactar y explicar este dossier. No es el go final para construir, migrar, provisionar, desplegar o compartir una propuesta con un cliente.
 
 ## Decision proposed
 
-Rooms se construye alrededor de una **sala comercial**, con una o más experiencias versionadas para una oportunidad. Tres trabajos integrados: preparar, demostrar y facilitar la evaluación. La primera entrega es la prueba creativa inmersiva con herramientas del champion y colaboración contextual básica.
+Rooms se construye alrededor de una **sala comercial**, con una o más experiencias versionadas para una oportunidad. Tres trabajos integrados: preparar, demostrar y facilitar la evaluación. El primer recorrido que se materializa es la prueba creativa inmersiva; el alcance V1 incluye también SEO/AEO como perfil de primera clase, y salas que combinan ambos. Los [perfiles de experiencia](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) definen sus bloques, evidencia y aceptación compartida.
 
 El equipo Efeonce opera la plataforma. El comprador obtiene una sala acotada; el champion añade capacidades de preparación/presentación autorizadas. El mismo contenido se puede explorar libremente, seguir como relato o presentar en pantalla limpia. Una biblioteca completa permanece accesible junto a recorridos selectivos.
 
@@ -80,7 +81,7 @@ El nombre está decidido; logo específico y subidentidad de Rooms requieren dis
 
 ## Acceptance and revisit
 
-La aceptación documental del operador precede al build. La aceptación del producto exige inventario reconciliado, carga por tres canales, material multiformato, dos marcas, acceso aislado, una presentación conducida por champion y QA desktop/móvil/motion reducido. No se sustituye por lint o un video promocional.
+La aceptación documental del operador precede al build. La aceptación del producto exige inventario reconciliado, carga por tres canales, material multiformato, dos marcas con perfil creativo y SEO/AEO más recorrido combinado, acceso aislado, una presentación conducida por champion y QA desktop/móvil/motion reducido. No se sustituye por lint o un video promocional.
 
 Reabrir si se requiere código por cliente, la UI aventaja en capacidades a CLI/MCP, el comprador depende de soporte para presentar, costes medidos exceden el valor o una integración fuerza ownership duplicado.
 
@@ -90,3 +91,7 @@ Reabrir si se requiere código por cliente, la UI aventaja en capacidades a CLI/
 - [Ecosistema](../../context/03_ecosistema-producto.md), [experiencia de cliente](../../context/10_experiencia-cliente.md).
 - [API parity](../GREENHOUSE_FULL_API_PARITY_DECISION_V1.md), [identidad contextual](../EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md), [MCP gateway](../EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md).
 - [AXIS portable](../EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md), [norma de marca](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
+
+## Addendum 2026-10-07 — dos perfiles comerciales de primera clase
+
+El operador aclara: «rooms debe servir para las dos», producción creativa y SEO/AEO. Esta decisión amplía el alcance explícito de producto; el diseño anterior trataba X-ray solo como referencia y centraba la aceptación en medios creativos. El núcleo es la demostración comercial, con bloques y renderers especializados por servicio. No se adopta una galería creativa con PDFs SEO adjuntos ni dos plataformas independientes. [Contrato de perfiles](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): continuidad nativa de X-ray, evidencia versionada, lectura editorial, radiografía, plan/medición y sala combinada. Se conserva el stack candidato; cambia el modelo de contenido y la certificación de EPIC-052. Construcción y migración de experiencias existentes siguen pendientes.

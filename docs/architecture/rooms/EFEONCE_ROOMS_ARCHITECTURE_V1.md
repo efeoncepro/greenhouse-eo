@@ -46,7 +46,7 @@ flowchart TD
 ## 2. Módulos y límites
 
 - **Spaces:** contexto, miembros, vinculación comercial y archivo.
-- **Content:** inventario, piezas/variantes, método, evidencia y tema validado.
+- **Content:** inventario de archivos y bloques estructurados, piezas/variantes, editorial, diagnósticos, relaciones X-ray, planes, escenarios, evidencia y tema validado.
 - **Editions:** revisión, snapshot, publicación y referencias inmutables.
 - **Access:** invitaciones, grants, sesiones externas y autorización de bytes/acciones.
 - **Presentation:** tours y notas persistidas; estado efímero de sesión separado.
@@ -76,7 +76,7 @@ El PDF de la propuesta existente se adjunta desde V1. Exportar toda la narrativa
 
 ## 4. Edición, cache y disponibilidad
 
-Una edición fija contenido, orden, variantes, assets, tours y versión de contrato de render. Conversaciones y acciones quedan fuera del snapshot pero referencian su id. La sala puede señalar que hay una edición nueva; quien está presentando decide cuándo cambiar, sin sustituir bytes a mitad de reunión.
+Una edición fija contenido, orden, variantes, assets, tours, snapshots de evidencia, relaciones entre bloques, modelos de escenario y versión de contrato de render. Conversaciones y acciones quedan fuera del snapshot pero referencian su id. La sala puede señalar que hay una edición nueva; quien está presentando decide cuándo cambiar, sin sustituir bytes a mitad de reunión.
 
 Las vistas privadas requieren cache segmentada o no-store según recurso; los grants nunca se incorporan a canonical/OG/logs. Persistir versión del contrato y fallback de render evita depender indefinidamente de un único bundle histórico. Restore debe recuperar metadatos y generaciones de assets, no solo filas.
 
@@ -109,6 +109,14 @@ Operación previa al release: restore de DB + storage probado, rotación de cred
 1. Fijar contratos, dependencias y ficha de deploy; UI first fold para aceptación visual.
 2. Backend/data: upload, medios, edición y acceso; API/CLI/MCP con transferencia y readback reales.
 3. UI: autoría y experiencia sobre ese contrato, luego consola y evaluación.
-4. Segundo cliente, resiliencia, accesibilidad, recuperación, coste y canary antes de entrega.
+4. Perfil creativo y SEO/AEO en dos marcas, recorrido combinado, resiliencia, accesibilidad, recuperación, coste y canary antes de entrega.
 
 Tasks backend/data y UI separadas, con dependencias; no crear solo una task híbrida gigante. Ninguna está implementada por este dossier.
+
+## 9. Perfiles y contenido estructurado
+
+El [contrato de perfiles](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) extiende Content mediante bloques discriminados/versionados; `Piece/Variant` no se fuerza a representar datos, artículos o planes. Un registro interno de tipos resuelve schema, renderer, anclas, validación y compatibilidad de edición. Plantillas creativa/SEO-AEO/combinada usan el mismo dominio; sin runtime ni permisos separados.
+
+SEO/AEO añade lectura editorial y radiografía vinculada, diagnóstico/evidencia, linaje, plan y escenario. El adapter X-ray transforma exportaciones autorizadas sin ejecutar HTML/JS ni acoplar Rooms al runtime Astro de Think. Los snapshots listos permiten presentar sin llamadas a buscadores/proveedores; actualización de datos es operación explícita del sistema dueño y luego una nueva revisión de Rooms. No introducir un motor de crawling/scoring ni consultas de pago al abrir una sala. Dependencias/fuentes no disponibles muestran su estado y conservan la edición autorizada.
+
+La ampliación no exige cambiar el stack propuesto ni añadir microservicios. Sí exige persistencia de bloques/relaciones, validación de fuente/ámbito/estado y renderers especializados; R01/R03/R07/R14 y el gate R15 cubren esos contratos.

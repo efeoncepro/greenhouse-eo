@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Continuidad activa
 
-Rooms: EPIC-052; La órbita gobierna todo el diseño (Bricolage/Poppins). Dossier y skill espejo corregidos; go pendiente.
+Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
 
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
