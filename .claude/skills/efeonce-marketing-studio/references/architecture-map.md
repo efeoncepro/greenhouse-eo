@@ -293,3 +293,10 @@ Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1
 El servicio actual lee originales completos en memoria; este delta no amplía límites de tamaño/duración ni
 introduce streaming adaptativo. La distribución pública es otra decisión: no persistir enlaces privados
 temporales en un artículo de WordPress.
+
+### Video accent belongs to the host view
+
+The deployed Marketing Studio player uses AXIS `line: growth`, matching its approved identity.
+Brand belongs to Creative Studio; do not select it merely because the content is creative.
+The current shell has no active Marketing/Creative switch: route the accent from that context when
+the switch exists, through the shared MediaVideo facade, never per playback surface.

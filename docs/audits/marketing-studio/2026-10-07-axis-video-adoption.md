@@ -111,3 +111,11 @@ No requiere reconstruir el worker: sigue en imagen `da2a02a60fcb`. La CLI soport
 `up [nombre] [--dry-run] [--no-verbose]`; `create`/`down` mantienen el CLI original. Push de `1c0e7ae` a main confirmado. Vercel
 `dpl_AA7iCBfggWkztvNZ9ssEKveVyi9U` READY y alias `studio.efeonce.org` verificados; la actualización
 es de CLI de operación, con el mismo reproductor y worker ya probados.
+
+## Corrección de acento del host
+
+Studio `b5adf16`, pusheado a main: la fachada usa `line: growth` para Marketing Studio,
+conforme a su identidad aprobada. Brand pertenece a Creative Studio; el shell actual no tiene
+un selector Marketing/Creative activo. No se duplicó el player ni se cambió AXIS/worker.
+`pnpm check` y `pnpm build` PASS; navegador productivo confirmó `data-line=growth`,
+surface light y acento AXIS `#259aa5`, con captura `production-growth-accent.png`.
