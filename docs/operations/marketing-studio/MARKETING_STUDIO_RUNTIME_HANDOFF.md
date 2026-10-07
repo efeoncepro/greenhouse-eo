@@ -1,5 +1,12 @@
 # Efeonce Marketing Studio — Runtime handoff
 
+## AXIS video — operativo, 2026-10-07
+
+Studio main `da2a02a` desplegado en `studio.efeonce.org`; worker staging `00008-n9x` y producción `00006-9lq`.
+Migración/CORS verificados en ambos ambientes; backfill 4/4 y 7/7, pending/failed/deferred=0 en producción.
+Reproducción, replay, móvil y miniaturas visibles verificados. [Evidencia y límites](../../audits/marketing-studio/2026-10-07-axis-video-adoption.md).
+Subida web, providers YouTube/Vimeo y distribución pública quedan separados; gateway sin cambios.
+
 ## TASK-1899 retirada (2026-10-04)
 
 Por decisión del operador se revirtió su implementación local en Greenhouse y Studio. No hubo commit, push,

@@ -551,3 +551,28 @@ hora (para aprobar)» (V3-DateOpen, V3-TimeOpen, V3-RangeOpen, V3-MobDate, V3-Mo
 - **Pendiente:** pooler de conexiones (task aparte); reintento ante `bad certificate` del connector; anillo de cambio de estado con una lectura real; salida animada de los
   selectores de fecha (hoy sólo entrada desde su origen); error de vista previa del diálogo que queda en «Validando…».
 - Contrato: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`; delta en TASK-2002.
+
+### 2026-10-07 — AXIS como reproductor transversal de Studio (operativo)
+
+Decisión: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`. Studio conserva
+la biblioteca, ingesta y worker actuales; AXIS aporta la reproducción en todas las superficies. No se crea otra
+biblioteca ni se reactiva Globe. La subida web sigue separada de la ingesta API/CLI existente.
+
+- Implementación desplegada: adapter web AXIS y extensión del worker con `timeline_sprite_v1` + `timeline_vtt_v1`,
+  hasta 60 cuadros de 160 × 90, `PlaybackRendition.thumbnailsUrl` opcional/nullable y transporte VTT privado.
+- Validación local: `check` y build PASS (corrida del integrador); 40 pruebas focales backend PASS, incluidas
+  FFmpeg real, backfill sin recodificar MP4, firma segura del VTT y compatibilidad del DTO anterior.
+- Studio `da2a02a` empujado a main. Migración `1791390000000_video-timeline-renditions.sql` aplicada por nombre
+  y constraint validada en staging/producción. CORS aplicado a ambos buckets; producción `206` y origen
+  `https://studio.efeonce.org` permitido. Web de producción READY y reproducción/replay/móvil verificados.
+  Worker staging `00008-n9x`, backfill 4/4; producción `00006-9lq`, 100 % tráfico, backfill 7/7
+  y pending=0/failed=0/deferred=0. Transporte VTT/sprite HTTP 200; QA visual de miniaturas y video
+  vertical PASS, capturas inspeccionadas; sin errores de reproducción.
+- Manifiesto regenerado localmente, 75 tools, hash
+  `df79cdd78000b1db3aa71df40cbe0fedbcf3805d043a38a5c0b86bbf56dda340`. Cambia por el schema de respuesta;
+  no hay nuevas operaciones ni scopes. Gateway reenvía el JSON sin `outputSchema`, sin requerir sync/deploy.
+  No ampliar su catálogo de 44 tools por los 75 del provider. Think/WordPress públicos y providers
+  YouTube/Vimeo no se habilitan con esta entrega.
+
+- El operador pidió «Termina todo lo que le falte»; rollout completado para player y pipeline.
+  Readback y límites: `docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md`.

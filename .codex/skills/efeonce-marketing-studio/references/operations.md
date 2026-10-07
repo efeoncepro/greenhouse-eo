@@ -530,3 +530,30 @@ test `open-write-window.test.ts`.
   pueden fallar con `bad certificate`: preferir `vercel redeploy <deploy> --target production` + `vercel promote`.
 - Tras `vercel rollback`/`promote`, los pushes siguientes a `main` siguen promoviéndose a producción (visto el 2026-10-05):
   cualquier push de otra sesión despliega todo `main`.
+
+## Rollout de miniaturas AXIS — verificado, 2026-10-07
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`. No ejecutar estos pasos
+como consecuencia automática de un cambio de skin. El operador autorizó completar el rollout el 2026-10-07;
+rollout cerrado con migración/CORS en ambos ambientes, web productiva, worker staging `00008-n9x` y
+producción `00006-9lq`, backfill 4/4 y 7/7, reproducción y miniaturas visibles. Evidencia:
+`docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md`. La secuencia siguiente es el runbook,
+no trabajo pendiente ni autorización para repetir operaciones ya aplicadas.
+
+1. Aplicar la migración aditiva `1791390000000_video-timeline-renditions.sql` en staging antes de activar
+   `MEDIA_WORKER_THUMBNAILS_ENABLED`; desplegar reader/transporte compatible y el worker.
+2. Configurar/verificar CORS GET/HEAD del bucket de **medios** para orígenes autorizados; el CORS de uploads
+   en originals no lo sustituye. Aplicado en ambos ambientes; readback de producción: video 206 y
+   `Access-Control-Allow-Origin: https://studio.efeonce.org`.
+3. Activar el flag en `apps/worker/deploy.sh`; con miniaturas activas, el barrido limita el lote a una versión.
+   No garantiza un presupuesto global para archivos grandes. Verificar dos
+   renditions nuevas por video, VTT válido, sprites cargados y segunda corrida sin regeneración. El MP4 previo
+   se conserva; no usar `force` para este backfill.
+4. Verificar en browser autorizado la reproducción y seek, autoocultación, miniaturas, fullscreen, expiración
+   y versión seleccionada. Promover a producción sólo con la evidencia y autorización correspondientes.
+5. El DTO modifica el manifiesto aunque no agrega tools: regeneración/check local hechos. Gateway sin
+   `outputSchema` reenvía JSON completo, por lo que no requiere sync/deploy; no incorporar readers ajenos.
+
+Rollback funcional: apagar el flag evita nueva generación; `thumbnailsUrl` ausente permite seguir con el MP4.
+La migración Down falla si quedan derivados timeline; no borrar objetos/filas como rollback automático.
+La autorización no prueba ejecución: consultar la auditoría para migración, CORS, backfill y despliegues confirmados.

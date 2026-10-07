@@ -9,6 +9,8 @@
 
 ## 2026-10-07 — Rooms y AXIS: experiencias y reproductor compartido
 
+- Studio: Fachada común para reproducción, galerías inertes y visor de grupos; worker existente suma timeline WebVTT/sprite. Paquete publicado, tests/build y QA local; Studio main `da2a02a`, migración y CORS verificados en staging/producción. [Decisión](docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md). Rollout completo: web/worker, backfill 7/7 y reproducción/miniaturas verificados en producción.
+
 **AXIS Video: publicación, adopción Think y documentación vigente (2026-10-07)**
 
 - Lab: Presentación/Superficie/Línea reutilizan `Field` + `Select` aprobado mediante `LabSelect.astro`; regla explícita en skill AXIS principal/consumo/primitives y gate contra nuevos selectores nativos. Excepciones heredadas inventariadas, sin copiar el dropdown ni publicar otra versión npm.

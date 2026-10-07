@@ -365,3 +365,19 @@
   usar 3.9.9 hasta migrar oidc a propósito.
 - **Avisar «no push» a una sesión no frena a las demás:** una sesión de branding empujó a `main` y desplegó el código en
   espera. Con trabajo en producción pendiente, revertir en `main` o confirmar con `ListAgents` y todas las sesiones activas.
+
+### 2026-10-07 — Reutilizar el pipeline de Studio al adoptar AXIS
+
+- Revisar `upload.ts`, `derivatives.ts` y `toolkit-node.ts` antes de diseñar «un servicio nuevo»: Studio ya
+  posee originales por SHA, ingesta verificable, worker FFmpeg y MP4 faststart. AXIS controla presentación;
+  no almacena ni procesa el original.
+- `thumb`/`poster` actuales son un fotograma, no miniaturas temporales. La secuencia requiere sprite + WebVTT,
+  soporte MIME/schema/transporte y reader; no basta añadir un `thumbnailsUrl` al frontend.
+- Un video nativo que responde 206 puede fallar con `crossorigin=anonymous`: comprobar CORS de la respuesta
+  final GCS. En producción se observó 206 con CORS null; no confundir Range operativo con integración completa.
+- No persistir URLs firmadas en VTT: almacenar referencia al sprite hermano y firmar al servir; limitar tamaño,
+  cues, geometría y rechazar referencias externas/traversal.
+- Las miniaturas faltantes se agregan con el barrido idempotente, sin rehacer el MP4. La UI conserva reproducción
+  cuando el índice es null; null no demuestra procesamiento en curso.
+- Un DTO aditivo también puede cambiar el hash del manifiesto MCP. Mantener artefacto local consistente y
+  documentar adopción del gateway por separado; no añadir permisos o despliegues por inferencia.

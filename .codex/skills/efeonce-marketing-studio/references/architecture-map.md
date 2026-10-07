@@ -274,3 +274,22 @@ All paths below are in Studio unless marked Greenhouse.
 | `packages/domain` readers | `getCalendarRange`, `listActivations`, `activationProjection` paralelizados; `loadChannelCatalog` con caché por versión publicada (`clearChannelCatalogCache`) |
 | `next.config.ts` | `experimental.staleTimes.static = 60` (prefetch manual vale 60 s) |
 | `apps/web/src/server/runtime.ts` + `packages/database/src/connection.ts` | `attachDatabasePool(handle.pool)` (`@vercel/functions` 3.9.9; la 3.9.11 arrastra `@vercel/oidc` 4) para cerrar conexiones antes de congelar; en Vercel `maxConnections` 2 e `idleTimeoutMillis` 5 s; el handle expone `pool` (ISSUE-180) |
+
+## AXIS video transversal — operativo 2026-10-07
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`.
+
+| Ruta en Studio | Responsabilidad |
+|---|---|
+| `apps/web/src/components/MediaVideo.tsx` | Entrada compartida al player AXIS; recibe el DTO de Studio y conserva la versión seleccionada |
+| `packages/domain/src/media/timeline.ts` | Receta v1 inmutable: máximo 60 cuadros, 160 × 90, 10 columnas, intervalo objetivo de 5 s y WebVTT |
+| `packages/domain/src/media/toolkit-node.ts` | FFmpeg genera el sprite en una pasada; worker existente, sin dependencias nuevas |
+| `packages/domain/src/media/derivatives.ts` | Dos nuevos kinds idempotentes; el barrido genera sólo faltantes, sin recodificar playback ya existente |
+| `packages/contracts/src/dto.ts` + `packages/domain/src/readers/campaigns.ts` | `PlaybackRendition.thumbnailsUrl?: string | null` en asset actual y versiones |
+| `packages/domain/src/media-url.ts` + `apps/web/src/app/api/v1/media/[token]/route.ts` | VTT privado; valida referencias de sprite hermano y firma al servir, sin guardar enlaces caducables |
+| `packages/database/migrations/1791390000000_video-timeline-renditions.sql` | Kinds/MIME aditivos, dimensiones nulas sólo para VTT; aplicada en staging/producción |
+| `apps/worker/deploy.sh` | Flag `MEDIA_WORKER_THUMBNAILS_ENABLED`; activar sólo después de migración y QA; estado runtime en auditoría |
+
+El servicio actual lee originales completos en memoria; este delta no amplía límites de tamaño/duración ni
+introduce streaming adaptativo. La distribución pública es otra decisión: no persistir enlaces privados
+temporales en un artículo de WordPress.

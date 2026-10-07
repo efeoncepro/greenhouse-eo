@@ -462,3 +462,22 @@ La UI es un cliente más del registro de operaciones (paridad UI↔API).
   (paid → `buyingPlatform`, resto → `readbackProvider` si no es `none`). Fecha/hora en la zona de la cuenta (`toZonedIso`).
 - **Autoridad:** en modo `open` el actor anónimo no escribe ni siquiera `dryRun` (403 `write_not_allowed`); los diálogos
   no se montan sin actor con permiso. Escrituras web esperan TASK-1898; por MCP, TASK-2003.
+
+## Reproducción AXIS y miniaturas — contrato operativo 2026-10-07
+
+- `PlaybackRendition` añade **`thumbnailsUrl?: string | null`**. Ausente/null = no hay índice disponible;
+  el MP4 sigue siendo reproducible. No inferir «procesando» o «falló» sólo de un null. Contrato anterior válido.
+- `Asset.playback` y `AssetVersionDetail.playback` usan los mismos readers y transporte existente. No nueva
+  operación/tool/scope. El manifiesto local cambia por schemas de respuesta y se regenera. El gateway vigente
+  reenvía el JSON completo sin `outputSchema`: este campo no requiere sync/deploy ni ampliar su catálogo.
+- Nuevos `RenditionKind`: `timeline_sprite_v1` (WebP) y `timeline_vtt_v1` (`text/vtt`). La receta se versiona en
+  el kind; cambiar geometría/muestreo exige nueva versión, no sobreescritura del objeto.
+- El VTT persistido referencia únicamente `timeline_sprite_v1-<sha12>.webp` en el directorio de su versión.
+  `getMedia` valida máximo 32 KiB/60 cues, tiempos contiguos y rectángulos de la receta; devuelve referencias
+  HMAC del mismo bucket/directorio, con vencimiento limitado al del índice padre (rechaza padre expirado),
+  `text/vtt; charset=utf-8`, caché privada 300 s. Sin firmante,
+  el reader deja `thumbnailsUrl=null`; no entrega un índice privado incompleto.
+- Preparación técnica no cambia `reviewState` ni aprobación/publicación. Subir por API/CLI ya existe; la
+  experiencia de subida web, permisos para distribución pública y YouTube/Vimeo permanecen separados.
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`.

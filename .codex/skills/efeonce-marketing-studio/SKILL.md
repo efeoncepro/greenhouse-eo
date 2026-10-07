@@ -63,6 +63,16 @@ aprobación, publicación observada e indexación son estados distintos. El brie
 insumos SEO con fuente/as-of y null/[]+razón; refresh/fix sin owner URL bloquea handoff. Insights
 conserva informes/render/grants/distribución. No spend/publish implícito ni copia de series SEO.
 
+## Video transversal con AXIS
+
+Para reproducir videos o ampliar miniaturas, cargar
+`docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md` y el delta 2026-10-07 de
+`references/program-ledger.md`, `contracts.md` y `operations.md`. Reusar ingesta/worker/biblioteca de Studio;
+no crear otro pipeline. AXIS está operativo mediante el componente compartido; evidencia en la auditoría
+`docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md`. Implementación local validada no
+significa miniaturas activas: migración, CORS, flag del worker, backfill y despliegue web tienen estados
+propios. El gateway reenvía el DTO completo; no sincronizar catálogos ajenos por este campo aditivo. Subida web y distribución pública Think/WordPress son trabajos separados.
+
 ## Read order
 
 1. This file (rules + workflows).
