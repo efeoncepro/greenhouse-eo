@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Continuidad activa
 
-AXIS Video 0.5.0: candidato en revisión; replay orbital y previews Think/post 251941. QA: 36 browser PASS + 2 skips, 16 consumidores, 48 primitives. Imagen azul intermitente en Think ABIERTA; decoder correcto no prueba render. Push autorizado; Think link local, sin release/deploy. Canon: skill `efeonce-graphic-line/references/video-player.md`, QA AXIS `docs/quality/video-player-0.5.0.md`.
+AXIS Video 0.5.0: candidato en revisión; replay orbital y previews Think/post 251941. QA: 36 browser PASS + 2 skips, 16 consumidores, 48 primitives. Imagen azul intermitente en Think ABIERTA; decoder correcto no prueba render. Push verificado en 4 repos (`codex/video-player-20261007`); Think Preview cloud falló por link local. Sin release/merge. Canon: skill `efeonce-graphic-line/references/video-player.md`, QA AXIS `docs/quality/video-player-0.5.0.md`.
 
 Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
 

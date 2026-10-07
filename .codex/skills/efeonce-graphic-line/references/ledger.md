@@ -758,3 +758,5 @@ Corrección del operador sobre V4: range con insets de tokens y clipping durante
 - 2026-10-07 · Video 0.5.0 local: auditoría implementada, barra compacta flotante y thumb separado de Play tras corrección del operador; Think + snapshot del último post público 251941. API/QA y límites en `references/video-player.md`. Sin publicación.
 
 - 2026-10-07 · El operador pide replay dentro de La órbita y autoriza «ve pusheando lo que llevas y documentando». Replay canónico estático y accesible implementado; ramas de revisión, sin release/deploy. Incidente de imagen azul reaparecido en Think sigue abierto: imágenes decodificadas no acreditan píxeles visibles. Detalle en `video-player.md` y QA AXIS.
+
+- 2026-10-07 · Push propio confirmado en los cuatro repos, rama `codex/video-player-20261007`; SHAs en `video-player.md`. Vercel Preview de Think falló por link local a AXIS; sin release ni merge. Incidente de imagen sigue abierto.

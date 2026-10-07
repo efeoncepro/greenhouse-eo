@@ -116,3 +116,16 @@ El operador pidió reemplazar el CTA textual por replay dentro de La órbita y a
 Estado de entrega: ramas de revisión en AXIS, Think, WordPress y Greenhouse; sin package release, merge, deploy ni activación. Think conserva link local hasta disponer de un pin publicado verificable. QA previa: 36 browser PASS + 2 skips; consumidores 16 PASS y primitives 48 PASS. Consultar AXIS `docs/quality/video-player-0.5.0.md` para evidencia vigente y cambios posteriores.
 
 **Pendiente real:** Think volvió a mostrar superficie azul con tiempo/subtítulos avanzando. Se verificó que el decoder entregaba imágenes y que un video nativo, dos instancias AXIS frescas y un run nuevo de Think completaban con imagen. No se aisló el disparador del estado de pintura: no declararlo resuelto por recargar, tener readyState=4 o pasar canvas/tests breves. Reproducir sesión prolongada y cambios de pestaña antes del release.
+
+### Registro de push verificado — 2026-10-07
+
+Rama `codex/video-player-20261007`, con HEAD remoto contrastado por `git ls-remote`:
+
+| Repositorio | Commit inicial de esta entrega |
+|---|---|
+| AXIS | `df338d1130d9e25cfc2e122f2c7fc82a2586fb4a` |
+| Think | `8a1c2066b615ddcc80d072b504d7503fd7a08acc` |
+| WordPress runtime | `da97cf9ee3f4fbb3ce5abda64c63c7ed8eda6868` |
+| Greenhouse documentación | `87e7097be6060786733f862e158d832d12845f59` |
+
+Push no equivale a release: no merge ni publicación de paquetes. El push de Think disparó automáticamente Vercel Preview y **falló**: no resuelve `@efeoncepro/axis-ui-primitives/video-player`, porque el link al checkout hermano no existe en cloud. Confirmado en logs de `dpl_3MAWPHcmSmkFtnHtFc6iKhRCp6ed`. Requiere pin exacto de una distribución AXIS verificable antes de desplegar; no se publicó el package para evadir ese límite. AXIS y Greenhouse no registraron runs GitHub Actions para esta rama en el readback. El incidente intermitente de pintura azul sigue abierto e independiente del build cloud.
