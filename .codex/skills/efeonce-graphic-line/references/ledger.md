@@ -760,3 +760,7 @@ Corrección del operador sobre V4: range con insets de tokens y clipping durante
 - 2026-10-07 · El operador pide replay dentro de La órbita y autoriza «ve pusheando lo que llevas y documentando». Replay canónico estático y accesible implementado; ramas de revisión, sin release/deploy. Incidente de imagen azul reaparecido en Think sigue abierto: imágenes decodificadas no acreditan píxeles visibles. Detalle en `video-player.md` y QA AXIS.
 
 - 2026-10-07 · Push propio confirmado en los cuatro repos, rama `codex/video-player-20261007`; SHAs en `video-player.md`. Vercel Preview de Think falló por link local a AXIS; sin release ni merge. Incidente de imagen sigue abierto.
+
+- 2026-10-07 · Publicación de paquetes AXIS autorizada explícitamente. Target `v0.6.2`: tokens 0.6.0, contracts 0.7.0, primitives 0.6.2; Think debe fijar registry, sin vendor. Run y estado en `video-player.md`.
+
+- 2026-10-07 · Operador ordena AXIS y Think a main. AXIS main 7fb549a; release v0.6.3 en curso. Think debe consumir versión publicada exacta desde GitHub Packages; sin dependencia local en cloud. Detalle y fallos previos en video-player.md.

@@ -129,3 +129,13 @@ Rama `codex/video-player-20261007`, con HEAD remoto contrastado por `git ls-remo
 | Greenhouse documentación | `87e7097be6060786733f862e158d832d12845f59` |
 
 Push no equivale a release: no merge ni publicación de paquetes. El push de Think disparó automáticamente Vercel Preview y **falló**: no resuelve `@efeoncepro/axis-ui-primitives/video-player`, porque el link al checkout hermano no existe en cloud. Confirmado en logs de `dpl_3MAWPHcmSmkFtnHtFc6iKhRCp6ed`. Requiere pin exacto de una distribución AXIS verificable antes de desplegar; no se publicó el package para evadir ese límite. AXIS y Greenhouse no registraron runs GitHub Actions para esta rama en el readback. El incidente intermitente de pintura azul sigue abierto e independiente del build cloud.
+
+### Autorización de publicación y corrección de Think — 2026-10-07
+
+El operador ordenó explícitamente «El paquete de axis publicalo». Se descarta vendorizar una copia: Think debe consumir una versión publicada exacta. Release `v0.6.2`, fuente AXIS `99f8644e06b4a7e230d5c58f79a64f234cd4ef3c`, objetivo tokens 0.6.0 / contracts 0.7.0 / primitives 0.6.2 mediante pipeline, con gates de video antes de publicar. Run: https://github.com/efeoncepro/axis-design-system/actions/runs/37627621634. Estado aún en ejecución; no afirmar publicación hasta lectura del registry.
+
+Think Preview no tenía NPM_RC: se configuró sólo para `codex/video-player-20261007` desde el secreto vigente `projects/efeonce-group/secrets/axis-packages-read-token`, sin imprimir ni guardar su valor en el repo. No se modificaron variables de producción, IAM, aliases ni credenciales del origen. El link local se sustituirá por `0.6.2` y lockfile verificado. El incidente intermitente de pintura permanece independiente.
+
+### Main y distribución central — instrucción posterior del operador
+
+AXIS y Think deben ir a `main`. AXIS main verificado en `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`. Intentos v0.6.1/v0.6.2 fallaron antes de publicar por presupuesto de pruebas y una interacción tapada por el header fijo en WebKit Linux; tercer target primitives 0.6.3, tokens 0.6.0 y contracts 0.7.0, run https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367. Publicación aún pendiente. Think debe instalar desde GitHub Packages con pin exacto y lockfile; `link:` sólo fue un mecanismo de desarrollo y NO es la arquitectura de distribución. NPM_RC sensible preparado también en Production de Think; no otras variables modificadas. Fuente viva de resultado final: QA AXIS.

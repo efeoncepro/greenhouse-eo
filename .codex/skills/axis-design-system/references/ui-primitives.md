@@ -201,3 +201,7 @@ unactivated candidate block, not a live article change. The in-app blue-surface 
 still open despite passing fresh playback/decoded-frame checks; verify painted pixels across full
 playback, replay and tab changes before release. Preserve consumer authority for review, streaming,
 analytics consent and persistence. Push, visual acceptance and production adoption remain separate.
+
+Video release autorizado posteriormente por el operador: target tokens 0.6.0, contracts 0.7.0, primitives 0.6.2, tag `v0.6.2`. Pipeline exige video browser antes de publicar. Sustituir Think link por pin exacto sólo tras registry readback; estado vivo en la referencia de graphic-line video. Publicación no acredita resolución del incidente de pintura azul.
+
+Instrucción posterior: AXIS/Think a main. Target actual primitives 0.6.3; v0.6.1/v0.6.2 no publicaron. Think consume registry privado + pin/lockfile, nunca un link a un checkout hermano en cloud. Cada producto valida y actualiza su versión de la implementación central AXIS. Estado vivo en graphic-line/video-player y QA AXIS.
