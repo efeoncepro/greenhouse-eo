@@ -55,6 +55,17 @@ and installed exports rather than historic version examples below; consumer adop
 
 ### Product controls: buttons, chips, badges and forms
 
+**Approved controls are the default.** Before adding AXIS-owned UI, reuse the existing primitive;
+do not hand-build a native control or copy its CSS merely to finish the page faster. For finite-choice
+selectors use `Field` + `Select`; in the Astro Lab use `components/LabSelect.astro` (same package
+component, SSR and hydration). Astro alone is not a reason to choose a bare `<select>`.
+`NativeSelect`/`selectHtml` require an explicit platform or no-hydration requirement and a documented
+reason. Run the ordinary `approved-selects.test.ts` gate; never regenerate its legacy exception
+fingerprints to make a violation pass. Existing exceptions are migration debt, not examples to copy.
+See [UI primitives](references/ui-primitives.md#select-keyboard-and-popup-ownership) for the contract,
+checks and boundaries. This does not authorize replacing a consumer's MUI/Vuexy adapter globally.
+
+
 Read [UI primitives](references/ui-primitives.md) before composing or adopting controls. It routes the
 compatible package set, ten form families, rich `Select` versus `NativeSelect`, shared functional icons,
 single-contour field focus, business-line palettes and consumer verification. `axis-ui-primitives` owns

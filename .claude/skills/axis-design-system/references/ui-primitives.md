@@ -59,7 +59,7 @@ Do not copy Astro, Lab CSS or its configuration controls into a product.
 | Immediate binary preference | `Switch`, stable label and native checkbox semantics |
 | Multiple choices | `CheckboxGroup`, required means at least one enabled member |
 | Short finite list with context | `Select`, rich descriptions and committed-selection check |
-| Native platform picker / no React | `NativeSelect` or `selectHtml`; native options do not render rich descriptions |
+| Explicit native-platform or no-hydration requirement (document the reason) | `NativeSelect` or `selectHtml`; native options do not render rich descriptions |
 | Search among supplied options | `Combobox`, React-only, explicit single selection; no freeform/multiselect |
 | Incrementable quantity | `NumberField`; use text/inputMode for IDs, phone or exact financial decimals |
 
@@ -80,7 +80,7 @@ focuses on a failed submission attempt; it is not an automatic alert on every ed
 The AXIS Astro Lab uses `components/LabSelect.astro`, which SSR-renders and hydrates those same
 exports. Do not recreate the dropdown with bare `<select>` and local CSS. Native controls require
 a documented platform/no-hydration reason; existing Lab exceptions are frozen, not approval.
-The ordinary Lab test `approved-selects.test.ts` rejects new handwritten controls. Canon:
+The ordinary Lab test `approved-selects.test.ts` rejects new handwritten controls. Astro without a React integration is not an exception: `LabSelect.astro` supplies the approved hydration adapter. Never update legacy fingerprints solely to clear this gate. Verify pointer/keyboard selection, focus return, selected-state marker, popup fit on mobile and labeled no-JavaScript fallback. Canon:
 [Lab approved controls](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/LAB_APPROVED_CONTROLS_DECISION_V1.md).
 
 

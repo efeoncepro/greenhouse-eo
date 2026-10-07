@@ -30,6 +30,16 @@ and brand-assets `/logos` exports are source-only until their own package releas
 Publication/readbacks belong to Greenhouse's `AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; do not
 infer them from a package.json version, public Lab or a pushed source commit.
 
+## Approved UI before implementation
+
+For AXIS-owned controls, inspect [UI primitives](ui-primitives.md) before writing markup. In the Lab,
+use `LabSelect.astro` for finite lists; in React use the package `Field` + `Select`. Both consume the
+approved renderer. A native picker is an explicit, documented exception, not an Astro shortcut.
+Confirm the actual rendered popup, selected option, keyboard/focus and mobile fit; native SSR fallback
+without JavaScript must retain its label. Run `approved-selects.test.ts` from the Lab's unit suite.
+The frozen native-selector inventory is debt to remove when migrating a surface, never permission
+to add or restyle another native selector. Canon: [approved controls decision](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/LAB_APPROVED_CONTROLS_DECISION_V1.md).
+
 ## Execute and verify
 
 With authorized checkout/package access, follow `pnpm agent:help`. From the AXIS repository:

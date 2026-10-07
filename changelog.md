@@ -11,7 +11,7 @@
 
 **AXIS Video: publicación, adopción Think y documentación vigente (2026-10-07)**
 
-- Lab: Presentación/Superficie/Línea reutilizan `Field` + `Select` aprobado mediante `LabSelect.astro`; regla para agentes y gate contra nuevos selectores nativos. Excepciones heredadas inventariadas, sin copiar el dropdown ni publicar otra versión npm.
+- Lab: Presentación/Superficie/Línea reutilizan `Field` + `Select` aprobado mediante `LabSelect.astro`; regla explícita en skill AXIS principal/consumo/primitives y gate contra nuevos selectores nativos. Excepciones heredadas inventariadas, sin copiar el dropdown ni publicar otra versión npm.
 
 - Cinema/Editorial/Review publicados en primitives 0.6.5; AXIS y Think main desplegados. Think usa registry privado + lockfile. [Distribución y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 - Adapters Think/WordPress ampliados: modelo completo, callbacks cliente y ciclo de vida; muestras con subtítulos, diez miniaturas, cuatro capítulos y 12 cues. Bundle WordPress desde package publicado con hashes; sigue sin activación. Paridad documentada; 0.6.5 distribuye corrección de órbita oculta al coexistir con estilos de botones.
