@@ -381,3 +381,9 @@
   cuando el índice es null; null no demuestra procesamiento en curso.
 - Un DTO aditivo también puede cambiar el hash del manifiesto MCP. Mantener artefacto local consistente y
   documentar adopción del gateway por separado; no añadir permisos o despliegues por inferencia.
+
+- **Compatibilidad de toda la imagen del worker:** antes de promover un cambio acotado, revisar migraciones
+  pendientes de todos los handlers incluidos y ejecutar readback de los jobs compartidos. Flags OFF no
+  demuestran independencia de schema: una ruta social puede escribir columnas de evidencia añadidas para
+  email sin consultar su flag. Aplicar sólo dependencias canónicas verificadas, con staging previo, no todas
+  las migraciones pendientes; cerrar con el job fallido recuperado y health, no sólo con SQL o video PASS.

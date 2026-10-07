@@ -6,6 +6,9 @@ Studio main `da2a02a` desplegado en `studio.efeonce.org`; worker staging `00008-
 Migración/CORS verificados en ambos ambientes; backfill 4/4 y 7/7, pending/failed/deferred=0 en producción.
 Reproducción, replay, móvil y miniaturas visibles verificados. [Evidencia y límites](../../audits/marketing-studio/2026-10-07-axis-video-adoption.md).
 Subida web, providers YouTube/Vimeo y distribución pública quedan separados; gateway sin cambios.
+Incidente de cierre recuperado: dependencia `email_evidence` aplicada por migración canónica acotada en
+ambos ambientes; Metricool HTTP 200 y deep health worker/Metricool/derivados OK. Flags owned/email OFF;
+avisos de verificaciones/mapeo separados conservados. Evidencia en la auditoría enlazada.
 
 ## TASK-1899 retirada (2026-10-04)
 

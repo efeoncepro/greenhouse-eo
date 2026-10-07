@@ -1,6 +1,6 @@
 # AXIS en Marketing Studio — implementación y QA, 2026-10-07
 
-Estado: rollout completo para reproductor compartido y miniaturas, autorizado por el operador («Termina todo lo que le falte»). Studio `da2a02a` en main y producción; migración, CORS, workers y backfill verificados en ambos ambientes. Reproducción y miniaturas comprobadas visualmente en producción.
+Estado: rollout completo para reproductor compartido y miniaturas, autorizado por el operador («Termina todo lo que le falte»). Studio `da2a02a` en main y producción; migración, CORS, workers y backfill verificados en ambos ambientes. Reproducción y miniaturas comprobadas visualmente en producción. La regresión del reader Metricool detectada al cierre fue recuperada y verificada; incidente y evidencia abajo.
 
 ## Decisión y fuente
 
@@ -72,3 +72,26 @@ Tres subagentes descubrieron superficies, pipeline y adapter antes de implementa
   generación y pintura de miniaturas verificados. No hay pendiente de rollout dentro de este alcance.
 - Subida web, subtítulos/capítulos generados, YouTube/Vimeo y distribución pública Think/WordPress
   siguen siendo continuaciones independientes; no se declaran implementadas aquí.
+
+
+## Incidente posterior — compatibilidad del worker compartido
+
+El deep health de cierre detectó `metricool_readback:last_run_failed`. La corrida 21:30 UTC de la revisión
+`00006-9lq` falló; las de 21:00 y 20:30 UTC habían terminado bien. Un reintento confirmó HTTP 500.
+No se considera un aviso ajeno al release: el worker nuevo contiene código ya presente en main que escribe
+`email_evidence` en `activations/observation.ts`, también para observaciones sociales de Metricool.
+La migración canónica `1791155100000_owned-email-providers` estaba pendiente en ambos ambientes.
+
+La migración `1791155100000_owned-email-providers` se aplicó acotadamente como dependencia del código
+ya desplegado, en staging y después producción, tras dry-run por nombre con `--no-check-order` porque la
+migración de timeline posterior ya estaba aplicada. Constraint staging validada; no se infiere aquí un
+readback de constraint productiva que no fue reportado. Flags leídos en ambos workers:
+`MEDIA_WORKER_THUMBNAILS_ENABLED=true`, `MEDIA_WORKER_OWNED_READBACK_ENABLED=false`; owned/email no se habilitan, sin cuentas ni
+proveedores nuevos. No se amplía funcionalidad ni se cambia el lifecycle de tasks.
+
+Recuperación verificada: POST Metricool HTTP 200, corrida `9b52e838-5aad-400f-bdaf-a163fdb1a90d`
+succeeded; candidates=4, observed=3, new_observations=0, not_found=1, brands=2, brand_errors=0.
+Deep health: media_worker=OK, metricool_readback=OK, pending_renditions=OK. Persisten avisos separados
+`activations_pending_verification` y `channels_require_mapping`; greenhouse_metrics/owned no configurados.
+No se atribuyen a fallos de reproducción ni se ocultan. Incidente recuperado, sin regresión de worker
+pendiente de este release y sin issue formal creada.
