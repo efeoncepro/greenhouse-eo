@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "16b8b4ea6cf19354881bc30e30e281b49d9bf337c1b623b35921aff55868ba1c",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine.purpose",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:HS6-una-decision",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6-una-decision.png",
+      "sha256": "5a3b92506bfb5bcd6e19598a6d1868b64ce62ef8faa16fe671a5a49a10eb3357"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

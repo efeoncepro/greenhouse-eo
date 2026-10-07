@@ -1,0 +1,39 @@
+{
+  "tenderId": "cmp-crm-B",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic.hero",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 285,
+          "answerPx": 176,
+          "bodyTop": 560,
+          "bodyPx": 27,
+          "bodyWidth": 500
+        },
+        "photo": {
+          "src": "asset-ref:plate:CMP-crm-B",
+          "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara junto a un registro de cliente de luz que se llena solo con tres haces que vienen de una llamada, un email y una reunión"
+        },
+        "voice": {
+          "question": "¿Sigo llenando el CRM?",
+          "answer": "Ya no",
+          "eyebrow": "El nuevo Smart CRM"
+        },
+        "body": "El CRM de HubSpot se llena con llamadas, emails y reuniones. Lo dejamos configurado y confiable.",
+        "selection": {
+          "label": "Nexa",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematicHero"
+    }
+  ]
+}

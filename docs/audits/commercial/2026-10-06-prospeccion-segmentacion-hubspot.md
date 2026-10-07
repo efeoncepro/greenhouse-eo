@@ -1,6 +1,75 @@
 # Auditoría de prospección y segmentación HubSpot — 2026-10-06
 
-## Alcance y estado
+## Estado actual: incorporación Sika México — 2026-10-06, 18 h Chile
+
+Alta explícitamente autorizada: [Sika México LIC-1164](../../commercial/tenders/sika-mexico-campana-creativa-1164/README.md). Delta exacto **una Company México + un Contact individual creativo**; la cohorte devuelve **81 empresas y 81 contactos**, exactamente el corte anterior más esos registros. Primary verificada en Sika Mexicana. El registro vacío automático por dominio de email permanece secundario y fuera de la cohorte.
+
+Membresías automáticas: **174 Individuales con email 63**, **176 Fit creativo 51**, **175 HubSpot/CRM 26 sin cambios**. Nuevo **ACTIVE 177 Química y materiales** (Company): cohorte `research_2026_10_06` AND `industry IN ('BUILDING_MATERIALS', 'CHEMICALS')`, con **una empresa**. Las 19 reglas de cohorte derivan de atributos; no hay inscripción manual. Comparación contra el prestate completo: cero faltantes y cero extras en cohorte y conjuntos 174/175/176/177.
+
+Evidencia fuera de Git: `/Users/jreye/Documents/Codex/2026-10-06-sika-mexico-1164/CRM-CIERRE-READBACK.json` y `CONTACTOS-COHORTE-CIERRE.json`; originales y registro interno en OneDrive. Cargo/identidad personal no revalidados independientemente; email aportado por el operador, no validado por Apollo. No se enviaron correos ni se presentó oferta. Los apartados siguientes conservan sus cortes históricos de 80/80 y 79 contactos iniciales.
+
+## Cierre documental y nueva lectura completa — 2026-10-06
+
+Pedido: que cualquier agente pueda continuar la segmentación. Se volvió a verificar identidad CLI/MCP en portal
+48713323 y Agent CLI 0.15.1. Lectura independiente de **34 definiciones ACTIVE**: 19 de cohorte (159–177) y
+15 generales (144–158); los 18 filtros existentes de cohorte y las 15 reglas generales coinciden exactamente
+con su prestate. Lectura completa de **19 conjuntos** por MCP: corte anterior más Sika en 174/176 y 177,
+sin faltantes ni extras. Sin nuevas escrituras CRM, definiciones, emails o automatizaciones durante este cierre.
+
+El [modelo funcional](../../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) concentra el
+catálogo resumido y los casos; el [catálogo JSON fechado](../../operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json)
+conserva nombres/IDs/objetos/expresiones exactas sin PII. Manual actualizado con pasos, preview, consulta MCP,
+paginación, recuperación y diagnóstico; decisión/runbook, índices y routers de agentes enlazados. Skill
+`hubspot-as-a-service` y referencias de prospección/schema sincronizadas byte por byte Codex/Claude.
+
+Evidencia individual fuera de Git: `Cierre-documentacion/Definiciones-live.json`, `Membresias-live.json` y
+`Verificacion-live.json`, bajo `/Users/jreye/Documents/Codex/2026-10-06-segmentos-busquedas-nuevas/`.
+Las cifras son un corte fechado y deben refrescarse antes de seleccionar destinatarios.
+
+### Validación documental
+
+Paridad explícita de las tres referencias/entrypoint HubSpot Codex/Claude, enlaces locales y restricciones de
+las 19 expresiones: PASS. Gate general de mirrors: PASS. Routing bridge abreviado en CLAUDE y su texto íntegro
+preservado en el runbook para conservar contenido y reducir presupuesto. La auditoría global de CLAUDE detecta
+una línea histórica de arquitectura de marca no alcanzable literalmente, previa a este cambio y ajena a
+segmentación; no se restaura una regla de identidad obsoleta ni se modifica su allowlist dentro de este alcance.
+El canon vigente de identidad está en `DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md`, con decisión del 05/10.
+
+## Corte anterior: corrección a propiedades activas — 2026-10-06
+
+El operador corrigió el método: incorporar mediante propiedades, sin inscripciones manuales en bases estáticas.
+Se crearon por Agent CLI cuatro definiciones en grupo `efeonce_prospecting`, con diccionario canónico en la
+[decisión aceptada](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
+Cohorte verificada en **80 empresas y 80 contactos**; tipo/fit en los contactos. Escrituras y readbacks completos
+coinciden fila por fila. La consulta global por la nueva cohorte devuelve exactamente esos conjuntos, sin extras.
+
+Los **18 ACTIVE 159–176** mantienen IDs, nombres y objetos, ahora sin `IN_LIST` ni dependencias de bases
+estáticas. Las **15 definiciones globales 144–158** coinciden exactamente con el prestate. Los conjuntos de los
+18 segmentos coinciden con los históricos más la incorporación autorizada de un contacto individual creativo:
+**0 faltantes, 0 extras, 0 ajenos al lote**. El contacto entra automáticamente en 167, 171, 174 y 176, y queda
+fuera de 172, 173 y 175. La solicitud audiovisual no se forzó en `servicio_de_interes`.
+
+| Segmento                            | Corte inicial | Actual verificado |
+| ----------------------------------- | ------------: | ----------------: |
+| 167 Retail                          |            10 |                11 |
+| 171 Marketing/Growth/Comunicaciones |            31 |                32 |
+| 174 Individuales con email          |            61 |                62 |
+| 176 Fit creativo                    |            49 |                50 |
+| 175 Fit HubSpot/CRM                 |            26 |                26 |
+
+Los otros 13 conteos del catálogo histórico no cambian. El universo de preparación actual tiene **62** emails
+individuales y 57 cuentas; nueve contactos sin email, siete buzones y dos identidades pendientes permanecen aparte.
+No es un recuento de destinatarios habilitados. La incorporación manual intermedia a la base 118 (79 → 80)
+queda reconocida; 140/122/124 conservaron su corte. Esas bases históricas ya no gobiernan los segmentos activos.
+
+Evidencia local: `Propiedades-activas/Schema-contactos.jsonl`, `Schema-empresas.jsonl`, propuestas, escrituras,
+`Registros-readback.json` y `Segmentos-readback-y-verificacion.json`. El prestate y los filtros previos permiten
+restaurar los atributos y definiciones, preservando registros. La operación no envió correos; sí se observó en
+el CRM un correo comercial ya enviado por el operador. Consultar actividad previa antes de preparar otro contacto.
+La regla duradera de alta está en las skills HubSpot Codex/Claude y en el manual enlazado. Los apartados
+siguientes conservan el corte anterior y explican su evidencia; sus cifras no sustituyen este estado actual.
+
+## Corte inicial histórico: alcance y estado
 
 Portal: **48713323, Efeonce**. Alcance de esta auditoría: contraste de los artefactos de creación, definiciones y
 readback de miembros, con nueva lectura independiente de los 18 segmentos el 06-10-2026 durante el cierre documental. La investigación tiene **80 cuentas investigadas**: 40 empresas

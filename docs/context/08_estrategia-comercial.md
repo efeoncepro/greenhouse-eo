@@ -37,6 +37,9 @@ públicas, licitaciones privadas, prospección fría y paid media. Cada una conv
 activación del encargo; costo de adquisición, decisión y cobro se registran por separado. No cambia los
 porcentajes de motores ni supone conversión a retainer.
 
+Clasificación previa: Factory sólo On-Demand; servicios mensuales y operación continua bajo Efeonce. Las cuotas
+de un proyecto no prueban recurrencia ni MRR.
+
 La meta de caja, disponibilidad reportada, economics, OT/brief, CX y validación viven en el
 [Business Model Factory](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md); la
 [guía de encargos](../services/factory/README.md) orienta el empaque y la compra. La

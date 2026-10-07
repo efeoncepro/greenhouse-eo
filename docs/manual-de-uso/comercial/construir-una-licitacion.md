@@ -33,6 +33,8 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 
 ### 3. Decidir si conviene (bid / no-bid)
 - Confirma que encaja con lo que Efeonce ofrece y define el **ángulo** (¿cliente existente?, ¿qué diferenciadores usar o evitar?).
+- Prioriza preparación por **fit**, sin cupo por horas libres actuales. Mantén borradores mientras se cierran evidencias; antes de presentar, valida ejecución, proveedores, adjudicaciones simultáneas, costo completo, margen y caja.
+- Clasifica antes de nombrar el Deal: **Factory On-Demand**; **Efeonce mensual/continuo**. Un proyecto por hitos no es recurrente por esa forma de pago. [Canon](../../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).
 - Las decisiones sensibles (usar o no un resultado/caso, tono político) las define **el operador**.
 
 ### 4. Traer contexto y diferenciadores

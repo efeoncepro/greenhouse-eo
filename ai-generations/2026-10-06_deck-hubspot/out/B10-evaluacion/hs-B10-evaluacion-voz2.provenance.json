@@ -1,0 +1,14 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "0058e13c96d9e42067f802ec8a57ecbdde2bfa0e330f7f0a6f2b627a2f0da16b",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-diagnosis-verdict",
+  "plates": [],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

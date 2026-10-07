@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "e0c290ee43caf60c3be903cfae687fe7688e474835f85c14438c50aca96ca425",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-markets",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:RG1b-regiones",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG1b-regiones.png",
+      "sha256": "60a46f805c37776c1347e297f7e76ec2c27723d3ebe6dff74e7a62c81298934b"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

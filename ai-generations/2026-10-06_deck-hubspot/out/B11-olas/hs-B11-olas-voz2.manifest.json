@@ -1,0 +1,434 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B11-olas-voz2",
+  "input": {
+    "artifactId": "hs-B11-olas-voz2",
+    "slides": [
+      {
+        "slideId": "deck-method-waves",
+        "contentType": "deck.method-waves",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+            "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+            "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+            "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+            "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+            "lsGlassBlur": "--gl-ls-glass-blur=6px",
+            "lsGlassBorder": "--gl-ls-glass-border=1px",
+            "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+            "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+            "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+            "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+            "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+            "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+            "docFill": "--gl-ls-doc-color=#ffffff",
+            "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+            "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+            "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+            "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+            "docShadowY": "--gl-ls-doc-shadow-y=50px",
+            "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+            "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+            "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+            "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+            "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+            "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+            "docEdge": "--gl-ls-doc-edge=1px",
+            "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+            "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+            "stepWidth": "--gl-mwv-width=238px",
+            "stepPadY": "--gl-mwv-pad-y=22px",
+            "stepPadX": "--gl-mwv-pad-x=20px",
+            "stepRadius": "--gl-mwv-radius=20px",
+            "numberPx": "--gl-mwv-number-px=30px",
+            "numberColor": "--gl-mwv-number-color=#ffffff",
+            "numberSelected": "--gl-mwv-number-selected-color=#0b1f33",
+            "kickerPx": "--gl-mwv-kicker-px=12px",
+            "kickerWeight": "--gl-mwv-kicker-wght=600",
+            "kickerTracking": "--gl-mwv-kicker-tracking=0.12em",
+            "kickerGap": "--gl-mwv-kicker-gap=6px",
+            "kickerColor": "--gl-mwv-kicker-color=#e2e2e2",
+            "kickerSelected": "--gl-mwv-kicker-selected-color=#5f6b7a",
+            "titlePx": "--gl-mwv-title-px=25px",
+            "titleLeading": "--gl-mwv-title-leading=1.05",
+            "titleTracking": "--gl-mwv-title-tracking=-0.015em",
+            "titleGap": "--gl-mwv-title-gap=8px",
+            "titleColor": "--gl-mwv-title-color=#ffffff",
+            "titleSelected": "--gl-mwv-title-selected-color=#0b1f33",
+            "descPx": "--gl-mwv-desc-px=15px",
+            "descWeight": "--gl-mwv-desc-wght=400",
+            "descLeading": "--gl-mwv-desc-leading=1.45",
+            "descGap": "--gl-mwv-desc-gap=10px",
+            "descColor": "--gl-mwv-desc-color=#e6edf3",
+            "descSelected": "--gl-mwv-desc-selected-color=#5f6b7a"
+          },
+          "stage": {
+            "src": "asset-ref:layer:mwv-stage"
+          },
+          "trajectory": {
+            "src": "asset-ref:layer:method-waves-trajectory"
+          },
+          "voice": {
+            "question": "¿Sumo todos los agentes juntos?",
+            "answer": "olas",
+            "eyebrow": "Agent Hub · equipos híbridos",
+            "answerLead": "No, por"
+          },
+          "body": "Primero el trabajo, después la tecnología: cada ola se <strong>prueba</strong> antes de pasar a la siguiente.",
+          "steps": [
+            {
+              "role": "lead",
+              "left": "--gl-mwv-left=760px",
+              "top": "--gl-mwv-top=600px",
+              "height": "--gl-mwv-height=250px",
+              "number": "01",
+              "kicker": "Empieza aquí",
+              "title": "Blueprint",
+              "description": "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía."
+            },
+            {
+              "role": "rest",
+              "left": "--gl-mwv-left=1020px",
+              "top": "--gl-mwv-top=495px",
+              "height": "--gl-mwv-height=355px",
+              "number": "02",
+              "kicker": "Primer valor",
+              "title": "Primer equipo híbrido",
+              "description": "Un workflow real con supervisora nombrada, pruebas y producción acotada."
+            },
+            {
+              "role": "rest",
+              "left": "--gl-mwv-left=1280px",
+              "top": "--gl-mwv-top=390px",
+              "height": "--gl-mwv-height=460px",
+              "number": "03",
+              "kicker": "Escala",
+              "title": "Entre equipos",
+              "description": "Se extiende a otros equipos con la misma ficha, rituales y evaluación."
+            },
+            {
+              "role": "rest",
+              "left": "--gl-mwv-left=1540px",
+              "top": "--gl-mwv-top=285px",
+              "height": "--gl-mwv-height=565px",
+              "number": "04",
+              "kicker": "On-Going",
+              "title": "Operación híbrida",
+              "description": "Catálogo de workflows, revisión humana y costo por resultado válido."
+            }
+          ],
+          "selection": {
+            "label": "Cliente",
+            "anchor": "bottom-end",
+            "participantKind": "role",
+            "scale": 1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "compact",
+            "overlay": "none",
+            "item": 1
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-method-waves",
+      "contentType": "deck.method-waves",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "stepWidth": "--gl-mwv-width=238px",
+          "stepPadY": "--gl-mwv-pad-y=22px",
+          "stepPadX": "--gl-mwv-pad-x=20px",
+          "stepRadius": "--gl-mwv-radius=20px",
+          "numberPx": "--gl-mwv-number-px=30px",
+          "numberColor": "--gl-mwv-number-color=#ffffff",
+          "numberSelected": "--gl-mwv-number-selected-color=#0b1f33",
+          "kickerPx": "--gl-mwv-kicker-px=12px",
+          "kickerWeight": "--gl-mwv-kicker-wght=600",
+          "kickerTracking": "--gl-mwv-kicker-tracking=0.12em",
+          "kickerGap": "--gl-mwv-kicker-gap=6px",
+          "kickerColor": "--gl-mwv-kicker-color=#e2e2e2",
+          "kickerSelected": "--gl-mwv-kicker-selected-color=#5f6b7a",
+          "titlePx": "--gl-mwv-title-px=25px",
+          "titleLeading": "--gl-mwv-title-leading=1.05",
+          "titleTracking": "--gl-mwv-title-tracking=-0.015em",
+          "titleGap": "--gl-mwv-title-gap=8px",
+          "titleColor": "--gl-mwv-title-color=#ffffff",
+          "titleSelected": "--gl-mwv-title-selected-color=#0b1f33",
+          "descPx": "--gl-mwv-desc-px=15px",
+          "descWeight": "--gl-mwv-desc-wght=400",
+          "descLeading": "--gl-mwv-desc-leading=1.45",
+          "descGap": "--gl-mwv-desc-gap=10px",
+          "descColor": "--gl-mwv-desc-color=#e6edf3",
+          "descSelected": "--gl-mwv-desc-selected-color=#5f6b7a"
+        },
+        "stage": {
+          "src": "asset-ref:layer:mwv-stage"
+        },
+        "trajectory": {
+          "src": "asset-ref:layer:method-waves-trajectory"
+        },
+        "voice": {
+          "question": "¿Sumo todos los agentes juntos?",
+          "answer": "olas",
+          "eyebrow": "Agent Hub · equipos híbridos",
+          "answerLead": "No, por"
+        },
+        "body": "Primero el trabajo, después la tecnología: cada ola se <strong>prueba</strong> antes de pasar a la siguiente.",
+        "steps": [
+          {
+            "role": "lead",
+            "left": "--gl-mwv-left=760px",
+            "top": "--gl-mwv-top=600px",
+            "height": "--gl-mwv-height=250px",
+            "number": "01",
+            "kicker": "Empieza aquí",
+            "title": "Blueprint",
+            "description": "Proceso actual y futuro, fichas de rol de cada agente y matriz de autonomía."
+          },
+          {
+            "role": "rest",
+            "left": "--gl-mwv-left=1020px",
+            "top": "--gl-mwv-top=495px",
+            "height": "--gl-mwv-height=355px",
+            "number": "02",
+            "kicker": "Primer valor",
+            "title": "Primer equipo híbrido",
+            "description": "Un workflow real con supervisora nombrada, pruebas y producción acotada."
+          },
+          {
+            "role": "rest",
+            "left": "--gl-mwv-left=1280px",
+            "top": "--gl-mwv-top=390px",
+            "height": "--gl-mwv-height=460px",
+            "number": "03",
+            "kicker": "Escala",
+            "title": "Entre equipos",
+            "description": "Se extiende a otros equipos con la misma ficha, rituales y evaluación."
+          },
+          {
+            "role": "rest",
+            "left": "--gl-mwv-left=1540px",
+            "top": "--gl-mwv-top=285px",
+            "height": "--gl-mwv-height=565px",
+            "number": "04",
+            "kicker": "On-Going",
+            "title": "Operación híbrida",
+            "description": "Catálogo de workflows, revisión humana y costo por resultado válido."
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "MethodWaves",
+      "contractHash": "14424dd06fb615f6cb352cd3218ee293bc231546614c89fe5fc6e20b8bb37d20",
+      "templateHash": "1a7cf47918a0120b73722f792f7544b0b50084b02fe99b48fbff0aa4db1c4d13"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

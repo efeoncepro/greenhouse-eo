@@ -1,0 +1,82 @@
+{
+  "tenderId": "hs-B25-11",
+  "slides": [
+    {
+      "slideId": "deck-content-markets",
+      "contentType": "deck.content-markets",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 130,
+          "questionTop": 196,
+          "answerTop": 280,
+          "answerPx": 128,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=600px",
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "lumWidth": "--gl-lum-width=160px",
+          "lumBottom": "--gl-lum-bottom=62px",
+          "svSpaceBg": "--gl-sv-space-bg-color=#020716",
+          "svHalo": "--gl-sv-halo-color=#72ded8",
+          "svShadow": "--gl-sv-shadow-color=#000610",
+          "svLabelBg": "--gl-sv-label-bg-color=#041028",
+          "svCity": "--gl-sv-city-color=#9fd7ff"
+        },
+        "photo": {
+          "src": "asset-ref:plate:RG2b-mapa",
+          "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia"
+        },
+        "voice": {
+          "question": "¿Dónde están mis datos?",
+          "answer": "Unidos",
+          "eyebrow": "Residencia de datos",
+          "answerLead": "En Estados"
+        },
+        "body": "HubSpot los guarda en <strong>cinco</strong> regiones: EE. UU. Este y Oeste, Canadá, Fráncfort y Australia. La ley lo permite con las garantías de su DPA.",
+        "markets": [
+          {
+            "country": "Canadá",
+            "city": "Región Canadá",
+            "side": "end",
+            "x": "--gl-smk-x=881px",
+            "top": "--gl-smk-top=327px"
+          },
+          {
+            "country": "EE. UU.",
+            "city": "Región Este",
+            "side": "start",
+            "x": "--gl-smk-x=1069px",
+            "top": "--gl-smk-top=374px"
+          },
+          {
+            "country": "Alemania",
+            "city": "Fráncfort",
+            "side": "start",
+            "x": "--gl-smk-x=1346px",
+            "top": "--gl-smk-top=327px"
+          },
+          {
+            "country": "Australia",
+            "city": "Región Australia",
+            "side": "end",
+            "x": "--gl-smk-x=130px",
+            "top": "--gl-smk-top=672px"
+          },
+          {
+            "country": "Chile",
+            "city": "Tu empresa",
+            "side": "end",
+            "x": "--gl-smk-x=943px",
+            "top": "--gl-smk-top=673px"
+          }
+        ]
+      },
+      "template": "ContentMarkets"
+    }
+  ]
+}

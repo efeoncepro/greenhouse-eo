@@ -1,0 +1,49 @@
+{
+  "model": "gemini-nano-banana-2.1",
+  "project": "efeonce-group",
+  "location": "global",
+  "endpoint": "generateContent",
+  "aspect": "4:5",
+  "resolution": "4K",
+  "thinking": "high",
+  "search": "off",
+  "references": 3,
+  "previousTurns": 0,
+  "outputImageUsd": 0.0756,
+  "estimateScope": "Sólo imagen de salida; entrada, reasoning y búsquedas adicionales.",
+  "modelVersion": "gemini-nano-banana-2.1",
+  "latencyMs": 65080,
+  "width": 3712,
+  "height": 4608,
+  "nativeMime": "image/png",
+  "format": "png",
+  "usage": {
+    "promptTokenCount": 4909,
+    "candidatesTokenCount": 3894,
+    "totalTokenCount": 12721,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 3360
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 1549
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 114
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 3780
+      }
+    ],
+    "thoughtsTokenCount": 3918
+  },
+  "text": "Here is the award-level, candid documentary photograph of Nexa (image_0.png, image_1.png, image_2.png) at a store aisle in Mexico City, captured with natural midday light and a graphic, extreme vertical 4:5 crop.",
+  "grounding": []
+}

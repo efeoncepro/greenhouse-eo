@@ -1,0 +1,59 @@
+{
+  "tenderId": "C10-medicion",
+  "slides": [
+    {
+      "slideId": "deck-content-measure",
+      "contentType": "deck.content-measure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 150,
+          "questionTop": 215,
+          "answerTop": 270,
+          "answerPx": 300,
+          "bodyTop": 590,
+          "bodyPx": 26,
+          "bodyWidth": 560,
+          "eyebrowPx": "--gl-eyebrow-px=20px",
+          "figurePx": "--gl-figure-px=64px",
+          "notePx": "--gl-note-px=17px",
+          "lensCx": "--gl-lens-cx=1420px",
+          "lensCy": "--gl-lens-cy=600px",
+          "lensR": "--gl-lens-r=359.97px",
+          "lensGrayscale": "--gl-lens-grayscale=1",
+          "lensContrast": "--gl-lens-contrast=1.1",
+          "lensBrightness": "--gl-lens-brightness=0.5",
+          "lensMultiply": "--gl-lens-multiply=0.8",
+          "columnWidth": "--gl-column-width=976.84px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:H1b-estratega-uniforme",
+          "lensSrc": "asset-ref:plate:H1b-estratega-uniforme",
+          "alt": "Una estratega de Efeonce, con el uniforme del equipo, revisa el tablero de entregas del cliente"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:measure-880-brand"
+        },
+        "voice": {
+          "question": "¿Cuántas llegan a tiempo?",
+          "answer": "88 %",
+          "eyebrow": "Lo medimos"
+        },
+        "body": "de las entregas de Sky llegaron a tiempo en 12 meses. Lo ves en tu portal, no en un informe que llega tarde.",
+        "figures": [
+          {
+            "value": "0,12",
+            "label": "ajustes por pieza"
+          },
+          {
+            "value": "39",
+            "label": "campañas"
+          }
+        ],
+        "note": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+      },
+      "template": "ContentMeasure"
+    }
+  ]
+}

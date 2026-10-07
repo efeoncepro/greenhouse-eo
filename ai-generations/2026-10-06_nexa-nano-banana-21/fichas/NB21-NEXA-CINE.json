@@ -1,0 +1,56 @@
+{
+  "id": "NB21-NEXA-CINE",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "conviccion"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-reportes",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field, the instant a leader deploys her squad inside a vast dark hangar at night): Nexa stands well to the RIGHT of the frame, her face centred at about 70% of the frame width, framed from the waist up, a heroic medium shot. Her LEFT hand (on the right side of the frame) is raised palm up at chest height, about thirty centimetres in front of her face, and on her palm burns a FIST-SIZED CORE of azure-white light, the brightest thing in the frame. From the core, four streams of azure light fly away from her, back and to the right into the depth of the hangar. LIGHT: the core is the only key light on her: hard, from below and to the right, so the right side of her face, her glasses, her raised hand and the white plates of her shoulder and chest glow azure, while the far side of her face falls into deep shadow with the nose shadow legible on her cheek. NO fill light, NO front light. A low cool rim light from behind outlines her hair and shoulder. REALISTIC ADULT PROPORTIONS: the camera is about two meters away at chest height with an 85mm lens at f/1.8, nothing foreshortened, she does not lean toward the lens; her head is about one quarter of the frame height, her shoulders clearly wider than two head-widths. Her head stays almost frontal, both eyes and both eyebrows visible, and she looks straight into the lens through her clear glasses with composed determination, lips gently closed without a smile, gaze intent and direct, razor-thin focus on her eyes. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate on her left side exactly as in the reference and the macro (no other logo, no lettering), the bionic glasses exactly as in their reference, small gold earrings as in the identity anchor, NO watch, NO bracelet, NO ring. THE SPARKS, copied EXACTLY from their two references, each smaller than her head, all above her waist, never arranged in a symmetric arc: the Reports Spark hovers just above the core on her palm, sharp, lit from below by the core, its bar-chart model glowing, pointing at the tallest bar; the Research Spark is PERCHED ON HER RIGHT SHOULDER (on the left side of her body in the frame), one small hand resting on her shoulder plate, holding its magnifying glass to its side and peering toward the core, half in her shadow, sharp. Both Sparks are lit only by the scene light and obey the same depth of field as everything else, never a clean product shot. ONLY TWO foreground Sparks have readable faces, arms or accessories. THREE distant Sparks sit four to six metres deep inside the hangar (EXACTLY FIVE Sparks total): ONE above her frame-right shoulder, ONE by the far-right gantry at chest height, ONE visible just beyond the frame-right edge of her hair. Each distant figure is at most one third of the near Sparks' apparent width; all three are heavily defocused, with no readable smile, arms, orbit ring or accessory, only a soft white silhouette and two tiny azure eye dots. All three must remain separately visible, none hidden or cut off by the frame. Each catches one stream. Further back, a long row of large round cold practical lights hangs across the hangar, melted into big soft bokeh discs. Thin haze catches the streams and the core. GEOGRAPHY: the Research Spark on her right shoulder is the leftmost lit element of the whole frame and its left edge stays at about 58% of the frame width; her elbow, hair and torso all stay to the right of that boundary; nothing lit, no Spark, no stream and no part of her body appears to the left of it. The LEFT half of the frame is calm, dark, empty hangar space with soft haze, no objects, no streams, no Sparks, no people. The hangar is a believable monumental physical space: structural ribs and distant gantries melt into the shadows and bokeh, not a plain black backdrop. Photographic skin with natural pores, tiny facial asymmetries, real stray hairs and physical fabric and ceramic textures, never waxy skin or beauty retouch. The face is lit by azure-white light, not a uniform blue wash. Rich contrast, deep navy blacks, awe-inspiring. No logos of any other brand, no readable text. The palm core is raised well behind the console hood; the hood blocks it from illuminating the console front edge nearest the camera. No added band, overlay or scrim.",
+  "lecho": {
+    "objeto": "the broad graphite-black matte rubber front edge of a real launch console, ten centimetres from the lens, deeply recessed under a thick overhanging black hood that physically blocks all light from the palm core; its irregular upper contour rises naturally from the bottom edge and the whole lowest sixth of the frame stays in deep near-black shadow, with no highlights, no reflected sky-blue light and no visible illuminated top surface",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, dark, empty hangar space on the left half",
+      "tinta": "blanca"
+    }
+  },
+  "desde": "NX7d",
+  "alcance": "nexa",
+  "llave": {
+    "fuente": "the fist-sized azure-white deployment core on her LEFT palm",
+    "lado": "below and frame-right of her face",
+    "tamano": "the size of a closed fist",
+    "distancia": "about 30 cm from her face"
+  },
+  "primerPlano": "a small out-of-focus dark clamp on the launch console, ten centimetres from the lens at the far bottom-right corner, separated from the broad matte console edge that forms the signature bed",
+  "fondo": "structural ribs of the monumental hangar and a row of large cold practical lights 8 metres behind Nexa, melted into large round bokeh discs; all activity lives in the right half",
+  "fenomeno": {
+    "que": "one azure-white core in her palm sends four controlled streams into the depth of the hangar to activate the squad",
+    "esServicio": "Agent Ops: Nexa supervisa y despliega agentes de investigación y reportes, cada uno con una tarea; la luz hace visible la delegación y su coordinación"
+  },
+  "nota": "Prueba local solicitada por el operador: Nano Banana 2.1 directo Google, 4K y thinking high. Referencias aprobadas: identidad facial v2, expresión, traje y lentes por catálogo; NX7d sólo como calibración visual, no ancla de rostro ni imagen enviada al modelo. Luz azul/blanco; sin nuevo acento en esta toma. V2: corrige Sparks lejanos tipo sticker/conteo y lecho insuficiente de V1; nueva generación con las mismas anclas, sin editar el plate."
+}

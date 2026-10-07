@@ -1,7 +1,8 @@
 # Población cliente SEO — propuestas visuales
 
-2026-10-04. Product Design + Greenhouse AI Design Studio. Estado: **propuestas, selección pendiente**.
-No wireframe aprobado, UI ready, código, GVC ni evidencia del runtime actual.
+2026-10-04; selección 2026-10-05. Product Design + Greenhouse AI Design Studio.
+Estado: **opción 1 corregida seleccionada por el operador** («Ok construyamosla»).
+Contrato UI preparado en TASK-2008; sin implementación, GVC ni nueva evidencia de runtime.
 [Discovery](../../../audits/seo/2026-10-04-task-1690-discovery.md).
 
 ## Fuentes y orden de selección
@@ -29,7 +30,7 @@ un escenario sintético mal usado como presentación por defecto. No describe ca
 La recomendación visual sigue siendo la1, revisada con GSC y AEO disponibles de forma independiente,
 cada uno con su corte. Sólo el seguimiento de posiciones está pendiente en ese caso de ejemplo.
 `no-aeo` queda como estado condicional por organización/período, nunca «Próximamente».
-La revisión conserva los originales y no equivale a selección/aprobación ni a UI implementada.
+La revisión conserva los originales; el operador seleccionó esta versión el 2026-10-05. No equivale a UI implementada.
 
 Revisión visible en el chat: [propuesta1 con AEO disponible](propuesta-1-aeo-disponible.png).
 Es la versión recomendada de la dirección1 después del feedback; no una cuarta alternativa.
@@ -76,9 +77,11 @@ sobre cualquier texto/geometría generados. No se emitió scorecard de aceptaci�
 - Todas: comprobar contraste, foco, teclado, tabla alternativa, scrollWidth y viewport390 con GVC
   después de implementar. Ninguna captura generativa sustituye esas pruebas.
 
-## Handoff pendiente
+## Handoff de implementación
 
-Dirección seleccionada: **pendiente**. Alternativas rechazadas: **pendiente**. Baseline de fidelidad,
-wireframe/flow/copy/motion contract y consumer UI formal: pendientes de esa selección.
-TASK-1690 conserva backend-data; el follow-up UI separado aún no tiene ID. Esta propuesta no
-reabre TASK-1310 ni convierte1690 en una task híbrida por inferencia.
+Dirección seleccionada: **1 corregida, GSC y AEO disponibles con evidencia independiente**.
+Las direcciones 2/3 quedan como alternativas no seleccionadas. Baseline de fidelidad y contratos:
+[TASK-2008](../../../tasks/to-do/TASK-2008-growth-seo-client-evidence-ui.md), con wireframe/flow/motion
+y copy ledger. [Plan conjunto](../../../tasks/plans/TASK-1690-TASK-2008-client-seo-plan.md).
+TASK-1690 conserva backend-data; TASK-2008 consume su contrato local. Goal/task-hooks e implementación
+pendientes. No reabre TASK-1310 ni convierte 1690 en una task híbrida.

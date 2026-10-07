@@ -1,0 +1,71 @@
+{
+  "schema": "efeonce.tender-workshop-render.v1",
+  "process": "1606-32-LE26",
+  "createdAt": "2026-10-05T17:24:57.629643+00:00",
+  "audience": "client_facing",
+  "status": "composed_for_review",
+  "catalog": "graphic-line-deck",
+  "catalogRecipeCount": 100,
+  "usedRecipeCount": 14,
+  "pageCount": 28,
+  "format": "16:9",
+  "pdf": {
+    "filename": "agcid-propuesta-1606-32-le26.pdf",
+    "bytes": 5551625,
+    "sha256": "ccfde0cd5a7b4ff2dc5301adee81d71ac083521cc8562226ea9febb543d734c7"
+  },
+  "sourceFiles": [
+    "deck-plan.json",
+    "deck-intent.json",
+    "deck-plan-bound.json",
+    "deck-binding-sources.json"
+  ],
+  "sourceHashes": {
+    "deck-plan.json": "c533f4e554bea1946f65bf1e05717da0446f5b18ccfba0d99534343236c7e7f8",
+    "deck-intent.json": "e0d1e53500f6e49a06e1f3ec8b15535c02bca46deee88152fe7006286299505c",
+    "deck-plan-bound.json": "5fce9e0f4d7407b385c6464bbd38a4871e7d129274ab6a8f8a1aaa7e1b984fbe"
+  },
+  "composerManifestSha256": "4ba8f67ab724b403a325b093d9c4c6fd72d014193fcea8dc2294b3fc1cc83050",
+  "surfaceManifestSha256": "6bc22085b12136c59f5a385558729728053a6ebd2c3d221adc266934cef17137",
+  "checks": {
+    "recipePlan": "PASS — 0 issues",
+    "axisDocument": "PASS",
+    "slotValidation": "PASS — overflow reject",
+    "render": "PASS — 28 PNG + merged native PDF",
+    "visualReview": "28 frames inspected; full-size checks on cover, hierarchy, staircase, QA and samples; two copy overlaps corrected",
+    "pdfReadback": "28 pages, 16:9, price, required formats and source labels; no placeholders, discarded price or internal cost",
+    "fileSize": "5.30 MiB; under composer default 20 MiB (not proof of buyer portal limit)"
+  },
+  "bindingLimitations": [
+    "No Proposal registered: Account 360 client-logo binding unbound. Native cover uses the original AGCID logo extracted from supplied Resolution 263 p.1, unmodified; no fabricated Account 360 asset id.",
+    "No case-performance figure bound for web page: optional proof omitted, no fabricated metrics."
+  ],
+  "conceptualSample": "Slide 8 demonstrates hierarchy in an approved committee-deck recipe with a graphic labeled Datos de muestra. It is not a bilingual publication mockup or approved AGCID design.",
+  "sources": {
+    "requirements": "bases/LECTURA-Y-FUENTES.md; Resolution 263 and Resolution 287; oferta-tecnica.md and propuesta-metodologica.md",
+    "price": "oferta-economica.md; Julio approved EUR 12000 total; signed Anexo 5",
+    "samples": "Berel original report p.1/7/8; GORE original portfolio p.8/9; Web portfolio p.16 Bresler and p.17 SKY; excludes confidential client metrics and misattributed portfolio text",
+    "logo": "Resolution 263 p.1 embedded image Image16.png, unmodified",
+    "brand": "Native AXIS recipes/assets and approved plates; provenance file"
+  },
+  "proposalStudio": {
+    "status": "workshop_only",
+    "proposalId": null,
+    "renderJobId": null,
+    "reason": "Local Artifact Composer render. No governed Proposal/asset-store closure or authenticated Studio verification; financial/operational GO remains unconfirmed."
+  },
+  "submission": {
+    "submitted": false,
+    "receipt": null
+  },
+  "oneDriveReadback": {
+    "method": "SharePoint list_folder_items authenticated",
+    "checkedAt": "2026-10-05T17:25:44Z",
+    "filename": "2.2 AGCID — Propuesta para presentación — Artifact Composer.pdf",
+    "bytes": 5551625,
+    "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/AGCID/05.%20Paquete%20para%20presentar/2.2%20AGCID%20%E2%80%94%20Propuesta%20para%20presentaci%C3%B3n%20%E2%80%94%20Artifact%20Composer.pdf",
+    "fileCount": 26,
+    "sizeMatchesLocal": true,
+    "remotePdfBytesDownloaded": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "cft-coquimbo-editorial-2026",
+  "workspacePath": "docs/commercial/tenders/cft-coquimbo-editorial-2026",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Borrador técnico y matriz inicial preparados por fit; sin precio, equipo, GO ni presentación aprobados.",
+    "Sin deck ni PDF final. El registro gobernado y los renders siguen pendientes."
+  ]
+}

@@ -2,6 +2,7 @@
 
 `pnpm ai:nano` opera `gemini-nano-banana-2.1` por Google Cloud/Vertex `global` con las credenciales
 del resolver canónico del repo. Es tooling local; no configura el producto ni promueve rutas de Globe.
+`pnpm ai:image` sigue usando OpenAI con default `gpt-image-2`; Sunburst y Flare 2.5 se eligen explícitamente.
 Implementación: `scripts/ai/nano-banana.ts`; contrato: `src/lib/ai/nano-banana-cli.ts`.
 
 ## Uso
@@ -49,6 +50,11 @@ o una URL pública de YouTube; PDF local o GCS. Entradas inline agregadas: 20 Mi
 con límite conservador del request de 28 MiB incluyendo historial. No se suben archivos automáticamente.
 `--image` remoto se rechaza: esta CLI verifica los bytes de las referencias locales.
 
+Si las referencias superan 20 MiB, preparar copias de transporte y registrar sus hashes junto a los
+originales. En la prueba Nexa se convirtió sólo la identidad a JPEG calidad 98, chroma 4:4:4, sin
+cambiar dimensiones, recortar ni retocar; el paquete pasó de 40,021 a 15,032 MiB. JPEG cambia los
+bytes: inspeccionar el detalle y conservar los originales. Las referencias con alfa mantuvieron sus bytes.
+
 `--format png|jpeg|webp` convierte localmente cuando corresponde; no se presenta como control nativo
 del modelo. La extensión debe coincidir. Los bytes nativos se conservan si ya tienen el formato pedido.
 
@@ -72,7 +78,17 @@ No se promete conservación exacta de píxeles al editar por instrucciones.
 ## Evidencia y límites
 
 Evidencia local y pruebas reales del 2026-10-06: [auditoría](../../audits/ai-tooling/2026-10-06-nano-banana-2-1-cli.md).
-No extrapolar una prueba de 1K/2K a la calidad de 4K, todos los ratios, 14 referencias o contexto video/PDF.
+La [prueba Nexa cine](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md)
+añade generación real 4K / thinking high / ocho referencias: PNG nativo 5504×3072, sin recorte,
+upscale ni grade. El 16:9 solicitado es aproximado en la salida. `high` es el mayor thinking expuesto
+por este contrato; no equivale a `--quality max` de OpenAI.
+
+Para foto Efeonce, construir la ficha y el prompt con `pnpm foto:prompt`, revisar identidad y objeto
+con referencias oficiales y aplicar los validadores y cine-reviewer del registro. La prueba quedó
+APROBABLE técnicamente; la selección estética frente a NX7d Sunburst favoreció Sunburst para ese
+caso por naturalidad cinematográfica. Nano destacó en resolución, reserva compositiva y fidelidad
+de referencias. Cambiaron prompt, expresión y referencias: no es A/B controlado ni ranking de motores.
+No extrapolar estas corridas a todos los ratios, 14 referencias, contexto video/PDF o consistencia de una serie.
 El helper del producto `google-gemini-image` sigue teniendo configuración independiente: este cambio sólo
 añade la CLI. Nano Banana 2 (`gemini-3.1-flash-image`) tiene retiro anunciado el 29/10/2026 en Gemini API;
 la migración del producto necesita verificación propia.

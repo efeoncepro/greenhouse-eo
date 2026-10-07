@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ec1cd99da8b78c45f71df3d655e328006677c5182ce18563a54ae82597e59b4a",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine.purpose",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:HS4-te-llevas-todo",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png",
+      "sha256": "54c38564e2b4240c7b6263efe9957a40d20261395522a6bd08999176b4693dfa"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

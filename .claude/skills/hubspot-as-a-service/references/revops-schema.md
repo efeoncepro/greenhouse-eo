@@ -67,9 +67,17 @@ membership verification contract. Existing properties describe the record; they 
   read the original note before personalization. Do not silently present those values as personal declarations.
 - Never fill `servicios_contratados`, deal service composition, lifecycle or pipeline stage from prospect fit.
   Do not manufacture SEO/AEO/GEO enum options to force an unsupported service into an existing field.
-- Confirm that the selected fields can express the requested scope. Otherwise keep a verified cohort list as the
-  origin boundary and use existing industry, size and role properties inside it; do not create custom schema by
-  default or insert all record IDs into every derived segment.
+- For automatic prospect intake, ACTIVE segments consume a cohort property plus supported industry, size, role,
+  contact-kind and fit attributes. If matching fields are absent and schema creation is authorized, define the
+  minimum dedicated dictionary through Agent CLI and verify definitions and consumers. Static cohort lists are
+  snapshots for explicitly bounded historical uses; do not make manual membership the ordinary intake requirement.
+  See the accepted property-segmentation decision linked in [prospecting-segmentation.md](prospecting-segmentation.md).
+
+For the current property consumers, load the [native segment catalog](../../../../docs/operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json)
+and [functional model](../../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md).
+Populate Company/Contact cohorts separately; do not equate their industry enums. Read back Primary after
+email-domain automation; a nameless domain stub is not evidence of the intended legal company. Keep the
+source/identity gap explicit and use the existing ACTIVE rules rather than manual static enrollment.
 
 ## Commercial pipeline governance contract
 

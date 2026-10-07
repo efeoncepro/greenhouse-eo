@@ -26,7 +26,7 @@ CLI y MCP son rutas alternativas de operación directa cuando la operación est�
 
 No guardar en el repo `~/.config/hubspot/auth.json`, service keys, OAuth codes ni salidas con registros personales. No imprimir tokens. La service key en `HUBSPOT_ACCESS_TOKEN` tiene prioridad sobre OAuth y puede carecer de auditoría por usuario: usarla sólo para una operación que la requiera, con scope y entorno controlados; retirarla al terminar. La existencia de la variable o un perfil `hs` no es prueba de que el comando pueda operar.
 
-### 2026-10-06 — segmentos por cohorte de prospección
+### 2026-10-06 — corte inicial con bases estáticas (histórico)
 
 - Agent CLI `0.15.1` (build 1348) en la misma ruta. Portal verificado `48713323`; `segments create` expone
   `--type`, `--filter`, `--list-type ACTIVE|STATIC`, `--file` y `--dry-run`, con scope `crm.lists.write`.
@@ -45,6 +45,37 @@ No guardar en el repo `~/.config/hubspot/auth.json`, service keys, OAuth codes n
 Caso, alcance y procedimiento: [manual de segmentación](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
 Evidencia agregada: [auditoría de la operación](../audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md).
 
+### 2026-10-06 — corrección: propiedades y segmentos activos
+
+- Instrucción del operador: asignar propiedades debe incorporar automáticamente a los segmentos activos.
+- Agent CLI `properties batch-create` creó cuatro definiciones (cohorte en Company/Contact y tipo/fit en Contact)
+  en grupo `efeonce_prospecting`. `objects update` cargó 80 empresas y 80 contactos; lectura independiente
+  verificó todas las filas y el conjunto exacto etiquetado, sin ampliar al CRM histórico.
+- `segments update-filters` migró 159–176 en el mismo ID después del backfill. Las reglas leen cohorte y atributos;
+  ya no dependen de 118/119/140/122/124. Cada rama OR conserva el límite. Las 15 definiciones globales no cambiaron.
+- Los 18 conjuntos completos coinciden: 62 individuales con email, Retail 11, roles 32, fit creativo 50, fit CRM 26.
+- OAuth rechazó `members-add` en 118 con 403. Hubo una incorporación UI intermedia en 118 antes de la corrección;
+  se conserva ese delta histórico. No se usa esa ruta como incorporación habitual: una regla activa por atributos
+  elimina la necesidad de escribir membresías manuales.
+- El preview de `update-filters` devolvió `executed:false` sin digest; el comando real y `get` confirmaron escritura.
+  Recalcular es asíncrono: verificar miembros efectivos después de guardar, no sólo la definición.
+
+Canon y diccionario: [decisión de segmentos por propiedades](../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
+
+### Configuración actual de prospección — cierre 2026-10-06
+
+La admisión autorizada Sika amplió la cohorte a 81 empresas/81 contactos. Nuevo ACTIVE 177 Química y materiales:
+Company, cohorte AND `industry IN ('BUILDING_MATERIALS', 'CHEMICALS')`. Contacto incorporado automáticamente en
+174/176, sin alta manual en bases. Totales 174=63, 176=51, 175=26, 177=1. Nueva lectura de 34 definiciones y
+19 membresías completas coincide con el prestate más el delta; 15 globales intactos.
+
+[Modelo funcional](../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) ·
+[catálogo exacto sin PII](HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json) ·
+[manual con escritura, lectura y diagnóstico](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
+Propiedades existentes, Company/Contact separados; conservar multiselects. Verificar Primary tras automatización
+por dominio: un email subdominio puede generar otra Company. Cohorte explícita, fit e intención separados;
+no poblar cargo/interés incompatibles para provocar membresía. La evidencia individual se guarda fuera de Git.
+
 ## Procedimiento por operación
 
 1. Identificar portal, objeto, resultado esperado, cohorte y permisos. En clientes, confirmar que la conexión apunta al portal del cliente; `48713323` es Efeonce/Kortex y no ANAM.
@@ -61,19 +92,25 @@ Evidencia agregada: [auditoría de la operación](../audits/commercial/2026-10-0
 
 Definir primero el universo: toda la base, una investigación o individuos con email de esa investigación.
 Los filtros por industria, tamaño y cargo sobre toda la base pueden incorporar datos antiguos. Para una cohorte,
-usar la pertenencia a una lista base verificada AND las propiedades existentes; un filtro por fecha de creación
+usar una propiedad de cohorte verificada AND atributos compatibles; un filtro por fecha de creación
 no sustituye el origen y excluiría cuentas preexistentes investigadas de nuevo.
 
 `segments create --dry-run` comprueba el payload sin crear. Tras una escritura autorizada, `segments get <id>
 --format json` debe confirmar tipo ACTIVE y expresión completa. La membresía requiere una lectura independiente
 de todos los registros, comparación exacta y negativos de fuga fuera del lote, incluidos los OR. Una cohorte
-estática fija el origen; la lista derivada activa puede cambiar por atributos dentro de ese origen y no incorpora
-automáticamente una ronda futura. Conservar los globales cuando el usuario pide ambos alcances.
+definida por propiedades incorpora automáticamente registros que reciban los valores requeridos. Una ronda
+futura requiere su opción/filtro o un universo combinado autorizado. Conservar los globales cuando se pidan ambos alcances.
 
 Para enriquecimiento y personalización, cargar
 [`prospecting-segmentation.md`](../../.codex/skills/hubspot-as-a-service/references/prospecting-segmentation.md).
 Fit, solicitud observada, vigencia, identidad y elegibilidad del email tienen evidencias distintas. Preparar
 segmentos no autoriza envíos, cambios de suscripciones, contactos de marketing ni activación de secuencias.
+
+## Contexto del carril bridge
+
+Texto de routing preservado desde CLAUDE.md para reducir su presupuesto; este carril no sustituye las altas directas por Agent CLI/MCP ni autoriza despertar Kortex.
+
+Los invariantes operativos del bridge HubSpot — Cloud Run hubspot-greenhouse-integration (write bridge + webhooks), inbound webhook p_services (0-162) auto-sync, service pipeline lifecycle stage sync, webhook events dual-format — viven en **`docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` → §`Invariantes operativos para agentes — HubSpot bridge/intake`** (+ `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` para el Cloud Run). El inbound companies+contacts (TASK-706) y el sample sprint outbound (TASK-837) viven en el companion `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` (ver el pointer "Integraciones/infra cross-runtime" abajo). **Invocar la skill `hubspot-greenhouse-bridge` al tocar rutas del bridge, webhooks HubSpot o secretos.**
 
 ## Fuentes y límites
 

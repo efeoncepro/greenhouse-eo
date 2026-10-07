@@ -126,8 +126,12 @@ del 29/08; el destacado consume orden canónico TASK-1700. `resolveActiveSeoTarg
 en su owner, porque hoy `hasAnyVolume` confunde cero real con ausencia. No recalcular en UI.
 
 Contrato aditivo y matriz ampliada documentados en el discovery. Baseline: 53 tests existentes
-PASS; sin matriz nueva, código, consulta PG, readback live o GVC nuevo. Propuesta Product Design
-pendiente de selección; consumer UI sigue como follow-up separado todavía sin ID.
+PASS; sin matriz nueva, código, consulta PG, readback live o GVC nuevo. El operador seleccionó la opción 1 corregida el 2026-10-05; consumer UI separado:
+[TASK-2008](../to-do/TASK-2008-growth-seo-client-evidence-ui.md). Goal explícito pendiente.
+
+El cruce `readSeoAeoGap` requiere hechos SEO y puede devolver `no_seo_data` antes de consultar AEO.
+Por eso la composición reutilizará `readClientGraderReport`, redactor cliente canónico y sujeto a org,
+para mostrar el análisis AEO independiente aunque falte GSC. No crear otro join ni reader del grader.
 
 ## Status
 
@@ -144,7 +148,7 @@ pendiente de selección; consumer UI sigue como follow-up separado todavía sin 
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `Diseno` — discovery completado el 2026-10-04 y decisión de fuentes registrada; implementación pendiente, propuesta UI pendiente de selección. Baseline existente: 53 tests PASS; sin evidencia nueva de runtime.
+- Status real: `Diseno` — discovery completado el 2026-10-04 y decisión de fuentes registrada; implementación pendiente; opción 1 corregida seleccionada, consumer UI TASK-2008 preparado. Baseline existente: 53 tests PASS; sin evidencia nueva de runtime.
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`

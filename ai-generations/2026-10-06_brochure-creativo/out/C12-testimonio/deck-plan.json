@@ -1,0 +1,91 @@
+{
+  "tenderId": "C12-testimonio",
+  "slides": [
+    {
+      "slideId": "deck-decision-testimonial",
+      "contentType": "deck.decision-testimonial",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 392,
+          "answerPx": 120,
+          "answerLeading": "--gl-dt-answer-leading=0.98",
+          "answerTracking": "--gl-dt-answer-tracking=-0.04em",
+          "answerWidth": "--gl-dt-answer-width=1080px",
+          "markTop": "--gl-dt-mark-top=236px",
+          "markPx": "--gl-dt-mark-px=190px",
+          "markInset": "--gl-dt-mark-inset=-14px",
+          "quoteTop": "--gl-dt-quote-top=696px",
+          "quotePx": "--gl-dt-quote-px=27px",
+          "quoteWidth": "--gl-dt-quote-width=980px",
+          "signatureTop": "--gl-dt-signature-top=854px",
+          "signatureGap": "--gl-dt-signature-gap=28px",
+          "logoMaxWidth": "--gl-dt-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dt-logo-max-height=64px",
+          "dividerWidth": "--gl-dt-divider-width=2px",
+          "dividerHeight": "--gl-dt-divider-height=48px",
+          "namePx": "--gl-dt-name-px=26px",
+          "rolePx": "--gl-dt-role-px=20px",
+          "roleGap": "--gl-dt-role-gap=4px",
+          "proofLeft": "--gl-dt-proof-left=1390px",
+          "proofTop": "--gl-dt-proof-top=330px",
+          "proofWidth": "--gl-dt-proof-width=390px",
+          "proofPad": "--gl-dt-proof-pad=26px",
+          "proofRule": "--gl-dt-proof-rule=2px",
+          "proofPx": "--gl-dt-proof-px=88px",
+          "proofTracking": "--gl-dt-proof-tracking=-0.04em",
+          "proofLabelPx": "--gl-dt-proof-label-px=22px",
+          "proofLabelGap": "--gl-dt-proof-label-gap=8px",
+          "sourcePx": "--gl-dt-source-px=15px",
+          "sourceGap": "--gl-dt-source-gap=18px"
+        },
+        "glow": {
+          "src": "asset-ref:layer:decision-testimonial-glow"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dt-progress-3-of-5-brand"
+        },
+        "voice": {
+          "question": "¿Cómo es trabajar con nosotros?",
+          "answer": "la carga de trabajo",
+          "eyebrow": "En palabras de Sky",
+          "answerLead": "Agilizar mucho"
+        },
+        "quote": "«Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido, gracias a ellos, agilizar mucho la carga de trabajo.»",
+        "clientLogo": {
+          "src": "asset-ref:file:sky",
+          "alt": "Sky Airline"
+        },
+        "author": {
+          "name": "Adriana Contreras",
+          "role": "Team SKY"
+        },
+        "proof": [
+          {
+            "value": "+2.000",
+            "label": "piezas aprobadas"
+          },
+          {
+            "value": "88 %",
+            "label": "entregadas a tiempo"
+          },
+          {
+            "value": "−25 %",
+            "label": "tiempo de producción"
+          }
+        ],
+        "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.15
+        }
+      },
+      "template": "DecisionTestimonial"
+    }
+  ]
+}

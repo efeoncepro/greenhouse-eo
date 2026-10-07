@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "58a3c3947b5dc66c6228fc9da9e26656354b96f42069c42722c963b0cbfb6534",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-markets",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:RG2-mapa",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2-mapa.png",
+      "sha256": "10d4a4a6ee905884f62b4c8663c90e60c6eedbd70e34b615ee5074a114bd4049"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,690 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B10-evaluacion-voz2",
+  "input": {
+    "artifactId": "hs-B10-evaluacion-voz2",
+    "slides": [
+      {
+        "slideId": "deck-decision-diagnosis-verdict",
+        "contentType": "deck.decision-diagnosis-verdict",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "docFill": "--gl-ls-doc-color=#ffffff",
+            "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+            "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+            "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+            "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+            "docShadowY": "--gl-ls-doc-shadow-y=50px",
+            "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+            "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+            "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+            "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+            "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+            "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+            "docEdge": "--gl-ls-doc-edge=1px",
+            "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+            "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+            "reportLeft": "--gl-ddv-left=780px",
+            "reportTop": "--gl-ddv-top=170px",
+            "reportWidth": "--gl-ddv-width=880px",
+            "reportPadTop": "--gl-ddv-pad-top=26px",
+            "reportPadX": "--gl-ddv-pad-x=28px",
+            "reportPadBottom": "--gl-ddv-pad-bottom=24px",
+            "reportRadius": "--gl-ddv-radius=26px",
+            "reportPerspective": "--gl-ddv-perspective=2200px",
+            "reportRotateY": "--gl-ddv-rotate-y=-9deg",
+            "reportRotateX": "--gl-ddv-rotate-x=3deg",
+            "headPadBottom": "--gl-ddv-head-pad-bottom=16px",
+            "headGapBottom": "--gl-ddv-head-gap-bottom=16px",
+            "headRule": "--gl-ddv-head-rule-color=#e3e8ee",
+            "headGap": "--gl-ddv-head-gap=12px",
+            "iconBox": "--gl-ddv-icon-box=40px",
+            "iconRadius": "--gl-ddv-icon-radius=12px",
+            "iconFill": "--gl-ddv-icon-fill-color=#0b1f33",
+            "iconSize": "--gl-ddv-icon=24px",
+            "titlePx": "--gl-ddv-title-px=22px",
+            "titleTracking": "--gl-ddv-title-tracking=-0.015em",
+            "subtitlePx": "--gl-ddv-subtitle-px=13px",
+            "subtitleWeight": "--gl-ddv-subtitle-wght=400",
+            "subtitleGap": "--gl-ddv-subtitle-gap=2px",
+            "subtitleColor": "--gl-ddv-subtitle-color=#5f6b7a",
+            "markPadY": "--gl-ddv-mark-pad-y=6px",
+            "markPadX": "--gl-ddv-mark-pad-x=12px",
+            "markRadius": "--gl-ddv-mark-radius=999px",
+            "markFill": "--gl-ddv-mark-fill-color=#f5f7fa",
+            "markBorder": "--gl-ddv-mark-border=1px",
+            "markBorderColor": "--gl-ddv-mark-border-color=#e3e8ee",
+            "markPx": "--gl-ddv-mark-px=12px",
+            "markWeight": "--gl-ddv-mark-wght=600",
+            "markTracking": "--gl-ddv-mark-tracking=0.08em",
+            "markColor": "--gl-ddv-mark-color=#5f6b7a",
+            "gridGap": "--gl-ddv-grid-gap=14px",
+            "gridColumns": "--gl-ddv-grid-columns=2",
+            "modulePadY": "--gl-ddv-module-pad-y=16px",
+            "modulePadX": "--gl-ddv-module-pad-x=18px",
+            "moduleRadius": "--gl-ddv-module-radius=16px",
+            "moduleFill": "--gl-ddv-module-fill-color=#f5f7fa",
+            "moduleBorder": "--gl-ddv-module-border=1px",
+            "moduleBorderColor": "--gl-ddv-module-border-color=#e3e8ee",
+            "moduleKickerPx": "--gl-ddv-module-kicker-px=12px",
+            "moduleKickerWeight": "--gl-ddv-module-kicker-wght=600",
+            "moduleKickerTracking": "--gl-ddv-module-kicker-tracking=0.1em",
+            "moduleKickerColor": "--gl-ddv-module-kicker-color=#5f6b7a",
+            "moduleTitlePx": "--gl-ddv-module-title-px=20px",
+            "moduleTitleTracking": "--gl-ddv-module-title-tracking=-0.015em",
+            "moduleTitleGapTop": "--gl-ddv-module-title-gap-top=3px",
+            "moduleTitleGapBottom": "--gl-ddv-module-title-gap-bottom=10px",
+            "nodeGap": "--gl-ddv-node-gap=8px",
+            "nodePadY": "--gl-ddv-node-pad-y=7px",
+            "nodePadX": "--gl-ddv-node-pad-x=11px",
+            "nodeRadius": "--gl-ddv-node-radius=999px",
+            "nodeFill": "--gl-ddv-node-fill-color=#ffffff",
+            "nodeBorder": "--gl-ddv-node-border=1px",
+            "nodeBorderColor": "--gl-ddv-node-border-color=#e3e8ee",
+            "nodePx": "--gl-ddv-node-px=13px",
+            "nodeWeight": "--gl-ddv-node-wght=500",
+            "nodeDot": "--gl-ddv-node-dot=9px",
+            "nodeDotFill": "--gl-ddv-node-dot-color=#0b1f33",
+            "nodeDotGap": "--gl-ddv-node-dot-gap=7px",
+            "footnotePx": "--gl-ddv-footnote-px=12px",
+            "footnoteWeight": "--gl-ddv-footnote-wght=400",
+            "footnoteGap": "--gl-ddv-footnote-gap=10px",
+            "footnoteColor": "--gl-ddv-footnote-color=#5f6b7a",
+            "optionGap": "--gl-ddv-option-gap=8px",
+            "optionFlex": "--gl-ddv-option-flex=1",
+            "optionFlexSelected": "--gl-ddv-option-flex-selected=1.6",
+            "optionPadY": "--gl-ddv-option-pad-y=10px",
+            "optionPadX": "--gl-ddv-option-pad-x=6px",
+            "optionRadius": "--gl-ddv-option-radius=12px",
+            "optionPx": "--gl-ddv-option-px=13px",
+            "optionWeight": "--gl-ddv-option-wght=600",
+            "optionSelectedFill": "--gl-ddv-option-selected-fill-color=#0b1f33",
+            "optionSelectedInk": "--gl-ddv-option-selected-color=#ffffff",
+            "optionOtherFill": "--gl-ddv-option-other-fill-color=#ffffff",
+            "optionOtherInk": "--gl-ddv-option-other-color=#5f6b7a",
+            "optionBorder": "--gl-ddv-option-border=1px",
+            "optionBorderColor": "--gl-ddv-option-border-color=#e3e8ee",
+            "conditionPx": "--gl-ddv-condition-px=12px",
+            "conditionWeight": "--gl-ddv-condition-wght=400",
+            "conditionLeading": "--gl-ddv-condition-leading=1.4",
+            "conditionGap": "--gl-ddv-condition-gap=10px",
+            "conditionColor": "--gl-ddv-condition-color=#5f6b7a",
+            "riskGapTop": "--gl-ddv-risk-gap-top=6px",
+            "riskGap": "--gl-ddv-risk-gap=8px",
+            "riskPx": "--gl-ddv-risk-px=13px",
+            "riskWeight": "--gl-ddv-risk-wght=400",
+            "riskIcon": "--gl-ddv-risk-icon=15px",
+            "recordPx": "--gl-ddv-record-px=13px",
+            "recordWeight": "--gl-ddv-record-wght=400",
+            "recordLeading": "--gl-ddv-record-leading=1.5",
+            "waveGap": "--gl-ddv-wave-gap=10px",
+            "wavePadY": "--gl-ddv-wave-pad-y=10px",
+            "wavePadX": "--gl-ddv-wave-pad-x=12px",
+            "waveRadius": "--gl-ddv-wave-radius=12px",
+            "waveFill": "--gl-ddv-wave-fill-color=#ffffff",
+            "waveBorder": "--gl-ddv-wave-border=1px",
+            "waveBorderColor": "--gl-ddv-wave-border-color=#e3e8ee",
+            "waveNamePx": "--gl-ddv-wave-name-px=18px",
+            "waveTitlePx": "--gl-ddv-wave-title-px=13px",
+            "waveTitleWeight": "--gl-ddv-wave-title-wght=600",
+            "waveTitleLeading": "--gl-ddv-wave-title-leading=1.3",
+            "waveTitleGap": "--gl-ddv-wave-title-gap=2px",
+            "waveKickerPx": "--gl-ddv-wave-kicker-px=11px",
+            "waveKickerWeight": "--gl-ddv-wave-kicker-wght=500",
+            "waveKickerTracking": "--gl-ddv-wave-kicker-tracking=0.06em",
+            "waveKickerGap": "--gl-ddv-wave-kicker-gap=4px",
+            "waveKickerColor": "--gl-ddv-wave-kicker-color=#5f6b7a"
+          },
+          "stage": {
+            "src": "asset-ref:layer:ddv-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:ddv-platform"
+          },
+          "voice": {
+            "question": "¿Qué recibo primero?",
+            "answer": "decisión",
+            "eyebrow": "Evaluación inicial · sin costo",
+            "answerLead": "Una"
+          },
+          "body": "Una decisión informada, con <strong>evidencia</strong>, no una recomendación por defecto.",
+          "report": {
+            "icon": "asset-ref:icon:informe-revenue-hubspot-dark-24",
+            "title": "Evaluación de encaje y arquitectura",
+            "subtitle": "HubSpot · estado actual, encaje y roadmap"
+          },
+          "sampleMark": "Datos de muestra",
+          "moduleState": {
+            "span": "--gl-ddv-span=1",
+            "kicker": "01 · Estado actual",
+            "title": "Mapa de tu operación",
+            "nodes": [
+              {
+                "text": "Ventas"
+              },
+              {
+                "text": "Servicio"
+              },
+              {
+                "text": "Marketing"
+              },
+              {
+                "text": "ERP"
+              },
+              {
+                "text": "Web"
+              },
+              {
+                "text": "Datos"
+              }
+            ],
+            "footnote": "14 integraciones · 3 sin dueño"
+          },
+          "moduleVerdict": {
+            "span": "--gl-ddv-span=1",
+            "kicker": "02 · Veredicto",
+            "title": "Encaje de la plataforma",
+            "options": [
+              {
+                "role": "rest",
+                "text": "Fit"
+              },
+              {
+                "role": "lead",
+                "text": "Fit condicionado"
+              },
+              {
+                "role": "rest",
+                "text": "No fit"
+              }
+            ],
+            "condition": "Condición: ordenar datos y consentimiento antes de automatizar"
+          },
+          "moduleRisks": {
+            "span": "--gl-ddv-span=1",
+            "kicker": "03 · Riesgos",
+            "title": "Lo que hoy frena",
+            "risks": [
+              {
+                "icon": "asset-ref:icon:warning-triangle-15",
+                "text": "Duplicados en contactos"
+              },
+              {
+                "icon": "asset-ref:icon:warning-triangle-15",
+                "text": "Workflows sin dueño"
+              },
+              {
+                "icon": "asset-ref:icon:warning-triangle-15",
+                "text": "Propiedades sin gobierno"
+              }
+            ]
+          },
+          "moduleRecord": {
+            "span": "--gl-ddv-span=1",
+            "kicker": "04 · Evidencia",
+            "title": "Registro verificable",
+            "record": "Cada hallazgo con su fuente: el portal, los datos y las entrevistas con tu equipo."
+          },
+          "moduleRoadmap": {
+            "span": "--gl-ddv-span=2",
+            "kicker": "05 · Roadmap",
+            "title": "Plan por olas",
+            "waves": [
+              {
+                "name": "Ola 1",
+                "title": "Datos y Smart CRM",
+                "kicker": "Base"
+              },
+              {
+                "name": "Ola 2",
+                "title": "Pipeline y servicio con SLA",
+                "kicker": "Primer valor"
+              },
+              {
+                "name": "Ola 3",
+                "title": "Customer Agent supervisado",
+                "kicker": "Agentes"
+              }
+            ]
+          },
+          "selection": {
+            "label": "Cliente",
+            "anchor": "bottom-end",
+            "participantKind": "role",
+            "scale": 1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "compact",
+            "overlay": "none"
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-decision-diagnosis-verdict",
+      "contentType": "deck.decision-diagnosis-verdict",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "reportLeft": "--gl-ddv-left=780px",
+          "reportTop": "--gl-ddv-top=170px",
+          "reportWidth": "--gl-ddv-width=880px",
+          "reportPadTop": "--gl-ddv-pad-top=26px",
+          "reportPadX": "--gl-ddv-pad-x=28px",
+          "reportPadBottom": "--gl-ddv-pad-bottom=24px",
+          "reportRadius": "--gl-ddv-radius=26px",
+          "reportPerspective": "--gl-ddv-perspective=2200px",
+          "reportRotateY": "--gl-ddv-rotate-y=-9deg",
+          "reportRotateX": "--gl-ddv-rotate-x=3deg",
+          "headPadBottom": "--gl-ddv-head-pad-bottom=16px",
+          "headGapBottom": "--gl-ddv-head-gap-bottom=16px",
+          "headRule": "--gl-ddv-head-rule-color=#e3e8ee",
+          "headGap": "--gl-ddv-head-gap=12px",
+          "iconBox": "--gl-ddv-icon-box=40px",
+          "iconRadius": "--gl-ddv-icon-radius=12px",
+          "iconFill": "--gl-ddv-icon-fill-color=#0b1f33",
+          "iconSize": "--gl-ddv-icon=24px",
+          "titlePx": "--gl-ddv-title-px=22px",
+          "titleTracking": "--gl-ddv-title-tracking=-0.015em",
+          "subtitlePx": "--gl-ddv-subtitle-px=13px",
+          "subtitleWeight": "--gl-ddv-subtitle-wght=400",
+          "subtitleGap": "--gl-ddv-subtitle-gap=2px",
+          "subtitleColor": "--gl-ddv-subtitle-color=#5f6b7a",
+          "markPadY": "--gl-ddv-mark-pad-y=6px",
+          "markPadX": "--gl-ddv-mark-pad-x=12px",
+          "markRadius": "--gl-ddv-mark-radius=999px",
+          "markFill": "--gl-ddv-mark-fill-color=#f5f7fa",
+          "markBorder": "--gl-ddv-mark-border=1px",
+          "markBorderColor": "--gl-ddv-mark-border-color=#e3e8ee",
+          "markPx": "--gl-ddv-mark-px=12px",
+          "markWeight": "--gl-ddv-mark-wght=600",
+          "markTracking": "--gl-ddv-mark-tracking=0.08em",
+          "markColor": "--gl-ddv-mark-color=#5f6b7a",
+          "gridGap": "--gl-ddv-grid-gap=14px",
+          "gridColumns": "--gl-ddv-grid-columns=2",
+          "modulePadY": "--gl-ddv-module-pad-y=16px",
+          "modulePadX": "--gl-ddv-module-pad-x=18px",
+          "moduleRadius": "--gl-ddv-module-radius=16px",
+          "moduleFill": "--gl-ddv-module-fill-color=#f5f7fa",
+          "moduleBorder": "--gl-ddv-module-border=1px",
+          "moduleBorderColor": "--gl-ddv-module-border-color=#e3e8ee",
+          "moduleKickerPx": "--gl-ddv-module-kicker-px=12px",
+          "moduleKickerWeight": "--gl-ddv-module-kicker-wght=600",
+          "moduleKickerTracking": "--gl-ddv-module-kicker-tracking=0.1em",
+          "moduleKickerColor": "--gl-ddv-module-kicker-color=#5f6b7a",
+          "moduleTitlePx": "--gl-ddv-module-title-px=20px",
+          "moduleTitleTracking": "--gl-ddv-module-title-tracking=-0.015em",
+          "moduleTitleGapTop": "--gl-ddv-module-title-gap-top=3px",
+          "moduleTitleGapBottom": "--gl-ddv-module-title-gap-bottom=10px",
+          "nodeGap": "--gl-ddv-node-gap=8px",
+          "nodePadY": "--gl-ddv-node-pad-y=7px",
+          "nodePadX": "--gl-ddv-node-pad-x=11px",
+          "nodeRadius": "--gl-ddv-node-radius=999px",
+          "nodeFill": "--gl-ddv-node-fill-color=#ffffff",
+          "nodeBorder": "--gl-ddv-node-border=1px",
+          "nodeBorderColor": "--gl-ddv-node-border-color=#e3e8ee",
+          "nodePx": "--gl-ddv-node-px=13px",
+          "nodeWeight": "--gl-ddv-node-wght=500",
+          "nodeDot": "--gl-ddv-node-dot=9px",
+          "nodeDotFill": "--gl-ddv-node-dot-color=#0b1f33",
+          "nodeDotGap": "--gl-ddv-node-dot-gap=7px",
+          "footnotePx": "--gl-ddv-footnote-px=12px",
+          "footnoteWeight": "--gl-ddv-footnote-wght=400",
+          "footnoteGap": "--gl-ddv-footnote-gap=10px",
+          "footnoteColor": "--gl-ddv-footnote-color=#5f6b7a",
+          "optionGap": "--gl-ddv-option-gap=8px",
+          "optionFlex": "--gl-ddv-option-flex=1",
+          "optionFlexSelected": "--gl-ddv-option-flex-selected=1.6",
+          "optionPadY": "--gl-ddv-option-pad-y=10px",
+          "optionPadX": "--gl-ddv-option-pad-x=6px",
+          "optionRadius": "--gl-ddv-option-radius=12px",
+          "optionPx": "--gl-ddv-option-px=13px",
+          "optionWeight": "--gl-ddv-option-wght=600",
+          "optionSelectedFill": "--gl-ddv-option-selected-fill-color=#0b1f33",
+          "optionSelectedInk": "--gl-ddv-option-selected-color=#ffffff",
+          "optionOtherFill": "--gl-ddv-option-other-fill-color=#ffffff",
+          "optionOtherInk": "--gl-ddv-option-other-color=#5f6b7a",
+          "optionBorder": "--gl-ddv-option-border=1px",
+          "optionBorderColor": "--gl-ddv-option-border-color=#e3e8ee",
+          "conditionPx": "--gl-ddv-condition-px=12px",
+          "conditionWeight": "--gl-ddv-condition-wght=400",
+          "conditionLeading": "--gl-ddv-condition-leading=1.4",
+          "conditionGap": "--gl-ddv-condition-gap=10px",
+          "conditionColor": "--gl-ddv-condition-color=#5f6b7a",
+          "riskGapTop": "--gl-ddv-risk-gap-top=6px",
+          "riskGap": "--gl-ddv-risk-gap=8px",
+          "riskPx": "--gl-ddv-risk-px=13px",
+          "riskWeight": "--gl-ddv-risk-wght=400",
+          "riskIcon": "--gl-ddv-risk-icon=15px",
+          "recordPx": "--gl-ddv-record-px=13px",
+          "recordWeight": "--gl-ddv-record-wght=400",
+          "recordLeading": "--gl-ddv-record-leading=1.5",
+          "waveGap": "--gl-ddv-wave-gap=10px",
+          "wavePadY": "--gl-ddv-wave-pad-y=10px",
+          "wavePadX": "--gl-ddv-wave-pad-x=12px",
+          "waveRadius": "--gl-ddv-wave-radius=12px",
+          "waveFill": "--gl-ddv-wave-fill-color=#ffffff",
+          "waveBorder": "--gl-ddv-wave-border=1px",
+          "waveBorderColor": "--gl-ddv-wave-border-color=#e3e8ee",
+          "waveNamePx": "--gl-ddv-wave-name-px=18px",
+          "waveTitlePx": "--gl-ddv-wave-title-px=13px",
+          "waveTitleWeight": "--gl-ddv-wave-title-wght=600",
+          "waveTitleLeading": "--gl-ddv-wave-title-leading=1.3",
+          "waveTitleGap": "--gl-ddv-wave-title-gap=2px",
+          "waveKickerPx": "--gl-ddv-wave-kicker-px=11px",
+          "waveKickerWeight": "--gl-ddv-wave-kicker-wght=500",
+          "waveKickerTracking": "--gl-ddv-wave-kicker-tracking=0.06em",
+          "waveKickerGap": "--gl-ddv-wave-kicker-gap=4px",
+          "waveKickerColor": "--gl-ddv-wave-kicker-color=#5f6b7a"
+        },
+        "stage": {
+          "src": "asset-ref:layer:ddv-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:ddv-platform"
+        },
+        "voice": {
+          "question": "¿Qué recibo primero?",
+          "answer": "decisión",
+          "eyebrow": "Evaluación inicial · sin costo",
+          "answerLead": "Una"
+        },
+        "body": "Una decisión informada, con <strong>evidencia</strong>, no una recomendación por defecto.",
+        "report": {
+          "icon": "asset-ref:icon:informe-revenue-hubspot-dark-24",
+          "title": "Evaluación de encaje y arquitectura",
+          "subtitle": "HubSpot · estado actual, encaje y roadmap"
+        },
+        "sampleMark": "Datos de muestra",
+        "moduleState": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "01 · Estado actual",
+          "title": "Mapa de tu operación",
+          "nodes": [
+            {
+              "text": "Ventas"
+            },
+            {
+              "text": "Servicio"
+            },
+            {
+              "text": "Marketing"
+            },
+            {
+              "text": "ERP"
+            },
+            {
+              "text": "Web"
+            },
+            {
+              "text": "Datos"
+            }
+          ],
+          "footnote": "14 integraciones · 3 sin dueño"
+        },
+        "moduleVerdict": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "02 · Veredicto",
+          "title": "Encaje de la plataforma",
+          "options": [
+            {
+              "role": "rest",
+              "text": "Fit"
+            },
+            {
+              "role": "lead",
+              "text": "Fit condicionado"
+            },
+            {
+              "role": "rest",
+              "text": "No fit"
+            }
+          ],
+          "condition": "Condición: ordenar datos y consentimiento antes de automatizar"
+        },
+        "moduleRisks": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "03 · Riesgos",
+          "title": "Lo que hoy frena",
+          "risks": [
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "Duplicados en contactos"
+            },
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "Workflows sin dueño"
+            },
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "Propiedades sin gobierno"
+            }
+          ]
+        },
+        "moduleRecord": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "04 · Evidencia",
+          "title": "Registro verificable",
+          "record": "Cada hallazgo con su fuente: el portal, los datos y las entrevistas con tu equipo."
+        },
+        "moduleRoadmap": {
+          "span": "--gl-ddv-span=2",
+          "kicker": "05 · Roadmap",
+          "title": "Plan por olas",
+          "waves": [
+            {
+              "name": "Ola 1",
+              "title": "Datos y Smart CRM",
+              "kicker": "Base"
+            },
+            {
+              "name": "Ola 2",
+              "title": "Pipeline y servicio con SLA",
+              "kicker": "Primer valor"
+            },
+            {
+              "name": "Ola 3",
+              "title": "Customer Agent supervisado",
+              "kicker": "Agentes"
+            }
+          ]
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "DecisionDiagnosisVerdict",
+      "contractHash": "58e0f802892aa96ca95fac6f3efe2da3e29b035c2ba45044f6b6e6afeaf4cd9c",
+      "templateHash": "58228403436b5b7a70e31df636488d3d3b831c58bd392167f3ad1ba7f7f8ef85"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-06",
+  "scope": "operator-local-proof",
+  "model": "gemini-nano-banana-2.1",
+  "endpoint": "Vertex global generateContent",
+  "resolution": "4K",
+  "thinking": "high",
+  "search": "off",
+  "requestedAspect": "4:5",
+  "referenceCount": 3,
+  "referenceProvenance": [
+    {
+      "source": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png",
+      "transport": ".captures/nexa-nano-2026-10-06/input/ref-1.jpg",
+      "sha256Source": "2937f1fe3d37383d2e80b74282a8543eb30e161c92c25d98717552ac8a850aa2",
+      "sha256Transport": "ebd649958883a3910e2915331a92080a2a65211e6fcec443ddc4411c1f5781a0",
+      "bytes": 3351261,
+      "operation": "JPEG quality 98, 4:4:4; no resize, crop or retouch"
+    },
+    {
+      "source": "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png",
+      "transport": "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-12-mirada-lateral.png",
+      "sha256Source": "3ad780587e358a5a16fa090e55e6f410eb78dfb6f5758ea3e7dd5ca1be1a9fa8",
+      "sha256Transport": "3ad780587e358a5a16fa090e55e6f410eb78dfb6f5758ea3e7dd5ca1be1a9fa8",
+      "bytes": 7598313,
+      "operation": "original bytes"
+    },
+    {
+      "source": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png",
+      "transport": ".captures/nexa-nano-2026-10-06/input/ref-3.jpg",
+      "sha256Source": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1",
+      "sha256Transport": "e6fd44062aaf709d9e31f506c892869957e02a0b8ca15bf6ed2d3d6531e03a99",
+      "bytes": 2900724,
+      "operation": "JPEG quality 98, 4:4:4; no resize, crop or retouch"
+    }
+  ],
+  "transportMiB": 13.209,
+  "recipe": "https://axis.efeonce.org/media/photography/recipes/palanca-fragmento-nexa.json",
+  "calibrationPlate": "ai-generations/2026-09-20_palancas-con-color/plates/F6-fragmento-nexa-color.png",
+  "calibrationSentToModel": false,
+  "preflight": [
+    "foto:doctor PASS",
+    "foto:prompt compiled every version",
+    "looked at two approved AXIS fragmento precedents, roster contact sheet, all identity references and transport face"
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "plate": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO.png",
+      "sha256": "8e7e32bbe47703d23f645c8b23caa78c622cdc9df6a2880c508fa428e665087c",
+      "ficha": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/fichas/NB21-NEXA-FRAGMENTO-v1.json",
+      "fichaSha256": "331112f550bfb27c4e5330da0c7e03b7694fc79bfb326f60ed142e99e5b7bcfc",
+      "prompt": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/prompts/NB21-NEXA-FRAGMENTO-v1.txt",
+      "promptSha256": "7e3531897c32d00c0e40c5b0e6a735be57bc818cd2372a0f848a32272055346a",
+      "width": 3712,
+      "height": 4608,
+      "latencyMs": 65080,
+      "usage": {
+        "promptTokenCount": 4909,
+        "candidatesTokenCount": 3894,
+        "totalTokenCount": 12721,
+        "trafficType": "ON_DEMAND",
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 1549
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 114
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3780
+          }
+        ],
+        "thoughtsTokenCount": 3918
+      },
+      "nominalOutputImageUsd": 0.0756,
+      "validator": "\n> vuexy-mui-nextjs-admin-template@5.0.1 foto:validar /Users/jreye/Documents/greenhouse-eo\n> node scripts/foto/validar-reservas.mjs ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO.png\n\nNB21-NEXA-FRAGMENTO.png  3712×4608  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.00 · oscura 0.00 del alto                  —\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 4.98 · navy 1.66 · nitidez 0.0012 (frágil)   ✓\n  color · sombras no azules               b* del cuartil oscuro -5.8 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.54 / 0.80                          ✓\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  3/4 reservas cumplidas\n ELIFECYCLE  Command failed with exit code 1.\n",
+      "fullValidatorExitCode": 1
+    },
+    {
+      "version": 2,
+      "plate": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO-v2.png",
+      "sha256": "e25fcb810853e32ab4b7495c8ed2c028fea9f2103b80294d433662210024adfc",
+      "ficha": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/fichas/NB21-NEXA-FRAGMENTO-v2.json",
+      "fichaSha256": "8ea8394e91be93177fc68a4f2f426d1ab81704820dab26e0cbf9a6bdb969a055",
+      "prompt": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/prompts/NB21-NEXA-FRAGMENTO-v2.txt",
+      "promptSha256": "2105942a4a09645e98f83b82b3b3502fe58fb34e7fef6ccf762c77ba24dd66a4",
+      "width": 3712,
+      "height": 4608,
+      "latencyMs": 85781,
+      "usage": {
+        "promptTokenCount": 5054,
+        "candidatesTokenCount": 3780,
+        "totalTokenCount": 13471,
+        "trafficType": "ON_DEMAND",
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1694
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3780
+          }
+        ],
+        "thoughtsTokenCount": 4637
+      },
+      "nominalOutputImageUsd": 0.0756,
+      "validator": "\n> vuexy-mui-nextjs-admin-template@5.0.1 foto:validar /Users/jreye/Documents/greenhouse-eo\n> node scripts/foto/validar-reservas.mjs ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO-v2.png\n\nNB21-NEXA-FRAGMENTO-v2.png  3712×4608  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.00 · oscura 0.00 del alto                  —\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 2.05 · navy 1.72 · nitidez 0.0019 (frágil)   ✗\n  color · sombras no azules               b* del cuartil oscuro -3.8 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.44 / 0.47                          ✓\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  2/4 reservas cumplidas\n ELIFECYCLE  Command failed with exit code 1.\n",
+      "fullValidatorExitCode": 1
+    },
+    {
+      "version": 3,
+      "plate": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO-v3.png",
+      "sha256": "404ad5c8b5e5a689e22bd9f72d1a65742174b00915af864512ba8deb19ae8094",
+      "ficha": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/fichas/NB21-NEXA-FRAGMENTO-v3.json",
+      "fichaSha256": "e1b817735f7899ce8c6f256b5f101a844c0585cbba033c1a693eb916ed27a9c4",
+      "prompt": "ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/prompts/NB21-NEXA-FRAGMENTO-v3.txt",
+      "promptSha256": "25e15abae529e1107e0b11fa049ff3ab2ebc1792d442c8b48dca7bbf3e172f30",
+      "width": 3712,
+      "height": 4608,
+      "latencyMs": 84396,
+      "usage": {
+        "promptTokenCount": 5237,
+        "candidatesTokenCount": 3780,
+        "totalTokenCount": 13868,
+        "trafficType": "ON_DEMAND",
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 1877
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3780
+          }
+        ],
+        "thoughtsTokenCount": 4851
+      },
+      "nominalOutputImageUsd": 0.0756,
+      "validator": "\n> vuexy-mui-nextjs-admin-template@5.0.1 foto:validar /Users/jreye/Documents/greenhouse-eo\n> node scripts/foto/validar-reservas.mjs ai-generations/2026-10-06_nexa-fragmento-nano-banana-21/plates/NB21-NEXA-FRAGMENTO-v3.png\n\nNB21-NEXA-FRAGMENTO-v3.png  3712×4608  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.00 · oscura 0.00 del alto                  —\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 5.42 · navy 1.73 · nitidez 0.0015 (frágil)   ✓\n  color · sombras no azules               b* del cuartil oscuro -3.8 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.61 / 0.38                          ✓\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  3/4 reservas cumplidas\n ELIFECYCLE  Command failed with exit code 1.\n",
+      "fullValidatorExitCode": 1
+    }
+  ],
+  "outputOperations": "native PNG bytes retained; no crop, resize, upscale, retouch or grade; extracts in .captures only for inspection",
+  "selectedVersion": 3,
+  "approval": "not-approved",
+  "visualReview": {
+    "realism": "Convincing skin, lip texture, small irregularities and individual hair strands; pore/shine slightly more polished than the Sunburst precedent.",
+    "identity": "Visually coherent with current frontal anchor; half-face cannot establish full face proportion metrics.",
+    "fragmento": "One eye visible in V2/V3, but model introduced a vertical foreground obstruction on the right despite explicit prohibition in V3. Not a pure crop at the frame edge.",
+    "accent": "V1 rectangular label too prominent; V2 restrained; V3 marker/bokeh enlarged again.",
+    "signatureBed": "V3 white contrast 5.42:1; no signature composited for this raw model proof.",
+    "fullValidator": "V3 3/4; field at margin FAIL. No headline/collaborative reservations declared. Full gate not claimed PASS.",
+    "comparison": "Historical Sunburst F6 has cleaner edge crop and more candid quality; Nano gives higher native resolution and convincing close-up material. Current identity references and compiled blocks differ, so not a controlled A/B."
+  },
+  "cost": "Three nominal visual outputs total USD 0.2268; input/thinking additional, not total billed cost.",
+  "externalActions": "None; no publishing, source bank changes, commit, push, runtime or default changes."
+}

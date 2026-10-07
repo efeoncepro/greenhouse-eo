@@ -1,7 +1,7 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.10 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-03 por Claude (1.11: el cine pasa a valer en superficies de producto — caso 6, alcance `producto`, [delta 2026-10-03](#delta-2026-10-03--el-cine-también-vale-en-superficies-de-producto). 1.10: el escenario del login de Greenhouse — excepción del operador para cine con una persona de casting en uniforme en una superficie de producto, y el alcance que falta; [delta 2026-10-02 (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse). 1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.12 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-10-06 por Codex (1.12: prueba portable Nexa con Nano Banana 2.1 y comparación visual acotada con Sunburst; no incorpora una receta aprobada ni cambia el motor por defecto. 1.11: el cine pasa a valer en superficies de producto — caso 6, alcance `producto`, [delta 2026-10-03](#delta-2026-10-03--el-cine-también-vale-en-superficies-de-producto). 1.10: el escenario del login de Greenhouse — excepción del operador para cine con una persona de casting en uniforme en una superficie de producto, y el alcance que falta; [delta 2026-10-02 (c)](#delta-2026-10-02-c--el-escenario-del-login-de-greenhouse). 1.9: siete decisiones del operador tras la prueba ciega — aros dorados, destacado «Agents», escala vertical, mirada en la sección partida, vestuario, luces prácticas y una sección partida por deck; [delta 2026-10-02 (b)](#delta-2026-10-02-b--decisiones-del-operador-tras-la-prueba-ciega). 1.8: [§7.1](#71-nexa) y la [plantilla de §12](#12-plantilla-de-ficha-comentada) alineadas con el kit del traje: traje y lentes por catálogo con `"registro": "cine"` y una `expresion` declarada; las descripciones a mano quedan marcadas como superadas. 1.7: la escena con Sparks que sí se siente cine, NX7d, aprobada por el operador, y la receta de lo que la hizo funcionar frente a las dos que no; [delta 2026-10-02](#delta-2026-10-02--nexa-despliega-a-su-squad-qué-hace-cine-una-escena-con-sparks). Antes, 1.6: los mini robots agentes de §8 pasan a ser los **Sparks** del kit, declarados por catálogo, con su escala y la puesta en escena; [delta 2026-10-01 (b)](#delta-2026-10-01-b--los-sparks-reemplazan-a-los-mini-robots-agentes). Antes, 1.5: el registro cine con Nexa protagonista, aprobado en las portadas de perfil social y los destacados de Instagram de Efeonce; quinto caso de §2, [delta 2026-10-01](#delta-2026-10-01--registro-cine-con-nexa-en-portadas-sociales-y-destacados-de-instagram). Antes, 2026-09-30: delta `WB1c`. Antes, 2026-09-28, 1.4: la portada de Creative Services pasa a su plate propio `CR4`,
 > «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
 > [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
@@ -35,6 +35,26 @@ Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en 
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
 
 ---
+
+## Delta 2026-10-06 — prueba portable con Nano Banana 2.1
+
+**[medido]** El operador pidió probar Nexa en cine con Nano Banana 2.1 y esfuerzo máximo. La ficha
+`NB21-NEXA-CINE` partió de `NX7d`, conservó los campos cine y se compiló con `pnpm foto:prompt`; el prompt y sus ocho
+referencias ordenadas se ejecutaron por `pnpm ai:nano` con `gemini-nano-banana-2.1`, `4K`, `16:9` y `thinking high`.
+El plate V2 nativo mide **5504×3072**, pasó `foto:validar:cine` y las cuatro reservas de `foto:validar`
+(lecho para tinta blanca **5,32:1**). `cine-reviewer`: **APROBABLE**; aprobación del operador e incorporación a una
+receta o al banco AXIS pendientes. Corrida local: `ai-generations/2026-10-06_nexa-nano-banana-21/`.
+
+**[criterio visual, acotado a estas imágenes]** Frente al `NX7d` aprobado de Sunburst (1792×1024), se prefirió
+Sunburst para esta escena por naturalidad de pose, luz e integración física de los Sparks. Nano conservó bien rostro
+y kit, entregó mayor resolución nativa y mejores reservas para composición. **No fue un A/B controlado**: cambiaron
+expresión, referencias de identidad y frases de escena. Los gates aprobados prueban reservas y revisión técnica;
+no prueban superioridad artística ni establecen un ranking de modelos.
+
+El estilo es portable: **ficha y compilador primero, motor elegido explícitamente después, mismos gates al final**.
+`foto:generar` conserva su ruta habitual; `pnpm ai:image` y su default OpenAI no se modificaron. Procedimiento,
+iteración y límites: [casebook](EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable).
+Evidencia central: [informe comparativo](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md).
 
 ## Delta 2026-10-03 — el cine también vale en superficies de producto
 

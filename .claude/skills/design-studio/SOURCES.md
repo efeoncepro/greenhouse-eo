@@ -54,7 +54,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
 | GPT Image 2 / 2.5 (Sunburst, Flare) | OpenAI directo (`pnpm ai:image`) | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. 2.5 sin Batch; costo estimable por fórmula oficial y rate limits publicados (iguales a GPT Image 2). |
-| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado 2026-09-16: **Nano Banana 2** (`gemini-3.1-flash-image`) es el default del provider `google-gemini-image` del producto; **Nano Banana Pro** (`gemini-3-pro-image`) está disponible en nuestro Vertex (`models.get`, location `global`) pero **ninguna superficie lo usa**; no hay CLI de Gemini Image. Gemini Omni **1.1 video** se opera con `pnpm ai:omni` directo a Cloud (2026-09-24). |
+| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado CLI 2026-10-06: **Nano Banana 2.1** (`gemini-nano-banana-2.1`) se opera con `pnpm ai:nano`, Google Cloud/Vertex `global`; [manual](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md). **Nano Banana 2** (`gemini-3.1-flash-image`) conserva el default del provider `google-gemini-image` del producto; la nueva CLI no lo migra. **Nano Banana Pro** (`gemini-3-pro-image`) figuraba disponible en Vertex en la revisión 2026-09-16, sin superficie ni CLI propia; no se refrescó en esta prueba. Gemini Omni **1.1 video** se opera con `pnpm ai:omni` directo a Cloud (2026-09-24). |
 | Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v); USD/s por resolución base 0,05 · 0,10 · **0,20 a 1080p (default)**, Prime 0,068 · 0,14 · 0,28; 30 fps. Los 6 verificados en real 2026-09-16. Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
 | Kling 3 · Grok Imagine | Fal (evaluado, **no conectado**) | Revisión de catálogo/OpenAPI 2026-09-16, sin corridas: Kling O3 0,14 USD/s (4k 0,42/s; multi-shot, elements con voz, motion-control, 4K); Grok Imagine video v1.5 0,01/s (#10 OpenArt), imagen v2.0 (#4 OpenArt). Conectarlos es decisión del operador. |
 | Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): registro finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s; **publicado por BFL/fal: final 0,17 (720p) / 0,29 (1080p), draft 0,06, extend 0,41** → confirmar con `pnpm ai:fal --balance`. Ruta directa BFL sin evaluar. |
@@ -63,7 +63,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 datos; `fallback` → Fal sólo con slug/schema verificados y salida normalizada. Registrar fecha, resolución,
 duración, reintentos y costo efectivo por output.
 
-## Matriz de disponibilidad real en Greenhouse (as-of 2026-09-24 para Omni; otras filas 2026-09-16)
+## Matriz de disponibilidad real en Greenhouse (Nano CLI: 2026-10-06; Omni: 2026-09-24; otras filas: 2026-09-16)
 
 Guía canónica de qué modelo elegir, cuándo y cómo: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Esta matriz separa lo que **se puede
 producir hoy** de lo que sólo está evaluado; la tabla de "Fuentes base" de abajo es un mapa de fortalezas, no de
@@ -71,7 +71,7 @@ disponibilidad.
 
 | Estado | Imagen | Video |
 |---|---|---|
-| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
+| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:nano`: Nano Banana 2.1 directo global, 4K/high con ocho refs verificado en Nexa cine; default OpenAI intacto. `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
 | **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (con sesión desde 2026-09-24; SVG real **sin corrida**; estado en `higgsfield-provider`) | Veo 3.1 (Vertex) |
 | **Evaluado, no conectado** | Grok Imagine imagen v2.0, Qwen Image 3, Flux.2 Pro, Kling imagen O3, Recraft por fal (23 endpoints) | Kling 3 (O3/V3), Grok Imagine video, Wan 2.7 (edición), HappyHorse 1.1, PixVerse V6 |
 | **Workbench watch** | Midjourney, Ideogram, Adobe Firefly, Magnific (upscale) | Higgsfield (Seedance 2.5 `omni_reference`, Kling, Soul ID), Runway |
@@ -158,6 +158,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 
 | Modelo | Fuerte en | Débil en | Cuándo usarlo |
 |---|---|---|---|
+| **Nano Banana 2.1** (Google Cloud/Vertex, operador local 2026-10-06) | multirreferencia, 4K nativo solicitado y thinking high verificados en Nexa | comparación cine sólo de dos imágenes; no ranking del motor ni paridad de todos los endpoints | `pnpm ai:nano`; estilo por `foto:prompt`; gates y criterio visual; guía canónica §10.1 |
 | **Gemini 2.5 Flash Image** (Vertex) | contexto, multirreferencia, generación/edición conversacional | texto final exacto sigue fuera del raster | ruta Google core; directo por GCP |
 | **Gemini 3.1 Flash Image** (Vertex) | contexto/multirreferencia, core estratégico | base GA; 4K/video-input pueden ser preview | directo GCP; eval antes de production approval |
 | **Gemini 3 Pro Image** (Vertex) | acabado premium/edición razonada | mayor costo/latencia | specialist directo GCP |

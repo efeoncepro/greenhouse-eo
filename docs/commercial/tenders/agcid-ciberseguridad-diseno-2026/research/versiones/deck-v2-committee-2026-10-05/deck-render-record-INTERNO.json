@@ -1,0 +1,61 @@
+{
+  "schema": "efeonce.tender-workshop-render.v1",
+  "process": "1606-32-LE26",
+  "revision": 2,
+  "createdAt": "2026-10-05T17:40:22.136615+00:00",
+  "audience": "client_facing",
+  "status": "composed_for_review",
+  "catalog": "deck-axis",
+  "pageCount": 24,
+  "format": "16:9",
+  "pdf": {
+    "filename": "AGCID-1606-32-LE26.pdf",
+    "bytes": 8549412,
+    "sha256": "9fae3df251f819222c7250f2d8130a086bb8e10ce182dc262e9520c4c168539d"
+  },
+  "sourceFiles": [
+    "deck-plan.json",
+    "deck-outline.md"
+  ],
+  "sourceHashes": {
+    "deck-plan.json": "db2567d1397c082e8ced16985d56e93f20152961d67c54b9e1dbbb41f0905b0a"
+  },
+  "composerManifestSha256": "840aba43a2a0169fe7ada848def9c57e241c79a0a00a1c2b50a6c1a101d05ccb",
+  "checks": {
+    "slotValidation": "PASS",
+    "semanticValidators": "PASS",
+    "nativeRender": "PASS — 24 PNG + merged PDF",
+    "pdfReadback": "PASS — 24 pages; approved price, exact net breakdown, required formats and source labels; no placeholders or discarded price",
+    "priceArithmetic": "PASS — Decimal sum, tax total and 30 × unit price",
+    "visualReview": "All 24 frames inspected on contact sheets; web, timeline, evidence and price inspected full size. Financial subheads shortened after visual review. Final frames reviewed before publication.",
+    "fileSize": "8.15 MiB; composer default 20 MiB, not a verified portal limit"
+  },
+  "editorialDecision": {
+    "audience": "committee reads without a presenter",
+    "headlineRule": "complete claims, supported by specific scope, process or evidence",
+    "previousVersion": "research/versiones/deck-v1-graphic-line-2026-10-05",
+    "removed": [
+      "question plus isolated answer word",
+      "generic cinematic photographs",
+      "illustrative metric chart",
+      "repetitive section separators"
+    ],
+    "selectionExceptions": "Existing PricingFull implies alternative offers and TeamSplit requires unconfirmed dedication; both deliberately omitted rather than fabricate content."
+  },
+  "sources": {
+    "requirements": "Original buyer Resolutions 263/287; oferta-tecnica.md; propuesta-metodologica.md",
+    "price": "Julio approval EUR 12000 total incl IVA; signed Anexo 5",
+    "samples": "Berel report cover; GORE p.8; Bresler web portfolio p.16; full curated dossier remains attached",
+    "logo": "Original embedded logo Resolution 263 p.1"
+  },
+  "proposalStudio": {
+    "status": "workshop_only",
+    "proposalId": null,
+    "renderJobId": null
+  },
+  "submission": {
+    "submitted": false,
+    "receipt": null
+  },
+  "oneDriveReadback": null
+}

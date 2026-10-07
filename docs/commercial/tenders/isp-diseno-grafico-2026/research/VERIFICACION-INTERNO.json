@@ -1,0 +1,66 @@
+{
+  "process": "813-655-COT26",
+  "asOf": "2026-10-05",
+  "status": "review_documents_prepared",
+  "priceApproved": false,
+  "submitted": false,
+  "pdfs": [
+    {
+      "file": "Pricing y caja ISP - INTERNO.pdf",
+      "pages": 3,
+      "bytes": 282964,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "02 Cotización detallada ISP.pdf",
+      "pages": 3,
+      "bytes": 282051,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "04 Dossier de muestras SKY.pdf",
+      "pages": 3,
+      "bytes": 2731149,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "01 Propuesta técnica ISP.pdf",
+      "pages": 5,
+      "bytes": 289170,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "Requisitos ISP - INTERNO.pdf",
+      "pages": 3,
+      "bytes": 282192,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "Campos para postular ISP - INTERNO.pdf",
+      "pages": 1,
+      "bytes": 268754,
+      "text_and_size": "pass"
+    },
+    {
+      "file": "03 Plan de trabajo ISP.pdf",
+      "pages": 2,
+      "bytes": 279366,
+      "text_and_size": "pass"
+    }
+  ],
+  "net": 4000000,
+  "vat": 760000,
+  "total": 4760000,
+  "milestonesNet": [
+    1200000,
+    1200000,
+    1600000
+  ],
+  "portalDetailCharacters": 220,
+  "officialOriginalUnmodified": true,
+  "internalAudienceSeparated": true,
+  "syncedOfficeContentsEqual": true,
+  "canonicalGate": "BLOCK workshop_only; no source deck plan, no governed render/portal verification",
+  "studioPreflight": "owner Efeonce and ISP client resolved read-only; no registration or GO executed",
+  "officialUrl": "https://compra-agil.mercadopublico.cl/resumen-cotizacion/813-655-COT26"
+}

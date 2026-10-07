@@ -1,0 +1,235 @@
+{
+  "tenderId": "hs-B23-seguridad-z1",
+  "slides": [
+    {
+      "slideId": "deck-decision-difference",
+      "contentType": "deck.decision-difference",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 280,
+          "answerPx": 120,
+          "bodyTop": 640,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-df-question-width=470px",
+          "answerLeading": "--gl-df-answer-leading=0.9",
+          "answerTracking": "--gl-df-answer-tracking=-0.05em",
+          "answerInset": "--gl-df-answer-inset=-8px",
+          "answerShadowY": "--gl-df-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-df-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-df-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-df-answer-shadow-color=#000000",
+          "perspective": "--gl-df-perspective=1600px",
+          "altLeft": "--gl-df-alt-left=790px",
+          "altTop": "--gl-df-alt-top=210px",
+          "altWidth": "--gl-df-alt-width=470px",
+          "altPadTop": "--gl-df-alt-pad-top=26px",
+          "altPadX": "--gl-df-alt-pad-x=26px",
+          "altPadBottom": "--gl-df-alt-pad-bottom=22px",
+          "altRadius": "--gl-df-alt-radius=24px",
+          "altRotate": "--gl-df-alt-rotate=14deg",
+          "altOrigin": "--gl-df-alt-origin=100%",
+          "altOpacity": "--gl-df-alt-opacity=88%",
+          "altBorder": "--gl-df-alt-border=1px",
+          "altBorderColor": "--gl-df-alt-border-color=#ffffff",
+          "altBorderOpacity": "--gl-df-alt-border-opacity=16%",
+          "altGlowBlur": "--gl-df-alt-glow-blur=30px",
+          "altGlowOpacity": "--gl-df-alt-glow-opacity=8%",
+          "altKickerColor": "--gl-df-alt-kicker-color=#9fb3c8",
+          "altTitlePx": "--gl-df-alt-title-px=32px",
+          "altTitleColor": "--gl-df-alt-title-color=#e6edf3",
+          "altRowPx": "--gl-df-alt-row-px=16px",
+          "altRowWeight": "--gl-df-alt-row-weight=400",
+          "altRowLeading": "--gl-df-alt-row-leading=1.35",
+          "altRowPadY": "--gl-df-alt-row-pad-y=12px",
+          "altRowColor": "--gl-df-alt-row-color=#9fb3c8",
+          "altRuleWidth": "--gl-df-alt-rule=1.5px",
+          "altRuleColor": "--gl-df-alt-rule-color=#ffffff",
+          "altRuleOpacity": "--gl-df-alt-rule-opacity=10%",
+          "altMarkPx": "--gl-df-alt-mark-px=20px",
+          "altFillFrom": "--gl-df-alt-fill-from-color=#12344f",
+          "altFillTo": "--gl-df-alt-fill-to-color=#081c30",
+          "altAngle": "--gl-df-alt-angle=165deg",
+          "altStrikeColor": "--gl-df-alt-strike-color=#9fb3c8",
+          "altStrikeOpacity": "--gl-df-alt-strike-opacity=55%",
+          "efLeft": "--gl-df-ef-left=1290px",
+          "efTop": "--gl-df-ef-top=170px",
+          "efWidth": "--gl-df-ef-width=520px",
+          "efPadTop": "--gl-df-ef-pad-top=30px",
+          "efPadX": "--gl-df-ef-pad-x=30px",
+          "efPadBottom": "--gl-df-ef-pad-bottom=26px",
+          "efRadius": "--gl-df-ef-radius=24px",
+          "efRotate": "--gl-df-ef-rotate=-6deg",
+          "efOrigin": "--gl-df-ef-origin=0%",
+          "efOpacity": "--gl-df-ef-opacity=100%",
+          "efBorder": "--gl-df-ef-border=2px",
+          "efBorderColor": "--gl-df-ef-border-color=#72ded8",
+          "efBorderOpacity": "--gl-df-ef-border-opacity=90%",
+          "efGlowBlur": "--gl-df-ef-glow-blur=110px",
+          "efGlowOpacity": "--gl-df-ef-glow-opacity=40%",
+          "efKickerColor": "--gl-df-ef-kicker-color=#0e8c82",
+          "efTitlePx": "--gl-df-ef-title-px=38px",
+          "efTitleColor": "--gl-df-ef-title-color=#0b1f33",
+          "efRowPx": "--gl-df-ef-row-px=18px",
+          "efRowWeight": "--gl-df-ef-row-weight=500",
+          "efRowLeading": "--gl-df-ef-row-leading=1.35",
+          "efRowPadY": "--gl-df-ef-row-pad-y=13px",
+          "efRowColor": "--gl-df-ef-row-color=#0b1f33",
+          "efRuleWidth": "--gl-df-ef-rule=1.5px",
+          "efRuleColor": "--gl-df-ef-rule-color=#e3e8ee",
+          "efRuleOpacity": "--gl-df-ef-rule-opacity=100%",
+          "efMarkPx": "--gl-df-ef-mark-px=22px",
+          "efFillFrom": "--gl-df-ef-fill-from-color=#ffffff",
+          "efFillTo": "--gl-df-ef-fill-to-color=#ffffff",
+          "efAngle": "--gl-df-ef-angle=0deg",
+          "shadowY": "--gl-df-shadow-y=50px",
+          "shadowBlur": "--gl-df-shadow-blur=110px",
+          "shadowColor": "--gl-df-shadow-color=#000610",
+          "shadowOpacity": "--gl-df-shadow-opacity=70%",
+          "haloColor": "--gl-df-halo-color=#72ded8",
+          "kickerPx": "--gl-df-kicker-px=14px",
+          "kickerWeight": "--gl-df-kicker-weight=600",
+          "kickerTracking": "--gl-df-kicker-tracking=0.12em",
+          "titleLeading": "--gl-df-title-leading=1",
+          "titleTracking": "--gl-df-title-tracking=-0.03em",
+          "titleGapTop": "--gl-df-title-gap-top=6px",
+          "titleGapBottom": "--gl-df-title-gap-bottom=16px",
+          "rowGap": "--gl-df-row-gap=12px",
+          "vsLeft": "--gl-df-vs-left=1238px",
+          "vsTop": "--gl-df-vs-top=470px",
+          "vsSize": "--gl-df-vs-size=64px",
+          "vsFill": "--gl-df-vs-fill-color=#001a33",
+          "vsRing": "--gl-df-vs-ring=2px",
+          "vsRingColor": "--gl-df-vs-ring-color=#72ded8",
+          "vsGlowBlur": "--gl-df-vs-glow-blur=40px",
+          "vsGlowOpacity": "--gl-df-vs-glow-opacity=50%",
+          "vsTextPx": "--gl-df-vs-text-px=22px",
+          "vsTextColor": "--gl-df-vs-text-color=#ffffff",
+          "ownLeft": "--gl-df-own-left=790px",
+          "ownTop": "--gl-df-own-top=858px",
+          "ownWidth": "--gl-df-own-width=1020px",
+          "ownPadY": "--gl-df-own-pad-y=18px",
+          "ownPadX": "--gl-df-own-pad-x=24px",
+          "ownRadius": "--gl-df-own-radius=18px",
+          "ownGap": "--gl-df-own-gap=26px",
+          "ownAngle": "--gl-df-own-angle=160deg",
+          "ownFillFrom": "--gl-df-own-fill-from-color=#0e2a44",
+          "ownFillTo": "--gl-df-own-fill-to-color=#081c30",
+          "ownBorder": "--gl-df-own-border=1px",
+          "ownBorderColor": "--gl-df-own-border-color=#ffffff",
+          "ownBorderOpacity": "--gl-df-own-border-opacity=16%",
+          "ownShadowY": "--gl-df-own-shadow-y=30px",
+          "ownShadowBlur": "--gl-df-own-shadow-blur=70px",
+          "ownShadowColor": "--gl-df-own-shadow-color=#000610",
+          "ownShadowOpacity": "--gl-df-own-shadow-opacity=55%",
+          "ownKickerPx": "--gl-df-own-kicker-px=13px",
+          "ownKickerWeight": "--gl-df-own-kicker-weight=600",
+          "ownKickerTracking": "--gl-df-own-kicker-tracking=0.12em",
+          "ownKickerColor": "--gl-df-own-kicker-color=#72ded8",
+          "ownTitlePx": "--gl-df-own-title-px=26px",
+          "ownTitleTracking": "--gl-df-own-title-tracking=-0.02em",
+          "ownTitleGap": "--gl-df-own-title-gap=4px",
+          "pillarRule": "--gl-df-pillar-rule=1px",
+          "pillarRuleColor": "--gl-df-pillar-rule-color=#ffffff",
+          "pillarRuleOpacity": "--gl-df-pillar-rule-opacity=14%",
+          "pillarPadStart": "--gl-df-pillar-pad-start=18px",
+          "pillarTitlePx": "--gl-df-pillar-title-px=18px",
+          "pillarTitleWeight": "--gl-df-pillar-title-weight=600",
+          "pillarDescPx": "--gl-df-pillar-desc-px=14px",
+          "pillarDescWeight": "--gl-df-pillar-desc-weight=400",
+          "pillarDescLeading": "--gl-df-pillar-desc-leading=1.35",
+          "pillarDescGap": "--gl-df-pillar-desc-gap=3px",
+          "pillarDescColor": "--gl-df-pillar-desc-color=#c9d6e2",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:decision-difference-stage"
+        },
+        "voice": {
+          "question": "¿Quién ve mis datos?",
+          "answer": "debe",
+          "eyebrow": "Seguridad y accesos",
+          "answerLead": "Sólo quien"
+        },
+        "body": "HubSpot tiene SOC 2 Tipo II y SOC 3. Nosotros dejamos sus controles <strong>encendidos</strong> y documentados antes del go-live.",
+        "alternative": {
+          "kicker": "HubSpot recién creado",
+          "title": "Controles por configurar"
+        },
+        "alternativeRows": [
+          {
+            "mark": "asset-ref:layer:decision-difference-cross",
+            "text": "Usuarios creados a mano, uno por uno"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-cross",
+            "text": "Todos ven todos los registros"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-cross",
+            "text": "Datos sensibles en cualquier campo"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-cross",
+            "text": "La IA de HubSpot entrena con tus datos"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-cross",
+            "text": "Cambios directo en producción"
+          }
+        ],
+        "efeonce": {
+          "kicker": "HubSpot que entregamos",
+          "title": "Controles encendidos"
+        },
+        "efeonceRows": [
+          {
+            "mark": "asset-ref:layer:decision-difference-check",
+            "text": "SSO y altas desde tu directorio, con SCIM"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-check",
+            "text": "Permisos por equipo y rol, documentados"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-check",
+            "text": "Datos sensibles cifrados, en Enterprise"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-check",
+            "text": "Entrenamiento de IA apagado desde el día uno"
+          },
+          {
+            "mark": "asset-ref:layer:decision-difference-check",
+            "text": "Sandbox, pruebas e historial de cada cambio"
+          }
+        ],
+        "versus": "vs",
+        "ownTeam": {
+          "kicker": "¿Y mi equipo de TI?",
+          "title": "Decide con nosotros"
+        },
+        "pillars": [
+          {
+            "title": "Identidad",
+            "description": "SSO y altas desde tu directorio"
+          },
+          {
+            "title": "Arquitectura",
+            "description": "Integraciones con dueño y registro"
+          },
+          {
+            "title": "Auditoría",
+            "description": "Accesos y cambios a la vista"
+          }
+        ]
+      },
+      "template": "DecisionDifference"
+    }
+  ]
+}

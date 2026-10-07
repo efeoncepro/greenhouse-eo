@@ -2,6 +2,14 @@
 
 El ciclo de una oportunidad, del ruido del portal a un GO defendible. Aplica a público y privado (los estados son los mismos; cambian las fuentes y los plazos).
 
+## Aplicación Efeonce / Factory — decisión del operador 2026-10-05
+
+Priorizar selección y preparación de propuestas por **fit**. Las horas libres del equipo no fijan un cupo de
+propuestas. Preparar no compromete producción; el GO para una oferta vinculante exige admisibilidad, forma de
+ejecución, proveedores, escenarios de adjudicación simultánea, costo completo, margen y caja. Esta precisión
+no elimina las puertas de este companion. Factory = On-Demand; Efeonce = servicio mensual/continuo. Los pagos
+por cuotas/hitos no determinan engagement. Canon: `docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md`.
+
 ## Lifecycle canónico (7 estados)
 
 Alinea con el modelo del módulo RESEARCH-007. Cada estado tiene una pregunta y una salida.

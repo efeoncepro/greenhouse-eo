@@ -1,0 +1,325 @@
+{
+  "schema": "axis.surface-composition.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "resolved",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "close",
+  "recipe": {
+    "id": "close-proposal",
+    "status": "approved",
+    "role": "close"
+  },
+  "use": "proposal",
+  "layout": null,
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "palette": {
+    "background": "#001a33",
+    "accent": "#e86bd0",
+    "ink": "#ffffff",
+    "soft": "#e2e2e2",
+    "text": "#E6EDF3",
+    "rule": "#1D3A57"
+  },
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px",
+    "format": "16x9"
+  },
+  "safeArea": {
+    "marginOfWidth": 0.07291666666666667,
+    "marginPx": 140
+  },
+  "reserves": [
+    {
+      "band": "logo",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTop": 0.213
+    },
+    {
+      "band": "slogan",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTop": 0.3889
+    },
+    {
+      "band": "contact",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTop": 0.5556
+    }
+  ],
+  "type": {
+    "slogan": {
+      "family": "Poppins",
+      "weight": 800,
+      "px": 72,
+      "lineHeight": 1.15,
+      "tracking": null,
+      "uppercase": false,
+      "color": "#e2e2e2"
+    }
+  },
+  "dominance": null,
+  "steps": null,
+  "signature": {
+    "mode": "logo",
+    "logoOnly": [
+      "cover",
+      "close",
+      "brand-is-subject"
+    ],
+    "photoSlideLogo": false,
+    "anchor": "top-start",
+    "widthPx": 500,
+    "urlBubble": {
+      "form": "baked",
+      "insetOfWidth": 0.0729,
+      "bottomOfHeight": 0.0796,
+      "heightPx": 30,
+      "assetId": "url-bubble-baked-dark"
+    },
+    "urlBubbleAlign": "social-row",
+    "assetId": "efeonce-logo-negative",
+    "alt": "Efeonce",
+    "minContrast": 4.5,
+    "orbitDelegate": "surface-owned"
+  },
+  "timeline": null,
+  "rules": [
+    {
+      "id": "efeonce-dark-ground",
+      "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+    },
+    {
+      "id": "one-sphere-per-piece",
+      "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+    },
+    {
+      "id": "one-orbit-per-piece",
+      "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+    },
+    {
+      "id": "accent-text-min-size",
+      "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+    },
+    {
+      "id": "timings-from-tokens",
+      "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+    },
+    {
+      "id": "answer-dominates-3x",
+      "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+    },
+    {
+      "id": "figures-with-source",
+      "text": "Cifras sólo con fuente; precios siempre como marcador."
+    },
+    {
+      "id": "isotype-composed",
+      "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+    },
+    {
+      "id": "cine-only-nexa-or-proposal",
+      "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+    },
+    {
+      "id": "no-close-gaze-pairs",
+      "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+    },
+    {
+      "id": "semantic-reserves-only",
+      "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+    },
+    {
+      "id": "photo-slide-no-logo",
+      "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+    },
+    {
+      "id": "url-bubble-in-footer",
+      "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+    },
+    {
+      "id": "selection-one-thing-per-slide",
+      "text": "La selección toma una sola cosa por lámina."
+    },
+    {
+      "id": "third-party-logos-one-tone-same-ink",
+      "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+    },
+    {
+      "id": "close-message-by-use",
+      "text": "El mensaje de la contraportada depende del documento: en la propuesta comercial es el eslogan «Empower your Growth», grande y protagonista en sus pesos oficiales (la propuesta llega después de conversar: «¿Conversamos?» no aplica); en el brochure es «¿Conversamos? Cuando quieras.» en la voz pregunta–respuesta, con el eslogan como firma debajo (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-bound-to-use",
+      "text": "Las portadas y contraportadas de brochure y de propuesta no se cruzan: cada una admite sólo su uso, porque el cliente (sólo en la propuesta), la foto y el mensaje del cierre dependen del documento (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-photo-alternates",
+      "text": "Portada y contraportada alternan foto y sin foto: si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. Vale para el brochure y para la propuesta comercial (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-logo-min-screen",
+      "text": "El logo de portada y contraportada mide 500 px en 1920 (480 en la portada de propuesta al amanecer): así se lee a efeonceGraphicLine.logo.minScreenPx (96 px) o más en un teléfono de 390 px, que pide 473 px o más en 1920. Los 230 y 220 px de las recetas clásicas no llegan (operador, 2026-09-27)."
+    },
+    {
+      "id": "photo-reserves-start-45",
+      "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+    },
+    {
+      "id": "text-clears-orbit-and-subject",
+      "text": "Ningún texto cruza la órbita ni al sujeto de la foto: la columna vive en el 45 % izquierdo oscuro. Si una pregunta o la evidencia cruza un haz, una mano o la órbita, se acorta la pregunta («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?») o se parte la evidencia en 2 o 3 líneas (operador, 2026-09-27)."
+    },
+    {
+      "id": "partner-claim-readback",
+      "text": "La insignia de partner es un claim: va sólo con la referencia de su autorización o de su readback vigente en el registro de partnerships del consumidor (la «Salesforce Partner» está autorizada por Salesforce desde el 2026-09-29 y el deck Salesforce la lleva por defecto). Sin esa referencia, la portada dice «Operamos sobre» con el logo de la plataforma y la contraportada va sin insignia. Nunca es un elemento fijo de la receta."
+    }
+  ],
+  "references": [
+    {
+      "id": "close-proposal-horizon",
+      "title": "Propuesta · contraportada: «Empower your Growth» hacia la órbita",
+      "status": "approved",
+      "image": "/references/surfaces/deck/close-proposal-horizon.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPropuestaContraHorizonte.dc.html"
+    },
+    {
+      "id": "close-proposal-dawn",
+      "title": "Propuesta · contraportada: «Empower your Growth» al amanecer",
+      "status": "approved",
+      "image": "/references/surfaces/deck/close-proposal-dawn.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPropuestaContraAmanecer.dc.html"
+    },
+    {
+      "id": "close-proposal-horizon-revenue-salesforce",
+      "title": "Propuesta · contraportada Salesforce: «Empower your Revenue» en bloque bajo el logo, con la insignia «Salesforce Partner» autorizada",
+      "status": "approved",
+      "image": "/references/surfaces/deck/close-proposal-horizon-revenue-salesforce.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckSalesforceContraportada.dc.html"
+    }
+  ],
+  "delegates": {
+    "orbit": [
+      {
+        "scene": "main",
+        "contract": "efeonce.graphic-line-orbit",
+        "intent": {
+          "canvas": {
+            "width": 1920,
+            "height": 1080,
+            "line": "revenue-hubspot",
+            "surface": "dark",
+            "channel": "deck"
+          },
+          "elements": [
+            {
+              "kind": "url-bubble",
+              "id": "url-bubble",
+              "medium": "pdf"
+            }
+          ]
+        }
+      }
+    ],
+    "close": null,
+    "selection": [],
+    "icons": [],
+    "photo": {
+      "placement": "bleed",
+      "register": "cine",
+      "lensMm": 85,
+      "cameraDistanceM": 2,
+      "reserve": {
+        "side": "start",
+        "share": 0.45,
+        "form": "calm-deep-dark"
+      },
+      "bed": "dark-bottom",
+      "accentLight": "line",
+      "emblem": "compose-from-axis-brand-assets",
+      "lookAtLens": false,
+      "subjectPlacement": {
+        "side": "end",
+        "facing": "away",
+        "toward": "orbit"
+      },
+      "subject": "nexa",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte",
+      "native": null,
+      "focus": null,
+      "cine": {
+        "lensMm": 85,
+        "cameraDistanceM": 2
+      }
+    }
+  },
+  "content": {
+    "eyebrow": null,
+    "question": null,
+    "answer": [],
+    "answerSphere": null,
+    "body": null,
+    "proof": null,
+    "measure": null,
+    "progress": null,
+    "cta": null,
+    "variants": null,
+    "levels": null,
+    "note": null,
+    "panels": null,
+    "figures": null,
+    "nav": null,
+    "title": null,
+    "frames": null,
+    "chapter": null,
+    "shots": null,
+    "subtitles": null,
+    "lines": null,
+    "slogan": {
+      "text": "Empower your Revenue",
+      "runs": [
+        {
+          "text": "Empower",
+          "weight": 800,
+          "italic": true,
+          "color": "#e2e2e2"
+        },
+        {
+          "text": "your",
+          "weight": 800,
+          "italic": false,
+          "color": "#e2e2e2"
+        },
+        {
+          "text": "Revenue",
+          "weight": 900,
+          "italic": true,
+          "color": "#e86bd0"
+        }
+      ]
+    }
+  },
+  "adapterChecks": [
+    "text-inside-its-reserve",
+    "text-never-crosses-ring",
+    "answer-dominates-3x-painted",
+    "accent-text-min-size",
+    "signature-where-the-surface-says",
+    "subject-outside-text-reserve",
+    "last-frame-is-static-fallback",
+    "legibility-at-reading-distance"
+  ],
+  "issues": []
+}

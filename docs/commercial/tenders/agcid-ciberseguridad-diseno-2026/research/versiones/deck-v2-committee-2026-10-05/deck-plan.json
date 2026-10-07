@@ -1,0 +1,692 @@
+{
+  "tenderId": "AGCID-1606-32-LE26",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "slots": {
+        "clientLogo": {
+          "src": "file:///Users/jreye/Documents/greenhouse-eo/.auth/agcid-deck-media/base-p1-0-Image16.png"
+        },
+        "proposalKind": "combined"
+      }
+    },
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "slots": {
+        "sectionLabel": "AGCID / ANCI · 1606-32-LE26",
+        "title": "Contenido de la oferta",
+        "deckMeta": "<b>5</b> capítulos · propuesta técnica y económica",
+        "chapters": [
+          {
+            "title": "Enfoque y productos",
+            "description": "Qué recibe ANCI y cómo se relacionan los entregables",
+            "targetSlideId": "sistema",
+            "number": "01"
+          },
+          {
+            "title": "Método y plazos",
+            "description": "Cómo producimos, revisamos y aprobamos cada entrega",
+            "targetSlideId": "metodo",
+            "number": "02"
+          },
+          {
+            "title": "Muestras y antecedentes",
+            "description": "Trabajos previos y respaldos de la entidad oferente",
+            "targetSlideId": "berel",
+            "number": "03"
+          },
+          {
+            "title": "Organización y transferencia",
+            "description": "Responsabilidades, archivos editables y cierre",
+            "targetSlideId": "organizacion",
+            "number": "04"
+          },
+          {
+            "title": "Oferta económica",
+            "description": "EUR 12.000 totales, IVA incluido, y desglose por producto",
+            "targetSlideId": "precio",
+            "number": "05"
+          }
+        ],
+        "footerLabel": "EFEONCE GROUP SpA · 05 de octubre de 2026"
+      }
+    },
+    {
+      "slideId": "sistema",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "Un sistema común conecta las publicaciones y el sitio web",
+        "leftConcept": {
+          "label": "EL PROYECTO",
+          "title": "Presentar información técnica con claridad",
+          "paragraphs": [
+            "El proyecto de ciberseguridad necesita que sus documentos, resultados y recursos digitales compartan una jerarquía de lectura reconocible.",
+            "Conservaremos los logotipos institucionales y las obligaciones de visibilidad de la Unión Europea. La línea gráfica no incluye crear un nuevo logotipo."
+          ]
+        },
+        "rightConcept": {
+          "label": "NUESTRA PROPUESTA",
+          "title": "Diseñar una base que ANCI pueda reutilizar",
+          "paragraphs": [
+            "El manual define las reglas; las plantillas y componentes las aplican; las publicaciones muestran cómo funcionan con los contenidos definitivos.",
+            "Entregaremos las fuentes editables y las especificaciones para que ANCI y el equipo de desarrollo continúen el trabajo."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "Una misma lógica de diseño une los cuatro productos y facilita su continuidad."
+        }
+      }
+    },
+    {
+      "slideId": "manual",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "El manual convierte la identidad en reglas de uso diario",
+        "leftConcept": {
+          "label": "PRODUCTO 1 · DÍA 30",
+          "title": "Una guía para documentos y entornos digitales",
+          "paragraphs": [
+            "Definiremos tipografía, jerarquías, color, retícula y espaciado, junto con reglas para tablas, gráficos, figuras y convivencia de logotipos.",
+            "Las aplicaciones mostrarán cómo mantener la coherencia cuando ANCI incorpore nuevos contenidos."
+          ]
+        },
+        "rightConcept": {
+          "label": "APLICACIÓN",
+          "title": "Plantillas que se pueden editar y reutilizar",
+          "paragraphs": [
+            "La presentación PowerPoint incluirá portada animada, diapositivas maestras y elementos editables.",
+            "Prepararemos cuatro familias Word: informe, minuta, invitación y programa, con estilos nativos adecuados a cada uso."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "ANCI recibe reglas documentadas y plantillas listas para incorporar sus contenidos."
+        }
+      }
+    },
+    {
+      "slideId": "formatos",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "FUENTES DEL SISTEMA",
+        "leftTitle": "Las reglas se entregan con archivos editables",
+        "leftItems": [
+          {
+            "lead": "Manual de aplicación",
+            "body": "INDD/IDML y PDF digital, con ejemplos editoriales y digitales."
+          },
+          {
+            "lead": "Recursos gráficos",
+            "body": "Inventario de vínculos, fuentes y condiciones de uso."
+          },
+          {
+            "lead": "Presentación institucional",
+            "body": "PPTX con maestras, portada animada y elementos reutilizables."
+          }
+        ],
+        "rightEyebrow": "PLANTILLAS WORD",
+        "rightTitle": "Cada documento conserva estilos nativos",
+        "rightItems": [
+          {
+            "lead": "Informe y minuta",
+            "body": "DOCX y DOTX; títulos, cuerpo, tablas y numeración según su finalidad."
+          },
+          {
+            "lead": "Invitación y programa",
+            "body": "DOCX y DOTX; retícula y jerarquías ajustadas al tipo de documento."
+          },
+          {
+            "lead": "Verificación de uso",
+            "body": "Comprobamos edición, índices y estilos antes de transferir los archivos."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "web",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "ANCI recibirá el diseño completo del sitio y un prototipo",
+        "leftConcept": {
+          "label": "PRODUCTO 2 · DÍA 60",
+          "title": "Diseñar las vistas para tres dispositivos",
+          "paragraphs": [
+            "Diseñaremos las páginas tipo y sus variantes para escritorio, tablet y móvil, a partir del inventario de contenidos validado con ANCI.",
+            "La navegación conectará países, estudios, Ley Modelo/Marco, actividades, recursos y resultados."
+          ]
+        },
+        "rightConcept": {
+          "label": "VALIDACIÓN",
+          "title": "Probar recorridos antes de implementar",
+          "paragraphs": [
+            "El prototipo Figma de alta fidelidad permitirá revisar navegación, filtros, fichas y descargas, junto con los estados pertinentes de cada vista.",
+            "Entregaremos el archivo editable y las especificaciones. El CMS, backend y desarrollo productivo corresponden a la implementación posterior."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "El diseño permite revisar cómo se consulta cada contenido antes del desarrollo."
+        }
+      }
+    },
+    {
+      "slideId": "vistas",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "ACCESO A LA INFORMACIÓN",
+        "leftTitle": "El diseño cubre repositorios y fichas",
+        "leftItems": [
+          {
+            "lead": "Inicio y navegación",
+            "body": "Presentación del proyecto, visibilidad institucional y accesos principales."
+          },
+          {
+            "lead": "Países",
+            "body": "Repositorio y ficha reutilizable para los doce países contemplados."
+          },
+          {
+            "lead": "Estudios",
+            "body": "Listado, búsqueda/filtros, metadatos, ficha y descarga de documentos."
+          }
+        ],
+        "rightEyebrow": "CONTENIDOS Y ESTADOS",
+        "rightTitle": "Cada sección se adapta a su función",
+        "rightItems": [
+          {
+            "lead": "Ley Modelo / Ley Marco",
+            "body": "Vista del contenido y acceso a documentos, según la denominación de ANCI."
+          },
+          {
+            "lead": "Eventos, talleres y recursos",
+            "body": "Listados y fichas; galería, descargables y resultados del proyecto."
+          },
+          {
+            "lead": "Interacción",
+            "body": "Estados de filtros, foco, resultados vacíos, paginación y validación pertinente."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "componentes",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "La biblioteca documenta cómo implementar el diseño aprobado",
+        "leftConcept": {
+          "label": "PRODUCTO 3 · DÍA 70",
+          "title": "Componentes con estados y variantes",
+          "paragraphs": [
+            "La biblioteca reunirá botones, menús, tarjetas, filtros, formularios, tablas, banners y etiquetas necesarios para las vistas definidas.",
+            "Cada componente documentará sus propiedades, estados e interacción, junto con su comportamiento adaptable."
+          ]
+        },
+        "rightConcept": {
+          "label": "TRANSFERENCIA TÉCNICA",
+          "title": "Figma, referencia HTML y especificaciones",
+          "paragraphs": [
+            "Entregaremos componentes editables en Figma, tokens de tipografía, color y espaciado, ejemplos de uso y HTML de referencia.",
+            "Contrastaremos las vistas aprobadas con la biblioteca. La referencia HTML apoya al desarrollador; no constituye un sitio productivo."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "El equipo de desarrollo recibe una referencia consistente entre vistas y componentes."
+        }
+      }
+    },
+    {
+      "slideId": "documentos",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "La diagramación contempla 20 versiones digitales y 10 bilingües",
+        "leftConcept": {
+          "label": "PRODUCTO 4",
+          "title": "Veinte versiones monolingües para publicación",
+          "paragraphs": [
+            "Se diagramarán siete documentos de trabajo, dos productos de fondos de investigación y un documento de Ley Marco, cada uno en español e inglés.",
+            "Las veinte versiones digitales recibirán estilos, tablas, figuras, índice y referencias coherentes con el manual."
+          ]
+        },
+        "rightConcept": {
+          "label": "VERSIÓN PARA IMPRESIÓN",
+          "title": "Diez documentos bilingües consolidados",
+          "paragraphs": [
+            "Prepararemos diez versiones que reúnen español e inglés, con separadores de idioma, navegación y PDF de alta resolución para impresión.",
+            "Los textos y traducciones definitivos provienen de ANCI. El servicio no incluye traducción, redacción técnica ni impresión física."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "30 unidades según el Anexo 5 modificado; cada archivo tendrá su fuente editable."
+        }
+      }
+    },
+    {
+      "slideId": "bilingue",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "Español e inglés se revisan por separado para preservar la lectura",
+        "leftConcept": {
+          "label": "COMPOSICIÓN",
+          "title": "Una estructura común para ambos idiomas",
+          "paragraphs": [
+            "Compartiremos jerarquías, retícula y estilos; revisaremos en inglés la expansión de títulos, los saltos, las tablas y las leyendas.",
+            "No forzaremos una paginación idéntica entre idiomas cuando perjudique la lectura o la composición."
+          ]
+        },
+        "rightConcept": {
+          "label": "CONTROL EDITORIAL",
+          "title": "Cotejar el diseño con el texto definitivo",
+          "paragraphs": [
+            "Revisaremos índices, numeración, notas, unidades y referencias cruzadas; cada figura conservará su fuente y correspondencia con el texto.",
+            "En las versiones consolidadas se distinguirán los idiomas y se comprobará el orden completo del documento."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "Cada PDF conserva el contenido aprobado y una navegación comprensible en su idioma."
+        }
+      }
+    },
+    {
+      "slideId": "metodo",
+      "contentType": "process-sequential",
+      "slots": {
+        "sectionLabel": "METODOLOGÍA DE TRABAJO",
+        "title": "Cada entrega pasa por un ciclo de producción y aprobación",
+        "steps": [
+          {
+            "title": "Acordar el alcance",
+            "description": "Revisamos insumos, contenidos, inventario de vistas y calendario con ANCI.",
+            "deliverable": "Acta de inicio e inventario de trabajo"
+          },
+          {
+            "title": "Definir el sistema",
+            "description": "Aprobamos jerarquías y aplicaciones para sostener la coherencia entre productos.",
+            "deliverable": "Manual y criterios de diseño"
+          },
+          {
+            "title": "Producir y cotejar",
+            "description": "Diseñamos el entregable y contrastamos textos, estados, tablas y referencias.",
+            "deliverable": "Versión revisada internamente"
+          },
+          {
+            "title": "Revisar con ANCI",
+            "description": "Consolidamos las observaciones y registramos su resolución por versión.",
+            "deliverable": "Matriz de observaciones y ajustes"
+          },
+          {
+            "title": "Transferir los archivos",
+            "description": "Comprobamos finales, editables y recursos antes de solicitar la conformidad.",
+            "deliverable": "Paquete final e inventario de entrega"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "cronograma",
+      "contentType": "timeline",
+      "slots": {
+        "sectionLabel": "PRIMEROS TRES PRODUCTOS",
+        "title": "Los tres hitos iniciales se entregan a 30, 60 y 70 días",
+        "meta": "Desde la reunión de inicio. Cada tramo del eje representa <b>10 días</b>.",
+        "timeUnit": "custom",
+        "timeAxis": [
+          "Días 1–10",
+          "11–20",
+          "21–30",
+          "31–40",
+          "41–50",
+          "51–60",
+          "61–70"
+        ],
+        "milestones": [
+          {
+            "at": 3,
+            "label": "Manual y plantillas",
+            "caption": "Día 30"
+          },
+          {
+            "at": 6,
+            "label": "Diseño web",
+            "caption": "Día 60"
+          },
+          {
+            "at": 7,
+            "label": "Biblioteca",
+            "caption": "Día 70"
+          }
+        ],
+        "phases": [
+          {
+            "kind": "work",
+            "startUnit": 1,
+            "endUnit": 3,
+            "title": "P1 · Manual y plantillas",
+            "description": "Identidad, aplicaciones y archivos editables."
+          },
+          {
+            "kind": "work",
+            "startUnit": 1,
+            "endUnit": 6,
+            "title": "P2 · Diseño visual web",
+            "description": "Inventario, vistas adaptables y prototipo."
+          },
+          {
+            "kind": "work",
+            "startUnit": 4,
+            "endUnit": 7,
+            "title": "P3 · Biblioteca de componentes",
+            "description": "Variantes, estados y referencia HTML."
+          },
+          {
+            "kind": "continuous",
+            "startUnit": 1,
+            "endUnit": 7,
+            "title": "Coordinación y control",
+            "description": "Revisión cruzada y aprobaciones con ANCI."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "plazos-documentos",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "La producción documental comienza al recibir contenidos definitivos",
+        "leftConcept": {
+          "label": "POR SOLICITUD",
+          "title": "Primera entrega en cinco días hábiles",
+          "paragraphs": [
+            "Las solicitudes de diagramación se registran con documento, idioma, insumos completos y fecha de recepción. La primera entrega se prepara en cinco días hábiles.",
+            "ANCI dispone de cinco días hábiles para revisar. Se incorporan los ajustes dentro de las ventanas aplicables de las bases."
+          ]
+        },
+        "rightConcept": {
+          "label": "CALENDARIO DEL CONTRATO",
+          "title": "Acordar las solicitudes y sus dependencias",
+          "paragraphs": [
+            "La ejecución considera el término contractual al 30 de abril de 2027. La Carta Gantt adjunta desarrolla actividades y controles.",
+            "En la reunión de inicio se contrastarán los plazos absolutos con las dependencias de aprobación y se aclararán las discrepancias del pliego."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "El registro de solicitudes vincula cada plazo con un contenido definitivo y una versión."
+        }
+      }
+    },
+    {
+      "slideId": "calidad",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "ANTES DE ENVIAR A ANCI",
+        "leftTitle": "La revisión interna comprueba contenido y composición",
+        "leftItems": [
+          {
+            "lead": "Contenido íntegro",
+            "body": "Cotejo de textos, figuras, unidades, fuentes, notas y referencias cruzadas."
+          },
+          {
+            "lead": "Consistencia visual",
+            "body": "Jerarquías, retícula, estilos, tablas y uso de logotipos institucionales."
+          },
+          {
+            "lead": "Navegación y estados",
+            "body": "Recorridos del prototipo y correspondencia entre vistas y componentes."
+          }
+        ],
+        "rightEyebrow": "ANTES DE LA TRANSFERENCIA",
+        "rightTitle": "La revisión final incluye los archivos que recibe ANCI",
+        "rightItems": [
+          {
+            "lead": "PDF completo",
+            "body": "Revisión de todas las páginas, índices, saltos, figuras y exportación."
+          },
+          {
+            "lead": "Fuentes editables",
+            "body": "Comprobación de estilos nativos, vínculos, recursos y formatos acordados."
+          },
+          {
+            "lead": "Trazabilidad",
+            "body": "Inventario por producto, documento, idioma, versión y estado de aprobación."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "coordinacion",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "ANCI revisará versiones identificadas y observaciones consolidadas",
+        "leftConcept": {
+          "label": "INTERLOCUCIÓN",
+          "title": "Un responsable coordina alcance y calendario",
+          "paragraphs": [
+            "Julio Reyes centralizará la coordinación del servicio, las comunicaciones y el seguimiento de las aprobaciones con ANCI.",
+            "En cada revisión se identificarán producto, versión, cambios y puntos que requieren una decisión de la contraparte."
+          ]
+        },
+        "rightConcept": {
+          "label": "SEGUIMIENTO",
+          "title": "Cada observación tendrá una respuesta verificable",
+          "paragraphs": [
+            "La matriz registrará la observación, su responsable, el ajuste realizado y la versión en que se resolvió.",
+            "Las solicitudes que cambien insumos o alcance se documentarán para revisar su efecto en el calendario antes de continuar."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "La contraparte puede seguir qué se entregó, qué observó y cómo se resolvió cada ajuste."
+        }
+      }
+    },
+    {
+      "slideId": "berel",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "MUESTRA DE TRABAJO PREVIO",
+        "title": "Los informes de Berel muestran jerarquía y continuidad editorial",
+        "lead": "La portada, el índice y el glosario seleccionados ilustran organización editorial. Se incluyen en el dossier de muestras; no son un diseño propuesto para AGCID.",
+        "artifact": {
+          "src": "file:///Users/jreye/Documents/greenhouse-eo/.auth/agcid-deck-media/berel-portada.png"
+        },
+        "caption": "Berel · Informe agosto de 2026, portada. Trabajo previo; no contiene métricas del cliente.",
+        "note": "Fuente: dossier de muestras adjunto a la oferta."
+      }
+    },
+    {
+      "slideId": "gore",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "MUESTRA DE TRABAJO PREVIO",
+        "title": "Gobierno de Santiago muestra coherencia entre formatos",
+        "lead": "El programa Cuidando a Quienes Cuidan muestra aplicaciones de una identidad en distintos formatos. La muestra ilustra coherencia visual en comunicación institucional.",
+        "artifact": {
+          "src": "file:///Users/jreye/Documents/greenhouse-eo/.auth/agcid-deck-media/gore-8.png"
+        },
+        "caption": "Gobierno de Santiago · Portafolio original, página 8. Muestra de trabajo previo.",
+        "note": "Fuente: dossier de muestras adjunto a la oferta."
+      }
+    },
+    {
+      "slideId": "web-muestra",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "MUESTRA DE TRABAJO PREVIO",
+        "title": "La muestra de Bresler ilustra jerarquía visual en una interfaz",
+        "lead": "La pieza seleccionada permite revisar composición y prioridades de lectura en diseño web. El dossier también incluye una muestra de SKY; no se atribuyen resultados de negocio.",
+        "artifact": {
+          "src": "file:///Users/jreye/Documents/greenhouse-eo/.auth/agcid-deck-media/bresler-16.png"
+        },
+        "caption": "Bresler · Portafolio web original, página 16. Muestra de trabajo previo.",
+        "note": "Fuente: dossier de muestras adjunto a la oferta."
+      }
+    },
+    {
+      "slideId": "antecedentes",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "EXPERIENCIA DE LA ENTIDAD",
+        "leftTitle": "Efeonce respalda tres servicios con documentos",
+        "leftItems": [
+          {
+            "lead": "SKY Airline",
+            "body": "Servicio incluido en Anexo 4; respaldo emitido a Efeonce Group SpA."
+          },
+          {
+            "lead": "Berel",
+            "body": "Servicio incluido en Anexo 4; contrato y factura de exportación."
+          },
+          {
+            "lead": "Gobierno de Santiago",
+            "body": "Servicio incluido en Anexo 4; recepción conforme y documentación de cobro."
+          }
+        ],
+        "rightEyebrow": "FUENTES ADJUNTAS",
+        "rightTitle": "Los respaldos identifican al proveedor y el servicio",
+        "rightItems": [
+          {
+            "lead": "SKY Airline",
+            "body": "Contrato; OC 221970, factura 56 y carta de recomendación."
+          },
+          {
+            "lead": "Berel",
+            "body": "Contrato y factura de exportación 53."
+          },
+          {
+            "lead": "Gobierno de Santiago",
+            "body": "Recepción conforme, OC 1003780-11-AG25 y factura 111."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "organizacion",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "La organización distingue coordinación, diseño y revisión editorial",
+        "leftConcept": {
+          "label": "RESPONSABILIDAD",
+          "title": "Coordinar el servicio y sus aprobaciones",
+          "paragraphs": [
+            "Julio Reyes será el interlocutor para alcance, calendario, comunicaciones y entrega. La propuesta metodológica define los puntos de revisión con ANCI.",
+            "La organización del trabajo contempla diseño editorial, diseño de interfaces y control de contenidos."
+          ]
+        },
+        "rightConcept": {
+          "label": "ROLES DE PRODUCCIÓN",
+          "title": "Revisar cada producto desde dos especialidades",
+          "paragraphs": [
+            "El diseño editorial construye el manual, las plantillas y publicaciones. El diseño de interfaces prepara vistas, prototipo y biblioteca.",
+            "La revisión editorial coteja contenidos y versiones; la revisión cruzada comprueba coherencia entre lo documental y lo digital."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "Organización propuesta; asignación y dedicaciones por validar antes de formalizar."
+        }
+      }
+    },
+    {
+      "slideId": "transferencia",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "ARCHIVOS FINALES",
+        "leftTitle": "ANCI recibe formatos preparados para cada uso",
+        "leftItems": [
+          {
+            "lead": "Publicación digital",
+            "body": "PDF optimizado por documento e idioma, con navegación revisada."
+          },
+          {
+            "lead": "Versión para impresión",
+            "body": "PDF de alta resolución de los documentos bilingües consolidados."
+          },
+          {
+            "lead": "Presentación y plantillas",
+            "body": "PPTX, DOCX y DOTX editables, según el tipo de aplicación."
+          }
+        ],
+        "rightEyebrow": "CONTINUIDAD DEL SISTEMA",
+        "rightTitle": "Los editables permiten continuar el trabajo",
+        "rightItems": [
+          {
+            "lead": "Fuentes de diseño",
+            "body": "INDD/IDML y recursos vinculados para los productos editoriales."
+          },
+          {
+            "lead": "Diseño y componentes web",
+            "body": "Figma editable, biblioteca, tokens y HTML de referencia."
+          },
+          {
+            "lead": "Inventario y guía de uso",
+            "body": "Formatos, versiones, recursos y criterios necesarios para reutilizar el sistema."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "precio",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "La oferta asciende a EUR 12.000, IVA incluido",
+        "leftConcept": {
+          "label": "PRECIO TOTAL",
+          "title": "EUR 12.000 por el alcance completo",
+          "paragraphs": [
+            "El precio total corresponde a los cuatro productos y a las 30 unidades de diagramación del Anexo 5 modificado. Es una oferta por entregables.",
+            "Neto: EUR 10.084,03. IVA 19%: EUR 1.915,97. Total: EUR 12.000,00. El Anexo 5 firmado contiene el desglose formal."
+          ]
+        },
+        "rightConcept": {
+          "label": "CONDICIONES DE PAGO",
+          "title": "Facturación contra entregables conformes",
+          "paragraphs": [
+            "El pago se solicita con la conformidad del producto y la factura correspondiente, dentro de las condiciones y plazos establecidos en las bases.",
+            "La diagramación se paga por unidades solicitadas y entregadas. La propuesta no contempla un anticipo."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "Precio en EUR, impuestos incluidos y pago por entregables conformes."
+        }
+      }
+    },
+    {
+      "slideId": "desglose",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "El desglose neto distribuye el precio entre los cuatro productos",
+        "leftConcept": {
+          "label": "BASE DE CÁLCULO: NETO",
+          "title": "P1 y P2 suman el 30% neto",
+          "paragraphs": [
+            "P1 · Manual y plantillas: EUR 2.016,80600 netos, equivalente al 20%.",
+            "P2 · Diseño visual web: EUR 1.008,40300 netos, equivalente al 10%."
+          ]
+        },
+        "rightConcept": {
+          "label": "BASE DE CÁLCULO: NETO",
+          "title": "P3 y P4 suman el 70% neto",
+          "paragraphs": [
+            "P3 · Biblioteca de componentes: EUR 1.008,40300 netos, equivalente al 10%.",
+            "P4 · Diagramación: EUR 6.050,41800 netos, equivalente al 60%. Son 30 unidades a EUR 201,68060 netos."
+          ]
+        },
+        "outcome": {
+          "label": "RESULTADO",
+          "text": "Neto EUR 10.084,03 + IVA EUR 1.915,97 = total EUR 12.000,00, conforme al Anexo 5."
+        }
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "slots": {}
+    }
+  ]
+}

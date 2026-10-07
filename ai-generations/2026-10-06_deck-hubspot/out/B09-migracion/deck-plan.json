@@ -1,0 +1,168 @@
+{
+  "tenderId": "hs-B09-migracion-voz2",
+  "slides": [
+    {
+      "slideId": "deck-method-migration-reconcile",
+      "contentType": "deck.method-migration-reconcile",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "blockWidth": "--gl-mmr-block-width=232px",
+          "blockHeight": "--gl-mmr-block-height=280px",
+          "blockPad": "--gl-mmr-block-pad=20px",
+          "blockRadius": "--gl-mmr-block-radius=20px",
+          "kickerPx": "--gl-mmr-kicker-px=12px",
+          "kickerWeight": "--gl-mmr-kicker-wght=600",
+          "kickerTracking": "--gl-mmr-kicker-tracking=0.12em",
+          "kickerColor": "--gl-mmr-kicker-color=#e2e2e2",
+          "valuePx": "--gl-mmr-value-px=44px",
+          "valueTracking": "--gl-mmr-value-tracking=-0.02em",
+          "valueGap": "--gl-mmr-value-gap=14px",
+          "valueColor": "--gl-mmr-value-color=#ffffff",
+          "descPx": "--gl-mmr-desc-px=15px",
+          "descWeight": "--gl-mmr-desc-wght=400",
+          "descLeading": "--gl-mmr-desc-leading=1.4",
+          "descGap": "--gl-mmr-desc-gap=6px",
+          "descColor": "--gl-mmr-desc-color=#e6edf3",
+          "recLeft": "--gl-mmr-rec-left=960px",
+          "recTop": "--gl-mmr-rec-top=700px",
+          "recWidth": "--gl-mmr-rec-width=660px",
+          "recPadY": "--gl-mmr-rec-pad-y=20px",
+          "recPadX": "--gl-mmr-rec-pad-x=24px",
+          "recRadius": "--gl-mmr-rec-radius=20px",
+          "recGap": "--gl-mmr-rec-gap=22px",
+          "recIcon": "--gl-mmr-rec-icon=48px",
+          "recKickerPx": "--gl-mmr-rec-kicker-px=12px",
+          "recKickerWeight": "--gl-mmr-rec-kicker-wght=600",
+          "recKickerTracking": "--gl-mmr-rec-kicker-tracking=0.1em",
+          "recKickerColor": "--gl-mmr-rec-kicker-color=#5f6b7a",
+          "recTitlePx": "--gl-mmr-rec-title-px=26px",
+          "recTitleTracking": "--gl-mmr-rec-title-tracking=-0.015em",
+          "recTitleGap": "--gl-mmr-rec-title-gap=4px",
+          "tagPadY": "--gl-mmr-tag-pad-y=8px",
+          "tagPadX": "--gl-mmr-tag-pad-x=14px",
+          "tagRadius": "--gl-mmr-tag-radius=10px",
+          "tagRing": "--gl-mmr-tag-ring=1.5px",
+          "tagRingColor": "--gl-mmr-tag-ring-color=#0b1f33",
+          "tagPx": "--gl-mmr-tag-px=13px",
+          "tagWeight": "--gl-mmr-tag-wght=600"
+        },
+        "stage": {
+          "src": "asset-ref:layer:mmr-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:mmr-platform"
+        },
+        "beams": {
+          "src": "asset-ref:layer:method-migration-reconcile-beams"
+        },
+        "voice": {
+          "question": "¿Cómo sé que migró todo?",
+          "answer": "cuadra",
+          "eyebrow": "Migración a HubSpot",
+          "answerLead": "Porque"
+        },
+        "body": "Claves, duplicados, carga de prueba y <strong>reconciliación</strong> registro por registro, con vuelta atrás lista.",
+        "note": "Datos de muestra · cada migración define claves y reglas con tu equipo",
+        "stages": [
+          {
+            "left": "--gl-mmr-left=790px",
+            "top": "--gl-mmr-top=300px",
+            "label": "01 · Origen",
+            "value": "48.210",
+            "description": "registros de empresas y contactos"
+          },
+          {
+            "left": "--gl-mmr-left=1040px",
+            "top": "--gl-mmr-top=326px",
+            "label": "02 · Claves y duplicados",
+            "value": "1.842",
+            "description": "duplicados unificados"
+          },
+          {
+            "left": "--gl-mmr-left=1290px",
+            "top": "--gl-mmr-top=352px",
+            "label": "03 · Carga de prueba",
+            "value": "500",
+            "description": "registros · 0 errores"
+          },
+          {
+            "left": "--gl-mmr-left=1540px",
+            "top": "--gl-mmr-top=378px",
+            "label": "04 · Carga completa",
+            "value": "46.368",
+            "description": "con resultado por registro"
+          }
+        ],
+        "reconcile": {
+          "icon": "asset-ref:file:hubspot-icon-data",
+          "step": "05",
+          "result": "46.368 = 46.368 · cuadra",
+          "badge": "Rollback listo"
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-start",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "MethodMigrationReconcile"
+    }
+  ]
+}

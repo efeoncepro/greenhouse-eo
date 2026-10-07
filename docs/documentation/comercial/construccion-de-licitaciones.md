@@ -14,6 +14,12 @@ La idea de fondo: **una buena propuesta no se improvisa ni se escribe de memoria
 
 ## El método en pocas palabras
 
+**Criterio comercial actualizado (2026-10-05):** la preparación de propuestas se prioriza por fit, sin fijar un
+cupo a partir de las horas libres actuales. Preparar un borrador no compromete producción: antes de presentar
+se cierran requisitos, forma de ejecución, proveedores, costos, margen y caja. Factory corresponde a encargos
+On-Demand; los servicios mensuales/continuos van bajo Efeonce. Cuotas o hitos no definen la modalidad por sí solos.
+Canon: [decisión Factory](../../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).
+
 Construir una licitación pasa por diez momentos encadenados. Cada uno produce algo que alimenta el siguiente:
 
 1. **Leer las bases.** Entender qué pide el cliente, para cuándo, en qué formato, con qué reglas (plazos, garantías, penalidades, contrato).

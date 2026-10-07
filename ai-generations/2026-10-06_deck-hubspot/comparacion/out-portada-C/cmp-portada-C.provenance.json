@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "8bdd1ee9e2c3b2224e787f2271b80edd4aeb3d7108081e22c39c4be343aeb9ae",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CMP-portada-C",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-C.png",
+      "sha256": "f545366a4b1ed45b6ecf40d1ccd0287a0551c8ff3960c5483066c11b8509ee68"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

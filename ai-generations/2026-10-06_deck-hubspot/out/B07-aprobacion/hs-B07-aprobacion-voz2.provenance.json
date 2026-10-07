@@ -1,0 +1,25 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "f5ea4e4b4c69966b655e8ea5b367b9c9a2ca5f4c85d9e63fb531901db304ccb2",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day-live-approval",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:tool-teams",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-service",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-service.svg",
+      "sha256": "964925292dbd8777f63b478490ec358387403730577d1d6694b7e57aa92e3ac4"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

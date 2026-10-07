@@ -1,0 +1,520 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B13-adopcion-voz2",
+  "input": {
+    "artifactId": "hs-B13-adopcion-voz2",
+    "slides": [
+      {
+        "slideId": "deck-content-day-live-library",
+        "contentType": "deck.content-day-live-library",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "docFill": "--gl-ls-doc-color=#f5f7fa",
+            "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+            "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+            "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+            "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+            "docShadowY": "--gl-ls-doc-shadow-y=50px",
+            "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+            "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+            "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+            "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+            "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+            "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+            "docEdge": "--gl-ls-doc-edge=1px",
+            "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+            "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+            "libraryLeft": "--gl-cll-library-left=820px",
+            "libraryTop": "--gl-cll-library-top=260px",
+            "libraryWidth": "--gl-cll-library-width=880px",
+            "libraryPadY": "--gl-cll-library-pad-y=24px",
+            "libraryPadX": "--gl-cll-library-pad-x=26px",
+            "libraryRadius": "--gl-cll-library-radius=26px",
+            "libraryPerspective": "--gl-cll-library-perspective=2200px",
+            "libraryRotateY": "--gl-cll-library-rotate-y=-8deg",
+            "libraryRotateX": "--gl-cll-library-rotate-x=3deg",
+            "headerToolPx": "--gl-cll-tool-px=40px",
+            "headerGap": "--gl-cll-header-gap=12px",
+            "headerGapBottom": "--gl-cll-header-gap-bottom=18px",
+            "kickerPx": "--gl-cll-kicker-px=12px",
+            "kickerWeight": "--gl-cll-kicker-wght=600",
+            "kickerTracking": "--gl-cll-kicker-tracking=1.2px",
+            "kickerColor": "--gl-cll-kicker-color=#5f6b7a",
+            "titlePx": "--gl-cll-title-px=22px",
+            "titleTracking": "--gl-cll-title-tracking=-0.33px",
+            "titleGap": "--gl-cll-title-gap=2px",
+            "markPadY": "--gl-cll-mark-pad-y=6px",
+            "markPadX": "--gl-cll-mark-pad-x=12px",
+            "markRadius": "--gl-cll-mark-radius=999px",
+            "markFill": "--gl-cll-mark-fill-color=#ffffff",
+            "markBorder": "--gl-cll-mark-border=1px",
+            "markBorderColor": "--gl-cll-mark-border-color=#e3e8ee",
+            "markPx": "--gl-cll-mark-px=12px",
+            "markWeight": "--gl-cll-mark-wght=600",
+            "markTracking": "--gl-cll-mark-tracking=0.96px",
+            "markColor": "--gl-cll-mark-color=#5f6b7a",
+            "videoCount": "--gl-cll-videos=4",
+            "videosGap": "--gl-cll-videos-gap=14px",
+            "cardPad": "--gl-cll-card-pad=12px",
+            "cardRadius": "--gl-cll-card-radius=18px",
+            "cardFill": "--gl-cll-card-fill-color=#ffffff",
+            "cardShadowY": "--gl-cll-card-shadow-y=20px",
+            "cardShadowBlur": "--gl-cll-card-shadow-blur=50px",
+            "cardShadowColor": "--gl-cll-card-shadow-color=#000610",
+            "cardShadowOpacity": "--gl-cll-card-shadow-opacity=45%",
+            "thumbHeight": "--gl-cll-thumb-height=130px",
+            "thumbRadius": "--gl-cll-thumb-radius=12px",
+            "thumbAngle": "--gl-cll-thumb-angle=135deg",
+            "thumbTo": "--gl-cll-thumb-to-color=#0b1f33",
+            "thumbIconPx": "--gl-cll-thumb-icon-px=34px",
+            "thumbIconInset": "--gl-cll-thumb-icon-inset=14px",
+            "playPx": "--gl-cll-play-px=46px",
+            "playGlyphPx": "--gl-cll-play-glyph-px=18px",
+            "playFill": "--gl-cll-play-fill-color=#ffffff",
+            "playGlyph": "--gl-cll-play-glyph-color=#0b1f33",
+            "durationPx": "--gl-cll-duration-px=12px",
+            "durationWeight": "--gl-cll-duration-wght=600",
+            "durationPadY": "--gl-cll-duration-pad-y=3px",
+            "durationPadX": "--gl-cll-duration-pad-x=8px",
+            "durationRadius": "--gl-cll-duration-radius=7px",
+            "durationInset": "--gl-cll-duration-inset=10px",
+            "durationFill": "--gl-cll-duration-fill-color=#000000",
+            "durationFillOpacity": "--gl-cll-duration-fill-opacity=55%",
+            "durationColor": "--gl-cll-duration-color=#ffffff",
+            "rolePx": "--gl-cll-role-px=12px",
+            "roleWeight": "--gl-cll-role-wght=600",
+            "roleTracking": "--gl-cll-role-tracking=1.2px",
+            "roleGap": "--gl-cll-role-gap=10px",
+            "roleInsetX": "--gl-cll-role-inset-x=4px",
+            "roleColor": "--gl-cll-role-color=#5f6b7a",
+            "videoTitlePx": "--gl-cll-video-title-px=16px",
+            "videoTitleWeight": "--gl-cll-video-title-wght=600",
+            "videoTitleLeading": "--gl-cll-video-title-leading=1.3",
+            "videoTitleGap": "--gl-cll-video-title-gap=3px",
+            "videoTitleInsetX": "--gl-cll-video-title-inset-x=4px",
+            "videoTitleGapBottom": "--gl-cll-video-title-gap-bottom=4px",
+            "statsGap": "--gl-cll-stats-gap=12px",
+            "statsGapTop": "--gl-cll-stats-gap-top=18px",
+            "statPadY": "--gl-cll-stat-pad-y=12px",
+            "statPadX": "--gl-cll-stat-pad-x=16px",
+            "statRadius": "--gl-cll-stat-radius=14px",
+            "statFill": "--gl-cll-stat-fill-color=#ffffff",
+            "statBorder": "--gl-cll-stat-border=1px",
+            "statBorderColor": "--gl-cll-stat-border-color=#e3e8ee",
+            "statValuePx": "--gl-cll-stat-value-px=26px",
+            "statLabelPx": "--gl-cll-stat-label-px=13px",
+            "statLabelWeight": "--gl-cll-stat-label-wght=400",
+            "statLabelGap": "--gl-cll-stat-label-gap=2px",
+            "statLabelColor": "--gl-cll-stat-label-color=#5f6b7a"
+          },
+          "stage": {
+            "src": "asset-ref:layer:cll-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:cll-platform"
+          },
+          "voice": {
+            "question": "¿Cómo aprende mi equipo?",
+            "answer": "ritmo",
+            "eyebrow": "Activación y adopción",
+            "answerLead": "A su"
+          },
+          "body": "Tutoriales cortos en video, grabados sobre <strong>tu</strong> HubSpot: responden «¿cómo hago…?» sin agendar una reunión.",
+          "libraryTool": {
+            "src": "asset-ref:file:tool-loom"
+          },
+          "library": {
+            "kicker": "En Loom · sobre tu portal",
+            "title": "Tutoriales de tu equipo"
+          },
+          "sampleMark": "Datos de muestra",
+          "videos": [
+            {
+              "icon": "asset-ref:file:hubspot-icon-sales",
+              "from": "--gl-cll-thumb-from-color=#16395c",
+              "duration": "2:40",
+              "role": "Ventas",
+              "title": "Cómo registrar un negocio"
+            },
+            {
+              "icon": "asset-ref:file:hubspot-icon-service",
+              "from": "--gl-cll-thumb-from-color=#1b3f5e",
+              "duration": "3:05",
+              "role": "Servicio",
+              "title": "Cerrar un ticket con knowledge"
+            },
+            {
+              "icon": "asset-ref:file:hubspot-icon-marketing",
+              "from": "--gl-cll-thumb-from-color=#14324f",
+              "duration": "4:12",
+              "role": "Marketing",
+              "title": "Probar un workflow antes de activarlo"
+            },
+            {
+              "icon": "asset-ref:file:hubspot-icon-revenue",
+              "from": "--gl-cll-thumb-from-color=#10304d",
+              "duration": "3:30",
+              "role": "Revenue",
+              "title": "Crear una cotización y su contrato"
+            }
+          ],
+          "stats": [
+            {
+              "value": "24",
+              "label": "tutoriales grabados"
+            },
+            {
+              "value": "3 min",
+              "label": "duración promedio"
+            },
+            {
+              "value": "Por rol",
+              "label": "ventas, servicio, marketing y revenue"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-day-live-library",
+      "contentType": "deck.content-day-live-library",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "docFill": "--gl-ls-doc-color=#f5f7fa",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "libraryLeft": "--gl-cll-library-left=820px",
+          "libraryTop": "--gl-cll-library-top=260px",
+          "libraryWidth": "--gl-cll-library-width=880px",
+          "libraryPadY": "--gl-cll-library-pad-y=24px",
+          "libraryPadX": "--gl-cll-library-pad-x=26px",
+          "libraryRadius": "--gl-cll-library-radius=26px",
+          "libraryPerspective": "--gl-cll-library-perspective=2200px",
+          "libraryRotateY": "--gl-cll-library-rotate-y=-8deg",
+          "libraryRotateX": "--gl-cll-library-rotate-x=3deg",
+          "headerToolPx": "--gl-cll-tool-px=40px",
+          "headerGap": "--gl-cll-header-gap=12px",
+          "headerGapBottom": "--gl-cll-header-gap-bottom=18px",
+          "kickerPx": "--gl-cll-kicker-px=12px",
+          "kickerWeight": "--gl-cll-kicker-wght=600",
+          "kickerTracking": "--gl-cll-kicker-tracking=1.2px",
+          "kickerColor": "--gl-cll-kicker-color=#5f6b7a",
+          "titlePx": "--gl-cll-title-px=22px",
+          "titleTracking": "--gl-cll-title-tracking=-0.33px",
+          "titleGap": "--gl-cll-title-gap=2px",
+          "markPadY": "--gl-cll-mark-pad-y=6px",
+          "markPadX": "--gl-cll-mark-pad-x=12px",
+          "markRadius": "--gl-cll-mark-radius=999px",
+          "markFill": "--gl-cll-mark-fill-color=#ffffff",
+          "markBorder": "--gl-cll-mark-border=1px",
+          "markBorderColor": "--gl-cll-mark-border-color=#e3e8ee",
+          "markPx": "--gl-cll-mark-px=12px",
+          "markWeight": "--gl-cll-mark-wght=600",
+          "markTracking": "--gl-cll-mark-tracking=0.96px",
+          "markColor": "--gl-cll-mark-color=#5f6b7a",
+          "videoCount": "--gl-cll-videos=4",
+          "videosGap": "--gl-cll-videos-gap=14px",
+          "cardPad": "--gl-cll-card-pad=12px",
+          "cardRadius": "--gl-cll-card-radius=18px",
+          "cardFill": "--gl-cll-card-fill-color=#ffffff",
+          "cardShadowY": "--gl-cll-card-shadow-y=20px",
+          "cardShadowBlur": "--gl-cll-card-shadow-blur=50px",
+          "cardShadowColor": "--gl-cll-card-shadow-color=#000610",
+          "cardShadowOpacity": "--gl-cll-card-shadow-opacity=45%",
+          "thumbHeight": "--gl-cll-thumb-height=130px",
+          "thumbRadius": "--gl-cll-thumb-radius=12px",
+          "thumbAngle": "--gl-cll-thumb-angle=135deg",
+          "thumbTo": "--gl-cll-thumb-to-color=#0b1f33",
+          "thumbIconPx": "--gl-cll-thumb-icon-px=34px",
+          "thumbIconInset": "--gl-cll-thumb-icon-inset=14px",
+          "playPx": "--gl-cll-play-px=46px",
+          "playGlyphPx": "--gl-cll-play-glyph-px=18px",
+          "playFill": "--gl-cll-play-fill-color=#ffffff",
+          "playGlyph": "--gl-cll-play-glyph-color=#0b1f33",
+          "durationPx": "--gl-cll-duration-px=12px",
+          "durationWeight": "--gl-cll-duration-wght=600",
+          "durationPadY": "--gl-cll-duration-pad-y=3px",
+          "durationPadX": "--gl-cll-duration-pad-x=8px",
+          "durationRadius": "--gl-cll-duration-radius=7px",
+          "durationInset": "--gl-cll-duration-inset=10px",
+          "durationFill": "--gl-cll-duration-fill-color=#000000",
+          "durationFillOpacity": "--gl-cll-duration-fill-opacity=55%",
+          "durationColor": "--gl-cll-duration-color=#ffffff",
+          "rolePx": "--gl-cll-role-px=12px",
+          "roleWeight": "--gl-cll-role-wght=600",
+          "roleTracking": "--gl-cll-role-tracking=1.2px",
+          "roleGap": "--gl-cll-role-gap=10px",
+          "roleInsetX": "--gl-cll-role-inset-x=4px",
+          "roleColor": "--gl-cll-role-color=#5f6b7a",
+          "videoTitlePx": "--gl-cll-video-title-px=16px",
+          "videoTitleWeight": "--gl-cll-video-title-wght=600",
+          "videoTitleLeading": "--gl-cll-video-title-leading=1.3",
+          "videoTitleGap": "--gl-cll-video-title-gap=3px",
+          "videoTitleInsetX": "--gl-cll-video-title-inset-x=4px",
+          "videoTitleGapBottom": "--gl-cll-video-title-gap-bottom=4px",
+          "statsGap": "--gl-cll-stats-gap=12px",
+          "statsGapTop": "--gl-cll-stats-gap-top=18px",
+          "statPadY": "--gl-cll-stat-pad-y=12px",
+          "statPadX": "--gl-cll-stat-pad-x=16px",
+          "statRadius": "--gl-cll-stat-radius=14px",
+          "statFill": "--gl-cll-stat-fill-color=#ffffff",
+          "statBorder": "--gl-cll-stat-border=1px",
+          "statBorderColor": "--gl-cll-stat-border-color=#e3e8ee",
+          "statValuePx": "--gl-cll-stat-value-px=26px",
+          "statLabelPx": "--gl-cll-stat-label-px=13px",
+          "statLabelWeight": "--gl-cll-stat-label-wght=400",
+          "statLabelGap": "--gl-cll-stat-label-gap=2px",
+          "statLabelColor": "--gl-cll-stat-label-color=#5f6b7a"
+        },
+        "stage": {
+          "src": "asset-ref:layer:cll-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:cll-platform"
+        },
+        "voice": {
+          "question": "¿Cómo aprende mi equipo?",
+          "answer": "ritmo",
+          "eyebrow": "Activación y adopción",
+          "answerLead": "A su"
+        },
+        "body": "Tutoriales cortos en video, grabados sobre <strong>tu</strong> HubSpot: responden «¿cómo hago…?» sin agendar una reunión.",
+        "libraryTool": {
+          "src": "asset-ref:file:tool-loom"
+        },
+        "library": {
+          "kicker": "En Loom · sobre tu portal",
+          "title": "Tutoriales de tu equipo"
+        },
+        "sampleMark": "Datos de muestra",
+        "videos": [
+          {
+            "icon": "asset-ref:file:hubspot-icon-sales",
+            "from": "--gl-cll-thumb-from-color=#16395c",
+            "duration": "2:40",
+            "role": "Ventas",
+            "title": "Cómo registrar un negocio"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "from": "--gl-cll-thumb-from-color=#1b3f5e",
+            "duration": "3:05",
+            "role": "Servicio",
+            "title": "Cerrar un ticket con knowledge"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-marketing",
+            "from": "--gl-cll-thumb-from-color=#14324f",
+            "duration": "4:12",
+            "role": "Marketing",
+            "title": "Probar un workflow antes de activarlo"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-revenue",
+            "from": "--gl-cll-thumb-from-color=#10304d",
+            "duration": "3:30",
+            "role": "Revenue",
+            "title": "Crear una cotización y su contrato"
+          }
+        ],
+        "stats": [
+          {
+            "value": "24",
+            "label": "tutoriales grabados"
+          },
+          {
+            "value": "3 min",
+            "label": "duración promedio"
+          },
+          {
+            "value": "Por rol",
+            "label": "ventas, servicio, marketing y revenue"
+          }
+        ]
+      },
+      "template": "ContentDayLiveLibrary",
+      "contractHash": "e4eb4178a0787232a67df92813cd07d90cce6e9e7a57b87033bd45c6872a8306",
+      "templateHash": "021240faf2a5f0f0c9058dc65fdc36a755f8302de19a9f5ac0c36b4c47b350de"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

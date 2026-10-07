@@ -1,0 +1,426 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B15-medicion-voz2",
+  "input": {
+    "artifactId": "hs-B15-medicion-voz2",
+    "slides": [
+      {
+        "slideId": "deck-content-measure-formulas",
+        "contentType": "deck.content-measure-formulas",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "noteRight": "--gl-ls-note-right=120px",
+            "noteTop": "--gl-ls-note-top=112px",
+            "notePx": "--gl-ls-note-px=16px",
+            "noteWeight": "--gl-ls-note-wght=400",
+            "noteColor": "--gl-ls-note-color=#e2e2e2",
+            "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+            "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+            "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+            "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+            "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+            "lsGlassBlur": "--gl-ls-glass-blur=6px",
+            "lsGlassBorder": "--gl-ls-glass-border=1px",
+            "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+            "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+            "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+            "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+            "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+            "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+            "cardWidth": "--gl-cmf-card-width=330px",
+            "cardHeight": "--gl-cmf-card-height=262px",
+            "cardPadY": "--gl-cmf-card-pad-y=22px",
+            "cardPadX": "--gl-cmf-card-pad-x=24px",
+            "cardRadius": "--gl-cmf-card-radius=22px",
+            "iconSize": "--gl-cmf-icon=52px",
+            "titlePx": "--gl-cmf-title-px=28px",
+            "titleTracking": "--gl-cmf-title-tracking=-0.56px",
+            "titleGap": "--gl-cmf-title-gap=16px",
+            "titleColor": "--gl-cmf-title-color=#ffffff",
+            "formulaPx": "--gl-cmf-formula-px=16px",
+            "formulaWeight": "--gl-cmf-formula-wght=500",
+            "formulaLeading": "--gl-cmf-formula-leading=1.4",
+            "formulaGap": "--gl-cmf-formula-gap=10px",
+            "formulaPadY": "--gl-cmf-formula-pad-y=8px",
+            "formulaPadX": "--gl-cmf-formula-pad-x=12px",
+            "formulaRadius": "--gl-cmf-formula-radius=10px",
+            "formulaFill": "--gl-cmf-formula-fill-color=#ffffff",
+            "formulaFillOpacity": "--gl-cmf-formula-fill-opacity=8%",
+            "formulaColor": "--gl-cmf-formula-color=#e6edf3",
+            "metaPx": "--gl-cmf-meta-px=13px",
+            "metaWeight": "--gl-cmf-meta-wght=500",
+            "metaTracking": "--gl-cmf-meta-tracking=1.3px",
+            "metaGapFirst": "--gl-cmf-meta-gap-first=12px",
+            "metaGapNext": "--gl-cmf-meta-gap-next=6px",
+            "metaColor": "--gl-cmf-meta-color=#e2e2e2"
+          },
+          "stage": {
+            "src": "asset-ref:layer:cmf-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:cmf-platform"
+          },
+          "voice": {
+            "question": "¿Cómo sé que funciona?",
+            "answer": "medimos",
+            "eyebrow": "Qué medimos",
+            "answerLead": "Lo"
+          },
+          "body": "Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>, desde el diagnóstico.",
+          "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+          "metrics": [
+            {
+              "icon": "asset-ref:icon:medicion-revenue-hubspot-dark-52",
+              "name": "Adopción",
+              "formula": "Usuarios activos ÷ licencias",
+              "sourceLabel": "Fuente",
+              "source": "HubSpot",
+              "ownerLabel": "Dueño",
+              "owner": "Líder del área",
+              "left": "--gl-cmf-left=760px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:reloj-revenue-hubspot-dark-52",
+              "name": "Primer valor",
+              "formula": "Días del kickoff al primer valor acordado",
+              "sourceLabel": "Fuente",
+              "source": "Plan del proyecto",
+              "ownerLabel": "Dueño",
+              "owner": "Efeonce",
+              "left": "--gl-cmf-left=1110px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:checklist-revenue-hubspot-dark-52",
+              "name": "Soporte en SLA",
+              "formula": "Solicitudes dentro del SLA ÷ total",
+              "sourceLabel": "Fuente",
+              "source": "Tu canal de soporte",
+              "ownerLabel": "Dueño",
+              "owner": "Efeonce",
+              "left": "--gl-cmf-left=1460px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:base-de-datos-revenue-hubspot-dark-52",
+              "name": "Calidad de datos",
+              "formula": "Registros completos y sin duplicar ÷ total",
+              "sourceLabel": "Fuente",
+              "source": "Data Hub · informes",
+              "ownerLabel": "Dueño",
+              "owner": "Admin de tu portal",
+              "left": "--gl-cmf-left=935px",
+              "top": "--gl-cmf-top=480px"
+            },
+            {
+              "icon": "asset-ref:icon:ia-revenue-hubspot-dark-52",
+              "name": "Agentes",
+              "formula": "Propuestas aprobadas sin corrección ÷ total",
+              "sourceLabel": "Fuente",
+              "source": "Agent Hub",
+              "ownerLabel": "Dueño",
+              "owner": "Supervisora",
+              "left": "--gl-cmf-left=1285px",
+              "top": "--gl-cmf-top=480px"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-measure-formulas",
+      "contentType": "deck.content-measure-formulas",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "cardWidth": "--gl-cmf-card-width=330px",
+          "cardHeight": "--gl-cmf-card-height=262px",
+          "cardPadY": "--gl-cmf-card-pad-y=22px",
+          "cardPadX": "--gl-cmf-card-pad-x=24px",
+          "cardRadius": "--gl-cmf-card-radius=22px",
+          "iconSize": "--gl-cmf-icon=52px",
+          "titlePx": "--gl-cmf-title-px=28px",
+          "titleTracking": "--gl-cmf-title-tracking=-0.56px",
+          "titleGap": "--gl-cmf-title-gap=16px",
+          "titleColor": "--gl-cmf-title-color=#ffffff",
+          "formulaPx": "--gl-cmf-formula-px=16px",
+          "formulaWeight": "--gl-cmf-formula-wght=500",
+          "formulaLeading": "--gl-cmf-formula-leading=1.4",
+          "formulaGap": "--gl-cmf-formula-gap=10px",
+          "formulaPadY": "--gl-cmf-formula-pad-y=8px",
+          "formulaPadX": "--gl-cmf-formula-pad-x=12px",
+          "formulaRadius": "--gl-cmf-formula-radius=10px",
+          "formulaFill": "--gl-cmf-formula-fill-color=#ffffff",
+          "formulaFillOpacity": "--gl-cmf-formula-fill-opacity=8%",
+          "formulaColor": "--gl-cmf-formula-color=#e6edf3",
+          "metaPx": "--gl-cmf-meta-px=13px",
+          "metaWeight": "--gl-cmf-meta-wght=500",
+          "metaTracking": "--gl-cmf-meta-tracking=1.3px",
+          "metaGapFirst": "--gl-cmf-meta-gap-first=12px",
+          "metaGapNext": "--gl-cmf-meta-gap-next=6px",
+          "metaColor": "--gl-cmf-meta-color=#e2e2e2"
+        },
+        "stage": {
+          "src": "asset-ref:layer:cmf-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:cmf-platform"
+        },
+        "voice": {
+          "question": "¿Cómo sé que funciona?",
+          "answer": "medimos",
+          "eyebrow": "Qué medimos",
+          "answerLead": "Lo"
+        },
+        "body": "Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>, desde el diagnóstico.",
+        "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+        "metrics": [
+          {
+            "icon": "asset-ref:icon:medicion-revenue-hubspot-dark-52",
+            "name": "Adopción",
+            "formula": "Usuarios activos ÷ licencias",
+            "sourceLabel": "Fuente",
+            "source": "HubSpot",
+            "ownerLabel": "Dueño",
+            "owner": "Líder del área",
+            "left": "--gl-cmf-left=760px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-revenue-hubspot-dark-52",
+            "name": "Primer valor",
+            "formula": "Días del kickoff al primer valor acordado",
+            "sourceLabel": "Fuente",
+            "source": "Plan del proyecto",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=1110px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:checklist-revenue-hubspot-dark-52",
+            "name": "Soporte en SLA",
+            "formula": "Solicitudes dentro del SLA ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Tu canal de soporte",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=1460px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:base-de-datos-revenue-hubspot-dark-52",
+            "name": "Calidad de datos",
+            "formula": "Registros completos y sin duplicar ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Data Hub · informes",
+            "ownerLabel": "Dueño",
+            "owner": "Admin de tu portal",
+            "left": "--gl-cmf-left=935px",
+            "top": "--gl-cmf-top=480px"
+          },
+          {
+            "icon": "asset-ref:icon:ia-revenue-hubspot-dark-52",
+            "name": "Agentes",
+            "formula": "Propuestas aprobadas sin corrección ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Agent Hub",
+            "ownerLabel": "Dueño",
+            "owner": "Supervisora",
+            "left": "--gl-cmf-left=1285px",
+            "top": "--gl-cmf-top=480px"
+          }
+        ]
+      },
+      "template": "ContentMeasureFormulas",
+      "contractHash": "35488938636cf73de112d6c55ed89a36226f890be009021a55fec69d28bc52e3",
+      "templateHash": "5a50c85ed97aa406f54bbad048d9b5d4409de0b8c8f0ec2b808bbfb4c6c348ff"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

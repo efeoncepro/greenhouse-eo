@@ -7,6 +7,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Fuentes y autoridad
 
+- [Segmentos activos de prospección](../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md): propiedades, catálogo y cierre del alta automática; [manual CLI/MCP](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
+
 | Superficie                                                                                     | Autoridad                                                                                        |
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | HubSpot                                                                                        | Company, Contact, Deal, asociaciones, owner, pipeline, stage, monto, moneda y fechas comerciales |

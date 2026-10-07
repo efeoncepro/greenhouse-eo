@@ -13,6 +13,12 @@ una oferta existente o configurar el encargo desde la necesidad del cliente; cad
 derechos, revisiones y condiciones concretas. No exige limitarse a dos ofertas ni completar un catálogo para vender.
 Precio y capacidad se validan antes de contratar; no existe una tarifa pública ni SLA universal Factory.
 
+Factory es exclusivo para encargos **On-Demand**. Servicios mensuales, retainers y operación continua pertenecen
+a **Efeonce** y su práctica. El canal de captación no decide la modalidad; clasificar antes de nombrar el Deal.
+Cobrar un proyecto acotado por cuotas/hitos no lo convierte por sí solo en un servicio mensual.
+La preparación de propuestas se prioriza por fit; la capacidad libre no fija un cupo. La ejecución y economía
+se validan antes de una oferta vinculante, incluyendo proveedores y posibles adjudicaciones simultáneas.
+
 ## Capacidades que se pueden contratar
 
 Esta es una guía abierta, no un catálogo exhaustivo ni una secuencia obligatoria de lanzamiento.

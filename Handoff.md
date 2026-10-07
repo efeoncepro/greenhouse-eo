@@ -1,23 +1,24 @@
 # Handoff activo
 
-**Pibank v0.6:** [caso y método](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md): SEO/GEO+PR1.216h; costos/roster/fee pendientes. Corte09/10.
+**Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
-**Nano 2.1:** `pnpm ai:nano` local.
+**Pibank v0.6:** [caso y método](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md): SEO/GEO+PR1.216h; costos/roster/fee pendientes. Corte09/10.
 
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
 
-**Factory (05/10):** [canon local](docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md), vía
-transversal On-Demand. Commercial/Operations/Finance: capacidad, costing, cobro y oportunidades pendientes.
-Sin runtime/envíos; capas funcional/manual al implementar billing/OT/brief/CX (Product/Operations).
-Entradas: licitaciones públicas/privadas, prospección fría y paid media.
-
-**TASK-2007 (05/10, Codex):** producto, scheduler y Growth CTA AXIS aprobados visualmente; [estado, evidencia y pendientes](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md). Banners editorial/marca, anillo arriba/esfera al cierre, Bricolage400/700 opt-in y agenda dialog/inline. Preview `http://127.0.0.1:4340/references/growth-cta/#banners`; CTA40/40 + final4/4 PASS. Nuevos exports unreleased; release/instalación, AT físico y adopción Growth/hosts pendientes. Sin cambios consumidores. AXIS `447ea0c` enviado a main; CI en curso. Preservar WIP ajeno AI Visibility Report/tokens.
+**Factory (05/10):** [canon](docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md): On-Demand;
+continuos/mensuales bajo Efeonce. [HubSpot](docs/commercial/tenders/FACTORY_HUBSPOT_CHANGESET_2026-10-05.md): cinco
+altas (tres Factory/dos Efeonce), veinte vencidas perdidas; registros/forecast sincronizados; RFI preservado.
+[Cola por fit](docs/commercial/tenders/LICITALAB_PRIORITY_QUEUE_2026-10-05.md): 14 fichas adicionales, ocho
+borradores técnicos; capacidad libre no limita propuestas. Pendientes: respaldos, costing, ejecución y aprobación;
+sin ofertas enviadas ni billing/OT/CX. RevOps/Julio: buckets derivaron a Core; UNAP sin amount. Entradas:
+licitaciones públicas/privadas, prospección fría y paid media. [AGCID](docs/commercial/tenders/agcid-ciberseguridad-diseno-2026/README.md): originales y anexos 1/2/4/8 con firma gráfica autorizada; técnica/metodología firmadas para revisión, Gantt, programa actualizado y muestras curadas en OneDrive. Anexo 5 EUR 12.000 total IVA incluido aprobado por Julio y firmado; costos/margen, disponibilidad contractual SKY y respaldo de difusión pendientes; habilitación confirmada por Julio; sin postulación.
 
 **Títulos del portal (05/10, Codex):** `Efeonce | Greenhouse` por defecto; Acceder, Proyectos y Finanzas con Efeonce primero y locale ES/EN. Helper de copy compartido y labels de navegación reutilizados. ESLint y TypeScript PASS; [detalle](docs/audits/ui/2026-10-05-portal-metadata.md). Commit y push a `develop` autorizados (05/10); despliegue no verificado.
 
 **Identidad del portal (05/10, Codex):** Efeonce en el menú (logo/isotipo), Greenhouse en ambos footers con tema claro/oscuro; cambio local autorizado por el operador. Canon y assets existentes preservados. Validación y capturas: [dossier](docs/audits/ui/2026-10-05-portal-brand-chrome.md). Commit y push a `develop` autorizados (05/10); sin deploy verificado.
 
-**TASK-2007 (05/10, Codex):** mejoras AXIS implementadas localmente en `../axis-design-system`: opciones con media/grupos, Combobox remoto recuperable, feedback/superficies, MultiSelect, tabs/colección, fecha/rango y archivo. Preview `http://127.0.0.1:4337/references/product/`; [task](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md) y dossier AXIS `docs/quality/product-primitives.md`. Publicado previamente: tokens0.5.1 ≠ primitives0.5.0; exports nuevas sin publicar. Sin pins ni runtime de Growth modificados. Suite global detenida por hash preexistente de AI Visibility Report en tokens; no tocar ese WIP. QA: 28/28 nuevos journeys, build/typecheck, 36 unit, 191 contracts, 14 registry y 4 agent PASS. Regresión amplia 194/196 con dos timeouts de navegación; rerun focal 4/4. AT físico y release pendientes. Dossier con evidencia.
+**TASK-2007 (05/10, Codex):** producto, scheduler y Growth CTA AXIS aprobados visualmente; [estado, evidencia y pendientes](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md). Banners editorial/marca, anillo arriba/esfera al cierre, Bricolage400/700 opt-in y agenda dialog/inline. Preview `http://127.0.0.1:4340/references/growth-cta/#banners`; CTA40/40 + final4/4 PASS. Nuevos exports unreleased; release/instalación, AT físico y adopción Growth/hosts pendientes. Sin cambios consumidores. AXIS `447ea0c` enviado a main; CI en curso. Preservar WIP ajeno AI Visibility Report/tokens.
 
 **TASK-2002 (04–05/10, Claude):** calendario de Studio en producción con rendimiento y motion v3.6 (`3829a8b`, deploy `3ai7wipv3`); escritura abierta para Efeonce hasta 2026-10-12T10:00Z. Incidente de conexiones durante la verificación resuelto: [ISSUE-180](docs/issues/resolved/ISSUE-180-marketing-studio-pg-connections-exhausted-after-calendar-deploy.md) (`attachDatabasePool`, 2 conexiones por instancia). Pendiente: pooler de conexiones (task aparte). Detalle en la [task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
 
@@ -33,7 +34,7 @@ Entradas: licitaciones públicas/privadas, prospección fría y paid media.
 
 Staging: ISSUE-178 resuelto.
 
-**SEO / Studio / Insights (04/10):** [ownership](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md); [discovery1690](docs/audits/seo/2026-10-04-task-1690-discovery.md). UI por seleccionar; código pendiente.
+**SEO / Studio / Insights (04/10):** [ownership](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md); [discovery1690](docs/audits/seo/2026-10-04-task-1690-discovery.md). Opción 1 corregida seleccionada (05/10): GSC y AEO independientes; [TASK-2008](docs/tasks/to-do/TASK-2008-growth-seo-client-evidence-ui.md) y [plan conjunto](docs/tasks/plans/TASK-1690-TASK-2008-client-seo-plan.md) preparados. Goal explícito pendiente; código no iniciado.
 
 **Spot «Los Sparks» (04/10):** en Studio (CMP001-08, `imported`, sin aprobar) y programado en Metricool (IG 05-oct 14:00, LinkedIn 08-oct 11:00, `PENDING`). Falta: enlace en la bio de IG, aprobar en Studio y licencia de la música antes de pautar. [Programación](ai-generations/2026-10-03_sparks-aeo-60s/final/redes/PROGRAMACION.md). Naming: marca Efeonce, servicio «Efeonce | AEO».
 
@@ -66,9 +67,9 @@ Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y tota
 
 **CMP-004 por servicios (02/10):** [CDR-012](docs/campaigns/decisions/CDR-012-cmp004-reorientacion-por-servicios.md) — 8 pilotos N2 certificados (`graphicLine`, `fde62f05d`); pendientes y artefactos en el CDR §6. Sin push.
 
-**Registro cine sin consultor (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md) delta b en develop (último `00e53ef53`), AXIS en vivo. Dos pruebas ciegas: las sesiones llegan solas usando `cine-reviewer`; barra de luz recalibrada contra las aprobadas. Pendiente: veredicto del operador sobre `ai-generations/2026-10-02_prueba-ciega-cine-2/` y el orquestador idempotente. [Casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
+**Cine (02/10):** [TASK-1926](docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md): delta b local (`00e53ef53`), AXIS live; dos pruebas ciegas autónomas con `cine-reviewer`, luz recalibrada contra aprobadas. Pendientes: veredicto en `ai-generations/2026-10-02_prueba-ciega-cine-2/` y orquestador idempotente. [Casebook](docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
 
-**Traje biónico de Nexa (02/10):** [TASK-1940](docs/tasks/complete/TASK-1940-nexa-bionic-suit-reference-kit.md) complete: kit sellado y publicado, catálogo sólo Nexa/cine, marcas armadas, NX7d canonizada. Pendientes (OneDrive, NX7d con titular, pose repetida de Nexa, Sparks en el publicador) en el delta de cierre de la task.
+**Traje Nexa (02/10):** [TASK-1940](docs/tasks/complete/TASK-1940-nexa-bionic-suit-reference-kit.md) complete: kit sellado/publicado, sólo Nexa/cine, marcas armadas, NX7d canonizada. Pendientes: OneDrive, NX7d con titular, pose repetida y Sparks en publicador; detalle en cierre de task.
 
 **Workbench:** Lab v6 publicado. Íconos: `af6f5e2` local, publicación pendiente. SKY local: 76 badges LEFT, 24 adaptaciones v6, 394 pruebas PASS; aceptación visual pendiente. [Estado](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md). Efeonce ID diferido.
 
@@ -77,7 +78,7 @@ Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y tota
 **DataForSEO CLI (30/09):** [TASK-1948](docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md) complete local, CLI 1.1.0: URL/host, JSON/CSV, techo y resume. [Evidencia](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests; prueba corregida MX para Berel USD 0,0284 reconciliados, 20 keywords/2 páginas y resume USD 0. Guías/skills sincronizadas; sugerencias con ruido editorial, CL separado. Typecheck global con WIP ajeno; sin push/deploy.
 **Creative Workbench (30/09, actualización):** el harness activo está en `creative-workbench`; PR 11 (lotes) y PR 12 (círculos) integrados en main `2bb761a`. Skills Codex/Claude y documentación de SKY se publican en una rama aislada para no arrastrar commits ajenos de develop. Cargar [skill](.codex/skills/efeonce-creative-workbench/SKILL.md) y [estado fechado](.codex/skills/efeonce-creative-workbench/references/state-continuity.md). **Siguiente:** recomponer en corridas nuevas las dos muestras antiguas afectadas, completar revisión visual y flujo IA. Efeonce ID diferido en [TASK-1952](docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md); sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse. El corte anterior del PR 3 borrador queda superado; CI/código no acreditan deploy del broker ni IA habilitada.
 
-**HubSpot / prospección (06/10):** CLI 0.15.1, portal `48713323`; 18 activos del lote y 15 globales verificados. [Auditoría y abordaje](docs/audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md) · [manual](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md). 61 candidatos con correo; revalidar intención, email y supresiones antes del envío, con una entrada por cuenta. ANAM requiere conexión propia.
+**HubSpot / prospección (06/10):** `48713323`: cohorte 81/81; 19 ACTIVE, 15 globales intactos. Emails 63, creativo 51, CRM 26; 19 conjuntos exactos tras Sika. [Modelo y catálogo](docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) · [manual](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md). Routers y skills Codex/Claude sincronizados; alta requiere propiedades, Primary y membresía. ANAM: conexión propia.
 
 **Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete** (94/94 con plantilla, AXIS `v0.3.36`, insignia autorizada). Pendiente externo: autorización de Anthropic para Claude/Claudeforce en SF16 (TASK-1937). Siguiente: serie HubSpot (TASK-1943).
 
@@ -397,4 +398,4 @@ Think `be8d484`: demo publicada y aceptada. [Dossier](docs/think/aeo-xray-implem
 
 TASK-1950/1951: integración Greenhouse pendiente, sin promoción; `sample_` no acredita grant. Deal 65352884246 en `presentationscheduled` verificado; correo redactado, envío no verificado.
 
-Diferenciador comercial reconocido: [experimentar capacidad antes de contratar](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md); canon `context/09` y skills espejo Agency/Brand/SEO. Sistematización operativa aún propuesta.
+Comercial: [demostración contextual](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md), propuesta.

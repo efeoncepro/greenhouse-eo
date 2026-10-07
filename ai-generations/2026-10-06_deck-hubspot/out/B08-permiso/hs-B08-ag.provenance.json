@@ -1,0 +1,35 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "050600e1105c5306b54fccbb7c064efcbb2b2c07bd2ec3044e9587dd81d90de4",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-identity-consent",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:hubspot-icon-data",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-data.svg",
+      "sha256": "1618a4b400d1518e77cf51fbb84627aee5290a8b72612ec186b8aaca4fb8a594"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-marketing",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-marketing.svg",
+      "sha256": "89ead75d1c2fdd407ab6705fb2c50c88813f44dd2b5fa6e3a71ce8f4afacba80"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-service",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-service.svg",
+      "sha256": "964925292dbd8777f63b478490ec358387403730577d1d6694b7e57aa92e3ac4"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-sales",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-sales.svg",
+      "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

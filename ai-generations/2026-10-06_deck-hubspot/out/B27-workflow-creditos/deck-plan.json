@@ -1,0 +1,168 @@
+{
+  "tenderId": "hs-B27-workflow-creditos-2",
+  "slides": [
+    {
+      "slideId": "deck-decision-ai-market",
+      "contentType": "deck.decision-ai-market",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 132,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-am-question-width=470px",
+          "answerLeading": "--gl-am-answer-leading=0.9",
+          "answerTracking": "--gl-am-answer-tracking=-0.05em",
+          "answerInset": "--gl-am-answer-inset=-8px",
+          "answerShadowY": "--gl-am-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-am-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-am-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-am-answer-shadow-color=#000000",
+          "perspective": "--gl-am-perspective=1800px",
+          "originX": "--gl-am-origin-x=1320px",
+          "originY": "--gl-am-origin-y=450px",
+          "radius": "--gl-am-radius=24px",
+          "angle": "--gl-am-angle=165deg",
+          "leadFillFrom": "--gl-am-lead-from-color=#135064",
+          "leadFillTo": "--gl-am-lead-to-color=#081c30",
+          "sideFillFrom": "--gl-am-side-from-color=#12344f",
+          "sideFillTo": "--gl-am-side-to-color=#081c30",
+          "leadPadY": "--gl-am-lead-pad-y=34px",
+          "leadPadX": "--gl-am-lead-pad-x=32px",
+          "sidePadY": "--gl-am-side-pad-y=28px",
+          "sidePadX": "--gl-am-side-pad-x=26px",
+          "leadBorder": "--gl-am-lead-border=2px",
+          "leadBorderColor": "--gl-am-lead-border-color=#72ded8",
+          "leadBorderOpacity": "--gl-am-lead-border-opacity=90%",
+          "sideBorder": "--gl-am-side-border=1px",
+          "sideBorderColor": "--gl-am-side-border-color=#ffffff",
+          "sideBorderOpacity": "--gl-am-side-border-opacity=16%",
+          "shadowY": "--gl-am-shadow-y=50px",
+          "shadowBlur": "--gl-am-shadow-blur=110px",
+          "shadowColor": "--gl-am-shadow-color=#000610",
+          "shadowOpacity": "--gl-am-shadow-opacity=70%",
+          "haloColor": "--gl-am-halo-color=#72ded8",
+          "leadGlowBlur": "--gl-am-lead-glow-blur=120px",
+          "leadGlowOpacity": "--gl-am-lead-glow-opacity=45%",
+          "sideGlowBlur": "--gl-am-side-glow-blur=40px",
+          "sideGlowOpacity": "--gl-am-side-glow-opacity=14%",
+          "reflectGap": "--gl-am-reflect-gap=14px",
+          "reflectFrom": "--gl-am-reflect-from=72%",
+          "reflectOpacity": "--gl-am-reflect-opacity=16%",
+          "valueLeadPx": "--gl-am-value-lead-px=150px",
+          "valuePx": "--gl-am-value-px=116px",
+          "valueLongPx": "--gl-am-value-long-px=76px",
+          "valueLeading": "--gl-am-value-leading=0.95",
+          "valueTracking": "--gl-am-value-tracking=-0.05em",
+          "valueLeadColor": "--gl-am-value-lead-color=#ffffff",
+          "valueColor": "--gl-am-value-color=#e6edf3",
+          "labelLeadPx": "--gl-am-label-lead-px=30px",
+          "labelPx": "--gl-am-label-px=26px",
+          "labelLeading": "--gl-am-label-leading=1.12",
+          "labelTracking": "--gl-am-label-tracking=-0.02em",
+          "labelGap": "--gl-am-label-gap=26px",
+          "detailLeadPx": "--gl-am-detail-lead-px=18px",
+          "detailPx": "--gl-am-detail-px=16px",
+          "detailWeight": "--gl-am-detail-weight=400",
+          "detailLeading": "--gl-am-detail-leading=1.5",
+          "detailGap": "--gl-am-detail-gap=14px",
+          "detailColor": "--gl-am-detail-color=#c9d6e2",
+          "footerPadTop": "--gl-am-footer-pad-top=18px",
+          "rule": "--gl-am-rule=1px",
+          "ruleColor": "--gl-am-rule-color=#ffffff",
+          "ruleOpacity": "--gl-am-rule-opacity=14%",
+          "yearPx": "--gl-am-year-px=15px",
+          "yearWeight": "--gl-am-year-weight=500",
+          "yearColor": "--gl-am-year-color=#e2e2e2",
+          "logoHeight": "--gl-am-logo-height=26px",
+          "wordmarkPx": "--gl-am-wordmark-px=22px",
+          "wordmarkWeight": "--gl-am-wordmark-weight=700",
+          "wordmarkTracking": "--gl-am-wordmark-tracking=-0.01em",
+          "wordmarkColor": "--gl-am-wordmark-color=#e6edf3",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:decision-ai-market-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:decision-ai-market-platform"
+        },
+        "voice": {
+          "question": "¿Un workflow gasta créditos?",
+          "answer": "Si usa IA",
+          "eyebrow": "Workflows y créditos"
+        },
+        "body": "Las reglas fijas no consumen. Cada acción de IA dentro de un workflow sí, y la <strong>medimos</strong> antes de activarla.",
+        "figures": [
+          {
+            "role": "rest",
+            "size": "large",
+            "left": "--gl-am-left=840px",
+            "top": "--gl-am-top=250px",
+            "width": "--gl-am-width=300px",
+            "height": "--gl-am-height=540px",
+            "rotate": "--gl-am-rotate=16deg",
+            "z": "--gl-am-z=2",
+            "value": "10",
+            "label": "créditos por cada acción de IA en un workflow.",
+            "detail": "Unos USD 0,10 por acción, al precio de lista.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          },
+          {
+            "role": "lead",
+            "size": "large",
+            "left": "--gl-am-left=1135px",
+            "top": "--gl-am-top=190px",
+            "width": "--gl-am-width=370px",
+            "height": "--gl-am-height=600px",
+            "rotate": "--gl-am-rotate=0deg",
+            "z": "--gl-am-z=5",
+            "value": "0",
+            "label": "créditos gasta un workflow sin IA.",
+            "detail": "Asignar, notificar o actualizar un registro no consume.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          },
+          {
+            "role": "rest",
+            "size": "large",
+            "left": "--gl-am-left=1500px",
+            "top": "--gl-am-top=250px",
+            "width": "--gl-am-width=300px",
+            "height": "--gl-am-height=540px",
+            "rotate": "--gl-am-rotate=-16deg",
+            "z": "--gl-am-z=2",
+            "value": "300",
+            "label": "acciones de IA al mes con los créditos de Pro.",
+            "detail": "Pro incluye 3.000 créditos; Enterprise, 5.000.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          }
+        ]
+      },
+      "template": "DecisionAiMarket"
+    }
+  ]
+}

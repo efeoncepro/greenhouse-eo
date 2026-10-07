@@ -1,0 +1,14 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "9561ef1dc3c934b10e56070aa1303789cf6c9a8ed96cce9ac9f9c225941991c3",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-brochure",
+  "plates": [],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.15"
+  }
+}

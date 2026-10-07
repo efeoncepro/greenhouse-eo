@@ -1,0 +1,27 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "agcid-ciberseguridad-diseno-2026",
+  "workspacePath": "docs/commercial/tenders/agcid-ciberseguridad-diseno-2026",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": [
+      "deck-plan.json",
+      "deck-plan-bound.json"
+    ]
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Preparación por fit; sin GO financiero/operativo ni presentación.",
+    "05/10/2026: firma gráfica autorizada por Julio; declaraciones 1/2 y programa propio confirmados. Anexos 1/2/4/8 completos; técnica/metodología y programa actualizados con firma para revisión; Gantt, muestras curadas y respaldos adjuntos.",
+    "Habilidad del oferente confirmada directamente por Julio el 05/10/2026; sin lectura independiente ni certificado generado.",
+    "Precio decidido por Julio 05/10/2026: EUR 12000 total IVA incluido; neto 10084.03 e IVA 1915.97. Anexo 5 firmado; recomendación EUR 14280 sustituida. No hay GO financiero/operativo ni presentación.",
+    "05/10/2026: Artifact Composer graphic-line-deck produjo presentación de 28 láminas, 14 recetas, 5.30 MiB, inspeccionada visualmente. Fuentes/manifest/provenance y deck-render-record-INTERNO.json conservados. Render local; no hay Proposal registrada, job gobernado ni assets versionados; continúa workshop_only.",
+    "05/10/2026: revisión 2 a pedido de Julio. Deck-axis, 24 láminas, titulares completos y lectura autónoma del comité; sustituyó la presentación graphic-line-deck de 28 láminas, archivada. Render local; continúa workshop_only, sin GO ni postulación.",
+    "05/10/2026 revisión 3: graphic-line-deck 23 láminas; se restituye línea nueva con fotos aprobadas, se corrigen titulares y SKY sustituye el informe Berel. Revisión 2 queda sustituida. Workshop_only, sin postulación."
+  ]
+}

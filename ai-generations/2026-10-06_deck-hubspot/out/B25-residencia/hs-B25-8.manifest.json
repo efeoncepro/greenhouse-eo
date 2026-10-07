@@ -1,0 +1,294 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B25-8",
+  "input": {
+    "artifactId": "hs-B25-8",
+    "slides": [
+      {
+        "slideId": "deck-content-markets",
+        "contentType": "deck.content-markets",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 130,
+            "questionTop": 196,
+            "answerTop": 280,
+            "answerPx": 128,
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=600px",
+            "bodyTop": 560,
+            "bodyPx": 26,
+            "bodyWidth": 520,
+            "lumWidth": "--gl-lum-width=160px",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "svSpaceBg": "--gl-sv-space-bg-color=#020716",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svLabelBg": "--gl-sv-label-bg-color=#041028",
+            "svCity": "--gl-sv-city-color=#9fd7ff"
+          },
+          "photo": {
+            "src": "asset-ref:plate:RG2-mapa",
+            "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia"
+          },
+          "voice": {
+            "question": "¿Dónde están mis datos?",
+            "answer": "Unidos",
+            "eyebrow": "Residencia de datos",
+            "answerLead": "En Estados"
+          },
+          "body": "HubSpot no tiene centro de datos en Chile; si prefieres, se mueven a Europa sin costo. La ley lo permite con <strong>garantías</strong>, que HubSpot firma en su DPA.",
+          "markets": [
+            {
+              "country": "Canadá",
+              "city": "Región Canadá",
+              "side": "end",
+              "x": "--gl-smk-x=942px",
+              "top": "--gl-smk-top=299px"
+            },
+            {
+              "country": "EE. UU.",
+              "city": "Región Este",
+              "side": "start",
+              "x": "--gl-smk-x=1006px",
+              "top": "--gl-smk-top=362px"
+            },
+            {
+              "country": "Alemania",
+              "city": "Fráncfort",
+              "side": "start",
+              "x": "--gl-smk-x=1316px",
+              "top": "--gl-smk-top=297px"
+            },
+            {
+              "country": "Australia",
+              "city": "Región Australia",
+              "side": "end",
+              "x": "--gl-smk-x=137px",
+              "top": "--gl-smk-top=667px"
+            },
+            {
+              "country": "Chile",
+              "city": "Tu empresa",
+              "side": "end",
+              "x": "--gl-smk-x=1001px",
+              "top": "--gl-smk-top=660px"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-markets",
+      "contentType": "deck.content-markets",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 130,
+          "questionTop": 196,
+          "answerTop": 280,
+          "answerPx": 128,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=600px",
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "lumWidth": "--gl-lum-width=160px",
+          "lumBottom": "--gl-lum-bottom=62px",
+          "svSpaceBg": "--gl-sv-space-bg-color=#020716",
+          "svHalo": "--gl-sv-halo-color=#72ded8",
+          "svShadow": "--gl-sv-shadow-color=#000610",
+          "svLabelBg": "--gl-sv-label-bg-color=#041028",
+          "svCity": "--gl-sv-city-color=#9fd7ff"
+        },
+        "photo": {
+          "src": "asset-ref:plate:RG2-mapa",
+          "alt": "Mapa del mundo hecho de puntos de luz; desde Santiago salen cuatro arcos azules hacia las regiones de datos de HubSpot en EE. UU., Canadá, Fráncfort y Australia"
+        },
+        "voice": {
+          "question": "¿Dónde están mis datos?",
+          "answer": "Unidos",
+          "eyebrow": "Residencia de datos",
+          "answerLead": "En Estados"
+        },
+        "body": "HubSpot no tiene centro de datos en Chile; si prefieres, se mueven a Europa sin costo. La ley lo permite con <strong>garantías</strong>, que HubSpot firma en su DPA.",
+        "markets": [
+          {
+            "country": "Canadá",
+            "city": "Región Canadá",
+            "side": "end",
+            "x": "--gl-smk-x=942px",
+            "top": "--gl-smk-top=299px"
+          },
+          {
+            "country": "EE. UU.",
+            "city": "Región Este",
+            "side": "start",
+            "x": "--gl-smk-x=1006px",
+            "top": "--gl-smk-top=362px"
+          },
+          {
+            "country": "Alemania",
+            "city": "Fráncfort",
+            "side": "start",
+            "x": "--gl-smk-x=1316px",
+            "top": "--gl-smk-top=297px"
+          },
+          {
+            "country": "Australia",
+            "city": "Región Australia",
+            "side": "end",
+            "x": "--gl-smk-x=137px",
+            "top": "--gl-smk-top=667px"
+          },
+          {
+            "country": "Chile",
+            "city": "Tu empresa",
+            "side": "end",
+            "x": "--gl-smk-x=1001px",
+            "top": "--gl-smk-top=660px"
+          }
+        ]
+      },
+      "template": "ContentMarkets",
+      "contractHash": "5f73b5f9eb9dcc49d42a234de072d7e9ccb5f168c697d93c1a897029bfe83c82",
+      "templateHash": "0e2dcfc51452f1f742cf1b7cbf59a213e89f834401fb170cf94288f2110a9cd0"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

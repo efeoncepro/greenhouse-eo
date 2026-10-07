@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "430d6f008a252185ae0487e445d2ae266c48d7aec4e26a62ba9c38392151e973",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-hybrid-workforce.scene",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:HW1-mismo-trabajo",
+      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+      "sha256": "d31b9c513392b9496ebb2961969ee6cb7ac09cd2d4a3a42bfcd6bb6b95069ea3"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

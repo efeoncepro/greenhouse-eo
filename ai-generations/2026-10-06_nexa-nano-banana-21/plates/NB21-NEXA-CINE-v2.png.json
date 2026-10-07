@@ -1,0 +1,56 @@
+{
+  "model": "gemini-nano-banana-2.1",
+  "project": "efeonce-group",
+  "location": "global",
+  "endpoint": "generateContent",
+  "aspect": "16:9",
+  "resolution": "4K",
+  "thinking": "high",
+  "search": "off",
+  "references": 8,
+  "previousTurns": 0,
+  "outputImageUsd": 0.0756,
+  "estimateScope": "Sólo imagen de salida; entrada, reasoning y búsquedas adicionales.",
+  "modelVersion": "gemini-nano-banana-2.1",
+  "latencyMs": 62354,
+  "width": 5504,
+  "height": 3072,
+  "nativeMime": "image/png",
+  "format": "png",
+  "usage": {
+    "promptTokenCount": 12559,
+    "candidatesTokenCount": 3780,
+    "totalTokenCount": 19463,
+    "cachedContentTokenCount": 7985,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 8960
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 3599
+      }
+    ],
+    "cacheTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 2288
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 5697
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 3780
+      }
+    ],
+    "thoughtsTokenCount": 3124
+  },
+  "text": "",
+  "grounding": []
+}

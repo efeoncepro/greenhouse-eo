@@ -1,0 +1,185 @@
+{
+  "tenderId": "A15-siguiente",
+  "slides": [
+    {
+      "slideId": "deck-decision-next-steps",
+      "contentType": "deck.decision-next-steps",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "bodyTop": 640,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-ns-question-width=470px",
+          "answerGap": "--gl-ns-answer-gap=36px",
+          "answerSize": "--gl-ns-answer-px=128px",
+          "answerLeading": "--gl-ns-answer-leading=0.9",
+          "answerShadowY": "--gl-ns-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ns-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ns-answer-shadow-opacity=35%",
+          "contactPx": "--gl-ns-contact-px=19px",
+          "contactGap": "--gl-ns-contact-gap=22px",
+          "agendaLeft": "--gl-ns-agenda-left=900px",
+          "agendaTop": "--gl-ns-agenda-top=310px",
+          "agendaWidth": "--gl-ns-agenda-width=680px",
+          "agendaPadTop": "--gl-ns-agenda-pad-top=34px",
+          "agendaPadX": "--gl-ns-agenda-pad-x=38px",
+          "agendaPadBottom": "--gl-ns-agenda-pad-bottom=38px",
+          "agendaRadius": "--gl-ns-agenda-radius=26px",
+          "tileSize": "--gl-ns-tile=56px",
+          "tileRadius": "--gl-ns-tile-radius=16px",
+          "isotypeSize": "--gl-ns-isotype=30px",
+          "headerGap": "--gl-ns-header-gap=16px",
+          "kickerGap": "--gl-ns-kicker-gap=4px",
+          "kickerPx": "--gl-ns-kicker-px=14px",
+          "kickerColor": "--gl-ns-kicker-color=#023c70",
+          "titlePx": "--gl-ns-title-px=36px",
+          "descriptorPx": "--gl-ns-descriptor-px=18px",
+          "descriptorGap": "--gl-ns-descriptor-gap=18px",
+          "daysGapTop": "--gl-ns-days-gap-top=26px",
+          "daysGap": "--gl-ns-days-gap=12px",
+          "dayWidth": "--gl-ns-day-width=92px",
+          "dayHeight": "--gl-ns-day-height=84px",
+          "dayRadius": "--gl-ns-day-radius=14px",
+          "dayLabelPx": "--gl-ns-day-label-px=14px",
+          "dayNumberPx": "--gl-ns-day-number-px=34px",
+          "timesGapTop": "--gl-ns-times-gap-top=14px",
+          "timesGap": "--gl-ns-times-gap=12px",
+          "timeWidth": "--gl-ns-time-width=113px",
+          "timeHeight": "--gl-ns-time-height=54px",
+          "timeRadius": "--gl-ns-time-radius=12px",
+          "timePx": "--gl-ns-time-px=19px",
+          "footerGap": "--gl-ns-footer-gap=30px",
+          "summaryPx": "--gl-ns-summary-px=16px",
+          "ctaPx": "--gl-ns-cta-px=23px",
+          "ctaPadY": "--gl-ns-cta-pad-y=20px",
+          "ctaPadX": "--gl-ns-cta-pad-x=34px",
+          "ctaRadius": "--gl-ns-cta-radius=14px",
+          "haloColor": "--gl-ns-halo-color=#72ded8",
+          "stepPerspective": "--gl-ns-step-perspective=1400px",
+          "stepPadTop": "--gl-ns-step-pad-top=24px",
+          "stepPadX": "--gl-ns-step-pad-x=26px",
+          "stepPadBottom": "--gl-ns-step-pad-bottom=26px",
+          "stepRadius": "--gl-ns-step-radius=22px",
+          "stepFillFrom": "--gl-ns-step-from-color=#10324c",
+          "stepFillTo": "--gl-ns-step-to-color=#081c30",
+          "stepNumberPx": "--gl-ns-step-number-px=34px",
+          "stepNumberGap": "--gl-ns-step-number-gap=10px",
+          "stepNumberShift": "--gl-ns-step-number-shift=-4px",
+          "stepLabelPx": "--gl-ns-step-label-px=15px",
+          "stepTitlePx": "--gl-ns-step-title-px=44px",
+          "stepTitleGap": "--gl-ns-step-title-gap=12px",
+          "stepDescPx": "--gl-ns-step-desc-px=18px",
+          "stepDescGap": "--gl-ns-step-desc-gap=10px",
+          "stepDescColor": "--gl-ns-step-desc-color=#c9d6e2",
+          "chosenDay": "2",
+          "chosenTime": "2",
+          "docFill": "--gl-ns-doc-color=#ffffff",
+          "docInk": "--gl-ns-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ns-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ns-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ns-doc-chip-color=#f5f7fa",
+          "docShadowColor": "--gl-ns-doc-shadow-color=#000610",
+          "docShadowY": "--gl-ns-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ns-doc-shadow-blur=110px",
+          "docShadowOpacity": "--gl-ns-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ns-doc-halo-blur=90px",
+          "docHaloOpacity": "--gl-ns-doc-halo-opacity=22%",
+          "docEdgeOpacity": "--gl-ns-doc-edge-opacity=16%",
+          "step1Left": "--gl-ns-step1-left=1410px",
+          "step1Top": "--gl-ns-step1-top=104px",
+          "step1Width": "--gl-ns-step1-width=380px",
+          "step1Rotate": "--gl-ns-step1-rotate=-14deg",
+          "step1Opacity": "--gl-ns-step1-opacity=0.9",
+          "step2Left": "--gl-ns-step2-left=1520px",
+          "step2Top": "--gl-ns-step2-top=830px",
+          "step2Width": "--gl-ns-step2-width=330px",
+          "step2Rotate": "--gl-ns-step2-rotate=-16deg",
+          "step2Opacity": "--gl-ns-step2-opacity=0.8",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:decision-next-steps-stage"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:decision-next-steps-orbit"
+        },
+        "voice": {
+          "question": "¿Qué recibo primero?",
+          "answer": "Un plan",
+          "eyebrow": "Próximos pasos"
+        },
+        "body": "Un diagnóstico con tu baseline y la fase que sigue.",
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phone": "+56 9 3732 3064"
+        },
+        "agenda": {
+          "kicker": "01 · Creative Diagnostic",
+          "title": "Agenda tu diagnóstico",
+          "descriptor": "45 min por videollamada · baseline y siguiente fase",
+          "summary": "Martes 13 · 11:30 · hora de Chile"
+        },
+        "days": [
+          {
+            "weekday": "Lun",
+            "day": "12"
+          },
+          {
+            "weekday": "Mar",
+            "day": "13"
+          },
+          {
+            "weekday": "Mié",
+            "day": "14"
+          },
+          {
+            "weekday": "Jue",
+            "day": "15"
+          },
+          {
+            "weekday": "Vie",
+            "day": "16"
+          }
+        ],
+        "times": [
+          {
+            "time": "09:30"
+          },
+          {
+            "time": "11:30"
+          },
+          {
+            "time": "15:00"
+          },
+          {
+            "time": "17:00"
+          }
+        ],
+        "cta": {
+          "text": "Agenda un diagnóstico",
+          "cursorScale": 1.25
+        },
+        "nextSteps": [
+          {
+            "number": "02",
+            "label": "Piloto pagado",
+            "title": "Sample Sprint",
+            "desc": "Acotado y gobernado, para probar el encaje con tu marca."
+          },
+          {
+            "number": "03",
+            "label": "On-Going",
+            "title": "Tu squad",
+            "desc": "Tu squad, con métricas en vivo."
+          }
+        ]
+      },
+      "template": "DecisionNextSteps"
+    }
+  ]
+}

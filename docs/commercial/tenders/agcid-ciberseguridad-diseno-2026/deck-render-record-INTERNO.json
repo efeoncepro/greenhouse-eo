@@ -1,0 +1,64 @@
+{
+  "schema": "efeonce.tender-workshop-render.v1",
+  "process": "1606-32-LE26",
+  "revision": 3,
+  "createdAt": "2026-10-05T17:57:49.569099+00:00",
+  "status": "composed_for_review",
+  "audience": "client_facing",
+  "catalog": "graphic-line-deck",
+  "pageCount": 23,
+  "recipesUsed": 12,
+  "pdf": {
+    "filename": "agcid-propuesta-1606-32-le26.pdf",
+    "bytes": 4167909,
+    "sha256": "d1c86a4b54a03a2cac10a50c6fc82f7a143e9f79ffad99694650eb9d1e964249"
+  },
+  "checks": {
+    "nativeRender": "PASS",
+    "pdfReadback": "PASS — 23 pages; approved price and scope; no discarded price or report sample claim",
+    "priceArithmetic": "PASS Decimal sum and 30 × unit",
+    "visualReview": "All 23 frames inspected; changed agenda, QA, SKY and GORE inspected full size; manual/web/price also inspected. New photographs retained."
+  },
+  "editorialDecision": "Restore new graphic-line deck and photographs, complete meaningful headlines; replace Berel report sample with real SKY campaign and three country mailings.",
+  "sourceFiles": [
+    "deck-intent.json",
+    "deck-plan.json",
+    "deck-plan-bound.json",
+    "deck-binding-sources.json",
+    "deck-outline.md"
+  ],
+  "sourceHashes": {
+    "deck-intent.json": "f4a0c5fc606e0dff84c8fc9e0ae9a3e01d454a9d2ee5b20386872bcac5083781",
+    "deck-plan.json": "0fdbdda0d47ac695a18a786225a1239d27ee4453db7768dbdb860809768ab199",
+    "deck-plan-bound.json": "ac0d1434dab12aeb437f640ac0040972179bc2b32fa790b95506d708c081f677"
+  },
+  "proposalStudio": {
+    "status": "workshop_only",
+    "proposalId": null,
+    "renderJobId": null,
+    "optionalProofSlotsBound": false
+  },
+  "submission": {
+    "submitted": false,
+    "receipt": null
+  },
+  "oneDriveReadback": {
+    "checkedAt": "2026-10-05T17:58:54Z",
+    "method": "independent Microsoft Graph exact-item metadata",
+    "size": 4167909,
+    "modified": "2026-10-05T17:54:47Z",
+    "eTag": "\"{651DCA54-36CD-4323-A7BD-65ECB8165C7F},4\"",
+    "expectedSize": 4167909,
+    "sizeMatches": true,
+    "remotePdfDownloaded": false
+  },
+  "companionDocuments": {
+    "dossier": {
+      "bytes": 18172048,
+      "sha256": "899355c58e97aa997b7cdeb51451d5b2cdc4d79fe70933969d232a9114b41a8d",
+      "pages": 9,
+      "samples": "GORE, Bresler, SKY campaign and Chile/Brazil/Peru mailings; no Berel report"
+    },
+    "anexo4": "Only obsolete Berel report sample reference removed; entity, three services and existing authorized signature preserved. Native Word PDF, 3 pages inspected."
+  }
+}

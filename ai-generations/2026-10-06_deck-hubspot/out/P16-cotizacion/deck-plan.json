@@ -1,0 +1,145 @@
+{
+  "tenderId": "hs-P16-cotizacion-voz",
+  "slides": [
+    {
+      "slideId": "deck-content-pricing",
+      "contentType": "deck.content-pricing",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "bodyTop": 560,
+          "bodyPx": 25,
+          "bodyWidth": 470,
+          "legalTop": "--gl-pt-legal-top=880px",
+          "legalPx": "--gl-pt-legal-px=17px",
+          "plansLeft": "--gl-pt-plans-left=760px",
+          "plansTop": "--gl-pt-plans-top=250px",
+          "planWidth": "--gl-pt-plan-width=320px",
+          "planHeight": "--gl-pt-plan-height=640px",
+          "planGap": "--gl-pt-plan-gap=30px",
+          "planRadius": "--gl-pt-plan-radius=18px",
+          "liftPx": "--gl-pt-lift=50px",
+          "extraHeight": "--gl-pt-extra-height=100px",
+          "shadowY": "--gl-pt-shadow-y=40px",
+          "shadowBlur": "--gl-pt-shadow-blur=90px",
+          "shadowOpacity": "--gl-pt-shadow-opacity=45%",
+          "labelColor": "--gl-pt-label-color=#023c70",
+          "padY": "--gl-pt-pad-y=34px",
+          "padX": "--gl-pt-pad-x=32px",
+          "recPadY": "--gl-pt-rec-pad-y=40px",
+          "namePx": "--gl-pt-name-px=52px",
+          "recNamePx": "--gl-pt-rec-name-px=64px",
+          "taglinePx": "--gl-pt-tagline-px=21px",
+          "taglineGap": "--gl-pt-tagline-gap=10px",
+          "amountPx": "--gl-pt-amount-px=36px",
+          "recAmountPx": "--gl-pt-rec-amount-px=44px",
+          "amountGap": "--gl-pt-amount-gap=28px",
+          "recAmountGap": "--gl-pt-rec-amount-gap=34px",
+          "periodPx": "--gl-pt-period-px=17px",
+          "periodGap": "--gl-pt-period-gap=4px",
+          "featurePx": "--gl-pt-feature-px=20px",
+          "featurePad": "--gl-pt-feature-pad=13px",
+          "featureRule": "--gl-pt-feature-rule=1.5px",
+          "featuresGap": "--gl-pt-features-gap=26px",
+          "recFeaturesGap": "--gl-pt-rec-features-gap=30px",
+          "labelPx": "--gl-pt-label-px=15px",
+          "labelGap": "--gl-pt-label-gap=14px",
+          "recommended": "2"
+        },
+        "voice": {
+          "question": "¿Cómo se cotiza?",
+          "answer": "Por alcance",
+          "eyebrow": "Inversión"
+        },
+        "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",
+        "legal": "Valores netos + IVA. Licencias y créditos de HubSpot no incluidos.",
+        "plans": [
+          {
+            "name": "Blueprint",
+            "tagline": "Para decidir con datos",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Inventario del portal"
+              },
+              {
+                "text": "Modelo objetivo"
+              },
+              {
+                "text": "Roadmap por olas"
+              },
+              {
+                "text": "Criterios de aceptación"
+              }
+            ]
+          },
+          {
+            "label": "Recomendado",
+            "name": "Proyecto",
+            "tagline": "Para construir por fases",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Configuración y datos"
+              },
+              {
+                "text": "Integraciones"
+              },
+              {
+                "text": "Automatización y QA"
+              },
+              {
+                "text": "Capacitación por rol"
+              },
+              {
+                "text": "Documentación"
+              }
+            ]
+          },
+          {
+            "name": "Operar",
+            "tagline": "Para operar y crecer",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Releases con aprobación"
+              },
+              {
+                "text": "Soporte con SLA"
+              },
+              {
+                "text": "Agentes supervisados"
+              },
+              {
+                "text": "Revisión trimestral de valor"
+              },
+              {
+                "text": "Reporting mensual"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "label": "Finanzas",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "ContentPricing"
+    }
+  ]
+}

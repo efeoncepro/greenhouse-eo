@@ -1,0 +1,68 @@
+{
+  "tenderId": "hs-B26-salida-cine2",
+  "slides": [
+    {
+      "slideId": "deck-section-cine",
+      "contentType": "deck.section-cine.purpose",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 270,
+          "answerPx": 176,
+          "eyebrowPx": "--gl-sec-eyebrow-px=16px",
+          "eyebrowWght": "--gl-sec-eyebrow-wght=500",
+          "eyebrowTracking": "--gl-sec-eyebrow-tracking=0.14em",
+          "eyebrowColor": "--gl-sec-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-sec-question-px=40px",
+          "questionLeading": "--gl-sec-question-leading=1.2",
+          "questionColor": "--gl-sec-question-color=#f4f6f8",
+          "answerLeading": "--gl-sec-answer-leading=0.9",
+          "answerTracking": "--gl-sec-answer-tracking=-0.05em",
+          "answerInset": "--gl-sec-answer-inset=-8px",
+          "bodyTop": 470,
+          "bodyPx": 34,
+          "bodyWidth": 700,
+          "bodyLeading": "--gl-sc-body-leading=1.35",
+          "bodyColor": "--gl-sc-body-color=#ffffff",
+          "pillarsTop": "--gl-sc-pillars-top=690px",
+          "pillarsWidth": "--gl-sc-pillars-width=700px",
+          "pillarPadY": "--gl-sc-pillar-pad-y=14px",
+          "pillarGap": "--gl-sc-pillar-gap=18px",
+          "pillarStroke": "--gl-sc-pillar-rule=1px",
+          "pillarRuleOpacity": "--gl-sc-pillar-rule-opacity=16%",
+          "pillarLabelPx": "--gl-sc-pillar-label-px=22px",
+          "pillarLabelWidth": "--gl-sc-pillar-label-width=250px",
+          "pillarTextPx": "--gl-sc-pillar-text-px=20px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:HS4-te-llevas-todo",
+          "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara"
+        },
+        "voice": {
+          "question": "¿Y si mañana nos vamos?",
+          "answer": "Con todo",
+          "eyebrow": "Sin amarras"
+        },
+        "body": "Tus datos son tuyos: entran a HubSpot con <strong>orden</strong> y salen igual de completos.",
+        "pillars": [
+          {
+            "label": "Exportables",
+            "text": "registros y propiedades cuando quieras."
+          },
+          {
+            "label": "API estable",
+            "text": "versiones que HubSpot sostiene 18 meses."
+          },
+          {
+            "label": "Recuperables",
+            "text": "hasta 90 días para restaurar lo borrado."
+          }
+        ]
+      },
+      "template": "SectionCinePurpose"
+    }
+  ]
+}

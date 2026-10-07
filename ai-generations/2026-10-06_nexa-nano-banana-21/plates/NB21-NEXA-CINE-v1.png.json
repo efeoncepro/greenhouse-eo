@@ -1,0 +1,60 @@
+{
+  "model": "gemini-nano-banana-2.1",
+  "project": "efeonce-group",
+  "location": "global",
+  "endpoint": "generateContent",
+  "aspect": "16:9",
+  "resolution": "4K",
+  "thinking": "high",
+  "search": "off",
+  "references": 8,
+  "previousTurns": 0,
+  "outputImageUsd": 0.0756,
+  "estimateScope": "Sólo imagen de salida; entrada, reasoning y búsquedas adicionales.",
+  "modelVersion": "gemini-nano-banana-2.1",
+  "latencyMs": 86594,
+  "width": 5504,
+  "height": 3072,
+  "nativeMime": "image/png",
+  "format": "png",
+  "usage": {
+    "promptTokenCount": 12468,
+    "candidatesTokenCount": 3844,
+    "totalTokenCount": 20398,
+    "cachedContentTokenCount": 7983,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 8960
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 3508
+      }
+    ],
+    "cacheTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 5737
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 2246
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 64
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 3780
+      }
+    ],
+    "thoughtsTokenCount": 4086
+  },
+  "text": "Here is the requested movie still, captures with the cinematic, raw film aesthetic and precise composition we wanted. Let me know if we need to refine any specifics!",
+  "grounding": []
+}

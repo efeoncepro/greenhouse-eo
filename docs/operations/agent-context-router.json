@@ -654,7 +654,11 @@
         "HubSpot sector",
         "HubSpot landing",
         "HubSpot Agent CLI",
-        "HubSpot MCP"
+        "HubSpot MCP",
+        "prospección HubSpot",
+        "segmentos activos",
+        "cohorte de prospección",
+        "alta automática de prospectos"
       ],
       "skills": [
         "hubspot-greenhouse-bridge",
@@ -665,7 +669,9 @@
         "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
         "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md",
         "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
-        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md"
+        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md",
+        "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md",
+        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md"
       ]
     },
     {

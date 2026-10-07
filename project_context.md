@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-[Factory](docs/services/factory/README.md).
+[Factory](docs/services/factory/README.md): On-Demand.
 
 Studio: [readers y rollout TASK-2001](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
 
@@ -18,7 +18,7 @@ CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-HubSpot directo: [Agent CLI/MCP](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); portal y permisos separados.
+HubSpot: [altas y segmentos activos](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md); verificar portal/permisos CLI y MCP.
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
@@ -68,10 +68,9 @@ para añadir o auditar proveedores: `greenhouse-globe-model-fleet` (espejado Cod
 sustituyen la autoridad live del reader. ADR-023 separa evidencia del proveedor, cables de integración y disponibilidad
 de Globe. “Imagen 2 de ChatGPT” se normaliza a
 `gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. La transparencia GPT Image 2 sigue en preview y gated hasta
-canary y readback. Desde 2026-09-08 existe `gpt-image-2.5` (Sunburst/Flare): provider-supported,
-sin ruta Globe, sin Batch y **sin calculadora de costo por imagen**; `gpt-image-2` no quedó deprecado y el
-helper local no transporta 2.5. Matriz canónica:
-`docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
+canary y readback. `gpt-image-2.5` (Sunburst/Flare): provider-supported, sin ruta Globe ni Batch;
+el helper transporta 2.5. CLI `ai:image`: OpenAI,
+default `gpt-image-2`, con 2.5 seleccionable. [Matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
 CLI: [Nano 2.1](docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) · [Omni](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md).
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano

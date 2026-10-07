@@ -1,0 +1,149 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "cb8cdab428c8",
+  "key": "cb8cdab428c8b875cc1c52052cfa68472959fd01de71f9e5dabca7d2f517071e",
+  "status": "completed",
+  "createdAt": "2026-10-06T21:36:14.717Z",
+  "inputs": {
+    "image": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/d3a199df-8c32-4f98-960f-80886b477ed5/scratchpad/sika/gen3/obra-profesional.png",
+    "imageSha256": "f77eea25572df9c314485c630d898f684bd5dc29c48464ddb50168372a9daf96",
+    "mask": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/d3a199df-8c32-4f98-960f-80886b477ed5/scratchpad/sika/gen3/mask-bandera.png",
+    "maskSha256": "ccd04d8c3af5d3fe8bd4b21db18eaf02ab6edba4200da8c74905f19207a656d2",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the flag and its flagpole completely; rebuild the hazy city skyline, sky and distant mountains behind them so nothing remains.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the flag and its flagpole completely; rebuild the hazy city skyline, sky and distant mountains behind them so nothing remains.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.01220703125,
+    "editable": 19200,
+    "soft": 0,
+    "protected": 1553664
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 311,
+      "top": 0,
+      "width": 322,
+      "height": 468
+    },
+    "target": {
+      "width": 848,
+      "height": 1232
+    },
+    "aspectError": 0.0004031607805192843,
+    "reason": "la zona con contexto ocupa 9.5 % de la imagen: se genera recortada a 848x1232"
+  },
+  "estimate": {
+    "usd": 0.0093,
+    "basis": "1 × salida 848x1232 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 13.383,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -3,
+        "scale": 1,
+        "stillError": 3.73,
+        "bestError": 2.25,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -5.33,
+        -6.1,
+        -4.39
+      ],
+      "protected": {
+        "pixels": 1553664,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 19200,
+        "maxDelta": 140,
+        "meanDelta": 13.383,
+        "worst": {
+          "x": 487,
+          "y": 169
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1553664,
+        "maxDelta": 123,
+        "meanDelta": 0.785,
+        "worst": {
+          "x": 311,
+          "y": 451
+        }
+      },
+      "outputUsd": 0.0093,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2255,
+        "input_tokens_details": {
+          "image_tokens": 2106,
+          "text_tokens": 149
+        },
+        "output_tokens": 311,
+        "output_tokens_details": {
+          "image_tokens": 311,
+          "text_tokens": 0
+        },
+        "total_tokens": 2566
+      },
+      "meta": {
+        "size": "848x1232",
+        "quality": "medium",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 10.18,
+        "corePixels": 19200,
+        "objectLikeness": null,
+        "residueSuspected": true
+      }
+    ]
+  }
+}

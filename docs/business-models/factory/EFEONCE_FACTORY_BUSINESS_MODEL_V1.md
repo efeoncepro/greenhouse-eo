@@ -2,7 +2,7 @@
 
 > **Status:** `Approved for validation` — vía comercial aceptada; validación económica por oferta/encargo pendiente.
 > **Owner:** Julio Reyes + Efeonce Strategy/Commercial + prácticas dueñas de cada encargo + Operations + Finance.
-> **Version:** V1.2 — alcance transversal y cuatro entradas comerciales definidas por el operador.
+> **Version:** V1.4 — Factory On-Demand; servicios continuos bajo Efeonce; propuestas priorizadas por fit.
 > **Date / Validated as of:** 2026-10-05, decisión del operador y revisión documental.
 > **Review cadence:** después de cada encargo piloto y consolidación mensual.
 > **Decisión:** [Efeonce Factory — vía comercial On-Demand](../../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).
@@ -19,6 +19,13 @@ campaña puntual y kit comercial son ejemplos opcionales; no delimitan el catál
 La meta del operador es **CLP 5–10 millones adicionales cobrados al mes o su equivalente**, en cualquier país
 y moneda donde el encargo sea entregable y contratable. CLP es referencia comparativa; no fija moneda de venta.
 No hay un ticket, volumen, margen mínimo, anticipo o plazo de entrega nuevo aprobado para Factory.
+
+**Límite comercial aclarado por el operador el 2026-10-05:** Factory se reserva a encargos On-Demand.
+Los servicios mensuales, retainers y operación continua se venden y registran bajo **Efeonce** y la práctica
+correspondiente. Detectar una oportunidad mediante el radar Factory no la convierte en Factory: calificar la
+modalidad antes de nombrar el Deal. Un proyecto acotado puede ejecutarse durante varios meses y cobrarse por
+cuotas/hitos; esa distribución de pagos no basta para convertirlo en servicio recurrente. Si el alcance combina
+un proyecto con operación continua, separar ambos compromisos y sus condiciones.
 
 ## 2. Problema, cliente y Operator & Buying Group Contract
 
@@ -162,6 +169,14 @@ el modelo admite organizaciones con o sin relación previa con Efeonce.
 
 Commercial gobierna las entradas; la práctica responsable valida fit y entrega, y Finance valida economía y
 calendario de cobro. Licitaciones aplican la skill `greenhouse-public-private-tenders` y sus contratos vigentes.
+
+**Priorización de propuestas (operador, 2026-10-05):** se selecciona por fit con las capacidades de Efeonce,
+requisitos acreditables y atractivo comercial. La capacidad libre reportada no fija un cupo de propuestas.
+Preparación comercial y compromiso de producción son decisiones distintas: antes de presentar una oferta
+vinculante se confirma cómo ejecutar si se adjudica, incluyendo proveedores, adjudicaciones simultáneas,
+costo completo, margen y caja. El operador estima unas 20 horas semanales libres por persona en diseño y
+contenido; es una referencia de planificación declarada, no una reserva ni límite de prospección.
+
 En todos los canales se registra origen y se converge en alcance/propuesta → aceptación comercial y condición de
 cobro → OT → ejecución/QA → entrega/aceptación → factura/cobro. El brief reutiliza bases, requerimientos o
 información ya obtenida; no obliga al cliente a explicar todo de nuevo.

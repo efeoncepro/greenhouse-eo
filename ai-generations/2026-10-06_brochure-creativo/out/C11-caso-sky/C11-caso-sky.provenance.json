@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "748bccd68655282ee020298e9cb497f760b2c2ef568bd8d9892dc92c8d1fbbd8",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-case",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:L1-mesa-de-luz",
+      "path": "ai-generations/2026-09-26_deck-mosaico-documental/plates/L1-mesa-de-luz.png",
+      "sha256": "d7c1fa6f87a8b17f1eb92b717e16ea2585dd370c3017138be8601821ccc2bd68"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

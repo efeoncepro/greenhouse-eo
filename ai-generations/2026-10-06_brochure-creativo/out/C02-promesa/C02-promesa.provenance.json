@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "565d957e42b59a4d41d17f5fd67bcda9865a60bc7304e07083c0227a341b264d",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CR2b-constelacion-isotipo",
+      "path": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
+      "sha256": "4213e0b9d870f4cb49f58e6ac5dfad120fe07d59a1831c6b4fc0357ffc4f8a75"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

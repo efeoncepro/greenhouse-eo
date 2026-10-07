@@ -113,8 +113,9 @@ El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_P
 **Fuente vigente:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
 (2026-09-27). Los dos deltas cine del maestro quedan como historia. **Cárgalo completo antes de escribir una ficha
 cine**: aquí va sólo lo operativo. Es **ficción declarada**: el servicio (o lo digital) en acción como fotograma de
-una película de gran presupuesto, y **el color de la línea sale de la escena como luz** —anillo, haz, holograma, moño
-de partículas, esferas—, nunca pintado encima ni puesto como grade.
+una película de gran presupuesto. La luz sale de una fuente de la escena —anillo, haz, holograma, moño de
+partículas, esferas—, nunca pintada encima ni puesta como grade. Para tomas nuevas rige la [falla 34 del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
+**luz azure/blanco frío y acento como puntuación, que no ilumina**; los precedentes aprobados conservan su historia.
 
 🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
 El flujo: casebook → `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]`
@@ -126,6 +127,15 @@ uno inválido aborta) → `pnpm foto:prompt` (los compila en «CINEMATIC CRAFT»
 `cine-reviewer` sobre la ficha → `pnpm foto:generar <ficha> --quality high` → `pnpm foto:validar:cine` +
 `pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate. El revisor calibra contra el plate de la
 receta de partida y su APROBABLE no es la aprobación del operador.
+
+**Motor elegido explícitamente (prueba 2026-10-06):** para Nano Banana 2.1, conserva ficha, prompt compilado y orden
+de referencias; sustituye sólo la llamada de generación por `pnpm ai:nano` (`4K`, `16:9`, `thinking high` en esta
+corrida), y aplica los mismos gates. Procedimiento y correcciones: [casebook, prueba portable](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable).
+V2 `NB21-NEXA-CINE` dio 5504×3072 y reservas 4/4 PASS; quedó APROBABLE, sin alta en recetas ni AXIS. En la
+comparación visual con NX7d se prefirió Sunburst por naturalidad de la escena; Nano destacó en reservas y fidelidad
+del kit. No fue un A/B del motor: cambiaron expresión, referencias y prompt. [Evidencia y límites](../../../../docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md).
+La ruta habitual de `foto:generar` y el default OpenAI de `ai:image` permanecen vigentes.
+
 En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta solo:
 llave única sin relleno, lecho mate y real (no banda) separado del primer plano, fenómeno y fondo bajo el 36 % del alto
 en 4:5 y 9:16, escala por encuadre con `identidad`, mirada al panel con `alcance: deck-seccion`, uniforme navy (el

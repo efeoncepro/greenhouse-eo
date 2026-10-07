@@ -1,0 +1,278 @@
+{
+  "tenderId": "hs-B06-agentes-v3",
+  "slides": [
+    {
+      "slideId": "deck-method-agent-supervisor",
+      "contentType": "deck.method-agent-supervisor",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "supLeft": "--gl-mas-sup-left=1005px",
+          "supTop": "--gl-mas-sup-top=170px",
+          "supWidth": "--gl-mas-sup-width=470px",
+          "supPadY": "--gl-mas-sup-pad-y=22px",
+          "supPadX": "--gl-mas-sup-pad-x=26px",
+          "supRadius": "--gl-mas-sup-radius=24px",
+          "supGap": "--gl-mas-sup-gap=18px",
+          "avatarSize": "--gl-mas-avatar=76px",
+          "avatarFill": "--gl-mas-avatar-color=#e86bd0",
+          "avatarFillOpacity": "--gl-mas-avatar-opacity=18%",
+          "avatarRing": "--gl-mas-avatar-ring=2px",
+          "avatarRingColor": "--gl-mas-avatar-ring-color=#e86bd0",
+          "avatarGlowBlur": "--gl-mas-avatar-glow=40px",
+          "avatarGlowColor": "--gl-mas-avatar-glow-color=#e86bd0",
+          "avatarGlowOpacity": "--gl-mas-avatar-glow-opacity=50%",
+          "initialsPx": "--gl-mas-initials-px=28px",
+          "initialsColor": "--gl-mas-initials-color=#ffffff",
+          "supKickerPx": "--gl-mas-sup-kicker-px=13px",
+          "supKickerWeight": "--gl-mas-sup-kicker-wght=600",
+          "supKickerTracking": "--gl-mas-sup-kicker-tracking=0.12em",
+          "supKickerColor": "--gl-mas-sup-kicker-color=#e2e2e2",
+          "supRolePx": "--gl-mas-sup-role-px=30px",
+          "supRoleTracking": "--gl-mas-sup-role-tracking=-0.02em",
+          "supRoleGap": "--gl-mas-sup-role-gap=3px",
+          "supRoleColor": "--gl-mas-sup-role-color=#ffffff",
+          "supDutyPx": "--gl-mas-sup-duty-px=16px",
+          "supDutyWeight": "--gl-mas-sup-duty-wght=400",
+          "supDutyGap": "--gl-mas-sup-duty-gap=4px",
+          "supDutyColor": "--gl-mas-sup-duty-color=#e2e2e2",
+          "cardWidth": "--gl-mas-card-width=320px",
+          "cardPadTop": "--gl-mas-card-pad-top=20px",
+          "cardPadX": "--gl-mas-card-pad-x=22px",
+          "cardPadBottom": "--gl-mas-card-pad-bottom=14px",
+          "cardRadius": "--gl-mas-card-radius=22px",
+          "cardPerspective": "--gl-mas-card-perspective=1600px",
+          "iconSize": "--gl-mas-icon=46px",
+          "iconGap": "--gl-mas-icon-gap=12px",
+          "headGap": "--gl-mas-head-gap=10px",
+          "kickerPx": "--gl-mas-kicker-px=12px",
+          "kickerWeight": "--gl-mas-kicker-wght=600",
+          "kickerTracking": "--gl-mas-kicker-tracking=0.1em",
+          "kickerColor": "--gl-mas-kicker-color=#5f6b7a",
+          "titlePx": "--gl-mas-title-px=22px",
+          "titleTracking": "--gl-mas-title-tracking=-0.015em",
+          "titleGap": "--gl-mas-title-gap=1px",
+          "jobPx": "--gl-mas-job-px=14px",
+          "jobWeight": "--gl-mas-job-wght=400",
+          "jobLeading": "--gl-mas-job-leading=1.4",
+          "jobGap": "--gl-mas-job-gap=10px",
+          "jobColor": "--gl-mas-job-color=#5f6b7a",
+          "rowPadY": "--gl-mas-row-pad-y=7px",
+          "rowGap": "--gl-mas-row-gap=10px",
+          "rowRule": "--gl-mas-row-rule-color=#e3e8ee",
+          "dotSize": "--gl-mas-dot=18px",
+          "dotFull": "--gl-mas-dot-full-color=#0b1f33",
+          "dotHalfRing": "--gl-mas-dot-half-ring=2px",
+          "dotHalfColor": "--gl-mas-dot-half-color=#0b1f33",
+          "dotEmptyRing": "--gl-mas-dot-empty-ring=2px",
+          "dotEmptyColor": "--gl-mas-dot-empty-color=#b8c2cc",
+          "keyPx": "--gl-mas-key-px=13px",
+          "keyWeight": "--gl-mas-key-wght=600",
+          "keyTracking": "--gl-mas-key-tracking=0.06em",
+          "keyWidth": "--gl-mas-key-width=78px",
+          "keyColor": "--gl-mas-key-color=#5f6b7a",
+          "valuePx": "--gl-mas-value-px=14px",
+          "valueWeight": "--gl-mas-value-wght=400",
+          "valueLeading": "--gl-mas-value-leading=1.35",
+          "valueColor": "--gl-mas-value-color=#0b1f33",
+          "approvalGap": "--gl-mas-approval-gap=10px",
+          "approvalPadY": "--gl-mas-approval-pad-y=10px",
+          "approvalPadX": "--gl-mas-approval-pad-x=12px",
+          "approvalRadius": "--gl-mas-approval-radius=12px",
+          "approvalFill": "--gl-mas-approval-color=#f5f7fa",
+          "approvalBorder": "--gl-mas-approval-border=1px",
+          "approvalBorderColor": "--gl-mas-approval-border-color=#e3e8ee",
+          "approvalPx": "--gl-mas-approval-px=13px",
+          "approvalWeight": "--gl-mas-approval-wght=500",
+          "approvalLeading": "--gl-mas-approval-leading=1.3",
+          "buttonPadY": "--gl-mas-button-pad-y=8px",
+          "buttonPadX": "--gl-mas-button-pad-x=14px",
+          "buttonRadius": "--gl-mas-button-radius=10px",
+          "buttonFill": "--gl-mas-button-color=#0b1f33",
+          "buttonColor": "--gl-mas-button-ink-color=#ffffff",
+          "buttonPx": "--gl-mas-button-px=13px",
+          "buttonWeight": "--gl-mas-button-wght=600"
+        },
+        "stage": {
+          "src": "asset-ref:layer:mas-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:mas-platform"
+        },
+        "beams": {
+          "src": "asset-ref:layer:method-agent-supervisor-beams"
+        },
+        "voice": {
+          "question": "¿Quién responde por el agente?",
+          "answer": "persona",
+          "eyebrow": "Agent Hub · equipos híbridos",
+          "answerLead": "Una"
+        },
+        "body": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y <strong>quién</strong> lo aprueba.",
+        "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+        "supervisor": {
+          "initials": "SV",
+          "kicker": "Persona responsable",
+          "role": "Supervisora de servicio",
+          "duty": "Aprueba, corrige y detiene"
+        },
+        "agents": [
+          {
+            "left": "--gl-mas-left=1075px",
+            "top": "--gl-mas-top=470px",
+            "rotate": "--gl-mas-rotate=-6deg",
+            "depth": "--gl-mas-depth=2",
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Tickets",
+            "job": "Clasifica, responde con knowledge y escala.",
+            "levels": [
+              {
+                "state": "yes",
+                "kind": "Lee",
+                "value": "Historial y knowledge"
+              },
+              {
+                "state": "yes",
+                "kind": "Propone",
+                "value": "Respuesta al cliente"
+              },
+              {
+                "state": "yes",
+                "kind": "Ejecuta",
+                "value": "Enrutar dentro del SLA"
+              },
+              {
+                "state": "no",
+                "kind": "Aprueba",
+                "value": "La supervisora"
+              }
+            ],
+            "pending": "Respuesta propuesta al ticket #4821"
+          },
+          {
+            "left": "--gl-mas-left=725px",
+            "top": "--gl-mas-top=545px",
+            "rotate": "--gl-mas-rotate=12deg",
+            "depth": "--gl-mas-depth=0",
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Prospección",
+            "job": "Investiga cuentas y sugiere el siguiente paso.",
+            "levels": [
+              {
+                "state": "yes",
+                "kind": "Lee",
+                "value": "Contactos y actividad"
+              },
+              {
+                "state": "yes",
+                "kind": "Propone",
+                "value": "Siguiente paso"
+              },
+              {
+                "state": "half",
+                "kind": "Ejecuta",
+                "value": "Sólo tareas y recordatorios"
+              },
+              {
+                "state": "no",
+                "kind": "Nunca",
+                "value": "Enviar sin revisión"
+              }
+            ]
+          },
+          {
+            "left": "--gl-mas-left=1460px",
+            "top": "--gl-mas-top=560px",
+            "rotate": "--gl-mas-rotate=-16deg",
+            "depth": "--gl-mas-depth=1",
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Campañas",
+            "job": "Prepara variantes para audiencias con consentimiento.",
+            "levels": [
+              {
+                "state": "yes",
+                "kind": "Lee",
+                "value": "Segmentos consentidos"
+              },
+              {
+                "state": "yes",
+                "kind": "Propone",
+                "value": "Variantes y audiencia"
+              },
+              {
+                "state": "no",
+                "kind": "Ejecuta",
+                "value": "Nada sin aprobación"
+              }
+            ]
+          }
+        ],
+        "approval": {
+          "text": "Respuesta propuesta al ticket #4821"
+        },
+        "selection": {
+          "label": "Supervisora",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "MethodAgentSupervisor"
+    }
+  ]
+}

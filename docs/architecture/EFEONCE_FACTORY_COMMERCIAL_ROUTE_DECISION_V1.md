@@ -22,8 +22,8 @@ El operador declara que Efeonce tiene una base de retainers que sostiene la cont
 flujos asistidos por agentes han liberado capacidad del equipo. Busca convertir esa disponibilidad en dinero
 adicional mediante servicios On-Demand y proyectos de inicio y término definidos.
 
-La capacidad reportada incluye a Melkin y Andrés en diseño y a Valentina en Social Media y periodismo. Las horas
-disponibles, costo completo y capacidad de entrega todavía deben cuantificarse. El mejor mes de indicadores
+La capacidad reportada incluye a Melkin y Andrés en diseño y a Valentina en Social Media y periodismo. El operador
+estima unas 20 horas semanales libres por persona; costo completo y asignaciones todavía deben validarse. El mejor mes de indicadores
 reportado por el operador ocurrió con menor delegación: no demuestra por sí solo mayor productividad a carga comparable.
 
 La meta expresada es cobrar **CLP 5–10 millones adicionales al mes o su equivalente**, admitiendo ventas en otros
@@ -137,3 +137,30 @@ El modelo vigente posee el detalle y las métricas por entrada. Commercial conse
 Finance reconcilia costo de adquisición, margen y cobros. Licitaciones conservan su proceso de admisibilidad y
 bid/no-bid. Se distinguen plazos de presentación, decisión/adjudicación y cobro. La dirección aceptada no fija
 inversión ni rendimiento por canal y no constituye lanzamiento de campañas, envío de contactos o postulación.
+
+## Delta aceptado 2026-10-05 — límite On-Demand y servicios mensuales
+
+**Status:** Accepted. **Autoridad:** aclaración del operador: Factory son servicios On-Demand; servicios mensuales
+o con compromiso de operación mensual corresponden a Efeonce.
+
+Factory se reserva a encargos con alcance/outcome y cierre definidos. Retainers y servicios de operación continua
+se presentan como **Efeonce**, bajo su práctica. El origen licitación, prospección o paid media no determina el
+engagement ni justifica prefijar todos los Deals con Factory. La clasificación precede al naming y al forecast.
+
+Separar modalidad de servicio y calendario de cobro: un proyecto puede extenderse varios meses o pagarse por
+cuotas/hitos sin vender una operación recurrente. Si coexisten proyecto y operación, separar sus compromisos,
+capacidad y economía; no atribuir automáticamente el total a Factory ni convertirlo en MRR sin evidencia.
+
+El modelo Factory V1.3 y su guía aplican este límite. No cambia capacidad, pricing, schema ni automatizaciones.
+
+## Delta aceptado 2026-10-05 — propuestas por fit
+
+El operador precisa que la selección y preparación de propuestas se prioriza por **fit**, para ampliar las
+posibilidades de adjudicación. La disponibilidad actual del equipo no determina un cupo de propuestas.
+Preparación comercial y compromiso de ejecución se separan: el borrador no reserva equipo ni habilita
+postulación. La oferta vinculante exige comprobar admisibilidad, forma de ejecución, economía, caja y respuesta
+ante adjudicaciones simultáneas, usando capacidad interna o proveedores aceptados según las bases.
+
+Esta precisión conserva los gates económicos y de entrega; sustituye cualquier interpretación que use las
+aproximadamente 20 horas libres por persona como tope de oportunidades a preparar. Aplicación fechada:
+[cola ampliada de licitaciones](../commercial/tenders/LICITALAB_PRIORITY_QUEUE_2026-10-05.md).

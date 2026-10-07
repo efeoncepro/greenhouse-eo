@@ -1,0 +1,76 @@
+{
+  "tenderId": "hs-B22-automatizacion-2",
+  "slides": [
+    {
+      "slideId": "deck-method-staircase",
+      "contentType": "deck.method-staircase",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 139,
+          "bodyTop": 590,
+          "bodyPx": 25,
+          "bodyWidth": 500,
+          "stairX0": "--gl-stair-x0=760px",
+          "stairDx": "--gl-stair-dx=70px",
+          "stairY0": "--gl-stair-y0=798px",
+          "stairDy": "--gl-stair-dy=132px",
+          "levelNamePx": "--gl-level-name-px=76px",
+          "levelTopNamePx": "--gl-level-top-name-px=86px",
+          "levelNumberPx": "--gl-level-number-px=30px",
+          "levelDescriptorPx": "--gl-level-descriptor-px=23px",
+          "notePx": "--gl-note-px=17px",
+          "noteTop": "--gl-note-top=930px",
+          "columnWidth": "--gl-column-width=740px",
+          "slabHeight": "--gl-slab-height=124px"
+        },
+        "voice": {
+          "question": "¿Workflow o agente?",
+          "answer": "la tarea",
+          "eyebrow": "Automatización",
+          "answerLead": "Según"
+        },
+        "body": "Si la regla es fija, va un workflow: siempre igual y auditable. Donde hace falta criterio, un agente.",
+        "levels": [
+          {
+            "name": "Workflow",
+            "descriptor": "regla fija, mismo resultado"
+          },
+          {
+            "name": "Código propio",
+            "descriptor": "lógica a medida, versionada"
+          },
+          {
+            "name": "Agente sugiere",
+            "descriptor": "una persona decide"
+          },
+          {
+            "name": "Con aprobación",
+            "descriptor": "actúa tras tu visto bueno"
+          },
+          {
+            "name": "Con límites",
+            "descriptor": "actúa solo, con un tope"
+          }
+        ],
+        "note": "Cada escalón suma criterio y también supervisión.",
+        "selection": {
+          "label": "TI",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "level": 1
+        }
+      },
+      "template": "MethodStaircase"
+    }
+  ]
+}

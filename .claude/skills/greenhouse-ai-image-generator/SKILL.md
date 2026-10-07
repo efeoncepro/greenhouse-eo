@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image, Nano Banana 2.1 via the direct Google CLI, Imagen, or Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -156,16 +156,25 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 8. **¿Separar una pieza aprobada en capas editables?** → `seedream5-pro-layerize` (hasta 16 capas PNG con alfa +
    `layers.json`; prompt y `--bbox` opcionales). No regeneres. Para editar con esas capas (máscara, clean plate,
    borrar, mover), entra por `pnpm ai:layers`, que guarda la caja en píxeles de la base y alimenta `ai:inpaint`.
-9. **¿Resolución nativa sobre 2K?** → `seedream5-lite` (área hasta 4096² según schema; la ficha dice 3072²) o GPT
+9. **¿Resolución nativa sobre 2K?** → Nano Banana 2.1 con `pnpm ai:nano --resolution 4K` (Nexa 5504×3072 verificado 2026-10-06; no ranking artístico), `seedream5-lite` (área hasta 4096² según schema; la ficha dice 3072²) o GPT
    Image (hasta 3840×2160; sobre 2560×1440 es experimental). 🔴 **Seedream 5 Pro en fal NO es 4K**: área máxima
    2048×2048 (la nota "Hasta 4K" del registro era incorrecta).
-10. **¿Formato más extremo que 3:1?** → Seedream (aspecto 1/16–16). GPT Image tope 3:1.
+10. **¿Formato más extremo que 3:1?** → Seedream (aspecto 1/16–16) o Nano Banana 2.1 (14 ratios, incluidos 1:8/8:1; no todos verificados en real). GPT Image tope 3:1.
 11. **¿Texto multilingüe dentro de la imagen, sólo para concepto?** → Seedream 5 Pro lo declara [oficial]; OpenAI no
     declara nada para 2.5. Igual va a composición determinística al release.
 12. **¿Generar/editar con Nano Banana desde terminal?** → `pnpm ai:nano` (2.1 por defecto): referencias,
     sesiones, búsqueda web/imagen, 1K–4K, thinking y streaming. `--dry-run` antes de gastar; `--yes` para
     generar. Batch API, Interactions remoto y máscara PNG no están implementados. No cambies
     `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: esa env gobierna el carril del producto, independiente del CLI.
+    Nexa cine 4K/high con ocho referencias entregó 5504×3072 nativo y V2 pasó gates técnicos
+    (APROBABLE, `proof-only`). `high` es el máximo thinking Nano, no el `quality max` de OpenAI.
+    [Caso y comparación con NX7d Sunburst](../../../docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md):
+    Sunburst fue preferido para esas imágenes por naturalidad cinematográfica; Nano destacó en
+    resolución, referencias y reservas. Prompts/expresión/referencias distintos: no es A/B controlado.
+    Foto Efeonce siempre por `design-studio`, ficha + `pnpm foto:prompt` y cine-reviewer; mismo
+    canon con cualquier motor. Si las referencias exceden el inline de 20 MiB, preparar copias
+    de transporte con procedencia y revisar detalle (Nexa: JPEG98 4:4:4 sin cambio geométrico).
+    El default de `pnpm ai:image` continúa `gpt-image-2`; no se promueve Nano al runtime/Globe.
 
 **Rankings: preséntalos con fecha y fuente, sin elegir uno como verdad.** OpenArt Arena imagen (2026-09-16):
 Seedream 5 Pro #1, GPT Image 2 #2, Nano Banana Pro #3. Arena y Artificial Analysis (2026-09-07/16): Sunburst y
@@ -848,7 +857,8 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
 - **OpenAI model targeting (delta 2026-09-08).** La frontera del proveedor es la familia **2.5**
-  (`gpt-image-2.5-flare` por defecto, `gpt-image-2.5-sunburst` para precisión de edición). `gpt-image-2`
+  (`gpt-image-2.5-flare` como opción para generación, `gpt-image-2.5-sunburst` para precisión de edición).
+  El default operativo de `pnpm ai:image` sigue siendo `gpt-image-2`; esa preferencia de familia no lo cambia. `gpt-image-2`
   **no** está deprecado y sigue siendo la elección correcta cuando necesitas Batch (2.5 no lo tiene). Corregido
   2026-09-16: el costo de 2.5 sí se estima antes de gastar y sus rate limits sí están publicados. Desde 2026-09-16 el helper
   transporta **ambas** familias, así que la elección ya es de necesidad, no de lo que el código soporta.
@@ -863,10 +873,11 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
   modelo muerto. **NUNCA** rutees a `google-imagen` ni prometas "continuidad con banners de Imagen": ese carril
   ya no genera. Usa `google-gemini-image` cuando la superficie ya use ese lenguaje visual.
   `generateAnimation()` y el carril SVG siguen intactos.
-- **Carril Google: Nano Banana 2 vs Nano Banana Pro (revisión 2026-09-16).** El default de `google-gemini-image` es
+- **Carril Google: Nano Banana 2.1 CLI vs Nano Banana 2 runtime y Pro (revisión 2026-10-06).** El default de `google-gemini-image` es
   **Nano Banana 2** (`gemini-3.1-flash-image`, vía Vertex con `getGoogleGenAIClient`), sobreescribible con la env
-  `GOOGLE_GEMINI_IMAGE_MODEL`; vive sólo en el generador del producto. **No hay CLI de Gemini Image**: `pnpm ai:image`
-  habla sólo OpenAI. **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
+  `GOOGLE_GEMINI_IMAGE_MODEL`; vive sólo en el generador del producto. **`pnpm ai:nano` usa Nano Banana 2.1**
+  (`gemini-nano-banana-2.1`) con contrato local independiente; ver [manual](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
+  y decisión 12. `pnpm ai:image` conserva OpenAI y default `gpt-image-2`. **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
   en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por

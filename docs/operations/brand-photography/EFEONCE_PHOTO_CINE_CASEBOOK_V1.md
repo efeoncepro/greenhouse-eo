@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.5 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-06 por Claude (1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.6 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-06 por Codex (1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -29,11 +29,48 @@ plate). Lo que no, lo revisa el agente **`cine-reviewer`** (`.claude/agents/cine
    [la ficha cine](#la-ficha-cine-los-campos-que-la-hacen-cine). `pnpm foto:prompt` los compila en el prompt y avisa lo
    que falta.
 4. **Pide revisión antes de gastar:** invoca el agente `cine-reviewer` con la ruta de la ficha.
-5. **Genera:** `pnpm foto:generar <ficha> --quality high` (gpt-image-2.5-sunburst, ≈ USD 0,05 por plate). Una sola
-   generación por intento; sin relight ni upscale.
+5. **Genera:** `pnpm foto:generar <ficha> --quality high` (ruta habitual gpt-image-2.5-sunburst; el costo histórico
+   no es una cotización vigente). Si el operador elige Nano Banana 2.1, usa el [puente explícito](#nexa-con-nano-banana-21-2026-10-06--prueba-portable)
+   con el mismo prompt compilado y referencias ordenadas. Una sola generación por intento; sin relight ni upscale.
 6. **Mide y mira:** `pnpm foto:validar:cine <plate>`, `pnpm foto:validar <plate>` (lecho y texto) y
    `pnpm foto:emblema <plate>` al 100 %. Después,
    `cine-reviewer` sobre el plate. Si algo falla, **corrige la ficha y regenera**; no edites la foto entera.
+
+## Nexa con Nano Banana 2.1 (2026-10-06) — prueba portable
+
+La prueba `NB21-NEXA-CINE` partió de `NX7d` por pedido explícito del operador. **No es una nueva receta aprobada**:
+V2 quedó APROBABLE en revisión técnica, con aceptación visual del operador y alta en el banco pendientes.
+[Informe y comparación visual](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md);
+fichas, prompts, V1 descartada y V2 local en `ai-generations/2026-10-06_nexa-nano-banana-21/`.
+
+**Puente al motor, sin reconstruir el prompt:**
+
+1. Mantén los pasos 1–4: receta aprobada, ficha completa, `foto:prompt` y `cine-reviewer` antes de gastar.
+   El prompt va al archivo emitido por el compilador. Resuelve las referencias que declara la ficha y conserva
+   exactamente su orden: frontal v2, expresión, cuerpo, traje, macro de marca, lentes y sólo dos Sparks cercanos.
+2. Lee el [manual del CLI](../../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md). Para esta prueba se usó
+   `pnpm ai:nano --prompt-file <prompt-compilado.txt> --image <ref-1> --image <ref-2> … --resolution 4K --aspect 16:9 --thinking high --search off --out <plate.png> --yes`.
+   `--image` se repite por cada referencia; la elipsis es ilustrativa, no un argumento. Prueba primero `--dry-run`.
+   No pegues bloques de fotografía a mano ni sustituyas referencias de identidad por el plate aprobado.
+3. Si las entradas exceden **20 MiB inline**, prepara copias de transporte y guarda su procedencia y hashes.
+   Aquí las tres referencias de identidad pasaron a JPEG calidad 98, 4:4:4, con dimensiones intactas; los cinco
+   archivos restantes conservaron sus bytes. No recortes, redimensiones ni retoques la identidad. Esto describe
+   esta corrida, no una mejora de la referencia ni un ajuste de formato del proveedor.
+4. Tras generar, sigue el paso 6 completo: gates cine y reservas, emblema al 100 %, rostro y `cine-reviewer`.
+   Una salida de mayor tamaño no cambia el umbral ni habilita upscale, grade, scrim o recorte del plate final.
+
+**Qué se corrigió:** V1 dejó los Sparks lejanos demasiado grandes/nítidos y su conteo sin comprobar; el lecho midió
+2,27:1. V2 fue una **nueva generación**, con las mismas referencias y una ficha corregida: tres Sparks lejanos
+visibles, cada uno como máximo un tercio del ancho aparente de los cercanos, sin detalles legibles; consola negra
+mate bajo un voladizo que bloquea físicamente la luz del núcleo. Resultado nativo: **5504×3072**, 67,11 % sombra,
+columna 0,46, lecho blanco **5,32:1** y **4/4 reservas PASS**. Ambos ojos quedaron legibles pese al reflejo de lentes.
+Se conservaron luz azure/blanco frío y el kit; esta corrida no cambia la regla del acento como puntuación (falla 34).
+
+**Qué enseña la comparación [criterio]:** en estas dos imágenes se prefirió `NX7d` de Sunburst por gesto, luz e
+integración de Sparks más naturales. Nano dio mejor espacio de composición, fidelidad del kit y resolución nativa.
+Cambios de expresión, referencias y prompt impiden tratarlo como un A/B del motor. APROBABLE significa que se puede
+presentar al operador; los medidores no puntúan calidad artística. No se cambian `foto:generar`, el default OpenAI,
+el índice de recetas ni el banco AXIS a partir de esta prueba.
 
 ## La ficha cine: los campos que la hacen cine
 
