@@ -42,6 +42,16 @@ which existing segment consumes each property. Revalidate the live definition/me
 four existing properties or assign the current cohort to all future prospects. Company and Contact need their
 own cohort values. A successful CRM create is incomplete until automatic membership and associations are read back.
 
+## Firmas personales en HubSpot
+
+Para instalar o reparar una firma de correo de Efeonce, seguir el
+[manual de instalación en HubSpot](../../../docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md#instalar-la-firma-en-hubspot).
+Usar el HTML fuente completo de la firma aprobada en el editor **HTML**, con estilos inline e imágenes HTTPS.
+No confundir el botón «Copiar mi firma» (texto enriquecido para Outlook) con copiar código: el pegado en
+«Simple» perdió diseño e imágenes en la prueba del 2026-10-07. Verificar usuario/portal, recursos, vista previa
+completa, aviso de guardado y persistencia. Guardado/vista previa no certifican recepción; no enviar pruebas
+sin autorización. La identidad y composición siguen bajo `efeonce-graphic-line`.
+
 ## Provider-fit boundary
 
 HubSpot is the default candidate for growth-oriented B2B, mid-market teams and faster adoption, not a universal

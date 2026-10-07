@@ -305,6 +305,47 @@ perdía al pegar) y el **eslogan va horneado** con sus pesos canónicos (Outlook
 Adaptarse sola al tema claro u oscuro del sistema no es posible: Outlook quita esas reglas al pegar; la versión de
 fondo blanco está preparada para el oscurecido automático de Outlook (logo y eslogan con halo blanco, partners transparente).
 
+### Instalar la firma en HubSpot
+
+**Ruta verificada el 2026-10-07:** pegar el **código HTML completo** de la firma existente en el editor
+**HTML** de HubSpot. La página «Copiar mi firma» prepara texto enriquecido para Outlook; su botón no copia
+el código fuente como texto plano para el campo HTML. En la prueba de HubSpot, pegar en «Simple» tampoco
+conservó la composición: quedaron texto, enlaces y símbolos 📷 en lugar de las imágenes. No repetir esa ruta
+como solución ni concluir que HubSpot no admite estilos. No se aisló qué etapa del portapapeles/editor produjo
+la pérdida; lo comprobado es el fallo del pegado y la recuperación al insertar el HTML original.
+
+1. Verificar el portal y el usuario de destino. La prueba fue en Efeonce `48713323`, usuario Julio Reyes,
+   firma «Julio», predeterminada global para `jreyes@efeoncepro.com`; no extrapolar ese permiso a otra persona
+   ni a otro portal. Una solicitud explícita de instalar la firma autoriza ese cambio de preferencia, no enviar correos.
+2. Recuperar la firma aprobada, sin rediseñarla. Para Julio se usó
+   `ai-generations/2026-09-29_avatares-equipo/firmas/out/julio-reyes/outlook-a.html`.
+   Para otra persona usar su artefacto equivalente y comprobar sus datos/enlaces; no copiar los de Julio.
+   Si falta el archivo en disco, seguir `pnpm ai-gen:where` / `pnpm ai-gen:pull` según
+   [almacenamiento de generaciones](../../operations/AI_GENERATIONS_STORAGE_V1.md), sin regenerar por defecto.
+3. Copiar **el contenido del archivo como texto fuente**, desde `<table` hasta su cierre, con tablas,
+   atributos de tamaño y estilos inline. Conservar las URLs HTTPS públicas de las imágenes ya publicadas;
+   no pegar una captura, texto renderizado, emojis ni rutas locales. Verificar respuesta HTTP y MIME de los
+   recursos: en esta instalación los nueve devolvieron `200` / `image/png`.
+4. En **Configuración → General → Correo → Gestionar firmas de correo electrónico**, seleccionar la firma,
+   elegir **HTML** y reemplazar el contenido por ese código. No pegar en HTML el resultado del botón
+   «Copiar mi firma», cuyo `text/plain` contiene solamente el texto visible.
+5. Revisar **Previsualizar**: foto con órbita, nombre/cargo, teléfono/correo, enlaces, logo, eslogan y partners.
+   El visor observado tiene poca altura y scroll interno: recorrer también la parte inferior antes de juzgar
+   la firma como recortada. Comprobar la carga visual, no solo la presencia de etiquetas `<img>`.
+6. Guardar, comprobar el aviso **«Tu firma se ha actualizado»** y reabrir la firma para verificar persistencia.
+   Conservar o cambiar la asignación predeterminada según el pedido. No volver a convertir a «Simple» después:
+   en la prueba ese modo quedó deshabilitado para el HTML completo.
+
+**Evidencia y límite:** la firma de Julio quedó guardada con el diseño original y se verificó nuevamente en
+la vista previa. No se envió un correo de prueba; la recepción en Outlook/Gmail u otros clientes no quedó
+certificada. La disponibilidad de las imágenes y la vista previa no prueban renderizado idéntico en todos los
+clientes; las fuentes pueden usar el fallback del HTML. El procedimiento reutiliza el contrato de firma existente,
+sin cambiar tokens, assets ni el constructor.
+
+Fuente del proveedor consultada el 2026-10-07:
+[HubSpot: agregar y gestionar firmas de correo](https://knowledge.hubspot.com/account-management/add-an-email-signature-in-the-crm)
+(documenta los editores Simple/HTML y las diferencias de renderizado entre clientes).
+
 **Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
 ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
 comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área
