@@ -210,6 +210,12 @@ Before adoption read AXIS `docs/agent-composition/video-player.md`,
 features, verified delivery and open limits. Use token-owned 44px controls resilient to host resets,
 real captions, automatic overlay hiding and static orbital replay with an accessible name.
 
+Approved replay follow-up (2026-10-07, published primitives 0.6.6 / tokens 0.6.1): image-bound centering excludes the dock,
+with shared responsive orbit/halo/scrim tokens under `axisVideoPlayer.replay`. Ended uses the model
+poster when available and leaves the last frame otherwise; replay and seek clear the overlay.
+Keep this inside the portable renderer, never consumer CSS. Release 37696704305 SUCCESS;
+Think d36ba40 and Studio 3ba7cff consume registry 0.6.6 with Vercel SUCCESS. WordPress stays unactivated.
+
 Consumer adapters must expose the full model and client callbacks, not only source/poster. Think and the
 WordPress candidate use `axis-video:configure` ({model,options}) before enhancement and `axis-video:ready`
 ({player}) afterward. Keep functions out of serialized props/block attributes. Parity fixtures supply actual

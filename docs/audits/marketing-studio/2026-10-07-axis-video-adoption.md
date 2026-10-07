@@ -119,3 +119,15 @@ conforme a su identidad aprobada. Brand pertenece a Creative Studio; el shell ac
 un selector Marketing/Creative activo. No se duplicó el player ni se cambió AXIS/worker.
 `pnpm check` y `pnpm build` PASS; navegador productivo confirmó `data-line=growth`,
 surface light y acento AXIS `#259aa5`, con captura `production-growth-accent.png`.
+
+## Replay aprobado — adopción 0.6.6
+
+Studio `3ba7cff` actualiza sólo catálogo/lockfile a primitives 0.6.6 y tokens 0.6.1.
+`pnpm check` y build PASS; Vercel SUCCESS (`dpl_3chg4RTsA26Ku82AskMJXopayQ79`).
+Think `d36ba40`, Vercel SUCCESS (`dpl_5hQ6rytjeGLPFrq1faY4vD3jmepo`). AXIS release
+`37696704305` SUCCESS; JS/CSS del registro coinciden byte a byte con el build verificado.
+Replay común centrado, trazos finos y póster final; sin cambios de worker, datos ni adapters.
+WordPress `e8366f6` conserva bundle candidato no activado (72.946 bytes gzip, PHP y dos tests JS PASS).
+
+Readback productivo en Studio: video de 15 s llega a ended; replay de 68 px con
+ring 1,25 px y arc 2 px. AXIS y Think también verificaron el póster final y esos trazos.

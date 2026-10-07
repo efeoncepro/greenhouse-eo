@@ -2,6 +2,14 @@
 
 > Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, main documental `d33ed9a`; Think `474250195059ad0db42ec3aa3f2d24ad60f3e7fc` — 2026-10-07.
 
+## Última actualización — 0.6.6
+
+Replay aprobado: órbita centrada sobre la imagen, halo/velo suaves, anillo 1,25 px y arco 2 px
+sin escalar su grosor, esfera proporcional y póster final. Package primitives 0.6.6 / tokens 0.6.1
+publicados; API/modelo y contrato 0.5.0 sin cambios. Los cortes siguientes conservan su historia.
+La publicación incremental se opera con `pnpm release:packages <version>` en AXIS; leer
+`axis-design-system/references/agent-consumption.md` para CI/baseline y límites de reutilización.
+
 ## Distribución y adopción verificadas
 
 El operador autorizó los tres usos, publicar el paquete y llevar AXIS y Think a `main`.
@@ -59,6 +67,14 @@ Son puntos de prueba, no promesa de un máximo fijo ni certificación de todos l
 El contenido manda. Color/tipografía salen de AXIS; la carga reutiliza la órbita de botones y la barra mide tiempo real.
 No añadir firma, logo u órbita decorativa sobre la imagen ni modificar sus assets. Replay usa la órbita canónica
 estática y nombre accesible «Volver a ver» / «Watch again»; nunca animación de loader.
+
+**Replay centrado (aprobado y publicado 0.6.6, 2026-10-07):** centrar la acción
+sobre la imagen, excluyendo dock/paneles. Usar `axisVideoPlayer.replay` para diámetro responsive,
+halo translúcido y velo final. Anillo y arco conservan grosor óptico fino (`non-scaling-stroke`),
+con esfera proporcional; no ampliar el grosor del loader al aumentar el botón. El póster del modelo reaparece al terminar; sin póster válido se conserva
+el último fotograma. Replay y seek retiran la capa. Estructura idéntica para los tres skins;
+no duplicar la composición en Think, Studio o WordPress. Release `37696704305` SUCCESS; tokens 0.6.1. Think `d36ba40` y Studio `3ba7cff` adoptan 0.6.6
+desde registry con despliegues Vercel SUCCESS. WordPress conserva bundle candidato sin activar.
 
 Familia funcional de 14 glifos curvos en `packages/primitives/src/video-player-icons.ts`, compartida por slots
 Media Chrome 4.19.3: play Bézier, pausa en cápsulas, volumen suave, CC/PiP/fullscreen y ajustes redondeados, replay.

@@ -1,5 +1,20 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Corte vigente — replay 0.6.6 y publicación incremental (2026-10-07)
+
+Primitives 0.6.6 / tokens 0.6.1 publicados por release `37696704305` SUCCESS, tag en `5062ba9`.
+Think `d36ba40` y Studio `3ba7cff` adoptan pins registry con Vercel SUCCESS; WordPress sólo bundle candidato.
+AXIS público verificado: póster final, anillo 1.25 px y arco 2 px. Contrato/API permanecen compatibles.
+
+Para publicar desde AXIS: commit + push main, luego `pnpm release:packages <version>`.
+Espera CI exitoso del mismo SHA antes de enviar tag. La selección de release usa diff completo desde
+un release ancestro exitoso: hereda sólo familias sin cambios y exige evidencia actual para las afectadas.
+Bumps de sólo version no disparan toda la batería; cambios de dependencias/exports/scripts/lockfile,
+fundaciones o control CI sí. Canon: `docs/architecture/CI_COST_AND_VERIFICATION_DECISION_V1.md` de AXIS.
+55 tests locales y readback de reuso real PASS; la duración de un futuro release incremental no está medida.
+Los cortes inferiores son históricos.
+
+
 ## Reproductor publicado — estado verificado 2026-10-07
 
 La distribución privada del reproductor está publicada. Este bloque es el estado vigente; las tablas

@@ -257,3 +257,19 @@ El Lab consume los mismos exports en `/patterns/efeonce.chip/`, `/patterns/efeon
 Badges informan; filtros y choices son campos nativos; action/removable tienen acciones explícitas.
 El producto posee lógica, operaciones asíncronas y foco al quitar. Soft por defecto;
 outline sólo donde el borde aporta jerarquía. No migrar pins de Greenhouse por un push de fuente.
+
+### Incremental publication correction — 2026-10-07
+
+The 0.6.6 release succeeded but repeated 19 minutes of browser gates. Do not dispatch its tag while
+same-commit main CI is pending. Use `pnpm release:packages <version>` after commit/push: the local
+command waits for trusted successful exact-SHA main CI, then pushes the tag. A manual tag without
+successful CI fails before installing/building in the publication runner.
+
+`ci-release-plan.mjs` compares the full diff from a verified successful ancestor release. Only unchanged
+families inherit its validation; affected families need exact-SHA CI plus identical build digest, or run.
+Version-only package JSON changes retain scope; dependencies, exports, scripts, lockfile, shared code,
+workflow/control changes and unknown paths retain broad verification. Never pass a hand-authored narrowed plan.
+Each suite has its own Actions step and timing summary, sharing install/build per job. No fake release to
+benchmark this. Local 55-test gate and readback against real release 37696704305/CI 37696699810 passed;
+first future incremental publication still needs its own observed timing. Full CI for this control-plane
+change is separate from the already successful 0.6.6 release.
