@@ -14,6 +14,8 @@
 
 ## Admisión Sika México Q4 Home Center — 2026-10-07
 
+**Estado local vigente: HOLD — en espera de respuesta de Sika**, por instrucción del operador el 07/10. [Análisis y ocho preguntas](sika-mexico-campana-q4-home-center-1169/research/ACLARACIONES-Y-ESPERA-INTERNO.md): envío no confirmado, sin respuestas recibidas en este chat. El brief no asigna expresamente ejecución física integral ni promotores a la agencia. Propuesta/escenarios/costeo detenidos; borrador previo de OneDrive no aprobado. Este cambio documental no modifica HubSpot ni consulta Wherex.
+
 [Workspace LIC-1169](sika-mexico-campana-q4-home-center-1169/README.md) · [Deal 65827529551](https://app.hubspot.com/contacts/48713323/record/0-3/65827529551?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1169). Distinta de LIC-1164. Brief de cinco páginas leído completo; dos frentes, 34 tiendas Home Depot, noviembre–diciembre, creatividad/medios geodirigidos/apoyo en tienda/medición y tres escenarios.
 
 Company existente `59084984648` Primary y contacto existente `253487637159` asociados; nota `118213040416` leída y asociada a los tres. Contacto de relación, responsable específico sin confirmar. Datos personales en CRM/OneDrive. `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`; segundo readback muestra `Core Pipeline` automático tras proponer `Strategic Bets`, sin acreditar cliente existente. Monto/cierre comercial vacíos; moneda sin acordar.

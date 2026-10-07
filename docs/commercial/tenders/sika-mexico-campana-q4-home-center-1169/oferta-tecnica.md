@@ -1,3 +1,5 @@
-# Propuesta técnica — estado de preparación
+# Propuesta técnica — detenida en espera de aclaraciones
 
-No redactada ni aprobada para LIC-1169. Leer el [brief y fuentes](bases/FUENTES.md), el [intake](research/INTAKE-2026-10-07.md) y el [registro](README.md) antes de preparar la propuesta de campaña Q4. Los requisitos del comprador se convierten en una matriz de cobertura y una estrategia viable; no son compromisos de ejecución asumidos.
+No hay oferta técnica aprobada para LIC-1169. Por instrucción del operador del 07/10/2026, **no desarrollar propuesta ni costeo hasta recibir y conciliar las respuestas de Sika**. Leer el [análisis y preguntas pendientes](research/ACLARACIONES-Y-ESPERA-INTERNO.md) y el [registro vigente](README.md).
+
+El brief pide contemplar apoyo en tienda y planificar implementación, pero no asigna expresamente a la agencia impresión, logística, instalación o promotores. No asumir ejecución física integral. El borrador interno previo de OneDrive queda detenido y no aprobado; no constituye alcance para cotizar. Preguntas preparadas, envío no confirmado, sin respuestas recibidas en este chat.
