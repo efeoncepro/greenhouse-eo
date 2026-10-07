@@ -1,0 +1,347 @@
+{
+  "batch_estimate_usd": 0.381,
+  "finalists_status": "editorially_selected_by_authorized_agent",
+  "finalists_basis": "Opening/comparison/current savings fit; digital conditional; highyield localized Peru; safety assist; own brand separated. No automatic ranking-driven production",
+  "requests": [
+    {
+      "id": "extra-suggestion-01",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "como ahorrar dinero",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "limit": 300,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "extra-related-01",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "como ahorrar dinero",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "extra-suggestion-02",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "que banco paga mas intereses",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "limit": 300,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "extra-related-02",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "que banco paga mas intereses",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "extra-suggestion-03",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "bancos seguros peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "limit": 300,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "extra-related-03",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "bancos seguros peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "serp-competitors-01",
+      "kind": "serp_competitors",
+      "endpoint": "/v3/dataforseo_labs/google/serp_competitors/live",
+      "task": {
+        "keywords": [
+          "cuenta de ahorros",
+          "cuenta digital",
+          "mejor cuenta de ahorros peru",
+          "cuenta de alto rendimiento peru",
+          "que banco paga mas intereses en peru",
+          "cuenta de ahorros sin mantenimiento",
+          "fondo de seguro de depositos",
+          "pibank peru",
+          "abrir cuenta de ahorros online"
+        ],
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 50,
+        "item_types": [
+          "organic"
+        ]
+      },
+      "estimate_usd": 0.018
+    },
+    {
+      "id": "serp-01-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-01-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-02-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-02-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-03-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "mejor cuenta de ahorros peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-04-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de alto rendimiento peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-04-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de alto rendimiento peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-05-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "que banco paga mas intereses en peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-05-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "que banco paga mas intereses en peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-06-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de ahorros sin mantenimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-06-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "cuenta de ahorros sin mantenimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-07-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "fondo de seguro de depositos",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-07-mobile",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "fondo de seguro de depositos",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "os": "android",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-08-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "pibank peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    },
+    {
+      "id": "serp-09-desktop",
+      "kind": "serp",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "task": {
+        "keyword": "abrir cuenta de ahorros online",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      },
+      "estimate_usd": 0.005
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "status": "visually_reviewed",
+  "workbook_sha256": "d87c2aabdf7a3a04ff59a719c48a747ab19a3d689eaa14e6d22427d455f7207e",
+  "engine": "Bundled LibreOffice PDF export + Poppler raster",
+  "pages": 11,
+  "inspection": [
+    "All11pages contact sheet",
+    "CosteoRoles full resolution:13roles,1216h total,150h included reserve,empty cost inputs and ND totals",
+    "Demanda full resolution:19families/representatives/ranks,volume not visitors",
+    "Plan2027 full resolution:12months,firstfundingM2,campaignsM3/M5/M8/M11",
+    "Economy includes core924+PR292 in combined1216; not double-counted"
+  ],
+  "qa_pdf": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/cierre-brechas-2027/qa/Pibank-decision-inversion-2027-QA.pdf",
+  "formula_count": 1303,
+  "formula_cache_errors": 0,
+  "unverified": "Excel Desktop UI; real costs, roster, quote, bank valuation and causal attribution."
+}

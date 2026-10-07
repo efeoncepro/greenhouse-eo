@@ -150,6 +150,14 @@ mide cada canal. Nunca saltes a "hagamos TikTok" sin objetivo/audiencia/mensaje.
 
 ---
 
+Para **PR editorial integrado con SEO/AEO**, carga el módulo
+[07 · Campañas integradas](modules/07_INTEGRATED_CAMPAIGNS.md#3-digital-pr--earned-media)
+y el [método comercial](../../../docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md).
+Coordina un calendario de recursos y campañas con costos explícitos: contenido disponible,
+QA y revisión preceden la salida a medios. Objetivos de cobertura/enlaces y scores de
+proveedor no son garantías ni sustituyen captación. La preparación del plan conserva el
+alcance autorizado para contacto y publicación.
+
 ## 3. Mapa de módulos (load-on-demand)
 
 | Si el trabajo es… | Carga |

@@ -1,0 +1,258 @@
+{
+  "batch_estimate_usd": 0.7993199999999999,
+  "requests": [
+    {
+      "id": "suggestion-01-page2",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 333,
+        "offset": 1100,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.05196
+    },
+    {
+      "id": "suggestion-02-page2",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 369,
+        "offset": 400,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.05628
+    },
+    {
+      "id": "suggestion-05-page2",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "transferencia bancaria",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 60,
+        "offset": 400,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.0192
+    },
+    {
+      "id": "suggestion-07-page2",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta en dolares",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 99,
+        "offset": 400,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.02388
+    },
+    {
+      "id": "ranked-01",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-02",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-03",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://www.viabcp.com/abrir-cuenta",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-04",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-05",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-06",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-07",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "https://pibank.pe/cuenta-soles-pibank/",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-08",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "viabcp.com",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ],
+        "filters": [
+          "ranked_serp_element.serp_item.relative_url",
+          "regex",
+          "(?i)(cuenta|ahorr|deposit|transfer)"
+        ]
+      },
+      "estimate_usd": 0.072
+    },
+    {
+      "id": "ranked-09",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "bbva.pe",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ],
+        "filters": [
+          "ranked_serp_element.serp_item.relative_url",
+          "regex",
+          "(?i)(cuenta|ahorr|deposit|transfer)"
+        ]
+      },
+      "estimate_usd": 0.072
+    }
+  ]
+}

@@ -12,6 +12,18 @@
 - `pnpm ai:nano` usa `gemini-nano-banana-2.1` directo por Google `global`: generación/edición/fusión, sesiones privadas, contexto video/PDF, búsqueda web/imagen, 1K–4K, 14 ratios y thinking. Expone `generateContent`, `streamGenerateContent` y `countTokens`; Batch/Interactions remoto/máscaras no implementados.
 - 29 tests nuevos, TypeScript y canaries reales 1K + edición/stream/búsqueda 2K PASS; [evidencia y límites](docs/audits/ai-tooling/2026-10-06-nano-banana-2-1-cli.md). Manual, ADR embebido y skills espejo sincronizados. Sin push/deploy; runtime y Globe independientes.
 
+## 2026-10-06 — Pibank: caso de negocio, modelo y propuesta SEO/AEO
+
+- Aprendizajes del caso incorporados al método/manual/lectura funcional y skills de SEO/AEO, negocio, cliente, pricing, licitaciones, DataForSEO, reportes/decks, growth y PR; continuidad v0.6 corregida, historia preservada. [Mapa y verificación](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md). Preparación revisable, sin nuevos forecasts, precios, gasto o publicación.
+
+- Cierre v0.6: apertura M1, calculadora/fondeo M2, PR M3/M5/M8/M11; modelo integra1.216h y13costos por función,29pruebas nativas. Capturas competitivas ampliadas, costo BBVA conciliado y baseline de backlinks. PDFs revisados; precio/roster y datos bancarios pendientes. [Cierre de brechas](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md). Sin envío ni contacto a medios.
+
+- PR editorial añadido al plan y propuesta: cuatro campañas, 48 propuestas individuales y vocería; objetivos de cobertura/enlaces sin garantía. Capacidad candidata combinada 1.216h; Excel conserva base SEO/GEO. PDFs y deck actualizados, [evidencia PR](docs/audits/commercial/2026-10-06-pibank-pr-autoridad.md). Sin contacto a medios, gastos nuevos de datos ni publicación.
+- Exploración de demanda capturada por BCP/Interbank/Scotiabank y peer adicional BBVA: 1.476 observaciones / 1.286 consultas, 19 familias, volúmenes con procedencia y [plan de conquista anual](docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-competitor-capture-2026-10-06/ANALISIS-Y-PLAN.md). Reutilización de capturas del mismo día y verificación pública; USD 0 adicional. Cobertura de dominios incompleta y ampliación preparada en preview, pendiente de conciliación de request BBVA abortado/costo desconocido. Proxies no son mercado, visitantes ni forecast; PDFs/XLSX permanecen sin nuevos resultados inventados.
+- Reunión completa leída por MCP: mandato Pibank 2027, preparación histórica de Banco Pichincha diferenciada y supuesto US$38m trazable al operador. Expediente, método, manual, documentación funcional y cuatro skills Codex/Claude actualizados.
+- [Evidencia y validación](docs/audits/commercial/2026-10-06-pibank-business-case-documentation.md). Reconstrucción v0.4: [propuesta cliente y modelo inverso](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/README.md); aperturas/fondeo separados, alcance enfocado de doce meses y escenario de lanzamiento. Tabla anterior retirada del uso cliente; historia y QA preservadas. M1 entrega; revisiones trimestrales según maduración. Inversión/valoración bancaria pendientes; sin envío, publicación ni cambios en CRM/runtime.
+
+
 ## 2026-10-06 — Prospección HubSpot: cohortes y abordaje personalizados
 
 - Portal `48713323`: 15 segmentos globales conservados y 18 nuevos activos, con pertenencia obligatoria al lote antes de industria, país, tamaño o cargo. Lectura completa confirma conjuntos exactos y cero registros ajenos. 80 cuentas investigadas, 79 contactos nuevos; 61 individuales con email para preparación, no aprobación de envío.

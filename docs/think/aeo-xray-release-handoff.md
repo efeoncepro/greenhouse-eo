@@ -4,6 +4,10 @@ Actualizado 30/09/2026. Owners: TASK-1950 (dominio/acceso),TASK-1951 (Think/comp
 [Dossier detallado](aeo-xray-implementation-dossier-2026-09-30.md) ·
 [Auditoría actual](aeo-xray-completion-audit-2026-09-30.md).
 
+**Contexto comercial 06/10:** el nuevo mandato es Pibank para 2027; la muestra publicada de Banco
+Pichincha conserva su contexto histórico. [Expediente y adaptación pendiente](../commercial/prospects/banco-pichincha-peru-seo-2026/README.md).
+Este delta documental no verifica nuevamente el deployment ni publica una muestra Pibank.
+
 ## Estado operativo real
 
 El operador cerró la muestra Banco Pichincha y autorizó documentación/commit. La entrega ya vive en

@@ -11,3 +11,6 @@
 *.ttf binary
 *.eot binary
 *.pdf binary
+
+# Preserve original evidence bytes and hashes for this prospect.
+docs/commercial/prospects/banco-pichincha-peru-seo-2026/**/*.csv -text

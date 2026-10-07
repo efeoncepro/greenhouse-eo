@@ -114,6 +114,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Comercial
 
+- [Caso de negocio SEO/AEO](comercial/caso-negocio-seo-aeo.md) — cómo se conectan meta, demanda, aperturas, fondeo, saldos y valor; integra PR y distingue requisitos, atribución, escenarios y forecast validado.
+
 - [Catálogo HubSpot as a Service](../services/hubspot-as-a-service/README.md) — define Customer Agent gestionado y RevOps/automatización/paneles como dos servicios operables separados, con ANAM como referencia de implementación.
 - [ANAM HubSpot Managed Service end-to-end](hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md) — modelo funcional del portal cliente `19893546`: Customer Agent, Growth/calidad, segmentación, Services, automatización, paneles piloto, disciplina comercial y futura foundation Account Unit + Billing Event.
 - [Digital Sales Room y el Workspace del Deal](comercial/digital-sales-room-y-workspace-del-deal.md) — qué es un DSR y las TRES capas (el taller/carpeta · el registro gobernado = la `Proposal` que es el contenedor, no un doc adentro · el DSR externo del comprador, futuro); el workspace interno canónico (`pnpm tender:new`), el discriminador de audiencia, el manifiesto de artefactos vivos (por enlace, nunca captura) y por qué el deck es una proyección de la oferta, no se auto-genera.

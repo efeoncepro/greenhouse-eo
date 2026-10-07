@@ -1,0 +1,50 @@
+{
+  "preparedAt": "2026-10-06",
+  "state": "local_annual_review_prepared",
+  "client": "Pibank Perú — Banco Pichincha Perú",
+  "horizon": "12 meses desde inicio acordado; enero-diciembre2027 calendario ilustrativo",
+  "decision": "M1 preparación/entregables; M3/M6/M9/M12 revisión según maduración",
+  "scope": "Plan anual, investigación ampliada, modelo, capacidad, material ejecutivo y censo público",
+  "approval": "Revisión comercial/roster/costo/fee y aceptación bancaria pendientes; sin envío/publicación",
+  "files": [
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/Pibank-Resumen-ejecutivo-anual-2027.pdf",
+      "sha256": "0fee43b438db7f286854166cec9f41e4f2616f8835681478f1ada92c4f39ac7a",
+      "bytes": 77852,
+      "pages": 2
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/Pibank-Plan-anual-2027.pdf",
+      "sha256": "6f6a2eeada72ef7f7cc62eef17b3247847c70c78d3c40171b74cfc59b6bfb5b4",
+      "bytes": 260842,
+      "pages": 7
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/Pibank-Plan-tecnico-editorial-2027.pdf",
+      "sha256": "84d33fc589ac4008f80949d2b2513e198ff7a8daaba7d005641fc6714132d841",
+      "bytes": 763272,
+      "pages": 18
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/deck/PIBANK-PROPUESTA-ANUAL-2027.pdf",
+      "sha256": "a3dad0e4a5166a48883cbda40f0ed0e3712105bcb0effdc671559c3e4eb56913",
+      "bytes": 2322560,
+      "pages": 12
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/modelo/Pibank-caso-negocio-anual-2027.xlsx",
+      "sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+      "bytes": 62534
+    }
+  ],
+  "editable_sources": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/fuentes-editables",
+  "research": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/research",
+  "modelNativeChecks": 22,
+  "demandProxyMonthly": 3690,
+  "demandNature": "Panel histórico selectivo; no TAM/personas/forecast2027",
+  "researchKeywords": 4855,
+  "faqRead": 51,
+  "finance": "CAC/ROI/payback N/D hasta inputs y validaciones aplicables",
+  "historicalPackage": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027",
+  "qa": "docs/audits/commercial/2026-10-06-pibank-plan-anual-qa.md"
+}

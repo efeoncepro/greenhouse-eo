@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-10-06",
+  "start_month": "2027-01-01",
+  "start_status": "Enero es calendario ilustrativo; inicio del programa por validar",
+  "months": 6,
+  "selected_case": 2,
+  "goal_accounts": 15200,
+  "goal_usd": 38000000,
+  "ticket_usd": 2500,
+  "goal_status": "Hipótesis provisional del operador: 15200 × US$2500. Moneda, periodo y definición por validar",
+  "demand_monthly": 3900,
+  "demand_status": "Proxy editorial con estimaciones DataForSEO PE/es, suma MAX de seis grupos. Alto rendimiento1600 excluido por SERP mixta geográfica. Snapshot sept2026/últimos meses agosto; no TAM personas ni forecast2027",
+  "demand_source": "../research/pibank-demand-2026-10-06/demand-inputs.json; keyword_overview/live + keyword_suggestions/live, consultado2026-10-06",
+  "relevance_eligibility_factor": 0.75,
+  "relevance_status": "Factor de prueba 75% no medido sobre3900. Recorta relevancia/elegibilidad y solapamiento restante; sensibilizar, no personas únicas",
+  "finance_validated": false,
+  "net_annual_value_per_usd_external_balance": null,
+  "costs_validated": false,
+  "monthly_cost_usd": [null, null, null, null, null, null],
+  "client_investment_status": "Inversión cliente pendiente. No es cero. No fee ni quote aprobado",
+  "investment_sensitivity_usd": [10000, 25000, 50000],
+  "delivery_capacity_hours_with_reserve": 995.9,
+  "efeonce_internal_cost_usd": null,
+  "cases": [
+    {"name":"Conservador","extra_capture":[0.0025,0.005,0.0125,0.025,0.04,0.06],"reference_capture":[0.01,0.01,0.01,0.01,0.01,0.01],"opening_rate":0.01,"funding_rate":0.5,"retention30":0.9,"retention60":0.8,"retention90":0.7,"external_share":0.7,"condition":"Curva ilustrativa más lenta y conversiones de prueba bajas; no probabilidad asignada"},
+    {"name":"Base","extra_capture":[0.005,0.015,0.035,0.06,0.10,0.15],"reference_capture":[0.01,0.01,0.01,0.01,0.01,0.01],"opening_rate":0.02,"funding_rate":0.65,"retention30":0.95,"retention60":0.90,"retention90":0.85,"external_share":0.7,"condition":"Curva de prueba con implementación gradual; Base es nombre de caso ilustrativo, no forecast recomendado"},
+    {"name":"Favorable","extra_capture":[0.01,0.025,0.05,0.10,0.175,0.25],"reference_capture":[0.01,0.01,0.01,0.01,0.01,0.01],"opening_rate":0.03,"funding_rate":0.75,"retention30":0.97,"retention60":0.95,"retention90":0.92,"external_share":0.7,"condition":"Implementación y adopción más rápidas como prueba de sensibilidad, sin garantía"}
+  ],
+  "sources": [
+    {"id":"CAPACIDAD","nature":"Estimación de planificación","source":"../propuesta/ALCANCE-Y-COSTEO-INTERNO.md §2","scope":"866h + reserva15%=995,9h. No costo monetario, roster ni fee aprobado","date":"2026-10-06","confidence":"Pendiente Operations/Finance"},
+    {"id":"META","nature":"Inferencia provisional","source":"MEETING-2026-10-06.md y conversación del operador","scope":"Meta Pibank referida en reunión; moneda/horizonte/estado de cuenta no confirmados","date":"2026-10-06","confidence":"Alta aritmética; baja confirmación de meta"},
+    {"id":"PRODUCTO","nature":"Observación pública","source":"https://pibank.pe/cuenta-soles-pibank/","scope":"Cuenta Soles, ahorro digital; no valida meta USD ni producto dólares","date":"2026-10-06","confidence":"Alta para página observada"},
+    {"id":"IDENTIDAD","nature":"Observación pública","source":"https://pibank.pe/quienes-somos/","scope":"Pibank pertenece a Banco Pichincha Perú","date":"2026-10-06","confidence":"Alta para identidad declarada"},
+    {"id":"GOOGLE","nature":"Documentación primaria","source":"https://developers.google.com/search/docs/appearance/ai-features","scope":"Google: SEO fundamentos; sin requisitos técnicos extras ni aparición garantizada","date":"2026-10-06","confidence":"Alta para Google únicamente"},
+    {"id":"SIM","nature":"Ejemplo aritmético","source":"Diseño del modelo de prueba; inputs.json","scope":"Captura, referencia, apertura, fondeo, retención, origen externo no medidos","date":"2026-10-06","confidence":"No inferencia empírica"}
+  ]
+}

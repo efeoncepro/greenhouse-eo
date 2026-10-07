@@ -1,0 +1,287 @@
+{
+  "budget_usd": 2,
+  "organization": "EO-ORG-0007 Efeonce adquisición",
+  "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+  "consumer": "seo",
+  "location_code": 2604,
+  "language_code": "es",
+  "device": "not_device_specific_Labs",
+  "batch_estimate_usd": 0.876,
+  "requests": [
+    {
+      "id": "suggestion-01",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 1000,
+        "offset": 100,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.132
+    },
+    {
+      "id": "suggestion-02",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "suggestion-03",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "mejor banco para ahorrar",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "suggestion-04",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "intereses cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "suggestion-05",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "transferencia bancaria",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "suggestion-06",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "fondo de seguro de depositos",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "suggestion-07",
+      "kind": "suggestion",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "task": {
+        "keyword": "cuenta en dolares",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.06
+    },
+    {
+      "id": "related-01",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-02",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-03",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "mejor cuenta de ahorros peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-04",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "cuenta de ahorros de alto rendimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-05",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "transferencia bancaria",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-06",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "fondo de seguro de depositos",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-07",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "depositar dinero en cuenta",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    },
+    {
+      "id": "related-08",
+      "kind": "related",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "task": {
+        "keyword": "cuenta en dolares",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      },
+      "estimate_usd": 0.048
+    }
+  ],
+  "reuse": [
+    "../pibank-demand-2026-10-06/keyword-overview-provider.json",
+    "../pibank-demand-2026-10-06/keyword-suggestions-provider.json"
+  ],
+  "rankings_etv_policy": "Ranking requests read positions only; ETV discarded and not comparable; no manual use_improved_etv flag"
+}

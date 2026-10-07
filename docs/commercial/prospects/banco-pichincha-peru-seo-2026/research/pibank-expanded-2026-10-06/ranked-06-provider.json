@@ -1,0 +1,1308 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:25.316Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1115,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1115,
+        "costUsd": 0.01272,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-717debb85bb1",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01272,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01272,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-717debb85bb1",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.2795 sec.",
+        "cost": 0.01272,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 6,
+            "items_count": 6,
+            "metrics": {
+              "organic": {
+                "pos_1": 1,
+                "pos_2_3": 0,
+                "pos_4_10": 0,
+                "pos_11_20": 1,
+                "pos_21_30": 2,
+                "pos_31_40": 1,
+                "pos_41_50": 0,
+                "pos_51_60": 0,
+                "pos_61_70": 0,
+                "pos_71_80": 1,
+                "pos_81_90": 0,
+                "pos_91_100": 0,
+                "etv": 51.96000146865845,
+                "count": 6,
+                "estimated_paid_traffic_cost": 54.96871919929981,
+                "is_new": 6,
+                "is_up": 0,
+                "is_down": 0,
+                "is_lost": 0,
+                "clickstream_etv": null,
+                "clickstream_gender_distribution": null,
+                "clickstream_age_distribution": null
+              },
+              "paid": null,
+              "featured_snippet": null,
+              "local_pack": null,
+              "ai_overview_reference": null
+            },
+            "metrics_absolute": null,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de ahorros",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 05:09:54 +00:00",
+                    "competition": 0.4699999988079071,
+                    "competition_level": "MEDIUM",
+                    "cpc": 2,
+                    "search_volume": 2900,
+                    "low_top_of_page_bid": 0.4399999976158142,
+                    "high_top_of_page_bid": 2.319999933242798,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 3600
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 21,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 10,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches",
+                      "images"
+                    ],
+                    "se_results_count": 134,
+                    "last_updated_time": "2026-09-03 18:45:16 +00:00",
+                    "previous_updated_time": "2026-05-17 23:13:48 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 146.5,
+                    "dofollow": 46.20000076293945,
+                    "referring_pages": 108.0999984741211,
+                    "referring_domains": 41.400001525878906,
+                    "referring_main_domains": 33.599998474121094,
+                    "rank": 110.4000015258789,
+                    "main_domain_rank": 342.79998779296875,
+                    "last_updated_time": "2026-09-03 18:45:20 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": [
+                      "commercial"
+                    ],
+                    "last_updated_time": "2026-04-29 19:22:42 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 21,
+                    "rank_absolute": 25,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Cuenta 100% digital ; 4.5% de tasa (TREA) por tus ahorros en soles; Sin monto mínimo de apertura, ni costo de mantenimiento; Los intereses se pagan desde el ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta 100% digital"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 6.670000076293945,
+                    "estimated_paid_traffic_cost": 13.34000015258789,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 175
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches",
+                    "images"
+                  ],
+                  "se_results_count": 134,
+                  "keyword_difficulty": 10,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-03 18:45:16 +00:00",
+                  "previous_updated_time": "2026-05-17 23:13:48 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta leonisa perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 05:02:27 +00:00",
+                    "competition": 0.019999999552965164,
+                    "competition_level": "LOW",
+                    "cpc": 0.09000000357627869,
+                    "search_volume": 320,
+                    "low_top_of_page_bid": 0.009999999776482582,
+                    "high_top_of_page_bid": 0.009999999776482582,
+                    "categories": [
+                      10008
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": -18
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "leonisa peru cuenta",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20leonisa%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 156,
+                    "last_updated_time": "2026-09-19 16:00:31 +00:00",
+                    "previous_updated_time": "2026-06-03 07:12:54 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 38.29999923706055,
+                    "dofollow": 26.799999237060547,
+                    "referring_pages": 30.5,
+                    "referring_domains": 7.300000190734863,
+                    "referring_main_domains": 7,
+                    "rank": 44.70000076293945,
+                    "main_domain_rank": 419.20001220703125,
+                    "last_updated_time": "2026-09-19 16:00:31 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": [
+                      "commercial"
+                    ],
+                    "last_updated_time": "2026-04-26 05:49:57 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 71,
+                    "rank_absolute": 74,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Más info ingresa a: www.fsd.org.pe. Abrir tu cuenta es facilísimo. #1. Descarga la App “Efectibank”. #2. Ingresa, confirma tus datos y valida tu identidad. #3.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "cuenta"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 0.671999990940094,
+                    "estimated_paid_traffic_cost": 0.06047999858856201,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 175
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20leonisa%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 156,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-19 16:00:31 +00:00",
+                  "previous_updated_time": "2026-06-03 07:12:54 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta en euros",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 09:14:03 +00:00",
+                    "competition": 0.23999999463558197,
+                    "competition_level": "LOW",
+                    "cpc": 0.550000011920929,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.019999999552965164,
+                    "high_top_of_page_bid": 1.2100000381469727,
+                    "categories": [
+                      10012,
+                      10095,
+                      11831
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 210
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 21,
+                      "quarterly": 21,
+                      "yearly": -19
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20en%20euros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-09-26 14:54:30 +00:00",
+                    "previous_updated_time": "2026-07-07 19:37:08 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 0.4000000059604645,
+                    "dofollow": 0.4000000059604645,
+                    "referring_pages": 0.4000000059604645,
+                    "referring_domains": 0.20000000298023224,
+                    "referring_main_domains": 0.20000000298023224,
+                    "rank": 13.100000381469727,
+                    "main_domain_rank": 491.79998779296875,
+                    "last_updated_time": "2026-09-26 14:54:31 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 05:42:20 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 40,
+                    "rank_absolute": 46,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Cuenta 100% digital ; 4.5% de tasa (TREA) por tus ahorros en soles; Sin monto mínimo de apertura, ni costo de mantenimiento; Los intereses se pagan desde el ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta 100% digital"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 0.4410000145435333,
+                    "estimated_paid_traffic_cost": 0.24255000054836273,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 208
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20en%20euros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-26 14:54:30 +00:00",
+                  "previous_updated_time": "2026-07-07 19:37:08 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "interés de cuenta de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 11:55:49 +00:00",
+                    "competition": 0.6600000262260437,
+                    "competition_level": "MEDIUM",
+                    "cpc": 1.1200000047683716,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.30000001192092896,
+                    "high_top_of_page_bid": 1.2599999904632568,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 1000
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=inter%C3%A9s%20de%20cuenta%20de%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 138,
+                    "last_updated_time": "2026-09-25 17:14:44 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 13.699999809265137,
+                    "dofollow": 5.699999809265137,
+                    "referring_pages": 12.800000190734863,
+                    "referring_domains": 9.399999618530273,
+                    "referring_main_domains": 5.599999904632568,
+                    "rank": 61.400001525878906,
+                    "main_domain_rank": 382.79998779296875,
+                    "last_updated_time": "2026-09-25 17:14:45 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 15:39:50 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 14,
+                    "rank_absolute": 17,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Cuenta 100% digital · 4.5% de tasa (TREA) por tus ahorros en soles · Sin monto mínimo de apertura, ni costo de mantenimiento · Los intereses se pagan desde el ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "4.5% de tasa (TREA) por tus ahorros en soles"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 1.1759999990463257,
+                    "estimated_paid_traffic_cost": 1.3171199560165405,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 208
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=inter%C3%A9s%20de%20cuenta%20de%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 138,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-25 17:14:44 +00:00",
+                  "previous_updated_time": null
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "mejores cuentas de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 09:00:49 +00:00",
+                    "competition": 0.4399999976158142,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.9700000286102295,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.30000001192092896,
+                    "high_top_of_page_bid": 1.100000023841858,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 260
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -33,
+                      "quarterly": 0,
+                      "yearly": -33
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=mejores%20cuentas%20de%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches",
+                      "images"
+                    ],
+                    "se_results_count": 122,
+                    "last_updated_time": "2026-09-25 09:24:03 +00:00",
+                    "previous_updated_time": "2026-07-07 02:33:43 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 10.899999618530273,
+                    "dofollow": 4,
+                    "referring_pages": 10.800000190734863,
+                    "referring_domains": 8.5,
+                    "referring_main_domains": 4.800000190734863,
+                    "rank": 30.600000381469727,
+                    "main_domain_rank": 454.70001220703125,
+                    "last_updated_time": "2026-09-25 09:24:04 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 19:58:58 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 30,
+                    "rank_absolute": 36,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Cuenta 100% digital · 4.5% de tasa (TREA) por tus ahorros en soles · Sin monto mínimo de apertura, ni costo de mantenimiento · Los intereses se pagan desde el ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta 100% digital"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 0.4410000145435333,
+                    "estimated_paid_traffic_cost": 0.4277699887752533,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 201
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=mejores%20cuentas%20de%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches",
+                    "images"
+                  ],
+                  "se_results_count": 122,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-25 09:24:03 +00:00",
+                  "previous_updated_time": "2026-07-07 02:33:43 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "financiera efectiva cuenta de ahorros",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 23:42:40 +00:00",
+                    "competition": 0.5299999713897705,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.9300000071525574,
+                    "search_volume": 140,
+                    "low_top_of_page_bid": 0.3499999940395355,
+                    "high_top_of_page_bid": 0.9200000166893005,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 210
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -43,
+                      "quarterly": -71,
+                      "yearly": -71
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=financiera%20efectiva%20cuenta%20de%20ahorros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "ai_overview",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 107,
+                    "last_updated_time": "2026-08-30 04:38:11 +00:00",
+                    "previous_updated_time": "2026-06-16 22:04:54 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 0.10000000149011612,
+                    "dofollow": 0.10000000149011612,
+                    "referring_pages": 0.10000000149011612,
+                    "referring_domains": 0.10000000149011612,
+                    "referring_main_domains": 0.10000000149011612,
+                    "rank": 26.600000381469727,
+                    "main_domain_rank": 499.29998779296875,
+                    "last_updated_time": "2026-08-30 04:51:45 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 07:50:58 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.efectibank.pe",
+                    "title": "Cuenta de Ahorros Efectiva",
+                    "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+                    "breadcrumb": "https://www.efectibank.pe › ahorros › cuenta-de-ahorros",
+                    "website_name": "Efectibank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Cuenta 100% digital · 4.5% de tasa (TREA) por tus ahorros en soles · Sin monto mínimo de apertura, ni costo de mantenimiento · Los intereses se pagan desde el ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta 100% digital"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "efectibank.pe",
+                    "relative_url": "/ahorros/cuenta-de-ahorros/",
+                    "etv": 42.560001373291016,
+                    "estimated_paid_traffic_cost": 39.5807991027832,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 175
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=financiera%20efectiva%20cuenta%20de%20ahorros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "ai_overview",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 107,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-30 04:38:11 +00:00",
+                  "previous_updated_time": "2026-06-16 22:04:54 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

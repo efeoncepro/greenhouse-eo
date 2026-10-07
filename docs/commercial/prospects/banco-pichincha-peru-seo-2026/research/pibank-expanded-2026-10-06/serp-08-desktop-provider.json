@@ -1,0 +1,1108 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:22:01.364Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "pibank peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.005,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 25181,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 25181,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061921-1987-0139-0000-f0e418ea4e53",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061921-1987-0139-0000-f0e418ea4e53",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "23.6395 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "pibank peru",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows",
+          "depth": 20
+        },
+        "result": [
+          {
+            "keyword": "pibank peru",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=pibank%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 19:22:00 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "organic",
+              "people_also_ask",
+              "short_videos",
+              "images"
+            ],
+            "se_results_count": 4010,
+            "pages_count": 2,
+            "items_count": 21,
+            "items": [
+              {
+                "type": "organic",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "🏦📱💰 La nueva propuesta debuta con una cuenta de ...",
+                "url": "https://www.instagram.com/p/Dd4MXI0mjcs/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "8 me gusta  ·  hace 1 semana",
+                "website_name": "Instagram · peruretail_oficial",
+                "is_image": true,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_image"
+                ],
+                "description": "Pibank empezará sus operaciones en Perú con una cuenta en soles sin comisiones ni montos mínimos y prepara una alternativa en dólares. La ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": [
+                  {
+                    "type": "images_element",
+                    "alt": "pibank peru de www.instagram.com",
+                    "url": "https://www.instagram.com/p/Dd4MXI0mjcs/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:0"
+                  }
+                ],
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank empezará sus operaciones en Perú"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "people_also_ask",
+                "rank_group": 1,
+                "rank_absolute": 2,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+                "items": [
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco respalda a Pibank?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_expanded_element",
+                        "featured_title": null,
+                        "url": "https://www.pibank.co/quienes-somos/#:~:text=Pibank%20es%20una%20marca%20registrada,Garant%C3%ADas%20de%20Instituciones%20Financieras%20FOGAFIN.",
+                        "domain": "www.pibank.co",
+                        "title": "Conoce quiénes somos más de cerca - Pibank",
+                        "description": "Pibank es una marca registrada por Banco Pichincha S.A. – Colombia, adscrita al Fondo de Garantías de Instituciones Financieras FOGAFIN.",
+                        "images": null,
+                        "timestamp": null,
+                        "table": null
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Hay Banco Pichincha en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_expanded_element",
+                        "featured_title": null,
+                        "url": "https://www.pichincha.com/conoce-tu-banco/grupo-financiero-pichincha#:~:text=Con%20filial%20en%20Per%C3%BA%2C%20Banco,sus%20servicios%20fuera%20del%20Ecuador.",
+                        "domain": "www.pichincha.com",
+                        "title": "Grupo Financiero Pichincha",
+                        "description": "Con filial en Perú, Banco Pichincha ofrece sus servicios fuera del Ecuador.",
+                        "images": null,
+                        "timestamp": null,
+                        "table": null
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Cuál es el banco que paga más intereses en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_expanded_element",
+                        "featured_title": null,
+                        "url": "https://www.prestamype.com/articulos/que-bancos-pagan-mas-intereses-por-ahorros-en-peru#:~:text=Seg%C3%BAn%20la%20SBS%2C%20al%2030,una%20tasa%20de%206.75%25%20anual.",
+                        "domain": "www.prestamype.com",
+                        "title": "¿Qué bancos pagan más intereses por ahorros en Perú? - Prestamype",
+                        "description": "Según la SBS, al 30 de enero de 2024, la entidad financiera que ofrece la mejor tasa de retorno por depositar dinero en su cuenta de ahorro es la Financiera Qapaq con una TREA de 7.5%. Le sigue el Banco Ripley con una tasa anual de 7.25% y completa el podio Banco Pichincha con una tasa de 6.75% anual.",
+                        "images": null,
+                        "timestamp": null,
+                        "table": null
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco se fue a bancarrota en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_expanded_element",
+                        "featured_title": null,
+                        "url": "https://www.facebook.com/larepublicape/posts/sbs-confirma-disoluci%C3%B3n-de-popular-entidad-financierauna-publicaci%C3%B3n-de-wapape/1504258125066499/#:~:text=La%20Superintendencia%20de%20Banca%2C%20Seguros%20y%20AFP%20(SBS)%20inform%C3%B3,y%20de%20la%20reserva%20cooperativa.",
+                        "domain": "www.facebook.com",
+                        "title": "SBS confirma disolución de popular ENTIDAD FINANCIERA Una ...",
+                        "description": "La Superintendencia de Banca, Seguros y AFP (SBS) informó que declaró la disolución de la Cooperativa de Ahorro y Crédito Credicoop Cusco, por encontrarse incursa en la causal de pérdida total del capital social y de la reserva cooperativa.",
+                        "images": null,
+                        "timestamp": null,
+                        "table": null
+                      }
+                    ]
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 2,
+                "rank_absolute": 3,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+                "domain": "pibank.pe",
+                "title": "Aviso de privacidad - Pibank Perú",
+                "url": "https://pibank.pe/aviso-de-privacidad/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://pibank.pe › aviso-de-priv...",
+                "website_name": "pibank.pe",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "27 may. 2024 — Aviso de privacidad ; What we do ; How does Pibank protect my personal information? To protect your personal information from unauthorized access ...",
+                "pre_snippet": "05/27/2024 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "How does Pibank protect my personal information"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2024-05-27 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "short_videos",
+                "rank_group": 1,
+                "rank_absolute": 4,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]",
+                "title": "Videos cortos",
+                "items": [
+                  {
+                    "type": "short_videos_element",
+                    "title": "Pibank llega con una nueva cuenta de ahorro con 5% TREA ...",
+                    "url": "https://www.facebook.com/juan.apontegranda/videos/pibank-llega-con-una-nueva-cuenta-de-ahorro-con-5-trea-pibank-per%C3%BA-este-nuevo-pr/1884694559601316/",
+                    "domain": "google.com",
+                    "source": "Juan Aponte Granda"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Ya abrí una cuenta en Pibank para contarles toda la ...",
+                    "url": "https://www.facebook.com/tomaeldato/videos/ya-abr%C3%AD-una-cuenta-en-pibank-para-contarles-toda-la-experiencia-pibank-es-la-ban/929850623180382/",
+                    "domain": "google.com",
+                    "source": "Toma el Dato - César Sánchez"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Ya abrí una cuenta en Pibank para contarles toda ...",
+                    "url": "https://www.instagram.com/reel/Dd96sH-yh2T/",
+                    "domain": "google.com",
+                    "source": "César Sánchez | Finanzas | Inversiones | Crecimiento"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Cada persona tiene una forma distinta de vivir sus finanzas. ...",
+                    "url": "https://www.facebook.com/BancoPichinchaPeru/videos/cada-persona-tiene-una-forma-distinta-de-vivir-sus-finanzas-hay-quienes-disfruta/2275828516603334/",
+                    "domain": "google.com",
+                    "source": "Banco Pichincha Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Pibank, la marca digital de Banco Pichincha, llegó a Perú con ...",
+                    "url": "https://www.instagram.com/reel/Dd9Okk_IVK2/",
+                    "domain": "google.com",
+                    "source": "Alexander Valdiviezo ⚡️"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Pibank llega con una nueva cuenta de ahorro con 5% TREA ...",
+                    "url": "https://www.instagram.com/reel/Dd7trJJucvW/",
+                    "domain": "google.com",
+                    "source": "Juan Aponte Granda | Asesor financiero | Finanzas"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Diario Gestión",
+                    "url": "https://www.facebook.com/Gestionpe/posts/lanoticiadeld%C3%ADa-banco-pichincha-apuesta-por-la-banca-digital-en-per%C3%BA-con-pibank-/1568491078650534/",
+                    "domain": "google.com",
+                    "source": "Diario Gestión"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "La competencia en banca siempre nos va a convenir ...",
+                    "url": "https://www.instagram.com/reel/DeDJM22KBw4/",
+                    "domain": "google.com",
+                    "source": "Pilar Cabrera"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Pibank llega con una nueva cuenta de ahorro con 5% TREA ...",
+                    "url": "https://www.instagram.com/juan.apontegranda/reel/Dd7trJJucvW/?hl=bn",
+                    "domain": "google.com",
+                    "source": "Juan Aponte Granda | Asesor financiero | Finanzas"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Llego Pibank a cambiar la banca digital? Banco Pichincha ya ...",
+                    "url": "https://www.tiktok.com/@toma.el.dato/video/7690800377297407250",
+                    "domain": "google.com",
+                    "source": "toma.el.dato"
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 3,
+                "rank_absolute": 5,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "La competencia en banca siempre nos va a convenir ...",
+                "url": "https://www.instagram.com/reel/DeDJM22KBw4/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "9 me gusta  ·  hace 2 días",
+                "website_name": "Instagram · pilicabfinanzas",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Pibank es la banca 100% digital de @bancopichincha.pe. Tendrás una cuenta soles de TREA 5% que se abona mes a mes. Tiene FSD de hasta S/123000 y ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-10-04 19:21:58 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 1,
+                "rank_absolute": 6,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]",
+                "title": "Imágenes",
+                "url": "https://www.google.com/search?sca_esv=99fa615e217dff4e&hl=es&gl=PE&sxsrf=APpeQnurL2EbBE-hAW8A1NodxsiBaZzS3Q:1791314518113&q=pibank+peru&udm=2&source=univ&fir=Re_T0PdQ87OT3M%252CUDgA7zZCpLnDLM%252C_%253BnIo_b7000PjPKM%252CzuKWSiq7BCl3OM%252C_%253BeazQ8VDqSWix3M%252CeS2SuLAGGu5AfM%252C_%253BC8mpUiCnvUU-eM%252CqhQEplwNtslFdM%252C_%253BMryg38XzV5wBDM%252CUn6AOG-Zv4UDWM%252C_%253BcK4Ab2qS6bPy4M%252CASZxwpsWMfrbCM%252C_%253B3Wmr1oC8K-Hc4M%252CR32xRG3vvBomzM%252C_%253B7TJl62wQp-ZCLM%252CqgCi08JeWoqRBM%252C_%253B8k_h44sWgkAb-M%252CYeB6CTvLba1MjM%252C_&usg=AI4_-kQpZ8OeQwZYs68mLBVbkhr5ZgpF0w&sa=X&ved=2ahUKEwjVv6DMjqaXAxWi3wIHHS4NH1AQ7Al6BAhEEAU",
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "Cada persona tiene una forma distinta de vivir sus finanzas. 💛, Hay  quienes disfrutan de la cercanía de una atención presencial y quienes  prefieren tenerlo todo al alcance de su celular., Para ellos, ...",
+                    "url": "https://www.facebook.com/BancoPichinchaPeru/videos/cada-persona-tiene-una-forma-distinta-de-vivir-sus-finanzas-hay-quienes-disfruta/2275828516603334/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:1"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Respuesta a @andreadbc todo lo que debes hacer para abrir la cuenta que te  paga 5% de TREA #cuentasdeahorro #peru #pibank",
+                    "url": "https://www.tiktok.com/@toma.el.dato/video/7691480530449075457",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:2"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Una nueva opción al mercado financiero peruano: Pibank #pibank  #finanzaspersonales #ahorro #bancos #finanzas",
+                    "url": "https://www.instagram.com/reel/Dd5b9J1RD0i/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:3"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "#LaNoticiaDelDía , 🏦📱 Banco Pichincha apuesta por la banca digital en  Perú con Pibank, una propuesta enfocada en captar ahorros a través de  canales exclusivamente digitales. 💳💰, Su nueva Cuenta Soles ...",
+                    "url": "https://www.facebook.com/Gestionpe/posts/lanoticiadeld%C3%ADa-banco-pichincha-apuesta-por-la-banca-digital-en-per%C3%BA-con-pibank-/1568491078650534/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvNqehzOxn_doXWIg33328Jsaa_Lg9xud3ojyfqiokZhOsGg9CtJd_-_s&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "tiendas – Prestamos",
+                    "url": "https://afluenta.pe/author/tiendas/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFZLVNF2Qhtda4ByB5XnE-UkAJmJqimD8PF1im2EffNvzS9Sqj_7D9df4&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Disfrutar el momento y tener el control de tu dinero… sí se ...",
+                    "url": "https://www.instagram.com/p/DY2PldXIJGX/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdHw_8P3ZhKHTMMwxNpoo3dluKTytGQc2UscAdT67tAdaos0PBHyEe7Rw&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Erick Alencar Rios - Gerente de Canales Digitales y ...",
+                    "url": "https://pe.linkedin.com/in/erick-alencar-rios-4664a35a",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXliwrdan-5n4tNr1PuTz6oDnc0x-dDeYBFlDvTw500zYKiHnhpsTFeC0&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "bancopichincha.pe dio inicio a las operaciones de Pibank, su ...",
+                    "url": "https://www.instagram.com/p/Dd2dhHpFTZ_/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPojVovEZQIYzeH7URs1762GTtgUbwewdAg8PoSOgSXAbPKIJo8BiS4-E&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Carol Celene Cornejo Ochoa - Jefe de Calidad de Software TI ...",
+                    "url": "https://pe.linkedin.com/in/carol-celene-cornejo-ochoa-97664127",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHk_q4j_LLFIiQR8l43TEAF6y3vJky9PiEehp5BkyBrz-A4qrPbH01pK0&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 4,
+                "rank_absolute": 7,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]",
+                "domain": "www.tiktok.com",
+                "title": "¿Llego Pibank a cambiar la banca digital? Banco Pichincha ya ...",
+                "url": "https://www.tiktok.com/@toma.el.dato/video/7690800377297407250",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 15.4 k vistas  ·  hace 1 semana",
+                "website_name": "TikTok · César Sánchez - Finanzas",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "... me gusta,40 comentarios.Vídeo de TikTok de César Sánchez - Finanzas (@toma.el.dato): «¿Llego Pibank ... peru #tomaeldato».sonido original - César",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank",
+                  "peru"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-29 19:21:58 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 5,
+                "rank_absolute": 8,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[13]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Pibank Perú | Cuando entiendes cómo funciona tu dinero ...",
+                "url": "https://www.instagram.com/p/Dd1nAArFMBl/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 20 \"me gusta\"  ·  hace 1 semana",
+                "website_name": "Instagram · pibank_pe",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Una cuenta de ahorro debería ser así de simple: ✓ Intereses desde el primer sol. ✓ Sin comisiones. ✓ Tu dinero siempre disponible. Obviooo.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Intereses desde el primer sol"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 6,
+                "rank_absolute": 9,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[14]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Compartamos Banco Perú | Ahorrar no tiene que empezar en ...",
+                "url": "https://www.instagram.com/reel/DdAYsM-iXzF/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 120 \"me gusta\"  ·  hace 4 semanas",
+                "website_name": "Instagram · compartamosbancoperu",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Con la Cuenta Soles de Pibank puedes obtener 5% TREA, desde el primer sol, sin comisión de mantenimiento y gestionando todo de manera 100% ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-08 19:21:58 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 7,
+                "rank_absolute": 10,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[16]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "qué empiecen los juegos del hambreeee 🔥🔥🔥🔥 que ...",
+                "url": "https://www.facebook.com/finanfieras/posts/qu%C3%A9-empiecen-los-juegos-del-hambreeee-que-venga-m%C3%A1s-competencia-finanzas-finanfi/1750371720428003/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "hace 6 días",
+                "website_name": "Facebook · Finanfieras",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Pi Bank es un nuevo banco cien por ciento digital. Vamos a leer la letra pequeña, a ver qué encontramos, sin monto mínimo de apertura, ni ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pi Bank es un nuevo banco cien por ciento digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 8,
+                "rank_absolute": 11,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[18]/div[1]/div[1]",
+                "domain": "pe.linkedin.com",
+                "title": "Pasquale Velazco Imparato - Gerente de Servicio al ...",
+                "url": "https://pe.linkedin.com/in/pasquale-velazco-imparato",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 190 seguidores",
+                "website_name": "LinkedIn · Pasquale Velazco Imparato",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Gerente de Servicio al Cliente en Pibank Perú | Líder en Operaciones Bancarias, Banca Directa y Digital, y Experiencia del Cliente | Transformación y Mejora ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Gerente de Servicio al Cliente en Pibank Perú"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 9,
+                "rank_absolute": 12,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.tiktok.com",
+                "title": "Respuesta a @andreadbc todo lo que debes hacer para abrir ...",
+                "url": "https://www.tiktok.com/@toma.el.dato/video/7691480530449075457",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 34 k vistas  ·  hace 5 días",
+                "website_name": "TikTok · César Sánchez - Finanzas",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "... peru # pibank ». pibank. @toma.el.datosonido original - César Sánchez - Finanzas.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "peru",
+                  "pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-10-01 19:21:59 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 10,
+                "rank_absolute": 13,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡Haz que tus ahorros crezcan en dólares!",
+                "url": "https://www.facebook.com/BancoPichinchaPeru/videos/haz-que-tus-ahorros-crezcan-en-d%C3%B3lares/508437691935955/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 290 reacciones  ·  hace 2 años",
+                "website_name": "Facebook · Banco Pichincha Perú",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Banco Pichincha critiques 'Cyber Days' sales events as marketing tactics designed to encourage spending rather than saving. The bank positions ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2024-10-06 19:21:59 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 11,
+                "rank_absolute": 14,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "dar continuidad a Tu Otro Banco junto a @bancopichincha.pe. ...",
+                "url": "https://www.instagram.com/reel/DUBSfESExUR/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "6 me gusta  ·  hace 8 meses",
+                "website_name": "Instagram · ladovdevalor",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Banco Pichincha amplía su presencia digital en Perú. Pibank comenzó a operar con una cuenta de ahorros en soles 100% digital, sin monto ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Perú",
+                  "Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-02-06 19:21:59 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 12,
+                "rank_absolute": 15,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+                "domain": "afluenta.pe",
+                "title": "tiendas - Prestamos",
+                "url": "https://afluenta.pe/author/tiendas/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://afluenta.pe › author › tiendas",
+                "website_name": "afluenta.pe",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "“` Conoce cómo funciona Pibank, qué características ofrece su Cuenta Soles, cuáles son sus requisitos y cómo abrir una cuenta completamente digital.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 13,
+                "rank_absolute": 16,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Banco Pichincha lanza Pibank: 5% TREA sin comisión ni ...",
+                "url": "https://www.instagram.com/p/Dd7yl-Nioa6/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "2 me gusta  ·  hace 5 días",
+                "website_name": "Instagram",
+                "is_image": true,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_image"
+                ],
+                "description": "ÚLTIMA HORA | Banco Pichincha lanza Pibank: 5% TREA sin comisión ni mínimo · Pibank empezará sus operaciones en Perú con una cuenta en soles ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": [
+                  {
+                    "type": "images_element",
+                    "alt": "pibank peru de www.instagram.com",
+                    "url": "https://www.instagram.com/p/Dd7yl-Nioa6/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:4"
+                  }
+                ],
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Banco Pichincha lanza Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 2,
+                "rank_absolute": 17,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]",
+                "title": "Imágenes",
+                "url": "https://www.google.com/search?sa=N&hl=es&gl=PE&sca_esv=99fa615e217dff4e&sxsrf=APpeQnvYfSx8kz231erT6k6eX3a-HsPtpA:1791314519033&q=pibank+peru&udm=2&source=univ&fir=Mj7pyyvuND_FJM%252CDjLr74txyWGmzM%252C_%253BoQLJ_tPC0s9o8M%252Clh_IebKz67oGbM%252C_%253BY2-6EqiIxiG21M%252C1NH9eNPA2UgiIM%252C_%253B1xyQArIcd5uDmM%252CcJzHfyQlUU_DiM%252C_%253Blmw-JdGSdXINqM%252Ce4pneZVRyLRAFM%252C_%253B5393xIftpBOyRM%252CbKTIKM4GHEp3wM%252C_%253Bku_un3gWa5Zu8M%252CWG1PFZev-7J6ZM%252C_%253BqZRpUAUuGy3fxM%252CsE2sMKm69Y9BSM%252C_%253Bnu06FO2IRrEOwM%252CysnpZzPCWAtJZM%252C_&usg=AI4_-kSIiMuK2e2TsLyvyIP8oaKznBPsqg&ved=2ahUKEwio0dnMjqaXAxVzxQIHHVTyACw4ChDsCXoECBkQBQ",
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "Un nuevo amigo fiel llegó para llevar tus ahorros al ...",
+                    "url": "https://www.instagram.com/p/DZvrK6ese2D/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:5"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "¿Llego Pibank a cambiar la banca digital? Banco Pichincha ya anunció a la  SMV que este lanzamiento es un hecho de importancia y forma parte de su  estrategia de crecimiento. Tiene app propia y debuta ...",
+                    "url": "https://www.tiktok.com/@toma.el.dato/video/7690800377297407250",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:6"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Pibank Perú – Праграмы ў Google Play",
+                    "url": "https://play.google.com/store/apps/details?id=pe.pibank.bm&hl=be",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061921-1987-0139-0000-f0e418ea4e53:7"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Pibank llega con una nueva cuenta de ahorro con 5% TREA 👀💰 Pibank Perú ,  Este nuevo producto de Banco Pichincha Perú sale en octubre y tiene varios  puntos interesantes:, ✅ Sin costo de mantenimiento, ...",
+                    "url": "https://www.facebook.com/juan.apontegranda/videos/pibank-llega-con-una-nueva-cuenta-de-ahorro-con-5-trea-pibank-per%C3%BA-este-nuevo-pr/1884694559601316/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdJrDoI1Q-T1Z-wHWwt34U0h-R5sSp7dXFAuQOLpA4JjW11dR9uNZDfpY&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Así es la cuenta Pibank, una cuenta para ahorrar de verdad",
+                    "url": "https://es-us.finanzas.yahoo.com/noticias/pibank-ahorrar-verdad-190000188.html",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCarzUYUIC4Gwspowthi1Uc1ohy1Ir3PLdMjBbISNmZMjYTiFjBS0In40&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Pibank, la marca digital de Banco Pichincha, llegó a Perú con una cuenta al  5% TREA 🇵🇪 Sin tarjeta, sin agencias y sin cajero. ¿Por qué un banco te  pagaría más que todos? Te lo explico 👇, ¿Tú moverías ...",
+                    "url": "https://www.instagram.com/reel/Dd9Okk_IVK2/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGCbwbYprvgjtuIAMlHxmypfGcjMxat4WM8qXj9NLukbPu20bIu6skGMg&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "En 2025 asumimos uno de esos retos que nos gustan de verdad ...",
+                    "url": "https://www.instagram.com/reel/DUBSfESExUR/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLn28A51bBDwDEz_EcamMKoIbwQcEi5JGQi2U4H5LQ8bIiWVOL_okQlR0&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Ana Alegre Lara - Product Owner de Canales Digitales - Banco ...",
+                    "url": "https://pe.linkedin.com/in/ana-alegre-lara-27657350",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSESLmSwYfvajx_CyEUCSy-kLHsqfcxPxprbTP9ZITLAY-AzwAW4Kmk4fk&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "🛑𝐁𝐚𝐧𝐜𝐨 𝐏𝐢𝐜𝐡𝐢𝐧𝐜𝐡𝐚 𝐥𝐚𝐧𝐳𝐚 𝐏𝐢𝐛𝐚𝐧𝐤 ...",
+                    "url": "https://www.facebook.com/SantaAnitaTeInforma/posts/%F0%9D%90%81%F0%9D%90%9A%F0%9D%90%A7%F0%9D%90%9C%F0%9D%90%A8-%F0%9D%90%8F%F0%9D%90%A2%F0%9D%90%9C%F0%9D%90%A1%F0%9D%90%A2%F0%9D%90%A7%F0%9D%90%9C%F0%9D%90%A1%F0%9D%90%9A-%F0%9D%90%A5%F0%9D%90%9A%F0%9D%90%A7%F0%9D%90%B3%F0%9D%90%9A-%F0%9D%90%8F%F0%9D%90%A2%F0%9D%90%9B%F0%9D%90%9A%F0%9D%90%A7%F0%9D%90%A4-%F0%9D%90%AC%F0%9D%90%AE-%F0%9D%90%A6%F0%9D%90%A8%F0%9D%90%9D%F0%9D%90%9E%F0%9D%90%A5%F0%9D%90%A8-%F0%9D%90%9D%F0%9D%90%9E-%F0%9D%90%9B%F0%9D%90%9A%F0%9D%90%A7%F0%9D%90%9C%F0%9D%90%9A-%F0%9D%90%9D%F0%9D%90%A2%F0%9D%90%AB%F0%9D%90%9E%F0%9D%90%9C%F0%9D%90%AD%F0%9D%90%9A-%F0%9D%90%9C%F0%9D%90%A8%F0%9D%90%A7-%F0%9D%90%AE%F0%9D%90%A7%F0%9D%90%9A-%F0%9D%90%9C%F0%9D%90%AE%F0%9D%90%9E%F0%9D%90%A7%F0%9D%90%AD%F0%9D%90%9A-%F0%9D%90%9D%F0%9D%90%9E-%F0%9D%90%9A%F0%9D%90%A1%F0%9D%90%A8%F0%9D%90%AB%F0%9D%90%AB%F0%9D%90%A8/122189318690853924/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2SpC4XW2CWX8xsFwPHEXgMAzCNWdlV7yGh3EDOkiWQESToFsHO6jWxZA&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 14,
+                "rank_absolute": 18,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+                "domain": "pe.linkedin.com",
+                "title": "Erick Alencar Rios - Gerente de Canales Digitales y ...",
+                "url": "https://pe.linkedin.com/in/erick-alencar-rios-4664a35a",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 1.8 K seguidores",
+                "website_name": "LinkedIn · Erick Alencar Rios",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Gerente de Canales Digitales y Experiencia en Pibank Perú · Ejecutivo en transformación digital con más de 15 años de experiencia en el sector financiero.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Gerente de Canales Digitales y Experiencia en Pibank Perú"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 15,
+                "rank_absolute": 19,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¿Tu tarjeta venció? ¡Tranqui! Con la APP Banco Pichincha ...",
+                "url": "https://www.facebook.com/BancoPichinchaPeru/videos/tu-tarjeta-venci%C3%B3-tranqui-con-la-app-banco-pichincha-per%C3%BA-puedes-seguir-realizan/881865051325313/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 reacciones  ·  hace 7 meses",
+                "website_name": "Facebook · Banco Pichincha Perú",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Pibank, la marca digital de Banco Pichincha, llegó a Perú ... ... Si estás pensando ahorrar en dólares.. ¡Esta es tu oportunidad!. 00 ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank",
+                  "Perú"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-03-06 19:21:59 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 16,
+                "rank_absolute": 20,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Banco Pichincha Perú on Reels",
+                "url": "https://www.facebook.com/BancoPichinchaPeru/videos/cuenta-de-ahorros-preferente-550-trea-soles-/896974885578795/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 170 reacciones  ·  hace 2 años",
+                "website_name": "Facebook · Banco Pichincha Perú",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Pagar y recibir dinero en segundos, desde cualquier en... ... #ATENCIÓN | Así fue como el Banco Pichincha me R0B0 mi dinero, sin necesidad. 03: ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pagar y recibir dinero en segundos"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 17,
+                "rank_absolute": 21,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Scotiabank Perú | Descubre los mejores tips para lograr tus ...",
+                "url": "https://www.instagram.com/reel/DXPKF7Bjz5J/?hl=es",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 30 \"me gusta\"  ·  hace 5 meses",
+                "website_name": "Instagram · scotiabankpe",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Con la Cuenta Soles de Pibank puedes obtener 5% TREA, desde el primer sol, sin comisión de mantenimiento y gestionando todo de manera 100% ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Pibank"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-05-06 19:21:59 +00:00",
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

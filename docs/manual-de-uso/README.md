@@ -138,6 +138,8 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- [Construir un caso de negocio SEO/AEO](comercial/construir-caso-negocio-seo-aeo.md) — de evidencia y funnel inverso a investigación competitiva, calendario conjunto, costos por función y paquete cliente, con QA del modelo y PDF.
+
 - [Catálogo HubSpot as a Service](../services/hubspot-as-a-service/README.md) — alcance y frontera de los dos servicios operables que este manual soporta.
 - [Operar ANAM HubSpot Managed Service](hubspot-as-a-service/operar-anam-hubspot-managed-service.md) — rutina diaria/semanal/mensual para Customer Agent, calidad por owner, Growth, Services, automatización, pilotos y preparación read-only de billing.
 - [Usar el Diagnóstico SEO de Prospecto en venta](comercial/diagnostico-seo-prospecto-en-venta.md) — cómo convertir la sorpresa del Grader en tamaño de pérdida cuantificado sin pedirle nada al prospecto: el encadenamiento Grader → diagnóstico → Radiografía AEO → propuesta, qué significa cada estado (`cost_blocked` = cero gasto), y las tres prohibiciones (nunca presentar un estimado como medido, nunca declarar un sitio "sano", nunca cifras de industria ni lifts).

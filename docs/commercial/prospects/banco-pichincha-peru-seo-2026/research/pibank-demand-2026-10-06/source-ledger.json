@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-06",
+  "dataforseo_cost_usd": 0.07714,
+  "runs": [
+    {
+      "id": "keyword-overview-provider",
+      "file": "keyword-overview-provider.json",
+      "captured_at": "2026-10-06T17:36:17.479Z",
+      "cost_usd": 0.01464,
+      "outcome": "success",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_overview/live",
+      "consumer": "seo",
+      "attribution": "Efeonce acquisition",
+      "status_codes": [
+        {
+          "id": "10061736-1987-0607-0000-75239d28c636",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.01464,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "keyword-suggestions-provider",
+      "file": "keyword-suggestions-provider.json",
+      "captured_at": "2026-10-06T17:36:56.392Z",
+      "cost_usd": 0.024,
+      "outcome": "success",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "consumer": "seo",
+      "attribution": "Efeonce acquisition",
+      "status_codes": [
+        {
+          "id": "10061736-1987-0399-0000-3b6b2f0807b4",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.024,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-full-comparison",
+      "file": "serp-full-comparison.json",
+      "captured_at": "2026-10-06T17:39:08.959Z",
+      "cost_usd": 0.0035,
+      "outcome": "success",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061738-1987-0139-0000-ebada8e65731",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-full-high-yield",
+      "file": "serp-full-high-yield.json",
+      "captured_at": "2026-10-06T17:40:13.766Z",
+      "cost_usd": 0.0035,
+      "outcome": "success",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061739-1987-0139-0000-199546935daa",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-full-online-opening",
+      "file": "serp-full-online-opening.json",
+      "captured_at": "2026-10-06T17:40:38.107Z",
+      "cost_usd": 0.0035,
+      "outcome": "success",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061740-1987-0139-0000-bee18d189ad7",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-provider",
+      "file": "serp-provider.json",
+      "captured_at": "2026-10-06T17:37:15.697Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061737-1987-0139-0000-0caefefe7c83",
+          "statusCode": 20000,
+          "statusMessage": "Ok.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        },
+        {
+          "id": "10061737-1987-0139-0000-e55c8b069e28",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-c0bf99945cb7",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-7cb3deef5040",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-e2adb0407cd3",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-1a53ba50b083",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-a60cace3da56",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        },
+        {
+          "id": "10061737-1987-0139-0000-60d9dd0fc9c2",
+          "statusCode": 40000,
+          "statusMessage": "You can set only one task at a time.",
+          "resultCount": 0,
+          "cost": 0,
+          "hasResult": false
+        }
+      ]
+    },
+    {
+      "id": "serp-query-02",
+      "file": "serp-query-02.json",
+      "captured_at": "2026-10-06T17:37:55.596Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061737-1987-0139-0000-f8ed2372aa24",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-03",
+      "file": "serp-query-03.json",
+      "captured_at": "2026-10-06T17:38:07.965Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061737-1987-0139-0000-6264274c2ded",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-04",
+      "file": "serp-query-04.json",
+      "captured_at": "2026-10-06T17:38:18.889Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061738-1987-0139-0000-17d0307a2403",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-05",
+      "file": "serp-query-05.json",
+      "captured_at": "2026-10-06T17:38:39.058Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061738-1987-0139-0000-52f4a21c8383",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-06",
+      "file": "serp-query-06.json",
+      "captured_at": "2026-10-06T17:38:52.430Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061738-1987-0139-0000-65d4b365382f",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-07",
+      "file": "serp-query-07.json",
+      "captured_at": "2026-10-06T17:39:23.828Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061738-1987-0139-0000-4d656de708d2",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    },
+    {
+      "id": "serp-query-08",
+      "file": "serp-query-08.json",
+      "captured_at": "2026-10-06T17:39:46.412Z",
+      "cost_usd": 0.0035,
+      "outcome": "provider_task_error",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "consumer": "seo",
+      "attribution": "public prospect SERP; no client organization",
+      "status_codes": [
+        {
+          "id": "10061739-1987-0139-0000-665c06f9e61f",
+          "statusCode": 40102,
+          "statusMessage": "No Search Results.",
+          "resultCount": 1,
+          "cost": 0.0035,
+          "hasResult": true
+        }
+      ]
+    }
+  ],
+  "public_primary_sources": [
+    {
+      "id": "WEB-PIBANK-PRODUCT",
+      "url": "https://pibank.pe/cuenta-soles-pibank/",
+      "type": "official_product",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Cuenta Soles:5%TREA published, first sol, no minimum/maintenance",
+        "Savings-only, no debit/payment methods; digital web opening with registro.pibank.pe",
+        "Calculator and FAQ already present; legal documents linked"
+      ],
+      "limitation": "Product conditions must revalidate at delivery; not channel baseline or financial advice"
+    },
+    {
+      "id": "WEB-PIBANK-ENTITY",
+      "url": "https://pibank.pe/quienes-somos/",
+      "type": "official_entity",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Pibank belongs to Banco Pichincha Peru",
+        "Model born Spain2018, presence Colombia/US"
+      ],
+      "limitation": "International model is not Peru conversion/traffic benchmark"
+    },
+    {
+      "id": "WEB-INTERBANK",
+      "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+      "type": "official_product",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Soles opening from S/10000; tiered rates up to4.5%",
+        "Published table S/10000-29999.99 rate0.5%; maximum from S/200000",
+        "Maintenance waiver tied to average balance; online opening"
+      ],
+      "limitation": "Page table/conditions, not a current financial recommendation; check tariff before comparative client copy"
+    },
+    {
+      "id": "WEB-SCOTIA",
+      "url": "https://www.scotiabank.com.pe/Personas/ahorros/default?cliente=false",
+      "type": "official_product_list",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Lists accounts and advertises up to4.60%TREA soles for Cuenta Power"
+      ],
+      "limitation": "Maximum headline; no claim equivalent ticket or eligibility without tariff"
+    },
+    {
+      "id": "WEB-BCP",
+      "url": "https://www.viabcp.com/abrir-cuenta",
+      "type": "official_product_comparison",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Multiple accounts by use; Premio lists rate soles0.25%-1.00%",
+        "Some transactional accounts state no interest"
+      ],
+      "limitation": "Do not generalize one account conditions to BCP entire portfolio"
+    },
+    {
+      "id": "WEB-FALABELLA",
+      "url": "https://www.bancofalabella.pe/cuentas",
+      "type": "official_product_list",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Savings and transactional products with different conditions"
+      ],
+      "limitation": "Promotional headlines/time windows need specific current tariff; excluded expired August promotion from rate comparison"
+    },
+    {
+      "id": "WEB-EFECTIBANK",
+      "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+      "type": "official_product",
+      "as_of": "2026-10-06",
+      "facts": [
+        "Digital savings account lists4.5%TREA soles, no minimum/maintenance",
+        "App opening and debit/payment functionality"
+      ],
+      "limitation": "Efectiva brand terms in keywords retained; current official identity Efectibank; no historic transfer of conversion"
+    }
+  ],
+  "entitlement_evidence": "All Labs paid requests passed canonical enforceSeoRunEntitlement before provider; acquisition org EO-ORG-0007 from canonical source. No provision/change. Extra MCP entitlement read UNAUTHORIZED reauthentication; no bypass and CLI succeeded via configured operator lane."
+}

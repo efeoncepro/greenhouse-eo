@@ -43,7 +43,7 @@ mercado, oferta, venta y retención.
 
 > **Portfolio owner:** Search Visibility 360 es una familia de servicios productizados de Wave dentro de Efeonce.
 > Esta skill gobierna el negocio de SEO/AEO; sus boundaries con web, measurement, Globe, Reach y CRM están en
-> [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+> [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
 
 Esta skill opera **el negocio de vender SEO/AEO**. No enseña a hacer SEO.
 
@@ -235,6 +235,26 @@ panorama, límites y reunión)*
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 
 ---
+
+## 3b. De discovery a caso de inversión
+
+Si el comprador pide estimar aporte a una meta de negocio, cargar
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md`; el oficio y la demanda los valida `seo-aeo`, el
+buying group `efeonce-customer-model-operator` y la economía `efeonce-pricing-operator` con Finance.
+Conservar el brief posterior a la reunión, la evidencia previa y sus límites; una muestra acredita ejecución, no
+captación. Una meta, ticket o moneda inferidos pueden sostener un borrador cuando el operador lo autoriza, con
+etiqueta, aritmética, confianza y validación pendiente; esa autorización no confirma cifras del cliente ni aprueba
+precio, capacidad, acceso o publicación. Preparar escenarios mensuales, sensibilidad, dependencias y criterios de
+validación; fracciones de una meta son bandas de evaluación, no forecast. El contrafactual desde lanzamiento es
+ilustrativo hasta disponer de evidencia causal suficiente. Separar compromisos controlables de objetivos
+comerciales compartidos y mantener los datos de cada prospecto en su expediente.
+
+
+Diseñar horizonte y revisiones según implementación y maduración: M1 valida preparación y entregables, no
+ROI temprano. Ampliar demanda y revisar el corpus antes de fijar contribución; dimensionar capacidad por
+rol/mes y lotes, sin duplicar mecánicamente un horizonte previo. Duración y cifras de cliente permanecen
+en su expediente; no crean mínimos ni política comercial general.
 
 ## 4. Contrato de sinergias — quién manda en qué
 
@@ -500,3 +520,10 @@ inclusión en motores ni recuperación/ahorro en paid por una correlación; no p
 experiencia previa para todo prospecto. Medir conversiones de referencia cuando existan datos no prueba el efecto
 causal de una cita. Estas precisiones prevalecen para copy sobre formulaciones absolutas de módulos históricos.
 No reiniciar el Grader por defecto en MOFU/BOFU: evidencia, muestra autorizada y alcance según avance real.
+
+## De la práctica a una propuesta ejecutable
+
+Para dimensionar un programa SEO/AEO, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Sustentar duración,
+lotes y aceptación desde el corpus y las dependencias; contrastar requisitos comerciales con demanda
+curada y separar compromisos de entrega de resultados compartidos o fuera del control del equipo.

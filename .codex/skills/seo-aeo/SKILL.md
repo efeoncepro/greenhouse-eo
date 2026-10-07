@@ -73,6 +73,30 @@ Para preparar, extender o revisar una muestra de trabajo, cargar
 evidencia por bloque, composición neutral, distribución, telón y QA. Es una demostración;
 Assessment, AI Visibility Report e Insights conservan su función y metodología propias.
 
+### Caso de negocio después de discovery
+
+Para conectar diagnóstico y propuesta con resultados comerciales, cargar
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md` junto a `seo-aeo-practice`.
+Reidentificar entidad, marca, producto, dominio, mercado y periodo: una demo o baseline de otra marca no mide la
+superficie recién descubierta. Si el operador autoriza avanzar sin datos privados, preparar un borrador con
+evidencia pública fechada, supuestos y sensibilidad; no presentar esos supuestos como observaciones del cliente.
+Contrastar demanda alcanzable (bottom-up) con visitas requeridas por la meta (top-down), separando tráfico de
+marca/genérico, apertura, fondeo y saldos por cohorte. Atribución no demuestra incrementalidad; citas de IA no
+equivalen a conversiones. El acceso a onboarding, app y resultados bancarios se verifica antes de prometer medición
+o implementación. Los datos particulares y las inferencias de moneda viven en el expediente de cuenta.
+
+
+Diseñar horizonte y revisiones según implementación y maduración: M1 valida preparación y entregables, no
+ROI temprano. Ampliar demanda y revisar el corpus antes de fijar contribución; dimensionar capacidad por
+rol/mes y lotes, sin duplicar mecánicamente un horizonte previo. Duración y cifras de cliente permanecen
+en su expediente; no crean mínimos ni política comercial general.
+
+Antes de presentar contribución, contrastar cobertura del modelo y alcance vendido. Un panel parcial no mide
+el programa completo; ampliar sólo con evidencia, sin desechar resultados bajos ni inventar conversiones
+para otros carriles. Las bandas del modelo inverso son requerimientos de decisión, no forecasts. Separar
+propuesta para comprador y expediente interno; capacidad y precio se sustentan en costo y valor, no en duración.
+
 ### SEO/AEO como competencia de selección
 
 Cuando SEO/AEO se evalúa como parte de una contratación, esta skill aporta el oficio y la evidencia técnica; la
@@ -480,3 +504,10 @@ Revisar correspondencia entre claim, diagnóstico y destino antes de entregar co
 ## Lanzamiento del grader y programación aprobada
 
 Para copy de lanzamiento del grader, cargar [framework BeX](efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md) y [producto](efeonce/AI_VISIBILITY_GRADER.md). Explicar muestra de respuestas, señales públicas y prioridades; separar percepción y operabilidad. No presentar monitoreo recurrente o auditoría completa como incluido en un diagnóstico gratuito, ni inferioridad de competidores sin verificación actual. Caso: [CMP-001](../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).
+
+## Caso de negocio y propuesta ejecutable
+
+Al pasar de discovery o investigación a contribución comercial, cargar
+[caso de negocio y propuesta](references/caso-negocio-y-propuesta.md): elegibilidad desde competidores,
+modelo inverso como requisitos, mecanismos sin doble conteo, duración por maduración y PR con capacidad.
+El método enlazado conserva el canon; los datos y benchmarks del prospecto permanecen en su expediente.

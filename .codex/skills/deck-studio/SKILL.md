@@ -1130,6 +1130,10 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 └─ FUENTES verificadas + LOS MITOS QUE NO SE CITAN .... SOURCES.md
 ```
 
+### Deck dentro de un paquete de decisión
+
+Si comparte alcance, calendario o cifras con una propuesta, informe y modelo editable, carga [coherencia del paquete](references/decision-package.md) y el QA conjunto de `report-studio`. Verifica la decisión y las copias finales junto con sus fuentes; no basta el render de láminas.
+
 ## Sinergias — quién decide qué (para que no se pisen)
 
 | Skill | Decide | Frontera |

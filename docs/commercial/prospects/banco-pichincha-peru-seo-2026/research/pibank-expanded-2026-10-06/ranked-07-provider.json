@@ -1,0 +1,118 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:30.371Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://pibank.pe/cuenta-soles-pibank/",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1405,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1405,
+        "costUsd": 0.012,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-49101e14f3f8",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.012,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.012,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-49101e14f3f8",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.1894 sec.",
+        "cost": 0.012,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://pibank.pe/cuenta-soles-pibank/",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://pibank.pe/cuenta-soles-pibank/",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": null,
+            "items_count": 0,
+            "metrics": null,
+            "metrics_absolute": null,
+            "items": null
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1165 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:17:59.791Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.005,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 16246,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 16246,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061917-1987-0139-0000-b7d4ed3e3749",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061917-1987-0139-0000-b7d4ed3e3749",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "15.1900 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "cuenta de ahorros",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows",
+          "depth": 20
+        },
+        "result": [
+          {
+            "keyword": "cuenta de ahorros",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 19:17:58 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview",
+              "organic",
+              "people_also_ask",
+              "images"
+            ],
+            "se_results_count": 280000,
+            "pages_count": 2,
+            "items_count": 21,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "asynchronous_ai_overview": false,
+                "markdown": "Las mejores opciones de [cuentas de ahorros](https://comparabien.com.pe/ahorros) en el Perú ofrecen tasas competitivas (TREA) sin cobro de comisiones por mantenimiento si cumples con las condiciones digitales o de saldo.[[1]](https://www.instagram.com/reel/Dd4wfY6vpyR/)\n\n### Opciones destacadas de ahorro en soles\n\n- **Pibank:** Ofrece una Cuenta Soles de Pibank con una tasa de **5% TREA** desde el primer sol, sin comisiones de mantenimiento y de manejo 100% digital.[[1]](https://www.instagram.com/reel/Dd4wfY6vpyR/)\n- **Banco Falabella:** Cuenta con alternativas que otorgan hasta **3.75% a 5% TREA** en soles (según recepción de sueldo) con costo de mantenimiento cero si mantienes un saldo promedio mensual determinado.[[1]](https://www.bancofalabella.pe/cuentas/cuenta-ahorro-clasico)[[2]](https://www.bancofalabella.pe/cuentas)\n- **Interbank:** Ofrece la [Cuenta de Ahorro Súper Tasa](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa) con un rendimiento de hasta **4.5% TREA** en soles para aperturas desde S/10,000.[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa)\n- **BCP y BBVA:** Proveen [Cuentas Digitales BCP](https://www.viabcp.com/cuentas/cuenta-ahorro) y cuentas en BBVA de apertura 100% en línea y sin costo de mantenimiento, ideales para operaciones diarias y acceso a yape o sorteos.[[1]](https://www.viabcp.com/cuentas/cuenta-ahorro)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro.html)[[3]](https://www.instagram.com/reel/Dd4wfY6vpyR/)\n\nSi me dices cuál es tu **monto aproximado a depositar** y si prefieres **disponibilidad inmediata con tarjeta** o **máxima rentabilidad** , te puedo recomendar la cuenta exacta que más te conviene.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Las mejores opciones de cuentas de ahorros en el Perú ofrecen tasas competitivas (TREA) sin cobro de comisiones por mantenimiento si cumples con las condiciones digitales o de saldo.",
+                    "markdown": "Las mejores opciones de [cuentas de ahorros](https://comparabien.com.pe/ahorros) en el Perú ofrecen tasas competitivas (TREA) sin cobro de comisiones por mantenimiento si cumples con las condiciones digitales o de saldo.[[1]](https://www.instagram.com/reel/Dd4wfY6vpyR/)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "cuentas de ahorros",
+                        "description": null,
+                        "url": "https://comparabien.com.pe/ahorros",
+                        "domain": "comparabien.com.pe"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Instagram",
+                        "domain": "www.instagram.com",
+                        "url": "https://www.instagram.com/reel/Dd4wfY6vpyR/",
+                        "title": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa ...",
+                        "text": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa desde S/100 en tus Cuentas de Ahorro BCP y participa por premi..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Opciones destacadas de ahorro en soles",
+                    "text": "Pibank: Ofrece una Cuenta Soles de Pibank con una tasa de 5% TREA desde el primer sol, sin comisiones de mantenimiento y de manejo 100% digital. Banco Falabella: Cuenta con alternativas que otorgan hasta 3.75% a 5% TREA en soles (según recepción de sueldo) con costo de mantenimiento cero si mantienes un saldo promedio mensual determinado. Interbank: Ofrece la Cuenta de Ahorro Súper Tasa con un rendimiento de hasta 4.5% TREA en soles para aperturas desde S/10,000. BCP y BBVA: Proveen Cuentas Digitales BCP y cuentas en BBVA de apertura 100% en línea y sin costo de mantenimiento, ideales para operaciones diarias y acceso a yape o sorteos.",
+                    "markdown": "- **Pibank:** Ofrece una Cuenta Soles de Pibank con una tasa de **5% TREA** desde el primer sol, sin comisiones de mantenimiento y de manejo 100% digital.[[1]](https://www.instagram.com/reel/Dd4wfY6vpyR/)\n- **Banco Falabella:** Cuenta con alternativas que otorgan hasta **3.75% a 5% TREA** en soles (según recepción de sueldo) con costo de mantenimiento cero si mantienes un saldo promedio mensual determinado.[[1]](https://www.bancofalabella.pe/cuentas/cuenta-ahorro-clasico)[[2]](https://www.bancofalabella.pe/cuentas)\n- **Interbank:** Ofrece la [Cuenta de Ahorro Súper Tasa](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa) con un rendimiento de hasta **4.5% TREA** en soles para aperturas desde S/10,000.[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa)\n- **BCP y BBVA:** Proveen [Cuentas Digitales BCP](https://www.viabcp.com/cuentas/cuenta-ahorro) y cuentas en BBVA de apertura 100% en línea y sin costo de mantenimiento, ideales para operaciones diarias y acceso a yape o sorteos.[[1]](https://www.viabcp.com/cuentas/cuenta-ahorro)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro.html)[[3]](https://www.instagram.com/reel/Dd4wfY6vpyR/)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta de Ahorro Súper Tasa",
+                        "description": null,
+                        "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+                        "domain": "interbank.pe"
+                      },
+                      {
+                        "type": "link_element",
+                        "title": "Cuentas Digitales BCP",
+                        "description": null,
+                        "url": "https://www.viabcp.com/cuentas/cuenta-ahorro",
+                        "domain": "www.viabcp.com"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Instagram",
+                        "domain": "www.instagram.com",
+                        "url": "https://www.instagram.com/reel/Dd4wfY6vpyR/",
+                        "title": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa ...",
+                        "text": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa desde S/100 en tus Cuentas de Ahorro BCP y participa por premi..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Banco Falabella Perú",
+                        "domain": "www.bancofalabella.pe",
+                        "url": "https://www.bancofalabella.pe/cuentas/cuenta-ahorro-clasico",
+                        "title": "Abre tu Cuenta de Ahorro con 3.75% Trea soles y 1.5% en dolares",
+                        "text": "Banco Falabella - Cuenta Ahorro Clásico: - Edad mín: 18 años. Sin monto de apertura. - TREA regular: 3.75% soles, 1.5% dólares (5%"
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Banco Falabella Perú",
+                        "domain": "www.bancofalabella.pe",
+                        "url": "https://www.bancofalabella.pe/cuentas",
+                        "title": "Cuentas de Ahorro: 5% TREA, Costo S/0 y Yape-Plin",
+                        "text": "Banco Falabella savings accounts: - Cuenta Sueldo: bono bienvenida hasta S/1,000; 50% desc. restaurantes miércoles (sin tope); 10%"
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Interbank",
+                        "domain": "interbank.pe",
+                        "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+                        "title": "Cuenta de Ahorro Súper Tasa - Hasta 4.5% | Interbank",
+                        "text": "* Prod: Cuenta de Ahorro Súper Tasa (Interbank) * Apertura min: S/10,000 o US$5,000 * Tasa interes: Hasta 4.5% TREA (Soles), hasta..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BCP",
+                        "domain": "www.viabcp.com",
+                        "url": "https://www.viabcp.com/cuentas/cuenta-ahorro",
+                        "title": "Cuentas de Ahorros Digital | Tarjeta de ahorro BCP",
+                        "text": "BCP Savings Accounts: - Types: Cuenta Contigo: Retiro AFP, Cuenta Digital, Cuenta Premio, Cuenta Sueldo, Cuenta Ilimitada, Wardadi..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro.html",
+                        "title": "Abre tu Cuenta de Ahorro Online sin Comisiones | Cuenta de Ahorros BBVA| | BBVA Perú",
+                        "text": "BBVA Perú: Cuentas de ahorro online sin comisiones. - S/10M: Sorteo actual para Cuenta Ganadora. - Cuenta Digital: Cero mantenimie..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si me dices cuál es tu monto aproximado a depositar y si prefieres disponibilidad inmediata con tarjeta o máxima rentabilidad, te puedo recomendar la cuenta exacta que más te conviene.",
+                    "markdown": "Si me dices cuál es tu **monto aproximado a depositar** y si prefieres **disponibilidad inmediata con tarjeta** o **máxima rentabilidad** , te puedo recomendar la cuenta exacta que más te conviene.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Banco Falabella Perú",
+                    "domain": "www.bancofalabella.pe",
+                    "url": "https://www.bancofalabella.pe/cuentas/cuenta-ahorro-clasico",
+                    "title": "Abre tu Cuenta de Ahorro con 3.75% Trea soles y 1.5% en dolares",
+                    "text": "Banco Falabella - Cuenta Ahorro Clásico: - Edad mín: 18 años. Sin monto de apertura. - TREA regular: 3.75% soles, 1.5% dólares (5%"
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BCP",
+                    "domain": "www.viabcp.com",
+                    "url": "https://www.viabcp.com/cuentas/cuenta-ahorro",
+                    "title": "Cuentas de Ahorros Digital | Tarjeta de ahorro BCP",
+                    "text": "BCP Savings Accounts: - Types: Cuenta Contigo: Retiro AFP, Cuenta Digital, Cuenta Premio, Cuenta Sueldo, Cuenta Ilimitada, Wardadi..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Banco Falabella Perú",
+                    "domain": "www.bancofalabella.pe",
+                    "url": "https://www.bancofalabella.pe/cuentas",
+                    "title": "Cuentas de Ahorro: 5% TREA, Costo S/0 y Yape-Plin",
+                    "text": "Banco Falabella savings accounts: - Cuenta Sueldo: bono bienvenida hasta S/1,000; 50% desc. restaurantes miércoles (sin tope); 10%"
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "www.bbva.pe",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro.html",
+                    "title": "Abre tu Cuenta de Ahorro Online sin Comisiones | Cuenta de Ahorros BBVA| | BBVA Perú",
+                    "text": "BBVA Perú: Cuentas de ahorro online sin comisiones. - S/10M: Sorteo actual para Cuenta Ganadora. - Cuenta Digital: Cero mantenimie..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Interbank",
+                    "domain": "interbank.pe",
+                    "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+                    "title": "Cuenta de Ahorro Súper Tasa - Hasta 4.5% | Interbank",
+                    "text": "* Prod: Cuenta de Ahorro Súper Tasa (Interbank) * Apertura min: S/10,000 o US$5,000 * Tasa interes: Hasta 4.5% TREA (Soles), hasta..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Instagram",
+                    "domain": "www.instagram.com",
+                    "url": "https://www.instagram.com/reel/Dd4wfY6vpyR/",
+                    "title": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa ...",
+                    "text": "¡Hazle caso a tu YO del futuro y empieza a ahorrar! 💰👀 Incrementa desde S/100 en tus Cuentas de Ahorro BCP y participa por premi..."
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 1,
+                "rank_absolute": 2,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                "domain": "coopacsancristobal.pe",
+                "title": "Cuenta Recupero",
+                "url": "https://coopacsancristobal.pe/ahorros/cuenta-recupero/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://coopacsancristobal.pe › ahorros › cuenta-recupero",
+                "website_name": "Cooperativa San Cristóbal",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Cuenta Recupero ; Capital inicial. S/ 5,000 ; Plazo. 12 meses ; Tasa estimada. 7.5% ; Ganancia aprox. S/ 375.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta Recupero"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "people_also_ask",
+                "rank_group": 1,
+                "rank_absolute": 3,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]",
+                "items": [
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco es mejor para abrir una cuenta de ahorros en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué significa una cuenta de ahorros?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco es el mejor para abrir una cuenta de ahorro?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Cuánto gano si depósito 1000 soles a plazo fijo?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 2,
+                "rank_absolute": 4,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+                "domain": "www.bancognb.com.pe",
+                "title": "Cartilla Campaña Ahorros",
+                "url": "https://www.bancognb.com.pe/main/download?file=peru%2Fbanca_personas%2Fcuentas%2Fcartilla_campana_ahorros.pdf",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bancognb.com.pe › main › download",
+                "website_name": "Banco GNB Perú",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Cuenta Ahorros : Servicios asociados a la cuenta. Mantenimiento de cuenta. S ... Número de retiros sin costo al mes: Cuenta Ahorro (1). Conversión de ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta Ahorros"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 3,
+                "rank_absolute": 5,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+                "domain": "comparabien.com.pe",
+                "title": "Qué es cuenta ilimitada BCP",
+                "url": "https://comparabien.com.pe/producto/ahorros/bcp-cuenta-ilimitada",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://comparabien.com.pe › producto › ahorros › bcp...",
+                "website_name": "Comparabien",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "La cuenta ilimitada del Banco de Crédito del Perú (BCP ) está pensada para quien mueve su plata con frecuencia: deposita, retira y hace operaciones varias ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "La cuenta ilimitada del Banco de Crédito del Perú (BCP"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 4,
+                "rank_absolute": 6,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+                "domain": "www.gob.pe",
+                "title": "Formatos Cuenta de Ahorros en Agencias UOB",
+                "url": "https://www.gob.pe/institucion/bn/colecciones/27054-formatos-cuenta-de-ahorros-en-agencias-uob",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.gob.pe › institucion › colecciones › 27054...",
+                "website_name": "Plataforma del Estado Peruano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Contratos, formulas y cartilla de información para obtener la cuenta de ahorros en agencias uob.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Contratos, formulas y cartilla de información"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 5,
+                "rank_absolute": 7,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]",
+                "domain": "www.businessempresarial.com.pe",
+                "title": "¿Cómo escoger una cuenta de ahorros ideal?",
+                "url": "https://www.businessempresarial.com.pe/como-escoger-una-cuenta-de-ahorros-ideal/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.businessempresarial.com.pe › como-escoger...",
+                "website_name": "Business Empresarial",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "28 mar. 2022 — Antes de optar por una cuenta de ahorros, analiza bien tus necesidades y consulta con entidades financieras sus tasas de interés, sus términos y ...",
+                "pre_snippet": "03/28/2022 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "analiza bien tus necesidades"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2022-03-28 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 1,
+                "rank_absolute": 8,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[14]/div[1]",
+                "title": "Imágenes",
+                "url": "https://www.google.com/search?sca_esv=99fa615e217dff4e&hl=es&gl=PE&sxsrf=APpeQnsF9h6OKJKP1YAnhhRfzpYSm_xlJg:1791314275196&q=cuenta+de+ahorros&udm=2&source=univ&fir=mk0VMZmSrmO5jM%252C-T4Qf7MBkSjKaM%252C_%253BEMltlzB6S0kHbM%252CITzeUZ6RoCbA2M%252C_%253B17aRJ0HZzzvJcM%252CUopq1ztOi2mJeM%252C_%253B9uY0O093-Fx09M%252C9LxMEcHNg3_7HM%252C_%253Bpire-kCddadM6M%252C4NMYn3oQWfvapM%252C_%253BaODlFZ8gznTdoM%252C8v0w8fm666_RGM%252C_%253Bwu7hqgZdLw0LFM%252CXMy58hspSq-1uM%252C_%253BXINilFP2fw0T7M%252CF2bBn3qjjXogIM%252C_%253BB32LujSJyu1zoM%252CGq2ey-eCOiVYwM%252C_&usg=AI4_-kTq0lKbC932iJ1AGkWmYCqAS40q5A&sa=X&ved=2ahUKEwiJsbXYjaaXAxX8hf0HHUSkCmsQ7Al6BAhPEAU",
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "Qué es una cuenta de ahorro y cómo funciona (guía 2026)",
+                    "url": "https://rankiator.com/que-es-cuenta-ahorro/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:0"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Gestión efectiva de tu cuenta de ahorros | BBVA Perú",
+                    "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro/gestion-efectiva-de-tu-cuenta-de-ahorros.html",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:1"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cómo ganar más dinero con tu cuenta de ahorros • Mesfix Blog",
+                    "url": "https://mesfix.com/blog/educacion-financiera/ganar-mas-dinero-cuenta-de-ahorros/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:2"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "ABC de una Cuenta de Ahorro | Compartamos Banco",
+                    "url": "https://www.compartamos.com.mx/compartamos/blog/cuida-tu-cartera/como-usar-cuenta-de-ahorro",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0aGNXlO_z6IVtxvqmnqjXG-A7fnXXwEw-3RvlTevHFZmzduN7OyytWWM&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Beneficios de una cuenta de ahorros | Perspectivas de PNC",
+                    "url": "https://www.pnc.com/insights/es/personal-finance/save/benefits-of-a-savings-account.html",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlPglk4QrYYAGgPYXjgA27gzVcdDat_RSoC0Trun0F3Lh1MeLqg52myHs&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Qué es mejor, un Depósito a Plazo o una Cuenta de Ahorros ...",
+                    "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro/diferencia-entre-cuenta-y-deposito-a-plazo.html",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bDYb13886_l-yYia74LPU1VALKB5uBDxqYil3c3ULswTIPyUtzMijlg&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Abrir una cuenta de ahorros en Caja Piura es fácil 💡., Acércate a  cualquiera de nuestras agencias, lleva tu DNI y solicita la apertura de tu  cuenta ✅., Conoce los requisitos aquí: ...",
+                    "url": "https://www.facebook.com/CajaPiura/videos/abrir-una-cuenta-de-ahorros-en-caja-piura-es-f%C3%A1cil-ac%C3%A9rcate-a-cualquiera-de-nues/773356153880892/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMk0b2XHUGVOer9PjkgHwYSxhsEmGxZBK1IHc9go-ihKvwT1IjDH5XS2M&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cómo escoger una cuenta de ahorros ideal? – Business Empresarial",
+                    "url": "https://www.businessempresarial.com.pe/como-escoger-una-cuenta-de-ahorros-ideal/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-j2-vd07cURpOS88PaBJ6h_ZzHeOm1T-NKMS9gJ-LXKsuNZQSfPWxiaY&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cómo funciona una cuenta de ahorro | Vivanuncios",
+                    "url": "https://www.vivanuncios.com.mx/guia-finanzas-personales/aprende/como-funciona-cuenta-ahorro.html",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg5pPQK_UH4nkOyuEFomBOtpQ-TEhl-ZleiqkIXgW8qN-fK6-BYbCr-Xc&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 6,
+                "rank_absolute": 9,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[16]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Caja Piura",
+                "url": "https://www.facebook.com/CajaPiura/posts/-comunicado-estimados-clientes-ante-la-interrupci%C3%B3n-temporal-de-nuestra-web-les-/1403176828502488/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 reacciones  ·  hace 3 meses",
+                "website_name": "Facebook · Caja Piura",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "... Cuentas: Abre tu cuenta de ahorros en línea de manera rápida: https://cuentaahorro.cajapiura.pe/seleccion-de- cuenta Planicmac: Envío ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Abre tu cuenta de ahorros en línea de manera rápida"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 7,
+                "rank_absolute": 10,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[18]/div[1]/div[1]",
+                "domain": "www.pibank.es",
+                "title": "Cuenta de ahorros vs cuenta corriente",
+                "url": "https://www.pibank.es/diferencia-cuenta-de-ahorros-cuenta-corriente/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.pibank.es › Blog",
+                "website_name": "Pibank España",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "13 oct. 2020 — La rentabilidad máxima que ofrecen las cuentas de ahorro en España suele rondar el 1%, salvo casos excepcionales. A día de hoy, el tipo de ...",
+                "pre_snippet": "10/13/2020 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "La rentabilidad máxima que ofrecen las cuentas de ahorro en España suele rondar el 1"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2020-10-13 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 8,
+                "rank_absolute": 11,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[19]/div[1]/div[1]/div[1]",
+                "domain": "www.youtube.com",
+                "title": "Cuenta de Ahorros | Scotiabank Perú",
+                "url": "https://www.youtube.com/watch?v=LF6wRzWnFjs",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 20.9 k vistas  ·  hace 6 años",
+                "website_name": "YouTube · Scotiabank Perú",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¿Cómo abrir una Súper Cuenta 100% online? | Cuenta de Ahorros | Scotiabank Perú. @ScotiabankPE18 likes20K views6 years ago more.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta de Ahorros"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2020-09-18 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 9,
+                "rank_absolute": 12,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.bancognb.com.pe",
+                "title": "fórmulas",
+                "url": "https://www.bancognb.com.pe/main/download?file=peru%2Fbanca_personas%2Fcuentas%2Fbp_formulas_cuentas_23052013.pdf",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bancognb.com.pe › main › download",
+                "website_name": "Banco GNB Perú",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Para Cuentas de Ahorros la T.E.A. es igual a la Tasa de Rendimiento Efectiva Anual (T.R.E.A.), cuando el saldo promedio mensual es igual a S/.1000 ó $400.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuentas de Ahorros"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 2,
+                "rank_absolute": 13,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]",
+                "title": "Imágenes",
+                "url": "https://www.google.com/search?sa=N&hl=es&gl=PE&sca_esv=99fa615e217dff4e&sxsrf=APpeQnuzdmvN4BP0-AcVyK-TnH_UWCa-4w:1791314276046&q=cuenta+de+ahorros&udm=2&source=univ&fir=WTYmKBHyHK9zQM%252C-T4Qf7MBkSjKaM%252C_%253BT0djhBUr-d7BNM%252CdPmJTLDc2s6WpM%252C_%253Bdj9K3oryh6wwvM%252CwoI2n0WICP64aM%252C_%253BB8qzWcvs16up1M%252CzZlir9XUwd-6PM%252C_%253Bf-32UpHM3vvHiM%252CMTMtSkutjFLahM%252C_%253BtPTXULNnrG59rM%252CoInGFQpWNY5YRM%252C_%253BejD-wlzrBcDc2M%252C8NS2j76cohxb2M%252C_%253B3u1S2aIRjEajYM%252C3DgsvwAE7IMdAM%252C_%253B_350dlEauChjOM%252CIlg9ykZwXtwGPM%252C_&usg=AI4_-kRRtsEt-UMskrwqWlSbZwisw9NXFA&ved=2ahUKEwiV--rYjaaXAxUShv0HHepmG2Q4ChDsCXoECB0QBQ",
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "Qué es una cuenta de ahorro y cómo funciona (guía 2026)",
+                    "url": "https://rankiator.com/que-es-cuenta-ahorro/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:3"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta de ahorros o “caja chica” ¿cuál es la diferencia ...",
+                    "url": "https://elcomercio.pe/economia/personal/finanzas-emprendedores-cuenta-ahorros-caja-chica-usarlas-noticia-662490-noticia/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:4"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta de ahorro - Qué es y qué incluye",
+                    "url": "https://economipedia.com/definiciones/cuenta-de-ahorro.html",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061917-1987-0139-0000-b7d4ed3e3749:5"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Banco BDI",
+                    "url": "https://www.bdi.com.do/cuentas/cuentas-de-ahorro/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhzLdVcO_Dwn-FgbAD2dHFljfVI20HokgU1MtjY9Kkjmpu6DACNJjhUkE&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "¿Qué es una Cuenta de Ahorros? | Bancolombia",
+                    "url": "https://www.youtube.com/watch?v=if4SEJjIJm4",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs1fr7AxSfz8CjaYJECfClvlZd_NUzvIldPC1hc3XKxg&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta de ahorros: lo que debe tener antes de abrir una",
+                    "url": "https://www.portafolio.co/mis-finanzas/ahorro/cuenta-de-ahorros-lo-que-debe-tener-antes-de-abrir-una-599105",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIjhzesrg3EB4lTF-500aTsrnJ4kY2mNdoMx6NP8DxZwnz4QIZSq-PrTA&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta de ahorros vs. certificado de depósito (CD): cuál ...",
+                    "url": "https://bettermoneyhabits.bankofamerica.com/es/saving-budgeting/money-market-vs-cd-vs-savings",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHX7w6dSPC2E9xZNZo4hBGe_9M7f-D9dGRuDiq6TswcMvZJyd1gvWjuhI&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta de Ahorros - Cooperativa de Ahorro y Crédito Tena Ltda.",
+                    "url": "https://cooptena.fin.ec/productos/cuenta-de-ahorros/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQdVxUyPwIJwymcaLxhRu4HV5fNGmb8wtXfQHHL5cHqgAUEea5z2VcNLk&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Tipos de cuentas de ahorro en el Perú - Kambista",
+                    "url": "https://kambista.com/banca/tipos-de-cuentas-de-ahorro-en-el-peru/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXozmSC3LjJ4BS74Z25adsddpCcEf91HD6w6vYREnObv72Bhew49RQqOE&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 10,
+                "rank_absolute": 14,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¡Qué bien se ven tus ahorros! 🤩💰 Dale un buen look a tu ...",
+                "url": "https://www.instagram.com/p/DdHv4GlEQRA/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 20 \"me gusta\"  ·  hace 3 semanas",
+                "website_name": "Instagram · alfinbanco",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "✨​ ​ Abre tu Cuenta Ahorro Digital y deja que tu dinero crezca con una tasa de 4% TREA promocional en soles o 2% TREA promocional en ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Abre tu Cuenta Ahorro Digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 11,
+                "rank_absolute": 15,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+                "domain": "google.com",
+                "title": "Preguntas frecuentes sobre ahorros con PayPal",
+                "url": "https://google.com/goto?url=CAESxgEB6zswFQzGwC3TeebSqfa690-PdKoXSYyYk6LuGfMh_d18Q8YvG1_mpbbr0Rn9M_F9bbv9M3DA1P6GzbMx4BVo8cguYj8H1g2zRVw70bTamuqat4x50iJ-2BSn0RVejdKqKzE9wr4DFv4jgV7blCsMIn0rEjZHOTN3TwYPyBQYsUjX7xPXlIEZAtV81kPcOiB1LA4URtK_a3vpHJ7Ptfazq5XOPrjHijjfKRKuyRBCK_4KKmQ3wHdAH7Gm_Oofcl8ewKP-zzE",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.paypal.com › paypal-savings-faqs-help777",
+                "website_name": "PayPal",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Con PayPal Savings , puedes guardar tu dinero en una cuenta de depósito para ganar intereses y ver cómo crece. No hay saldo mínimo ni comisiones mensuales.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "puedes guardar tu dinero en una cuenta de depósito"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 12,
+                "rank_absolute": 16,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¡Abre tu cuenta desde dónde estés!  Ahora puedes abrir ...",
+                "url": "https://www.instagram.com/reel/DZLsMdYRHVu/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 \"me gusta\"  ·  hace 4 meses",
+                "website_name": "Instagram · alfinbanco",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¡Abre tu cuenta desde dónde estés! Ahora puedes abrir tu Cuenta Ahorro Meta 100% Digital y empezar a hacer crecer tu dinero, al toque.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta Ahorro"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-06-06 19:17:56 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 13,
+                "rank_absolute": 17,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¡Haz crecer tu GRATI!  Abre tu Cuenta Ahorro Meta 100% ...",
+                "url": "https://www.instagram.com/reel/DannEL0R4MK/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 \"me gusta\"  ·  hace 2 meses",
+                "website_name": "Instagram · alfinbanco",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Muchas cuentas de ahorro tradicionales pagan tasas muy bajas, mientras que existen alternativas donde puedes obtener un mejor rendimiento sin ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuentas de ahorro"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-08-06 19:17:56 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 14,
+                "rank_absolute": 18,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+                "domain": "www.bancocajasocial.com",
+                "title": "¿Puedes manejar la cuenta Mi Casa Mi Ahorro por internet?",
+                "url": "https://www.bancocajasocial.com/centro-de-ayuda/ahorros-e-inversiones/manejar-cuenta-mi-casa-mi-ahorro-por-internet/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bancocajasocial.com › ahorros-e-inversiones",
+                "website_name": "Banco Caja Social",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "La cuenta Mi Casa Mi Ahorro no dispone de medio de manejo ni permite la asignación de la clave de internet. Ahorros Portal transaccional.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuenta",
+                  "Ahorro",
+                  "Ahorros"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 15,
+                "rank_absolute": 19,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+                "domain": "www.gob.pe",
+                "title": "Carta / Oficio de Requerimiento de Apertura de Cuentas ...",
+                "url": "https://www.gob.pe/institucion/bn/informes-publicaciones/4222079-carta-oficio-de-requerimiento-de-apertura-de-cuentas-de-ahorros-masiva",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.gob.pe › informes-publicaciones › 422207...",
+                "website_name": "Plataforma del Estado Peruano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "12 may. 2023 — Formato sobre el uso de Carta / Oficio de Requerimiento de Apertura de Cuentas de Ahorros Masiva del Banco de la Nación.",
+                "pre_snippet": "05/12/2023 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuentas de Ahorros"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2023-05-12 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 16,
+                "rank_absolute": 20,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+                "domain": "www.banesco.com.do",
+                "title": "Cuenta de ahorros para banca personal",
+                "url": "https://www.banesco.com.do/banca-personal/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.banesco.com.do › banca-personal",
+                "website_name": "Banesco Rep. Dominicana",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "¿Necesitas abrir una cuenta? · Visa Débito para gestionar tu dinero fácilmente · Atractivas tasas de interés · Acceso a los servicios de banca en línea · Cuenta ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Visa Débito para gestionar tu dinero fácilmente"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 17,
+                "rank_absolute": 21,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Una forma de garantizar tus ahorros es asignar tu depósito ...",
+                "url": "https://www.facebook.com/bancatlan.sv/posts/una-forma-de-garantizar-tus-ahorros-es-asignar-tu-dep%C3%B3sito-a-una-cuenta-especial/1495425790654384/?locale=es_LA",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 30 reacciones  ·  hace 6 años",
+                "website_name": "Facebook · Banco Atlántida El Salvador",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Las cuentas de ahorro en línea le ofrecen la opción de obtener buenas tasas de interés en su depósito. ¡Estas cuentas ciertamente se ocuparían ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuentas de ahorro"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

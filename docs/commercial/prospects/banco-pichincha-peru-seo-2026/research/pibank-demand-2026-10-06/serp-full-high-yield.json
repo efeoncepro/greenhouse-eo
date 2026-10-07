@@ -1,0 +1,1285 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T17:40:13.766Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "cuenta de ahorros de alto rendimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 17421,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 17421,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061739-1987-0139-0000-199546935daa",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061739-1987-0139-0000-199546935daa",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "16.4909 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "cuenta de ahorros de alto rendimiento",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "mobile",
+          "depth": 20,
+          "os": "android"
+        },
+        "result": [
+          {
+            "keyword": "cuenta de ahorros de alto rendimiento",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20de%20alto%20rendimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 17:40:13 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview",
+              "organic",
+              "people_also_ask",
+              "short_videos",
+              "people_also_search",
+              "images"
+            ],
+            "se_results_count": 0,
+            "pages_count": 2,
+            "items_count": 22,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[1]/div[1]",
+                "asynchronous_ai_overview": false,
+                "markdown": "Una cuenta de ahorro de alto rendimiento en Perú es un producto financiero que te paga una tasa de interés superior a la de una cuenta tradicional, permitiéndote ganar dinero mientras mantienes disponibilidad inmediata de tus fondos sin penalidades.[[1]](https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento)[[2]](https://www.youtube.com/watch?v=rFvo7DurR8M&t=28)\n\nPuedes revisar opciones actualizadas en el portal de [Comparabien](https://comparabien.com.pe/ahorros) o leer una guía detallada sobre [Cuentas de ahorro de alto rendimiento en Perú 2026](https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru).[[1]](https://comparabien.com.pe/ahorros)[[2]](https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru)\n\n### Qué debes tener en cuenta\n\n- **Disponibilidad:** Retiras tu dinero cuando quieras sin perder los beneficios acumulados.\n- **TREA vs. TEA:** La TREA (Tasa de Rendimiento Efectivo Anual) incluye la ganancia real descontando comisiones, siendo el indicador más fiel de lo que ganarás.\n- **Mantenimiento y saldos:** Algunas entidades exigen un monto promedio mensual para no cobrar comisiones.\n- **Respaldo:** Verifica que la institución esté supervisada por la SBS y cuente con el Fondo de Seguro de Depósitos.[[1]](https://www.cajaarequipa.pe/personas/ahorros/ahorro-rentable/)[[2]](https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power)[[3]](https://www.youtube.com/watch?v=rFvo7DurR8M&t=28)[[4]](https://www.pichincha.pe/blog/cuenta-de-ahorro-de-alto-rendimiento-que-es)[[5]](https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento)\n\nSi me dices **cuánto dinero planeas depositar** y si prefieres **soles o dólares** , te puedo recomendar qué entidad ofrece la mejor tasa actual.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Una cuenta de ahorro de alto rendimiento en Perú es un producto financiero que te paga una tasa de interés superior a la de una cuenta tradicional, permitiéndote ganar dinero mientras mantienes disponibilidad inmediata de tus fondos sin penalidades.",
+                    "markdown": "Una cuenta de ahorro de alto rendimiento en Perú es un producto financiero que te paga una tasa de interés superior a la de una cuenta tradicional, permitiéndote ganar dinero mientras mantienes disponibilidad inmediata de tus fondos sin penalidades.[[1]](https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento)[[2]](https://www.youtube.com/watch?v=rFvo7DurR8M&t=28)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Mibanco Perú",
+                        "domain": "www.mibanco.com.pe",
+                        "url": "https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento",
+                        "title": "Blog - Mibanco Perú",
+                        "text": "* Tarjeta de Débito. Compras sin efectivo. * Información y educación financiera para emprendedores como tú. * Información y educación financiera para emprendedo..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=rFvo7DurR8M&t=28",
+                        "title": "BEST Savings Accounts in Soles Peru - August 2026 | One Bank PAYS 9.7% ...",
+                        "text": "Las MEJORES cuentas de Ahorro en Soles Perú - Agosto 2026 | Un Banco PAGA 9.7% ANUAL 😱 9.7% 7% pero más adelante te voy a contar exactamente los detalles exact..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Puedes revisar opciones actualizadas en el portal de Comparabien o leer una guía detallada sobre Cuentas de ahorro de alto rendimiento en Perú 2026.",
+                    "markdown": "Puedes revisar opciones actualizadas en el portal de [Comparabien](https://comparabien.com.pe/ahorros) o leer una guía detallada sobre [Cuentas de ahorro de alto rendimiento en Perú 2026](https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru).[[1]](https://comparabien.com.pe/ahorros)[[2]](https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "Comparabien",
+                        "description": null,
+                        "url": "https://comparabien.com.pe/ahorros",
+                        "domain": "comparabien.com.pe"
+                      },
+                      {
+                        "type": "link_element",
+                        "title": "Cuentas de ahorro de alto rendimiento en Perú 2026",
+                        "description": null,
+                        "url": "https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru",
+                        "domain": "www.prestamype.com"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Comparabien",
+                        "domain": "comparabien.com.pe",
+                        "url": "https://comparabien.com.pe/ahorros",
+                        "title": "Cuenta de Ahorros: Ahorra y Obtén Beneficios | Comparabien",
+                        "text": "Productos Recomendados: - Compartamos Banco: Campaña Cuenta WOW Digital, Soles, 4.60% TEA. Sin monto mínimo. - Financiera Confianza: Cuenta Ahorro Confianza, So..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Prestamype",
+                        "domain": "www.prestamype.com",
+                        "url": "https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru",
+                        "title": "Cuentas de ahorro de alto rendimiento en Perú 2026",
+                        "text": "Cuentas de ahorro en soles con cobro de mantenimiento: Financiera Surgir - 5.6 % anual; Santander Consumer - 4.6 % anual; Banco Ripley - 4.5 % anual; Compartamo..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Qué debes tener en cuenta",
+                    "text": "Disponibilidad: Retiras tu dinero cuando quieras sin perder los beneficios acumulados. TREA vs. TEA: La TREA (Tasa de Rendimiento Efectivo Anual) incluye la ganancia real descontando comisiones, siendo el indicador más fiel de lo que ganarás. Mantenimiento y saldos: Algunas entidades exigen un monto promedio mensual para no cobrar comisiones. Respaldo: Verifica que la institución esté supervisada por la SBS y cuente con el Fondo de Seguro de Depósitos.",
+                    "markdown": "- **Disponibilidad:** Retiras tu dinero cuando quieras sin perder los beneficios acumulados.\n- **TREA vs. TEA:** La TREA (Tasa de Rendimiento Efectivo Anual) incluye la ganancia real descontando comisiones, siendo el indicador más fiel de lo que ganarás.\n- **Mantenimiento y saldos:** Algunas entidades exigen un monto promedio mensual para no cobrar comisiones.\n- **Respaldo:** Verifica que la institución esté supervisada por la SBS y cuente con el Fondo de Seguro de Depósitos.[[1]](https://www.cajaarequipa.pe/personas/ahorros/ahorro-rentable/)[[2]](https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power)[[3]](https://www.youtube.com/watch?v=rFvo7DurR8M&t=28)[[4]](https://www.pichincha.pe/blog/cuenta-de-ahorro-de-alto-rendimiento-que-es)[[5]](https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Caja Arequipa",
+                        "domain": "www.cajaarequipa.pe",
+                        "url": "https://www.cajaarequipa.pe/personas/ahorros/ahorro-rentable/",
+                        "title": "Abre tu Cuenta Ahorro Rentable | Caja Arequipa",
+                        "text": "* Producto: Cuenta de Ahorro Rentable Caja Arequipa * Apertura online: S/50 o $30 * Beneficios: Tarjeta VISA, intereses, disponibilidad inmediata, retiros ilimi..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Scotiabank",
+                        "domain": "www.scotiabank.com.pe",
+                        "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                        "title": "Abre tu Cuenta Power y Genera Intereses - Scotiabank Perú",
+                        "text": "Scotiabank Perú Cuenta Power: - TREA soles: Hasta 4.00% y 4.60% con ScotiaCombos. - TREA dólares: Hasta 1.25%. - Saldo mínimo para 0 costo de mantenimiento y so..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=rFvo7DurR8M&t=28",
+                        "title": "BEST Savings Accounts in Soles Peru - August 2026 | One Bank PAYS 9.7% ...",
+                        "text": "Las MEJORES cuentas de Ahorro en Soles Perú - Agosto 2026 | Un Banco PAGA 9.7% ANUAL 😱 9.7% 7% pero más adelante te voy a contar exactamente los detalles exact..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "www.pichincha.pe",
+                        "domain": "www.pichincha.pe",
+                        "url": "https://www.pichincha.pe/blog/cuenta-de-ahorro-de-alto-rendimiento-que-es",
+                        "title": "¿Qué es una cuenta de ahorro de alto rendimiento? | Banco Pichincha",
+                        "text": "¿Qué es una cuenta de ahorro de alto rendimiento? ... Banco Pichincha. ¿Qué es una cuenta de ahorro de alto rendimiento? (y por qué debería importarte en el Per..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Mibanco Perú",
+                        "domain": "www.mibanco.com.pe",
+                        "url": "https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento",
+                        "title": "Blog - Mibanco Perú",
+                        "text": "* Tarjeta de Débito. Compras sin efectivo. * Información y educación financiera para emprendedores como tú. * Información y educación financiera para emprendedo..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si me dices cuánto dinero planeas depositar y si prefieres soles o dólares, te puedo recomendar qué entidad ofrece la mejor tasa actual.",
+                    "markdown": "Si me dices **cuánto dinero planeas depositar** y si prefieres **soles o dólares** , te puedo recomendar qué entidad ofrece la mejor tasa actual.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Mibanco Perú",
+                    "domain": "www.mibanco.com.pe",
+                    "url": "https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento",
+                    "title": "Blog - Mibanco Perú",
+                    "text": "* Tarjeta de Débito. Compras sin efectivo. * Información y educación financiera para emprendedores como tú. * Información y educación financiera para emprendedo..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Caja Arequipa",
+                    "domain": "www.cajaarequipa.pe",
+                    "url": "https://www.cajaarequipa.pe/personas/ahorros/ahorro-rentable/",
+                    "title": "Abre tu Cuenta Ahorro Rentable | Caja Arequipa",
+                    "text": "* Producto: Cuenta de Ahorro Rentable Caja Arequipa * Apertura online: S/50 o $30 * Beneficios: Tarjeta VISA, intereses, disponibilidad inmediata, retiros ilimi..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "www.pichincha.pe",
+                    "domain": "www.pichincha.pe",
+                    "url": "https://www.pichincha.pe/blog/cuenta-de-ahorro-de-alto-rendimiento-que-es",
+                    "title": "¿Qué es una cuenta de ahorro de alto rendimiento? | Banco Pichincha",
+                    "text": "¿Qué es una cuenta de ahorro de alto rendimiento? ... Banco Pichincha. ¿Qué es una cuenta de ahorro de alto rendimiento? (y por qué debería importarte en el Per..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Scotiabank",
+                    "domain": "www.scotiabank.com.pe",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "title": "Abre tu Cuenta Power y Genera Intereses - Scotiabank Perú",
+                    "text": "Scotiabank Perú Cuenta Power: - TREA soles: Hasta 4.00% y 4.60% con ScotiaCombos. - TREA dólares: Hasta 1.25%. - Saldo mínimo para 0 costo de mantenimiento y so..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Comparabien",
+                    "domain": "comparabien.com.pe",
+                    "url": "https://comparabien.com.pe/ahorros",
+                    "title": "Cuenta de Ahorros: Ahorra y Obtén Beneficios | Comparabien",
+                    "text": "Productos Recomendados: - Compartamos Banco: Campaña Cuenta WOW Digital, Soles, 4.60% TEA. Sin monto mínimo. - Financiera Confianza: Cuenta Ahorro Confianza, So..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Prestamype",
+                    "domain": "www.prestamype.com",
+                    "url": "https://www.prestamype.com/articulos/cuentas-de-ahorro-de-alto-rendimiento-peru",
+                    "title": "Cuentas de ahorro de alto rendimiento en Perú 2026",
+                    "text": "Cuentas de ahorro en soles con cobro de mantenimiento: Financiera Surgir - 5.6 % anual; Santander Consumer - 4.6 % anual; Banco Ripley - 4.5 % anual; Compartamo..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "YouTube",
+                    "domain": "www.youtube.com",
+                    "url": "https://www.youtube.com/watch?v=rFvo7DurR8M&t=28",
+                    "title": "BEST Savings Accounts in Soles Peru - August 2026 | One Bank PAYS 9.7% ...",
+                    "text": "Las MEJORES cuentas de Ahorro en Soles Perú - Agosto 2026 | Un Banco PAGA 9.7% ANUAL 😱 9.7% 7% pero más adelante te voy a contar exactamente los detalles exact..."
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 1,
+                "rank_absolute": 2,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "📈 Haz crecer tus ahorros con total libertad 💰 Con la Cuenta ...",
+                "url": "https://www.facebook.com/100077766706082/posts/-haz-crecer-tus-ahorros-con-total-libertad-con-la-cuenta-ahorro-flexitotal-de-ca/1056819923586888/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "1 reacción",
+                "website_name": "Facebook · ICA REC-Noticias",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Para acceder a esta campaña sólo debes aperturar una cuenta a plazo fijo desde S/ 500 soles con plazos entre 13 a 18 meses, la cuenta no tiene ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-07-06 17:40:09 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "people_also_ask",
+                "rank_group": 1,
+                "rank_absolute": 3,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[5]/div[1]",
+                "items": [
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Cuál es la cuenta de ahorros más rentable en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[5]/div[1]/div[2]/div[2]/div[1]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Cuál es la mejor cuenta de ahorros de alto rendimiento?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[5]/div[1]/div[2]/div[2]/div[2]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco te da mejor rendimiento en una cuenta de ahorro?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[5]/div[1]/div[2]/div[2]/div[3]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco ofrece cuentas de ahorro de alto rendimiento?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[5]/div[1]/div[2]/div[2]/div[4]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 2,
+                "rank_absolute": 4,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[7]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "do.scotiabank.com",
+                "title": "Cuenta de Ahorro Alto Rendimiento Empresarial para Pequeña y ...",
+                "url": "https://do.scotiabank.com/banca-de-negocios/administracion-de-efectivo/cuentas-de-ahorro/pequena-y-mediana-empresa/cuenta-alto-rendimiento-empresarial-para-pequena-y-mediana-empresa.html",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://do.scotiabank.com",
+                "website_name": "Scotiabank",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Lo que buscas es maximizar el dinero de tu empresa con un rendimiento similar a un Certificado de Deposito y tener la flexibilidad de una cuenta de Ahorro.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "maximizar el dinero de tu empresa con un rendimiento similar a un Certificado de Deposito"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "short_videos",
+                "rank_group": 1,
+                "rank_absolute": 5,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[9]",
+                "title": "Videos cortos",
+                "items": [
+                  {
+                    "type": "short_videos_element",
+                    "title": "Cuentas de ahorro de alto rendimiento 2026: comparativa y mejores ... de barbara_llontop en TikTok. Reproducir en TikTok. 1:02",
+                    "url": "https://www.tiktok.com/@barbara_llontop/video/7664762352671149332",
+                    "domain": "google.com",
+                    "source": "barbara_llontop"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "#datofinanciero Les comparto las cuentas de ahorro de alto ... de Fiore | IA, Finanzas & Carrera en Instagram. Reproducir en Instagram. 0:51",
+                    "url": "https://www.instagram.com/reel/DXF3QCBtkTj/",
+                    "domain": "google.com",
+                    "source": "Fiore | IA, Finanzas & Carrera"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Tu banco realmente te está pagando bien por tener tus ahorros ahí? ... de Ricardo Asmat M. en Facebook. Reproducir en Facebook. 1:58",
+                    "url": "https://www.facebook.com/ricardoasmatm/posts/tu-banco-realmente-te-est%C3%A1-pagando-bien-por-tener-tus-ahorros-ah%C3%AD-muchas-cuentas/1935847287726270/",
+                    "domain": "google.com",
+                    "source": "Ricardo Asmat M."
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Les comparto las cuentas de ahorro de alto rendimiento de bancos ... de Fiore | IA, Finanzas & Carrera en Instagram. Reproducir en Instagram. 0:58",
+                    "url": "https://www.instagram.com/reel/DVw4VhxjV7B/",
+                    "domain": "google.com",
+                    "source": "Fiore | IA, Finanzas & Carrera"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Cuentas de ahorro de alto rendimiento en Perú de anita_sare en TikTok. Reproducir en TikTok. 0:31",
+                    "url": "https://www.tiktok.com/@anita_sare/video/7468447768470752517",
+                    "domain": "google.com",
+                    "source": "anita_sare"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "#TercerEpisodio 🎙️​ ¿Cuenta de ahorro o depósito a plazo?​ No se ... de BanBif en Instagram. Reproducir en Instagram. 2:14",
+                    "url": "https://www.instagram.com/reel/DZn9NP6kWi1/?hl=es",
+                    "domain": "google.com",
+                    "source": "BanBif"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¡3 beneficios de abrir tu Cuenta Ahorro Meta! 🤩💯 Ingresa a 📲 https: ... de Alfin Banco en Facebook. Reproducir en Facebook. 0:28",
+                    "url": "https://www.facebook.com/AlfinBanco/videos/3-beneficios-de-abrir-tu-cuenta-ahorro-meta-ingresa-a-httpsalfinbancopeahorrosah/1250305443978439/",
+                    "domain": "google.com",
+                    "source": "Alfin Banco"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Mejores cuentas de ahorro 2026💸 Tu cuenta sueldo te paga 0% 📉 y la ... de Daniel Ortega (No me llamo Decateca) en Instagram. Reproducir en Instagram. 1:57",
+                    "url": "https://www.instagram.com/reel/DaO4EJYgAds/",
+                    "domain": "google.com",
+                    "source": "Daniel Ortega (No me llamo Decateca)"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Caja Ica de Caja Ica en Facebook. Reproducir en Facebook. 0:34",
+                    "url": "https://www.facebook.com/CajaMunicipalIca/posts/-haz-crecer-tus-ahorros-con-total-libertad-con-la-cuenta-ahorro-flexitotal-de-ca/1341629034661991/",
+                    "domain": "google.com",
+                    "source": "Caja Ica"
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 3,
+                "rank_absolute": 6,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "es.selco.org",
+                "title": "Haz que cada $ realmente cuente con los ahorros de alto rendimiento ...",
+                "url": "https://es.selco.org/education-articles/make-every-dollar-really-count-with-cultivate-high-yield-savings/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://es.selco.org",
+                "website_name": "SELCO Community Credit Union",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "25 abr. 2025 — No solo tu dinero crecerá más rápido con Cultivate, sino que las cuentas de ahorros de alto rendimiento son una opción más segura que las ...",
+                "pre_snippet": "04/25/2025 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuentas de ahorros de alto rendimiento"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2025-04-25 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 4,
+                "rank_absolute": 7,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[12]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡3 beneficios de abrir tu Cuenta Ahorro Meta!  Ingresa a  https: ...",
+                "url": "https://www.facebook.com/AlfinBanco/videos/3-beneficios-de-abrir-tu-cuenta-ahorro-meta-ingresa-a-httpsalfinbancopeahorrosah/1250305443978439/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 30 reacciones",
+                "website_name": "Facebook · Alfin Banco",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Cuenta de Ahorro de Alto Rendimiento. Efectibank #efe... ... Cuando las obligaciones se acumulan, organizar tus finanzas puede marcar la ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:28",
+                    "description": null,
+                    "url": "https://www.facebook.com/AlfinBanco/videos/3-beneficios-de-abrir-tu-cuenta-ahorro-meta-ingresa-a-httpsalfinbancopeahorrosah/1250305443978439/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-04-06 17:40:09 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 5,
+                "rank_absolute": 8,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[14]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.reddit.com",
+                "title": "¿Vale la pena abrir varias cuentas bancarias para ahorros de alto ...",
+                "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/?tl=es-419",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 30 comentarios",
+                "website_name": "Reddit · r/BEFire",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Tengo una cuenta de ahorros con 8k ahí como fondo de emergencia. Ahora mismo la estoy transfiriendo de a poquito, mes por mes (máximo 500 al mes), a la ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "\" ¿También pueden los bancos bajar estos intereses de un momento a otro? ¿Estas cuentas ...",
+                    "description": "Mejor respuesta · 9 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p34zo7q/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Belfius Flow es el mejor, en mi opinión. Es de 3.1% y tiene un límite de 600 al mes.",
+                    "description": "6 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p33ouu3/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Eso es mucho manejo para solo un poco de dinero. También revisa cómo se calcula esa lealtad. ...",
+                    "description": "6 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p34og2b/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "O Argenta con 3.15% - límite de 500€/mes",
+                    "description": "5 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p33ri7b/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Sí, vale la pena para poder saltarte de forma efectiva el límite mensual de depósitos, sobre ...",
+                    "description": "5 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p34f09h/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Estoy haciendo Belfius/VDK todos los meses; los dos tienen cuentas gratis. \n\nVDK ha sido la ...",
+                    "description": "4 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p37ka8q/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Sí, puedes hacerlo, pero personalmente no me parece que valga la pena el esfuerzo. Yo guardo ...",
+                    "description": "4 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p33yuwl/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Los bancos sí pueden cambiar las tasas en cualquier momento. Parte de eso es marketing ...",
+                    "description": "3 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p33t7mx/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Una cosa que deberías checar es cuánto cobran por tener una cuenta ahí. No todos los bancos ...",
+                    "description": "3 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p33umsg/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  },
+                  {
+                    "type": "link_element",
+                    "title": "Entre más bancos, más rápido puedes depositar todo el dinero y más rápido empiezas a ...",
+                    "description": "3 votos",
+                    "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/p34ghcq/?tl=es-419",
+                    "domain": "www.reddit.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-06 17:40:09 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 6,
+                "rank_absolute": 9,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[16]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.promerica.fi.cr",
+                "title": "reglamento ahorro de alto rendimiento",
+                "url": "https://www.promerica.fi.cr/media/4rubcoqd/030626-reglamento-ahorro-de-alto-rendimiento.pdf?Tarjeta=Veinsa",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.promerica.fi.cr",
+                "website_name": "Banco Promerica Costa Rica",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "“Ahorro de Alto Rendimiento” se constituye mediante depósitos extraordinarios o depó- sitos programados, semanales, quincenales y mensuales previamente ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 7,
+                "rank_absolute": 10,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[18]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "freedomcu.com",
+                "title": "Cuentas de ahorro - Freedom Credit Union",
+                "url": "https://freedomcu.com/cuentas-de-ahorro/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://freedomcu.com",
+                "website_name": "freedomcu.com",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Con plazos que van desde seis meses hasta cinco años y tasas competitivas, los certificados de ahorro son una excelente opción para quienes buscan mayores ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Con plazos que van desde seis meses hasta cinco años"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 8,
+                "rank_absolute": 11,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[20]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Nuestra Cuenta de Ahorro Alto Rendimiento en Dólares te ofrece ...",
+                "url": "https://www.instagram.com/p/DG3tusUThoo/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 \"me gusta\"",
+                "website_name": "Instagram · scotiabankdo",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Nuestra Cuenta de Ahorro Alto Rendimiento en Dólares te ofrece una excelente oportunidad para hacer crecer tus ahorros en una de las monedas ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Nuestra Cuenta de Ahorro Alto Rendimiento en Dólares"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": [
+                  "cuentas de ahorro",
+                  "cuenta empresarial"
+                ],
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2025-10-06 17:40:09 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "people_also_search",
+                "rank_group": 1,
+                "rank_absolute": 12,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[22]",
+                "title": "También se buscó",
+                "items": [
+                  "Cuentas de ahorro empresariales",
+                  "Cuenta Empresarial Scotiabank"
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 9,
+                "rank_absolute": 13,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¿Cuáles son las mejores cuentas de ahorro de alto rendimiento? Acá te ...",
+                "url": "https://www.instagram.com/reel/DUMWB9wESvN/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 \"me gusta\"",
+                "website_name": "Instagram · alejandroolivag",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¿Tu cuenta de ahorros realmente está haciendo crecer tu dinero? Estas son 5 cuentas de alto rendimiento que destacan en septiembre de 2026 ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "2:06",
+                    "description": null,
+                    "url": "https://www.instagram.com/reel/DUMWB9wESvN/",
+                    "domain": "www.instagram.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-02-06 17:40:10 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 10,
+                "rank_absolute": 14,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                "domain": "www.youtube.com",
+                "title": "Como ESCOGER una cuenta de AHORROS de alto RENDIMIENTO",
+                "url": "https://www.youtube.com/watch?v=kUlAPWvRlIA",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 2 K vistas",
+                "website_name": "YouTube · César AT",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Buscas GANAR MAS CON TUS AHORROS pero no sabes donde ponerlo? Existen 5 claves para poder escoger una cuenta de ahorros de ALTO RENDIMIENTO ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2024-10-06 17:40:10 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 11,
+                "rank_absolute": 15,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[3]/div[1]/div[1]",
+                "domain": "www.tiktok.com",
+                "title": "Cuentas de Ahorro de Alto Rendimiento en Perú",
+                "url": "https://www.tiktok.com/@arenscristian/video/7219077183669636358",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 461 k vistas",
+                "website_name": "TikTok · Cristian Arens",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Descubre por qué debes sacar tus ahorros de los bancos grandes en Perú y optar por. @Cristian Arens.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:22",
+                    "description": null,
+                    "url": "https://www.tiktok.com/@arenscristian/video/7219077183669636358",
+                    "domain": "www.tiktok.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2023-10-06 17:40:10 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 12,
+                "rank_absolute": 16,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.bbva.pe",
+                "title": "Ahorro",
+                "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro.html",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bbva.pe",
+                "website_name": "BBVA Perú",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Compara una cuenta de alto rendimiento y un plazo fijo, conoce sus diferencias y elige la opción que mejor se adapta a tus objetivos financieros. Leer Nota.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Compara una cuenta de alto rendimiento"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 13,
+                "rank_absolute": 17,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Conoce las mejores cuentas de ahorro en Perú a setiembre de 2026 ...",
+                "url": "https://www.facebook.com/americatelevision/posts/conoce-las-mejores-cuentas-de-ahorro-en-per%C3%BA-a-setiembre-de-2026-respaldadas-por/1711373603683551/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "3 reacciones",
+                "website_name": "Facebook · América Televisión",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Conoce las mejores cuentas de ahorro en Perú a setiembre de 2026, respaldadas por la SBS, sus rendimientos y qué beneficios te brindan.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-15 17:40:10 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 14,
+                "rank_absolute": 18,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[6]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "📈 ¡Haz que tus ahorros crezcan a tu ritmo! 💰✨ Con la Cuenta FlexiTotal ...",
+                "url": "https://www.facebook.com/CajaMunicipalIca/posts/-haz-que-tus-ahorros-crezcan-a-tu-ritmo-con-la-cuenta-flexitotal-de-caja-ica-haz/1554008610090698/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 20 reacciones",
+                "website_name": "Facebook · Caja Ica",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Para acceder a esta campaña sólo debes aperturar una cuenta a plazo fijo desde S/ 500 soles con plazos entre 13 a 18 meses, la cuenta no tiene ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-08 17:40:10 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 15,
+                "rank_absolute": 19,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[7]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "banbif.com.pe",
+                "title": "Ahorro Persona Natural",
+                "url": "https://banbif.com.pe/Portals/0/PortalOld/simuladores/calculodepositoahorros_22_02_18.htm?ver=2018-01-03-163110-820",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://banbif.com.pe",
+                "website_name": "BanBif",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "La cuenta permite realizar un número de operaciones libres por retiro/consulta en cajeros automáticos y depósitos y retiros en ventanillas de BanBif, según el ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 16,
+                "rank_absolute": 20,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[8]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.bancognb.com.pe",
+                "title": "E000275 - Cartilla Campaña de Ahorros",
+                "url": "https://www.bancognb.com.pe/main/download?file=peru%2Fbanca_personas%2Fcuentas%2FCartilla_Campana_de_Ahorros_13022015.pdf",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bancognb.com.pe",
+                "website_name": "Banco GNB Perú",
+                "is_image": true,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_image"
+                ],
+                "description": "Si EL CLIENTE abre una Cuenta de Ahorros con un importe de S/. 1,000.00 o US$ 400.00, asumiendo que no realiza ningún retiro ni deposito, a un plazo de 360 ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": [
+                  {
+                    "type": "images_element",
+                    "alt": null,
+                    "url": "https://www.bancognb.com.pe/main/download?file=peru%2Fbanca_personas%2Fcuentas%2FCartilla_Campana_de_Ahorros_13022015.pdf",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyGGT0WtM0w39ruxh5IRdi4UvD-5b3dB7Q7o5vjdAs9iUZWg&s"
+                  }
+                ],
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 17,
+                "rank_absolute": 21,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[9]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.affinityfcu.com",
+                "title": "Qué Buscar Al Elegir una Cuenta de Ahorros",
+                "url": "https://www.affinityfcu.com/es-us/financial-wellbeing/blog/financial-wellbeing/what-to-look-for-when-choosing-a-savings-account",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.affinityfcu.com",
+                "website_name": "Affinity Federal Credit Union",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Cuentas de ahorro de alto rendimiento: Estas proporcionan tasas de interés más altas que las cuentas de ahorro tradicionales. Una cuenta de ahorro de alto ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 1,
+                "rank_absolute": 22,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[10]",
+                "title": "Imágenes",
+                "url": null,
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "Cuentas de ahorro de ALTO RENDIMIENTO - 2024",
+                    "url": "https://www.youtube.com/watch?v=vrqEBRzXxMI",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQojm6cZVjpalLQI-XrPmAvAmJKLsfTbKhk-fvkbqJ2nA&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Mis MEJORES CUENTAS DE AHORRO PERU 🔥💰🇵🇪",
+                    "url": "https://www.youtube.com/watch?v=NbXgnF-3rK4",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoVFYh2kYKAP1WCYHaysaTXk6nvOoA_RHaW-EhmgxEJg&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Conozca algunas de las cuentas de ahorro de fintech con los ...",
+                    "url": "https://www.larepublica.co/finanzas/cuentas-de-ahorro-con-los-mejores-rendimientos-3783428",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsHm-a7WH8yoBjlaOnnVuwCLq0lLN4TKclZyOZzFD9xt6wnLxTAXSUZOY&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Qué es una cuenta de ahorro de alto interés? - Relentless Latina",
+                    "url": "https://relentlesslatina.com/cuenta-de-alto-interes/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-cU6LFm-dry1jAKOgz7oi30XPwhJw89ZWJyMrajqOtRNtHiHKCnl_9Ow&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

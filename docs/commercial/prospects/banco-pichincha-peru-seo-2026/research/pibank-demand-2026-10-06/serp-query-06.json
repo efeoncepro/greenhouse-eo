@@ -1,0 +1,122 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": false,
+  "outcome": "provider_task_error",
+  "queriedAt": "2026-10-06T17:38:52.430Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "cuenta de ahorros sin mantenimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "target": "pibank.pe",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 11865,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 11865,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061738-1987-0139-0000-65d4b365382f",
+        "statusCode": 40102,
+        "statusMessage": "No Search Results.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061738-1987-0139-0000-65d4b365382f",
+        "status_code": 40102,
+        "status_message": "No Search Results.",
+        "time": "11.0312 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "cuenta de ahorros sin mantenimiento",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "mobile",
+          "target": "pibank.pe",
+          "depth": 20,
+          "os": "android"
+        },
+        "result": [
+          {
+            "keyword": "cuenta de ahorros sin mantenimiento",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20sin%20mantenimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 17:38:51 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview",
+              "organic",
+              "people_also_ask",
+              "video",
+              "images"
+            ],
+            "se_results_count": 0,
+            "pages_count": 2,
+            "items_count": 0,
+            "items": null
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "as_of": "2026-10-06",
+  "scope": "SEO_GEO_plus_editorial_PR",
+  "status": "planning_estimate_not_roster_quote_or_measured_time",
+  "base_seo_geo_hours": 814,
+  "base_seo_geo_reserve": 110,
+  "pr_base_hours": 252,
+  "pr_reserve_hours": 40,
+  "combined_base_hours": 1066,
+  "combined_reserve_hours": 150,
+  "combined_hours": 1216,
+  "roles": [
+    {
+      "role": "Relaciones con medios",
+      "basis": "Mapa inicial20h + once ciclos8h; 48 propuestas personalizadas y seguimiento acotado",
+      "base_hours": 108,
+      "reserve_hours": 16
+    },
+    {
+      "role": "Editorial PR",
+      "basis": "12 kits/angulos5h; no duplica redaccion de paginas SEO",
+      "base_hours": 60,
+      "reserve_hours": 10
+    },
+    {
+      "role": "Datos PR",
+      "basis": "Cuatro paquetes12h de metodo/compilacion/derivado; sin encuesta propia",
+      "base_hours": 48,
+      "reserve_hours": 8
+    },
+    {
+      "role": "Preparacion de voceria",
+      "basis": "Cuatro sesiones de3h preparacion y practica; vocero del banco",
+      "base_hours": 12,
+      "reserve_hours": 2
+    },
+    {
+      "role": "QA y medicion PR",
+      "basis": "Doce cortes2h; QA editorial y enlaces, adicion al informe existente",
+      "base_hours": 24,
+      "reserve_hours": 4
+    }
+  ],
+  "not_double_counted": "Existing SEO pages/FAQ/CMS and monthly report base preserved; PR adds packaging, evidence method, relationships, coaching and link verification",
+  "fees_media_spend_surveys": null,
+  "workbook_scope": "v0.6 SEO/GEO+PR 1216h;13role cost inputs; no approved quote",
+  "campaign_months": [
+    3,
+    5,
+    8,
+    11
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "as_of": "2026-10-06",
+    "market": "PE",
+    "language": "es",
+    "default_envelope_searches_monthly": 3900,
+    "gross_candidate_envelope_searches_monthly": 5500,
+    "default_envelope_status": "conservative_editorial_proxy_NOT_TAM_forecast_or_unique_people",
+    "source_records": [
+      {
+        "id": "DFS-OVERVIEW",
+        "file": "keyword-overview-provider.json",
+        "endpoint": "/v3/dataforseo_labs/google/keyword_overview/live",
+        "captured_at": "2026-10-06T17:36:17.479Z",
+        "task_status": [
+          {
+            "id": "10061736-1987-0607-0000-75239d28c636",
+            "statusCode": 20000,
+            "statusMessage": "Ok.",
+            "resultCount": 1,
+            "cost": 0.01464,
+            "hasResult": true
+          }
+        ],
+        "cost_usd": 0.01464,
+        "requested_keywords": 36,
+        "returned_rows": 22
+      },
+      {
+        "id": "DFS-SUGGESTIONS",
+        "file": "keyword-suggestions-provider.json",
+        "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+        "captured_at": "2026-10-06T17:36:56.392Z",
+        "cost_usd": 0.024,
+        "returned_rows": 100,
+        "database_matching_candidates": 1433,
+        "coverage": "first100 ordered by search volume; 1333 not downloaded; candidates are keywords not search counts"
+      }
+    ],
+    "attribution": "Efeonce canonical acquisition org, not Pibank client spend",
+    "deduplication": [
+      "Lowercase + accent normalization for exact keyword duplicates",
+      "Provider core_keyword preserved for analysis, never summed blindly",
+      "Explicit editorial groups aggregate by MAX observed member, not SUM",
+      "Brand competitor, Pibank brand, education, trust/support, term deposits and future USD excluded from default acquisition envelope",
+      "No attempt to infer unique persons or estimate inter-group audience overlap"
+    ],
+    "limitations": [
+      "Market estimates, not GSC/GA4 or bank conversions",
+      "Seed selection + top100 suggestions is incomplete market coverage",
+      "Volume snapshots September2026 and monthly data through August2026; not postlaunch demand or 2027 projection",
+      "3900 default excludes high-yield1600 with mixed-country SERP;5500gross available only explicit relevance sensitivity; remaining eligibility unknown",
+      "No binding conversion or ranking forecast; unknown values retain null"
+    ]
+  },
+  "groups": [
+    {
+      "id": "G01_category",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-050",
+        "KW-082"
+      ],
+      "representative_keyword": "cuenta de ahorros",
+      "monthly_volume_proxy": 2900,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G02_high_yield",
+      "category": "broad_mixed_geo",
+      "member_ids": [
+        "KW-064"
+      ],
+      "representative_keyword": "cuenta de ahorros de alto rendimiento",
+      "monthly_volume_proxy": 1600,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G03_comparison",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-108",
+        "KW-109",
+        "KW-110",
+        "KW-119"
+      ],
+      "representative_keyword": "mejor cuenta de ahorros peru",
+      "monthly_volume_proxy": 320,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G04_digital",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-068"
+      ],
+      "representative_keyword": "cuenta de ahorros digital",
+      "monthly_volume_proxy": 210,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G05_opening",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-001",
+        "KW-006",
+        "KW-010",
+        "KW-011"
+      ],
+      "representative_keyword": "abrir cuenta de ahorros",
+      "monthly_volume_proxy": 210,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G06_no_maintenance",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-090"
+      ],
+      "representative_keyword": "cuenta de ahorros sin mantenimiento",
+      "monthly_volume_proxy": 50,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G07_interest",
+      "category": "core_acquisition",
+      "member_ids": [
+        "KW-063",
+        "KW-106",
+        "KW-107",
+        "KW-127"
+      ],
+      "representative_keyword": "cuenta de ahorros con intereses",
+      "monthly_volume_proxy": 210,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": true,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G08_usd_future",
+      "category": "future_dollars",
+      "member_ids": [
+        "KW-046",
+        "KW-070",
+        "KW-074"
+      ],
+      "representative_keyword": "cuenta de ahorros en dolares",
+      "monthly_volume_proxy": 210,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G09_term_substitute",
+      "category": "substitute",
+      "member_ids": [
+        "KW-048",
+        "KW-051",
+        "KW-084",
+        "KW-097"
+      ],
+      "representative_keyword": "cuenta de ahorros a plazo fijo",
+      "monthly_volume_proxy": 390,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G10_definition",
+      "category": "education",
+      "member_ids": [
+        "KW-086",
+        "KW-121",
+        "KW-123"
+      ],
+      "representative_keyword": "cuenta de ahorros que es",
+      "monthly_volume_proxy": 590,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G11_current_vs_savings",
+      "category": "education",
+      "member_ids": [
+        "KW-032",
+        "KW-042",
+        "KW-043",
+        "KW-044",
+        "KW-045",
+        "KW-081",
+        "KW-091",
+        "KW-092",
+        "KW-098",
+        "KW-100",
+        "KW-120"
+      ],
+      "representative_keyword": "diferencia entre cuenta corriente y cuenta de ahorros",
+      "monthly_volume_proxy": 1600,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G12_trust_fsd",
+      "category": "trust_support",
+      "member_ids": [
+        "KW-103"
+      ],
+      "representative_keyword": "fondo de seguro de depositos",
+      "monthly_volume_proxy": 1600,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    },
+    {
+      "id": "G13_trea",
+      "category": "trust_support",
+      "member_ids": [
+        "KW-122"
+      ],
+      "representative_keyword": "que es trea",
+      "monthly_volume_proxy": 880,
+      "aggregation": "maximum observed member volume; conservative editorial proxy",
+      "use_in_default_envelope": false,
+      "confidence": "market_estimate; editorial overlap adjustment; not unique audience"
+    }
+  ],
+  "original_file": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-demand-2026-10-06/demand-inputs.json",
+  "original_sha256": "1ba7fa8b7eaf4ba865c268ed7e8df7f00f79da7123003be9305bd3f372dcd957",
+  "scope": "Metadata/grupos de fuente, no listado completo de keywords"
+}

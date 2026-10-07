@@ -1,0 +1,63 @@
+{
+  "as_of": "2026-10-06 America/Santiago; queries UTC 2026-10-07",
+  "raw_observations": 2555,
+  "deduplicated_bank_keyword_url_observations": 2278,
+  "exact_queries": 1594,
+  "observations_by_bank": {
+    "Interbank": 343,
+    "BBVA": 745,
+    "BCP": 878,
+    "Scotiabank": 312
+  },
+  "new_domain_receipts": [
+    {
+      "bank": "Interbank",
+      "task_id": "10070057-1987-0381-0000-cd6a909d28d0",
+      "cost_usd": 0.05304,
+      "returned_rows": 342,
+      "total_filtered_rows": 342,
+      "queried_at": "2026-10-07T00:57:38.320Z",
+      "source": "research/pibank-gap-closure-2026-10-06/interbank-provider.json",
+      "sha256": "f51b3619ceaf2427c4cc37927d3f0d4d5d8ab750ab7611763c68ed16a4ed5821"
+    },
+    {
+      "bank": "Scotiabank",
+      "task_id": "10070058-1987-0381-0000-c681f2bb4d1f",
+      "cost_usd": 0.04968,
+      "returned_rows": 314,
+      "total_filtered_rows": 314,
+      "queried_at": "2026-10-07T00:58:05.706Z",
+      "source": "research/pibank-gap-closure-2026-10-06/scotiabank-provider.json",
+      "sha256": "52a20c5d9671399efb28403a75f1268865da48b05318b28dfb9a69710ea53956"
+    },
+    {
+      "bank": "BBVA",
+      "task_id": "10070100-1987-0381-0000-49bb376218a8",
+      "cost_usd": 0.06276,
+      "returned_rows": 423,
+      "total_filtered_rows": 423,
+      "queried_at": "2026-10-07T01:00:11.734Z",
+      "source": "research/pibank-gap-closure-2026-10-06/bbva-product-provider.json",
+      "sha256": "e931053e49a59c03c63d540f44885799d323bf20a0db07fb72cceb3bce995784"
+    }
+  ],
+  "new_paid_cost_usd": 0.213552,
+  "total_confirmed_research_cost_usd": 1.491372,
+  "budget_ceiling_usd": 2,
+  "remaining_unknown_costs": [],
+  "proxy_by_lane": {
+    "direct": 3740,
+    "conditional": 3330,
+    "competitor": 18300,
+    "assisted": 5680
+  },
+  "families": 19,
+  "scope": "Complete within returned product/keyword filters for Interbank, Scotiabank and BBVA; BCP prior capture. Not all-bank census, live SERP or TAM.",
+  "historical_bbva_result": "Portal confirms prior USD0.132 task complete;1000 rows unavailable and excluded from observations; not retried. New BBVA query has narrower keyword filter.",
+  "volumes": "Family representatives preserve original source/date; no summing variants or competitor brand into direct acquisition.",
+  "new_backlink_cost_usd": 0.048072,
+  "new_paid_calls": 5,
+  "backlinks_baseline_file": "baseline-backlinks.json",
+  "previous_reused_research_cost_usd_separate": 0.07714,
+  "conservative_cost_including_previous_reused_usd": 1.568512
+}

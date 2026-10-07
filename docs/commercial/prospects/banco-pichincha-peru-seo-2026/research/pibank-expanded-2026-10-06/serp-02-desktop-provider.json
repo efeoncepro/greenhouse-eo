@@ -1,0 +1,1264 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:18:24.196Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "cuenta digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.005,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 10148,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 10148,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061918-1987-0139-0000-14c99ae01cc7",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061918-1987-0139-0000-14c99ae01cc7",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "9.3145 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "cuenta digital",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows",
+          "depth": 20
+        },
+        "result": [
+          {
+            "keyword": "cuenta digital",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 19:18:23 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview",
+              "organic",
+              "people_also_ask",
+              "short_videos",
+              "images"
+            ],
+            "se_results_count": 3430000,
+            "pages_count": 2,
+            "items_count": 21,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "asynchronous_ai_overview": false,
+                "markdown": "Una [Cuenta Digital BBVA](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html) es una cuenta de ahorros que se abre y administra 100% por internet desde el celular, sin costo de mantenimiento ni saldo mínimo requerido.[[1]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[2]](https://www.youtube.com/watch?v=31exVlQBht8)[[3]](https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/)\n\n### Características principales\n\n- **Sin mantenimiento:** No pagas comisiones por no tener un monto mínimo.\n- **Moneda:** Puedes elegir entre soles o dólares.\n- **Operaciones gratis:** Retiros y depósitos ilimitados en cajeros y agentes autorizados.\n- **Billeteras móviles:** Integración gratuita con Plin o Yape según el banco.[[1]](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.youtube.com/watch?v=31exVlQBht8)\n\n### Requisitos de apertura\n\n- **DNI vigente:** Documento de identidad original.\n- **Smartphone:** Con conexión a internet para descargar la aplicación del banco.\n- **Validación facial:** Una selfie o validación de datos en línea.[[1]](https://www.bbva.pe/blog/mis-finanzas/ahorro/guia-facil-para-abrir-una-cuenta-digital.html)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/)[[4]](https://www.scotiabank.com.pe/blog/que-es-cuenta-digital-como-abrirla)\n\n### Otras opciones populares en el mercado\n\n- [Cuenta Digital BCP](https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp) : Sin costo de mantenimiento y operaciones digitales gratuitas.\n- [Cuenta Digital Banco Falabella](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una) : Activación rápida con beneficios asociados a tiendas y Yape/Plin.[[1]](https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp)[[2]](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una)\n\nSi lo deseas, dime **qué banco prefieres** o **qué beneficio buscas** (como mejor tasa de interés o retiros ilimitados) para recomendarte la opción ideal.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Una Cuenta Digital BBVA es una cuenta de ahorros que se abre y administra 100% por internet desde el celular, sin costo de mantenimiento ni saldo mínimo requerido.",
+                    "markdown": "Una [Cuenta Digital BBVA](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html) es una cuenta de ahorros que se abre y administra 100% por internet desde el celular, sin costo de mantenimiento ni saldo mínimo requerido.[[1]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[2]](https://www.youtube.com/watch?v=31exVlQBht8)[[3]](https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta Digital BBVA",
+                        "description": null,
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "domain": "www.bbva.pe"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                        "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancaria..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=31exVlQBht8",
+                        "title": "Digital account: what it is, benefits, and how to open one",
+                        "text": "¿qué es una cuenta. digital es una cuenta que te permite. administrar tu dinero y realizar gran parte de tus. operaciones desde ca..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "¿Un momento libre y tu celular a la mano? Con eso puedes abrir tu ...",
+                        "domain": "www.facebook.com",
+                        "url": "https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/",
+                        "title": "Cuenta Digital BBVA",
+                        "text": "¿Un momento libre y tu celular a la mano? 🤳 Con eso puedes abrir tu Cuenta Digital BBVA desde la App al toque y sin interrumpir t..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Características principales",
+                    "text": "Sin mantenimiento: No pagas comisiones por no tener un monto mínimo. Moneda: Puedes elegir entre soles o dólares. Operaciones gratis: Retiros y depósitos ilimitados en cajeros y agentes autorizados. Billeteras móviles: Integración gratuita con Plin o Yape según el banco.",
+                    "markdown": "- **Sin mantenimiento:** No pagas comisiones por no tener un monto mínimo.\n- **Moneda:** Puedes elegir entre soles o dólares.\n- **Operaciones gratis:** Retiros y depósitos ilimitados en cajeros y agentes autorizados.\n- **Billeteras móviles:** Integración gratuita con Plin o Yape según el banco.[[1]](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.youtube.com/watch?v=31exVlQBht8)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Banco Falabella Perú",
+                        "domain": "www.bancofalabella.pe",
+                        "url": "https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una",
+                        "title": "Cuenta Digital: abre tu cuenta Banco Falabella 100% online",
+                        "text": "¿Qué es una cuenta digital?​. Una Cuenta Digital es una cuenta de ahorros que abres y gestionas 100% por internet: la activas, con..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                        "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancaria..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=31exVlQBht8",
+                        "title": "Digital account: what it is, benefits, and how to open one",
+                        "text": "¿qué es una cuenta. digital es una cuenta que te permite. administrar tu dinero y realizar gran parte de tus. operaciones desde ca..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Requisitos de apertura",
+                    "text": "DNI vigente: Documento de identidad original. Smartphone: Con conexión a internet para descargar la aplicación del banco. Validación facial: Una selfie o validación de datos en línea.",
+                    "markdown": "- **DNI vigente:** Documento de identidad original.\n- **Smartphone:** Con conexión a internet para descargar la aplicación del banco.\n- **Validación facial:** Una selfie o validación de datos en línea.[[1]](https://www.bbva.pe/blog/mis-finanzas/ahorro/guia-facil-para-abrir-una-cuenta-digital.html)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/)[[4]](https://www.scotiabank.com.pe/blog/que-es-cuenta-digital-como-abrirla)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro/guia-facil-para-abrir-una-cuenta-digital.html",
+                        "title": "Guía fácil para abrir una cuenta digital | BBVA Perú",
+                        "text": "Abre tu Cuenta Digital sin salir de casa. 1 Descarga el APP BBVA y elige “Hazte cliente”; 2 Ingresa tus datos y valida tu identida..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                        "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancaria..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "¿Un momento libre y tu celular a la mano? Con eso puedes abrir tu ...",
+                        "domain": "www.facebook.com",
+                        "url": "https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/",
+                        "title": "Cuenta Digital BBVA",
+                        "text": "¿Un momento libre y tu celular a la mano? 🤳 Con eso puedes abrir tu Cuenta Digital BBVA desde la App al toque y sin interrumpir t..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Scotiabank",
+                        "domain": "www.scotiabank.com.pe",
+                        "url": "https://www.scotiabank.com.pe/blog/que-es-cuenta-digital-como-abrirla",
+                        "title": "¿Qué es una cuenta digital y cómo abrir una? | Scotiabank Blog",
+                        "text": "- Entidad: Scotiabank (Nueva Cuenta Digital) - Gestión: Online vía Banca por Internet o App Móvil (sin intermediario físico) - Cos..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Otras opciones populares en el mercado",
+                    "text": "Cuenta Digital BCP : Sin costo de mantenimiento y operaciones digitales gratuitas. Cuenta Digital Banco Falabella : Activación rápida con beneficios asociados a tiendas y Yape/Plin.",
+                    "markdown": "- [Cuenta Digital BCP](https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp) : Sin costo de mantenimiento y operaciones digitales gratuitas.\n- [Cuenta Digital Banco Falabella](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una) : Activación rápida con beneficios asociados a tiendas y Yape/Plin.[[1]](https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp)[[2]](https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta Digital BCP",
+                        "description": null,
+                        "url": "https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp",
+                        "domain": "www.viabcp.com"
+                      },
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta Digital Banco Falabella",
+                        "description": null,
+                        "url": "https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una",
+                        "domain": "www.bancofalabella.pe"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BCP",
+                        "domain": "www.viabcp.com",
+                        "url": "https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp",
+                        "title": "Abre tu Cuenta Digital BCP 100% Online y sin Mantenimiento",
+                        "text": "* Cuenta Digital BCP: 100% online, sin mantenimiento, saldo mínimo S/ 0.00 / $ 0.00. * Moneda: Soles o dólares. * Operaciones digi..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Banco Falabella Perú",
+                        "domain": "www.bancofalabella.pe",
+                        "url": "https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una",
+                        "title": "Cuenta Digital: abre tu cuenta Banco Falabella 100% online",
+                        "text": "¿Qué es una cuenta digital?​. Una Cuenta Digital es una cuenta de ahorros que abres y gestionas 100% por internet: la activas, con..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si lo deseas, dime qué banco prefieres o qué beneficio buscas (como mejor tasa de interés o retiros ilimitados) para recomendarte la opción ideal.",
+                    "markdown": "Si lo deseas, dime **qué banco prefieres** o **qué beneficio buscas** (como mejor tasa de interés o retiros ilimitados) para recomendarte la opción ideal.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Banco Falabella Perú",
+                    "domain": "www.bancofalabella.pe",
+                    "url": "https://www.bancofalabella.pe/cuenta-digital-que-es-y-como-abrir-una",
+                    "title": "Cuenta Digital: abre tu cuenta Banco Falabella 100% online",
+                    "text": "¿Qué es una cuenta digital?​. Una Cuenta Digital es una cuenta de ahorros que abres y gestionas 100% por internet: la activas, con..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "www.bbva.pe",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                    "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancaria..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BCP",
+                    "domain": "www.viabcp.com",
+                    "url": "https://www.viabcp.com/cuentas/cuenta-ahorro/cuenta-digital-bcp",
+                    "title": "Abre tu Cuenta Digital BCP 100% Online y sin Mantenimiento",
+                    "text": "* Cuenta Digital BCP: 100% online, sin mantenimiento, saldo mínimo S/ 0.00 / $ 0.00. * Moneda: Soles o dólares. * Operaciones digi..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "www.bbva.pe",
+                    "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro/guia-facil-para-abrir-una-cuenta-digital.html",
+                    "title": "Guía fácil para abrir una cuenta digital | BBVA Perú",
+                    "text": "Abre tu Cuenta Digital sin salir de casa. 1 Descarga el APP BBVA y elige “Hazte cliente”; 2 Ingresa tus datos y valida tu identida..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Scotiabank",
+                    "domain": "www.scotiabank.com.pe",
+                    "url": "https://www.scotiabank.com.pe/blog/que-es-cuenta-digital-como-abrirla",
+                    "title": "¿Qué es una cuenta digital y cómo abrir una? | Scotiabank Blog",
+                    "text": "- Entidad: Scotiabank (Nueva Cuenta Digital) - Gestión: Online vía Banca por Internet o App Móvil (sin intermediario físico) - Cos..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "¿Un momento libre y tu celular a la mano? Con eso puedes abrir tu ...",
+                    "domain": "www.facebook.com",
+                    "url": "https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/1335128191710826/",
+                    "title": "Cuenta Digital BBVA",
+                    "text": "¿Un momento libre y tu celular a la mano? 🤳 Con eso puedes abrir tu Cuenta Digital BBVA desde la App al toque y sin interrumpir t..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "YouTube",
+                    "domain": "www.youtube.com",
+                    "url": "https://www.youtube.com/watch?v=31exVlQBht8",
+                    "title": "Digital account: what it is, benefits, and how to open one",
+                    "text": "¿qué es una cuenta. digital es una cuenta que te permite. administrar tu dinero y realizar gran parte de tus. operaciones desde ca..."
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 1,
+                "rank_absolute": 2,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Con tu cuenta digital, ahorrar y manejar tu dinero es más ...",
+                "url": "https://www.facebook.com/ACAPdom/posts/con-tu-cuenta-digital-ahorrar-y-manejar-tu-dinero-es-m%C3%A1s-f%C3%A1cil-descubre-todo-lo-/1574519698050080/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "3 reacciones  ·  hace 1 semana",
+                "website_name": "Facebook · Asociación Cibao de Ahorros y Préstamos",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "✓ 0% de comisión por mantenimiento mensual, para que tus ahorros sigan creciendo. ✓Realiza pagos, consultas y transacciones de forma segura a ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "0% de comisión por mantenimiento mensual"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "people_also_ask",
+                "rank_group": 1,
+                "rank_absolute": 3,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]",
+                "items": [
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué es una cuenta digital?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Cuáles son los bancos digitales en el Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué bancos tienen cuenta digital?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco es mejor para abrir una cuenta digital?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 2,
+                "rank_absolute": 4,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+                "domain": "ifs.com.pe",
+                "title": "Interbank presenta la primera cuenta digital para menores ...",
+                "url": "https://ifs.com.pe/web/guest/blog/sala-de-prensa/cuenta-joven",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://ifs.com.pe › blog › sala-de-prensa › cuenta-joven",
+                "website_name": "Intercorp Financial Services",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Interbank presenta Cuenta Joven, la primera cuenta 100% digital de un banco en el Perú diseñada para menores entre 8 y 17 años con acompañamiento.​",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Interbank presenta Cuenta Joven"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "short_videos",
+                "rank_group": 1,
+                "rank_absolute": 5,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[8]/div[1]",
+                "title": "Videos cortos",
+                "items": [
+                  {
+                    "type": "short_videos_element",
+                    "title": "Haz crecer tu dinero con una Cuenta Digital y ten una tasa de ...",
+                    "url": "https://www.facebook.com/ScotiabankPE/videos/aprovecha-una-tasa-de-97-trea-por-3-meses/1609011724292777/",
+                    "domain": "google.com",
+                    "source": "Scotiabank Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Obtén 9.7% TREA en soles por 3 meses al abrir tu Cuenta ...",
+                    "url": "https://www.facebook.com/ScotiabankPE/videos/disfruta-una-cuenta-digital-con-beneficios-desde-el-primer-d%C3%ADa/1556399396219750/",
+                    "domain": "google.com",
+                    "source": "Scotiabank Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¡Tu cuenta digital empieza con un clic!",
+                    "url": "https://www.youtube.com/shorts/GW28sAlwgPI",
+                    "domain": "google.com",
+                    "source": "Banco GNB Paraguay"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¡Ya no necesitas ir al banco! Apertura tu cuenta digital BCP ...",
+                    "url": "https://www.facebook.com/bancodecreditobcp/videos/hazlo-100-online/812716798088236/",
+                    "domain": "google.com",
+                    "source": "Banco de Crédito BCP"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Listo para abrir tu Cuenta de Ahorro Bancom ...",
+                    "url": "https://www.instagram.com/reel/DZgIOnlu045/",
+                    "domain": "google.com",
+                    "source": "Bancom"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "La Cuenta Digital BBVA es el camino para tu negocio",
+                    "url": "https://www.youtube.com/shorts/CIPJxKmYGwg",
+                    "domain": "google.com",
+                    "source": "BBVA en Colombia"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Todos ganan con Scotiabank. Abre tu Cuenta Digital y recibe S ...",
+                    "url": "https://www.facebook.com/ScotiabankPE/videos/inscr%C3%ADbete-aqu%C3%AD/2308191206362771/",
+                    "domain": "google.com",
+                    "source": "Scotiabank Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Abre una Cuenta Digital y realiza transferencias sin costo ...",
+                    "url": "https://www.facebook.com/ScotiabankPE/videos/abre-tu-cuenta-digital/1421303238945661/",
+                    "domain": "google.com",
+                    "source": "Scotiabank Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Pensando en retirar tu AFP? Tu Cuenta Digital BBVA es la ...",
+                    "url": "https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/815591821270396/",
+                    "domain": "google.com",
+                    "source": "BBVA"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Cuenta de Ahorro BCP",
+                    "url": "https://www.facebook.com/bancodecreditobcp/videos/cuenta-de-ahorro-bcp/831661108704727/",
+                    "domain": "google.com",
+                    "source": "Banco de Crédito BCP"
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 3,
+                "rank_absolute": 6,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¿Pensando en retirar tu AFP? Tu Cuenta Digital BBVA es la ...",
+                "url": "https://www.facebook.com/bbvaenperu/videos/cuenta-digital-bbva/815591821270396/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 110 reacciones  ·  hace 11 meses",
+                "website_name": "Facebook · BBVA",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "More videos you may like. Haz que recibir transferencias sea más simple. Con Alias ACH ya no necesitas compartir tu.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2025-11-06 19:18:19 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 4,
+                "rank_absolute": 7,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]",
+                "domain": "apps.apple.com",
+                "title": "‎Prexpe - Cuenta digital - También te podría interesar - App Store",
+                "url": "https://apps.apple.com/pe/app/prexpe-cuenta-digital/id1562711270?see-all=customers-also-bought-apps&platform=iphone",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://apps.apple.com › app › prexpe-cuenta-digital",
+                "website_name": "Apple",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Prexpe - Cuenta digital. También te podría interesar. Ver. iO. Tarjeta sin costo ... Un nuevo mundo digital · Ver. Págalo.pe. Tasas y servicios al instante · Ver ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Prexpe - Cuenta digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 5,
+                "rank_absolute": 8,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡Abre tu Cuenta Digital BCP 100% Online en minutos! Ingresa ...",
+                "url": "https://www.facebook.com/bancodecreditobcp/posts/abre-tu-cuenta-digital-bcp-100-online-en-minutosingresa-a-viabcp-y-sigue-estos-p/2600632219999047/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 120 reacciones  ·  hace 7 años",
+                "website_name": "¡Abre tu Cuenta Digital BCP 100% Online en minutos! Ingresa ... · Banco de Crédito BCP",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Abre tu Cuenta Digital BCP 100% Online en minutos! Ingresa a ViaBCP y sigue estos pasos:",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta Digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2019-10-06 19:18:19 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 6,
+                "rank_absolute": 9,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[13]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Todos ganan con Scotiabank. Abre tu Cuenta Digital y recibe S ...",
+                "url": "https://www.facebook.com/ScotiabankPE/videos/inscr%C3%ADbete-aqu%C3%AD/2308191206362771/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "hace 10 meses",
+                "website_name": "Todos ganan con Scotiabank. Abre tu Cuenta Digital y recibe ... · Scotiabank Perú",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¿no ganaste nada en el bingo de la abuela? No importa, porque con Scotiabank todos ganan. Abre tu cuenta digital y recibe cincuenta soles sin ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuenta digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2025-12-06 19:18:19 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 7,
+                "rank_absolute": 10,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[14]/div[1]/div[1]/div[1]",
+                "domain": "www.youtube.com",
+                "title": "Aperturar cuenta digital en BCP",
+                "url": "https://www.youtube.com/watch?v=9wLga64Xw5o",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 13 k vistas  ·  hace 5 años",
+                "website_name": "YouTube · C.P.C Beltran Valencia Camargo",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Como aperturar una cuenta en Banco de Crédito por internet Aperturar una cuenta digital en BCP es fácil y gratuito, solo entramos a la ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuenta digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2021-02-14 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 8,
+                "rank_absolute": 11,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[15]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡Abre tu Cuenta Digital BCP 100% Online en minutos! Ingresa ...",
+                "url": "https://www.facebook.com/bancodecreditobcp/videos/nueva-cuenta-digital-bcp/1784109395025680/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 reacciones  ·  hace 7 años",
+                "website_name": "Facebook · Banco de Crédito BCP",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Ahora deposita en cualquier Agente BCP solo con el nú... ... Retira efectivo con tu tarjeta de Banco BISA en cajeros BCP sin pagar comisiones.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2019-10-06 19:18:19 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 9,
+                "rank_absolute": 12,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.studocu.com",
+                "title": "Cartilla Informativa Cuenta Digital BCP: Ahorra Sin ...",
+                "url": "https://www.studocu.com/pe/document/universidad-nacional-de-san-agustin-de-arequipa/economia/cartilla-informativa-cuenta-digital-bcp/58028081",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.studocu.com › ... › Economia",
+                "website_name": "Studocu",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Cuenta Digital BCP : Una cuenta sin mantenimiento con saldo mínimo de S/0.00 o US$0.00. Tasas de Interés: TEA de 0% en Soles y Dólares, ideales para ahorros.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": {
+                  "rating_type": "Max5",
+                  "value": 5,
+                  "votes_count": 1,
+                  "rating_max": 5
+                },
+                "price": null,
+                "highlighted": [
+                  "Cuenta Digital BCP"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 10,
+                "rank_absolute": 13,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                "domain": "www.gob.pe",
+                "title": "Abrir una cuenta bancaria digital para cobrar el Bono 600",
+                "url": "https://www.gob.pe/12556-abrir-una-cuenta-bancaria-digital-para-cobrar-el-bono-600",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.gob.pe › 12556-abrir-una-cuenta-bancaria-...",
+                "website_name": "Plataforma del Estado Peruano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "31 ago. 2021 — Descarga la aplicación Wayki App de Caja Cusco en la tienda de Apple o Android, ingresa tus datos y verifica tu cuenta. Recoge tu tarjeta de la ...",
+                "pre_snippet": "08/31/2021 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Descarga la aplicación Wayki App de Caja Cusco"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2021-08-31 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 11,
+                "rank_absolute": 14,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "lo que necesitas saber sobre la Cuenta Digital BDI: ➡️ 7 ...",
+                "url": "https://www.instagram.com/p/C6_hUjrotgK/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 80 \"me gusta\"  ·  hace 2 años",
+                "website_name": "Instagram · bancobdi",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Con nuestra Cuenta Alcancía Digital, tu dinero puede trabajar para ti con tasas de interés anual de hasta 7% y de forma 100% digital, sin filas, ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "tu dinero puede trabajar para ti con tasas de interés anual de hasta 7"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 12,
+                "rank_absolute": 15,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Abrir tu cuenta digital es tan fácil y rápido que lo haces en ...",
+                "url": "https://www.instagram.com/reel/CzWIIy6rCVp/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 40 \"me gusta\"  ·  hace 2 años",
+                "website_name": "Instagram · bancofamiliar",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "49 likes, 3 comments - bancofamiliar on November 7, 2023: \"Abrir tu cuenta digital es tan fácil y rápido que lo haces en cuestión de minutos ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuenta digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2024-10-06 19:18:21 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 1,
+                "rank_absolute": 16,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]",
+                "title": "Imágenes",
+                "url": "https://www.google.com/search?sa=N&hl=es&gl=PE&sca_esv=99fa615e217dff4e&sxsrf=APpeQnuvUHgNK3JFtCX-hXGtRHVN_B3Kgw:1791314299938&q=cuenta+digital&udm=2&source=univ&fir=NGZZVzWCYKI5EM%252C9jSN1i0foEH3vM%252C_%253BFp97s-9-h7kE6M%252CTwq7tqUYrDn8nM%252C_%253BMlT3t7C1lv3iqM%252C1imzzKC3fwG7UM%252C_%253B45rvI8tUPCj6xM%252CIIakD1iAvyJiKM%252C_%253BPpxohpxl3CYXWM%252Cbm5qrTFuXxRruM%252C_%253Br_VrD6YyKiJJ6M%252C2W2TYiF164uB8M%252C_%253BcIrYVk3vrDNIAM%252CtCGTpAOczLfprM%252C_%253B581DerFfbWV5jM%252CRaZ71Jir7P9LJM%252C_%253Bs1FsbRnG1_sQAM%252CVPOt1t-sOCQfrM%252C_&usg=AI4_-kQ3tdMttTPCMFOz7o_xsMUTGV_TZQ&ved=2ahUKEwjKnJ3kjaaXAxU5QfEDHd8AIhA4ChDsCXoECBcQBQ",
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "¡Abre tu Cuenta Digital BCP 100% Online en minutos!, Ingresa a ViaBCP y  sigue estos pasos: | Banco de Crédito BCP | Facebook",
+                    "url": "https://www.facebook.com/bancodecreditobcp/videos/nueva-cuenta-digital-bcp/337177617215397/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061918-1987-0139-0000-14c99ae01cc7:0"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Banco BDI | ¡Con la Cuenta Digital BDI obtienes un mayor ...",
+                    "url": "https://www.instagram.com/p/C4TB1loM66b/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061918-1987-0139-0000-14c99ae01cc7:1"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "👉 Cuenta Independencia: muévete como quieras. 👉 Cuenta ...",
+                    "url": "https://www.instagram.com/p/DOW-e1vE8Mo/",
+                    "image_url": "https://api.dataforseo.com/cdn/i/10061918-1987-0139-0000-14c99ae01cc7:2"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Es una cuenta de ahorros 100% digital, que genera una de las ...",
+                    "url": "https://masfinanzas.com.pe/entrevistas/es-una-cuenta-de-ahorros-100-digital-que-genera-una-de-las-tasas-de-interes-anual-mas-altas-del-mercado/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgMFfmmhpVGM_Hc-GgQfF1xpfaYAsmrqC_5brnDEXXIQJqFa8xHm2mIyI&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Aprovecha las ofertas y descuentos en la quincena con tu ...",
+                    "url": "https://www.bbva.pe/blog/mi-guia-digital/aprovecha-las-ofertas-y-descuentos-en-la-quincena-con-tu-cuenta-bancaria.html",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtIL4wvRmRk2mnsKPFdZWqiduOP0RTvLNiyzXEN3tYy52ys-TSgEkHsig&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Cuenta Digital BBVA",
+                    "url": "https://www.youtube.com/watch?v=5L_zH9HcY_g",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgf3YQs53k92y-gNx_DKaPWQqp0I9eMMX4nPj8esNb&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Abre una Cuenta Digital y realiza transferencias sin costo desde tu  celular, 100% digital 🤩📱 | Scotiabank Perú | Facebook",
+                    "url": "https://www.facebook.com/ScotiabankPE/videos/abre-tu-cuenta-digital/1421303238945661/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlBUtBJEqx-WVtpq0mGk4LLQzYUfjgDntnRkz3bd1iis4v0v4LN6hOp7iohA&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Abrir tu cuenta digital es tan fácil y rápido que lo haces en cuestión de  minutos.🤩🙌🏻 , Descargá la APP y disfrutá de todos los beneficios que te  brinda🎉📱",
+                    "url": "https://www.instagram.com/reel/CzWIIy6rCVp/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSW4DP79vOcHSyZAEDi_6tuVCf_11K1QK90Lj6PNLHGqKYf7Fn1umTP-wbig&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Abre tu Cuenta de AHORRO DIGITAL - Caja Arequipa",
+                    "url": "https://www.cajaarequipa.pe/qu/personas-nisqa/ahorros-nisqa/ahorro-caja-digital-nisqa/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDl-o9jgVDIaQ-f-TVPwelnwhOw6j3iIILcdg_RWCIgdSNdL57mekwGqc&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 13,
+                "rank_absolute": 17,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+                "domain": "apps.apple.com",
+                "title": "Cuenta Digital - App Store - Apple",
+                "url": "https://apps.apple.com/us/app/cuenta-digital/id6449967849?l=zh-Hans-CN&platform=watch",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://apps.apple.com › app › c...",
+                "website_name": "Apple",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Cuenta Digital es tu espacio personal con la Comunidad de Madrid. Desde tu móvil, gestiona trámites, recibe avisos y guarda tus tarjetas de forma sencilla y ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Cuenta Digital es tu espacio personal con la Comunidad de Madrid"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 14,
+                "rank_absolute": 18,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]/div[1]",
+                "domain": "www.youtube.com",
+                "title": "Primera Cuenta de Ahorro Digital",
+                "url": "https://www.youtube.com/watch?v=75UDXnsr4gw",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 562.5 k vistas  ·  hace 3 años",
+                "website_name": "YouTube · BAC Credomatic",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "... cuenta de Ahorro Digital con un solo clic desde donde estés.     Conoce más aquí: https://bacsv.com/nuevacuentadigital ¡Innovamos para ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "cuenta",
+                  "Digital"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2023-01-16 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 15,
+                "rank_absolute": 19,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+                "domain": "es.scribd.com",
+                "title": "Ventajas de la Cuenta Digital BCP | PDF | Bancos",
+                "url": "https://es.scribd.com/document/595080639/BCP",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://es.scribd.com › document › BCP",
+                "website_name": "Scribd",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "- Es gratis. No tiene costo de descarga, ni pago de comisiones. - Contarás con dinero al instante. El dinero ingresará inmediatamente a tu cuenta bancaria. - ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Es gratis"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 16,
+                "rank_absolute": 20,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Abrir tu cuenta digital es súper sencillo   Desde tu celular ...",
+                "url": "https://www.instagram.com/reel/DNyYTPYUneW/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 60 \"me gusta\"  ·  hace 1 año",
+                "website_name": "Instagram · sudamerispy",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¡Solo necesitás tener tu DNI a mano! Mirá lo simple que es arrancar: 1. Descargá la app: Buscá BIX en Google Play y tocá instalar. 2.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2025-10-06 19:18:21 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 17,
+                "rank_absolute": 21,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "Abre tu Cuenta Digital en 7 minutos y 3 simples pasos, solo ...",
+                "url": "https://www.instagram.com/reel/DUJ4MxuDOfV/?hl=es",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 150 \"me gusta\"  ·  hace 8 meses",
+                "website_name": "Instagram · produbancoec",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¡Puedes hacerlo de manera fácil y rápida! Opción 1: Visita la oficina Prosperando más cercana. Opción 2: Ingresa a www.prosperando.co, ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-02-06 19:18:21 +00:00",
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,977 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:15:03.914Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.related.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/related_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "fondo de seguro de depositos",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "sourceModifiedAt": "2026-08-14T14:55:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1434,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1434,
+        "costUsd": 0.01272,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061915-1987-0387-0000-99a1b04ff995",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01272,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01272,
+    "tasks": [
+      {
+        "id": "10061915-1987-0387-0000-99a1b04ff995",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0390 sec.",
+        "cost": 0.01272,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "related_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "related_keywords",
+          "se_type": "google",
+          "keyword": "fondo de seguro de depositos",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "depth": 3,
+          "limit": 300,
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "fondo de seguro de depositos",
+            "seed_keyword_data": {
+              "se_type": "google",
+              "keyword": "fondo de seguro de depositos",
+              "location_code": 2604,
+              "language_code": "es",
+              "keyword_info": {
+                "se_type": "google",
+                "last_updated_time": "2026-09-12 15:15:53 +00:00",
+                "competition": 0,
+                "competition_level": "LOW",
+                "cpc": 0.37,
+                "search_volume": 1600,
+                "low_top_of_page_bid": null,
+                "high_top_of_page_bid": null,
+                "categories": [
+                  10012,
+                  10095,
+                  11828
+                ],
+                "monthly_searches": [
+                  {
+                    "year": 2026,
+                    "month": 8,
+                    "search_volume": 1300
+                  },
+                  {
+                    "year": 2026,
+                    "month": 7,
+                    "search_volume": 1300
+                  },
+                  {
+                    "year": 2026,
+                    "month": 6,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2026,
+                    "month": 5,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2026,
+                    "month": 4,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 3,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 2,
+                    "search_volume": 1300
+                  },
+                  {
+                    "year": 2026,
+                    "month": 1,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2025,
+                    "month": 12,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2025,
+                    "month": 11,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2025,
+                    "month": 10,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2025,
+                    "month": 9,
+                    "search_volume": 2400
+                  }
+                ],
+                "search_volume_trend": {
+                  "monthly": 0,
+                  "quarterly": -19,
+                  "yearly": -32
+                }
+              },
+              "keyword_info_normalized_with_bing": null,
+              "keyword_info_normalized_with_clickstream": null,
+              "clickstream_keyword_info": null,
+              "keyword_properties": {
+                "se_type": "google",
+                "core_keyword": "fondo de seguro de deposito",
+                "synonym_clustering_algorithm": "text_processing",
+                "keyword_difficulty": 0,
+                "detected_language": "es",
+                "is_another_language": false
+              },
+              "serp_info": {
+                "se_type": "google",
+                "check_url": "https://www.google.com/search?q=fondo%20de%20seguro%20de%20depositos&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                "serp_item_types": [
+                  "organic",
+                  "people_also_ask",
+                  "video",
+                  "short_videos",
+                  "related_searches",
+                  "knowledge_graph",
+                  "google_reviews"
+                ],
+                "se_results_count": 127,
+                "last_updated_time": "2026-07-12 19:29:19 +00:00",
+                "previous_updated_time": "2026-04-16 17:33:10 +00:00"
+              },
+              "avg_backlinks_info": {
+                "se_type": "google",
+                "backlinks": 18,
+                "dofollow": 13.1,
+                "referring_pages": 17.9,
+                "referring_domains": 12.2,
+                "referring_main_domains": 8.4,
+                "rank": 27.5,
+                "main_domain_rank": 426.6,
+                "last_updated_time": "2026-07-12 19:29:19 +00:00"
+              },
+              "search_intent_info": {
+                "se_type": "google",
+                "main_intent": "commercial",
+                "foreign_intent": null,
+                "last_updated_time": "2026-04-29 07:24:45 +00:00"
+              }
+            },
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 6,
+            "items_count": 6,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "fondo de seguro de depositos",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 15:15:53 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": 0.37,
+                    "search_volume": 1600,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10095,
+                      11828
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 2400
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -19,
+                      "yearly": -32
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "fondo de seguro de deposito",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=fondo%20de%20seguro%20de%20depositos&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches",
+                      "knowledge_graph",
+                      "google_reviews"
+                    ],
+                    "se_results_count": 127,
+                    "last_updated_time": "2026-07-12 19:29:19 +00:00",
+                    "previous_updated_time": "2026-04-16 17:33:10 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 18,
+                    "dofollow": 13.1,
+                    "referring_pages": 17.9,
+                    "referring_domains": 12.2,
+                    "referring_main_domains": 8.4,
+                    "rank": 27.5,
+                    "main_domain_rank": 426.6,
+                    "last_updated_time": "2026-07-12 19:29:19 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 07:24:45 +00:00"
+                  }
+                },
+                "depth": 0,
+                "related_keywords": [
+                  "fondo de seguro de depósito 2026",
+                  "fondo de seguro de depositos peru",
+                  "monto del fondo de seguro de deposito",
+                  "fondo de seguro de depósito sbs monto",
+                  "fondo de seguro de depósito cooperativo",
+                  "fondo de seguro de depósito cajas municipales",
+                  "que entidades financieras no son cubiertas por el fondo de seguro de depósito",
+                  "fondo seguro es confiable"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "fondo de seguro de depósito 2026",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 21:31:19 +00:00",
+                    "competition": 0.01,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 140,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10095,
+                      11828
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": [
+                      "commercial"
+                    ],
+                    "last_updated_time": "2026-05-02 14:40:13 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "fondo seguro es confiable",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 18:37:41 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10095,
+                      11828
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 110
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -50,
+                      "yearly": -86
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-05 10:16:59 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "fondo de seguro de depositos peru",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 04:03:21 +00:00",
+                    "competition": 0.01,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10093,
+                      10095,
+                      11817,
+                      11828,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 40
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 40,
+                      "quarterly": 75,
+                      "yearly": 133
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "fondo de seguro de deposito peru",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 49,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": null,
+                    "serp_item_types": null,
+                    "se_results_count": null,
+                    "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": [
+                      "informational"
+                    ],
+                    "last_updated_time": "2026-07-13 02:22:14 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "monto del fondo de seguro de deposito",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 02:42:41 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10093,
+                      10095,
+                      11817,
+                      11828,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-07-13 02:23:30 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "fondo de seguro de depósito cooperativo",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 13:02:57 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10095,
+                      11828
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "fondo de seguro de deposito cooperativas",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": null,
+                    "serp_item_types": null,
+                    "se_results_count": null,
+                    "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-02 16:09:41 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

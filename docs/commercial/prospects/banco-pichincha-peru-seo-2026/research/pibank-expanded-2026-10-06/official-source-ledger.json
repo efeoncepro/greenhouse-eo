@@ -1,0 +1,124 @@
+{
+  "consulted_at": "2026-10-06",
+  "sources": [
+    {
+      "id": "SRC-PIBANK",
+      "url": "https://pibank.pe/cuenta-soles-pibank/",
+      "type": "primary",
+      "summary": "Cuenta Soles: ahorro digital sin medios de pago; tasa pública5%TREA, sin mantenimiento ni saldo mínimo. Verificar cartilla/tarifario antes de publicar, no trasladar tasa2027.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-IDENTITY",
+      "url": "https://pibank.pe/quienes-somos/",
+      "type": "primary",
+      "summary": "Marca Pibank pertenece a Banco Pichincha Perú; entidad legal importa para identidad y cobertura.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-BBVA",
+      "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+      "type": "primary",
+      "summary": "Cuenta Digital con débito/Plin/pagos, TREA0%publicada; ahorro transaccional tiene distinta propuesta de uso.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-INTERBANK",
+      "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+      "type": "primary",
+      "summary": "SúperTasa escalonada por saldo; hasta4,5%headline no corresponde automáticamente al ticketS10.000.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-BCP",
+      "url": "https://www.viabcp.com/abrir-cuenta",
+      "type": "primary",
+      "summary": "Página de apertura multiproducto; no atribuir una sola tasa al banco.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-SCOTIA",
+      "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+      "type": "primary",
+      "summary": "CuentaPower distinta de Digital; comparar condiciones propias y noheadline general.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-SCOTIA-DIGITAL",
+      "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital?cliente=false",
+      "type": "primary",
+      "summary": "CuentaDigital permite operación cotidiana; comparación por tarea y funciones.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-EFECTIBANK",
+      "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+      "type": "primary",
+      "summary": "Ahorro4,5%TREA publicado, sin mantenimiento/minapertura; débito digital/pagos y libre disponibilidad.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-SBS",
+      "url": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/compara-y-elige",
+      "type": "primary",
+      "summary": "Comparar TREA, cargos, requisitos y supervisión; usar fuentes de producto y condiciones equivalentes.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-SBS-RETASAS",
+      "url": "https://www.sbs.gob.pe/usuarios/informate-y-compara/compara-productos-financieros/compara-rendimiento-de-depositos",
+      "type": "primary",
+      "summary": "Herramienta pública para comparar rendimiento; no se extrajo matriz de tasas ni se inventaron datos.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-FSD",
+      "url": "https://fsd.org.pe/cobertura/",
+      "type": "primary",
+      "summary": "S123.000 máximo periodo septiembre–noviembre2026. Cobertura por depositante/institución miembro, no por marca; verificar periodo/condiciones antes de publicar.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-GOOGLE-YMYL",
+      "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+      "type": "primary",
+      "summary": "Confianza y exactitud tienen mayor peso en temas que afectan estabilidad financiera; fuentes, autoría y revisión humana.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-GOOGLE-AI",
+      "url": "https://developers.google.com/search/docs/appearance/ai-features",
+      "type": "primary",
+      "summary": "Mismas buenas prácticas SEO; sin requisito especial de marcado/archivoIA; indexabilidad/snippet y enlaces ayudan. Sin garantía de aparición.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-DFS-RANKED",
+      "url": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "type": "primary",
+      "summary": "URL requiere esquema; filtros y paginación por total_count; rankings de base no GSC.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-DFS-RELATED",
+      "url": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "type": "primary",
+      "summary": "Expansión relaciones SERP; no prueba equivalencia ni elegibilidad.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-DFS-COMP",
+      "url": "https://docs.dataforseo.com/v3/dataforseo_labs/google/serp_competitors/live/",
+      "type": "primary",
+      "summary": "Competidores para set definido; ranking/posición y cobertura no universo financiero completo.",
+      "snapshot_not_2027_commitment": true
+    },
+    {
+      "id": "SRC-GSC-GENERATIVE",
+      "url": "https://support.google.com/webmasters/answer/16984139?hl=es",
+      "type": "primary",
+      "summary": "Informe de impresiones generativas Google: comprobar disponibilidad por propiedad, cobertura y filtros. Datos incluidos en informe Web; no sumar tráfico. Exportaciones de dato no disponible pueden convertirse en cero; conservar contexto de interfaz. No asumir API ni GSC accesible.",
+      "snapshot_not_2027_commitment": true
+    }
+  ]
+}

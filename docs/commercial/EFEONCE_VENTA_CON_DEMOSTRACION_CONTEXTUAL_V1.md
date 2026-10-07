@@ -1,6 +1,6 @@
 # Venta con demostración contextual — metodología comercial de Efeonce
 
-Fecha: 2026-09-30. Uso interno. Owner: Comercial / Julio Reyes.
+Fecha: 2026-09-30. Actualización de caso: 2026-10-06. Uso interno. Owner: Comercial / Julio Reyes.
 Estado: **diferenciador reconocido por el operador el 2026-09-30; sistematización operativa propuesta**.
 No modifica stages de HubSpot, precios, oferta ni obligaciones de delivery. No constituye una política
 obligatoria para todas las oportunidades ni una prueba estadística de mejora en conversión.
@@ -37,7 +37,7 @@ prematura. En expansión, la demostración aprovecha el conocimiento acumulado d
 |---|---|---|---|
 | Berel | Notion con una muestra, video con IA, artículo redactado y banners; todavía no existían X-Ray ni el informe de visibilidad de IA | El operador declara en esta conversación que ese trabajo funcionó comercialmente | El método precede a las herramientas. Faltan incorporar al expediente los originales, fecha, feedback y trazabilidad de la decisión; no se atribuye una tasa de conversión |
 | SKY — licitación SEO/AEO | Primera versión del X-Ray, informe de visibilidad de IA y propuesta | Adjudicación documentada el 23/09/2026 en el [workspace SKY](tenders/sky-blog-2026/README.md); el operador identifica la milla extra como factor de éxito | La demostración acompañó una venta ganada. También influyeron relación previa, alcance, condiciones económicas, equipo y cumplimiento; no puede aislarse una causa única |
-| Banco Pichincha Perú | X-Ray personalizado con landing, artículo, radiografía y derivados; diagnóstico de visibilidad documentado en el caso; brochure y muestra de Insights preparados para el correo previo | Oportunidad abierta con reunión agendada; paquete y CRM en el [Prospect Case](prospects/banco-pichincha-peru-seo-2026/PROSPECT-CASE.md) y construcción en el [dossier X-Ray](../think/aeo-xray-implementation-dossier-2026-09-30.md) | Aplicación actual del patrón, todavía sin cierre ganado. Preparación y publicación no prueban envío, lectura ni aprobación del prospecto |
+| Banco Pichincha Perú / Pibank | X-Ray sobre Banco Pichincha con landing, artículo, radiografía y derivados; diagnóstico, brochure y muestra de Insights | Reunión del 06/10: según el [registro de reunión](prospects/banco-pichincha-peru-seo-2026/MEETING-2026-10-06.md), Jesús comprendió la metodología tras el recorrido y pidió propuesta técnica/caso de captación para Pibank. [Expediente](prospects/banco-pichincha-peru-seo-2026/PROSPECT-CASE.md), [caso 2027](prospects/banco-pichincha-peru-seo-2026/BUSINESS-CASE-2027.md) y [dossier X-Ray](../think/aeo-xray-implementation-dossier-2026-09-30.md) | Hay feedback y siguiente entregable; no acredita presupuesto, adjudicación ni efecto causal de la demo. Pibank es el foco de la propuesta; la muestra y diagnóstico anteriores no describen automáticamente su dominio |
 
 La declaración sobre Berel es evidencia del aprendizaje del operador, no una reconstrucción documental
 independiente. Los estados de los casos están fechados; HubSpot y los expedientes dueños gobiernan su
@@ -118,6 +118,12 @@ Relacionar la necesidad validada con el servicio, capacidad, responsabilidades d
 y condiciones. En licitación, conservar los formatos, entregables y canales exigidos; la demostración
 complementa la oferta admisible, nunca sustituye las bases.
 
+Cuando el comprador solicita contribución cuantificada, acompañar el alcance con el
+[método propuesto de caso de negocio SEO/AEO](SEO_AEO_BUSINESS_CASE_METHOD_V1.md): demanda y meta,
+dos trayectorias, outcome verificable, inversión y supuestos explícitos. La demo acredita capacidad de
+ejecución; no reemplaza evidencia económica ni garantiza conversiones. Si no hay más datos privados,
+avanzar en preparación con fuentes públicas y supuestos provisionales rotulados.
+
 ### G. Cerrar el siguiente paso y acumular aprendizaje
 
 Acordar acción, responsable y fecha. Registrar en HubSpot sólo lo autorizado y contrastado. Preservar
@@ -165,7 +171,8 @@ para esta metodología en este documento.
 
 1. Recuperar el paquete original y feedback comercial de Berel.
 2. Recoger feedback de SKY que permita distinguir el valor de la muestra del de otros factores.
-3. Registrar reacción, próximo paso y eventual resultado de Banco Pichincha.
+3. Continuar desde el feedback y pedido registrados el 06/10 para Pibank; registrar entrega, evaluación
+   y eventual resultado comercial en su expediente, sin inferir aprobación desde la reacción a la muestra.
 4. Estimar inversión real de estos casos para definir una intensidad sostenible.
 5. Contrastar casos ganados, perdidos y detenidos antes de fijar un estándar obligatorio.
 

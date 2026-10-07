@@ -1,0 +1,46 @@
+{
+  "preparedAt": "2026-10-06",
+  "state": "local_review_prepared",
+  "client": "Pibank Perú — Banco Pichincha Perú",
+  "scope": "Research, modelo editable, paquete ejecutivo/técnico y demo DEV",
+  "approval": "Revisión del operador y banco pendientes; sin fee aprobado, envío, publicación ni deploy",
+  "files": [
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027/Pibank-Resumen-ejecutivo-2027.pdf",
+      "sha256": "46ed1a14ad9ce85592cc80dfc75fa79359f9a6b6aef71d2aadf912c70c979be5",
+      "bytes": 76675,
+      "pages": 2
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027/deck/PIBANK-PROPUESTA-2027.pdf",
+      "sha256": "6b80cfebb59ce424ee524a7df9adc317503dd15e0e05d8c5f801f16d7ba17190",
+      "bytes": 2366980,
+      "pages": 12
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027/Pibank-Anexo-tecnico-2027.pdf",
+      "sha256": "92202b3183767a35b3f54174ecd3b82cc22d1bf6e2a96b116a6853431f2c3300",
+      "bytes": 303004,
+      "pages": 7
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/modelo/Pibank-caso-negocio-2027.xlsx",
+      "sha256": "275722eabca7c1d373203acf6a0c1ceb9adaa9e29a8ad9a10e899a969606c9a9",
+      "bytes": 30489
+    },
+    {
+      "path": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027/pibank-xray-case/manifest.json",
+      "sha256": "01c6afe5135a2e328ab6fefd75d92d76048c3e389dc153b63ad0629c8a68432b",
+      "bytes": 70860
+    }
+  ],
+  "preview": "http://127.0.0.1:4355/aeo-xray/r/fixture-client",
+  "modelNativeChecks": 12,
+  "demoMainChecks": 183,
+  "demoAdditionalChecks": 21,
+  "demandProxyMonthly": 3900,
+  "demandNature": "Subtotal histórico selectivo; no TAM/personas/forecast2027",
+  "finance": "CAC,ROI,payback N/D hasta inputs y validaciones aplicables",
+  "sourceCase": "docs/commercial/prospects/banco-pichincha-peru-seo-2026",
+  "qa": "docs/audits/commercial/2026-10-06-pibank-proposal-package-qa.md"
+}

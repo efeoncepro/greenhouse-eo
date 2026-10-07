@@ -1,0 +1,5540 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:14:16.923Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.keyword.suggestions.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/keyword_suggestions/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "intereses cuenta de ahorros",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.06,
+    "estimateStatus": "available",
+    "maxUsd": 0.06,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live/",
+      "sourceModifiedAt": "2026-08-14T14:59:52.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1176,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1176,
+        "costUsd": 0.01788,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061914-1987-0399-0000-63e24ffcc378",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01788,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01788,
+    "tasks": [
+      {
+        "id": "10061914-1987-0399-0000-63e24ffcc378",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0821 sec.",
+        "cost": 0.01788,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "keyword_suggestions",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "keyword_suggestions",
+          "se_type": "google",
+          "keyword": "intereses cuenta de ahorros",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": false,
+          "include_serp_info": true,
+          "limit": 400,
+          "offset": 0,
+          "order_by": [
+            "keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "intereses cuenta de ahorros",
+            "seed_keyword_data": null,
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 49,
+            "items_count": 49,
+            "offset": 0,
+            "offset_token": "eyJDdXJyZW50T2Zmc2V0Ijo0OSwiUmVxdWVzdERhdGEiOnsia2V5d29yZCI6ImludGVyZXNlcyBjdWVudGEgZGUgYWhvcnJvcyIsImluY2x1ZGVfc2VlZF9rZXl3b3JkIjpmYWxzZSwiZnVsbF9tYXRjaCI6ZmFsc2UsImxvYWRfc2VycF9pbmZvIjp0cnVlLCJzZWFyY2hfYWZ0ZXJfdG9rZW4iOm51bGwsImlnbm9yZV9zeW5vbnltcyI6ZmFsc2UsImxhbmd1YWdlIjoiZXMiLCJzZWFyY2hfZW5naW5lIjoiZ29vZ2xlIiwibG9jYXRpb24iOjI2MDQsInVzZV9uZXdfY2F0ZWdvcmllcyI6dHJ1ZSwib3JkZXJfYnkiOnsib3JkZXJfZmllbGQiOiJrZXl3b3JkX2luZm8uc2VhcmNoX3ZvbHVtZSIsIm9yZGVyX3R5cGUiOiJEZXNjIiwibmV4dCI6bnVsbH0sImxpbWl0Ijo0MDAsIm9mZnNldCI6MCwiYWlkIjoxOTg3OTIsInVzZV9jYWNoZSI6dHJ1ZSwidGFza19pZCI6IjEwMDYxOTE0LTE5ODctMDM5OS0wMDAwLTYzZTI0ZmZjYzM3OCIsImZsYWdzIjpudWxsfSwiUmF3UXVlcnkiOm51bGwsIklkIjoiNjU4ZjI1MjYtOWI0Ni00YmI3LThiZjYtNjY3ZjA1NGY0MzBmIiwiU2VhcmNoQWZ0ZXJEYXRhIjpbLTkyMjMzNzIwMzY4NTQ3NzU4MDgsImY4YWQ1NmNlLWMyY2YtMGY3Zi05OWRjLTBhZjkwMGZkMWVmMSJdLCJFeGVjdXRvciI6LTkxODQ0MDU5NDA0NDQ1MTc2MzN9",
+            "items": [
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 21:31:51 +00:00",
+                  "competition": 0.66,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.12,
+                  "search_volume": 210,
+                  "low_top_of_page_bid": 0.3,
+                  "high_top_of_page_bid": 1.26,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 390
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 260
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 320
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -48
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "interés de cuenta de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 0,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 4
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=intereses%20cuenta%20de%20ahorros&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 34200000,
+                  "last_updated_time": "2021-05-25 08:57:10 +00:00",
+                  "previous_updated_time": "2021-01-13 10:44:35 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:33:45 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses en cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 18:14:50 +00:00",
+                  "competition": 0.66,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.12,
+                  "search_volume": 210,
+                  "low_top_of_page_bid": 0.3,
+                  "high_top_of_page_bid": 1.26,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 390
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 260
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 320
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -48
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "interés de cuenta de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 0,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 12:48:19 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 00:06:24 +00:00",
+                  "competition": 0.66,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.12,
+                  "search_volume": 210,
+                  "low_top_of_page_bid": 0.3,
+                  "high_top_of_page_bid": 1.26,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 390
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 210
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 170
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 260
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 320
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -48
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "interés de cuenta de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 0,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cuenta%20de%20ahorros%20con%20intereses&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&glp=1&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 15700000,
+                  "last_updated_time": "2024-12-12 15:56:44 +00:00",
+                  "previous_updated_time": null
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 142.7,
+                  "dofollow": 135.3,
+                  "referring_pages": 139.6,
+                  "referring_domains": 7,
+                  "referring_main_domains": 5,
+                  "rank": 98.7,
+                  "main_domain_rank": 332.6,
+                  "last_updated_time": "2024-12-12 15:56:45 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 19:43:04 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros que genera intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 08:34:03 +00:00",
+                  "competition": 0.73,
+                  "competition_level": "HIGH",
+                  "cpc": 2.41,
+                  "search_volume": 30,
+                  "low_top_of_page_bid": 0.41,
+                  "high_top_of_page_bid": 1.6,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 20
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -33,
+                    "quarterly": 0,
+                    "yearly": -50
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta ahorro que genere intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 20:00:20 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros que paga mas intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 17:44:43 +00:00",
+                  "competition": 0.73,
+                  "competition_level": "HIGH",
+                  "cpc": 1.28,
+                  "search_volume": 30,
+                  "low_top_of_page_bid": 0.29,
+                  "high_top_of_page_bid": 1.14,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 20
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 100,
+                    "quarterly": 100,
+                    "yearly": 100
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 06:09:12 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 23:10:13 +00:00",
+                  "competition": 0.51,
+                  "competition_level": "MEDIUM",
+                  "cpc": 0.99,
+                  "search_volume": 30,
+                  "low_top_of_page_bid": 0.2,
+                  "high_top_of_page_bid": 1.5,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 50
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -50,
+                    "quarterly": -50,
+                    "yearly": -67
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "interés de cuenta de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 0,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 4
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cuenta%20de%20ahorros%20intereses&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 31500000,
+                  "last_updated_time": "2022-03-13 14:57:56 +00:00",
+                  "previous_updated_time": "2021-12-06 17:50:08 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-26 05:49:56 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que banco paga mas intereses por cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 15:09:40 +00:00",
+                  "competition": 0.86,
+                  "competition_level": "HIGH",
+                  "cpc": 0.45,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-25 15:11:14 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros bbva intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 08:13:27 +00:00",
+                  "competition": 0.29,
+                  "competition_level": "LOW",
+                  "cpc": 4.31,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "bbva cuenta de ahorros intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 05:38:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con mas intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 01:21:42 +00:00",
+                  "competition": 0.75,
+                  "competition_level": "HIGH",
+                  "cpc": 2.37,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.32,
+                  "high_top_of_page_bid": 1.9,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -50
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "keyword_metrics",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-24 18:44:25 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que cuenta de ahorros da mas intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 17:29:47 +00:00",
+                  "competition": 0.75,
+                  "competition_level": "HIGH",
+                  "cpc": 1.41,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.36,
+                  "high_top_of_page_bid": 1.63,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-04-29 20:44:16 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con intereses altos",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 23:42:58 +00:00",
+                  "competition": 0.56,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.53,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.31,
+                  "high_top_of_page_bid": 1.45,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-05-02 14:30:15 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "simulador de intereses cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 01:28:05 +00:00",
+                  "competition": 0.86,
+                  "competition_level": "HIGH",
+                  "cpc": 0.47,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": null,
+                    "yearly": null
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 22:37:21 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses ganados en cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 13:27:30 +00:00",
+                  "competition": 0.07,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": null,
+                    "quarterly": null,
+                    "yearly": null
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta de ahorros ganan intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-09-04 05:26:31 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "bbva cuenta de ahorros intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 03:40:27 +00:00",
+                  "competition": 0.31,
+                  "competition_level": "LOW",
+                  "cpc": 3.64,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.98,
+                  "high_top_of_page_bid": 6.57,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -50,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-05-04 03:01:52 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros ganan intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 03:26:33 +00:00",
+                  "competition": 0.86,
+                  "competition_level": "HIGH",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": null
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-26 08:32:33 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "banco pichincha intereses cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 14:20:58 +00:00",
+                  "competition": 0.4,
+                  "competition_level": "MEDIUM",
+                  "cpc": 0.08,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.22,
+                  "high_top_of_page_bid": 0.5,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "keyword_metrics",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-04-29 03:05:22 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "como funcionan los intereses en una cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 09:50:01 +00:00",
+                  "competition": 0,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": null,
+                    "quarterly": null,
+                    "yearly": null
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 17:30:06 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses mensuales cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 23:23:53 +00:00",
+                  "competition": 0,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": null,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta de ahorro con intereses mensuales",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 22:52:23 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros que gana intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 06:03:50 +00:00",
+                  "competition": 0.86,
+                  "competition_level": "HIGH",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 23:55:39 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "bcp cuenta de ahorros intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 15:35:49 +00:00",
+                  "competition": 0,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 03:46:15 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros bancolombia",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 23:18:22 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-28 01:31:30 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "scotiabank intereses cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 17:16:33 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 17:19:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con pago de intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 17:14:18 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 17:15:48 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "como se calculan los intereses de una cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 09:43:40 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 09:45:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros en dolares con intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 15:14:27 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta de ahorro dolares intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-25 15:16:30 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "como calcular los intereses de mi cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 03:21:29 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 03:22:59 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros nu",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 11:00:25 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "intereses de cuenta de ahorros nu",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 11:02:43 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros bbva",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 05:29:18 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "bbva cuenta de ahorros intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 05:31:06 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con intereses peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 22:49:51 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuentas de ahorro con intereses perú",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 22:53:20 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros para ganar intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 09:47:22 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta de ahorros ganan intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "transactional",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-09-04 09:52:21 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros pibank",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 14:28:32 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "navigational",
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-03 14:30:16 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "calculadora intereses cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 01:08:19 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "calculadora de intereses cuenta de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "navigational"
+                  ],
+                  "last_updated_time": "2026-09-04 01:09:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "caja arequipa cuenta de ahorros intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 05:24:37 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 05:25:31 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros bac",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 22:46:46 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "navigational",
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-09-03 22:47:26 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros bac costa rica intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 13:38:04 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-25 13:42:00 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros falabella",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 15:44:20 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-03 15:46:50 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejores intereses en cuenta de ahorros",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 11:53:53 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cuenta de ahorro con mejor interés",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 11:56:31 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que cuenta de ahorros genera mas intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 12:41:43 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "que cuenta de ahorro genera mas intereses",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-25 12:42:36 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros av villas",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 09:40:04 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 09:41:18 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses de cuenta de ahorros bancolombia",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 14:30:40 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "intereses cuenta de ahorros bancolombia",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 14:34:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros colombia",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 14:49:14 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-25 14:51:09 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros con buenos intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 10:58:57 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 11:00:13 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros puc",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 12:37:05 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-25 12:37:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros davivienda",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 14:32:39 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "intereses cuenta de ahorro davivienda",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 14:34:32 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros santander intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 01:08:19 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 01:09:05 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses de cuenta de ahorros nu",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 07:37:54 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-04 07:40:53 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros nubank",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-25 17:33:59 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-09-25 17:34:57 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "intereses cuenta de ahorros bcr",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 14:30:40 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "navigational",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 14:33:03 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuenta de ahorros que de intereses",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 03:21:29 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 03:22:15 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

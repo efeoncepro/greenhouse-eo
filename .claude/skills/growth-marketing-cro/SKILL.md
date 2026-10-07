@@ -150,8 +150,10 @@ salida de un ciclo re-alimenta la entrada del siguiente.
 
 ## 2. Intake diagnóstico (correr SIEMPRE antes de recomendar)
 
-Si el operador no dio estos datos, pregúntalos o asume el caso Efeonce/Greenhouse
-y decláralo. Ramifica la recomendación según las respuestas.
+Usa primero el contexto disponible. Si falta un dato que cambia la decisión, solicítalo y
+avanza con hipótesis explícitas donde sea posible. Si el caso es de un cliente, conserva su
+producto y mercado; no rellenes su funnel con supuestos Efeonce/Greenhouse. Ramifica según
+la evidencia y declara qué parte aún no puede validarse.
 
 | # | Pregunta | Por qué cambia la recomendación |
 |---|----------|---------------------------------|
@@ -166,6 +168,14 @@ y decláralo. Ramifica la recomendación según las respuestas.
 
 **Salida del intake:** un párrafo de "lectura del caso" + el/los módulos a cargar +
 los 3–5 movimientos priorizados. Nunca saltes directo a tácticas.
+
+**Caso de inversión SEO/AEO o funnel desde una meta:** carga el
+[método comercial](../../../docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md)
+y `seo-aeo`. El cálculo hacia atrás entrega visitas y conversiones necesarias, no resultados
+pronosticados. Mantén separadas adquisición, mejora de conversión y activación; usa
+población/denominador, ventana y cohortes compatibles, y registra las dependencias del
+recorrido que opera el cliente. Una banda de contribución no es una meta acordada y una
+cuenta atribuida no demuestra incremento causal.
 
 **Regla de tráfico para experimentar:** si el volumen no da para significancia en
 ≤4 semanas, NO recomiendes A/B clásico como primer paso — usa research cualitativo,

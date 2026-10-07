@@ -1,0 +1,1222 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T17:40:38.107Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.organic.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/organic/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "abrir cuenta de ahorros online",
+        "location_code": 2604,
+        "language_code": "es",
+        "device": "mobile",
+        "depth": 20
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.005,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/",
+      "sourceModifiedAt": "2026-08-14T11:22:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 23012,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 23012,
+        "costUsd": 0.0035,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061740-1987-0139-0000-bee18d189ad7",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0035,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0035,
+    "tasks": [
+      {
+        "id": "10061740-1987-0139-0000-bee18d189ad7",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "21.9596 sec.",
+        "cost": 0.0035,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "organic",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "organic",
+          "keyword": "abrir cuenta de ahorros online",
+          "location_code": 2604,
+          "language_code": "es",
+          "device": "mobile",
+          "depth": 20,
+          "os": "android"
+        },
+        "result": [
+          {
+            "keyword": "abrir cuenta de ahorros online",
+            "type": "organic",
+            "se_domain": "google.com",
+            "location_code": 2604,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=abrir%20cuenta%20de%20ahorros%20online&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+            "datetime": "2026-10-06 17:40:37 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "organic",
+              "ai_overview",
+              "people_also_ask",
+              "short_videos",
+              "images"
+            ],
+            "se_results_count": 0,
+            "pages_count": 2,
+            "items_count": 21,
+            "items": [
+              {
+                "type": "organic",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "trujilloinforma.com",
+                "title": "Abrir cuenta de ahorros digital: guía completa para hacerlo desde tu ...",
+                "url": "https://trujilloinforma.com/abrir-cuenta-de-ahorros-digital-guia-completa-para-hacerlo-desde-tu-celular/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://trujilloinforma.com",
+                "website_name": "trujilloinforma.com",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "13 jun. 2026 — Puedes abrir tu cuenta 100% por Internet en menos de 5 minutos, ingresando los datos de tu DNI y validando tu identidad mediante biometría ...",
+                "pre_snippet": "06/13/2026 00:00:00",
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Puedes abrir tu cuenta 100% por Internet en menos de 5 minutos"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-06-13 00:00:00 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 2,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[3]/div[1]",
+                "asynchronous_ai_overview": false,
+                "markdown": "Puedes abrir tu cuenta de ahorros digital de forma inmediata en la [Cuenta Digital BBVA](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html) o revisar opciones como la [Cuenta Simple de Interbank](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple).[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)\n\n### Requisitos Principales\n\n- Tener a la mano tu **DNI original** vigente.\n- Un **celular** con cámara y conexión a internet para la validación de identidad (toma de fotografía y selfie).\n- Número de **celular personal** y correo electrónico activos.[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.youtube.com/shorts/ktIOXeoqLWk)\n\n### Pasos Generales para la Apertura Online\n\n1. Ingresa a la web oficial del banco de tu preferencia o descarga su aplicación móvil.\n2. Selecciona la opción para abrir una **cuenta 100% digital** o de ahorros en línea.\n3. Completa tus **datos personales** (nombre, DNI, dirección y contacto).\n4. Valida tu identidad mediante una foto de tu documento de identidad y una **selfie** de confirmación.\n5. Recibirás un correo de bienvenida con tu **número de cuenta** y el Código de Cuenta Interbancario (CCI) para empezar a operar.[[1]](https://www.bbva.pe/personas/productos/cuentas/ahorro.html)[[2]](https://www.cajaarequipa.pe/personas/ahorros/ahorro-caja-digital/)[[3]](https://cuentas.bbva.pe/)[[4]](https://www.banbif.com.pe/personas/cuentas/cuenta-ahorro/digital)[[5]](https://www.youtube.com/shorts/ktIOXeoqLWk)\n\nSi me indicas **qué banco prefieres** o si buscas **algún beneficio en particular** (como cero mantenimiento o transferencias gratis), puedo darte los detalles específicos de esa entidad.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Puedes abrir tu cuenta de ahorros digital de forma inmediata en la Cuenta Digital BBVA o revisar opciones como la Cuenta Simple de Interbank.",
+                    "markdown": "Puedes abrir tu cuenta de ahorros digital de forma inmediata en la [Cuenta Digital BBVA](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html) o revisar opciones como la [Cuenta Simple de Interbank](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple).[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta Digital BBVA",
+                        "description": null,
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "domain": "www.bbva.pe"
+                      },
+                      {
+                        "type": "link_element",
+                        "title": "Cuenta Simple de Interbank",
+                        "description": null,
+                        "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple",
+                        "domain": "interbank.pe"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Interbank",
+                        "domain": "interbank.pe",
+                        "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple",
+                        "title": "Cuenta de Ahorro Simple 100% Digital | Interbank​ | Interbank",
+                        "text": "Interbank Cuenta Simple: - 100% digital, soles o dólares. - Apertura: S/0 o US$0. - Mantenimiento: S/0. - Elegibilidad: Peruanos 18-70 años con DNI y celular en..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                        "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancarias gratis hasta S/1,000 o $280."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Requisitos Principales",
+                    "text": "Tener a la mano tu DNI original vigente. Un celular con cámara y conexión a internet para la validación de identidad (toma de fotografía y selfie). Número de celular personal y correo electrónico activos.",
+                    "markdown": "- Tener a la mano tu **DNI original** vigente.\n- Un **celular** con cámara y conexión a internet para la validación de identidad (toma de fotografía y selfie).\n- Número de **celular personal** y correo electrónico activos.[[1]](https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple)[[2]](https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html)[[3]](https://www.youtube.com/shorts/ktIOXeoqLWk)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Interbank",
+                        "domain": "interbank.pe",
+                        "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple",
+                        "title": "Cuenta de Ahorro Simple 100% Digital | Interbank​ | Interbank",
+                        "text": "Interbank Cuenta Simple: - 100% digital, soles o dólares. - Apertura: S/0 o US$0. - Mantenimiento: S/0. - Elegibilidad: Peruanos 18-70 años con DNI y celular en..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                        "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                        "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancarias gratis hasta S/1,000 o $280."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/shorts/ktIOXeoqLWk",
+                        "title": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros!",
+                        "text": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros! oye así es como puedes abrir tu nueva cuenta de ahorro espera pero ahora puedes abrirlo. online desde tu celu..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Pasos Generales para la Apertura Online",
+                    "text": "Ingresa a la web oficial del banco de tu preferencia o descarga su aplicación móvil. Selecciona la opción para abrir una cuenta 100% digital o de ahorros en línea. Completa tus datos personales (nombre, DNI, dirección y contacto). Valida tu identidad mediante una foto de tu documento de identidad y una selfie de confirmación. Recibirás un correo de bienvenida con tu número de cuenta y el Código de Cuenta Interbancario (CCI) para empezar a operar.",
+                    "markdown": "1. Ingresa a la web oficial del banco de tu preferencia o descarga su aplicación móvil.\n2. Selecciona la opción para abrir una **cuenta 100% digital** o de ahorros en línea.\n3. Completa tus **datos personales** (nombre, DNI, dirección y contacto).\n4. Valida tu identidad mediante una foto de tu documento de identidad y una **selfie** de confirmación.\n5. Recibirás un correo de bienvenida con tu **número de cuenta** y el Código de Cuenta Interbancario (CCI) para empezar a operar.[[1]](https://www.bbva.pe/personas/productos/cuentas/ahorro.html)[[2]](https://www.cajaarequipa.pe/personas/ahorros/ahorro-caja-digital/)[[3]](https://cuentas.bbva.pe/)[[4]](https://www.banbif.com.pe/personas/cuentas/cuenta-ahorro/digital)[[5]](https://www.youtube.com/shorts/ktIOXeoqLWk)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "www.bbva.pe",
+                        "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro.html",
+                        "title": "Abre tu Cuenta de Ahorro Online sin Comisiones | Cuenta de Ahorros BBVA| | BBVA Perú",
+                        "text": "BBVA Perú: Cuentas de ahorro online sin comisiones. - S/10M: Sorteo actual para Cuenta Ganadora. - Cuenta Digital: Cero mantenimiento, 1 depósito gratis, apertu..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Caja Arequipa",
+                        "domain": "www.cajaarequipa.pe",
+                        "url": "https://www.cajaarequipa.pe/personas/ahorros/ahorro-caja-digital/",
+                        "title": "Abre tu Cuenta de Ahorros Digital Hoy - Caja Arequipa",
+                        "text": "Requisitos para abrir una cuenta de ahorro. Presentar y entregar Fotocopia del documento oficial de identidad en agencia. Descargar App caja móvil para realizar..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BBVA Perú",
+                        "domain": "cuentas.bbva.pe",
+                        "url": "https://cuentas.bbva.pe/",
+                        "title": "Abrir cuenta de ahorro BBVA - BBVA Perú",
+                        "text": "Abre tu cuenta de ahorros BBVA 100% online. Conoce los requisitos, disfruta de alta rentabilidad y comienza a ahorrar de forma fácil, segura y sin complicacione..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "BanBif",
+                        "domain": "www.banbif.com.pe",
+                        "url": "https://www.banbif.com.pe/personas/cuentas/cuenta-ahorro/digital",
+                        "title": "Cuenta de Ahorro Digital - Abre tu cuenta 100% Digital | BanBif",
+                        "text": "* Producto: Cuenta Ahorro Digital BanBif (100% online) * TREA promocional (01/10/26-31/01/27): 4% soles, 2% dólares (vigente 1 año) * Costos: Sin costo de mante..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/shorts/ktIOXeoqLWk",
+                        "title": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros!",
+                        "text": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros! oye así es como puedes abrir tu nueva cuenta de ahorro espera pero ahora puedes abrirlo. online desde tu celu..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si me indicas qué banco prefieres o si buscas algún beneficio en particular (como cero mantenimiento o transferencias gratis), puedo darte los detalles específicos de esa entidad.",
+                    "markdown": "Si me indicas **qué banco prefieres** o si buscas **algún beneficio en particular** (como cero mantenimiento o transferencias gratis), puedo darte los detalles específicos de esa entidad.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "www.bbva.pe",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro.html",
+                    "title": "Abre tu Cuenta de Ahorro Online sin Comisiones | Cuenta de Ahorros BBVA| | BBVA Perú",
+                    "text": "BBVA Perú: Cuentas de ahorro online sin comisiones. - S/10M: Sorteo actual para Cuenta Ganadora. - Cuenta Digital: Cero mantenimiento, 1 depósito gratis, apertu..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Caja Arequipa",
+                    "domain": "www.cajaarequipa.pe",
+                    "url": "https://www.cajaarequipa.pe/personas/ahorros/ahorro-caja-digital/",
+                    "title": "Abre tu Cuenta de Ahorros Digital Hoy - Caja Arequipa",
+                    "text": "Requisitos para abrir una cuenta de ahorro. Presentar y entregar Fotocopia del documento oficial de identidad en agencia. Descargar App caja móvil para realizar..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "cuentas.bbva.pe",
+                    "url": "https://cuentas.bbva.pe/",
+                    "title": "Abrir cuenta de ahorro BBVA - BBVA Perú",
+                    "text": "Abre tu cuenta de ahorros BBVA 100% online. Conoce los requisitos, disfruta de alta rentabilidad y comienza a ahorrar de forma fácil, segura y sin complicacione..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Interbank",
+                    "domain": "interbank.pe",
+                    "url": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-simple",
+                    "title": "Cuenta de Ahorro Simple 100% Digital | Interbank​ | Interbank",
+                    "text": "Interbank Cuenta Simple: - 100% digital, soles o dólares. - Apertura: S/0 o US$0. - Mantenimiento: S/0. - Elegibilidad: Peruanos 18-70 años con DNI y celular en..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BBVA Perú",
+                    "domain": "www.bbva.pe",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento | BBVA Perú",
+                    "text": "Cuenta Digital BBVA Perú: 100% online. - Sin costo de mantenimiento ni monto mínimo. - Plin gratis. - Transferencias interbancarias gratis hasta S/1,000 o $280."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "BanBif",
+                    "domain": "www.banbif.com.pe",
+                    "url": "https://www.banbif.com.pe/personas/cuentas/cuenta-ahorro/digital",
+                    "title": "Cuenta de Ahorro Digital - Abre tu cuenta 100% Digital | BanBif",
+                    "text": "* Producto: Cuenta Ahorro Digital BanBif (100% online) * TREA promocional (01/10/26-31/01/27): 4% soles, 2% dólares (vigente 1 año) * Costos: Sin costo de mante..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "YouTube",
+                    "domain": "www.youtube.com",
+                    "url": "https://www.youtube.com/shorts/ktIOXeoqLWk",
+                    "title": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros!",
+                    "text": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros! oye así es como puedes abrir tu nueva cuenta de ahorro espera pero ahora puedes abrirlo. online desde tu celu..."
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 2,
+                "rank_absolute": 3,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[4]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Financiera Confianza",
+                "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/est%C3%A9s-donde-est%C3%A9s-tu-dinero-puede-seguir-creciendo-abre-tu-cuenta-ahorro-confian/1095977102798390/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 90 reacciones",
+                "website_name": "Facebook · Financiera Confianza",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Abre tu Cuenta Ahorro Confianza y empieza hoy. ⏳ Vigencia de campaña: Del 01/09/2026 al 30/09/2026 Solicita tu cuenta aquí: https:// ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:30",
+                    "description": null,
+                    "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/est%C3%A9s-donde-est%C3%A9s-tu-dinero-puede-seguir-creciendo-abre-tu-cuenta-ahorro-confian/1095977102798390/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "people_also_ask",
+                "rank_group": 1,
+                "rank_absolute": 4,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[6]/div[1]",
+                "items": [
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco me permite abrir una cuenta online?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[6]/div[1]/div[2]/div[2]/div[1]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco es mejor para abrir una cuenta de ahorros en Perú?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[6]/div[1]/div[2]/div[2]/div[2]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Qué banco es más confiable para abrir una cuenta de ahorro?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[6]/div[1]/div[2]/div[2]/div[3]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "people_also_ask_element",
+                    "title": "¿Es posible abrir una cuenta de ahorros por internet?",
+                    "seed_question": null,
+                    "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[6]/div[1]/div[2]/div[2]/div[4]",
+                    "expanded_element": [
+                      {
+                        "type": "people_also_ask_ai_overview_expanded_element",
+                        "items": null,
+                        "references": null,
+                        "asynchronous_ai_overview": true
+                      }
+                    ]
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 3,
+                "rank_absolute": 5,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[8]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¿Quieres abrir tu cuenta en Caja Piura? Ingresa a nuestro Simulador de ...",
+                "url": "https://www.facebook.com/CajaPiura/posts/quieres-abrir-tu-cuenta-en-caja-piura-ingresa-a-nuestro-simulador-de-ahorros-en-/2584656038211404/?locale=es_LA",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 70 reacciones",
+                "website_name": "Facebook · Caja Piura",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Abrir una cuenta de ahorros en Caja Piura es muy sencillo. Solo debes acercarte a cualquiera de nuestras agencias con tu DOI (Documento original ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Solo debes acercarte a cualquiera de nuestras agencias con tu"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2019-10-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 4,
+                "rank_absolute": 6,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[9]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡Tu dinero merece crecer!  Abre tu Cuenta Ahorro Meta 100% digital y ...",
+                "url": "https://www.facebook.com/AlfinBanco/posts/tu-dinero-merece-crecer-abre-tu-cuenta-ahorro-meta-100-digital-y-accede-a-una-ta/1427555342741831/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 110 reacciones",
+                "website_name": "Facebook · Alfin Banco",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Tu dinero merece crecer! Abre tu Cuenta Ahorro Meta 100% digital y accede a una tasa exclusiva. Hazlo desde dónde estés, ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:25",
+                    "description": null,
+                    "url": "https://www.facebook.com/AlfinBanco/posts/tu-dinero-merece-crecer-abre-tu-cuenta-ahorro-meta-100-digital-y-accede-a-una-ta/1427555342741831/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-07-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 5,
+                "rank_absolute": 7,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[10]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "comenzar a ahorrar ​ ​ Con la Cuenta WOW puedes abrir tu ...",
+                "url": "https://www.instagram.com/reel/DZgHPmQFPTE/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 70 \"me gusta\"",
+                "website_name": "Instagram · compartamosbancoperu",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Con la Cuenta WOW puedes abrir tu cuenta de forma 100% digital y empezar desde el monto que tú quieras.​ ... Haz crecer tus ahorros con una súper ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:27",
+                    "description": null,
+                    "url": "https://www.instagram.com/reel/DZgHPmQFPTE/",
+                    "domain": "www.instagram.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-07-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 6,
+                "rank_absolute": 8,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[11]/div[1]/div[1]",
+                "domain": "www.youtube.com",
+                "title": "¿Cómo abrir una Cuenta Power 100% online? | Cuenta de Ahorros",
+                "url": "https://www.youtube.com/watch?v=dRktcOICqtY",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 9.9 K vistas",
+                "website_name": "YouTube · Scotiabank Perú",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Conoce paso a paso cómo abrir una Cuenta Power 100% online desde tu celular. La cuenta de ahorros que hace crecer tu dinero con la seguridad ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2020-10-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 7,
+                "rank_absolute": 9,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[13]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "portaldeayuda.bolivariano.com",
+                "title": "¿Qué información debo ingresar para abrir una Cuenta de Ahorros Online?",
+                "url": "https://portaldeayuda.bolivariano.com/informaci%C3%B3n-abrir-cuenta-ahorros-online",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://portaldeayuda.bolivariano.com",
+                "website_name": "Banco Bolivariano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Tú número de cédula de identidad. · Es indispensable tu correo electrónico y número de celular. · Información referente a tu situación laboral. · Registra tu ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 8,
+                "rank_absolute": 10,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[15]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¡Que tus ahorros no se queden colgados!🕸️👀​ Un nuevo día es ...",
+                "url": "https://www.instagram.com/p/Dbbytbflibu/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 40 \"me gusta\"",
+                "website_name": "Instagram · banbifperu",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "​​ Sin monto mínimo y sin mantenimiento, para que empezar sea lo más fácil posible.  ​ Abre tu cuenta aquí: https://www.banbif.com.pe /abrir- ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Abre tu cuenta aquí: https://www.banbif.com.pe"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-08-06 17:40:35 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "short_videos",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "right",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[11]/div[3]/div[1]/div[1]/div[17]",
+                "title": "Videos cortos",
+                "items": [
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Listo para abrir tu Cuenta de Ahorro Bancom? ⚽💰 1️⃣ Ingresa a ... de Bancom en Facebook. Reproducir en Facebook. 0:25",
+                    "url": "https://www.facebook.com/Bancom.pe/posts/listo-para-abrir-tu-cuenta-de-ahorro-bancom-1%EF%B8%8F%E2%83%A3-ingresa-a-bancompe2%EF%B8%8F%E2%83%A3-ve-a-produ/1422538796567826/",
+                    "domain": "google.com",
+                    "source": "Bancom"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "🎉¡Ahora puedes abrir online tu Cuenta de Ahorros! 👀 Mira el tutorial y hazlo al ... de Santander Consumer Perú en Facebook. Reproducir en Facebook. 0:56",
+                    "url": "https://www.facebook.com/SantanderConsumerPe/posts/ahora-puedes-abrir-online-tu-cuenta-de-ahorros-mira-el-tutorial-y-hazlo-al-toque/1417044013799523/",
+                    "domain": "google.com",
+                    "source": "Santander Consumer Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "comenzar a ahorrar 💰🙌​ ​ Con la Cuenta WOW puedes abrir tu ... de Compartamos Banco Perú en Instagram. Reproducir en Instagram. 0:27",
+                    "url": "https://www.instagram.com/reel/DZgHPmQFPTE/",
+                    "domain": "google.com",
+                    "source": "Compartamos Banco Perú"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¡Así de fácil es abrir tu Cuenta Ahorro Meta! 📲😉 Empieza a hacer crecer ... de Alfin Banco en Facebook. Reproducir en Facebook. 0:56",
+                    "url": "https://www.facebook.com/AlfinBanco/posts/as%C3%AD-de-f%C3%A1cil-es-abrir-tu-cuenta-ahorro-meta-empieza-a-hacer-crecer-tu-dinero-des/1416790323818333/",
+                    "domain": "google.com",
+                    "source": "Alfin Banco"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¿Listo para abrir tu Cuenta de Ahorro Bancom? ⚽💰 1️⃣ Ingresa a ... de Bancom en Instagram. Reproducir en Instagram. 0:24",
+                    "url": "https://www.instagram.com/reel/DZgIOnlu045/",
+                    "domain": "google.com",
+                    "source": "Bancom"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Financiera Confianza de Financiera Confianza en Facebook. Reproducir en Facebook. 0:30",
+                    "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/est%C3%A9s-donde-est%C3%A9s-tu-dinero-puede-seguir-creciendo-abre-tu-cuenta-ahorro-confian/1095977102798390/",
+                    "domain": "google.com",
+                    "source": "Financiera Confianza"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Caja Huancayo de Caja Huancayo en Facebook. Reproducir en Facebook. 0:16",
+                    "url": "https://www.facebook.com/CajaHuancayo/posts/-abre-tu-cuenta-100-digital-de-forma-f%C3%A1cil-r%C3%A1pida-y-segura-en-el-siguiente-linkh/7706961999317629/",
+                    "domain": "google.com",
+                    "source": "Caja Huancayo"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "¡Tu dinero merece crecer! 🤩 Abre tu Cuenta Ahorro Meta 100% digital y ... de Alfin Banco en Facebook. Reproducir en Facebook. 0:25",
+                    "url": "https://www.facebook.com/AlfinBanco/posts/tu-dinero-merece-crecer-abre-tu-cuenta-ahorro-meta-100-digital-y-accede-a-una-ta/1427555342741831/",
+                    "domain": "google.com",
+                    "source": "Alfin Banco"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "Abre tu cuenta de Ahorros Online - Caja Ica de Caja Ica en Facebook. Reproducir en Facebook. 0:19",
+                    "url": "https://www.facebook.com/CajaMunicipalIca/videos/abre-tu-cuenta-de-ahorros-online/575412180145709/",
+                    "domain": "google.com",
+                    "source": "Caja Ica"
+                  },
+                  {
+                    "type": "short_videos_element",
+                    "title": "📱En solo unos minutos puedes abrir tu Cuenta de Ahorros desde tu celular y ... de Banco Bisa en Facebook. Reproducir en Facebook. 0:20",
+                    "url": "https://www.facebook.com/BancoBisa/videos/en-solo-unos-minutos-puedes-abrir-tu-cuenta-de-ahorros-desde-tu-celular-y-empeza/1791340342109636/",
+                    "domain": "google.com",
+                    "source": "Banco Bisa"
+                  }
+                ],
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 9,
+                "rank_absolute": 11,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.bancointernacional.com.ec",
+                "title": "OB Cuenta Ahorros Persona Natural - Pantalla Inicio",
+                "url": "https://www.bancointernacional.com.ec/ob-cuenta-ahorros-persona-natural-pantalla-inicio/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://www.bancointernacional.com.ec",
+                "website_name": "Banco Internacional",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Abre tu cuenta de ahorro en línea en minutos. Solo necesitas tu cédula, sin monto de apertura y 100% digital.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Abre tu cuenta de ahorro en línea en minutos"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 10,
+                "rank_absolute": 12,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Abre tu Cuenta de Ahorros Online de forma fácil y sencilla, sin ir al banco. ...",
+                "url": "https://www.facebook.com/BancoBolivariano/videos/abre-tu-cuenta-de-ahorros-online-de-forma-f%C3%A1cil-y-sencilla-sin-ir-al-banco-%C3%A1brel/325213515546592/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 90 reacciones",
+                "website_name": "Facebook · Banco Bolivariano",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Hola, estimado. Para abrir una cuenta de ahorros en el banco debe presentar su cédula (original y copia) y la última planilla de servicios ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:12",
+                    "description": null,
+                    "url": "https://www.facebook.com/BancoBolivariano/videos/abre-tu-cuenta-de-ahorros-online-de-forma-f%C3%A1cil-y-sencilla-sin-ir-al-banco-%C3%A1brel/325213515546592/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2020-10-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 11,
+                "rank_absolute": 13,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[3]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "¡Abrir tu Cuenta de ahorro Online es sencillo! Solo debés seguir los ...",
+                "url": "https://www.facebook.com/BDFNicaragua/videos/cuenta-online/964385221142386/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 reacciones",
+                "website_name": "Facebook · BDF Nicaragua",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "¡Abrir tu Cuenta de ahorro Online es sencillo! Solo debés seguir los siguientes pasos al ingresar en http: //bit.ly/CuentaOnlineBDF # ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:27",
+                    "description": null,
+                    "url": "https://www.facebook.com/BDFNicaragua/videos/cuenta-online/964385221142386/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2022-10-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 12,
+                "rank_absolute": 14,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "REPOST @virginialimongis Si quieren abrir su propia Cuenta de ...",
+                "url": "https://www.instagram.com/tv/CZNI3amFPNb/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 170 \"me gusta\"",
+                "website_name": "Instagram · bancobolivariano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "REPOST @virginialimongis. Si quieren abrir su propia Cuenta de Ahorros Online en @bancobolivariano ¡no esperen más!",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2022-10-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 13,
+                "rank_absolute": 15,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "100% digital 📲 • Seguro Protección 360 (Plan Free) 🛡️ ⏳ Campaña válida",
+                "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/-haz-que-tu-ahorro-crezca-contigoabre-tu-cuenta-de-ahorro-confianza-y-empieza-a-/982113120851456/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 10 reacciones",
+                "website_name": "Facebook · Financiera Confianza",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Si estás pensando abrir una cuenta de ahorro, BANDEC te da la posibilidad de hacerlo sin necesidad de acudir a la sucursal. Las personas ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "BANDEC te da la posibilidad de hacerlo sin necesidad de acudir a la sucursal"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-05-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 14,
+                "rank_absolute": 16,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[6]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "portaldeayuda.bolivariano.com",
+                "title": "¿Cuáles son los beneficios de abrir una Cuenta Ahorros?",
+                "url": "https://portaldeayuda.bolivariano.com/beneficios-cuenta-ahorros",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "https://portaldeayuda.bolivariano.com",
+                "website_name": "Banco Bolivariano",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Deposito inicial del monto que prefieras, acceso a más de 3000 cajeros automáticos, acceso a todos los Multicanales BB las 24 horas del día.",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 15,
+                "rank_absolute": 17,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[7]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Cuenta Ahorros Online | Banco Bolivariano",
+                "url": "https://www.facebook.com/BancoBolivariano/videos/cuenta-ahorros-online/1133080533710529/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 50 reacciones",
+                "website_name": "Facebook · Banco Bolivariano",
+                "is_image": false,
+                "is_video": true,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": [
+                  "is_video"
+                ],
+                "description": "Ahora puedes abrir tu #CuentaAhorrosOnline desde #24móvil o bolivariano.com porque ir al Banco, #YaFue! Ábrela hoy mismo en instantes y sin ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": null,
+                "links": [
+                  {
+                    "type": "link_element",
+                    "title": "0:11",
+                    "description": null,
+                    "url": "https://www.facebook.com/BancoBolivariano/videos/cuenta-ahorros-online/1133080533710529/",
+                    "domain": "www.facebook.com"
+                  }
+                ],
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2020-10-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "images",
+                "rank_group": 1,
+                "rank_absolute": 18,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[8]",
+                "title": "Imágenes",
+                "url": null,
+                "items": [
+                  {
+                    "type": "images_element",
+                    "alt": "📱En solo unos minutos puedes abrir tu Cuenta de Ahorros desde tu celular y  empezar a ahorrar para cumplir tus metas., Comienza aquí:  https://www.bisa.com/online/nuevo-cliente/cuenta-de-ah | Banco Bisa",
+                    "url": "https://www.facebook.com/BancoBisa/videos/en-solo-unos-minutos-puedes-abrir-tu-cuenta-de-ahorros-desde-tu-celular-y-empeza/1791340342109636/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh-mqHiq-4WAlHr1pUfsHkgIebvpQ9IsAw7AYTuhqx1g&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Ahora abrir tu cuenta de Ahorros Online es super rápido, sencillo y sin  salir de casa 🏠, Además puedes llevarte una de las 05 tablets que tenemos  para ti 🤗, Abre tu cuenta de Ahorros online 👉: ...",
+                    "url": "https://www.facebook.com/CajaMunicipalIca/videos/abre-tu-cuenta-de-ahorros-online/575412180145709/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxp7GUy8tqG5GuQMOYHXOyRcMkzSode_K0bfKoYcdJf1Qzx4Nko0fp1lk&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Abre tu Cuenta de Ahorros Online 4.5% sin salir de casa ...",
+                    "url": "https://www.facebook.com/BancoPichinchaPeru/posts/abre-tu-cuenta-de-ahorros-online-45-sin-salir-de-casa-qu%C3%A9-esperas-para-comenzar-/3346026255448405/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo79l85ePaPH2qWK9O8k-glZKow0fN26dPyw_9viIHRg&s"
+                  },
+                  {
+                    "type": "images_element",
+                    "alt": "Ten tu cuenta de ahorros sin salir de tu casa 🏠, sin hacer ...",
+                    "url": "https://www.facebook.com/CajaMunicipalIca/posts/ten-tu-cuenta-de-ahorros-sin-salir-de-tu-casa-sin-hacer-colas-o-papeleos-abre-tu/7949155231777091/",
+                    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRL22MEXLgtWbRgwAvwM-UMpFBe-l4N8GTkku_t76lc8Q&s"
+                  }
+                ],
+                "related_image_searches": null,
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 16,
+                "rank_absolute": 19,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[9]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.facebook.com",
+                "title": "Abre tu Cuenta de Ahorro Confianza y descubre que ...",
+                "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/abre-tu-cuenta-de-ahorro-confianza-y-descubre-que-ahorrar-tambi%C3%A9n-puede-traer-be/1090832253312875/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "2 reacciones",
+                "website_name": "Facebook · Financiera Confianza",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "Monto mínimo de apertura de S/5000 con periodo de permanencia del mes siguiente. Solicita tu cuenta aquí: https://productos.confianza.pe/ ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Monto mínimo de apertura de S/5000"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-09-06 17:40:36 +00:00",
+                "rectangle": null
+              },
+              {
+                "type": "organic",
+                "rank_group": 17,
+                "rank_absolute": 20,
+                "page": 2,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[4]/div[2]/div[1]/div[12]/div[3]/div[1]/div[1]/div[10]/div[1]/div[1]/div[1]/div[1]",
+                "domain": "www.instagram.com",
+                "title": "¡Que tus ahorros no se queden colgados!🕸️👀​ Un nuevo día es ...",
+                "url": "https://www.instagram.com/p/Dbbytbflibu/",
+                "cache_url": null,
+                "related_search_url": null,
+                "breadcrumb": "Más de 40 \"me gusta\"",
+                "website_name": "Instagram · banbifperu",
+                "is_image": false,
+                "is_video": false,
+                "is_featured_snippet": false,
+                "is_malicious": false,
+                "is_web_story": false,
+                "checks": null,
+                "description": "​​ Sin monto mínimo y sin mantenimiento, para que empezar sea lo más fácil posible.  ​ Abre tu cuenta aquí: https://www.banbif.com.pe /abrir- ...",
+                "pre_snippet": null,
+                "extended_snippet": null,
+                "images": null,
+                "amp_version": false,
+                "rating": null,
+                "price": null,
+                "highlighted": [
+                  "Abre tu cuenta aquí: https://www.banbif.com.pe"
+                ],
+                "links": null,
+                "faq": null,
+                "extended_people_also_search": null,
+                "about_this_result": null,
+                "related_result": null,
+                "timestamp": "2026-08-06 17:40:36 +00:00",
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

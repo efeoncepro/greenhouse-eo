@@ -1,0 +1,855 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:17:23.203Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.related.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/related_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "que banco paga mas intereses",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "sourceModifiedAt": "2026-08-14T14:55:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1416,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1416,
+        "costUsd": 0.0126,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061917-1987-0387-0000-2f7e6bb9d441",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.0126,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.0126,
+    "tasks": [
+      {
+        "id": "10061917-1987-0387-0000-2f7e6bb9d441",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.1681 sec.",
+        "cost": 0.0126,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "related_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "related_keywords",
+          "se_type": "google",
+          "keyword": "que banco paga mas intereses",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "depth": 3,
+          "limit": 300,
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "que banco paga mas intereses",
+            "seed_keyword_data": {
+              "se_type": "google",
+              "keyword": "que banco paga mas intereses",
+              "location_code": 2604,
+              "language_code": "es",
+              "keyword_info": {
+                "se_type": "google",
+                "last_updated_time": "2026-09-12 22:01:21 +00:00",
+                "competition": 0.43,
+                "competition_level": "MEDIUM",
+                "cpc": 0.71,
+                "search_volume": 480,
+                "low_top_of_page_bid": 0.16,
+                "high_top_of_page_bid": 0.57,
+                "categories": [
+                  10012,
+                  10093,
+                  11817,
+                  12949
+                ],
+                "monthly_searches": [
+                  {
+                    "year": 2026,
+                    "month": 8,
+                    "search_volume": 260
+                  },
+                  {
+                    "year": 2026,
+                    "month": 7,
+                    "search_volume": 320
+                  },
+                  {
+                    "year": 2026,
+                    "month": 6,
+                    "search_volume": 320
+                  },
+                  {
+                    "year": 2026,
+                    "month": 5,
+                    "search_volume": 480
+                  },
+                  {
+                    "year": 2026,
+                    "month": 4,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2026,
+                    "month": 3,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2026,
+                    "month": 2,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2026,
+                    "month": 1,
+                    "search_volume": 720
+                  },
+                  {
+                    "year": 2025,
+                    "month": 12,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2025,
+                    "month": 11,
+                    "search_volume": 720
+                  },
+                  {
+                    "year": 2025,
+                    "month": 10,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2025,
+                    "month": 9,
+                    "search_volume": 590
+                  }
+                ],
+                "search_volume_trend": {
+                  "monthly": -19,
+                  "quarterly": -19,
+                  "yearly": -56
+                }
+              },
+              "keyword_info_normalized_with_bing": null,
+              "keyword_info_normalized_with_clickstream": null,
+              "clickstream_keyword_info": null,
+              "keyword_properties": {
+                "se_type": "google",
+                "core_keyword": null,
+                "synonym_clustering_algorithm": "text_processing",
+                "keyword_difficulty": 0,
+                "detected_language": "pt",
+                "is_another_language": true
+              },
+              "serp_info": {
+                "se_type": "google",
+                "check_url": "https://www.google.com/search?q=que%20banco%20paga%20mas%20intereses&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                "serp_item_types": [
+                  "ai_overview",
+                  "organic",
+                  "people_also_ask",
+                  "related_searches"
+                ],
+                "se_results_count": 125,
+                "last_updated_time": "2026-07-20 19:30:20 +00:00",
+                "previous_updated_time": "2026-04-25 02:27:11 +00:00"
+              },
+              "avg_backlinks_info": {
+                "se_type": "google",
+                "backlinks": 6,
+                "dofollow": 1,
+                "referring_pages": 6,
+                "referring_domains": 5.8,
+                "referring_main_domains": 2,
+                "rank": 14.6,
+                "main_domain_rank": 378.7,
+                "last_updated_time": "2026-07-20 19:30:20 +00:00"
+              },
+              "search_intent_info": {
+                "se_type": "google",
+                "main_intent": "informational",
+                "foreign_intent": [
+                  "commercial"
+                ],
+                "last_updated_time": "2026-04-29 18:30:08 +00:00"
+              }
+            },
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 5,
+            "items_count": 5,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "que banco paga mas intereses",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 22:01:21 +00:00",
+                    "competition": 0.43,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.71,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 0.57,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 590
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -19,
+                      "quarterly": -19,
+                      "yearly": -56
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "pt",
+                    "is_another_language": true
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=que%20banco%20paga%20mas%20intereses&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 125,
+                    "last_updated_time": "2026-07-20 19:30:20 +00:00",
+                    "previous_updated_time": "2026-04-25 02:27:11 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 6,
+                    "dofollow": 1,
+                    "referring_pages": 6,
+                    "referring_domains": 5.8,
+                    "referring_main_domains": 2,
+                    "rank": 14.6,
+                    "main_domain_rank": 378.7,
+                    "last_updated_time": "2026-07-20 19:30:20 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": [
+                      "commercial"
+                    ],
+                    "last_updated_time": "2026-04-29 18:30:08 +00:00"
+                  }
+                },
+                "depth": 0,
+                "related_keywords": [
+                  "que banco paga más intereses en perú",
+                  "que banco paga más intereses a plazo fijo",
+                  "que banco paga más intereses en cuenta de ahorro",
+                  "que banco paga mas intereses en dolares",
+                  "que banco paga más intereses 2026",
+                  "que banco paga más intereses en perú 2026",
+                  "que banco paga más intereses en dólares perú",
+                  "sbs que banco paga más intereses"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "que banco paga más intereses en perú 2026",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 11:19:44 +00:00",
+                    "competition": 0.3,
+                    "competition_level": "LOW",
+                    "cpc": 0.53,
+                    "search_volume": 90,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.61,
+                    "categories": [
+                      10012,
+                      10093,
+                      10097,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 53,
+                      "quarterly": 53,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-22 21:37:40 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "que banco paga más intereses en perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 16:12:48 +00:00",
+                    "competition": 0.39,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.44,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.42,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 50
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 100,
+                      "yearly": -60
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "informational"
+                    ],
+                    "last_updated_time": "2026-04-28 21:27:11 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "que banco paga más intereses a plazo fijo",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 14:25:42 +00:00",
+                    "competition": 0.25,
+                    "competition_level": "LOW",
+                    "cpc": 0.58,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.67,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -33,
+                      "quarterly": -33,
+                      "yearly": 100
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "bancos que pagan mas intereses a plazo fijo",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": null,
+                    "serp_item_types": null,
+                    "se_results_count": null,
+                    "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-08 04:40:43 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "que banco paga más intereses en cuenta de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 08:31:50 +00:00",
+                    "competition": 0.57,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.25,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-07-21 01:23:08 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

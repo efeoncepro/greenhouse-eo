@@ -23,3 +23,9 @@ Se revisan preguntas, cobertura, estado del score, límites del texto capturado 
 Capturas de LinkedIn: fuente directa del trigger. Perfil y publicaciones públicas: corroboración profesional. Apollo: descubrimiento de contacto; ZeroBounce: validación puntual de entregabilidad. Un correo inferido o una etiqueta de Apollo no prevalece sobre un resultado invalid. La autoridad comercial del cargo no se infiere del email ni de un agradecimiento en LinkedIn.
 
 Company, Lead y asociaciones fueron leídos después de su escritura. No se crearon ingresos, acuerdos ni un comité ficticio. BICE/Security es experiencia declarada por Julio; la simulación sintética BICE encontrada en el repo no se usa como evidencia de resultados.
+
+## Actualización de procedencia — 06-10-2026
+
+La [reunión](../MEETING-2026-10-06.md) se releyó por MCP con transcripción completa. Pibank es el foco; SERP/AI Mode/Grader originales analizan Pichincha y conservan su fecha/unidad. No son baseline `pibank.pe`. La [base del caso](../BUSINESS-CASE-2027.md) distingue cifras declaradas, inferencia USD por Julio, cálculos condicionales y unknowns. Resumen automático Notion S/38m contradice la aritmética; conservar la incertidumbre.
+
+Fuentes oficiales de identidad y producto Pibank consultadas 06-10: `https://pibank.pe/quienes-somos/` y `https://pibank.pe/cuenta-soles-pibank/`. Identidad, condiciones y elementos existentes corroborados; no se midieron demanda, visibilidad ni conversiones. Tasa fechada y claims de servicio deben validarse antes de uso externo. Los resultados de casos expuestos por Efeonce requieren evidencia independiente, no basta la transcripción. No se almacenó la transcripción completa ni credenciales en Git.

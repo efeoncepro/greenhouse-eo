@@ -12,6 +12,8 @@ Skill de dos capas, inseparables:
 
 Esta skill existe en `.claude/skills/` y `.codex/skills/` con el mismo cuerpo. **Las `references/` canónicas viven SOLO en `.claude/skills/dataforseo-operator/references/`** — ambos agentes las leen de ahí; no duplicarlas (anti-drift).
 
+Para compras de research, respuestas perdidas o ampliación de muestras, carga [reconciliación y cobertura](../../../.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md#reconciliacion-y-cobertura-de-investigacion): costo, tarea y resultado se verifican por separado; conservar filtros, fechas y límites antes de repetir una compra.
+
 ### Versionamiento obligatorio de la CLI
 
 `pnpm dataforseo` tiene SemVer propio; no usa la versión raíz del repo. Antes de modificar sus comandos, flags,

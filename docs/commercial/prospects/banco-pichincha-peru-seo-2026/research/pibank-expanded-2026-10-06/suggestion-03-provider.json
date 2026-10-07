@@ -1,0 +1,4839 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:14:12.059Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.keyword.suggestions.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/keyword_suggestions/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "mejor banco para ahorrar",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": false,
+        "include_serp_info": true,
+        "limit": 400,
+        "offset": 0,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.06,
+    "estimateStatus": "available",
+    "maxUsd": 0.06,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live/",
+      "sourceModifiedAt": "2026-08-14T14:59:52.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1232,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1232,
+        "costUsd": 0.01692,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061914-1987-0399-0000-584e18ab8457",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01692,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01692,
+    "tasks": [
+      {
+        "id": "10061914-1987-0399-0000-584e18ab8457",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.1757 sec.",
+        "cost": 0.01692,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "keyword_suggestions",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "keyword_suggestions",
+          "se_type": "google",
+          "keyword": "mejor banco para ahorrar",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": false,
+          "include_serp_info": true,
+          "limit": 400,
+          "offset": 0,
+          "order_by": [
+            "keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "mejor banco para ahorrar",
+            "seed_keyword_data": null,
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 41,
+            "items_count": 41,
+            "offset": 0,
+            "offset_token": "eyJDdXJyZW50T2Zmc2V0Ijo0MSwiUmVxdWVzdERhdGEiOnsia2V5d29yZCI6Im1lam9yIGJhbmNvIHBhcmEgYWhvcnJhciIsImluY2x1ZGVfc2VlZF9rZXl3b3JkIjpmYWxzZSwiZnVsbF9tYXRjaCI6ZmFsc2UsImxvYWRfc2VycF9pbmZvIjp0cnVlLCJzZWFyY2hfYWZ0ZXJfdG9rZW4iOm51bGwsImlnbm9yZV9zeW5vbnltcyI6ZmFsc2UsImxhbmd1YWdlIjoiZXMiLCJzZWFyY2hfZW5naW5lIjoiZ29vZ2xlIiwibG9jYXRpb24iOjI2MDQsInVzZV9uZXdfY2F0ZWdvcmllcyI6dHJ1ZSwib3JkZXJfYnkiOnsib3JkZXJfZmllbGQiOiJrZXl3b3JkX2luZm8uc2VhcmNoX3ZvbHVtZSIsIm9yZGVyX3R5cGUiOiJEZXNjIiwibmV4dCI6bnVsbH0sImxpbWl0Ijo0MDAsIm9mZnNldCI6MCwiYWlkIjoxOTg3OTIsInVzZV9jYWNoZSI6dHJ1ZSwidGFza19pZCI6IjEwMDYxOTE0LTE5ODctMDM5OS0wMDAwLTU4NGUxOGFiODQ1NyIsImZsYWdzIjpudWxsfSwiUmF3UXVlcnkiOm51bGwsIklkIjoiMjdlMjRkYTgtNmM5MS00ZmUwLTg2MTktN2Q0YWIxOThiZmRkIiwiU2VhcmNoQWZ0ZXJEYXRhIjpbLTkyMjMzNzIwMzY4NTQ3NzU4MDgsIjdkNjc0YTIwLTlmNDEtNzNmOC01YmI5LTlkZmQ3YjRlZjljZiJdLCJFeGVjdXRvciI6LTkxODQ0MDU5NDA0NDQ1MTc2MzN9",
+            "items": [
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 05:34:43 +00:00",
+                  "competition": 0.55,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.22,
+                  "search_volume": 90,
+                  "low_top_of_page_bid": 0.34,
+                  "high_top_of_page_bid": 1.25,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 140
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 140
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 70
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": -29,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos para ahorrar",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 16,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 4
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=mejor%20banco%20para%20ahorrar&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 41100000,
+                  "last_updated_time": "2023-11-14 09:28:49 +00:00",
+                  "previous_updated_time": "2023-08-12 17:30:48 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 17.6,
+                  "dofollow": 15.6,
+                  "referring_pages": 17.6,
+                  "referring_domains": 3.2,
+                  "referring_main_domains": 3.8,
+                  "rank": 48.2,
+                  "main_domain_rank": 471.4,
+                  "last_updated_time": "2023-11-14 09:28:56 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 14:44:07 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual banco es mejor para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 06:00:44 +00:00",
+                  "competition": 0.55,
+                  "competition_level": "MEDIUM",
+                  "cpc": 2.09,
+                  "search_volume": 70,
+                  "low_top_of_page_bid": 0.26,
+                  "high_top_of_page_bid": 1.4,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 70
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 40,
+                    "quarterly": 40,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco para ahorrar",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 52,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20banco%20es%20mejor%20para%20ahorrar&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 18100000,
+                  "last_updated_time": "2021-06-21 13:49:06 +00:00",
+                  "previous_updated_time": "2021-02-06 07:44:10 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 08:38:23 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en perú",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 05:52:04 +00:00",
+                  "competition": 0.52,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.15,
+                  "search_volume": 70,
+                  "low_top_of_page_bid": 0.19,
+                  "high_top_of_page_bid": 1.1,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 50
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 40
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20es%20el%20mejor%20banco%20para%20ahorrar%20en%20per%C3%BA&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 96,
+                  "last_updated_time": "2022-03-13 15:38:18 +00:00",
+                  "previous_updated_time": "2021-12-03 13:34:41 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-27 03:13:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 21:30:01 +00:00",
+                  "competition": 0.55,
+                  "competition_level": "MEDIUM",
+                  "cpc": 2.09,
+                  "search_volume": 70,
+                  "low_top_of_page_bid": 0.26,
+                  "high_top_of_page_bid": 1.4,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 110
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 90
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 70
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 40,
+                    "quarterly": 40,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 52,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20es%20el%20mejor%20banco%20para%20ahorrar&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "video"
+                  ],
+                  "se_results_count": 14100000,
+                  "last_updated_time": "2021-06-15 14:49:02 +00:00",
+                  "previous_updated_time": "2021-01-31 17:35:26 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 21:45:07 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que banco es mejor para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 05:49:58 +00:00",
+                  "competition": 0.5,
+                  "competition_level": "MEDIUM",
+                  "cpc": 0.74,
+                  "search_volume": 70,
+                  "low_top_of_page_bid": 0.26,
+                  "high_top_of_page_bid": 1.57,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 50
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -29,
+                    "quarterly": 25,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 13,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=que%20banco%20es%20mejor%20para%20ahorrar&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 21300000,
+                  "last_updated_time": "2023-08-12 17:11:15 +00:00",
+                  "previous_updated_time": "2023-06-14 19:35:39 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 6.2,
+                  "dofollow": 4.5,
+                  "referring_pages": 6,
+                  "referring_domains": 1.7,
+                  "referring_main_domains": 1.6,
+                  "rank": 30,
+                  "main_domain_rank": 384.8,
+                  "last_updated_time": "2023-08-12 17:11:15 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 19:04:01 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 07:47:13 +00:00",
+                  "competition": 0.55,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.63,
+                  "search_volume": 50,
+                  "low_top_of_page_bid": 0.38,
+                  "high_top_of_page_bid": 1.42,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 70
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -25,
+                    "quarterly": 0,
+                    "yearly": -67
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos para ahorrar peru",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 31,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 5
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=mejor%20banco%20para%20ahorrar%20peru&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 97,
+                  "last_updated_time": "2022-11-28 17:08:17 +00:00",
+                  "previous_updated_time": "2022-10-13 06:19:24 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 24.2,
+                  "dofollow": 20.5,
+                  "referring_pages": 22.6,
+                  "referring_domains": 5.2,
+                  "referring_main_domains": 5.1,
+                  "rank": 65.1,
+                  "main_domain_rank": 582.4,
+                  "last_updated_time": "2022-11-28 17:08:17 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 18:59:38 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 21:28:51 +00:00",
+                  "competition": 0.55,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.63,
+                  "search_volume": 50,
+                  "low_top_of_page_bid": 0.38,
+                  "high_top_of_page_bid": 1.42,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 70
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": -25,
+                    "quarterly": 0,
+                    "yearly": -67
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos para ahorrar peru",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 31,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 00:59:59 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco del perú para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 22:01:03 +00:00",
+                  "competition": 0.24,
+                  "competition_level": "LOW",
+                  "cpc": 0.44,
+                  "search_volume": 30,
+                  "low_top_of_page_bid": 0.21,
+                  "high_top_of_page_bid": 0.8,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 50
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 100,
+                    "quarterly": 100,
+                    "yearly": -71
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 05:10:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "el mejor banco para ahorrar en peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 17:48:59 +00:00",
+                  "competition": 0.67,
+                  "competition_level": "HIGH",
+                  "cpc": null,
+                  "search_volume": 30,
+                  "low_top_of_page_bid": 0.23,
+                  "high_top_of_page_bid": 1.49,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 50
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 20
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -50
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos para ahorrar peru",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 31,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=el%20mejor%20banco%20para%20ahorrar%20en%20peru&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 97,
+                  "last_updated_time": "2022-11-28 18:06:01 +00:00",
+                  "previous_updated_time": "2022-10-13 07:36:05 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 25.3,
+                  "dofollow": 21.5,
+                  "referring_pages": 23.7,
+                  "referring_domains": 6,
+                  "referring_main_domains": 5.9,
+                  "rank": 100.5,
+                  "main_domain_rank": 424.2,
+                  "last_updated_time": "2022-11-28 18:06:01 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-27 15:58:35 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que banco es mejor para ahorrar en perú",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 23:06:51 +00:00",
+                  "competition": 0.44,
+                  "competition_level": "MEDIUM",
+                  "cpc": 0.99,
+                  "search_volume": 20,
+                  "low_top_of_page_bid": 0.2,
+                  "high_top_of_page_bid": 0.83,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 40
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 20
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 100,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "keyword_metrics",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 8
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 20:19:10 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuál es el mejor banco para ahorrar en perú",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 14:19:33 +00:00",
+                  "competition": 0.07,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 20,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 70
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 30
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco para ahorrar en perú",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-05-08 04:18:42 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en perú 2021",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 19:22:19 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": 16,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20es%20el%20mejor%20banco%20para%20ahorrar%20en%20per%C3%BA%202021&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "paid",
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 98,
+                  "last_updated_time": "2022-08-29 19:19:53 +00:00",
+                  "previous_updated_time": "2022-07-10 14:54:33 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 11.2,
+                  "dofollow": 9.8,
+                  "referring_pages": 11,
+                  "referring_domains": 3.8,
+                  "referring_main_domains": 3.7,
+                  "rank": 40.5,
+                  "main_domain_rank": 464.6,
+                  "last_updated_time": "2022-08-29 19:19:54 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-25 14:23:34 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "que banco tiene la mejor tasa de interés para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 11:41:28 +00:00",
+                  "competition": 0.86,
+                  "competition_level": "HIGH",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": null,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 19:46:06 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en perú 2023",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 22:37:53 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 12:15:40 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco en peru para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 20:39:50 +00:00",
+                  "competition": 0.51,
+                  "competition_level": "MEDIUM",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.27,
+                  "high_top_of_page_bid": 0.99,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos para ahorrar peru",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 31,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 15:45:58 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco del peru para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 23:46:37 +00:00",
+                  "competition": 0.57,
+                  "competition_level": "MEDIUM",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco del perú para ahorrar",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 17:15:00 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en perú 2022",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 05:40:54 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": 19,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20es%20el%20mejor%20banco%20para%20ahorrar%20en%20per%C3%BA%202022&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 100,
+                  "last_updated_time": "2023-06-06 11:49:49 +00:00",
+                  "previous_updated_time": "2023-04-12 14:57:53 +00:00"
+                },
+                "avg_backlinks_info": {
+                  "se_type": "google",
+                  "backlinks": 8.6,
+                  "dofollow": 6.5,
+                  "referring_pages": 8.3,
+                  "referring_domains": 2.9,
+                  "referring_main_domains": 2.7,
+                  "rank": 53.6,
+                  "main_domain_rank": 489.1,
+                  "last_updated_time": "2023-06-06 11:50:35 +00:00"
+                },
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-25 17:34:06 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco en peru para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 16:13:22 +00:00",
+                  "competition": 0.71,
+                  "competition_level": "HIGH",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco para ahorrar en perú",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": null,
+                  "serp_item_types": null,
+                  "se_results_count": null,
+                  "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                  "previous_updated_time": null
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-26 21:42:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en dolares",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 00:59:21 +00:00",
+                  "competition": 0.43,
+                  "competition_level": "MEDIUM",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:50:35 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar a plazo fijo",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 21:55:49 +00:00",
+                  "competition": 0.82,
+                  "competition_level": "HIGH",
+                  "cpc": 0.75,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.2,
+                  "high_top_of_page_bid": 0.71,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "keyword_metrics",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:30:16 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco del ecuador para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 09:34:08 +00:00",
+                  "competition": 0,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": null,
+                    "quarterly": null,
+                    "yearly": null
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 15:31:42 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar a plazo fijo",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 21:20:55 +00:00",
+                  "competition": 0.37,
+                  "competition_level": "MEDIUM",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": null,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-29 06:49:58 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en chile",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 08:14:50 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": 53,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=mejor%20banco%20para%20ahorrar%20en%20chile&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 2110000,
+                  "last_updated_time": "2022-06-17 09:10:46 +00:00",
+                  "previous_updated_time": null
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 18:30:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar dinero",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 01:20:47 +00:00",
+                  "competition": 0.46,
+                  "competition_level": "MEDIUM",
+                  "cpc": 3.19,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 8
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 23:39:13 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en dolares peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 04:48:21 +00:00",
+                  "competition": 0.21,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 14:41:54 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 13:00:33 +00:00",
+                  "competition": 0.66,
+                  "competition_level": "MEDIUM",
+                  "cpc": 1.32,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.32,
+                  "high_top_of_page_bid": 0.76,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco para ahorrar en perú",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": null,
+                  "serp_item_types": null,
+                  "se_results_count": null,
+                  "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                  "previous_updated_time": null
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 05:10:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en honduras",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 22:08:35 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": [
+                    "informational"
+                  ],
+                  "last_updated_time": "2026-04-26 17:15:00 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar peru 2018",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 21:42:23 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 14:40:44 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar en perú 2020",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 07:22:25 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": "https://www.google.com.pe/search?q=cual%20es%20el%20mejor%20banco%20para%20ahorrar%20en%20per%C3%BA%202020&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "featured_snippet",
+                    "people_also_ask",
+                    "organic",
+                    "video",
+                    "images",
+                    "related_searches"
+                  ],
+                  "se_results_count": 85,
+                  "last_updated_time": "2022-05-19 22:53:47 +00:00",
+                  "previous_updated_time": "2022-02-24 13:38:10 +00:00"
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-27 08:38:36 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en bolivia",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 07:51:04 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:09:42 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en chile 2022",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 06:33:17 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:39:04 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en panamá",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-13 16:57:24 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 15:09:32 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar perú 2020",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 04:16:36 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 15:45:58 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar profeco 2019",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-17 18:07:16 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-04-29 05:52:55 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en mexico",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-12 12:06:55 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejores bancos de mexico para ahorrar",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:09:42 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cuál es el mejor banco para ahorrar en perú 2020",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-15 04:52:38 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": 0,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "cual es el mejor banco para ahorrar en perú 2020",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": 55,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 10
+                },
+                "serp_info": {
+                  "se_type": "google",
+                  "check_url": null,
+                  "serp_item_types": null,
+                  "se_results_count": null,
+                  "last_updated_time": "0001-01-01 00:00:00 +00:00",
+                  "previous_updated_time": null
+                },
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-25 20:06:47 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "banco con mejor tasa para ahorrar",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-03 11:00:27 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "banco con mejor tasa de ahorro",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-03 11:02:30 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "cual es el mejor banco para ahorrar profeco 2018",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-07-13 15:15:40 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 7,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 9
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "informational",
+                  "foreign_intent": [
+                    "commercial"
+                  ],
+                  "last_updated_time": "2026-04-27 00:46:54 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar en dólares perú",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-04 01:04:37 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejor banco para ahorrar en dolares peru",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 7
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-09-04 01:05:40 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "mejor banco para ahorrar perú 2019",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-07-13 22:06:45 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 7,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": "mejor banco para ahorrar peru 2019",
+                  "synonym_clustering_algorithm": "text_processing",
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 6
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 16:20:47 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "el mejor banco para ahorrar en colombia 2020",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-07-16 06:12:36 +00:00",
+                  "competition": null,
+                  "competition_level": null,
+                  "cpc": null,
+                  "search_volume": null,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 8,
+                      "search_volume": 0
+                    },
+                    {
+                      "year": 2025,
+                      "month": 7,
+                      "search_volume": 0
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 8
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-27 17:35:38 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

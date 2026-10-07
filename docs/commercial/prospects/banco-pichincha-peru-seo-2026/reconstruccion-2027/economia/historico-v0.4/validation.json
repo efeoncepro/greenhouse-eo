@@ -1,0 +1,644 @@
+{
+  "status": "passed",
+  "native_recalculation_tests": 25,
+  "engine": "Bundled LibreOffice",
+  "workbook_sha256": "7f656e384a088e0ebec96a34226d23cf2862af467afc5739417aa5aa9dea1fb0",
+  "checks": [
+    {
+      "test": "Delivered cache: annual Aperturas default, cohorts and requirements",
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "5pct opening band",
+      "changed_inputs": {
+        "D3": 2
+      },
+      "result": {
+        "accounts_required": 760,
+        "definition": "Aperturas",
+        "visits_required": 38000.0,
+        "funded_within_window": 494.00000000000006,
+        "funded_after_window": -5.684341886080802e-14,
+        "average_external_balance": 374582.4613268342,
+        "external_balance_end": 712099.4237987988,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "10pct opening band",
+      "changed_inputs": {
+        "D3": 3
+      },
+      "result": {
+        "accounts_required": 1520,
+        "definition": "Aperturas",
+        "visits_required": 76000.0,
+        "funded_within_window": 988.0000000000001,
+        "funded_after_window": -1.1368683772161603e-13,
+        "average_external_balance": 749164.9226536684,
+        "external_balance_end": 1424198.8475975976,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Funded target explicitly selected",
+      "changed_inputs": {
+        "G6": "Fondeadas"
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Fondeadas",
+        "visits_required": 11692.307692307691,
+        "funded_within_window": 152.0,
+        "funded_after_window": -2.842170943040401e-14,
+        "average_external_balance": 115256.14194671821,
+        "external_balance_end": 219107.51501501497,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Funding lag1 opening target",
+      "changed_inputs": {
+        "D13": 1
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 90.56666666666666,
+        "funded_after_window": 8.233333333333334,
+        "average_external_balance": 63420.264592801796,
+        "external_balance_end": 131555.2225975976,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Funding lag1 funded target",
+      "changed_inputs": {
+        "G6": "Fondeadas",
+        "D13": 1
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Fondeadas",
+        "visits_required": 11692.307692307691,
+        "funded_within_window": 151.99999999999997,
+        "funded_after_window": 0.0,
+        "average_external_balance": 106439.60491099603,
+        "external_balance_end": 220791.98198198198,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Funding lag12 all funding outside",
+      "changed_inputs": {
+        "D13": 12
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 0,
+        "funded_after_window": 98.8,
+        "average_external_balance": 0.0,
+        "external_balance_end": 0.0,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Last origin external changed only",
+      "changed_inputs": {
+        "Q44": 0.3
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74545.25451148392,
+        "external_balance_end": 134406.10698198198,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Finance alone no investment",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Finance+investment within2027",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": -0.875139179557722,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Incomplete investment",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": null
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Zero investment distinct from blank",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 0,
+        "G32": 0,
+        "H32": 0,
+        "I32": 0,
+        "J32": 0,
+        "K32": 0,
+        "L32": 0,
+        "M32": 0,
+        "N32": 0,
+        "O32": 0,
+        "P32": 0,
+        "Q32": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Negative expense refused",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": -10
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Zero expense in one month valid",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": -0.863788195881151,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Costed floor/capacity compatibility",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000,
+        "D20": "Sí",
+        "D21": 30,
+        "D22": 0.45,
+        "D25": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": 50400,
+        "roi_within_window": -0.875139179557722,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Unknown other internal cost",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000,
+        "D20": "Sí",
+        "D21": 30,
+        "D22": 0.45,
+        "D25": null
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": "N/D",
+        "roi_within_window": -0.875139179557722,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Zero loaded cost not unlimited capacity",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000,
+        "D20": "Sí",
+        "D21": 0,
+        "D22": 0.45,
+        "D25": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 1498.32984530734,
+        "investment_ceiling": 1498.32984530734,
+        "cost_floor": 0,
+        "roi_within_window": -0.875139179557722,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Retrolaunch window unknown",
+      "changed_inputs": {
+        "D29": "Retrolanzamiento"
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": "N/D",
+        "funded_within_window": "N/D",
+        "status": "N/D from missing/infeasible requirement input"
+      }
+    },
+    {
+      "test": "Retrolaunch3months from partial launch month",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000,
+        "D29": "Retrolanzamiento",
+        "D30": "2026-09-14T00:00:00",
+        "D35": 3
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 84341.42562724014,
+        "external_balance_end": 159740.38888888888,
+        "bank_value": 421.707128136201,
+        "investment_ceiling": 421.707128136201,
+        "cost_floor": "N/D",
+        "roi_within_window": -0.859430957287933,
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Retrolaunch zero months invalid",
+      "changed_inputs": {
+        "D29": "Retrolanzamiento",
+        "D30": "2026-09-14T00:00:00",
+        "D35": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": "N/D",
+        "funded_within_window": "N/D",
+        "status": "N/D from missing/infeasible requirement input"
+      }
+    },
+    {
+      "test": "24m approved valueperaccount method no double count",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D17": 0.02,
+        "D19": "Sí",
+        "F32": 1000,
+        "G32": 1000,
+        "H32": 1000,
+        "I32": 1000,
+        "J32": 1000,
+        "K32": 1000,
+        "L32": 1000,
+        "M32": 1000,
+        "N32": 1000,
+        "O32": 1000,
+        "P32": 1000,
+        "Q32": 1000,
+        "D52": "Valor neto por fondeada",
+        "D53": 24,
+        "D54": 50
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": 4940,
+        "investment_ceiling": 4940,
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "36m unknown peraccount remains ND",
+      "changed_inputs": {
+        "D16": "Sí",
+        "D52": "Valor neto por fondeada",
+        "D53": 36
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 98.79999999999998,
+        "funded_after_window": 1.4210854715202004e-14,
+        "average_external_balance": 74916.49226536683,
+        "external_balance_end": 142419.88475975976,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Zero funding opening requirement survives",
+      "changed_inputs": {
+        "D10": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": 7599.999999999999,
+        "funded_within_window": 0.0,
+        "funded_after_window": 0.0,
+        "average_external_balance": 0.0,
+        "external_balance_end": 0.0,
+        "bank_value": "N/D",
+        "investment_ceiling": "N/D",
+        "cost_floor": "N/D",
+        "roi_within_window": "N/D",
+        "status": "checked independent within window"
+      }
+    },
+    {
+      "test": "Zero funding funded requirement infeasible",
+      "changed_inputs": {
+        "G6": "Fondeadas",
+        "D10": 0
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Fondeadas",
+        "visits_required": "N/D",
+        "funded_within_window": "N/D",
+        "status": "N/D from missing/infeasible requirement input"
+      }
+    },
+    {
+      "test": "Missing selected opening rate",
+      "changed_inputs": {
+        "D9": null
+      },
+      "result": {
+        "accounts_required": 152,
+        "definition": "Aperturas",
+        "visits_required": "N/D",
+        "funded_within_window": 98.8,
+        "status": "Unknown/infeasible visit requirement; cohort quality remains conditional on the required accounts"
+      }
+    }
+  ],
+  "historical_artifacts_unchanged": true,
+  "unverified": "Excel Desktop UI, bank value, quote and Operations capacity approval."
+}

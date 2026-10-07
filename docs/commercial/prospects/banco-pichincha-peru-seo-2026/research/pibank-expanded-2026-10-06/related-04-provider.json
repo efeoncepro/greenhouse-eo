@@ -1,0 +1,745 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:14:53.239Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.related.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/related_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "cuenta de ahorros de alto rendimiento",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "sourceModifiedAt": "2026-08-14T14:55:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1004,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1004,
+        "costUsd": 0.01248,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061914-1987-0387-0000-05e2487d4542",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01248,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01248,
+    "tasks": [
+      {
+        "id": "10061914-1987-0387-0000-05e2487d4542",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0900 sec.",
+        "cost": 0.01248,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "related_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "related_keywords",
+          "se_type": "google",
+          "keyword": "cuenta de ahorros de alto rendimiento",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "depth": 3,
+          "limit": 300,
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "cuenta de ahorros de alto rendimiento",
+            "seed_keyword_data": {
+              "se_type": "google",
+              "keyword": "cuenta de ahorros de alto rendimiento",
+              "location_code": 2604,
+              "language_code": "es",
+              "keyword_info": {
+                "se_type": "google",
+                "last_updated_time": "2026-09-17 16:28:29 +00:00",
+                "competition": 0.72,
+                "competition_level": "HIGH",
+                "cpc": 1.4,
+                "search_volume": 1600,
+                "low_top_of_page_bid": 0.32,
+                "high_top_of_page_bid": 1.49,
+                "categories": [
+                  10012,
+                  10093,
+                  11817,
+                  12949
+                ],
+                "monthly_searches": [
+                  {
+                    "year": 2026,
+                    "month": 8,
+                    "search_volume": 2900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 7,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 6,
+                    "search_volume": 1300
+                  },
+                  {
+                    "year": 2026,
+                    "month": 5,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 4,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2026,
+                    "month": 3,
+                    "search_volume": 1900
+                  },
+                  {
+                    "year": 2026,
+                    "month": 2,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2026,
+                    "month": 1,
+                    "search_volume": 2400
+                  },
+                  {
+                    "year": 2025,
+                    "month": 12,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2025,
+                    "month": 11,
+                    "search_volume": 1600
+                  },
+                  {
+                    "year": 2025,
+                    "month": 10,
+                    "search_volume": 1000
+                  },
+                  {
+                    "year": 2025,
+                    "month": 9,
+                    "search_volume": 1000
+                  }
+                ],
+                "search_volume_trend": {
+                  "monthly": 53,
+                  "quarterly": 123,
+                  "yearly": 190
+                }
+              },
+              "keyword_info_normalized_with_bing": null,
+              "keyword_info_normalized_with_clickstream": null,
+              "clickstream_keyword_info": null,
+              "keyword_properties": {
+                "se_type": "google",
+                "core_keyword": "cuentas de ahorro de alto rendimiento",
+                "synonym_clustering_algorithm": "text_processing",
+                "keyword_difficulty": 0,
+                "detected_language": "es",
+                "is_another_language": false
+              },
+              "serp_info": {
+                "se_type": "google",
+                "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20de%20alto%20rendimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                "serp_item_types": [
+                  "ai_overview",
+                  "organic",
+                  "video",
+                  "people_also_ask",
+                  "related_searches",
+                  "images"
+                ],
+                "se_results_count": 12100000,
+                "last_updated_time": "2026-03-19 18:41:36 +00:00",
+                "previous_updated_time": "2025-06-16 10:38:33 +00:00"
+              },
+              "avg_backlinks_info": {
+                "se_type": "google",
+                "backlinks": 3.2,
+                "dofollow": 2.5,
+                "referring_pages": 3.2,
+                "referring_domains": 1.7,
+                "referring_main_domains": 1.7,
+                "rank": 29.4,
+                "main_domain_rank": 323.1,
+                "last_updated_time": "2026-03-19 18:41:40 +00:00"
+              },
+              "search_intent_info": {
+                "se_type": "google",
+                "main_intent": "commercial",
+                "foreign_intent": null,
+                "last_updated_time": "2026-04-30 02:32:12 +00:00"
+              }
+            },
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 4,
+            "items_count": 4,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de ahorros de alto rendimiento",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 16:28:29 +00:00",
+                    "competition": 0.72,
+                    "competition_level": "HIGH",
+                    "cpc": 1.4,
+                    "search_volume": 1600,
+                    "low_top_of_page_bid": 0.32,
+                    "high_top_of_page_bid": 1.49,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1000
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 53,
+                      "quarterly": 123,
+                      "yearly": 190
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuentas de ahorro de alto rendimiento",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20de%20alto%20rendimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "video",
+                      "people_also_ask",
+                      "related_searches",
+                      "images"
+                    ],
+                    "se_results_count": 12100000,
+                    "last_updated_time": "2026-03-19 18:41:36 +00:00",
+                    "previous_updated_time": "2025-06-16 10:38:33 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 3.2,
+                    "dofollow": 2.5,
+                    "referring_pages": 3.2,
+                    "referring_domains": 1.7,
+                    "referring_main_domains": 1.7,
+                    "rank": 29.4,
+                    "main_domain_rank": 323.1,
+                    "last_updated_time": "2026-03-19 18:41:40 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-30 02:32:12 +00:00"
+                  }
+                },
+                "depth": 0,
+                "related_keywords": [
+                  "cuenta de ahorros de alto rendimiento perú",
+                  "cuenta de ahorros de alto rendimiento banco pichincha",
+                  "cuentas de ahorro de alto rendimiento perú 2026",
+                  "cuenta de ahorros de alto rendimiento bcp",
+                  "cuenta de ahorros de alto rendimiento caja cusco",
+                  "cuenta de ahorro de alto rendimiento interbank",
+                  "financiera qapaq cuenta de ahorros de alto rendimiento",
+                  "cuenta de alto rendimiento falabella"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuentas de ahorro de alto rendimiento perú 2026",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 08:59:39 +00:00",
+                    "competition": 0.62,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.89,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.24,
+                    "high_top_of_page_bid": 1.08,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 84,
+                      "quarterly": 181,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorro%20de%20alto%20rendimiento%20per%C3%BA%202026&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "images"
+                    ],
+                    "se_results_count": 43500,
+                    "last_updated_time": "2026-10-01 14:13:20 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-03 11:58:39 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de alto rendimiento falabella",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 08:25:37 +00:00",
+                    "competition": 0.25,
+                    "competition_level": "LOW",
+                    "cpc": 1.08,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": 0.27,
+                    "high_top_of_page_bid": 0.78,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 20
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 22,
+                      "quarterly": 175,
+                      "yearly": 450
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-03 11:58:39 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de ahorro de alto rendimiento interbank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 01:34:08 +00:00",
+                    "competition": 0.43,
+                    "competition_level": "MEDIUM",
+                    "cpc": 1.09,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": 0.1,
+                    "high_top_of_page_bid": 0.99,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 100,
+                      "quarterly": 100,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-05 05:21:08 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

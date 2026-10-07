@@ -1,0 +1,182 @@
+{
+  "status": "passed",
+  "engine": "Bundled LibreOffice",
+  "workbook_sha256": "275722eabca7c1d373203acf6a0c1ceb9adaa9e29a8ad9a10e899a969606c9a9",
+  "checks": [
+    {
+      "test": "Delivered cached values",
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Conservador",
+      "changed_inputs": {
+        "D4": 1
+      },
+      "result": {
+        "case": "Conservador",
+        "funded_incremental": 2.120625,
+        "balance_end_usd_equivalent": 4753.125,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Favorable",
+      "changed_inputs": {
+        "D4": 3
+      },
+      "result": {
+        "case": "Favorable",
+        "funded_incremental": 40.145625,
+        "balance_end_usd_equivalent": 97558.8046875,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Edit later-period funding",
+      "changed_inputs": {
+        "K40": 0.325
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 11.027250000000002,
+        "balance_end_usd_equivalent": 25738.171875000004,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Finance validation alone",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D15": 0.08
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Finance and investment validated",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F19": 1000,
+        "G19": 1000,
+        "H19": 1000,
+        "I19": 1000,
+        "J19": 1000,
+        "K19": 1000
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": -0.945230796875,
+        "payback": "No en 6m"
+      }
+    },
+    {
+      "test": "Missing investment",
+      "changed_inputs": {
+        "K19": null,
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Zero investment",
+      "changed_inputs": {
+        "F19": 0,
+        "G19": 0,
+        "H19": 0,
+        "I19": 0,
+        "J19": 0,
+        "K19": 0,
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank unselected case",
+      "changed_inputs": {
+        "F24": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 13.879125000000002,
+        "balance_end_usd_equivalent": 32867.859375,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank selected capture",
+      "changed_inputs": {
+        "F25": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": "N/D",
+        "balance_end_usd_equivalent": "N/D",
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank relevance",
+      "changed_inputs": {
+        "D13": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": "N/D",
+        "balance_end_usd_equivalent": "N/D",
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Zero relevance",
+      "changed_inputs": {
+        "D13": 0
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 0.0,
+        "balance_end_usd_equivalent": 0.0,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    }
+  ],
+  "unverified": "Excel UI interaction not performed; formulas/control recalculated in LibreOffice",
+  "source_inputs_finance_validated": false
+}

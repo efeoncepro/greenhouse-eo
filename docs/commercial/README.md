@@ -34,9 +34,11 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Workspaces comerciales
 
+- [Casos de negocio SEO/AEO](SEO_AEO_BUSINESS_CASE_METHOD_V1.md): método propuesto para evaluar requisitos desde la meta, demanda competitiva por intención, ejecución conjunta SEO/AEO+PR y costo/valor por horizonte; [manual](../manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md) y [lectura funcional](../documentation/comercial/caso-negocio-seo-aeo.md).
+
 - [Venta con demostración contextual](EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md): metodología observada en Berel y SKY y aplicada a Banco Pichincha; diagnóstico, muestra de ejecución, operación y propuesta. Sistematización propuesta, sin atribuir causalidad exclusiva ni cambiar el pipeline.
 
-- [Banco Pichincha Perú — SEO, GEO y AEO](prospects/banco-pichincha-peru-seo-2026/README.md): Prospect Case, sales pod, investigación de cuenta y ejecución del Brand Visibility Grader; búsqueda pública de proveedor, sin RFP confirmado.
+- [Banco Pichincha / Pibank Perú — propuesta 2027](prospects/banco-pichincha-peru-seo-2026/README.md): reunión del 06/10, caso de negocio y próximos hitos; conserva la preparación histórica de Banco Pichincha y distingue el nuevo mandato Pibank. Moneda y definición de las metas pendientes de confirmación del banco.
 
 - [Berel — App móvil](tenders/berel-app-movil/README.md): expansión de cliente SEO; brief de venta y análisis del lanzamiento de nueva Color Berel, con ASO, creatividad, adquisición, activación y medición. Propuesta interna pendiente de build, alcance y aprobación.
 

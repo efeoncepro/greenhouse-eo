@@ -38,6 +38,17 @@ reduces it, what evidence reaches the sponsor and what risk appears when the ope
 The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
 Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
 
+## Continuidad de discovery en propuestas SEO/AEO
+
+Cuando la reunión cambia el objetivo de una propuesta, separar entidad legal, marca comercial, producto,
+dominio y oportunidad antes de reutilizar investigación o demos. Registrar la decisión que debe poder defender el
+interlocutor y los roles de evaluación/compra como conocidos o pendientes; interés y recepción positiva no prueban
+champion, presupuesto ni adjudicación. Con autorización del operador, avanzar el borrador con evidencia pública
+y supuestos explícitos aunque falten datos privados, dejando owner y siguiente validación; una moneda inferida por
+aritmética sigue sin confirmar. Datos de cuenta en su expediente, método reusable en
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y operación en
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md`.
+
 ## Resultado obligatorio
 
 Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría
@@ -68,3 +79,10 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 El brief CMP registra JTBD situado y roles operador/sponsor/validadores; mid-market/enterprise son contextos,
 no equivalencias rígidas entre cargo, autoridad o conversión. Etiquetar inferencias y validar con compradores;
 una skill o una recepción positiva del concepto no certifica demanda. Conservar alternativas y frenos de compra.
+
+## Contrato de éxito y dependencias en SEO/AEO
+
+Al convertir discovery SEO/AEO en propuesta, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Reconciliar producto,
+uso, etapa del outcome y periodo de la meta; registrar buying group, owners y alternativas de acceso,
+revisión e instrumentación. Una aspiración de contribución no es forecast ni presupuesto confirmado.

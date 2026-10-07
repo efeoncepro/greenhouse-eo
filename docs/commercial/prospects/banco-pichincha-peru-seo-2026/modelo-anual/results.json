@@ -1,0 +1,442 @@
+{
+  "as_of": "2026-10-06",
+  "horizon": "2027,12meses desde enero ilustrativo; no incluye2028",
+  "goal_status": "US$38m provisional por inferencia15200×2500. Programa2027 anual autorizado; periodo exacto de meta y definición cuenta no confirmados por banco",
+  "demand_monthly_proxy": 3690,
+  "demand_monthly": 3690,
+  "demand_status": "Panel manual de adquisición directa PE/es: proxy3690/mes, cobertura parcial y overlap residual; noTAM ni forecast2027",
+  "relevance_factor_illustrative": 0.75,
+  "growth_multiplier_hypothesis": 1.0,
+  "seasonality_mode": "Plano",
+  "cases": [
+    {
+      "case": "Conservador",
+      "nature": "Hipótesis ilustrativa anual, no forecast bancario validado",
+      "visits_incremental": 1999.5187500000002,
+      "openings_incremental": 19.9951875,
+      "funded_incremental_within2027": 9.99759375,
+      "funded_scheduled_after2027": 0.0,
+      "first_deposit_usd_equivalent_within2027": 24993.984375,
+      "balance_end2027_usd_equivalent": 18841.322318412163,
+      "external_balance_end2027_usd_equivalent": 13188.925622888513,
+      "average_external_balance_2027_usd_equivalent": 4077.6346589693903,
+      "account_goal_share_arithmetic": 0.0006577364309210527,
+      "roi": null,
+      "payback_month": null,
+      "financial_status": "N/D hasta inversión y Finance validados",
+      "monthly": [
+        {
+          "month": "2027-01-01",
+          "visits_incremental": 6.91875,
+          "openings_incremental": 0.0691875,
+          "funded_incremental": 0.03459375,
+          "balance_close_usd_equivalent": 81.871875,
+          "external_balance_close_usd_equivalent": 57.310312499999995,
+          "average_external_balance_usd_equivalent": 32.313538306451605
+        },
+        {
+          "month": "2027-02-01",
+          "visits_incremental": 13.8375,
+          "openings_incremental": 0.138375,
+          "funded_incremental": 0.0691875,
+          "balance_close_usd_equivalent": 239.2734375,
+          "external_balance_close_usd_equivalent": 167.49140624999998,
+          "average_external_balance_usd_equivalent": 113.7125390625
+        },
+        {
+          "month": "2027-03-01",
+          "visits_incremental": 27.675,
+          "openings_incremental": 0.27675,
+          "funded_incremental": 0.138375,
+          "balance_close_usd_equivalent": 539.9507812500001,
+          "external_balance_close_usd_equivalent": 377.96554687500003,
+          "average_external_balance_usd_equivalent": 287.3620047883064
+        },
+        {
+          "month": "2027-04-01",
+          "visits_incremental": 55.35,
+          "openings_incremental": 0.5535,
+          "funded_incremental": 0.27675,
+          "balance_close_usd_equivalent": 1140.296484375,
+          "external_balance_close_usd_equivalent": 798.2075390625,
+          "average_external_balance_usd_equivalent": 609.8806054687499
+        },
+        {
+          "month": "2027-05-01",
+          "visits_incremental": 96.86250000000001,
+          "openings_incremental": 0.9686250000000002,
+          "funded_incremental": 0.4843125000000001,
+          "balance_close_usd_equivalent": 2167.1062500000003,
+          "external_balance_close_usd_equivalent": 1516.974375,
+          "average_external_balance_usd_equivalent": 1208.8083058215725
+        },
+        {
+          "month": "2027-06-01",
+          "visits_incremental": 138.375,
+          "openings_incremental": 1.38375,
+          "funded_incremental": 0.691875,
+          "balance_close_usd_equivalent": 3597.4617187500003,
+          "external_balance_close_usd_equivalent": 2518.223203125,
+          "average_external_balance_usd_equivalent": 2072.0839453125
+        },
+        {
+          "month": "2027-07-01",
+          "visits_incremental": 179.88750000000002,
+          "openings_incremental": 1.7988750000000002,
+          "funded_incremental": 0.8994375000000001,
+          "balance_close_usd_equivalent": 5373.056059966217,
+          "external_balance_close_usd_equivalent": 3761.1392419763515,
+          "average_external_balance_usd_equivalent": 3234.7991560184178
+        },
+        {
+          "month": "2027-08-01",
+          "visits_incremental": 221.4,
+          "openings_incremental": 2.214,
+          "funded_incremental": 1.107,
+          "balance_close_usd_equivalent": 7495.034607263514,
+          "external_balance_close_usd_equivalent": 5246.524225084459,
+          "average_external_balance_usd_equivalent": 4620.899959336857
+        },
+        {
+          "month": "2027-09-01",
+          "visits_incremental": 262.9125,
+          "openings_incremental": 2.629125,
+          "funded_incremental": 1.3145625,
+          "balance_close_usd_equivalent": 9982.63688766892,
+          "external_balance_close_usd_equivalent": 6987.845821368243,
+          "average_external_balance_usd_equivalent": 6220.706820101352
+        },
+        {
+          "month": "2027-10-01",
+          "visits_incremental": 304.425,
+          "openings_incremental": 3.0442500000000003,
+          "funded_incremental": 1.5221250000000002,
+          "balance_close_usd_equivalent": 12767.00004222973,
+          "external_balance_close_usd_equivalent": 8936.900029560811,
+          "average_external_balance_usd_equivalent": 8123.341735948398
+        },
+        {
+          "month": "2027-11-01",
+          "visits_incremental": 332.09999999999997,
+          "openings_incremental": 3.3209999999999997,
+          "funded_incremental": 1.6604999999999999,
+          "balance_close_usd_equivalent": 15748.27747043919,
+          "external_balance_close_usd_equivalent": 11023.794229307432,
+          "average_external_balance_usd_equivalent": 10111.11150443412
+        },
+        {
+          "month": "2027-12-01",
+          "visits_incremental": 359.77500000000003,
+          "openings_incremental": 3.5977500000000004,
+          "funded_incremental": 1.7988750000000002,
+          "balance_close_usd_equivalent": 18841.322318412163,
+          "external_balance_close_usd_equivalent": 13188.925622888513,
+          "average_external_balance_usd_equivalent": 12296.595793033457
+        }
+      ],
+      "funded_incremental": 9.99759375,
+      "account_goal_share": 0.0006577364309210527
+    },
+    {
+      "case": "Base",
+      "nature": "Hipótesis ilustrativa anual, no forecast bancario validado",
+      "visits_incremental": 3874.5,
+      "openings_incremental": 77.49,
+      "funded_incremental_within2027": 50.3685,
+      "funded_scheduled_after2027": 0.0,
+      "first_deposit_usd_equivalent_within2027": 125921.25,
+      "balance_end2027_usd_equivalent": 109054.67657939189,
+      "external_balance_end2027_usd_equivalent": 76338.27360557432,
+      "average_external_balance_2027_usd_equivalent": 23973.872400195654,
+      "account_goal_share_arithmetic": 0.003313717105263158,
+      "roi": null,
+      "payback_month": null,
+      "financial_status": "N/D hasta inversión y Finance validados",
+      "monthly": [
+        {
+          "month": "2027-01-01",
+          "visits_incremental": 13.8375,
+          "openings_incremental": 0.27675,
+          "funded_incremental": 0.1798875,
+          "balance_close_usd_equivalent": 437.72625,
+          "external_balance_close_usd_equivalent": 306.408375,
+          "average_external_balance_usd_equivalent": 170.33218548387094
+        },
+        {
+          "month": "2027-02-01",
+          "visits_incremental": 41.512499999999996,
+          "openings_incremental": 0.8302499999999999,
+          "funded_incremental": 0.5396624999999999,
+          "balance_close_usd_equivalent": 1736.6639062499999,
+          "external_balance_close_usd_equivalent": 1215.6647343749999,
+          "average_external_balance_usd_equivalent": 766.15210546875
+        },
+        {
+          "month": "2027-03-01",
+          "visits_incremental": 83.02499999999999,
+          "openings_incremental": 1.6604999999999999,
+          "funded_incremental": 1.0793249999999999,
+          "balance_close_usd_equivalent": 4270.0795312499995,
+          "external_balance_close_usd_equivalent": 2989.0556718749995,
+          "average_external_balance_usd_equivalent": 2205.128191028225
+        },
+        {
+          "month": "2027-04-01",
+          "visits_incremental": 138.375,
+          "openings_incremental": 2.7675,
+          "funded_incremental": 1.798875,
+          "balance_close_usd_equivalent": 8437.473281249999,
+          "external_balance_close_usd_equivalent": 5906.231296874998,
+          "average_external_balance_usd_equivalent": 4570.941374999999
+        },
+        {
+          "month": "2027-05-01",
+          "visits_incremental": 207.5625,
+          "openings_incremental": 4.15125,
+          "funded_incremental": 2.6983125,
+          "balance_close_usd_equivalent": 14576.63390625,
+          "external_balance_close_usd_equivalent": 10203.643734374999,
+          "average_external_balance_usd_equivalent": 8311.857485383063
+        },
+        {
+          "month": "2027-06-01",
+          "visits_incremental": 276.75,
+          "openings_incremental": 5.535,
+          "funded_incremental": 3.59775,
+          "balance_close_usd_equivalent": 22670.07234375,
+          "external_balance_close_usd_equivalent": 15869.050640624997,
+          "average_external_balance_usd_equivalent": 13282.94296875
+        },
+        {
+          "month": "2027-07-01",
+          "visits_incremental": 345.9375,
+          "openings_incremental": 6.91875,
+          "funded_incremental": 4.4971875,
+          "balance_close_usd_equivalent": 32577.308880912162,
+          "external_balance_close_usd_equivalent": 22804.11621663851,
+          "average_external_balance_usd_equivalent": 19764.78337822853
+        },
+        {
+          "month": "2027-08-01",
+          "visits_incremental": 415.125,
+          "openings_incremental": 8.3025,
+          "funded_incremental": 5.396625,
+          "balance_close_usd_equivalent": 44305.5012035473,
+          "external_balance_close_usd_equivalent": 31013.850842483105,
+          "average_external_balance_usd_equivalent": 27422.823469076942
+        },
+        {
+          "month": "2027-09-01",
+          "visits_incremental": 484.31249999999994,
+          "openings_incremental": 9.68625,
+          "funded_incremental": 6.2960625,
+          "balance_close_usd_equivalent": 57903.2878125,
+          "external_balance_close_usd_equivalent": 40532.301468749996,
+          "average_external_balance_usd_equivalent": 36204.61877280405
+        },
+        {
+          "month": "2027-10-01",
+          "visits_incremental": 553.5,
+          "openings_incremental": 11.07,
+          "funded_incremental": 7.1955,
+          "balance_close_usd_equivalent": 73184.17047719595,
+          "external_balance_close_usd_equivalent": 51228.919334037164,
+          "average_external_balance_usd_equivalent": 46565.73032074842
+        },
+        {
+          "month": "2027-11-01",
+          "visits_incremental": 622.6875,
+          "openings_incremental": 12.45375,
+          "funded_incremental": 8.0949375,
+          "balance_close_usd_equivalent": 90323.31667652026,
+          "external_balance_close_usd_equivalent": 63226.321673564176,
+          "average_external_balance_usd_equivalent": 57782.46101161317
+        },
+        {
+          "month": "2027-12-01",
+          "visits_incremental": 691.875,
+          "openings_incremental": 13.8375,
+          "funded_incremental": 8.994375,
+          "balance_close_usd_equivalent": 109054.67657939189,
+          "external_balance_close_usd_equivalent": 76338.27360557432,
+          "average_external_balance_usd_equivalent": 70638.6975387628
+        }
+      ],
+      "funded_incremental": 50.3685,
+      "account_goal_share": 0.003313717105263158
+    },
+    {
+      "case": "Favorable",
+      "nature": "Hipótesis ilustrativa anual, no forecast bancario validado",
+      "visits_incremental": 6531.3,
+      "openings_incremental": 195.939,
+      "funded_incremental_within2027": 146.95425,
+      "funded_scheduled_after2027": 0.0,
+      "first_deposit_usd_equivalent_within2027": 367385.625,
+      "balance_end2027_usd_equivalent": 342807.44347550673,
+      "external_balance_end2027_usd_equivalent": 239965.21043285468,
+      "average_external_balance_2027_usd_equivalent": 71060.04878443043,
+      "account_goal_share_arithmetic": 0.009668042763157894,
+      "roi": null,
+      "payback_month": null,
+      "financial_status": "N/D hasta inversión y Finance validados",
+      "monthly": [
+        {
+          "month": "2027-01-01",
+          "visits_incremental": 27.675,
+          "openings_incremental": 0.83025,
+          "funded_incremental": 0.6226875000000001,
+          "balance_close_usd_equivalent": 1531.8112500000002,
+          "external_balance_close_usd_equivalent": 1072.267875,
+          "average_external_balance_usd_equivalent": 592.7985000000001
+        },
+        {
+          "month": "2027-02-01",
+          "visits_incremental": 69.1875,
+          "openings_incremental": 2.075625,
+          "funded_incremental": 1.55671875,
+          "balance_close_usd_equivalent": 5336.691328125,
+          "external_balance_close_usd_equivalent": 3735.6839296874996,
+          "average_external_balance_usd_equivalent": 2412.829740234375
+        },
+        {
+          "month": "2027-03-01",
+          "visits_incremental": 138.375,
+          "openings_incremental": 4.15125,
+          "funded_incremental": 3.1134375,
+          "balance_close_usd_equivalent": 12853.3078125,
+          "external_balance_close_usd_equivalent": 8997.31546875,
+          "average_external_balance_usd_equivalent": 6649.822511718749
+        },
+        {
+          "month": "2027-04-01",
+          "visits_incremental": 207.5625,
+          "openings_incremental": 6.226875,
+          "funded_incremental": 4.67015625,
+          "balance_close_usd_equivalent": 24037.034765624998,
+          "external_balance_close_usd_equivalent": 16825.924335937496,
+          "average_external_balance_usd_equivalent": 13212.650390625
+        },
+        {
+          "month": "2027-05-01",
+          "visits_incremental": 276.75,
+          "openings_incremental": 8.3025,
+          "funded_incremental": 6.226875,
+          "balance_close_usd_equivalent": 38764.54546875,
+          "external_balance_close_usd_equivalent": 27135.181828125,
+          "average_external_balance_usd_equivalent": 22547.19870703125
+        },
+        {
+          "month": "2027-06-01",
+          "visits_incremental": 415.125,
+          "openings_incremental": 12.45375,
+          "funded_incremental": 9.3403125,
+          "balance_close_usd_equivalent": 60918.38296875,
+          "external_balance_close_usd_equivalent": 42642.86807812499,
+          "average_external_balance_usd_equivalent": 35491.0859296875
+        },
+        {
+          "month": "2027-07-01",
+          "visits_incremental": 553.5,
+          "openings_incremental": 16.605,
+          "funded_incremental": 12.45375,
+          "balance_close_usd_equivalent": 90249.63822212837,
+          "external_balance_close_usd_equivalent": 63174.746755489854,
+          "average_external_balance_usd_equivalent": 54042.09866680743
+        },
+        {
+          "month": "2027-08-01",
+          "visits_incremental": 691.875,
+          "openings_incremental": 20.756249999999998,
+          "funded_incremental": 15.5671875,
+          "balance_close_usd_equivalent": 126718.10768158783,
+          "external_balance_close_usd_equivalent": 88702.67537711147,
+          "average_external_balance_usd_equivalent": 77355.32512880067
+        },
+        {
+          "month": "2027-09-01",
+          "visits_incremental": 830.25,
+          "openings_incremental": 24.9075,
+          "funded_incremental": 18.680625,
+          "balance_close_usd_equivalent": 170333.97780405407,
+          "external_balance_close_usd_equivalent": 119233.78446283784,
+          "average_external_balance_usd_equivalent": 105172.35187309966
+        },
+        {
+          "month": "2027-10-01",
+          "visits_incremental": 968.6249999999999,
+          "openings_incremental": 29.058749999999996,
+          "funded_incremental": 21.794062499999995,
+          "balance_close_usd_equivalent": 220827.01062922296,
+          "external_balance_close_usd_equivalent": 154578.90744045607,
+          "average_external_balance_usd_equivalent": 138889.60563914696
+        },
+        {
+          "month": "2027-11-01",
+          "visits_incremental": 1107.0,
+          "openings_incremental": 33.21,
+          "funded_incremental": 24.9075,
+          "balance_close_usd_equivalent": 278467.65448479727,
+          "external_balance_close_usd_equivalent": 194927.35813935808,
+          "average_external_balance_usd_equivalent": 176358.62872740708
+        },
+        {
+          "month": "2027-12-01",
+          "visits_incremental": 1245.375,
+          "openings_incremental": 37.36125,
+          "funded_incremental": 28.0209375,
+          "balance_close_usd_equivalent": 342807.44347550673,
+          "external_balance_close_usd_equivalent": 239965.21043285468,
+          "average_external_balance_usd_equivalent": 219996.18959860643
+        }
+      ],
+      "funded_incremental": 146.95425,
+      "account_goal_share": 0.009668042763157894
+    }
+  ],
+  "workbook": "Pibank-caso-negocio-anual-2027.xlsx",
+  "recalculation_engine": "Bundled LibreOffice",
+  "scale_tests_base": [
+    {
+      "share_provisional_goal": 0.01,
+      "accounts": 152.0,
+      "visits_required_at_constant_base_rates": 11692.307692307691,
+      "nature": "Escala hipotética; no cuota prometida ni periodo confirmado meta"
+    },
+    {
+      "share_provisional_goal": 0.05,
+      "accounts": 760.0,
+      "visits_required_at_constant_base_rates": 58461.538461538454,
+      "nature": "Escala hipotética; no cuota prometida ni periodo confirmado meta"
+    },
+    {
+      "share_provisional_goal": 0.1,
+      "accounts": 1520.0,
+      "visits_required_at_constant_base_rates": 116923.07692307691,
+      "nature": "Escala hipotética; no cuota prometida ni periodo confirmado meta"
+    }
+  ],
+  "investment_sensitivity_base": [
+    {
+      "hypothetical_total_investment_usd": 10000,
+      "value_per_account_needed_for_equilibrium": 198.53678390263758,
+      "nature": "Sensibilidad, no fee ni ROI"
+    },
+    {
+      "hypothetical_total_investment_usd": 25000,
+      "value_per_account_needed_for_equilibrium": 496.34195975659395,
+      "nature": "Sensibilidad, no fee ni ROI"
+    },
+    {
+      "hypothetical_total_investment_usd": 50000,
+      "value_per_account_needed_for_equilibrium": 992.6839195131879,
+      "nature": "Sensibilidad, no fee ni ROI"
+    }
+  ],
+  "delivery_capacity": {
+    "base_hours": 2560,
+    "reserve_hours": 336,
+    "total_hours": 2896,
+    "status": "Estimación planificación, no fee ni costo real"
+  }
+}

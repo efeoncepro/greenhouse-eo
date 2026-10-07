@@ -1,0 +1,342 @@
+{
+  "as_of": "2026-10-06",
+  "checks": [
+    {
+      "name": "json_parse",
+      "pass": true,
+      "detail": "121 JSON files parsed"
+    },
+    {
+      "name": "exact_keywords_unique",
+      "pass": true,
+      "detail": 4855
+    },
+    {
+      "name": "market_scope",
+      "pass": true,
+      "detail": "PE/es"
+    },
+    {
+      "name": "volume_states",
+      "pass": true,
+      "detail": {
+        "value": 3696,
+        "null": 678,
+        "zero": 466,
+        "missing": 15
+      }
+    },
+    {
+      "name": "csv_roundtrip",
+      "pass": true,
+      "detail": "row count"
+    },
+    {
+      "name": "model_snapshot_unchanged",
+      "pass": true,
+      "detail": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23"
+    },
+    {
+      "name": "panel_source_D01",
+      "pass": true,
+      "detail": "pibank-demand-2026-10-06/keyword-overview-provider.json"
+    },
+    {
+      "name": "panel_keyword_D01",
+      "pass": true,
+      "detail": "KW-6f1e9261d7de"
+    },
+    {
+      "name": "panel_volume_D01",
+      "pass": true,
+      "detail": 2900
+    },
+    {
+      "name": "panel_history_D01",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_D02",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-01-provider.json"
+    },
+    {
+      "name": "panel_keyword_D02",
+      "pass": true,
+      "detail": "KW-6a85782fedfa"
+    },
+    {
+      "name": "panel_volume_D02",
+      "pass": true,
+      "detail": 320
+    },
+    {
+      "name": "panel_history_D02",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_D03",
+      "pass": true,
+      "detail": "pibank-demand-2026-10-06/keyword-overview-provider.json"
+    },
+    {
+      "name": "panel_keyword_D03",
+      "pass": true,
+      "detail": "KW-96d6310d4067"
+    },
+    {
+      "name": "panel_volume_D03",
+      "pass": true,
+      "detail": 210
+    },
+    {
+      "name": "panel_history_D03",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_D04",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-01-provider.json"
+    },
+    {
+      "name": "panel_keyword_D04",
+      "pass": true,
+      "detail": "KW-2a790d8e0e07"
+    },
+    {
+      "name": "panel_volume_D04",
+      "pass": true,
+      "detail": 210
+    },
+    {
+      "name": "panel_history_D04",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_D05",
+      "pass": true,
+      "detail": "pibank-demand-2026-10-06/keyword-overview-provider.json"
+    },
+    {
+      "name": "panel_keyword_D05",
+      "pass": true,
+      "detail": "KW-0db6905fa453"
+    },
+    {
+      "name": "panel_volume_D05",
+      "pass": true,
+      "detail": 50
+    },
+    {
+      "name": "panel_history_D05",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_C01",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-05-provider.json"
+    },
+    {
+      "name": "panel_keyword_C01",
+      "pass": true,
+      "detail": "KW-4b5808c1040b"
+    },
+    {
+      "name": "panel_volume_C01",
+      "pass": true,
+      "detail": 1300
+    },
+    {
+      "name": "panel_history_C01",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_C02",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-01-provider.json"
+    },
+    {
+      "name": "panel_keyword_C02",
+      "pass": true,
+      "detail": "KW-6dd48781f2c5"
+    },
+    {
+      "name": "panel_volume_C02",
+      "pass": true,
+      "detail": 390
+    },
+    {
+      "name": "panel_history_C02",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_E01",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-08-provider.json"
+    },
+    {
+      "name": "panel_keyword_E01",
+      "pass": true,
+      "detail": "KW-fdba39a2d3e2"
+    },
+    {
+      "name": "panel_volume_E01",
+      "pass": true,
+      "detail": 1600
+    },
+    {
+      "name": "panel_history_E01",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_E02",
+      "pass": true,
+      "detail": "pibank-demand-2026-10-06/keyword-overview-provider.json"
+    },
+    {
+      "name": "panel_keyword_E02",
+      "pass": true,
+      "detail": "KW-a961453d693c"
+    },
+    {
+      "name": "panel_volume_E02",
+      "pass": true,
+      "detail": 880
+    },
+    {
+      "name": "panel_history_E02",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_E03",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-08-provider.json"
+    },
+    {
+      "name": "panel_keyword_E03",
+      "pass": true,
+      "detail": "KW-ee2d6a5d9b6c"
+    },
+    {
+      "name": "panel_volume_E03",
+      "pass": true,
+      "detail": 1000
+    },
+    {
+      "name": "panel_history_E03",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_E04",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/extra-related-01-provider.json"
+    },
+    {
+      "name": "panel_keyword_E04",
+      "pass": true,
+      "detail": "KW-d423bffb69ac"
+    },
+    {
+      "name": "panel_volume_E04",
+      "pass": true,
+      "detail": 590
+    },
+    {
+      "name": "panel_history_E04",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_source_F01",
+      "pass": true,
+      "detail": "pibank-expanded-2026-10-06/ranked-08-provider.json"
+    },
+    {
+      "name": "panel_keyword_F01",
+      "pass": true,
+      "detail": "KW-f592ba8452f0"
+    },
+    {
+      "name": "panel_volume_F01",
+      "pass": true,
+      "detail": 480
+    },
+    {
+      "name": "panel_history_F01",
+      "pass": true,
+      "detail": "Sep2025-Aug2026"
+    },
+    {
+      "name": "panel_subtotals",
+      "pass": true,
+      "detail": {
+        "acquisition_direct": 3690,
+        "acquisition_conditional": 1690,
+        "assisted_education": 4070,
+        "future_usd": 480
+      }
+    },
+    {
+      "name": "ledger_costs",
+      "pass": true,
+      "detail": {
+        "requests": 52,
+        "known": 51,
+        "unknown": 1,
+        "subtotal": 1.14582
+      }
+    },
+    {
+      "name": "unknown_request_not_measured",
+      "pass": true,
+      "detail": "aborted without provider file"
+    },
+    {
+      "name": "cost_report_honest",
+      "pass": true,
+      "detail": "full cost N/D"
+    },
+    {
+      "name": "suggestion_pagination",
+      "pass": true,
+      "detail": "10 seeds exhausted"
+    },
+    {
+      "name": "serp_scope",
+      "pass": true,
+      "detail": "19 captures;17generic without Pibank in captured organic"
+    },
+    {
+      "name": "serp_ai_not_baseline",
+      "pass": true,
+      "detail": "provider blocks only"
+    },
+    {
+      "name": "cluster_direct_subtotal",
+      "pass": true,
+      "detail": "3 direct clusters; support/brand not acquisition"
+    },
+    {
+      "name": "research_local_links",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "limitations": [
+    "BBVA filtered rankings partial; one aborted paid request has unknown cost",
+    "Classification lanes are candidates; only curated panel model-ready",
+    "No private analytics, measured conversion or controlled AEO baseline"
+  ],
+  "status": "PASS bounded research for internal preparation",
+  "model_input_sha256": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23"
+}

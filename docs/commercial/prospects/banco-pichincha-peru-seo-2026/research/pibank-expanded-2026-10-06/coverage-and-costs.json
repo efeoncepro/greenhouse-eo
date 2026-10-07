@@ -1,0 +1,219 @@
+{
+  "as_of": "2026-10-06",
+  "paid_requests_recorded": 52,
+  "known_paid_responses": 51,
+  "known_cost_subtotal_usd": 1.14582,
+  "full_observed_cost_usd": 1.27782,
+  "planned_exposure_estimate_usd": 1.27782,
+  "free_preflight_calls": 2,
+  "free_preflight_cost_usd": 0,
+  "reused_previous_calls": {
+    "keyword_raws": 2,
+    "valid_serp_captures": 4,
+    "incremental_cost_usd": 0,
+    "previous_research_cost_usd": 0.07714
+  },
+  "normalised_keywords": 4855,
+  "with_volume": 4162,
+  "volume_null_or_missing": 693,
+  "lane_counts": {
+    "excluded_noise": 1123,
+    "assisted_education": 710,
+    "brand_competitor": 2076,
+    "acquisition_direct": 459,
+    "future_usd": 194,
+    "substitute_or_other_product": 186,
+    "acquisition_conditional": 100,
+    "brand_own": 7
+  },
+  "coverage_subjects": [
+    {
+      "id": "suggestion-01",
+      "subject": "cuenta de ahorros",
+      "pages_measured": 3,
+      "returned_rows": 1433,
+      "unique_exact_keywords": 1433,
+      "duplicate_keywords": 0,
+      "reported_total": 1433,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-02",
+      "subject": "cuenta digital",
+      "pages_measured": 2,
+      "returned_rows": 769,
+      "unique_exact_keywords": 769,
+      "duplicate_keywords": 0,
+      "reported_total": 769,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-03",
+      "subject": "mejor banco para ahorrar",
+      "pages_measured": 1,
+      "returned_rows": 41,
+      "unique_exact_keywords": 41,
+      "duplicate_keywords": 0,
+      "reported_total": 41,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-04",
+      "subject": "intereses cuenta de ahorros",
+      "pages_measured": 1,
+      "returned_rows": 49,
+      "unique_exact_keywords": 49,
+      "duplicate_keywords": 0,
+      "reported_total": 49,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-05",
+      "subject": "transferencia bancaria",
+      "pages_measured": 2,
+      "returned_rows": 460,
+      "unique_exact_keywords": 460,
+      "duplicate_keywords": 0,
+      "reported_total": 460,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-06",
+      "subject": "fondo de seguro de depositos",
+      "pages_measured": 1,
+      "returned_rows": 6,
+      "unique_exact_keywords": 6,
+      "duplicate_keywords": 0,
+      "reported_total": 6,
+      "exhausted": true
+    },
+    {
+      "id": "suggestion-07",
+      "subject": "cuenta en dolares",
+      "pages_measured": 2,
+      "returned_rows": 499,
+      "unique_exact_keywords": 499,
+      "duplicate_keywords": 0,
+      "reported_total": 499,
+      "exhausted": true
+    },
+    {
+      "id": "extra-suggestion-01",
+      "subject": "como ahorrar dinero",
+      "pages_measured": 1,
+      "returned_rows": 299,
+      "unique_exact_keywords": 299,
+      "duplicate_keywords": 0,
+      "reported_total": 299,
+      "exhausted": true
+    },
+    {
+      "id": "extra-suggestion-02",
+      "subject": "que banco paga mas intereses",
+      "pages_measured": 1,
+      "returned_rows": 28,
+      "unique_exact_keywords": 28,
+      "duplicate_keywords": 0,
+      "reported_total": 28,
+      "exhausted": true
+    },
+    {
+      "id": "extra-suggestion-03",
+      "subject": "bancos seguros peru",
+      "pages_measured": 1,
+      "returned_rows": 2,
+      "unique_exact_keywords": 2,
+      "duplicate_keywords": 0,
+      "reported_total": 2,
+      "exhausted": true
+    },
+    {
+      "id": "ranked-08",
+      "subject": "viabcp.com",
+      "pages_measured": 2,
+      "returned_rows": 917,
+      "unique_exact_keywords": 917,
+      "duplicate_keywords": 0,
+      "reported_total": 917,
+      "exhausted": true
+    },
+    {
+      "id": "ranked-09",
+      "subject": "bbva.pe",
+      "pages_measured": 1,
+      "returned_rows": 500,
+      "unique_exact_keywords": 500,
+      "duplicate_keywords": 0,
+      "reported_total": 1544,
+      "exhausted": false
+    }
+  ],
+  "valid_serp_captures": 19,
+  "new_serp_captures": 15,
+  "queries": [
+    "abrir cuenta de ahorros online",
+    "cuenta de ahorros",
+    "cuenta de ahorros de alto rendimiento",
+    "cuenta de ahorros sin mantenimiento",
+    "cuenta de alto rendimiento peru",
+    "cuenta digital",
+    "fondo de seguro de depositos",
+    "mejor cuenta de ahorros peru",
+    "pibank peru",
+    "que banco paga mas intereses en peru"
+  ],
+  "devices": [
+    "desktop",
+    "mobile"
+  ],
+  "failed_serp_requests_reused_as_failures_only": 7,
+  "ai_overview_provider_blocks_returned": 16,
+  "llm_baseline_measured": false,
+  "monthly_inputs_sha256": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23",
+  "model_panel_proxy": {
+    "acquisition_conditional": 1690,
+    "acquisition_direct": 3690,
+    "assisted_education": 4070,
+    "future_usd": 480
+  },
+  "status": "complete_bounded_research_with_BBVA_partial_and_unknown_cost; no retries; unexecuted overview/page3 not measured",
+  "ceiling_operational_usd": 2,
+  "ceiling_policy": "Delegated operating limit inside existing Efeonce acquisition budget; not a separate client budget",
+  "cost_reconciliation": {
+    "request": "ranked-09-page2",
+    "provider_task_id": "10061922-1987-0381-0000-51045e53a5b8",
+    "verified_by": "DataForSEO portal Task lookup and Metadata after operator login",
+    "provider_cost_usd": 0.132,
+    "returned_rows_reported": 1000,
+    "target": "bbva.pe",
+    "offset": 500,
+    "limit": 1000,
+    "market": "PE/2604/es",
+    "filters": "relative_url regex (?i)(cuenta|ahorr|deposit|transfer)",
+    "status": "completed_paid_result_not_available_in_portal",
+    "result_recovered": false,
+    "repeated_post": false,
+    "reason": "Portal Result disabled; completed status/cost do not recover keyword rows",
+    "source_url": "https://app.dataforseo.com/api-detail/dataforseo-labs"
+  },
+  "remaining_unknown_cost_requests": [],
+  "historical_cost_status": "reconciled via portal task10061922-1987-0381-0000-51045e53a5b8; missing rows still unavailable",
+  "latest_expansion_ledger": "../pibank-gap-closure-2026-10-06/resultados.json",
+  "unknown_cost_requests": [],
+  "historically_aborted_requests": [
+    {
+      "id": "ranked-09-page2",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.132,
+      "output": "ranked-09-page2-provider.json",
+      "exit_code": 2,
+      "cost_usd": null,
+      "statuses": [],
+      "stderr_redacted": "This operation was aborted\n",
+      "reconciled_cost_usd": 0.132,
+      "reconciliation_source": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/conciliacion-bbva.json"
+    }
+  ],
+  "confirmed_cost_tasks": 52
+}

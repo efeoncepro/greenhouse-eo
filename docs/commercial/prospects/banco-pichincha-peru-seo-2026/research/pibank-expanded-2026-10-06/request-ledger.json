@@ -1,0 +1,832 @@
+{
+  "ceiling_usd": 2,
+  "requests": [
+    {
+      "id": "suggestion-01",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.132,
+      "output": "suggestion-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.132,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061913-1987-0399-0000-559c4f0d3bb9"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-02",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-02-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.06,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-17d66fdc22a2"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-03",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-03-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01692,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-584e18ab8457"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-04",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-04-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01788,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-63e24ffcc378"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-05",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-05-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.06,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-8ecc2370d866"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-06",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-06-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01272,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-5e753a58132e"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-07",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.06,
+      "output": "suggestion-07-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.06,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0399-0000-f1cbfaac9654"
+        }
+      ]
+    },
+    {
+      "id": "related-01",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0234,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0387-0000-ebd823173be8"
+        }
+      ]
+    },
+    {
+      "id": "related-02",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-02-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.024,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0387-0000-feb89b3585e1"
+        }
+      ]
+    },
+    {
+      "id": "related-03",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-03-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0192,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0387-0000-034d311c8e26"
+        }
+      ]
+    },
+    {
+      "id": "related-04",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-04-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01248,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0387-0000-05e2487d4542"
+        }
+      ]
+    },
+    {
+      "id": "related-05",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-05-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01932,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061914-1987-0387-0000-9ff67e8a1f52"
+        }
+      ]
+    },
+    {
+      "id": "related-06",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-06-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01272,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0387-0000-99a1b04ff995"
+        }
+      ]
+    },
+    {
+      "id": "related-07",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-07-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.012,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0387-0000-9b8bfea4a220"
+        }
+      ]
+    },
+    {
+      "id": "related-08",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "related-08-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.02688,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0387-0000-13d9c1b6a19e"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-01-page2",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.05196,
+      "output": "suggestion-01-page2-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.05196,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0399-0000-c4d5750f0d47"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-02-page2",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.05628,
+      "output": "suggestion-02-page2-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.05628,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0399-0000-3d414745ed66"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-05-page2",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.0192,
+      "output": "suggestion-05-page2-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0192,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0399-0000-48599e673679"
+        }
+      ]
+    },
+    {
+      "id": "suggestion-07-page2",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.02388,
+      "output": "suggestion-07-page2-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.02388,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0399-0000-64f06971be28"
+        }
+      ]
+    },
+    {
+      "id": "ranked-01",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01488,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061915-1987-0381-0000-17d2f98aeb09"
+        }
+      ]
+    },
+    {
+      "id": "ranked-02",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-02-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01308,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-2807795b1a2e"
+        }
+      ]
+    },
+    {
+      "id": "ranked-03",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-03-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01212,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-02dd35fc3c69"
+        }
+      ]
+    },
+    {
+      "id": "ranked-04",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-04-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01272,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-9a21212a5a39"
+        }
+      ]
+    },
+    {
+      "id": "ranked-05",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-05-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01428,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-92472ff16307"
+        }
+      ]
+    },
+    {
+      "id": "ranked-06",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-06-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01272,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-717debb85bb1"
+        }
+      ]
+    },
+    {
+      "id": "ranked-07",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-07-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.012,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-49101e14f3f8"
+        }
+      ]
+    },
+    {
+      "id": "ranked-08",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-08-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.072,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-c011335956d7"
+        }
+      ]
+    },
+    {
+      "id": "ranked-09",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.072,
+      "output": "ranked-09-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.072,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061916-1987-0381-0000-155364d725ca"
+        }
+      ]
+    },
+    {
+      "id": "extra-suggestion-01",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.048,
+      "output": "extra-suggestion-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.04788,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0399-0000-a53e52c37677"
+        }
+      ]
+    },
+    {
+      "id": "extra-related-01",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "extra-related-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01656,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0387-0000-c42716486728"
+        }
+      ]
+    },
+    {
+      "id": "extra-suggestion-02",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.048,
+      "output": "extra-suggestion-02-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01536,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0399-0000-bbec4994cf86"
+        }
+      ]
+    },
+    {
+      "id": "extra-related-02",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "extra-related-02-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0126,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0387-0000-2f7e6bb9d441"
+        }
+      ]
+    },
+    {
+      "id": "extra-suggestion-03",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_suggestions/live",
+      "kind": "suggestion",
+      "estimate_usd": 0.048,
+      "output": "extra-suggestion-03-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.01224,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0399-0000-8ab113294819"
+        }
+      ]
+    },
+    {
+      "id": "extra-related-03",
+      "endpoint": "/v3/dataforseo_labs/google/related_keywords/live",
+      "kind": "related",
+      "estimate_usd": 0.048,
+      "output": "extra-related-03-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.012,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0387-0000-76ed42579d40"
+        }
+      ]
+    },
+    {
+      "id": "serp-competitors-01",
+      "endpoint": "/v3/dataforseo_labs/google/serp_competitors/live",
+      "kind": "serp_competitors",
+      "estimate_usd": 0.018,
+      "output": "serp-competitors-01-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.018,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0383-0000-9fba6b864004"
+        }
+      ]
+    },
+    {
+      "id": "serp-01-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-01-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061917-1987-0139-0000-b7d4ed3e3749"
+        }
+      ]
+    },
+    {
+      "id": "serp-01-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-01-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061918-1987-0139-0000-9bf8af734377"
+        }
+      ]
+    },
+    {
+      "id": "serp-02-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-02-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061918-1987-0139-0000-14c99ae01cc7"
+        }
+      ]
+    },
+    {
+      "id": "serp-02-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-02-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061918-1987-0139-0000-d4cec63a173c"
+        }
+      ]
+    },
+    {
+      "id": "serp-03-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-03-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061918-1987-0139-0000-45f0553e4d1c"
+        }
+      ]
+    },
+    {
+      "id": "serp-04-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-04-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061918-1987-0139-0000-0b4bf7b48a49"
+        }
+      ]
+    },
+    {
+      "id": "serp-04-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-04-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061919-1987-0139-0000-c3419706fe2a"
+        }
+      ]
+    },
+    {
+      "id": "serp-05-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-05-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061919-1987-0139-0000-f64c78f15292"
+        }
+      ]
+    },
+    {
+      "id": "serp-05-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-05-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061920-1987-0139-0000-cc3baa765aff"
+        }
+      ]
+    },
+    {
+      "id": "serp-06-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-06-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061920-1987-0139-0000-120c3554b5cc"
+        }
+      ]
+    },
+    {
+      "id": "serp-06-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-06-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061920-1987-0139-0000-0e1dbcc090e2"
+        }
+      ]
+    },
+    {
+      "id": "serp-07-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-07-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061921-1987-0139-0000-495957dacc1b"
+        }
+      ]
+    },
+    {
+      "id": "serp-07-mobile",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-07-mobile-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061921-1987-0139-0000-ee5cd9b77f4f"
+        }
+      ]
+    },
+    {
+      "id": "serp-08-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-08-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061921-1987-0139-0000-f0e418ea4e53"
+        }
+      ]
+    },
+    {
+      "id": "serp-09-desktop",
+      "endpoint": "/v3/serp/google/organic/live/advanced",
+      "kind": "serp",
+      "estimate_usd": 0.005,
+      "output": "serp-09-desktop-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.0035,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061922-1987-0139-0000-00d726681a1c"
+        }
+      ]
+    },
+    {
+      "id": "ranked-08-page2",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.06204,
+      "output": "ranked-08-page2-provider.json",
+      "exit_code": 0,
+      "cost_usd": 0.06204,
+      "statuses": [
+        {
+          "code": 20000,
+          "message": "Ok.",
+          "id": "10061922-1987-0381-0000-9919d76c08e4"
+        }
+      ]
+    },
+    {
+      "id": "ranked-09-page2",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "kind": "ranked",
+      "estimate_usd": 0.132,
+      "output": "ranked-09-page2-provider.json",
+      "exit_code": 2,
+      "cost_usd": null,
+      "statuses": [],
+      "stderr_redacted": "This operation was aborted\n"
+    }
+  ]
+}

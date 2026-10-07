@@ -1,0 +1,138 @@
+{
+  "as_of": "2026-10-06",
+  "status": "PASS reaudited bounded corpus; decision support only",
+  "source_dataset_sha256": "74a70af6088099f7d21ac7885d2beda3420fe238dbd5b9b84f1f18853aadc254",
+  "source_monthly_panel_sha256": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23",
+  "keyword_count": 4855,
+  "all_keywords_have_verdict": true,
+  "curated_opportunity_families": 32,
+  "provider_core_or_exact_families": 3886,
+  "lane_keyword_counts_not_demand": {
+    "excluded": 1444,
+    "assisted": 323,
+    "service": 324,
+    "benchmark": 1576,
+    "conditional": 910,
+    "direct": 82,
+    "future": 189,
+    "brand": 7
+  },
+  "faq_read": 51,
+  "faq_source": "same-day previously obtained public census; no new crawl",
+  "manual_keys_not_found": [
+    "cuenta de ahorros en soles"
+  ],
+  "aggregation_policy": "No sum of representative volumes or cores as market; no claim unique users; no blanket MAX; opportunities can overlap",
+  "new_paid_calls": 0,
+  "additional_provider_cost_usd": 0,
+  "own_brand_baseline": null,
+  "aeo_baseline": null,
+  "eligible_sessions": null,
+  "onboarding_conversion": null,
+  "funding_and_balance_baseline": null,
+  "full_program_return": null,
+  "history_policy": "Original research/model unchanged; representative history available source rows, not2027 forecast",
+  "checks": {
+    "unique_ids": true,
+    "all_rows_classified": true,
+    "all_sources_local": true,
+    "no_acquisition_forecast": true,
+    "no_current_brand_volume_inferred": true
+  },
+  "verification": [
+    {
+      "name": "keyword_coverage_exact",
+      "pass": true,
+      "details": 4855
+    },
+    {
+      "name": "intent_families_unique",
+      "pass": true,
+      "details": 32
+    },
+    {
+      "name": "provider_family_coverage",
+      "pass": true,
+      "details": 3886
+    },
+    {
+      "name": "member_counts",
+      "pass": true,
+      "details": "no duplicate row assignment"
+    },
+    {
+      "name": "every_row_has_modelability",
+      "pass": true,
+      "details": "4855 verdicts"
+    },
+    {
+      "name": "no_aggregation",
+      "pass": true,
+      "details": "no MAX/sum population"
+    },
+    {
+      "name": "facts_source_exists",
+      "pass": true,
+      "details": "source paths"
+    },
+    {
+      "name": "corpus_url_unique",
+      "pass": true,
+      "details": "51same-day read responses"
+    },
+    {
+      "name": "previous_model_input_preserved",
+      "pass": true,
+      "details": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23"
+    },
+    {
+      "name": "recovered_need",
+      "pass": true,
+      "details": "conditional consideration, no sum390+110"
+    },
+    {
+      "name": "competitor_consideration_retained",
+      "pass": true,
+      "details": "608conditional candidates, no acquirable volume claim"
+    },
+    {
+      "name": "bank_interest_conditional",
+      "pass": true,
+      "details": "without exact decisive SERP"
+    },
+    {
+      "name": "unmeasured_preserved",
+      "pass": true,
+      "details": "N/D remains"
+    },
+    {
+      "name": "volume_states_conserved",
+      "pass": true,
+      "details": {
+        "value": 3696,
+        "null": 678,
+        "zero": 466,
+        "missing": 15
+      }
+    },
+    {
+      "name": "memo_links",
+      "pass": true,
+      "details": []
+    }
+  ],
+  "official_public_source_readback": {
+    "as_of": "2026-10-06",
+    "product": "https://pibank.pe/cuenta-soles-pibank/",
+    "identity": "https://pibank.pe/quienes-somos/",
+    "faq_index_attempt": "tool_unavailable; individual earlier same-day census reused",
+    "source_corpus_sha256": "bbe50bb4349fa385a78e927efd250e2459a3b3059807b07a4d3ee0af997cadb6"
+  },
+  "artifact_sha256": {
+    "oportunidades-curadas.csv": "07c55215bc92f085a5f69c2d8899b7213e9f2ca2223dd43c3bc0354c6b4ffe23",
+    "auditoria-keywords.csv": "01896687cea1d1775bc044d0ba673f894fab72a9eb2ba9c0d0179ce8e5ad862d",
+    "familias-proveedor.csv": "57a36e5c2c7dd35c76b38a80e51c2ac0d0fd01f4f6661b228c99ce2a133e0e50",
+    "cobertura-corpus-publico.csv": "724cb70f200b7b53a1ee9b942f803d9a146eaeff4fada1a5e18b57a469915f9a",
+    "OPORTUNIDAD-Y-COBERTURA.md": "d8e608e9685823d5cb5fdfe12895b201a932527cf925538b6fd7bc66ac4fe405"
+  }
+}

@@ -13,6 +13,10 @@ with retainer capacity and complete costs preserved. Collection targets are not 
 Greenhouse billing/OT/brief/CX implementation requires its own formal unit; other models retain their states.
 Acquisition: public tenders, private tenders, cold prospecting and paid media. Track cost, conversion and cash by entry;
 load `greenhouse-public-private-tenders` for tenders and preserve its contracts.
+Factory applies only to On-Demand engagements. Monthly/continuous services are named Efeonce; classify
+before naming a Deal. Project installments/milestones do not prove recurrence. Canon: accepted delta and model V1.4.
+Prioritize proposals by fit; current spare capacity does not cap the number of proposals. Separate preparation
+from production commitments; validate execution, suppliers, margin and cash before a binding offer.
 
 The canonical operating skill is `.codex/skills/efeonce-business-model-operator/SKILL.md`.
 Its hardening set includes portfolio/capability model contracts, source catalog, acceptance criteria and
@@ -85,3 +89,10 @@ Full-chain and bounded-chain scopes preserve delivery/engagement/mode taxonomy; 
 expansion are lifecycle stages. Quality requires acceptance and correction, time-to-market claims need a baseline,
 and each offer retains its economic, commercial and runtime gates. The full instructions remain in the canonical
 Codex skill above.
+
+## Casos de negocio SEO/AEO
+
+For SEO/AEO business cases, load
+[case-to-proposal decisions](../seo-aeo/references/caso-negocio-y-propuesta.md): separate customer outcomes,
+service duration, cohort value and complete delivery costs. Complementary growth mechanisms cannot
+count the same outcome twice. A prospect case does not create a new offer or approve price or capacity.

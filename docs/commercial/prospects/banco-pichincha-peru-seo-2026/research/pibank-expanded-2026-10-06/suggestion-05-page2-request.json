@@ -1,0 +1,14 @@
+[
+  {
+    "keyword": "transferencia bancaria",
+    "location_code": 2604,
+    "language_code": "es",
+    "include_seed_keyword": false,
+    "include_serp_info": true,
+    "limit": 60,
+    "offset": 400,
+    "order_by": [
+      "keyword_info.search_volume,desc"
+    ]
+  }
+]

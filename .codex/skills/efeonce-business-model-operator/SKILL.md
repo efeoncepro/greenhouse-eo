@@ -494,3 +494,10 @@ No decir “listo para escalar” si faltan economics, capacidad, rights, soport
 - Crear V2 o una decisión que superseda; no reescribir historia para ocultar un cambio.
 - Ejecutar `checklists/business-model-review.md`, `quick_validate.py` y el protocolo ciego de `evals/protocol.md`
   para cambios sustantivos antes de cierre.
+
+## Casos de negocio SEO/AEO
+
+For SEO/AEO business cases, load
+[case-to-proposal decisions](../seo-aeo/references/caso-negocio-y-propuesta.md): separate customer outcomes,
+service duration, cohort value and complete delivery costs. Complementary growth mechanisms cannot
+count the same outcome twice. A prospect case does not create a new offer or approve price or capacity.

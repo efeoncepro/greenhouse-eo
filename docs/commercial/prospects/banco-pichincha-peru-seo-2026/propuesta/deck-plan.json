@@ -1,0 +1,405 @@
+{
+  "tenderId": "PIBANK-PROPUESTA-2027",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "template": "CoverFull",
+      "slots": {
+        "clientLogo": {
+          "src": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTI5cHgiIGhlaWdodD0iMzNweCIgdmlld0JveD0iMCAwIDEyOSAzMyIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNDcuMSAoNDU0MjIpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPmxvZ288L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz4KICAgICAgICA8cG9seWdvbiBpZD0icGF0aC0xIiBwb2ludHM9IjUuNjkwMzU1ODllLTE2IDIwLjkyODg2MjQgNS42OTAzNTU4OWUtMTYgMC4yMzc1NzAxODEgMTUuNzUxNjg3NiAwLjIzNzU3MDE4MSAxNS43NTE2ODc2IDIwLjkyODg2MjQiPjwvcG9seWdvbj4KICAgICAgICA8cG9seWdvbiBpZD0icGF0aC0zIiBwb2ludHM9IjMxLjY3Mjc4NjYgMzEuODYyOTUzNSAwLjIyNzUxOTUwNSAzMS44NjI5NTM1IDAuMjI3NTE5NTA1IDAuMDU0MTkyNTExMyAzMS42NzI3ODY2IDAuMDU0MTkyNTExMyI+PC9wb2x5Z29uPgogICAgPC9kZWZzPgogICAgPGcgaWQ9ImRlc2t0b3AiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSIwNmJsb2dfMDRkZXRhbGxlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTA5LjAwMDAwMCwgLTY5LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0iaGVhZGVyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDkuMDAwMDAwLCAyMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJsb2dvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwgNDguMDAwMDAwKSI+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwLTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCA4LjEwMjg3NykiPgogICAgICAgICAgICAgICAgICAgICAgICA8bWFzayBpZD0ibWFzay0yIiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dXNlIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJDbGlwLTIiPjwvZz4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTcuODc1ODE4NjEsMTEuNjY5NzQzIEM4LjkwMDY1MTczLDExLjY2OTc0MyA5LjcyMDM2NzA0LDExLjM0Mzk3NjIgMTAuMzY0NDQ3MSwxMC42OTI0NDI1IEMxMS4wMzgwMDk2LDEwLjA0MDkwODggMTEuMzU5Nzk3Niw5LjE1MjMxNDc3IDExLjM1OTc5NzYsOC4wNTY0ODQwNyBDMTEuMzU5Nzk3Niw2Ljk2MDY1MzM3IDExLjAzODAwOTYsNi4wNzIwNTkzMyAxMC4zNjQ0NDcxLDUuNDIwNTI1NjUgQzkuNzIwMzY3MDQsNC43Njg5OTE5OCA4LjkwMDY1MTczLDQuNDQzMjI1MTQgNy44NzU4MTg2MSw0LjQ0MzIyNTE0IEM2Ljg1MTQ4OTQ2LDQuNDQzMjI1MTQgNi4wMzEyNzAxOCw0Ljc2ODk5MTk4IDUuMzU3OTU5NjEsNS40MjA1MjU2NSBDNC43MTM4Nzk1OCw2LjA3MjA1OTMzIDQuMzkxODM5NTcsNi45NjA2NTMzNyA0LjM5MTgzOTU3LDguMDU2NDg0MDcgQzQuMzkxODM5NTcsOS4xNTIzMTQ3NyA0LjcxMzg3OTU4LDEwLjA0MDkwODggNS4zNTc5NTk2MSwxMC42OTI0NDI1IEM2LjAzMTI3MDE4LDExLjM0Mzk3NjIgNi44NTE0ODk0NiwxMS42Njk3NDMgNy44NzU4MTg2MSwxMS42Njk3NDMgTTEzLjcwMjUyNTMsMi41MTc5MzgwNCBDMTUuMDc4Mzc3LDQuMDI4NDk2OTQgMTUuNzUxNjg3Niw1Ljg2NDgyMjY4IDE1Ljc1MTY4NzYsOC4wNTY0ODQwNyBDMTUuNzUxNjg3NiwxMC4yNDgxNDU1IDE1LjA3ODM3NywxMi4xMTQwNCAxMy43MDI1MjUzLDEzLjYyNDM0NCBDMTIuMzI2MTY5NywxNS4xMzQ5MDI5IDEwLjY4NjQ4NzEsMTUuODc1Mzk4IDguNzU0MjQ3LDE1Ljg3NTM5OCBDNi44ODA0NjgwMiwxNS44NzUzOTggNS40MTY0MjA3LDE1LjI4MzAwMTkgNC4zOTE4Mzk1NywxNC4wNjg2NDEgTDQuMzkxODM5NTcsMTguNjg5Mjc5MSBDNC4zOTE4Mzk1NywxOS45MjYwNzE1IDMuNDAwNTIwNzgsMjAuOTI4ODYyNCAyLjE3NzYyNTQ5LDIwLjkyODg2MjQgTC01LjAzOTc0OTA3ZS0wNSwyMC45Mjg4NjI0IEwtNS4wMzk3NDkwN2UtMDUsMC42NTIyOTgzODQgTDQuMzkxODM5NTcsMC42NTIyOTgzODQgTDQuMzkxODM5NTcsMi4wNDQzMjcxIEM1LjQxNjQyMDcsMC44Mjk5NjYyMTMgNi44ODA0NjgwMiwwLjIzNzU3MDE4MSA4Ljc1NDI0NywwLjIzNzU3MDE4MSBDMTAuNjg2NDg3MSwwLjIzNzU3MDE4MSAxMi4zMjYxNjk3LDEuMDA3NjM0MDQgMTMuNzAyNTI1MywyLjUxNzkzODA0IiBpZD0iRmlsbC0xIiBmaWxsPSIjRkZGRkZGIiBtYXNrPSJ1cmwoI21hc2stMikiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgPHBvbHlnb24gaWQ9IkZpbGwtNCIgZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIxNy40MzQyNTg1IDIzLjU2MzU0NjMgMjEuODI2MTQ4NCAyMy41NjM1NDYzIDIxLjgyNjE0ODQgOC43NTQ5MjAwMSAxNy40MzQyNTg1IDguNzU0OTIwMDEiPjwvcG9seWdvbj4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMTYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0LjE5MDc5OSwgMC4yMDA4NjQpIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTcuOTI2NTE4NDksMTkuNTcxNzU1NSBDOC45NTEzNTE2MSwxOS41NzE3NTU1IDkuNzcxMDY2OTIsMTkuMjQ1OTg4NiAxMC40MTUzOTg5LDE4LjU5NDQ1NSBDMTEuMDg4OTYxNSwxNy45NDI5MjEzIDExLjQxMDQ5NzUsMTcuMDU0MzI3MiAxMS40MTA0OTc1LDE1Ljk1ODQ5NjUgQzExLjQxMDQ5NzUsMTQuODYyNjY1OCAxMS4wODg5NjE1LDEzLjk3NDA3MTggMTAuNDE1Mzk4OSwxMy4zMjI1MzgxIEM5Ljc3MTA2NjkyLDEyLjY3MTAwNDUgOC45NTEzNTE2MSwxMi4zNDUyMzc2IDcuOTI2NTE4NDksMTIuMzQ1MjM3NiBDNi45MDIxODkzNCwxMi4zNDUyMzc2IDYuMDgyMjIyMDUsMTIuNjcxMDA0NSA1LjQwODkxMTQ4LDEzLjMyMjUzODEgQzQuNzY0NTc5NDYsMTMuOTc0MDcxOCA0LjQ0Mjc5MTQ0LDE0Ljg2MjY2NTggNC40NDI3OTE0NCwxNS45NTg0OTY1IEM0LjQ0Mjc5MTQ0LDE3LjA1NDMyNzIgNC43NjQ1Nzk0NiwxNy45NDI5MjEzIDUuNDA4OTExNDgsMTguNTk0NDU1IEM2LjA4MjIyMjA1LDE5LjI0NTk4ODYgNi45MDIxODkzNCwxOS41NzE3NTU1IDcuOTI2NTE4NDksMTkuNTcxNzU1NSBNMTMuNzUyOTczMiwxMC40MTk5NTA1IEMxNS4xMjg4MjQ5LDExLjkzMDUwOTQgMTUuODAyNjM5NSwxMy43NjY4MzUxIDE1LjgwMjYzOTUsMTUuOTU4NDk2NSBDMTUuODAyNjM5NSwxOC4xNTAxNTc5IDE1LjEyODgyNDksMjAuMDE2MDUyNSAxMy43NTI5NzMyLDIxLjUyNjM1NjUgQzEyLjM3Njg2OTYsMjMuMDM2OTE1NCAxMC43MzcxODcsMjMuNzc3NDEwNCA4LjgwNDk0Njg4LDIzLjc3NzQxMDQgQzYuOTMxNDE5ODksMjMuNzc3NDEwNCA1LjQ2NzEyMDU5LDIzLjE4NTAxNDQgNC40NDI3OTE0NCwyMS45NzA2NTM1IEw0LjQ0Mjc5MTQ0LDIzLjM2MjY4MjIgTDAuMDUwNjQ5NDg1NSwyMy4zNjI2ODIyIEwwLjA1MDY0OTQ4NTUsMy4wODU4NjMzMiBMMi4yMjg1NzczNiwzLjA4NTg2MzMyIEMzLjQ1MTIyMDY3LDMuMDg1ODYzMzIgNC40NDI3OTE0NCw0LjA4ODY1NDIgNC40NDI3OTE0NCw1LjMyNTQ0NjYgTDQuNDQyNzkxNDQsOS45NDYzMzk1NyBDNS40NjcxMjA1OSw4LjczMTk3ODY4IDYuOTMxNDE5ODksOC4xMzk1ODI2NSA4LjgwNDk0Njg4LDguMTM5NTgyNjUgQzEwLjczNzE4Nyw4LjEzOTU4MjY1IDEyLjM3Njg2OTYsOC45MDk2NDY1MSAxMy43NTI5NzMyLDEwLjQxOTk1MDUiIGlkPSJGaWxsLTUiIGZpbGw9IiNGRkZGRkYiPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI0LjYyOTA1NTcsMTkuNTcxNzU1NSBDMjUuNjUzNjM2OCwxOS41NzE3NTU1IDI2LjUwMzA4NjcsMTkuMjQ1OTg4NiAyNy4xNDY5MTQ3LDE4LjU5NDQ1NSBDMjcuNzkxMjQ2NywxNy45NDI5MjEzIDI4LjExMzI4NjcsMTcuMDU0MzI3MiAyOC4xMTMyODY3LDE1Ljk1ODQ5NjUgQzI4LjExMzI4NjcsMTQuODYyNjY1OCAyNy43OTEyNDY3LDEzLjk3NDA3MTggMjcuMTQ2OTE0NywxMy4zMjI1MzgxIEMyNi41MDMwODY3LDEyLjY3MTAwNDUgMjUuNjUzNjM2OCwxMi4zNDUyMzc2IDI0LjYyOTA1NTcsMTIuMzQ1MjM3NiBDMjMuNjA0NzI2NiwxMi4zNDUyMzc2IDIyLjc1NTI3NjcsMTIuNjcxMDA0NSAyMi4xMTE0NDg3LDEzLjMyMjUzODEgQzIxLjQ2Njg2NDcsMTMuOTc0MDcxOCAyMS4xNDUzMjg2LDE0Ljg2MjY2NTggMjEuMTQ1MzI4NiwxNS45NTg0OTY1IEMyMS4xNDUzMjg2LDE3LjA1NDMyNzIgMjEuNDY2ODY0NywxNy45NDI5MjEzIDIyLjExMTQ0ODcsMTguNTk0NDU1IEMyMi43NTUyNzY3LDE5LjI0NTk4ODYgMjMuNjA0NzI2NiwxOS41NzE3NTU1IDI0LjYyOTA1NTcsMTkuNTcxNzU1NSBMMjQuNjI5MDU1NywxOS41NzE3NTU1IFogTTI4LjExMzI4NjcsOC41NTQzMTA4NiBMMzIuNTA1MTc2Nyw4LjU1NDMxMDg2IEwzMi41MDUxNzY3LDIzLjM2MjkzNzEgTDI4LjExMzI4NjcsMjMuMzYyOTM3MSBMMjguMTEzMjg2NywyMS45NzA5MDg0IEMyNy4wODg3MDU2LDIzLjE4NTAxNDQgMjUuNjI0NDA2MywyMy43Nzc0MTA0IDIzLjc1MDg3OTMsMjMuNzc3NDEwNCBDMjEuODE4NjM5MiwyMy43Nzc0MTA0IDIwLjE3ODk1NjYsMjMuMDM2OTE1NCAxOC44MDI4NTI5LDIxLjUyNjM1NjUgQzE3LjQyNjc0OTMsMjAuMDE2MDUyNSAxNi43NTMxODY3LDE4LjE1MDE1NzkgMTYuNzUzMTg2NywxNS45NTg0OTY1IEMxNi43NTMxODY3LDEzLjc2NjgzNTEgMTcuNDI2NzQ5MywxMS45MzA1MDk0IDE4LjgwMjg1MjksMTAuNDE5OTUwNSBDMjAuMTc4OTU2Niw4LjkwOTY0NjUxIDIxLjgxODYzOTIsOC4xMzk1ODI2NSAyMy43NTA4NzkzLDguMTM5NTgyNjUgQzI1LjYyNDQwNjMsOC4xMzk1ODI2NSAyNy4wODg3MDU2LDguNzMxOTc4NjggMjguMTEzMjg2Nyw5Ljk0NjMzOTU3IEwyOC4xMTMyODY3LDguNTU0MzEwODYgWiIgaWQ9IkZpbGwtNyIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNDcuMzkyMzQ1Niw5Ljc2ODQxNjg0IEM0OC40NDY2NjEzLDEwLjg2NDI0NzUgNDguOTczMzE1MSwxMi4zNDUyMzc2IDQ4Ljk3MzMxNTEsMTQuMjcwMjY5OCBMNDguOTczMzE1MSwyMy4zNjI2ODIyIEw0NC41ODE0MjUyLDIzLjM2MjY4MjIgTDQ0LjU4MTQyNTIsMTQuOTIxODAzNSBDNDQuNTgxNDI1MiwxMy4xNzQ0MzkxIDQzLjUyNzYxMzUsMTIuMjI2NzA3NCA0Mi4wMzQzMzU2LDEyLjIyNjcwNzQgQzQwLjM2NTQyMjUsMTIuMjI2NzA3NCAzOS4zMTEzNTg4LDEzLjI2MzE0NTYgMzkuMzExMzU4OCwxNS4yNzcxMzkxIEwzOS4zMTEzNTg4LDIzLjM2MjY4MjIgTDM0LjkxOTcyMDgsMjMuMzYyNjgyMiBMMzQuOTE5NzIwOCw4LjU1NDA1NTk1IEwzOS4zMTEzNTg4LDguNTU0MDU1OTUgTDM5LjMxMTM1ODgsOS45NDYwODQ2NyBDNDAuMTg5Nzg3Miw4LjczMTk3ODY4IDQxLjU5NTM3MzQsOC4xMzk1ODI2NSA0My40OTgzODI5LDguMTM5NTgyNjUgQzQ1LjA0OTg2OTksOC4xMzk1ODI2NSA0Ni4zNjc3NjQ1LDguNjcyNTg2MTQgNDcuMzkyMzQ1Niw5Ljc2ODQxNjg0IiBpZD0iRmlsbC05IiBmaWxsPSIjRkZGRkZGIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik02NC45MzY5NzQ2LDIzLjM2MjcwNzcgTDU5Ljk1OTcxNzcsMjMuMzYyNzA3NyBMNTUuMjc1MDE4MywxNi44MTcyOTI0IEw1NS4yNzUwMTgzLDIzLjM2MjcwNzcgTDUwLjg4MzM4MDMsMjMuMzYyNzA3NyBMNTAuODgzMzgwMywzLjA4NTg4ODgxIEw1My4wNjEwNTYyLDMuMDg1ODg4ODEgQzU0LjI4MzY5OTUsMy4wODU4ODg4MSA1NS4yNzUwMTgzLDQuMDg4Njc5NjkgNTUuMjc1MDE4Myw1LjMyNTcyNjk5IEw1NS4yNzUwMTgzLDE1LjA0MDM1OTIgTDU5LjY2NjkwODMsOC41NTQwODE0NCBMNjQuNzkwNTY5OSw4LjU1NDA4MTQ0IEw1OS40NjE3OTA0LDE1Ljk1ODUyMiBMNjQuOTM2OTc0NiwyMy4zNjI3MDc3IFoiIGlkPSJGaWxsLTExIiBmaWxsPSIjRkZGRkZGIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJHcm91cC0xNSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzIuNTcyMzk3LCAwLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPG1hc2sgaWQ9Im1hc2stNCIgZmlsbD0id2hpdGUiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMyI+PC91c2U+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iQ2xpcC0xNCI+PC9nPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTE1Ljg1NTAyNzcsMC4wNTQxOTI1MTEzIEMyNC44MTE0MTksMC4wNTQxOTI1MTEzIDMxLjY3MTc3ODUsNi45OTMxNzkwOCAzMS42NzI3ODY0LDE2LjA1MjcwODkgQzMxLjY3Mzc5NDQsMjMuMjU1MDEwOSAyNi45Nzk1MTk0LDI5LjM5MzM0NTIgMjAuMTA4MzI0NSwzMS4yODA2NTE3IEM5Ljc0MjA2MzE2LDM0LjEyNzkyNTIgMC4yMjc1MTk1MDUsMjYuMTMyMTA4MiAwLjIyNzUxOTUwNSwxNi4wNTQ3NDgyIEMwLjIyNzUxOTUwNSw2Ljk5NDQ1MzU5IDcuMjc5MTM3NDMsMC4wNTQxOTI1MTEzIDE1Ljg1NTAyNzcsMC4wNTQxOTI1MTEzIiBpZD0iRmlsbC0xMyIgZmlsbD0iI0ZGREMwMCIgbWFzaz0idXJsKCNtYXNrLTQpIj48L3BhdGg+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==",
+          "alt": "Pibank Perú"
+        },
+        "proposalKind": "executive"
+      }
+    },
+    {
+      "slideId": "decision",
+      "contentType": "highlight",
+      "template": "HighlightWave",
+      "slots": {
+        "eyebrow": "PIBANK PERÚ · CANDIDATA · 06-10-2026",
+        "statementLead": "De la búsqueda y la confianza a",
+        "highlight": "cuentas con primer fondeo",
+        "statementTail": "y saldo mantenido.",
+        "supporting": "Programa candidato de seis meses en 2027. <strong>Decisión de viabilidad al cierre de M1</strong>: continuar, recalibrar o detener la expansión."
+      }
+    },
+    {
+      "slideId": "producto",
+      "contentType": "dual-text",
+      "template": "DualTextSplit",
+      "slots": {
+        "title": "Un banco digital necesita resolver la decisión completa",
+        "leftConcept": {
+          "label": "OFERTA PÚBLICA ACTUAL",
+          "title": "Cuenta Soles Pibank",
+          "paragraphs": [
+            "Apertura digital, operación por transferencias y sin tarjeta de débito. Producto, calculadora y FAQ ya existen.",
+            "La tasa y las condiciones deben conservar fuente y fecha efectiva. La oferta en dólares sigue por validar."
+          ],
+          "icon": "users"
+        },
+        "rightConcept": {
+          "label": "HIPÓTESIS DEL PROGRAMA",
+          "title": "Descubrir, comprender y activar",
+          "paragraphs": [
+            "Cubrir comparación, confianza y uso del ahorro; enlazar contenidos aprobados con el recorrido oficial.",
+            "Medir apertura completada y primer fondeo con datos agregados del banco, además de clics y visitas."
+          ],
+          "icon": "target"
+        },
+        "outcome": {
+          "label": "OBJETIVO DE TRABAJO",
+          "text": "Activos útiles y una contribución <strong>medible y condicionada</strong>."
+        }
+      }
+    },
+    {
+      "slideId": "demanda",
+      "contentType": "several-kpis",
+      "template": "MetricsSplit",
+      "slots": {
+        "title": "Demanda encontrada",
+        "subtitle": {
+          "client": "Pibank Perú",
+          "context": "Perú · español · histórica"
+        },
+        "kpis": [
+          {
+            "kind": "visibility",
+            "value": "3.900",
+            "label": "Búsquedas/mes seleccionadas",
+            "qual": "Subtotal de seis grupos; estimación histórica, no personas.",
+            "evidenceRef": "research/pibank-demand-2026-10-06/demand-inputs.json"
+          },
+          {
+            "kind": "engines",
+            "value": "127",
+            "label": "Keywords normalizadas",
+            "qual": "113 con volumen y 14 sin dato; nulos conservados.",
+            "evidenceRef": "research/PIBANK-DEMAND-2026-10-06.md"
+          },
+          {
+            "kind": "gap",
+            "value": "3 / 3",
+            "label": "Consultas genéricas examinadas",
+            "qual": "Pibank no observado a profundidad solicitada 20; muestra puntual.",
+            "evidenceRef": "research/pibank-demand-2026-10-06/serp-observations.json"
+          }
+        ],
+        "readEyebrow": "IMPLICACIÓN",
+        "readLead": "Medir antes de <em>prometer escala</em>",
+        "readBody": "Se excluyen 1.600 búsquedas de «alto rendimiento» por mezcla de países. La muestra <b>no es TAM ni forecast 2027</b>; falta ampliar cobertura y contrastar datos privados.",
+        "source": "DataForSEO PE/es · corte 06-10-2026 · snapshot septiembre; serie mensual hasta agosto."
+      }
+    },
+    {
+      "slideId": "meta",
+      "contentType": "several-kpis",
+      "template": "MetricsSplit",
+      "slots": {
+        "title": "La meta por confirmar",
+        "subtitle": {
+          "client": "Reunión 06-10-2026",
+          "context": "Datos y lectura provisional"
+        },
+        "kpis": [
+          {
+            "kind": "gap",
+            "value": "15.200",
+            "label": "Cuentas mencionadas",
+            "qual": "Periodo y apertura frente a fondeo pendientes.",
+            "evidenceRef": "MEETING-2026-10-06.md"
+          },
+          {
+            "kind": "authority",
+            "value": "38",
+            "label": "Millones: moneda provisional",
+            "qual": "US$38m = 15.200 × US$2.500; interpretación del operador.",
+            "evidenceRef": "MEETING-2026-10-06.md",
+            "unit": "US$m"
+          },
+          {
+            "kind": "visibility",
+            "value": "152",
+            "label": "Cuentas equivalentes al 1%",
+            "qual": "Referencia de escala; no compromiso del programa.",
+            "evidenceRef": "modelo/Pibank-caso-negocio-2027.xlsx"
+          }
+        ],
+        "readEyebrow": "VALIDACIÓN BANCARIA",
+        "readLead": "Alinear meta, producto <em>y periodo</em>",
+        "readBody": "Confirmar moneda, horizonte, ticket y saldo inicial o mantenido. Una cuenta en soles puede reportarse en otra moneda; <b>no se infiere un tipo de cambio</b>.",
+        "source": "Reunión y aclaración del operador · US$38m provisional · sin confirmación bancaria."
+      }
+    },
+    {
+      "slideId": "escenarios",
+      "contentType": "several-kpis",
+      "template": "MetricsSplit",
+      "slots": {
+        "title": "Escenarios de prueba",
+        "subtitle": {
+          "client": "Seis meses candidatos",
+          "context": "Cuentas fondeadas extra"
+        },
+        "kpis": [
+          {
+            "kind": "visibility",
+            "value": "2,12",
+            "label": "Conservador",
+            "qual": "Resultado ilustrativo; 0,014% de la meta de cuentas.",
+            "evidenceRef": "modelo/results.json"
+          },
+          {
+            "kind": "authority",
+            "value": "13,88",
+            "label": "Base",
+            "qual": "Resultado ilustrativo; 0,091% de la meta de cuentas.",
+            "evidenceRef": "modelo/results.json"
+          },
+          {
+            "kind": "gap",
+            "value": "40,15",
+            "label": "Favorable",
+            "qual": "Resultado ilustrativo; 0,264% de la meta de cuentas.",
+            "evidenceRef": "modelo/results.json"
+          }
+        ],
+        "readEyebrow": "LECTURA DEL MODELO",
+        "readLead": "Estos inputs <em>no sostienen el 1%</em>",
+        "readBody": "Proxy 3.900/mes × relevancia supuesta 75%. Captura, apertura, fondeo y retención son hipótesis. <b>ROI y CAC: N/D</b>. Falta inversión; ROI requiere valoración de fondeo.",
+        "source": "Modelo editable recalculado · referencia vs. programa · hipótesis, no forecast ni cuentas medidas."
+      }
+    },
+    {
+      "slideId": "cambio",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "Estado público observado",
+        "rightTitle": "Trabajo propuesto y verificable",
+        "presentation": {
+          "mode": "proposal"
+        },
+        "rows": [
+          {
+            "left": {
+              "lead": "Identidad fragmentada",
+              "body": "Grafos custom y Yoast difieren en host y entidad."
+            },
+            "right": {
+              "lead": "Fuente coherente",
+              "body": "Alinear IDs, marca y proveedor legal con aprobación bancaria."
+            },
+            "evidenceRef": "propuesta/ANEXO-TECNICO-PIBANK-2027.md#PT-01"
+          },
+          {
+            "left": {
+              "lead": "Contenido ya disponible",
+              "body": "Producto, calculadora y 51 FAQ declaradas en sitemap."
+            },
+            "right": {
+              "lead": "Intenciones priorizadas",
+              "body": "Inventariar y aprovechar el corpus antes de ampliar contenidos."
+            },
+            "evidenceRef": "propuesta/ANEXO-TECNICO-PIBANK-2027.md"
+          },
+          {
+            "left": {
+              "lead": "Embudo privado pendiente",
+              "body": "La lectura pública no certifica aperturas, fondeo o saldos."
+            },
+            "right": {
+              "lead": "Conciliación bancaria",
+              "body": "Eventos web + datos agregados y cohortes con denominadores claros."
+            },
+            "evidenceRef": "propuesta/ANEXO-TECNICO-PIBANK-2027.md#medicion"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "metodo",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "ENTREGABLES · RESPONSABLES · ACEPTACIÓN",
+        "title": "Construir capacidad y <em>comprobar contribución</em>",
+        "steps": [
+          {
+            "title": "Diagnosticar y decidir",
+            "description": "Línea base, corpus, demanda y condiciones económicas; hito de viabilidad al cierre de M1.",
+            "deliverable": "Backlog y modelo recalibrado"
+          },
+          {
+            "title": "Corregir y producir",
+            "description": "Identidad y plantilla coherentes; producto y contenidos con condiciones revisadas por el banco.",
+            "deliverable": "Cambios aceptados + lote editorial"
+          },
+          {
+            "title": "Medir y conciliar",
+            "description": "Separar clic, apertura y primer fondeo. Leer dinero externo y saldo por cohorte.",
+            "deliverable": "Panel de embudo + conciliación"
+          },
+          {
+            "title": "Optimizar y transferir",
+            "description": "Ampliar lo validado y dejar fuentes, decisiones y activos disponibles para el siguiente ciclo.",
+            "deliverable": "Evaluación + recomendación de continuidad"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "plan",
+      "contentType": "timeline",
+      "template": "TimelineFull",
+      "slots": {
+        "sectionLabel": "BASE CANDIDATA · 2027",
+        "title": "Seis meses con <em>decisión temprana</em>",
+        "meta": "Desde inicio acordado. <b>Duración y costo por cerrar.</b>",
+        "timeUnit": "month",
+        "timeAxis": [
+          "M1",
+          "M2",
+          "M3",
+          "M4",
+          "M5",
+          "M6"
+        ],
+        "milestones": [
+          {
+            "at": 1,
+            "label": "Viabilidad",
+            "caption": "Recalibrar"
+          },
+          {
+            "at": 3,
+            "label": "Primera conciliación",
+            "caption": "Datos y brechas"
+          },
+          {
+            "at": 6,
+            "label": "Evaluación",
+            "caption": "Siguiente ciclo"
+          }
+        ],
+        "phases": [
+          {
+            "kind": "work",
+            "startUnit": 1,
+            "endUnit": 1,
+            "title": "Línea base y primeras mejoras",
+            "description": "Accesos, fuentes y backlog; ejecución segura.",
+            "barLabel": "Base"
+          },
+          {
+            "kind": "work",
+            "startUnit": 2,
+            "endUnit": 3,
+            "title": "Fundamento y cobertura",
+            "description": "Plantillas, producto y contenidos aprobados.",
+            "barLabel": "Implementación + contenidos"
+          },
+          {
+            "kind": "work",
+            "startUnit": 4,
+            "endUnit": 6,
+            "title": "Expansión condicionada",
+            "description": "Evidencia, cohortes y optimización.",
+            "barLabel": "Ampliar y evaluar"
+          },
+          {
+            "kind": "continuous",
+            "startUnit": 1,
+            "endUnit": 6,
+            "title": "Operación y revisión",
+            "description": "Coordinación semanal; lectura mensual.",
+            "barLabel": "Seguimiento y decisiones compartidas"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "condiciones",
+      "contentType": "requirements-table",
+      "template": "RequirementsTableFull",
+      "slots": {
+        "sectionLabel": "CONDICIONES PARA EJECUTAR",
+        "title": "Convertir las brechas en <em>decisiones del banco</em>",
+        "summary": {
+          "value": "M1",
+          "label": "Hito de viabilidad por acordar",
+          "detail": "Demanda, embudo, acceso, implementación y economía."
+        },
+        "requirements": [
+          {
+            "kind": "excluyente",
+            "requirement": "Responsable de negocio y definición de meta/periodo",
+            "evidence": "Reunión y ledger: moneda, cuentas, saldo y horizonte por confirmar.",
+            "status": "riesgo"
+          },
+          {
+            "kind": "excluyente",
+            "requirement": "Analítica y datos agregados de apertura, fondeo y saldos",
+            "evidence": "Fuente bancaria y conciliación mensual previstas; acceso pendiente.",
+            "status": "riesgo"
+          },
+          {
+            "kind": "excluyente",
+            "requirement": "CMS/staging y aprobación de condiciones financieras",
+            "evidence": "RACI, permisos mínimos y aceptación técnica incluidos en anexo.",
+            "status": "riesgo"
+          },
+          {
+            "kind": "excluyente",
+            "requirement": "Inversión y valoración económica del fondeo",
+            "evidence": "Modelo editable preparado; fee y valoración de Finanzas pendientes.",
+            "status": "riesgo"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "siguiente",
+      "contentType": "capabilities-grid",
+      "template": "CardGridFull",
+      "slots": {
+        "eyebrow": "DECISIÓN SIGUIENTE",
+        "headline": "Revisar el caso con <em>datos y responsables</em>",
+        "intro": "Cerrar alcance, criterios y costo de M1. El semestre candidato depende de viabilidad; inversión por definir.",
+        "highlight": "El saldo captado requiere <em>valoración de Finanzas</em>. No equivale a ingreso ni ROI.",
+        "panelQuestion": "Material disponible para esa revisión",
+        "capabilities": [
+          {
+            "kind": "authoring",
+            "title": "Resumen ejecutivo",
+            "description": "Decisión, alcance y supuestos en dos páginas."
+          },
+          {
+            "kind": "data",
+            "title": "Modelo editable",
+            "description": "Seis meses, cohortes y sensibilidad; inputs trazables."
+          },
+          {
+            "kind": "governance",
+            "title": "Anexo técnico",
+            "description": "Diagnóstico, backlog, accesos, RACI y aceptación."
+          },
+          {
+            "kind": "search",
+            "title": "Muestra AEO Pibank",
+            "description": "Landing y guía candidatas; revisión bancaria pendiente."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
+    }
+  ]
+}

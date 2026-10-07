@@ -23,6 +23,8 @@ y la route-ownership matrix.
 
 ## Indice
 
+- [Banco Pichincha / Pibank — continuidad comercial](../commercial/prospects/banco-pichincha-peru-seo-2026/README.md): muestra histórica y nuevo mandato 2027; no cambia el estado de publicación.
+
 - [Arquitectura de patrones UI Think](architecture-ui-patterns.md)
 - [Landing Brand Visibility](brand-visibility-landing.md)
 - [Manual para reutilizar patrones UI Think](reuse-ui-patterns-manual.md)

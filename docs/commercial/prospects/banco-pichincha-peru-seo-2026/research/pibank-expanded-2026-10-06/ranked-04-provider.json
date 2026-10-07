@@ -1,0 +1,1338 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:15.011Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1817,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1817,
+        "costUsd": 0.01272,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-9a21212a5a39",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01272,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01272,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-9a21212a5a39",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.3284 sec.",
+        "cost": 0.01272,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 6,
+            "items_count": 6,
+            "metrics": {
+              "organic": {
+                "pos_1": 1,
+                "pos_2_3": 0,
+                "pos_4_10": 3,
+                "pos_11_20": 1,
+                "pos_21_30": 1,
+                "pos_31_40": 0,
+                "pos_41_50": 0,
+                "pos_51_60": 0,
+                "pos_61_70": 0,
+                "pos_71_80": 0,
+                "pos_81_90": 0,
+                "pos_91_100": 0,
+                "etv": 425.9010120034218,
+                "count": 6,
+                "estimated_paid_traffic_cost": 143.18398249149323,
+                "is_new": 2,
+                "is_up": 0,
+                "is_down": 3,
+                "is_lost": 0,
+                "clickstream_etv": null,
+                "clickstream_gender_distribution": null,
+                "clickstream_age_distribution": null
+              },
+              "paid": null,
+              "featured_snippet": null,
+              "local_pack": null,
+              "ai_overview_reference": null
+            },
+            "metrics_absolute": null,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuentas de ahorro de alto rendimiento",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 10:11:37 +00:00",
+                    "competition": 0.7200000286102295,
+                    "competition_level": "HIGH",
+                    "cpc": 1.399999976158142,
+                    "search_volume": 1600,
+                    "low_top_of_page_bid": 0.3199999928474426,
+                    "high_top_of_page_bid": 1.4900000095367432,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1000
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 53,
+                      "quarterly": 123,
+                      "yearly": 190
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorro%20de%20alto%20rendimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches",
+                      "images"
+                    ],
+                    "se_results_count": 127,
+                    "last_updated_time": "2026-09-05 21:23:43 +00:00",
+                    "previous_updated_time": "2026-05-19 04:26:24 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 12.300000190734863,
+                    "dofollow": 6.900000095367432,
+                    "referring_pages": 12,
+                    "referring_domains": 9.100000381469727,
+                    "referring_main_domains": 5.300000190734863,
+                    "rank": 44.099998474121094,
+                    "main_domain_rank": 372,
+                    "last_updated_time": "2026-09-05 21:23:43 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 11:17:59 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 10,
+                    "rank_absolute": 13,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abre tu Cuenta Power y Genera Intereses",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "¿Qué es la Cuenta Power? Es una cuenta de ahorro de alto rendimiento diseñada para quienes buscan hacer crecer su dinero de forma segura y eficiente ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Es una cuenta de ahorro de alto rendimiento"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 18.079999923706055,
+                    "estimated_paid_traffic_cost": 25.312000274658203,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 12,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 24,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorro%20de%20alto%20rendimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches",
+                    "images"
+                  ],
+                  "se_results_count": 127,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-05 21:23:43 +00:00",
+                  "previous_updated_time": "2026-05-19 04:26:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta power scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 03:38:50 +00:00",
+                    "competition": 0.1599999964237213,
+                    "competition_level": "LOW",
+                    "cpc": 0.27000001072883606,
+                    "search_volume": 1300,
+                    "low_top_of_page_bid": 0.029999999329447746,
+                    "high_top_of_page_bid": 0.5699999928474426,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1300
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 30,
+                      "quarterly": 30,
+                      "yearly": -19
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20power%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-07-15 01:08:06 +00:00",
+                    "previous_updated_time": "2026-04-18 01:16:42 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 6.599999904632568,
+                    "dofollow": 2.299999952316284,
+                    "referring_pages": 6.5,
+                    "referring_domains": 5.699999809265137,
+                    "referring_main_domains": 2,
+                    "rank": 12.100000381469727,
+                    "main_domain_rank": 474.1000061035156,
+                    "last_updated_time": "2026-07-15 01:08:06 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 23:43:43 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 2,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abre tu Cuenta Power y Genera Intereses",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Más beneficios con tu Cuenta Power · Tasa de campaña (1) de hasta 4.00% (TREA) por tus ahorros en soles y hasta 1.25% (TREA) en dólares. · Tasa TREA soles de ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Tasa de campaña (1) de hasta 4.00% (TREA) por tus ahorros en soles"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 395.20001220703125,
+                    "estimated_paid_traffic_cost": 106.7040023803711,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 2,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 24,
+                      "main_domain_rank": 324
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20power%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 106,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-15 01:08:06 +00:00",
+                  "previous_updated_time": "2026-04-18 01:16:42 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de alto rendimiento peru",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 00:22:46 +00:00",
+                    "competition": 0.7099999785423279,
+                    "competition_level": "HIGH",
+                    "cpc": 1.0199999809265137,
+                    "search_volume": 390,
+                    "low_top_of_page_bid": 0.25,
+                    "high_top_of_page_bid": 1.1399999856948853,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 390
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 23,
+                      "quarterly": 50,
+                      "yearly": 50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuentas de alto rendimiento peru",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20de%20alto%20rendimiento%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-08-01 02:47:33 +00:00",
+                    "previous_updated_time": "2026-04-19 13:57:41 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 10.800000190734863,
+                    "dofollow": 6.099999904632568,
+                    "referring_pages": 10.699999809265137,
+                    "referring_domains": 8.300000190734863,
+                    "referring_main_domains": 4.5,
+                    "rank": 30.100000381469727,
+                    "main_domain_rank": 420.29998779296875,
+                    "last_updated_time": "2026-08-01 02:47:33 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "informational",
+                      "navigational"
+                    ],
+                    "last_updated_time": "2026-04-26 03:56:02 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 9,
+                    "rank_absolute": 11,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abre tu Cuenta Power y Genera Intereses",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "¿Qué es la Cuenta Power? Es una cuenta de ahorro de alto rendimiento diseñada para quienes buscan hacer crecer su dinero de forma segura y eficiente ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Es una cuenta de ahorro de alto rendimiento"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 5.849999904632568,
+                    "estimated_paid_traffic_cost": 5.9670000076293945,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 5,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 24,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20de%20alto%20rendimiento%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-01 02:47:33 +00:00",
+                  "previous_updated_time": "2026-04-19 13:57:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuentas de alto rendimiento peru",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 04:16:36 +00:00",
+                    "competition": 0.7099999785423279,
+                    "competition_level": "HIGH",
+                    "cpc": 1.0199999809265137,
+                    "search_volume": 390,
+                    "low_top_of_page_bid": 0.25,
+                    "high_top_of_page_bid": 1.1399999856948853,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 390
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 23,
+                      "quarterly": 50,
+                      "yearly": 50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuentas%20de%20alto%20rendimiento%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 127,
+                    "last_updated_time": "2026-09-16 09:03:03 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 12.300000190734863,
+                    "dofollow": 7.099999904632568,
+                    "referring_pages": 12,
+                    "referring_domains": 9.199999809265137,
+                    "referring_main_domains": 5.400000095367432,
+                    "rank": 52.599998474121094,
+                    "main_domain_rank": 363.70001220703125,
+                    "last_updated_time": "2026-09-16 09:03:05 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-09-03 20:46:56 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 11,
+                    "rank_absolute": 14,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abre tu Cuenta Power y Genera Intereses",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Tasa de campaña (1) de hasta 4.00% (TREA) por tus ahorros en soles y hasta 1.25% (TREA) en dólares. · Tasa TREA soles de hasta 4.6% solo con ScotiaCombos.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Tasa de campaña (1) de hasta 4.00% (TREA) por tus ahorros en soles"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 3.5490000247955322,
+                    "estimated_paid_traffic_cost": 3.6199798583984375,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 24,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuentas%20de%20alto%20rendimiento%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 127,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-16 09:03:03 +00:00",
+                  "previous_updated_time": null
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuál es el número que no se cuenta",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 01:57:02 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 320,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10008
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 100,
+                      "quarterly": 27,
+                      "yearly": 1300
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cu%C3%A1l%20es%20el%20n%C3%BAmero%20que%20no%20se%20cuenta&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-09-19 15:39:26 +00:00",
+                    "previous_updated_time": "2026-06-06 03:48:27 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 21:45:24 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 29,
+                    "rank_absolute": 33,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "¡Abre tu Cuenta Power con hasta 4.6% TREA soles!",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Alcanza tus objetivos financieros con la Cuenta Meta. Ideal para programar tus ahorros de forma automática. Cumple tus metas financieras.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 0.671999990940094,
+                    "estimated_paid_traffic_cost": null,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 24,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cu%C3%A1l%20es%20el%20n%C3%BAmero%20que%20no%20se%20cuenta&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 106,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-19 15:39:26 +00:00",
+                  "previous_updated_time": "2026-06-06 03:48:27 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuentas de ahorro de alto rendimiento perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 04:36:15 +00:00",
+                    "competition": 0.7099999785423279,
+                    "competition_level": "HIGH",
+                    "cpc": 0.6200000047683716,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.18000000715255737,
+                    "high_top_of_page_bid": 0.9200000166893005,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 210
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -44,
+                      "yearly": -81
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta de ahorro de alto rendimiento peru",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorro%20de%20alto%20rendimiento%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-07 19:36:09 +00:00",
+                    "previous_updated_time": "2026-04-13 16:05:06 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 11,
+                    "dofollow": 6.5,
+                    "referring_pages": 11,
+                    "referring_domains": 8.600000381469727,
+                    "referring_main_domains": 4.800000190734863,
+                    "rank": 40,
+                    "main_domain_rank": 341.70001220703125,
+                    "last_updated_time": "2026-07-07 19:36:12 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 10:58:46 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 9,
+                    "rank_absolute": 13,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abre tu Cuenta Power y Genera Intereses",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "¿Qué es la Cuenta Power? Es una cuenta de ahorro de alto rendimiento diseñada para quienes buscan hacer crecer su dinero de forma segura y eficiente ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Es una cuenta de ahorro de alto rendimiento"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+                    "etv": 2.549999952316284,
+                    "estimated_paid_traffic_cost": 1.5809999704360962,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 11,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 4,
+                      "dofollow": 3,
+                      "backlinks": 4,
+                      "time_update": "2026-09-22 11:43:51 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 27,
+                      "main_domain_rank": 324
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorro%20de%20alto%20rendimiento%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-07 19:36:09 +00:00",
+                  "previous_updated_time": "2026-04-13 16:05:06 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

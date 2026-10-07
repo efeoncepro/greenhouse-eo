@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Pibank v0.6:** [caso y método](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md): SEO/GEO+PR1.216h; costos/roster/fee pendientes. Corte09/10.
+
 **Nano 2.1:** `pnpm ai:nano` local.
 
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.

@@ -359,3 +359,32 @@ Estructura observada en `greenhouse-documentation-governor` (existe en ambos ár
 **Notas de precisión para la capa "contrato Greenhouse" de la skill:** el hook de spend está registrado en el ops-worker (`services/ops-worker/server.ts`) desde TASK-1303, **no en Vercel** — un route handler que llame una familia SEO con org lanza en la primera llamada; `postDataForSeoSerpLiveAdvanced` es contrato congelado del AEO; `checkDataForSeoConnection` no pasa por allowlist/breaker a propósito; y el flip de `GROWTH_SEO_ENABLED` es multi-runtime (worker + Vercel + scheduler).
 
 **Nota de precisión sobre el gasto (TASK-1308):** el gate de costo protege la corrida que gasta, **no la decisión que la agranda**. Al auditar costo DataForSEO, mira también `track-keywords.ts` (§5b): ahí se decide cuántas keywords paga el cron de mañana, y ese archivo no aparece en ningún grep de `postDataForSeoTask`.
+
+<a id="reconciliacion-y-cobertura-de-investigacion"></a>
+
+## Reconciliación y cobertura de investigación
+
+Carga esta sección cuando una investigación reutiliza datos, pierde una respuesta o amplía una muestra pagada. Complementa el contrato y los guards existentes; no cambia presupuestos, identidad, entitlement ni capacidades de recuperación de la CLI.
+
+### Costo, tarea y resultado son registros distintos
+
+- Antes de repetir un POST o comprar una alternativa tras un timeout, concilia la tarea original mediante la evidencia disponible del carril autorizado: receipt/ledger, consulta de tarea soportada o portal del proveedor. Timeout no prueba ausencia de cargo; tarea completada y cobrada tampoco prueba que sus filas se hayan recibido.
+- Conserva task ID, endpoint, organización/consumer, mercado, parámetros o digest, fecha, estimación, techo operativo, costo confirmado, estado proveedor y filas efectivamente guardadas. Redacta credenciales y links firmados. Si el costo no puede verificarse, mantiene un subtotal conocido y el importe desconocido separado; no lo convierte en cero ni en costo estimado confirmado.
+- Si el proveedor confirma el cargo pero el resultado no es recuperable, registra ambas cosas. Las filas no recibidas no forman evidencia medida. Una consulta posterior con otro filtro es una compra y una cobertura distintas, aunque responda una necesidad semejante; no la llama recuperación, reanudación ni completitud del intento original.
+- Deduplica costos por tarea y documenta importes acumulados e incrementales. Reutilizar un raw tiene costo incremental cero, pero conserva su costo original. No suma receipts y ledger que representan el mismo cargo. El techo de gasto limita nuevas decisiones; no demuestra un reembolso ni un límite efectivo del cargo ya aceptado.
+- Presupuesto, entitlement, estado de tarea y score son ejes distintos. Un presupuesto de investigación no es el fee del servicio; un score no acredita autorización, cobertura ni costo. Ante costo desconocido, resuelve o expone esa incertidumbre antes de una nueva decisión de compra; no provisiona ni evita guards para avanzar.
+
+### Cobertura y deduplicación
+
+- Registra filtro exacto, endpoint, ubicación/idioma, dispositivo cuando aplique, período de la métrica, fecha de captura y fecha de actualización de cada dato. Una consulta nueva no rejuvenece el volumen histórico incluido en la respuesta.
+- Pagina hasta el total reportado para ese filtro cuando el objetivo sea completarlo y el techo lo permita. Conserva offset/limit, total filtrado, filas recibidas y límite del proveedor o del trabajo. Si falta una página, un cap o un error impiden completarlo, declara cobertura parcial. Una primera página no representa el dominio completo.
+- Deduplica observaciones por entidad/banco, keyword normalizada y URL cuando el endpoint aporta esas dimensiones. Conserva procedencia y fechas; no borra URLs distintas de una misma keyword. La selección de la observación más reciente se declara, no se presenta como una métrica temporal nueva.
+- Mantén las diferencias de filtros entre competidores visibles. Nulos, respuestas vacías y errores no son volumen cero. Un total filtrado, una selección de representantes o el máximo por familia no son TAM; variantes, intenciones, personas y marcas competidoras no se suman como audiencias únicas o tráfico adquirible.
+
+### Baseline de enlaces y nombre del instrumento
+
+Declara la métrica exacta, escala, método y fecha del proveedor. DataForSEO Domain Rank no es Moz Domain Authority, Brand Authority ni Ahrefs DR; los instrumentos ausentes quedan N/D. No convierte un score en autoridad bancaria comprobada o aporte comercial.
+
+Summary y detalle de backlinks son observaciones con alcance y fecha propios: documenta sus diferencias, no fuerza recuentos iguales ni afirma un censo por una muestra. La existencia pública del enlace y los atributos informados por el proveedor son pruebas distintas. Una captura inicial es baseline, no resultado del programa de PR; un solo enlace no acredita una relación pagada ni fundamenta por sí solo disavow.
+
+Canon y oficio: [spend guard](#4-spend-guard-y-costos), [Labs](02-labs.md), [Backlinks](03-backlinks.md), arquitectura SEO y CLI indicadas en este contrato. Usa sólo operaciones realmente soportadas y conserva límites de observación al entregar research.

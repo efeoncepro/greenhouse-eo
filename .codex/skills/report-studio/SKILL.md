@@ -27,6 +27,7 @@ Carga según la decisión pendiente, no todo el paquete por defecto:
 | Retícula A4, tipografía, tablas, fichas, marcas y navegación | [Diseño editorial](references/editorial-design.md) |
 | HTML→PDF, Word, fuentes, enlaces, impresión y accesibilidad | [Producción y PDF](references/pdf-production.md) |
 | Cierre, evaluación independiente y condiciones de bloqueo | [QA y entrega](references/quality-and-delivery.md) |
+| Informes, deck y modelo editable de una misma decisión | [Coherencia del paquete](references/decision-package-qa.md) |
 | Todo informe emitido por Efeonce | [Overlay Efeonce](references/efeonce-overlay.md) |
 | Procedencia de recomendaciones y límites de estándares | [Fuentes de mercado](SOURCES.md) |
 

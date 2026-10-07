@@ -168,6 +168,18 @@ Entregar hipótesis, experimento, muestra, métrica primaria, threshold, stop co
 ledger. `Approved for validation` permite sólo pilotos/SOW gobernados; no venta general, checkout ni claims de
 tracción.
 
+## Valoración de casos SEO/AEO para captación bancaria
+
+Cargar `docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md` cuando la decisión sea invertir en captación.
+Separar apertura, cuenta fondeada y saldo retenido por cohorte: depósitos captados no son ingresos ni margen del
+banco. Finanzas del cliente valida un método de valoración, horizonte y costos; no sumar beneficios económicos
+superpuestos. Costear el programa completo y su capacidad real, y calcular sensibilidad, costo por cuenta
+incremental fondeada y punto de equilibrio con supuestos visibles. Una meta o moneda inferida autorizada para el
+borrador no aprueba presupuesto ni pricing; sin valoración bancaria, presentar captación y contribución mínima
+requerida para recuperar la inversión como escenarios, sin declarar ROI confirmado. La propuesta conserva los
+gates de Finance, Commercial y Operations para precio, capacidad y compromisos.
+
 ## Guardrails transversales
 
 - ASaaS no equivale a SaaS, ARR ni producto software.
@@ -206,3 +218,10 @@ Emitir:
 - `.codex/skills/gtm-architect/modules/03_OFFER_PACKAGING_PRICING.md` — estrategia de packaging.
 - `.codex/skills/creative-practice/modules/04_PRICING.md` — Creative Studio cuando aplique.
 - Modelo concreto de la oferta en `docs/business-models/` — la skill no lo sustituye.
+
+## Capacidad, horizonte y reputación en casos SEO/AEO
+
+Para valorar o dimensionar una propuesta SEO/AEO, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Costear todos los roles,
+meses, revisiones, PR, herramientas y reserva; comparar valor neto por cohorte con costos del mismo
+horizonte. Capacidad estimada, roster, costo y fee son estados separados bajo la autoridad vigente.

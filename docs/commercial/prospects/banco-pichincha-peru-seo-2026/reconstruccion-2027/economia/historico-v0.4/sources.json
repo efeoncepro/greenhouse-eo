@@ -1,0 +1,47 @@
+{
+  "as_of": "2026-10-06",
+  "direct_panel_proxy_monthly": 3690,
+  "source_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-expanded-2026-10-06/monthly-demand-inputs.json",
+  "source_sha256": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23",
+  "curated_families_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oportunidades-curadas.csv",
+  "curated_families_sha256": "07c55215bc92f085a5f69c2d8899b7213e9f2ca2223dd43c3bc0354c6b4ffe23",
+  "coverage_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/OPORTUNIDAD-Y-COBERTURA.md",
+  "coverage_sha256": "d8e608e9685823d5cb5fdfe12895b201a932527cf925538b6fd7bc66ac4fe405",
+  "family_count": 32,
+  "family_volumes_aggregated": false,
+  "current_brand_baseline": null,
+  "current_funnel_conversion": null,
+  "eligible_multichannel_traffic": null,
+  "external_balance_bank_value": null,
+  "historical_artifacts": [
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/modelo-anual/Pibank-caso-negocio-anual-2027.xlsx",
+      "sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+      "status": "withdrawn_for_client_use; preserved historical"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/modelo/Pibank-caso-negocio-2027.xlsx",
+      "sha256": "275722eabca7c1d373203acf6a0c1ceb9adaa9e29a8ad9a10e899a969606c9a9",
+      "status": "withdrawn_for_client_use; preserved historical"
+    }
+  ],
+  "capacity_candidate": {
+    "authority": "Root envelope message06/10/2026; not Operations approved",
+    "base_hours": 814,
+    "reserve_hours": 110,
+    "total_hours": 924,
+    "roles_base_hours": {
+      "Dirección": 72,
+      "SEO": 134,
+      "Editorial": 236,
+      "CMS": 102,
+      "Datos": 70,
+      "AEO": 52,
+      "QA": 76,
+      "Coordinación": 72
+    },
+    "bounds": "1dominioPE/es;12entregas sustanciales6newmax+6existing;24FAQ;12CMS≤8h;12preguntas3superficies1rep36obsmonthly; sinapp/core/deploy asumido",
+    "fee": null,
+    "roster": null
+  }
+}
