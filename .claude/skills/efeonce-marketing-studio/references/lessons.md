@@ -387,3 +387,8 @@
   demuestran independencia de schema: una ruta social puede escribir columnas de evidencia añadidas para
   email sin consultar su flag. Aplicar sólo dependencias canónicas verificadas, con staging previo, no todas
   las migraciones pendientes; cerrar con el job fallido recuperado y health, no sólo con SQL o video PASS.
+
+- Una migración canónica aplicada fuera de orden puede recuperar runtime y dejar el migrador ordinal roto.
+  Conservar historia real; una excepción debe identificar exactamente la inversión, validar schema bajo el
+  mismo lock y rechazar cualquier otro hueco. Nunca resolverlo reescribiendo `run_on` ni apagando check-order
+  globalmente. Studio `1c0e7ae` conserva sólo la excepción owned-email/timeline del 07/10/2026.

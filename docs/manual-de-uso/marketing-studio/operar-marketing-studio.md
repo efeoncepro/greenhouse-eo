@@ -622,3 +622,20 @@ Para mapear aliases, revisar findings o revalidar, usa el [manual de catálogo](
 No cambies flags ni ejecutes un backfill para ocultar la señal: los 134 registros pendientes observados en el
 release necesitan revisión explícita. ICP sigue desactivado; una nota pendiente conserva el trabajo sin inventar
 referencias del modelo de cliente.
+
+
+## Migraciones: comprobación técnica previa
+
+El equipo técnico opera desde el repo Studio y con la conexión migrator autorizada del ambiente:
+
+```bash
+pnpm migrate up --dry-run --no-verbose
+pnpm migrate up <nombre> --dry-run
+pnpm migrate up <nombre>
+```
+
+`up [nombre] [--dry-run] [--no-verbose]` usa el wrapper de operador; `create` y `down` mantienen el CLI
+original. La inversión histórica owned-email `1791155100000`/timeline `1791390000000` del 07/10/2026 es la
+única excepción: valida schema bajo el mismo advisory lock y conserva IDs/timestamps. Otros huecos u órdenes
+inválidos fallan; no usar una desactivación global del chequeo ni volver a aplicar SQL para «arreglar» el ledger.
+El dry-run de staging y producción ya pasó sin pendientes. [Evidencia](../../audits/marketing-studio/2026-10-07-axis-video-adoption.md).

@@ -95,3 +95,19 @@ Deep health: media_worker=OK, metricool_readback=OK, pending_renditions=OK. Pers
 `activations_pending_verification` y `channels_require_mapping`; greenhouse_metrics/owned no configurados.
 No se atribuyen a fallos de reproducción ni se ocultan. Incidente recuperado, sin regresión de worker
 pendiente de este release y sin issue formal creada.
+
+
+## Cierre del orden histórico de migraciones
+
+La aplicación posterior de owned-email dejó una inversión histórica frente a timeline. El chequeo ordinal
+estándar del migrador fallaba aunque ambas migraciones estuvieran aplicadas; no era un fallo del runtime.
+Studio `1c0e7ae` añade un wrapper de operador para `pnpm migrate up`: acepta únicamente la inversión
+`1791155100000`/`1791390000000`, verifica efectos de schema y ejecuta bajo el mismo advisory lock y cliente.
+Conserva IDs y `run_on`; rechaza otros huecos/inversiones y no desactiva globalmente check-order.
+
+Cinco tests PASS. Readback en staging y producción: `pnpm migrate up --dry-run --no-verbose` valida la
+excepción del 07/10, responde `No migrations to run!` y termina 0. Queda resuelta la excepción operativa.
+No requiere reconstruir el worker: sigue en imagen `da2a02a60fcb`. La CLI soporta
+`up [nombre] [--dry-run] [--no-verbose]`; `create`/`down` mantienen el CLI original. Push de `1c0e7ae` a main confirmado. Vercel
+`dpl_AA7iCBfggWkztvNZ9ssEKveVyi9U` READY y alias `studio.efeonce.org` verificados; la actualización
+es de CLI de operación, con el mismo reproductor y worker ya probados.

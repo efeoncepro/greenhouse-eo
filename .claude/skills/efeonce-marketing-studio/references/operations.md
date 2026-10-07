@@ -557,3 +557,13 @@ no trabajo pendiente ni autorización para repetir operaciones ya aplicadas.
 Rollback funcional: apagar el flag evita nueva generación; `thumbnailsUrl` ausente permite seguir con el MP4.
 La migración Down falla si quedan derivados timeline; no borrar objetos/filas como rollback automático.
 La autorización no prueba ejecución: consultar la auditoría para migración, CORS, backfill y despliegues confirmados.
+
+
+### Migrador: excepción histórica del 07/10/2026
+
+Desde Studio `1c0e7ae`, `pnpm migrate up [nombre] [--dry-run] [--no-verbose]` usa wrapper de operador.
+La única inversión aceptada es owned-email `1791155100000` después de timeline `1791390000000`, con
+ambas aplicadas y efectos de schema verificados bajo el mismo advisory lock/cliente. No reordenar IDs ni
+`run_on`, no desactivar globalmente check-order, no repetir SQL. Otros huecos/inversiones fallan.
+`create` y `down` mantienen el CLI original. Dry-run staging/producción exit 0, sin pendientes, tras recuperar
+el reader Metricool. No implica flags email ON ni nuevo worker. Evidencia en la auditoría AXIS del 07/10.

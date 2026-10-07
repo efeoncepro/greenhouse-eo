@@ -9,6 +9,8 @@ Subida web, providers YouTube/Vimeo y distribución pública quedan separados; g
 Incidente de cierre recuperado: dependencia `email_evidence` aplicada por migración canónica acotada en
 ambos ambientes; Metricool HTTP 200 y deep health worker/Metricool/derivados OK. Flags owned/email OFF;
 avisos de verificaciones/mapeo separados conservados. Evidencia en la auditoría enlazada.
+Migrador `1c0e7ae`: excepción única del orden owned-email/timeline validada bajo lock; dry-run staging y
+producción exit 0 sin migraciones pendientes. Timestamps intactos; worker conserva su imagen.
 
 ## TASK-1899 retirada (2026-10-04)
 
