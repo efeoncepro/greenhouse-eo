@@ -190,7 +190,16 @@ antes de cambiar versiones, catálogo o embeds.
 
 El [Lab publicado](https://axis.efeonce.org/references/video-player/) permite comparar las tres skins.
 Think ya usa el package en [su ruta de integración](https://think.efeoncepro.com/preview/video-player).
+En Think, pasa `options` serializables al componente Astro; conecta funciones antes del montaje mediante
+`axis-video:configure` y recibe el handle en `axis-video:ready` (`detail.player`). WordPress expone los datos
+del modelo en el editor y esos mismos hooks cliente. Nunca guardar funciones, permisos o secretos en JSON.
+Para thumbnails, entrega el VTT y sus imágenes accesibles; el package no los genera a partir del MP4.
 El bloque WordPress sigue sin activar: probar un snapshot del artículo no es editar el artículo público.
+La entrega WordPress prevista tendrá **bloque Gutenberg y widget Elementor**. Hoy existe el bloque candidato;
+el widget Elementor se implementará después. Al crear el widget, reutiliza modelo/validación/renderizado,
+assets y eventos del adapter compartido; ofrece las mismas capacidades mediante controles humanos, sin
+JSON manual ni otro reproductor. Verifica su ciclo de vida dentro del editor Elementor antes de cualquier
+activación o inserción en artículos. Esta orientación no declara el widget implementado ni publicado.
 
 Si una sesión antigua muestra una imagen azul mientras el tiempo o los subtítulos avanzan, registra fuente,
 navegador, tiempo y reproducción fresca por separado. El incidente permanece abierto; recargar no constituye

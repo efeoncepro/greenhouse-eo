@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Continuidad activa
 
-AXIS Video: primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0 publicados; release 37630788367 SUCCESS. AXIS/Think main y Vercel Ready; Think usa registry + lockfile. Imagen azul intermitente ABIERTA; WordPress sin activar. [Consumo, evidencia y pendientes](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+AXIS Video: primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0 publicados; release 37630788367 SUCCESS. Think/WordPress: adapters ampliados, medios completos y callbacks; QA por host. Imagen azul intermitente ABIERTA; WordPress sin activar. [Distribución, evidencia y pendientes](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
 Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
 

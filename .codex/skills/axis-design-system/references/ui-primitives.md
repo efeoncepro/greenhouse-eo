@@ -202,6 +202,15 @@ Before adoption read AXIS `docs/agent-composition/video-player.md`,
 features, verified delivery and open limits. Use token-owned 44px controls resilient to host resets,
 real captions, automatic overlay hiding and static orbital replay with an accessible name.
 
+Consumer adapters must expose the full model and client callbacks, not only source/poster. Think and the
+WordPress candidate use `axis-video:configure` ({model,options}) before enhancement and `axis-video:ready`
+({player}) afterward. Keep functions out of serialized props/block attributes. Parity fixtures supply actual
+tracks, thumbnails, chapters and transcript; tests must reject omissions before changing skins. Build the
+standalone WordPress artifact from the installed published package with `--package-root`; retain its version
+and SHA256 manifest, all engine chunks and content-based cache version. No separate player implementation.
+Test co-loaded primitive styles as well as host resets: `.axis-button__spinner` hid the video replay orbit
+until its own selector explicitly set display (0.6.4 patch). DOM presence alone is not visual parity.
+
 WordPress remains an unactivated candidate block. The in-app blue-paint incident remains open;
 fresh playback and decoded frames do not prove its resolution. Native adapters, physical AT/devices,
 streaming providers, review persistence and analytics consent remain consumer responsibilities.

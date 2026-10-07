@@ -26,6 +26,30 @@ fechadas de releases anteriores describen sus propios cortes y no sustituyen est
 - El contrato `efeonce.video-player` conserva su versión propia `0.5.0`; no es el número del package.
   El paquete registry `0.7.2` conserva su inventario anterior: no inferir descubrimiento de video desde él.
 
+### Paridad de adapters — ampliación 2026-10-07
+
+Think recibe modelo completo, opciones serializables y callbacks cliente por `axis-video:configure`;
+`axis-video:ready` devuelve `{player}`. Montaje, cancelación y teardown pertenecen al adapter. La muestra
+incluye cuatro capítulos, 12 cues, subtítulos y VTT con diez miniaturas reales. WordPress ofrece esos campos
+en Gutenberg y valida el modelo en PHP; callbacks/persistencia siguen siendo responsabilidad de la plataforma.
+La dirección posterior de WordPress incluye **bloque Gutenberg y widget Elementor**. El bloque ya existe
+como candidato sin activar; el widget Elementor está **pendiente de implementación**. Ambas superficies
+mapearán controles al mismo modelo, validación PHP, renderer y bundle publicado, con las mismas capacidades;
+no se copiará el core. La preview/lifecycle de Elementor necesita QA propia y no se acredita con el snapshot
+Gutenberg. La activación y la inserción en contenido real siguen siendo acciones posteriores.
+La compatibilidad de Ohio restaura únicamente el panel Review contextual que el tema ocultaba con una
+regla global sobre `aside`, conservando tabs móviles y embedded.
+Su bundle candidato se reconstruyó desde el package publicado 0.6.3: `size-report.json` registra versión,
+procedencia y hashes de cada archivo. Esto no activa el plugin ni modifica el artículo.
+
+Replay, iconos, targets y estados compartidos conservan implementación única en las tres skins; una pestaña
+abierta con JS anterior no acredita el estado del release. Antes de evaluar diferencias, comprobar el recurso
+realmente cargado. Una prueba de paridad debe fallar si faltan medios/datos, sin completarlos en el harness.
+El [manual AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md#consumidores-y-paquete-standalone)
+y los README de cada adapter mantienen la API. La ampliación de datos no cambia el core. La colisión adicional con `button.css` sí requiere 0.6.4;
+[release 37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) en curso.
+El aviso WebKit `ResizeObserver` en ajustes/velocidad sigue abierto; se registra, no se silencia.
+
 ### Evidencia y límites
 
 El release aprobó 78 pruebas de video y conservó 10 exclusiones intencionales, además de sus otros gates.

@@ -86,6 +86,24 @@ Web comparte HTML/CSS; apps nativas requieren adapter propio aunque compartan to
 El host posee acceso, URLs firmadas, hosting, HLS/DASH/DRM, persistencia, aprobaciones y consentimiento analítico.
 No autoplay, almacenamiento ni telemetría implícitos. Fuentes/pistas remotas requieren CORS correcto.
 
+## Paridad al integrar
+
+La skin cambia composición y color, no la identidad de replay, iconos, targets o estados comunes.
+Comprobar versión y JS cargado antes de atribuir diferencias a una skin: una pestaña antigua del Lab
+conservaba replay textual aunque el package 0.6.3 ya entregaba la órbita para todas.
+Think y WordPress deben recibir tracks, thumbnails, chapters y transcript reales; no basta con fuente/poster.
+Los adapters exponen `axis-video:configure` ({model,options}) y `axis-video:ready` ({player}); callbacks,
+permisos y persistencia los conecta el host. El bloque WordPress sigue candidato sin activar.
+Dirección WordPress confirmada: **Gutenberg + Elementor**. El bloque existe como candidato; el widget
+Elementor es trabajo posterior, no capacidad implementada. Ambos adapters deben exponer el mismo modelo
+validado y capacidades, consumir un único bundle AXIS y compartir hooks cliente; nunca copiar el core ni
+crear otra línea visual. La preview/lifecycle de Elementor exige QA propia. Activación y artículo real siguen
+pendientes; la orientación de arquitectura no los ejecuta.
+Ejecutar la paridad focal de consumidores de AXIS; verificar datos de entrada antes de variar skins y exigir
+miniaturas cargadas, captions activos, capítulos navegables y replay orbital en cada skin/superficie.
+No ampliar a un release o CI completo cuando sólo cambia la conexión del consumidor.
+La colisión con `button.css` mostró otra limitación: un SVG presente puede estar oculto. Exigir órbita, anillo y esfera visibles en píxeles, cargando ambas hojas en ambos órdenes; el parche 0.6.4 explicita su display.
+
 ## QA al continuar
 
 El release verificó 78 browser PASS y 10 skips explícitos en Linux, además de build/types/unit/design y los gates
