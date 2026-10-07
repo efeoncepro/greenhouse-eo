@@ -1,4 +1,12 @@
 # Product UI primitives — consumption and verification
+## Distribución verificada — 2026-10-07
+
+Publicado en GitHub Packages: `axis-ui-primitives@0.6.3`, `axis-tokens@0.6.0`, `axis-ui-contracts@0.7.0`. [Release v0.6.3](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367) SUCCESS, fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`. Instalación limpia, exports DOM/React/integrations, SSR y igualdad byte a byte del JS/CSS con el build verificado: PASS. Think fija registry + lockfile, sin `link:`; build y typecheck PASS, main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Vercel Production Ready en https://think.efeoncepro.com/preview/video-player. AXIS main y https://axis.efeonce.org/references/video-player/ desplegados.
+
+El incidente intermitente de pintura azul en sesiones antiguas del navegador integrado sigue ABIERTO; esta publicación no acredita su corrección. WordPress conserva bloque candidato sin activación ni modificación del artículo publicado. Dispositivos/AT físicos y streaming real mantienen sus gates. Registry empaquetado 0.7.2 conserva su inventario anterior; no inferir descubrimiento de video desde ese paquete histórico.
+
+Los estados de entrega anteriores conservan la historia; prevalece la distribución verificada anterior.
+
 
 ## Current source and release boundary
 

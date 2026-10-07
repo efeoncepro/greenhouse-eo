@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Continuidad activa
 
-AXIS Video: AXIS main `7fb549a`, Lab desplegado; release v0.6.3 en curso tras dos fallos de harness antes de publicar. Think espera registry pin 0.6.3 para push main autorizado; NPM_RC sensible configurado Preview/Production. Imagen azul intermitente ABIERTA. Estado vivo: skill `efeonce-graphic-line/references/video-player.md` y QA AXIS `docs/quality/video-player-0.5.0.md`.
+AXIS Video: primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0 publicados; release 37630788367 SUCCESS. AXIS y Think en main, Vercel Ready. Think usa registry + lockfile, sin link local. Imagen azul intermitente ABIERTA; WordPress sin activación. Estado y evidencia: skill efeonce-graphic-line/references/video-player.md y QA AXIS docs/quality/video-player-0.5.0.md.
 
 Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
 

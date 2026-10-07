@@ -12,7 +12,7 @@
 **AXIS Video: candidato portable y validación consumidora (2026-10-07)**
 
 - Cinema/Editorial/Review y adapters DOM/React/Astro/Gutenberg candidatos, integración local Think y snapshot post 251941; replay orbital por solicitud del operador. Skill `efeonce-graphic-line` espejo y docs de marca/API/QA actualizados.
-- Commit/push autorizado en ramas de revisión. Incidente intermitente de imagen azul sigue abierto; reproducción fresca con captions y replay verificada, sin afirmar corrección de causa. Think usa link local; sin release de paquetes, deploy ni activación WordPress. Fuente viva: AXIS `docs/quality/video-player-0.5.0.md`.
+- Publicación y main autorizados posteriormente: primitives 0.6.3, tokens 0.6.0 y contracts 0.7.0 publicados; AXIS y Think main desplegados. Think consume registry privado + lockfile, sin link local. Imagen azul intermitente sigue abierta; WordPress sin activación. Evidencia: AXIS `docs/quality/video-player-0.5.0.md`.
 
 
 - Decisión explícita del operador: `efeonce-graphic-line` gobierna estética, tipografía, componentes, iconografía y motion de Rooms; Bricolage editorial/Poppins funcional, AXIS como distribución técnica. [Dossier](docs/architecture/rooms/README.md) y [EPIC-052](docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md) corregidos, incluida autoría/consola; arte cliente intacto y sin narrativa pregunta/respuesta obligatoria.

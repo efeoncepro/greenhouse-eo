@@ -764,3 +764,9 @@ Corrección del operador sobre V4: range con insets de tokens y clipping durante
 - 2026-10-07 · Publicación de paquetes AXIS autorizada explícitamente. Target `v0.6.2`: tokens 0.6.0, contracts 0.7.0, primitives 0.6.2; Think debe fijar registry, sin vendor. Run y estado en `video-player.md`.
 
 - 2026-10-07 · Operador ordena AXIS y Think a main. AXIS main 7fb549a; release v0.6.3 en curso. Think debe consumir versión publicada exacta desde GitHub Packages; sin dependencia local en cloud. Detalle y fallos previos en video-player.md.
+
+## Distribución verificada — 2026-10-07
+
+Publicado en GitHub Packages: `axis-ui-primitives@0.6.3`, `axis-tokens@0.6.0`, `axis-ui-contracts@0.7.0`. [Release v0.6.3](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367) SUCCESS, fuente `7fb549a4ee862f077a05e8ff6bc0fadc58f44ff0`. Instalación limpia, exports DOM/React/integrations, SSR y igualdad byte a byte del JS/CSS con el build verificado: PASS. Think fija registry + lockfile, sin `link:`; build y typecheck PASS, main `cd428c789a4fea2feab3b4b0d08cf68c7f07efd5`, Vercel Production Ready en https://think.efeoncepro.com/preview/video-player. AXIS main y https://axis.efeonce.org/references/video-player/ desplegados.
+
+El incidente intermitente de pintura azul en sesiones antiguas del navegador integrado sigue ABIERTO; esta publicación no acredita su corrección. WordPress conserva bloque candidato sin activación ni modificación del artículo publicado. Dispositivos/AT físicos y streaming real mantienen sus gates. Registry empaquetado 0.7.2 conserva su inventario anterior; no inferir descubrimiento de video desde ese paquete histórico.
