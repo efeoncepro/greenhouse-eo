@@ -1,0 +1,136 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "6255a307e437",
+  "key": "6255a307e437973fcee3f8c21ba2f681312a1d2253ea9326306235dcf8fd8ee3",
+  "status": "completed",
+  "createdAt": "2026-10-07T00:15:33.027Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK1b-muro-compuesto.png",
+    "imageSha256": "5373a494b0bda5dfe69c91fa168df88176172e50b888cfd9e88bd06cfff93a58",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-mask-muro.png",
+    "maskSha256": "f922eb29458fb8c0449eff3ae17254fbdc2c73c875e03a3031c99bf88ac801d0",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "In the marked zone there is only the plain dark matte charcoal studio wall, continuing exactly the texture and darkness of the wall around it, with the same soft warm glow just under the bottom edge of the lightbox panel fading down. Nothing on the wall: no object, no chair, no shadow shape. Keep the framing identical.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nIn the marked zone there is only the plain dark matte charcoal studio wall, continuing exactly the texture and darkness of the wall around it, with the same soft warm glow just under the bottom edge of the lightbox panel fading down. Nothing on the wall: no object, no chair, no shadow shape. Keep the framing identical.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0751953125,
+    "editable": 277200,
+    "soft": 0,
+    "protected": 3409200
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 800,
+      "top": 560,
+      "width": 1200,
+      "height": 880
+    },
+    "target": {
+      "width": 1200,
+      "height": 880
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 28.6 % de la imagen: se genera recortada a 1200x880"
+  },
+  "estimate": {
+    "usd": 0.0385,
+    "basis": "1 × salida 1200x880 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 3.075,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.78,
+        "bestError": 1.78,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.29,
+        -0.54,
+        -0.46
+      ],
+      "protected": {
+        "pixels": 3409200,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 277200,
+        "maxDelta": 61,
+        "meanDelta": 3.075,
+        "worst": {
+          "x": 1431,
+          "y": 1122
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 3409200,
+        "maxDelta": 130,
+        "meanDelta": 1.021,
+        "worst": {
+          "x": 1757,
+          "y": 842
+        }
+      },
+      "outputUsd": 0.0385,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2317,
+        "input_tokens_details": {
+          "image_tokens": 2128,
+          "text_tokens": 189
+        },
+        "output_tokens": 1284,
+        "output_tokens_details": {
+          "image_tokens": 1284,
+          "text_tokens": 0
+        },
+        "total_tokens": 3601
+      },
+      "meta": {
+        "size": "1200x880",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "SK1-muro-posible",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "deck-portada",
+  "impacto": true,
+  "linea": "brand",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "a hard white spotlight in a small fixture, outside the frame",
+    "lado": "high on the left of her face, slightly in front",
+    "distancia": "about 3 meters from her"
+  },
+  "fenomeno": {
+    "que": "one giant blank lightbox glowing a single flat warm yellow, the only big light of the studio, drawing a thin yellow rim on her",
+    "esServicio": "Creative Studio: la campaña que hacemos para Sika ya es real, a escala, y llena el cuarto de su amarillo"
+  },
+  "escena": "SCENE (staged cinematic editorial photograph, a large dark creative studio at night, the moment of a campaign reveal): the back wall is a deep matte charcoal wall. On it hangs a GIANT frameless backlit lightbox panel, perfectly flat and perfectly FRONTAL to the camera (the camera axis perpendicular to it: no perspective, no tilt), a clean 16:9 rectangle with four sharp straight edges and four visible square corners: its left edge just to the right of the frame centre, at about 50 % of the frame width, its right edge at about 96 %, its top edge at about 8 % of the frame height and its bottom edge at about 54 %. Its whole face is ONE flat, evenly lit warm yellow (#FCC500), exposed so it keeps its saturated yellow and never clips to white: no hotspot, no gradient, no vignetting, completely BLANK: no image, no graphic, no text, no seams, no fixings. Its light stays on the panel: only a thin soft halo at its edges; the wall to its left stays dark charcoal. The art director, wearing the EFEONCE HOODIE in its royal blue, the only blue of the frame, stands about two meters in front of the panel at the far right of the frame: her shoulder nearer the frame centre at about 80 % of the frame width, the other near 94 %; between the panel's left edge and her shoulder the yellow surface is uninterrupted. Camera about five meters from her at chest height, 85mm f/2.8; she is framed from the waist up, the top of her head at about 40 % of the frame height, so her head and shoulders overlap ONLY the bottom-right corner of the panel and everything above and to the left of her stays clear. She stands relaxed and confident, one hand in the hoodie pocket, the other arm loose, body turned slightly toward the panel, head almost frontal, eyes straight into the lens with a sly half smile. The panel draws a thin warm yellow rim on her curls and shoulders and separates her from it; her face is lit by the hard white key. The LEFT 42 % of the frame is the charcoal wall in deep shadow: no light, no glow, no bokeh, no objects. Outside the panel and that rim the whole frame is cool and contemporary: nothing amber, orange or golden, no tungsten, no retro glow. No text anywhere, no logos of any brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a worktable close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the charcoal wall in deep shadow on the left 42% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

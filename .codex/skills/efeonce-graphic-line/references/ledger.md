@@ -705,3 +705,16 @@ es Marketing Studio» y a nombrar cada vista completa en superficies visibles (A
 D9 y §7). Primer uso: encabezado de las interfaces del brochure Agencia Creativa (lockup «efeonce | Creative Studio»).
 Pendiente en el release AXIS: el README de `brand-assets` todavía dice que «Creative Studio» es sólo el descriptor de
 Globe.
+
+### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
+
+- **Firma de Efeonce en una propuesta para la marca de un cliente:** pie navy `#001a33` en cada hoja con el lockup
+  `creative-studio-lockup-negative`, el texto de la licitación y la burbuja `url-bubble-baked-dark`; fuera del material
+  del cliente. Portadas y contraportada sin pie (operador: «para la portada únicamente esto no es necesario»).
+- **Excepción del operador, sólo para esa pieza:** portada cine con el arte aprobado del cliente dentro de la foto
+  (Karo presenta el Master Graphic de Sika en un lightbox), compuesta con `cover-brochure` layout `line` línea brand.
+  Primer precedente de arte de cliente en foto cine; no es regla. Aprobada: «Está perfecta».
+- Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
+  línea Growth.
+- Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
+

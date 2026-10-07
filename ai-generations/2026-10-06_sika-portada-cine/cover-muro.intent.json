@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Propuesta · Sika Mexicana",
+    "question": "¿Cómo se ve lo posible?",
+    "answer": [
+      "Así"
+    ]
+  },
+  "body": "Por **Efeonce Creative Studio**\nLicitación Wherex N.º 1164 · Confidencial",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_sika-portada-cine/plates/SK1c-muro.png",
+    "alt": "Karo, directora de arte de Efeonce Creative Studio con el hoodie, mira a cámara frente a un muro de luz gigante con la campaña POSIBLE de Sika, que la recorta en amarillo en un estudio oscuro"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

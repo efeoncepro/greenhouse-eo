@@ -585,6 +585,25 @@
 - **Una foto cuya luz ya es una órbita no lleva lente.** Las novedades cine del login (`LG1`, `LG2e`) van sin lente
   (una órbita por pieza); la foto en registro B (`LG3e`) sí la lleva. El operador lo aceptó.
 
+## 2026-10-07 (portada de propuesta con el arte del cliente, Sika LIC-1164)
+
+- **El arte de un cliente pegado sobre una foto terminada siempre se lee pegado.** Dos intentos rechazados («se ve
+  horrible», «se nota demasiado lo determinístico»): nueve piezas con homografía sobre tarjetas de luz de un plate
+  ajeno, y un Master Graphic sobre un lightbox en blanco con la persona recortada y movida. Causa: el **orden** (el
+  arte no recibe la luz de la escena, la escena no recibe luz del arte; la persona movida conserva la luz de su lugar
+  original). Regla: generar la escena **con el arte como referencia** (`foto:generar --dry` + `ai:image` con imagen
+  extra), componer el arte exacto encima y terminar sólo con materia y luz (`ai:inpaint image` Sunburst). Nunca mover
+  una persona recortada: se regenera la toma.
+- **El acabado Sunburst reinventa texto chico aunque el prompt lo prohíba** («PURFORM» → «PUREFORM», «-119» → «-119S»)
+  y vira el amarillo de marca a limón (b alto). Se resuelve fuera del modelo: híbrido de frecuencias (alta frecuencia
+  del arte exacto + baja del acabado, sigma 10) y ganancia de color sólo en los píxeles del color de marca; una
+  corrección global tiñe blancos y azules.
+- **`ai:image:rmbg` toma un lightbox brillante como sujeto:** la máscara de la persona sólo vale en su zona; las manos
+  se recortan con `rmbg` sobre un recorte local.
+- **`foto:expandir` con reposición deja costura vertical en fondos oscuros;** con `--reponer no` queda limpio pero el
+  modelo puede recortar el arte: se repone sólo el arte exacto encima.
+- Detalle y archivos: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md` §3.5.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos
