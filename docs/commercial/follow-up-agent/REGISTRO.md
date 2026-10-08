@@ -18,7 +18,7 @@ Owner: Julio Reyes. [Contrato](README.md) · [Proyecto Notion](https://app.notio
 | --- | --- | --- |
 | Hoy | INDAP08/10 14:00 Chile | Canal, costo, soporte y GO antes de ofertar |
 | Hoy | INDH08/10 15:30 Chile según investigación 07/10 | Revalidar plazo y experiencia DDHH/LSCh; sin Deal confirmado |
-| Hoy | UTEM08/10 18:00 Chile | Anexos firmados; preparar propuesta/ficha de cumplimiento y cotización, cerrar costeo/precio y decidir presentación |
+| Hoy | UTEM08/10 18:00 Chile | Anexos firmados; técnica v1.1 y deck v2 listos: revisar deck/técnica, cerrar cotización y decidir presentación |
 | Hoy | UNAP08/10 19:00 Chile | Resolver presupuesto contradictorio y respaldo CRM/educación |
 | Preparar hoy | SANNA09/10 09:00 Chile | Costear antes del cierre; revisión09:00 llegaría tarde |
 | Mañana | ProChile09/10 13:00 Chile | Referencias, terreno, perfiles, caja y oferta |
@@ -204,3 +204,12 @@ Corrección explícita de Julio, 08/10/2026: la regla de no exigir contacto prev
 ### 2026-10-08 — consolidación documental para continuidad entre agentes
 
 Sin nueva revisión SaaS: sincronizados contrato, cola, decisión de autonomía y `state.json` con UTEM firmado, datos confirmados, pendientes reales y regla general de plataformas. Conservados 23 IDs de tareas y su último estado observado; no se crearon tareas, no se inscribieron contactos, no se mandaron correos y no se renovó el corte de CRM/correo. El error Outlook 403 y el aviso de créditos de Prospecting Agent siguen como observaciones fechadas, no como diagnóstico revalidado hoy en esta consolidación. La [auditoría de segmentos](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md) conserva el readback de Diego y Emily: reutilizar activos existentes y propiedades respaldadas; una membresía no autoriza inscripción o envío.
+
+
+### 2026-10-08 — UTEM técnica v1.0 preparada; deck para Claude
+
+Por mandato de Julio se redactó la [propuesta técnica y matriz de cumplimiento](../tenders/utem-seo-aeo-2026/README.md). El operador sustituyó Word por HTML y PDF; entregados Markdown, HTML autocontenido y PDF de once páginas en `UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica`, con guía interna separada para Claude. PDF revisado visualmente; 303 bloques de contenido cotejados, cero omisiones y cinco enlaces. Técnica para revisión, no firmada ni presentada. Pendientes: revisión del alcance/capacidad, costo/precio exacto y cotización, deck y decisión de presentación. Tarea UTEM actualizada y leída de vuelta; no se cerró el paquete. Este delta no renueva el corte global de CRM/correo ni el deadline.
+
+### UTEM · deck y técnica v1.1 (Claude)
+
+08/10: Claude armó el deck v2 de la propuesta técnica (35 láminas, cinco capítulos) y su PDF en `05. Propuesta tecnica`; la técnica pasó a v1.1 alineada con el deck (revisión pública, equipo nominal, experiencia y fuentes). Revisión pública: UTEM entre los primeros 20 en 2 de 15 búsquedas y citada por la IA en 3 de 15. Pendientes: decidir «Todo junto» y «Cada mes» (Insights/panel fuera del alcance técnico), fuente exacta del caso Sky, cotización/costeo y decisión de presentación. Sin escritura HubSpot, envío ni postulación. [Registro](../../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md).

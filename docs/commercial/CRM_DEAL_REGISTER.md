@@ -14,7 +14,7 @@
 
 Julio corrigió la clasificación comercial: **una señal o lead no equivale a una oportunidad calificada**. Los Deals ya creados se conservan por instrucción expresa; `qualifiedtobuy` no acredita calificación completa. Para nuevas señales, calificar desde lead antes de promover y reutilizar registros/segmentos activos existentes.
 
-UTEM fue seleccionada para preparación; el [estado del expediente](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md) actualiza anexos y decisiones del operador, sin nueva escritura ni readback CRM. No exigir contacto previo para licitaciones por plataforma; usar canal disponible y registrar supuestos acordados si no lo hay. [Criterio y datos confirmados](EFEONCE_DATOS_PARA_LICITACIONES.md).
+UTEM fue seleccionada para preparación; el [estado del expediente](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md) actualiza anexos y decisiones del operador, sin nueva escritura ni readback CRM. No exigir contacto previo para licitaciones por plataforma; usar canal disponible y registrar supuestos acordados si no lo hay. [Criterio y datos confirmados](EFEONCE_DATOS_PARA_LICITACIONES.md). Técnica v1.1 y [deck v2](../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md) están preparados, sin escritura HubSpot ni presentación.
 
 ## Altas LicitaLAB verificadas — 2026-10-08
 
