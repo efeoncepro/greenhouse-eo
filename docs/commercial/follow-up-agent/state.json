@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-08T10:08:03Z",
+  "timezone": "America/Santiago",
+  "automation": {
+    "id": "seguimiento-comercial-plazos-y-pr-ximos-pasos",
+    "kind": "heartbeat",
+    "status": "ACTIVE",
+    "schedule": "Monday-Friday 09:00 and 16:00",
+    "timezone": "America/Santiago",
+    "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,16;BYMINUTE=0;BYSECOND=0",
+    "target_thread_id": "01a11903-9829-7b90-a11d-c20a6be6576e",
+    "created_at": "2026-10-08T10:11:03Z",
+    "config_readback": "verified",
+    "first_scheduled_run": "not_yet_observed"
+  },
+  "portal_id": "48713323",
+  "notion_project_id": "3f339c2f-efe7-816a-b5b2-d29551199c43",
+  "notion_task_data_source_id": "2a539c2f-efe7-8177-a02d-000b4e8604c0",
+  "owner_notion_id": "98be6859-4b84-4dee-a8f2-5546d770c44b",
+  "coverage": {
+    "crm_total": 251,
+    "crm_open": 41,
+    "crm_closed": 207,
+    "test_without_state": 3,
+    "email": "targeted_partial",
+    "official_tender_revalidation": "not_complete"
+  },
+  "actions": [
+    {
+      "key": "followup:65806293639:indap",
+      "deal_id": "65806293639",
+      "tender_id": "609-107-COT26",
+      "title": "INDAP — resolver GO y cotización Claude antes del cierre",
+      "internal_due": "2026-10-08T12:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-81a4-b52d-f35e4e10fc53",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781a4b52df35e4e10fc53?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65832566144:utem",
+      "deal_id": "65832566144",
+      "tender_id": "5251-1060-COT26",
+      "title": "UTEM — terminar paquete SEO/GEO/AEO y decidir presentación",
+      "internal_due": "2026-10-08T15:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-815b-bf44-df20bcf8f5db",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7815bbf44df20bcf8f5db?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null,
+      "local_preparation": {
+        "updated_on": "2026-10-08",
+        "source": "operator confirmations and repository evidence; no new external task readback",
+        "folder": "Licitaciones/UTEM/1. Agencia SEO-AEO",
+        "annexes": {
+          "status": "completed_and_signed",
+          "numbers": [
+            "1",
+            "2B",
+            "3",
+            "4"
+          ],
+          "formats": [
+            "DOCX",
+            "PDF"
+          ],
+          "consolidated_pdf_pages": 6
+        },
+        "operator_confirmed": [
+          "sole_shareholder_100_percent",
+          "current_phone_and_bank_details",
+          "mercado_publico_enabled",
+          "no_utem_relationships",
+          "no_utem_debts",
+          "in_house_no_subcontracting_for_this_process"
+        ],
+        "company_data_ref": "docs/commercial/EFEONCE_DATOS_PARA_LICITACIONES.md",
+        "duration_months": 3,
+        "pricing_direction": {
+          "currency": "CLP",
+          "near_net_amount": 6800000,
+          "status": "operator_assumption_not_buyer_confirmed",
+          "exact_price_approved": false,
+          "quote_must_show": [
+            "net",
+            "VAT",
+            "total"
+          ]
+        },
+        "remaining": [
+          "technical_proposal_and_compliance_sheet",
+          "cost_and_exact_price",
+          "formal_quote",
+          "package_review_and_submission_decision"
+        ],
+        "prior_buyer_contact_required": false,
+        "submission": "not_submitted",
+        "external_task_status": "unchanged_since_last_readback"
+      }
+    },
+    {
+      "key": "followup:65678277469:unap",
+      "deal_id": "65678277469",
+      "tender_id": "2013-13-LE26",
+      "title": "UNAP — conciliar presupuesto y decidir oferta de admisión",
+      "internal_due": "2026-10-08T16:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-8152-8525-ca4c9f849f7e",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781528525ca4c9f849f7e?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:603663-7-LE26:indh",
+      "deal_id": null,
+      "tender_id": "603663-7-LE26",
+      "title": "INDH — verificar elegibilidad y cierre de cápsulas DDHH",
+      "internal_due": "2026-10-08T12:30:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-815d-8094-dadbffb68424",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7815d8094dadbffb68424?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65806331396:sanna",
+      "deal_id": "65806331396",
+      "tender_id": "757-422-COT26",
+      "title": "MINSAL SANNA — costear alcance y decidir presentación",
+      "internal_due": "2026-10-08T17:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-8120-b470-f326e4de8a57",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe78120b470f326e4de8a57?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65678232118:prochile",
+      "deal_id": "65678232118",
+      "tender_id": "1138297-11-LE26",
+      "title": "ProChile Atacama — cerrar respaldos, campo y oferta",
+      "internal_due": "2026-10-09T10:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-81ea-a3fa-d61fce34be66",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781eaa3fad61fce34be66?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65352884246:pibank-seo",
+      "deal_id": "65352884246",
+      "tender_id": null,
+      "title": "Pibank — revisar y enviar paquete SEO/GEO/AEO solicitado",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81c7-8a1e-ecffb5fd4859",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781c78a1eecffb5fd4859?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": "notion_task"
+    },
+    {
+      "key": "followup:65718071655:pibank-crm",
+      "deal_id": "65718071655",
+      "tender_id": null,
+      "title": "Pibank CRM — responder contexto a Natalia y coordinar sync",
+      "internal_due": "2026-10-08",
+      "notion_task_id": "3f339c2f-efe7-812d-a9e0-dec30b9d2f06",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7812da9e0dec30b9d2f06?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": "notion_task"
+    },
+    {
+      "key": "followup:65806334790:mujer",
+      "deal_id": "65806334790",
+      "tender_id": "918434-271-COT26",
+      "title": "Ministerio de la Mujer — validar horario y cotizar Claude",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-8149-8833-dc2a072faaac",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781498833dc2a072faaac?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65832763160:minsal-video",
+      "deal_id": "65832763160",
+      "tender_id": "757-429-COT26",
+      "title": "MINSAL — aclarar cantidades y preparar adaptación audiovisual",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81ba-9526-dd1da6176ab6",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781ba9526dd1da6176ab6?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65806250773:estacion",
+      "deal_id": "65806250773",
+      "tender_id": "2432-31-LE26",
+      "title": "Estación Central — resolver viabilidad de continuidad web",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81c5-a9cb-fa98cc93ec0b",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781c5a9cbfa98cc93ec0b?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65832737849:fucoa",
+      "deal_id": "65832737849",
+      "tender_id": "1108660-10-LE26",
+      "title": "FUCOA/CNR — preparar web y aula virtual con respaldos",
+      "internal_due": "2026-10-12",
+      "notion_task_id": "3f339c2f-efe7-81f8-a6cc-f46bcd070e85",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781f8a6ccf46bcd070e85?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:5586-155-LE26:ufro",
+      "deal_id": null,
+      "tender_id": "5586-155-LE26",
+      "title": "UFRO admisión — acreditar equipo y economía de pauta",
+      "internal_due": "2026-10-12",
+      "notion_task_id": "3f339c2f-efe7-8130-964b-cf111c3180d0",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe78130964bcf111c3180d0?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65771827631:sika1164",
+      "deal_id": "65771827631",
+      "tender_id": "LIC-1164",
+      "title": "Sika 1164 — resolver consultas y dirección de nueva técnica",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-8160-b84f-feba99a2d665",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe78160b84ffeba99a2d665?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65827529551:sika1169",
+      "deal_id": "65827529551",
+      "tender_id": "LIC-1169",
+      "title": "Sika Q4 — verificar respuestas manteniendo HOLD",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81b9-b1df-e31032595d65",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781b9b1dfe31032595d65?pvs=204",
+      "status": "hold",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65472322064:sgs",
+      "deal_id": "65472322064",
+      "tender_id": null,
+      "title": "SGS — preparar caso de contactabilidad comprometido",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-8103-af22-f97a2c787968",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe78103af22f97a2c787968?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": "notion_task"
+    },
+    {
+      "key": "followup:65757239717:tvn",
+      "deal_id": "65757239717",
+      "tender_id": null,
+      "title": "TVN — alinear con partner la alternativa tras rechazo de registro",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81eb-b9f4-d5c8b28d4dbf",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781ebb9f4d5c8b28d4dbf?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:63837046880:mineduc",
+      "deal_id": "63837046880",
+      "tender_id": null,
+      "title": "Mineduc — concretar reunión pendiente con vendedor HubSpot",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81ed-ba1a-efffbfdd9da1",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781edba1aefffbfdd9da1?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:56549453888:sky-care",
+      "deal_id": "56549453888",
+      "tender_id": null,
+      "title": "SKY Social Care — revisar definición de presupuesto 2027",
+      "internal_due": "2026-10-13",
+      "notion_task_id": "3f339c2f-efe7-81a7-a212-fedd84d6f952",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781a7a212fedd84d6f952?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65806491771:yanbal",
+      "deal_id": "65806491771",
+      "tender_id": null,
+      "title": "Yanbal — preparar primer contacto para calificar agentes creativos",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-81e2-b0fd-d5269968920b",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781e2b0fdd5269968920b?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65832889458:olivos",
+      "deal_id": "65832889458",
+      "tender_id": null,
+      "title": "Olivos del Sur — preparar contacto y pedir brief audiovisual",
+      "internal_due": "2026-10-09",
+      "notion_task_id": "3f339c2f-efe7-816a-ac13-e481cac46a1d",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7816aac13e481cac46a1d?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:65718062956:berel",
+      "deal_id": "65718062956",
+      "tender_id": null,
+      "title": "Berel — alinear CRM y campaña app con el vínculo existente",
+      "internal_due": "2026-10-12",
+      "notion_task_id": "3f339c2f-efe7-81a2-9456-ea0b54379285",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781a29456ea0b54379285?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    },
+    {
+      "key": "followup:higiene:higiene",
+      "deal_id": null,
+      "tender_id": null,
+      "title": "Conciliar vencimientos y decisiones de negocios antiguos",
+      "internal_due": "2026-10-12",
+      "notion_task_id": "3f339c2f-efe7-8101-b4d9-ee7731d3685a",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe78101b4d9ee7731d3685a?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null
+    }
+  ],
+  "outlook_drafts": {
+    "created": 0,
+    "status": "blocked_403",
+    "attempted_at": "2026-10-08",
+    "fallback": "3 texts in Notion",
+    "preserve_human_drafts": true,
+    "status_scope": "last_documented_attempt_only; not revalidated during documentation consolidation"
+  },
+  "mail_sources": [
+    {
+      "subject": "Pibank | SEO Efeonce",
+      "received_at": "2026-10-08T02:41:42Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7moAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7moAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "RE: Piloto comentarios Efeonce",
+      "received_at": "2026-10-07T23:15:30Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mlAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mlAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Natalia Baena agregó un mensaje al negocio compartido \"Pibank Perú - HuBSpot CRM\"",
+      "received_at": "2026-10-07T23:14:11Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mkAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mkAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Re: Piloto comentarios Efeonce",
+      "received_at": "2026-10-07T21:59:06Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQFkBblAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQFkBblAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Re: Piloto comentarios Efeonce",
+      "received_at": "2026-10-07T21:32:48Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEKAAAR61VaBWh6QqphZWDfIIRIAAQFkeu7AAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEKAAAR61VaBWh6QqphZWDfIIRIAAQFkeu7AAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Efeonce | HubSpot  - La grabación y los seguimientos están listos",
+      "received_at": "2026-10-07T16:44:56Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mRAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7mRAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Re: TVN | Participación de Efeonce en la licitación CRM",
+      "received_at": "2026-10-06T15:56:56Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQFkBbdAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQFkBbdAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Re: TVN | Participación de Efeonce en la licitación CRM",
+      "received_at": "2026-10-06T15:54:52Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7lqAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQFj7lqAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Minuta y próximos pasos | SGS + Efeonce",
+      "received_at": "2026-09-29T21:51:20Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQEh0WZAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQEh0WZAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Wherex – Nueva Licitación de Sika [Lic - 1169]",
+      "received_at": "2026-10-07T19:17:12Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58VAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58VAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "wherEX – Anuncio general licitación LIC-1164 de Sika",
+      "received_at": "2026-10-06T16:48:31Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58NAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58NAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Wherex – Nueva Licitación de Sika [Lic - 1164]",
+      "received_at": "2026-10-05T17:16:41Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58MAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58MAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Wherex - Cambio fecha de cierre Licitación [1507] de la Empresa Metrogas",
+      "received_at": "2026-10-06T18:29:56Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58QAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQFj58QAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    }
+  ],
+  "decisions": {
+    "tvn": "late registration rejected 2026-10-06; no repeat outreach",
+    "sika1169": "HOLD",
+    "sika1164": "discarded technical proposal; new direction required",
+    "sky_social_care": "2027 budget only; no service 2026",
+    "isp_design": "NO-BID",
+    "leads": "do not infer qualified from existing Deal",
+    "platform_tenders": "Wherex and Mercado Publico submission; LicitaLAB discovery connected to Mercado Publico. No prior buyer contact requirement; use real questions channel if available, otherwise proceed with documented operator assumptions. No autonomous submission.",
+    "segments": "Reuse existing active segments with supported properties; preserve static lists; no duplicate segments. Membership does not authorize enrollment or sending."
+  },
+  "documentation_update": {
+    "date": "2026-10-08",
+    "scope": "conversation and repository continuity only",
+    "live_crm_outlook_audit": false,
+    "external_task_sync": false,
+    "scheduler_readback": false,
+    "sources": [
+      "docs/commercial/EFEONCE_DATOS_PARA_LICITACIONES.md",
+      "docs/commercial/tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md",
+      "docs/audits/commercial/2026-10-08-prospecting-agent-active-segments.md"
+    ]
+  }
+}

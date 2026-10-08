@@ -1,0 +1,58 @@
+# Seguimiento comercial recurrente
+
+Owner: Julio Reyes / Commercial. Corte inicial: 2026-10-08, America/Santiago.
+Autorización: solicitud explícita del operador de alertas, borradores, tareas en Efeonce Comercial y registro en Markdown; frecuencia confirmada lunes a viernes 09:00 y 16:00.
+
+- [Registro vivo y cola completa](REGISTRO.md)
+- [Estado estructurado para deduplicar](state.json)
+- [Decisión de autonomía](../../architecture/GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md)
+- [Proyecto Notion](https://app.notion.com/3f339c2fefe7816ab5b2d29551199c43)
+- [Índice comercial](../README.md), [registro CRM](../CRM_DEAL_REGISTER.md), [investigación de licitaciones](../tenders/LICITALAB_PRIORITY_QUEUE_2026-10-05.md).
+
+## Contrato operativo
+
+Este agente de Codex revisa el trabajo comercial existente. Complementa el radar diario de prospección HubSpot; no lo sustituye ni duplica. No depende de créditos de Breeze. El scheduler vive en la app Codex, no en producción Greenhouse.
+
+HubSpot es la fuente de objetos y etapas comerciales; Notion de tareas; Outlook de comunicaciones. Las bases, ficha y anuncios vigentes del comprador gobiernan plazos y admisibilidad. Markdown guarda evidencia observada, decisiones y continuidad, no es un CRM alternativo.
+
+## Cada ejecución
+
+1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders, notion-platform y documentación comercial pertinente.
+2. Confirmar fecha/hora America/Santiago, portal HubSpot 48713323, identidad y mailbox Outlook jreyes@efeoncepro.com. Leer todos los pipelines; paginar hasta agotar todos los negocios abiertos. Revisar también investigación reciente sin Deal, leads y compromisos de los últimos 14 días; incluir propuestas cerradas solo si dejan un compromiso pendiente verificado.
+3. Cruzar descripción, hs_next_step, fecha_de_cierre_de_licitacion, notes_next_activity_date y cambios recientes. closedate es forecast, nunca deadline de oferta. Leer las notas/hilos/documentos que cambien la decisión. Buscar Outlook desde el último corte exitoso con 48h de solapamiento; primera recuperación usa 14 días. Paginar y declarar cobertura parcial cuando proceda.
+4. Buscar respuestas, enviados, borradores y tareas previas antes de proponer un envío. Leer el último mensaje real completo; resumen IA no prevalece sobre respuesta directa del comprador. Respetar rechazos, opt-outs, NO-BID, HOLD y límites de propuesta.
+5. Revalidar cambios de fechas en LicitaLAB/Mercado Público/Wherex o correos oficiales. Mantener fecha original, zona, fuente y observación. Si hay conflicto, alertar y pedir validación con margen conservador; nunca inventar UTC. Un cierre vencido no prueba pérdida ni postulación.
+6. Priorizar: plazo vencido con acción sin conciliar; cierre/compromiso antes de la siguiente revisión; <=24h; <=72h; <=7d; después preparación. Anticipar lunes y fin de semana en el corte del viernes. Si el plazo cae a las 09:00, resolver el día hábil anterior. La fecha interna recomendada se etiqueta distinta del plazo del cliente. La cadencia es lunes–viernes; no se omiten festivos automáticamente.
+7. Crear o actualizar tareas necesarias en el teamspace Efeonce Comercial, data source 2a539c2f-efe7-8177-a02d-000b4e8604c0, tras fetch de schema. Responsable Julio 98be6859-4b84-4dee-a8f2-5546d770c44b. Proyecto octubre 3f339c2f-efe7-816a-b5b2-d29551199c43; al cambiar mes, descubrir/reusar el proyecto comercial vigente antes de crear el mensual equivalente. Incluir objetivo, DoD, contexto, fuentes, deadline externo, fecha interna, bloqueo y siguiente paso.
+8. Preparar borradores personalizados cuando haya contexto suficiente. Reutilizar hilo original y destinatarios verificados. No inventar adjuntos, reuniones, credenciales, experiencia, precios, garantía de resultados ni autoridad de compra. Si Outlook permite guardar, crear borrador y leerlo de vuelta; si devuelve 403, registrar el texto en la tarea/Markdown, sin reintentos repetidos ni escalación de permisos. No sobrescribir borradores humanos; conservarlos y sugerir ajustes en la tarea.
+9. Verificar cada escritura por lectura independiente y registrar resultado/ID. No cerrar tareas por haber creado un archivo: requiere evidencia de la DoD. Si hay respuesta pero falta acción, cambiar la recomendación sin dar el trabajo por terminado. No modificar campos humanos ajenos al seguimiento.
+10. Actualizar REGISTRO.md y state.json, añadir una entrada fechada de ejecución con cobertura, cambios, IDs, borradores, alertas y bloqueos. Preservar historia; archivarla con enlace si crece. En checkout compartido, releer antes de editar y preservar cambios ajenos.
+11. Entregar SIEMPRE reporte en español en este chat: urgente antes del próximo corte; próximos siete días; tareas/borradores nuevos o actualizados con links; esperas/decisiones; cobertura y fallas. Si no hay novedades, decirlo. Alertas en Codex; no mandar notificaciones por email/Teams/Slack.
+
+## Deduplicación y autoridad
+
+Clave estable: followup:<deal-id o código licitación o cuenta>:<acción-semántica>. Fechas/versiones se guardan aparte; no crear otra tarea por ejecutar el agente de nuevo. Consultar también tareas terminadas y relaciones padre/proyecto. Una propuesta terminada no impide una tarea posterior distinta de seguimiento, pero no se reabre ni duplica.
+
+Tras timeout/resultado incierto de una escritura, buscar y leer antes de reintentar. Registrar proposed, attempted, created, verified, blocked o unknown de forma honesta. No duplicar alertas como hallazgos nuevos; un riesgo crítico abierto puede repetirse con su ID y estado.
+
+Autorizado de forma recurrente: lectura, investigación, tareas comerciales, borradores sin envío, documentación local. Prohibido sin nuevo mandato: enviar/programar emails, mensajes externos, secuencias/Prospecting Agent, presentar ofertas, cambiar CRM/etapas/segmentos, crear Deals, compras/créditos, cambios de permisos, borrados y commits/push.
+
+Criterio del operador sobre postulaciones por plataforma (08/10/2026): en licitaciones por plataforma en general —Wherex, Mercado Público y oportunidades consultadas mediante LicitaLAB conectado con Mercado Público—, no exigir conversación o respuesta previa del comprador como condición automática para preparar la oferta. Buscar contacto del proceso/canal de preguntas disponible; si no existe, registrar esa limitación y trabajar con bases y supuestos acordados. No repetir aclaraciones imposibles como bloqueos. Facturación/soporte no son interlocutores del proceso. [Detalle y búsqueda UTEM](../EFEONCE_DATOS_PARA_LICITACIONES.md#operación-por-plataforma-y-contacto-previo--criterio-de-julio-08102026).
+
+Una señal sigue siendo lead hasta calificación. Los Deals existentes se conservan por instrucción del operador; tener un Deal o pertenecer a un segmento no acredita calificación, consentimiento ni autoridad de envío. Para altas autorizadas por separado, reutilizar segmentos activos existentes y completar sólo propiedades respaldadas; no crear más segmentos ni eliminar los estáticos. El agente de seguimiento sólo recomienda estas acciones: su autonomía recurrente no incluye ejecutarlas. [Readback de Diego/Emily y segmentos](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md). Sika Q4 continúa HOLD; Sika 1164 conserva técnica descartada fuera de uso. Nunca deducir GO por tener un plazo próximo.
+
+## Continuidad vigente de preparación
+
+UTEM `5251-1060-COT26`: anexos 1, 2B, 3 y 4 completados y firmados en Word/PDF, con originales preservados. Julio confirmó accionista único 100%, teléfono y cuenta bancaria; para este proceso confirmó ausencia de vínculos y deudas con UTEM y ejecución in-house sin subcontratación. Confirmó además habilitación en Mercado Público. Reutilizar los [datos confirmados](../EFEONCE_DATOS_PARA_LICITACIONES.md), sin pedirlos otra vez salvo evidencia nueva; son declaraciones del operador, no certificados ni nueva consulta de plataforma.
+
+Carpeta: `Licitaciones/UTEM/1. Agencia SEO-AEO`. Convención permanente: `Licitaciones/<Empresa o institución>/<N>. <Nombre de la licitación>`. Mantener cada proceso separado, sus originales y código oficial. La autorización de usar la firma corresponde a los anexos de UTEM y no se extiende a otras declaraciones o propuestas.
+
+Siguiente acción UTEM: propuesta/ficha de cumplimiento y cotización, costeo y precio exacto por definir. Trabajar con tres meses y orientación cercana a CLP 6.800.000 netos; explicitar neto, IVA y total. El tratamiento neto es un supuesto acordado, no confirmado por UTEM, y no bloquea preparar por ausencia de canal. No se ha presentado oferta. La tarea de Notion conserva su estado observado hasta lectura/escritura externa verificadas; anexos terminados no equivalen a paquete presentado ni tarea cerrada. [Revisión del proceso](../tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md).
+
+## Estado técnico observado en el corte inicial
+
+Evidencia histórica del 08/10/2026 a las 07:11 Chile: primera revisión manual ejecutada; heartbeat `seguimiento-comercial-plazos-y-pr-ximos-pasos` ACTIVE y configuración verificada en la app y archivo local, adjunto a este chat. L–V 09:00/16:00 America/Santiago; en ese corte se esperaba la primera corrida a las 09:00 del 08/10. Esa previsión no confirma que se haya ejecutado. Una corrida programada aún no es evidencia de ejecución. Si faltan conectores, continuar con las fuentes disponibles y marcar el corte parcial; no afirmar pipeline actualizado.
+
+Outlook lectura verificada en el corte inicial; creación de reply draft devolvió `403 ErrorAccessDenied` el 08/10. Es el último intento documentado, no una comprobación permanente de que siga bloqueado. Una reconexión o cambio informado requiere prueba acotada de guardar y leer un borrador, sin envío ni asumir permisos por la sola disponibilidad de la herramienta. Tres textos preparados en Notion (Pibank SEO, Pibank CRM y SGS), ninguno enviado. Existen borradores SKY del usuario que se preservan.
+
+Actualización documental del 08/10: no constituye una nueva auditoría completa del CRM/correo, readback del scheduler ni sincronización de tareas externas. `state.json.observed_at` conserva el corte de datos; los deltas documentales se registran por separado.

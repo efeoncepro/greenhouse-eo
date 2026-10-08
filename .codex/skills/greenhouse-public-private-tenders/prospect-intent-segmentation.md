@@ -17,7 +17,9 @@ releerse antes de actuar.
    ni cierre del proceso completo. Sin readback actual, no digas «están buscando».
 3. **Contacto:** distingue autor, área de compras, responsable contractual, contacto funcional y comprador
    confirmado. Cargo y email no prueban presupuesto, autoridad ni responsabilidad en el proceso. Contrasta
-   empresa actual y homónimos antes de trasladar una solicitud del perfil a la Company.
+   empresa actual y homónimos antes de trasladar una solicitud del perfil a la Company. En licitaciones por
+   plataforma, la ausencia de email/interlocutor no bloquea automáticamente la preparación: aplicar
+   `platform-bids-and-administrative-package.md`; no confundir prospección directa con postulación por plataforma.
 4. **Ruta:** creatividad, CRM y SEO son alcances distintos. HubSpot sólo cuando se nombre o cuando la evaluación
    técnica lo sustente; un pliego Zoho obligatorio no autoriza migración. Mención IA no acredita AEO/GEO.
 5. **Cohorte antes de atributos:** entrega a `hubspot-as-a-service` el universo exacto investigado, las fuentes y

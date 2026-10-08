@@ -228,6 +228,14 @@ fuera del universo individual con email y 15 definiciones globales preservadas.
 Los manifiestos, fuentes, notas, readbacks y filas individuales permanecen en la carpeta local de trabajo
 `/Users/jreye/Documents/Codex/2026-10-06-segmentos-busquedas-nuevas/`; no copiar PII al repositorio.
 
+## Ronda del 08-10-2026
+
+La opción research_2026_10_08 y los ACTIVE 178 (Contact, fit creativo con/sin email) y 179 (Company, empresas
+de la ronda) incorporaron dos contactos y dos empresas, con conjuntos completos y Primary verificados.
+No se reutilizó la etiqueta del 06/10 ni se modificaron sus filtros. El segmento 178 no es un universo de
+envío: comprobar el correo, supresiones y autorización de cada destinatario antes de cualquier comunicación.
+[Expresiones, alcance y auditoría](../../audits/commercial/2026-10-08-creative-prospect-intake.md).
+
 ## 5. Preparar el abordaje personalizado
 
 Usar **174** como universo, **175/176** para elegir la propuesta y **171 + industria** para modularla según
@@ -259,3 +267,15 @@ estado de bajas/suscripción, identidad y vigencia, y cargar
 Una verificación previa de Apollo no sustituye la validación actual del correo ni resuelve por sí sola un
 resultado de entregabilidad desconocido. Mantener separados los registros `do_not_mail` y los correos vacíos;
 el corte inicial tenía 61 individuales con email; el último corte, tras Sika, tiene 63.
+
+## 6. Precisión operativa del 08/10/2026
+
+Reutilizar los segmentos activos compatibles y completar sólo propiedades respaldadas. No crear segmentos
+adicionales por cada alta. Los 178–179 corresponden a la ronda del 08/10; 180–187 agrupan todas las cohortes
+etiquetadas y se crearon antes de la precisión del operador. No eliminar segmentos históricos ni alterar
+negocios existentes para forzar elegibilidad. Una alta es lead hasta calificación efectiva.
+
+Prospecting Agent admite inscripción manual filtrada por segmento y automatización al entrar en una lista.
+La incorporación al segmento no ejecuta ninguna de ellas por sí sola. Al 08/10, la guía está activada y exige
+revisión; la cuenta agotó 3.000/3.000 créditos y muestra consumo en pausa, con reposición el 29/10.
+[Procedimiento observado, límites y evidencia](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).

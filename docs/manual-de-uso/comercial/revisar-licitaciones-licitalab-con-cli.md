@@ -1,9 +1,9 @@
 # Revisar licitaciones públicas de LicitaLAB con la CLI
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-17 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-09-17 por Claude
+> **Última actualización:** 2026-10-08 por Codex
 > **Documentación técnica:** skill `greenhouse-public-private-tenders` → `licitalab-mcp.md` (receta 0 y §API key + CLI) · cliente `src/lib/commercial/tenders/licitalab/client.ts` · CLI `scripts/commercial/licitalab.ts`
 
 ## Para qué sirve
@@ -61,36 +61,44 @@ pnpm licitalab search --view all --max 200 --match "marketing" --enrich --no-log
 
 ### 2. Recibir la lista corta
 
-El agente descarta lo que no es de Efeonce (licencias de software, equipos, bienes) y lo que cierra demasiado
-pronto, y te muestra 3 a 5 candidatas con código, comprador, monto, cierre y una línea de por qué.
+El agente clasifica por alcance real y fit: CRM y relacionados, diseño y servicios creativos, diseño web, SEO/AEO y licencias Claude/OpenAI cuando están dentro del pedido. Las licencias requieren revisar canal, condiciones de suministro, costo y margen; no se excluyen automáticamente. Un cierre próximo genera urgencia, no descarte automático.
+
+Si pediste revisión amplia, cubre todas las categorías autorizadas y presenta las candidatas encontradas, sin reducir la investigación a cinco ni a las recomendadas. Declara filas, búsquedas, paginación, IDs únicos y documentos realmente leídos. `--max` limita la captura; no acredita cobertura nacional completa.
 
 ### 3. Elegir qué analizar
 
-Responde con los códigos que quieres revisar a fondo. El agente no analiza en masa sin tu elección.
+Puedes elegir códigos concretos. Si ya pediste analizar a fondo todas las oportunidades pertinentes, esa instrucción autoriza la investigación y no requiere una segunda selección para continuar.
 
 ### 4. Análisis de cada candidata
 
 El agente corre, por candidata:
 
 ```bash
-pnpm licitalab opportunity 1386073-21-LE26
-pnpm licitalab documents 1386073-21-LE26
-pnpm licitalab ask-docs 1386073-21-LE26 "requisitos de experiencia y equipo exigido"
-pnpm licitalab ask-docs 1386073-21-LE26 "garantías de seriedad y fiel cumplimiento"
-pnpm licitalab ask-docs 1386073-21-LE26 "criterios de evaluación y ponderación"
+pnpm licitalab opportunity 1386073-21-LE26 --no-login
+pnpm licitalab documents 1386073-21-LE26 --no-login
+pnpm licitalab ask-docs 1386073-21-LE26 "requisitos de experiencia y equipo exigido" --no-login
+pnpm licitalab ask-docs 1386073-21-LE26 "garantías de seriedad y fiel cumplimiento" --no-login
+pnpm licitalab ask-docs 1386073-21-LE26 "criterios de evaluación y ponderación" --no-login
 ```
 
 Y, si sirve, el historial del comprador o de un competidor:
 
 ```bash
-pnpm licitalab provider 77.357.182-1 --period sc_last_year --include lost_items_pricing
+pnpm licitalab provider 77.357.182-1 --period sc_last_year --include lost_items_pricing --no-login
 ```
 
 ### 5. Revisar la matriz y decidir
 
 Recibes, por oportunidad: cada requisito como **cumple / no cumple / falta evidencia** con archivo y página,
-riesgos, fechas clave y una recomendación GO / HOLD / NO-GO. Tú decides. Solo con tu confirmación se crea la
-oportunidad en Greenhouse o el deal en HubSpot.
+riesgos, fechas clave y una recomendación GO / HOLD / NO-GO. Una señal se registra como lead hasta calificación; tener fit o urgencia no basta para crear un Deal calificado. Para escrituras CRM se requiere autorización del alcance concreto; si ya fue concedida, se ejecuta sin pedirla nuevamente. Reutilizar empresa/contacto, propiedades y segmentos activos, y verificar por lectura posterior. Los Deals existentes que el operador pidió conservar no se reclasifican por esta regla.
+
+## Originales, expediente y presentación
+
+`documents` y `ask-docs` ayudan a investigar, pero no prueban que los originales estén descargados ni reemplazan su lectura. Desde la ficha autenticada, guardar cada original sin modificar y verificar apertura, tipo, tamaño y hash. Compra Ágil usa `/search/agile/<código>`; una página vacía bajo `/search/details/` no prueba ausencia de documentos. Compra Ágil conserva su modalidad aunque una herramienta la agrupe junto a trato directo.
+
+Archivar en `Licitaciones/<Empresa o institución>/<N>. <Nombre de la licitación>`, con originales, revisión, anexos completados y versiones separadas. Reutilizar la [ficha corporativa](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md) y seguir el [manual de construcción](construir-una-licitacion.md) para declaraciones, firma autorizada y QA.
+
+En Wherex, Mercado Público y las oportunidades descubiertas mediante LicitaLAB, la preparación no exige contacto previo del comprador. Usar el canal de consultas si existe; si no, documentar limitación y supuestos acordados y continuar. La postulación se realiza por la plataforma del proceso y requiere autorización específica; descargar o firmar anexos no equivale a presentar.
 
 ## Qué significan las señales
 

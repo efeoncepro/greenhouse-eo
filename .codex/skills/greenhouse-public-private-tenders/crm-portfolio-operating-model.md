@@ -18,8 +18,11 @@ El flujo es `search → propose → confirm → write → readback → automatio
    - `id_de_licitacion`: identidad visible del proceso;
    - `gh_idempotency_key`: pública `hubspot-public-tender:<país>:<ID>` o privada
      `hubspot-private-tender:<plataforma>:<ID>`.
-4. Para un proceso nuevo aprobado, usa `pipeline=default` y `dealstage=qualifiedtobuy`, salvo que el proceso real
-   ya esté en una etapa posterior verificada.
+4. La investigación/alta de prospectos permanece en etapa lead hasta calificación efectiva; una señal, fit o
+   autorización de crear contactos no bastan para crear Deal. Sólo promover cuando la calificación y el alta
+   de Deal estén cubiertas por la instrucción. Leer pipeline/etapa live y elegirlos por evidencia, nunca aplicar
+   `qualifiedtobuy` por defecto a todo hallazgo. Si el operador instruye conservar Deals existentes, no
+   retrocorregirlos ni borrarlos por este criterio; registrar la excepción y la calificación pendiente.
 5. La relación comercial manda sobre el mecanismo de compra:
    - cliente existente, renovación o expansión → `Core Pipeline` + `existingbusiness`;
    - cuenta nueva seleccionada como apuesta → `Strategic Bets` + `newbusiness`;

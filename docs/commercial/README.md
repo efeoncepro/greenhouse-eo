@@ -7,6 +7,10 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Fuentes y autoridad
 
+- [Datos confirmados para licitaciones](EFEONCE_DATOS_PARA_LICITACIONES.md): accionista, contacto, datos bancarios y alcance de las declaraciones confirmadas por Julio el 08/10/2026.
+
+- [Agente de seguimiento comercial](follow-up-agent/README.md): revisiones L–V 09:00/16:00 Chile, [registro vivo](follow-up-agent/REGISTRO.md), tareas y borradores en Notion.
+
 - [Segmentos activos de prospección](../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md): propiedades, catálogo y cierre del alta automática; [manual CLI/MCP](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
 
 | Superficie                                                                                     | Autoridad                                                                                        |
@@ -35,6 +39,10 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
    explícita, motivo, fecha y versión.
 
 ## Workspaces comerciales
+
+- [Revisión amplia LicitaLAB](tenders/licitalab-deep-review-2026-10-07/README.md): todas las categorías solicitadas, vista Todos y búsquedas libres; cobertura y 13 altas verificadas. Nueva señal se califica desde lead; los Deals creados se conservan por instrucción del operador.
+- [UTEM — Agencia SEO/AEO](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md): originales y anexos firmados en OneDrive; técnica/cotización y costo/margen pendientes, sin presentación.
+- [Yanbal](prospects/yanbal-ai-creative-2026/README.md) y [Olivos del Sur](prospects/olivos-del-sur-peru-2026/README.md): investigación y registros asociados, segmentos activos verificados al corte; siguen por calificar, sin outreach.
 
 - [Casos de negocio SEO/AEO](SEO_AEO_BUSINESS_CASE_METHOD_V1.md): método propuesto para evaluar requisitos desde la meta, demanda competitiva por intención, ejecución conjunta SEO/AEO+PR y costo/valor por horizonte; [manual](../manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md) y [lectura funcional](../documentation/comercial/caso-negocio-seo-aeo.md).
 

@@ -2,6 +2,36 @@
 
 > Índice rápido compartido para Codex y Claude. **No reemplaza HubSpot, LicitaLAB, Mercado Público, las bases ni el comprobante de postulación.** Antes de decidir, escribir o afirmar un estado, confirma el dato en su fuente de verdad y luego actualiza este archivo.
 
+## Criterio operativo posterior al alta · 08-10-2026
+
+Julio corrigió la clasificación comercial: **una señal o lead no equivale a una oportunidad calificada**. Los Deals ya creados se conservan por instrucción expresa; `qualifiedtobuy` no acredita calificación completa. Para nuevas señales, calificar desde lead antes de promover y reutilizar registros/segmentos activos existentes.
+
+UTEM fue seleccionada para preparación; el [estado del expediente](licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md) actualiza anexos y decisiones del operador, sin nueva escritura ni readback CRM. No exigir contacto previo para licitaciones por plataforma; usar canal disponible y registrar supuestos acordados si no lo hay. [Criterio y datos confirmados](../EFEONCE_DATOS_PARA_LICITACIONES.md).
+
+## Altas LicitaLAB verificadas — 2026-10-08
+
+Trece altas autorizadas por Julio, verificadas con dos lecturas y deduplicación final. [Change set, evidencia y límites](licitalab-deep-review-2026-10-07/HUBSPOT_ALTA_2026-10-08.md). Todas `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`, estado operativo **En evaluación / preparación condicionada**. Amount y closedate vacíos; presupuesto comprador separado. Asociación Company pendiente. Sin postulación.
+
+Bucket propuesto Strategic Bets; lectura posterior: nueve Core Pipeline y cuatro Strategic Bets. Regla responsable no identificada; no se corrigió en bucle ni se infirió relación previa.
+
+| Proceso / Deal | Presupuesto comprador CLP | Cierre oferta Chile | Bucket live | Próximo paso |
+| --- | ---: | --- | --- | --- |
+| `5251-1060-COT26` · [Efeonce — UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 6,800,000 | 08-10-2026 18:00 | Core Pipeline | Anexos firmados; habilitación y no deuda confirmadas por Julio. Preparar técnica/cumplimiento, precio exacto y costo/margen: tres meses, objetivo cercano a CLP 6,8 M netos. Sin envío. |
+| `609-107-COT26` · [Efeonce — INDAP — Claude Team Premium · 65806293639](https://app.hubspot.com/contacts/48713323/record/0-3/65806293639?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 7,180,000 | 08-10-2026 14:00 | Core Pipeline | Cotizar canal y soporte hoy; estrecha holgura al precio público. Cierra 8/10 14:00. |
+| `757-422-COT26` · [Efeonce Factory — MINSAL — Diseño SANNA · 65806331396](https://app.hubspot.com/contacts/48713323/record/0-3/65806331396?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 2,000,000 | 09-10-2026 09:00 | Core Pipeline | Candidato Factory acotado; contar páginas/adaptaciones y horas. No asumir impresión física incluida. |
+| `757-429-COT26` · [Efeonce Factory — MINSAL — Adaptación de videos y dípticos · 65832763160](https://app.hubspot.com/contacts/48713323/record/0-3/65832763160?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 4,000,000 | 13-10-2026 11:00 | Core Pipeline | Confirmar tema, cantidades, fuentes editables y revisiones antes de precio cerrado. |
+| `1108660-10-LE26` · [Efeonce — FUCOA/CNR — Portal institucional y aula virtual · 65832737849](https://app.hubspot.com/contacts/48713323/record/0-3/65832737849?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 13,000,000 | 14-10-2026 15:30 | Core Pipeline | Candidato nuevo principal de web. Acreditar proyectos 2023–2025 y presupuestar Moodle/SSO y garantía. |
+| `2432-31-LE26` · [Efeonce — Estación Central — Continuidad web municipal · 65806250773](https://app.hubspot.com/contacts/48713323/record/0-3/65806250773?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 28,000,000 | 13-10-2026 15:20 | Core Pipeline | Recomiendo calificar: inventario técnico, transferencia, certificaciones, alcance SLA y costo de guardia antes del GO. |
+| `1562-76-LE26` · [Efeonce — SERNAGEOMIN — ChatGPT Business · 65806299318](https://app.hubspot.com/contacts/48713323/record/0-3/65806299318?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 9,000,000 | 16-10-2026 15:01 | Core Pipeline | Priorizar cotización de canal; aclarar modelos históricos y SKU actual antes de declarar cumplimiento. |
+| `1375757-32-LP26` · [Efeonce — SLEP Puelche — ChatGPT y Claude por líneas · 65832650852](https://app.hubspot.com/contacts/48713323/record/0-3/65832650852?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 101,220,000 | 19-10-2026 17:00 | Core Pipeline | Priorizar línea 11; línea 10 solo con costo viable y modalidad oficial. Contrato de suministro 18 meses, activaciones a requerimiento. |
+| `918434-271-COT26` · [Efeonce — Ministerio de la Mujer — Claude Team Premium · 65806334790](https://app.hubspot.com/contacts/48713323/record/0-3/65806334790?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 3,000,000 | 12-10-2026 12:30 | Core Pipeline | Cotizar modalidad corporativa y margen; precio oficial vigente permite equipos desde 2 usuarios, no aplicar memoria antigua de mínimo 5. |
+| `1040538-11-LP26` · [Efeonce — SERNATUR Ñuble — Campaña turística · 65806359148](https://app.hubspot.com/contacts/48713323/record/0-3/65806359148?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 135,000,000 | 26-10-2026 15:00 | Strategic Bets | Validar referencias, comisión rentable, costo de extras y financiamiento; separar inversión en medios de honorarios. |
+| `1332-12-LP26` · [Efeonce — SERNATUR Aysén — Campaña de promoción · 65832697782](https://app.hubspot.com/contacts/48713323/record/0-3/65832697782?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 200,000,000 | 21-10-2026 15:00 | Strategic Bets | Acreditar campañas multimedio, revisar subcontratación 30%, costear producción/medios y verificar caja. |
+| `757-90-LP26` · [Efeonce — MINSAL — Campaña de actividad física · 65832645385](https://app.hubspot.com/contacts/48713323/record/0-3/65832645385?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 130,000,000 | 27-10-2026 15:00 | Strategic Bets | Preparar concepto y briefing; cerrar referencias, producción, pauta y calendario que menciona fines de octubre pese al cierre 27/10. |
+| `1177296-23-LP26` · [Efeonce — Protección de la Niñez — Familias de Acogida · 65806377357](https://app.hubspot.com/contacts/48713323/record/0-3/65806377357?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 270,699,000 | 02-11-2026 15:01 | Strategic Bets | Acreditar referencias, obtener tres cotizaciones de productoras exigidas por bases, separar fee/producción/medios y costear hitos 50/30/20 con caja suficiente. |
+
+ProChile `65678232118` y UNAP `65678277469` continúan sin nuevas escrituras. No se ejecutó la higiene de oportunidades históricas.
+
 ## Alcance y corte
 
 - Inicio del registro operativo: **2026-08-28**.

@@ -38,7 +38,7 @@ sus criterios ponderados), pero la **evidencia es CONTRATO** — toda cifra vive
 (`missing_evidence_ref` rompe el build), pero atrapado **antes**, en el Markdown.
 
 **El deck NO auto-deriva del Markdown.** SSOT del deck = los **slots del `deck-plan.json`**
-(mismos slots → mismo PDF; un humano firma). El `.md` es la fuente **narrativa + evidencia**;
+(mismos slots → mismo PDF; firma bajo autorización humana específica). El `.md` es la fuente **narrativa + evidencia**;
 el `deck-plan.json` es la fuente de **composición**. Comparten el ledger, pero son archivos
 independientes y revisables por separado. El autor/agente construye el plan **desde** la
 oferta (propose→confirm), eligiendo qué secciones se vuelven lámina y con qué `contentType`
@@ -97,9 +97,15 @@ Los típicos (varían por bases — lee siempre):
 
 **Errores fatales frecuentes:** declaración jurada sin firmar/vencida, poder desactualizado, garantía con vigencia corta, anexo en versión anterior tras una respuesta del foro que cambió las bases.
 
+Completar, firmar con autorización específica, archivar en OneDrive y verificar Word/PDF sigue
+`platform-bids-and-administrative-package.md`. Los datos confirmados viven en la ficha comercial enlazada
+allí; no volver a preguntar hechos resueltos ni extrapolar declaraciones entre compradores.
+
 ## Foro de aclaraciones como arma de propuesta
 
-- Úsalo para **cerrar ambigüedades** que afectan tu precio o admisibilidad (mejor preguntar que asumir).
+- Usar el foro/canal de consultas cuando esté disponible y vigente. No exigir interlocutor ni contacto previo
+  como gate automático de una licitación por plataforma. Sin canal, conservar la limitación y continuar con
+  supuestos explícitos acordados; no inventar cláusulas ni declarar cumplimiento falso.
 - Lee las **respuestas a preguntas de otros**: suelen cambiar las bases y revelar la intención del comprador.
 - Cuidado: cada respuesta puede volver **obsoleto un anexo** que ya tenías armado — re-corre la matriz de cumplimiento tras cada tanda de respuestas.
 

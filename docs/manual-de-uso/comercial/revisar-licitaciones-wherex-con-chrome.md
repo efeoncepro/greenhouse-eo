@@ -85,7 +85,8 @@ licitación como candidata para evaluación comercial.
 
 1. Crea o reutiliza el workspace del repositorio con `pnpm tender:new <slug>`. Guarda las bases normativas en
    `bases/` y la investigación interna en `research/`; ese workspace no reemplaza el archivo operativo de OneDrive.
-2. Busca la carpeta del comprador en la biblioteca sincronizada `Alineación/4. Comercial/Licitaciones/` de OneDrive.
+2. Busca la carpeta del comprador en la biblioteca sincronizada `Alineación/4. Comercial/Licitaciones/` de OneDrive. Dentro, reutiliza o crea el proceso numerado
+   `<N>. <Nombre de la licitación>`; por ejemplo `UTEM/1. Agencia SEO-AEO`.
    Si no existe, créala sólo cuando haya al menos un adjunto original que guardar. Conserva el nombre del comprador
    para que el equipo pueda encontrar el expediente sin conocer el slug técnico.
 3. Copia cada PDF, DOCX, XLSX o PPTX original con su nombre de origen. Comprueba que el archivo exista, tenga tamaño
@@ -110,16 +111,15 @@ registro comercial canónico.
    un deal histórico cerrado o uno sin asociación no cubre automáticamente la licitación vigente.
 3. Consulta las propiedades disponibles de HubSpot antes de preparar la creación. Pipeline, etapa, owner y opciones
    permitidas se toman del portal, no de una tabla copiada en este manual.
-4. Si falta la empresa, muestra al operador una tabla con las propiedades exactas y pide aprobación explícita. Crea la
-   empresa, relee su ID y verifica sus valores.
-5. Luego muestra una segunda tabla con el deal exacto y la asociación a esa empresa por ID. Pide una segunda
-   aprobación antes de crear; la primera no autoriza por sí sola una asociación contra un ID aún desconocido.
-6. Relee el deal y consulta su empresa asociada. Informa el ID y la verificación final. No modifiques registros
-   existentes ni inventes properties para que parezcan equivalentes sin confirmación específica.
+4. Si faltan registros, prepara propiedades, identidad y asociaciones para el alcance autorizado. Una señal sigue como lead hasta calificación; no crear un Deal calificado sólo por haber encontrado una licitación.
+5. Obtén autorización cuando falte. Si ya se autorizó la empresa, el proceso y su asociación, resolver y verificar el ID no exige una segunda aprobación por sí solo. No extender ese permiso a otros objetos, etapas ni envíos.
+6. Relee cada objeto y su asociación por ID. Reutiliza registros vigentes y conserva los Deals que el operador haya pedido dejar sin cambios. No dupliques segmentos activos: completa propiedades respaldadas y verifica membresía efectiva.
 
-HubSpot exige esta confirmación por cada escritura, incluso cuando el objetivo general era crear los registros.
-Polpaico ilustra la rama de reutilización: si el deal vigente y su empresa ya existen y están asociados, se reportan
-como verificados y no se duplican.
+Polpaico ilustra la rama de reutilización: si el deal vigente y su empresa ya existen y están asociados, se reportan como verificados y no se duplican.
+
+## Contacto y postulaciones por plataforma
+
+La regla aplica a Wherex, Mercado Público y procesos descubiertos en LicitaLAB: el comprador puede contactar después de revisar la oferta. Si no existe interlocutor o canal de preguntas, documentar la limitación y continuar con las bases y supuestos acordados; no convertir una aclaración imposible en requisito previo automático. Consultar, firmar y enviar requieren su propio alcance autorizado. Método común: [construir una licitación](construir-una-licitacion.md).
 
 ## Preparar y presentar una oferta en Wherex
 
@@ -166,7 +166,7 @@ enlaces firmados de descarga ni información confidencial innecesaria a document
 
 ## Límites de seguridad y control humano
 
-El runner opera en modo lectura. Puede leer la ficha y los adjuntos autorizados para fundar la recomendación, pero el operador conserva el control de toda acción con efecto comercial o contractual. Presentar una oferta, aceptar términos, responder mensajes, cargar archivos o firmar requiere una instrucción explícita y confirmación humana final.
+El runner opera en modo lectura. Puede leer la ficha y los adjuntos autorizados para fundar la recomendación, pero el operador conserva el control de toda acción con efecto comercial o contractual. Presentar una oferta, aceptar términos, responder mensajes, cargar archivos o firmar requiere autorización explícita del alcance concreto. Una autorización vigente no se pide de nuevo; el permiso de preparar o firmar no habilita enviar.
 
 Al terminar, el perfil aislado conserva sólo su propia sesión; los archivos temporales de adjuntos se eliminan.
 

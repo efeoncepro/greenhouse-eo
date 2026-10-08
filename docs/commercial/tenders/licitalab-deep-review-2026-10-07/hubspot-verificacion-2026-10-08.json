@@ -1,0 +1,75 @@
+{
+  "portal": 48713323,
+  "authorized_action": "create_13_selected_deals",
+  "created": 13,
+  "independent_readbacks": 2,
+  "dedup_final_total": 13,
+  "unexpected_differences": [
+    {
+      "id_licitacion": "5251-1060-COT26",
+      "deal_id": 65832566144,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "609-107-COT26",
+      "deal_id": 65806293639,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "757-422-COT26",
+      "deal_id": 65806331396,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "757-429-COT26",
+      "deal_id": 65832763160,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "1108660-10-LE26",
+      "deal_id": 65832737849,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "2432-31-LE26",
+      "deal_id": 65806250773,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "1562-76-LE26",
+      "deal_id": 65806299318,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "1375757-32-LP26",
+      "deal_id": 65832650852,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    },
+    {
+      "id_licitacion": "918434-271-COT26",
+      "deal_id": 65806334790,
+      "property": "pipeline_bucket",
+      "proposed": "Strategic Bets",
+      "observed": "Core Pipeline"
+    }
+  ],
+  "company_associations": "pending_canonical_identity_reconciliation",
+  "messages_sent": 0,
+  "bids_submitted": 0
+}

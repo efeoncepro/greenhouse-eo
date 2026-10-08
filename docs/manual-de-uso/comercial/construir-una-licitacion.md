@@ -1,9 +1,9 @@
 # Manual de uso — Construir una licitación paso a paso
 
 > **Tipo de documento:** Manual de uso (runbook operativo)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-07-11 por Claude
+> **Última actualización:** 2026-10-08 por Codex
 > **Documentación funcional:** `docs/documentation/comercial/construccion-de-licitaciones.md`
 > **Método canónico (skill):** `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
@@ -14,11 +14,17 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 ## Antes de empezar
 
 - Si la oportunidad se descubrió en Wherex, primero ejecuta el [radar con Playwright](revisar-licitaciones-wherex-con-chrome.md): revisa Nueva y Editando, y lee ficha y adjuntos antes de decidir si vale la pena construir una propuesta.
-- Ubica la carpeta de la licitación (por ejemplo, en OneDrive `Alineación/4. Comercial/Licitaciones/<Cliente>/`). Si
+- Ubica la carpeta de la licitación (por ejemplo, en OneDrive `Alineación/4. Comercial/Licitaciones/<Empresa o institución>/<N>. <Proceso>/`). Si
   surgió de Wherex, deja allí los originales descargados y conserva el workspace técnico creado por `pnpm tender:new`
   como fuente versionada; el detalle está en el manual del radar.
 - Ten a mano las **bases** (documento del cliente) y, si existe, la planilla económica exigida.
-- Define quién es el operador humano que **presentará** la oferta (el agente no la sube).
+- Define quién presentará la oferta y el alcance autorizado; la preparación no incluye envío por defecto.
+
+## Plataforma, datos y autorizaciones
+
+En licitaciones por plataforma —Wherex, Mercado Público y procesos encontrados mediante LicitaLAB—, preparar y presentar por el canal del proceso es el flujo normal. No exigir una conversación previa como requisito automático: el comprador puede contactar después de evaluar la oferta. Revisar canales oficiales de consultas disponibles; sin canal, dejar los supuestos acordados explícitos y continuar la preparación. No usar direcciones de facturación como contacto del proceso.
+
+Los datos reutilizables y su evidencia están en [Datos para licitaciones](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md). Separar hechos confirmados por el operador, certificados y comprobación actual de plataforma. Declaraciones sobre vínculos, deudas y subcontratación corresponden al proceso confirmado; no extrapolarlas a otros compradores. Un presupuesto tomado como neto por decisión del operador sigue siendo un supuesto si las bases no lo aclaran.
 
 ## Paso a paso
 
@@ -75,6 +81,12 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 - El agente crea la **planilla económica** (en el formato exigido; si no hay, diseña una limpia) con el precio confirmado.
 - Se re-corre la **matriz de cumplimiento** (todos los obligatorios ✅) y se **exporta a PDF** la técnica + la económica.
 
+### 9-bis. Completar anexos y firma autorizada
+
+Conservar los originales intactos y completar copias desde los hechos confirmados. Una autorización explícita permite aplicar la firma gráfica del operador a los documentos indicados; no pedirla otra vez para ese mismo alcance. No autoriza otras declaraciones ni la presentación. Mantener el archivo de firma y credenciales fuera de skills y Git; los datos corporativos autorizados se conservan sólo en la ficha canónica del repo.
+
+Verificar casillas, nombres, participación societaria, contacto, cuenta bancaria y fechas contra la ficha y las confirmaciones del proceso. Revisar DOCX y PDF finales: texto, firma visible, márgenes, tablas, páginas y ausencia de marcadores pendientes. Archivar borradores anteriores e identificar versión vigente con fuentes y hashes.
+
 ### 9.5. Revisión crítica antes de cerrar (pídela siempre)
 Antes de dar por lista la propuesta, pide al agente una **revisión con tres miradas**:
 - **Comercial:** ¿convence al comité, baja el miedo a decidir (plan de primeros 90 días, quick win), conecta con el negocio del cliente y el precio va en tramos?
@@ -84,7 +96,7 @@ Antes de dar por lista la propuesta, pide al agente una **revisión con tres mir
 Si las tres no pasan, la propuesta no está lista.
 
 ### 10. Presentar (lo haces tú)
-- **Tú subes** la oferta a la plataforma y guardas el comprobante. El agente **no** la sube ni la firma.
+- **Tú subes** la oferta a la plataforma y guardas el comprobante, o autorizas expresamente al agente para presentar el paquete concreto. Firmar anexos, preparar archivos o registrar CRM no autoriza la presentación. Sólo el comprobante y la lectura posterior acreditan el envío.
 - Confirma las declaraciones sensibles (por ejemplo, "sin demandas contra el cliente") antes de enviar.
 
 ## Qué significan los estados de la matriz de cumplimiento
@@ -96,7 +108,7 @@ Si las tres no pasan, la propuesta no está lista.
 
 ## Qué NO hacer
 
-- **No** dejar que el agente **suba o firme** la oferta: eso lo hace una persona.
+- **No** firmar ni presentar sin autorización específica y hechos respaldados. Una autorización ya concedida se respeta dentro de su alcance.
 - **No** presentar sin cerrar todos los requisitos **obligatorios**.
 - **No** cotizar bajo el costo real del equipo ni bajar del piso de negociación.
 - **No** usar cifras o casos inventados; solo casos reales y citables.

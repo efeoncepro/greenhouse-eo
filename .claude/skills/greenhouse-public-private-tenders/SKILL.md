@@ -47,6 +47,7 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ├─ Decidir participar / priorizar / scoring bid-no-bid ......... bid-lifecycle-go-no-go.md
 ├─ Precio, garantías (boleta/póliza), cashflow, factoring ...... pricing-garantias-finance.md
 ├─ Armar la oferta técnica/económica/administrativa ............ propuesta-tecnica-economica.md
+├─ Plataformas, contacto, originales, OneDrive y anexos ........ platform-bids-and-administrative-package.md
 ├─ Producir el DECK de la propuesta: catálogo de plantillas,
 │  molde visual, selector, 3D icons, fotos del equipo ......... deck-visual-system.md
 ├─ Otro país LATAM (portal, registro, umbrales) ............... latam-portales-matriz.md
@@ -103,6 +104,9 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 4. **No identidades paralelas.** La oportunidad extiende el modelo canónico 360: `public_opportunity → deal → quote → SOW → delivery`. El comprador público mapea a `organization/account`. Ver `data-sources-apis.md` + `arch-architect`.
 5. **Señales no canónicas ≠ servicios.** Los hits de medios/PR/influencers/staff-aug que aún no son servicio canónico del catálogo se guardan como `signals`, **nunca** dentro de `servicios_matched` (hallazgo TASK-673).
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales, salvo los runners locales autorizados expresamente de Wherex y LicitaLAB: `.auth/` ignorado, `0600`, perfil aislado y sin exponer valores.
+   Una autorización específica vigente no se solicita otra vez: aplicar su alcance y comprobar hechos antes
+   de insertar firma. Carpeta, originales, anexos y criterio general de contacto por plataforma:
+   `platform-bids-and-administrative-package.md`.
    **Frontera LicitaLAB: sólo discovery público.** Toda oportunidad obtenida desde su UI o MCP se clasifica como
    `public_tender`/`public_opportunity`, su comprador es un organismo público y su evidencia debe contrastarse con
    las bases y la fuente oficial de contratación. Nunca uses LicitaLAB para inferir cobertura de RFP/RFQ privados,
@@ -119,6 +123,8 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
    plazo, postulación o resultado, actualiza el registro; nunca lo trates como source of truth.
    Si ya existe un Deal HubSpot, sincroniza también `docs/commercial/CRM_DEAL_REGISTER.md` usando el mismo
    `deal_id`; una oportunidad todavía en radar no entra al registro comercial general.
+   La revisión amplia cubre todas las categorías pedidas y el universo `all`, no sólo recomendadas; no descartar
+   licencias Claude/OpenAI por etiqueta. El análisis autorizado no requiere otra selección previa.
    7 bis. **Fit, petición y vigencia son datos distintos.** Una contratación histórica, un cargo público o un
    correo enriquecido no prueban compra abierta, autoridad ni permiso para enviar. Conserva fecha de señal,
    fecha de verificación, plazo y estado por separado; no conviertas una petición CRM/Zoho/SEO/IA en demanda

@@ -1,6 +1,8 @@
 # Handoff
 
-## 2026-10-07 — Continuidad activa
+## 2026-10-08 — Continuidad activa
+
+[UTEM, CRM, seguimiento y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
 
 **Prospecting Agent:** [web guardada; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
 

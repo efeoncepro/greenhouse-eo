@@ -53,7 +53,9 @@ requiere que el operador guarde el original desde Chrome.
 
 El runner es de lectura. No pulsa acciones como participar, descartar, enviar mensajes, cargar archivos,
 presentar oferta o firmar. Esas acciones requieren una instrucción explícita y, para envío o firma,
-confirmación humana final.
+autorización humana específica. Una autorización vigente que ya cubre la firma no se pide otra vez;
+no amplía la autoridad a envío. Regla general de plataformas, consultas y expediente:
+`platform-bids-and-administrative-package.md`.
 
 ## Criterio de salida
 
@@ -152,10 +154,10 @@ nombre parecido. Aplica además el contrato común de `crm-portfolio-operating-m
    con la empresa. Distingue un deal histórico/cerrado de la oportunidad vigente y no dupliques una asociación válida.
 3. Consulta las propiedades y opciones reales antes de proponer un alta: HubSpot, no la memoria ni un documento,
    gobierna pipelines, etapas y valores permitidos.
-4. Antes de todo write, muestra la tabla exacta de cambios y obtén confirmación explícita del operador. Para una
-   empresa inexistente, crea primero la empresa con los datos mínimos verificados y vuelve a leer su ID. Luego
-   muestra y confirma por separado el deal y su asociación a esa empresa concreta. Esta segunda confirmación es
-   obligatoria: una asociación no se aprueba contra un nombre ambiguo.
+4. Antes de escribir, preparar el conjunto exacto de cambios y aplicar la autorización vigente. Para una
+   empresa inexistente, crear los datos mínimos autorizados y releer su ID antes de asociar. Si el lote aprobado
+   ya identifica inequívocamente empresa, proceso y asociación, no pedir otra aprobación sólo porque el ID
+   acaba de generarse. Resolver cualquier identidad ambigua antes del write correspondiente.
 5. Crea sólo las propiedades necesarias y usa el owner/pipeline/stage vigentes. Para una licitación privada nueva,
    la clasificación comercial debe quedar trazable, sin inventar propiedades que no existan.
 6. Relee el deal y busca la empresa asociada por ID. Repite el readback después de que hayan podido correr
@@ -165,8 +167,9 @@ nombre parecido. Aplica además el contrato común de `crm-portfolio-operating-m
 7. Actualiza `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y, si existe Deal,
    `docs/commercial/CRM_DEAL_REGISTER.md` con el mismo `deal_id` y el estado del último readback.
 
-El MCP exige confirmación aun si el operador había autorizado en general crear los registros. Nunca actualices un
-deal o empresa existente para "hacerlo coincidir" sin mostrar el cambio puntual y recibir esa aprobación.
+Una autorización general no cubre cambios ajenos al alcance aprobado ni resuelve una identidad ambigua.
+No inventar requisitos universales del MCP: respetar los controles efectivos de la tool. No actualizar registros
+existentes para «hacerlos coincidir» fuera del alcance autorizado; conservar prestate y readback.
 
 ### 3. Entrega al operador
 

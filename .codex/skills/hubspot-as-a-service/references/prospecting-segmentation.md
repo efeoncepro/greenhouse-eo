@@ -30,6 +30,9 @@ If scope is already explicit, proceed within it; ask only when a material ambigu
 ## Research and enrichment contract
 
 1. Inventory existing companies, contacts, associations, properties and native lists in the verified portal.
+   Research remains in the lead stage until effective qualification. Creating/enriching a prospect is not
+   authority to create a qualified opportunity. Preserve existing Deals when the operator explicitly says to
+   leave them unchanged; document the exception instead of retroactively moving or deleting them.
 2. Keep source identity, source date, signal, service fit, observed intent/state and contact type in a bounded
    local manifest. Never invent individual email; Apollo `emails: []` is a stop for email population. Preserve
    extrapolated, shared and employment-unconfirmed evidence as such.
@@ -46,7 +49,10 @@ segments must consume record properties so assigning supported values incorporat
 Static research lists are historical snapshots, not an ordinary enrollment step or a prerequisite for intake.
 Canon: [property segmentation decision](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
 
-1. Resolve the authorized research universe and reconcile source identities to CRM IDs. Reuse existing records
+1. Inspect existing ACTIVE definitions before creating any segment. If the required segment already exists,
+   populate supported record properties and verify membership; do not create another segment. Preserve static
+   snapshots and unrelated active definitions. Change filters only when the approved scope requires it.
+   Resolve the authorized research universe and reconcile source identities to CRM IDs. Reuse existing records
    when appropriate. Preserve the original snapshot and document every authorized extension as a dated delta.
 2. Inventory writable properties and exact enum values. Reuse fields with matching semantics. When automatic
    cohort/fit incorporation requires missing fields and schema creation is authorized, define the minimum dictionary
@@ -165,3 +171,23 @@ inboxes, named contract/payment contacts and confirmed marketing buyers require 
 Leave the source manifest, property change set/prestate, execution ledger, definition readback, complete member
 verification, named residual gaps and preparation strategy. Preparing these artifacts never constitutes proof
 of an email sent, read or delivered, an opportunity qualified, or a purchase invitation received.
+
+## Prospecting Agent: diagnose, then enroll within authority
+
+- Inspect the effective portal UI, play, user, connected inbox and saved configuration before declaring the
+  agent unavailable. Missing MCP/CLI capability or an outdated document is not evidence that the native agent
+  is broken, especially when the operator reports recent successful use.
+- Read [the Prospecting Agent reference](../../hubspot-solutions-partner/references/prospecting-agent.md) and
+  [voice configuration manual](../../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md). Check
+  the actual play language separately from Brand Voice; one does not prove the other.
+- Record eligibility, enrolled state, draft generation, approval/review mode and sent state independently.
+  Segment membership is selection readiness, not enrollment or sending authorization. Research on how to
+  enroll does not itself enroll a contact. Existing authorization applies only to its stated scope.
+- Reconcile prior sends and active enrollments before any authorized enrollment; avoid duplicate outreach
+  across overlapping segments. Read back the actual native enrollment/result rather than inferring it from
+  contact properties or a successful configuration save.
+- Keep the commercial follow-up agent separate from HubSpot's native Prospecting Agent. Operational state,
+  draft locations, Notion tasks and next actions live in
+  [the follow-up register](../../../../docs/commercial/follow-up-agent/README.md), not in this skill. A connector
+  that can read mail may still lack draft/send capability. A 403 remains a permission error until the affected
+  operation is verified; reconnection alone does not prove it is repaired.

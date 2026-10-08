@@ -4,6 +4,11 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [Licitaciones, CRM y continuidad documental — 08-10-2026](2026-10-08-licitaciones-crm-continuidad-docs-skills.md) — consolidación UTEM, datos corporativos, seguimiento, manuales y skills espejo.
+- [Alta de prospectos creativos — 08-10-2026](2026-10-08-creative-prospect-intake.md) — Diego/Yanbal y Emily/Olivos, evidencia de contacto y registros autorizados.
+- [Segmentos y Prospecting Agent — 08-10-2026](2026-10-08-prospecting-agent-active-segments.md) — readback histórico de membresías, play y créditos; sin inscripción ni envío.
+
+
 - [Prospecting Agent HubSpot — voz de Julio, 07-10-2026](2026-10-07-hubspot-prospecting-agent-voz.md) — prompt y CTA guardados con readback; nueva generación final pendiente, sin envío.
 
 - [Pibank — oferta híbrida, 07-10-2026](2026-10-07-pibank-oferta-hibrida.md) — base y activaciones, costos repartidos sin duplicación, selector, PDF y paquete para Claude; precios propuestos.

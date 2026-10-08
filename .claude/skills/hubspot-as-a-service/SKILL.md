@@ -40,7 +40,9 @@ The [functional model](../../../docs/documentation/hubspot-as-a-service/prospecc
 [dated native filter catalog](../../../docs/operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json) identify
 which existing segment consumes each property. Revalidate the live definition/member set; never recreate the
 four existing properties or assign the current cohort to all future prospects. Company and Contact need their
-own cohort values. A successful CRM create is incomplete until automatic membership and associations are read back.
+own cohort values. Reuse existing ACTIVE segments; populate the properties they consume instead of creating
+duplicates. Research remains a lead until effective qualification; preserve existing Deals the operator asks
+to leave unchanged. A successful CRM create is incomplete until automatic membership and associations are read back.
 
 ## Firmas personales en HubSpot
 

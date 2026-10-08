@@ -24,7 +24,7 @@ Playwright autenticado (discovery público de códigos)
         ↓ reporte local protegido
 LicitaLAB MCP (ficha → documentos → preguntas evidence-first)
         ↓ screening + admisibilidad + delivery + margen
-confirmación humana de candidata
+selección y calificación de candidata dentro del mandato humano
         ↓
 public_opportunity / Proposal canónicos
         ↓ propuesta exacta de cambios CRM
@@ -77,6 +77,10 @@ score, organismo comprador, región, monto y cierre visibles. El runner:
 - no crea empresas ni deals en HubSpot.
 
 ## Análisis de candidatas
+
+Si el pedido es exhaustivo, cubrir `all`, categorías y límites de recolección; el análisis profundo ya
+autorizado no exige otra confirmación previa. Originales, rutas por modalidad y QA:
+`platform-bids-and-administrative-package.md`.
 
 Para cada código que parezca relevante:
 
@@ -160,10 +164,11 @@ pipeline `default`, aunque sus buckets variaban.
 
 #### Pipeline y etapa inicial
 
-La oportunidad no entra a HubSpot sólo por aparecer en el radar. Se crea después de selección humana, GO y
-admisibilidad básica en `Pipeline de ventas` (`pipeline='default'`) y `Calificado para comprar`
-(`dealstage='qualifiedtobuy'`, probabilidad live 25%). No uses `Cita programada` como default: una licitación no
-implica una reunión comercial y ese valor falsea el estado. `HubSpot Shared Selling Pipeline` pertenece a
+Una señal investigada permanece en lead hasta calificación efectiva; aparecer en el radar o autorizar un
+alta de contactos no basta para crear Deal. La promoción requiere calificación y alcance de escritura autorizados
+según `crm-portfolio-operating-model.md`. Verificar pipeline/etapa live y seleccionar por evidencia del proceso.
+No corregir ni borrar Deals existentes que el operador instruyó conservar. No uses `Cita programada` como
+default: una licitación no implica una reunión comercial y ese valor falsea el estado. `HubSpot Shared Selling Pipeline` pertenece a
 co-selling/deal registration y no recibe licitaciones Efeonce.
 
 | Etapa                      | `dealstage`             | Uso en licitaciones                                                 |
@@ -179,7 +184,7 @@ co-selling/deal registration y no recibe licitaciones Efeonce.
 
 Snapshot live del 2026-08-28: los 99 deals con enlace LicitaLAB estaban en `default`; 95 en `closedlost`, 3 en
 `closedwon`, 1 en `appointmentscheduled` y ninguno en las etapas intermedias. Ese histórico no define el workflow:
-la regla nueva parte en `qualifiedtobuy` y avanza según evidencia del bid.
+las etapas se asignan según calificación efectiva y evidencia del bid, no por herencia de ese snapshot.
 
 #### Propose → confirm → write → readback
 

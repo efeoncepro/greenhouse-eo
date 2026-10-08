@@ -5,6 +5,15 @@ Operación: [manual](../../manual-de-uso/hubspot/segmentar-prospeccion-por-cohor
 Las expresiones completas, nombres e IDs leídos en HubSpot están en el
 [catálogo fechado](../../operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json). Es evidencia de configuración; HubSpot sigue siendo la fuente viva.
 
+## Ronda adicional — 2026-10-08
+
+Se añadió research_2026_10_08 como opción en Company y Contact para dos oportunidades autorizadas.
+ACTIVE **178** selecciona esa cohorte + tipo individual_email/individual_no_email + fit creative;
+ACTIVE **179** selecciona las empresas de esa cohorte. Miembros efectivos: **2 contactos y 2 empresas**,
+coincidentes con los conjuntos completos etiquetados. 178 clasifica fit con o sin email; no es una lista de
+envío ni modifica el universo con email de 174/176. Las definiciones anteriores permanecen intactas.
+[Diccionario, expresiones y evidencia de la ronda](../../audits/commercial/2026-10-08-creative-prospect-intake.md).
+
 ## Cómo se incorpora un prospecto
 
 El agente completa las propiedades del registro. HubSpot recalcula la pertenencia a los segmentos nativos
@@ -105,3 +114,13 @@ deduplica por contacto y se elige un ángulo inicial. No se activaron campañas,
 
 Evidencia: [auditoría](../../audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md). Los manifiestos y
 miembros individuales permanecen fuera de Git; el catálogo sólo contiene definiciones y agregados.
+
+## Actualización operativa — 2026-10-08
+
+Existen activos de la ronda 08/10 (178–179) y ocho activos continuos (180–187), creados antes de la
+precisión posterior del operador: **no crear más segmentos si ya hay uno compatible; completar propiedades
+respaldadas y verificar incorporación automática**. Los 86 segmentos previos permanecen intactos.
+Diego y Emily ya cumplen las propiedades de 178; sus empresas, las de 179. No fue necesario agregar
+atributos ni forzar cargo/interés/industria. Fit y pertenencia no equivalen a oportunidad calificada.
+Los negocios previos se conservan por instrucción del operador; siguientes altas siguen lead → calificación
+→ oportunidad. [Catálogo, conteos, verificación y diagnóstico de Prospecting Agent](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).

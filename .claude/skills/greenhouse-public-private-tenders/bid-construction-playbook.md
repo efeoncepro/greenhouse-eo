@@ -2,7 +2,7 @@
 
 El **método canónico** para construir una propuesta de licitación de punta a punta, orquestando las skills del ecosistema. Los otros companions cubren *una etapa* (admisibilidad, pricing, propuesta, etc.); **este las encadena en un flujo repetible** y dice qué skill entra en cada fase. Es el "director de orquesta" del bid.
 
-> **Regla raíz del método:** una propuesta de licitación no se improvisa ni se escribe de memoria. Se **funda en evidencia** (bases leídas, contexto de negocio real, datos de nómina, casos citables) y se **orquesta con las skills de dominio** (contenido, SEO/AEO, talent, finance, copywriting), no con supuestos. Cada afirmación se encadena a su mecanismo o su prueba.
+> **Regla raíz del método:** una propuesta de licitación no se improvisa ni se escribe de memoria. Se **funda en evidencia** (bases leídas, contexto de negocio real, datos de nómina, casos citables) y se **orquesta con las skills de dominio** (contenido, SEO/AEO, talent, finance, copywriting), no con hechos inventados. Cada afirmación se encadena a su mecanismo o su prueba; las ambigüedades sin canal de aclaración se trabajan con supuestos explícitos acordados, nunca como hechos del comprador.
 
 ## Cuándo usar este companion
 
@@ -13,6 +13,7 @@ Cárgalo cuando el encargo es **"armar/construir la propuesta de esta licitació
 Cada fase declara: **qué se hace**, **qué skill/companion entra**, y **el output** que alimenta la siguiente.
 
 ### Fase 0 — Intake y lectura de bases
+- Cargar `platform-bids-and-administrative-package.md`: contacto previo no es gate automático, discovery amplio respeta todas las categorías autorizadas, originales y RAG son evidencias distintas y OneDrive usa institución/proceso numerado. Si la revisión completa ya está autorizada, no pedir otra selección antes de analizar.
 - **Arranca el workspace del deal:** `pnpm tender:new <slug>` crea la carpeta canónica (el "DSR interno") con `bases/`, `research/`, `oferta-tecnica.md` (del template), `deck-plan.json`, `artifact-manifest.json` y `anexos/`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 - Ubica la carpeta de la licitación y **lee las bases completas** (objeto, calendario, requisitos, criterios de evaluación, SLA, penalidades, plazo del contrato, garantías/comisiones, formato y plataforma).
 - Extrae lo load-bearing: **fecha de entrega**, cierre de consultas, formato de oferta (PDF/planilla), validez, y quién asume comisiones.
@@ -155,7 +156,11 @@ Reglas duras que se cruzan con este playbook:
 - **Registro institucional (de usted)** en todo lo client-facing.
 
 ### Fase 10 — Presentación human-in-control
-- **La oferta la sube un humano** a la plataforma, con comprobante guardado. El agente/skill **prepara**; **nunca envía ni firma**. Confirmaciones sensibles (ej. "sin demandas contra el comprador") las valida el operador.
+- **La decisión y autorización son humanas.** El agente prepara; sólo firma o presenta cuando el operador
+  ha autorizado explícitamente esa acción y su alcance. Para insertar la firma existente en anexos autorizados,
+  los hechos declarados deben estar confirmados; no repetir la aprobación ya concedida para ese paquete.
+  Firma de anexos no autoriza presentación. Guardar comprobante y releer estado para acreditar un envío.
+  Aplicar `platform-bids-and-administrative-package.md` para datos, modalidad de firma, originales y QA.
 
 ## Principios cross-cutting (aplican a todo el flujo)
 
@@ -163,7 +168,8 @@ Reglas duras que se cruzan con este playbook:
 2. **Nunca GO sin margen** sobre loaded cost. Fit alto + margen negativo = NO-BID.
 3. **Fundar con skills, no con memoria.** Cada fase se apoya en la skill de dominio y en datos reales (bases, contexto, nómina, casos).
 4. **Evidence-first + anti-humo.** Cada claim se encadena a su mecanismo o su prueba citable.
-5. **Human-in-control.** El agente prepara; el humano decide, firma y sube.
+5. **Human-in-control.** El humano decide y autoriza cada alcance sensible; el agente puede ejecutar firma o
+   presentación dentro de esa autorización. No inferir permiso de envío desde preparación o firma.
 6. **Documentar mientras se itera.** Cada mejora del método se refleja en este playbook + docu + manual (ver abajo).
 
 ## Mapa de orquestación (qué skill en qué fase)

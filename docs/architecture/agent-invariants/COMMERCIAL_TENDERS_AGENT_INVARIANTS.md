@@ -11,6 +11,20 @@
 
 ---
 
+## Operación comercial por plataforma — criterio vigente 2026-10-08
+
+Esta aclaración gobierna el trabajo del operador y los agentes; no modifica el runtime de Proposal.
+
+- Investigar todo el alcance autorizado, incluidas oportunidades no recomendadas y las categorías CRM, creativos, diseño web y licencias Claude/OpenAI cuando fueron pedidas. Declarar cobertura real; score no equivale a GO.
+- En Wherex, Mercado Público y procesos descubiertos mediante LicitaLAB, preparar la oferta no requiere contacto previo del comprador. Si no hay canal de consultas, registrar la limitación y los supuestos acordados. No bloquear por aclaraciones imposibles ni inventar requisitos satisfechos.
+- Originales descargados, anexos firmados y postulación son estados separados. Expediente: institución/empresa y proceso numerado; datos corporativos por fuente, nunca copiados a skills. Firma sólo dentro del alcance expresamente autorizado y con declaraciones confirmadas; no habilita envío.
+- Una señal permanece lead hasta calificación. Conservar los Deals existentes cuando el operador lo instruyó. Reutilizar segmentos activos mediante propiedades respaldadas; membresía no equivale a inscripción en Prospecting Agent, consentimiento ni envío.
+- La autorización vigente se reutiliza dentro de su alcance; no exigir nuevamente permiso para una acción ya autorizada. Antes de presentar siguen vigentes admisibilidad, ejecución, costo, margen y aceptación del paquete concreto.
+
+Método: [plataformas y expediente administrativo](../../../.codex/skills/greenhouse-public-private-tenders/platform-bids-and-administrative-package.md).
+Datos: [ficha corporativa](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md).
+Continuidad y evidencia: [cierre de sesión](../../audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
+
 ## Estado real del dominio (2026-07-12, post TASK-1393 Slices 0-4) — no asumas de más
 
 | Pieza                                                                                                                                                      | Estado                                                                                                                                                                                                                                                                   |

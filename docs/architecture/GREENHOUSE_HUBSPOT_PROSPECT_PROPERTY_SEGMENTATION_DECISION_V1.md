@@ -85,6 +85,14 @@ individual Contact 174/176 y Company 177; no se volvió a enumerar toda la cohor
 La nota del Deal conserva la intención del proceso y la responsabilidad del contacto pendiente. Es aplicación
 del contrato existente, no ampliación del universo ni revisión de la decisión aceptada.
 
+### Ronda adicional — 2026-10-08
+
+Aplicación del contrato de rondas independientes: nueva opción research_2026_10_08 en Company y Contact,
+sin reemplazar cohortes ni reglas previas. ACTIVE 178 clasifica personas con/sin email por fit creativo de esa
+ronda; ACTIVE 179 selecciona sus empresas. Se verificaron conjuntos completos de dos contactos y dos empresas,
+asociaciones Primary y notas de fuente. 178 no acredita disponibilidad/entregabilidad de correo ni autorización
+de envío. [Auditoría y expresiones](../audits/commercial/2026-10-08-creative-prospect-intake.md).
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

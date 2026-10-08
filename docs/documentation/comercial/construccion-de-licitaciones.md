@@ -1,9 +1,9 @@
 # Construcción de Licitaciones — Método Efeonce
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-09-23 por Claude
+> **Última actualización:** 2026-10-08 por Codex
 > **Documentación técnica / método canónico:** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
 ## Para qué sirve este documento
@@ -31,7 +31,7 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 7. **Poner el precio.** Se calcula sobre el **costo real del equipo** (Efeonce conoce su nómina) más un margen sano. En licitaciones privadas, además, se cuida no cobrar de menos por el valor entregado.
 8. **Escribir la propuesta técnica.** Redactar de forma clara y persuasiva, con cada afirmación respaldada por su mecanismo o una prueba, sin humo.
 9. **Armar la oferta económica y el paquete.** La planilla de precios en el formato pedido, revisar que todo lo obligatorio esté, y exportar a PDF.
-10. **Presentar (lo hace una persona).** La oferta la sube un humano a la plataforma; el sistema solo la prepara. Nunca se envía ni se firma solo.
+10. **Presentar con autorización.** La persona sube la oferta o autoriza al agente sobre el paquete concreto. Completar o firmar anexos con autorización no implica permiso para presentar. La evidencia de presentación es el comprobante y su lectura posterior.
 
 ## Desde el radar público de LicitaLAB hasta una candidata analizada
 
@@ -40,14 +40,13 @@ una persona elige y decide**.
 
 1. **Búsqueda.** El agente recorre el listado de LicitaLAB (recomendadas o todas) y filtra por tema. LicitaLAB no
    ofrece búsqueda por su API: el listado se lee desde la web con una sesión automatizada.
-2. **Lista corta.** Descarta lo que no es servicio de Efeonce (licencias, equipos, bienes) y lo que cierra muy
-   pronto, y propone 3 a 5 candidatas. El puntaje de LicitaLAB solo ordena la lista.
-3. **Elección humana** de qué candidatas analizar.
+2. **Clasificación por fit.** Incluye CRM, servicios creativos, diseño web, SEO/AEO y licencias Claude/OpenAI si fueron solicitadas; estas últimas exigen canal, costo y margen viables. No hay descarte automático de licencias ni cupo de cinco cuando se pidió revisión exhaustiva. El puntaje de LicitaLAB sólo ordena. Declarar cobertura observada y límites.
+3. **Alcance autorizado.** La elección puede ser por códigos o una instrucción de investigar a fondo todas las pertinentes; no repetir esa selección cuando ya está autorizada.
 4. **Lectura de bases.** Por cada candidata, el agente consulta la ficha y hace preguntas acotadas a los documentos
    (requisitos, experiencia, garantías, criterios, formato). Toda respuesta cita archivo y página; lo que no aparece
    queda como «falta evidencia», nunca como «no se exige».
 5. **Matriz y recomendación** GO / HOLD / NO-GO, que decide una persona, con margen revisado.
-6. **Solo con confirmación** la oportunidad pasa a Greenhouse y a HubSpot.
+6. **Registro autorizado y calificación.** Reutilizar registros y segmentos activos; una señal permanece lead hasta calificarse. La autorización para registrar no implica crear siempre un Deal ni enviar mensajes. Respetar la instrucción de conservar los Deals existentes.
 
 Hay un límite práctico: buscar, ver la ficha y analizar proveedores dependen del inicio de sesión de una persona en
 LicitaLAB, que el agente no realiza. La lectura de documentos funciona también desde la plataforma con una clave de
@@ -69,14 +68,12 @@ admisibilidad, capacidad efectiva y margen.
 
 Cuando el operador elige una candidata, el sistema conserva tres verdades complementarias. El expediente interno
 versionado guarda bases e investigación; OneDrive conserva los adjuntos originales en
-`Alineación/4. Comercial/Licitaciones/<Comprador>/`; y HubSpot mantiene empresa, deal y asociación comercial. No
+`Alineación/4. Comercial/Licitaciones/<Comprador>/<N>. <Proceso>/`; y HubSpot mantiene empresa, deal y asociación comercial. No
 son sustitutos: una carpeta no prueba una asociación CRM, y un deal no reemplaza las bases normativas.
 
 El CRM se revisa y, si hace falta, se crea por MCP con confirmaciones humanas. Primero se verifica la empresa, el
 deal vigente y su asociación; los deals históricos o cerrados no cubren una nueva licitación. Si faltan registros,
-el operador aprueba las propiedades concretas de la empresa. Con su ID ya verificado, aprueba en una segunda etapa
-el deal y su asociación. La lectura posterior confirma que el vínculo realmente quedó creado. Este diseño evita
-duplicados y asociaciones contra una organización equivocada.
+el operador autoriza los objetos y asociaciones concretos. Si esa autorización ya existe, resolver un ID no exige repetirla; la lectura posterior verifica identidad, propiedades y vínculo. Este diseño evita duplicados y asociaciones contra una organización equivocada.
 
 Los adjuntos se conservan con nombre de origen, sin URLs firmadas ni secretos. Si la automatización autorizada no
 puede guardar un documento desde el visor, se declara el bloqueo y se usa una copia local entregada o guardada por
@@ -84,6 +81,12 @@ una persona; nunca se elude la protección del navegador. El contenido se resume
 riesgos y próximos gates, no como una transcripción de información confidencial.
 
 Antes de dar la propuesta por lista, se hace una **revisión crítica con tres miradas**: comercial (¿convence al comité y baja el miedo a decidir?), equipo (¿el equipo es real y tiene capacidad?) y finanzas (¿el precio cubre el costo real y no se erosiona con el tiempo?). Si las tres no pasan, la propuesta no está lista aunque el texto se lea bien.
+
+## Preparar sin contacto previo obligatorio
+
+En licitaciones por plataforma —Wherex, Mercado Público y las consultadas mediante LicitaLAB— se prepara la oferta para el canal del proceso. No se exige que el comprador responda primero; puede contactar después de evaluar la propuesta. Si hay canal oficial de preguntas, se considera según sus reglas; si no, se conserva la limitación y los supuestos acordados sin bloquear automáticamente la preparación. No inventar condiciones ni sustituir requisitos excluyentes por supuestos.
+
+Originales, anexos editables, PDF firmados y comprobante de postulación son evidencias distintas. Los datos corporativos se reutilizan desde la [ficha confirmada](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md); la firma gráfica se aplica sólo a los documentos autorizados y se verifica visualmente. Los hechos específicos de un comprador no se generalizan a otro. El [manual](../../manual-de-uso/comercial/construir-una-licitacion.md) detalla el expediente y QA.
 
 ## Cómo se materializa una postulación privada en Wherex
 
@@ -123,7 +126,7 @@ La cadena correcta es:
 - **Nunca un "sí" sin margen.** Un encaje perfecto con precio que pierde plata es un "no".
 - **Fundar, no suponer.** Cada decisión se apoya en las bases, el contexto real y el conocimiento de cada área.
 - **Sin humo.** Cada beneficio va acompañado de cómo lo logramos o una prueba real (un caso, un dato).
-- **La persona manda.** El sistema prepara; el humano decide, firma y presenta.
+- **La persona manda.** El sistema prepara; el operador decide y autoriza de forma específica firma y presentación.
 
 ## Los tres planos donde vive este método
 
