@@ -4,6 +4,8 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [QuePlan y WIN — investigación y alta de leads, 08-10-2026](2026-10-08-jorge-fiorella-intake.md) — dos Leads y notas verificados; Jorge frío con correo Apollo Verified (2 créditos), Fiorella búsqueda activa.
+
 - [UTEM — deck de la propuesta técnica, 08-10-2026](2026-10-08-utem-deck-propuesta-tecnica.md) — deck v2 de 35 láminas, PDF y técnica v1.1; actualización enlazada: oferta presentada por Julio, cotización aprobada y CRM verificado.
 - [Licitaciones, CRM y continuidad documental — 08-10-2026](2026-10-08-licitaciones-crm-continuidad-docs-skills.md) — consolidación UTEM, datos corporativos, seguimiento, manuales y skills espejo.
 - [Alta de prospectos creativos — 08-10-2026](2026-10-08-creative-prospect-intake.md) — Diego/Yanbal y Emily/Olivos, evidencia de contacto y registros autorizados.

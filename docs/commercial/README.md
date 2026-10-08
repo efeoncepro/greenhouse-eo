@@ -9,6 +9,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Fuentes y autoridad
 
+- [QuePlan — Jorge Godoy: prospección fría](prospects/queplan-jorge-godoy-2026/README.md) y [WIN Fitness Wear — Fiorella: búsqueda activa de agencia](prospects/win-fitness-wear-social-2026/README.md): investigación, Leads y notas verificados el 08/10; correo corporativo de Jorge obtenido con Apollo. [Auditoría](../audits/commercial/2026-10-08-jorge-fiorella-intake.md).
+
 - [SKY Staff Augmentation 2026](prospects/sky-staff-augmentation-2026/README.md): cotizaciones enviadas, nota compartida en contacto/deal y siguiente paso.
 
 - [Datos confirmados para licitaciones](EFEONCE_DATOS_PARA_LICITACIONES.md): accionista, contacto, datos bancarios y alcance de las declaraciones confirmadas por Julio el 08/10/2026.
