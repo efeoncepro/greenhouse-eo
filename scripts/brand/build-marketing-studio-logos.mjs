@@ -139,6 +139,8 @@ const efeonceAsset = (kind, variant) => {
     .replace(/<defs>[\s\S]*?<\/defs>/, '')
     .replace(/class="(cls-\d+)"/g, (_, c) => `fill="${variant === 'white' ? '#ffffff' : (fills[c] ?? '#000')}"`)
     .replace(/\s(id|data-name)="[^"]*"/g, '')
+    // Sin espacios al final de línea: el gate `git diff --check` de AXIS rechaza los que trae el archivo de Efeonce.
+    .replace(/[ \t]+$/gm, '')
 }
 
 const nest = (source, x, y, { h, w }) => {

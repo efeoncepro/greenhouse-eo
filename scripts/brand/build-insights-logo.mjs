@@ -128,6 +128,8 @@ const inlineStyles = svg => {
     .replace(/<defs>[\s\S]*?<\/defs>/, '')
     .replace(/class="(cls-\d+)"/g, (_, c) => `fill="${fills[c] ?? '#000'}"`)
     .replace(/\s(id|data-name)="[^"]*"/g, '')
+    // Sin espacios al final de línea: el gate `git diff --check` de AXIS rechaza los que trae el archivo de Efeonce.
+    .replace(/[ \t]+$/gm, '')
 }
 
 const nest = (svg, x, y, h) => {
