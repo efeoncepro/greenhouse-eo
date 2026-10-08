@@ -17,7 +17,7 @@
 5. [Perfiles creativo y SEO/AEO; continuidad X-ray](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): bloques, evidencias, sala combinada y aceptación V1.
 
 6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y gate R01; sin build conjunto certificado.
-7. [Marca de Rooms](EFEONCE_ROOMS_MARK_DECISION_V1.md): ruta «Encuentro», las dos «o» como órbitas enlazadas con una sola esfera; aceptada 2026-10-08, 18 SVG `rooms-*` en `axis-brand-assets` 0.4.27.
+7. [Marca de Rooms](EFEONCE_ROOMS_MARK_DECISION_V1.md): «eslabón leve», las dos «o» como órbitas enlazadas con la esfera a la 1:30 (nunca en el cruce); aceptada 2026-10-08, 18 SVG `rooms-*` en `axis-brand-assets` 0.4.27.
 
 ## Contratos de experiencia para revisión
 

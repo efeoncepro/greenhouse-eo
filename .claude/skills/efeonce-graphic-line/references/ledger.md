@@ -712,16 +712,19 @@ Globe.
 ### 2026-10-08 — Logo de Efeonce Rooms (18 piezas)
 
 El operador pidió el logo de Efeonce Rooms (sala comercial, `rooms.efeonce.org`, EPIC-052) «al estilo de Marketing
-Studio, Creative Studio, Efeonce Factory» y con impacto; aprobó la ruta B «Encuentro» con sus aplicaciones. La regla
-«la órbita vive en la O» en una palabra con dos: las dos «o» son **dos órbitas enlazadas** y la **única esfera** (acento
-Growth) se posa en el cruce de arriba; en el de abajo la segunda pasa por encima. Símbolo: las dos órbitas sin letra
-(se lee a 24–32 px). Descartada la ruta A (órbita en la primera «o»: la segunda queda como letra suelta). 6 formas
-(`logo`, `lockup`, `compact`, `stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`,
-`rooms-<forma>-<variante>.svg`. Generador `scripts/brand/build-rooms-logos.mjs` (método de Factory; enlace con
-separación 1,3 × radio; cortes como contornos, nunca máscaras: una prueba de AXIS lo exige). Destino
-`@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `0c3d7ab`, commit local; falta push + tag). Sólo en el paquete, como
-Creative Studio. ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`. Pendiente: revisión de parecido con
-marcas de círculos entrelazados antes de pauta o registro.
+Studio, Creative Studio, Efeonce Factory» y con impacto. La regla «la órbita vive en la O» en una palabra con dos: las
+dos «o» son **dos órbitas enlazadas como eslabones** (arriba la segunda por encima, abajo la primera), separadas 1,6 ×
+el radio medio («eslabón leve»), con la **única esfera a la 1:30 de la segunda órbita**. Símbolo: las dos órbitas sin
+letra. **Lección:** la primera versión aprobada ponía la esfera en el cruce de arriba («el punto de encuentro») y el
+operador advirtió que una esfera en la punta de la almendra de dos círculos se lee como figura anatómica (publicidad
+íntima femenina); se cambió el mismo día, antes de publicar. **Regla: la esfera nunca va en un cruce de órbitas**, y una
+letra dentro de una órbita no puede ser R (se lee ®). Descartadas también: superposición plana (reaparece la almendra),
+órbitas que sólo se tocan (anteojos), escalón (la «o» flota) y eslabón profundo (se empasta). 6 formas (`logo`,
+`lockup`, `compact`, `stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`. Generador
+`scripts/brand/build-rooms-logos.mjs` (cortes genéricos como contornos, nunca máscaras: una prueba de AXIS lo exige).
+Destino `@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `0c3d7ab` + `046f494`, commits locales; falta push + tag). Sólo
+en el paquete, como Creative Studio. ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`. Pendiente: prueba
+sin contexto del símbolo y revisión de parecido antes de pauta o registro.
 
 ### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
 
