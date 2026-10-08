@@ -22,7 +22,7 @@ Estos wireframes son estructura dentro de **La órbita**: títulos y capítulos 
 * Preparar solo si el grant lo permite.
 ```
 
-La pieza o demostración SEO/AEO está visible en el primer viewport; dimensiones exactas se resuelven con assets reales. La entrada no fuerza reproducción ni consume pantalla con un splash.
+«Efeonce · Rooms» en el encabezado es el lockup oficial **Efeonce | Rooms** (`rooms-lockup`, [ADR de marca](../../architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md)); el símbolo de dos órbitas enlazadas (`rooms-isotype`) va en favicon y avatar de la sala, nunca junto al nombre. La marca de Rooms vive en el marco, nunca sobre el arte del cliente. La pieza o demostración SEO/AEO está visible en el primer viewport; dimensiones exactas se resuelven con assets reales. La entrada no fuerza reproducción ni consume pantalla con un splash.
 
 ## Explorar una pieza
 

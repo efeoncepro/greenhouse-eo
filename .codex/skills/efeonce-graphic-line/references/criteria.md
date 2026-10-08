@@ -39,6 +39,17 @@ El operador corrigió la documentación: «efeonce-graphic-line es el nuevo desi
 
 Ejemplo corregido: la consola Rooms usa encabezados Bricolage y notas/controles Poppins, no un theme heredado Poppins/Geist; el anuncio del cliente mostrado conserva sus fuentes. Motivo: coherencia de producto con el design system actual sin alterar la propuesta. [Dossier Rooms](../../../../docs/architecture/rooms/README.md). Decisión de sistema aceptada; composición renderizada y go de implementación pendientes.
 
+## Rooms: la marca y la esfera fuera del cruce — 2026-10-08
+
+El operador aprobó el logo de Efeonce Rooms, «eslabón leve»: las dos «o» de «Rooms» son dos órbitas enlazadas como eslabones y la única esfera va a la 1:30 de la segunda. Antes había aprobado una versión con la esfera en el cruce de arriba y la retiró el mismo día: «todas las entrelazadas con esfera al centro parecen publicidad íntima femenina».
+
+- **La esfera nunca va en un cruce de órbitas.** En la punta de la almendra que forman dos círculos superpuestos, la esfera se lee, sin contexto, como una figura anatómica. Va a la 1:30 de su órbita, como en toda la familia.
+- **Una letra dentro de una órbita nunca es R:** se lee como ®.
+- **Dos círculos que sólo se tocan** se leen como anteojos o ∞: son genéricos.
+- Antes de aprobar un símbolo, se mira solo (sin la palabra), en grande y a 16–32 px, en claro y oscuro, y se nombra qué más podría leerse (anatómico, ®, 🔗, ⚣, argollas).
+
+Ejemplo corregido: «Rooms» con la esfera posada donde se cruzan las órbitas («el punto de encuentro») → la misma palabra con la esfera a la 1:30 de la segunda órbita. Motivo: el concepto no puede depender de una lectura que el público no hace. [ADR de la marca](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md).
+
 ## 1. La idea en una frase y el porqué
 
 **Una esfera que recorre su órbita** (manual §0; Lab 0.1). La esfera del isotipo —la nave con su anillo y su esfera— es

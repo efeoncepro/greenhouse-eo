@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (delta: el deck de la línea se compone entero desde el Artifact Composer, 69 de 69, con D1 medido por el gate). Antes, 2026-09-27 (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-10-08 por Claude (delta: marca de Efeonce Rooms, «eslabón leve», y dos reglas de toda la línea: la esfera nunca va en un cruce de órbitas y una letra dentro de una órbita nunca es R). Antes, 2026-09-28 (delta: el deck de la línea se compone entero desde el Artifact Composer, 69 de 69, con D1 medido por el gate). Antes, 2026-09-27 (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -268,6 +268,22 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 - Greenhouse fija `axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19, `axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5.
   Spec técnica: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md); norma:
   [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+
+### Delta 2026-10-08 — Efeonce Rooms: su marca y dos reglas para toda la línea
+
+- **Marca de Rooms, «eslabón leve»** (aprobada por el operador): «Rooms» en Poppins Bold a contornos, con las dos «o»
+  como dos órbitas enlazadas como eslabones (quien propone y quien decide, en la misma sala), centros a 1,6 × el radio
+  medio y una sola esfera a la 1:30 de la segunda órbita, en el acento Growth, como Factory, Marketing Studio y
+  Creative Studio. 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `main` `1dfb95c`, `f249e82` y
+  `6e1621b`; release `v0.4.27` en curso: verificar el tag antes de darlo por publicado), sólo en el paquete hasta
+  fragmentar el índice de logos del Lab; generador `scripts/brand/build-rooms-logos.mjs`. Decisión, alternativas y
+  consecuencias en su [ADR](rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); norma en el manual §7.4.
+- **Regla nueva de toda la línea: la esfera nunca va en un cruce de órbitas.** La primera versión aprobada de Rooms
+  ponía la esfera en el cruce de arriba («el punto de encuentro»); el operador advirtió que una esfera en la punta de
+  la almendra que forman dos círculos superpuestos se lee, sin contexto, como una figura anatómica propia de la
+  publicidad íntima femenina, y se descartó el mismo día, antes de publicar. Manual §1.3.
+- **Regla nueva de toda la línea: una letra dentro de una órbita no puede ser R**, porque se lee como ®. Manual §1.3.
+- Descartado también en esta marca: dos órbitas que sólo se tocan, sin enlazar, se leen como anteojos o ∞ (genérico).
 
 ## Alternativas descartadas
 

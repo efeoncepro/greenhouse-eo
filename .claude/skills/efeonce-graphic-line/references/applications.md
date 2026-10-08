@@ -1,5 +1,7 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+> Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` aún no en el remoto) — 2026-10-08.
+
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
 
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
@@ -434,9 +436,11 @@ vale en toda aplicación:
 - **Superficies:** entrada, gestión de salas, editor, exploración, consola del champion, audiencia y evaluación; [dossier](../../../../docs/architecture/rooms/README.md), [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
 - **Tipografía:** Bricolage editorial, Poppins funcional desde los roles de `efeonceGraphicLine.type`; ninguna base Geist ni Poppins para todos los títulos. Cada rol conserva peso/escala de su contrato.
 - **Composición:** escenario editorial dentro de La órbita; papel/navy, acentos y componentes canónicos; órbita con intención, iconos del catálogo, sin volumen en UI. No imponer el formato pregunta/respuesta al relato.
-- **Marca/cliente:** usar assets oficiales de Efeonce; logo Rooms todavía sin diseñar/aprobar. No modificar arte cliente ni sus fuentes. No añadir una firma gráfica a cada control como si fuera un anuncio.
+- **Marca/cliente:** usar assets oficiales de Efeonce y la marca Rooms del paquete (abajo). No modificar arte cliente ni sus fuentes. No añadir una firma gráfica a cada control como si fuera un anuncio.
+- **Marca Rooms (aprobada 2026-10-08, «eslabón leve»):** las dos «o» de «Rooms» (Poppins Bold a contornos) son dos órbitas enlazadas como eslabones, centros a 1,6 × el radio medio, con la única esfera Growth (`#0e8c82` sobre papel, `#36c8bf` sobre navy) a la 1:30 de la segunda; **nunca en un cruce**. 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (6 formas × `positive`/`negative`/`white`): `lockup` («efeonce | Rooms», por defecto), `logo`, `compact`, `stacked-lockup`, `isotype` (las dos órbitas sin letra: favicon, avatar de la sala, ícono de app; nunca junto al nombre) e `icon` (nave sobre «Rooms» liso). Junto a Efeonce, «Rooms» en el gris de la familia; sólo la esfera lleva el acento. En publicidad, siempre «efeonce | Rooms», nunca «Rooms» suelto. Sólo en el paquete, no en el catálogo del Lab. Generador `scripts/brand/build-rooms-logos.mjs`; nunca editar los SVG a mano. ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); QA en [qa-checklist.md](qa-checklist.md#marcas-de-producto-con-órbitas-enlazadas-rooms-2026-10-08).
+- **Aplicaciones de la marca exploradas, no aprobadas como composiciones de la sala (2026-10-08):** canvas privado «Efeonce Rooms — Logo» (`https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1`; páginas Logo, Aplicaciones y Variantes del símbolo): imagen del enlace compartido 1200×630, invitación por correo, pestaña + ícono de app + avatar + stickers, portada del modo presentación 1920×1080, placa de sala en oficina («Medir.»), post de lanzamiento 1080×1350 y storyboard de apertura (dos órbitas se acercan, se enlazan y la esfera se posa a la 1:30; con movimiento reducido, sólo el cuadro final). Son exploraciones: no aprueban composiciones de la sala (siguen sujetas a los contratos de UI y al go de EPIC-052) ni una animación de logo nueva (las aprobadas siguen siendo reveal/apertura/sting).
 - **Producción y motion:** adapter nativo Rooms sobre packages, no copia de Lab; `efeonceGraphicLine.motion` para marca y `axisMotion`/contrato del componente para interacción. Pins, mappings y píxeles se validan al implementar.
-- **Estado/QA:** decisión de sistema aceptada; composición, runtime, GVC, fuente efectiva, accesibilidad y go final pendientes. Ningún cambio automático al theme de Greenhouse.
+- **Estado/QA:** decisión de sistema y marca aceptadas; release `v0.4.27` en curso (verificar el tag), prueba del símbolo sin contexto y búsqueda formal de marca pendientes; composición, runtime, GVC, fuente efectiva, accesibilidad y go final pendientes. Ningún cambio automático al theme de Greenhouse.
 
 ## B. Presentaciones e informes
 

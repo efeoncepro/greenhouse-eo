@@ -38,6 +38,10 @@ La diferencia con otras capas de documentacion:
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
+- [Usar la marca de Efeonce Rooms](creative/usar-marca-efeonce-rooms.md) — qué pieza usar dónde (lockup Efeonce | Rooms
+  por defecto, compacto, apilado, símbolo, ícono), variantes `positive`/`negative`/`white`, nunca «Rooms» suelto en
+  publicidad ni la marca sobre el arte del cliente, y cómo regenerar los 18 SVG (generador + sello AXIS). Aceptada el
+  2026-10-08; release `v0.4.27` por verificar.
 - [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
   qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
   el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente

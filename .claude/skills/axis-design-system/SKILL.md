@@ -737,6 +737,28 @@ Efeonce in a lockup and **never sign alone**. Naming: Greenhouse ADR `EFEONCE_AE
   (client logos are third-party marks: never generated, used only with the client's authorization, TASK-1937). Norm:
   `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
 
+### Efeonce Rooms product mark (brand assets only; 2026-10-08)
+
+The operator approved the **Efeonce Rooms** mark (the sales room product, Greenhouse EPIC-052), variant «eslabón leve»:
+«Rooms» in outlined Poppins Bold whose two o's are **two orbits linked like chain links** (centers 1.6 × the mean
+radius), with the single **Growth** sphere at 1:30 of the second orbit, like the rest of the product family. Same ring,
+sphere, air and concentric terminations as the family; cuts computed as outlines, never masks.
+
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.27`**: 18 SVG `rooms-{logo,lockup,compact,stacked-lockup,isotype,icon}-{positive,negative,white}`
+  (`lockup` «efeonce | Rooms» is the default; `isotype` = the two linked orbits without letters, for favicon, room
+  avatar and app icon, never next to the name). Next to Efeonce, «Rooms» goes in the family's measured gray and only the
+  sphere keeps the accent. AXIS commits on `main`: `6e1621b` (release) + `1dfb95c` (eslabón leve) + `f249e82` (no
+  trailing whitespace). **Release `v0.4.27` in progress on 2026-10-08: verify the tag before calling it published.**
+- **Package only**, like Creative Studio: not in the Lab's public logo catalog until the search index is split
+  (`AXIS_LOGO_EXCLUSIONS`).
+- **Generation:** Greenhouse `scripts/brand/build-rooms-logos.mjs` (strips the trailing whitespace the Efeonce logo
+  carries, which AXIS's `git diff --check` gate rejects); copy to `packages/brand-assets/assets/` and
+  `apps/lab/public/branding/`, then `pnpm seal`; never edit the SVG by hand.
+- **Line-wide rules born here:** the sphere never sits on a crossing of orbits (it reads as an anatomical figure), and a
+  letter inside an orbit is never R (reads as ®). Naming risk, small-size symbol test and pending items: Greenhouse ADR
+  `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md` and `efeonce-graphic-line` → `references/ledger.md`
+  (2026-10-08).
+
 ### Efeonce AI Visibility Report (0.3.30 set)
 
 The operator approved the **Efeonce AI Visibility Report** (the PDF deliverable of the Efeonce AEO Assessment; product

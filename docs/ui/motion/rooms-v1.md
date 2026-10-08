@@ -40,7 +40,7 @@ Precargar escena actual/siguiente bajo presupuesto; no todos los medios. Suspend
 
 ## 4. Lo que no se utiliza
 
-Sin scroll hijacking, parallax obligatorio, texto letra a letra, cámara 3D decorativa, elasticidad excesiva, temblores de error ni cursores perseguidores. No órbitas decorativas permanentes; un loader orbital canónico sí puede indicar trabajo en curso según su contrato y detenerse al terminar. Medida/progreso exige dato real, distinto de espera indeterminada. El movimiento de marca aprobado se consume de assets oficiales cuando corresponde; no autoriza una nueva animación de logo Rooms.
+Sin scroll hijacking, parallax obligatorio, texto letra a letra, cámara 3D decorativa, elasticidad excesiva, temblores de error ni cursores perseguidores. No órbitas decorativas permanentes; un loader orbital canónico sí puede indicar trabajo en curso según su contrato y detenerse al terminar. Medida/progreso exige dato real, distinto de espera indeterminada. El movimiento de marca aprobado se consume de assets oficiales cuando corresponde. La marca de Rooms ya existe ([ADR de marca](../../architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md), 2026-10-08); su apertura (las dos órbitas se enlazan y la esfera se posa a la 1:30; con movimiento reducido, sólo el cuadro final) se exploró en el canvas de marca y **no está aprobada**. Sin aprobación expresa no hay animación de logo Rooms nueva.
 
 ## 5. Accesibilidad y medios
 

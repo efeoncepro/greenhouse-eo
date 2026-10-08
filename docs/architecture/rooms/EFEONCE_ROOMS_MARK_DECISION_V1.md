@@ -9,8 +9,8 @@
 - **Reversibility:** two-way-but-slow. Los archivos se regeneran en minutos; cuando la sala tenga clientes, el cambio tiene
   inercia de marca.
 - **Confidence:** high en la forma: el operador la eligió viéndola junto a la ruta canónica, la familia, tres variantes de
-  riesgo y seis refinamientos. Medium en distintividad y lectura: faltan la prueba sin contexto y la revisión de parecido
-  (ver Consecuencias).
+  riesgo y seis refinamientos. Medium en distintividad y lectura: la revisión de parecido por web está hecha (ver
+  Revisión de parecido); faltan la prueba sin contexto del símbolo y la búsqueda formal de marca.
 - **Validated as of:** 2026-10-08, sesión de diseño con el operador (canvas «Efeonce Rooms — Logo», páginas «Logo»,
   «Aplicaciones» y «Variantes del símbolo»).
 
@@ -48,16 +48,20 @@ regla de la familia es «la órbita vive en la O»; «Rooms» tiene dos.
 
 Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
 [`scripts/brand/build-rooms-logos.mjs`](../../../scripts/brand/build-rooms-logos.mjs) y se sellan en
-`@efeoncepro/axis-brand-assets` **0.4.27** (commits AXIS `0c3d7ab` y `046f494`, locales; el release del paquete requiere
-push y tag).
-Quedan sólo en el paquete, como Creative Studio, hasta que el índice de búsqueda del Lab se fragmente. Nunca se editan a
-mano.
+`@efeoncepro/axis-brand-assets` **0.4.27** (commits AXIS en `main`, empujados: `6e1621b` release, `1dfb95c` eslabón leve,
+`f249e82` sin espacios al final de línea). Release `v0.4.27` en curso: verificar el tag antes de darlo por publicado.
+Quedan sólo en el paquete, como Creative Studio, hasta que el índice de búsqueda del Lab se fragmente
+(`AXIS_LOGO_EXCLUSIONS`). Nunca se editan a mano: regenerar es correr el generador, copiar a
+`packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y correr `pnpm seal`. El generador quita los
+espacios al final de línea que trae el logo de Efeonce (gate `git diff --check` de AXIS).
 
 ## Aplicaciones exploradas
 
 El mismo canvas explora la marca en aplicaciones (enlace compartido, invitación por correo, modo presentación, pestaña
-e ícono de app, señalética de sala, lanzamiento y la apertura en movimiento). Son **exploraciones**: no aprueban
-composiciones de la sala, que siguen sujetas a los contratos de UI de Rooms y al QA visual tras el go de EPIC-052. Las
+e ícono de app, señalética de sala, lanzamiento y la apertura en movimiento: las dos órbitas se acercan, se enlazan y la
+esfera se posa a la 1:30; con movimiento reducido, sólo el cuadro final). Son **exploraciones**: no aprueban
+composiciones de la sala, que siguen sujetas a los contratos de UI de Rooms y al QA visual tras el go de EPIC-052, ni una
+animación de logo nueva. Las
 piezas del cliente conservan su marca: la de Rooms nunca va encima del arte del cliente.
 
 ## Alternativas descartadas
@@ -79,9 +83,35 @@ piezas del cliente conservan su marca: la de Rooms nunca va encima del arte del 
 
 - **Positivas:** Rooms entra a la fila de productos (Marketing Studio, Creative Studio, Factory) con el mismo anillo, esfera
   y gris, y su símbolo dice «enlace» sin texto.
-- **Riesgo conocido:** dos anillos enlazados son una figura común (argollas, eslabones, marcas de círculos entrelazados).
-  Antes de pauta o registro: prueba sin contexto del símbolo con 5–8 personas («¿qué ves?», la tarjeta está en el canvas)
-  y revisión de parecido en las clases relevantes (pendiente, owner Efeonce Brand).
-- **Regla para cualquier versión futura:** la esfera nunca va en un cruce de las órbitas.
-- **Pendiente:** release de `@efeoncepro/axis-brand-assets` 0.4.27 (push + tag en AXIS) y que Greenhouse/Rooms lo
-  consuman; las composiciones de la sala siguen pendientes del go de EPIC-052.
+- **Riesgo conocido:** dos anillos enlazados son una figura común (argollas, eslabones, marcas de círculos entrelazados);
+  el riesgo mayor está en el nombre (ver Revisión de parecido). Antes de pauta o registro: prueba sin contexto del símbolo
+  con 5–8 personas («¿qué ves?», la tarjeta está en el canvas) y búsqueda formal de marca (owner Efeonce Brand).
+- **Reglas para cualquier versión futura, y para toda la línea:** la esfera nunca va en un cruce de las órbitas; una letra
+  dentro de una órbita no puede ser R (se lee ®); dos círculos que sólo se tocan, sin enlazar, se leen como anteojos o ∞.
+- **Pendiente:** verificar el tag `v0.4.27` de `@efeoncepro/axis-brand-assets` y que Greenhouse/Rooms lo consuman; la
+  prueba sin contexto; la búsqueda formal de marca. Las composiciones de la sala siguen pendientes del go de EPIC-052.
+
+## Revisión de parecido (2026-10-08)
+
+Búsqueda web hecha el mismo día. **No es asesoría legal** ni sustituye una búsqueda formal de marca.
+
+- **Logotipo:** no se encontró parecido con marcas conocidas (Audi, aros olímpicos, Mastercard) ni con proveedores de salas
+  de venta digitales. Dos aros enlazados es un gesto común (stock, Radius en cripto): el símbolo solo es poco distintivo;
+  la esfera Growth y la palabra lo diferencian.
+- **Lecturas no deseadas del símbolo solo:** argollas de matrimonio con piedra (medio); el ícono de «enlace» 🔗 de las
+  interfaces (medio); ⚣, el doble signo de Marte, porque la esfera a la 1:30 coincide con la flecha (bajo a medio, a
+  tamaños chicos). Esposas, cadena, infinito, anteojos u «OO/CO»: bajo.
+- **Nombre (el riesgo real):** «room/rooms» es casi genérico en la categoría (Aligned «Rooms», Arrows «Sales Rooms», DealHub
+  DealRoom, GetAccept «Deal Room», Dock «sales rooms»). Antecedentes en EE.UU.: ZOOM ROOMS / ZOOMROOMS (Zoom,
+  conferencias); ROOMS, serie 98150902 (clases 9 y 42, software de escenas 3D; Rooms de Things Inc, titular sin
+  confirmar); y un ROOMS de 1993 en clase 9 (74284081, estado incierto). Chile (INAPI): no verificable por web.
+
+**Recomendaciones:**
+
+1. Búsqueda formal en INAPI y en las oficinas de los mercados de venta, clases 9, 35 y 42. Solicitar **«EFEONCE ROOMS»
+   mixta** (palabra + diseño), no «ROOMS» solo. Revisar 98150902 y 74284081 en TSDR antes de cualquier presentación en
+   EE.UU.
+2. Usar siempre la firma **Efeonce | Rooms**; nunca «Rooms» suelto en publicidad.
+3. Prueba sin contexto del símbolo a 16–32 px, en claro y oscuro, frente a 🔗, ⚣ y argollas de boda. Si confunde, el
+   símbolo se muestra siempre junto a la palabra. **Nunca** mover la esfera a un cruce para diferenciarlo (regla 2 de la
+   Decisión).

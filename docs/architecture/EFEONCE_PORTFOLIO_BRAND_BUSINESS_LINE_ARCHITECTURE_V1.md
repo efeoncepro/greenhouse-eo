@@ -156,3 +156,15 @@ precio cerrados, de cualquier línea (Brand, Engine, Revenue, Voice…). Su cont
   acento.
 - No crea business line, entidad, enum comercial ni pipeline CRM nuevos; la práctica dueña conserva ownership y
   economía de cada encargo.
+
+## Aplicación 2026-10-08 — marca de Efeonce Rooms
+
+[Efeonce Rooms](rooms/README.md) es la sala de venta de Efeonce: sirve a propuestas creativas y SEO/AEO, a veces en la
+misma sala. Su marca entra a la fila de productos (Marketing Studio, Creative Studio, Factory) con el acento Growth de
+la masterbrand porque, como Factory, no pertenece a una sola línea
+([marca de Rooms](rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md)).
+
+- Aplica la regla 1 de §4: la firma es siempre «efeonce | Rooms», nunca «Rooms» suelto en publicidad; «rooms» es casi
+  genérico en la categoría de salas de venta digitales.
+- La marca no decide su clase en la taxonomía de §2, ni producto, publicación o el go de
+  [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).

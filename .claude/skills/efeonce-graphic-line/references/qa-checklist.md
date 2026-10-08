@@ -2,6 +2,8 @@
 
 > Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
 
+> Delta marca Rooms (2026-10-08): reglas del operador sobre esfera en cruces y R en órbita, más la prueba del símbolo a tamaño chico; AXIS `main` en `6e1621b` (paquete 0.4.27, release `v0.4.27` en curso: verificar el tag). Prueba del símbolo aún sin ejecutar.
+
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
@@ -50,6 +52,8 @@
 | [ ] | Logo ≥ 96 px (25 mm impreso; recomendado ≥ 160 px); isotipo ≥ 24 px (8 mm); resguardo X respetado | Revisión |
 | [ ] | El logo dentro de la órbita **sólo** en el cierre del deck, el cierre de video o el muro de recepción, con el anillo fuera de su resguardo X; nunca en el banner de LinkedIn, el reverso de la tarjeta ni un objeto (D5) | Revisión (el contrato acepta `targetKind: 'logo'` en cualquier pieza) |
 | [ ] | El anillo propio de la esfera (`sphereRing`) sólo en algo **en vivo** (eco del impacto, estado «en el aire»), con `live: true` (D8) | Automático desde 0.3.1: `sphere-ring-only-live`; hoy, revisión |
+| [ ] | **La esfera nunca va en un cruce de órbitas** (operador, 2026-10-08, caso Rooms): donde dos órbitas se superponen o enlazan, la esfera queda fuera de la punta de la almendra que forman; ahí se lee, sin contexto, como figura anatómica | Revisión: ubicar cada cruce de anillos y confirmar que ninguna esfera lo toca; en marcas de producto, la esfera a la 1:30 de su órbita como el resto de la familia |
+| [ ] | Una letra dentro de una órbita nunca es una R (se lee como ®) | Revisión |
 
 ## 2. Texto y voz
 
@@ -524,3 +528,15 @@ Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, prim
 - [ ] Capturas desktop/móvil e interacción revisadas por operador; decisión documental no presentada como aceptación de píxeles.
 
 Owner del consumidor: [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). Estos checks se ejecutarán al implementar Rooms.
+
+## Marcas de producto con órbitas enlazadas (Rooms, 2026-10-08)
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | La esfera de la marca está a la 1:30 de su órbita y **nunca** en un cruce (ver §1) | Revisión del SVG `rooms-*` del paquete; nunca editar a mano: se regenera con `scripts/brand/build-rooms-logos.mjs` |
+| [ ] | Ninguna letra dentro de una órbita es R (®) | Revisión |
+| [ ] | El símbolo solo (las dos órbitas sin letra) probado sin contexto a 16, 24 y 32 px, en claro y oscuro, frente a 🔗 (enlace de interfaz), ⚣ y argollas de boda con piedra; si confunde, el símbolo va siempre junto a la palabra | Revisión con operador; pendiente al 2026-10-08 |
+| [ ] | En publicidad, siempre la firma «efeonce \| Rooms»; nunca «Rooms» suelto | Revisión del copy y del asset (`rooms-lockup-*` por defecto) |
+| [ ] | Junto a Efeonce, «Rooms» en el gris medido de la familia; sólo la esfera conserva el acento Growth | `assetId` del manifest; revisión |
+
+Fuente: ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md) y [ledger 2026-10-08](ledger.md#2026-10-08--logo-de-efeonce-rooms-18-piezas).

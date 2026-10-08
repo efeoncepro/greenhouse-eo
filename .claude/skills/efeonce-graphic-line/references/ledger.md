@@ -1,5 +1,7 @@
 # Registro de decisiones y versiones
 
+> Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` aún no en el remoto) — 2026-10-08.
+
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
 
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
@@ -121,6 +123,7 @@
 | 2026-10-02 (b) | **La línea en el login V4 de Greenhouse** (TASK-1964; dirección V4 aprobada por el operador ese día). Primera pantalla del producto Greenhouse con La órbita, contra el alcance escrito («No: la interfaz del producto Greenhouse»): **riesgo abierto declarado en la task**, no una regla nueva (ver Pendientes). Lo decidido: (1) la **Lente** del escenario se construye al canon de AXIS —anillo a 1,12 × el radio de la foto (`1 + orbit.ringAirRatio`), foto interior ampliada × `lens.zoom` (no saturada), exterior con `lens.outside`, trazos y esfera × ancho/794 con los pisos `orbit.arcStrokePx[0]`/`sphereRadiusPx[0]`, arco de 50° centrado en `upper-start` con la esfera en su punta y el acento de la línea de servicio de la novedad—; (2) las novedades **cine van sin lente**, porque su luz ya es la órbita de la pieza (aceptado por el operador); (3) la **voz**: «El ring y la esfera faltan como manda /efeonce-graphic-line» → anillo pequeño delante del kicker y la esfera como punto del titular, en el acento; (4) fotos del escenario aprobadas: `LG1`, `LG2e` (cine) y `LG3e` (registro B), con la excepción de cine para una persona de casting en el login (registro cine, delta 2026-10-02 (c)). Detalle: [applications.md](applications.md) §A12 |
 | 2026-10-02 (c) | **El avatar oficial con la bomber es la referencia de identidad del equipo** («Es el último, descarta los anteriores, es donde salen con la bomber»). Andrés, Daniela, Melkin, Humberly y Valentina se anclan en su avatar (maestro 1080 de `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/`, copiado como `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png`); `actual` y `antiguo` quedan en disco, fuera de uso. Julio conserva su set propio. Aplicado en `scripts/foto/build-prompt.mjs` (`PERSONAS`), `scripts/foto/assets.lock.json` (376 assets), el roster y `_identidad-equipo/LEEME.md`. Reemplaza la regla del 2026-09-29 que trataba los avatares como derivados no aptos de referencia |
 | 2026-10-03 | **El cine también vale en superficies de producto** («Si, para producto también es necesario el estilo cine»). Caso 6 del registro cine, `alcance: "producto"` en `ALCANCES_CINE` (`scripts/foto/build-prompt.mjs`, con aviso y prueba): escenario del login, hero de producto; protagonista Nexa, roster con la prenda de su línea o casting anclado a su retrato; la superficie no dibuja otra órbita encima. `LG2e` pasa de `publicidad-prueba` a `producto`. **Pendiente:** llevarlo al contrato AXIS (`surfaces.photo.cine`, issue `cine-requires-nexa-or-proposal`) |
+| 2026-10-08 | **Marca de Efeonce Rooms aprobada («eslabón leve») y dos reglas para toda la línea:** la esfera nunca va en un cruce de órbitas (en la punta de la almendra de dos círculos se lee como figura anatómica; la primera versión aprobada se descartó el mismo día, antes de publicar) y una letra dentro de una órbita no puede ser R (se lee ®). Detalle en [2026-10-08 — Logo de Efeonce Rooms](#2026-10-08--logo-de-efeonce-rooms-18-piezas). |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -722,9 +725,18 @@ letra dentro de una órbita no puede ser R (se lee ®). Descartadas también: su
 órbitas que sólo se tocan (anteojos), escalón (la «o» flota) y eslabón profundo (se empasta). 6 formas (`logo`,
 `lockup`, `compact`, `stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`. Generador
 `scripts/brand/build-rooms-logos.mjs` (cortes genéricos como contornos, nunca máscaras: una prueba de AXIS lo exige).
-Destino `@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `0c3d7ab` + `046f494`, commits locales; falta push + tag). Sólo
-en el paquete, como Creative Studio. ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`. Pendiente: prueba
-sin contexto del símbolo y revisión de parecido antes de pauta o registro.
+El generador quita los espacios al final de línea que trae el logo de Efeonce (el gate `git diff --check` de AXIS
+los rechaza); regenerar = correr, copiar a `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y
+`pnpm seal`, nunca editar los SVG a mano. Destino `@efeoncepro/axis-brand-assets` 0.4.27: AXIS `6e1621b` (release) +
+`1dfb95c` (eslabón leve) + `f249e82` (sin espacios al final de línea), rebasados y empujados a `main`; **release
+`v0.4.27` en curso** (el tag no estaba en el remoto al 2026-10-08: verificarlo antes de darlo por publicado). Sólo en
+el paquete, como Creative Studio (`AXIS_LOGO_EXCLUSIONS`). ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`.
+**Revisión de parecido (2026-10-08, búsqueda web, no asesoría legal):** el logotipo no se parece a marcas conocidas; el
+riesgo está en el **nombre** («room/rooms» es casi genérico en salas de venta y hay antecedentes ROOMS/ZOOM ROOMS en
+EE.UU.): búsqueda formal y solicitud **«EFEONCE ROOMS» mixta** (palabra + diseño), nunca «Rooms» suelto en publicidad;
+probar el símbolo solo a 16–32 px frente a 🔗, ⚣ y argollas de boda; **nunca** mover la esfera a un cruce. Pendientes:
+tag `v0.4.27`, prueba sin contexto del símbolo y búsqueda formal de marca. Aplicaciones del canvas «Efeonce Rooms —
+Logo» exploradas, no aprobadas como composiciones de la sala ([A13](applications.md#a13-efeonce-rooms--design-system-de-producto-2026-10-07)).
 
 ### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
 

@@ -196,3 +196,7 @@ Verificación de registro: `pnpm epic:lint --item EPIC-052` → `scanned=1 canon
 ### Ampliación de alcance 2026-10-07 — creativo y SEO/AEO
 
 Aclaración explícita del operador: Rooms debe servir a ambos servicios. Se actualizan R01/R02/R03/R07/R08/R11/R13/R14/R15 y los Exit Criteria dentro de las quince unidades existentes; no se registran tasks ni se inicia implementación. Creatividad conserva el primer hito de materialización; cerrar solo ese perfil no completa V1. Experiencia funcional especificada en el dossier; manuales operativos y documentación del runtime se materializan con R15 cuando exista una capacidad ejecutable.
+
+## Delta 2026-10-08 — marca aceptada
+
+El operador aceptó la marca de Rooms («eslabón leve»): las dos «o» como órbitas enlazadas, esfera Growth a la 1:30, lockup Efeonce | Rooms por defecto. Decisión, piezas y revisión de parecido en el [ADR de marca](../../architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (release `v0.4.27` en curso: verificar el tag). Cubre la condición «sin diseño AXIS» de Non-goals para el logo. No cambia lifecycle, unidades ni go: las composiciones de la sala siguen sujetas a R02 y a los contratos de UI.
