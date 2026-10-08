@@ -51,6 +51,23 @@ Determina primero `author`, `surface` y `speaker`. No elijas por intuición tona
 3. En una pieza híbrida, los cambios de speaker se atribuyen; nunca se mezclan de forma invisible.
 4. Julio puede autorizar una excepción. El agente no puede inventarla.
 
+### Aplicación: correo personal de prospección
+
+En correo comercial firmado por Julio, cargar el
+[manual del Prospecting Agent](../../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md).
+La calibración del 2026-10-07 usó ocho mensajes propios de Outlook; no reemplaza este canon editorial ni
+convierte sus giros en voz institucional. Para otro remitente, obtener su propia muestra.
+
+Primero un motivo concreto, luego una capacidad pertinente y una invitación útil. La cercanía se expresa
+en atender el contexto y dejar decidir, con seguridad tranquila: no encadenar «quizás», «podría» y «no sé
+si es prioridad». Una pregunta o condición basta para una necesidad no confirmada. Usar la investigación
+para encontrar pertinencia, sin recitar el cargo o resumir la empresa; una señal pública no prueba un problema.
+
+Mantener el enlace de reunión configurado y permitir respuesta por correo como alternativa de la misma
+invitación. No inventar URL, duración, experiencia sectorial o resultados. Respetar negativas y reuniones
+ya agendadas. Párrafos cortos, una situación y una capacidad; los ejemplos de cadencia son referencias,
+nunca fórmulas obligatorias. No trasladar automáticamente el ritmo de una columna ni sus motivos a un correo frío.
+
 ## 3. Principio raíz
 
 **Pensar contigo, no dictarte desde arriba.**

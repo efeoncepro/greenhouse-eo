@@ -4,6 +4,8 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [Prospecting Agent HubSpot — voz de Julio, 07-10-2026](2026-10-07-hubspot-prospecting-agent-voz.md) — prompt y CTA guardados con readback; nueva generación final pendiente, sin envío.
+
 - [Pibank — oferta híbrida, 07-10-2026](2026-10-07-pibank-oferta-hibrida.md) — base y activaciones, costos repartidos sin duplicación, selector, PDF y paquete para Claude; precios propuestos.
 
 - [Pibank — conexión demanda, plan y costo, 07-10-2026](2026-10-07-pibank-conexion-demanda-plan.md) — anexo sobre las 19 familias originales, escenarios mensuales, capacidad y fee interno propuesto; fuentes/modelo preservados.

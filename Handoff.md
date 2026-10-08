@@ -2,6 +2,8 @@
 
 ## 2026-10-07 — Continuidad activa
 
+**Prospecting Agent:** [guardado; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
+
 [Studio/AXIS: operativo](docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md).
 
 AXIS Video: primitives 0.6.5 publicados (release 37669427070 SUCCESS); Think pin registry/main. CI proporcional en main: docs rápidas, suites por impacto, reuso release por SHA/digest. Lab: Select aprobado por defecto con gate y skills; WordPress sin activar; imagen azul y aviso WebKit abiertos. [Estado y evidencia](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
@@ -88,7 +90,7 @@ Septiembre observado: CLP 10.480,64 netos. Residual Kortex ~CLP 3.500/mes y tota
 **DataForSEO CLI (30/09):** [TASK-1948](docs/tasks/complete/TASK-1948-dataforseo-url-keyword-relevance-cli.md) complete local, CLI 1.1.0: URL/host, JSON/CSV, techo y resume. [Evidencia](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests; prueba corregida MX para Berel USD 0,0284 reconciliados, 20 keywords/2 páginas y resume USD 0. Guías/skills sincronizadas; sugerencias con ruido editorial, CL separado. Typecheck global con WIP ajeno; sin push/deploy.
 **Creative Workbench (30/09, actualización):** el harness activo está en `creative-workbench`; PR 11 (lotes) y PR 12 (círculos) integrados en main `2bb761a`. Skills Codex/Claude y documentación de SKY se publican en una rama aislada para no arrastrar commits ajenos de develop. Cargar [skill](.codex/skills/efeonce-creative-workbench/SKILL.md) y [estado fechado](.codex/skills/efeonce-creative-workbench/references/state-continuity.md). **Siguiente:** recomponer en corridas nuevas las dos muestras antiguas afectadas, completar revisión visual y flujo IA. Efeonce ID diferido en [TASK-1952](docs/tasks/to-do/TASK-1952-creative-workbench-efeonce-id-integration.md); sin AUTH paralelo. No ejecutar sync total heredado ni alterar CLIs Greenhouse. El corte anterior del PR 3 borrador queda superado; CI/código no acreditan deploy del broker ni IA habilitada.
 
-**HubSpot / prospección (06/10):** `48713323`: cohorte 81/81; 19 ACTIVE, 15 globales intactos. Emails 63, creativo 51, CRM 26; 19 conjuntos exactos tras Sika. [Modelo y catálogo](docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) · [manual](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md). Routers y skills Codex/Claude sincronizados; alta requiere propiedades, Primary y membresía. ANAM: conexión propia.
+**HubSpot (06/10):** 48713323: cohorte 81/81; 19 ACTIVE exactos tras Sika, 15 globales intactos; email/creativo/CRM 63/51/26. [Canon y skills espejo](docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md). Alta: propiedades, Primary, membresía. ANAM: conexión propia.
 
 **Deck de práctica Salesforce (29/09, cierre):** [TASK-1942](docs/tasks/complete/TASK-1942-salesforce-deck-recipes-canonization.md) **complete** (94/94 con plantilla, AXIS `v0.3.36`, insignia autorizada). Pendiente externo: autorización de Anthropic para Claude/Claudeforce en SF16 (TASK-1937). Siguiente: serie HubSpot (TASK-1943).
 
