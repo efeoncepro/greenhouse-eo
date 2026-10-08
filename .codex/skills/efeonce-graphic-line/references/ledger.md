@@ -1,6 +1,6 @@
 # Registro de decisiones y versiones
 
-> Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` aún no en el remoto) — 2026-10-08.
+> Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
 
@@ -728,8 +728,8 @@ letra dentro de una órbita no puede ser R (se lee ®). Descartadas también: su
 El generador quita los espacios al final de línea que trae el logo de Efeonce (el gate `git diff --check` de AXIS
 los rechaza); regenerar = correr, copiar a `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y
 `pnpm seal`, nunca editar los SVG a mano. Destino `@efeoncepro/axis-brand-assets` 0.4.27: AXIS `6e1621b` (release) +
-`1dfb95c` (eslabón leve) + `f249e82` (sin espacios al final de línea), rebasados y empujados a `main`; **release
-`v0.4.27` en curso** (el tag no estaba en el remoto al 2026-10-08: verificarlo antes de darlo por publicado). Sólo en
+`1dfb95c` (eslabón leve) + `f249e82` (sin espacios al final de línea), rebasados y empujados a `main`; **publicado en el release
+`v0.4.27`** (2026-10-08, readback en GitHub Packages). Sólo en
 el paquete, como Creative Studio (`AXIS_LOGO_EXCLUSIONS`). ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`.
 **Revisión de parecido (2026-10-08, búsqueda web, no asesoría legal):** el logotipo no se parece a marcas conocidas; el
 riesgo está en el **nombre** («room/rooms» es casi genérico en salas de venta y hay antecedentes ROOMS/ZOOM ROOMS en

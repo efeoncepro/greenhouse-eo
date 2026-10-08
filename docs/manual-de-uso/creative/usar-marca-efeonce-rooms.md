@@ -21,8 +21,7 @@ de [EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform
 ## Antes de empezar
 
 - **Toma los archivos del paquete**, nunca de una captura ni del canvas: `@efeoncepro/axis-brand-assets` **0.4.27**,
-  archivos `rooms-<pieza>-<variante>.svg`. El release `v0.4.27` estaba **en curso** el 2026-10-08: verifica que el tag
-  exista antes de darlo por publicado o de fijar esa versión (ver el
+  archivos `rooms-<pieza>-<variante>.svg`. Publicado en el release `v0.4.27` (2026-10-08); fíjalo exacto (ver el
   [runbook de consumo de AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)).
 - **No busques Rooms en el catálogo público de logos del Lab**: como Creative Studio, vive sólo en el paquete hasta que
   el índice de búsqueda del Lab se fragmente (`AXIS_LOGO_EXCLUSIONS`).

@@ -49,7 +49,7 @@ regla de la familia es «la órbita vive en la O»; «Rooms» tiene dos.
 Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
 [`scripts/brand/build-rooms-logos.mjs`](../../../scripts/brand/build-rooms-logos.mjs) y se sellan en
 `@efeoncepro/axis-brand-assets` **0.4.27** (commits AXIS en `main`, empujados: `6e1621b` release, `1dfb95c` eslabón leve,
-`f249e82` sin espacios al final de línea). Release `v0.4.27` en curso: verificar el tag antes de darlo por publicado.
+`f249e82` sin espacios al final de línea). Publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages).
 Quedan sólo en el paquete, como Creative Studio, hasta que el índice de búsqueda del Lab se fragmente
 (`AXIS_LOGO_EXCLUSIONS`). Nunca se editan a mano: regenerar es correr el generador, copiar a
 `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y correr `pnpm seal`. El generador quita los
@@ -88,8 +88,8 @@ piezas del cliente conservan su marca: la de Rooms nunca va encima del arte del 
   con 5–8 personas («¿qué ves?», la tarjeta está en el canvas) y búsqueda formal de marca (owner Efeonce Brand).
 - **Reglas para cualquier versión futura, y para toda la línea:** la esfera nunca va en un cruce de las órbitas; una letra
   dentro de una órbita no puede ser R (se lee ®); dos círculos que sólo se tocan, sin enlazar, se leen como anteojos o ∞.
-- **Pendiente:** verificar el tag `v0.4.27` de `@efeoncepro/axis-brand-assets` y que Greenhouse/Rooms lo consuman; la
-  prueba sin contexto; la búsqueda formal de marca. Las composiciones de la sala siguen pendientes del go de EPIC-052.
+- **Pendiente:** que Greenhouse/Rooms consuman `@efeoncepro/axis-brand-assets` 0.4.27 (publicado el 2026-10-08; la
+  adopción del juego AXIS en Greenhouse es TASK-2014); la prueba sin contexto; la búsqueda formal de marca. Las composiciones de la sala siguen pendientes del go de EPIC-052.
 
 ## Revisión de parecido (2026-10-08)
 

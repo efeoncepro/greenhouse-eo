@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseño — creada 2026-10-08 a pedido del operador; depende del release AXIS v0.4.27`
+- Status real: `Diseño — creada 2026-10-08 a pedido del operador; release AXIS v0.4.27 publicado el mismo día (readback OK)`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `release AXIS v0.4.27 publicado (tag + readback en GitHub Packages)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -92,9 +92,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Release AXIS `v0.4.27` publicado: `axis-tokens` 0.6.2, `axis-ui-contracts` 0.7.1, `axis-brand-assets` 0.4.27,
-  `axis-ui-primitives` 0.6.7 (AXIS `99bf77c` en `main`). Readback de cada versión en GitHub Packages antes de empezar.
-- Versiones vigentes de `axis-graphic-line` y `axis-ui-registry` compatibles con tokens 0.6.2 [verificar en AXIS].
+- Release AXIS `v0.4.27` **publicado el 2026-10-08** (tag sobre `99bf77c`, run 37858201188): publicó `axis-tokens`
+  0.6.2, `axis-ui-contracts` 0.7.1, `axis-brand-assets` 0.4.27 y `axis-ui-primitives` 0.6.7; omitió por ya publicadas
+  `axis-graphic-line` 0.17.0 y `axis-ui-registry` 0.7.2, que son las versiones del mismo juego. Readback en GitHub
+  Packages verificado ese día.
 
 ### Blocks / Impacts
 
@@ -153,8 +154,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Inventario de cambios y readback
 
-- Readback de las cinco versiones destino en GitHub Packages y elección de las versiones compatibles de
-  `axis-graphic-line` y `axis-ui-registry`.
+- Confirmar el readback de las versiones destino (incluidas `axis-graphic-line` 0.17.0 y `axis-ui-registry` 0.7.2)
+  al momento de tomar la task.
 - Inventario de exports eliminados, renombrados o con valor distinto entre el juego fijado y el destino, cruzado con
   los imports reales de Greenhouse; resultado en el plan de la task.
 
@@ -249,7 +250,7 @@ pins anteriores.
 
 ## Acceptance Criteria
 
-- [ ] `package.json` fija exacto `axis-tokens` 0.6.2, `axis-ui-contracts` 0.7.1, `axis-brand-assets` 0.4.27 y versiones compatibles de `axis-graphic-line` y `axis-ui-registry`, con lockfile commiteado.
+- [ ] `package.json` fija exacto `axis-tokens` 0.6.2, `axis-ui-contracts` 0.7.1, `axis-brand-assets` 0.4.27, `axis-graphic-line` 0.17.0 y `axis-ui-registry` 0.7.2 (o versiones posteriores del mismo juego, justificadas), con lockfile commiteado.
 - [ ] El inventario de cambios entre versiones está en el plan, con cada consumidor afectado y su resolución.
 - [ ] `pnpm typecheck`, `pnpm lint` y `pnpm test` (suite completa) verdes.
 - [ ] `pnpm composer:visual-gate` a cero píxeles sin rebaseline, o con rebaseline aprobado por el operador y registrado en `BASELINE_DELTAS.md`.
@@ -287,4 +288,5 @@ pins anteriores.
 
 ## Open Questions
 
-- ¿Qué versiones de `axis-graphic-line` y `axis-ui-registry` corresponden al juego `v0.4.27`? Se resuelve en el Slice 1.
+- Ninguna al crear la task: las versiones de `axis-graphic-line` (0.17.0) y `axis-ui-registry` (0.7.2) del juego
+  `v0.4.27` quedaron confirmadas por el propio release.

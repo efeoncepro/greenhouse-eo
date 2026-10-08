@@ -2,7 +2,7 @@
 
 > Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
 
-> Delta marca Rooms (2026-10-08): reglas del operador sobre esfera en cruces y R en órbita, más la prueba del símbolo a tamaño chico; AXIS `main` en `6e1621b` (paquete 0.4.27, release `v0.4.27` en curso: verificar el tag). Prueba del símbolo aún sin ejecutar.
+> Delta marca Rooms (2026-10-08): reglas del operador sobre esfera en cruces y R en órbita, más la prueba del símbolo a tamaño chico; AXIS `main` en `6e1621b` (paquete 0.4.27, publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)). Prueba del símbolo aún sin ejecutar.
 
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 

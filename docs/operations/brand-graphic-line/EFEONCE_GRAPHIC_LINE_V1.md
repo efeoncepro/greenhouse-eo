@@ -576,7 +576,7 @@ contornos, nunca como máscaras.
 - **Siempre con la firma «efeonce | Rooms»;** nunca «Rooms» suelto en publicidad: «rooms» es casi genérico en la
   categoría (revisión de parecido del 2026-10-08, en el ADR).
 - **Archivos:** `@efeoncepro/axis-brand-assets` **0.4.27** (AXIS `main`: `1dfb95c` eslabón leve, `f249e82` sin espacios
-  al final de línea, `6e1621b` release). Release `v0.4.27` en curso: verificar el tag antes de darlo por publicado. Como
+  al final de línea, `6e1621b` release). Publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages). Como
   Creative Studio, viven sólo en el paquete: no entran al catálogo público de logos del Lab hasta fragmentar su índice
   de búsqueda (`AXIS_LOGO_EXCLUSIONS`).
 - **Nunca se editan a mano:** se regeneran con `scripts/brand/build-rooms-logos.mjs`, se copian a

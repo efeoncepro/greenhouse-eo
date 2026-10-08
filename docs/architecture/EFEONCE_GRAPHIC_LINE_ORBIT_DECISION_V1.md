@@ -275,7 +275,7 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
   como dos órbitas enlazadas como eslabones (quien propone y quien decide, en la misma sala), centros a 1,6 × el radio
   medio y una sola esfera a la 1:30 de la segunda órbita, en el acento Growth, como Factory, Marketing Studio y
   Creative Studio. 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `main` `1dfb95c`, `f249e82` y
-  `6e1621b`; release `v0.4.27` en curso: verificar el tag antes de darlo por publicado), sólo en el paquete hasta
+  `6e1621b`; publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)), sólo en el paquete hasta
   fragmentar el índice de logos del Lab; generador `scripts/brand/build-rooms-logos.mjs`. Decisión, alternativas y
   consecuencias en su [ADR](rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); norma en el manual §7.4.
 - **Regla nueva de toda la línea: la esfera nunca va en un cruce de órbitas.** La primera versión aprobada de Rooms

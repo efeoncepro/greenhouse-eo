@@ -748,7 +748,7 @@ sphere, air and concentric terminations as the family; cuts computed as outlines
   (`lockup` «efeonce | Rooms» is the default; `isotype` = the two linked orbits without letters, for favicon, room
   avatar and app icon, never next to the name). Next to Efeonce, «Rooms» goes in the family's measured gray and only the
   sphere keeps the accent. AXIS commits on `main`: `6e1621b` (release) + `1dfb95c` (eslabón leve) + `f249e82` (no
-  trailing whitespace). **Release `v0.4.27` in progress on 2026-10-08: verify the tag before calling it published.**
+  trailing whitespace). **Published in release `v0.4.27` on 2026-10-08 (GitHub Packages readback).**
 - **Package only**, like Creative Studio: not in the Lab's public logo catalog until the search index is split
   (`AXIS_LOGO_EXCLUSIONS`).
 - **Generation:** Greenhouse `scripts/brand/build-rooms-logos.mjs` (strips the trailing whitespace the Efeonce logo
