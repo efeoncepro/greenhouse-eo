@@ -15,7 +15,7 @@ AX = json.load(open(os.path.join(HERE, 'axis-assets.json')))
 BL = lambda i: f'/_blob/{i}'
 BUB = '434cdccb13af2a417f555053d9a45582'
 IMG = {'C01': 'd8a543dde98647bb5c4f3a2338930929', 'C04': '443f206029e67e2f2177a8749d01157e', 'C06': '5f3c83b94f1bcab135421beb67d092aa',
-       'C07': 'ef5c813791c8aa7c6ec9c88d35b36f32', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
+       'C07': 'f116209d1cd6415a3bbe77dd498f8503', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
 ACC = '#0375db'
 DARK = dict(name='dark', bg='#091951', ink='#ffffff', soft='#cfe4fa', rule='rgba(114, 222, 216, 0.16)', eb='#ffffff')
 LIGHT = dict(name='light', bg='#f7f8f6', ink='#023c70', soft='#5f5a69', rule='rgba(2, 60, 112, 0.14)', eb='#5f5a69')
@@ -222,14 +222,14 @@ S.append(('Cómo leer esta propuesta', page('Pibank · Cómo leer',
 MONTHLY = [6000, 7200, 7700, 7700, 7700, 6200, 5700, 7700, 5700, 5700, 6200, 5700]
 assert sum(MONTHLY) == 79200
 sq = ''.join(f'<div style="width: 16px; height: 16px; border-radius: 4px; box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.45)"></div>' for _ in range(17))
-mini_prob = f'<div style="display: grid; grid-template-columns: repeat(9, 16px); gap: 6px; margin-top: 18px">{sq}</div>' + otext('17 búsquedas genéricas en Google Perú: en ninguna aparece Pibank.', 16)
+mini_prob = f'<div style="display: grid; grid-template-columns: repeat(9, 16px); gap: 6px; margin-top: 18px">{sq}</div>' + otext('17 capturas de búsquedas genéricas en Google Perú: en ninguna aparece Pibank.', 16)
 chipx = lambda x, on=True: (f'<div style="padding: 8px 12px; border-radius: 10px; font-size: 15px; font-weight: 500; line-height: 1.3; '
                            + ('background: rgba(255, 255, 255, 0.08)' if on else 'box-shadow: inset 0 0 0 1px rgba(207, 228, 250, 0.3)') + f'">{x}</div>')
 mini_meta = (f'<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {W_}; margin-top: 18px">Visibilidad · SEO y AEO</div>'
              f'<div style="display: grid; gap: 7px; margin-top: 8px">{chipx("Posiciones frente a otros bancos")}{chipx("Menciones correctas en IA")}{chipx("Visitas orgánicas sin marca")}</div>'
              f'<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {W_}; margin-top: 16px">Negocio</div>'
              f'<div style="display: grid; gap: 7px; margin-top: 8px">{chipx("Aperturas y cuentas con fondos")}</div>'
-             + otext('La meta del banco es 15.200 cuentas con fondos; el aporte se mide con sus datos.', 15))
+             + otext('Meta del banco: 15.200 cuentas con fondos. Aporte estimado en la lámina ⟦Evaluación 2026⟧.', 15))
 mb = ''.join(f'<div style="display: flex; flex-direction: column; justify-content: flex-end; height: 70px"><div style="height: {round(70 * (v - 4500) / 7700)}px; border-radius: 3px 3px 0 0; background: {ACC}"></div><div style="height: {round(70 * 4500 / 7700)}px; border-radius: 0 0 3px 3px; background: rgba(207, 228, 250, 0.38)"></div></div>' for v in MONTHLY)
 mini_inv = f'<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin-top: 18px">{mb}</div>' + otext('Al año, en la ruta recomendada: US$4.500 al mes de base más proyectos y campañas con fecha.', 16)
 fig = lambda v, px: f'<div style="font-family: {ID}; font-size: {px}px; font-weight: 760; letter-spacing: -0.045em; line-height: 0.9; margin-top: 14px; white-space: nowrap">{v}</div>'
@@ -238,7 +238,7 @@ cards3 = (obj(okicker('El problema') + fig('0 de 17', 64) + mini_prob, 820, 360,
           obj(okicker('La inversión') + fig('US$79.200', 52) + mini_inv, 1480, 360, 300, False, '; height: 430px'))
 S.append(('Resumen para gerencia', page('Pibank · Resumen', halo_platform(1300, 520, 1300, 800, 560, 50) + cards3 +
     col(eyebrow('Resumen para gerencia') + headline(['Doce meses para', 'que Pibank sea', 'la respuesta', 'cuando alguien', 'busca dónde ahorrar'], 64, extra='; margin-top: 56px') +
-        body('Un programa SEO y AEO sobre pibank.pe: que Pibank aparezca en Google y en las respuestas de IA, gane terreno frente a otros bancos y tenga un sitio que convence. Se mide en visibilidad y en cuentas con fondos.', 20, 560, extra='; margin-top: 28px') +
+        body('Un programa SEO, GEO y AEO sobre pibank.pe: que Pibank aparezca en Google y en las respuestas de IA, gane terreno frente a otros bancos y tenga un sitio que convence. Se mide en visibilidad y en cuentas con fondos.', 20, 560, extra='; margin-top: 28px') +
         f'<div style="margin-top: 34px; padding-top: 18px; border-top: 1px solid {RULE_}">{label("Qué decide la gerencia", W_)}'
         f'<div style="font-family: {ID}; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-top: 10px">Aprobar el programa anual, elegir la ruta y habilitar los datos para medir el aporte.</div></div>', 120, 600) +
     bubble())))
@@ -286,10 +286,10 @@ card5 = obj(pill + f'<div style="font-size: 13px; font-weight: 500; letter-spaci
 S.append(('Hoy no encuentra a Pibank', page('Pibank · Visibilidad', halo_platform(1310, 470, 1310, 800, 560, 50) + card5 +
     col(eyebrow('Por qué ahora') + headline(['Hoy, quien busca', 'dónde ahorrar', 'no encuentra', 'a Pibank'], 76, extra='; margin-top: 56px') +
         f'<div style="display: flex; align-items: baseline; gap: 18px; margin-top: 44px"><div style="font-family: {ID}; font-size: 150px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">0</div>'
-        f'<div style="font-family: {ID}; font-size: 30px; font-weight: 640; letter-spacing: -0.02em; line-height: 1.15; color: {SOFT_}">de {TOTAL} resultados en<br>17 búsquedas de ahorro</div></div>' +
+        f'<div style="font-family: {ID}; font-size: 30px; font-weight: 640; letter-spacing: -0.02em; line-height: 1.15; color: {SOFT_}">de {TOTAL} resultados en<br>17 capturas de búsqueda</div></div>' +
         para('Repetimos la prueba con 9 consultas genéricas, en móvil y escritorio. Pibank no apareció en ninguna. Y solo un sitio enlaza a pibank.pe.', 19, '; margin-top: 24px; max-width: 540px'), 120, 620) +
     means('Las búsquedas de ahorro tienen un espacio que hoy ocupan otros. El contenido de comparación y las referencias de medios son la forma de entrar.',
-          f'Investigación Efeonce en Google Perú, 06-10-2026: 17 búsquedas genéricas, {TOTAL} resultados orgánicos. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=1)))
+          f'Muestra Efeonce en Google Perú, 06-10-2026: 17 capturas (9 consultas genéricas, móvil y escritorio), {TOTAL} resultados orgánicos. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=1)))
 
 # 06 · Demanda — capítulo 1
 grp = [('Productos rivales', 18300, 'Cuentas de BCP, Interbank, Scotiabank y BBVA', 'objetivo'), ('Educativa', 5680, 'TREA, respaldo y hábitos de ahorro', 'contenido'),
@@ -314,7 +314,7 @@ for i, (n, v, d, g) in enumerate(grp):
         bars += callout('Aquí está el ahorrador que Pibank quiere ganar: tiene su dinero en un banco grande y compara antes de moverlo.', '; margin: 2px 0 18px 316px')
 S.append(('La demanda', page('Pibank · Demanda',
     col(eyebrow('Por qué ahora') + headline(['La mayor demanda', 'está en quienes', 'miran cuentas de', 'otros bancos'], 84, extra='; margin-top: 64px') +
-        body('Medimos cuántas veces al mes se buscan en Google Perú términos de ahorro y los agrupamos según lo que la persona busca. El grupo más grande no busca a Pibank: busca las cuentas de los bancos grandes.', 21, 560, extra='; margin-top: 40px'), 120, 620) +
+        body('Medimos cuántas veces al mes se buscan en Google Perú términos de ahorro y los agrupamos según lo que la persona busca. El grupo más grande no busca a Pibank: busca las cuentas de los bancos grandes. Público que indicó el banco: NSE A/B, de 35 a 55 años.', 21, 560, extra='; margin-top: 40px'), 120, 620) +
     zone(label('Búsquedas mensuales estimadas en Perú, por grupo') + f'<div style="margin-top: 18px">{bars}</div>', 820, 230, 960) +
     means('Por eso la comparación —rendimiento, costos y liquidez— y el comparador son prioridad: es donde está el ahorrador que hoy tiene su dinero en un banco grande.',
           'Investigación Efeonce, corte 06-10: 1.594 consultas en 19 familias. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=1)))
@@ -335,8 +335,8 @@ for i, (g, k, v, l, d, h) in enumerate(st):
                 f'background: rgba(3, 117, 219, 0.22); box-shadow: inset 0 0 0 1px rgba(3, 117, 219, 0.7); font-size: 15px; font-weight: 600; white-space: nowrap">→ {jumps[i]}</div>')
 S.append(('La meta del banco', page('Pibank · La meta', halo_platform(1300, 520, 1300, 790, 560, 50) + stc +
     col(eyebrow('Cómo sabremos si funciona') + headline(['La cadena', 'termina en', 'la meta', 'del banco'], 84, extra='; margin-top: 64px') +
-        body('La meta de referencia es 15.200 cuentas con fondos, en todos los canales. Contada hacia atrás con tasas de prueba, exige 1,17 millones de visitas. SEO y AEO aportan visitas sin pagar cada clic y un sitio que convence más.', 21, 560, extra='; margin-top: 40px'), 120, 620) +
-    means('La meta es del banco en todos sus canales. SEO y AEO aportan una parte, y cuánto se mide con datos de Pibank desde el mes 1.',
+        body('El banco nos compartió su meta: 15.200 cuentas con fondos, US$38 millones con un ticket de US$2.500. Contada hacia atrás con tasas de prueba, exige 1,17 millones de visitas de todos sus canales: es un requisito, no tráfico que prometa la búsqueda.', 21, 560, extra='; margin-top: 40px'), 120, 620) +
+    means('La meta es del banco en todos sus canales. SEO, GEO y AEO aportan una parte: la estimamos en las dos láminas siguientes.',
           'Cálculo Efeonce con tasas de prueba. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
 
 # 08 · Diagnóstico técnico — capítulo 1 · cuatro hallazgos, cada uno con su evidencia dibujada en miniatura
@@ -353,8 +353,8 @@ m3 = codebox(f'<div style="font-size: 13px; font-weight: 600">¿Cuál es la tasa
 chip = lambda t: f'<div style="padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); font-size: 13px; text-align: center">{t}</div>'
 m4 = codebox(f'<div style="font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: {SOFT_}">Identificador del sitio</div>'
              f'<div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 10px">{chip("Página A")}<div style="font-size: 26px; font-weight: 600">≠</div>{chip("Página B")}</div>')
-finds = [(m1, 'Dos etiquetas «canonical» en páginas clave', 'La canonical le dice a Google cuál es la versión oficial de una página. Dos iguales confunden; no es una penalización.', 'Una sola por plantilla, comprobada en el código.'),
-         (m2, 'Preguntas frecuentes con el mismo texto', 'Horarios y cancelación repiten su respuesta: Google ve contenido duplicado y no sabe cuál mostrar.', 'Mantener, mejorar o unir según lo que la gente busca.'),
+finds = [(m1, 'Dos etiquetas «canonical» en páginas clave', 'La canonical le dice a Google cuál es la versión oficial de una página. Hoy se repite en el código de páginas clave.', 'Una sola por plantilla, comprobada en el código.'),
+         (m2, 'Preguntas frecuentes con el mismo texto', 'Horarios y cancelación repiten la misma respuesta en dos preguntas distintas.', 'Mantener, mejorar o unir según lo que la gente busca.'),
          (m3, 'La tasa remite al tarifario sin enlazarlo', 'En un banco, la exactitud de las condiciones es confianza, para las personas y para la IA.', 'Enlazar fuentes vigentes, con visto bueno de Producto y Cumplimiento.'),
          (m4, 'Datos estructurados con identificadores distintos', 'El código que describe el sitio a buscadores e IA no dice lo mismo en todas las páginas.', 'Un solo identificador, coherente con lo que se ve.')]
 cards8 = ''
@@ -447,8 +447,8 @@ for i, (lab, t, cta) in enumerate(arts):
 S.append(('Contenido', page('Pibank · Contenido', halo_platform(1300, 520, 1300, 790, 560, 46) + cards12 +
     col(eyebrow('Qué haremos') + headline(['Cada mes, artículos', 'que responden', 'lo que la gente', 'pregunta antes', 'de abrir'], 64, extra='; margin-top: 56px') +
         f'<div style="display: flex; align-items: baseline; gap: 18px; margin-top: 36px"><div style="font-family: {ID}; font-size: 140px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">60</div>'
-        f'<div style="font-family: {ID}; font-size: 28px; font-weight: 640; letter-spacing: -0.02em; line-height: 1.15; color: {SOFT_}">artículos al año,<br>24 temas ya listos</div></div>' +
-        para('Cada artículo nace de una pregunta real y termina con un siguiente paso hacia el producto. Las preguntas frecuentes se mejoran cuando hay dudas, sin cuota fija.', 19, '; margin-top: 22px; max-width: 540px'), 120, 620) +
+        f'<div style="font-family: {ID}; font-size: 28px; font-weight: 640; letter-spacing: -0.02em; line-height: 1.15; color: {SOFT_}">espacios al año, entre<br>nuevos y actualizaciones</div></div>' +
+        para('Hasta cinco al mes: unas 36 piezas nuevas y 24 actualizaciones, con 24 temas de partida. Cada pieza nace de una pregunta real y termina en un siguiente paso hacia el producto.', 19, '; margin-top: 22px; max-width: 540px'), 120, 620) +
     means('El contenido no es volumen: cada pieza ataca una duda que hoy frena la apertura o el primer depósito, y se actualiza o se une a otra si la evidencia lo pide.',
           'Cuatro de los 24 temas del plan de contenidos Efeonce v0.7. Son candidatos: se priorizan en M1 con Search Console y el equipo de Pibank.') + bubble(), section=2)))
 
@@ -495,7 +495,7 @@ obs = (okicker('Una observación') +
 S.append(('Respuestas de IA (AEO)', page('Pibank · Panel AEO', halo_platform(1290, 520, 1300, 800, 560, 44) +
     obj(panel, 820, 330, 620, True, '; height: 450px') + obj(obs, 1400, 250, 380, False, '; height: 480px') +
     col(eyebrow('Qué haremos') + headline(['Parte de la', 'búsqueda ya', 'la responde', 'la IA'], 88, extra='; margin-top: 64px') +
-        body('AEO es optimizar para motores de respuesta: los resúmenes con IA del buscador y asistentes como ChatGPT o Gemini. Ahí la persona recibe una respuesta antes de visitar un sitio, y esa respuesta puede nombrar a Pibank o no.', 21, 560, extra='; margin-top: 36px'), 120, 620) +
+        body('AEO y GEO son optimizar para motores de respuesta: los resúmenes con IA del buscador y asistentes como ChatGPT o Gemini. Ahí la persona recibe una respuesta antes de visitar un sitio, y esa respuesta puede nombrar a Pibank o no.', 21, 560, extra='; margin-top: 36px'), 120, 620) +
     means('Así sabremos si la IA describe bien Cuenta Soles, frente a qué bancos compite en cada respuesta y qué corregir en el sitio para que la cite.',
           'La columna encendida es la pregunta del ejemplo, en las tres superficies. Superficies y su acceso se acuerdan al inicio.') + bubble(), section=2)))
 
@@ -546,21 +546,21 @@ def semcard(kicker, opens, cost, hero):
              f'<div style="font-family: {ID}; font-size: 48px; font-weight: 760; letter-spacing: -0.03em">{cost}</div></div>')
     return inner
 S.append(('Eficiencia de la pauta', page('Pibank · SEM', halo_platform(1300, 520, 1300, 790, 560, 46) +
-    obj(semcard('Hoy · página actual', 2, '100 %', False), 820, 230, 450, False, '; height: 550px') +
+    obj(semcard('Escenario de referencia', 2, '100 %', False), 820, 230, 450, False, '; height: 550px') +
     obj(semcard('Con mejor página', 3, '67 %', True), 1310, 190, 470, True, '; height: 590px') +
-    col(eyebrow('Qué haremos') + headline(['Una mejor página', 'abarata la pauta'], 72, extra='; margin-top: 56px') +
+    col(eyebrow('Qué haremos') + headline(['Una mejor página', 'puede abaratar', 'la pauta'], 72, extra='; margin-top: 56px') +
         f'<div style="display: flex; align-items: baseline; gap: 18px; margin-top: 30px"><div style="font-family: {ID}; font-size: 150px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">−33 %</div></div>'
         f'<div style="font-family: {ID}; font-size: 28px; font-weight: 640; letter-spacing: -0.02em; color: {SOFT_}; margin-top: 10px">en el costo de cada apertura pagada</div>' +
         para('SEM es la pauta en buscadores: anuncios que se pagan por clic. Esos clics aterrizan en las páginas que mejora el programa. Si una página convence a 3 de cada 100 en vez de a 2, cada apertura pagada cuesta un tercio menos.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
     means('Cada sol de pauta rinde más cuando la página convence. Lo comprobaremos con el costo por apertura y por cuenta con fondos, con datos de Marketing.',
-          'Ejemplo aritmético. Marketing opera la pauta. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=2)))
+          'Ejemplo aritmético: tasas ilustrativas y condiciones constantes. Marketing opera la pauta. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=2)))
 
 # 17 · Ciclo mensual (compositor)
 S.append(('Ciclo mensual', img_page('Pibank · Ciclo', IMG['C04'], 'Cómo trabajamos cada mes: medir, crear, distribuir y optimizar alrededor de Pibank.')))
 
 # 18 · Calendario — capítulo 3 · cuatro etapas como objetos alineados a sus meses; el gantt en un panel de vidrio con el mes 1 encendido
 gantt = [('Servicio base', [(1, 12, 's')]), ('Diagnóstico y medición', [(1, 2, 's')]), ('Panel AEO', [(1, 12, 's')]), ('Hub de ahorro', [(1, 2, 'w')]),
-         ('Calculadora', [(2, 2, 'w')]), ('Comparador', [(4, 5, 'w')]), ('Comunidad', [(3, 12, 's')]), ('Campañas de PR', [(3, 4, 'w'), (8, 9, 'w')]),
+         ('Calculadora', [(2, 2, 'w')]), ('Comparador', [(4, 5, 'w')]), ('Comparativas de cuentas', [(3, 6, 'w')]), ('Comunidad', [(3, 12, 's')]), ('Campañas de PR', [(3, 4, 'w'), (8, 9, 'w')]),
          ('Refuerzos de enlaces', [(6, 6, 'w'), (11, 11, 'w')]), ('Mantenimiento', [(3, 12, 's')]), ('Revisión trimestral', [(3, 3, 'r'), (6, 6, 'r'), (9, 9, 'r'), (12, 12, 'r')])]
 TPL = 'grid-template-columns: 300px repeat(12, minmax(0, 1fr)); column-gap: 6px'
 GX, GW = 150, 1620
@@ -583,7 +583,7 @@ for name, bs in gantt:
     for a_, b_, k in bs:
         sty = {'w': 'background: #ffffff', 's': 'background: rgba(207, 228, 250, 0.38)', 'r': 'box-shadow: inset 0 0 0 2px #cfe4fa'}[k]
         pos += f'<div style="grid-column: {a_ + 1} / {b_ + 2}; grid-row: 1; height: 16px; align-self: center; border-radius: 5px; {sty}"></div>'
-    gl += f'<div style="display: grid; {TPL}; padding: 4px 0; border-top: 1px solid {RULE_}"><div style="grid-column: 1; grid-row: 1; font-size: 16px; font-weight: 400">{name}</div>{pos}</div>'
+    gl += f'<div style="display: grid; {TPL}; padding: 2px 0; border-top: 1px solid {RULE_}"><div style="grid-column: 1; grid-row: 1; font-size: 15px; font-weight: 400">{name}</div>{pos}</div>'
 legend = (f'<span style="display: inline-flex; align-items: center; gap: 6px; margin-right: 14px"><span style="width: 20px; height: 10px; border-radius: 3px; background: #ffffff"></span>Construcción o campaña</span>'
           f'<span style="display: inline-flex; align-items: center; gap: 6px; margin-right: 14px"><span style="width: 20px; height: 10px; border-radius: 3px; background: rgba(207, 228, 250, 0.38)"></span>Operación continua</span>'
           f'<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 20px; height: 10px; border-radius: 3px; box-shadow: inset 0 0 0 2px #cfe4fa"></span>Revisión</span>')
@@ -613,28 +613,70 @@ S.append(('Lo que veremos moverse', page('Pibank · Lo que veremos moverse', hal
     means('La gerencia verá avances de visibilidad desde el primer semestre, antes de que maduren las cuentas. Son señales para revisar cada mes, no posiciones garantizadas.',
           'Plazos orientativos según el calendario de la ruta gradual. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
 
+# 20b · Evaluación de oportunidad 2026 — capítulo 3 · lo que pidió el banco (correo del 07-10), escenario central de la estimación Codex 08-10
+QT = [('T1', 543, 7), ('T2', 3845, 50), ('T3', 10777, 155), ('T4', 18505, 292)]
+qbars = ''
+for i, (q, v, f) in enumerate(QT):
+    h = round(300 * f / 292)
+    qbars += (f'<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 380px">'
+              f'<div style="font-family: {ID}; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; margin-bottom: 10px">{f}</div>'
+              f'<div style="width: 150px; height: {h}px; border-radius: 10px 10px 0 0; background: {ACC if i == 3 else "rgba(207, 228, 250, 0.42)"}{"; box-shadow: 0 0 40px rgba(3, 117, 219, 0.55)" if i == 3 else ""}"></div>'
+              f'<div style="font-size: 20px; font-weight: 600; margin-top: 12px">{q}</div>'
+              f'<div style="font-size: 15px; color: {SOFT_}">{format(v, ",").replace(",", ".")} visitas</div></div>')
+scen = ''
+for i, (n, c, d) in enumerate([('Prudente', '171', 'Captura madura 2 %'), ('Central', '504', 'Captura madura 5 %'), ('Favorable', '1.357', 'Captura madura 10 %')]):
+    scen += obj(okicker(n) + f'<div style="font-family: {ID}; font-size: 48px; font-weight: 760; letter-spacing: -0.03em; margin-top: 8px">{c}</div>'
+                + otext('cuentas con fondos · ' + d, 15), 820 + i * 330, 655, 310, i == 1, '; height: 175px; padding: 20px 24px')
+S.append(('Evaluación 2026', page('Pibank · Evaluación 2026', halo_only(1300, 420) + scen +
+    col(eyebrow('Evaluación de oportunidad 2026') + headline(['Si Pibank', 'hubiera empezado', 'en enero de 2026'], 66, extra='; margin-top: 56px') +
+        f'<div style="display: flex; align-items: baseline; gap: 16px; margin-top: 30px"><div style="font-family: {ID}; font-size: 120px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">≈500</div>'
+        f'<div style="font-family: {ID}; font-size: 24px; font-weight: 640; line-height: 1.15; color: {SOFT_}">cuentas con fondos<br>en el año</div></div>' +
+        para('Lo que pidió el banco, en el escenario central: 33.700 visitas orgánicas, unas 760 aperturas y cerca de 500 cuentas con fondos, equivalentes a US$1,26 millones al ticket de US$2.500.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
+    zone(label('Cuentas con fondos por trimestre, escenario central') + f'<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 6px">{qbars}</div>', 820, 200, 960) +
+    means('El aporte crece a medida que los recursos se publican y maduran: casi seis de cada diez cuentas del año llegan en el último trimestre.',
+          'Estimación Efeonce con hipótesis, ejercicio enero–diciembre 2026: producto y programa disponibles desde enero. No es pronóstico ni dato del banco. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
+
+# 20c · Cómo se conecta con la meta — capítulo 3 · composición de la fila que resuelve la meta y tabla de visitas de otros canales
+seg = lambda w, c, t, v: (f'<div style="width: {w}%; display: flex; flex-direction: column; gap: 8px"><div style="height: 46px; border-radius: 8px; background: {c}"></div>'
+                          f'<div style="font-family: {ID}; font-size: 30px; font-weight: 760; letter-spacing: -0.02em">{v}</div><div style="font-size: 15px; color: {SOFT_}; line-height: 1.3">{t}</div></div>')
+stack = (f'<div style="display: flex; gap: 6px; align-items: flex-start">'
+         + seg(78, 'rgba(207, 228, 250, 0.42)', 'Referencia del banco con sus otros canales', '13.119')
+         + seg(14, 'rgba(3, 117, 219, 0.6)', 'Mejor conversión', '1.576')
+         + seg(8, ACC, 'Directas', '504') + '</div>')
+rows = [('100.000', '658', '1.936'), ('250.000', '888', '4.084'), ('500.000', '1.272', '7.664'), ('1.000.000', '2.040', '14.824'), ('1.026.286 · meta', '2.081', '15.200')]
+W3 = [1.3, 1, 1]
+tbl = thead(['Visitas de otros canales (supuesto)', 'Aporte del programa', 'Cuentas totales del banco'], W3, DARK) + ''.join(
+    (f'<div style="background: rgba(3, 117, 219, 0.2); border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(3, 117, 219, 0.7)">{trow(r, W3, DARK, px=19, pad=12)}</div>' if i == 4 else trow(r, W3, DARK, px=19, pad=12)) for i, r in enumerate(rows))
+S.append(('Cómo se conecta con la meta', page('Pibank · Conexión con la meta', halo_only(1300, 300) +
+    col(eyebrow('Evaluación de oportunidad 2026') + headline(['Así se conecta', 'con las 15.200', 'cuentas'], 76, extra='; margin-top: 56px') +
+        body('El programa aporta de dos formas: cuentas directas desde la búsqueda y PR, y una mejor conversión del tráfico que el banco trae por otros canales. Escenario central: 504 directas más 154 por cada 100.000 visitas de esos canales.', 20, 560, extra='; margin-top: 32px'), 120, 620) +
+    zone(label('La fila que resuelve la meta: 15.200 cuentas') + f'<div style="margin-top: 16px">{stack}</div>' +
+         f'<div style="margin-top: 40px">{tbl}</div>', 820, 210, 960) +
+    means('A ese nivel el programa aporta unas 2.100 cuentas (13,7 % de la meta); el resto depende de los otros canales del banco. Las 1,03 millones de visitas son un requisito, no una predicción.',
+          'Escenario central 2026. Cada cuenta se cuenta una vez; las visitas de otros canales excluyen búsqueda orgánica y PR. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
+
 # 19 · Aporte calculable: retirada a pedido del operador (07-10): restaba a la venta; la cifra de sensibilidad queda como nota en la lámina siguiente.
 
 # 20 · Convertir lo que ya llega y medirlo en M1 — capítulo 3
 b20 = (sbar('Hoy: 2 % abre y 65 % deposita', round(560 * 130 / 225), 'rgba(207, 228, 250, 0.42)', '130') +
        sbar('Mejor conversión: 3 % abre y 75 % deposita', 560, ACC, '225', True))
 S.append(('Convertir lo que ya llega', page('Pibank · Medir en M1',
-    col(eyebrow('Cómo sabremos si funciona') + headline(['Convertir mejor', 'lo que ya llega', 'suma cuentas, y lo', 'mediremos con datos', 'de Pibank en el mes 1'], 60, extra='; margin-top: 64px') +
-        body('Qué necesitamos: la fecha de lanzamiento; por canal y página, sesiones, aperturas validadas y primer depósito; y los cambios de tasa, campañas y registro. Datos agregados, sin información personal.', 20, 560, extra='; margin-top: 32px'), 120, 620) +
-    zone(label('Ejemplo: cuentas con fondos por cada 10.000 visitas') + f'<div style="margin-top: 14px">{b20}</div>' +
+    col(eyebrow('Cómo sabremos si funciona') + headline(['Convertir mejor', 'lo que ya llega', 'suma cuentas, y lo', 'calibraremos con', 'datos de Pibank'], 60, extra='; margin-top: 64px') +
+        body('Pibank se lanzó hace pocos días. Con los agregados disponibles desde el lanzamiento —sesiones por canal y página, solicitudes, aperturas y primer depósito— ajustamos la estimación. Datos agregados, sin información personal.', 20, 560, extra='; margin-top: 32px'), 120, 620) +
+    zone(label('Ejemplo ilustrativo: cuentas con fondos por cada 10.000 visitas') + f'<div style="margin-top: 14px">{b20}</div>' +
          callout('+95 cuentas con fondos con las mismas visitas: es lo que suma un sitio que convence mejor.', '; margin-top: 10px') +
-         label('Dos entregables del mes 1', extra='; margin-top: 40px') +
+         label('En el mes 1', extra='; margin-top: 40px') +
          '<div style="margin-top: 6px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 44px">' +
-         item('Estimación del aporte', 'Aperturas y cuentas con fondos por mes, separando demanda nueva, mejor conversión y primer depósito, sin contar dos veces una misma cuenta.', None, 28) +
-         item('¿Qué habría pasado desde el lanzamiento?', 'Lo que pidió Jesús: con la serie desde el lanzamiento, simulamos qué habría aportado el programa con sus recursos listos. Es un escenario, no una medición.', None, 28) + '</div>', 820, 230, 960) +
-    means('Con esos datos, la gerencia evaluará el programa con números de Pibank y no con supuestos. Si falta algún dato, diremos qué no se puede estimar.',
+         item('Calibración', 'Ajustamos la estimación de esta propuesta con las primeras cohortes de apertura y fondeo, sin contar dos veces una misma cuenta.', None, 28) +
+         item('El ejercicio desde enero', 'La evaluación 2026 que pidió el banco (lámina ⟦Evaluación 2026⟧) se recalcula con datos reales en cuanto existan.', None, 28) + '</div>', 820, 230, 960) +
+    means('Con esos datos, la estimación de esta propuesta pasa a números de Pibank. Si falta algún dato, diremos qué no se puede estimar.',
           'Ejemplo ilustrativo de 10.000 visitas. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
 
 # 21 · Medición (compositor)
 S.append(('Medición y atribución', img_page('Pibank · Medición', IMG['C06'], '¿Cómo sabremos si funciona? Lo medimos: cinco métricas con fórmula, fuente y dueño.')))
 
 # 22 · Equipo (compositor)
-S.append(('Equipo de la cuenta', img_page('Pibank · Equipo', IMG['C07'], '¿Quién trabaja en la cuenta? Expertos por área: equipo multidisciplinario con Pibank al centro.')))
+S.append(('Equipo de la cuenta', img_page('Pibank · Equipo', IMG['C07'], '¿Quién trabaja en la cuenta? Expertos por área: Andrés, Valentina, Julio y Daniela, y diseño visual por asignar antes del inicio.')))
 
 # 23 · Responsabilidades — capítulo 4 · dos objetos, qué hace cada uno, y la cadencia de trabajo al pie
 EFE_LOGO = base64.b64encode(open(os.path.join(HERE, '../../node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-negative.svg'), 'rb').read()).decode()
@@ -709,20 +751,20 @@ S.append(('Costo por cuenta', page('Pibank · Costo por cuenta', halo_only(1300,
     col(eyebrow('Inversión') + headline(['Cuantas más', 'cuentas sume,', 'menos cuesta', 'cada una'], 84, extra='; margin-top: 64px') +
         body('El costo por cuenta es la inversión del año dividida por las cuentas con fondos que aporta el programa. Se compara con lo que cuesta una cuenta en los otros canales del banco.', 21, 560, extra='; margin-top: 36px'), 120, 620) +
     means('El resultado se mide en costo por cuenta, con datos del banco y frente a sus otros canales, no con un volumen prometido.',
-          'Escenarios aritméticos: US$79.200 ÷ cuentas aportadas. Depósitos con el ticket de referencia de US$2.500; no son ingreso del banco. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=5)))
+          'US$79.200 ÷ cuentas atribuidas al programa. 250 a 2.000 son denominadores de ejemplo, no proyecciones ni costo total de adquisición. Depósitos al ticket de US$2.500; no son ingreso del banco.') + bubble(), section=5)))
 
 # 26 · Siguiente paso — capítulo 5
-cal = [('Semana del 19-10', 'Revisión con gerencia'), ('Fin de octubre', 'Reunión para resolver dudas'), ('Noviembre', 'Documentos y acuerdo'), ('2027', 'Inicio del mes 1')]
+cal = [('09-10', 'Entrega de la propuesta'), ('Semana del 12-10', 'Revisión con el equipo de Pibank'), ('Semana del 19-10', 'Revisión con gerencia'), ('2027', 'Inicio del mes 1')]
 tl26 = (f'<div style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 20px">'
         f'<div style="position: absolute; left: 9px; right: 0; top: 9px; height: 2px; background: rgba(207, 228, 250, 0.35)"></div>' +
         ''.join(f'<div style="position: relative"><div style="width: 16px; height: 16px; border-radius: 50%; background: #091951; box-shadow: inset 0 0 0 2px {W_ if i == 0 else SOFT_}"></div>'
                 f'<div style="font-size: 15px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: {SOFT_}; margin-top: 14px">{d}</div>'
                 f'<div style="font-family: {ID}; font-size: 24px; font-weight: 740; line-height: 1.1; margin-top: 6px">{t}</div></div>' for i, (d, t) in enumerate(cal)) + '</div>')
-need = [('calendario', 'Fecha y series del lanzamiento', 'Tráfico, aperturas, fondeo y campañas, por canal y página.'),
+need = [('calendario', 'Agregados desde el lanzamiento', 'Sesiones, solicitudes, aperturas y primer depósito, aunque sean pocos días.'),
         ('medicion', 'Search Console y analítica', 'Acceso para fijar la línea base de búsqueda.'),
         ('web', 'WordPress y entorno de pruebas', 'O el contacto del proveedor que implementa.'),
         ('contrato', 'Revisores de Producto y Cumplimiento', 'Y una persona que consolide las revisiones.'),
-        ('objetivo', 'Definición de la meta', 'Unidad, moneda y período de las 15.200 cuentas, con Finanzas.')]
+        ('objetivo', 'La meta del servicio', 'Meta 2027 y cómo se mide la captación, con Finanzas.')]
 nl = ''.join(f'<div style="display: grid; grid-template-columns: 70px minmax(0, 1fr); column-gap: 18px; align-items: center; padding: 12px 0; border-top: 1px solid {RULE_}">'
              f'{icon(g)}<div><div style="font-family: {ID}; font-size: 28px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05">{t}</div><div style="font-size: 18px; font-weight: 300; color: {SOFT_}; margin-top: 4px">{d}</div></div></div>' for g, t, d in need)
 S.append(('Siguiente paso', page('Pibank · Siguiente paso',
@@ -730,28 +772,30 @@ S.append(('Siguiente paso', page('Pibank · Siguiente paso',
         body('Qué decide la gerencia: aprobar el programa anual, elegir la ruta, gradual o integral, y designar a la persona del banco que consolida las revisiones.', 21, 540, extra='; margin-top: 36px'), 120, 600) +
     zone(label('Calendario que nos compartió Jesús', W_) + f'<div style="margin-top: 18px">{tl26}</div>' +
          label('Cinco datos para el mes 1', W_, extra='; margin-top: 40px') + f'<div style="margin-top: 10px">{nl}</div>', 820, 210, 960) +
-    means('Con la decisión y los datos, el mes 1 entrega el diagnóstico validado, la medición, la línea base en IA, la mejora del pilar, los primeros artículos y la estimación del aporte.') + bubble(), section=5)))
+    means('La propuesta y la evaluación 2026 están listas hoy. El mes 1 entrega diagnóstico validado, medición, línea base en IA, pilar mejorado, primeros artículos y estimación calibrada.') + bubble(), section=5)))
 
 # 26b · Supuestos y fuentes (anexo) — todas las advertencias reunidas en un solo lugar
-sups = [('Meta de referencia', '15.200 cuentas con fondos y US$38 millones, conversadas el 06-10. Unidad, moneda y período se confirman con el banco.'),
+sups = [('Meta de referencia', '15.200 cuentas con fondos y US$38 millones (ticket US$2.500), del correo del banco del 07-10, con su público NSE A/B de 35 a 55 años. La meta del servicio 2027 se confirma al inicio.'),
         ('Tasas del embudo', '2 % de visitas que abren y 65 % de aperturas que depositan: tasas de prueba para dimensionar la meta, no datos de Pibank.'),
         ('Ticket de referencia', 'US$2.500 por cuenta, mencionado en la reunión. Un depósito inicial no es un ingreso del banco.'),
-        ('Muestra de búsqueda', '17 búsquedas genéricas en Google Perú, en móvil y escritorio, el 06-10-2026: 301 resultados. Es una muestra fechada; se contrasta con Search Console en el mes 1.'),
+        ('Muestra de búsqueda', '17 capturas de 9 búsquedas genéricas en Google Perú, en móvil y escritorio, el 06-10-2026: 301 resultados. Es una muestra fechada; se contrasta con Search Console en el mes 1.'),
         ('Demanda estimada', 'Búsquedas mensuales estimadas por grupo, corte 06-10. Los grupos se solapan: no se suman como mercado ni como personas.'),
         ('Qué no se garantiza', 'Posiciones en Google, menciones en IA, aperturas y depósitos dependen también del banco y del mercado. Nos comprometemos con el trabajo, la medición mensual y el costo por cuenta.'),
+        ('Evaluación 2026', 'Ejercicio hipotético: producto y programa disponibles desde enero de 2026. 63 consultas (140.130 búsquedas/mes); ene–ago según el proveedor, sep–dic constante. Captura 2/5/10 %, apertura 2→2,3 %, fondeo 65→70 % (80 % en el mes de apertura), 230 visitas de PR. No es pronóstico ni dato del banco.'),
         ('Ejemplos ilustrativos', 'Los hallazgos técnicos dibujados, el newsletter, el ejemplo de 100 clics y el de 10.000 visitas explican mecanismos; no son resultados observados.'),
         ('Respuestas de IA', 'Una mención en una respuesta de IA no es una visita ni una cuenta. Las superficies y su acceso se acuerdan al inicio.'),
         ('Condiciones y comparaciones', 'Toda condición de producto y toda comparación con otras marcas se publica con fuente vigente y visto bueno de Producto y Cumplimiento.'),
         ('Precios', 'Valores en USD antes de impuestos. Cada activación se acuerda antes de ejecutarse.')]
-sup_html = ''.join(f'<div style="padding: 14px 0; border-top: 1px solid {RULE_}"><div style="font-family: {ID}; font-size: 22px; font-weight: 740">{t}</div>'
-                   f'<div style="font-size: 16px; font-weight: 300; line-height: 1.42; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in sups)
+sup_html = ''.join(f'<div style="padding: 11px 0; border-top: 1px solid {RULE_}"><div style="font-family: {ID}; font-size: 21px; font-weight: 740">{t}</div>'
+                   f'<div style="font-size: 15px; font-weight: 300; line-height: 1.38; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in sups)
 S.append(('Supuestos y fuentes', page('Pibank · Supuestos',
     col(eyebrow('Anexo') + headline(['Supuestos y fuentes de esta propuesta'], 60, extra='; margin-top: 30px'), 110, 1600) +
-    zone(f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(5, auto); column-gap: 64px">{sup_html}</div>', 140, 250, 1640) + bubble())))
+    zone(f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(6, auto); column-gap: 64px">{sup_html}</div>', 140, 250, 1640) + bubble())))
 
 # 27 · Glosario (anexo)
 glos = [('SEO', 'Optimización para buscadores: que las páginas de Pibank aparezcan cuando alguien busca en Google.'),
         ('AEO', 'Optimización para motores de respuesta: que los resúmenes con IA y asistentes como ChatGPT o Gemini mencionen a Pibank con información correcta.'),
+        ('GEO', 'Optimización para respuestas generativas: que Pibank esté bien representado en lo que responden las IA. Se trabaja junto con AEO.'),
         ('SEM', 'Pauta en buscadores: anuncios que se pagan por clic.'),
         ('Indexación', 'Que Google encuentre y guarde una página para poder mostrarla.'),
         ('Canonical', 'Etiqueta que indica a Google cuál es la versión oficial de una página.'),
@@ -761,27 +805,30 @@ glos = [('SEO', 'Optimización para buscadores: que las páginas de Pibank apare
         ('Pilar y hub', 'El pilar es la página principal de Cuenta Soles; el hub, la sección que reúne artículos y herramientas.'),
         ('Captura', 'Una página de resultados de Google guardada para revisar quién aparece.'),
         ('Observación', 'En el panel AEO: una pregunta, en una superficie de IA, en un corte de medición.'),
-        ('Cuenta con fondos', 'Una cuenta abierta y validada por el banco que recibió su primer depósito.'),
+        ('Apertura y cuenta con fondos', 'Apertura: cuenta abierta y validada por el banco. Cuenta con fondos: la que además recibió su primer depósito.'),
+        ('Captación', 'Depósitos que traen las cuentas nuevas; si se mide como primer depósito o saldo mantenido se define con el banco.'),
         ('M1 a M12', 'Meses del programa, contados desde el inicio acordado.'),
         ('Activación', 'Proyecto o campaña con fecha y precio propios, que se acuerda antes de ejecutar.')]
-gl27 = ''.join(f'<div style="padding: 13px 0; border-top: 1px solid {RULE_}"><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.01em">{t}</div>'
-               f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in glos)
+gl27 = ''.join(f'<div style="padding: 10px 0; border-top: 1px solid {RULE_}"><div style="font-family: {ID}; font-size: 22px; font-weight: 740; letter-spacing: -0.01em">{t}</div>'
+               f'<div style="font-size: 16px; font-weight: 300; line-height: 1.38; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in glos)
 S.append(('Glosario', page('Pibank · Glosario',
     col(eyebrow('Anexo') + headline(['Glosario: los términos de esta propuesta, en simple'], 60, extra='; margin-top: 30px'), 110, 1600) +
-    zone(f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(7, auto); column-gap: 64px">{gl27}</div>', 140, 250, 1640) + bubble())))
+    zone(f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(8, auto); column-gap: 64px">{gl27}</div>', 140, 250, 1640) + bubble())))
 
 # 28 · Cierre (compositor)
 S.append(('Cierre', img_page('Pibank · Cierre', IMG['C09'], 'Contraportada: Empower your Engine, con los datos de contacto de Efeonce.')))
 
 _m = [t for t, _ in S].index('La meta del banco'); _meta = S.pop(_m)
 S.insert([t for t, _ in S].index('Lo que veremos moverse') + 1, _meta)
+for _k in ['Cómo se conecta con la meta', 'Evaluación 2026']:
+    _x = S.pop([t for t, _ in S].index(_k)); S.insert([t for t, _ in S].index('La meta del banco') + 1, _x)
 
 # ── ritmo: láminas con foto del compositor intercaladas entre las azules (set SEO aprobado, voz Pibank) ──
 FOTOS = [('De la búsqueda a la cuenta', 'Encuentran a Pibank al buscar', 'd675c179ed94d303c3cff0a4aa4f7371', 'Sección partida: ¿Encuentran a Pibank al buscar? Todavía no.'),
          ('Cinco frentes', 'Cómo aparece Pibank', '89a8d3e3ea5cc7199b00a922bdaef58a', '¿Cómo aparece Pibank? Paso a paso: base técnica, contenido, herramientas e informe mensual.'),
          ('SEO técnico', 'Y si hay que tocar código', '9840a86dca8a3254268812d6a519d9c0', '¿Y si hay que tocar código? Lo hacemos: WordPress de pibank.pe.'),
          ('Respuestas de IA (AEO)', 'Qué dice la IA de Pibank', '6540e9e599c1d73e1c312e6aa958d40c', '¿Qué dice la IA de Pibank? Lo sabremos: panel de respuestas de IA.'),
-         ('Comunidad y PR', 'E-E-A-T', 'b72c6f7b34297e66b8f5c270b6980d0f', 'E-E-A-T en banca: ¿Por qué la IA citaría a Pibank? Porque confía: experiencia, pericia, autoridad y confianza.'),
+         ('Comunidad y PR', 'E-E-A-T', '81f7c41d2e679b0e5f31cc6fc5498ee7', 'E-E-A-T en banca: ¿Qué hace citable a Pibank? Lo verificable: fuentes vigentes, autoría y revisión, condiciones claras y datos consistentes.'),
          ('Equipo de la cuenta', 'Métricas SEO y AEO', '02654e6b3f11d2753c580dee51977793', '¿Cómo se mide la visibilidad? Cinco métricas de SEO y AEO con fórmula, fuente y dueño.'),
          ('Equipo de la cuenta', 'Reporte mensual', '48d063a211117f41d6652bcdfb94b9cc', '¿Cómo lo verán? Cada mes: reporte de Efeonce Insights y revisión en Teams.'),
          ('Inversión', 'Por qué Efeonce', '182202cde0d97d420102df86c5e84201', '¿Qué nos hace distintos? Se puede medir: método medible frente a una agencia commodity.'),
@@ -812,7 +859,7 @@ assert not any('⟦' in h for _, h in S)
 
 # ── canvas: cuatro láminas por fila ──
 N = len(S)
-assert N == 44, N
+assert N == 46, N
 idx = json.load(open(f'{ROOT}/canvas.json'))
 for f in list(idx['boards']):
     if f.startswith('Tec-'):
@@ -826,8 +873,8 @@ idx['order'] = [f'Tec-{i + 1:02d}.dc.html' for i in range(N)] + others
 for p in idx['pages']:
     if p['id'] == 'tecnica':
         p['name'] = f'Propuesta técnica · {N}'
-idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v5 del 07-10 · para leer sin nosotros'
-idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Melkin sigue provisorio como quinta ficha; confirma quién va.\n\n'
+idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v11 del 08-10 · con la evaluación 2026 que pidió el banco'
+idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Andrés, Valentina, Julio y Daniela confirmados; diseño visual por asignar antes del inicio.\n\n'
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'
     '4. Las láminas con foto, portada, ciclo, medición, equipo y cierre salen del compositor (imagen); las demás se editan aquí.')
