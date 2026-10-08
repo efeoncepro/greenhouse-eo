@@ -604,6 +604,19 @@
   modelo puede recortar el arte: se repone sólo el arte exacto encima.
 - Detalle y archivos: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md` §3.5.
 
+## 2026-10-08 (propuesta técnica Pibank v11: borrar la selección sobre fichas superpuestas)
+
+- **Síntoma:** al borrar la selección por defecto de `content-team` con `borrar-seleccion.mjs`, quedaron guiones
+  sueltos (las manijas del centro de cada lado) y la línea derecha, que cruzaba el nombre de la ficha vecina, dejó la
+  «D» de «Daniela» corrida.
+- **Causa:** el script interpola a través del trazo; donde el recuadro pasa sobre texto de otra ficha, interpola con
+  píxeles de letra.
+- **Regla:** después de borrar, mirar al 100 % los costados del recuadro. Los guiones se rellenan interpolando en
+  horizontal; el texto cruzado se restaura desde la composición original **sin** la columna del punteado, y esa
+  columna se rellena con el fondo de la ficha interpolando en vertical. Además, `method-eeat` admite 24 caracteres en
+  `meterTopic` y `content-team` exige cinco fichas (un rol por asignar va con ficha neutra, nunca con la foto de otra
+  persona).
+
 ## 2026-10-07 (recetas del compositor en la propuesta técnica Pibank v10)
 
 - **La selección colaborativa no se apaga en `cover-proposal`, `content-team` ni `content-clients`.** Síntoma: las

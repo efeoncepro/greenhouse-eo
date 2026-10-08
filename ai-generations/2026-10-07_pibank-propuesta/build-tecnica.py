@@ -610,7 +610,7 @@ for i, (g, k, t, sig, ch, h) in enumerate(mv):
 S.append(('Lo que veremos moverse', page('Pibank · Lo que veremos moverse', halo_platform(1300, 480, 1300, 790, 560, 50) + cmv +
     col(eyebrow('Cómo sabremos si funciona') + headline(['Lo que veremos', 'moverse,', 'en orden'], 84, extra='; margin-top: 64px') +
         body('SEO y AEO no se ven de un mes a otro: primero se corrige la base, después crece la visibilidad en Google y en la IA, y al final llegan las decisiones. Cada etapa tiene señales propias en el informe mensual.', 21, 560, extra='; margin-top: 40px'), 120, 620) +
-    means('La gerencia verá avances de visibilidad desde el primer semestre, antes de que maduren las cuentas. Son señales para revisar cada mes, no posiciones garantizadas.',
+    means('La gerencia verá avances de visibilidad desde el primer semestre, antes de que maduren las cuentas. Son señales para revisar en cada informe mensual.',
           'Plazos orientativos según el calendario de la ruta gradual. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
 
 # 20b · Evaluación de oportunidad 2026 — capítulo 3 · lo que pidió el banco (correo del 07-10), escenario central de la estimación Codex 08-10
@@ -780,7 +780,6 @@ sups = [('Meta de referencia', '15.200 cuentas con fondos y US$38 millones (tick
         ('Ticket de referencia', 'US$2.500 por cuenta, mencionado en la reunión. Un depósito inicial no es un ingreso del banco.'),
         ('Muestra de búsqueda', '17 capturas de 9 búsquedas genéricas en Google Perú, en móvil y escritorio, el 06-10-2026: 301 resultados. Es una muestra fechada; se contrasta con Search Console en el mes 1.'),
         ('Demanda estimada', 'Búsquedas mensuales estimadas por grupo, corte 06-10. Los grupos se solapan: no se suman como mercado ni como personas.'),
-        ('Qué no se garantiza', 'Posiciones en Google, menciones en IA, aperturas y depósitos dependen también del banco y del mercado. Nos comprometemos con el trabajo, la medición mensual y el costo por cuenta.'),
         ('Evaluación 2026', 'Ejercicio hipotético: producto y programa disponibles desde enero de 2026. 63 consultas (140.130 búsquedas/mes); ene–ago según el proveedor, sep–dic constante. Captura 2/5/10 %, apertura 2→2,3 %, fondeo 65→70 % (80 % en el mes de apertura), 230 visitas de PR. No es pronóstico ni dato del banco.'),
         ('Ejemplos ilustrativos', 'Los hallazgos técnicos dibujados, el newsletter, el ejemplo de 100 clics y el de 10.000 visitas explican mecanismos; no son resultados observados.'),
         ('Respuestas de IA', 'Una mención en una respuesta de IA no es una visita ni una cuenta. Las superficies y su acceso se acuerdan al inicio.'),

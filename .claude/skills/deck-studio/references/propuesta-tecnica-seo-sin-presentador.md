@@ -4,7 +4,7 @@
 > actualizada el 2026-10-08 con el segundo caso y las correcciones del operador.
 > **No reemplaza** a los brochures ni a las propuestas compuestas con las recetas de La órbita (`pnpm brand:compose`):
 > para brochure manda el set de recetas aprobado. Caso fuente: propuesta técnica Pibank / Banco Pichincha Perú 2027
-> (44 láminas). Segundo caso: deck de la propuesta técnica UTEM, Compra Ágil SEO/GEO/AEO (2026-10-08, 35 láminas,
+> (v11 del 2026-10-08, 46 láminas, con la evaluación 2026 que pidió el banco). Segundo caso: deck de la propuesta técnica UTEM, Compra Ágil SEO/GEO/AEO (2026-10-08, 35 láminas,
 > Engine; registro en `docs/audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md`).
 
 ## Cuándo usarla
@@ -45,6 +45,8 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - El registro `cine` exige Nexa o propuesta (`cine-requires-nexa-or-proposal`).
 - En un documento el `progress` debe ser monótono (`document-progress-inconsistent`).
 - `section-classic` muestra una sola línea de respuesta; `content-team` exige 5 fichas.
+- `method-eeat`: el `meterTopic` admite 24 caracteres; evitar jerarquías absolutas en el medidor (Pibank v11 usa
+  «Relevantes» en Google y en IA).
 - Título central vacío: U+2800 se dibuja como puntos braille y NBSP lo recorta el compositor (detalle en la skill
   `efeonce-graphic-line`, `references/lessons.md`).
 
@@ -71,6 +73,14 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - **Economía:** precio cerrado comercialmente, inversión mes a mes y **costo por cuenta** como escenarios aritméticos
   frente a otros canales, sin prometer volumen.
 - **Supuestos reunidos en un anexo**, no repartidos en advertencias por lámina.
+- **Cuando el cliente pide una estimación de impacto** (Pibank, correo del 07-10): se entrega en la propuesta, no se
+  difiere al mes 1. Dos láminas: (1) la evaluación con el escenario central en grande, la curva por trimestre y los
+  tres escenarios, con «ejercicio hipotético, no pronóstico» junto a la cifra; (2) la conexión con la meta del
+  cliente: aporte directo + mejora de conversión por cada 100.000 visitas de otros canales, la fila que resuelve la
+  meta y el tráfico requerido rotulado como requisito, no predicción. El mes 1 **calibra** esa estimación. Las cifras
+  salen del modelo del caso (Pibank: `estimacion-seo-aeo-2026-10-08/` de Codex), nunca se inventan en la lámina.
+- **Equipo:** nombres sólo de personas confirmadas por el operador; el resto como rol «por asignar antes del inicio»
+  (en `content-team`, que exige cinco fichas, con una ficha neutra).
 
 ## Lo que el operador rechazó (no repetir)
 

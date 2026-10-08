@@ -1,12 +1,12 @@
 # Armar una propuesta técnica SEO/AEO para leer sin presentador
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-07 por Claude (con Julio Reyes)
-> **Ultima actualizacion:** 2026-10-07 por Claude
+> **Ultima actualizacion:** 2026-10-08 por Claude
 > **Documentacion funcional:** [Composición por superficie — §4.6 Deck](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck)
 > **Documentacion tecnica:** [deck-studio — propuesta técnica SEO/AEO sin presentador](../../../.claude/skills/deck-studio/references/propuesta-tecnica-seo-sin-presentador.md)
-> **Caso fuente:** propuesta técnica Pibank (Banco Pichincha Perú) 2027, v10 — 44 láminas, línea Engine
+> **Caso fuente:** propuesta técnica Pibank (Banco Pichincha Perú) 2027, v11 — 46 láminas, línea Engine
 
 ## Para qué sirve
 
@@ -77,6 +77,19 @@ Es lo que hace que la propuesta se entienda sin presentador:
 6. **Economía** como inversión mes a mes y costo por resultado en escenarios aritméticos, sin prometer volumen.
 7. **Anexos al final:** supuestos y fuentes (incluido «Qué no se garantiza») y glosario. Los supuestos van ahí, no
    repartidos en advertencias por lámina.
+
+### 2b. Si el cliente pide una estimación de impacto, entrégala en la propuesta
+
+Caso Pibank (correo del banco del 07-10): el cliente pidió qué habría aportado el programa desde enero de 2026.
+
+1. Las cifras salen del modelo del caso, con sus supuestos autorizados por el operador (Pibank:
+   `reconstruccion-2027/estimacion-seo-aeo-2026-10-08/`). Nunca se inventan en la lámina.
+2. Una lámina de **evaluación**: el escenario central en grande, la curva por trimestre y los tres escenarios, con
+   «ejercicio hipotético, no pronóstico» junto a la cifra.
+3. Una lámina de **conexión con la meta**: aporte directo más mejora de conversión por cada 100.000 visitas de otros
+   canales, la fila que resuelve la meta y el tráfico requerido rotulado como requisito, no predicción.
+4. El mes 1 **calibra** esa estimación con los primeros datos; no la difiere.
+5. En el equipo, sólo nombres confirmados por el operador; el resto, «por asignar antes del inicio».
 
 ### 3. Compón las láminas que tienen receta
 
