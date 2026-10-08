@@ -358,25 +358,85 @@
       "key": "followup:65806491771:yanbal",
       "deal_id": "65806491771",
       "tender_id": null,
-      "title": "Yanbal — preparar primer contacto para calificar agentes creativos",
-      "internal_due": "2026-10-09",
+      "title": "Yanbal — revisar respuesta y preparar seguimiento manual",
+      "internal_due": "2026-10-13T10:00:00-03:00",
       "notion_task_id": "3f339c2f-efe7-81e2-b0fd-d5269968920b",
-      "notion_url": "https://app.notion.com/p/3f339c2fefe781e2b0fdd5269968920b?pvs=204",
-      "status": "todo",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe781e2b0fdd5269968920b",
+      "status": "in_progress",
       "write_status": "verified",
-      "draft_location": null
+      "draft_location": "notion_task",
+      "last_task_status_readback_at": "2026-10-08T18:29:22.100459+00:00",
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "outreach": {
+        "initial_send_date": "2026-10-08",
+        "send_evidence": "operator_confirmation_and_outlook_sent_folder_readback",
+        "outlook_item_received_at": "2026-10-08T14:13:06Z",
+        "sent_at_exact": null,
+        "hubspot_note_id": "118254368439",
+        "contact_ids": [
+          "253779289495"
+        ],
+        "note_associations_readback": "verified",
+        "last_confirmed_touch": 1,
+        "next_touch": 2,
+        "tentative_review_dates": [
+          "2026-10-13T10:00:00-03:00",
+          "2026-10-19T10:00:00-03:00",
+          "2026-10-26T10:00:00-03:00"
+        ],
+        "advance_requires_previous_send_evidence": true,
+        "pause_on": [
+          "reply",
+          "meeting",
+          "bounce",
+          "rejection",
+          "opt_out"
+        ],
+        "sending": "manual_only",
+        "report": "docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md"
+      }
     },
     {
       "key": "followup:65832889458:olivos",
       "deal_id": "65832889458",
       "tender_id": null,
-      "title": "Olivos del Sur — preparar contacto y pedir brief audiovisual",
-      "internal_due": "2026-10-09",
+      "title": "Olivos del Sur — revisar respuesta y preparar seguimiento manual",
+      "internal_due": "2026-10-13T10:00:00-03:00",
       "notion_task_id": "3f339c2f-efe7-816a-ac13-e481cac46a1d",
-      "notion_url": "https://app.notion.com/p/3f339c2fefe7816aac13e481cac46a1d?pvs=204",
-      "status": "todo",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7816aac13e481cac46a1d",
+      "status": "in_progress",
       "write_status": "verified",
-      "draft_location": null
+      "draft_location": "notion_task",
+      "last_task_status_readback_at": "2026-10-08T18:29:22.100459+00:00",
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "outreach": {
+        "initial_send_date": "2026-10-08",
+        "send_evidence": "operator_confirmation_and_outlook_sent_folder_readback",
+        "outlook_item_received_at": "2026-10-08T14:14:51Z",
+        "sent_at_exact": null,
+        "hubspot_note_id": "118256441352",
+        "contact_ids": [
+          "253775782421"
+        ],
+        "note_associations_readback": "verified",
+        "last_confirmed_touch": 1,
+        "next_touch": 2,
+        "tentative_review_dates": [
+          "2026-10-13T10:00:00-03:00",
+          "2026-10-19T10:00:00-03:00",
+          "2026-10-26T10:00:00-03:00"
+        ],
+        "advance_requires_previous_send_evidence": true,
+        "pause_on": [
+          "reply",
+          "meeting",
+          "bounce",
+          "rejection",
+          "opt_out"
+        ],
+        "sending": "manual_only",
+        "report": "docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md"
+      }
     },
     {
       "key": "followup:65718062956:berel",
@@ -401,6 +461,52 @@
       "status": "todo",
       "write_status": "verified",
       "draft_location": null
+    },
+    {
+      "key": "followup:lead:lotus",
+      "deal_id": null,
+      "lead_id": "595274430797",
+      "company_id": "59086736953",
+      "title": "Lotus — revisar respuesta y preparar seguimiento manual",
+      "internal_due": "2026-10-13T10:00:00-03:00",
+      "notion_task_id": "3f339c2f-efe7-819a-8342-dacb48ce7922",
+      "notion_url": "https://app.notion.com/p/3f339c2fefe7819a8342dacb48ce7922",
+      "status": "in_progress",
+      "write_status": "verified",
+      "draft_location": "notion_task",
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "last_task_status_readback_at": "2026-10-08T18:29:22.100459+00:00",
+      "outreach": {
+        "initial_send_date": "2026-10-08",
+        "send_evidence": "operator_confirmation_and_outlook_sent_folder_readback",
+        "outlook_item_received_at": "2026-10-08T14:10:41Z",
+        "sent_at_exact": null,
+        "hubspot_note_id": "118225374121",
+        "contact_ids": [
+          "253803331765",
+          "253804699495",
+          "253796596584",
+          "253804201609"
+        ],
+        "note_associations_readback": "verified",
+        "last_confirmed_touch": 1,
+        "next_touch": 2,
+        "tentative_review_dates": [
+          "2026-10-13T10:00:00-03:00",
+          "2026-10-19T10:00:00-03:00",
+          "2026-10-26T10:00:00-03:00"
+        ],
+        "advance_requires_previous_send_evidence": true,
+        "pause_on": [
+          "reply",
+          "meeting",
+          "bounce",
+          "rejection",
+          "opt_out"
+        ],
+        "sending": "manual_only",
+        "report": "docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md"
+      }
     }
   ],
   "outlook_drafts": {
@@ -517,5 +623,24 @@
     "at": "2026-10-08T18:01:38.577483+00:00",
     "scope": "UTEM only; global observed_at and other actions preserved",
     "source": "docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md"
+  },
+  "manual_outreach_update": {
+    "at": "2026-10-08T18:29:22.100459+00:00",
+    "scope": [
+      "yanbal",
+      "lotus",
+      "olivos"
+    ],
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md",
+    "crm_notes_created": 3,
+    "contact_associations_verified": 6,
+    "notion_created": 1,
+    "notion_updated": 2,
+    "drafts_prepared_in_notion": 3,
+    "outlook_drafts_created_this_update": 0,
+    "emails_sent_by_agent": 0,
+    "automation_reused": "seguimiento-comercial-plazos-y-pr-ximos-pasos",
+    "automation_config_readback_at": "2026-10-08T18:29:22.100459+00:00",
+    "global_observed_at_unchanged": true
   }
 }

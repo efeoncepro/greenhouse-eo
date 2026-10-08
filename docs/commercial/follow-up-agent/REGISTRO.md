@@ -1,5 +1,7 @@
 # Registro de seguimiento comercial
 
+**Delta focalizado 08/10, outreach manual:** tres mensajes verificados en Enviados, tres notas CRM asociadas a seis contactos y tres tareas Notion con borradores (una nueva, dos reutilizadas). Próximo seguimiento interno 13/10 10:00 Chile; 19/10 y 26/10 tentativos. [IDs, evidencia y reglas](runs/2026-10-08-outreach-manual.md). Sustituye la preparación inicial pendiente de Yanbal/Olivos; no renueva el corte global de abajo.
+
 Corte de datos CRM/Notion/Outlook: **08-10-2026 07:08 America/Santiago**. Revisión manual inicial; no demuestra ejecución del scheduler. Los deltas de preparación posteriores se registran abajo sin renovar ese corte ni los estados externos.
 Owner: Julio Reyes. [Contrato](README.md) · [Proyecto Notion](https://app.notion.com/3f339c2fefe7816ab5b2d29551199c43).
 

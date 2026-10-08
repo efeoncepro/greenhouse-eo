@@ -43,6 +43,10 @@ ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the
 the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
 `hubspot-solutions-partner` § «Collateral comercial vigente».
 
+## Manual outreach continuity
+
+For sent-email logging, reminders and repeated prospect touches, load [manual-outreach-follow-up.md](references/manual-outreach-follow-up.md). Reconcile actual recipients and sent evidence, reuse the account task and existing heartbeat, and keep future sending manual unless separately authorized.
+
 ## Prospect segmentation handoff
 
 For any prospect create/reuse or segment correction, load [prospecting-segmentation.md](references/prospecting-segmentation.md)

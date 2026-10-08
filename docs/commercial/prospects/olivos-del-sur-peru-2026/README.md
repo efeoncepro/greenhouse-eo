@@ -1,5 +1,7 @@
 # Olivos del Sur Perú — audiovisual y campañas 360°
 
+**Actualización 08/10 posterior al alta:** primer correo enviado por Julio y verificado en Outlook; nota CRM y tarea de seguimiento con borrador verificadas. Primera revisión interna 13/10 10:00 Chile. [Evidencia y próximos contactos](../../follow-up-agent/runs/2026-10-08-outreach-manual.md). El estado histórico «sin outreach» de abajo corresponde al alta inicial; el envío no califica por sí solo el lead.
+
 Corte: 2026-10-08. Investigación y alta de oportunidad autorizadas por Julio.
 Estado: **En evaluación; prioridad alta para calificar**. No existe propuesta enviada ni presupuesto confirmado.
 

@@ -1,5 +1,7 @@
 # Yanbal — agentes IA y automatización creativa
 
+**Actualización 08/10 posterior al alta:** primer correo enviado por Julio y verificado en Outlook; nota CRM y tarea de seguimiento con borrador verificadas. Primera revisión interna 13/10 10:00 Chile. [Evidencia y próximos contactos](../../follow-up-agent/runs/2026-10-08-outreach-manual.md). El estado histórico «sin outreach» de abajo corresponde al alta inicial; el envío no califica por sí solo el lead.
+
 Corte 2026-10-08. Estado **En evaluación / prioridad alta de calificación**.
 Solicitud del operador: investigar al interlocutor y empresa, obtener correo y registrar a este contacto
 y al de Olivos del Sur en segmentos pertinentes. Enriquecimiento Apollo autorizado por separado.
@@ -22,7 +24,7 @@ En Yanbal desde 2019, lidera una agencia interna con campañas, catálogo, redes
 preprensa. Trayectoria previa en ADVICE GROUP, Grey, Leo Burnett y Y&R; experiencia regional en FMCG.
 La nota CRM conserva nombre completo, enlaces originales y fechas de fuentes.
 
-La publicación original fue localizada en LinkedIn y coincide con la captura: busca especialistas en
+La publicación original fue localizada en LinkedIn y coincide con la captura: busca compañías o personas especializadas en
 creación de agentes IA para generación de contenido creativo, adaptación de formatos y automatización
 de procesos y assets, con foco gráfico y audiovisual. No publica presupuesto, calendario o brief.
 Su rol lo hace un interlocutor funcional pertinente; no prueba facultad final de contratar.

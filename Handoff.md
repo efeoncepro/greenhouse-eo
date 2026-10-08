@@ -4,6 +4,8 @@ Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ## 2026-10-08 — Continuidad activa
 
+**Outreach manual registrado:** [Yanbal, Lotus y Olivos](docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md): tres envíos verificados, tres notas en seis contactos y tareas Notion con borradores. Seguimiento 13/10 10:00; 19/10 y 26/10 tentativos. Heartbeat existente activo, sin envío automático; skills espejo actualizadas.
+
 **UTEM presentada:** [evidencia, precio y CRM](docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md): CLP4,8M netos /5,712M con IVA; Presentación de soluciones. Notion Enviada; siguiente paso evaluación/resultado. [Continuidad comercial previa](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
 
 **Oferta económica documental rápida:** [plantilla A4 y uso](docs/commercial/templates/cotizacion-a4/README.md) para avanzar en licitación/Compra Ágil con precio/alcance aprobados; JSON/HTML/PDF locales. [Cotizador Greenhouse](docs/documentation/finance/cotizador.md) conserva catálogo, persistencia y aprobación; rutas y skills sincronizados. UTEM presentada intacta.

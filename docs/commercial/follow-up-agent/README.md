@@ -15,6 +15,10 @@ Este agente de Codex revisa el trabajo comercial existente. Complementa el radar
 
 HubSpot es la fuente de objetos y etapas comerciales; Notion de tareas; Outlook de comunicaciones. Las bases, ficha y anuncios vigentes del comprador gobiernan plazos y admisibilidad. Markdown guarda evidencia observada, decisiones y continuidad, no es un CRM alternativo.
 
+## Seguimiento de correos manuales
+
+Aplicar [cadencia y reconciliación](../../../.codex/skills/hubspot-as-a-service/references/manual-outreach-follow-up.md). Yanbal, Lotus y Olivos tienen primer correo enviado el 08/10 y tareas con borradores para el 13/10; revisiones tentativas 19/10 y 26/10. [Evidencia y textos compartidos](runs/2026-10-08-outreach-manual.md). Una conversación por cuenta; no avanzar sin envío previo confirmado ni insistir ante respuesta/rechazo/rebote. El heartbeat existente prepara y alerta, sin envío automático.
+
 ## Cada ejecución
 
 1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders, notion-platform y documentación comercial pertinente.
