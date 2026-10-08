@@ -671,3 +671,16 @@ por SHA. Documentación sola no justifica otro release. Reutilizar evidencia del
 futura del pipeline, no una optimización ya entregada. No atribuir costo monetario sin medición.
 
 Verificado contra: release `37630788367` SUCCESS (`7fb549a`), main documental `15b1898` — 2026-10-07.
+
+## 2026-10-08 — Lámina importada a Engine: manchas del recolor y el título vacío que dibuja puntos (UTEM)
+
+- **Síntoma:** al pasar una lámina compuesta de turquesa a Engine con `teal2engine.cjs` (corte por saturación > 0,18), el
+  operador vio «manchas teal» en la plataforma de `content-team`; y al dejar `center.title` vacío con U+2800 aparecieron
+  seis circulitos sobre el logo del cliente.
+- **Causa:** el umbral de saturación deja islas sin recolorear en los degradados suaves; U+2800 es el patrón braille
+  vacío y la fuente lo dibuja con puntos. Borrar la palabra del centro con interpolación dejaba además un rectángulo,
+  porque la palabra lleva brillo detrás.
+- **Regla:** recolorear con peso continuo por tono (`ai-generations/2026-10-08_utem-propuesta/recolor-engine.mjs`,
+  `RECOLOR_LO=156` para no tocar el verde de Greenhouse); para poner un logo al centro de `content-team`, componer con
+  título vacío, borrar sólo los puntos del U+2800 y componer el logo encima, sin parche. Revisar siempre al 100 % y con
+  contraste aumentado: el rectángulo y las manchas no se ven a tamaño de hoja de contacto.
