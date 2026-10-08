@@ -875,7 +875,7 @@ README del catálogo de recetas.
 
 ### Propuesta técnica SEO/AEO para leer sin presentador — alternativa aprobada (2026-10-07)
 
-Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotros, hay un estilo aprobado como **alternativa** (caso Pibank 2027, 44 láminas): canvas Design con láminas HTML de tokens para los datos del cliente, láminas del compositor para lo que tiene receta, cinco capítulos con pregunta, franja «Qué significa para…» en cada lámina con datos, cadena búsqueda → cuenta con SEO/AEO equilibrado frente al negocio, anexo de supuestos y PDF 16:9. **No reemplaza** el brochure ni la propuesta de recetas: para brochure manda el set aprobado. Método, reglas y rechazos: [references/propuesta-tecnica-seo-sin-presentador.md](references/propuesta-tecnica-seo-sin-presentador.md).
+Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotros, hay un estilo aprobado como **alternativa** (caso Pibank 2027, 44 láminas; segundo caso UTEM Compra Ágil, 2026-10-08, 35 láminas): canvas Design con láminas HTML de tokens para los datos del cliente, láminas del compositor para lo que tiene receta, cinco capítulos con pregunta, franja «Qué significa para…» en cada lámina con datos, cadena búsqueda → cuenta con SEO/AEO equilibrado frente al negocio, anexo de supuestos y PDF 16:9. **No reemplaza** el brochure ni la propuesta de recetas: para brochure manda el set aprobado. Método, reglas y rechazos: [references/propuesta-tecnica-seo-sin-presentador.md](references/propuesta-tecnica-seo-sin-presentador.md).
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

@@ -241,6 +241,8 @@ Fuente: [serp/locations](https://docs.dataforseo.com/v3/serp-se-locations/) (as-
 
 12. 🔴 **Ningún consumer debe navegar a `result[0].items` (ni a `items[]` en el shape plano V3 `.ai`) sin validar antes `status_code == 20000` por task.** Una task degradada del proveedor se manifiesta como **cero filas**, indistinguible de "no hay resultados": el pipeline sigue verde, el reporte dice "sin citas"/"sin datos" y nadie se entera. Es transversal a TODA la API v3 (SERP, Labs, Backlinks, OnPage), no sólo a AI Mode (§4.1). En el shape plano V3 `.ai` el `status_code` a mirar es el de **nivel superior**; en el shape con wrapper, el de `tasks[0]`. (as-of 2026-09-11: verificado como defecto presente en los 7 workflows n8n publicados por el propio proveedor — **ninguno** valida el status de la task antes del traversal.)
 
+13. **`serp-compare`: alias genérico = `aiMention` falso** (2026-10-08, UTEM): un alias derivado de la etiqueta de un subdominio (`educacioncontinua` → «educación continua») marca `aiMention=true` cada vez que el AI Overview usa la frase genérica. Para contar citas de marca, usar sólo `aiCitation` / `aiDirectLink`; los alias deben ser propios de la marca. En la misma corrida el MCP de Semrush cortó a mitad con `API UNITS BALANCE IS ZERO`: el respaldo fue `serp-compare` (≈USD 0,0035 por búsqueda con AI Overview, top 20, Google Chile escritorio; una búsqueda salió en 0,0055).
+
 ---
 
 ## 8. Oportunidades de máximo provecho

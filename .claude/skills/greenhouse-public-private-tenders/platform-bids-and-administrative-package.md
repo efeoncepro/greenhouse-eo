@@ -66,6 +66,15 @@ No copiar cuentas bancarias, teléfonos personales, RUT del representante ni ima
 Conservar fecha y autoridad de cada dato. Habilitación declarada por el operador no equivale a certificado o
 readback live; ausencia de conflictos/deudas y modalidad de equipo/subcontratación se limitan al proceso indicado.
 
+## Deck y técnica en Compra Ágil SEO/AEO (2026-10-08, UTEM)
+
+- El deck **acompaña** a la oferta técnica; no la reemplaza. La técnica en Markdown sigue siendo la fuente y el deck
+  se genera desde ella, nunca al revés.
+- Si el deck agrega datos (revisión pública de búsqueda, equipo nominal, experiencia), la técnica se alinea en la
+  misma pasada: UTEM pasó a v1.1 con §2.2 revisión pública, §8 equipo, §8.1 experiencia y fuentes nuevas.
+- El archivo de handoff interno (`CLAUDE-HANDOFF-INTERNO.md`) puede quedar copiado en la carpeta de entrega de
+  OneDrive: **no** forma parte del set que se carga. Revisar la lista de archivos antes de cada carga.
+
 ## Completar y firmar anexos
 
 1. Leer el original, identificar anexos aplicables a persona jurídica y reunir datos desde la fuente anterior.

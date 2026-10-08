@@ -41,7 +41,7 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 ## Workspaces comerciales
 
 - [Revisión amplia LicitaLAB](tenders/licitalab-deep-review-2026-10-07/README.md): todas las categorías solicitadas, vista Todos y búsquedas libres; cobertura y 13 altas verificadas. Nueva señal se califica desde lead; los Deals creados se conservan por instrucción del operador.
-- [UTEM — Agencia SEO/AEO](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md): originales y anexos firmados en OneDrive; técnica/cotización y costo/margen pendientes, sin presentación.
+- [UTEM — Agencia SEO/AEO](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md): originales y anexos firmados en OneDrive; técnica v1.1 y [deck v2 con PDF](../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md) hechos; cotización/costeo y presentación pendientes.
 - [Yanbal](prospects/yanbal-ai-creative-2026/README.md) y [Olivos del Sur](prospects/olivos-del-sur-peru-2026/README.md): investigación y registros asociados, segmentos activos verificados al corte; siguen por calificar, sin outreach.
 
 - [Casos de negocio SEO/AEO](SEO_AEO_BUSINESS_CASE_METHOD_V1.md): método propuesto para evaluar requisitos desde la meta, demanda competitiva por intención, ejecución conjunta SEO/AEO+PR y costo/valor por horizonte; [manual](../manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md) y [lectura funcional](../documentation/comercial/caso-negocio-seo-aeo.md).

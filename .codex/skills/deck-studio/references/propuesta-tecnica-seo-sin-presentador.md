@@ -1,9 +1,11 @@
 # Propuesta técnica SEO/AEO para leer sin presentador — alternativa aprobada
 
-> **Estado:** aprobada por el operador (CEO) el 2026-10-07 como **alternativa** para propuestas técnicas SEO/AEO.
+> **Estado:** aprobada por el operador (CEO) el 2026-10-07 como **alternativa** para propuestas técnicas SEO/AEO;
+> actualizada el 2026-10-08 con el segundo caso y las correcciones del operador.
 > **No reemplaza** a los brochures ni a las propuestas compuestas con las recetas de La órbita (`pnpm brand:compose`):
 > para brochure manda el set de recetas aprobado. Caso fuente: propuesta técnica Pibank / Banco Pichincha Perú 2027
-> (44 láminas).
+> (44 láminas). Segundo caso: deck de la propuesta técnica UTEM, Compra Ágil SEO/GEO/AEO (2026-10-08, 35 láminas,
+> Engine; registro en `docs/audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md`).
 
 ## Cuándo usarla
 
@@ -19,18 +21,44 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
    diagnóstico, cadena, frentes, calendario, meta, inversión, supuestos. Generador de referencia:
    `ai-generations/2026-10-07_pibank-propuesta/build-tecnica.py` (helpers `page`, `eyebrow` con anillo, `headline`
    con esfera, `means`, `obj`, `halo_platform`; íconos Trazo y navegación de capítulo desde AXIS en `axis-assets.mjs`).
+   Segundo generador de referencia: `ai-generations/2026-10-08_utem-propuesta/build-tecnica.py` (UTEM; ver su
+   `LEEME.md`). Los datos van como **objetos sobre la plataforma de luz** —escalera para priorizar, tablero para
+   medir, fichas para fuentes—, no como tablas planas: el operador las rechazó por falta de impacto visual.
 2. **Láminas del compositor** (`pnpm brand:compose`) para lo que tiene receta: portada, ciclo, métricas, equipo,
-   diferencia, clientes, E-E-A-T, reporte y cierre. Entran como imagen.
+   diferencia, clientes, E-E-A-T, reporte y cierre. Entran como imagen. **Portada y contraportada salen siempre del
+   compositor**, nunca armadas a mano: `cover-proposal` con el logo oficial del cliente dentro de la órbita y la
+   selección quitada (UTEM: `quitar-seleccion-portada.mjs`), y `close-proposal`. Del set aprobado se traen el equipo
+   (`content-team`), los casos (`decision-case`), los clientes (`content-clients`), el día a día (`content-day` con
+   `tools` / `live-progress` / `live-results`) y las portadas de capítulo (`section-classic`).
 3. **Ritmo:** se alternan láminas azules con las de foto del set aprobado (secciones partidas y láminas con persona).
    Ninguna racha larga de láminas de texto.
 4. **Láminas de otros decks aprobados** (casos, países, día a día): se importan como imagen y se llevan a **un solo
-   acento** (`teal2engine.cjs` corre el turquesa al acento de la línea; revisar fotos al 100 %).
-5. **PDF:** `render-pdf.mjs` renderiza cada lámina con las imágenes locales y arma el PDF 16:9. Sin PowerPoint.
+   acento**. Para láminas claras de Growth usar `ai-generations/2026-10-08_utem-propuesta/recolor-engine.mjs` (peso
+   continuo por tono, `RECOLOR_LO=156` respeta el verde de Greenhouse), no `teal2engine.cjs`: su corte por saturación
+   deja manchas. QA al 100 % y con contraste aumentado; las manchas no se ven en la hoja de contacto.
+5. **PDF:** `render-pdf.mjs` renderiza cada lámina con las imágenes locales y arma el PDF 16:9. Sin PowerPoint
+   (UTEM: `render-pdf-utem.mjs`, con el mapa de imágenes en `blobs.json`).
+
+### Restricciones del compositor (UTEM, 2026-10-08)
+
+- `decision-case` y `content-clients` sólo existen claros y en Growth (`line-piece-keeps-efeonce-dark`): se recolorean.
+- El registro `cine` exige Nexa o propuesta (`cine-requires-nexa-or-proposal`).
+- En un documento el `progress` debe ser monótono (`document-progress-inconsistent`).
+- `section-classic` muestra una sola línea de respuesta; `content-team` exige 5 fichas.
+- Título central vacío: U+2800 se dibuja como puntos braille y NBSP lo recorta el compositor (detalle en la skill
+  `efeonce-graphic-line`, `references/lessons.md`).
 
 ## Columna narrativa (lo que hace que se entienda solo)
 
 - **Cinco capítulos con una pregunta cada uno**, una lámina «Cómo leer esta propuesta» y navegación de capítulo con
   la órbita. Anexos al final: supuestos y fuentes, glosario.
+- **Pregunta y respuesta con lógica:** la respuesta contesta la pregunta. Rechazada en UTEM: «¿Dónde se elige un
+  programa? Al buscar»; vigente: «¿Dónde nace una postulación? En la búsqueda».
+- **Lámina «Búsqueda hoy» con revisión pública real:** DataForSEO `serp-compare` (top 20 + AI Overview) sobre las
+  búsquedas del cliente y Semrush para volumen. Se rotula **revisión pública** con fecha, nunca auditoría. UTEM:
+  15 búsquedas, presente entre los 20 primeros en 2, respuesta de IA en 15, citado por la IA en 3.
+- **Responsabilidades con logos:** en láminas de quién hace qué, los logos de Efeonce y del cliente en vez de sus
+  nombres.
 - **Cada título afirma su conclusión.** Cada lámina con datos cierra con una franja «Qué significa para <cliente>» y
   su fuente.
 - **Equilibrio SEO/AEO ↔ negocio (regla del operador).** SEO y AEO valen por sí mismos y además conectan con el
@@ -49,6 +77,10 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - Margen, costos internos, horas o salarios en material de cliente.
 - Copy adulador o de auto-justificación («proponemos que nos mida con esta vara»), frases de relleno y Q/A absurdas.
 - Una lámina entera para una cifra de aporte pequeña o una lámina de riesgos que responde objeciones no planteadas.
+- Bloques «No se garantizan» o autodefensas en anexos: perjudican más de lo que ayudan (retirado en UTEM, como la
+  lámina de riesgos de Pibank).
+- Portadas y contraportadas armadas a mano («estas no son nuestras portadas»).
+- Tablas planas de texto donde cabe un objeto sobre la plataforma.
 - Cursores o selecciones que no dicen nada (un cursor «Pibank» apuntando al logo de Pibank).
 - Relato centrado solo en la métrica de negocio: una propuesta SEO/AEO tiene que mostrar SEO y AEO.
 - Texto que se desborda de una tarjeta: el compositor no la agranda; acorta el texto y mira la lámina al 100 %.
