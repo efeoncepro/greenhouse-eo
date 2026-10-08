@@ -1,5 +1,7 @@
 # Banco Pichincha Perú · Pibank 2027
 
+**Cotización detallada USD/PEN:** [19 páginas por moneda, fuentes y entrega](reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md); ambas versiones PDF/HTML están junto al deck en la raíz comercial Banco Pichincha. Copias y snapshots preservados; impuestos/tasa contractual pendientes y sin envío o actualización CRM.
+
 **Operación vigente:** [SEO/AEO evolutivo e incremental](reconstruccion-2027/oferta-hibrida/MODELO-EVOLUTIVO.md): ciclo mensual de expansión, mejora y medición; sin cuota fija de FAQ. Fee y activaciones se conservan.
 
 **Capacidad editorial vigente:** hasta cinco artículos al mes incluidos en base US$4.500; máximo 60 al año, sin suplemento editorial. Las 24 piezas del plan anterior son backlog inicial. Ruta gradual US$79.200/año; integral US$89.200. Mayor capacidad no modifica automáticamente la demanda ni la captación proyectada. [Oferta y calendario actual](reconstruccion-2027/oferta-hibrida/README.md).

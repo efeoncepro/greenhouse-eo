@@ -1,0 +1,105 @@
+{
+  "identicalPages": 16,
+  "changedPages": [
+    "pagina-04.png",
+    "pagina-10.png",
+    "pagina-19.png"
+  ],
+  "pages": [
+    {
+      "file": "pagina-01.png",
+      "finalSha256": "956b9f988534bab1ebaa8e73d4933bc7c8ef3fc31619c7bb4aee9f52c1764977",
+      "previousSha256": "956b9f988534bab1ebaa8e73d4933bc7c8ef3fc31619c7bb4aee9f52c1764977"
+    },
+    {
+      "file": "pagina-02.png",
+      "finalSha256": "e96bd08f7b27305b0f17acd9a4593ee2875e14bbd456f6da1df9989284d00d04",
+      "previousSha256": "e96bd08f7b27305b0f17acd9a4593ee2875e14bbd456f6da1df9989284d00d04"
+    },
+    {
+      "file": "pagina-03.png",
+      "finalSha256": "074ef4b25bf4f0223e134ed87ef3f40c452cc094ad21d20ab48c481d5a20f445",
+      "previousSha256": "074ef4b25bf4f0223e134ed87ef3f40c452cc094ad21d20ab48c481d5a20f445"
+    },
+    {
+      "file": "pagina-04.png",
+      "finalSha256": "a1cc93cfcc10c2d5d3fb7e2591093df1293f04e3d96b4bd44b5fc87873566923",
+      "previousSha256": "74d4e85d24978953cbf7be2c166b8d41c5b32bdddb5422312a4ec9fceece1c88"
+    },
+    {
+      "file": "pagina-05.png",
+      "finalSha256": "188123d74b8a376603d068029c2b5fa56426aefd40384e4de4f86d3d03bc2dbe",
+      "previousSha256": "188123d74b8a376603d068029c2b5fa56426aefd40384e4de4f86d3d03bc2dbe"
+    },
+    {
+      "file": "pagina-06.png",
+      "finalSha256": "439aaf3eb88143f8e63159beb4f1fad6bf58ea6183c6d4de210586ac650fd0cf",
+      "previousSha256": "439aaf3eb88143f8e63159beb4f1fad6bf58ea6183c6d4de210586ac650fd0cf"
+    },
+    {
+      "file": "pagina-07.png",
+      "finalSha256": "04f4e6d0edff6f89b9ad1306e128a9dfe0cffafb3140198a4a4a960e0c40e885",
+      "previousSha256": "04f4e6d0edff6f89b9ad1306e128a9dfe0cffafb3140198a4a4a960e0c40e885"
+    },
+    {
+      "file": "pagina-08.png",
+      "finalSha256": "33028be28b5a728ccba49f3939090a6797bcef94bc014790b5adc12c69cce40b",
+      "previousSha256": "33028be28b5a728ccba49f3939090a6797bcef94bc014790b5adc12c69cce40b"
+    },
+    {
+      "file": "pagina-09.png",
+      "finalSha256": "9a18a1009e00168732bf10c6af78d15c2eb38b26099374e268d9829b06e81ca3",
+      "previousSha256": "9a18a1009e00168732bf10c6af78d15c2eb38b26099374e268d9829b06e81ca3"
+    },
+    {
+      "file": "pagina-10.png",
+      "finalSha256": "ac43e844d59015fa439a838b867352629dd79edd84291bbc3fcbb4ded7bc5f09",
+      "previousSha256": "bb014e036412c9491722d4050b0f990c2b90fe653a5aa8252e0640344ac3c9d3"
+    },
+    {
+      "file": "pagina-11.png",
+      "finalSha256": "deb20f7a847337ac0ed39fad268e5db749a188d5ff0b21a887c04539ae5fb418",
+      "previousSha256": "deb20f7a847337ac0ed39fad268e5db749a188d5ff0b21a887c04539ae5fb418"
+    },
+    {
+      "file": "pagina-12.png",
+      "finalSha256": "d70822c53403479ce69092477fe0659953d11e73c428dea050bf511bffc04c9c",
+      "previousSha256": "d70822c53403479ce69092477fe0659953d11e73c428dea050bf511bffc04c9c"
+    },
+    {
+      "file": "pagina-13.png",
+      "finalSha256": "023209f21d14668c63c8d9770902677264c09975ef7f5eec535b557e84377f47",
+      "previousSha256": "023209f21d14668c63c8d9770902677264c09975ef7f5eec535b557e84377f47"
+    },
+    {
+      "file": "pagina-14.png",
+      "finalSha256": "fea533ab00c82001b8a7407382249a0558c94e75856c894842ea8562b631302e",
+      "previousSha256": "fea533ab00c82001b8a7407382249a0558c94e75856c894842ea8562b631302e"
+    },
+    {
+      "file": "pagina-15.png",
+      "finalSha256": "8782fe9003b4fb98a99dddd693ae9933eb07eedf1a564ee9efb255f1d8c8a94c",
+      "previousSha256": "8782fe9003b4fb98a99dddd693ae9933eb07eedf1a564ee9efb255f1d8c8a94c"
+    },
+    {
+      "file": "pagina-16.png",
+      "finalSha256": "2acde0ec2f455d9f9232eb0140c6535775369e9890a2eb2976ce9c60b729e954",
+      "previousSha256": "2acde0ec2f455d9f9232eb0140c6535775369e9890a2eb2976ce9c60b729e954"
+    },
+    {
+      "file": "pagina-17.png",
+      "finalSha256": "d660133d0d58d2fdd1e8ebac46bfb9aed39a6e72f2f1381b09365d1069b73e85",
+      "previousSha256": "d660133d0d58d2fdd1e8ebac46bfb9aed39a6e72f2f1381b09365d1069b73e85"
+    },
+    {
+      "file": "pagina-18.png",
+      "finalSha256": "c44fe55fa251e6b1242ca0aab116369721f8343c55af938849317ac37a26718e",
+      "previousSha256": "c44fe55fa251e6b1242ca0aab116369721f8343c55af938849317ac37a26718e"
+    },
+    {
+      "file": "pagina-19.png",
+      "finalSha256": "12234a9b0813f70f2ac988df91c775019ea3531a0a1102db4d00bf532db05cb6",
+      "previousSha256": "2a3550faf91b2a3a7a173ae139981cfcfc2106e9a1e434a9fe3cceeee1fbf9ea"
+    }
+  ]
+}

@@ -10,6 +10,8 @@ Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 **Oferta económica documental rápida:** [plantilla A4 y uso](docs/commercial/templates/cotizacion-a4/README.md) para avanzar en licitación/Compra Ágil con precio/alcance aprobados; JSON/HTML/PDF locales. [Cotizador Greenhouse](docs/documentation/finance/cotizador.md) conserva catálogo, persistencia y aprobación; rutas y skills sincronizados. UTEM presentada intacta.
 
+**Cotizaciones Pibank USD/PEN:** [documentos, edición y entrega](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md); ambos PDF/HTML en raíz Banco Pichincha, copia verificada. [Multimoneda documental](docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): fuente USD/FX registrado, impuestos pendientes, sin registro de Quote ni envío/CRM.
+
 **Prospecting Agent:** [web guardada; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
 
 [Studio/AXIS: operativo](docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md).

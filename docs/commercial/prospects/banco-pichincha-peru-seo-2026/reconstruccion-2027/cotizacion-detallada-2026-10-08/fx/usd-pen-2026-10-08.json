@@ -1,0 +1,18 @@
+{
+  "from": "USD",
+  "to": "PEN",
+  "rate": "3.437",
+  "date": "2026-10-06",
+  "source": "BCRPData · TC Sistema bancario SBS · Venta · PD04640PD",
+  "sourceUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/diarias/resultados/PD04640PD/html",
+  "requestUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04640PD/json/2026-10-01/2026-10-08",
+  "retrievedAt": "2026-10-08T19:08:32.239055+00:00",
+  "purpose": "reference_conversion",
+  "quoteDate": "2026-10-08",
+  "rawSha256": "f7e0fef20d7fdb59a1ad94e5b485c65000108d6918bcb4c838447a84a2f5c9bb",
+  "unavailableDates": [
+    "2026-10-07",
+    "2026-10-08"
+  ],
+  "settlementRateAgreed": false
+}

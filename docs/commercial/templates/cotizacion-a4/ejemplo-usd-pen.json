@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "status": "example",
+  "date": "2026-10-08",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "USD",
+  "net": "1200.00",
+  "vatRate": null,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de marketing",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": [
+      "Posicionamiento",
+      "SEO, GEO",
+      "y AEO."
+    ],
+    "subtitle": "Un programa integral de tres meses para Cliente de ejemplo."
+  },
+  "service": {
+    "name": "Servicio integral de posicionamiento SEO, GEO y AEO",
+    "detail": "Duración: tres meses desde la fecha acordada. Incluye los componentes descritos en la página 2."
+  },
+  "scope": {
+    "title": [
+      "Un alcance completo,",
+      "con entregas cada mes."
+    ],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar las entregas, cantidades y responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Auditoría y estrategia",
+        "text": "Diagnóstico SEO/GEO/AEO, revisión técnica y editorial, línea base y plan de acciones priorizadas."
+      },
+      {
+        "title": "Contenido editorial",
+        "text": "15 artículos originales, 5 por mes, con ficha SEO/AEO, fuentes y enlaces. Dos rondas consolidadas de revisión y aprobación del cliente antes de publicar."
+      },
+      {
+        "title": "Implementación",
+        "text": "Optimización de hasta 10 páginas existentes. Carga y publicación de artículos aprobados, según permisos y componentes disponibles del CMS."
+      },
+      {
+        "title": "Autoridad y PR digital",
+        "text": "Una campaña con al menos 10 destinos pertinentes. Preparación, gestión, seguimiento y reporte de acciones y enlaces obtenidos."
+      },
+      {
+        "title": "Medición",
+        "text": "Panel de 15 consultas en 2 sistemas de IA, con cortes inicial, intermedio y final. Seguimiento orgánico según fuentes disponibles."
+      },
+      {
+        "title": "Informes",
+        "text": "Informe de auditoría, informe de seguimiento e informe final; reportes mensuales y revisión de resultados."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Responsable de proyecto, reuniones quincenales, inicio y transferencia final. Revisión colaborativa y acceso al panel durante el servicio."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de tres meses",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Diagnóstico y arranque",
+        "text": "Auditoría, línea base, priorización e inicio de ajustes. Primeros 5 artículos y preparación de PR."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Implementación",
+        "text": "Continuidad de ajustes y PR. 5 artículos, medición intermedia e informe de seguimiento."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Resultados y cierre",
+        "text": "Últimos 5 artículos, reporte de PR, informe final, recomendaciones y transferencia."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una cotización por",
+      "el servicio integral."
+    ],
+    "intro": "Ejemplo de equivalencia referencial en soles desde un precio base USD. No asigna impuestos.",
+    "summary": "Tres meses · Equivalencia PEN · Impuestos pendientes",
+    "taxNote": "Impuestos y total facturable por confirmar. Ejemplo sin validez comercial.",
+    "monthly": null,
+    "taxLabel": "Impuestos"
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "Tres meses desde la fecha acordada. El calendario de entregas, revisión y publicación se definirá con la contraparte del cliente."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de recepción, facturación y pago se acuerdan antes de emitir la cotización final. Este ejemplo no establece un calendario de cobro."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente valida los temas y datos y aprueba los artículos antes de publicar. Facilita los accesos y permisos acordados; los cambios se ejecutan con autorización."
+      },
+      {
+        "title": "Límites del alcance",
+        "text": "Rediseños, migraciones, nuevas funcionalidades e infraestructura requieren un alcance independiente. Las publicaciones y enlaces de PR dependen de cada medio."
+      },
+      {
+        "title": "Herramientas y resguardo",
+        "text": "El panel se configura con las fuentes disponibles. Su acceso se incluye durante el servicio; nuevas integraciones requieren un acuerdo específico. Se resguardan los accesos y la información del cliente."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  },
+  "locale": "es-PE",
+  "presentation": {
+    "currency": "PEN",
+    "locale": "es-PE",
+    "fx": {
+      "from": "USD",
+      "to": "PEN",
+      "rate": "3.437",
+      "date": "2026-10-06",
+      "source": "BCRPData · TC Sistema bancario SBS · Venta · PD04640PD",
+      "sourceUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/diarias/resultados/PD04640PD/html",
+      "requestUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04640PD/json/2026-10-01/2026-10-08",
+      "retrievedAt": "2026-10-08T19:08:32.239055+00:00",
+      "purpose": "reference_conversion",
+      "quoteDate": "2026-10-08",
+      "rawSha256": "f7e0fef20d7fdb59a1ad94e5b485c65000108d6918bcb4c838447a84a2f5c9bb",
+      "unavailableDates": [
+        "2026-10-07",
+        "2026-10-08"
+      ],
+      "settlementRateAgreed": false
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # Pibank 2027 · Estrategia integrada v0.7
 
+**Cotización detallada USD/PEN:** [19 páginas por moneda, fuentes y entrega](cotizacion-detallada-2026-10-08/README.md); ambas versiones PDF/HTML están junto al deck en la raíz comercial Banco Pichincha. Copias y snapshots preservados; impuestos/tasa contractual pendientes y sin envío o actualización CRM.
+
 **Operación vigente:** [SEO/AEO evolutivo e incremental](oferta-hibrida/MODELO-EVOLUTIVO.md): ciclo mensual de expansión, mejora y medición; sin cuota fija de FAQ. Fee y activaciones se conservan.
 
 **Alcance vigente de autoridad y técnica:** [SEO técnico/schema y refuerzos de enlaces](oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md). Se retiran las sesiones digitales y no se incorporan tutoriales. Gradual: dos campañas M3/M8 + dos refuerzos M6/M11; integral: cuatro campañas y cuatro refuerzos. Precios anuales intactos; técnico/schema dentro de base y 8h CMS/mes.

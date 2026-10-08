@@ -37,6 +37,10 @@ Para una **oferta económica documental rápida de licitación/Compra Ágil urge
 
 El JSON/data slots y el manifiesto pertenecen al documento local: no crean `quoteId`, aprueban precio, verifican margen, ejecutan maker-checker ni registran CRM/facturación/envío. Si se pide operar el **sistema Greenhouse de cotizaciones**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y verificar Quote Builder/catálogo/engine/snapshots/aprobaciones; este recurso editorial no sustituye ese sistema. Preservar las versiones firmadas/presentadas.
 
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer.
+
+Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
+
 ## Flujo de trabajo
 
 ### 1. Reconstruir y delimitar

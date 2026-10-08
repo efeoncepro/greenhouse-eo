@@ -19,3 +19,11 @@ SHA-256 del ejemplo revisado:
 | `cotizacion.pdf` | `cfccae4b98f4f1b559698d2b91d696bbcc9853cbf36249c84e8e10fdacfd9c66` |
 
 El generador deja futuras revisiones visuales y auditorías de PDF como pendientes: este resultado sólo aplica al ejemplo guardado.
+
+## Extensión multimoneda · 08/10/2026
+
+- Diez pruebas unitarias: precisión ISO (0/2/3 decimales), límite seguro, half-up decimal exacto, pares/fechas/fuentes FX inválidos, impuestos explícitos/desconocidos y regresión CLP.
+- Tres ejemplos completos generados: CLP con IVA 19% explícito; PEN nativo con centavos e impuestos pendientes; USD → PEN con snapshot BCRP/SBS venta 06/10. Cada uno produce cuatro páginas A4 y conserva ancho móvil de 390px. QA local: `.captures/cotizacion-a4-multimoneda-2026-10-08-{clp,pen,fx}/`.
+- Los doce folios PDF fueron revisados: páginas 1/3 de cada versión y 2/4 comunes por comparación de hashes. Texto extraído y montos verificados; originales CLP de la cotización UTEM/vista previa preservados.
+- Pibank PEN: 19 páginas verificadas en el [expediente](../../prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md), anual 272,210.40 neto, alternativa 306,580.40, impuestos pendientes. Datos fuente USD, FX explícito, conciliación de unidades/subtotales/meses y promedios sin doble redondeo.
+- Alcance: presentación documental local; no amplía FinanceCurrency, providers, pricing engine, readiness, ni crea registros/aprobaciones o sincronizaciones CRM.

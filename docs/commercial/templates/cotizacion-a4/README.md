@@ -11,7 +11,7 @@ Es una vía documental local creada para avanzar con la presentación de UTEM. N
 | Necesidad | Plantilla A4 de licitación | Sistema de cotizaciones Greenhouse |
 | --- | --- | --- |
 | Preparar la oferta económica que pide el proceso | Usa los datos aprobados y compone cuatro páginas HTML/PDF. | Usar su flujo cuando el pedido incluya una cotización del sistema. |
-| Determinar el precio o validar costos y margen | Recibe el precio; sólo calcula neto, IVA, total y referencia mensual. | Catálogo, costing, pricing engine y sus reglas pertenecen a este dominio. |
+| Determinar el precio o validar costos y margen | Recibe el precio; sólo calcula neto, impuestos, total y referencia mensual. | Catálogo, costing, pricing engine y sus reglas pertenecen a este dominio. |
 | Identificar el documento | `reference` es la referencia documental o el código del proceso. | Un `quoteId` corresponde a un registro del sistema; no se inventa desde el JSON. |
 | Aprobar la oferta | La aprobación del operador se documenta en el expediente. `status: draft` es el estado de preparación del archivo. | Los estados y aprobaciones persistidos se operan mediante el flujo del sistema. |
 | Registrar o enviar | Guarda archivos locales. Presentación al comprador y cambios CRM se ejecutan y verifican por separado cuando están autorizados. | Persistencia, asociaciones y sincronizaciones se rigen por sus contratos y runtime vigente. |
@@ -73,7 +73,9 @@ Los atributos `data-slot` permiten localizar los campos en el HTML generado. La 
 | `service` | Nombre y detalle del servicio completo. Una unidad por cotización. |
 | `scope` | Título, introducción y hasta siete componentes con título/texto. |
 | `schedule` | Título, nota de inicio y entre una y tres fases con etiqueta/título/texto. |
-| `currency`, `net`, `vatRate` | `CLP`; precio neto **total** en pesos enteros; tasa decimal (`0.19` = 19 %). |
+| `currency`, `locale`, `net` | Moneda ISO 4217 del precio base; locale opcional (`es-CL`, `es-PE`); neto **total** con los decimales propios de la moneda (CLP: 0; USD/PEN: 2). Número o string decimal sin separadores. |
+| `vatRate`, `pricing.taxLabel` | Tasa explícita (`0.19` = 19 %), `0` si corresponde y está confirmado, o `null` para impuestos/total facturable por confirmar. Etiqueta opcional (`IVA`, `IGV`, `Impuestos`); elegirla no asigna una tasa. |
+| `presentation` | Opcional: moneda/locale de salida y snapshot FX explícito. Ver [contrato multimoneda](MULTIMONEDA.md). |
 | `pricing` | Título, introducción, resumen de portada y aclaración tributaria. |
 | `pricing.monthly` | Opcional: `{ "months": 3, "note": "…" }`; `null` elimina la referencia mensual. |
 | `conditions` | Título y hasta seis condiciones comerciales con título/texto. Incluir vigencia y forma de pago aplicables. |
@@ -89,9 +91,13 @@ Los títulos aceptan texto o arrays de líneas. Los campos contienen texto plano
 
 Usar un archivo oficial ya descargado. La fuente se registra en el manifiesto. Si `logo` es `null`, aparece el nombre del cliente sin inventar una identidad gráfica. El ejemplo contiene datos corporativos públicos de Efeonce confirmados en [Datos para licitaciones](../../EFEONCE_DATOS_PARA_LICITACIONES.md); verificar responsable e identificación antes de emitir otra oferta.
 
+## Multimoneda
+
+La plantilla admite presentación de monedas ISO mediante `Intl`, con símbolos, separadores y decimales locales. Permite precios nativos en CLP, USD o PEN y equivalencias con un snapshot FX explícito, fechado y con fuente. No consulta tasas al generar ni reescribe el precio base. Uso, campos y límites: [MULTIMONEDA.md](MULTIMONEDA.md). Ejemplo nativo en soles: [ejemplo-pen.json](ejemplo-pen.json); conversión explícita USD → PEN: [ejemplo-usd-pen.json](ejemplo-usd-pen.json). El soporte documental no amplía monedas/providers ni readiness de Finance o del pricing engine.
+
 ## Cálculo, marca y revisión
 
-`amount.net`, `amount.vat` y `amount.total` se calculan desde el precio completo: IVA redondeado al peso y total = neto + IVA. Nunca se ingresa el monto mensual en `net` salvo que el servicio cotizado sea efectivamente de un mes. El equivalente mensual es referencial, redondeado para su visualización; no define cuotas ni fechas de cobro. En casos no divisibles, la suma de referencias redondeadas puede diferir del total.
+`amount.net`, `amount.vat` y `amount.total` se calculan desde el precio completo: impuestos redondeados a la unidad menor de la moneda de salida y total = neto + impuestos. Con `vatRate: null`, impuesto y total facturable quedan por confirmar. La moneda no decide el tratamiento tributario. Nunca se ingresa el monto mensual en `net` salvo que el servicio cotizado sea efectivamente de un mes. El equivalente mensual es referencial, redondeado para su visualización; no define cuotas ni fechas de cobro. En casos no divisibles, la suma de referencias redondeadas puede diferir del total.
 
 La marca procede de `@efeoncepro/axis-tokens`, `axis-brand-assets` y `axis-graphic-line`: Engine, Poppins/Bricolage, logo oficial, órbita de portada, divisor y burbuja URL horneada. El pie institucional se lee de `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json`; no se copia en el JSON comercial. Esta plantilla es un artefacto documental local, sin cambios al Composer ni al runtime de cotizaciones.
 
@@ -100,5 +106,5 @@ El generador comprueba reserva de encabezado/pie, desborde horizontal, carga de 
 Referencia verificada: [registro de revisión](VERIFICACION.md). Uso y frontera con Greenhouse: [continuidad de agentes](../../../audits/commercial/2026-10-08-plantilla-cotizacion-licitacion-routing.md). Pruebas del cálculo, validación y escape:
 
 ```sh
-node --test scripts/documents/render-cotizacion-a4.test.mjs
+node --test scripts/documents/document-money.test.mjs scripts/documents/render-cotizacion-a4.test.mjs
 ```

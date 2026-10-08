@@ -1,0 +1,78 @@
+{
+  "scope": "document_renderer_only",
+  "historicalPdfBytesPreserved": true,
+  "results": [
+    {
+      "currency": "PEN",
+      "net": 272210.4,
+      "pages": 19,
+      "moneyAudit": {
+        "base": {
+          "annualMinor": "18559800",
+          "moduleSumMinor": "18559800",
+          "monthSumMinor": "18559800",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        },
+        "gradual": {
+          "annualMinor": "27221040",
+          "moduleSumMinor": "27221040",
+          "monthSumMinor": "27221040",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        },
+        "integral": {
+          "annualMinor": "30658040",
+          "moduleSumMinor": "30658040",
+          "monthSumMinor": "30658040",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        }
+      },
+      "sourceEvidence": {
+        "kind": "recorded_readback",
+        "snapshot": "provenance-snapshot.json",
+        "sha256": "930ea84f388c31543236180100182fce8d78ffa2662e1a0d1c54353d9cff4c35",
+        "capturedAt": "2026-10-08T19:26:13.851655+00:00",
+        "liveSourcesRechecked": false
+      },
+      "allExternalSourcesAbsent": true
+    },
+    {
+      "currency": "USD",
+      "net": 79200,
+      "pages": 19,
+      "moneyAudit": {
+        "base": {
+          "annualMinor": "5400000",
+          "moduleSumMinor": "5400000",
+          "monthSumMinor": "5400000",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        },
+        "gradual": {
+          "annualMinor": "7920000",
+          "moduleSumMinor": "7920000",
+          "monthSumMinor": "7920000",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        },
+        "integral": {
+          "annualMinor": "8920000",
+          "moduleSumMinor": "8920000",
+          "monthSumMinor": "8920000",
+          "monthsReconcile": true,
+          "unitsReconcile": true
+        }
+      },
+      "sourceEvidence": {
+        "kind": "recorded_readback",
+        "snapshot": "provenance-snapshot.json",
+        "sha256": "930ea84f388c31543236180100182fce8d78ffa2662e1a0d1c54353d9cff4c35",
+        "capturedAt": "2026-10-08T19:26:13.851655+00:00",
+        "liveSourcesRechecked": false
+      },
+      "allExternalSourcesAbsent": true
+    }
+  ]
+}

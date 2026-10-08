@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "capturedAt": "2026-10-08T19:26:13.851655+00:00",
+  "evidence": "hash_readback_against_export_manifest",
+  "exportManifest": "pen-v3/manifest.json",
+  "note": "Hashes de fuentes revisadas para la oferta. No acredita lectura vigente de esos documentos en futuras generaciones ni disponibilidad en el checkout.",
+  "sources": [
+    {
+      "file": "oferta-hibrida/OFERTA-PARA-PIBANK.md",
+      "sha256": "5374c4832f0f320fc7ffdc03dfbd3683e295562b74acc5b3f9a69291fe911cef"
+    },
+    {
+      "file": "oferta-hibrida/capacidades-y-precios.csv",
+      "sha256": "c43730442502c45ff301512c9b2441fda3c459a178c7ad2c8848fe21d554f4d2"
+    },
+    {
+      "file": "oferta-hibrida/activaciones-mensuales.csv",
+      "sha256": "e6688f4ebf802c009692754f05543e6d6a58c5c29d206271215abec080dfc0ac"
+    },
+    {
+      "file": "oferta-hibrida/ACUERDOS-DE-ENTREGA.md",
+      "sha256": "8835c3ec1a1efb5ce502eca5782c0bf2d5df0c0600f81998cc4f530e4edb1cfe"
+    },
+    {
+      "file": "oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md",
+      "sha256": "7f4e3dc1c980e9774b5f147defa402fece809dec500a32f9649b44ee388aa53f"
+    },
+    {
+      "file": "oferta-hibrida/AEO-Y-AUTORIDAD.md",
+      "sha256": "4657601578133a781b700bc1c2defcc403ec12f30166df004d88d4c35d552a29"
+    },
+    {
+      "file": "oferta-hibrida/COMUNIDAD-Y-RECORRIDO.md",
+      "sha256": "ddac705000808458d1294f82019927c3626bda5a0f313ac0a8e909b0462e4aeb"
+    },
+    {
+      "file": "complemento-2026-10-08/README.md",
+      "sha256": "62ef83ff1aff323bb5260ac459f73baaf93615e4f594e869ded1e598e487fd3b"
+    },
+    {
+      "file": "estimacion-seo-aeo-2026-10-08/README.md",
+      "sha256": "f478f37b83993c480a9bf27a790f5f9cae6111ad8ba839f0e707ba2295a42e6d"
+    },
+    {
+      "file": "meta-integrada-2026-10-08/README.md",
+      "sha256": "8ad7ad392e05c60dddd7cd5bf6e2954421774116c78ed89400a00b30c47e713c"
+    }
+  ]
+}

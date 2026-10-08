@@ -177,6 +177,10 @@ node scripts/documents/render-cotizacion-a4.mjs --data ruta/cotizacion.json --ou
 
 Si el pedido es operar el **sistema de cotizaciones Greenhouse**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y el contrato de Quote Builder/catálogo/engine/snapshots/aprobaciones, verificando su disponibilidad real. No sustituir ese trabajo por este HTML ni tratar su manifiesto local como snapshot del sistema. Tampoco satisface el `quotation_id` ni el GO de Proposal Studio: no inventar IDs o margen para pasar esos gates. El deck y Proposal Studio conservan sus propios catálogos, identidades y gates; emitir este documento no cierra una Proposal ni exige recrear el paquete UTEM ya aprobado/presentado.
 
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer.
+
+Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
+
 ## Sinergias — tabla de hand-off
 
 Esta skill **decide y estructura**; delega el craft especializado. Declara siempre a quién pasas la posta:

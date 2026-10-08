@@ -1,0 +1,17 @@
+{
+  "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Cotizacion detallada 2027/2026-10-08-PEN-v1",
+  "source": "pen-v3",
+  "localCopyVerified": true,
+  "remoteSyncAudited": false,
+  "sha256": {
+    "Pibank-Cotizacion-detallada-2027-PEN.pdf": "0fe7cf0808e512a2a4a56ee90000130c572f15619b2e572044c375eb90e58cdf",
+    "datos.json": "9c2aec00d8fd91df3b2a2f4e30c285998c3ccaf99269a417054a0ce6f5309a7d",
+    "Pibank-Cotizacion-detallada-2027-PEN.html": "c610fe79eff007b0b20a65bf84bd43a18879e8904b645b887a7897440b71190f"
+  },
+  "currency": "PEN",
+  "annualNet": 272210.4,
+  "tax": null,
+  "sourceCurrency": "USD",
+  "fxSnapshot": "fx/usd-pen-2026-10-08.json",
+  "sent": false
+}

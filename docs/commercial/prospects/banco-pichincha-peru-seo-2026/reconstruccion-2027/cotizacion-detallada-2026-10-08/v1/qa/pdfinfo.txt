@@ -1,0 +1,19 @@
+Title:           Pibank · Cotización detallada 2027 · Efeonce
+Creator:         Chromium
+Producer:        Skia/PDF m147
+CreationDate:    Thu Oct  8 16:00:22 2026 -03
+ModDate:         Thu Oct  8 16:00:22 2026 -03
+Custom Metadata: no
+Metadata Stream: no
+Tagged:          no
+UserProperties:  no
+Suspects:        no
+Form:            none
+JavaScript:      no
+Pages:           19
+Encrypted:       no
+Page size:       594.96 x 841.92 pts (A4)
+Page rot:        0
+File size:       522761 bytes
+Optimized:       no
+PDF version:     1.4

@@ -1,0 +1,19 @@
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+AAAAAA+Poppins-Regular               CID TrueType      Identity-H       yes yes yes      7  0
+BAAAAA+Poppins-Medium                CID TrueType      Identity-H       yes yes yes      8  0
+CAAAAA+BricolageGrotesque-96ptExtraBold_opsz395553_wght2F80000_wdth Type 3            Custom           yes yes yes      9  0
+CAAAAA+BricolageGrotesque-96ptExtraBold_opsz395553_wght2F80000_wdth Type 3            Custom           yes yes yes     10  0
+DAAAAA+BricolageGrotesque-96ptExtraBold_opsz300000_wght2F80000_wdth Type 3            Custom           yes yes yes     31  0
+DAAAAA+BricolageGrotesque-96ptExtraBold_opsz300000_wght2F80000_wdth Type 3            Custom           yes yes yes     32  0
+EAAAAA+Poppins-SemiBold              CID TrueType      Identity-H       yes yes yes     34  0
+FAAAAA+BricolageGrotesque-96ptExtraBold_opsz240000_wght2F80000_wdth Type 3            Custom           yes yes yes     40  0
+FAAAAA+BricolageGrotesque-96ptExtraBold_opsz240000_wght2F80000_wdth Type 3            Custom           yes yes yes     41  0
+GAAAAA+BricolageGrotesque-96ptExtraBold_opsz12AAA6_wght2F80000_wdth Type 3            Custom           yes yes yes     42  0
+GAAAAA+BricolageGrotesque-96ptExtraBold_opsz12AAA6_wght2F80000_wdth Type 3            Custom           yes yes yes     43  0
+HAAAAA+BricolageGrotesque-96ptExtraBold_opsz100000_wght2F80000_wdth Type 3            Custom           yes yes yes     44  0
+HAAAAA+BricolageGrotesque-96ptExtraBold_opsz100000_wght2F80000_wdth Type 3            Custom           yes yes yes     45  0
+IAAAAA+BricolageGrotesque-96ptExtraBold_opsz280000_wght2580000_wdth Type 3            Custom           yes yes yes     83  0
+IAAAAA+BricolageGrotesque-96ptExtraBold_opsz280000_wght2580000_wdth Type 3            Custom           yes yes yes     84  0
+JAAAAA+BricolageGrotesque-96ptExtraBold_opsz240000_wght2580000_wdth Type 3            Custom           yes yes yes    113  0
+JAAAAA+BricolageGrotesque-96ptExtraBold_opsz240000_wght2580000_wdth Type 3            Custom           yes yes yes    114  0
