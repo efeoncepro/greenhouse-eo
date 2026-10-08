@@ -4,7 +4,7 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
-- [UTEM — deck de la propuesta técnica, 08-10-2026](2026-10-08-utem-deck-propuesta-tecnica.md) — deck v2 de 35 láminas, PDF y técnica v1.1; pendientes Insights, fuente Sky, cotización y presentación.
+- [UTEM — deck de la propuesta técnica, 08-10-2026](2026-10-08-utem-deck-propuesta-tecnica.md) — deck v2 de 35 láminas, PDF y técnica v1.1; actualización enlazada: oferta presentada por Julio, cotización aprobada y CRM verificado.
 - [Licitaciones, CRM y continuidad documental — 08-10-2026](2026-10-08-licitaciones-crm-continuidad-docs-skills.md) — consolidación UTEM, datos corporativos, seguimiento, manuales y skills espejo.
 - [Alta de prospectos creativos — 08-10-2026](2026-10-08-creative-prospect-intake.md) — Diego/Yanbal y Emily/Olivos, evidencia de contacto y registros autorizados.
 - [Segmentos y Prospecting Agent — 08-10-2026](2026-10-08-prospecting-agent-active-segments.md) — readback histórico de membresías, play y créditos; sin inscripción ni envío.

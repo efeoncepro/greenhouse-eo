@@ -66,6 +66,17 @@ No copiar cuentas bancarias, teléfonos personales, RUT del representante ni ima
 Conservar fecha y autoridad de cada dato. Habilitación declarada por el operador no equivale a certificado o
 readback live; ausencia de conflictos/deudas y modalidad de equipo/subcontratación se limitan al proceso indicado.
 
+## Oferta económica documental rápida A4
+
+Para avanzar en una licitación/Compra Ágil urgente con alcance y precio aprobados, usar el [manual de la plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md). La salida puede integrar formalmente el paquete presentado; no es una quote persistida de Greenhouse.
+
+1. Copiar `ejemplo.json` al expediente; adaptar cliente, proceso, alcance, plazo, vigencia y condiciones aprobadas. Usar `status: draft`, quitar la etiqueta de ejemplo y conservar la autoridad comercial en el expediente.
+2. Ingresar en `net` el precio neto **del servicio completo**, con tasa de IVA confirmada. La referencia mensual opcional no define cuotas ni cobro mensual.
+3. Generar HTML/PDF con el comando del manual en una carpeta nueva o vacía. Revisar todas las páginas del PDF y sus montos; el manifiesto conserva la revisión manual pendiente hasta registrar su evidencia.
+4. Incorporar únicamente los entregables aprobados al paquete de presentación; datos JSON, capturas QA y manifiesto son internos. Firmar/presentar sólo dentro de la autorización vigente y guardar el comprobante después.
+
+Esta ruta no crea `quoteId`, no costea ni valida margen, no aprueba precios ni ejecuta maker-checker, no registra CRM/facturación y no envía. Una petición de operar catálogo/engine/Quote Builder/snapshots de Greenhouse sigue [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y el runtime verificado; no se redirige a la plantilla. Conservar los archivos firmados/presentados; una continuidad documental no los regenera.
+
 ## Deck y técnica en Compra Ágil SEO/AEO (2026-10-08, UTEM)
 
 - El deck **acompaña** a la oferta técnica; no la reemplaza. La técnica en Markdown sigue siendo la fuente y el deck
@@ -94,3 +105,14 @@ Leer [follow-up-agent/README.md](../../../docs/commercial/follow-up-agent/README
 crear otra automatización o tarea. Alertas, borradores de correo, tareas Notion y MD de continuidad no prueban
 que el correo se envió o que la oferta fue presentada. Mantener deadlines oficiales y acciones internas separados;
 actualizar tareas existentes por ID cuando el alcance lo permita, conservando autor, fuente y siguiente acción.
+
+## Después de presentar: evidencia, importe y continuidad
+
+- La confirmación del operador acompañada por una captura inequívoca de la plataforma y el código permite registrar **presentada**. Conservar la imagen original, ruta y hash; indicar la fecha confirmada y qué no muestra la captura (hora exacta, montos, inventario o ID independiente de recepción), sin inventarlo ni exigir repetir el envío.
+- En el formulario, ingresar el precio completo en la unidad monetaria requerida. Verificar el resumen calculado de neto, IVA y total antes de enviar: un separador puede transformar 4.800.000 en 4.800. Despacho cero cuando el servicio no tiene despacho; cantidad uno no convierte el programa completo en cuota mensual.
+- El precio final aprobado sustituye las orientaciones anteriores. El presupuesto comprador queda separado. No tomar el techo como precio objetivo ni afirmar ser la oferta más barata sin conocer competidores.
+- Tras el mandato de actualizar CRM, verificar identidad/portal, el Deal existente y el ID live de etapa. Registrar el importe neto del programa completo, moneda, IVA/total y plazo; no usar el equivalente mensual como valor total. Releer el Deal y comprobar estabilidad después de automatizaciones.
+- Sincronizar el expediente, manifiestos, ambos registros CRM, tarea existente y cola de seguimiento. Cerrar la preparación/presentación con su evidencia; el siguiente paso es evaluación/resultado. Costos, margen, capacidad u otros antecedentes sin validar conservan esa condición, sin simular que se revisaron ni reabrir una presentación ya ejecutada.
+- Conservar los bytes/hashes del paquete presentado. Una actualización de continuidad no autoriza regenerar PDFs, reemplazar adjuntos, reenviar, firmar ni crear otra postulación. LicitaLAB sigue siendo discovery; el comprobante es de la plataforma de envío.
+
+Caso verificado: [UTEM 5251-1060-COT26, presentada por Julio el 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). Su precio y estado son evidencia fechada, no una tarifa ni regla permanente.

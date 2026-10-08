@@ -53,6 +53,7 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ├─ Precio, garantías (boleta/póliza), cashflow, factoring ...... pricing-garantias-finance.md
 ├─ Armar la oferta técnica/económica/administrativa ............ propuesta-tecnica-economica.md
 ├─ Plataformas, contacto, originales, OneDrive y anexos ........ platform-bids-and-administrative-package.md
+├─ Oferta económica urgente de licitación, HTML→PDF A4 ........ docs/commercial/templates/cotizacion-a4/README.md
 ├─ Producir el DECK de la propuesta: catálogo de plantillas,
 │  molde visual, selector, 3D icons, fotos del equipo ......... deck-visual-system.md
 ├─ Otro país LATAM (portal, registro, umbrales) ............... latam-portales-matriz.md
@@ -124,7 +125,7 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
    `Strategic Bets`. Compra Ágil nueva permanece `policy_required` hasta decisión del operador.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
    Antes de responder dónde está una licitación, lee `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y
-   confirma el estado vivo en HubSpot/LicitaLAB o la fuente oficial. Después de cualquier cambio de bid, CRM,
+   confirma el estado vivo en HubSpot/LicitaLAB o la fuente oficial. Tras presentar, aplicar evidencia, preservación del paquete y conciliación CRM del companion `platform-bids-and-administrative-package.md` (§Después de presentar); no repetir el envío. Después de cualquier cambio de bid, CRM,
    plazo, postulación o resultado, actualiza el registro; nunca lo trates como source of truth.
    Si ya existe un Deal HubSpot, sincroniza también `docs/commercial/CRM_DEAL_REGISTER.md` usando el mismo
    `deal_id`; una oportunidad todavía en radar no entra al registro comercial general.
@@ -149,9 +150,10 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
     embebido deriva de la misma cotización aprobada; si existen artefactos independientes, cada uno conserva
     narrativa, `deck-plan`, output, manifest y capturas propios. Nunca reemplaces el deck de otra licitación
     ni mezcles sus assets.
-11. **Usa `PricingFull` para presentar la inversión.** La oferta económica debe mostrar la opción
+11. **En el deck, usa `PricingFull` para presentar la inversión.** La lámina económica debe mostrar la opción
     recomendada, el desglose cotizado y las condiciones comerciales desde una cotización aprobada;
-    no autorices una tabla libre que omita la estructura del catálogo.
+    no autorices una lámina libre que omita la estructura del catálogo. La oferta documental A4 independiente
+    sigue su plantilla aprobada, descrita abajo; no se convierte en una lámina del deck.
 12. **Declara siempre la base fiscal.** Cada monto client-facing debe indicar de forma visible si es
     neto y si el IVA está excluido o incluido. La propuesta económica y el deck deben decir lo mismo.
 13. **Cuando aplique, presenta HubSpot CRM como beneficio incluido.** Especifica la configuración
@@ -160,6 +162,20 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 14. **Cierra con revisión visual completa.** Después de componer, inspecciona todos los frames
     exportados de cada deck y verifica recortes, legibilidad, jerarquía, condiciones fiscales, assets
     y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
+
+### Oferta económica documental rápida para licitación
+
+Ante una licitación o Compra Ágil urgente que requiere HTML para PDF, con **alcance, precio y condiciones ya aprobados para ese proceso**, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Produce una oferta económica formal de cuatro páginas para incorporar al paquete de presentación; sólo el ejemplo carece de validez comercial. Su origen es la cotización UTEM aprobada, no una nueva modalidad de pricing.
+
+Desde la raíz del repo, copiar el JSON de ejemplo al expediente, reemplazar todos los datos y generar en una carpeta nueva o vacía:
+
+```sh
+node scripts/documents/render-cotizacion-a4.mjs --data ruta/cotizacion.json --out ruta/cotizacion-v1
+```
+
+`status: draft` es preparación documental; no es un estado de quote persistida ni prueba falta de aprobación del precio. Los data slots y el JSON son datos del documento. El generador calcula neto/IVA/total, pero **no crea `quoteId`, valida costos/margen, aprueba el precio, ejecuta maker-checker, registra CRM/facturación ni envía la oferta**. Registrar por separado fuente y autoridad del alcance/precio y cada acción posterior. Revisar todos los folios del PDF final; conservar los bytes de documentos firmados o presentados.
+
+Si el pedido es operar el **sistema de cotizaciones Greenhouse**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y el contrato de Quote Builder/catálogo/engine/snapshots/aprobaciones, verificando su disponibilidad real. No sustituir ese trabajo por este HTML ni tratar su manifiesto local como snapshot del sistema. Tampoco satisface el `quotation_id` ni el GO de Proposal Studio: no inventar IDs o margen para pasar esos gates. El deck y Proposal Studio conservan sus propios catálogos, identidades y gates; emitir este documento no cierra una Proposal ni exige recrear el paquete UTEM ya aprobado/presentado.
 
 ## Sinergias — tabla de hand-off
 

@@ -1,12 +1,14 @@
 # UTEM · guía para Claude — INTERNO
 
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Estado y evidencia](PRESENTACION-2026-10-08.md). El paquete está presentado: no regenerarlo ni repetir la preparación. Las instrucciones de construcción siguientes se conservan como antecedente.
+
 Fecha: 08/10/2026. Compra Ágil 5251-1060-COT26. No incorporar este documento al deck del comprador.
 
 ## Mandato y fuente
 
 Julio pidió la propuesta técnica en Markdown y luego sustituyó Word por HTML y PDF; Claude realizará el deck. La fuente narrativa es `oferta-tecnica.md` en este expediente. HTML y PDF se derivan de ese Markdown. Copias de entrega en OneDrive: `Licitaciones/UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica`.
 
-Estado: propuesta técnica v1.1 (alineada con el deck de Claude, 35 láminas) para revisión de Julio. No equivale a aprobación comercial, firma o presentación. La autorización de firma anterior cubre los anexos administrativos de UTEM, no este documento.
+Estado: técnica v1.1 y deck de 35 láminas preparados para el paquete que Julio aprobó y presentó. Cotización final separada: CLP4,8M netos, IVA912.000, total5.712.000. La autorización de firma anterior cubre los anexos administrativos; no se añadió firma gráfica a la técnica/cotización.
 
 ## Estructura sugerida del deck
 
@@ -36,21 +38,21 @@ El número de láminas es orientativo. Mantener capacidad de lectura sin present
 - No hay promesa de backlinks, citas en IA, matrículas ni aumentos porcentuales.
 - Delta 08/10 (Claude, por instrucción de Julio): se incorporaron los casos Sky (+65 % impresiones, +27 % clics, +39 % citabilidad IA, 6 meses) y Berel (cifras del deck SEO/AEO aprobado), la lámina de clientes, el equipo nominal (Andrés, Valentina, Julio, Daniela y Melkin, este último provisional como en Pibank) y la revisión pública del 08/10 (§2.2, F6–F7). No trasladar cifras de Pibank.
 
-## Parámetros de ejecución propuestos, pendientes de aceptación del paquete
+## Parámetros de ejecución del paquete presentado
 
-Son decisiones del borrador, no requisitos literales del comprador ni hechos ya contratados:
+Son decisiones ofertadas por Efeonce en el paquete aprobado y presentado, no requisitos literales del comprador ni hechos ya contratados:
 - Hasta diez páginas existentes prioritarias, además de los quince artículos.
 - Dos rondas consolidadas por artículo, conservando corrección de errores y cumplimiento.
 - Una campaña con al menos diez destinos/interlocutores pertinentes; sin pauta pagada.
 - Panel de quince consultas en dos sistemas accesibles, inicio/intermedio/cierre.
 - Coordinación quincenal además del inicio y cierre.
 
-Julio debe revisar capacidad y costo de estos parámetros con la cotización. Si cambian, actualizar primero el Markdown, luego el HTML/PDF y el deck. No ampliar entregables por diseño.
+Julio aprobó el paquete y su precio. Capacidad/costo medidos permanecen como verificación interna pendiente. Si después solicita una modificación, crear una revisión separada sin reemplazar los archivos ya presentados. No ampliar entregables por diseño.
 
 ## Fuera del documento cliente
 
 - No incorporar costos, margen, caja, credenciales, banco, deliberaciones internas o este handoff.
-- La orientación cercana a CLP6.800.000 netos no es precio exacto aprobado. La cotización formal está pendiente y no se escribió en la técnica.
+- Precio final aprobado y presentado: CLP4.800.000 netos, IVA912.000, total5.712.000. La orientación de 6,8M quedó sustituida. Cotización formal separada de la técnica, en `06. Cotizacion`.
 - Anexos 1, 2B, 3 y 4 firmados en `03. Anexos completados`; 2A no aplica.
 - Cierre observado 08/10 18:00 Chile, sin prórroga garantizada. Revisar antes de cargar.
 - Sin contacto previo obligatorio: no detener la preparación por no disponer de un interlocutor de la compra.

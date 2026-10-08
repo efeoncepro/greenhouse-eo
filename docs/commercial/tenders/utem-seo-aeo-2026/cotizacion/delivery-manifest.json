@@ -1,0 +1,248 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-10-08T17:41:59.657Z",
+  "status": "submitted_by_operator",
+  "source": "docs/commercial/tenders/utem-seo-aeo-2026/cotizacion/cotizacion.json",
+  "net": 4800000,
+  "vat": 912000,
+  "total": 5712000,
+  "monthlyEquivalent": {
+    "net": 1600000,
+    "vat": 304000,
+    "total": 1904000
+  },
+  "priceAuthority": "Precio autorizado por Julio en esta conversación: incremento a CLP 4.800.000 netos y mandato de crear el documento HTML. La referencia mensual es aritmética, no calendario de pagos.",
+  "signed": false,
+  "submitted": true,
+  "outputFolder": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/UTEM/1. Agencia SEO-AEO/06. Cotizacion",
+  "remoteSyncVerified": false,
+  "brand": {
+    "line": "engine",
+    "tokens": "@efeoncepro/axis-tokens",
+    "assets": [
+      {
+        "source": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+        "bytes": 4383,
+        "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+      },
+      {
+        "source": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+        "bytes": 9410,
+        "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+      },
+      {
+        "source": "ai-generations/2026-10-08_utem-propuesta/logos-cliente/logo-v3.svg",
+        "bytes": 11179,
+        "sha256": "7d5290806fca95414a905018dd8ada799d122006da794c170f3d3f1a288bee86"
+      },
+      {
+        "source": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+        "bytes": 408496,
+        "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+      },
+      {
+        "source": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+        "bytes": 158240,
+        "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+      },
+      {
+        "source": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+        "bytes": 152860,
+        "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+      },
+      {
+        "source": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+        "bytes": 151516,
+        "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+      },
+      {
+        "source": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+        "bytes": 150292,
+        "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+      }
+    ],
+    "contactSource": "src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json",
+    "orbit": {
+      "schema": "axis.graphic-line-orbit-composition.v1",
+      "contract": {
+        "id": "efeonce.graphic-line-orbit",
+        "version": "0.3.1"
+      },
+      "canvas": {
+        "width": 794,
+        "height": 1123,
+        "line": "engine",
+        "product": "wave",
+        "platform": null,
+        "surface": "light",
+        "channel": "print",
+        "scale": 1,
+        "socialMultiplierApplied": false
+      },
+      "palette": {
+        "accent": "#0375db",
+        "background": "#f7f8f6",
+        "ring": "#72ded8",
+        "halo": "#72ded8"
+      },
+      "elements": [
+        {
+          "kind": "orbit",
+          "id": "orbit",
+          "placement": {
+            "region": "center",
+            "radius": {
+              "ratio": 0.3,
+              "of": "width"
+            }
+          },
+          "ring": {
+            "strokePx": 1,
+            "opacity": 0.16,
+            "color": "#023c70",
+            "innerOrbits": [
+              {
+                "radiusRatio": 0.72,
+                "opacity": 0.11
+              },
+              {
+                "radiusRatio": 0.44,
+                "opacity": 0.06
+              }
+            ]
+          },
+          "innerOrbits": false,
+          "arc": {
+            "startDeg": 65,
+            "sweepDeg": 50,
+            "strokePx": 1.6,
+            "color": "#0375db",
+            "linecap": "round",
+            "gradient": false
+          },
+          "trajectory": {
+            "meaning": "accent",
+            "origin": null,
+            "direction": "clockwise",
+            "sweepDeg": 50,
+            "value": null,
+            "valueLabel": null,
+            "pairsWithNumber": false
+          },
+          "sphere": {
+            "radiusPx": 3.5,
+            "color": "#0375db",
+            "at": "arc-end",
+            "ring": null
+          },
+          "halo": null
+        }
+      ],
+      "adapterChecks": [
+        "text-never-crosses-ring",
+        "ring-center-on-target-center",
+        "sphere-on-arc-end",
+        "lens-subject-inside-circle",
+        "url-as-bubble-never-text",
+        "decorative-svg-hidden-from-accessibility-tree",
+        "signature-centered",
+        "signature-min-contrast",
+        "accent-text-min-size",
+        "orbit-never-over-subject-or-reserves",
+        "accent-arc-never-reads-as-data",
+        "answer-period-part-of-text",
+        "measure-shows-value-and-source"
+      ]
+    }
+  },
+  "checks": {
+    "fontsLoaded": true,
+    "imagesDecoded": true,
+    "layout": [
+      {
+        "page": 1,
+        "width": 793.6875,
+        "height": 1122.515625,
+        "contentBottom": 956.515625,
+        "footerTop": 1032.171875,
+        "gapPx": 75.65625,
+        "overflow": []
+      },
+      {
+        "page": 2,
+        "width": 793.6875,
+        "height": 1122.515625,
+        "contentBottom": 997.859375,
+        "footerTop": 1032.171875,
+        "gapPx": 34.3125,
+        "overflow": []
+      },
+      {
+        "page": 3,
+        "width": 793.6875,
+        "height": 1122.515625,
+        "contentBottom": 1019.984375,
+        "footerTop": 1032.171875,
+        "gapPx": 12.1875,
+        "overflow": []
+      },
+      {
+        "page": 4,
+        "width": 793.6875,
+        "height": 1122.515625,
+        "contentBottom": 1020.078125,
+        "footerTop": 1032.171875,
+        "gapPx": 12.09375,
+        "overflow": []
+      }
+    ],
+    "mobile": {
+      "width": 390,
+      "scrollWidth": 390,
+      "overflow": false
+    },
+    "browserErrors": [],
+    "visualReview": {
+      "status": "passed",
+      "surface": "PDF final rasterizado con pdftoppm; cuatro paginas revisadas a 1400 px, portada HTML movil a 390 px",
+      "evidenceDirectory": ".captures/utem-cotizacion-2026-10-08",
+      "pageRasterHashes": [
+        "970ea4848df4499b4715b371488b068e30541c4024785d8fc6f6325f6aa9ceee",
+        "8fa7b2e7d83180d46fc3161625dc7d71744d255587fe666166bf3bb810d90ff6",
+        "a192c75e2c00aa9346725300b39287f9dd72cefb9229ee621640b7c7ebe54bea",
+        "ddb5ff740bd4402ff7f40dca31707e4c9a7d6a66dc3af73c049d5b8faa3e7482"
+      ],
+      "findings": "Sin cortes ni superposiciones; logotipos oficiales y jerarquia legible. Copia final coincide pixel a pixel con el PDF revisado."
+    },
+    "pdfTextAndPageAudit": {
+      "status": "passed",
+      "pages": 4,
+      "format": "A4 portrait",
+      "textExtractable": true,
+      "fontsEmbedded": true,
+      "tagged": true,
+      "processCodeAndFolioEachPage": true,
+      "amountsVerified": true,
+      "internalNotesAbsent": true,
+      "localOneDriveCopiesHashMatch": true,
+      "pdfUaConformance": "not_certified"
+    }
+  },
+  "files": [
+    {
+      "name": "UTEM - Cotizacion SEO GEO AEO.html",
+      "bytes": 1474697,
+      "sha256": "21c6b7e3f128c0f1e4b162b74958b661eab58b41de11e13f6269200db5670d19"
+    },
+    {
+      "name": "UTEM - Cotizacion SEO GEO AEO.pdf",
+      "bytes": 273553,
+      "sha256": "bc8dd4b627261e67eb93a297d4478435a9a2a269e780a08354c41f1869cca81c"
+    }
+  ],
+  "verifiedAt": "2026-10-08T17:43:01.564199+00:00",
+  "submittedOn": "2026-10-08",
+  "approvedByOperator": true,
+  "submissionEvidence": "../submission-evidence.json",
+  "submittedFilesByteIdentityIndependentlyVerified": false
+}

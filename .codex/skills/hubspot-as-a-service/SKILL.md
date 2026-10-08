@@ -12,6 +12,12 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 
 Operate HubSpot as an accountable managed service, not as a collection of portal clicks.
 
+## Submitted proposals: reconcile the existing Deal
+
+For an operator-authorized stage and value update after submitting a proposal, read the existing Deal and the live pipeline stage IDs in the verified portal. Use the approved net value for the complete engagement as `amount`, with its currency; keep buyer budget, VAT and gross total separate and explain them in the description. A monthly arithmetic equivalent is not the full Deal value or a payment schedule. Do not infer or overwrite `closedate`, associations, bucket or customer relationship from submission alone.
+
+Reconcile stale descriptions that still claim no offer was submitted. Read back the exact changes and check stability after native automation; update both local CRM registers and the existing preparation task with submission evidence. Preserve the submitted deliverables. Case and dated readbacks: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). This task-specific authorization does not authorize other CRM changes or communications.
+
 ## Commercial context
 
 The canonical commercial structure is **Efeonce → RevOps & CRM → Kortex (when applicable) → HubSpot as

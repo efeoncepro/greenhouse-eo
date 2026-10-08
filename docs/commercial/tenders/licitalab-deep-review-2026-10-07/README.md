@@ -7,7 +7,7 @@ El objetivo es decidir dónde conviene competir, incluyendo CRM e integraciones,
 
 ## Continuidad posterior al corte · 08-10-2026
 
-- **UTEM seleccionada para preparación:** [expediente vigente](UTEM-5251-1060-COT26-REVISION-2026-10-08.md). Dos originales preservados en OneDrive, anexos 1/2B/3/4 completos y firmados; habilitación y no deuda confirmadas por Julio. Tres meses y objetivo cercano a CLP 6,8 M netos; precio exacto, propuesta, costo/margen y presentación pendientes.
+- **UTEM seleccionada para preparación:** [expediente vigente](UTEM-5251-1060-COT26-REVISION-2026-10-08.md). Dos originales preservados en OneDrive, anexos 1/2B/3/4 completos y firmados; habilitación y no deuda confirmadas por Julio. Oferta **presentada** por Julio: tres meses, neto CLP4.800.000 + IVA912.000 = total5.712.000. HubSpot Presentación de soluciones y amount4.800.000, releídos. [Evidencia](../utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). Evaluación/resultado e internos de costo/capacidad/panel pendientes.
 - **Corrección de calificación:** Julio pidió conservar los Deals existentes, pero las nuevas señales deben calificarse desde lead antes de tratarse como oportunidades. La etapa registrada no prueba calificación.
 - **Presentación por plataforma:** regla general para Wherex/Mercado Público/LicitaLAB; falta de contacto no bloquea preparar. [Criterio del operador](../../EFEONCE_DATOS_PARA_LICITACIONES.md).
 - [Agente de seguimiento y registro](../../follow-up-agent/README.md): consultar pendientes vigentes antes de repetir alertas del corte. No se enviaron ofertas en esta revisión documental.
@@ -56,7 +56,7 @@ Las especificaciones de cuatro páginas requieren auditoría técnica, arquitect
 
 El presupuesto referencial es $6,8 M por todo el período, equivalente a $2,267 M mensuales antes de aclarar su tratamiento tributario y costos. La factura se tramita tras la recepción conforme completa; no hay anticipo en el texto recuperado. Eso exige caja para tres meses, además de redacción, SEO técnico, analítica, revisión y gestión. Conviene preparar una matriz de los quince contenidos y un plan técnico con entregables verificables; no prometer rankings o menciones garantizadas.
 
-**Fuente:** `ESPECIFICACIONES TÉCNICAS MINIMAS 9284 - SERVICIO POSICIONAMIENTO.pdf`, pp. 1–4. **Estado del análisis inicial:** IVA, CMS, baseline, implementación y expediente eran pendientes. **Actualización 08/10:** administrativos completados y firmados; Julio aceptó tres meses y precio cercano a CLP 6,8 M netos. Quedan propuesta/cotización, alcance y costo/margen; no exigir aclaración sin canal. Ver [expediente vigente](UTEM-5251-1060-COT26-REVISION-2026-10-08.md).
+**Fuente:** `ESPECIFICACIONES TÉCNICAS MINIMAS 9284 - SERVICIO POSICIONAMIENTO.pdf`, pp. 1–4. **Estado del análisis inicial:** IVA, CMS, baseline, implementación y expediente eran pendientes. **Actualización 08/10:** administrativos completados y firmados; Julio aprobó y presentó el paquete por tres meses a CLP4,8M netos (5,712M con IVA); presupuesto comprador de 6,8M separado. Siguen evaluación/resultado y validaciones internas de costo/capacidad/panel; no reabrir decisión de presentación ni exigir aclaración sin canal. Ver [expediente vigente](UTEM-5251-1060-COT26-REVISION-2026-10-08.md).
 
 ### FUCOA/CNR: la mejor oportunidad de diseño web encontrada
 

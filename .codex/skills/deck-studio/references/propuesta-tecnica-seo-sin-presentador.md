@@ -102,3 +102,9 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - No prometer formatos de producto que no estén operando (correo de Insights, modo presentación).
 - Si es licitación formal, ver el gate de Proposal Studio (`pnpm tender:canonical-gate`).
 - Nada se envía ni se mueve a la carpeta de envío sin aprobación del operador.
+
+## UTEM: paquete presentado y preservación — 08/10/2026
+
+El segundo caso ya fue presentado por Julio en Mercado Público. El deck v2 de 35 láminas y la técnica v1.1 forman el paquete preparado; la cotización formal se mantiene separada en HTML/PDF A4 vertical. [Estado, precio final y evidencia](../../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md).
+
+Después de presentar, conservar archivos y hashes aprobados. Actualizar estado en el expediente y seguimiento sin regenerar la técnica/deck ni sustituir adjuntos. La confirmación de envío no acredita adjudicación ni valida por sí sola los pendientes internos de costos, capacidad, panel o fuentes de casos.

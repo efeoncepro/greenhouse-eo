@@ -2,18 +2,23 @@
 
 > **Capa estratégica:** la metodología transversal de pricing y packaging vive en
 > [`.codex/skills/efeonce-pricing-operator/SKILL.md`](../../../.codex/skills/efeonce-pricing-operator/SKILL.md) y su
-> referencia general. Este documento sigue siendo el owner operativo del catálogo Greenhouse, pricing engine,
-> quote builder, approvals y persistencia; no es la doctrina de pricing de todas las líneas Efeonce.
+> referencia general. Este documento conserva el diseño histórico del programa. La operación vigente de catálogo,
+> pricing engine, quote builder, approvals y persistencia se consulta en [Cotizador](cotizador.md) y su arquitectura;
+> no constituye la doctrina de pricing de todas las líneas Efeonce.
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-18 por Claude (TASK-469)
-> **Ultima actualizacion:** 2026-04-18 por Claude (TASK-469)
-> **Estado:** Programa en diseño (TASK-463..468 en backlog; no implementado en runtime todavía)
+> **Ultima actualizacion:** 2026-10-08: remisión al cotizador vigente y frontera con plantilla documental; diseño original 2026-04-18 por Claude (TASK-469)
+> **Estado de este documento:** diseño histórico del programa (18/04/2026). El cotizador vigente se documenta en [Cotizador](cotizador.md) y la [arquitectura canónica](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md); la disponibilidad en cada entorno se verifica por separado.
 > **Documentacion tecnica:**
 > - Plano UI: [TASK-469 — Commercial Pricing UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
 > - Tasks de schema + engine: [TASK-464a..d](../../tasks/to-do/) — roles, governance, tool catalog, engine
 > - Task bridge payroll: [TASK-468](../../tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md)
+
+## Oferta documental rápida de licitación
+
+Para preparar rápidamente la oferta económica HTML/PDF de una licitación o Compra Ágil, desde precio y alcance aprobados, existe una [plantilla documental local](../../commercial/templates/cotizacion-a4/README.md). Puede producir el documento formal de presentación; no crea una cotización persistida, valida margen ni ejecuta approvals o quote-to-cash. Si se pide operar el sistema Greenhouse, seguir el [cotizador](cotizador.md), sus comandos y su estado verificado. El JSON de la plantilla no es una entrada de importación ni un `quotation_id` del sistema.
 
 ## Que es
 
@@ -162,6 +167,6 @@ El resto (CostStackPanel, SellableItemPickerDrawer, ServiceCompositionEditor, Qu
 # Pricing strategy companion
 
 The cross-line pricing strategy and packaging method lives in `.codex/skills/efeonce-pricing-operator/SKILL.md` and
-its general patterns reference. This document remains the runtime owner for Greenhouse catalog, pricing engine,
-quote builder, approval and operational persistence; it is not the source for pricing doctrine across all Efeonce
-lines.
+its general patterns reference. This document preserves the historical program design. Current Greenhouse
+catalog, pricing engine, quote builder, approvals and persistence are documented in [Cotizador](cotizador.md)
+and its canonical architecture; this companion does not define pricing doctrine across all Efeonce lines.

@@ -18,7 +18,7 @@ Owner: Julio Reyes. [Contrato](README.md) · [Proyecto Notion](https://app.notio
 | --- | --- | --- |
 | Hoy | INDAP08/10 14:00 Chile | Canal, costo, soporte y GO antes de ofertar |
 | Hoy | INDH08/10 15:30 Chile según investigación 07/10 | Revalidar plazo y experiencia DDHH/LSCh; sin Deal confirmado |
-| Hoy | UTEM08/10 18:00 Chile | Anexos firmados; técnica v1.1 y deck v2 listos: revisar deck/técnica, cerrar cotización y decidir presentación |
+| Hoy | UTEM08/10 18:00 Chile | **Presentada** por Julio; netoCLP4,8M /total5,712M; HubSpot Presentación de soluciones, Notion Enviada. Revisar evaluación/resultado |
 | Hoy | UNAP08/10 19:00 Chile | Resolver presupuesto contradictorio y respaldo CRM/educación |
 | Preparar hoy | SANNA09/10 09:00 Chile | Costear antes del cierre; revisión09:00 llegaría tarde |
 | Mañana | ProChile09/10 13:00 Chile | Referencias, terreno, perfiles, caja y oferta |
@@ -89,7 +89,7 @@ Deadline = propiedad de licitación leída en CRM, expresada UTC tal como vuelve
 | [Efeonce Factory / MINSAL — Adaptación de videos y dípticos · 65832763160](https://app.hubspot.com/contacts/48713323/record/0-3/65832763160) | 2026-10-13T14:00:00Z | Confirmar tema, cantidades, fuentes editables y revisiones antes de precio cerrado. [Tarea](https://app.notion.com/p/3f339c2fefe781ba9526dd1da6176ab6?pvs=204) |
 | [Efeonce Factory / MINSAL — Diseño SANNA · 65806331396](https://app.hubspot.com/contacts/48713323/record/0-3/65806331396) | 2026-10-09T12:00:00Z | Candidato Factory acotado; contar páginas/adaptaciones y horas. No asumir impresión física incluida. [Tarea](https://app.notion.com/p/3f339c2fefe78120b470f326e4de8a57?pvs=204) |
 | [Efeonce / INDAP — Claude Team Premium · 65806293639](https://app.hubspot.com/contacts/48713323/record/0-3/65806293639) | 2026-10-08T17:00:00Z | Cotizar canal y soporte hoy; estrecha holgura al precio público. Cierra 8/10 14:00. [Tarea](https://app.notion.com/p/3f339c2fefe781a4b52df35e4e10fc53?pvs=204) |
-| [Efeonce / UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144) | 2026-10-08T21:00:00Z | Anexos firmados y declaraciones resueltas. Preparar propuesta/ficha y cotización por tres meses, cerca de CLP6.800.000 netos como supuesto acordado, con neto/IVA/total; cerrar alcance y costo. Sin contacto previo obligatorio. Cierre registrado 8/10 18:00. [Tarea](https://app.notion.com/p/3f339c2fefe7815bbf44df20bcf8f5db?pvs=204) |
+| [Efeonce / UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144) | 2026-10-08T21:00:00Z | **Presentada.** Precio netoCLP4.800.000 /total5.712.000; HubSpot Presentación de soluciones, Notion Enviada. Siguiente paso evaluación/resultado; no repetir preparación. |
 | [Sika México · LIC-1169 · Campaña Q4 Home Center · 65827529551](https://app.hubspot.com/contacts/48713323/record/0-3/65827529551) | Sin fecha | HOLD. Verificar preguntas/respuestas y discrepancia de horarios. No desarrollar propuesta. [Tarea](https://app.notion.com/p/3f339c2fefe781b9b1dfe31032595d65?pvs=204) |
 | [Grupo Berel - CRM · 65718062956](https://app.hubspot.com/contacts/48713323/record/0-3/65718062956) | Sin fecha | Posicionar CRM antes de finQ4 y coordinar alcance con campaña app; próxima actividad 12/10. [Tarea](https://app.notion.com/p/3f339c2fefe781a29456ea0b54379285?pvs=204) |
 | [Pibank Perú - HuBSpot CRM · 65718071655](https://app.hubspot.com/contacts/48713323/record/0-3/65718071655) | Sin fecha | Responder a Natalia los cinco puntos de calificación y coordinar sync; no confundir SEO con CRM. [Tarea](https://app.notion.com/p/3f339c2fefe7812da9e0dec30b9d2f06?pvs=204) |
@@ -134,16 +134,15 @@ Deadline = propiedad de licitación leída en CRM, expresada UTC tal como vuelve
 - Reunión partner HubSpot07/10: https://app.hubspot.com/contacts/48713323/record/0-47/118160553829 (resumen leído; transcripción no reconsultada en este corte).
 - Mensajes fuente y URLs privadas exactas se guardan en tareas pertinentes y estado estructurado cuando son necesarios, sin copiar cuerpos completos.
 
-## Estado vigente de UTEM después de las confirmaciones
+## Estado vigente de UTEM después de la presentación
 
 La siguiente síntesis prevalece sobre los pendientes iniciales conservados en la bitácora:
 
-- Anexos 1, 2B, 3 y 4 firmados y completados en Word/PDF; consolidado de seis páginas. Carpeta `Licitaciones/UTEM/1. Agencia SEO-AEO/03. Anexos completados`. Originales y borradores anteriores preservados.
-- Julio confirmó accionista único 100%, datos bancarios y teléfono; habilitación en Mercado Público; sin vínculos ni deudas con UTEM y sin subcontratación para este servicio. Reutilizar la [ficha confirmada](../EFEONCE_DATOS_PARA_LICITACIONES.md); no reabrir consultas resueltas sin nueva evidencia.
-- Preparar por tres meses. Oferta cercana a CLP6.800.000 netos como orientación y supuesto del operador, con neto/IVA/total explícitos; precio exacto y margen pendientes. No afirmar que UTEM confirmó presupuesto neto.
-- Pendientes: propuesta técnica, ficha/matriz de cumplimiento y cotización, revisión del paquete y decisión de presentación. Ninguna oferta enviada o postulada; completar anexos no cierra la tarea completa.
-- Estado Notion/CRM: conservado como fue leído en la primera revisión. Esta actualización documental no simula cambios en la tarea ni actualiza la fecha de auditoría global.
-- Regla general: Wherex y Mercado Público son canales de postulación; LicitaLAB permite descubrir/consultar oportunidades conectadas con Mercado Público. Aprovechar canales reales de preguntas, pero no exigir contacto previo ni bloquear por una aclaración sin canal disponible. Presentación requiere su mandato específico.
+- Tarea Notion existente marcada **Enviada**, fecha de envío08/10, resumen/DoD/resultado actualizados y releídos. Se preserva su ID; no crear otro pendiente de preparación.
+- Paquete aprobado conservado: anexos1/2B/3/4 firmados; técnica v1.1, deck35láminas y cotización HTML/PDF A4 de4páginas.
+- Siguiente acción: revisar evaluación/resultado y responder solicitudes reales de la plataforma.
+- Costo/margen/capacidad medidos, habilitación del panel y respaldo exacto del caso Sky permanecen internos pendientes; no simular su validación.
+- Bitácora anterior conservada como historia, no estado actual. No reabrir datos confirmados, preparación ni decisión de envío.
 
 ## Bitácora
 
@@ -213,3 +212,7 @@ Por mandato de Julio se redactó la [propuesta técnica y matriz de cumplimiento
 ### UTEM · deck y técnica v1.1 (Claude)
 
 08/10: Claude armó el deck v2 de la propuesta técnica (35 láminas, cinco capítulos) y su PDF en `05. Propuesta tecnica`; la técnica pasó a v1.1 alineada con el deck (revisión pública, equipo nominal, experiencia y fuentes). Revisión pública: UTEM entre los primeros 20 en 2 de 15 búsquedas y citada por la IA en 3 de 15. Pendientes: decidir «Todo junto» y «Cada mes» (Insights/panel fuera del alcance técnico), fuente exacta del caso Sky, cotización/costeo y decisión de presentación. Sin escritura HubSpot, envío ni postulación. [Registro](../../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md).
+
+### 2026-10-08 — UTEM presentada; CRM y tarea sincronizados
+
+Julio aportó la captura de Mercado Público «Cotización enviada correctamente», código5251-1060-COT26. Cotización final aprobada: netoCLP4.800.000, IVA912.000, total5.712.000 por tres meses. Cambio autorizado en Deal65832566144 y dos readbacks: Presentación de soluciones/amount4.800.000 CLP, descripción reconciliada. Notion Enviada, resumen/DoD/resultado y fecha actualizados y releídos. Captura y registro en `07. Presentacion`; oferta sin adjudicación confirmada. [Registro completo](../tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). No correos, tareas/Deals nuevos, ni repetición de postulación.

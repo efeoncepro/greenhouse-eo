@@ -47,12 +47,12 @@
       "internal_due": "2026-10-08T15:00:00-03:00",
       "notion_task_id": "3f339c2f-efe7-815b-bf44-df20bcf8f5db",
       "notion_url": "https://app.notion.com/p/3f339c2fefe7815bbf44df20bcf8f5db?pvs=204",
-      "status": "todo",
+      "status": "done",
       "write_status": "verified",
       "draft_location": null,
       "local_preparation": {
         "updated_on": "2026-10-08",
-        "source": "operator confirmations and repository evidence; no new external task readback",
+        "source": "Operator submission screenshot; HubSpot two independent readbacks and Notion fetch after authorized updates",
         "folder": "Licitaciones/UTEM/1. Agencia SEO-AEO",
         "annexes": {
           "status": "completed_and_signed",
@@ -80,24 +80,74 @@
         "duration_months": 3,
         "pricing_direction": {
           "currency": "CLP",
-          "near_net_amount": 6800000,
-          "status": "operator_assumption_not_buyer_confirmed",
-          "exact_price_approved": false,
+          "net": 4800000,
+          "vat": 912000,
+          "total": 5712000,
+          "duration_months": 3,
+          "status": "operator_approved_submitted_quote",
+          "exact_price_approved": true,
           "quote_must_show": [
             "net",
             "VAT",
             "total"
-          ]
+          ],
+          "monthly_net_equivalent": 1600000,
+          "monthly_payment_terms_confirmed": false
         },
         "remaining": [
-          "technical_proposal_and_compliance_sheet",
-          "cost_and_exact_price",
-          "formal_quote",
-          "package_review_and_submission_decision"
+          "evaluation_and_result",
+          "measured_cost_capacity_margin",
+          "panel_enablement_for_utem",
+          "exact_sky_case_source"
         ],
         "prior_buyer_contact_required": false,
-        "submission": "not_submitted",
-        "external_task_status": "unchanged_since_last_readback"
+        "submission": "submitted_by_operator",
+        "external_task_status": "Enviada independently verified after update",
+        "technical_proposal": {
+          "status": "prepared_for_submitted_package",
+          "version": "1.1",
+          "formats": [
+            "md",
+            "html",
+            "pdf"
+          ],
+          "pages": 11,
+          "source": "docs/commercial/tenders/utem-seo-aeo-2026/oferta-tecnica.md",
+          "manifest": "docs/commercial/tenders/utem-seo-aeo-2026/delivery-manifest.json",
+          "folder": "Licitaciones/UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica",
+          "deck_owner": "Claude",
+          "signed": false,
+          "submitted": true,
+          "updated_at": "2026-10-08T18:01:38.577483+00:00",
+          "submitted_attachment_inventory_verified": false,
+          "deck_pages": 35
+        },
+        "submission_date": "2026-10-08",
+        "submission_evidence": "docs/commercial/tenders/utem-seo-aeo-2026/submission-evidence.json",
+        "quote": {
+          "status": "submitted_by_operator",
+          "net": 4800000,
+          "vat": 912000,
+          "total": 5712000,
+          "pages": 4,
+          "formats": [
+            "html",
+            "pdf"
+          ],
+          "manifest": "docs/commercial/tenders/utem-seo-aeo-2026/cotizacion/delivery-manifest.json"
+        }
+      },
+      "last_task_status_readback_at": "2026-10-08T18:01:38.577483+00:00",
+      "external_status": "Enviada",
+      "completed_on": "2026-10-08",
+      "completion_reason": "operator_submission_confirmation",
+      "next_action": "Review evaluation/result in Mercado Publico; do not repeat package preparation or submission",
+      "hubspot_update": {
+        "stage": "presentationscheduled",
+        "amount": 4800000,
+        "currency": "CLP",
+        "readback_verified": true,
+        "source": "docs/commercial/tenders/utem-seo-aeo-2026/hubspot-presentacion-2026-10-08.json"
       }
     },
     {
@@ -462,5 +512,10 @@
       "docs/commercial/tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md",
       "docs/audits/commercial/2026-10-08-prospecting-agent-active-segments.md"
     ]
+  },
+  "utem_submission_update": {
+    "at": "2026-10-08T18:01:38.577483+00:00",
+    "scope": "UTEM only; global observed_at and other actions preserved",
+    "source": "docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md"
   }
 }

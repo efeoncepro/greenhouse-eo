@@ -8,7 +8,7 @@
     "html",
     "pdf"
   ],
-  "status": "prepared_for_operator_review_not_submitted",
+  "status": "package_submitted_by_operator",
   "signed": false,
   "economic_offer_included": false,
   "metrics": {
@@ -47,8 +47,19 @@
     },
     {
       "name": "CLAUDE-HANDOFF-INTERNO.md",
-      "bytes": 5137,
-      "sha256": "5091e421e02a8a761f4cea905ba9d602f3e297106e551cf252169b1c28cc1711"
+      "bytes": 5844,
+      "sha256": "9336194c3b5d5308eb6781a26e674c1b323ceff92ff8856d69341455d01e0bb1",
+      "preSubmissionPreparationSha256": "5091e421e02a8a761f4cea905ba9d602f3e297106e551cf252169b1c28cc1711",
+      "audience": "internal_not_for_buyer",
+      "updated_reason": "Continuidad posterior a presentacion; no cambia entregables client-facing"
     }
-  ]
+  ],
+  "submitted": true,
+  "submitted_on": "2026-10-08",
+  "submission_evidence": "submission-evidence.json",
+  "submitted_attachment_inventory_verified": false,
+  "preservation": {
+    "clientFacingFilesUnchanged": true,
+    "internalHandoffUpdatedSeparately": true
+  }
 }

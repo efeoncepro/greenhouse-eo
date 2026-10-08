@@ -11,6 +11,10 @@
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
 
+## Oferta económica rápida para licitación — documento local
+
+La [plantilla A4 de licitación](../../commercial/templates/cotizacion-a4/README.md) resuelve el pedido de componer rápidamente HTML/PDF desde un alcance, precio y condiciones aprobados. Su oferta puede presentarse formalmente al comprador. El renderer sólo genera archivos: su `reference`, JSON y estado documental no son `quotation_id`, snapshot ni lifecycle de este cotizador, y no ejecutan catálogo, costing, margen, approvals, CRM o quote-to-cash. Para crear, simular, emitir o aprobar una cotización en Greenhouse, seguir el flujo canónico descrito aquí; no sustituirlo por ese HTML ni importar sus datos automáticamente. Cada registro posterior requiere conciliación y evidencia propias.
+
 ## Cambios v3.12 (2026-06-21 — TASK-1211 · Read parity multi-consumer)
 
 El cotizador separa dos capacidades distintas: **simular precio** (consultar, sin guardar nada) y **autorar/emitir** (escribir una cotización real). Esta entrega cubre la primera y la abre a más consumidores.

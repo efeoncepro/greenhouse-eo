@@ -1,5 +1,7 @@
 # Alta autorizada en HubSpot — 8 de octubre de 2026
 
+**Actualización posterior de UTEM:** presentación confirmada y Deal65832566144 actualizado a Presentación de soluciones /CLP4.800.000 netos. [Readback posterior](../utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). Este documento y su JSON conservan la evidencia histórica de las trece altas, no sus valores actuales.
+
 **Resultado: 13 Deals creados y verificados en portal 48713323, owner Julio Reyes (75788512).** Autorización directa: «Te autorizo», referida a las trece altas de la selección presentada. No autoriza envío de mensajes, ofertas ni postulaciones.
 
 Se revalidaron las trece fichas en LicitaLAB el 08/10 entre 06:14 y 06:17 Chile: todas Publicada, no vencidas, cierres sin cambios respecto de la selección. Se buscaron duplicados por ID, llave `hubspot-public-tender:CL:<ID>` y nombres de comprador. Cero coincidencias de proceso antes de crear; trece IDs distintos en búsqueda posterior.

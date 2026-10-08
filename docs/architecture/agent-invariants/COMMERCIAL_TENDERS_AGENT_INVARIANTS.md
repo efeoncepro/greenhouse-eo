@@ -25,6 +25,16 @@ Método: [plataformas y expediente administrativo](../../../.codex/skills/greenh
 Datos: [ficha corporativa](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md).
 Continuidad y evidencia: [cierre de sesión](../../audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
 
+## Oferta económica documental rápida para licitación — 2026-10-08
+
+Para el pedido de avanzar rápido con HTML/PDF de una licitación o Compra Ágil, usar la [plantilla A4](../../commercial/templates/cotizacion-a4/README.md) desde alcance, precio y condiciones aprobados para ese expediente. Puede generar la oferta económica formal que se presenta al comprador; el ejemplo es ilustrativo. El renderer es local y su JSON/slots, referencia y manifiesto no son registros ni snapshots del cotizador.
+
+Si el pedido requiere calcular por catálogo, persistir, emitir o aprobar una cotización en Greenhouse, operar el [cotizador canónico](../../documentation/finance/cotizador.md) conforme a la [arquitectura de cotizaciones](../GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md). No usar el HTML como reemplazo, inventar `quotation_id`/`quote_id` ni promover su precio a rate card. Firma, presentación, actualización CRM y operaciones financieras conservan su propia autoridad y evidencia.
+
+Proposal Studio mantiene su gate de Quote/margen: `evaluateQuoteMarginGate` en `src/lib/commercial/tenders/proposals/quote-gate.ts` rechaza `quote_missing` y `margin_unknown`. La oferta documental aprobada o presentada no satisface por sí sola ese GO, los approvals persistidos ni quote-to-cash. Preservar el paquete presentado a UTEM; esta distinción no requiere regenerarlo ni reinterpretar su aprobación comercial.
+
+Fuentes del carril gobernado: [orquestación agéntica propuesta](../GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md) y [guardrails de pricing](../../audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md). Routing load-on-demand conforme a [Agent Context Router](../GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md); esta aclaración documental no cambia el runtime.
+
 ## Estado real del dominio (2026-07-12, post TASK-1393 Slices 0-4) — no asumas de más
 
 | Pieza                                                                                                                                                      | Estado                                                                                                                                                                                                                                                                   |

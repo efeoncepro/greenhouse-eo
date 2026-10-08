@@ -1,22 +1,26 @@
 # Registro operativo CRM de licitaciones
 
+## UTEM · presentada — actualización puntual 08-10-2026
+
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Evidencia y readback](utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). La fila vigente de UTEM prevalece sobre el estado histórico de las trece altas.
+
 > Índice rápido compartido para Codex y Claude. **No reemplaza HubSpot, LicitaLAB, Mercado Público, las bases ni el comprobante de postulación.** Antes de decidir, escribir o afirmar un estado, confirma el dato en su fuente de verdad y luego actualiza este archivo.
 
 ## Criterio operativo posterior al alta · 08-10-2026
 
 Julio corrigió la clasificación comercial: **una señal o lead no equivale a una oportunidad calificada**. Los Deals ya creados se conservan por instrucción expresa; `qualifiedtobuy` no acredita calificación completa. Para nuevas señales, calificar desde lead antes de promover y reutilizar registros/segmentos activos existentes.
 
-UTEM fue seleccionada para preparación; el [estado del expediente](licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md) actualiza anexos y decisiones del operador, sin nueva escritura ni readback CRM. No exigir contacto previo para licitaciones por plataforma; usar canal disponible y registrar supuestos acordados si no lo hay. [Criterio y datos confirmados](../EFEONCE_DATOS_PARA_LICITACIONES.md).
+UTEM fue seleccionada para preparación y luego presentada por Julio. El expediente enlazado y la fila vigente registran la confirmación de Mercado Público, precio final y readbacks CRM/Notion. No exigir contacto previo ni repetir la preparación o la decisión de presentación. Las trece altas y sus valores iniciales se conservan como evidencia histórica.
 
 ## Altas LicitaLAB verificadas — 2026-10-08
 
-Trece altas autorizadas por Julio, verificadas con dos lecturas y deduplicación final. [Change set, evidencia y límites](licitalab-deep-review-2026-10-07/HUBSPOT_ALTA_2026-10-08.md). Todas `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`, estado operativo **En evaluación / preparación condicionada**. Amount y closedate vacíos; presupuesto comprador separado. Asociación Company pendiente. Sin postulación.
+Trece altas autorizadas por Julio, verificadas con dos lecturas y deduplicación final. [Change set, evidencia y límites](licitalab-deep-review-2026-10-07/HUBSPOT_ALTA_2026-10-08.md). **Estado histórico de la ronda de altas:** todas nacieron `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`, amount/closedate vacíos y sin postulación. UTEM fue actualizada después de presentar: ver fila vigente y registro de presentación; las otras doce altas no se modificaron en esta operación. Presupuesto comprador separado y asociación Company pendiente.
 
 Bucket propuesto Strategic Bets; lectura posterior: nueve Core Pipeline y cuatro Strategic Bets. Regla responsable no identificada; no se corrigió en bucle ni se infirió relación previa.
 
 | Proceso / Deal | Presupuesto comprador CLP | Cierre oferta Chile | Bucket live | Próximo paso |
 | --- | ---: | --- | --- | --- |
-| `5251-1060-COT26` · [Efeonce — UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 6,800,000 | 08-10-2026 18:00 | Core Pipeline | Anexos firmados; habilitación y no deuda confirmadas por Julio. Preparar técnica/cumplimiento, precio exacto y costo/margen: tres meses, objetivo cercano a CLP 6,8 M netos. Sin envío. |
+| `5251-1060-COT26` · [Efeonce — UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 6,800,000 | 08-10-2026 18:00 | Core Pipeline | **Presentada / En decisión.** Mercado Público confirmó envío; HubSpot Presentación de soluciones, amount CLP4.800.000 netos por tres meses (IVA912.000, total5.712.000). Revisar evaluación/resultado; costo/capacidad medidos y panel pendientes internos. |
 | `609-107-COT26` · [Efeonce — INDAP — Claude Team Premium · 65806293639](https://app.hubspot.com/contacts/48713323/record/0-3/65806293639?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 7,180,000 | 08-10-2026 14:00 | Core Pipeline | Cotizar canal y soporte hoy; estrecha holgura al precio público. Cierra 8/10 14:00. |
 | `757-422-COT26` · [Efeonce Factory — MINSAL — Diseño SANNA · 65806331396](https://app.hubspot.com/contacts/48713323/record/0-3/65806331396?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 2,000,000 | 09-10-2026 09:00 | Core Pipeline | Candidato Factory acotado; contar páginas/adaptaciones y horas. No asumir impresión física incluida. |
 | `757-429-COT26` · [Efeonce Factory — MINSAL — Adaptación de videos y dípticos · 65832763160](https://app.hubspot.com/contacts/48713323/record/0-3/65832763160?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 4,000,000 | 13-10-2026 11:00 | Core Pipeline | Confirmar tema, cantidades, fuentes editables y revisiones antes de precio cerrado. |
@@ -35,7 +39,7 @@ ProChile `65678232118` y UNAP `65678277469` continúan sin nuevas escrituras. No
 ## Alcance y corte
 
 - Inicio del registro operativo: **2026-08-28**.
-- Última actualización documentada: **2026-10-07, America/Santiago**.
+- Última actualización documentada: **2026-10-08, America/Santiago**, actualización puntual UTEM; no nuevo barrido global.
 - Snapshot histórico 2026-09-01: 35 oportunidades revisadas (23 públicas y 12 privadas); 29 cuentan con Deal HubSpot verificado: 28 abiertos y uno `closedlost`.
 - El readback live del 2026-09-01 encontró 29 Deals de licitación abiertos: 28 pertenecen a esta admisión y uno corresponde al RFI CRM Mineduc `1588-33-RFI26`, anterior al corte de este registro.
 - Screening comparativo: [`LICITALAB_SCREENING_2026-08-28.md`](LICITALAB_SCREENING_2026-08-28.md).

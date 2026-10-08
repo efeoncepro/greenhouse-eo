@@ -47,7 +47,7 @@ UTEM `5251-1060-COT26`: anexos 1, 2B, 3 y 4 completados y firmados en Word/PDF, 
 
 Carpeta: `Licitaciones/UTEM/1. Agencia SEO-AEO`. Convención permanente: `Licitaciones/<Empresa o institución>/<N>. <Nombre de la licitación>`. Mantener cada proceso separado, sus originales y código oficial. La autorización de usar la firma corresponde a los anexos de UTEM y no se extiende a otras declaraciones o propuestas.
 
-Siguiente acción UTEM: propuesta/ficha de cumplimiento y cotización, costeo y precio exacto por definir. Trabajar con tres meses y orientación cercana a CLP 6.800.000 netos; explicitar neto, IVA y total. El tratamiento neto es un supuesto acordado, no confirmado por UTEM, y no bloquea preparar por ausencia de canal. No se ha presentado oferta. La tarea de Notion conserva su estado observado hasta lectura/escritura externa verificadas; anexos terminados no equivalen a paquete presentado ni tarea cerrada. [Revisión del proceso](../tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md).
+Siguiente acción UTEM: **revisar evaluación/resultado**. Oferta presentada por Julio el08/10/2026, confirmación de Mercado Público conservada; tres meses, netoCLP4.800.000, IVA912.000, total5.712.000. HubSpot Presentación de soluciones/amount4.800.000 verificados; tarea Notion existente en Enviada, DoD y resumen actualizados y releídos. No repetir preparación ni exigir otra decisión de envío. [Evidencia](../tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). Validaciones internas de costo/margen/capacidad/panel siguen pendientes y no se declaran completadas. Sin adjudicación confirmada.
 
 ## Estado técnico observado en el corte inicial
 

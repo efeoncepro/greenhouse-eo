@@ -1,0 +1,12 @@
+{
+  "kind": "operator_provided_mercado_publico_confirmation",
+  "date": "2026-10-08",
+  "exactSubmissionTime": null,
+  "message": "Cotización enviada correctamente",
+  "process": "5251-1060-COT26",
+  "file": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/UTEM/1. Agencia SEO-AEO/07. Presentacion/UTEM - Confirmacion envio Mercado Publico - 2026-10-08.png",
+  "sha256": "97a6e1143b1341df2acef584dfb558a29812f7fa5e1524339732f9b658a45f60",
+  "buyerDeadlineShown": "2026-10-08T18:00:00-03:00",
+  "attachmentInventoryVerified": false,
+  "submittedAmountBasis": "Cotizacion aprobada y confirmacion del operador; la pantalla de confirmacion no muestra montos."
+}

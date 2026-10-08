@@ -1,5 +1,7 @@
 # Licitaciones, CRM y continuidad — consolidación 2026-10-08
 
+**Actualización posterior:** UTEM presentada y CRM actualizado por mandato expreso del operador; [registro final y readbacks](../../commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). Los valores/pendientes de las tablas siguientes describen la consolidación anterior al envío.
+
 Owner: Commercial / Julio Reyes. Actualización documental solicitada expresamente por el operador y ejecutada con tres subagentes: documentación comercial, skills y seguimiento. Esta consolidación no es una nueva corrida global de CRM, Outlook ni scheduler.
 
 ## Estado recuperado y fuentes

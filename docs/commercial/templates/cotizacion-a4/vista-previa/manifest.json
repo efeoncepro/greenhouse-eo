@@ -1,0 +1,219 @@
+{
+  "template": "cotizacion-a4",
+  "version": 1,
+  "templateFiles": [
+    {
+      "name": "template.html",
+      "sha256": "63759f3b55913cef514c2145b297fdde899d8d2b980a603c28d9d921cd6b7bfb"
+    },
+    {
+      "name": "template.css",
+      "sha256": "c79c121d37ae2619e36dcfe497be9f4150e5bba52f57835502891869d8e16fe5"
+    }
+  ],
+  "generatedAt": "2026-10-08T18:12:34.031Z",
+  "status": "example",
+  "signed": false,
+  "submitted": false,
+  "currency": "CLP",
+  "amounts": {
+    "net": 4800000,
+    "vat": 912000,
+    "total": 5712000,
+    "monthly": {
+      "months": 3,
+      "net": 1600000,
+      "vat": 304000,
+      "total": 1904000
+    }
+  },
+  "dataSource": "docs/commercial/templates/cotizacion-a4/ejemplo.json",
+  "dataSha256": "f0afaac1de3828df534f8105b08cb790412fcdf4e697802df1717ea5e78bda28",
+  "brand": {
+    "line": "engine",
+    "assets": [
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+        "source": "axis-brand-assets:efeonce-logo-positive",
+        "bytes": 4383,
+        "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+      },
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+        "source": "axis-brand-assets:url-bubble-baked-light",
+        "bytes": 9410,
+        "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+        "source": "axis-fonts",
+        "bytes": 408496,
+        "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+        "source": "axis-fonts",
+        "bytes": 158240,
+        "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+        "source": "axis-fonts",
+        "bytes": 152860,
+        "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+        "source": "axis-fonts",
+        "bytes": 151516,
+        "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+        "source": "axis-fonts",
+        "bytes": 150292,
+        "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+      }
+    ],
+    "contactSource": "src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json",
+    "orbit": {
+      "schema": "axis.graphic-line-orbit-composition.v1",
+      "contract": {
+        "id": "efeonce.graphic-line-orbit",
+        "version": "0.3.1"
+      },
+      "canvas": {
+        "width": 794,
+        "height": 1123,
+        "line": "engine",
+        "product": "wave",
+        "platform": null,
+        "surface": "light",
+        "channel": "print",
+        "scale": 1,
+        "socialMultiplierApplied": false
+      },
+      "palette": {
+        "accent": "#0375db",
+        "background": "#f7f8f6",
+        "ring": "#72ded8",
+        "halo": "#72ded8"
+      },
+      "elements": [
+        {
+          "kind": "orbit",
+          "id": "orbit",
+          "placement": {
+            "region": "center",
+            "radius": {
+              "ratio": 0.3,
+              "of": "width"
+            }
+          },
+          "ring": {
+            "strokePx": 1,
+            "opacity": 0.16,
+            "color": "#023c70",
+            "innerOrbits": [
+              {
+                "radiusRatio": 0.72,
+                "opacity": 0.11
+              },
+              {
+                "radiusRatio": 0.44,
+                "opacity": 0.06
+              }
+            ]
+          },
+          "innerOrbits": false,
+          "arc": {
+            "startDeg": 65,
+            "sweepDeg": 50,
+            "strokePx": 1.6,
+            "color": "#0375db",
+            "linecap": "round",
+            "gradient": false
+          },
+          "trajectory": {
+            "meaning": "accent",
+            "origin": null,
+            "direction": "clockwise",
+            "sweepDeg": 50,
+            "value": null,
+            "valueLabel": null,
+            "pairsWithNumber": false
+          },
+          "sphere": {
+            "radiusPx": 3.5,
+            "color": "#0375db",
+            "at": "arc-end",
+            "ring": null
+          },
+          "halo": null
+        }
+      ],
+      "adapterChecks": [
+        "text-never-crosses-ring",
+        "ring-center-on-target-center",
+        "sphere-on-arc-end",
+        "lens-subject-inside-circle",
+        "url-as-bubble-never-text",
+        "decorative-svg-hidden-from-accessibility-tree",
+        "signature-centered",
+        "signature-min-contrast",
+        "accent-text-min-size",
+        "orbit-never-over-subject-or-reserves",
+        "accent-arc-never-reads-as-data",
+        "answer-period-part-of-text",
+        "measure-shows-value-and-source"
+      ]
+    }
+  },
+  "checks": {
+    "layout": [
+      {
+        "page": 1,
+        "gapPx": 102.828125,
+        "headerGapPx": 64,
+        "overflow": []
+      },
+      {
+        "page": 2,
+        "gapPx": 86.015625,
+        "headerGapPx": 22.296875,
+        "overflow": []
+      },
+      {
+        "page": 3,
+        "gapPx": 33.5,
+        "headerGapPx": 22.296875,
+        "overflow": []
+      },
+      {
+        "page": 4,
+        "gapPx": 151,
+        "headerGapPx": 22.296875,
+        "overflow": []
+      }
+    ],
+    "mobile": {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    "browserErrors": [],
+    "visualReview": "passed",
+    "pdfTextAndPageAudit": "passed",
+    "reviewedOn": "2026-10-08",
+    "reviewEvidence": "../VERIFICACION.md"
+  },
+  "files": [
+    {
+      "name": "cotizacion.html",
+      "sha256": "3b5b943e33bdea1e65fc38549821d1d96a9c643f8ced261025787923d21a430f"
+    },
+    {
+      "name": "cotizacion.pdf",
+      "sha256": "cfccae4b98f4f1b559698d2b91d696bbcc9853cbf36249c84e8e10fdacfd9c66"
+    }
+  ]
+}

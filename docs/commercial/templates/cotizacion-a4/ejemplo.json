@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "status": "example",
+  "date": "2026-10-08",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "CLP",
+  "net": 4800000,
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de marketing",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": ["Posicionamiento", "SEO, GEO", "y AEO."],
+    "subtitle": "Un programa integral de tres meses para Cliente de ejemplo."
+  },
+  "service": {
+    "name": "Servicio integral de posicionamiento SEO, GEO y AEO",
+    "detail": "Duración: tres meses desde la fecha acordada. Incluye los componentes descritos en la página 2."
+  },
+  "scope": {
+    "title": ["Un alcance completo,", "con entregas cada mes."],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar las entregas, cantidades y responsabilidades acordadas con el cliente.",
+    "rows": [
+      {"title": "Auditoría y estrategia", "text": "Diagnóstico SEO/GEO/AEO, revisión técnica y editorial, línea base y plan de acciones priorizadas."},
+      {"title": "Contenido editorial", "text": "15 artículos originales, 5 por mes, con ficha SEO/AEO, fuentes y enlaces. Dos rondas consolidadas de revisión y aprobación del cliente antes de publicar."},
+      {"title": "Implementación", "text": "Optimización de hasta 10 páginas existentes. Carga y publicación de artículos aprobados, según permisos y componentes disponibles del CMS."},
+      {"title": "Autoridad y PR digital", "text": "Una campaña con al menos 10 destinos pertinentes. Preparación, gestión, seguimiento y reporte de acciones y enlaces obtenidos."},
+      {"title": "Medición", "text": "Panel de 15 consultas en 2 sistemas de IA, con cortes inicial, intermedio y final. Seguimiento orgánico según fuentes disponibles."},
+      {"title": "Informes", "text": "Informe de auditoría, informe de seguimiento e informe final; reportes mensuales y revisión de resultados."},
+      {"title": "Coordinación", "text": "Responsable de proyecto, reuniones quincenales, inicio y transferencia final. Revisión colaborativa y acceso al panel durante el servicio."}
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de tres meses",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {"label": "Mes 1", "title": "Diagnóstico y arranque", "text": "Auditoría, línea base, priorización e inicio de ajustes. Primeros 5 artículos y preparación de PR."},
+      {"label": "Mes 2", "title": "Implementación", "text": "Continuidad de ajustes y PR. 5 artículos, medición intermedia e informe de seguimiento."},
+      {"label": "Mes 3", "title": "Resultados y cierre", "text": "Últimos 5 artículos, reporte de PR, informe final, recomendaciones y transferencia."}
+    ]
+  },
+  "pricing": {
+    "title": ["Una cotización por", "el servicio integral."],
+    "intro": "Precio fijo para los tres meses de ejecución. Todos los valores se expresan en pesos chilenos (CLP).",
+    "summary": "Tres meses · Pesos chilenos · IVA no incluido",
+    "taxNote": "El valor neto excluye IVA. El total incluye IVA y corresponde al precio completo del servicio por tres meses.",
+    "monthly": {
+      "months": 3,
+      "note": "Esta distribución es una referencia aritmética. La modalidad y los plazos de facturación y pago se establecen en las condiciones comerciales."
+    }
+  },
+  "conditions": {
+    "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
+    "rows": [
+      {"title": "Plazo e inicio", "text": "Tres meses desde la fecha acordada. El calendario de entregas, revisión y publicación se definirá con la contraparte del cliente."},
+      {"title": "Facturación y pago", "text": "Las condiciones de recepción, facturación y pago se acuerdan antes de emitir la cotización final. Este ejemplo no establece un calendario de cobro."},
+      {"title": "Aprobaciones y accesos", "text": "El cliente valida los temas y datos y aprueba los artículos antes de publicar. Facilita los accesos y permisos acordados; los cambios se ejecutan con autorización."},
+      {"title": "Límites del alcance", "text": "Rediseños, migraciones, nuevas funcionalidades e infraestructura requieren un alcance independiente. Las publicaciones y enlaces de PR dependen de cada medio."},
+      {"title": "Herramientas y resguardo", "text": "El panel se configura con las fuentes disponibles. Su acceso se incluye durante el servicio; nuevas integraciones requieren un acuerdo específico. Se resguardan los accesos y la información del cliente."},
+      {"title": "Vigencia", "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."}
+    ]
+  }
+}

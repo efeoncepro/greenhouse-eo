@@ -1,14 +1,16 @@
 # UTEM · deck de la propuesta técnica SEO/GEO/AEO — 2026-10-08
 
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Presentación y continuidad](../../commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). La auditoría de producción siguiente conserva su corte anterior al envío.
+
 Owner: Commercial / Julio Reyes. Ejecutado por Claude (sesión «Propuesta UTEM») sobre la técnica v1.0 de Codex, con el
 estilo alternativo «propuesta técnica para leer sin presentador» aprobado en Pibank (2026-10-07). Compra Ágil
-5251-1060-COT26, cierre observado 08/10/2026 18:00 Chile. **Sin oferta presentada ni enviada.**
+5251-1060-COT26, cierre observado 08/10/2026 18:00 Chile. **En el corte de producción aún no se había presentado; después Julio presentó y aportó confirmación, enlazada arriba.**
 
 ## Qué quedó
 
 | Pieza | Dónde | Estado |
 | --- | --- | --- |
-| Deck v2, 35 láminas 16:9, línea Engine | Canvas Design https://claude.ai/artifact/28wHXcgyA3ANNqaaeJcrfb (privado) | Revisado por el operador lámina por lámina en comentarios; sin aprobación final de envío |
+| Deck v2, 35 láminas 16:9, línea Engine | Canvas Design https://claude.ai/artifact/28wHXcgyA3ANNqaaeJcrfb (privado) | Revisado por el operador lámina por lámina; paquete posteriormente presentado por Julio |
 | PDF del deck | OneDrive `Licitaciones/UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica/UTEM - Propuesta tecnica SEO GEO AEO - Deck.pdf` | Generado con `render-pdf-utem.mjs` |
 | Técnica v1.1 (MD/HTML/PDF) | [oferta-tecnica.md](../../commercial/tenders/utem-seo-aeo-2026/oferta-tecnica.md) → misma carpeta OneDrive | Alineada con el deck: §2.2 revisión pública, §8 equipo nominal, §8.1 experiencia, fuentes F6–F7 |
 | Producción | [`ai-generations/2026-10-08_utem-propuesta/`](../../../ai-generations/2026-10-08_utem-propuesta/LEEME.md) | Commit `940700c9c` (sin push) |
@@ -62,10 +64,10 @@ Engine»).
 - `serp-compare` con alias genérico (`educacioncontinua`) marca `aiMention` por el texto «educación continua»: contar
   sólo `aiCitation`/`aiDirectLink`.
 
-## Pendientes antes de presentar
+## Pendientes documentados en el corte de producción — estado posterior
 
-- Decidir si «Todo junto» y «Cada mes» (Insights y panel Greenhouse) se quedan: la técnica no los incluye en alcance;
+- La cotización posterior incluye Insights y panel Greenhouse durante tres meses según fuentes disponibles, sin integraciones nuevas. En el corte inicial la técnica no los incluía expresamente;
   «Cada mes» trae cifras de muestra.
 - Fuente exacta del caso Sky; nombres completos del equipo si la oferta los exige.
 - `CLAUDE-HANDOFF-INTERNO.md` está en la carpeta de entrega de OneDrive (lo copia `render-proposal.mjs`): no se carga.
-- Cotización exacta, costeo/margen y decisión de presentación (fuera del deck).
+- Cotización exacta y presentación resueltas posteriormente: CLP4,8M netos /5,712M total, enviada por Julio. Costeo/margen medidos permanecen pendientes internos.

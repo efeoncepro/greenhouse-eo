@@ -33,6 +33,10 @@ Carga según la decisión pendiente, no todo el paquete por defecto:
 
 Plantillas operativas: [brief](templates/report-brief.md), [ledger de evidencia](templates/evidence-ledger.csv), [plan de acciones](templates/action-register.csv), [revisión](templates/review.md) y [manifiesto de PDF](templates/pdf-check.json). Son formatos adaptables, no formularios que deban aparecer en el informe del cliente.
 
+Para una **oferta económica documental rápida de licitación/Compra Ágil urgente**, solicitada en HTML para PDF y desde alcance/precio/condiciones aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Pricing/Tenders gobiernan los datos comerciales; Report Studio verifica todas las páginas del PDF final. La salida puede ser una oferta formal; únicamente `ejemplo.json` es ilustrativo sin validez comercial.
+
+El JSON/data slots y el manifiesto pertenecen al documento local: no crean `quoteId`, aprueban precio, verifican margen, ejecutan maker-checker ni registran CRM/facturación/envío. Si se pide operar el **sistema Greenhouse de cotizaciones**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y verificar Quote Builder/catálogo/engine/snapshots/aprobaciones; este recurso editorial no sustituye ese sistema. Preservar las versiones firmadas/presentadas.
+
 ## Flujo de trabajo
 
 ### 1. Reconstruir y delimitar

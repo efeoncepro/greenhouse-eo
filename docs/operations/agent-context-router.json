@@ -789,6 +789,24 @@
       ]
     },
     {
+      "id": "tender-economic-document",
+      "triggers": [
+        "oferta económica rápida de licitación",
+        "cotización A4 para Compra Ágil",
+        "HTML para PDF de licitación",
+        "plantilla UTEM de cotización"
+      ],
+      "skills": [
+        "greenhouse-public-private-tenders",
+        "report-studio"
+      ],
+      "sources": [
+        "docs/commercial/templates/cotizacion-a4/README.md",
+        "docs/documentation/finance/cotizador.md",
+        "docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
       "id": "documentation-context",
       "triggers": [
         "documentation",

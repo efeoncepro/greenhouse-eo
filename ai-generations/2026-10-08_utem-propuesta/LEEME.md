@@ -1,5 +1,7 @@
 # UTEM · Propuesta técnica SEO/GEO/AEO — carpeta de producción
 
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. Registro: `docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md`. No regenerar ni sustituir los archivos del paquete presentado. Los comandos siguientes documentan su producción histórica.
+
 Deck v1 del 2026-10-08, 21 láminas 16:9, línea Engine, molde «propuesta técnica para leer sin presentador» (Pibank).
 Fuente narrativa: `docs/commercial/tenders/utem-seo-aeo-2026/oferta-tecnica.md` v1.0. Si cambia el Markdown, se
 cambia `build-tecnica.py` y se regenera; nunca al revés.

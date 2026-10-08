@@ -44,8 +44,10 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Workspaces comerciales
 
+- [Oferta económica rápida para licitación / Compra Ágil](templates/cotizacion-a4/README.md): plantilla A4 derivada de UTEM, con slots y JSON; prepara HTML/PDF desde precio y alcance aprobados. Su guía distingue la emisión documental de una cotización persistida: no crea `quoteId`, no ejecuta pricing/costing ni actualiza CRM o Finance. Para operar el sistema de cotizaciones Greenhouse, seguir [pricing comercial](../documentation/finance/pricing-comercial.md) y el [canon de Finance](../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), verificando runtime vigente.
+
 - [Revisión amplia LicitaLAB](tenders/licitalab-deep-review-2026-10-07/README.md): todas las categorías solicitadas, vista Todos y búsquedas libres; cobertura y 13 altas verificadas. Nueva señal se califica desde lead; los Deals creados se conservan por instrucción del operador.
-- [UTEM — Agencia SEO/AEO](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md): originales y anexos firmados en OneDrive; técnica v1.1 y [deck v2 con PDF](../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md) hechos; cotización/costeo y presentación pendientes.
+- [UTEM — Agencia SEO/AEO](tenders/licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md): originales y anexos firmados en OneDrive; técnica v1.1 y [deck v2 con PDF](../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md) hechos; **oferta presentada**, CLP4,8M netos /5,712M con IVA y HubSpot Presentación de soluciones. [Evidencia](tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md); seguimiento de evaluación/resultado.
 - [Yanbal](prospects/yanbal-ai-creative-2026/README.md) y [Olivos del Sur](prospects/olivos-del-sur-peru-2026/README.md): investigación y registros asociados, segmentos activos verificados al corte; siguen por calificar, sin outreach.
 
 - [Casos de negocio SEO/AEO](SEO_AEO_BUSINESS_CASE_METHOD_V1.md): método propuesto para evaluar requisitos desde la meta, demanda competitiva por intención, ejecución conjunta SEO/AEO+PR y costo/valor por horizonte; [manual](../manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md) y [lectura funcional](../documentation/comercial/caso-negocio-seo-aeo.md).

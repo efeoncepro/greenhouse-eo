@@ -697,3 +697,17 @@ Verificado contra: release `37630788367` SUCCESS (`7fb549a`), main documental `1
   `RECOLOR_LO=156` para no tocar el verde de Greenhouse); para poner un logo al centro de `content-team`, componer con
   título vacío, borrar sólo los puntos del U+2800 y componer el logo encima, sin parche. Revisar siempre al 100 % y con
   contraste aumentado: el rectángulo y las manchas no se ven a tamaño de hoja de contacto.
+
+## 2026-10-08 — Cotización A4: HTML para PDF y conservación del paquete (UTEM)
+
+La cotización vertical de cuatro páginas fue aprobada por Julio y presentada como parte del proceso UTEM. El HTML es fuente editable para exportar el PDF: tamaño físico A4, saltos definidos, encabezado/pie reservados y fuentes/logos oficiales incluidos. Verificar todos los folios del **PDF exportado**, texto extraíble, fuentes incrustadas y montos; un screenshot del HTML no sustituye esa revisión. Este documento comercial no amplía ni cambia las recetas de deck o los tokens de La órbita.
+
+Tras la presentación, actualizar metadatos y continuidad conservando los bytes/hashes aprobados. [Registro de la presentación y archivos](../../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El caso no autoriza variantes nuevas de logos, eslóganes ni reglas de composición.
+
+## 2026-10-08 — Cotización A4 guardada como plantilla
+
+Por mandato de Julio, el HTML aprobado se guardó como [plantilla A4 para oferta económica documental rápida de licitación](../../../../docs/commercial/templates/cotizacion-a4/README.md): `template.html` con data slots, CSS, JSON de ejemplo y generador `scripts/documents/render-cotizacion-a4.mjs`. Usarla ante una licitación/Compra Ágil urgente que requiere HTML para PDF, desde alcance, precio y condiciones aprobados. Puede emitir una oferta formal; sólo el ejemplo es sin validez comercial.
+
+Conserva cuatro hojas, recursos AXIS y pie institucional; calcula neto/IVA/total y referencia mensual opcional. Los datos se sustituyen en el JSON; no se editan tokens ni recetas de deck. El generador rechaza desborde y versiones firmadas/presentadas; cada PDF exige revisión visual propia. La cotización enviada a UTEM permanece intacta.
+
+Es un artefacto documental local: no crea `quoteId`, costea/valida margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Pedir operar el sistema de cotizaciones Greenhouse activa [Cotizador](../../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../../docs/documentation/finance/pricing-comercial.md), con catálogo/engine/Quote Builder/snapshots y estado runtime verificado; no activa esta plantilla por compartir el nombre «cotización». Su manifiesto no es el de Artifact Composer ni un snapshot del sistema.

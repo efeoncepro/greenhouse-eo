@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="{{document.description}}">
+  <title>{{document.title}}</title>
+  <style>{{brand.css}}</style>
+</head>
+<body>
+  <div class="toolbar"><nav aria-label="Secciones del documento"><a href="#pagina-1">Portada</a><a href="#pagina-2">Alcance</a><a href="#pagina-3">Cotización</a><a href="#pagina-4">Condiciones</a></nav><button type="button" onclick="window.print()">Imprimir / Guardar PDF</button></div>
+  <main>
+    <section id="pagina-1" class="page cover" aria-label="Página 1: Portada">
+      <div class="cover-orbit" aria-hidden="true">{{brand.orbit}}</div>
+      <header class="cover-header"><img src="{{brand.logo}}" alt="Efeonce"><p class="overline">Oferta económica · <span data-slot="date">{{date.label}}</span></p><p class="cover-code" data-slot="reference">{{reference}}</p></header>
+      <div class="cover-content">
+        <p class="overline" data-slot="cover.label">{{cover.label}}</p>
+        <h1 data-slot="cover.title">{{cover.title}}</h1>
+        <p class="cover-deck" data-slot="cover.subtitle">{{cover.subtitle}}</p>
+        <div class="client-block"><span class="label">Preparado para</span>{{buyer.logo}}<p><span data-slot="buyer.name">{{buyer.name}}</span><br><span data-slot="buyer.taxId">{{buyer.taxId}}</span></p></div>
+        <div class="cover-investment"><div><span class="label">Valor neto del servicio completo</span><strong data-slot="amount.net">{{amount.net}}</strong><span data-slot="pricing.summary">{{pricing.summary}}</span></div><div class="cover-total"><span class="label">Total con IVA</span><b data-slot="amount.total">{{amount.total}}</b></div></div>
+        <div class="cover-supplier"><div><span class="label">Oferente</span><b data-slot="supplier.name">{{supplier.name}}</b><span data-slot="supplier.taxId">{{supplier.taxId}}</span></div><div><span class="label">Responsable</span><b data-slot="supplier.contact">{{supplier.contact}}</b><a href="{{supplier.emailHref}}" data-slot="supplier.email">{{supplier.email}}</a></div></div>
+      </div>{{footer.1}}
+    </section>
+    <section id="pagina-2" class="page" aria-label="Página 2: Alcance y calendario">
+      {{header.2}}<div class="page-content">
+        <p class="overline">01 · El servicio</p><h2 data-slot="scope.title">{{scope.title}}</h2><p class="intro" data-slot="scope.intro">{{scope.intro}}</p>
+        <table class="scope-table"><caption class="sr-only">Componentes incluidos</caption><thead><tr><th scope="col">Componente</th><th scope="col">Alcance incluido</th></tr></thead><tbody data-slot="scope.rows">{{scope.rows}}</tbody></table>
+        <div class="section-heading"><h3 data-slot="schedule.title">{{schedule.title}}</h3><span data-slot="schedule.note">{{schedule.note}}</span></div>
+        <div class="timeline" data-count="{{schedule.count}}" data-slot="schedule.phases">{{schedule.phases}}</div>
+      </div>{{footer.2}}
+    </section>
+    <section id="pagina-3" class="page" aria-label="Página 3: Detalle económico">
+      {{header.3}}<div class="page-content">
+        <p class="overline">02 · Inversión</p><h2 data-slot="pricing.title">{{pricing.title}}</h2><p class="intro" data-slot="pricing.intro">{{pricing.intro}}</p>
+        <table class="price-table"><caption class="sr-only">Precio del servicio completo</caption><thead><tr><th scope="col">Servicio</th><th scope="col">Cantidad</th><th scope="col">Valor neto</th></tr></thead><tbody><tr><td><strong data-slot="service.name">{{service.name}}</strong><span data-slot="service.detail">{{service.detail}}</span></td><td>1<span>servicio</span></td><td data-slot="amount.net">{{amount.net}}</td></tr></tbody></table>
+        <div class="totals"><div><span>Subtotal neto</span><strong data-slot="amount.net">{{amount.net}}</strong></div><div><span>IVA (<span data-slot="vatRate">{{vatRate.label}}</span> %)</span><strong data-slot="amount.vat">{{amount.vat}}</strong></div><div class="grand-total"><span>Total con IVA</span><strong data-slot="amount.total">{{amount.total}}</strong></div></div>
+        <p class="tax-note" data-slot="pricing.taxNote">{{pricing.taxNote}}</p>
+        {{pricing.monthly}}
+      </div>{{footer.3}}
+    </section>
+    <section id="pagina-4" class="page" aria-label="Página 4: Condiciones comerciales">
+      {{header.4}}<div class="page-content">
+        <p class="overline">03 · Condiciones comerciales</p><h2 data-slot="conditions.title">{{conditions.title}}</h2>
+        <div class="conditions" data-slot="conditions.rows">{{conditions.rows}}</div>
+        <div class="contact-line"><strong data-slot="supplier.contact">{{supplier.contact}}</strong><a href="{{supplier.emailHref}}" data-slot="supplier.email">{{supplier.email}}</a><a href="{{supplier.phoneHref}}" data-slot="supplier.phone">{{supplier.phone}}</a></div>
+      </div>{{footer.4}}
+    </section>
+  </main>
+</body>
+</html>

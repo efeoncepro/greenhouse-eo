@@ -4,7 +4,9 @@ Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ## 2026-10-08 — Continuidad activa
 
-[UTEM, CRM, seguimiento y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
+**UTEM presentada:** [evidencia, precio y CRM](docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md): CLP4,8M netos /5,712M con IVA; Presentación de soluciones. Notion Enviada; siguiente paso evaluación/resultado. [Continuidad comercial previa](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
+
+**Oferta económica documental rápida:** [plantilla A4 y uso](docs/commercial/templates/cotizacion-a4/README.md) para avanzar en licitación/Compra Ágil con precio/alcance aprobados; JSON/HTML/PDF locales. [Cotizador Greenhouse](docs/documentation/finance/cotizador.md) conserva catálogo, persistencia y aprobación; rutas y skills sincronizados. UTEM presentada intacta.
 
 **Prospecting Agent:** [web guardada; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
 
