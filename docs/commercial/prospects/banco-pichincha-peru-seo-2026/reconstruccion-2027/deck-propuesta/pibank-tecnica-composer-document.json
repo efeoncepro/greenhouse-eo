@@ -1,0 +1,292 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 3,
+  "pages": [
+    {
+      "role": "cover",
+      "recipe": "cover-proposal",
+      "layout": "orbit",
+      "voice": {
+        "eyebrow": "Propuesta técnica · Octubre 2026",
+        "question": "¿Dónde nace una cuenta?",
+        "answer": [
+          "En la",
+          "búsqueda"
+        ]
+      },
+      "body": "Preparada para **Pibank** · Confidencial",
+      "column": {
+        "topPx": 220
+      },
+      "clientLogo": {
+        "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+        "alt": "Pibank"
+      }
+    },
+    {
+      "role": "section",
+      "recipe": "section-classic",
+      "line": "growth",
+      "theme": "light",
+      "progress": {
+        "sections": 3,
+        "current": 1
+      },
+      "voice": {
+        "question": "¿Nos encuentran hoy al buscar?",
+        "answer": [
+          "Casi nunca"
+        ]
+      }
+    },
+    {
+      "role": "section",
+      "recipe": "section-classic",
+      "line": "growth",
+      "theme": "light",
+      "progress": {
+        "sections": 3,
+        "current": 2
+      },
+      "voice": {
+        "question": "¿Qué cambia en pibank.pe?",
+        "answer": [
+          "El recorrido"
+        ]
+      }
+    },
+    {
+      "role": "method",
+      "recipe": "method-surround-cycle",
+      "voice": {
+        "eyebrow": "Cómo trabajamos cada mes",
+        "question": "¿Cómo se sostiene?",
+        "answer": [
+          "En ciclo"
+        ]
+      },
+      "body": "El programa no termina en una implementación: cada mes aprende del anterior y sube a Pibank un **nivel**.",
+      "startLabel": "Empieza aquí",
+      "stations": [
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/medir.png",
+          "title": "Medir",
+          "description": "Search Console, analítica y el panel de IA: dónde aparece Pibank, qué consultas llegan y qué avanza a la apertura."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/crear.png",
+          "title": "Crear",
+          "description": "Hasta cinco artículos al mes y mejoras del pilar Cuenta Soles, con fuente y revisión del banco."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/distribuir.png",
+          "title": "Distribuir",
+          "description": "Comunidad, PR y enlaces llevan los recursos a quien compara cuentas, más allá del sitio."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/optimizar.png",
+          "title": "Optimizar",
+          "description": "Corregimos lo que la medición muestra: consultas sin respuesta, condiciones desactualizadas y fricciones."
+        }
+      ],
+      "core": {
+        "title": "Pibank",
+        "caption": "sube un nivel en cada vuelta"
+      }
+    },
+    {
+      "role": "section",
+      "recipe": "section-classic",
+      "line": "growth",
+      "theme": "light",
+      "progress": {
+        "sections": 3,
+        "current": 3
+      },
+      "voice": {
+        "question": "¿Cuándo se mide el aporte?",
+        "answer": [
+          "Cada mes"
+        ]
+      }
+    },
+    {
+      "role": "content",
+      "recipe": "content-measure-formulas",
+      "line": "engine",
+      "voice": {
+        "eyebrow": "Medición y atribución",
+        "question": "¿Cómo sabremos si funciona?",
+        "answer": [
+          "Lo",
+          "medimos"
+        ]
+      },
+      "body": "Cada métrica con su fórmula, su fuente y un **dueño**. Una cuenta se cuenta una vez, aunque la hayan tocado varios canales.",
+      "note": "Sin cifras de promesa: la línea base se fija en el primer mes con datos del banco",
+      "metrics": [
+        {
+          "glyph": "medicion",
+          "name": "Visitas elegibles",
+          "formula": "Sesiones en páginas de ahorro, por canal",
+          "source": "Analítica web",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "checklist",
+          "name": "Aperturas validadas",
+          "formula": "Cuentas abiertas confirmadas por el banco",
+          "source": "Registro Pibank",
+          "owner": "Analítica Pibank"
+        },
+        {
+          "glyph": "base-de-datos",
+          "name": "Cuentas con fondos",
+          "formula": "Primer depósito dentro de la ventana acordada",
+          "source": "Datos del banco",
+          "owner": "Onboarding Pibank"
+        },
+        {
+          "glyph": "finanzas",
+          "name": "Costo por cuenta",
+          "formula": "Inversión del programa ÷ cuentas con fondos atribuidas",
+          "source": "Datos del banco",
+          "owner": "Finanzas Pibank"
+        },
+        {
+          "glyph": "reloj",
+          "name": "Referencias",
+          "formula": "Coberturas y enlaces editoriales verificados",
+          "source": "Registro de PR",
+          "owner": "Comunicaciones"
+        }
+      ]
+    },
+    {
+      "line": "engine",
+      "role": "content",
+      "recipe": "content-team",
+      "voice": {
+        "eyebrow": "El equipo",
+        "question": "¿Quién trabaja en la cuenta?",
+        "answer": [
+          "Expertos",
+          "por área"
+        ]
+      },
+      "body": "Equipo multidisciplinario: SEO, contenido y diseño, con un **Responsable de Cuenta**.",
+      "team": [
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+            "alt": "Andrés, SEO Specialist"
+          },
+          "name": "Andrés",
+          "role": "SEO Specialist"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+            "alt": "Valentina, Redactora SEO"
+          },
+          "name": "Valentina",
+          "role": "Redactora SEO"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+            "alt": "Julio, Responsable de Cuenta"
+          },
+          "name": "Julio",
+          "role": "Responsable de Cuenta"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+            "alt": "Daniela, Creative Operations Lead"
+          },
+          "name": "Daniela",
+          "role": "Creative Operations Lead"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+            "alt": "Melkin, Senior Visual Designer"
+          },
+          "name": "Melkin",
+          "role": "Senior Visual Designer"
+        }
+      ],
+      "center": {
+        "title": "Pibank",
+        "note": "al centro de todo"
+      }
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-risk",
+      "voice": {
+        "eyebrow": "Riesgo controlado",
+        "question": "¿Y si no funciona?",
+        "answer": [
+          "Lo sabrás",
+          "pronto"
+        ]
+      },
+      "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+      "headers": {
+        "risk": "El riesgo",
+        "how": "Cómo lo cubrimos"
+      },
+      "risks": [
+        {
+          "risk": "Promesas sin respaldo",
+          "name": "Sin promesas vacías",
+          "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+        },
+        {
+          "risk": "Condiciones erradas",
+          "name": "Revisión del banco",
+          "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+        },
+        {
+          "risk": "Esperar a TI",
+          "name": "Plan alternativo",
+          "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+        },
+        {
+          "risk": "Depender de una persona",
+          "name": "Traspaso documentado",
+          "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+        }
+      ],
+      "selected": 1,
+      "selection": {
+        "target": "object",
+        "label": "Pibank",
+        "participantKind": "department"
+      },
+      "line": "growth",
+      "theme": "light",
+      "progress": {
+        "sections": 3,
+        "current": 3
+      }
+    },
+    {
+      "role": "close",
+      "recipe": "close-proposal",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-10-07_pibank-propuesta/plates/BR3f-contra-horizonte-engine.png",
+        "alt": "Nexa, de espaldas, camina hacia una órbita de luz azul Efeonce que se levanta como un portal en el horizonte"
+      }
+    }
+  ]
+}

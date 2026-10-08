@@ -667,6 +667,16 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 | Las dieciséis del deck Salesforce (`content-one-platform`, `method-agent-supervisor`, `decision-platform-coexistence`, `decision-provider-fit`, `content-service-lanes`, `content-season-launches`, `method-identity-consent`, `method-migration-reconcile`, `content-day-release-cycle`, `content-day-live-library`, `content-live-chat`, `content-measure-formulas`, `decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`) | la práctica Salesforce en cinco actos (abajo, «Deck de práctica Salesforce»); con plantilla desde `84c83a044` (doce) y `f05c26e2f` (cuatro) | **aprobado** (2026-09-29) |
 | Las seis del deck SEO/AEO (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`) | la familia SV360, lo que hace el equipo, cómo llega el informe, el PPT del comité, las industrias y los mercados (abajo, «Deck SEO/AEO»); **sin plantilla todavía** (`recipe-without-template`, TASK-1949 Slice 2) | **aprobado** (2026-09-30) |
 
+> **Delta 2026-10-07 — alternativa para propuestas técnicas SEO/AEO que se leen sin presentador [decisión del operador,
+> 2026-10-07].** El operador aprobó como **alternativa canónica** el estilo de la propuesta técnica Pibank v10 (44
+> láminas, línea Engine): un híbrido de láminas a mano en HTML con tokens para los datos del cliente, láminas del
+> compositor para lo que tiene receta y láminas importadas de decks aprobados llevadas a un solo acento, con cinco
+> capítulos con pregunta, títulos que afirman y anexos de supuestos. **Cuándo:** propuesta técnica o licitación SEO/AEO
+> que el cliente lee sin nosotros y que tiene que explicar diagnóstico, plan, medición e inversión. **No reemplaza las
+> recetas:** brochures y propuestas de práctica siguen con el set de recetas de esta sección. Método y reglas:
+> [`deck-studio` — propuesta técnica sin presentador](../../../.claude/skills/deck-studio/references/propuesta-tecnica-seo-sin-presentador.md);
+> paso a paso: [manual de uso](../../manual-de-uso/comercial/armar-propuesta-tecnica-seo-sin-presentador.md).
+
 **Reglas del deck**
 
 - La selección toma **una sola cosa** por lámina.

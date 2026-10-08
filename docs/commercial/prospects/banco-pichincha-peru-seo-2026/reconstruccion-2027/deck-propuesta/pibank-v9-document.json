@@ -1,0 +1,119 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "line": "engine",
+  "sections": 5,
+  "use": "proposal",
+  "pages": [
+    {
+      "role": "method",
+      "recipe": "method-eeat",
+      "voice": {
+        "eyebrow": "E-E-A-T · Banca",
+        "question": "¿Por qué la IA citaría a Pibank?",
+        "answer": [
+          "Porque",
+          "confía"
+        ]
+      },
+      "body": "En finanzas, la IA solo cita a quien puede **verificar**. Cada entregable del programa construye una de estas señales.",
+      "meterTopic": "Peso de E-E-A-T",
+      "meter": [
+        {
+          "label": "En SEO clásico",
+          "value": "Importante",
+          "fill": 0.55
+        },
+        {
+          "label": "En AEO / IA",
+          "value": "Determinante",
+          "fill": 1
+        }
+      ],
+      "builtWithLabel": "Lo construimos con",
+      "letters": [
+        {
+          "letter": "E",
+          "name": "Experiencia",
+          "description": "Contenido de quien opera la cuenta y conoce al ahorrador.",
+          "builtWith": "Preguntas reales de clientes",
+          "deliverable": "Contenido y hub"
+        },
+        {
+          "letter": "E",
+          "name": "Pericia",
+          "description": "Tasas, TREA y condiciones exactas, con fuente vigente.",
+          "builtWith": "Revisión de Producto y Cumplimiento",
+          "deliverable": "Contenido y herramientas"
+        },
+        {
+          "letter": "A",
+          "name": "Autoridad",
+          "description": "Que medios y sitios de referencia hablen de Pibank.",
+          "builtWith": "PR, enlaces y entidad clara",
+          "deliverable": "Comunidad y PR"
+        },
+        {
+          "letter": "T",
+          "name": "Confianza",
+          "description": "Respaldo y seguridad del banco, fáciles de verificar.",
+          "builtWith": "Datos estructurados y fuentes oficiales",
+          "deliverable": "SEO técnico"
+        }
+      ]
+    },
+    {
+      "role": "content",
+      "recipe": "content-day",
+      "layout": "live-results",
+      "voice": {
+        "eyebrow": "El reporte mensual",
+        "question": "¿Cómo lo verán?",
+        "answer": [
+          "Cada",
+          "mes"
+        ]
+      },
+      "body": "Cada mes, Efeonce Insights arma el reporte de SEO y AEO de Pibank y lo revisamos **juntos** en Teams.",
+      "panel": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+        "alt": "Tu panel de Greenhouse, en vivo"
+      },
+      "meeting": {
+        "tool": {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+          "name": "Microsoft Teams"
+        },
+        "kicker": "En Microsoft Teams",
+        "title": "Revisión de resultados",
+        "meta": "Cada mes · 30 min · con Pibank"
+      },
+      "report": {
+        "kicker": "Efeonce Insights · ahora",
+        "title": "Tu edición del mes está lista",
+        "sample": "Datos de muestra",
+        "kpis": [
+          {
+            "value": "144",
+            "label": "observaciones IA"
+          },
+          {
+            "value": "5",
+            "label": "artículos del mes"
+          },
+          {
+            "value": "8 h",
+            "label": "ajustes WordPress"
+          }
+        ],
+        "action": "Ver la edición",
+        "logo": {
+          "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+          "alt": "Greenhouse"
+        }
+      }
+    }
+  ]
+}

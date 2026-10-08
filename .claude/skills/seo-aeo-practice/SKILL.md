@@ -490,6 +490,15 @@ Las láminas nativas (familia de marcas, servicios, formatos, comité, industria
 solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git; si no está en
 disco: `pnpm ai-gen:pull ai-generations/2026-09-29_deck-seo-aeo-documentos/out`, nunca re-exportar uno aproximado).
 
+**Propuesta técnica que el cliente lee sin nosotros (alternativa aprobada, 2026-10-07).** Cuando la propuesta
+SEO/AEO la lee un comité o gerencia sin presentador (licitación, propuesta técnica), el deck de práctica no basta:
+usar la alternativa aprobada, con diagnóstico real, plan, medición, responsabilidades y supuestos, y pasar su checklist
+antes de entregar — [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md)
+(caso fuente: Pibank 2027). No reemplaza al brochure ni a la propuesta de práctica. **Regla del operador:**
+equilibrar las métricas propias de SEO/AEO (posiciones, menciones en IA, orgánico sin marca) con las de negocio; SEO y
+AEO valen por sí mismos y además conectan con el negocio, así que la meta del cliente cierra la cadena, no la
+protagoniza, y nunca se promete volumen de negocio.
+
 **Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
 `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
 si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).

@@ -202,3 +202,8 @@ Para una propuesta SEO/AEO con caso de negocio, cargar
 [caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md): investigación interna,
 requisitos frente a forecast, alcance costeado y dependencias explícitas. Aplicar los companions de bid
 cuando existan bases; una propuesta directa no requiere inventar RFP, criterios o admisibilidad.
+
+Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (comité, gerencia, compras), usar la
+alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
+enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
+No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.

@@ -1,0 +1,30 @@
+{
+  "document": "proposal",
+  "line": "engine",
+  "diagnosisDone": false,
+  "slides": [
+    { "recipeId": "cover-proposal-orbit", "purpose": "01 · ¿Qué movemos en 2027? Cuenta Soles. Logo Pibank (oficial, inverso)" },
+    { "recipeId": "decision-ai-market", "purpose": "02 · ¿Dónde busca tu cliente? En la IA." },
+    { "recipeId": "decision-ai-answer", "purpose": "03 · ¿A quién recomienda la IA? A tu competencia. Ejemplo ilustrativo de ahorro en Perú" },
+    { "recipeId": "content-bullets", "purpose": "04 · Diagnóstico de pibank.pe: cuatro hallazgos fechados" },
+    { "recipeId": "decision-traffic-to-revenue", "purpose": "05 · La meta hacia atrás: 1,17 m visitas → 23.385 aperturas → 15.200 con fondos → US$38m (autorizado por el CEO)" },
+    { "recipeId": "section-split", "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png", "purpose": "06 · ¿SEO o AEO? Ambos." },
+    { "recipeId": "content-bullets", "purpose": "07 · Arquitectura: pilar Cuenta Soles, hub, herramientas, comunidad y PR" },
+    { "recipeId": "proposal-service-seo", "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png", "purpose": "08 · SEO técnico y contenido en WordPress" },
+    { "recipeId": "proposal-service-aeo", "plateRef": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png", "purpose": "09 · Panel AEO: 24 preguntas, tres superficies" },
+    { "recipeId": "method-eeat", "purpose": "10 · ¿Por qué te citaría la IA? Porque confía." },
+    { "recipeId": "proposal-cinematic-web", "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png", "purpose": "11 · ¿Y si hay que tocar código? Lo hacemos." },
+    { "recipeId": "method-surround-cycle", "purpose": "12 · ¿Cómo se sostiene? En ciclo." },
+    { "recipeId": "content-team", "purpose": "13 · Equipo de la cuenta: Julio, Andrés, Valentina, Daniela" },
+    { "recipeId": "content-day-live-progress", "purpose": "14 · ¿Cómo avanza tu SEO? A la vista." },
+    { "recipeId": "content-day-live-results", "purpose": "15 · ¿Cómo avanza? Cada mes." },
+    { "recipeId": "content-measure-formulas", "purpose": "16 · ¿Cómo sabremos si funciona? Lo medimos." },
+    { "recipeId": "content-industries", "purpose": "17 · Banca destacada" },
+    { "recipeId": "content-markets", "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png", "purpose": "18 · Cinco países, Perú incluido" },
+    { "recipeId": "decision-difference", "purpose": "19 · ¿Qué nos hace distintos? Lo puedes ver." },
+    { "recipeId": "decision-risk", "purpose": "20 · Riesgos con su cobertura" },
+    { "recipeId": "decision-plan", "purpose": "21 · Tres tramos del año" },
+    { "recipeId": "decision-diagnosis-map", "purpose": "22 · ¿Qué recibes primero? El mapa." },
+    { "recipeId": "close-proposal-horizon", "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png", "purpose": "23 · Empower your Engine" }
+  ]
+}

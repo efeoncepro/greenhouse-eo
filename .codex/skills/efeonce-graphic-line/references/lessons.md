@@ -604,6 +604,29 @@
   modelo puede recortar el arte: se repone sólo el arte exacto encima.
 - Detalle y archivos: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md` §3.5.
 
+## 2026-10-07 (recetas del compositor en la propuesta técnica Pibank v10)
+
+- **La selección colaborativa no se apaga en `cover-proposal`, `content-team` ni `content-clients`.** Síntoma: las
+  tres láminas salen siempre con un recuadro de selección y cursor que nadie pidió (el operador rechaza selecciones sin
+  sentido). Causa: la receta pinta la selección por defecto; `selection: false` se ignora, `null` rompe el render y
+  `"none"` es inválido. Regla: hoy se borra en post (`borrar-seleccion.mjs`, `quitar-seleccion-portada.mjs` en
+  `ai-generations/2026-10-07_pibank-propuesta/`) y se revisa al 100 % que no quede resto. **Pendiente:** corregir la
+  receta para que la selección sea opcional; al hacerlo, borrar esta línea.
+- **`content-measure-formulas` no agranda la tarjeta con el texto.** Síntoma: una fórmula de tres líneas empuja
+  «Dueño · Efeonce» fuera de la tarjeta. Causa: la tarjeta tiene alto fijo. Regla: fórmulas de **dos líneas** como
+  máximo y mirar la lámina al 100 % antes de darla por buena.
+- **El límite de largo de la respuesta no es arbitrario.** En esa misma receta la respuesta tiene un tope (≈15
+  caracteres) porque a 150 px el texto se desborda. Regla: acortar la respuesta, nunca subir el límite ni bajar el
+  cuerpo para que quepa.
+- **`method-eeat` y `content-day` pintan los realces en turquesa aunque la línea sea Engine.** Causa: toman la tinta
+  del anillo, no el acento de la línea. Lo mismo pasa con láminas importadas de otros decks (esfera y anillo de los
+  casos). Regla: llevar la lámina a un solo acento con `teal2engine.cjs` (corre los tonos 155–192° a 208°) y revisar
+  fotos al 100 %, porque el corrimiento de tono también las toca.
+- **`productMark` (lockup de submarca) no es campo del intent.** Regla: se superpone en post, como `bake.cjs` del deck
+  SEO/AEO; en el reporte con Insights quedó en (140, 44) con alto 40.
+- Método completo de esta propuesta y su checklist: skill `deck-studio`,
+  [propuesta-tecnica-seo-sin-presentador.md](../../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

@@ -139,6 +139,7 @@ La diferencia con otras capas de documentacion:
 ### Comercial
 
 - [Construir un caso de negocio SEO/AEO](comercial/construir-caso-negocio-seo-aeo.md) — de evidencia y funnel inverso a investigación competitiva, calendario conjunto, costos por función y paquete cliente, con QA del modelo y PDF.
+- [Armar una propuesta técnica SEO/AEO para leer sin presentador](comercial/armar-propuesta-tecnica-seo-sin-presentador.md) — la alternativa aprobada el 2026-10-07 (caso Pibank v10, 44 láminas) para propuestas técnicas que el cliente lee solo: copiar el molde `build-tecnica.py`, intents del compositor, assets al canvas, láminas aprobadas importadas a un acento, PDF con `render-pdf.mjs`, revisión al 100 % y checklist antes de enviar. No reemplaza las recetas de La órbita para brochures.
 
 - [Catálogo HubSpot as a Service](../services/hubspot-as-a-service/README.md) — alcance y frontera de los dos servicios operables que este manual soporta.
 - [Segmentar una prospección por cohorte y propiedades](hubspot/segmentar-prospeccion-por-cohorte.md) — completar cada alta, conservar valores, leer miembros por MCP y resolver recálculo/enums/asociaciones.

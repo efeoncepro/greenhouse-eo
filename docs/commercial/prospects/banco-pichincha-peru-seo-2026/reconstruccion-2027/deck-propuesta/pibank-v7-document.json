@@ -1,0 +1,259 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "pages": [
+    {
+      "line": "engine",
+      "role": "content",
+      "recipe": "content-team",
+      "voice": {
+        "eyebrow": "El equipo",
+        "question": "¿Quién trabaja en la cuenta?",
+        "answer": [
+          "Expertos",
+          "por área"
+        ]
+      },
+      "body": "Equipo multidisciplinario: SEO, contenido y diseño, con un **Responsable de Cuenta**.",
+      "team": [
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+            "alt": "Andrés, SEO Specialist"
+          },
+          "name": "Andrés",
+          "role": "SEO Specialist"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+            "alt": "Valentina, Redactora SEO"
+          },
+          "name": "Valentina",
+          "role": "Redactora SEO"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+            "alt": "Julio, Responsable de Cuenta"
+          },
+          "name": "Julio",
+          "role": "Responsable de Cuenta"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+            "alt": "Daniela, Creative Operations Lead"
+          },
+          "name": "Daniela",
+          "role": "Creative Operations Lead"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+            "alt": "Melkin, Senior Visual Designer"
+          },
+          "name": "Melkin",
+          "role": "Senior Visual Designer"
+        }
+      ],
+      "center": {
+        "title": "Pibank",
+        "note": "al centro de todo"
+      },
+      "selection": false
+    },
+    {
+      "role": "content",
+      "recipe": "content-measure-formulas",
+      "line": "engine",
+      "voice": {
+        "eyebrow": "Medición y atribución",
+        "question": "¿Cómo sabremos si funciona?",
+        "answer": [
+          "Lo",
+          "medimos"
+        ]
+      },
+      "body": "Cada métrica con su fórmula, su fuente y un **dueño**. Una cuenta se cuenta una vez, aunque la hayan tocado varios canales.",
+      "note": "Sin cifras de promesa: la línea base se fija en el primer mes con datos del banco",
+      "metrics": [
+        {
+          "glyph": "medicion",
+          "name": "Visitas elegibles",
+          "formula": "Sesiones en páginas de ahorro, por canal",
+          "source": "Analítica web",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "checklist",
+          "name": "Aperturas validadas",
+          "formula": "Cuentas abiertas confirmadas por el banco",
+          "source": "Registro Pibank",
+          "owner": "Analítica Pibank"
+        },
+        {
+          "glyph": "base-de-datos",
+          "name": "Cuentas con fondos",
+          "formula": "Primer depósito dentro de la ventana acordada",
+          "source": "Datos del banco",
+          "owner": "Onboarding Pibank"
+        },
+        {
+          "glyph": "finanzas",
+          "name": "Costo por cuenta",
+          "formula": "Inversión del programa ÷ cuentas con fondos atribuidas",
+          "source": "Datos del banco",
+          "owner": "Finanzas Pibank"
+        },
+        {
+          "glyph": "reloj",
+          "name": "Referencias",
+          "formula": "Coberturas y enlaces editoriales verificados",
+          "source": "Registro de PR",
+          "owner": "Comunicaciones"
+        }
+      ]
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-difference",
+      "voice": {
+        "eyebrow": "Por qué Efeonce",
+        "question": "¿Qué nos hace distintos?",
+        "answer": [
+          "Se puede",
+          "medir"
+        ]
+      },
+      "body": "La mayoría vende promesas. Nosotros, un programa que Pibank puede ver y **medir**.",
+      "alternative": {
+        "kicker": "La alternativa",
+        "title": "Agencia commodity"
+      },
+      "efeonce": {
+        "kicker": "Efeonce",
+        "title": "Método medible"
+      },
+      "versus": "vs",
+      "rows": [
+        {
+          "alternative": "Promete el primer lugar en Google",
+          "efeonce": "Parte de un diagnóstico real de pibank.pe"
+        },
+        {
+          "alternative": "Precio «desde» sin alcance claro",
+          "efeonce": "Alcance y calendario cerrados por doce meses"
+        },
+        {
+          "alternative": "Reporta tráfico y posiciones",
+          "efeonce": "Reporta aperturas y cuentas con datos del banco"
+        },
+        {
+          "alternative": "Caja negra: no sabes qué se hace",
+          "efeonce": "Plan, informe y revisión cada mes"
+        },
+        {
+          "alternative": "SEO que ignora la IA",
+          "efeonce": "SEO y un panel de IA de 144 observaciones al mes"
+        }
+      ],
+      "ownTeam": {
+        "kicker": "¿Y si lo hace mi equipo?",
+        "title": "Complemento, no reemplazo",
+        "pillars": [
+          {
+            "title": "Velocidad",
+            "description": "Sin meses de curva de aprendizaje"
+          },
+          {
+            "title": "Método",
+            "description": "Un sistema probado, multimercado y en español"
+          },
+          {
+            "title": "Foco",
+            "description": "Tu equipo sigue en lo suyo"
+          }
+        ]
+      }
+    },
+    {
+      "role": "content",
+      "recipe": "content-clients",
+      "voice": {
+        "eyebrow": "Clientes",
+        "question": "¿Quién confía en nosotros?",
+        "answer": [
+          "Marcas",
+          "líderes"
+        ]
+      },
+      "progress": {
+        "sections": 5,
+        "current": 4
+      },
+      "figures": [
+        {
+          "value": "+127%",
+          "label": "tráfico orgánico de Sky frente a LATAM Airlines",
+          "source": "caso publicado de Sky Airlines"
+        },
+        {
+          "value": "+180%",
+          "label": "ventas digitales de Bresler",
+          "source": "caso publicado de Bresler"
+        }
+      ],
+      "selected": 1,
+      "clients": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+          "alt": "Sky Airline"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+          "alt": "Berel"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+          "alt": "Bresler"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+          "alt": "Carozzi"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+          "alt": "Aguas Andinas"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+          "alt": "ANAM"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+          "alt": "Marca Chile"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+          "alt": "Gobierno de Santiago"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+          "alt": "Universidad Católica de Temuco"
+        }
+      ],
+      "markets": {
+        "title": "Operamos en",
+        "text": "Chile, EE. UU., Colombia, México y Perú"
+      },
+      "selection": false,
+      "line": "growth",
+      "theme": "light"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "role": "decision",
+  "recipe": "decision-risk",
+  "voice": {
+    "eyebrow": "Riesgo controlado",
+    "question": "¿Y si no funciona?",
+    "answer": [
+      "Lo",
+      "corregimos"
+    ]
+  },
+  "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+  "headers": {
+    "risk": "El riesgo",
+    "how": "Cómo lo cubrimos"
+  },
+  "risks": [
+    {
+      "risk": "Promesas sin respaldo",
+      "name": "Sin promesas vacías",
+      "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+    },
+    {
+      "risk": "Condiciones erradas",
+      "name": "Revisión del banco",
+      "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+    },
+    {
+      "risk": "Esperar a TI",
+      "name": "Plan alternativo",
+      "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+    },
+    {
+      "risk": "Depender de una persona",
+      "name": "Traspaso documentado",
+      "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Pibank",
+    "participantKind": "department"
+  },
+  "line": "growth",
+  "theme": "light",
+  "progress": {
+    "sections": 5,
+    "current": 4
+  }
+}

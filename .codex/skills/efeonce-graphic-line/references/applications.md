@@ -1223,6 +1223,14 @@ repetía `CR2b` con `proposal-cinematic-creative` y el plan marcaba `plate-repea
 plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 `src/lib/brand-surfaces/examples/deck-*-intent.json`.
 
+**Propuesta técnica SEO/AEO que se lee sin presentador (alternativa aprobada, 2026-10-07).** Para una licitación o
+propuesta técnica SEO/AEO que el cliente lee sin nosotros existe una alternativa aprobada por el operador: láminas a
+mano con tokens para los datos del cliente más láminas del compositor para lo que tiene receta, cinco capítulos con
+pregunta y franja «Qué significa para <cliente>» (caso fuente: Pibank 2027, 44 láminas, línea Engine). **No
+reemplaza** las recetas de brochure ni de propuesta de práctica: esas siguen mandando. Método, columna narrativa y
+checklist: [propuesta-tecnica-seo-sin-presentador.md](../../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md)
+(skill `deck-studio`); trampas de las recetas usadas, en [lessons.md](lessons.md) §2026-10-07 (Pibank).
+
 **Antes de componer un deck entero, valida su plan (TASK-1929, 2026-09-28).** El plan es la lista ordenada de ids de
 receta (`{ document, line?, diagnosisDone?, slides: [{ recipeId, slots?, plateRef?, progress?, purpose? }] }`):
 `pnpm brand:deck-plan -- --plan plan.json` corre `validateDeckPlan` (piso AXIS `resolveSurfaceDocument` en propuesta y
