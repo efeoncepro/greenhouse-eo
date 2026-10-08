@@ -4,6 +4,8 @@ Fecha: 2026-10-07. **Proposed; go final y build pendientes.** Dueño: Platform/P
 
 ## 1. Topología y stack propuestos
 
+Selección de versiones: [baseline y política de actualización](EFEONCE_ROOMS_STACK_BASELINE_V1.md), consulta 07/10/2026. Objetivo: últimas estables compatibles, con pins/lockfile y pruebas. Next 16.4/React 19.3/Tailwind 4.3 son candidatos; TS7 requiere convivencia de tooling y ESLint10 resolver plugins antes de fijar el manifest. Node24 LTS según hosting. No se heredan las versiones de Greenhouse ni se declara un build verificado.
+
 Destino de producto: `rooms.efeonce.org`. Candidato de repo: `efeonce-rooms`, aún sin crear. Documentación canónica en Greenhouse. Una app con módulos y un worker de medios; no se requieren microservicios por entidad.
 
 | Unidad | Tecnología propuesta | Responsabilidad |

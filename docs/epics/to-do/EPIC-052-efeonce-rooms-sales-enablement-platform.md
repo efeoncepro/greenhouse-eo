@@ -49,6 +49,7 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 - [Dossier Rooms](../../architecture/rooms/README.md): índice canónico del dominio.
 - [ADR Rooms](../../architecture/rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md): decisiones aceptadas separadas de propuesta técnica/visual.
 - [Arquitectura](../../architecture/rooms/EFEONCE_ROOMS_ARCHITECTURE_V1.md): app modular Next.js/React/TypeScript, PostgreSQL, storage privado y worker multimedia.
+- [Baseline técnico y política de versiones](../../architecture/rooms/EFEONCE_ROOMS_STACK_BASELINE_V1.md): objetivo de últimas estables compatibles; TS7/tooling, plugins ESLint10, Node LTS y gate ejecutable de R01.
 - [API y acceso](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md): commands/readers, catálogo por canal, permisos y edición.
 - [Perfiles creativo y SEO/AEO](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): contenido estructurado, evidencia, continuidad X-ray y aceptación conjunta.
 - [Experiencia](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_V1.md), [dirección visual](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md), [wireframes](../../ui/wireframes/rooms-v1.md), [flujos](../../ui/flows/rooms-v1.md) y [motion](../../ui/motion/rooms-v1.md).
@@ -63,7 +64,7 @@ El operador corrigió expresamente la estética y tipografía: **La órbita (`ef
 
 | Unidad | Entrega prevista | Perfil de futura task / owner funcional | Dependencias | Evidencia de salida |
 |---|---|---|---|---|
-| R01 | Contratos ejecutables y ficha de runtime: operaciones/schemas, bloques/perfiles/evidencia/edición, mapping X-ray, decisiones de identidad, límites, pins, región, retención y coste | backend-data / Platform | Go de implementación; revisión del ADR | Contratos versionados, decisiones pendientes resueltas, plantilla de fixture multicanal y límites publicados; sin provisión implícita |
+| R01 | Contratos ejecutables y ficha de runtime: operaciones/schemas, bloques/perfiles/evidencia/edición, mapping X-ray, decisiones de identidad, límites, pins, región, retención y coste | backend-data / Platform | Go de implementación; revisión del ADR | Contratos y manifest/lockfile versionados; matriz de compatibilidad actualizada, decisiones TS7/tooling y ESLint resueltas con instalación/lint/typecheck/build; fixture multicanal y límites publicados; sin provisión implícita |
 | R02 | Dirección materializada en composición desktop/móvil y primera transición con material real | ui-ux / Product + Creative + SEO-AEO + AXIS | Go; dossier y fixtures autorizadas | Primer viewport y pieza→detalle creativos, más lectura→radiografía SEO/AEO aceptados por operador; Bricolage/Poppins, paleta/componentes/iconografía La órbita, estados y movimiento reducido medidos |
 | R03 | Foundation del runtime y dominio: borrador, bloques tipados, piezas/variantes, evidencia/snapshots/relaciones, planes/escenarios, relato, tours, ediciones, outbox y auditoría | backend-data / Platform | R01 | Commands/readers persistidos, concurrencia y replay; edición inmutable, migración/rollback verificados |
 | R04 | Identidad y acceso: relying party, invitaciones/sesiones externas, grants, capabilities y proyecciones privadas | backend-data / Identity + Platform | R01, R03 | Acceso interno/externo, denegación entre tenants, expiración/revocación; notas ausentes del DTO de audiencia |
@@ -140,6 +141,7 @@ Barrido de dominio/superficie efectuado sobre registries y épicas: no existe du
 Todos pendientes de implementación/evidencia, salvo el hito documental M0. Registrar evidencia junto a cada casilla al cumplirla; no estimar porcentaje de producto usando el número de documentos redactados.
 
 - [ ] Go de implementación registrado; ADR/decisiones concretas y tasks hijas sincronizadas con sus owners, perfiles y dependencias.
+- [ ] Baseline R01 certificado: versiones estables/pins, instalación reproducible, resolución TS7/tooling y ESLint/plugins, lint con casos negativos, typecheck, build y primer consumidor AXIS; excepciones temporales con owner/condición de retiro.
 - [ ] Dos salas de marcas diferentes, una creativa y una SEO/AEO, más un tour combinado de una misma marca; sin código especial por cliente, inventario de archivos/bloques reconciliado y exclusiones expresas.
 - [ ] Perfil SEO/AEO nativo: lectura completa → fragmento/radiografía/evidencia → derivado/origen → plan/medición; adapter X-ray preserva contenido, anclas, fuentes y estado sin ejecutar código importado.
 - [ ] Evidencia con entidad/ámbito, fecha, método y cobertura; observación/hipótesis/simulación/propuesta distinguibles; fuente caída o desactualizada, ancla rota y ausencia de baseline resueltas explícitamente, sin cambiar la edición en presentación.

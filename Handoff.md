@@ -8,7 +8,7 @@
 
 AXIS Video: primitives 0.6.5 publicados (release 37669427070 SUCCESS); Think pin registry/main. CI proporcional en main: docs rápidas, suites por impacto, reuso release por SHA/digest. Lab: Select aprobado por defecto con gate y skills; WordPress sin activar; imagen azul y aviso WebKit abiertos. [Estado y evidencia](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
-Rooms: EPIC-052; creativo + SEO/AEO combinables, X-ray nativo previsto. La órbita (Bricolage/Poppins); dossier/epic actualizados; go pendiente.
+Rooms: EPIC-052; creativo/SEO-AEO, La órbita. [Stack](docs/architecture/rooms/EFEONCE_ROOMS_STACK_BASELINE_V1.md): TS7/ESLint10 por validar en R01; sin build/go.
 
 **[Sika/skills](docs/commercial/tenders/LICITATION_CRM_REGISTER.md)**.
 

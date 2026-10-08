@@ -16,6 +16,8 @@
 4. [Experiencia completa](EFEONCE_ROOMS_EXPERIENCE_V1.md).
 5. [Perfiles creativo y SEO/AEO; continuidad X-ray](EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md): bloques, evidencias, sala combinada y aceptación V1.
 
+6. [Política de versiones y baseline técnico](EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, hallazgos TS7/ESLint10 y gate R01; sin build conjunto certificado.
+
 ## Contratos de experiencia para revisión
 
 - [Dirección visual y alternativas](../../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
