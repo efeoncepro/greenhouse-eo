@@ -709,6 +709,20 @@ D9 y §7). Primer uso: encabezado de las interfaces del brochure Agencia Creativ
 Pendiente en el release AXIS: el README de `brand-assets` todavía dice que «Creative Studio» es sólo el descriptor de
 Globe.
 
+### 2026-10-08 — Logo de Efeonce Rooms (18 piezas)
+
+El operador pidió el logo de Efeonce Rooms (sala comercial, `rooms.efeonce.org`, EPIC-052) «al estilo de Marketing
+Studio, Creative Studio, Efeonce Factory» y con impacto; aprobó la ruta B «Encuentro» con sus aplicaciones. La regla
+«la órbita vive en la O» en una palabra con dos: las dos «o» son **dos órbitas enlazadas** y la **única esfera** (acento
+Growth) se posa en el cruce de arriba; en el de abajo la segunda pasa por encima. Símbolo: las dos órbitas sin letra
+(se lee a 24–32 px). Descartada la ruta A (órbita en la primera «o»: la segunda queda como letra suelta). 6 formas
+(`logo`, `lockup`, `compact`, `stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`,
+`rooms-<forma>-<variante>.svg`. Generador `scripts/brand/build-rooms-logos.mjs` (método de Factory; enlace con
+separación 1,3 × radio; cortes como contornos, nunca máscaras: una prueba de AXIS lo exige). Destino
+`@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `0c3d7ab`, commit local; falta push + tag). Sólo en el paquete, como
+Creative Studio. ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`. Pendiente: revisión de parecido con
+marcas de círculos entrelazados antes de pauta o registro.
+
 ### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
 
 - **Firma de Efeonce en una propuesta para la marca de un cliente:** pie navy `#001a33` en cada hoja con el lockup

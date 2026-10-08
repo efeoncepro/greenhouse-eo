@@ -77,7 +77,7 @@ La composición recomendada dentro de ese sistema es **escenario editorial**: un
 
 Beneficios: recorrido completo, autonomía del champion, inventario íntegro, diferencias creativas demostrables y reuso entre servicios. Costos: una aplicación adicional, manejo audiovisual, acceso externo, integraciones y operación. Riesgos principales: degradar piezas al adaptarlas, exponer notas, confundir edición con conversación o añadir demasiado alcance antes de demostrar valor.
 
-El nombre está decidido; logo específico y subidentidad de Rooms requieren diseño dentro de AXIS. El host es destino acordado, no evidencia DNS/TLS/servicio activo. La futura venta del software a terceros no está decidida.
+El nombre está decidido; el logo quedó aceptado el 2026-10-08 ([ADR de marca](EFEONCE_ROOMS_MARK_DECISION_V1.md), `rooms-*` en AXIS). El host es destino acordado, no evidencia DNS/TLS/servicio activo. La futura venta del software a terceros no está decidida.
 
 ## Acceptance and revisit
 
