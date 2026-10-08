@@ -1,5 +1,6 @@
 # Task Index
 
+- `TASK-2014` — [adoptar los paquetes AXIS publicados y retirar la copia generada del informe AI Visibility](to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md), to-do; bloqueada por el release AXIS `v0.4.27`.
 - `TASK-2009` — [corrección contractor server/Finance](in-progress/TASK-2009-contractor-command-payment-integrity.md), corregido y verificado localmente; release/readback pendientes.
 - `TASK-2010` — [consumer contractor/reintentos/CTA](in-progress/TASK-2010-contractor-submission-retry-period-actions.md), regresiones y GVC premium PASS; sin release.
 

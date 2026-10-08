@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-10-08
+
+- [TASK-2014](TASK-2014-axis-packages-adoption-and-report-projection-retirement.md) sube Greenhouse al juego AXIS `v0.4.27` (`axis-tokens` 0.6.2, `axis-ui-contracts` 0.7.1) con regresión completa: el pin que necesitan los módulos de correo queda resuelto ahí; esta task conserva la adopción de los módulos.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,5 +1,10 @@
 # TASK-1938 — Informe PDF del Grader de visibilidad en IA con «La órbita»
 
+
+## Delta 2026-10-08
+
+- La anatomía editorial que el PDF lee de `ai-visibility-layout.generated.json` se publicó en `@efeoncepro/axis-tokens` 0.6.2 (AXIS `dd22aa4`, digest `484a0729…`, idéntico a la copia), con `axis-ui-contracts` 0.7.1 (salida del contrato 0.1.0 sin cambios); la proyección local de AXIS se retiró. Release `v0.4.27` en curso. Importar el paquete exige subir Greenhouse de `axis-tokens` 0.3.41 a 0.6.2: el retiro de la copia generada pasa a [TASK-2014](../to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md).
+
 ## Delta 2026-10-03 (noche) — el ops-worker no compilaba con el manifest de assets
 
 - Desde `6ebf3d519`, `report-pdf-primitives.tsx` importa `public/branding/pdf/ai-visibility-assets.manifest.json`, que
