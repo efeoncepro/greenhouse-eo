@@ -119,7 +119,7 @@ no copiar el corpus privado ni confundir calibración por instrucciones con fine
 
 Lecciones verificadas en portal 48713323 / Starter Play 101042425:
 
-- El ejemplo con contador 0/10000 era placeholder. Límite observado: 10.000; texto final: 7.550 caracteres.
+- El ejemplo con contador 0/10000 era placeholder. Límite observado: 10.000; versión previa: 7.550; con enlace web: 7.969 caracteres.
   Revalidar límite y estado real en cada portal, sin sustituir valor por placeholder.
 - Guardar en el panel dejó un cambio pendiente: Revisar cambios → Aprobar 1 cambio → recargar → leer
   y comparar íntegramente. Reconciliar cambios ajenos antes de aprobar. Botón deshabilitado no prueba persistencia.
@@ -127,9 +127,12 @@ Lecciones verificadas en portal 48713323 / Starter Play 101042425:
   como dos vías de una invitación; no interpretar «sin presión» como quitar la agenda.
 - Investigar para encontrar un motivo, sin recitar cargo o empresa. Una situación concreta, una capacidad
   pertinente y una invitación; evitar dudas acumuladas, catálogo y diagnósticos derivados de una noticia.
+- Delta de Julio: primera mención de Efeonce en el primer correo enlazada a https://efeoncepro.com/
+  como respaldo contextual; no sustituye agenda ni añade otro CTA. No repetir obligatoriamente en seguimientos
+  ni explicar la ausencia del brochure. Guardado de 7.969 caracteres verificado; ambos enlaces en nuevo borrador pendientes.
 - Validar URL y duración antes de prometer minutos, y sustentar capacidades/casos. Enlace visible no prueba destino.
 - Guardado, borrador, envío y resultados son evidencias distintas. Generar un borrador nuevo y revisar
-  seguimientos tras el cambio; la muestra final de 7.550 todavía no tenía QA de nueva generación al cierre.
+  seguimientos tras el cambio; la versión vigente de 7.969 sigue pendiente de QA de nueva generación.
 - Preservar revisión humana, audiencia, cadencia y autonomía salvo autorización específica. Ajustar voz
   no autoriza enrollment ni Iniciar comunicación.
 

@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Continuidad activa
 
-**Prospecting Agent:** [guardado; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
+**Prospecting Agent:** [web guardada; Julio revisa borrador y CTA](docs/audits/commercial/2026-10-07-hubspot-prospecting-agent-voz.md).
 
 [Studio/AXIS: operativo](docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md).
 

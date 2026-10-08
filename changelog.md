@@ -9,7 +9,7 @@
 
 ## 2026-10-07 — Prospecting Agent: voz de Julio y enlace de reunión
 
-- [Manual](docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md), ADR, snapshot exacto y skills Codex/Claude: contexto, una capacidad, invitación con agenda y alternativa de respuesta; guardar/aprobar/readback. Configuración final de 7.550 caracteres verificada en HubSpot; QA del último borrador pendiente, sin envío.
+- [Manual](docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md), ADR, snapshot exacto y skills Codex/Claude: contexto, una capacidad, invitación con agenda y alternativa de respuesta; guardar/aprobar/readback. Configuración de 7.969 caracteres verificada en HubSpot: añade enlace institucional en la primera mención de Efeonce y conserva agenda; QA del último borrador pendiente, sin envío.
 
 ## 2026-10-07 — Firma Efeonce en HubSpot: instalación por HTML
 

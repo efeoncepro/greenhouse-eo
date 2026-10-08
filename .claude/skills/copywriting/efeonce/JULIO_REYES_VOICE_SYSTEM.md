@@ -64,7 +64,10 @@ si es prioridad». Una pregunta o condición basta para una necesidad no confirm
 para encontrar pertinencia, sin recitar el cargo o resumir la empresa; una señal pública no prueba un problema.
 
 Mantener el enlace de reunión configurado y permitir respuesta por correo como alternativa de la misma
-invitación. No inventar URL, duración, experiencia sectorial o resultados. Respetar negativas y reuniones
+invitación. En el primer correo, enlazar la primera mención de Efeonce a https://efeoncepro.com/ dentro
+de la capacidad pertinente, como respaldo institucional: complementa la agenda, no añade otro CTA ni
+exige repetición en seguimientos. No explicar la ausencia del brochure.
+No inventar URL, duración, experiencia sectorial o resultados. Respetar negativas y reuniones
 ya agendadas. Párrafos cortos, una situación y una capacidad; los ejemplos de cadencia son referencias,
 nunca fórmulas obligatorias. No trasladar automáticamente el ritmo de una columna ni sus motivos a un correo frío.
 

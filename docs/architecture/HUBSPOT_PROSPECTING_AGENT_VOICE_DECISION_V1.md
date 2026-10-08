@@ -24,6 +24,9 @@ La investigación establece pertinencia, sin recitar el perfil ni convertir señ
 El CTA se declara explícitamente: incluir el enlace real del remitente configurado y permitir respuesta por
 correo como alternativa de la misma invitación. La empatía no elimina el enlace. Respetar negativas y
 reuniones ya agendadas. Las capacidades comerciales deben tener sustento.
+Delta aprobado el mismo día: la primera mención de Efeonce del primer correo enlaza a https://efeoncepro.com/
+como respaldo contextual, complementario a la agenda y sin otra llamada a la acción. Snapshot vigente:
+7.969 caracteres; persistencia comprobada, generación con ambos enlaces pendiente.
 
 HubSpot es dueño de la configuración efectiva del play. El repo conserva un snapshot fechado, el método
 operativo y evidencia acotada. Guardar en el panel y aprobar el cambio de la guía son pasos distintos;

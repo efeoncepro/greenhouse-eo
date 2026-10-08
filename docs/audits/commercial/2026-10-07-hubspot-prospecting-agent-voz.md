@@ -1,6 +1,6 @@
 # Calibración de voz del Prospecting Agent — 2026-10-07
 
-Owner: Julio Reyes / Commercial. Estado: configuración guardada y persistencia verificada; QA del último
+Owner: Julio Reyes / Commercial. Estado: configuración guardada y persistencia verificada; versión vigente de 7.969 caracteres; QA del último
 borrador pendiente. No se enviaron correos ni se inició comunicación.
 
 ## Alcance y fuentes
@@ -24,14 +24,15 @@ La configuración se operó en la UI autenticada, Comunicaciones → Instruccion
 | CTA | 5.757 | Enlace configurado obligatorio en primer correo y seguimientos, respuesta alternativa. |
 | Naturalidad | 7.300 | Seguridad sin dudas acumuladas, lenguaje cotidiano y apertura pertinente. |
 | Foco | 7.550 | Investigar para encontrar motivo, sin recitar cargo/empresa; una situación y una capacidad. |
+| Web institucional | 7.969 | Primera mención de Efeonce enlazada a efeoncepro.com; agenda preservada. |
 
 El límite temporalmente interpretado como 1.000 fue corregido por el operador a 10.000; la versión abreviada
 de 978 caracteres se canceló, no quedó aplicada.
 
 Cada versión aplicada pasó por Guardar → Revisar cambios → Aprobar 1 cambio y lectura tras recargar.
-El [snapshot final exacto](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07.txt)
+El [snapshot de foco, previo al enlace web](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07.txt)
 fue comparado íntegramente con el valor vivo: 7.550 caracteres, coincidencia exacta y sin cambios pendientes.
-El archivo conserva el texto sin salto de línea adicional; el conteo no es tamaño en bytes.
+Ambos snapshots conservan el texto sin salto de línea adicional; el conteo no es tamaño en bytes.
 
 ## CTA y borradores
 
@@ -77,3 +78,20 @@ registradas, changelog y Handoff. project_context, AGENTS y CLAUDE no requieren 
 El detector QA de integración se activa por las rutas HubSpot; no aplica pruebas de backend, Vercel o Teams
 a este cambio documental. Veredicto del paquete documental: PASS; los pendientes de contenido live anteriores
 siguen abiertos y no bloquean documentar fielmente su estado.
+
+## Delta posterior: enlace institucional — 2026-10-07
+
+El operador autorizó incorporar https://efeoncepro.com/ en la primera mención de Efeonce del primer
+correo, como respaldo dentro de la capacidad pertinente; conservar agenda y respuesta por correo,
+sin añadir una invitación a visitar la web ni explicar que falta el brochure. Se añadió al punto 4
+sobre la capacidad de Efeonce, conservando el resto del texto: 7.550 → 7.969 caracteres.
+
+Guardar → Revisar cambios → Aprobar 1 cambio → recarga y reapertura del campo: coincidencia exacta de
+7.969 caracteres, sin cambios pendientes. El enlace de reunión configurado y revisión humana siguen
+presentes. [Snapshot vigente](../../operations/hubspot-prospecting-agent/julio-reyes-starter-play-2026-10-07-enlace-web.txt).
+La versión anterior y su evidencia se conservan como historia. No se generó ni envió un nuevo correo;
+la inclusión efectiva de ambos enlaces sigue pendiente de QA del siguiente borrador.
+
+Cierre de este delta: manual, ADR/índice, handoff/changelog y skills de HubSpot/copywriting espejadas
+actualizados. Snapshot vigente de 7.969 caracteres idéntico al readback de la sesión; el snapshot anterior
+se preserva sin cambios. SHA-256 del vigente: 89c52096369b61eb29aa9e22a351ea51ee2d8780bbe6c4a6a26ace80b7b8143a.
