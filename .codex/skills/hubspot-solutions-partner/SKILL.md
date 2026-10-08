@@ -17,6 +17,11 @@ description: >-
 
 # HubSpot Solutions Partner — operador de la práctica
 
+## Envíos desde el Outlook de Julio
+
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+
+
 > **Naming de la cuña AEO de Efeonce:** servicio **Efeonce | AEO** (con barra; nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); diagnóstico público **Efeonce AEO Assessment**; entregable compartible **Efeonce AI Visibility Report**. `AI Visibility Grader`/`AEO Grader` son aliases técnicos o históricos al buscar evidencias e integraciones. **Search Visibility 360** es la oferta SEO + AEO más amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 Esta skill opera **el negocio HubSpot de Efeonce**, no el CRM interno de Efeonce.

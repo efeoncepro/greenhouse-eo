@@ -262,6 +262,8 @@ foto nueva de ese tipo:
 
 ## Paso a paso — armar una firma de correo
 
+Para **enviar desde el Outlook de Julio**, cumplir primero la [política de firma oficial completa y CCO HubSpot](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md), también en respuestas y reenvíos. Ambas vías están aprobadas: reutilizar su HTML oficial en Outlook UI, o añadir la firma completa en texto de la política al enviar por conector. Una firma instalada en Outlook no se añade automáticamente a envíos por conector.
+
 La firma v3.1 está aprobada en dos versiones: **A · sobre papel** y **B · tarjeta navy**. Las reglas completas están
 en el [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail); el contrato
 que las hace cumplir es `efeonce.email-signature` de AXIS.

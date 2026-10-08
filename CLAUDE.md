@@ -24,6 +24,7 @@ la [regla completa de auto-load, subagentes y gobernanza](docs/operations/CLAUDE
 | Payroll/Workforce participation/exit/leave/contract-type/approval | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` |
 | Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
 | Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
+| Outlook: firma y CCO HubSpot | `copywriting` | [Política](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) |
 | HubSpot bridge / intake / CRM (CLI o MCP) | `hubspot-greenhouse-bridge` + `hubspot-as-a-service` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` + `operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md` |
 | Prospección HubSpot / segmentos activos | `hubspot-as-a-service` | `docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md` |
 | HubSpot portfolio / Solutions Partner / agents / public offer / sectors | `hubspot-solutions-partner` + `hubspot-as-a-service` | `services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + skill `SOURCES.md` |
@@ -301,7 +302,7 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 - **PostgreSQL health:** `pnpm pg:doctor`
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
-- **Correo laboral:** el correo de trabajo de Efeonce y sus clientes, incluido ANAM, vive en Outlook/Microsoft 365. Gmail, incluido `jreysgo@gmail.com`, es correo personal y no es fuente de verdad laboral; si Outlook no está disponible, informar el bloqueo y no sustituirlo por Gmail.
+- **Correo laboral:** Outlook/Microsoft 365; Gmail es personal. [Fuente, firma y CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ### Solution Quality Contract
 

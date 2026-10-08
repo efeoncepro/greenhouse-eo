@@ -719,6 +719,8 @@ Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbi
 
 ### C3. Firma de respuesta y reenvío
 
+**Excepción vigente, operador 2026-10-08:** los agentes que envían desde el Outlook de Julio usan la firma oficial **completa** (texto por conector o gráfica por Outlook UI), también en respuestas/reenvíos, y CCO `48713323@bcc.hubspot.com`. La versión abreviada de abajo no se elige automáticamente para esos envíos. [Contrato y verificación](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+
 - Una **línea de texto vivo** (nombre, cargo, teléfono), **sin imágenes** (T `emailSignature.reply`).
 - **Fuente:** M §10.2.
 

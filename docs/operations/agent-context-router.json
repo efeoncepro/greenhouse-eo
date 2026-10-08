@@ -895,6 +895,26 @@
         "docs/audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md",
         "docs/services/media-distribution/README.md"
       ]
+    },
+    {
+      "id": "julio-outlook-send",
+      "triggers": [
+        "enviar correo desde Outlook",
+        "correo de Julio",
+        "firma oficial de correo",
+        "BCC HubSpot",
+        "CCO HubSpot",
+        "48713323@bcc.hubspot.com"
+      ],
+      "skills": [
+        "copywriting",
+        "hubspot-as-a-service"
+      ],
+      "sources": [
+        "docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md",
+        "docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md",
+        "docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md"
+      ]
     }
   ]
 }

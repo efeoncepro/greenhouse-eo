@@ -955,6 +955,8 @@ fuente del manual en PDF.
 
 ### 10.2 Firma de mail
 
+**Envíos por agentes desde el Outlook de Julio (operador, 2026-10-08):** firma completa en texto por conector o gráfica oficial por Outlook UI, y CCO `48713323@bcc.hubspot.com`, también en respuestas/reenvíos; prevalece sobre la recomendación abreviada de esta sección. [Política de envío, fuente HTML y readback](../EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+
 **Aprobada el 2026-09-26 (v3.1) en sus dos versiones:** **A · sobre papel** y **B · tarjeta navy**. HTML de correo
 con tablas y estilos en línea, 460 px en escritorio y fluida en móvil. Contrato AXIS `efeonce.email-signature` 0.3.0
 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab y guía

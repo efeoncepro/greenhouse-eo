@@ -1,5 +1,7 @@
 # Commercial
 
+- [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
+
 > **Naming AEO vigente:** **Efeonce AEO** es la capacidad comercial; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Índice operativo de ventas de Efeonce. Esta carpeta conecta las metas aprobadas, el forecast y los negocios

@@ -1,5 +1,7 @@
 # Greenhouse EO — Manual de Uso
 
+- [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
+
 > **Naming AEO vigente (2026-09-29):** la capacidad pública es **Efeonce AEO**, el diagnóstico **Efeonce AEO Assessment** y su entregable **Efeonce AI Visibility Report**. Los manuales conservan `AI Visibility Grader` para comandos y rutas existentes. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Esta carpeta guarda guias practicas para usar capacidades concretas del portal Greenhouse.

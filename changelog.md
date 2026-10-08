@@ -9,6 +9,8 @@
 
 ## 2026-10-08 — Seguimiento comercial recurrente
 
+- [Política aceptada](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa + CCO `48713323@bcc.hubspot.com` en nuevos correos, respuestas y reenvíos autorizados; conector con firma en texto u Outlook UI con firma gráfica, ambas aprobadas. Prueba por conector verificada en Enviados; registro CRM sin verificar. Routers, manuales y skills sincronizados.
+
 - [UTEM deck de propuesta técnica](docs/audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md): deck v2 de 35 láminas y PDF (Claude) sobre la técnica, que pasa a v1.1 con revisión pública, equipo nominal y experiencia. Pendientes Insights, fuente Sky, cotización/costeo y presentación; sin envío.
 
 - [Consolidación comercial y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md): revisión LicitaLAB amplia, altas Diego/Emily y segmentos con evidencia; UTEM con originales/anexos firmados y datos corporativos confirmados. Tres subagentes sincronizaron documentos, seguimiento y 11 pares de skills. Manuales corrigen contacto previo, firma autorizada, leads y reutilización. Sin nuevos envíos ni postulación.

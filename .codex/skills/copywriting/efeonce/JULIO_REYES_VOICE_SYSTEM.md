@@ -53,6 +53,8 @@ Determina primero `author`, `surface` y `speaker`. No elijas por intuición tona
 
 ### Aplicación: correo personal de prospección
 
+Todo envío autorizado desde Outlook debe cumplir la [política de firma oficial completa y BCC HubSpot](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Preparar copy no sustituye el preflight de firma según vía, CCO y destinatarios.
+
 En correo comercial firmado por Julio, cargar el
 [manual del Prospecting Agent](../../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md).
 La calibración del 2026-10-07 usó ocho mensajes propios de Outlook; no reemplaza este canon editorial ni
