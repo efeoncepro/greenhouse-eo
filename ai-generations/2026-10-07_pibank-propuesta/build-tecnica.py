@@ -802,16 +802,51 @@ for m, tot in enumerate(monthly):
               f'<div style="position: absolute; left: {x - 12}px; top: {top + H + 10}px; width: 80px; text-align: center; font-size: 15px; color: {SOFT_}">M{m + 1}</div>')
 legend25 = (f'<div style="display: flex; gap: 22px; font-size: 16px; color: {SOFT_}"><span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 12px; border-radius: 3px; background: rgba(207, 228, 250, 0.38)"></span>Servicio base · US$4.500</span>'
             f'<span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 12px; border-radius: 3px; background: {ACC}"></span>Activaciones del mes</span></div>')
-inv = [('Servicio base · US$4.500 al mes', 'Lo continuo: dirección, SEO técnico, hasta cinco artículos, panel de IA y medición.'),
-       ('Activaciones · US$25.200', 'Proyectos y campañas con fecha: hub, calculadora, comparador, comunidad, PR y mantenimiento. Cada una se acuerda antes de empezar.'),
-       ('Ruta integral · US$89.200', 'Por US$10.000 más: planificador de ahorro, dos meses más de comunidad, dos campañas y dos refuerzos.')]
-S.append(('Inversión', page('Pibank · Inversión', chart +
-    col(eyebrow('Inversión') + headline(['US$79.200 en', 'doce meses'], 92, extra='; margin-top: 56px') +
-        ''.join(f'<div style="padding: 16px 0; border-top: 1px solid {RULE_}; margin-top: {36 if i == 0 else 0}px">{label(a, W_)}<div style="font-size: 19px; font-weight: 300; line-height: 1.45; color: {SOFT_}; margin-top: 6px">{b}</div></div>' for i, (a, b) in enumerate(inv)), 120, 600) +
-    zone(label('Inversión mes a mes, ruta gradual recomendada (US$)', W_) + f'<div style="margin-top: 12px">{legend25}</div>', 820, 214, 960) +
-    zone(callout('Máximo de US$7.700 en M3, M4, M5 y M8, cuando coinciden proyectos y campañas.'), 820, 790, 960) +
-    means('El gasto no es plano: sube en los meses de proyectos y campañas y baja a US$5.700 cuando solo corren la base, la comunidad y el mantenimiento.',
-          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Calendario de referencia.') + bubble(), section=5)))
+menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 'US$3.000', 'proyecto'),
+        ('Calculadora', 'Mejora de la herramienta existente', 'US$1.200', 'proyecto'),
+        ('Comparador', 'Hasta cinco productos, fuentes aprobadas', 'US$4.000', 'proyecto'),
+        ('Planificador de ahorro', 'Meta, aportes y plazo', 'US$3.000', 'proyecto'),
+        ('Comunidad', 'Newsletter, cuatro adaptaciones y escucha', 'US$1.000', 'mes activo'),
+        ('Campaña de PR', 'Tres ángulos y doce propuestas a medios', 'US$2.000', 'campaña'),
+        ('Refuerzo de enlaces', 'Hasta seis gestiones con seguimiento', 'US$500', 'ronda'),
+        ('Mantenimiento', 'Hasta tres herramientas entregadas', 'US$200', 'mes activo')]
+menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 150px; column-gap: 20px; align-items: center; padding: 12px 0; border-top: 1px solid {RULE_}">'
+                    f'<div><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.01em">{n_}</div><div style="font-size: 16px; font-weight: 300; color: {SOFT_}; margin-top: 2px">{d_}</div></div>'
+                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 28px; font-weight: 760; letter-spacing: -0.02em">{p_}</div><div style="font-size: 13px; color: {SOFT_}">por {u_}</div></div></div>' for n_, d_, p_, u_ in menu)
+base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
+base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
+             + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc))
+S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
+    obj(base_card, 140, 530, 600, True, '; height: 318px; padding-top: 22px') +
+    col(eyebrow('Inversión') + headline(['US$4.500 al mes.', 'Lo demás, cuando', 'lo decidan'], 72, extra='; margin-top: 56px') +
+        body('La base es lo continuo. Los proyectos y campañas se suman uno a uno, con precio cerrado, solo cuando Pibank los aprueba.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
+    zone(label('Lo que se suma a demanda, con su precio', W_) + f'<div style="margin-top: 10px">{menu_html}</div>', 900, 150, 880) +
+    means('Pibank sabe cuánto cuesta un mes y cuánto cuesta cada pieza. La ruta recomendada para el año suma US$79.200; la integral, US$89.200.',
+          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los extras requieren la base activa.') + bubble(), section=5)))
+
+# 25a · Cómo empezar — capítulo 5 · arranque de tres meses y continuidad trimestral (montos del mismo calendario)
+quarters = [('Arranque', 'Meses 1 a 3', monthly[0:3], ['Base, hub y calculadora', 'Comunidad y primera campaña de PR'], ('Decisión M3', 'Arranque listo')),
+            ('Trimestre 2', 'Meses 4 a 6', monthly[3:6], ['Comparador de cuentas', 'Primer refuerzo de enlaces'], ('Decisión M6', 'Primeras señales')),
+            ('Trimestre 3', 'Meses 7 a 9', monthly[6:9], ['Comunidad y mantenimiento', 'Segunda campaña de PR'], None),
+            ('Trimestre 4', 'Meses 10 a 12', monthly[9:12], ['Segundo refuerzo de enlaces', 'Evaluación anual'], ('Decisión M12', 'Evaluación anual'))]
+assert sum(sum(q[2]) for q in quarters) == 79200
+qcards = ''
+for i, (k_, sub_, ms, items, dec) in enumerate(quarters):
+    tot = sum(ms)
+    mini = ''.join(f'<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 34px; height: {round(84 * v / 7700)}px; border-radius: 5px; background: {ACC if i == 0 else "rgba(207, 228, 250, 0.42)"}"></div><div style="font-size: 12px; color: {SOFT_}">M{3 * i + j + 1}</div></div>' for j, v in enumerate(ms))
+    inner = (okicker(k_) + f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">{sub_}</div><div style="font-family: {ID}; font-size: 38px; font-weight: 760; letter-spacing: -0.03em; margin-top: 10px">US${format(tot, ",").replace(",", ".")}</div>'
+             + f'<div style="display: flex; align-items: flex-end; gap: 14px; height: 112px; margin-top: 14px">{mini}</div>'
+             + ''.join(f'<div style="font-size: 16px; line-height: 1.35; color: #c9d6e2; margin-top: 8px">{x}</div>' for x in items)
+             + (f'<div style="margin-top: 16px"><span style="padding: 6px 12px; border-radius: 999px; display: inline-block; font-size: 13px; font-weight: 600; {"background: " + ACC if i == 0 else "box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.5)"}">{dec[0]}</span><div style="font-size: 13px; color: {SOFT_}; margin-top: 6px">{dec[1]}</div></div>' if dec else ''))
+    qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('500px' if i == 0 else '460px') + '; padding: 22px 20px')
+at3 = ['Medición y panel de IA con línea base', 'Auditoría técnica y pilar mejorado', 'Hub y calculadora publicados', 'Hasta 15 artículos y comunidad activa']
+S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 500, 1300, 760, 600, 44) + qcards +
+    col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; luego,', 'trimestre a trimestre'], 64, extra='; margin-top: 56px') +
+        body('El primer trimestre deja la base funcionando. Desde ahí Pibank decide cada trimestre con resultados a la vista, sin firmar el año por adelantado.', 20, 560, extra='; margin-top: 26px') +
+        label('Lo que tiene Pibank al mes 3', W_, extra='; margin-top: 30px') +
+        ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 18px; line-height: 1.35; margin-top: 10px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in at3), 120, 600) +
+    means('Compromiso inicial de tres meses y renovación trimestral con aviso de 30 días. El precio de la base no cambia y los cuatro trimestres suman la misma ruta recomendada: US$79.200.',
+          'Montos por trimestre según el calendario de la ruta recomendada. Cada proyecto o campaña se acuerda antes de empezar. Valores en USD antes de impuestos.') + bubble(), section=5)))
 
 # 25b · Costo por cuenta — capítulo 5 · la vara para medirnos: inversión ÷ cuentas con fondos aportadas (aritmética, sin promesa)
 scen = [250, 500, 1000, 2000]
@@ -849,7 +884,7 @@ nl = ''.join(f'<div style="display: grid; grid-template-columns: 70px minmax(0, 
              f'{icon(g)}<div><div style="font-family: {ID}; font-size: 28px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05">{t}</div><div style="font-size: 18px; font-weight: 300; color: {SOFT_}; margin-top: 4px">{d}</div></div></div>' for g, t, d in need)
 S.append(('Siguiente paso', page('Pibank · Siguiente paso',
     col(eyebrow('Siguiente paso') + headline(['Para empezar', 'en 2027: una', 'decisión y', 'cinco datos'], 92, extra='; margin-top: 64px') +
-        body('Qué decide la gerencia: aprobar el programa anual, elegir la ruta, gradual o integral, y designar a la persona del banco que consolida las revisiones.', 21, 540, extra='; margin-top: 36px'), 120, 600) +
+        body('Qué decide la gerencia: aprobar el arranque de tres meses, elegir la ruta, recomendada o integral, y designar a la persona del banco que consolida las revisiones.', 21, 540, extra='; margin-top: 36px'), 120, 600) +
     zone(label('Calendario que nos compartió Jesús', W_) + f'<div style="margin-top: 18px">{tl26}</div>' +
          label('Cinco datos para el mes 1', W_, extra='; margin-top: 40px') + f'<div style="margin-top: 10px">{nl}</div>', 820, 210, 960) +
     means('La propuesta y la evaluación 2026 están listas hoy. El mes 1 entrega diagnóstico validado, medición, línea base en IA, pilar mejorado, primeros artículos y estimación calibrada.') + bubble(), section=5)))
@@ -941,7 +976,7 @@ assert not any('⟦' in h for _, h in S)
 
 # ── canvas: cuatro láminas por fila ──
 N = len(S)
-assert N == 47, N
+assert N == 48, N
 idx = json.load(open(f'{ROOT}/canvas.json'))
 for f in list(idx['boards']):
     if f.startswith('Tec-'):
@@ -955,7 +990,7 @@ idx['order'] = [f'Tec-{i + 1:02d}.dc.html' for i in range(N)] + others
 for p in idx['pages']:
     if p['id'] == 'tecnica':
         p['name'] = f'Propuesta técnica · {N}'
-idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v13 del 09-10 · con la evaluación 2026, leads y la muestra X-Ray'
+idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v13 del 09-10 · 48 láminas · con arranque de tres meses, leads y la muestra X-Ray'
 idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Andrés, Valentina, Julio y Daniela confirmados; diseño visual por asignar antes del inicio.\n\n'
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'
