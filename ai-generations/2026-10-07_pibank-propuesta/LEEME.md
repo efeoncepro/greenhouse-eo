@@ -38,9 +38,11 @@ de a uno) y se corre `render-pdf.mjs <project> <carpeta de blobs> <salida.pdf>` 
 
 ## Pendiente antes de enviar (OK del CEO)
 
-1. Si aplica `pnpm tender:canonical-gate`.
-2. Foto de cierre BR3f por aprobar.
-3. Si la lámina de medición de negocio suma la definición de «inicio de solicitud».
+1. ~~Si aplica `pnpm tender:canonical-gate`~~: no aplica (09-10). El gate evalúa sólo `docs/commercial/tenders/<slug>/`
+   y esta propuesta es un prospecto (`docs/commercial/prospects/`), no una licitación formal.
+2. Foto de cierre BR3f por aprobar (comparada con BR3e el 09-10; recomendación: BR3f).
+3. ~~Definición de «inicio de solicitud»~~: resuelto el 09-10 en el glosario (lámina 46, «Solicitud iniciada»; evento a
+   acordar con Analítica de Pibank en M1, sin tasa asignada). La lámina 29 es una receta de cinco tarjetas y no cambia.
 
 Resuelto el 08-10: casos internacionales validados por Julio; equipo con nombres confirmados y diseño visual por
 asignar; Insights y modo presentación operando.

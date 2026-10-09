@@ -881,6 +881,7 @@ glos = [('SEO', 'Optimización para buscadores: que las páginas de Pibank apare
         ('Captura', 'Una página de resultados de Google guardada para revisar quién aparece.'),
         ('Observación', 'En el panel AEO: una pregunta, en una superficie de IA, en un corte de medición.'),
         ('Apertura y cuenta con fondos', 'Apertura: cuenta abierta y validada por el banco. Cuenta con fondos: la que además recibió su primer depósito.'),
+        ('Solicitud iniciada', 'Cuando alguien empieza el formulario de apertura en registro.pibank.pe. El evento exacto se acuerda con Analítica de Pibank en el mes 1; mientras no se mida, no se le asigna una tasa.'),
         ('Captación', 'Depósitos que traen las cuentas nuevas; si se mide como primer depósito o saldo mantenido se define con el banco.'),
         ('M1 a M12', 'Meses del programa, contados desde el inicio acordado.'),
         ('Activación', 'Proyecto o campaña con fecha y precio propios, que se acuerda antes de ejecutar.')]
@@ -888,7 +889,7 @@ gl27 = ''.join(f'<div style="padding: 10px 0; border-top: 1px solid {RULE_}"><di
                f'<div style="font-size: 16px; font-weight: 300; line-height: 1.38; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in glos)
 S.append(('Glosario', page('Pibank · Glosario',
     col(eyebrow('Anexo') + headline(['Glosario: los términos de esta propuesta, en simple'], 60, extra='; margin-top: 30px'), 110, 1600) +
-    zone(f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(8, auto); column-gap: 64px">{gl27}</div>', 140, 250, 1640) + bubble())))
+    zone(f'<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(6, auto); column-gap: 48px">{gl27}</div>', 140, 250, 1640) + bubble())))
 
 # 28 · Cierre (compositor)
 S.append(('Cierre', img_page('Pibank · Cierre', IMG['C09'], 'Contraportada: Empower your Engine, con los datos de contacto de Efeonce.')))
