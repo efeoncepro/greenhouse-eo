@@ -1,12 +1,12 @@
 # Pibank · Programa anual de crecimiento orgánico y autoridad
 
-**Efeonce · Propuesta económica para revisión · 07 de octubre de 2026**
+**Efeonce · Propuesta económica para revisión · Rev. híbrida conciliada · 07 de octubre de 2026**
 
-### 1. Nuestra recomendación: US$79.200 durante doce meses
+### 1. Nuestra recomendación: US$79.200 en el año, con compromiso inicial de seis meses
 
 Proponemos una ruta gradual para que más personas encuentren Pibank, comprendan su propuesta de ahorro, comparen sus opciones y avancen hacia la apertura y el primer depósito. El programa combina SEO/AEO, contenidos, herramientas de decisión, comunidad y relaciones con medios. Cada mes amplía la cobertura y mejora los activos existentes a partir de búsquedas, comportamiento y resultados: investigar → priorizar → ejecutar → medir → volver a mejorar.
 
-La inversión recomendada es de **US$79.200 en el año**: **US$54.000 de servicio continuo** —US$4.500 mensuales— más **US$25.200 en activaciones calendarizadas**. Equivale a US$6.600 mensuales en promedio; el desembolso varía según los proyectos y campañas de cada mes. Cada activación se acuerda antes de comenzar.
+La inversión recomendada es de **US$79.200 en el año**: **US$54.000 de servicio continuo** —US$4.500 mensuales— más **US$25.200 en activaciones calendarizadas**. Equivale a US$6.600 mensuales en promedio; el desembolso varía según los proyectos y campañas de cada mes. Cada activación se acuerda antes de comenzar. El programa es anual, con **compromiso inicial de seis meses** (US$42.500 en la ruta gradual) y renovación trimestral con aviso de treinta días.
 
 La meta de referencia es **15.200 cuentas con fondos**. El programa busca contribuir a esa meta en coordinación con Marketing, Producto y TI del banco; su aporte se medirá en el recorrido hasta el primer depósito.
 
@@ -32,7 +32,7 @@ La comunidad ayuda a mantener la relación entre estas etapas. Contenidos y mejo
 - Recomendaciones para que contenido, relevancia y experiencia de destino apoyen la eficiencia de SEM.
 - Plan mensual priorizado e informe de ejecución, resultados disponibles y siguientes decisiones. El producto, los artículos, los enlaces internos y la estructura técnica evolucionan con la evidencia.
 
-**Compromiso base anual: US$54.000.** Hasta sesenta espacios editoriales al año, sin suplemento. El plan mensual acuerda nuevas piezas y actualizaciones según oportunidades y revisión bancaria. Las actualizaciones se registran aparte; las FAQ se mejoran según necesidad.
+**Base: US$4.500 mensuales (US$54.000 en el año), con compromiso inicial de seis meses y renovación trimestral.** Hasta sesenta espacios editoriales al año, sin suplemento. El plan mensual acuerda nuevas piezas y actualizaciones según oportunidades y revisión bancaria. Las actualizaciones se registran aparte; las FAQ se mejoran según necesidad.
 
 ### 4. Ruta recomendada de activación gradual
 
@@ -64,7 +64,7 @@ Mediremos suscripciones consentidas, participantes que vuelven, preguntas respon
 | Composición | Base anual | Activaciones previstas | Total anual de referencia |
 |---|---:|---:|---:|
 | **Ruta gradual recomendada** | US$54.000 | US$25.200 | **US$79.200**, promedio US$6.600/mes |
-| Servicio base | US$54.000 | Según decisión del banco | **US$54.000 de compromiso fijo** |
+| Servicio base | US$54.000 | Según decisión del banco | **US$54.000 en el año; compromiso inicial de seis meses (US$27.000)** |
 | Ruta integral del plan | US$54.000 | US$35.200 | **US$89.200**, promedio US$7.433/mes |
 
 **Por US$10.000 adicionales al año**, la ruta integral incorpora el planificador, dos meses más de comunidad, dos campañas PR y dos refuerzos adicionales. Activa comunidad desde M1, hub M1–M2, calculadora M2, comparador M3–M4, planificador M5–M6, cuatro campañas PR en M3/M5/M8/M11 y cuatro refuerzos de enlaces en M2/M4/M7/M10, y mantenimiento de herramientas M3–M12. Incluye capacidad para **hasta 60 espacios editoriales, 12 newsletters, 48 adaptaciones, cuatro campañas y cuatro refuerzos de enlaces** del plan completo.
@@ -92,7 +92,7 @@ Los precios corresponden a capacidades vinculadas al servicio base activo. Una c
 
 ### 8. Activación, pagos y coordinación
 
-Servicio base facturado mensualmente de forma anticipada, durante doce meses. Comunidad: activación inicial mínima de tres meses, luego continuidad mensual acordada, con aviso de treinta días para desactivar. Proyectos: 50% al inicio y 50% a la aceptación. Campañas y refuerzos: 50% al iniciar y 50% al cierre de los entregables. El calendario es una reserva presupuestaria de referencia; las fechas exactas de factura se establecen en cada orden.
+Servicio base facturado mensualmente de forma anticipada: compromiso inicial de seis meses (M1–M6) y luego renovación por trimestre, con aviso de treinta días antes del cierre de cada trimestre. Comunidad: activación inicial mínima de tres meses, luego continuidad mensual acordada, con aviso de treinta días para desactivar. Proyectos: 50% al inicio y 50% a la aceptación. Campañas y refuerzos: 50% al iniciar y 50% al cierre de los entregables. El calendario es una reserva presupuestaria de referencia; las fechas exactas de factura se establecen en cada orden.
 
 Cada activación registra alcance, precio, responsable, fecha y aceptación. El banco valida condiciones y mensajes, habilita entornos/datos, designa voceros y conserva la operación del registro y las cuentas. Si el hub no se activa, se necesita una infraestructura editorial equivalente habilitada para publicar. Para herramientas, el banco puede asumir el mantenimiento con el traspaso correspondiente o activar la capacidad de Efeonce. Se incluye una garantía correctiva de treinta días sobre defectos del alcance entregado; cambios de condiciones y mejoras posteriores pertenecen al mantenimiento o a un nuevo encargo.
 

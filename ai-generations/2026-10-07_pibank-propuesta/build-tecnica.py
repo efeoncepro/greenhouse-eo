@@ -807,8 +807,8 @@ FX_PEN = Decimal('3.437')  # BCRP · TC sistema bancario SBS · venta · 06-10-2
 def pen(usd):
     v = (Decimal(usd) * FX_PEN).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     ent, dec = f'{v:.2f}'.split('.')
-    return 'S/ ' + format(int(ent), ',').replace(',', '.') + ',' + dec
-FX_NOTE = 'Soles de referencia a S/ 3,437 por US$ (BCRP, venta SBS, 06-10-2026).'
+    return 'S/ ' + format(int(ent), ',') + '.' + dec  # formato peruano, como la cotización en soles
+FX_NOTE = 'Soles de referencia a S/ 3.437 por US$ (BCRP, venta SBS, 06-10-2026).'
 menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 3000, 'proyecto', 'M1–M2', 1),
         ('Calculadora', 'Mejora de la herramienta existente', 1200, 'proyecto', 'M2', 1),
         ('Comparador', 'Hasta cinco productos, fuentes aprobadas', 4000, 'proyecto', 'M4–M5', 1),
@@ -1037,5 +1037,6 @@ idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: André
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'
     '4. Las láminas con foto, portada, ciclo, medición, equipo y cierre salen del compositor (imagen); las demás se editan aquí.')
+idx['notes']['pendientes-tecnica']['text'] = 'Para revisar\n\n1. Equipo híbrido: SEO, contenido y diseño en Perú (Andrés, Valentina y diseño visual por asignar); dirección de cuenta en Chile (Julio y Daniela).\n\n2. Inversión: base US$4.500 al mes + módulos con precio (42); compromiso inicial de seis meses y renovación trimestral (43); proyección de retorno por escenarios (44). Cotización USD/PEN alineada el 09-10.\n\n3. Cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n4. Las láminas con foto, portada, ciclo, medición, equipo y cierre salen del compositor (imagen); las demás se editan aquí.'
 json.dump(idx, open(f'{ROOT}/canvas.json', 'w'), ensure_ascii=False, indent=2)
 print('ok', N)
