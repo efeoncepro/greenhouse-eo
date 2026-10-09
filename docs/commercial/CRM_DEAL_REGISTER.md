@@ -1,5 +1,9 @@
 # Registro operativo general de negocios CRM
 
+## SKY Social Care 2027 — solicitud y seguimiento — 09-10-2026
+
+[Deal 56549453888](https://app.hubspot.com/contacts/48713323/record/0-3/56549453888?utm_source=codex&utm_medium=ai_agent): Jaime solicitó cotización PPTO 2027 por 1.300 respuestas públicas mensuales en 13 cuentas. Nota `118298168622` y cuatro tareas nuevas en HubSpot/Notion verificadas; seguimiento principal reutilizado. Fechas internas 13–16/10; caso de negocio aún pendiente. [Expediente y enlaces](prospects/sky-social-care-2027/README.md). Monto CLP21.600.000 y etapa Sample Sprint / Validación históricos preservados; no fee mensual aprobado ni adjudicación.
+
 ## Banco Pichincha Perú / Pibank · propuesta enviada — 09-10-2026
 
 **Estado vigente 09/10/2026:** Julio envió a Jesús Vargas Serpa, en el hilo «Pibank | SEO Efeonce», la propuesta técnica SEO/AEO 2027 v13 (49 láminas) y la cotización detallada en USD y PEN. Programa anual con compromiso inicial de seis meses y renovación trimestral: base US$4.500/mes + módulos; ruta recomendada **US$79.200 al año** (S/ 272,210.40 a S/ 3.437 por US$, BCRP venta SBS 06-10-2026); primer semestre US$42.500; ruta integral US$89.200. [Deal 65352884246](https://app.hubspot.com/contacts/48713323/record/0-3/65352884246): `presentationscheduled` / Presentación de soluciones (antes `1356915244` Sample Sprint / Validación), `amount=272210.40` PEN (antes 126,596.45); readback verificado el 09-10. Próximo hito declarado por el cliente: revisión con gerencia la semana del 19-10 y decisión en noviembre. Archivos enviados: `00 FINAL ENVIAR 2026-10-09 - …` en OneDrive `4. Comercial/Licitaciones/Banco Pichincha/`. Expediente: [prospecto](prospects/banco-pichincha-peru-seo-2026/README.md).

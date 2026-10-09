@@ -13,6 +13,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 - [SKY Staff Augmentation 2026](prospects/sky-staff-augmentation-2026/README.md): cotizaciones enviadas, nota compartida en contacto/deal y siguiente paso.
 
+- [SKY Social Care 2027](prospects/sky-social-care-2027/README.md): solicitud de Jaime del 09/10 por 1.300 respuestas/mes en 13 cuentas; contexto del piloto, nota CRM y cuatro tareas en HubSpot/Notion. Revisión final interna 16/10; propuesta pendiente.
+
 - [Datos confirmados para licitaciones](EFEONCE_DATOS_PARA_LICITACIONES.md): accionista, contacto, datos bancarios y alcance de las declaraciones confirmadas por Julio el 08/10/2026.
 
 - [Agente de seguimiento comercial](follow-up-agent/README.md): revisiones L–V 09:00/16:00 Chile, [registro vivo](follow-up-agent/REGISTRO.md), tareas y borradores en Notion.
