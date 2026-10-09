@@ -885,24 +885,26 @@ S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 5
           'Montos por trimestre según el calendario de la ruta recomendada. Cada proyecto o campaña se acuerda antes de empezar. Valores en USD antes de impuestos. ' + FX_NOTE) + bubble(), section=5)))
 
 # 25b · Costo por cuenta — capítulo 5 · la vara para medirnos: inversión ÷ cuentas con fondos aportadas (aritmética, sin promesa)
-scen = [250, 500, 1000, 2000]
-cpa = [round(79200 / n) for n in scen]
-H25 = 370; base = 660
+scen = [('Prudente', 171, 'Evaluación 2026'), ('Central', 504, 'Evaluación 2026'), ('Favorable', 1357, 'Evaluación 2026'), ('Al nivel de la meta', 2081, 'Aporte con 1,03 M de visitas')]
+cpa = [round(79200 / n) for _, n, _ in scen]
+H25 = 330; base = 650
 bars25 = ''
-for i, (n, c) in enumerate(zip(scen, cpa)):
-    x = 850 + i * 235; h = round(H25 * c / cpa[0])
+for i, ((k, n, ref), c) in enumerate(zip(scen, cpa)):
+    x = 850 + i * 235; h = max(round(H25 * c / cpa[0]), 26); hero = k == 'Central'
     dep = n * 2500 / 1e6
-    bars25 += (f'<div style="position: absolute; left: {x - 20}px; top: {base - h - 58}px; width: 190px; text-align: center; font-family: {ID}; font-size: 40px; font-weight: 760; letter-spacing: -0.03em">US${c}</div>'
-               f'<div style="position: absolute; left: {x}px; top: {base - h}px; width: 150px; height: {h}px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, rgba(3, 117, 219, 0.95), rgba(3, 117, 219, 0.35)); box-shadow: 0 0 34px rgba(3, 117, 219, 0.35)"></div>'
-               f'<div style="position: absolute; left: {x - 20}px; top: {base + 14}px; width: 190px; text-align: center"><div style="font-size: 20px; font-weight: 600">{format(n, ",").replace(",", ".")} cuentas</div>'
-               f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">US${str(round(dep, 2)).replace(".", ",").rstrip("0").rstrip(",")} M en depósitos iniciales</div></div>')
+    bars25 += (f'<div style="position: absolute; left: {x - 25}px; top: {base - h - 84}px; width: 200px; text-align: center"><div style="font-family: {ID}; font-size: {46 if hero else 38}px; font-weight: 760; letter-spacing: -0.03em">US${c}</div><div style="font-size: 14px; color: {SOFT_}">{pen(c)} por cuenta</div></div>'
+               f'<div style="position: absolute; left: {x}px; top: {base - h}px; width: 150px; height: {h}px; border-radius: 10px 10px 4px 4px; background: {"linear-gradient(180deg, rgba(3, 117, 219, 1), rgba(3, 117, 219, 0.45)); box-shadow: 0 0 0 2px rgba(3, 117, 219, 0.95), 0 0 50px rgba(3, 117, 219, 0.5)" if hero else "linear-gradient(180deg, rgba(207, 228, 250, 0.45), rgba(207, 228, 250, 0.14))"}"></div>'
+               f'<div style="position: absolute; left: {x - 25}px; top: {base + 14}px; width: 200px; text-align: center"><div style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {W_ if hero else SOFT_}">{k}</div>'
+               f'<div style="font-family: {ID}; font-size: 22px; font-weight: 700; margin-top: 4px">{format(n, ",").replace(",", ".")} cuentas</div>'
+               f'<div style="font-size: 13px; color: {SOFT_}; margin-top: 3px">{ref}</div></div>')
+LT = '<span style="font-weight: 300; letter-spacing: -0.025em">'
 S.append(('Costo por cuenta', page('Pibank · Costo por cuenta', halo_only(1300, 520) + bars25 +
-    zone(label('Costo por cuenta con fondos, según cuántas sume el programa', W_), 820, 200, 960) +
-    zone(callout('Para comparar: lo que hoy paga Pibank por cada cuenta con fondos que llega por pauta. Lo calculamos con sus datos en el mes 1.'), 820, 800, 960) +
-    col(eyebrow('Inversión') + headline(['Cuantas más', 'cuentas sume,', 'menos cuesta', 'cada una'], 84, extra='; margin-top: 64px') +
-        body('El costo por cuenta es la inversión del año dividida por las cuentas con fondos que aporta el programa. Se compara con lo que cuesta una cuenta en los otros canales del banco.', 21, 560, extra='; margin-top: 36px'), 120, 620) +
-    means('El resultado se mide en costo por cuenta, con datos del banco y frente a sus otros canales, no con un volumen prometido.',
-          'US$79.200 ÷ cuentas atribuidas al programa. 250 a 2.000 son denominadores de ejemplo, no proyecciones ni costo total de adquisición. Depósitos al ticket de US$2.500; no son ingreso del banco.') + bubble(), section=5)))
+    zone(label('Costo por cuenta con fondos: inversión anual ÷ cuentas que aporta el programa', W_), 820, 160, 960) +
+    zone(callout('Para comparar: lo que hoy le cuesta a Pibank cada cuenta con fondos que llega por pauta. Lo calculamos con sus datos en el mes 1.'), 820, 790, 960) +
+    col(eyebrow('Inversión') + headline([LT + '¿Cuánto costaría</span>', LT + 'cada cuenta?</span>', 'Unos US$157'], 76, extra='; margin-top: 64px') +
+        body('Es la inversión del año (US$79.200) dividida por las cuentas con fondos que aporta el programa en los escenarios de la lámina ⟦Evaluación 2026⟧ y al nivel de la meta de la lámina ⟦Cómo se conecta con la meta⟧. En el escenario central, unos US$157 por cuenta.', 20, 580, extra='; margin-top: 32px'), 120, 640) +
+    means('Una vara simple para decidir: lo que cuesta cada cuenta del programa frente a lo que cuesta hoy en pauta, medido con datos del banco.',
+          'US$79.200 ÷ cuentas con fondos atribuidas al programa en cada escenario. Ejercicio hipotético: no es pronóstico ni costo total de adquisición. ' + FX_NOTE) + bubble(), section=5)))
 
 # 26 · Siguiente paso — capítulo 5
 cal = [('09-10', 'Entrega de la propuesta'), ('Semana del 12-10', 'Revisión con el equipo de Pibank'), ('Semana del 19-10', 'Revisión con gerencia'), ('2027', 'Inicio del mes 1')]
