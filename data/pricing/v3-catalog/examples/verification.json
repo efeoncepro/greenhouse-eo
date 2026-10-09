@@ -1,0 +1,166 @@
+{
+  "verifiedAt": "2026-10-09",
+  "binding": false,
+  "commercialReady": false,
+  "catalog": {
+    "valid": true,
+    "digest": "b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02",
+    "version": "review-2026-10-09-v1",
+    "records": 178,
+    "mode": "historical"
+  },
+  "designer": {
+    "calculationStatus": "calculated",
+    "reviewStatus": "requires_review",
+    "totals": {
+      "cost": "3334.00",
+      "undiscountedPrice": "4334.20",
+      "discount": "0.00",
+      "net": "4334.20",
+      "marginAmount": "1000.20",
+      "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+      "tax": null,
+      "grandTotal": null,
+      "cashCommitment": "3334.00",
+      "averageMonthlyNet": "1444.73",
+      "currency": "USD"
+    }
+  },
+  "pibank": {
+    "calculationStatus": "calculated",
+    "reviewStatus": "requires_review",
+    "totals": {
+      "cost": "61082.82",
+      "undiscountedPrice": "87102.66",
+      "discount": "0.00",
+      "net": "87102.66",
+      "marginAmount": "26019.84",
+      "marginRate": "0.29872612386349624684251893110956657351222109634768903728083619949149658575294945",
+      "tax": null,
+      "grandTotal": null,
+      "cashCommitment": "61082.82",
+      "averageMonthlyNet": "7258.56",
+      "currency": "USD"
+    }
+  },
+  "maintenance": {
+    "previewDigest": "a413b30207d3c7f0e9d058057cf080b23530a099196a2790c07bb04e27660eb9",
+    "successor": {
+      "updated": true,
+      "version": "review-example-v2",
+      "digest": "21f260a93ca7fbfea1b4305da3e63f30b737d5b6cef68d4145d486ee262825c9",
+      "binding": false
+    },
+    "impacts": [
+      {
+        "quoteDate": "2026-10-09",
+        "before": {
+          "cost": "3334.00",
+          "undiscountedPrice": "4334.20",
+          "discount": "0.00",
+          "net": "4334.20",
+          "marginAmount": "1000.20",
+          "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+          "tax": null,
+          "grandTotal": null,
+          "cashCommitment": "3334.00",
+          "averageMonthlyNet": "1444.73",
+          "currency": "USD"
+        },
+        "after": {
+          "cost": "3334.00",
+          "undiscountedPrice": "4334.20",
+          "discount": "0.00",
+          "net": "4334.20",
+          "marginAmount": "1000.20",
+          "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+          "tax": null,
+          "grandTotal": null,
+          "cashCommitment": "3334.00",
+          "averageMonthlyNet": "1444.73",
+          "currency": "USD"
+        }
+      },
+      {
+        "quoteDate": "2026-10-10",
+        "before": {
+          "cost": "3334.00",
+          "undiscountedPrice": "4334.20",
+          "discount": "0.00",
+          "net": "4334.20",
+          "marginAmount": "1000.20",
+          "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+          "tax": null,
+          "grandTotal": null,
+          "cashCommitment": "3334.00",
+          "averageMonthlyNet": "1444.73",
+          "currency": "USD"
+        },
+        "after": {
+          "cost": "3500.50",
+          "undiscountedPrice": "4550.65",
+          "discount": "0.00",
+          "net": "4550.65",
+          "marginAmount": "1050.15",
+          "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+          "tax": null,
+          "grandTotal": null,
+          "cashCommitment": "3500.50",
+          "averageMonthlyNet": "1516.88",
+          "currency": "USD"
+        }
+      }
+    ],
+    "comparison": {
+      "binding": false,
+      "calculations": [
+        "selection-34d01a41a1229925d06fd658",
+        "selection-70f314c46c02a7299a6af07d"
+      ],
+      "before": {
+        "cost": "3334.00",
+        "undiscountedPrice": "4334.20",
+        "discount": "0.00",
+        "net": "4334.20",
+        "marginAmount": "1000.20",
+        "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "1444.73",
+        "currency": "USD"
+      },
+      "after": {
+        "cost": "3500.50",
+        "undiscountedPrice": "4550.65",
+        "discount": "0.00",
+        "net": "4550.65",
+        "marginAmount": "1050.15",
+        "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3500.50",
+        "averageMonthlyNet": "1516.88",
+        "currency": "USD"
+      },
+      "comparability": {
+        "currencyMatches": true,
+        "scopeMatches": false,
+        "complete": true
+      },
+      "catalogs": [
+        "review-2026-10-09-v1",
+        "review-example-v2"
+      ]
+    },
+    "oldQuoteReplayVerified": true,
+    "staleConfirmationRejected": true
+  },
+  "checks": {
+    "twoReplays": true,
+    "twoExplanations": true,
+    "twoHistoricalExportsBlocked": true,
+    "sourceHashesUnchanged": true,
+    "originalCatalogUnchanged": true
+  }
+}

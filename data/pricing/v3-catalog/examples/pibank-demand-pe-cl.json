@@ -1,0 +1,1111 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-09",
+  "offerId": "talent-assurance-staffing",
+  "engagementCode": "monthly",
+  "accountId": "pibank-demand-simulation",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 12,
+  "lines": [
+    {
+      "lineId": "writer",
+      "profile": "ECG-011",
+      "talentCountry": "PE",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "1.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "designer",
+      "profile": "ECG-002",
+      "talentCountry": "PE",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "10.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "10.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "10.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "18.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "18.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "8.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "direction",
+      "profile": "ECG-005",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "9.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "9.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "coordination",
+      "profile": "ECG-016",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "6.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "6.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "seo",
+      "profile": "ECG-020",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "1.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        },
+        {
+          "requirementId": "seo-suite",
+          "resourceId": "ETG-004"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "fte",
+            "value": "1.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "wordpress",
+      "profile": "ECG-012",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "33.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "33.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "33.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "13.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "development",
+      "profile": "ECG-015",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "10.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "10.000000000"
+          }
+        },
+        {
+          "periodId": 2,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "42.000000000"
+          }
+        },
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "44.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "44.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "4.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "community",
+      "profile": "ECG-007",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "16.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "16.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "automation",
+      "profile": "ECG-021",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "2.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 4,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 5,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 7,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 9,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 10,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        },
+        {
+          "periodId": 12,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "2.000000000"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "pr",
+      "profile": "ECG-024",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "66.000000000"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "activePeriods": [
+        3,
+        6,
+        8,
+        11
+      ],
+      "dedicationByPeriod": [
+        {
+          "periodId": 3,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "66.000000000"
+          }
+        },
+        {
+          "periodId": 6,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "20.000000000"
+          }
+        },
+        {
+          "periodId": 8,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "46.000000000"
+          }
+        },
+        {
+          "periodId": 11,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "20.000000000"
+          }
+        }
+      ]
+    }
+  ]
+}

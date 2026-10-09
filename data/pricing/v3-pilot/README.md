@@ -28,3 +28,7 @@ Los controles históricos están comprobados con aritmética decimal independien
 - [Ficha económica Colombia→Chile](../../../docs/documentation/finance/cotizador-v3-piloto-colombia-chile.md) y [ledger para agentes](economics/colombia-chile-review.json): confirmaciones, bindings y sensibilidad preparada; costos vigentes pendientes. [Readiness](economics/colombia-chile-readiness.json): sin precio exportable.
 
 - [Simulación histórica ejecutable](scenarios/colombia-chile-design-historical-hypothesis.json): diseñador senior 50% con costo colombiano supuesto, kit histórico y placeholders de prueba; [supuestos](economics/historical-simulation/assumptions.json) y [cinco resultados](economics/historical-simulation/results.json). `calculated/requires_review`, sin habilitación comercial.
+
+- [Prueba de equipo Pibank Perú/Chile](../../../docs/documentation/finance/cotizador-v3-prueba-pibank.md): ruta gradual, diez funciones con capacidad media, costo reconciliado y ensayo de margen 40%; [input](scenarios/pibank-gradual-peru-chile.json), [supuestos](economics/pibank/assumptions.json) y [resultados](economics/pibank/results.json). Sin cambiar la oferta documental.
+
+[Selección desde catálogo y mantenimiento](../v3-catalog/README.md): recorrido implementado después de los ensayos con snapshots. Pibank pasa a demanda; catálogo aporta costos.

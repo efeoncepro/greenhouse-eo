@@ -316,3 +316,7 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## Contractor integrity — 2026-10-05
 
 [Accepted decision](GREENHOUSE_CONTRACTOR_SUBMISSION_PAYMENT_INTEGRITY_DECISION_V1.md): own-lane money, evidence by period, atomic attempt replay, payment-order backlink and full contractor settlement; TASK-2009/2010. No rollout/data recovery applied.
+
+## Pricing V3 — 2026-10-09
+
+[Catálogo, resolución y mantenimiento local](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md): Accepted, TASK-2019; versiones locales y cálculo congelado, sin promoción canónica.

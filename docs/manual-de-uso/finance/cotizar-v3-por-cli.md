@@ -59,6 +59,21 @@ del input y declarar la hipótesis en un nuevo manifest; guardar en un `--out` n
 artefactos sellados, ni convertir los supuestos a `confirmed` para superar revisión.
 La fecha de source es ventana del ensayo; extenderla no confirma vigencia de costos.
 
+## Prueba multirol Pibank
+
+La [ficha Pibank](../../documentation/finance/cotizador-v3-prueba-pibank.md) vincula el alcance
+vigente, países elegidos por el operador y provisiones históricas. El [input](../../../data/pricing/v3-pilot/scenarios/pibank-gradual-peru-chile.json)
+prueba capacidad media anual con target_margin 40%, sin cambiar la propuesta existente.
+
+```bash
+pnpm --silent pricing:v3 calculate --input data/pricing/v3-pilot/scenarios/pibank-gradual-peru-chile.json
+pnpm --silent pricing:v3 replay --input data/pricing/v3-pilot/economics/pibank/margin-40-hypothesis.artifact.json
+```
+
+Código 3 significa cálculo completo con revisión obligatoria. La variante cost-reconciliation
+con markup 0 es un control de costo, no oferta. Promedios de FTE/precio no sustituyen el
+calendario de proyectos, disponibilidad o facturación; export continúa bloqueado.
+
 ## Datos y reglas ejecutadas
 
 - Solicitud estricta: campos desconocidos, números monetarios en lugar de cadenas, fechas inválidas y dedicaciones conflictivas son errores. Decimal exacto, precisión 80, redondeo HALF_UP al final de cada línea.
@@ -97,3 +112,7 @@ El [caso diseñador senior compartido Colombia→Chile](../../../data/pricing/v3
 Esta vertical no implementa aún reader del catálogo canónico, autorización remota, cambios salariales por periodo, overrides en `request`, consumo AI medido, fees porcentuales sobre ingresos, rounding comercial adicional, setups amortizados, ajustes encadenados ni servicios compuestos. Esos campos no se aceptan silenciosamente. [Contrato objetivo y convergencia](../../documentation/finance/cotizador-v3-contrato-y-validacion.md) conserva esas extensiones y los gates productivos; [parámetros piloto](../../documentation/finance/cotizador-v3-parametros-piloto.md) conserva decisiones económicas pendientes.
 
 Verificación: `pnpm pricing:v3:test`, `pnpm pricing:workbook:test`, lint focal y `pnpm typecheck`. Evidencia y límite del lint global en el [cierre local](../../audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
+
+## Selección desde catálogo y mantenimiento
+
+[Recorrido para agentes y actualización versionada](catalogo-v3-seleccion-y-actualizacion.md): `catalog`, `prepare`, `quote`, explicación/replay y preview/apply. Este flujo usa catálogos locales, sin montar snapshots a mano ni incorporar provisiones de un expediente. Los comandos de snapshot anteriores siguen disponibles.

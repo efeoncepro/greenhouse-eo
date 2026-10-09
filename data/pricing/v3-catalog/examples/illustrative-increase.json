@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "illustrative-increase",
+  "baseDigest": "b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02",
+  "nextVersion": "review-example-v2",
+  "actor": "simulation-example",
+  "reason": "Example only: Adobe +10%, base salary +10%. No verified new price.",
+  "changes": [
+    {
+      "operation": "replace",
+      "recordId": "ETG-001",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "ETG-001",
+        "revision": 2,
+        "source": {
+          "reference": "illustrative-only:increase-not-provider-salary",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Illustrative increase, not new approved salary or invoice",
+        "kind": "resource",
+        "value": {
+          "amount": "88",
+          "currency": "USD",
+          "resourceId": "ETG-001",
+          "label": "Historical provider package — Adobe Creative Cloud",
+          "kind": "tool",
+          "unit": "month",
+          "scope": "account",
+          "covers": [
+            "tool:ETG-001"
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-002:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-002:unknown",
+        "revision": 2,
+        "source": {
+          "reference": "illustrative-only:increase-not-provider-salary",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Illustrative increase, not new approved salary or invoice",
+        "kind": "cost",
+        "value": {
+          "profileId": "ECG-002",
+          "seniorityCode": "senior",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1045"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -2,6 +2,21 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
+import { validateCatalog, searchCatalog } from '../../src/lib/finance/pricing-v3/catalog/catalog'
+import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
+import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
+import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
+import { projectCatalogQuote, catalogQuoteMarkdown } from '../../src/lib/finance/pricing-v3/catalog/client'
+import {
+  catalogDigest,
+  compareCatalogQuotes,
+  runCatalogQuote,
+  replayCatalogQuote,
+  explainCatalogQuote,
+  previewCatalogChange,
+  applyCatalogChange
+} from '../../src/lib/finance/pricing-v3/adapters/catalog-local'
+
 import type { calculatePricingV3 } from '../../src/lib/finance/pricing-v3'
 import { pricingV3ClientMarkdown, projectPricingV3ForClient } from '../../src/lib/finance/pricing-v3'
 import {
@@ -34,6 +49,11 @@ try {
       right: { type: 'string' },
       format: { type: 'string' },
       query: { type: 'string' },
+      catalog: { type: 'string' },
+      kind: { type: 'string' },
+      date: { type: 'string' },
+      impact: { type: 'string' },
+      confirm: { type: 'string' },
       help: { type: 'boolean' }
     }
   })
@@ -47,12 +67,28 @@ try {
     replay: ['input', 'help'],
     compare: ['left', 'right', 'help'],
     export: ['input', 'out', 'format', 'help'],
-    catalog: ['query', 'help'],
+    catalog: ['catalog', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
+    prepare: ['catalog', 'input', 'out', 'help'],
+    quote: ['catalog', 'input', 'out', 'help'],
     help: ['help']
   }
 
   if (command && permitted[command] && Object.keys(values).some(key => !permitted[command].includes(key)))
     throw new Error('INVALID_ARGUMENT')
+
+  const catalogPath =
+    values.catalog ?? fileURLToPath(new URL('../../data/pricing/v3-catalog/catalog.review-v1.json', import.meta.url))
+
+  const writeNew = (path: string, value: unknown) => writeFileSync(path, json(value), { flag: 'wx', mode: 0o600 })
+
+  const impacts = () => {
+    if (!values.impact) return []
+    const list = read(values.impact)
+
+    if (!Array.isArray(list) || list.length > 100) throw new Error('INVALID_ARGUMENT')
+
+    return list
+  }
 
   if (values.help || !command || command === 'help') {
     process.stdout.write(
@@ -66,46 +102,134 @@ try {
           replay: '--input frozen-artifact.json',
           compare: '--left artifact.json --right artifact.json',
           export: '--input frozen-artifact.json --out draft.md [--format markdown|json]',
-          catalog: 'search [--query text] | show --query exact-profile-id'
+          prepare: '--input brief.json [--catalog catalog.json] [--out selection.json]',
+          quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json]',
+          catalog:
+            'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
-          'All operational costs and policies must be supplied explicitly.',
+          'Catalog resolver supplies explicitly versioned records; simulation never approves operational prices.',
           'Pilot catalog is review_only.'
         ]
       })
     )
   } else if (command === 'catalog') {
-    if (!['search', 'show'].includes(subcommand) || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+    if (!['search', 'show', 'validate', 'preview', 'apply'].includes(subcommand) || positionals.length !== 2)
+      throw new Error('INVALID_ARGUMENT')
 
-    const catalog = read(fileURLToPath(new URL('../../data/pricing/v3-pilot/parameters.json', import.meta.url))) as {
-      profiles: { profileId: string; name?: string; [key: string]: unknown }[]
+    const permittedSub: Record<string, string[]> = {
+      search: ['catalog', 'query', 'kind', 'date', 'help'],
+      show: ['catalog', 'query', 'kind', 'date', 'help'],
+      validate: ['catalog', 'help'],
+      preview: ['catalog', 'input', 'impact', 'help'],
+      apply: ['catalog', 'input', 'impact', 'confirm', 'out', 'help']
     }
 
-    const query = (values.query ?? '')
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '')
-      .toLowerCase()
+    if (Object.keys(values).some(key => !permittedSub[subcommand].includes(key))) throw new Error('INVALID_ARGUMENT')
+    const catalog = validateCatalog(read(catalogPath))
 
-    const candidates = catalog.profiles.filter(profile =>
-      subcommand === 'show'
-        ? profile.profileId === values.query
-        : JSON.stringify(profile)
-            .normalize('NFD')
-            .replace(/\p{Diacritic}/gu, '')
-            .toLowerCase()
-            .includes(query)
-    )
+    if (subcommand === 'validate')
+      process.stdout.write(
+        json({
+          valid: true,
+          digest: catalogDigest(catalog),
+          version: catalog.version,
+          records: catalog.records.length,
+          mode: catalog.mode
+        })
+      )
+    else if (subcommand === 'preview')
+      process.stdout.write(json(previewCatalogChange(catalog, read(required(values.input)), impacts())))
+    else if (subcommand === 'apply') {
+      const next = applyCatalogChange(catalog, read(required(values.input)), required(values.confirm), impacts())
 
-    process.stdout.write(
-      json({
-        runtimeUse: 'review_only',
-        binding: false,
-        resolution: candidates.length === 1 ? 'candidate' : candidates.length ? 'ambiguous' : 'not_found',
-        candidates
-      })
-    )
-    if (!candidates.length || (subcommand === 'show' && candidates.length !== 1)) process.exitCode = 2
+      writeNew(required(values.out), next)
+      process.stdout.write(json({ updated: true, version: next.version, digest: catalogDigest(next), binding: false }))
+    } else {
+      if (values.date && !briefSchema.shape.quoteDate.safeParse(values.date).success) throw new Error('INVALID_ARGUMENT')
+      if (subcommand === 'show') required(values.query)
+
+      const kinds = [
+        'profile',
+        'cost',
+        'resource',
+        'kit',
+        'allocation',
+        'pricing',
+        'talent_factor',
+        'market_factor',
+        'fx'
+      ] as const
+
+      if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number])) throw new Error('INVALID_ARGUMENT')
+
+      const rows = searchCatalog(
+        catalog,
+        subcommand === 'search' ? (values.query ?? '') : '',
+        (values.kind ?? 'profile') as (typeof kinds)[number],
+        values.date
+      )
+
+      const candidates =
+        subcommand === 'search'
+          ? rows
+          : rows.filter(
+              r =>
+                r.recordId === required(values.query) ||
+                ('profileId' in r.value && r.value.profileId === values.query) ||
+                ('resourceId' in r.value && r.value.resourceId === values.query) ||
+                ('kitId' in r.value && r.value.kitId === values.query)
+            )
+
+      process.stdout.write(
+        json({
+          binding: false,
+          mode: catalog.mode,
+          version: catalog.version,
+          digest: catalogDigest(catalog),
+          resolution: candidates.length === 1 ? 'candidate' : candidates.length ? 'ambiguous' : 'not_found',
+          candidates
+        })
+      )
+      if (!candidates.length) process.exitCode = 2
+    }
+  } else if (command === 'prepare' || command === 'quote') {
+    if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
+    const catalog = validateCatalog(read(catalogPath))
+    const brief = read(required(values.input))
+
+    if (command === 'prepare') {
+      const selection = resolveBrief(catalog, brief)
+
+      if (values.out) writeNew(values.out, selection)
+      process.stdout.write(json(selection))
+      process.exitCode = selection.status === 'resolved' ? 0 : 2
+    } else {
+      const artifact = runCatalogQuote(catalog, brief)
+
+      if (values.out) writeNew(values.out, artifact)
+      const result = artifact.semantic.result
+
+      process.stdout.write(
+        json({
+          calculationId: artifact.calculationId,
+          replayDigest: artifact.replayDigest,
+          calculationStatus: result.calculationStatus,
+          reviewStatus: result.reviewStatus,
+          totals: result.totals,
+          diagnostics: result.diagnostics,
+          assumptions: result.resolution.assumptions,
+          periods: result.periods.map(p => ({
+            periodId: p.periodId,
+            totals: p.result.totals,
+            diagnostics: p.result.diagnostics
+          }))
+        })
+      )
+      process.exitCode =
+        result.calculationStatus !== 'calculated' ? 2 : result.reviewStatus === 'requires_review' ? 3 : 0
+    }
   } else if (command === 'calculate' || command === 'validate') {
     if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
     const input = read(required(values.input))
@@ -122,40 +246,105 @@ try {
   } else if (['explain', 'replay', 'compare', 'export'].includes(command)) {
     if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
 
-    if (command === 'compare')
-      process.stdout.write(json(comparePricingV3(read(required(values.left)), read(required(values.right)))))
-    else {
-      const artifact = replayPricingV3(read(required(values.input)))
+    if (command === 'compare') {
+      const left = read(required(values.left))
+      const right = read(required(values.right))
 
-      if (command === 'export') {
-        if (values.format && !['json', 'markdown'].includes(values.format)) throw new Error('INVALID_ARGUMENT')
-        const view = projectPricingV3ForClient(artifact)
-        const body = values.format === 'json' ? json(view) : pricingV3ClientMarkdown(view)
+      const catalogQuote = (value: unknown) =>
+        (value as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION
 
-        writeFileSync(required(values.out), body, { flag: 'wx', mode: 0o600 })
-        process.stdout.write(
-          json({
-            documentType: 'draft_estimate',
-            binding: false,
-            calculationId: artifact.calculationId,
-            exported: true
+      if (catalogQuote(left) !== catalogQuote(right)) throw new Error('INVALID_COMPARISON')
+      process.stdout.write(json(catalogQuote(left) ? compareCatalogQuotes(left, right) : comparePricingV3(left, right)))
+    } else {
+      const raw = read(required(values.input))
+
+      if ((raw as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION) {
+        const frozen = replayCatalogQuote(raw)
+
+        if (command === 'export') {
+          if (values.format && !['json', 'markdown'].includes(values.format)) throw new Error('INVALID_ARGUMENT')
+          const view = projectCatalogQuote(frozen.semantic.result, frozen.calculationId)
+
+          writeFileSync(required(values.out), values.format === 'json' ? json(view) : catalogQuoteMarkdown(view), {
+            flag: 'wx',
+            mode: 0o600
           })
-        )
-      } else {
-        process.stdout.write(
-          json(
-            command === 'replay'
-              ? { verified: true, calculationId: artifact.calculationId, result: artifact.semantic.result }
-              : explainPricingV3(artifact)
+          process.stdout.write(
+            json({
+              exported: true,
+              documentType: 'draft_estimate',
+              binding: false,
+              calculationId: frozen.calculationId
+            })
           )
-        )
-        process.exitCode = exitFor(artifact.semantic.result)
+        } else {
+          process.stdout.write(
+            json(
+              command === 'replay'
+                ? { verified: true, calculationId: frozen.calculationId, result: frozen.semantic.result }
+                : explainCatalogQuote(raw)
+            )
+          )
+          process.exitCode =
+            frozen.semantic.result.calculationStatus !== 'calculated'
+              ? 2
+              : frozen.semantic.result.reviewStatus === 'requires_review'
+                ? 3
+                : 0
+        }
+      } else {
+        const artifact = replayPricingV3(raw)
+
+        if (command === 'export') {
+          if (values.format && !['json', 'markdown'].includes(values.format)) throw new Error('INVALID_ARGUMENT')
+          const view = projectPricingV3ForClient(artifact)
+          const body = values.format === 'json' ? json(view) : pricingV3ClientMarkdown(view)
+
+          writeFileSync(required(values.out), body, { flag: 'wx', mode: 0o600 })
+          process.stdout.write(
+            json({
+              documentType: 'draft_estimate',
+              binding: false,
+              calculationId: artifact.calculationId,
+              exported: true
+            })
+          )
+        } else {
+          process.stdout.write(
+            json(
+              command === 'replay'
+                ? { verified: true, calculationId: artifact.calculationId, result: artifact.semantic.result }
+                : explainPricingV3(artifact)
+            )
+          )
+          process.exitCode = exitFor(artifact.semantic.result)
+        }
       }
     }
   } else throw new Error('UNKNOWN_COMMAND')
 } catch (error) {
   const safeCodes = [
     'REPLAY_MISMATCH',
+    'INVALID_COMPARISON',
+    'CATALOG_BASE_CONFLICT',
+    'CATALOG_PREVIEW_CONFLICT',
+    'CATALOG_RECORD_CONFLICT',
+    'CATALOG_VERSION_REQUIRED',
+    'DUPLICATE_CHANGE',
+    'UPDATED_SOURCE_REFERENCE_REQUIRED',
+    'CATALOG_DIMENSION_CONFLICT',
+    'INVALID_RETIREMENT',
+    'RETIRED_CATALOG_RECORD',
+    'CATALOG_IDENTITY_CONFLICT',
+    'DUPLICATE_CATALOG_DIMENSION',
+    'INVALID_CHANGE_RECORD',
+    'EFFECTIVE_DATE_CONFLICT',
+    'DUPLICATE_CATALOG_RECORD',
+    'OVERLAPPING_CATALOG_RECORD',
+    'DUPLICATE_KIT_REQUIREMENT',
+    'DUPLICATE_COST_COVERAGE',
+    'CHANGE_ALREADY_APPLIED',
+    'EXPORT_SELECTION_QUOTE_NOT_SUPPORTED',
     'EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY',
     'MISSING_ARGUMENT',
     'INVALID_ARGUMENT',

@@ -1,0 +1,1214 @@
+{
+  "request": {
+    "schemaVersion": "1.0.0",
+    "quoteDate": "2026-10-09",
+    "offerId": "pibank-capacity-simulation",
+    "deliveryModel": "staffing",
+    "engagementCode": "annual-capacity-review",
+    "offerMarketCountry": "PE",
+    "outputCurrency": "USD",
+    "duration": {
+      "unit": "month",
+      "periods": 12
+    },
+    "lines": [
+      {
+        "lineId": "writer",
+        "profileId": "PBI-WRITER",
+        "seniorityCode": "not_specified",
+        "talentCountry": "PE",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyRef": "hyp-full-reservation",
+        "assignments": [
+          {
+            "resourceId": "reserve-writer",
+            "allocationId": "assignment-reserve-writer",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-writer",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "designer",
+        "profileId": "PBI-DESIGNER",
+        "seniorityCode": "not_specified",
+        "talentCountry": "PE",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.236842105263157894"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "reserve-designer",
+            "allocationId": "assignment-reserve-designer",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-designer",
+            "quantity": "1",
+            "share": "0.236842105263157894",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "direction",
+        "profileId": "PBI-DIRECTION",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-direction",
+            "allocationId": "assignment-fee-direction",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-direction",
+            "quantity": "1",
+            "share": "0.05",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-direction",
+            "allocationId": "assignment-reserve-direction",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-direction",
+            "quantity": "1",
+            "share": "0.05",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "coordination",
+        "profileId": "PBI-COORDINATION",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.033333333333333333"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-coordination",
+            "allocationId": "assignment-fee-coordination",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-coordination",
+            "quantity": "1",
+            "share": "0.033333333333333333",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-coordination",
+            "allocationId": "assignment-reserve-coordination",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-coordination",
+            "quantity": "1",
+            "share": "0.033333333333333333",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "seo",
+        "profileId": "PBI-SEO",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyRef": "hyp-full-reservation",
+        "assignments": [
+          {
+            "resourceId": "reserve-seo",
+            "allocationId": "assignment-reserve-seo",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-seo",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "other-account",
+            "allocationId": "assignment-other-account",
+            "scope": "account",
+            "scopeRef": "pibank-hypothesis-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "wordpress",
+        "profileId": "PBI-WORDPRESS",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.09074074074074074"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-wordpress",
+            "allocationId": "assignment-fee-wordpress",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-wordpress",
+            "quantity": "1",
+            "share": "0.09074074074074074",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-wordpress",
+            "allocationId": "assignment-reserve-wordpress",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-wordpress",
+            "quantity": "1",
+            "share": "0.09074074074074074",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "development",
+        "profileId": "PBI-DEVELOPMENT",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.079629629629629629"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-development",
+            "allocationId": "assignment-fee-development",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-development",
+            "quantity": "1",
+            "share": "0.079629629629629629",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-development",
+            "allocationId": "assignment-reserve-development",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-development",
+            "quantity": "1",
+            "share": "0.079629629629629629",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "community",
+        "profileId": "PBI-COMMUNITY",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.074074074074074074"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-community",
+            "allocationId": "assignment-fee-community",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-community",
+            "quantity": "1",
+            "share": "0.074074074074074074",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-community",
+            "allocationId": "assignment-reserve-community",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-community",
+            "quantity": "1",
+            "share": "0.074074074074074074",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "automation",
+        "profileId": "PBI-AUTOMATION",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.009259259259259259"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-automation",
+            "allocationId": "assignment-fee-automation",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-automation",
+            "quantity": "1",
+            "share": "0.009259259259259259",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-automation",
+            "allocationId": "assignment-reserve-automation",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-automation",
+            "quantity": "1",
+            "share": "0.009259259259259259",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      },
+      {
+        "lineId": "pr",
+        "profileId": "PBI-PR",
+        "seniorityCode": "not_specified",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.07037037037037037"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared-180",
+        "assignments": [
+          {
+            "resourceId": "fee-pr",
+            "allocationId": "assignment-fee-pr",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-pr",
+            "quantity": "1",
+            "share": "0.07037037037037037",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "reserve-pr",
+            "allocationId": "assignment-reserve-pr",
+            "scope": "person",
+            "scopeRef": "pibank-hypothesis-pr",
+            "quantity": "1",
+            "share": "0.07037037037037037",
+            "cashTiming": "monthly"
+          }
+        ],
+        "notApplicable": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "snapshot": {
+    "schemaVersion": "1.0.0",
+    "snapshotId": "pibank-gradual-PE-CL-hypothesis",
+    "version": "hypothesis-2026-10-09-v1",
+    "mode": "historical",
+    "calculationCurrency": "USD",
+    "countries": [
+      "PE",
+      "CL"
+    ],
+    "currencies": [
+      {
+        "code": "USD",
+        "precision": 2
+      }
+    ],
+    "profiles": [
+      {
+        "profileId": "PBI-WRITER",
+        "label": "HIPÓTESIS PIBANK — Redactor",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "900",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "PE"
+          },
+          "covers": [
+            "human_salary",
+            "human_charges_provision"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-writer-PE-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_charges_provision",
+          "delivery_reserve"
+        ]
+      },
+      {
+        "profileId": "PBI-DESIGNER",
+        "label": "HIPÓTESIS PIBANK — Diseñador",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "1290",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "PE"
+          },
+          "covers": [
+            "human_salary",
+            "human_charges_provision"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-designer-PE-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_charges_provision",
+          "delivery_reserve"
+        ]
+      },
+      {
+        "profileId": "PBI-DIRECTION",
+        "label": "HIPÓTESIS PIBANK — Director de Arte",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2375",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-direction-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-COORDINATION",
+        "label": "HIPÓTESIS PIBANK — Account Manager / Project Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2656.25",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-coordination-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-SEO",
+        "label": "HIPÓTESIS PIBANK — Especialista SEO/AEO",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "1800",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_charges_provision"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-seo-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_charges_provision",
+          "delivery_reserve",
+          "other_costs_provision"
+        ]
+      },
+      {
+        "profileId": "PBI-WORDPRESS",
+        "label": "HIPÓTESIS PIBANK — Desarrollador WordPress",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2000",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-wordpress-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-DEVELOPMENT",
+        "label": "HIPÓTESIS PIBANK — Desarrollador Full Stack",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2656.25",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-development-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-COMMUNITY",
+        "label": "HIPÓTESIS PIBANK — Community Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "1750",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-community-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-AUTOMATION",
+        "label": "HIPÓTESIS PIBANK — Marketing Automation Specialist",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2500",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-automation-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      },
+      {
+        "profileId": "PBI-PR",
+        "label": "HIPÓTESIS PIBANK — Periodista / PR digital",
+        "seniorityCode": "not_specified",
+        "tierCode": "pibank-test-policy",
+        "cost": {
+          "amount": "2250",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CL"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses",
+            "human_charges_reference"
+          ],
+          "source": {
+            "reference": "pibank-hypothesis-only:human-pr-CL-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "human_charges_reference",
+          "delivery_reserve",
+          "platform_fee"
+        ]
+      }
+    ],
+    "allocationPolicies": [
+      {
+        "policyId": "hyp-shared-180",
+        "mode": "shared",
+        "hoursPerFteMonth": "180",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "pibank-hypothesis-only:shared-capacity",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "policyId": "hyp-full-reservation",
+        "mode": "dedicated",
+        "hoursPerFteMonth": "120",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "pibank-hypothesis-only:full-SEO-writer-reservation",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "pricingPolicies": [
+      {
+        "profileId": "PBI-WRITER",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-DESIGNER",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-DIRECTION",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-COORDINATION",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-SEO",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-WORDPRESS",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-DEVELOPMENT",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-COMMUNITY",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-AUTOMATION",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "profileId": "PBI-PR",
+        "tierCode": "pibank-test-policy",
+        "offerId": "pibank-capacity-simulation",
+        "engagementCode": "annual-capacity-review",
+        "method": "target_margin",
+        "rate": "0.4",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "pibank-hypothesis-only:historical-40pct-aspiration-not-approval",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "talentFactors": [],
+    "marketFactors": [
+      {
+        "country": "PE",
+        "factor": "1",
+        "source": {
+          "reference": "pibank-hypothesis-only:neutral-market-not-WTP",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "resources": [
+      {
+        "resourceId": "reserve-writer",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Redactor",
+        "kind": "operations",
+        "amount": "135",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-writer",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-designer",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Diseñador",
+        "kind": "operations",
+        "amount": "193.5",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-designer",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-direction",
+        "label": "Fee legacy atribuido, sólo reconciliación — Director de Arte",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-direction",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-direction",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Director de Arte",
+        "kind": "operations",
+        "amount": "365.4375",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-direction",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-coordination",
+        "label": "Fee legacy atribuido, sólo reconciliación — Account Manager / Project Manager",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-coordination",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-coordination",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Account Manager / Project Manager",
+        "kind": "operations",
+        "amount": "407.625",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-coordination",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-seo",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Especialista SEO/AEO",
+        "kind": "operations",
+        "amount": "270",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-seo",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "other-account",
+        "label": "Otros costos del expediente, provisión sin planes validados",
+        "kind": "operations",
+        "amount": "291.666666666666666666",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "other_costs_provision"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:other-account",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-wordpress",
+        "label": "Fee legacy atribuido, sólo reconciliación — Desarrollador WordPress",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-wordpress",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-wordpress",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Desarrollador WordPress",
+        "kind": "operations",
+        "amount": "309.1875",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-wordpress",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-development",
+        "label": "Fee legacy atribuido, sólo reconciliación — Desarrollador Full Stack",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-development",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-development",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Desarrollador Full Stack",
+        "kind": "operations",
+        "amount": "407.625",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-development",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-community",
+        "label": "Fee legacy atribuido, sólo reconciliación — Community Manager",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-community",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-community",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Community Manager",
+        "kind": "operations",
+        "amount": "271.6875",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-community",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-automation",
+        "label": "Fee legacy atribuido, sólo reconciliación — Marketing Automation Specialist",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-automation",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-automation",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Marketing Automation Specialist",
+        "kind": "operations",
+        "amount": "384.1875",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-automation",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "fee-pr",
+        "label": "Fee legacy atribuido, sólo reconciliación — Periodista / PR digital",
+        "kind": "platform_fee",
+        "amount": "61.25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:fee-pr",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "reserve-pr",
+        "label": "Provisión de entrega 15%, no Assurance certificado — Periodista / PR digital",
+        "kind": "operations",
+        "amount": "346.6875",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "delivery_reserve"
+        ],
+        "source": {
+          "reference": "pibank-hypothesis-only:reserve-pr",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "fx": []
+  }
+}

@@ -1,0 +1,344 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.pibank-capacity-review.v1",
+  "preparedAt": "2026-10-09",
+  "workUnit": "TASK-2018",
+  "runtimeUse": "review_only",
+  "commercialReady": false,
+  "baseInput": {
+    "path": "data/pricing/v3-pilot/scenarios/pibank-gradual-peru-chile.json",
+    "sha256": "ba7c28f3221c87e532bbdf200121db5e3e7b7cf1787cf8f2fcb0b4742cec1eb7"
+  },
+  "sources": [
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/conexion-demanda-plan/inputs.json",
+      "sha256": "707cb26fbb20046d8f7fe8dec915d93afd4bc267f39ac8e39f7087e3b741d643"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/conexion-demanda-plan/costeo-interno.csv",
+      "sha256": "b14dcdd52a633e3698cb3970df26266c88040be88e356403980260e2182ca59a"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/capacidad-asignada.csv",
+      "sha256": "11293d397543edef14613d4587a459eab729ba161b236a12c018b9f716fe05e8"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/costeo-por-capacidad.csv",
+      "sha256": "4b5bf1afc9caf7e9bbe1df8f83d4bac7a2d673ff83bb339dd0a0e4cd0e1adf5c"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/activaciones-mensuales.csv",
+      "sha256": "e6688f4ebf802c009692754f05543e6d6a58c5c29d206271215abec080dfc0ac"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/capacidades-y-precios.csv",
+      "sha256": "c43730442502c45ff301512c9b2441fda3c459a178c7ad2c8848fe21d554f4d2"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/resultados.json",
+      "sha256": "b17ca9731d1caaba46d305abb755f4db62af222cb7f2519acc750e46402d3a40"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oferta-hibrida/ACUERDOS-DE-ENTREGA.md",
+      "sha256": "8835c3ec1a1efb5ce502eca5782c0bf2d5df0c0600f81998cc4f530e4edb1cfe"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/cotizacion.json",
+      "sha256": "f94530f468fde5d8b5921ba2783072edafded78963e69280d53db01c8a37e213"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md",
+      "sha256": "43254180f374b663d06b50b8d094677ed5b4648cd88596a9b42672c4806d8248"
+    },
+    {
+      "path": "data/pricing/seed/sellable-roles-pricing.csv",
+      "sha256": "dcb26b9de88cb47d0ecc47016e0e3de02b7acbbe970c6acb8474760e8a6c2ebb"
+    }
+  ],
+  "scope": "Costos de capacidad media anual de ruta gradual; 12 meses, no nueva oferta ni calendario de equipo/contrato.",
+  "operatorSelections": {
+    "designer": "PE",
+    "writer": "PE",
+    "direction": "CL",
+    "coordination": "CL",
+    "remainingSpecialists": "CL",
+    "clientMarket": "PE"
+  },
+  "planUnits": {
+    "BASE": "12",
+    "HUB": "1",
+    "CALCULADORA": "1",
+    "COMPARADOR": "1",
+    "PLANIFICADOR": "0",
+    "COMUNIDAD": "10",
+    "PR": "2",
+    "REFUERZO_PR": "2",
+    "CUIDADO": "10"
+  },
+  "roles": [
+    {
+      "lineId": "writer",
+      "profileId": "PBI-WRITER",
+      "label": "Redactor",
+      "country": "PE",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": null,
+      "originalPibankRoleSku": null,
+      "humanMonthlyReferenceUsd": "900",
+      "seedFeeMonthlyReferenceUsd": null,
+      "fteBilledAverage": "1",
+      "capacityBasis": "full_monthly_reservation",
+      "equivalentReferenceHoursPerMonth": "120",
+      "sourceWorkHoursAnnualBudget": "1060",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "BASE": "1060"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "designer",
+      "profileId": "PBI-DESIGNER",
+      "label": "Diseñador",
+      "country": "PE",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": null,
+      "originalPibankRoleSku": null,
+      "humanMonthlyReferenceUsd": "1290",
+      "seedFeeMonthlyReferenceUsd": null,
+      "fteBilledAverage": "0.236842105263157894",
+      "capacityBasis": "historical_designer_30pct_reservation_scaled_to_activated_modules",
+      "equivalentReferenceHoursPerMonth": "42.631578947368421052",
+      "sourceWorkHoursAnnualBudget": "120",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "HUB": "20",
+        "COMPARADOR": "20",
+        "PLANIFICADOR": "0",
+        "COMUNIDAD": "80"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "direction",
+      "profileId": "PBI-DIRECTION",
+      "label": "Director de Arte",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-005",
+      "originalPibankRoleSku": "ECG-001",
+      "humanMonthlyReferenceUsd": "2375",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.05",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "9",
+      "sourceWorkHoursAnnualBudget": "108",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "BASE": "108"
+      },
+      "scopeNotes": "Director de Arte toma la referencia económica de direction, antes Creative Operations Lead; no confirma equivalencia de responsabilidades."
+    },
+    {
+      "lineId": "coordination",
+      "profileId": "PBI-COORDINATION",
+      "label": "Account Manager / Project Manager",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-016",
+      "originalPibankRoleSku": "ECG-016",
+      "humanMonthlyReferenceUsd": "2656.25",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.033333333333333333",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "5.999999999999999999",
+      "sourceWorkHoursAnnualBudget": "72",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "BASE": "72"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "seo",
+      "profileId": "PBI-SEO",
+      "label": "Especialista SEO/AEO",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": null,
+      "originalPibankRoleSku": null,
+      "humanMonthlyReferenceUsd": "1800",
+      "seedFeeMonthlyReferenceUsd": null,
+      "fteBilledAverage": "1",
+      "capacityBasis": "full_monthly_reservation",
+      "equivalentReferenceHoursPerMonth": "120",
+      "sourceWorkHoursAnnualBudget": "604",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "BASE": "604"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "wordpress",
+      "profileId": "PBI-WORDPRESS",
+      "label": "Desarrollador WordPress",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-012",
+      "originalPibankRoleSku": "ECG-012",
+      "humanMonthlyReferenceUsd": "2000",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.09074074074074074",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "16.333333333333333333",
+      "sourceWorkHoursAnnualBudget": "196",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "HUB": "40",
+        "BASE": "156"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "development",
+      "profileId": "PBI-DEVELOPMENT",
+      "label": "Desarrollador Full Stack",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-015",
+      "originalPibankRoleSku": "ECG-015",
+      "humanMonthlyReferenceUsd": "2656.25",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.079629629629629629",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "14.333333333333333333",
+      "sourceWorkHoursAnnualBudget": "172",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "HUB": "20",
+        "CALCULADORA": "32",
+        "COMPARADOR": "80",
+        "PLANIFICADOR": "0",
+        "CUIDADO": "40"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "community",
+      "profileId": "PBI-COMMUNITY",
+      "label": "Community Manager",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-007",
+      "originalPibankRoleSku": "ECG-007",
+      "humanMonthlyReferenceUsd": "1750",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.074074074074074074",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "13.333333333333333333",
+      "sourceWorkHoursAnnualBudget": "159.999999999999999999",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "COMUNIDAD": "159.999999999999999999"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "automation",
+      "profileId": "PBI-AUTOMATION",
+      "label": "Marketing Automation Specialist",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-021",
+      "originalPibankRoleSku": "ECG-021",
+      "humanMonthlyReferenceUsd": "2500",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.009259259259259259",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "1.666666666666666666",
+      "sourceWorkHoursAnnualBudget": "20",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "COMUNIDAD": "20"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    },
+    {
+      "lineId": "pr",
+      "profileId": "PBI-PR",
+      "label": "Periodista / PR digital",
+      "country": "CL",
+      "countrySelection": "operator_confirmed_for_simulation_2026-10-09",
+      "actualHistoricalCostCountry": null,
+      "referenceRoleSku": "ECG-024",
+      "originalPibankRoleSku": "ECG-024",
+      "humanMonthlyReferenceUsd": "2250",
+      "seedFeeMonthlyReferenceUsd": "61.25",
+      "fteBilledAverage": "0.07037037037037037",
+      "capacityBasis": "seed_hourly_cost_with_sensitivity_and_explicit_fee_split",
+      "equivalentReferenceHoursPerMonth": "12.666666666666666666",
+      "sourceWorkHoursAnnualBudget": "152",
+      "sourceWorkHoursInterpretation": "Weighted reference for economic allocation, including all BASE writer/SEO tasks from integral capacity reservation; not actual gradual output calendar.",
+      "moduleHourBindings": {
+        "PR": "112",
+        "REFUERZO_PR": "40"
+      },
+      "scopeNotes": "Disponibilidad, seniority, atribución de costos y país real del costo por confirmar."
+    }
+  ],
+  "commercialReference": {
+    "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/cotizacion.json",
+    "plan": "gradual",
+    "annualNetUsd": "79200",
+    "sixMonthBudgetUsd": "42500",
+    "baseMonthlyUsd": "4500",
+    "initialCommitmentMonths": 6,
+    "renewal": "quarterly",
+    "status": "existing_documentary_draft_not_bank_accepted"
+  },
+  "economicReference": {
+    "sourcePlan": "gradual",
+    "centralAnnualCostUsd": "57897.950657894726",
+    "targetMarginFraction": "0.4",
+    "targetStatus": "historical_aspiration_not_approved_floor_or_tariff"
+  },
+  "assumptions": [
+    "Country is selected by operator, but historical salaries/costs are only assumed applicable to those countries. No numeric country cost factor or WTP adjustment is invented.",
+    "Effective dates declare simulation evaluation window only, not verified provider or payroll validity. All sources estimated; dataMode historical.",
+    "Writer and SEO reserve their full monthly hiring cost once; consumed hours must not make these salaries disappear.",
+    "Designer retains expediente allocation 30% scaled by activated module workload (120/152), not half-time from the previous pilot.",
+    "Remaining seed profiles use 180h denominator and 1.25 cost sensitivity from source; these are neither productive-hours capacity nor commercial quote rates.",
+    "Fees are split from human costs. Explicit shares reproduce the historical hourly allocation solely for reconciliation; they do not approve a fee policy for fractional resources.",
+    "Delivery reserve 15% is a cost provision, not Talent Assurance certification/training priced or guaranteed.",
+    "Other provision contains unspecified tools/overhead; no extra tools, 25 USD Assurance/management placeholders or synthetic onboarding are added to duplicate it.",
+    "Annual-average FTE does not validate peaks, headcount, availability or monthly schedule.",
+    "Kernel staffing DTO is used only as a capacity economics probe; managed service scope, activated projects and billing milestones are not implemented by this fixture.",
+    "No taxes, salary indexes, WTP, treasury costs or complete guarantees are inferred.",
+    "BASE work hours include all SEO/writer tasks from the source capacity plan; actual gradual task volume/calendar must be reconciled separately."
+  ],
+  "cases": [
+    {
+      "scenarioId": "cost-reconciliation",
+      "policyOverride": {
+        "method": "markup",
+        "rate": "0"
+      },
+      "meaning": "Cost-only internal reconciliation; net equals modeled cost, not selling price."
+    },
+    {
+      "scenarioId": "margin-40-hypothesis",
+      "policyOverride": null,
+      "meaning": "Sensitivity with historical aspirational margin 40%; not approved new price."
+    }
+  ],
+  "resultsPath": "data/pricing/v3-pilot/economics/pibank/results.json"
+}

@@ -127,3 +127,25 @@ Dedicado absorbe costo completo; compartido exige hipótesis explícita de venta
 Es una alternativa local usable sin UI/DB; no remitir al operador a una UI que no le funciona.
 Sus resultados son hipótesis sobre costos históricos/declarados, no precios aprobados ni cotizaciones
 emitidas. No importar al catálogo, tocar payroll ni publicar costos internos por inferencia.
+
+## Cotizador V3: selección y mantenimiento del catálogo
+
+Para cotizar desde un pedido con perfiles, países, dedicación y recursos, preferir `pnpm --silent pricing:v3`
+con catálogo local explícito: `catalog search/show/validate` → `prepare --input brief.json` →
+`quote --input brief.json [--catalog version.json] [--out artifact.json]` → `explain/replay`.
+[Manual de agentes](../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md) y
+[contrato de mantenimiento](../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
+No construir precios en el agente ni tomar costos/provisiones del expediente: éste aporta demanda.
+Mantener variante/seniority/tier, ambos países, headcount y duración; kits especifican recursos completos,
+asignación y alternativas. Faltantes/ambiguos se resuelven explícitamente, sin elegir el más barato ni cero.
+Baseline histórica/simulación; no afirmar salario vigente o licencia compartible. `trial-*` son placeholders.
+Códigos 2=pendiente, 3=calculado con revisión, 1=adapter/conflicto/export bloqueado. Explain toma el artefacto
+congelado e incluye componentes humanos, recursos, cantidades, factores y fuentes utilizados.
+
+Actualizaciones autorizadas usan change-set `add/replace/retire` con fuente nueva, vigencia, actor/motivo,
+`baseDigest` y `nextVersion`; `catalog preview --input change.json [--impact briefs.json]` y
+`catalog apply ... --confirm previewDigest --out new-version.json`. No editar baseline in-place ni
+reutilizar confirmación de otra propuesta/base/impacto. Apply local no es aprobación comercial ni promoción
+runtime; cotizar con el sucesor requiere `--catalog new-version.json`. Nunca reprecificar artefactos existentes.
+Snapshot `calculate` permanece como operación de bajo nivel. Excel/workbook CLI es investigación histórica,
+no dependencia del flujo V3. API/UI/MCP canónicos quedan fuera de la implementación local.

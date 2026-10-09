@@ -25,6 +25,8 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2018` | `complete` | Pricing V3 Pibank multi-role historical simulation | `docs/tasks/complete/TASK-2018-pricing-v3-pibank-team-simulation.md` |
+| `TASK-2019` | `complete` | Pricing V3 catalog, resolution and maintenance | `docs/tasks/complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md` |
 | `TASK-2017` | `in-progress` | Pricing V3 Colombia-Chile economics validation | `docs/tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md` |
 | `TASK-2016` | `complete` | Pricing V3 local motor and CLI prototype | `docs/tasks/complete/TASK-2016-pricing-v3-local-prototype.md` |
 | `TASK-2015` | `complete` | Excel pricing agent CLI | `docs/tasks/complete/TASK-2015-pricing-workbook-agent-cli.md` |
@@ -2592,3 +2594,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex 2026-10-09: `TASK-2016` — prototipo local del motor V3 con CLI, posterior a TASK-2015; catálogo piloto y contratos definidos, escenario prioritario Colombia→Chile. V2/capabilities/costos operativos intactos. Siguiente ID libre `TASK-2017`.
 
 > Registro Codex 2026-10-09: `TASK-2017` (policy, finance) — ficha económica local diseñador senior 50%, Colombia→Chile; costos históricos disponibles, validación vigente pendiente. TASK-2016 conserva el núcleo cerrado y TASK-1607 el gate runtime. Siguiente ID libre `TASK-2018`.
+
+> Registro Codex 2026-10-09: `TASK-2018` — prueba multirol V3 con capacidad Pibank gradual; países del talento confirmados, hipótesis económicas preservadas, sin cambio de oferta ni runtime. Siguiente ID libre `TASK-2019`.
+
+> Registro Codex 2026-10-09: TASK-2019 implementa selección y mantenimiento local V3 autorizados por el operador; TASK-2016 kernel, TASK-2017 vigencia económica y TASK-2018 reconciliación se conservan. Siguiente ID libre TASK-2020.

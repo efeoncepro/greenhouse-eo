@@ -19,3 +19,7 @@ pnpm --silent pricing:workbook compare --input data/pricing/examples/crm-capacit
 
 Consulta, auditoría y cálculo local sin UI/DB. Costos reales pueden declararse por JSON con fecha/fuente.
 No importar esta proyección como catálogo comercial vigente ni exponer costos internos a clientes/público.
+
+## Selección y mantenimiento V3
+
+[Catálogo local versionado](v3-catalog/README.md): brief → selección → cálculo → explicación; actualizaciones con fecha efectiva, impacto y conflicto de base. Histórico/simulación, no tarifas vigentes.

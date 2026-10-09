@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `command`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `2019`
 - Domain: `finance`
 - Blocked by: `none`
@@ -177,12 +177,12 @@ Local-only, reversible. Riesgos: asumir salarios por país, prorratear seats, du
 
 ## Acceptance Criteria
 
-- [ ] Catálogo/rules consultables y brief resuelto sin aritmética en CLI.
-- [ ] Selección de kits/licencias explícita; faltantes/ambigüedades trazables.
-- [ ] Quotes/calendario congelados con explicación y replay.
-- [ ] Contrato de mantenimiento con cambios fechados, impacto, versión y conflicto base.
-- [ ] Pruebas y CLI diseñador/Pibank documentadas con estados honestos.
-- [ ] Docs/task/ADR/manual/handoff/changelog y gates sincronizados.
+- [x] Catálogo/rules consultables: 32 perfiles, 26 referencias proveedor; dominio puro y CLI fina.
+- [x] Kits/licencias, ambos países, alternativas y faltantes con códigos; fixtures/CLI diseñador y Pibank.
+- [x] Calendario mensual, quote congelada y desglose humano/recursos; dos replay reales verificados.
+- [x] Add/replace/retire, dimensiones, vigencia, fuente nueva, preview/apply, conflicto y quote vieja verificados.
+- [x] 74 pruebas y CLI diseñador/Pibank documentados en auditoría y examples/verification.json; requires_review, export bloqueado.
+- [x] Docs/task/ADR/manual/handoff/changelog sincronizados; cierre documental y contexto estrictos se verifican al finalizar.
 
 ## Verification
 
@@ -190,9 +190,16 @@ Vitest focal, lint/typecheck proporcional, CLI real, cierre documental/context-c
 
 ## Closing Protocol
 
-- [ ] Evidencia y acceptance criteria actualizados.
-- [ ] Manual/ADR/registro y handoff sincronizados.
+- [x] Evidencia y acceptance criteria actualizados en auditoría y fixtures ejecutados.
+- [x] Manual/ADR/registro y handoff sincronizados; sin promoción runtime.
 
 ## Follow-ups
 
 Vigencia comercial por país y proveedores sigue TASK-2017. Promoción canónica requiere integración propia; no es bloqueo para la simulación local aprobada.
+
+## Evidencia de cierre local 2026-10-09
+
+Auditoría: `docs/audits/commercial/2026-10-09-pricing-v3-catalog-selection-maintenance.md`.
+74/74 pruebas; tipos y lint focales PASS; CLI real verifica resolución, explicación, replay y actualización sin mutar padre.
+Documentación/contexto estrictos verificados durante el cierre. Divergencias globales de skills gráficas ajenas se preservan.
+Implementación local cerrada; costos operativos y API/UI/MCP no certificados. Sin push, deploy o cambio remoto.

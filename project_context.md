@@ -12,7 +12,7 @@ Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONC
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [pricing](data/pricing/README.md).
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md).
 
 ## Actualización documental
 

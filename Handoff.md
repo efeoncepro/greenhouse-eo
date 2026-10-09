@@ -1,6 +1,6 @@
 # Handoff
 
-[V3](data/pricing/README.md): hipótesis.
+[V3](data/pricing/README.md): CLI.
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ## 2026-10-09 — CRM y Talent Assurance
