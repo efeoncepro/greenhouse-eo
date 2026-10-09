@@ -2,6 +2,8 @@
 
 **Efeonce · Propuesta técnica para revisión · Rev. híbrida conciliada · 07 de octubre de 2026**
 
+**Delta 09-10-2026:** el programa sigue siendo anual (US$79.200 en la ruta gradual), pero lo enviado a Pibank el 09-10 —propuesta técnica v13 de 49 láminas y cotización detallada USD/PEN— fija un **compromiso inicial de seis meses** (US$42.500) con revisión en M3, decisión en M6 y **renovación trimestral** con aviso de 30 días (T3 US$19.100, T4 US$17.600). Montos en USD con soles a S/ 3.437 por US$ (BCRP, venta SBS 06-10-2026). Estado y fuentes: [README del caso](README.md). Donde §1 habla de «un programa de doce meses», se lee como plan anual con ese compromiso inicial.
+
 ### 1. Objetivo y alcance recomendado
 
 Proponemos un programa de doce meses para que más personas encuentren Cuenta Soles Pibank, comprendan sus condiciones, comparen alternativas y avancen hacia la apertura y el primer depósito. Conectamos SEO/AEO, contenidos, herramientas, comunidad y relaciones con medios, con mejoras del recorrido que también pueden apoyar la eficiencia de SEM.

@@ -2,6 +2,8 @@
 
 **Efeonce · Resumen para revisión · Rev. híbrida conciliada · 07 de octubre de 2026**
 
+**Delta 09-10-2026:** el programa sigue siendo anual (US$79.200 en la ruta gradual), pero lo enviado a Pibank el 09-10 —propuesta técnica v13 de 49 láminas y cotización detallada USD/PEN— fija un **compromiso inicial de seis meses** (US$42.500) con revisión en M3, decisión en M6 y **renovación trimestral** con aviso de 30 días (T3 US$19.100, T4 US$17.600). Montos en USD con soles a S/ 3.437 por US$ (BCRP, venta SBS 06-10-2026). Estado y fuentes: [README del caso](README.md). La «decisión propuesta» de cerrar un programa anual se reemplazó en la v13 por «aprobar el primer semestre».
+
 ## Un programa anual para encontrar, elegir, abrir y fondear
 
 Recomendamos una ruta gradual de **US$79.200 al año**: base de **US$4.500 mensuales** más US$25.200 en activaciones. El promedio es US$6.600 mensuales y el máximo presupuestado, US$7.700. SEO/AEO, hub WordPress, herramientas, comunidad y PR construyen recursos que pueden captar demanda y mejorar la experiencia de quienes ya llegan a Pibank.

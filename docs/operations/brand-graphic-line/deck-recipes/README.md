@@ -1,9 +1,11 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.13
+> **Versión:** 1.14
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-06 por Claude (1.13: el brochure Agencia Creativa aprobado por el operador — 27
+> **Última actualización:** 2026-10-09 por Claude (1.14: halo del ciclo `method-surround-cycle` recortado en un
+> cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
+> Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
 > a receta sin promoverlas (TASK-2013); sección «El brochure Agencia Creativa».
 > Antes, el mismo día, 1.12: el deck HubSpot aprobado por el operador — brochure de 27
@@ -545,6 +547,7 @@ unos píxeles más ajustada.
 | Cifra escrita como texto plano | un slot `metric` que trae «68 %» como texto | `figure-source-missing` sólo detecta una cifra escrita como objeto con `value`; una cifra en texto plano pasa sin fuente. Escríbela como objeto con `source` para que el validador la vea. Abierto, sin task dueña |
 | Camino «ausente» de un slot opcional nuevo | toda plantilla compartida que suma un slot opcional (caso: la nota del pie de `proposal-cinematic`) | el probe del gate siempre rellena los slots opcionales, así que el gate **nunca ejercita** una receta existente sin el slot, y los snapshots de planes no renderizan. La nota emitía sus medidas sólo con nota y rompía la propuesta creativa sin nota (gl-css «undefined»); lo encontró el operador, no el gate. **Corregido** en `af32d9353` con `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`. Regla vigente: todo slot opcional nuevo lleva un test que compone una receta existente sin él (misma clase de hueco que `CoverBrochure` con selección, TASK-1928) |
 | Las cinco `proposal-cinematic` sin mapa de slots | `proposal-cinematic-{creative,web,aeo,revops,seo}` (`slots: null` en `recipe-map.json`) | mapearlas juntas en `recipe-map.json`. Mientras tanto, la plantilla cine admite textos más largos que los de cada receta y el freno es `validateDeckPlan` (`slot-over-max-chars`), probado con un fixture adversarial. Dueña: TASK-1933 |
+| Halo de la esfera recortado en un cuadrado | `method-surround-cycle`, detrás del ícono de la estación 2 | **Resuelto el 2026-10-09** en `058df6ef8`: los filtros `sur-sphere-glow` y `sur-lit-glow` no declaraban región (por defecto, caja del objeto + 10 %) y el desenfoque salía cortado. Ahora usan `filterUnits="userSpaceOnUse"` con el lienzo entero. Snapshot de planes actualizado (una línea) y gate de La órbita a cero píxeles. Lo detectó el operador en la propuesta Pibank v13. Detalle: [spec §7.4](../../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md#74-filtros-svg-con-desenfoque-región-explícita-delta-2026-10-09) |
 | Plate SE1 fuera del banco | `proposal-service-seo`, `proposal-cinematic-seo` | declarado por ruta local (`ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png`), como los plates de las 69 recetas anteriores; se siembra en el banco de TASK-1931 |
 
 ## Qué sale hoy con un comando

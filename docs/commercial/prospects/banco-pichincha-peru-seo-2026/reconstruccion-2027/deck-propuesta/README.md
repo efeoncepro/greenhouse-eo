@@ -8,10 +8,53 @@
 
 **Complemento vigente 08-10:** [caso y ajustes para Claude](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Complemento-del-caso-y-ajustes-para-Claude-2026-10-08.md>), basado en el correo de Jesús del 07-10: USD confirmado, audiencia A/B 35–55, evaluación desde enero de 2026 y entrega 09-10. Incluye simulación retrospectiva y matriz por lámina. Este complemento actualiza el encargo; conserva precios/modelos originales. El PDF de 44 láminas todavía requiere esos ajustes. Casos internacionales validados por Julio; no hay caso documentado en Perú. Equipo: nombres confirmados y roles por asignar antes del inicio. Sin datos bancarios; lanzamiento reciente confirmado por el operador. §15 incorpora benchmark internacional y su utilidad para demanda local; forecast absoluto sigue condicionado.
 
-> **Estado:** v10 del 2026-10-07, OK del CEO para presentar. **No se ha enviado.** El complemento del 08-10 actualiza los pendientes al final; el PDF aún conserva el contenido del 07-10.
+> **Estado:** v13 del 2026-10-09, **enviada** ese día a Jesús Vargas Serpa junto con la cotización USD/PEN (ver «Estado v13»). La v10 del 07-10 y los pendientes previos al envío quedan abajo como historia.
 > **Registro de la sesión:** [auditoría del 2026-10-07](../../../../../audits/commercial/2026-10-07-pibank-propuesta-tecnica-v10.md)
 > **Método y reglas del estilo:** [`propuesta-tecnica-seo-sin-presentador.md`](../../../../../../.claude/skills/deck-studio/references/propuesta-tecnica-seo-sin-presentador.md) (skill `deck-studio`)
 > **Carpeta de producción:** [`ai-generations/2026-10-07_pibank-propuesta/`](../../../../../../ai-generations/2026-10-07_pibank-propuesta/LEEME.md)
+
+## Estado v13 · enviada el 2026-10-09
+
+| Pieza | Dónde |
+|---|---|
+| Canvas Design (privado) | mismo artifact, página «tecnica», versión 89 |
+| Formato | 49 láminas 16:9, línea Engine |
+| PDF de trabajo | `ai-generations/2026-10-07_pibank-propuesta/out/Pibank-Propuesta-tecnica-SEO-AEO-2027-v13.pdf` |
+| PDF enviado | OneDrive `Alineación/4. Comercial/Licitaciones/Banco Pichincha/00 FINAL ENVIAR 2026-10-09 - Pibank Propuesta tecnica SEO-AEO 2027.pdf` (12,3 MB; idéntico por sha256 al de trabajo) |
+
+Cubre todo lo que pidió Jesús en su correo del 08-10 (credenciales, experiencia, equipo y ubicación, casos, evaluación 2026, diagnóstico, estrategia, KPIs, proyección, alcance y propuesta económica). La experiencia en banca peruana se responde en el correo, no en el deck: banca en Chile (BICE, BICECORP), equipo local y la muestra X-Ray; Pibank sería la cuenta de referencia en la banca peruana.
+
+Cambios de la v13 por lámina:
+
+| Lámina | Cambio |
+|---|---|
+| 21 · Pauta | 1.000 clics, un punto por apertura: 20 contra 30, chip «+50 % aperturas» y barra de costo por apertura 100 % → 67 % |
+| 22 · Ciclo | halo recortado en un cuadrado detrás del ícono «Crear»: corregido en la receta `method-surround-cycle` (región de filtro = lienzo entero, `058df6ef8`); la lámina se recompuso y se transplantaron sólo los píxeles que cambian. El difuminado manual previo se rechazó |
+| 26 · Leads | unas 1.500 solicitudes iniciadas (tasa de prueba 50 % solicitud→apertura, rango 1.300–1.900), con supuestos y glosario («Solicitud iniciada» = el lead) |
+| 30 · Métricas | «Autoridad de marca» (Brand Authority de Moz, fuente Moz) reemplaza «Primera página»; referencia de proveedor, sin puntos prometidos. Ícono `autoridad-marca` de AXIS 0.17.0 (candidato) empalmado, porque el compositor fija `axis-graphic-line` 0.11.0 |
+| 32 · Equipo | híbrido: SEO, contenido y diseño en Perú; dirección de cuenta en Chile; banderas circulares Perú/Chile junto a cada nombre |
+| 35 · A la vista | «Aprobar» en blanco |
+| 36 · Stack (nueva) | receta `content-stack` con logos de AXIS en tres capas: Medir (Search Console, Google Analytics, Semrush, Visibility Grader), Observar IA destacada (ChatGPT, Gemini, AI Overviews) y Operar (Notion, Frame.io, Teams, Efeonce Insights con isotipo positive). Fuera: Ahrefs y Screaming Frog (sin evidencia de uso) y DataForSEO (sin logo en AXIS) |
+| 42 · Inversión | «US$4.500 al mes, más los módulos que construyen el plan»: fichas por módulo con precio USD + soles y cuándo entra en la ruta; base 12 meses US$54.000 + módulos US$25.200 = total anual US$79.200; tarjeta «Qué incluye la base cada mes» |
+| 43 · Cómo empezar (nueva) | «Seis meses para ver señales; luego, trimestre a trimestre»: primer semestre US$42.500, revisión M3, decisión M6, T3 US$19.100, T4 US$17.600; compromiso inicial de seis meses y renovación trimestral con aviso de 30 días |
+| 44 · Proyección de retorno | barras por cuentas: prudente 171, central 504 (destacada), favorable 1.357, nivel de la meta 2.081, con costo por cuenta como etiqueta. No se rotula ROI con depósitos |
+| 46 · Siguiente paso | «aprobar el primer semestre» |
+
+Soles a S/ 3.437 por US$ (BCRP, venta SBS 06-10-2026), en formato peruano (S/ 15,466.50), igual que la cotización.
+
+### Intents y empalmes de la v13
+
+| Archivo | Receta | Lámina |
+|---|---|---|
+| `pibank-equipo-v13-document.json` | `content-team` | 32 · Equipo |
+| `pibank-metricas-v13-document.json` | `content-measure-formulas` | 30 · Métricas |
+| `pibank-ciclo-v13-document.json` | `method-surround-cycle` | 22 · Ciclo |
+| `pibank-stack-v13-document.json` | `content-stack` | 36 · Stack |
+| `pibank-equipo-v11-document.json`, `pibank-eeat-v11-document.json` | `content-team`, `method-eeat` | versión intermedia v11 |
+
+Los ajustes sobre láminas ya aprobadas viven en la carpeta de producción: `equipo-v13/flags.mjs` y `equipo-v13/splice.mjs` (banderas y texto recompuesto, conservando el logo de Pibank y la órbita), `metricas-v13/icon-swap.mjs`, `ciclo-v13/transplant.mjs` y `a-la-vista-v13/white-label.mjs`. La técnica de empalme está en el [manual del deck](../../../../../manual-de-uso/creative/componer-deck-con-recetas.md#corregir-una-lámina-compuesta-ya-aprobada-empalme).
+
+Al publicar en el canvas con `root`, las rutas van como `project/…`: un publish con root en `project/` dejó duplicados en la raíz, que se retiraron con `null`.
 
 ## Qué es esta carpeta
 
@@ -19,7 +62,7 @@ Aquí están los intents JSON del compositor (`pnpm brand:compose`) que producen
 
 Esta carpeta guarda solo los intents. El generador, los scripts y las imágenes están en la carpeta de producción. Las imágenes y el PDF no se versionan en git.
 
-## Estado v10
+## Estado v10 (histórico)
 
 | Pieza | Dónde |
 |---|---|
@@ -115,7 +158,7 @@ Verificado con `ls` el 2026-10-07. Las recetas se leen dentro de cada archivo.
 - Sin copy adulador (se rechazó «proponemos que nos mida con esta vara»), sin cursores ni selecciones absurdas y sin una lámina de riesgos que responde objeciones que nadie planteó.
 - Para el ciclo prefirió íconos 3D nuevos premium (Sunburst).
 
-## Pendiente antes de enviar (OK del CEO)
+## Pendiente antes de enviar la v10 (histórico, previo al envío del 09-10)
 
 1. **Actualizado 08-10:** Julio confirma los casos internacionales validados. Conservarlos con su país y contexto; no existe caso documentado en Perú. No volver a pedir la validación de cifras resuelta por el operador. La confirmación no se presenta como nueva auditoría de reportes realizada por Codex.
 2. Confirmar si el correo de Insights y el modo presentación que muestran «Tu día a día», «A la vista» y el reporte están operando.

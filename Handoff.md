@@ -7,6 +7,8 @@ Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 [CRM](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md): aprobado; pendiente.
 
+**Pibank:** [v13 enviada 09-10](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md).
+
 ## 2026-10-08 — Continuidad activa
 
 **[QuePlan/WIN](docs/audits/commercial/2026-10-08-jorge-fiorella-intake.md):** Leads, sin envío.
@@ -30,8 +32,6 @@ Rooms: EPIC-052; creativo/SEO-AEO, La órbita. [Stack](docs/architecture/rooms/E
 **[Sika/skills](docs/commercial/tenders/LICITATION_CRM_REGISTER.md)**.
 
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
-
-**Pibank:** [paquete y pendientes](docs/audits/commercial/2026-10-07-pibank-conciliacion-paquete.md); sin envío.
 
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
 

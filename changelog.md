@@ -9,6 +9,8 @@
 
 ## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
 
+- [Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md): propuesta técnica v13 (49 láminas) y cotización USD/PEN enviadas a Jesús Vargas Serpa; compromiso inicial de seis meses y renovación trimestral sobre el plan anual de US$79.200; deal en Presentación de soluciones. [Deck v13](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/README.md), [región de filtros SVG](docs/architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) en `method-surround-cycle` y [manual: `content-stack` y empalme](docs/manual-de-uso/creative/componer-deck-con-recetas.md).
+
 - Pricing V3: [presupuesto IA por CLI](docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md), suscripción y paquetes extra discretos, caja/remanente/vencimiento; TASK-2020 local, sin compra ni binding automático a quotes.
 
 - Pricing V3: [licencias/plataforma declaradas](data/pricing/v3-pilot/economics/resource-inputs/README.md) registradas con créditos, moneda, renovación Adobe y propuesta de reparto; asignaciones/normalización pendientes, sin cambiar catálogo histórico ni quotes.
