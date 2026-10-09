@@ -25,6 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2020` | `in-progress` | Pricing V3 AI subscription and top-up budgeting | `docs/tasks/in-progress/TASK-2020-pricing-v3-ai-credit-budget.md` |
 | `TASK-2018` | `complete` | Pricing V3 Pibank multi-role historical simulation | `docs/tasks/complete/TASK-2018-pricing-v3-pibank-team-simulation.md` |
 | `TASK-2019` | `complete` | Pricing V3 catalog, resolution and maintenance | `docs/tasks/complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md` |
 | `TASK-2017` | `in-progress` | Pricing V3 Colombia-Chile economics validation | `docs/tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md` |
