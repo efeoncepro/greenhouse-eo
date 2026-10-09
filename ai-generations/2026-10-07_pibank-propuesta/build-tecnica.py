@@ -916,7 +916,7 @@ FOTOS = [('De la búsqueda a la cuenta', 'Encuentran a Pibank al buscar', 'd675c
          ('Inversión', 'Caso Berel', '36de7907d0d999ab6414d06bc8cbebf8', 'Caso de éxito Berel: ¿Qué cambió? Lo eligen.'),
          ('Inversión', 'Cinco países', 'cdb4ea4bbba4a91bcfb9df3f7555d139', '¿Dónde operamos? Cinco países: Chile, Estados Unidos, Colombia, México y Perú.'),
          ('Por qué Efeonce', 'Tu día a día', '7a7c5e3e80d16d7c4c9b7c60d2056050', 'Tu día a día con Efeonce: ¿Dónde ves lo que pasa? Todo junto: Teams, Notion, Frame.io y el reporte en vivo de Efeonce Insights en tu panel.'),
-         ('Por qué Efeonce', 'A la vista', '228a4d1b4e960751d9d9860b3332d45d', 'Tu día a día con Efeonce: ¿Cómo avanza tu SEO? A la vista: plan en Notion y aprobación de cada landing en Frame.io.')]
+         ('Por qué Efeonce', 'A la vista', '4835e2eb55685adff4305e18bc2bdd88', 'Tu día a día con Efeonce: ¿Cómo avanza tu SEO? A la vista: plan en Notion y aprobación de cada landing en Frame.io.')]
 # La sección partida abre el capítulo 1: sobre el papel, debajo de la voz, el índice del capítulo (lectura sin presentador).
 NAVY, PSOFT = '#023c70', '#5f5a69'
 toc1 = [('De la búsqueda a la cuenta', 'De la búsqueda a la cuenta'), ('Lo que vimos en Google', 'Hoy no encuentra a Pibank'),
