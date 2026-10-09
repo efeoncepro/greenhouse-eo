@@ -802,6 +802,13 @@ for m, tot in enumerate(monthly):
               f'<div style="position: absolute; left: {x - 12}px; top: {top + H + 10}px; width: 80px; text-align: center; font-size: 15px; color: {SOFT_}">M{m + 1}</div>')
 legend25 = (f'<div style="display: flex; gap: 22px; font-size: 16px; color: {SOFT_}"><span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 12px; border-radius: 3px; background: rgba(207, 228, 250, 0.38)"></span>Servicio base · US$4.500</span>'
             f'<span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 12px; border-radius: 3px; background: {ACC}"></span>Activaciones del mes</span></div>')
+from decimal import Decimal, ROUND_HALF_UP
+FX_PEN = Decimal('3.437')  # BCRP · TC sistema bancario SBS · venta · 06-10-2026 (fx/usd-pen-2026-10-08.json de la cotización)
+def pen(usd):
+    v = (Decimal(usd) * FX_PEN).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    ent, dec = f'{v:.2f}'.split('.')
+    return 'S/ ' + format(int(ent), ',').replace(',', '.') + ',' + dec
+FX_NOTE = 'Soles de referencia a S/ 3,437 por US$ (BCRP, venta SBS, 06-10-2026).'
 menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 'US$3.000', 'proyecto'),
         ('Calculadora', 'Mejora de la herramienta existente', 'US$1.200', 'proyecto'),
         ('Comparador', 'Hasta cinco productos, fuentes aprobadas', 'US$4.000', 'proyecto'),
@@ -810,19 +817,20 @@ menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 'US$3.000', 'pro
         ('Campaña de PR', 'Tres ángulos y doce propuestas a medios', 'US$2.000', 'campaña'),
         ('Refuerzo de enlaces', 'Hasta seis gestiones con seguimiento', 'US$500', 'ronda'),
         ('Mantenimiento', 'Hasta tres herramientas entregadas', 'US$200', 'mes activo')]
-menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 150px; column-gap: 20px; align-items: center; padding: 12px 0; border-top: 1px solid {RULE_}">'
+menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 250px; column-gap: 20px; align-items: center; padding: 12px 0; border-top: 1px solid {RULE_}">'
                     f'<div><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.01em">{n_}</div><div style="font-size: 16px; font-weight: 300; color: {SOFT_}; margin-top: 2px">{d_}</div></div>'
-                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 28px; font-weight: 760; letter-spacing: -0.02em">{p_}</div><div style="font-size: 13px; color: {SOFT_}">por {u_}</div></div></div>' for n_, d_, p_, u_ in menu)
+                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 28px; font-weight: 760; letter-spacing: -0.02em">{p_}</div><div style="font-size: 13px; color: {SOFT_}">{pen(int(p_[3:].replace(".", "")))} · por {u_}</div></div></div>' for n_, d_, p_, u_ in menu)
 base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
 base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
-             + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc))
+             + f'<div style="font-size: 18px; color: {SOFT_}; margin-top: 2px">{pen(4500)} al mes</div>'
+             + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc).replace('margin-top: 9px', 'margin-top: 7px'))
 S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
-    obj(base_card, 140, 530, 600, True, '; height: 318px; padding-top: 22px') +
+    obj(base_card, 140, 522, 600, True, '; height: 334px; padding-top: 20px') +
     col(eyebrow('Inversión') + headline(['US$4.500 al mes,', 'más los módulos que', 'construyen el plan'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
     zone(label('Módulos que se suman al plan, con su precio', W_) + f'<div style="margin-top: 10px">{menu_html}</div>', 900, 150, 880) +
-    means('Pibank ve cuánto vale un mes de trabajo y cuánto suma cada módulo. En doce meses, base y módulos construyen la ruta recomendada: US$79.200; la integral, US$89.200.',
-          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa.') + bubble(), section=5)))
+    means('Pibank ve cuánto vale un mes y cuánto suma cada módulo. En doce meses: ruta recomendada US$79.200 (' + pen(79200) + '); integral US$89.200 (' + pen(89200) + ').',
+          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa. ' + FX_NOTE) + bubble(), section=5)))
 
 # 25a · Cómo empezar — capítulo 5 · arranque de tres meses y continuidad trimestral (montos del mismo calendario)
 quarters = [('Arranque', 'Meses 1 a 3', monthly[0:3], ['Base, hub y calculadora', 'Comunidad y primera campaña de PR'], ('Decisión M3', 'Arranque listo')),
@@ -834,19 +842,19 @@ qcards = ''
 for i, (k_, sub_, ms, items, dec) in enumerate(quarters):
     tot = sum(ms)
     mini = ''.join(f'<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 34px; height: {round(84 * v / 7700)}px; border-radius: 5px; background: {ACC if i == 0 else "rgba(207, 228, 250, 0.42)"}"></div><div style="font-size: 12px; color: {SOFT_}">M{3 * i + j + 1}</div></div>' for j, v in enumerate(ms))
-    inner = (okicker(k_) + f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">{sub_}</div><div style="font-family: {ID}; font-size: 38px; font-weight: 760; letter-spacing: -0.03em; margin-top: 10px">US${format(tot, ",").replace(",", ".")}</div>'
+    inner = (okicker(k_) + f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">{sub_}</div><div style="font-family: {ID}; font-size: 38px; font-weight: 760; letter-spacing: -0.03em; margin-top: 10px">US${format(tot, ",").replace(",", ".")}</div><div style="font-size: 15px; color: {SOFT_}; margin-top: 2px">{pen(tot)}</div>'
              + f'<div style="display: flex; align-items: flex-end; gap: 14px; height: 112px; margin-top: 14px">{mini}</div>'
              + ''.join(f'<div style="font-size: 16px; line-height: 1.35; color: #c9d6e2; margin-top: 8px">{x}</div>' for x in items)
              + (f'<div style="margin-top: 16px"><span style="padding: 6px 12px; border-radius: 999px; display: inline-block; font-size: 13px; font-weight: 600; {"background: " + ACC if i == 0 else "box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.5)"}">{dec[0]}</span><div style="font-size: 13px; color: {SOFT_}; margin-top: 6px">{dec[1]}</div></div>' if dec else ''))
-    qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('500px' if i == 0 else '460px') + '; padding: 22px 20px')
+    qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('524px' if i == 0 else '484px') + '; padding: 22px 20px')
 at3 = ['Medición y panel de IA con línea base', 'Auditoría técnica y pilar mejorado', 'Hub y calculadora publicados', 'Hasta 15 artículos y comunidad activa']
 S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 500, 1300, 760, 600, 44) + qcards +
     col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; luego,', 'trimestre a trimestre'], 64, extra='; margin-top: 56px') +
         body('El primer trimestre deja la base funcionando. Desde ahí Pibank decide cada trimestre con el avance a la vista, sin firmar el año por adelantado.', 20, 560, extra='; margin-top: 26px') +
         label('Lo que tiene Pibank al mes 3', W_, extra='; margin-top: 30px') +
         ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 18px; line-height: 1.35; margin-top: 10px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in at3), 120, 600) +
-    means('Compromiso inicial de tres meses y renovación trimestral con aviso de 30 días. El precio de la base no cambia y los cuatro trimestres suman la misma ruta recomendada: US$79.200.',
-          'Montos por trimestre según el calendario de la ruta recomendada. Cada proyecto o campaña se acuerda antes de empezar. Valores en USD antes de impuestos.') + bubble(), section=5)))
+    means('Compromiso inicial de tres meses y renovación trimestral con aviso de 30 días. El precio de la base no cambia y los cuatro trimestres suman la misma ruta recomendada: US$79.200 (' + pen(79200) + ').',
+          'Montos por trimestre según el calendario de la ruta recomendada. Cada proyecto o campaña se acuerda antes de empezar. Valores en USD antes de impuestos. ' + FX_NOTE) + bubble(), section=5)))
 
 # 25b · Costo por cuenta — capítulo 5 · la vara para medirnos: inversión ÷ cuentas con fondos aportadas (aritmética, sin promesa)
 scen = [250, 500, 1000, 2000]
