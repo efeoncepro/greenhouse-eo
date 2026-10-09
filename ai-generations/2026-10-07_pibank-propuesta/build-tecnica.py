@@ -845,8 +845,8 @@ def eqcell(k, v, hero=False):
             f'<div style="font-family: {ID}; font-size: {34 if hero else 30}px; font-weight: 760; letter-spacing: -0.03em; margin-top: 4px">{usd(v)}</div>'
             f'<div style="font-size: 14px; color: #cfe4fa; margin-top: 2px">{pen(v)}</div></div>')
 op = lambda t: f'<div style="font-family: {ID}; font-size: 34px; font-weight: 300; color: #cfe4fa; padding: 0 2px">{t}</div>'
-sum_html = (f'<div style="margin-top: 18px; display: flex; align-items: center; gap: 12px">'
-            + eqcell('Base · 12 meses', 54000) + op('+') + eqcell('Módulos de la ruta', 25200) + op('=') + eqcell('Ruta recomendada', 79200, True) + '</div>')
+sum_html = (f'<div style="margin-top: 14px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: {SOFT_}">Ruta recomendada · inversión anual</div><div style="margin-top: 8px; display: flex; align-items: center; gap: 12px">'
+            + eqcell('Base · 12 meses', 54000) + op('+') + eqcell('Módulos · 12 meses', 25200) + op('=') + eqcell('Total anual', 79200, True) + '</div>')
 base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
 base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
              + f'<div style="font-size: 18px; color: {SOFT_}; margin-top: 2px">{pen(4500)} al mes</div>'
@@ -856,7 +856,7 @@ S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
     col(eyebrow('Inversión') + headline(['US$4.500 al mes,', '<span style="font-weight: 300; letter-spacing: -0.025em">más los módulos que</span>', '<span style="font-weight: 300; letter-spacing: -0.025em">construyen el plan</span>'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
     zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 12px">{menu_html}</div>' + sum_html, 880, 112, 820) +
-    means('Pibank ve cuánto vale un mes, qué módulos se suman y cuándo. La ruta integral suma el planificador y más comunidad, PR y refuerzos: US$89.200 (' + pen(89200) + ').',
+    means('Pibank ve cuánto vale un mes, qué módulos se suman y cuándo. La ruta integral suma el planificador y más comunidad, PR y refuerzos: US$89.200 al año (' + pen(89200) + ').',
           'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa. ' + FX_NOTE) + bubble(), section=5)))
 
 # 25a · Cómo empezar — capítulo 5 · arranque de tres meses y continuidad trimestral (montos del mismo calendario)
