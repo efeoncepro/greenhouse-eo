@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 AX = json.load(open(os.path.join(HERE, 'axis-assets.json')))
 BL = lambda i: f'/_blob/{i}'
 BUB = '434cdccb13af2a417f555053d9a45582'
-IMG = {'C01': 'd8a543dde98647bb5c4f3a2338930929', 'C04': '284130e04d49e0820bc9723231d35981', 'C06': '5f3c83b94f1bcab135421beb67d092aa',
+IMG = {'C01': 'd8a543dde98647bb5c4f3a2338930929', 'C04': '1b95f221901c4068af539fb33080abe4', 'C06': '5f3c83b94f1bcab135421beb67d092aa',
        'C07': '18b1f9c9d08d41dbd21d53b3b0308da6', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
 ACC = '#0375db'
 DARK = dict(name='dark', bg='#091951', ink='#ffffff', soft='#cfe4fa', rule='rgba(114, 222, 216, 0.16)', eb='#ffffff')

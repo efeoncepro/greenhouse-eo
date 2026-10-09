@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "pages": [
+    {
+      "role": "method",
+      "recipe": "method-surround-cycle",
+      "voice": {
+        "eyebrow": "Cómo trabajamos cada mes",
+        "question": "¿Cómo se sostiene?",
+        "answer": [
+          "En ciclo"
+        ]
+      },
+      "body": "El programa no termina en una implementación: cada mes aprende del anterior y sube a Pibank un **nivel**.",
+      "startLabel": "Empieza aquí",
+      "stations": [
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/medir.png",
+          "title": "Medir",
+          "description": "Search Console, analítica y el panel de IA: dónde aparece Pibank, qué consultas llegan y qué avanza a la apertura."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/crear.png",
+          "title": "Crear",
+          "description": "Hasta cinco artículos al mes y mejoras del pilar Cuenta Soles, con fuente y revisión del banco."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/distribuir.png",
+          "title": "Distribuir",
+          "description": "Comunidad, PR y enlaces llevan los recursos a quien compara cuentas, más allá del sitio."
+        },
+        {
+          "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/optimizar.png",
+          "title": "Optimizar",
+          "description": "Corregimos lo que la medición muestra: consultas sin respuesta, condiciones desactualizadas y fricciones."
+        }
+      ],
+      "core": {
+        "title": "Pibank",
+        "caption": "sube un nivel en cada vuelta"
+      }
+    }
+  ]
+}
