@@ -853,7 +853,7 @@ base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex;
              + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc).replace('margin-top: 9px', 'margin-top: 7px'))
 S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
     obj(base_card, 140, 522, 600, True, '; height: 334px; padding-top: 20px') +
-    col(eyebrow('Inversión') + headline(['US$4.500 al mes,', 'más los módulos que', 'construyen el plan'], 64, extra='; margin-top: 56px') +
+    col(eyebrow('Inversión') + headline(['US$4.500 al mes,', '<span style="font-weight: 300; letter-spacing: -0.025em">más los módulos que</span>', '<span style="font-weight: 300; letter-spacing: -0.025em">construyen el plan</span>'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
     zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 12px">{menu_html}</div>' + sum_html, 880, 112, 820) +
     means('Pibank ve cuánto vale un mes, qué módulos se suman y cuándo. La ruta integral suma el planificador y más comunidad, PR y refuerzos: US$89.200 (' + pen(89200) + ').',
