@@ -809,17 +809,26 @@ def pen(usd):
     ent, dec = f'{v:.2f}'.split('.')
     return 'S/ ' + format(int(ent), ',').replace(',', '.') + ',' + dec
 FX_NOTE = 'Soles de referencia a S/ 3,437 por US$ (BCRP, venta SBS, 06-10-2026).'
-menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 'US$3.000', 'proyecto'),
-        ('Calculadora', 'Mejora de la herramienta existente', 'US$1.200', 'proyecto'),
-        ('Comparador', 'Hasta cinco productos, fuentes aprobadas', 'US$4.000', 'proyecto'),
-        ('Planificador de ahorro', 'Meta, aportes y plazo', 'US$3.000', 'proyecto'),
-        ('Comunidad', 'Newsletter, cuatro adaptaciones y escucha', 'US$1.000', 'mes activo'),
-        ('Campaña de PR', 'Tres ángulos y doce propuestas a medios', 'US$2.000', 'campaña'),
-        ('Refuerzo de enlaces', 'Hasta seis gestiones con seguimiento', 'US$500', 'ronda'),
-        ('Mantenimiento', 'Hasta tres herramientas entregadas', 'US$200', 'mes activo')]
-menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 250px; column-gap: 20px; align-items: center; padding: 12px 0; border-top: 1px solid {RULE_}">'
-                    f'<div><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.01em">{n_}</div><div style="font-size: 16px; font-weight: 300; color: {SOFT_}; margin-top: 2px">{d_}</div></div>'
-                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 28px; font-weight: 760; letter-spacing: -0.02em">{p_}</div><div style="font-size: 13px; color: {SOFT_}">{pen(int(p_[3:].replace(".", "")))} · por {u_}</div></div></div>' for n_, d_, p_, u_ in menu)
+menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 3000, 'proyecto', 'M1–M2', 1),
+        ('Calculadora', 'Mejora de la herramienta existente', 1200, 'proyecto', 'M2', 1),
+        ('Comparador', 'Hasta cinco productos, fuentes aprobadas', 4000, 'proyecto', 'M4–M5', 1),
+        ('Comunidad', 'Newsletter, cuatro adaptaciones y escucha', 1000, 'mes', 'M3–M12 · 10 meses', 10),
+        ('Campaña de PR', 'Tres ángulos y doce propuestas a medios', 2000, 'campaña', 'M3 y M8 · 2 campañas', 2),
+        ('Refuerzo de enlaces', 'Hasta seis gestiones con seguimiento', 500, 'ronda', 'M6 y M11 · 2 rondas', 2),
+        ('Mantenimiento', 'Hasta tres herramientas entregadas', 200, 'mes', 'M3–M12 · 10 meses', 10),
+        ('Planificador de ahorro', 'Meta, aportes y plazo', 3000, 'proyecto', 'Solo en la ruta integral', 0)]
+assert sum(pr * q for *_, pr, _u, _w, q in [(m[0], m[1], m[2], m[3], m[4], m[5]) for m in menu]) == 25200
+usd = lambda v: 'US$' + format(v, ',').replace(',', '.')
+def rchip(t, off=False):
+    return (f'<span style="margin-left: 12px; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; vertical-align: 3px; '
+            + ('box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.45); color: #cfe4fa' if off else f'background: rgba(3, 117, 219, 0.28); color: #ffffff') + f'">{t}</span>')
+menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 230px; column-gap: 20px; align-items: center; padding: 9px 0; border-top: 1px solid {RULE_}">'
+                    f'<div><div style="font-family: {ID}; font-size: 23px; font-weight: 740; letter-spacing: -0.01em">{n_}{rchip(w_, q_ == 0)}</div><div style="font-size: 15px; font-weight: 300; color: {SOFT_}; margin-top: 2px">{d_}</div></div>'
+                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 26px; font-weight: 760; letter-spacing: -0.02em">{usd(p_)}<span style="font-family: Poppins, sans-serif; font-size: 14px; font-weight: 400; color: {SOFT_}"> / {u_}</span></div><div style="font-size: 15px; color: {SOFT_}">{pen(p_)}</div></div></div>' for n_, d_, p_, u_, w_, q_ in menu)
+sum_html = (f'<div style="margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(3, 117, 219, 0.16); box-shadow: inset 0 0 0 1px rgba(3, 117, 219, 0.5)">'
+            f'<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {SOFT_}">Ruta recomendada en doce meses</div>'
+            f'<div style="font-family: {ID}; font-size: 24px; font-weight: 740; margin-top: 4px">Base US$54.000 + módulos US$25.200 = US$79.200</div>'
+            f'<div style="font-size: 15px; color: {SOFT_}; margin-top: 2px">{pen(54000)} + {pen(25200)} = {pen(79200)}</div></div>')
 base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
 base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
              + f'<div style="font-size: 18px; color: {SOFT_}; margin-top: 2px">{pen(4500)} al mes</div>'
@@ -828,25 +837,26 @@ S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
     obj(base_card, 140, 522, 600, True, '; height: 334px; padding-top: 20px') +
     col(eyebrow('Inversión') + headline(['US$4.500 al mes,', 'más los módulos que', 'construyen el plan'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
-    zone(label('Módulos que se suman al plan, con su precio', W_) + f'<div style="margin-top: 10px">{menu_html}</div>', 900, 150, 880) +
-    means('Pibank ve cuánto vale un mes y cuánto suma cada módulo. En doce meses: ruta recomendada US$79.200 (' + pen(79200) + '); integral US$89.200 (' + pen(89200) + ').',
+    zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 8px">{menu_html}</div>' + sum_html, 900, 118, 800) +
+    means('Pibank ve cuánto vale un mes, qué módulos se suman y cuándo. La ruta integral suma el planificador y más comunidad, PR y refuerzos: US$89.200 (' + pen(89200) + ').',
           'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa. ' + FX_NOTE) + bubble(), section=5)))
 
 # 25a · Cómo empezar — capítulo 5 · arranque de tres meses y continuidad trimestral (montos del mismo calendario)
-quarters = [('Arranque', 'Meses 1 a 3', monthly[0:3], ['Base, hub y calculadora', 'Comunidad y primera campaña de PR'], ('Decisión M3', 'Arranque listo')),
-            ('Trimestre 2', 'Meses 4 a 6', monthly[3:6], ['Comparador de cuentas', 'Primer refuerzo de enlaces'], ('Decisión M6', 'Primeras señales')),
-            ('Trimestre 3', 'Meses 7 a 9', monthly[6:9], ['Comunidad y mantenimiento', 'Segunda campaña de PR'], None),
-            ('Trimestre 4', 'Meses 10 a 12', monthly[9:12], ['Segundo refuerzo de enlaces', 'Evaluación anual'], ('Decisión M12', 'Evaluación anual'))]
+quarters = [('Arranque', 'Meses 1 a 3', monthly[0:3], [('Hub', 3000), ('Calculadora', 1200), ('Comunidad · M3', 1000), ('Campaña de PR', 2000), ('Mantenimiento', 200)], ('Decisión M3', 'Arranque listo')),
+            ('Trimestre 2', 'Meses 4 a 6', monthly[3:6], [('Comparador', 4000), ('Comunidad × 3', 3000), ('Mantenimiento × 3', 600), ('Refuerzo de enlaces', 500)], ('Decisión M6', 'Primeras señales')),
+            ('Trimestre 3', 'Meses 7 a 9', monthly[6:9], [('Comunidad × 3', 3000), ('Mantenimiento × 3', 600), ('Campaña de PR', 2000)], None),
+            ('Trimestre 4', 'Meses 10 a 12', monthly[9:12], [('Comunidad × 3', 3000), ('Mantenimiento × 3', 600), ('Refuerzo de enlaces', 500)], ('Decisión M12', 'Evaluación anual'))]
 assert sum(sum(q[2]) for q in quarters) == 79200
+for q in quarters: assert 13500 + sum(v for _, v in q[3]) == sum(q[2]), q[0]
 qcards = ''
-for i, (k_, sub_, ms, items, dec) in enumerate(quarters):
+qline = lambda n, v, strong=False: (f'<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px; line-height: 1.3; padding: 5px 0; border-top: 1px solid rgba(255, 255, 255, 0.10); color: {"#ffffff" if strong else "#c9d6e2"}; font-weight: {600 if strong else 400}">'
+                                    f'<span>{n}</span><span style="white-space: nowrap">{usd(v)}</span></div>')
+for i, (k_, sub_, ms, mods, dec) in enumerate(quarters):
     tot = sum(ms)
-    mini = ''.join(f'<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 34px; height: {round(84 * v / 7700)}px; border-radius: 5px; background: {ACC if i == 0 else "rgba(207, 228, 250, 0.42)"}"></div><div style="font-size: 12px; color: {SOFT_}">M{3 * i + j + 1}</div></div>' for j, v in enumerate(ms))
-    inner = (okicker(k_) + f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">{sub_}</div><div style="font-family: {ID}; font-size: 38px; font-weight: 760; letter-spacing: -0.03em; margin-top: 10px">US${format(tot, ",").replace(",", ".")}</div><div style="font-size: 15px; color: {SOFT_}; margin-top: 2px">{pen(tot)}</div>'
-             + f'<div style="display: flex; align-items: flex-end; gap: 14px; height: 112px; margin-top: 14px">{mini}</div>'
-             + ''.join(f'<div style="font-size: 16px; line-height: 1.35; color: #c9d6e2; margin-top: 8px">{x}</div>' for x in items)
-             + (f'<div style="margin-top: 16px"><span style="padding: 6px 12px; border-radius: 999px; display: inline-block; font-size: 13px; font-weight: 600; {"background: " + ACC if i == 0 else "box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.5)"}">{dec[0]}</span><div style="font-size: 13px; color: {SOFT_}; margin-top: 6px">{dec[1]}</div></div>' if dec else ''))
-    qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('524px' if i == 0 else '484px') + '; padding: 22px 20px')
+    inner = (okicker(k_) + f'<div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">{sub_}</div><div style="font-family: {ID}; font-size: 38px; font-weight: 760; letter-spacing: -0.03em; margin-top: 10px">{usd(tot)}</div><div style="font-size: 17px; color: {SOFT_}; margin-top: 2px">{pen(tot)}</div>'
+             + f'<div style="margin-top: 14px">{qline("Base · 3 meses", 13500, True)}' + ''.join(qline(n, v) for n, v in mods) + '</div>'
+             + (f'<div style="margin-top: 14px"><span style="padding: 6px 12px; border-radius: 999px; display: inline-block; font-size: 13px; font-weight: 600; {"background: " + ACC if i == 0 else "box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.5)"}">{dec[0]}</span><div style="font-size: 13px; color: {SOFT_}; margin-top: 6px">{dec[1]}</div></div>' if dec else ''))
+    qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('524px' if i == 0 else '484px') + '; padding: 22px 18px')
 at3 = ['Medición y panel de IA con línea base', 'Auditoría técnica y pilar mejorado', 'Hub y calculadora publicados', 'Hasta 15 artículos y comunidad activa']
 S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 500, 1300, 760, 600, 44) + qcards +
     col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; luego,', 'trimestre a trimestre'], 64, extra='; margin-top: 56px') +
