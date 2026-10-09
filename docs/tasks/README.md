@@ -1,5 +1,7 @@
 # Task Index
 
+- `TASK-2021` — [composición de recursos V3](in-progress/TASK-2021-pricing-v3-demand-resource-composition.md), en progreso local; selección/asignación y binding IA al quote.
+
 - `TASK-2020` — [presupuesto IA y recargas V3](complete/TASK-2020-pricing-v3-ai-credit-budget.md), CLI local completa; packs/caja/remanente/vencimiento, binding automático a quote pendiente.
 
 - `TASK-2019` — [catálogo y actualización V3](complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md), implementación local completa; tarifas vigentes pendientes.
