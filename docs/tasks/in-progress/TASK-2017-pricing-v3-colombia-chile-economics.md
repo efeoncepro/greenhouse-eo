@@ -91,6 +91,7 @@ Embedded Creative Pod. Se reutiliza el ADR local; no se modifica semántica fina
 - `data/pricing/v3-pilot/economics/colombia-chile-review.json`
 - `data/pricing/v3-pilot/economics/colombia-chile-readiness.json`
 - `data/pricing/v3-pilot/economics/colombia-chile-artifact.json`
+- `data/pricing/v3-pilot/economics/resource-inputs/`: declaraciones de licencias/plataforma y propuesta de reparto, sin import automático.
 - `data/pricing/v3-pilot/README.md`: enlace y estado del piloto.
 - `docs/manual-de-uso/finance/cotizar-v3-por-cli.md`: confirmaciones y enlace.
 - `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `Handoff.md`, `changelog.md`: sólo delta propio.
@@ -179,7 +180,8 @@ retirar sólo los artefactos de esta task y sus enlaces; no hay estado remoto qu
 - [x] Simulación histórica con cinco casos calculados y comparados; replay verificado y export bloqueado — `data/pricing/v3-pilot/economics/historical-simulation/results.json`.
 - [x] Propuesta económica/provisiones/kits y fuentes oficiales preparada; seis sensibilidades con CLI/replay, piso y desglose verificados; carpeta commercial-policy-proposal.
 - [x] Catálogo candidato y brief comercial completos en estructura, pendientes de datos; needs_input sin totales y export histórico bloqueado.
-- [ ] Costos actuales/localización, capacidad y coberturas validados — no hay fuentes actuales disponibles.
+- [x] Antecedentes de licencias/plataforma del operador registrados — resource-inputs; planes, asignaciones y reparto pendientes, sin cambiar catálogo/quotes.
+- [ ] Costos actuales/localización, capacidad y coberturas validados — hay montos de recursos declarados por operador; costo humano vigente, cobertura/asignaciones y reparto aún pendientes.
 - [ ] Alcance creativo, política de precio/mercado/margen/FX y terms aprobados por sus dueños.
 - [ ] Cálculo completo, comparación y borrador revisados — depende de datos anteriores.
 
@@ -226,3 +228,9 @@ Drivers/provisiones, fuentes oficiales y borrador de alcance preparados. Seis qu
 Candidato local histórico genera32 diagnósticos al comercializar; costoCO y recursos pendientes no se reemplazan por trial25/25/100.
 Base histórica/catalogo/input comercial previo intactos. Artefactos en `data/pricing/v3-pilot/economics/commercial-policy-proposal/`.
 Status real sigue Parcial: faltan costo actual, modalidad/delivery, capacidad, contratos/recursos y aprobación de políticas nuevas.
+
+## Avance 2026-10-09 — recursos declarados
+
+Operador aporta Higgsfield139USD/3000créditos y Magnific40EUR/45000créditos mensuales, Adobe180USD/mes y3CC Teams+3Express con alza70% próxima, Vercel60–100USD/mes y GCP264USD/mes. Magnific mensual explícito; Vercel/GCP confirmados mensuales en respuesta posterior. Registro con fuente operator_statement, sin factura ni asignaciones inventadas. Cobertura/base del alza Adobe y fecha pendientes;306 condicional. Pool plataforma324–364USD/mes, reparto delivery/interno propuesto, sin precio por cliente.
+
+Datos review-only; no cambiar baseline histórico, quotes previas, DB/CLI o runtime. ADR de mantenimiento reutilizado; integración futura por normalización + preview/apply. Costeo de servicios y acceso API/Globe no se certifican por este registro. Task conserva Parcial.

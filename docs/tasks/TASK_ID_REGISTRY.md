@@ -25,7 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `TASK-2020` | `in-progress` | Pricing V3 AI subscription and top-up budgeting | `docs/tasks/in-progress/TASK-2020-pricing-v3-ai-credit-budget.md` |
+| `TASK-2020` | `complete` | Pricing V3 AI subscription and top-up budgeting | `docs/tasks/complete/TASK-2020-pricing-v3-ai-credit-budget.md` |
 | `TASK-2018` | `complete` | Pricing V3 Pibank multi-role historical simulation | `docs/tasks/complete/TASK-2018-pricing-v3-pibank-team-simulation.md` |
 | `TASK-2019` | `complete` | Pricing V3 catalog, resolution and maintenance | `docs/tasks/complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md` |
 | `TASK-2017` | `in-progress` | Pricing V3 Colombia-Chile economics validation | `docs/tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md` |
@@ -2599,3 +2599,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex 2026-10-09: `TASK-2018` — prueba multirol V3 con capacidad Pibank gradual; países del talento confirmados, hipótesis económicas preservadas, sin cambio de oferta ni runtime. Siguiente ID libre `TASK-2019`.
 
 > Registro Codex 2026-10-09: TASK-2019 implementa selección y mantenimiento local V3 autorizados por el operador; TASK-2016 kernel, TASK-2017 vigencia económica y TASK-2018 reconciliación se conservan. Siguiente ID libre TASK-2020.
+
+> Registro Codex2026-10-09: TASK-2020 completa presupuesto local de suscripción/recargasIA con capturas y CLI; no compra ni binding automático a quote. TASK-2017 conserva validación económica. Siguiente ID libre TASK-2021.

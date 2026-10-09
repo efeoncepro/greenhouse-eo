@@ -1,0 +1,195 @@
+{
+  "methodVersion": "pricing-v3-credit-budget/1",
+  "binding": false,
+  "reviewStatus": "requires_review",
+  "catalog": {
+    "schemaVersion": "pricing-v3-credit-catalog/1",
+    "version": "operator-screenshots-2026-10-09-v1",
+    "mode": "review_only",
+    "providers": [
+      {
+        "providerId": "higgsfield",
+        "currency": "USD",
+        "subscription": {
+          "amount": "139",
+          "includedCredits": 3000,
+          "frequency": "month",
+          "sourceRef": "operator:2026-10-09:higgsfield"
+        },
+        "extraCreditValidity": {
+          "unit": "days",
+          "value": 90
+        },
+        "activeSubscriptionRequired": null,
+        "extraAfterRegularCredits": null,
+        "packs": [
+          {
+            "packId": "higgsfield-100",
+            "credits": 100,
+            "amount": "6.25",
+            "priceBeforeDiscount": "8.5"
+          },
+          {
+            "packId": "higgsfield-200",
+            "credits": 200,
+            "amount": "12",
+            "priceBeforeDiscount": "17"
+          },
+          {
+            "packId": "higgsfield-500",
+            "credits": 500,
+            "amount": "26",
+            "priceBeforeDiscount": "42.5"
+          },
+          {
+            "packId": "higgsfield-1000",
+            "credits": 1000,
+            "amount": "49",
+            "priceBeforeDiscount": "85"
+          },
+          {
+            "packId": "higgsfield-2000",
+            "credits": 2000,
+            "amount": "95",
+            "priceBeforeDiscount": "170"
+          },
+          {
+            "packId": "higgsfield-4000",
+            "credits": 4000,
+            "amount": "190",
+            "priceBeforeDiscount": "340"
+          },
+          {
+            "packId": "higgsfield-5000",
+            "credits": 5000,
+            "amount": "235",
+            "priceBeforeDiscount": "425"
+          }
+        ],
+        "source": {
+          "reference": "operator-screenshot:2026-10-09:higgsfield",
+          "observedAt": "2026-10-09",
+          "evidenceStatus": "operator_screenshot",
+          "sha256": "d9105e2da9b0ecf0052a16b61cc1bea7968b6a7942c093f8e3c4ed1e12e63651",
+          "currencyBasis": "USD from operator subscription context; screenshot shows dollar sign",
+          "priceValidUntil": null,
+          "taxIncluded": null,
+          "repeatPurchasesVerified": false,
+          "note": "Visible top-up package prices only; no purchase or promotion validity verified. Higgsfield slider quantities above5000 have no observed price. Magnific requires active subscription and uses extra after normal credits."
+        }
+      },
+      {
+        "providerId": "magnific",
+        "currency": "EUR",
+        "subscription": {
+          "amount": "40",
+          "includedCredits": 45000,
+          "frequency": "month",
+          "sourceRef": "operator:2026-10-09:magnific"
+        },
+        "extraCreditValidity": {
+          "unit": "years",
+          "value": 3
+        },
+        "activeSubscriptionRequired": true,
+        "extraAfterRegularCredits": true,
+        "packs": [
+          {
+            "packId": "magnific-10000",
+            "credits": 10000,
+            "amount": "9.60",
+            "priceBeforeDiscount": null
+          },
+          {
+            "packId": "magnific-30000",
+            "credits": 30000,
+            "amount": "28.80",
+            "priceBeforeDiscount": null
+          },
+          {
+            "packId": "magnific-150000",
+            "credits": 150000,
+            "amount": "144",
+            "priceBeforeDiscount": null
+          }
+        ],
+        "source": {
+          "reference": "operator-screenshot:2026-10-09:magnific",
+          "observedAt": "2026-10-09",
+          "evidenceStatus": "operator_screenshot",
+          "sha256": "a92bfd6ad8f9e08dd29ba46a9d510bb70e112b7ec93312138f5bca7cd0491eb0",
+          "currencyBasis": "EUR visible in screenshot",
+          "priceValidUntil": null,
+          "taxIncluded": null,
+          "repeatPurchasesVerified": false,
+          "note": "Visible top-up package prices only; no purchase or promotion validity verified. Higgsfield slider quantities above5000 have no observed price. Magnific requires active subscription and uses extra after normal credits."
+        }
+      }
+    ]
+  },
+  "request": {
+    "schemaVersion": "pricing-v3-credit-budget/1",
+    "mode": "simulation",
+    "accountRef": "illustrative-client",
+    "providerId": "higgsfield",
+    "purchaseDate": "2026-10-09",
+    "useBy": "2026-10-31",
+    "requestedCredits": 1000,
+    "subscriptionCreditsAllocated": 400,
+    "subscriptionCreditsAvailable": 400,
+    "activeSubscription": true,
+    "allowRepeatedPacks": false
+  },
+  "diagnostics": [],
+  "assumptions": [
+    "Snapshot prices/promotions, taxes, subscription terms and access need revalidation before commitment.",
+    "Declared available credits are a planning input, not a live balance or concurrent reservation.",
+    "Client funds full incremental package cost; remaining credits do not reduce cash or presume future sales."
+  ],
+  "calculationStatus": "calculated",
+  "breakdown": {
+    "currency": "USD",
+    "subscription": {
+      "monthlyPackageCost": "139",
+      "includedCredits": 3000,
+      "allocatedCredits": 400,
+      "declaredAvailableBefore": 400,
+      "declaredAvailableAfter": 0,
+      "attributedCost": "18.53",
+      "newCash": "0.00",
+      "note": "Existing subscription is already funded; full fee remains a company cost. No incremental cash for this allocation."
+    },
+    "extra": {
+      "requestedCredits": 600,
+      "purchasedCredits": 600,
+      "remainingCredits": 0,
+      "expiresAt": "2027-01-07",
+      "validityEndExclusive": true,
+      "packages": [
+        {
+          "packId": "higgsfield-100",
+          "quantity": 1,
+          "creditsEach": 100,
+          "priceEach": "6.25",
+          "cash": "6.25"
+        },
+        {
+          "packId": "higgsfield-500",
+          "quantity": 1,
+          "creditsEach": 500,
+          "priceEach": "26",
+          "cash": "26.00"
+        }
+      ],
+      "purchaseCost": "32.25",
+      "newCash": "32.25",
+      "costAssignedToClient": "32.25"
+    },
+    "totalBudgetCost": "50.78",
+    "incrementalCash": "32.25",
+    "sourceRefs": [
+      "operator:2026-10-09:higgsfield",
+      "operator-screenshot:2026-10-09:higgsfield"
+    ]
+  }
+}

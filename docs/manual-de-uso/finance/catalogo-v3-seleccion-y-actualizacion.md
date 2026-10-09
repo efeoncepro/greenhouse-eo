@@ -31,6 +31,10 @@ Archivos nuevos usan `wx` y `0600`; nunca sobrescriben. Repetir comandos con `--
 
 ## Catálogo y reglas
 
+[Presupuesto IA](presupuestar-creditos-ia-v3.md): comando `resources budget` calcula desde catálogo de packs separado; no pasarlo a `quote` como catálogo monetario ni a `replay` como quote. Binding automático pendiente.
+
+Los [antecedentes del operador](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md) completan costos actuales de herramientas y plataforma. Leerlos antes de normalizar: completar planes/asignaciones/fechas/FX y policy, convertir a registros y kit, luego preview/apply. No pasar ese JSON como brief o catálogo; el motor no lo importa. Adobe futuro sin fecha, rango Vercel y créditos AI requieren normalización explícita. Las cifras históricas de abajo describen sólo la baseline vigente de simulación.
+
 La baseline incluye 32 perfiles con nombre (omite filas vacías), 26 referencias de proveedores,
 fees separados por perfil, kits propuestos, políticas, FX históricos y recursos de prueba. No lee Excel/CSV
 al ejecutar. Fuente/hashes quedan en `evidence`; cada registro conserva procedencia, note, revisión y vigencia.

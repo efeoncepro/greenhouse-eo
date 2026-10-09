@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `reader`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `2020`
 - Domain: `finance`
 - Blocked by: `none`
@@ -134,7 +134,7 @@ Necesita cantidad solicitada/asignada de suscripción y selección discreta de p
 
 <!-- ZONE 2 — PLAN MODE -->
 
-Lightweight, sequential: no subagentes autorizados/necesarios. Aprobación humana del incremento local en conversación 2026-10-09; scope limitado al presupuesto de créditos observado. Discovery verificó contratos y límites reales, skills Pricing/Finance/Architecture/QA/Documentation. Checkpoint: ejecutar cálculo reversible local; no autorización de compra/publicación.
+Lightweight, sequential: no subagentes autorizados/necesarios. Aprobación humana del incremento local en conversación 2026-10-09; scope limitado al presupuesto de créditos observado. Discovery verificó contratos y límites reales, skills Pricing/Finance/Architecture/QA/Documentation. Checkpoint auto porP2/Bajo: ejecutar cálculo reversible local; no autorización de compra/publicación. Plan registrado en commit2f713d7a4 antes de código.
 
 Slice1: catálogo de capturas y ADR. Slice2: planner puro + CLI. Slice3: tests/gates, tres capas documentales y cierre local. No plan de integración de servicios disfrazado de planner.
 
@@ -162,11 +162,11 @@ Local-only, review obligatorio. Riesgo principal: confundir promedio con recarga
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
-- [ ] Capturas normalizadas con10paquetes y vencimientos separados; sin datos privados de cuenta.
-- [ ] Primitive y CLI calculan óptimo/moneda/costo de suscripción vs compra/remanente.
-- [ ] Cantidades inválidas, base insuficiente y vencimiento detienen resultado completo.
-- [ ] Repetición explícita y base disponible no inferida, tests adversariales y regresión V3.
-- [ ] ADR/funcional/manual y estado/índices sincronizados; límites comerciales honestos.
+- [x] Capturas normalizadas con10paquetes y vencimientos separados; sólo hashes, sin datos privados de cuenta — ai-credits.review-v1.
+- [x] Primitive y CLI calculan óptimo/moneda/costo de suscripción vs compra/remanente — dos resultadosCLI guardados y comparación contra primitive.
+- [x] Cantidades inválidas, base insuficiente y vencimiento detienen resultado completo —15pruebas específicas.
+- [x] Repetición explícita y base disponible no inferida, tests adversariales y regresión V3 —89pruebas/3archivosPASS, tsc/ESLint focalPASS.
+- [x] ADR/funcional/manual y estado/índices sincronizados; límites comerciales honestos — documentos de créditosIA y auditoría local; integración quote y economics pendientes fuera de esta unidad.
 
 ## Verification
 
@@ -174,9 +174,13 @@ Tests focales, ESLint, TypeScript, CLI y replay previo, task lint/ops lint, cier
 
 ## Closing Protocol
 
-- [ ] Status real y criterios reflejan evidencia local.
-- [ ] Índices/registry/handoff/changelog sincronizados.
-- [ ] Quotes previas y datos fuente intactos; sin promoción remota.
+- [x] Status real y criterios reflejan evidencia local.
+- [x] Índices/registry/handoff/changelog sincronizados.
+- [x] Quotes previas y datos fuente intactos —12archivos comparados byte-for-byte conGit; sin promoción remota.
+
+## Evidence2026-10-09
+
+`docs/audits/commercial/2026-10-09-pricing-v3-ai-credit-budget.md`:89testsV3, tipos/lint y CLI directa; artefactos nuevos0600. Suscripción y packs se separan; planner no compra ni asigna automáticamente costos a quote. Legacy resolver/kernel y tarifas no se reescriben.
 
 ## Open Questions
 

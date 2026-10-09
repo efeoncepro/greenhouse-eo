@@ -9,6 +9,10 @@
 
 ## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
 
+- Pricing V3: [presupuesto IA por CLI](docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md), suscripción y paquetes extra discretos, caja/remanente/vencimiento; TASK-2020 local, sin compra ni binding automático a quotes.
+
+- Pricing V3: [licencias/plataforma declaradas](data/pricing/v3-pilot/economics/resource-inputs/README.md) registradas con créditos, moneda, renovación Adobe y propuesta de reparto; asignaciones/normalización pendientes, sin cambiar catálogo histórico ni quotes.
+
 - Pricing V3: [policy/provisiones propuestas](docs/business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), seis sensibilidades CLI y fuentes oficiales; TASK-2017 parcial.
 
 - Pricing V3: [selección y mantenimiento local](docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md), 32 perfiles históricos, kits, calendario, desglose y versiones con preview/apply. TASK-2019; tarifas vigentes y promoción runtime pendientes.

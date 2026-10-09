@@ -50,3 +50,22 @@ El [brief comercial](../../../data/pricing/v3-pilot/economics/commercial-policy-
 Recursos ya normalizados month/year/once, dedicación y asignación, países separados, markup/margen, descuentos, snapshots y desglose. No hidrata fórmulas de drivers, probabilidad de reemplazo, activos/depreciación, interés por DSO o mínimos de procurement desde este documento.
 El kernel staffing tampoco certifica delivery de un pod. Estas brechas se resuelven con evidencia/recursos explícitos o una futura extensión formal; no esconderlas en un monto global.
 Compromiso anual con pago mensual necesita términos de contrato separados: unit=month no demuestra cancelación mensual. Si no se puede representar correctamente caja/costo, no promocionar el caso.
+
+## Licencias y plataforma declaradas por el operador
+
+[Presupuesto IA y recargas](cotizador-v3-creditos-ia.md): primitive/CLI incorpora paquetes enteros observados, remanente/caducidad y costo de compra separado de cuota existente. No hidrata automáticamente quote/kit ni modifica el reparto de plataforma pendiente.
+
+[Registro2026-10-09](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md): Higgsfield139USD/mes con3000créditos, Magnific40EUR/mes con45000créditos, Adobe180USD/mes y3CC Teams+3Express, Vercel60–100USD/mes, GCP/BBDD264USD/mes. Son declaraciones del operador; no facturas verificadas, import automático, accesos asignados ni tarifa aprobada. Magnific mantiene EUR y requiere FX explícito al convertir.
+
+Adobe: cobertura del180, frecuencia mensual asumida por contexto y alcance/fecha del alza70% pendientes de confirmación.306USD/mes es proyección condicional si180 es la base afectada; no dividir entre seis seats de planes distintos, duplicar Express ni anticipar renovación sin fecha.
+
+Tratamiento propuesto para revisar con Finance/Operations:
+
+- Seat nominativo: costo según plan/persona y reparto entre servicios donde trabaja, con evidencia; no dividir por FTE sin regla ni compartir usuarios por supuesto.
+- Higgsfield/Magnific: cuota fija y presupuesto de consumo por servicio. `139/3000` y `40/45000` son referencias de costo medio del paquete si se utiliza completo, no tarifa marginal ni equivalencia entre proveedores. Asignaciones más remanente/interno deben reconciliar la cuota. Un consumo no cubierto puede exigir nuevo paquete/excedente, con precio pendiente; no sumar cuota completa y el mismo costo de créditos otra vez.
+- Vercel/GCP: pool compartido324–364USD/mes. Separar consumo atribuible a servicios y operación interna; revisar si cada proveedor necesita driver propio. Cada servicio absorbe `pool mensual × proporción de delivery × proporción del servicio`, con denominadores medidos y policy aprobada. No asignar todo el pool a cada cliente/persona ni ocultar capacidad interna/no vendida redistribuyéndola.
+- Vercel100 es escenario conservador de presupuesto, no costo fijo confirmado. Reparto igual entre cuentas elegibles sólo sirve como simulación mientras falten elegibilidad, número de cuentas y policy. No duplica un addon de operaciones ni overhead que ya cubra esta infraestructura.
+
+En servicio gestionado, equipo/esfuerzo/licencias/IA/plataforma son inputs internos de costo; la unidad comercial conserva alcance, cadencia y límites acordados. El rol/capacidad ofertado especifica su dedicación y cobertura. El kernel staffing actual no adquiere soporte de composición comercial de servicios por registrar estos antecedentes.
+
+Datos pendientes: asignaciones por persona/cuenta, permisos/planes, ventanas de vigencia/renovación, compromiso/plazo, uso y excedentes, fuente FX y reparto delivery/interno. Baseline/quotes previas quedan intactas. Se reutiliza ADR de mantenimiento; no cambia schema, cálculo, contabilidad ni runtime cloud.

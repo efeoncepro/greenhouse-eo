@@ -25,3 +25,7 @@ No importar esta proyección como catálogo comercial vigente ni exponer costos 
 [Catálogo local versionado](v3-catalog/README.md): brief → selección → cálculo → explicación; actualizaciones con fecha efectiva, impacto y conflicto de base. Histórico/simulación, no tarifas vigentes.
 
 [Reglas económicas y provisiones propuestas](v3-pilot/economics/commercial-policy-proposal/README.md): avance TASK-2017, sin tarifa aprobada.
+
+[Licencias y plataforma declaradas por el operador](v3-pilot/economics/resource-inputs/README.md): montos actuales, créditos, renovación Adobe y reparto pendiente; antecedente para actualizar catálogo, no import automático.
+
+[Presupuesto IA por CLI](v3-resources/README.md): suscripción atribuida y paquetes extra enteros, remanente y vencimiento; revisión obligatoria. Binding automático a quote y reparto de plataforma pendientes.

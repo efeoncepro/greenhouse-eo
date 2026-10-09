@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "pricing-v3-credit-budget/1",
+  "mode": "simulation",
+  "accountRef": "illustrative-client",
+  "providerId": "higgsfield",
+  "purchaseDate": "2026-10-09",
+  "useBy": "2026-10-31",
+  "requestedCredits": 1000,
+  "subscriptionCreditsAllocated": 400,
+  "subscriptionCreditsAvailable": 400,
+  "activeSubscription": true,
+  "allowRepeatedPacks": false
+}

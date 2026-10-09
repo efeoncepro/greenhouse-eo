@@ -320,3 +320,5 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## Pricing V3 — 2026-10-09
 
 [Catálogo, resolución y mantenimiento local](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md): Accepted, TASK-2019; versiones locales y cálculo congelado, sin promoción canónica.
+
+[Presupuesto de créditos IA y recargas](GREENHOUSE_PRICING_V3_AI_CREDIT_BUDGET_DECISION_V1.md): Accepted para prototipo local, TASK-2020; paquetes observados, costo/caja y caducidad separados, sin compra ni binding automático a quote.

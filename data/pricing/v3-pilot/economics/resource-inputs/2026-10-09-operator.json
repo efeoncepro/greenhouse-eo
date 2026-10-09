@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.resource-inputs.v1",
+  "recordedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "runtimeUse": "review_only",
+  "automaticCatalogUpdate": false,
+  "commercialReady": false,
+  "source": {
+    "kind": "operator_statement",
+    "reference": "pricing-v3-chat-2026-10-09-resource-costs",
+    "evidenceStatus": "operator_reported",
+    "invoiceVerified": false,
+    "billingEntity": null,
+    "taxIncluded": null,
+    "note": "Importes y frecuencias declarados por el operador; no son precios públicos, facturas verificadas ni autorización de reparto. Magnific mensual en mensaje original; Vercel/GCP mensuales confirmados en respuesta posterior."
+  },
+  "resources": [
+    {
+      "id": "higgsfield-subscription",
+      "provider": "Higgsfield",
+      "planName": null,
+      "cost": {"kind": "fixed", "amount": "139", "currency": "USD", "billingFrequency": "month"},
+      "includedUnits": {"kind": "provider_credit", "quantity": "3000", "resetFrequency": null},
+      "access": {"assignedMemberIds": null, "assignmentStatus": "unknown", "purchasedSeats": null, "freeSeats": null},
+      "proposal": {
+        "costClass": "shared_delivery_tool",
+        "allocationDriver": "measured_provider_credit_consumption",
+        "status": "proposed",
+        "scope": null,
+        "note": "Cuota fija más consumo presupuestado por servicio; confirmar reset, remanentes, condiciones de uso y excedentes. No supone acceso API/Fal ni disponibilidad en Globe."
+      },
+      "budgetReference": {"numerator": "139", "denominator": "3000", "currency": "USD", "per": "provider_credit", "meaning": "fixed_package_cost_divided_by_included_units", "usageRate": false},
+      "pending": ["plan_and_contract", "named_access_and_sharing", "credit_reset_rollover_and_overage", "service_consumption_budget", "effective_dates"]
+    },
+    {
+      "id": "magnific-subscription",
+      "provider": "Magnific",
+      "planName": null,
+      "cost": {"kind": "fixed", "amount": "40", "currency": "EUR", "billingFrequency": "month"},
+      "includedUnits": {"kind": "provider_credit", "quantity": "45000", "resetFrequency": null},
+      "access": {"assignedMemberIds": null, "assignmentStatus": "unknown", "purchasedSeats": null, "freeSeats": null},
+      "proposal": {
+        "costClass": "shared_delivery_tool",
+        "allocationDriver": "measured_provider_credit_consumption",
+        "status": "proposed",
+        "scope": null,
+        "note": "Conservar EUR. No convertir a USD sin snapshot FX ni equiparar créditos Magnific con créditos Higgsfield o créditos de venta."
+      },
+      "budgetReference": {"numerator": "40", "denominator": "45000", "currency": "EUR", "per": "provider_credit", "meaning": "fixed_package_cost_divided_by_included_units", "usageRate": false},
+      "pending": ["plan_and_contract", "named_access_and_sharing", "credit_reset_rollover_and_overage", "service_consumption_budget", "fx_snapshot", "effective_dates"]
+    },
+    {
+      "id": "adobe-current-subscriptions",
+      "provider": "Adobe",
+      "plans": [{"name": "Creative Cloud Teams", "licenses": 3}, {"name": "Adobe Express", "licenses": 3}],
+      "cost": {"kind": "fixed", "amount": "180", "currency": "USD", "billingFrequency": "month", "frequencyBasis": "contextual_pending_confirmation", "covers": "scope_pending"},
+      "access": {"assignedMemberIds": null, "assignmentStatus": "unknown", "freeSeats": null},
+      "renewal": {
+        "increaseRate": "0.70",
+        "effectiveFrom": null,
+        "increaseScope": null,
+        "projectedAmountIf180IsAffectedBase": "306.00",
+        "currency": "USD",
+        "status": "conditional_projection",
+        "note": "180 × 1.70. Confirmar si180 cubre ambos planes, si el70% aplica a ese total y fecha de renovación. No reemplaza el precio actual ni implica un cargo adicional de Express."
+      },
+      "proposal": {
+        "costClass": "member_direct_tool_or_shared_delivery_tool",
+        "allocationDriver": "named_seat_then_documented_client_allocation",
+        "status": "proposed",
+        "scope": null,
+        "note": "No dividir180 entre seis como si los planes fueran equivalentes. Tampoco sumar Express aparte hasta conocer la cobertura del monto."
+      },
+      "pending": ["amount_scope_cc_and_express", "billing_frequency_confirmation", "renewal_scope_and_date", "named_assignments_and_plan_breakdown", "annual_commitment_and_payment_terms", "effective_dates"]
+    },
+    {
+      "id": "vercel-greenhouse",
+      "provider": "Vercel",
+      "supports": "Greenhouse",
+      "planName": null,
+      "cost": {"kind": "range", "minimum": "60", "maximum": "100", "currency": "USD", "billingFrequency": "month"},
+      "access": {"assignmentStatus": "platform_scope", "assignedMemberIds": null},
+      "proposal": {
+        "costClass": "shared_operational_overhead",
+        "allocationDriver": "platform_pool_by_measured_service_share",
+        "status": "proposed",
+        "scope": "platform",
+        "planningMaximum": "100",
+        "planningMaximumStatus": "scenario_only",
+        "note": "Rango conserva variabilidad.100 es escenario conservador, no pago fijo confirmado ni monto automático por cliente. Separar base/uso y consumos exclusivos cuando exista evidencia."
+      },
+      "pending": ["billing_period_actual", "fixed_and_usage_components", "client_vs_internal_platform_share", "allocation_denominator_and_policy", "effective_dates"]
+    },
+    {
+      "id": "gcp-database",
+      "provider": "GCP",
+      "supports": "BBDD según declaración del operador",
+      "databaseProduct": null,
+      "cost": {"kind": "fixed", "amount": "264", "currency": "USD", "billingFrequency": "month"},
+      "access": {"assignmentStatus": "platform_scope", "assignedMemberIds": null},
+      "proposal": {
+        "costClass": "shared_operational_overhead",
+        "allocationDriver": "platform_pool_by_measured_service_share",
+        "status": "proposed",
+        "scope": "platform",
+        "note": "Confirmar proyectos/componentes cubiertos por264 y proporción interna/clientes. No presume que todo GCP ni toda la BBDD sirvan exclusivamente a Greenhouse/clientes."
+      },
+      "pending": ["billed_projects_and_database_components", "client_vs_internal_platform_share", "allocation_denominator_and_policy", "effective_dates"]
+    }
+  ],
+  "platformPool": {
+    "resourceIds": ["vercel-greenhouse", "gcp-database"],
+    "reportedMonthlyRange": {"minimum": "324", "maximum": "364", "currency": "USD"},
+    "allocationStatus": "proposed_unapproved",
+    "deliveryShare": null,
+    "perServiceShare": null,
+    "formula": "monthly_pool × approved_delivery_share × approved_service_share",
+    "rules": [
+      "Delivery + internal + unallocated shares reconcile to one pool; no redistribution of internal or unsold share without explicit decision.",
+      "Do not charge the entire pool to every service, role or person.",
+      "Prefer measured attributable usage when available; mixed providers may require different drivers.",
+      "Equal allocation across active eligible accounts is simulation only until denominator, eligibility and policy are approved.",
+      "Do not duplicate this pool in license costs, operations/addons and corporate overhead."
+    ]
+  },
+  "catalogProjection": {
+    "status": "pending_normalization",
+    "baselineChanged": false,
+    "needs": ["scope_and_units", "assignments_and_eligible_consumers", "effective_dates", "allocation_policy", "adobe_coverage", "eur_fx"],
+    "note": "Este antecedente no es un catálogo ni un brief CLI. Finance/Operations normaliza registros y kits mediante change-set preview/apply del ADR existente. El motor no importa estos inputs automáticamente."
+  }
+}

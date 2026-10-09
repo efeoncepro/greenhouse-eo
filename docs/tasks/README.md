@@ -1,10 +1,12 @@
 # Task Index
 
+- `TASK-2020` — [presupuesto IA y recargas V3](complete/TASK-2020-pricing-v3-ai-credit-budget.md), CLI local completa; packs/caja/remanente/vencimiento, binding automático a quote pendiente.
+
 - `TASK-2019` — [catálogo y actualización V3](complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md), implementación local completa; tarifas vigentes pendientes.
 
 - `TASK-2018` — [prueba V3 Pibank](complete/TASK-2018-pricing-v3-pibank-team-simulation.md), prueba local completa; capacidad Perú/Chile, hipótesis del expediente.
 
-- `TASK-2017` — [economics Colombia→Chile](in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md), parcial: diseñador50%, propuesta de política/provisiones y seis sensibilidades; costos/decisiones vigentes pendientes.
+- `TASK-2017` — [economics Colombia→Chile](in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md), parcial: diseñador50%, política/provisiones, seis sensibilidades y licencias/plataforma declaradas; asignaciones, costo humano y decisiones pendientes.
 
 - `TASK-2016` — [motor V3 local y CLI](complete/TASK-2016-pricing-v3-local-prototype.md), completo local; sin integración canónica ni tarifas aprobadas.
 

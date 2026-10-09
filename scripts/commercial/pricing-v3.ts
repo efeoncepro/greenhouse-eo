@@ -7,6 +7,7 @@ import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
 import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
 import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
 import { projectCatalogQuote, catalogQuoteMarkdown } from '../../src/lib/finance/pricing-v3/catalog/client'
+import { planCreditBudget } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
 import {
   catalogDigest,
   compareCatalogQuotes,
@@ -70,6 +71,7 @@ try {
     catalog: ['catalog', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
     prepare: ['catalog', 'input', 'out', 'help'],
     quote: ['catalog', 'input', 'out', 'help'],
+    resources: ['catalog', 'input', 'out', 'help'],
     help: ['help']
   }
 
@@ -104,6 +106,7 @@ try {
           export: '--input frozen-artifact.json --out draft.md [--format markdown|json]',
           prepare: '--input brief.json [--catalog catalog.json] [--out selection.json]',
           quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json]',
+          resources: 'budget --input credit-budget-request.json --catalog credit-catalog.json [--out budget.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
         },
@@ -114,6 +117,13 @@ try {
         ]
       })
     )
+  } else if (command === 'resources') {
+    if (subcommand !== 'budget' || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+    const result = planCreditBudget(read(required(values.catalog)), read(required(values.input)))
+
+    if (values.out) writeNew(values.out, result)
+    process.stdout.write(json(result))
+    process.exitCode = result.calculationStatus === 'calculated' ? 3 : 2
   } else if (command === 'catalog') {
     if (!['search', 'show', 'validate', 'preview', 'apply'].includes(subcommand) || positionals.length !== 2)
       throw new Error('INVALID_ARGUMENT')
@@ -147,7 +157,8 @@ try {
       writeNew(required(values.out), next)
       process.stdout.write(json({ updated: true, version: next.version, digest: catalogDigest(next), binding: false }))
     } else {
-      if (values.date && !briefSchema.shape.quoteDate.safeParse(values.date).success) throw new Error('INVALID_ARGUMENT')
+      if (values.date && !briefSchema.shape.quoteDate.safeParse(values.date).success)
+        throw new Error('INVALID_ARGUMENT')
       if (subcommand === 'show') required(values.query)
 
       const kinds = [

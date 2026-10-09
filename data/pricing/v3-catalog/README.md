@@ -17,4 +17,6 @@ No ejecutar el Excel, no modificar baseline in-place, no inventar costos ausente
 Las licencias usan precio completo del paquete histórico: permisos de compartir/plan/seat count aún pendientes.
 Talent Assurance/operación/setup `trial-*` son placeholders visibles del ensayo previo, no costos medidos.
 
+[Antecedentes actuales declarados por el operador](../v3-pilot/economics/resource-inputs/README.md): Higgsfield, Magnific, Adobe y plataforma Vercel/GCP. Registro local para normalizar; aún no reemplaza valores de esta baseline ni asigna usuarios/costos por servicio automáticamente.
+
 QA local: [auditoría TASK-2019](../../../docs/audits/commercial/2026-10-09-pricing-v3-catalog-selection-maintenance.md); 74 pruebas y CLI real.
