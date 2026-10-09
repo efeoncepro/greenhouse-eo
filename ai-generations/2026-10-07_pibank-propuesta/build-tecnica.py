@@ -611,23 +611,27 @@ def sbar(lab, w, color, val, glow=False):
             f'<div style="width: {w}px; height: 28px; border-radius: 8px; background: {color}{"; box-shadow: 0 0 40px rgba(3, 117, 219, 0.55)" if glow else ""}"></div>'
             f'<div style="font-family: {ID}; font-size: 34px; font-weight: 760">{val}</div></div></div>')
 def clicks(opens):
-    dots = ''.join(f'<div style="width: 18px; height: 18px; border-radius: 50%; '
-                   + (f'background: {ACC}; box-shadow: 0 0 16px rgba(3, 117, 219, 0.9)' if k < opens else 'box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.32)') + '"></div>' for k in range(100))
-    return f'<div style="display: grid; grid-template-columns: repeat(10, 18px); gap: 8px; margin-top: 16px">{dots}</div>'
+    # cada punto = 1 apertura por cada 1.000 clics pagados (30 lugares: la diferencia de 20 a 30 se ve)
+    dots = ''.join(f'<div style="width: 26px; height: 26px; border-radius: 50%; '
+                   + (f'background: {ACC}; box-shadow: 0 0 16px rgba(3, 117, 219, 0.9)' if k < opens else 'box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.32)') + '"></div>' for k in range(30))
+    return (f'<div style="display: grid; grid-template-columns: repeat(10, 26px); gap: 10px; margin-top: 18px">{dots}</div>'
+            f'<div style="font-size: 13px; color: {SOFT_}; margin-top: 10px">Cada punto: una apertura</div>')
 def semcard(kicker, opens, cost, hero):
-    inner = (okicker(kicker) + f'<div style="font-size: 16px; color: {SOFT_}; margin-top: 8px">100 clics pagados · mismo gasto</div>' + clicks(opens) +
-             f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 18px"><div style="font-family: {ID}; font-size: 52px; font-weight: 760; letter-spacing: -0.03em">{opens}</div><div style="font-size: 18px; font-weight: 600">aperturas</div></div>'
+    chip = (f'<div style="margin-left: auto; padding: 6px 14px; border-radius: 999px; background: {ACC}; font-size: 16px; font-weight: 600">+50 % aperturas</div>' if hero else '')
+    bar = (f'<div style="margin-top: 12px; height: 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.10)"><div style="width: {cost.replace(" ", "")}; height: 10px; border-radius: 6px; background: {ACC if hero else "rgba(207, 228, 250, 0.55)"}"></div></div>')
+    inner = (okicker(kicker) + f'<div style="font-size: 16px; color: {SOFT_}; margin-top: 8px">1.000 clics pagados · mismo gasto</div>' + clicks(opens) +
+             f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 18px"><div style="font-family: {ID}; font-size: 52px; font-weight: 760; letter-spacing: -0.03em">{opens}</div><div style="font-size: 18px; font-weight: 600">aperturas</div>{chip}</div>'
              f'<div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.12); display: flex; justify-content: space-between; align-items: baseline">'
              f'<div style="font-size: 15px; color: {SOFT_}">Costo por apertura<br><span style="color: #ffffff; font-weight: 600">gasto ÷ {opens}</span></div>'
-             f'<div style="font-family: {ID}; font-size: 48px; font-weight: 760; letter-spacing: -0.03em">{cost}</div></div>')
+             f'<div style="font-family: {ID}; font-size: 48px; font-weight: 760; letter-spacing: -0.03em">{cost}</div></div>' + bar)
     return inner
 S.append(('Eficiencia de la pauta', page('Pibank · SEM', halo_platform(1300, 520, 1300, 790, 560, 46) +
-    obj(semcard('Escenario de referencia', 2, '100 %', False), 820, 230, 450, False, '; height: 550px') +
-    obj(semcard('Con mejor página', 3, '67 %', True), 1310, 190, 470, True, '; height: 590px') +
+    obj(semcard('Escenario de referencia', 20, '100 %', False), 820, 250, 450, False, '; height: 470px') +
+    obj(semcard('Con mejor página', 30, '67 %', True), 1310, 210, 470, True, '; height: 510px') +
     col(eyebrow('Qué haremos') + headline(['Una mejor página', 'puede abaratar', 'la pauta'], 72, extra='; margin-top: 56px') +
         f'<div style="display: flex; align-items: baseline; gap: 18px; margin-top: 30px"><div style="font-family: {ID}; font-size: 150px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">−33 %</div></div>'
         f'<div style="font-family: {ID}; font-size: 28px; font-weight: 640; letter-spacing: -0.02em; color: {SOFT_}; margin-top: 10px">en el costo de cada apertura pagada</div>' +
-        para('SEM es la pauta en buscadores: anuncios que se pagan por clic. Esos clics aterrizan en las páginas que mejora el programa. Si una página convence a 3 de cada 100 en vez de a 2, cada apertura pagada cuesta un tercio menos.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
+        para('SEM es la pauta en buscadores: anuncios que se pagan por clic. Esos clics aterrizan en las páginas que mejora el programa. Si una página convence a 3 de cada 100 en vez de a 2, el mismo gasto trae 50 % más aperturas y cada una cuesta un tercio menos.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
     means('Cada sol de pauta rinde más cuando la página convence. Lo comprobaremos con el costo por apertura y por cuenta con fondos, con datos de Marketing.',
           'Ejemplo aritmético: tasas ilustrativas y condiciones constantes. Marketing opera la pauta. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=2)))
 
