@@ -90,3 +90,12 @@ El flujo local permite a un agente descubrir, planificar, componer, calcular, ex
 preview con recursos/prorrateo/créditos y mantenimiento versionado sin fórmulas propias ni sobrescribir historia.
 La evidencia económica y el lifecycle comercial real conservan sus owners. Completar esta unidad no aprueba
 un precio, asigna una persona, compra una licencia o sustituye el cotizador productivo.
+
+
+## Commits y aislamiento del checkout compartido
+
+Código/datos/manuales: `8ff088f64` (47paths); auditoría: `538b36f4f` (1path).
+Una sesión concurrente había capturado el staging; corrigió su commit y devolvió los cambios. Esta sesión
+hizo el commit funcional con pathspec explícito propio. Se cierra además la eliminación del archivo original
+in-progress de TASK-2022, conservando sólo su archivo complete y registry sincronizado. No se modificó ni
+reescribió el trabajo de la otra sesión. No push/deploy por esta entrega.
