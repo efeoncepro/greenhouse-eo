@@ -1,0 +1,30 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "e6179e67420cf4cf97a2d816197b167f6f24ad32c2ad9d281ca085e548932b9c",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 2,
+  "contentTypes": [
+    "deck.decision-case",
+    "deck.decision-case"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CS2-banco-bice",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS2-banco-bice.png",
+      "sha256": "7c58b11b843c020471e9c048c7662bc63d40efa176d6394c870afe7dcec44f08"
+    },
+    {
+      "ref": "asset-ref:plate:CS3b-berel-squad",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-berel-squad.png",
+      "sha256": "bcd8e7cc1c210eff24272cf4119f5c3bab141c3ad8df8b042d00418c4981381e"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

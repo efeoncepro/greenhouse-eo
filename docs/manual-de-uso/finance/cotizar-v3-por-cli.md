@@ -39,6 +39,26 @@ Elegir nombres nuevos al repetir: archivos con `wx`, sin sobreescritura, permiso
 
 Control independiente del fixture: humano mensual `1000 ×0,5 ×0,8=400`; herramientas/fee/Assurance/operación `100+50+25+25=200`. Precio humano `400 ×1,5 ×1,2=720`, otros `200 ×1,5=300`. Tres meses más setup `100 ×1,5`: 3210 USD; descuento 321, neto 2889, costo normalizado 1900 y margen 989. Caja atribuida 2800 porque la licencia anual se paga al inicio. Son números sintéticos; no una tarifa Colombia→Chile. Impuestos pendientes producen `tax=null`, `grandTotal=null`.
 
+## Prototipar con el antecedente histórico
+
+El [input del diseñador senior al 50%](../../../data/pricing/v3-pilot/scenarios/colombia-chile-design-historical-hypothesis.json)
+conecta importes históricos y placeholders explícitos, según la [ficha y sus supuestos](../../documentation/finance/cotizador-v3-piloto-colombia-chile.md#simulación-histórica-ejecutable--avance-2026-10-09).
+Está separado del input comercial incompleto; no hidrata el catálogo automáticamente.
+
+```bash
+pnpm --silent pricing:v3 calculate --input data/pricing/v3-pilot/scenarios/colombia-chile-design-historical-hypothesis.json
+pnpm --silent pricing:v3 explain --input data/pricing/v3-pilot/economics/historical-simulation/shared-half-three.artifact.json
+pnpm --silent pricing:v3 replay --input data/pricing/v3-pilot/economics/historical-simulation/shared-half-three.artifact.json
+pnpm --silent pricing:v3 compare --left data/pricing/v3-pilot/economics/historical-simulation/shared-half-three.artifact.json --right data/pricing/v3-pilot/economics/historical-simulation/shared-full-three.artifact.json
+```
+
+Cálculo/explain/replay devuelven código 3 porque conservan `requires_review`, aunque la aritmética
+está completa. Resultado base: USD 1.064,70/mes + USD 130 de setup, antes de impuestos, dentro
+del perímetro hipotético documentado. Export sigue bloqueado. Para ajustes, editar una copia
+del input y declarar la hipótesis en un nuevo manifest; guardar en un `--out` nuevo. No editar
+artefactos sellados, ni convertir los supuestos a `confirmed` para superar revisión.
+La fecha de source es ventana del ensayo; extenderla no confirma vigencia de costos.
+
 ## Datos y reglas ejecutadas
 
 - Solicitud estricta: campos desconocidos, números monetarios en lugar de cadenas, fechas inválidas y dedicaciones conflictivas son errores. Decimal exacto, precisión 80, redondeo HALF_UP al final de cada línea.
@@ -72,7 +92,7 @@ La proyección cliente usa allowlist. Excluye costos, márgenes, factores, fuent
 
 ## Primer caso comercial y límites abiertos
 
-El [caso diseñador senior compartido Colombia→Chile](../../../data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json) prioriza la combinación confirmada por el operador. El perfil/dedicación/duración son un escenario editable de validación, no un pedido comercial aprobado. Devuelve `needs_input`: costo colombiano vigente y sus coberturas, capacidad, kits, fees/Assurance/operación, política de precio/mercado y FX faltan. No localiza el histórico del Excel ni aplica tasas sintéticas.
+El [caso diseñador senior compartido Colombia→Chile](../../../data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json) prioriza la combinación confirmada por el operador. El operador confirmó diseñador senior al 50%; headcount/plazo/modalidad/moneda siguen como supuestos de análisis. [Ficha y ledger de economics](../../documentation/finance/cotizador-v3-piloto-colombia-chile.md) conservan fuentes pendientes, encaje creativo y sensibilidad, sin tarifa aprobada. Devuelve `needs_input`: costo colombiano vigente y sus coberturas, capacidad, kits, fees/Assurance/operación, política de precio/mercado y FX faltan. No localiza el histórico del Excel ni aplica tasas sintéticas.
 
 Esta vertical no implementa aún reader del catálogo canónico, autorización remota, cambios salariales por periodo, overrides en `request`, consumo AI medido, fees porcentuales sobre ingresos, rounding comercial adicional, setups amortizados, ajustes encadenados ni servicios compuestos. Esos campos no se aceptan silenciosamente. [Contrato objetivo y convergencia](../../documentation/finance/cotizador-v3-contrato-y-validacion.md) conserva esas extensiones y los gates productivos; [parámetros piloto](../../documentation/finance/cotizador-v3-parametros-piloto.md) conserva decisiones económicas pendientes.
 

@@ -4,6 +4,14 @@ Load when the task is **assembling a delivery team to assign to a client** — a
 
 > **One-line boundary.** Workforce-planning decides *whether and how* to cover a need; this module designs *the squad that covers it for a specific client*; finance prices the dedication × loaded cost; commercial sets margin/packaging; contracting/legal drafts the contract; payroll owns pay. You design the **capability shape**, never the money or the contract.
 
+## Regional CRM/RevOps capacity
+
+For this offer load `docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md` and
+`docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md`. Direction and Talent Assurance standard accepted 2026-10-09;
+offer in validation. Declare who directs each lane, map profiles to real Efeonce roles, reconcile
+dedication and finance training/QA/backup. Five operating markets do not imply five enabled staffing
+contracts; client country, person location, employer and effective direction require separate validation.
+
 ## Delivery model (declare one, or split an explicit hybrid by lanes)
 
 The delivery model says **what the client buys and who is accountable for delivery**. It is independent from the engagement form (On-Going, On-Demand, Sample Sprint) and from the Creative Studio operating mode used for a particular generative run.

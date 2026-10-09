@@ -3,15 +3,24 @@
 ## Status
 
 - Lifecycle: `Architecture`
-- State: `Proposed`
+- State: `Accepted` — arquitectura objetivo, 2026-10-09
 - Date: 2026-07-30
+- Accepted as of: 2026-10-09, aprobación explícita del operador; sin certificación de runtime
 - Owner: Talent + Workforce + Operations + Delivery; Finance/Commercial and Client Experience are required owners at their boundaries
 - Decision: [GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md)
 - Program: [EPIC-038](../epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md)
 - Confidence: `medium`
 - Runtime state: design only; no schema, capability, agent or autonomous write is authorized by this document
 
-## Baseline runtime verificado 2026-08-15
+## Alcance de la aceptación 2026-10-09
+
+Se acepta el diseño bajo la [decisión transversal](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md#aceptación-2026-10-09--estándar-transversal-y-alcance).
+El modelo objetivo no autoriza por sí solo schema, grants, writes ni promoción de autonomía. `TASK-1602`
+debe cerrar policy y ownership; cada unidad conserva sus gates de implementación, privacidad y evidencia.
+Los artefactos definidos abajo no son prueba de entidades o readers live. Las preguntas de la sección 13
+son calibraciones previas a activación, no una nueva solicitud de aceptación del concepto.
+
+## Baseline runtime verificado 2026-08-15 (histórico)
 
 Esta verificación separa runtime reutilizable de runtime de Talent Assurance. No acepta esta arquitectura ni
 autoriza un schema, reader, command, agente, badge o rollout nuevo.
@@ -92,7 +101,7 @@ command/capability existente sobre un endpoint local a una UI.
 
 ## 4. Target domain model
 
-The target model is additive and extraction-ready. Names are design candidates until an ADR is accepted. Estos
+The target model is additive and extraction-ready. Names describe the accepted target design; concrete schema and API contracts remain owned by implementation units. Estos
 objetos son proyecciones o registros de assurance sobre fuentes existentes, no reemplazos de esos dominios.
 
 ### 4.1 Capability Contract
@@ -306,7 +315,7 @@ No agentic runtime is launch-ready without:
 6. **Quality loop:** 30/60/90, operator feedback, selection-failure learning and template recalibration.
 7. **Autonomy review:** promote only bounded policy decisions with sustained evidence; keep employment and client-capacity decisions human-owned.
 
-## 13. Open questions before acceptance
+## 13. Calibraciones pendientes antes de activación
 
 - Which claims qualify for `Verificado por Efeonce` in V1?
 - Who is the accountable verifier per capability and role?

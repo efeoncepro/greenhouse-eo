@@ -1,0 +1,23 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "04bfe1ab52f25b767f6976298dcce4c1d15dec79dc38f0084bb936ed1731b00f",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 6,
+  "contentTypes": [
+    "deck.section-classic",
+    "deck.section-classic",
+    "deck.section-classic",
+    "deck.section-classic",
+    "deck.content-clients",
+    "deck.section-classic"
+  ],
+  "plates": [],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

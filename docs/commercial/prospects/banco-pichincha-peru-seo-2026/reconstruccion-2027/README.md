@@ -2,6 +2,14 @@
 
 **Cotización detallada USD/PEN:** [19 páginas por moneda, fuentes y entrega](cotizacion-detallada-2026-10-08/README.md); ambas versiones PDF/HTML están junto al deck en la raíz comercial Banco Pichincha. Copias y snapshots preservados; impuestos/tasa contractual pendientes y sin envío o actualización CRM.
 
+**Estimación vigente · 08-10 · supuestos autorizados por Julio:** [estimación SEO/AEO y ajustes para Claude](estimacion-seo-aeo-2026-10-08/ESTIMACION-Y-AJUSTES-PARA-CLAUDE.md). Central: 33.670 visitas orgánicas, 504 cuentas con fondos directas y 154 adicionales por cada 100.000 visitas elegibles de otros canales. Incluye escenarios y el requisito para la meta completa; no contiene presupuesto de pauta. Prevalece sobre instrucciones anteriores de aporte pendiente y sobre §17 del complemento previo. Precio y alcance híbrido conservados; PDF pendiente de actualización por Claude.
+
+**Dirección vigente del caso · 08-10:** [meta integrada de 15.200 cuentas con fondos](meta-integrada-2026-10-08/README.md). Diseñar y dimensionar el conjunto de tácticas para la meta; §17 del MD para Claude gobierna la narrativa. La estimación de 33 familias queda como anexo parcial, no como resultado total del programa. Requisitos calculados no equivalen a factibilidad demostrada.
+
+**Demanda ampliada 08-10:** [escenario enero 2026 y audiencia](demanda-audiencia-2026-10-08/README.md): 33 familias, 66.030 búsquedas/mes estimadas, escenario central condicional de 18.150 visitas y 236 cuentas con fondos; no es el aporte global ni volumen demográficamente filtrado. Ver §16 del MD para Claude. Los resultados originales se conservan.
+
+**Complemento vigente 08-10:** [caso y ajustes para Claude](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Complemento-del-caso-y-ajustes-para-Claude-2026-10-08.md>), basado en el correo de Jesús del 07-10: USD confirmado, audiencia A/B 35–55, evaluación desde enero de 2026 y entrega 09-10. Incluye simulación retrospectiva y matriz por lámina. Este complemento actualiza el encargo; conserva precios/modelos originales. El PDF de 44 láminas todavía requiere esos ajustes. Casos internacionales validados por Julio; no hay caso documentado en Perú. Equipo: nombres confirmados y roles por asignar antes del inicio. Sin datos bancarios; lanzamiento reciente confirmado por el operador. §15 incorpora benchmark internacional y su utilidad para demanda local; forecast absoluto sigue condicionado.
+
 **Operación vigente:** [SEO/AEO evolutivo e incremental](oferta-hibrida/MODELO-EVOLUTIVO.md): ciclo mensual de expansión, mejora y medición; sin cuota fija de FAQ. Fee y activaciones se conservan.
 
 **Alcance vigente de autoridad y técnica:** [SEO técnico/schema y refuerzos de enlaces](oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md). Se retiran las sesiones digitales y no se incorporan tutoriales. Gradual: dos campañas M3/M8 + dos refuerzos M6/M11; integral: cuatro campañas y cuatro refuerzos. Precios anuales intactos; técnico/schema dentro de base y 8h CMS/mes.
@@ -16,11 +24,11 @@
 
 ## Fuentes vigentes
 
-[Conexión demanda → ejecución → costo](conexion-demanda-plan/README.md): anexo del 07-10 con las mismas 19 familias y embudo, escenarios mensuales separados, 24 artículos vinculados, capacidad y fee propuesto a Julio. [Complemento para Claude](conexion-demanda-plan/PARA-CLAUDE.md) y [Excel complementario](conexion-demanda-plan/Pibank-Conexion-demanda-plan-costeo.xlsx). Prevalece para el estado de costeo y la definición de cuenta con fondos; no sustituye fuentes ni el modelo anterior.
+[Conexión demanda → ejecución → costo](conexion-demanda-plan/README.md): anexo del 07-10 con las mismas 19 familias y embudo, escenarios mensuales separados, 24 artículos vinculados, capacidad y fee propuesto a Julio. [Complemento para Claude](conexion-demanda-plan/PARA-CLAUDE.md) y [Excel complementario](conexion-demanda-plan/Pibank-Conexion-demanda-plan-costeo.xlsx). Conserva la sensibilidad del panel y el costeo histórico; el costeo y calendario vigentes pertenecen a oferta-hibrida.
 
 [ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md](ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md) gobierna arquitectura, hipótesis y alcance. [Brief Claude](BRIEF-PARA-DECK-VIGENTE.md), [propuesta](PROPUESTA-PARA-PIBANK-2027.md) y [resumen](RESUMEN-PARA-GERENCIA.md) son la entrada para el nuevo deck. Fuentes anteriores archivadas, sin borrar evidencia.
 
-Envolvente candidata: un hub/pilar mejorado; hasta cinco artículos/mes y mejora del corpus según evidencia, sin cuota FAQ; calculadora mejorada y dos tools nuevas; 48 adaptaciones; 12 newsletters y cuatro refuerzos de gestión editorial y enlaces; cuatro campañas PR/12 ángulos/48 propuestas/cuatro preparaciones de vocería; mantenimiento,144 observaciones AEO desde M2 (72 de referencia en M1) al mes,12informes y cuatro revisiones. La cantidad editorial reemplaza 12 entregas/hasta seis destinos nuevos, no se suma a ellas. Capacidad/costos propuestos en el anexo; disponibilidad y costos definitivos por validar.
+Alternativa integral (US$89.200, no alcance gradual): un hub/pilar mejorado; hasta cinco artículos/mes y mejora del corpus según evidencia, sin cuota FAQ; calculadora mejorada y dos tools nuevas; 48 adaptaciones; 12 newsletters y cuatro refuerzos de gestión editorial y enlaces; cuatro campañas PR/12 ángulos/48 propuestas/cuatro preparaciones de vocería; mantenimiento,144 observaciones AEO desde M2 (72 de referencia en M1) al mes,12informes y cuatro revisiones. La cantidad editorial reemplaza 12 entregas/hasta seis destinos nuevos, no se suma a ellas. Capacidad/costos vigentes en oferta-hibrida; disponibilidad y costos definitivos por validar.
 
 - [Calendario v0.7](CALENDARIO-CRECIMIENTO-V0.7.csv): doce meses, cadencias, recursos y eficiencia SEO–SEM.
 - [24 briefs](PLAN-DE-CONTENIDOS-V0.7.csv): trabajos candidatos por decisión/intención; no recursos ya publicados.
@@ -41,6 +49,6 @@ Falta estimar la contribución del programa ampliado y el contrafactual del lanz
 
 ## Artefactos y preparación
 
-Propuesta/resumen PDF v0.7 exportados: seis y dos páginas; las ocho páginas finales revisadas visualmente, fuentes cargadas, cero desbordes e imágenes rotas. El [manifest](delivery-manifest.json) registra páginas/copias/hashes. PDFs v0.6.1 archivados; deck14 v0.6 y assets pr-deck-render históricos. Claude prepara el nuevo deck desde el brief, con términos cliente y pendientes visibles; no se genera otro deck en esta integración.
+Los tres PDF —técnica, resumen y oferta— se concilian en una misma revisión híbrida y describen primero la ruta gradual de US$79.200. La integral de US$89.200 queda como alternativa explícita. El [manifest](delivery-manifest.json) registra fuentes, copias, hashes y QA. Versiones anteriores preservadas en el archivo interno; no son documentos vigentes para enviar.
 
-Fee interno propuesto US$8.000/mes; aprobación económica, disponibilidad y aporte global defendible pendientes; sin implementación WordPress, pauta, comunicaciones, publicación, envío, CRM/Notion, commit o push. Doce meses y ampliaciones son dirección del operador, no aceptación bancaria. Corte09-10 según reunión.
+Precios propuestos: base US$4.500/mes, gradual US$79.200/año, integral US$89.200/año. El fee fijo histórico US$8.000 está sustituido. Costos reales, decisión de margen y aporte global pendientes. [Conciliación comercial y pedidos de Jesús](CONCILIACION-COMERCIAL-Y-APORTE.md). Sin envío ni publicación; doce meses son dirección del operador, no aceptación bancaria.

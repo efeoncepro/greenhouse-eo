@@ -90,14 +90,19 @@ background:
 ```
 - Durations: `--dur-s 160ms` state changes, `--dur-m 320ms` panels/crossfades. Easing `--ease` — never `ease-in-out`.
 - Always honor `prefers-reduced-motion` (kill transitions + decorative loops).
-- **Signature loader:** the Globe balloon (isotype) rising + "breathing" (translateY + scale, no rotation) with a titilating orange **burner** flame and an azure pulse halo. Use for any "generating/working" moment.
+- **Signature loader:** the Globe balloon (isotype, in its logo colors — raspberry on dark, §5) rising + "breathing" (translateY + scale, no rotation) with a titilating orange **burner** flame and an azure pulse halo. Use for any "generating/working" moment.
 
 ---
 
 ## 5. Brand assets
 
-- Logo: `assets/globe-logo.svg` (white wordmark + orange spark). Isotype (balloon/orb): `assets/globe-isotipo.svg`.
-- ⚠️ Fills live inline (`fill="#fff"` / `#ff6500`) — the SVGs render **white-on-dark**; don't rely on a `<style>` block (stripped when loaded as `<img>`).
+- **Source of truth (since 2026-10-09, family route H3):** take the files from `@efeoncepro/axis-brand-assets` **0.4.28**, never redraw them. On Globe's dark canvas use the `negative` variants:
+  - `globe-logo-negative` — the **logotype alone** (no "by efeonce" endorsement any more): wherever Globe stands on its own.
+  - `globe-lockup-negative` — **Efeonce | globe** (Efeonce first + rule, the logotype in family gray `#6f89a2` with only the balloon in color): whenever Globe appears next to Efeonce. It is a file; never rebuild it from the two logos.
+  - `globe-isotype-negative` (balloon) — and `globe-isotype-small-negative` at **24 px or less** (favicon, chips, compact topbar marks); never shrink the regular isotype below 24 px.
+- On dark, the balloon is **raspberry `#ee4274`** (paper: `#bb1954`), never the Brand-line orange `#ff6500`; the stray orange speck of the old file was removed. `#ff6500` stays a UI accent of this canon (§0–§1), not a logo color. Rules: [ADR H3](../../architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md) · [graphic line §7.5](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
+- The local `assets/globe-logo.svg` / `assets/globe-isotipo.svg` (white wordmark + orange spark) are the **pre-H3 drawing**: replace them with the package files when a surface is touched.
+- ⚠️ Fills live inline — the SVGs render as drawn; don't rely on a `<style>` block (stripped when loaded as `<img>`).
 - Icons: **Tabler webfont** only (`ti ti-*`), 2px outline. No emoji, no mixed icon sets.
 
 ---

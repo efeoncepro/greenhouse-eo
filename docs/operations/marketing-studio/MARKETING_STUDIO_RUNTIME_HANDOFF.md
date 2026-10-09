@@ -12,6 +12,19 @@ avisos de verificaciones/mapeo separados conservados. Evidencia en la auditoría
 Migrador `1c0e7ae`: excepción única del orden owned-email/timeline validada bajo lock; dry-run staging y
 producción exit 0 sin migraciones pendientes. Timestamps intactos; worker conserva su imagen.
 
+## Discovery de tácticas y canales — 2026-10-07
+
+[Discovery completo](../../audits/marketing-studio/2026-10-07-initiatives-channels-discovery.md): nombre y definición de **táctica** acordados en la [precisión del ADR](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#precisión-aceptada-2026-10-07--tácticas-dentro-de-campaña). Intervención opcional por campaña, con contexto/enfoque y asociación explícita en activación; modalidades/canales independientes. Readback del discovery: API 1.9.0, catálogo v1 de 52 canales, 3 cuentas Metricool y 29 activaciones scheduled en 07/10–31/12. Sin cambios productivos ni reorganización de CMP-006. Próximo paso: diseño contractual y slices backend/UI; editorial SEO y migración histórica separados. Checks y límites en el dossier.
+
+## Copys de las activaciones y Seasonalities — 2026-10-07
+
+Readback 11:31 UTC: corregidas 25 asociaciones de copy omitidas en la carga; las 26 nuevas activaciones muestran texto literal coincidente con Metricool. Fuente OneDrive + import acotado (23 variantes) y commands Studio (2 variantes), sin alterar fechas, cuentas, piezas, campañas ni aprobaciones. UI comprobada en ACT-000007/26. Persisten gaps de catálogo orgánico, brief de CMP-006 y estados creativos; [dossier y checks](../../audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md#revisión-posterior-copys-y-completitud). [Comparación de Seasonalities](../../audits/marketing-studio/2026-10-07-seasonalities-model-comparison.md) a petición del operador; elección pendiente, sin reorganización.
+
+## Calendario Metricool — conciliación verificada 2026-10-07
+
+A las 09:32 UTC: 26 publicaciones existentes incorporadas mediante commands autorizados; calendario octubre–diciembre con 29 programadas (26 nuevas + 3 SKY), cero PENDING sin vincular y 31 evidencias históricas conservadas. CMP-001: 12 nuevas; CMP-002: 12 y slug registrado por CLI administrativa con autorización expresa; CMP-006: Día de Muertos, 2 borradores vinculados a evidencia scheduled, video ingresado por API y pendiente de revisión. Sin escrituras Metricool, cambios de permisos o deploy. Identidad, estado y límites en el [dossier y readback](../../audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md). Los snapshots siguientes conservan sus fechas históricas.
+
+
 ## TASK-1899 retirada (2026-10-04)
 
 Por decisión del operador se revirtió su implementación local en Greenhouse y Studio. No hubo commit, push,

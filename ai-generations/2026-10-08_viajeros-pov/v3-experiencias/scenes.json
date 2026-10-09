@@ -1,0 +1,44 @@
+[
+  {
+    "id": "01-austral-kayak",
+    "anchor": "austral",
+    "place": "Carretera Austral · lago General Carrera",
+    "moment": "Remar junto a tu compañera",
+    "gaze": "La abertura de la bahía hacia la que avanzan, a la derecha del encuadre"
+  },
+  {
+    "id": "02-austral-sendero",
+    "anchor": "austral",
+    "place": "Carretera Austral · Queulat",
+    "moment": "Seguir el sendero húmedo entre helechos",
+    "gaze": "El tablón siguiente, delante de sus botas"
+  },
+  {
+    "id": "03-cancun-ola",
+    "anchor": "cancun",
+    "place": "Cancún · Playa Delfines",
+    "moment": "Una ola interrumpe la caminata",
+    "gaze": "La cresta de la ola visible a su izquierda"
+  },
+  {
+    "id": "04-cancun-snorkel",
+    "anchor": "cancun",
+    "place": "Cancún · costa del Caribe",
+    "moment": "Salir del agua después de hacer snorkel",
+    "gaze": "El peldaño superior y la mano que agarra la baranda"
+  },
+  {
+    "id": "05-rio-volei",
+    "anchor": "rio",
+    "place": "Río de Janeiro · Ipanema",
+    "moment": "Entrar al juego en la arena",
+    "gaze": "La pelota visible sobre la red"
+  },
+  {
+    "id": "06-rio-descanso",
+    "anchor": "rio",
+    "place": "Río de Janeiro · Ipanema",
+    "moment": "Descansar juntos mirando el mar",
+    "gaze": "Una ola que está rompiendo frente a ambos"
+  }
+]

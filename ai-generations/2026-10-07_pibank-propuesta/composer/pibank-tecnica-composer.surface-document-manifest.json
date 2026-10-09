@@ -1,0 +1,2775 @@
+{
+  "schema": "axis.surface-document.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "resolved",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 3,
+  "pageCount": 9,
+  "outline": [
+    {
+      "page": 1,
+      "recipe": "cover-proposal",
+      "role": "cover",
+      "layout": "orbit",
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 2,
+      "recipe": "section-classic",
+      "role": "section",
+      "layout": null,
+      "line": "growth",
+      "progress": {
+        "sections": 3,
+        "current": 1
+      },
+      "status": "resolved"
+    },
+    {
+      "page": 3,
+      "recipe": "section-classic",
+      "role": "section",
+      "layout": null,
+      "line": "growth",
+      "progress": {
+        "sections": 3,
+        "current": 2
+      },
+      "status": "resolved"
+    },
+    {
+      "page": 4,
+      "recipe": "method-surround-cycle",
+      "role": "method",
+      "layout": null,
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 5,
+      "recipe": "section-classic",
+      "role": "section",
+      "layout": null,
+      "line": "growth",
+      "progress": {
+        "sections": 3,
+        "current": 3
+      },
+      "status": "resolved"
+    },
+    {
+      "page": 6,
+      "recipe": "content-measure-formulas",
+      "role": "content",
+      "layout": null,
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 7,
+      "recipe": "content-team",
+      "role": "content",
+      "layout": null,
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 8,
+      "recipe": "decision-risk",
+      "role": "decision",
+      "layout": null,
+      "line": "growth",
+      "progress": {
+        "sections": 3,
+        "current": 3
+      },
+      "status": "resolved"
+    },
+    {
+      "page": 9,
+      "recipe": "close-proposal",
+      "role": "close",
+      "layout": null,
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    }
+  ],
+  "pages": [
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "cover",
+      "recipe": {
+        "id": "cover-proposal",
+        "status": "approved",
+        "role": "cover"
+      },
+      "use": "proposal",
+      "layout": "orbit",
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "logo",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTopRange": [
+            0.1852,
+            0.2778
+          ]
+        },
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTopRange": [
+            0.3611,
+            0.4537
+          ]
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTopRange": [
+            0.4056,
+            0.4981
+          ]
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTopRange": [
+            0.463,
+            0.5556
+          ]
+        },
+        {
+          "band": "orbit",
+          "form": "giant",
+          "cxOfWidth": 0.8531,
+          "cyOfHeight": 0.5,
+          "rOfHeight": 0.7574,
+          "sphereRegion": "upper-center",
+          "croppedBy": "end",
+          "measuredOn": "reference"
+        },
+        {
+          "band": "clientLogo",
+          "boxPx": [
+            460,
+            200
+          ],
+          "cxOfWidth": 0.7292,
+          "cyOfHeight": 0.5,
+          "inside": "orbit"
+        },
+        {
+          "band": "urlBubble",
+          "side": "start",
+          "inset": 0.0729,
+          "bottomRangePx": [
+            51,
+            72
+          ]
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 22,
+          "lineHeight": 1.2,
+          "tracking": "0.24em",
+          "uppercase": true,
+          "color": "#e2e2e2"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": 1.2,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 124,
+          "lineHeight": 0.95,
+          "tracking": "-0.035em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 400,
+          "px": 28,
+          "lineHeight": 1.3,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        }
+      },
+      "dominance": {
+        "ratio": 3.1,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "logo",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "anchor": "top-start",
+        "widthPx": 500,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "placedBy": "reserves.urlBubble",
+          "assetId": "url-bubble-baked-dark"
+        },
+        "urlBubbleAlign": "column",
+        "assetId": "efeonce-logo-negative",
+        "alt": "Efeonce",
+        "minContrast": 4.5,
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "cover-full-voice",
+          "text": "La portada lleva la voz completa de la línea: eyebrow (Poppins 500, mayúsculas espaciadas) · pregunta con su anillo en el acento · respuesta de 1 a 3 palabras con su esfera, al menos 3 veces la pregunta · evidencia (Poppins 400, una palabra en negrita). Nada de títulos sueltos sin voz, tipo «Servicios 2026» (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-bound-to-use",
+          "text": "Las portadas y contraportadas de brochure y de propuesta no se cruzan: cada una admite sólo su uso, porque el cliente (sólo en la propuesta), la foto y el mensaje del cierre dependen del documento (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-photo-alternates",
+          "text": "Portada y contraportada alternan foto y sin foto: si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. Vale para el brochure y para la propuesta comercial (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-logo-min-screen",
+          "text": "El logo de portada y contraportada mide 500 px en 1920 (480 en la portada de propuesta al amanecer): así se lee a efeonceGraphicLine.logo.minScreenPx (96 px) o más en un teléfono de 390 px, que pide 473 px o más en 1920. Los 230 y 220 px de las recetas clásicas no llegan (operador, 2026-09-27)."
+        },
+        {
+          "id": "slogan-only-in-close",
+          "text": "El eslogan va sólo en el cierre, nunca en la portada: la recarga, repite la respuesta y la esquina inferior derecha es del sujeto o de la órbita (operador, 2026-09-27)."
+        },
+        {
+          "id": "proposal-cover-client-logo",
+          "text": "La portada de propuesta lleva un espacio fijo para el logo del cliente dentro de la órbita y la burbuja URL alineada a la columna. El nombre del cliente no se repite como título: vive en la evidencia («Preparada para [Cliente] · Confidencial») y en su logo. La portada de brochure no lleva cliente (operador, 2026-09-27)."
+        },
+        {
+          "id": "giant-orbit-cover-is-proposal",
+          "text": "La órbita gigante sin foto es el recurso de la portada de propuesta, no de la portada de brochure (se retiró como tal); en el brochure va sólo como contraportada sin foto (operador, 2026-09-27)."
+        },
+        {
+          "id": "text-clears-orbit-and-subject",
+          "text": "Ningún texto cruza la órbita ni al sujeto de la foto: la columna vive en el 45 % izquierdo oscuro. Si una pregunta o la evidencia cruza un haz, una mano o la órbita, se acorta la pregunta («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?») o se parte la evidencia en 2 o 3 líneas (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-selection-text-or-client-logo",
+          "text": "En portada y contraportada la selección toma sólo la columna de texto o el logo del cliente, nunca a la persona de la foto; en 16:9, un solo cursor (propio o de un colaborador). Las fotos de cine van sin interfaz por defecto (operador, 2026-09-27)."
+        }
+      ],
+      "references": [
+        {
+          "id": "cover-proposal-orbit",
+          "title": "Propuesta · portada sin foto: la órbita gigante sostiene el logo del cliente (plantilla)",
+          "status": "approved",
+          "image": "/references/surfaces/deck/cover-proposal-orbit.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaPortadaCliente1.dc.html"
+        },
+        {
+          "id": "cover-proposal-orbit-sky",
+          "title": "Propuesta · portada sin foto: la órbita gigante con el logo de SKY (ejemplo)",
+          "status": "approved",
+          "image": "/references/surfaces/deck/cover-proposal-orbit-sky.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaPortadaCliente2.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "En la búsqueda"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "client-logo",
+              "targetKind": "object",
+              "variant": "eight-handles",
+              "overlay": "none",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "client-logo",
+                  "anchor": "top-end",
+                  "label": "Pibank",
+                  "participantKind": "role"
+                }
+              ]
+            },
+            "collaboratorScale": null,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "overlay": "none"
+          }
+        ],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": "Propuesta técnica · Octubre 2026",
+        "question": "¿Dónde nace una cuenta?",
+        "answer": [
+          "En la",
+          "búsqueda"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "Preparada para **Pibank** · Confidencial",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "section",
+      "recipe": {
+        "id": "section-classic",
+        "status": "approved",
+        "role": "section"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "growth",
+      "theme": "light",
+      "palette": {
+        "background": "#f7f8f6",
+        "accent": "#0e8c82",
+        "ink": "#023c70",
+        "soft": "#6b6b6b",
+        "text": "#00284D",
+        "rule": "#DCE2E8"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "orbit",
+          "region": "center-end",
+          "circle": {
+            "cxOfWidth": 0.7396,
+            "cyOfHeight": 0.5,
+            "rOfHeight": 0.2778
+          },
+          "source": "pieces.deck.section"
+        }
+      ],
+      "type": {
+        "number": {
+          "family": null,
+          "weight": null,
+          "px": 190,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        }
+      },
+      "dominance": null,
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-light"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        }
+      ],
+      "references": [
+        {
+          "id": "section-classic",
+          "title": "Deck · sección clásica AXIS, sin foto",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-classic.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionClasica.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "growth",
+                "surface": "light",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Casi nunca"
+                },
+                {
+                  "kind": "progress",
+                  "id": "progress",
+                  "region": "center-end",
+                  "sections": 3,
+                  "current": 1
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": null,
+        "question": "¿Nos encuentran hoy al buscar?",
+        "answer": [
+          "Casi nunca"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": null,
+        "proof": null,
+        "measure": null,
+        "progress": {
+          "sections": 3,
+          "current": 1
+        },
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "section",
+      "recipe": {
+        "id": "section-classic",
+        "status": "approved",
+        "role": "section"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "growth",
+      "theme": "light",
+      "palette": {
+        "background": "#f7f8f6",
+        "accent": "#0e8c82",
+        "ink": "#023c70",
+        "soft": "#6b6b6b",
+        "text": "#00284D",
+        "rule": "#DCE2E8"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "orbit",
+          "region": "center-end",
+          "circle": {
+            "cxOfWidth": 0.7396,
+            "cyOfHeight": 0.5,
+            "rOfHeight": 0.2778
+          },
+          "source": "pieces.deck.section"
+        }
+      ],
+      "type": {
+        "number": {
+          "family": null,
+          "weight": null,
+          "px": 190,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        }
+      },
+      "dominance": null,
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-light"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        }
+      ],
+      "references": [
+        {
+          "id": "section-classic",
+          "title": "Deck · sección clásica AXIS, sin foto",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-classic.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionClasica.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "growth",
+                "surface": "light",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "El recorrido"
+                },
+                {
+                  "kind": "progress",
+                  "id": "progress",
+                  "region": "center-end",
+                  "sections": 3,
+                  "current": 2
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": null,
+        "question": "¿Qué cambia en pibank.pe?",
+        "answer": [
+          "El recorrido"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": null,
+        "proof": null,
+        "measure": null,
+        "progress": {
+          "sections": 3,
+          "current": 2
+        },
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "method",
+      "recipe": {
+        "id": "method-surround-cycle",
+        "status": "approved",
+        "role": "method"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1019
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1815
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTop": 0.2593
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTop": 0.5926
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": 1.2,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 470
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 150,
+          "lineHeight": 0.9,
+          "tracking": "-0.05em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 26,
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 380
+        }
+      },
+      "dominance": {
+        "ratio": 3.75,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "one-orbit-per-slide",
+          "text": "Una sola órbita por lámina."
+        },
+        {
+          "id": "icons-at-rest",
+          "text": "Los íconos de los pasos van en reposo: la esfera de la pieza es la de la respuesta."
+        }
+      ],
+      "references": [
+        {
+          "id": "method-surround-cycle",
+          "title": "Deck · cómo se sostiene: el ciclo Surround Discovery sobre la órbita",
+          "status": "approved",
+          "image": "/references/surfaces/deck/method-surround-cycle.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckCicloSurround.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "En ciclo"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": "Cómo trabajamos cada mes",
+        "question": "¿Cómo se sostiene?",
+        "answer": [
+          "En ciclo"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "El programa no termina en una implementación: cada mes aprende del anterior y sube a Pibank un **nivel**.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "section",
+      "recipe": {
+        "id": "section-classic",
+        "status": "approved",
+        "role": "section"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "growth",
+      "theme": "light",
+      "palette": {
+        "background": "#f7f8f6",
+        "accent": "#0e8c82",
+        "ink": "#023c70",
+        "soft": "#6b6b6b",
+        "text": "#00284D",
+        "rule": "#DCE2E8"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "orbit",
+          "region": "center-end",
+          "circle": {
+            "cxOfWidth": 0.7396,
+            "cyOfHeight": 0.5,
+            "rOfHeight": 0.2778
+          },
+          "source": "pieces.deck.section"
+        }
+      ],
+      "type": {
+        "number": {
+          "family": null,
+          "weight": null,
+          "px": 190,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        }
+      },
+      "dominance": null,
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-light"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        }
+      ],
+      "references": [
+        {
+          "id": "section-classic",
+          "title": "Deck · sección clásica AXIS, sin foto",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-classic.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionClasica.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "growth",
+                "surface": "light",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Cada mes"
+                },
+                {
+                  "kind": "progress",
+                  "id": "progress",
+                  "region": "center-end",
+                  "sections": 3,
+                  "current": 3
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": null,
+        "question": "¿Cuándo se mide el aporte?",
+        "answer": [
+          "Cada mes"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": null,
+        "proof": null,
+        "measure": null,
+        "progress": {
+          "sections": 3,
+          "current": 3
+        },
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "content",
+      "recipe": {
+        "id": "content-measure-formulas",
+        "status": "approved",
+        "role": "content"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1019
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1815
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTop": 0.2593
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTop": 0.5926
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": 1.2,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 500
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 150,
+          "lineHeight": 0.9,
+          "tracking": "-0.05em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 26,
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 420
+        }
+      },
+      "dominance": {
+        "ratio": 3.75,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "metrics-formula-source-owner",
+          "text": "Cada métrica lleva su fórmula, su fuente y su dueño (un rol), sin cifras de promesa: la línea base se mide en el diagnóstico."
+        },
+        {
+          "id": "icons-at-rest",
+          "text": "Los íconos de los pasos van en reposo: la esfera de la pieza es la de la respuesta."
+        },
+        {
+          "id": "one-orbit-per-slide",
+          "text": "Una sola órbita por lámina."
+        }
+      ],
+      "references": [
+        {
+          "id": "content-measure-formulas",
+          "title": "Deck · qué medimos: cinco métricas con fórmula, fuente y dueño, «Lo medimos.»",
+          "status": "approved",
+          "image": "/references/surfaces/deck/content-measure-formulas.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSalesforceQueMedimos.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Lo medimos"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": "Medición y atribución",
+        "question": "¿Cómo sabremos si funciona?",
+        "answer": [
+          "Lo",
+          "medimos"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "Cada métrica con su fórmula, su fuente y un **dueño**. Una cuenta se cuenta una vez, aunque la hayan tocado varios canales.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": "Sin cifras de promesa: la línea base se fija en el primer mes con datos del banco",
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "content",
+      "recipe": {
+        "id": "content-team",
+        "status": "approved",
+        "role": "content"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1019
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1815
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTop": 0.2593
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTop": 0.5926
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": 1.2,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 470
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 140,
+          "lineHeight": 0.9,
+          "tracking": "-0.05em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 26,
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": 380
+        },
+        "center": {
+          "family": null,
+          "weight": null,
+          "px": 46,
+          "lineHeight": null,
+          "tracking": "-0.03em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "centerNote": {
+          "family": null,
+          "weight": 300,
+          "px": 19,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        }
+      },
+      "dominance": {
+        "ratio": 3.5,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "team-real-people-only",
+          "text": "Las fichas del equipo son del squad real (fotos de las personas que trabajan la cuenta); nunca una cara generada."
+        },
+        {
+          "id": "one-orbit-per-slide",
+          "text": "Una sola órbita por lámina."
+        }
+      ],
+      "references": [
+        {
+          "id": "content-team",
+          "title": "Deck · el equipo: el squad real en fichas de vidrio sobre la órbita",
+          "status": "approved",
+          "image": "/references/surfaces/deck/content-team.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckEquipo.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Personas reales"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "object",
+              "targetKind": "object",
+              "variant": "eight-handles",
+              "padding": "standard",
+              "overlay": "none",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "object",
+                  "anchor": "top-end",
+                  "label": "Pibank",
+                  "participantKind": "role"
+                }
+              ]
+            },
+            "collaboratorScale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none"
+          }
+        ],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": "Tu equipo",
+        "question": "¿Quién trabaja en la cuenta?",
+        "answer": [
+          "Personas",
+          "reales"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "Un equipo que orbita Pibank y **un** solo interlocutor: tu Responsable de Cuenta.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "decision",
+      "recipe": {
+        "id": "decision-risk",
+        "status": "approved",
+        "role": "decision"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "growth",
+      "theme": "light",
+      "palette": {
+        "background": "#f7f8f6",
+        "accent": "#0e8c82",
+        "ink": "#023c70",
+        "soft": "#6b6b6b",
+        "text": "#00284D",
+        "rule": "#DCE2E8"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1019
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1852
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTop": 0.25
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTop": 0.5185
+        },
+        {
+          "band": "headers",
+          "side": "start",
+          "fromTop": 0.1852
+        },
+        {
+          "band": "indicator",
+          "region": "upper-end",
+          "circle": {
+            "cxOfWidth": 0.9167,
+            "cyOfHeight": 0.1204,
+            "rOfHeight": 0.037
+          },
+          "source": "pieces.deck.content"
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#023c70"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": 1.2,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 132,
+          "lineHeight": 0.95,
+          "tracking": "-0.045em",
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 26,
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70",
+          "maxWidthPx": 520
+        },
+        "header": {
+          "family": null,
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#023c70"
+        },
+        "risk": {
+          "family": null,
+          "weight": 300,
+          "px": 26,
+          "lineHeight": 1.3,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "name": {
+          "family": null,
+          "weight": null,
+          "px": 44,
+          "lineHeight": null,
+          "tracking": "-0.025em",
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "how": {
+          "family": null,
+          "weight": 300,
+          "px": 22,
+          "lineHeight": 1.4,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        }
+      },
+      "dominance": {
+        "ratio": 3.3,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-light"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "commitments-not-metrics",
+          "text": "Los plazos de un plan (el total de días, los rangos de cada tramo) son compromisos de la propuesta, no cifras medidas: no llevan fuente. Un resultado medido sí la lleva."
+        }
+      ],
+      "references": [
+        {
+          "id": "decision-risk",
+          "title": "Deck · por qué es seguro: cada riesgo con su cobertura",
+          "status": "approved",
+          "image": "/references/surfaces/deck/decision-risk.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeguro.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "growth",
+                "surface": "light",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Lo sabrás pronto"
+                },
+                {
+                  "kind": "progress",
+                  "id": "progress",
+                  "targetId": "indicator",
+                  "sections": 3,
+                  "current": 3
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "object",
+              "targetKind": "object",
+              "variant": "eight-handles",
+              "padding": "standard",
+              "overlay": "none",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "object",
+                  "anchor": "top-start",
+                  "label": "Pibank",
+                  "participantKind": "department"
+                }
+              ]
+            },
+            "collaboratorScale": 1.15,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none"
+          }
+        ],
+        "icons": [],
+        "photo": null
+      },
+      "content": {
+        "eyebrow": "Riesgo controlado",
+        "question": "¿Y si no funciona?",
+        "answer": [
+          "Lo sabrás",
+          "pronto"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+        "proof": null,
+        "measure": null,
+        "progress": {
+          "sections": 3,
+          "current": 3
+        },
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "close",
+      "recipe": {
+        "id": "close-proposal",
+        "status": "approved",
+        "role": "close"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "logo",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTop": 0.213
+        },
+        {
+          "band": "slogan",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTop": 0.3889
+        },
+        {
+          "band": "contact",
+          "side": "start",
+          "inset": 0.0729,
+          "fromTop": 0.5556
+        }
+      ],
+      "type": {
+        "slogan": {
+          "family": "Poppins",
+          "weight": 800,
+          "px": 72,
+          "lineHeight": 1.15,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#e2e2e2"
+        }
+      },
+      "dominance": null,
+      "steps": null,
+      "signature": {
+        "mode": "logo",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "anchor": "top-start",
+        "widthPx": 500,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "urlBubbleAlign": "social-row",
+        "assetId": "efeonce-logo-negative",
+        "alt": "Efeonce",
+        "minContrast": 4.5,
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "close-message-by-use",
+          "text": "El mensaje de la contraportada depende del documento: en la propuesta comercial es el eslogan «Empower your Growth», grande y protagonista en sus pesos oficiales (la propuesta llega después de conversar: «¿Conversamos?» no aplica); en el brochure es «¿Conversamos? Cuando quieras.» en la voz pregunta–respuesta, con el eslogan como firma debajo (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-bound-to-use",
+          "text": "Las portadas y contraportadas de brochure y de propuesta no se cruzan: cada una admite sólo su uso, porque el cliente (sólo en la propuesta), la foto y el mensaje del cierre dependen del documento (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-photo-alternates",
+          "text": "Portada y contraportada alternan foto y sin foto: si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. Vale para el brochure y para la propuesta comercial (operador, 2026-09-27)."
+        },
+        {
+          "id": "frame-logo-min-screen",
+          "text": "El logo de portada y contraportada mide 500 px en 1920 (480 en la portada de propuesta al amanecer): así se lee a efeonceGraphicLine.logo.minScreenPx (96 px) o más en un teléfono de 390 px, que pide 473 px o más en 1920. Los 230 y 220 px de las recetas clásicas no llegan (operador, 2026-09-27)."
+        },
+        {
+          "id": "photo-reserves-start-45",
+          "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+        },
+        {
+          "id": "text-clears-orbit-and-subject",
+          "text": "Ningún texto cruza la órbita ni al sujeto de la foto: la columna vive en el 45 % izquierdo oscuro. Si una pregunta o la evidencia cruza un haz, una mano o la órbita, se acorta la pregunta («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?») o se parte la evidencia en 2 o 3 líneas (operador, 2026-09-27)."
+        },
+        {
+          "id": "partner-claim-readback",
+          "text": "La insignia de partner es un claim: va sólo con la referencia de su autorización o de su readback vigente en el registro de partnerships del consumidor (la «Salesforce Partner» está autorizada por Salesforce desde el 2026-09-29 y el deck Salesforce la lleva por defecto). Sin esa referencia, la portada dice «Operamos sobre» con el logo de la plataforma y la contraportada va sin insignia. Nunca es un elemento fijo de la receta."
+        }
+      ],
+      "references": [
+        {
+          "id": "close-proposal-horizon",
+          "title": "Propuesta · contraportada: «Empower your Growth» hacia la órbita",
+          "status": "approved",
+          "image": "/references/surfaces/deck/close-proposal-horizon.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaContraHorizonte.dc.html"
+        },
+        {
+          "id": "close-proposal-dawn",
+          "title": "Propuesta · contraportada: «Empower your Growth» al amanecer",
+          "status": "approved",
+          "image": "/references/surfaces/deck/close-proposal-dawn.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaContraAmanecer.dc.html"
+        },
+        {
+          "id": "close-proposal-horizon-revenue-salesforce",
+          "title": "Propuesta · contraportada Salesforce: «Empower your Revenue» en bloque bajo el logo, con la insignia «Salesforce Partner» autorizada",
+          "status": "approved",
+          "image": "/references/surfaces/deck/close-proposal-horizon-revenue-salesforce.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSalesforceContraportada.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": {
+          "placement": "bleed",
+          "register": "cine",
+          "lensMm": 85,
+          "cameraDistanceM": 2,
+          "reserve": {
+            "side": "start",
+            "share": 0.45,
+            "form": "calm-deep-dark"
+          },
+          "bed": "dark-bottom",
+          "accentLight": "line",
+          "emblem": "compose-from-axis-brand-assets",
+          "lookAtLens": false,
+          "subjectPlacement": {
+            "side": "end",
+            "facing": "away",
+            "toward": "orbit"
+          },
+          "subject": "nexa",
+          "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+          "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte",
+          "native": null,
+          "focus": null,
+          "cine": {
+            "lensMm": 85,
+            "cameraDistanceM": 2
+          }
+        }
+      },
+      "content": {
+        "eyebrow": null,
+        "question": null,
+        "answer": [],
+        "answerSphere": null,
+        "body": null,
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": {
+          "text": "Empower your Engine",
+          "runs": [
+            {
+              "text": "Empower",
+              "weight": 800,
+              "italic": true,
+              "color": "#e2e2e2"
+            },
+            {
+              "text": "your",
+              "weight": 800,
+              "italic": false,
+              "color": "#e2e2e2"
+            },
+            {
+              "text": "Engine",
+              "weight": 900,
+              "italic": true,
+              "color": "#0375db"
+            }
+          ]
+        }
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    }
+  ],
+  "issues": []
+}

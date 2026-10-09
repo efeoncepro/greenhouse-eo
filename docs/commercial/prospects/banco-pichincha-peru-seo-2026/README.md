@@ -2,6 +2,8 @@
 
 **Cotización detallada USD/PEN:** [19 páginas por moneda, fuentes y entrega](reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md); ambas versiones PDF/HTML están junto al deck en la raíz comercial Banco Pichincha. Copias y snapshots preservados; impuestos/tasa contractual pendientes y sin envío o actualización CRM.
 
+**Aporte actualizado 08-10:** [estimación con supuestos autorizados y ajustes para Claude](reconstruccion-2027/estimacion-seo-aeo-2026-10-08/ESTIMACION-Y-AJUSTES-PARA-CLAUDE.md). Incluye captación directa, mejora de conversión y condiciones para 15.200 cuentas con fondos. Sustituye cifras parciales como resultado total; PDF a cargo de Claude.
+
 **Operación vigente:** [SEO/AEO evolutivo e incremental](reconstruccion-2027/oferta-hibrida/MODELO-EVOLUTIVO.md): ciclo mensual de expansión, mejora y medición; sin cuota fija de FAQ. Fee y activaciones se conservan.
 
 **Capacidad editorial vigente:** hasta cinco artículos al mes incluidos en base US$4.500; máximo 60 al año, sin suplemento editorial. Las 24 piezas del plan anterior son backlog inicial. Ruta gradual US$79.200/año; integral US$89.200. Mayor capacidad no modifica automáticamente la demanda ni la captación proyectada. [Oferta y calendario actual](reconstruccion-2027/oferta-hibrida/README.md).
@@ -38,7 +40,7 @@ Doce meses, PR, hub/comunidad y eficiencia SEM son decisiones posteriores de Jul
 
 ## Artefactos y versiones
 
-[Manifest vigente](reconstruccion-2027/delivery-manifest.json) identifica PDFs, preparación y QA. Propuesta/resumen v0.7 de seis/dos páginas exportados y revisados en sus ocho páginas finales; el nuevo deck requiere su propio QA. Modelo v0.6 permanece íntegro y no es forecast del programa integrado. [Estado integrado](reconstruccion-2027/README.md) y [verificación](../../../audits/commercial/2026-10-07-pibank-integracion-crecimiento-v0.7.md).
+[Manifest vigente](reconstruccion-2027/delivery-manifest.json) identifica PDFs, preparación y QA. Técnica/resumen/oferta híbridos conciliados: 5/2/5 páginas; las doce páginas finales revisadas. La gradual gobierna las tres piezas; el nuevo deck requiere su propio QA. Modelo v0.6 permanece íntegro y no es forecast del programa integrado. [Estado integrado](reconstruccion-2027/README.md) y [conciliación actual](reconstruccion-2027/CONCILIACION-COMERCIAL-Y-APORTE.md).
 
 Fuentes anteriores v0.6.1 archivadas en `reconstruccion-2027/historico-documental-v0.6.1/`; PDFs externos en `02-Uso-interno/reconstruccion-2027/historico-v0.6.1/`. Deck14 v0.6 y pr-deck-render son antecedentes; nuevo deck a cargo de Claude. [Modelo inverso anterior](reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx), [meta hacia atrás](reconstruccion-2027/meta-hacia-atras/ANALISIS.md), [research](research/pibank-gap-closure-2026-10-06/README.md).
 

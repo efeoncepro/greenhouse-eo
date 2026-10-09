@@ -54,6 +54,13 @@ La secuencia se adopta del brochure principal revisado (2026-07-26), pero ese ma
 auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md) registra
 qué se absorbió y qué claims, precios, nombres o capacidades no deben reutilizarse sin verificación.
 
+## Capacidad humana especializada
+
+[Capacidad especializada de CRM y RevOps](../revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) complementa las familias
+existentes con roles integrados al cliente o delivery gestionado. Dirección regional aceptada el 2026-10-09;
+oferta en validación. Talent Assurance está aprobado como estándar; claims, capacidad, economics y contratos
+se verifican por caso. Las modalidades no crean una séptima familia ni capacidad ilimitada.
+
 ## Familias canónicas
 
 | Familia | Clave estable | Resultado principal |

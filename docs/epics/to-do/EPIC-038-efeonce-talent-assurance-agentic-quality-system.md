@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Baseline verificado; ADR/claim policy Proposed. TASK-1604 inició un slice de autoría y datos para SEO/Arte, aún sin template runtime, policy, assessments ni Quality Gate.`
+- Status real: `2026-10-09: ADR, arquitectura objetivo y guardrails aceptados por el operador; claim policy y sistema integrado pendientes. TASK-1604 documenta piloto SEO manual activo desde 2026-09-13, con calibración pendiente; no acredita claims Talent Assurance ni Quality Gate obligatorio.`
 - Rank: `TBD`
 - Domain: `cross-domain` (workforce + hiring + people + client experience + delivery + finance + agents)
 - Owner: `unassigned`
@@ -63,7 +63,14 @@ autoriza por defecto.
 - [Nexa Core Agentic Platform Decision V1](../../architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md)
 - [Talent Assurance Economic Guardrails V1](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
 
-## Baseline y orden de ejecución verificados 2026-08-15
+## Avance documental 2026-10-09
+
+- Aprobación explícita de Talent Assurance registrada en el [ADR](../../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md#aceptación-2026-10-09--estándar-transversal-y-alcance), arquitectura objetivo y guardrails; resuelve aceptación de la dirección, sin cierre de `TASK-1602`.
+- Primera aplicación comercial documentada: [capacidad regional CRM/RevOps](../../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), sin nuevos contratos/pilotos ni rollout por esta actualización.
+- Según el estado registrado de `TASK-1604` el 2026-09-13, existen nueve preguntas SEO activas y template/policy `enabled/manual` para `EO-OPN-0674`, con canary documentado. La calibración independiente y el Quality Gate siguen pendientes. No se verificó live en esta sesión.
+- Siguiente paso Talent/Workforce/Delivery/CX/Finance/Privacy: cerrar catálogo y policy de `TASK-1602`. La aceptación comercial no reemplaza esos entregables ni amplía permisos de agentes.
+
+## Baseline y orden de ejecución verificados 2026-08-15 (histórico)
 
 La verificación inicial no implementó tasks hijas. Desde el 2026-09-09, `TASK-1604` mantiene un slice
 `in-progress` de autoría y datos para SEO/Arte; no activa el runtime Talent Assurance, su policy ni el Quality
@@ -75,8 +82,8 @@ agente, API compuesta ni cockpit.
 
 La ejecución debe seguir este orden:
 
-1. Aceptar o rechazar/revisar explícitamente `TASK-1602` con Talent, Workforce, Delivery, Client Experience,
-   Finance/Commercial and Legal/Privacy owners.
+1. Completar catálogo, policy y revisión de owners de `TASK-1602` con Talent, Workforce, Delivery, Client
+   Experience, Finance/Commercial y Legal/Privacy; la decisión fue aceptada el 2026-10-09.
 2. Completar la foundation Hiring: `TASK-1719` posee policy/asignación opening→assessment; `TASK-1603` la consume
    para completeness y override humano, y después `TASK-1604` entrega packs de roles críticos.
 3. En paralelo sólo tras el gate de policy, contratar inputs Finance/Commercial para `TASK-1607`; usar readers
@@ -95,7 +102,7 @@ No emite claims Talent Assurance ni reemplaza los gates de policy, outcome, acce
 
 ### Phase 0 — Decision and evidence baseline
 
-- Accept or revise the ADR.
+- ADR accepted 2026-10-09; complete claim policy and cross-domain review in TASK-1602.
 - Inventory existing profile, skills, portfolio, assessment, onboarding, performance, client feedback and economics sources.
 - Define V1 claim taxonomy, verifier ownership, evidence policy and privacy boundaries.
 
@@ -186,7 +193,7 @@ the dependencies recorded in each task:
 
 ## Exit Criteria
 
-- [ ] ADR accepted or explicitly rejected/recalibrated.
+- [x] ADR accepted — explicit operator approval 2026-10-09, rationale/scope in the [decision](../../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md#aceptación-2026-10-09--estándar-transversal-y-alcance); no runtime inferred.
 - [ ] V1 claim taxonomy and verification lifecycle approved.
 - [ ] Quality Gate is defined and enforced for at least one critical role.
 - [ ] 30/60/90 outcome and selection-failure taxonomy are operational.

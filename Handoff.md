@@ -1,13 +1,17 @@
 # Handoff
 
-[V3](data/pricing/README.md): local.
+[V3](data/pricing/README.md): hipótesis.
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+
+## 2026-10-09 — CRM y Talent Assurance
+
+[CRM](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md): aprobado; pendiente.
 
 ## 2026-10-08 — Continuidad activa
 
 **[QuePlan/WIN](docs/audits/commercial/2026-10-08-jorge-fiorella-intake.md):** Leads, sin envío.
 
-**Outreach manual registrado:** [Yanbal, Lotus y Olivos](docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md): tres envíos verificados, tres notas en seis contactos y tareas Notion con borradores. Seguimiento 13/10 10:00; 19/10 y 26/10 tentativos. Heartbeat existente activo, sin envío automático; skills espejo actualizadas.
+**Outreach manual:** [Yanbal/Lotus/Olivos](docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md): 3 envíos verificados; 3 notas/6 contactos y tareas Notion con borradores. Seguimiento 13/10 10:00; 19/10 y 26/10 tentativos. Heartbeat existente activo, sin envío automático; skills espejo actualizadas.
 
 **UTEM presentada:** [evidencia, precio y CRM](docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md): CLP4,8M netos /5,712M con IVA; Presentación de soluciones. Notion Enviada; siguiente paso evaluación/resultado. [Continuidad comercial previa](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
 
@@ -27,7 +31,7 @@ Rooms: EPIC-052; creativo/SEO-AEO, La órbita. [Stack](docs/architecture/rooms/E
 
 **Nano 2.1:** [Nexa](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md): V2 aprobable; canon pendiente. CLI `c36ce5ad0`, sin push.
 
-**Pibank:** [oferta híbrida](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md): ruta US$79.200; base US$4.500, 5 artículos/mes. AEO144/M2; PR M3/M8. PDF/Excel/Claude. Demanda intacta; precio propuesto. Corte09/10.
+**Pibank:** [paquete y pendientes](docs/audits/commercial/2026-10-07-pibank-conciliacion-paquete.md); sin envío.
 
 **Contractors:** [QA](docs/audits/payroll/README.md); rollout pendiente.
 
@@ -50,7 +54,9 @@ licitaciones públicas/privadas, prospección fría y paid media. [AGCID](docs/c
 **TASK-2001 (05/10):** Email/web API 1.9.0 local, QA/PG/build PASS; UI intacta. Sin push/deploy. [DTO para Claude y rollout](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
 
 
-**Studio, continuidad previa:** [cierre 04/10 y pendientes ICP/backfill/autoridad](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md). Estado posterior en el [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+[Studio: continuidad previa y estado posterior](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+
+**Studio (07/10):** [tácticas](docs/audits/marketing-studio/2026-10-07-initiatives-channels-discovery.md): nombre/definición acordados; intervención opcional por campaña. Contratos/UI pendientes; sin migración ni cambios productivos.
 
 **Marketing Studio (04/10):** [TASK-1899](docs/tasks/to-do/TASK-1899-marketing-studio-mcp-writes-approvals.md) **retirada por el operador** por fricción durante la construcción. Código y migraciones locales revertidos; sin rollout. No bloquea desarrollo API/CLI/UI. No reanudar automáticamente.
 

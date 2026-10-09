@@ -1,0 +1,2108 @@
+{
+  "schema": "axis.surface-document.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "resolved",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 5,
+  "pageCount": 4,
+  "outline": [
+    {
+      "page": 1,
+      "recipe": "section-split",
+      "role": "section",
+      "layout": null,
+      "line": "growth",
+      "progress": {
+        "sections": 5,
+        "current": 1
+      },
+      "status": "resolved"
+    },
+    {
+      "page": 2,
+      "recipe": "proposal-cinematic",
+      "role": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 3,
+      "recipe": "proposal-cinematic",
+      "role": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    },
+    {
+      "page": 4,
+      "recipe": "proposal-cinematic",
+      "role": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "progress": null,
+      "status": "resolved"
+    }
+  ],
+  "pages": [
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "section",
+      "recipe": {
+        "id": "section-split",
+        "status": "approved",
+        "role": "section"
+      },
+      "use": "proposal",
+      "layout": null,
+      "line": "growth",
+      "theme": "light",
+      "palette": {
+        "background": "#f7f8f6",
+        "accent": "#0e8c82",
+        "ink": "#023c70",
+        "soft": "#6b6b6b",
+        "text": "#00284D",
+        "rule": "#DCE2E8"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "number",
+          "side": "start",
+          "fromTop": 0.2407
+        },
+        {
+          "band": "sectionLabel",
+          "side": "start",
+          "fromTop": 0.4167
+        },
+        {
+          "band": "voice",
+          "side": "start",
+          "fromTop": 0.5556
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTop": 0.6204
+        },
+        {
+          "band": "indicator",
+          "region": "upper-start",
+          "circle": {
+            "cxOfWidth": 0.0938,
+            "cyOfHeight": 0.1574,
+            "rPx": 40
+          },
+          "source": "surfaces.recipe.progress"
+        }
+      ],
+      "type": {
+        "number": {
+          "family": "Bricolage Grotesque",
+          "weight": 300,
+          "px": 190,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "sectionLabel": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 24,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#023c70"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": 120,
+          "lineHeight": null,
+          "tracking": "-0.035em",
+          "uppercase": false,
+          "color": "#023c70"
+        }
+      },
+      "dominance": {
+        "ratio": 3,
+        "min": 3,
+        "ok": true
+      },
+      "steps": null,
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-light"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "split-indicator-rises-start",
+          "text": "Sección partida: el indicador nace abajo a la izquierda y sube por la IZQUIERDA en sentido horario, con la esfera arriba a la izquierda en la 2 de 5; nunca por la derecha, aunque el panel vaya a la derecha (corrección del operador, 2026-09-27)."
+        }
+      ],
+      "references": [
+        {
+          "id": "section-split",
+          "title": "Deck · sección partida: la esquina arriba y el indicador que sube por la izquierda",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-split.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionMedia72.dc.html"
+        },
+        {
+          "id": "section-split-corner-bottom",
+          "title": "Deck · sección partida con la esquina abajo: «¿Cuánto tarda tu campaña? En días.»",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-split-corner-bottom.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionMediaAbajo.dc.html"
+        },
+        {
+          "id": "section-split-panel-end",
+          "title": "Deck · sección partida con el panel a la derecha: «¿Qué responde la IA? Tu marca.»",
+          "status": "approved",
+          "image": "/references/surfaces/deck/section-split-panel-end.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckSeccionMediaDerecha.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "growth",
+                "surface": "light",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Al buscar"
+                },
+                {
+                  "kind": "progress",
+                  "id": "progress",
+                  "targetId": "indicator",
+                  "sections": 5,
+                  "current": 1
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [],
+        "icons": [],
+        "photo": {
+          "placement": "under-panel",
+          "fromOfWidth": 0.3438,
+          "register": "cine",
+          "subject": "object",
+          "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+          "alt": "Una caja de búsqueda y un composer de IA flotan en una nave oscura; sus haces de luz se unen en un solo punto sobre el piso",
+          "native": null,
+          "focus": null,
+          "cine": {
+            "lensMm": 85,
+            "cameraDistanceM": 2
+          },
+          "emblem": "compose-from-axis-brand-assets"
+        }
+      },
+      "content": {
+        "eyebrow": null,
+        "question": "¿Dónde decide quien ahorra?",
+        "answer": [
+          "Al buscar"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": null,
+        "proof": null,
+        "measure": null,
+        "progress": {
+          "sections": 5,
+          "current": 1
+        },
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "proposal",
+      "recipe": {
+        "id": "proposal-cinematic",
+        "status": "approved",
+        "role": "proposal"
+      },
+      "use": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "text",
+          "side": "start",
+          "share": 0.45,
+          "inset": 0.0729
+        },
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1111
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1722
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTopRange": [
+            0.2639,
+            0.2944
+          ]
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTopRange": [
+            0.463,
+            0.5185
+          ]
+        },
+        {
+          "band": "proof",
+          "side": "start",
+          "fromTop": 0.6852
+        },
+        {
+          "band": "note",
+          "side": "start",
+          "inset": 0.2396,
+          "fromTop": 0.9259
+        },
+        {
+          "band": "footer",
+          "side": "bottom",
+          "share": 0.0796
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": [
+            140,
+            176
+          ],
+          "lineHeight": 0.95,
+          "tracking": "-0.045em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": [
+            26,
+            27
+          ],
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": [
+            500,
+            640
+          ]
+        },
+        "proof": {
+          "family": "Poppins",
+          "weight": 600,
+          "px": 19,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "note": {
+          "family": null,
+          "weight": 400,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#e2e2e2"
+        }
+      },
+      "dominance": {
+        "ratio": 3.5,
+        "min": 3,
+        "ok": true
+      },
+      "steps": {
+        "layout": "columns-4",
+        "iconPx": 44,
+        "items": [
+          {
+            "index": 0,
+            "glyph": "busqueda",
+            "name": "Diagnóstico",
+            "desc": null,
+            "kicker": {
+              "text": "M1",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": {
+                "carriers": [
+                  "graphic-min-24px",
+                  "icon"
+                ],
+                "minPx": 24
+              }
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 1,
+            "glyph": "contenido",
+            "name": "Hub y artículos",
+            "desc": null,
+            "kicker": {
+              "text": "M1 a M12",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 2,
+            "glyph": "medicion",
+            "name": "Herramientas",
+            "desc": null,
+            "kicker": {
+              "text": "M2 a M5",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 3,
+            "glyph": "informe",
+            "name": "Informe",
+            "desc": null,
+            "kicker": {
+              "text": "Cada mes",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          }
+        ]
+      },
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "photo-reserves-start-45",
+          "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+        },
+        {
+          "id": "no-deck-indicator",
+          "text": "Sin indicador de deck: la lámina no lleva otra órbita."
+        },
+        {
+          "id": "icon-voice-by-line",
+          "text": "Voz del ícono por línea (icons.voiceByLine): Brand = Plastilina; Growth, Engine y Revenue = Trazo."
+        },
+        {
+          "id": "icons-at-rest",
+          "text": "Los íconos de los pasos van en reposo: la esfera de la pieza es la de la respuesta."
+        },
+        {
+          "id": "photo-light-spheres-not-voice",
+          "text": "Las esferas de color que viven en la foto (una por línea, en la lámina de líneas con Nexa) son luz de la escena, no la esfera de la voz: la respuesta cierra con una sola esfera (operador, 2026-09-27)."
+        }
+      ],
+      "references": [
+        {
+          "id": "proposal-cinematic-creative",
+          "title": "Propuesta · servicios creativos digitales: la directora dirige una órbita de pantallas",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-creative.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaCreativaDigital.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-web",
+          "title": "Propuesta · web con punch: una web holográfica para personas, buscadores y agentes",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-web.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaWebCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-aeo",
+          "title": "Propuesta · AEO con punch: entre miles de marcas, la IA ilumina una",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-aeo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaAEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-seo",
+          "title": "Propuesta · SEO con punch: el estratega frente al mapa de luz de su oficio",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-seo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaSEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-revops",
+          "title": "Propuesta · RevOps con punch: un moño de luz con agentes en el flujo",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-revops.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaRevOpsCine.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Quien ahorra"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "answer",
+              "targetKind": "text",
+              "overlay": "subtle",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "answer",
+                  "anchor": "bottom-end",
+                  "label": "Pibank",
+                  "participantKind": "department"
+                }
+              ]
+            },
+            "collaboratorScale": 1.2,
+            "targetKind": "text",
+            "overlay": "subtle"
+          }
+        ],
+        "icons": [
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "busqueda",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Diagnóstico"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "contenido",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Hub y artículos"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "medicion",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Herramientas"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "informe",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Informe"
+            }
+          }
+        ],
+        "photo": {
+          "placement": "bleed",
+          "register": "cine",
+          "lensMm": 85,
+          "cameraDistanceM": 2,
+          "lookAtLens": true,
+          "lever": "luz-motivada",
+          "atmosphere": "bruma",
+          "reserve": {
+            "side": "start",
+            "share": 0.45,
+            "form": "calm-deep-dark"
+          },
+          "emblem": "compose-from-axis-brand-assets",
+          "subject": "person",
+          "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+          "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz con constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita",
+          "native": null,
+          "focus": null,
+          "cine": {
+            "lensMm": 85,
+            "cameraDistanceM": 2
+          }
+        }
+      },
+      "content": {
+        "eyebrow": "Qué haremos · SEO y contenido",
+        "question": "¿Quién encuentra a Pibank?",
+        "answer": [
+          "Quien ahorra"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "SEO técnico en WordPress, contenido por decisión de ahorro y herramientas para comparar, para que quien busca dónde ahorrar llegue a Cuenta Soles.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": "No prometemos posiciones: medimos y reportamos lo que se mueve.",
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "proposal",
+      "recipe": {
+        "id": "proposal-cinematic",
+        "status": "approved",
+        "role": "proposal"
+      },
+      "use": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "text",
+          "side": "start",
+          "share": 0.45,
+          "inset": 0.0729
+        },
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1111
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1722
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTopRange": [
+            0.2639,
+            0.2944
+          ]
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTopRange": [
+            0.463,
+            0.5185
+          ]
+        },
+        {
+          "band": "proof",
+          "side": "start",
+          "fromTop": 0.6852
+        },
+        {
+          "band": "note",
+          "side": "start",
+          "inset": 0.2396,
+          "fromTop": 0.9259
+        },
+        {
+          "band": "footer",
+          "side": "bottom",
+          "share": 0.0796
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": [
+            140,
+            176
+          ],
+          "lineHeight": 0.95,
+          "tracking": "-0.045em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": [
+            26,
+            27
+          ],
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": [
+            500,
+            640
+          ]
+        },
+        "proof": {
+          "family": "Poppins",
+          "weight": 600,
+          "px": 19,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "note": {
+          "family": null,
+          "weight": 400,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#e2e2e2"
+        }
+      },
+      "dominance": {
+        "ratio": 3.5,
+        "min": 3,
+        "ok": true
+      },
+      "steps": {
+        "layout": "columns-4",
+        "iconPx": 44,
+        "items": [
+          {
+            "index": 0,
+            "glyph": "codigo",
+            "name": "Canonical y schema",
+            "desc": null,
+            "kicker": {
+              "text": "Plantillas",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": {
+                "carriers": [
+                  "graphic-min-24px",
+                  "icon"
+                ],
+                "minPx": 24
+              }
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 1,
+            "glyph": "web",
+            "name": "Core Web Vitals",
+            "desc": null,
+            "kicker": {
+              "text": "Velocidad",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 2,
+            "glyph": "nube",
+            "name": "WordPress y Yoast",
+            "desc": null,
+            "kicker": {
+              "text": "CMS",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 3,
+            "glyph": "checklist",
+            "name": "QA y continuidad",
+            "desc": null,
+            "kicker": {
+              "text": "Cada cambio",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          }
+        ]
+      },
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "photo-reserves-start-45",
+          "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+        },
+        {
+          "id": "no-deck-indicator",
+          "text": "Sin indicador de deck: la lámina no lleva otra órbita."
+        },
+        {
+          "id": "icon-voice-by-line",
+          "text": "Voz del ícono por línea (icons.voiceByLine): Brand = Plastilina; Growth, Engine y Revenue = Trazo."
+        },
+        {
+          "id": "icons-at-rest",
+          "text": "Los íconos de los pasos van en reposo: la esfera de la pieza es la de la respuesta."
+        },
+        {
+          "id": "photo-light-spheres-not-voice",
+          "text": "Las esferas de color que viven en la foto (una por línea, en la lámina de líneas con Nexa) son luz de la escena, no la esfera de la voz: la respuesta cierra con una sola esfera (operador, 2026-09-27)."
+        }
+      ],
+      "references": [
+        {
+          "id": "proposal-cinematic-creative",
+          "title": "Propuesta · servicios creativos digitales: la directora dirige una órbita de pantallas",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-creative.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaCreativaDigital.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-web",
+          "title": "Propuesta · web con punch: una web holográfica para personas, buscadores y agentes",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-web.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaWebCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-aeo",
+          "title": "Propuesta · AEO con punch: entre miles de marcas, la IA ilumina una",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-aeo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaAEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-seo",
+          "title": "Propuesta · SEO con punch: el estratega frente al mapa de luz de su oficio",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-seo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaSEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-revops",
+          "title": "Propuesta · RevOps con punch: un moño de luz con agentes en el flujo",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-revops.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaRevOpsCine.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Lo hacemos"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "answer",
+              "targetKind": "text",
+              "overlay": "subtle",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "answer",
+                  "anchor": "top-end",
+                  "label": "Pibank",
+                  "participantKind": "department"
+                }
+              ]
+            },
+            "collaboratorScale": 1.2,
+            "targetKind": "text",
+            "overlay": "subtle"
+          }
+        ],
+        "icons": [
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "codigo",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Canonical y schema"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "web",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Core Web Vitals"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "nube",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "WordPress y Yoast"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "checklist",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "QA y continuidad"
+            }
+          }
+        ],
+        "photo": {
+          "placement": "bleed",
+          "register": "cine",
+          "lensMm": 85,
+          "cameraDistanceM": 2,
+          "lookAtLens": true,
+          "lever": "luz-motivada",
+          "atmosphere": "bruma",
+          "reserve": {
+            "side": "start",
+            "share": 0.45,
+            "form": "calm-deep-dark"
+          },
+          "emblem": "compose-from-axis-brand-assets",
+          "subject": "person",
+          "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png",
+          "alt": "Una ingeniera front-end de Efeonce, con la chaqueta del equipo, mira a cámara mientras arrastra un bloque de código dentro de una landing holográfica de luz azul",
+          "native": null,
+          "focus": null,
+          "cine": {
+            "lensMm": 85,
+            "cameraDistanceM": 2
+          }
+        }
+      },
+      "content": {
+        "eyebrow": "Qué haremos · WordPress",
+        "question": "¿Y si hay que tocar código?",
+        "answer": [
+          "Lo hacemos"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "Hasta 8 horas al mes de ajustes en el WordPress de pibank.pe. Si depende de TI o del proveedor, entregamos la especificación y lo verificamos.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": null,
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    },
+    {
+      "schema": "axis.surface-composition.v1",
+      "contract": {
+        "id": "efeonce.surface-composition",
+        "version": "0.1.2",
+        "lifecycle": "candidate"
+      },
+      "status": "resolved",
+      "surface": "deck",
+      "format": "16x9",
+      "role": "proposal",
+      "recipe": {
+        "id": "proposal-cinematic",
+        "status": "approved",
+        "role": "proposal"
+      },
+      "use": "proposal",
+      "layout": "service",
+      "line": "engine",
+      "theme": "dark",
+      "palette": {
+        "background": "#001a33",
+        "accent": "#0375db",
+        "ink": "#ffffff",
+        "soft": "#e2e2e2",
+        "text": "#E6EDF3",
+        "rule": "#1D3A57"
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "unit": "px",
+        "format": "16x9"
+      },
+      "safeArea": {
+        "marginOfWidth": 0.07291666666666667,
+        "marginPx": 140
+      },
+      "reserves": [
+        {
+          "band": "text",
+          "side": "start",
+          "share": 0.45,
+          "inset": 0.0729
+        },
+        {
+          "band": "eyebrow",
+          "side": "start",
+          "fromTop": 0.1111
+        },
+        {
+          "band": "question",
+          "side": "start",
+          "fromTop": 0.1722
+        },
+        {
+          "band": "answer",
+          "side": "start",
+          "fromTopRange": [
+            0.2639,
+            0.2944
+          ]
+        },
+        {
+          "band": "body",
+          "side": "start",
+          "fromTopRange": [
+            0.463,
+            0.5185
+          ]
+        },
+        {
+          "band": "proof",
+          "side": "start",
+          "fromTop": 0.6852
+        },
+        {
+          "band": "note",
+          "side": "start",
+          "inset": 0.2396,
+          "fromTop": 0.9259
+        },
+        {
+          "band": "footer",
+          "side": "bottom",
+          "share": 0.0796
+        }
+      ],
+      "type": {
+        "eyebrow": {
+          "family": "Poppins",
+          "weight": 500,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": "0.14em",
+          "uppercase": true,
+          "color": "#ffffff"
+        },
+        "question": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": 40,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "answer": {
+          "family": "Bricolage Grotesque",
+          "weight": 760,
+          "px": [
+            140,
+            176
+          ],
+          "lineHeight": 0.95,
+          "tracking": "-0.045em",
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "body": {
+          "family": "Poppins",
+          "weight": 300,
+          "px": [
+            26,
+            27
+          ],
+          "lineHeight": 1.45,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff",
+          "maxWidthPx": [
+            500,
+            640
+          ]
+        },
+        "proof": {
+          "family": "Poppins",
+          "weight": 600,
+          "px": 19,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#ffffff"
+        },
+        "note": {
+          "family": null,
+          "weight": 400,
+          "px": 16,
+          "lineHeight": null,
+          "tracking": null,
+          "uppercase": false,
+          "color": "#e2e2e2"
+        }
+      },
+      "dominance": {
+        "ratio": 3.5,
+        "min": 3,
+        "ok": true
+      },
+      "steps": {
+        "layout": "columns-4",
+        "iconPx": 44,
+        "items": [
+          {
+            "index": 0,
+            "glyph": "busqueda",
+            "name": "Línea base",
+            "desc": null,
+            "kicker": {
+              "text": "M1",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": {
+                "carriers": [
+                  "graphic-min-24px",
+                  "icon"
+                ],
+                "minPx": 24
+              }
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 1,
+            "glyph": "medicion",
+            "name": "144 al mes",
+            "desc": null,
+            "kicker": {
+              "text": "Desde M2",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 2,
+            "glyph": "contenido",
+            "name": "Correcciones",
+            "desc": null,
+            "kicker": {
+              "text": "Cada mes",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          },
+          {
+            "index": 3,
+            "glyph": "informe",
+            "name": "Informe",
+            "desc": null,
+            "kicker": {
+              "text": "Cada mes",
+              "px": 12,
+              "weight": 600,
+              "uppercase": true,
+              "tracking": "0.12em",
+              "color": "#e2e2e2",
+              "accent": null
+            },
+            "title": {
+              "px": 21,
+              "lineHeight": 1.05,
+              "tracking": null,
+              "family": "Bricolage Grotesque",
+              "weight": 760,
+              "color": "#ffffff"
+            }
+          }
+        ]
+      },
+      "signature": {
+        "mode": "url-bubble-footer",
+        "logoOnly": [
+          "cover",
+          "close",
+          "brand-is-subject"
+        ],
+        "photoSlideLogo": false,
+        "urlBubble": {
+          "form": "baked",
+          "insetOfWidth": 0.0729,
+          "bottomOfHeight": 0.0796,
+          "heightPx": 30,
+          "assetId": "url-bubble-baked-dark"
+        },
+        "orbitDelegate": "surface-owned"
+      },
+      "timeline": null,
+      "rules": [
+        {
+          "id": "efeonce-dark-ground",
+          "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+        },
+        {
+          "id": "one-sphere-per-piece",
+          "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+        },
+        {
+          "id": "one-orbit-per-piece",
+          "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+        },
+        {
+          "id": "accent-text-min-size",
+          "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+        },
+        {
+          "id": "timings-from-tokens",
+          "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+        },
+        {
+          "id": "answer-dominates-3x",
+          "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+        },
+        {
+          "id": "figures-with-source",
+          "text": "Cifras sólo con fuente; precios siempre como marcador."
+        },
+        {
+          "id": "isotype-composed",
+          "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+        },
+        {
+          "id": "cine-only-nexa-or-proposal",
+          "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+        },
+        {
+          "id": "no-close-gaze-pairs",
+          "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+        },
+        {
+          "id": "semantic-reserves-only",
+          "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+        },
+        {
+          "id": "photo-slide-no-logo",
+          "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+        },
+        {
+          "id": "url-bubble-in-footer",
+          "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+        },
+        {
+          "id": "selection-one-thing-per-slide",
+          "text": "La selección toma una sola cosa por lámina."
+        },
+        {
+          "id": "third-party-logos-one-tone-same-ink",
+          "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+        },
+        {
+          "id": "photo-reserves-start-45",
+          "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+        },
+        {
+          "id": "no-deck-indicator",
+          "text": "Sin indicador de deck: la lámina no lleva otra órbita."
+        },
+        {
+          "id": "icon-voice-by-line",
+          "text": "Voz del ícono por línea (icons.voiceByLine): Brand = Plastilina; Growth, Engine y Revenue = Trazo."
+        },
+        {
+          "id": "icons-at-rest",
+          "text": "Los íconos de los pasos van en reposo: la esfera de la pieza es la de la respuesta."
+        },
+        {
+          "id": "photo-light-spheres-not-voice",
+          "text": "Las esferas de color que viven en la foto (una por línea, en la lámina de líneas con Nexa) son luz de la escena, no la esfera de la voz: la respuesta cierra con una sola esfera (operador, 2026-09-27)."
+        }
+      ],
+      "references": [
+        {
+          "id": "proposal-cinematic-creative",
+          "title": "Propuesta · servicios creativos digitales: la directora dirige una órbita de pantallas",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-creative.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaCreativaDigital.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-web",
+          "title": "Propuesta · web con punch: una web holográfica para personas, buscadores y agentes",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-web.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaWebCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-aeo",
+          "title": "Propuesta · AEO con punch: entre miles de marcas, la IA ilumina una",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-aeo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaAEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-seo",
+          "title": "Propuesta · SEO con punch: el estratega frente al mapa de luz de su oficio",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-seo.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaSEOCine.dc.html"
+        },
+        {
+          "id": "proposal-cinematic-revops",
+          "title": "Propuesta · RevOps con punch: un moño de luz con agentes en el flujo",
+          "status": "approved",
+          "image": "/references/surfaces/deck/proposal-cinematic-revops.jpg",
+          "canvasPage": "deck",
+          "canvasBoard": "DeckPropuestaRevOpsCine.dc.html"
+        }
+      ],
+      "delegates": {
+        "orbit": [
+          {
+            "scene": "main",
+            "contract": "efeonce.graphic-line-orbit",
+            "intent": {
+              "canvas": {
+                "width": 1920,
+                "height": 1080,
+                "line": "engine",
+                "surface": "dark",
+                "channel": "deck"
+              },
+              "elements": [
+                {
+                  "kind": "voice",
+                  "id": "voice",
+                  "questionId": "question",
+                  "answerId": "answer",
+                  "answerText": "Lo sabremos"
+                },
+                {
+                  "kind": "url-bubble",
+                  "id": "url-bubble",
+                  "medium": "pdf"
+                }
+              ]
+            }
+          }
+        ],
+        "close": null,
+        "selection": [
+          {
+            "contract": "efeonce.collaboration-selection",
+            "intent": {
+              "targetId": "answer",
+              "targetKind": "text",
+              "overlay": "subtle",
+              "cursors": [
+                {
+                  "id": "collaborator",
+                  "kind": "collaborator",
+                  "targetId": "answer",
+                  "anchor": "top-end",
+                  "label": "Pibank",
+                  "participantKind": "department"
+                }
+              ]
+            },
+            "collaboratorScale": 1.2,
+            "targetKind": "text",
+            "overlay": "subtle"
+          }
+        ],
+        "icons": [
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "busqueda",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Línea base"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "medicion",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "144 al mes"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "contenido",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Correcciones"
+            }
+          },
+          {
+            "package": "@efeoncepro/axis-graphic-line/icons",
+            "call": "resolveIcon",
+            "voice": "stroke",
+            "request": {
+              "glyph": "informe",
+              "size": 44,
+              "line": "engine",
+              "surface": "dark",
+              "state": "rest",
+              "label": "Informe"
+            }
+          }
+        ],
+        "photo": {
+          "placement": "bleed",
+          "register": "cine",
+          "lensMm": 85,
+          "cameraDistanceM": 2,
+          "lookAtLens": true,
+          "lever": "luz-motivada",
+          "atmosphere": "bruma",
+          "reserve": {
+            "side": "start",
+            "share": 0.45,
+            "form": "calm-deep-dark"
+          },
+          "emblem": "compose-from-axis-brand-assets",
+          "subject": "person",
+          "plateRef": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+          "alt": "Una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta",
+          "native": null,
+          "focus": null,
+          "cine": {
+            "lensMm": 85,
+            "cameraDistanceM": 2
+          }
+        }
+      },
+      "content": {
+        "eyebrow": "Qué haremos · Respuestas de IA",
+        "question": "¿Qué dice la IA de Pibank?",
+        "answer": [
+          "Lo sabremos"
+        ],
+        "answerSphere": "closes-last-line",
+        "body": "24 preguntas sobre ahorro en tres superficies de IA, dos veces al mes: presencia, exactitud, fuentes y competidores, para corregir lo que dice de Cuenta Soles.",
+        "proof": null,
+        "measure": null,
+        "progress": null,
+        "cta": null,
+        "variants": null,
+        "levels": null,
+        "note": "Una mención no es una visita ni una cuenta: es una señal que se sigue.",
+        "panels": null,
+        "figures": null,
+        "nav": null,
+        "title": null,
+        "frames": null,
+        "chapter": null,
+        "shots": null,
+        "subtitles": null,
+        "lines": null,
+        "slogan": null
+      },
+      "adapterChecks": [
+        "text-inside-its-reserve",
+        "text-never-crosses-ring",
+        "answer-dominates-3x-painted",
+        "accent-text-min-size",
+        "signature-where-the-surface-says",
+        "subject-outside-text-reserve",
+        "last-frame-is-static-fallback",
+        "legibility-at-reading-distance"
+      ],
+      "issues": []
+    }
+  ],
+  "issues": []
+}

@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
+
+- [Pricing V3 local](docs/manual-de-uso/finance/cotizar-v3-por-cli.md): núcleo decimal separado, CLI, snapshots/replay y borrador redactado. 49 pruebas V3 y 23 históricas; tipos/lint focal verdes. [Ficha Colombia→Chile](docs/documentation/finance/cotizador-v3-piloto-colombia-chile.md) preparada: diseñador senior 50%, ledger/readiness y cinco simulaciones históricas calculadas con revisión y export bloqueado; costos/políticas pendientes; sin integración canónica o tarifas aprobadas. [Evidencia](docs/audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
+
+- [CLI de pricing](docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md): Excel extraído con hash/celdas/fórmulas; búsqueda, auditoría, costos declarados, equipos y comparación de márgenes sin UI/DB. Escenarios hipotéticos; Excel/seeds y motor vigente intactos.
+
+- [Dirección regional aceptada](docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md), [servicio](docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), modelo y activación documentados: modalidades, buying group, economics, formación, continuidad y matriz contractual. Talent Assurance, arquitectura objetivo y guardrails pasan a aceptados por aprobación del operador; policy e implementación pendientes. Índices, task/epic, documentación funcional/manual y skills espejo conciliados. Sin nuevo runtime, precios, contratos ni envíos.
+
 ## 2026-10-08 — Cotizaciones documentales multimoneda y entrega Pibank
 
 - [Plantilla A4](docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): presentación ISO, precisión decimal, FX explícito con fecha/fuente y tratamiento fiscal independiente. [Cotización Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md): USD/PEN de 19 páginas y archivos en raíz de carpeta comercial, con copia por hash y procedencia registrada. Tres subagentes actualizaron docs/skills y auditaron aislamiento; sin cambios al cotizador Greenhouse, envío o CRM.
@@ -58,6 +66,8 @@
 - Nexa cine 4K/`high`, ocho referencias: V2 5504×3072, reservas 4/4 y revisión `APROBABLE`; [prueba y comparación con NX7d/Sunburst](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md). Preferencia cinematográfica por Sunburst en estas imágenes; Nano destaca en resolución/reservas. No es A/B controlado. Canon, manuales y skills espejo actualizados; OpenAI/GPT Image 2 sigue default de `ai:image`, sin publicar la prueba.
 
 ## 2026-10-06 — Pibank: caso de negocio, modelo y propuesta SEO/AEO
+
+- Conciliación 07-10: [técnica/resumen/oferta](docs/audits/commercial/2026-10-07-pibank-conciliacion-paquete.md) regenerados juntos, diagnóstico recuperado y gradual como alcance principal. 30 checks/12 páginas; precios/modelos intactos. Aporte y margen pendientes.
 
 - Oferta reforzada: AEO 24 preguntas/144 observaciones desde M2; PR gradual M3/M8 y refuerzos M6/M11; acuerdos de revisión y sensibilidad económica, con fee conservado. Modelo evolutivo sin cuota FAQ; PDF/Excel/Claude sincronizados. Híbrido 07-10: [base US$4.500 y activaciones](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md), catálogo, calendario, selector y PDF; hasta 5 artículos/mes incluidos; ruta recomendada US$79.200, integral US$89.200. Sesiones sustituidas por refuerzos PR; técnico/schema explícitos en base. Fee US$8.000 anterior sustituido; investigación/embudo intactos.
 
@@ -447,7 +457,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
   `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
   valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
   catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
-
-## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa
-
-- Agent CLI 0.15.0 instalada y OAuth de Efeonce/Kortex `48713323` verificado con una lectura CRM real. El conector MCP y la CLI se eligen por portal, capability y forma del trabajo; comparten change set, aprobación y readback, no credenciales. Límites OAuth y comandos sin `--dry-run` registrados en el [runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); skills Codex/Claude sincronizadas.

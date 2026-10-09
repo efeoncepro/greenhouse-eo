@@ -1,0 +1,39 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "88fb30a6c61981ff85b09cd9c8f64d79c332aed22e60ce042463bc66a92d58f4",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.method-surround-cycle"
+  ],
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:measure",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/measure.png",
+      "sha256": "4fccf6e3639fb718adc2af18c40b8f868b3cfb4fdd3114edb4cf2c2dee880edb"
+    },
+    {
+      "ref": "asset-ref:file:create",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/create.png",
+      "sha256": "7f0894dbffd8cb8b7614e36777671e69c19d0a7a6ade673eaf5359dd8959cd53"
+    },
+    {
+      "ref": "asset-ref:file:distribute",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/distribute.png",
+      "sha256": "e561d17bf2c6f08b350870c4b3428ca4d1c9cc522a0210b2bcab9a3d84f777a9"
+    },
+    {
+      "ref": "asset-ref:file:optimize",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo/optimize.png",
+      "sha256": "2c7b009f4be95e9f8e235b259dc41d80bd8d3b3584b55c59eaa6af66d03dfc87"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

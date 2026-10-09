@@ -1,5 +1,7 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
+> Delta familia H3 (2026-10-09): checks de Wave, Reach y Globe junto a Efeonce; AXIS `main` en `7c96680` (paquete 0.4.28, tag sin verificar). Prueba de los isotipos chicos en favicon real aún sin ejecutar.
+
 > Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
 
 > Delta marca Rooms (2026-10-08): reglas del operador sobre esfera en cruces y R en órbita, más la prueba del símbolo a tamaño chico; AXIS `main` en `6e1621b` (paquete 0.4.27, publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)). Prueba del símbolo aún sin ejecutar.
@@ -540,3 +542,14 @@ Owner del consumidor: [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-r
 | [ ] | Junto a Efeonce, «Rooms» en el gris medido de la familia; sólo la esfera conserva el acento Growth | `assetId` del manifest; revisión |
 
 Fuente: ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md) y [ledger 2026-10-08](ledger.md#2026-10-08--logo-de-efeonce-rooms-18-piezas).
+
+## Wave, Reach y Globe en la familia (H3, 2026-10-09)
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | Junto a Efeonce va `{wave,reach,globe}-lockup-*`; nunca «by efeonce» ni un lockup rearmado a mano | `assetId` del manifest (0.4.28) |
+| [ ] | El logotipo en el gris de la familia y sólo el gesto en color; el logotipo propio, nunca una versión en Poppins | Revisión del SVG del paquete; se regenera con `product-family.mjs` + `pnpm seal` en AXIS |
+| [ ] | Globe sobre oscuro en `#ee4274`, nunca el naranja Brand `#ff6500`; Wave sobre oscuro `#2e8be8` + `#a6cdf5` | Variante `negative` del paquete; sin repintar |
+| [ ] | A 24 px o menos, Reach y Globe usan `*-isotype-small-*` | `assetId`; prueba en favicon real pendiente al 2026-10-09 |
+
+Fuente: ADR [`EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md) y [ledger 2026-10-09](ledger.md#2026-10-09--wave-reach-y-globe-en-la-familia-h3-33-piezas).

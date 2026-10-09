@@ -1,8 +1,12 @@
 # Registro de seguimiento comercial
 
+**Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).
+
+**Corte vigente: 09/10, 09:00 Chile.** [Reporte completo](runs/2026-10-09-0900.md):254 Deals/44 abiertos;213 leads recientes;282 correos y12borradores;33 fichas LicitaLAB. Diez tareas nuevas y seis actualizadas con readback;41 claves. **Momentum y Pibank requieren acción esta mañana; ProChile cierra13:00; Valparaíso11:30; SENADIS11:00 condicionado a acreditación; Los Lagos17:15. SANNA y UNAP: no presentadas por tiempo, cierre perdido confirmado por Julio; sin conciliación pendiente.** FUCOA ahora15/10 15:30 según LicitaLAB, no verificación directa del comprador. UTEM presentada; outreach Yanbal/Lotus/Olivos se revisa13/10. Nuevo borrador WIN en Notion, sin envío. Wherex no accesible. Este corte prevalece sobre la historia inferior.
+
 **Delta focalizado 08/10, outreach manual:** tres mensajes verificados en Enviados, tres notas CRM asociadas a seis contactos y tres tareas Notion con borradores (una nueva, dos reutilizadas). Próximo seguimiento interno 13/10 10:00 Chile; 19/10 y 26/10 tentativos. [IDs, evidencia y reglas](runs/2026-10-08-outreach-manual.md). Sustituye la preparación inicial pendiente de Yanbal/Olivos; no renueva el corte global de abajo.
 
-Corte de datos CRM/Notion/Outlook: **08-10-2026 07:08 America/Santiago**. Revisión manual inicial; no demuestra ejecución del scheduler. Los deltas de preparación posteriores se registran abajo sin renovar ese corte ni los estados externos.
+Último corte: **08-10-2026 09:08 America/Santiago**, heartbeat recibido a las 08:57. [Reporte del corte 09:00](runs/2026-10-08-0900.md): 251 Deals / 41 abiertos, 183 leads recientes, 246 correos en ventana completa y 11 plazos LicitaLAB revalidados. Tres tareas nuevas y tres actualizadas, verificadas; 26 tareas del agente. Las secciones iniciales conservan la revisión manual de las 07:08; el reporte y la bitácora más reciente prevalecen para cobertura y estado actual.
 Owner: Julio Reyes. [Contrato](README.md) · [Proyecto Notion](https://app.notion.com/3f339c2fefe7816ab5b2d29551199c43).
 
 ## Cobertura y resultado
@@ -138,7 +142,7 @@ Deadline = propiedad de licitación leída en CRM, expresada UTC tal como vuelve
 
 ## Estado vigente de UTEM después de la presentación
 
-La siguiente síntesis prevalece sobre los pendientes iniciales conservados en la bitácora:
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Evidencia y CRM](../tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md).
 
 - Tarea Notion existente marcada **Enviada**, fecha de envío08/10, resumen/DoD/resultado actualizados y releídos. Se preserva su ID; no crear otro pendiente de preparación.
 - Paquete aprobado conservado: anexos1/2B/3/4 firmados; técnica v1.1, deck35láminas y cotización HTML/PDF A4 de4páginas.
@@ -207,6 +211,19 @@ Corrección explícita de Julio, 08/10/2026: la regla de no exigir contacto prev
 Sin nueva revisión SaaS: sincronizados contrato, cola, decisión de autonomía y `state.json` con UTEM firmado, datos confirmados, pendientes reales y regla general de plataformas. Conservados 23 IDs de tareas y su último estado observado; no se crearon tareas, no se inscribieron contactos, no se mandaron correos y no se renovó el corte de CRM/correo. El error Outlook 403 y el aviso de créditos de Prospecting Agent siguen como observaciones fechadas, no como diagnóstico revalidado hoy en esta consolidación. La [auditoría de segmentos](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md) conserva el readback de Diego y Emily: reutilizar activos existentes y propiedades respaldadas; una membresía no autoriza inscripción o envío.
 
 
+### 2026-10-08 09:08 Chile — heartbeat del corte 09:00 ejecutado
+
+Primera ejecución recibida del heartbeat: 08:57:38 Chile. [Reporte completo](runs/2026-10-08-0900.md). Pipeline completo reconsultado: 251 registros, 41 abiertos; 183 leads modificados en 14 días. Outlook: 246 mensajes desde el 06/10 con paginación agotada y nueve borradores recientes preservados. Once cierres revalidados en LicitaLAB; INDH coincide con ficha oficial accesible, potencialmente cacheada. Wherex no revalidado en portal.
+
+Se actualizaron UTEM (anexos firmados y pendientes reales), Pibank SEO (PDF pendiente de ajustes) e INDH (cierre hoy 15:30). Tres altas deduplicadas, todas con borrador en Notion y readback independiente:
+
+- Real Audiences: `followup:partnership:real-audiences`, [tarea y borrador](https://app.notion.com/p/3f339c2fefe78126a517f89f41d5b479). Meta interna hoy16:00, sin deadline externo; sostener pago a30d sin aceptar anticipo.
+- HubSpot Q4: `followup:partnership:hubspot-q4`, [tarea y borrador](https://app.notion.com/p/3f339c2fefe781e682cdf33ce9b90b58). Meta interna09/10 12:00; selección del play pendiente de Julio.
+- Norseg: `followup:lead:norseg`, [tarea y borrador](https://app.notion.com/p/3f339c2fefe781dd80a6c021d15f258e). Meta interna09/10 12:00; volver a buscar respuesta antes de seguimiento.
+
+Nuevo intento Outlook createReply para Real Audiences devolvió403; no hay borrador Outlook guardado ni correo enviado. Se conservan seis textos en Notion (tres anteriores+tres nuevos). Cero cambios CRM/postulaciones/créditos/commit/push. Repetir alertas existentes INDAP14:00 e INDH15:30 antes del próximo corte; UTEM18:00, UNAP19:00 y preparar SANNA hoy para mañana09:00. Sika HOLD, técnica descartada, TVN rechazado, SKY2027 y NO-BID ISP permanecen.
+
+
 ### 2026-10-08 — UTEM técnica v1.0 preparada; deck para Claude
 
 Por mandato de Julio se redactó la [propuesta técnica y matriz de cumplimiento](../tenders/utem-seo-aeo-2026/README.md). El operador sustituyó Word por HTML y PDF; entregados Markdown, HTML autocontenido y PDF de once páginas en `UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica`, con guía interna separada para Claude. PDF revisado visualmente; 303 bloques de contenido cotejados, cero omisiones y cinco enlaces. Técnica para revisión, no firmada ni presentada. Pendientes: revisión del alcance/capacidad, costo/precio exacto y cotización, deck y decisión de presentación. Tarea UTEM actualizada y leída de vuelta; no se cerró el paquete. Este delta no renueva el corte global de CRM/correo ni el deadline.
@@ -218,3 +235,25 @@ Por mandato de Julio se redactó la [propuesta técnica y matriz de cumplimiento
 ### 2026-10-08 — UTEM presentada; CRM y tarea sincronizados
 
 Julio aportó la captura de Mercado Público «Cotización enviada correctamente», código5251-1060-COT26. Cotización final aprobada: netoCLP4.800.000, IVA912.000, total5.712.000 por tres meses. Cambio autorizado en Deal65832566144 y dos readbacks: Presentación de soluciones/amount4.800.000 CLP, descripción reconciliada. Notion Enviada, resumen/DoD/resultado y fecha actualizados y releídos. Captura y registro en `07. Presentacion`; oferta sin adjudicación confirmada. [Registro completo](../tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). No correos, tareas/Deals nuevos, ni repetición de postulación.
+
+## Bitácora · 08/10/2026 · corte16:00Chile
+
+- Heartbeat18:58:09Z; cierre 2026-10-08T19:11:48.326178+00:00; [reporte](runs/2026-10-08-1600.md).
+-4tareasnuevas Momentum/Basis/DDSoft/SKYstaff;10actualizadas conlecturaindependiente.
+-Momentumdraft_emailpermitido y verificado19:04:59Z conBCC/firma; borradoreshumanos intactos. Noemailenviado.
+-MismoIDparariesgosINDAP/INDH/UNAP/SANNA; no nuevosDealsni cambiosCRM.
+-ReuniónBerel14/10 14:15Chile verificada. LotusDeal65718150708observado; mantiene tarea followup:lead:lotus.
+-ResearchsinDeal y15fichasLicitaLABleídos; detalledecobertura/bloqueos enreporte. Sincommit/push/deploy.
+
+
+## Bitácora · 09/10/2026 · corte09:00Chile
+
+- Ejecución recibida11:58:16Z; registro final 2026-10-09T12:13:03.495646+00:00. [Informe](runs/2026-10-09-0900.md).
+- Diez altas Notion deduplicadas: Valparaíso, SENADIS, Los Lagos, UChile Claude, UChile email, Patrimonio, Superir, FIA, Integra y WIN. Seis tareas actualizadas: UNAP, SANNA, FUCOA, Pibank SEO, SKY2027 y Momentum. Dieciséis lecturas independientes correctas.
+- Cambio de plazo FUCOA15/10; SENADIS11:00 observado frente a08:39histórico. Son fuentes LicitaLAB; acceso directo comprador falló. SANNA is_closed=true tras09:00 aunque status Publicada. Sin prórroga inferida.
+- Nuevo texto de email WIN y coordinación SKY/partner en Notion. Reutilizado Momentum,12borradores humanos/agente preservados, cero nuevos Outlook. No repetir Yanbal/Lotus/Olivos hoy.
+- USACH CRM mantiene NO-BID explícito; Sika HOLD/técnica descartada, TVN rechazado y SKY2027 intactos. Cero envío/postulación/CRM/créditos/commit/push/deploy.
+
+## 09/10/2026 — cierre manual autorizado de SANNA y UNAP
+
+**Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).

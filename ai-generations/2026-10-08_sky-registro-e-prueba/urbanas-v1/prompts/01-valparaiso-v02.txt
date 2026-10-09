@@ -1,0 +1,11 @@
+BASE
+Edit this existing Valparaíso travel photograph. Keep the same fictional woman's face, age, profile looking toward the harbour, fine ivory shirt, navy trousers, crossbody bag and the pause beside the real black railing. Preserve the complete authentic Casa Cuatro Vientos and harbour layouts, natural daylight and luminous restrained photographic finish. Preserve the genuine very-close lower-left softly defocused rail and sharp contact of the hand farther along it. Do not replace her identity or remake this as a portrait.
+
+The current background shipping containers have recognizable commercial company letters. They must be unbranded: preserve container dimensions, their real steel construction, colour variation and spatial order, remove every generated container word, company mark and letter grouping so painted surfaces look like ordinary unmarked painted steel. Remove all legible business words and invented letter-like symbols throughout the background, leaving real geographic forms intact. No sign replacing any logo. This is not permission to redesign architecture or remove actual buildings. Incidental wall markings should remain optically unreadable, not invented words.
+
+Reduce uniformly crisp distant harbour windows and tiny hill houses slightly with physically plausible distance and coastal atmosphere, keep the recognizable city and port, no Gaussian mask. Skin and blouse retain fine natural texture without increasing pore or fabric contrast. Open shadows preserve depth, blue sky is clean rather than saturated postcard blue. Restore casual balance: her free hand naturally rests lower on her bag strap rather than a pronounced fashion-shoot elbow-on-hip stance. Left hand remains on railing, weight grounded, attention at a visible distant ship to left of frame. Every visible eye tracks the same target; far eye stays naturally occluded. Photo should read as an unplanned pause after climbing, not an influencer pose.
+
+Native 3840x2160 horizontal, no text, no frame.
+
+NEGATIVE
+readable text, shipping brands, commercial logos, pseudo-writing, watermark, altered house, warped railings, altered port geography, identity replacement, beauty retouch, fashion pose, eye directed to camera, milky iris, wrong gaze target, extra fingers, erased contact, artificial blur, texture halos, excessive saturation, HDR, portrait background smear.

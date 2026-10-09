@@ -1,0 +1,109 @@
+{
+  "checkedAt": "2026-10-07T11:54:47.487574+00:00",
+  "scope": "Read-only public Studio API via CLI; local code inspection, no runtime writes",
+  "baseUrl": "https://studio.efeonce.org",
+  "apiVersion": "1.9.0",
+  "manifestHash": "898157089c5edbff75877788fa6218e6f1e4af5173416a470903609114813a5f",
+  "localStudioHead": "3829a8bc95c0dca7077d7afaae8dd05bdd933143",
+  "localHeadIsLiveDeployProof": false,
+  "operationCount": 80,
+  "toolCount": 75,
+  "initiativeOperations": [],
+  "catalog": {
+    "version": 1,
+    "channelCount": 52,
+    "modalities": {
+      "earned": 7,
+      "organic": 15,
+      "owned": 7,
+      "paid": 23
+    },
+    "families": [
+      "audio",
+      "community",
+      "creators_influencers",
+      "display",
+      "email",
+      "messaging",
+      "ooh_dooh",
+      "pr_media",
+      "search",
+      "social",
+      "video",
+      "web_content"
+    ],
+    "channelsWithPlacements": 1,
+    "channelsWithFormats": 1,
+    "channelsWithCopyLimits": 1,
+    "readbackProviders": {
+      "none": 42,
+      "metricool": 7,
+      "hubspot": 1,
+      "linkedin_ads": 1,
+      "meta_ads": 1
+    }
+  },
+  "accounts": {
+    "count": 3,
+    "nextCursor": null,
+    "items": [
+      {
+        "provider": "metricool",
+        "platform": "linkedin",
+        "label": "linkedin · Efeonce",
+        "timezone": "America/Santiago",
+        "readerAvailability": "implemented"
+      },
+      {
+        "provider": "metricool",
+        "platform": "instagram",
+        "label": "instagram · Efeonce",
+        "timezone": "America/Santiago",
+        "readerAvailability": "implemented"
+      },
+      {
+        "provider": "metricool",
+        "platform": "linkedin",
+        "label": "linkedin · Julio Reyes",
+        "timezone": "America/Santiago",
+        "readerAvailability": "implemented"
+      }
+    ]
+  },
+  "campaigns": {
+    "count": 6,
+    "kinds": {
+      "campaign": 6
+    }
+  },
+  "calendar": {
+    "from": "2026-10-07",
+    "to": "2026-12-31",
+    "nextCursor": null,
+    "count": 29,
+    "channels": {
+      "organic_social_instagram": 12,
+      "organic_social_linkedin": 17
+    },
+    "executionStatuses": {
+      "scheduled": 29
+    },
+    "planStates": {
+      "planned": 27,
+      "draft": 2
+    },
+    "markets": {
+      "CL": 27,
+      "MX": 2
+    },
+    "withLinkedCopy": 26,
+    "emailDtos": 0,
+    "webDtos": 0
+  },
+  "limitations": [
+    "No cloud flags refreshed; runtime handoff flag observations retain their dates",
+    "No paid/owned/earned execution canary performed",
+    "No tenant authority expansion; read scope is what the current API exposes",
+    "No migration or initiative capability implemented"
+  ]
+}

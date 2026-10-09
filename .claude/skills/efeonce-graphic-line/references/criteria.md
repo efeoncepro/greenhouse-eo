@@ -1,5 +1,7 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28) — 2026-10-09; corrige el endoso «by efeonce» de §6.
+
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
 
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
@@ -49,6 +51,17 @@ El operador aprobó el logo de Efeonce Rooms, «eslabón leve»: las dos «o» d
 - Antes de aprobar un símbolo, se mira solo (sin la palabra), en grande y a 16–32 px, en claro y oscuro, y se nombra qué más podría leerse (anatómico, ®, 🔗, ⚣, argollas).
 
 Ejemplo corregido: «Rooms» con la esfera posada donde se cruzan las órbitas («el punto de encuentro») → la misma palabra con la esfera a la 1:30 de la segunda órbita. Motivo: el concepto no puede depender de una lectura que el público no hace. [ADR de la marca](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md).
+
+## Wave, Reach y Globe: logotipo propio, lockup de familia (H3) — 2026-10-09
+
+El operador llevó Wave, Reach y Globe a la familia: «ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave». **Cada producto conserva su logotipo; la familia vive en el lockup.**
+
+- **No se redibujan en Poppins** (H1, descartada): la letra de cada marca es identidad (REACH modular, WAVE bloque en mayúsculas, globe redondo); en Poppins se volvían genéricas y perdían presencia.
+- **Lockup:** Efeonce adelante (30 de alto, 20 de aire, filete 1 × 26, 20 de aire) y el logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con **sólo su gesto en color**, para que Efeonce predomine. Tamaño por presencia, no por altura de mayúscula (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce; el globo conserva su despegue.
+- **Gestos:** la W de Wave (`#0375db` + `#091951`; oscuro `#2e8be8` + `#a6cdf5`), la «a» con flecha de Reach (`#f83902`), el globo de Globe (`#bb1954`; oscuro `#ee4274`). Globe sobre oscuro **no** toma el naranja Brand `#ff6500` (sigue siendo de Creative Studio): el globo es el objeto, no un acento de línea.
+- **«by efeonce» queda retirado**: `*-logo-*` es el logotipo solo; junto a Efeonce va siempre el `*-lockup-*`, nunca armado a mano. El producto sigue sin firmar (§6).
+
+Ejemplo corregido: «WAVE by efeonce» en el encabezado de un informe → `wave-lockup-positive` («efeonce | WAVE» con sólo la W en color). Motivo: el endoso se leía como marca distinta que Efeonce respalda; el lockup la lee como familia. [ADR H3](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md).
 
 ## 1. La idea en una frase y el porqué
 
@@ -658,7 +671,8 @@ esfera: el acento va al cierre.
 **Efeonce firma todo**, de cualquier línea de servicio; los productos (Globe, Wave, Reach, Greenhouse) aparecen como
 **contexto** —su nombre, su interfaz en un mockup, su isotipo pequeño dentro de su propia superficie— y nunca firman
 (operador, 2026-09-26; manual §7). *Esto reemplaza lo que decía la lámina 3.1 («la firma: el logo propio de cada
-producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la superficie del propio producto.*
+producto, con «by efeonce»»). Desde el 2026-10-09 (H3) el endoso «by efeonce» está **retirado**: junto a Efeonce,
+Wave, Reach y Globe van en su `*-lockup-*` de familia, y `*-logo-*` es el logotipo solo.*
 
 - **Insights, marca de producto que acompaña** (operador, 2026-09-28): en sus propias superficies (el informe compartido,
   el portal) va **junto al logo de Efeonce**, separados por un filete fino y los tres centrados en vertical (las alturas de x quedan ópticamente alineadas,
@@ -846,7 +860,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Órbita alrededor del logo** fuera de un cierre de marca (p. ej. banner de LinkedIn, reverso de la tarjeta), o **esfera pegada al logo** | el logo va en la órbita sólo en el cierre del deck, el cierre de video y el muro de recepción; la esfera es de la palabra | operador 2026-09-26 (D5); lámina 5.4 |
 | **Logo y órbita juntos al frente** de un objeto | frente la palabra, dorso el logo solo | láminas 4.4, 5.6 |
 | **URL como texto**, o **burbuja junto al logo**, o **firma y burbuja a la vez** | la burbuja sólo reemplaza al logo cuando el logo ya está en la imagen | manual §8.5; ADR |
-| **Producto que firma** la pieza (o «by efeonce» como firma) | Efeonce firma todo; el producto es contexto | operador 2026-09-26; manual §7 |
+| **Producto que firma** la pieza (o «by efeonce», retirado desde 2026-10-09) | Efeonce firma todo; el producto es contexto, junto a Efeonce en su lockup de familia | operador 2026-09-26; manual §7; ADR H3 |
 | **Dos acentos** en una pieza, o **teal en una pieza de otra línea** | una línea, un acento; el teal es de Efeonce | láminas 3.1, 3.2 |
 | **Teal claro como texto sobre blanco** | 2,1:1, no alcanza | láminas 1.1, 5.6 |
 | **El acento en texto de menos de 24 px** (eyebrow, etiqueta, dato chico, palabra del eslogan chico) | el acento es para gráfico y texto grande (≥ 3:1); el texto chico va en navy o blanco | operador 2026-09-26 (D1); `accent-text-min-size` |

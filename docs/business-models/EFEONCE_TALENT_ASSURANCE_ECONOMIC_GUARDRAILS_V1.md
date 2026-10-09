@@ -2,11 +2,19 @@
 
 ## Status
 
-- State: `Proposed`
+- State: `Accepted` — principios económicos, aprobación del operador 2026-10-09
 - Date: 2026-07-30
+- Activation: costos, precios, reservas y pisos de margen concretos pendientes de validación Finance/Commercial
 - Owner: Finance + Pricing + Commercial, con Talent/Operations como owners de capacidad
 - Related decision: [Efeonce Talent Assurance Decision V1](../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md)
 - Scope: ofertas que comprometen personas, pods, capacidad gestionada, embedded capacity o staffing para clientes
+
+## Alcance de la aceptación
+
+El operador aprobó Talent Assurance el 2026-10-09; estos guardrails son parte del estándar aceptado.
+No se aprueban cifras, precios, contratos ni interfaces Finance por esa decisión. `TASK-1607` conserva la
+implementación del gate y los owners económicos validan cada compromiso. La primera aplicación regional
+documentada es el [modelo de capacidad CRM/RevOps](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md).
 
 ## Purpose
 
@@ -107,4 +115,3 @@ Una vacante con requisitos senior y un presupuesto no competitivo genera fricci�
 - `scale_constrained`: la capacidad existe, pero no permite escalar al precio/volumen solicitado;
 - `blocked_by_finance`: falta validación de costo, margen o cash;
 - `no_go`: la promesa no puede sostenerse bajo las condiciones actuales.
-

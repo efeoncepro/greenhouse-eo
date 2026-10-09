@@ -1,0 +1,24 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "c8542872d797b9a60498031c9882db965a79970c9dd9c86f59fb1d1bf93562fd",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.cover-proposal"
+  ],
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:pibank-logo",
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+      "sha256": "cf06079bc36e825a2f293c67b96d756670935aad00e87662ad67dfb1542cd282"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

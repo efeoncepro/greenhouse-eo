@@ -1,0 +1,83 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "01502e12666e71250faa1eef1230a2aae53c74ba02cf4bc533ffe6c4fff26802",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 9,
+  "contentTypes": [
+    "deck.cover-proposal",
+    "deck.section-classic",
+    "deck.section-classic",
+    "deck.method-surround-cycle",
+    "deck.section-classic",
+    "deck.content-measure-formulas",
+    "deck.content-team",
+    "deck.decision-risk",
+    "deck.close-proposal"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3-contra-horizonte",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "sha256": "0463d21a42b850c7d169271d967c35c01b7bc3e333f5432e7586f3ded4cc4d7d"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:pibank-logo",
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+      "sha256": "cf06079bc36e825a2f293c67b96d756670935aad00e87662ad67dfb1542cd282"
+    },
+    {
+      "ref": "asset-ref:file:measure",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+      "sha256": "100cd0192cbb7e2a6adf995d5199d4e142524efc1f49101ad93a0756a71153d6"
+    },
+    {
+      "ref": "asset-ref:file:create",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+      "sha256": "58422e2e39a556e55d08020e0bc802ca027396076907eea0004c9de3737670ca"
+    },
+    {
+      "ref": "asset-ref:file:distribute",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+      "sha256": "01af746a8dc46f27040c2fed83c31ee7f545447e32e0275356549c149e328301"
+    },
+    {
+      "ref": "asset-ref:file:optimize",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+      "sha256": "e5458f43f544e30ce2d422e946851bf8043c0f191eba13c718a35acf8c3cfb1e"
+    },
+    {
+      "ref": "asset-ref:file:squad-andres",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e"
+    },
+    {
+      "ref": "asset-ref:file:squad-valentina",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+      "sha256": "c268125b320560a51815243e9d2a223288d41e4c3a954a744d95edaf6ab5e18b"
+    },
+    {
+      "ref": "asset-ref:file:squad-julio",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+      "sha256": "71728dfe3a8fccac6ec99338ebf176dc8eca6247f22beb0714a633657f9bf27e"
+    },
+    {
+      "ref": "asset-ref:file:squad-daniela",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53"
+    },
+    {
+      "ref": "asset-ref:file:squad-melkin",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+      "sha256": "3ed018d2435331cb1978bf46ef5a4580a9661ef5625d359a358da5d34146d085"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

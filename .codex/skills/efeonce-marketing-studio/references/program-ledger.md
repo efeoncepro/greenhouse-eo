@@ -1,5 +1,15 @@
 # Efeonce Marketing Studio — program ledger (EPIC-049)
 
+## Discovery 2026-10-07 — tácticas multicanal (definición acordada)
+
+`docs/audits/marketing-studio/2026-10-07-initiatives-channels-discovery.md`: táctica opcional dentro de campaña,
+intervención concreta que contribuye al objetivo, con asociación explícita por activación; contexto y enfoques
+seasonality/trendjacking independientes de canales/modalidades. Sustituye a «iniciativa», sin añadir otro nivel.
+No deducir táctica por concepto o primera pieza; preservar reutilización y tracking. API viva 1.9.0: ninguna
+capability de tácticas; 52 canales no equivalen a 52 integraciones. Encaje con TASK-1907/1913/1908/1667/1669,
+brecha de material editorial y migración de CMP-006 separados. Nombre/definición acordados en la precisión 2026-10-07 del ADR de estrategia; diseño detallado e implementación pendientes;
+no cambio de lifecycle de tasks ni datos productivos. El dossier conserva evidencia y siguientes decisiones.
+
 ## Decisión 2026-10-05 — Creative Studio (vista creativa)
 
 Studio gains a twin view, **Creative Studio**, over the same campaigns (ADR
@@ -296,6 +306,8 @@ only be authorized on Studio-governed campaigns, by a person, with `pnpm studio:
 
 ## Sessions
 
+- 2026-10-07 — Operación autorizada de incorporación de publicaciones Metricool al calendario, sin trabajo de implementación: `docs/audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md` conserva autorización administrativa, procedencia, estado y readback. No modifica el rollout de TASK-2001/2002/2003.
+
 - 2026-10-04 — TASK-1905 discovery by Codex with three read-only subagents; goal confirmed, plan awaiting the
   P1/high-effort checkpoint (`docs/tasks/plans/TASK-1905-plan.md`). Studio `c52eb4a`: risk tiers and ChannelValidator
   already exist; brief already has channel columns; other writers drop catalogVersion. Global catalog needs explicit
@@ -551,6 +563,11 @@ hora (para aprobar)» (V3-DateOpen, V3-TimeOpen, V3-RangeOpen, V3-MobDate, V3-Mo
 - **Pendiente:** pooler de conexiones (task aparte); reintento ante `bad certificate` del connector; anillo de cambio de estado con una lectura real; salida animada de los
   selectores de fecha (hoy sólo entrada desde su origen); error de vista previa del diálogo que queda en «Validando…».
 - Contrato: `docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md`; delta en TASK-2002.
+
+
+### 2026-10-07 — Completitud de copys tras conciliación Metricool
+
+Corrección operativa: 25 copys ausentes del plan vinculados; 26/26 coincidencia literal por API y UI de muestra verificada. No cambia lifecycle de tasks ni arquitectura. Evidencia: `docs/audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md` y `2026-10-07-metricool-copy-completion-checks.json`. Comparación de Seasonalities solicitada antes de decidir; ninguna reorganización aplicada.
 
 ### 2026-10-07 — AXIS como reproductor transversal de Studio (operativo)
 

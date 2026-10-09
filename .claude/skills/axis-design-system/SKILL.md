@@ -759,6 +759,33 @@ sphere, air and concentric terminations as the family; cuts computed as outlines
   `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md` and `efeonce-graphic-line` → `references/ledger.md`
   (2026-10-08).
 
+### Efeonce Wave, Reach and Globe in the product family (brand assets only; 2026-10-09, route «H3»)
+
+The operator moved Wave, Reach and Globe into the family («Efeonce Wave», not «Wave by efeonce»). Each product **keeps
+its own logotype** (redrawing it in Poppins, route H1, was rejected: it lost presence); the family lives in the
+**lockup**: Efeonce first (30 high, 20 air, rule 1 × 26, 20 air), the logotype in the family gray (`#6b6b6b` paper /
+`#6f89a2` dark) with **only its gesture in color**, sized by presence (WAVE 21, REACH 20, globe 35) and sitting on the
+baseline of Efeonce's «n».
+
+- **The «by efeonce» endorsement is retired:** `*-logo-*` is now the logotype alone (standalone words in family navy
+  `#023c70`). Next to Efeonce use `*-lockup-*`; never assemble it by hand.
+- **Gestures:** Wave's W `#0375db` + `#091951` (dark `#2e8be8` + `#a6cdf5`, also its isotype on dark); Reach's «a» with
+  arrow `#f83902` (arrowhead shifted so it no longer touches the stem; on dark the word keeps a solid orange «a», the
+  standalone isotype is white with only the arrowhead orange); Globe's balloon `#bb1954` (dark `#ee4274`, a product
+  exception: **not** the Brand line orange `#ff6500`, which stays with Creative Studio). These product colors live in
+  the SVG only, not in `axis-tokens` (`efeonceGraphicLine.family` still holds line accents).
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.28`** (AXIS `7c96680` on `main`; tag `v0.4.28` not seen on
+  the remote as of 2026-10-09, so do not call it published without a readback): 33 files, 12 replaced and 21 new.
+  Ids `{wave,reach,globe}-{logo,lockup,isotype}-{positive,negative,white}` + `{reach,globe}-isotype-small-{positive,negative,white}`
+  (≤ 24 px only: favicon, chips; Wave has no small version).
+- **Generation:** `packages/brand-assets/scripts/product-family.mjs` from `packages/brand-assets/sources/product-family/`
+  (originals versioned, never published), then `pnpm seal`; never edit the SVG by hand. Outlines only, no masks or
+  `clipPath`. New pieces are **package only** in the Lab catalog (`AXIS_LOGO_EXCLUSIONS`), like Creative Studio and
+  Rooms; the long-standing `logo`/`isotype` stay public with new bytes.
+- **Adoption:** Greenhouse still pins `0.4.25`; moving to 0.4.28 belongs to Greenhouse TASK-2014. Decision: Greenhouse
+  ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` and `efeonce-graphic-line` →
+  `references/ledger.md` (2026-10-09).
+
 ### Efeonce AI Visibility Report (0.3.30 set)
 
 The operator approved the **Efeonce AI Visibility Report** (the PDF deliverable of the Efeonce AEO Assessment; product

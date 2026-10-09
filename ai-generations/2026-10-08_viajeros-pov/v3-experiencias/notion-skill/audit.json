@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-08",
+  "pageId": "5e4b2473-c791-4933-a3e6-5531bb72c885",
+  "sourceCanonRead": "cbf3b294-2bf7-4f57-84f4-105881ed1f6d",
+  "scope": "Add Registro E alongside D; connect preflight, prompts, QA, task record and checklist",
+  "writes": "Targeted update_content; full-page replacement not used",
+  "verification": "Live readback: E present once, eight subsections, comparison and prompt toggle preserved, five workflow connections present, original D and all prior content exactly reconstructable",
+  "approvalBoundary": "Experience exploration accepted by operator; full D treatment and geographic QA required per article before existing release flow",
+  "sha256": {
+    "baseline.md": "757f7ebe5980aba8abc3779a843f90d48b2998e4550a99fa779bd117ed254e7e",
+    "registro-e.md": "d1472d7b558f595712821511a4f921500ad3db02a328132119248d32bdc21379",
+    "readback.md": "9ec1eb721a2295311ba46a4ba75a086d4282f4537cbf16fd40bf98240ae3ce40"
+  }
+}

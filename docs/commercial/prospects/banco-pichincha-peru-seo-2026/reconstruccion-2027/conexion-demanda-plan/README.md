@@ -48,9 +48,9 @@ La captura efectiva reúne exposición, posición y clic en una única hipótesi
 
 Para pasar de sensibilidad a estimación sustentada, el especialista sustituye captura y curva por consultas/URL observadas en GSC y sesiones analíticas, documenta cambios de cobertura y contrasta conversiones por población. No usar la misma tasa media para ocultar diferencias entre comparación y educación. Conservar por separado datos, hipótesis y resultado; cada revisión deja fecha y razón.
 
-## 3. Qué hacer con los 24 artículos
+## 3. Los 24 briefs como backlog inicial
 
-**Mantenerlos como capacidad inicial, no como prueba de suficiencia para la meta.** El pilar, la calculadora, el comparador y los artículos cubren conjuntamente las 19 familias. Varios temas pueden resolverse en una sola URL útil; otros artículos atienden conversión, confianza o mantenimiento. Publicar más piezas no multiplica automáticamente la demanda.
+**Mantenerlos como backlog inicial; la capacidad vigente es de hasta cinco artículos/mes y no prueba suficiencia para la meta.** El pilar, la calculadora, el comparador y los artículos cubren conjuntamente las 19 familias. Varios temas pueden resolverse en una sola URL útil; otros artículos atienden conversión, confianza o mantenimiento. Publicar más piezas no multiplica automáticamente la demanda.
 
 La principal mejora de secuencia es adelantar las cuatro comparativas. La matriz ofrece una alternativa manteniendo dos artículos por mes y 24 al año: Interbank M3, BCP M4, Scotiabank M5 y BBVA M6. Intercambia sus slots con contenidos de apoyo; el calendario original M5/M6/M7/M8 permanece como referencia. [Sensibilidad del cambio de secuencia](sensibilidad-prioridad-calendario.csv) aísla el efecto del tiempo, usando los mismos volúmenes y la misma captura. Adelantar exige revisión de fuentes y aprobación de comparabilidad a tiempo; no declara publicaciones realizadas.
 
@@ -68,7 +68,7 @@ Reglas de capacidad propuestas para las revisiones mensuales:
 | Captación por búsquedas genéricas y rivales | Pilar, comparativas, satélites y tools; enlaces y distribución | Visitas y cuentas de esas cohortes, contabilizadas una vez |
 | Conversión de tráfico que el banco ya recibe | Claridad móvil, requisitos, CTA, confianza y continuidad al registro | Diferencia frente a referencia comparable; no volver a sumar todas las cuentas del canal |
 | Primer fondeo | Guía de transferencias, dudas frecuentes, continuidad y comunicaciones bancarias | Primer depósito de la misma cohorte; cuentas preexistentes activadas se reportan aparte |
-| PR, AEO y comunidad | Cuatro recursos/campañas citables, 12 newsletters, cuatro sesiones y escucha | Referencias, retornos y asistencias observadas; sin convertir citas o audiencia editorial en visitas por fórmula |
+| PR, AEO y comunidad | Ruta gradual: dos campañas, dos refuerzos, diez newsletters y escucha; integral detallada en oferta-hibrida | Referencias, retornos y asistencias observadas; sin convertir citas o audiencia editorial en visitas por fórmula |
 
 Ejemplo con tasas explícitas, manteniendo el cálculo original como referencia: por cada **10.000 visitas existentes**, 2% de apertura y 65% de fondeo producen 130 cuentas con fondos. Si se alcanzaran 3% y 75%, serían 225: diferencia de 95. Es sensibilidad sobre una población hipotética, no tráfico bancario observado ni mejora causal acreditada. No sumar por separado las mejoras de apertura y fondeo a la diferencia conjunta. [Detalle](conversion-trafico-existente.csv).
 
@@ -82,16 +82,16 @@ La referencia de 1,17 millones corresponde al embudo completo. El programa busca
 | Comparaciones | Fuentes, método, diferencias relevantes y mantenimiento | Producto/Cumplimiento revisa comparabilidad y claims | Fuentes fechadas, revisión registrada y destino publicado |
 | Registro y depósito | Diagnóstico, diseño de hipótesis y QA de continuidad web | Dueño de onboarding/core implementa y decide comunicaciones | Cambio implementado y tasa por cohorte comparable |
 | Medición | Diccionario, instrumentación web y conciliación agregada | Analítica entrega eventos agregados y definición bancaria | Aperturas y primer fondeo conciliados con total del banco |
-| PR y comunidad | Recursos, guiones, gestión y moderación del alcance | Comunicaciones valida vocero/mensajes/canales | Gestiones, referencias, sesiones y participación verificables |
+| PR y comunidad | Recursos, guiones, gestión y moderación del alcance | Comunicaciones valida vocero/mensajes/canales | Gestiones, referencias y participación verificables |
 | Eficiencia SEO–SEM | Recomendaciones de intención y destinos | Marketing evalúa/aplica y comparte resultados autorizados | Cambio, periodo y población comparables documentados |
 
 Antes del inicio, el banco identifica una persona por función y acuerda un plazo de revisión propuesto de cinco días hábiles. La demora desplaza el hito dependiente; no convierte una pieza pendiente de aprobación en entregada. No se han asignado nombres ni accesos sin confirmación.
 
 Datos mínimos para cerrar un aporte global: mes/cohorte, canal y landing; sesiones elegibles; aperturas validadas; primer depósito por ventana; saldo/ticket según definición y maduración; cambios simultáneos de producto, campañas y onboarding. Preferir agregados, sin datos personales para este caso. Dueños: Analítica + Marketing + Producto del banco. Efeonce entrega el diccionario y concilia una sola vez el resultado. El banco confirma periodo y referencia monetaria; no se reinterpreta «con fondos» como registro.
 
-## 6. Capacidad y costo propuestos a Julio
+## 6. Antecedente histórico de capacidad y costo — sustituido por oferta híbrida
 
-**Recomiendo evaluar US$8.000 mensuales durante doce meses para el alcance integrado definido, antes de impuestos que correspondan.** Es un fee de programa, con implementación de hub/tools distribuida en el año; no se suma un setup duplicado. Propuesta para revisión interna, no oferta económica aprobada ni enviada.
+**La recomendación histórica era evaluar US$8.000 mensuales durante doce meses para el alcance integrado definido, antes de impuestos que correspondan.** Es un fee de programa, con implementación de hub/tools distribuida en el año; no se suma un setup duplicado. Propuesta para revisión interna, no oferta económica aprobada ni enviada.
 
 Costeo basado en trabajo: **2.216h base + 332,4h de reserva = 2.548,4h anuales**. Reemplaza el dimensionamiento de alcance cuando se evalúa esta ampliación; no se suma a las 1.216h del Excel histórico. [Trabajo por mes](capacidad-por-mes.csv), [asignación](asignacion-equipo.csv) y [costeo](costeo-interno.csv).
 

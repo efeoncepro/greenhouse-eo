@@ -1,0 +1,1682 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "pibank-tecnica-composer",
+  "input": {
+    "artifactId": "pibank-tecnica-composer",
+    "slides": [
+      {
+        "slideId": "p01-deck-cover-proposal",
+        "contentType": "deck.cover-proposal",
+        "slots": {
+          "frame": {
+            "line": "engine",
+            "margin": 140,
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=220px",
+            "eyebrowTop": 410,
+            "questionTop": 458,
+            "answerTop": 520,
+            "answerPx": 124,
+            "answerInset": "--gl-answer-inset=-4px",
+            "bodyTop": 790,
+            "bodyPx": 28,
+            "bodyWidth": 724,
+            "bodyLeading": "--gl-body-leading=1.3",
+            "bodyWeight": "--gl-body-wght=400",
+            "bodyStrongWeight": "--gl-body-strong-wght=600",
+            "bodyColor": "--gl-body-color=#ffffff",
+            "eyebrowPx": "--gl-eyebrow-px=22px",
+            "eyebrowWeight": "--gl-eyebrow-wght=500",
+            "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+            "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+            "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+            "questionPx": "--gl-question-px=40px",
+            "questionLeading": "--gl-question-leading=1.2",
+            "questionColor": "--gl-question-color=#ffffff",
+            "answerLeading": "--gl-answer-leading=0.95",
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "answerColor": "--gl-answer-color=#ffffff",
+            "logoWidth": "--gl-logo-width=500px",
+            "clientLeft": "--gl-client-left=1170px",
+            "clientTop": "--gl-client-top=440px",
+            "clientWidth": "--gl-client-width=460px",
+            "clientHeight": "--gl-client-height=200px",
+            "clientBorder": "--gl-client-border=2px",
+            "clientRadius": "--gl-client-radius=24px",
+            "clientLabelPx": "--gl-client-label-px=26px",
+            "clientLabelWeight": "--gl-client-label-wght=500",
+            "clientLabelLeading": "--gl-client-label-leading=1.2",
+            "clientLabelTracking": "--gl-client-label-tracking=0.14em"
+          },
+          "backdrop": {
+            "src": "asset-ref:layer:cover-proposal-orbit-engine",
+            "alt": ""
+          },
+          "voice": {
+            "question": "¿Dónde nace una cuenta?",
+            "answer": "búsqueda",
+            "eyebrow": "Propuesta técnica · Octubre 2026",
+            "answerLead": "En la"
+          },
+          "evidence": "Preparada para <strong>Pibank</strong> · Confidencial",
+          "clientLogo": {
+            "src": "asset-ref:file:pibank-logo",
+            "alt": "Pibank"
+          },
+          "selection": {
+            "label": "Pibank",
+            "anchor": "top-end",
+            "participantKind": "role",
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "overlay": "none"
+          }
+        }
+      },
+      {
+        "slideId": "p02-deck-section-classic",
+        "contentType": "deck.section-classic",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 420,
+            "answerTop": 495,
+            "answerPx": 120,
+            "ringCx": "--gl-ring-cx=1420px",
+            "numberTop": "--gl-number-top=430px",
+            "labelTop": "--gl-label-top=640px",
+            "numberPx": "--gl-number-px=190px",
+            "numberWeight": "--gl-number-wght=300",
+            "labelPx": "--gl-label-px=24px",
+            "columnWidth": "--gl-column-width=1080px"
+          },
+          "orbit": {
+            "src": "asset-ref:layer:section-progress-1-of-3-growth"
+          },
+          "progress": {
+            "number": "01",
+            "label": "Sección 1 de 3"
+          },
+          "voice": {
+            "question": "¿Nos encuentran hoy al buscar?",
+            "answer": "Casi nunca"
+          }
+        }
+      },
+      {
+        "slideId": "p03-deck-section-classic",
+        "contentType": "deck.section-classic",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 420,
+            "answerTop": 495,
+            "answerPx": 120,
+            "ringCx": "--gl-ring-cx=1420px",
+            "numberTop": "--gl-number-top=430px",
+            "labelTop": "--gl-label-top=640px",
+            "numberPx": "--gl-number-px=190px",
+            "numberWeight": "--gl-number-wght=300",
+            "labelPx": "--gl-label-px=24px",
+            "columnWidth": "--gl-column-width=1080px"
+          },
+          "orbit": {
+            "src": "asset-ref:layer:section-progress-2-of-3-growth"
+          },
+          "progress": {
+            "number": "02",
+            "label": "Sección 2 de 3"
+          },
+          "voice": {
+            "question": "¿Qué cambia en pibank.pe?",
+            "answer": "El recorrido"
+          }
+        }
+      },
+      {
+        "slideId": "p04-deck-method-surround-cycle",
+        "contentType": "deck.method-surround-cycle",
+        "slots": {
+          "frame": {
+            "line": "engine",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 280,
+            "answerPx": 150,
+            "bodyTop": 640,
+            "bodyPx": 26,
+            "bodyWidth": 380,
+            "questionWidth": "--gl-sur-question-width=470px",
+            "answerLeading": "--gl-sur-answer-leading=0.9",
+            "answerTracking": "--gl-sur-answer-tracking=-0.05em",
+            "answerInset": "--gl-sur-answer-inset=-8px",
+            "answerShadowY": "--gl-sur-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-sur-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-sur-answer-shadow-opacity=35%",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "answerShadowColor": "--gl-sur-answer-shadow-color=#000000",
+            "cardGlowColor": "--gl-sur-card-glow-color=#72ded8",
+            "coreGlowColor": "--gl-sur-core-glow-color=#72ded8",
+            "coreLeft": "--gl-sur-core-left=1140px",
+            "coreTop": "--gl-sur-core-top=558px",
+            "coreWidth": "--gl-sur-core-width=300px",
+            "coreTitlePx": "--gl-sur-core-title-px=38px",
+            "coreTitleLeading": "--gl-sur-core-title-leading=1",
+            "coreTitleTracking": "--gl-sur-core-title-tracking=-0.03em",
+            "coreGlowBlur": "--gl-sur-core-glow-blur=30px",
+            "coreGlowOpacity": "--gl-sur-core-glow-opacity=50%",
+            "coreCaptionPx": "--gl-sur-core-caption-px=16px",
+            "coreCaptionWght": "--gl-sur-core-caption-wght=400",
+            "coreCaptionGap": "--gl-sur-core-caption-gap=6px",
+            "coreCaptionColor": "--gl-sur-core-caption-color=#d6e2ec",
+            "iconShadowY": "--gl-sur-icon-shadow-y=18px",
+            "iconShadowBlur": "--gl-sur-icon-shadow-blur=24px",
+            "iconShadowColor": "--gl-sur-icon-shadow-color=#000610",
+            "iconShadowOpacity": "--gl-sur-icon-shadow-opacity=60%",
+            "cardPadTop": "--gl-sur-card-pad-top=16px",
+            "cardPadX": "--gl-sur-card-pad-x=20px",
+            "cardPadBottom": "--gl-sur-card-pad-bottom=18px",
+            "cardRadius": "--gl-sur-card-radius=18px",
+            "cardAngle": "--gl-sur-card-angle=160deg",
+            "leadFillFrom": "--gl-sur-lead-from-color=#0f4a5c",
+            "leadFillTo": "--gl-sur-lead-to-color=#0a2a40",
+            "restFillFrom": "--gl-sur-rest-from-color=#0e2a44",
+            "restFillTo": "--gl-sur-rest-to-color=#081c30",
+            "leadBorder": "--gl-sur-lead-border=2px",
+            "leadBorderColor": "--gl-sur-lead-border-color=#72ded8",
+            "leadBorderOpacity": "--gl-sur-lead-border-opacity=90%",
+            "restBorder": "--gl-sur-rest-border=1px",
+            "restBorderColor": "--gl-sur-rest-border-color=#ffffff",
+            "restBorderOpacity": "--gl-sur-rest-border-opacity=16%",
+            "shadowY": "--gl-sur-shadow-y=30px",
+            "shadowBlur": "--gl-sur-shadow-blur=70px",
+            "shadowColor": "--gl-sur-shadow-color=#000610",
+            "shadowOpacity": "--gl-sur-shadow-opacity=60%",
+            "leadGlowBlur": "--gl-sur-lead-glow-blur=70px",
+            "leadGlowOpacity": "--gl-sur-lead-glow-opacity=40%",
+            "restGlowBlur": "--gl-sur-rest-glow-blur=24px",
+            "restGlowOpacity": "--gl-sur-rest-glow-opacity=10%",
+            "kickerPx": "--gl-sur-kicker-px=14px",
+            "kickerWght": "--gl-sur-kicker-wght=600",
+            "kickerTracking": "--gl-sur-kicker-tracking=0.12em",
+            "kickerLeadColor": "--gl-sur-kicker-lead-color=#72ded8",
+            "kickerColor": "--gl-sur-kicker-color=#e2e2e2",
+            "kickerStartColor": "--gl-sur-kicker-start-color=#ffffff",
+            "titlePx": "--gl-sur-title-px=34px",
+            "titleLeading": "--gl-sur-title-leading=1",
+            "titleTracking": "--gl-sur-title-tracking=-0.03em",
+            "titleGap": "--gl-sur-title-gap=6px",
+            "descPx": "--gl-sur-desc-px=15px",
+            "descWght": "--gl-sur-desc-wght=400",
+            "descLeading": "--gl-sur-desc-leading=1.45",
+            "descGap": "--gl-sur-desc-gap=8px",
+            "descColor": "--gl-sur-desc-color=#d6e2ec"
+          },
+          "stage": {
+            "src": "asset-ref:layer:method-surround-cycle-stage"
+          },
+          "loop": {
+            "src": "asset-ref:layer:method-surround-cycle-loop"
+          },
+          "voice": {
+            "question": "¿Cómo se sostiene?",
+            "answer": "En ciclo",
+            "eyebrow": "Cómo trabajamos cada mes"
+          },
+          "body": "El programa no termina en una implementación: cada mes aprende del anterior y sube a Pibank un <strong>nivel</strong>.",
+          "stations": [
+            {
+              "role": "lead",
+              "iconLeft": "--gl-sur-icon-left=1231px",
+              "iconTop": "--gl-sur-icon-top=367.96px",
+              "iconSize": "--gl-sur-icon-size=118px",
+              "cardLeft": "--gl-sur-card-left=1110px",
+              "cardTop": "--gl-sur-card-top=160px",
+              "cardWidth": "--gl-sur-card-width=360px",
+              "src": "asset-ref:file:measure",
+              "number": "01",
+              "start": "Empieza aquí",
+              "title": "Medir",
+              "description": "Search Console, analítica y el panel de IA: dónde aparece Pibank, qué consultas llegan y qué avanza a la apertura."
+            },
+            {
+              "role": "rest",
+              "iconLeft": "--gl-sur-icon-left=1620px",
+              "iconTop": "--gl-sur-icon-top=522px",
+              "iconSize": "--gl-sur-icon-size=100px",
+              "cardLeft": "--gl-sur-card-left=1560px",
+              "cardTop": "--gl-sur-card-top=338px",
+              "cardWidth": "--gl-sur-card-width=300px",
+              "src": "asset-ref:file:create",
+              "number": "02",
+              "title": "Crear",
+              "description": "Hasta cinco artículos al mes y mejoras del pilar Cuenta Soles, con fuente y revisión del banco."
+            },
+            {
+              "role": "rest",
+              "iconLeft": "--gl-sur-icon-left=1240px",
+              "iconTop": "--gl-sur-icon-top=662px",
+              "iconSize": "--gl-sur-icon-size=100px",
+              "cardLeft": "--gl-sur-card-left=1110px",
+              "cardTop": "--gl-sur-card-top=804px",
+              "cardWidth": "--gl-sur-card-width=360px",
+              "src": "asset-ref:file:distribute",
+              "number": "03",
+              "title": "Distribuir",
+              "description": "Comunidad, PR y enlaces llevan los recursos a quien compara cuentas, más allá del sitio."
+            },
+            {
+              "role": "rest",
+              "iconLeft": "--gl-sur-icon-left=860px",
+              "iconTop": "--gl-sur-icon-top=522px",
+              "iconSize": "--gl-sur-icon-size=100px",
+              "cardLeft": "--gl-sur-card-left=620px",
+              "cardTop": "--gl-sur-card-top=660px",
+              "cardWidth": "--gl-sur-card-width=300px",
+              "src": "asset-ref:file:optimize",
+              "number": "04",
+              "title": "Optimizar",
+              "description": "Corregimos lo que la medición muestra: consultas sin respuesta, condiciones desactualizadas y fricciones."
+            }
+          ],
+          "core": {
+            "title": "Pibank",
+            "caption": "sube un nivel en cada vuelta"
+          }
+        }
+      },
+      {
+        "slideId": "p05-deck-section-classic",
+        "contentType": "deck.section-classic",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 420,
+            "answerTop": 495,
+            "answerPx": 120,
+            "ringCx": "--gl-ring-cx=1420px",
+            "numberTop": "--gl-number-top=430px",
+            "labelTop": "--gl-label-top=640px",
+            "numberPx": "--gl-number-px=190px",
+            "numberWeight": "--gl-number-wght=300",
+            "labelPx": "--gl-label-px=24px",
+            "columnWidth": "--gl-column-width=1080px"
+          },
+          "orbit": {
+            "src": "asset-ref:layer:section-progress-3-of-3-growth"
+          },
+          "progress": {
+            "number": "03",
+            "label": "Sección 3 de 3"
+          },
+          "voice": {
+            "question": "¿Cuándo se mide el aporte?",
+            "answer": "Cada mes"
+          }
+        }
+      },
+      {
+        "slideId": "p06-deck-content-measure-formulas",
+        "contentType": "deck.content-measure-formulas",
+        "slots": {
+          "frame": {
+            "line": "engine",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 150,
+            "answerLeading": "--gl-ls-answer-leading=0.9",
+            "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+            "answerInset": "--gl-ls-answer-inset=-8px",
+            "questionWidth": "--gl-ls-question-width=500px",
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 420,
+            "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px",
+            "noteRight": "--gl-ls-note-right=120px",
+            "noteTop": "--gl-ls-note-top=112px",
+            "notePx": "--gl-ls-note-px=16px",
+            "noteWeight": "--gl-ls-note-wght=400",
+            "noteColor": "--gl-ls-note-color=#e2e2e2",
+            "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+            "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+            "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+            "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+            "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+            "lsGlassBlur": "--gl-ls-glass-blur=6px",
+            "lsGlassBorder": "--gl-ls-glass-border=1px",
+            "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+            "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+            "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+            "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+            "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+            "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+            "cardWidth": "--gl-cmf-card-width=330px",
+            "cardHeight": "--gl-cmf-card-height=262px",
+            "cardPadY": "--gl-cmf-card-pad-y=22px",
+            "cardPadX": "--gl-cmf-card-pad-x=24px",
+            "cardRadius": "--gl-cmf-card-radius=22px",
+            "iconSize": "--gl-cmf-icon=52px",
+            "titlePx": "--gl-cmf-title-px=28px",
+            "titleTracking": "--gl-cmf-title-tracking=-0.56px",
+            "titleGap": "--gl-cmf-title-gap=16px",
+            "titleColor": "--gl-cmf-title-color=#ffffff",
+            "formulaPx": "--gl-cmf-formula-px=16px",
+            "formulaWeight": "--gl-cmf-formula-wght=500",
+            "formulaLeading": "--gl-cmf-formula-leading=1.4",
+            "formulaGap": "--gl-cmf-formula-gap=10px",
+            "formulaPadY": "--gl-cmf-formula-pad-y=8px",
+            "formulaPadX": "--gl-cmf-formula-pad-x=12px",
+            "formulaRadius": "--gl-cmf-formula-radius=10px",
+            "formulaFill": "--gl-cmf-formula-fill-color=#ffffff",
+            "formulaFillOpacity": "--gl-cmf-formula-fill-opacity=8%",
+            "formulaColor": "--gl-cmf-formula-color=#e6edf3",
+            "metaPx": "--gl-cmf-meta-px=13px",
+            "metaWeight": "--gl-cmf-meta-wght=500",
+            "metaTracking": "--gl-cmf-meta-tracking=1.3px",
+            "metaGapFirst": "--gl-cmf-meta-gap-first=12px",
+            "metaGapNext": "--gl-cmf-meta-gap-next=6px",
+            "metaColor": "--gl-cmf-meta-color=#e2e2e2"
+          },
+          "stage": {
+            "src": "asset-ref:layer:cmf-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:cmf-platform"
+          },
+          "voice": {
+            "question": "¿Cómo sabremos si funciona?",
+            "answer": "medimos",
+            "eyebrow": "Medición y atribución",
+            "answerLead": "Lo"
+          },
+          "body": "Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>. Una cuenta se cuenta una vez, aunque la hayan tocado varios canales.",
+          "note": "Sin cifras de promesa: la línea base se fija en el primer mes con datos del banco",
+          "metrics": [
+            {
+              "icon": "asset-ref:icon:medicion-engine-dark-52",
+              "name": "Visitas elegibles",
+              "formula": "Sesiones en páginas de ahorro, por canal",
+              "sourceLabel": "Fuente",
+              "source": "Analítica web",
+              "ownerLabel": "Dueño",
+              "owner": "Efeonce",
+              "left": "--gl-cmf-left=760px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:checklist-engine-dark-52",
+              "name": "Aperturas validadas",
+              "formula": "Cuentas abiertas confirmadas por el banco",
+              "sourceLabel": "Fuente",
+              "source": "Registro Pibank",
+              "ownerLabel": "Dueño",
+              "owner": "Analítica Pibank",
+              "left": "--gl-cmf-left=1110px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:base-de-datos-engine-dark-52",
+              "name": "Cuentas con fondos",
+              "formula": "Primer depósito dentro de la ventana acordada",
+              "sourceLabel": "Fuente",
+              "source": "Datos del banco",
+              "ownerLabel": "Dueño",
+              "owner": "Onboarding Pibank",
+              "left": "--gl-cmf-left=1460px",
+              "top": "--gl-cmf-top=190px"
+            },
+            {
+              "icon": "asset-ref:icon:ia-engine-dark-52",
+              "name": "Presencia en IA",
+              "formula": "Respuestas que citan bien a Pibank ÷ total",
+              "sourceLabel": "Fuente",
+              "source": "Panel AEO",
+              "ownerLabel": "Dueño",
+              "owner": "Efeonce",
+              "left": "--gl-cmf-left=935px",
+              "top": "--gl-cmf-top=480px"
+            },
+            {
+              "icon": "asset-ref:icon:reloj-engine-dark-52",
+              "name": "Referencias",
+              "formula": "Coberturas y enlaces editoriales verificados",
+              "sourceLabel": "Fuente",
+              "source": "Registro de PR",
+              "ownerLabel": "Dueño",
+              "owner": "Comunicaciones",
+              "left": "--gl-cmf-left=1285px",
+              "top": "--gl-cmf-top=480px"
+            }
+          ]
+        }
+      },
+      {
+        "slideId": "p07-deck-content-team",
+        "contentType": "deck.content-team",
+        "slots": {
+          "frame": {
+            "line": "engine",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 140,
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 380,
+            "questionWidth": "--gl-tm-question-width=470px",
+            "answerLeading": "--gl-tm-answer-leading=0.9",
+            "answerTracking": "--gl-tm-answer-tracking=-0.05em",
+            "answerInset": "--gl-tm-answer-inset=-8px",
+            "answerShadowY": "--gl-tm-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-tm-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-tm-answer-shadow-opacity=35%",
+            "perspective": "--gl-tm-perspective=1800px",
+            "originX": "--gl-tm-origin-x=1300px",
+            "originY": "--gl-tm-origin-y=450px",
+            "fillFrom": "--gl-tm-fill-from-color=#0e2a44",
+            "fillTo": "--gl-tm-fill-to-color=#081c30",
+            "leadRadius": "--gl-tm-lead-radius=24px",
+            "restRadius": "--gl-tm-rest-radius=20px",
+            "leadBorder": "--gl-tm-lead-border=2px",
+            "leadBorderColor": "--gl-tm-lead-border-color=#72ded8",
+            "leadBorderOpacity": "--gl-tm-lead-border-opacity=85%",
+            "restBorder": "--gl-tm-rest-border=1px",
+            "restBorderColor": "--gl-tm-rest-border-color=#ffffff",
+            "restBorderOpacity": "--gl-tm-rest-border-opacity=16%",
+            "shadowY": "--gl-tm-shadow-y=40px",
+            "shadowBlur": "--gl-tm-shadow-blur=90px",
+            "shadowColor": "--gl-tm-shadow-color=#000610",
+            "shadowOpacity": "--gl-tm-shadow-opacity=70%",
+            "haloColor": "--gl-tm-halo-color=#72ded8",
+            "leadGlowBlur": "--gl-tm-lead-glow-blur=90px",
+            "leadGlowOpacity": "--gl-tm-lead-glow-opacity=45%",
+            "restGlowBlur": "--gl-tm-rest-glow-blur=40px",
+            "restGlowOpacity": "--gl-tm-rest-glow-opacity=16%",
+            "leadPadTop": "--gl-tm-lead-pad-top=18px",
+            "leadPadX": "--gl-tm-lead-pad-x=20px",
+            "leadPadBottom": "--gl-tm-lead-pad-bottom=20px",
+            "restPadTop": "--gl-tm-rest-pad-top=14px",
+            "restPadX": "--gl-tm-rest-pad-x=16px",
+            "restPadBottom": "--gl-tm-rest-pad-bottom=16px",
+            "leadNamePx": "--gl-tm-lead-name-px=30px",
+            "restNamePx": "--gl-tm-rest-name-px=22px",
+            "leadRolePx": "--gl-tm-lead-role-px=18px",
+            "restRolePx": "--gl-tm-rest-role-px=15px",
+            "roleGap": "--gl-tm-role-gap=3px",
+            "roleColor": "--gl-tm-role-color=#c9d6e2",
+            "reflectGap": "--gl-tm-reflect-gap=14px",
+            "reflectFrom": "--gl-tm-reflect-from=72%",
+            "reflectOpacity": "--gl-tm-reflect-opacity=16%",
+            "centerLeft": "--gl-tm-center-left=1050px",
+            "centerTop": "--gl-tm-center-top=815px",
+            "centerWidth": "--gl-tm-center-width=500px",
+            "centerPx": "--gl-tm-center-px=46px",
+            "centerTracking": "--gl-tm-center-tracking=-0.03em",
+            "centerGlowBlur": "--gl-tm-center-glow-blur=30px",
+            "centerGlowOpacity": "--gl-tm-center-glow-opacity=45%",
+            "centerNotePx": "--gl-tm-center-note-px=19px",
+            "centerNoteGap": "--gl-tm-center-note-gap=4px"
+          },
+          "stage": {
+            "src": "asset-ref:layer:content-team-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:content-team-platform"
+          },
+          "voice": {
+            "question": "¿Quién trabaja en la cuenta?",
+            "answer": "reales",
+            "eyebrow": "Tu equipo",
+            "answerLead": "Personas"
+          },
+          "body": "Un equipo que orbita Pibank y <strong>un</strong> solo interlocutor: tu Responsable de Cuenta.",
+          "team": [
+            {
+              "role": "rest",
+              "left": "--gl-tm-left=790px",
+              "top": "--gl-tm-top=330px",
+              "width": "--gl-tm-width=190px",
+              "photoHeight": "--gl-tm-photo-height=213px",
+              "rotate": "--gl-tm-rotate=18deg",
+              "z": "--gl-tm-z=2",
+              "src": "asset-ref:file:squad-andres",
+              "alt": "Andrés, SEO Specialist",
+              "name": "Andrés",
+              "title": "SEO Specialist"
+            },
+            {
+              "role": "rest",
+              "left": "--gl-tm-left=952.5px",
+              "top": "--gl-tm-top=300px",
+              "width": "--gl-tm-width=225px",
+              "photoHeight": "--gl-tm-photo-height=252px",
+              "rotate": "--gl-tm-rotate=12deg",
+              "z": "--gl-tm-z=3",
+              "src": "asset-ref:file:squad-valentina",
+              "alt": "Valentina, Redactora SEO",
+              "name": "Valentina",
+              "title": "Redactora SEO"
+            },
+            {
+              "role": "lead",
+              "left": "--gl-tm-left=1155px",
+              "top": "--gl-tm-top=240px",
+              "width": "--gl-tm-width=290px",
+              "photoHeight": "--gl-tm-photo-height=325px",
+              "rotate": "--gl-tm-rotate=0deg",
+              "z": "--gl-tm-z=5",
+              "src": "asset-ref:file:squad-julio",
+              "alt": "Julio, Responsable de Cuenta",
+              "name": "Julio",
+              "title": "Responsable de Cuenta"
+            },
+            {
+              "role": "rest",
+              "left": "--gl-tm-left=1452.5px",
+              "top": "--gl-tm-top=300px",
+              "width": "--gl-tm-width=225px",
+              "photoHeight": "--gl-tm-photo-height=252px",
+              "rotate": "--gl-tm-rotate=-12deg",
+              "z": "--gl-tm-z=3",
+              "src": "asset-ref:file:squad-daniela",
+              "alt": "Daniela, Creative Operations Lead",
+              "name": "Daniela",
+              "title": "Creative Operations Lead"
+            },
+            {
+              "role": "rest",
+              "left": "--gl-tm-left=1705px",
+              "top": "--gl-tm-top=330px",
+              "width": "--gl-tm-width=170px",
+              "photoHeight": "--gl-tm-photo-height=190px",
+              "rotate": "--gl-tm-rotate=-18deg",
+              "z": "--gl-tm-z=2",
+              "src": "asset-ref:file:squad-melkin",
+              "alt": "Melkin, Senior Visual Designer",
+              "name": "Melkin",
+              "title": "Senior Visual Designer"
+            }
+          ],
+          "center": {
+            "title": "Pibank",
+            "note": "al centro de todo"
+          },
+          "selection": {
+            "label": "Pibank",
+            "anchor": "top-end",
+            "participantKind": "role",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 3
+          }
+        }
+      },
+      {
+        "slideId": "p08-deck-decision-risk",
+        "contentType": "deck.decision-risk",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 132,
+            "bodyTop": 560,
+            "bodyPx": 26,
+            "bodyWidth": 520,
+            "headersTop": "--gl-dr-headers-top=200px",
+            "headerPx": "--gl-dr-header-px=16px",
+            "secondColumn": "--gl-dr-second-column=1140px",
+            "tableLeft": "--gl-dr-table-left=800px",
+            "tableTop": "--gl-dr-table-top=250px",
+            "tableWidth": "--gl-dr-table-width=980px",
+            "rowHeight": "--gl-dr-row-height=150px",
+            "rowGap": "--gl-dr-row-gap=20px",
+            "riskWidth": "--gl-dr-risk-width=300px",
+            "columnGap": "--gl-dr-column-gap=40px",
+            "ruleStroke": "--gl-dr-rule=2px",
+            "rowPadTop": "--gl-dr-row-pad-top=22px",
+            "riskPx": "--gl-dr-risk-px=26px",
+            "namePx": "--gl-dr-name-px=44px",
+            "nameTracking": "--gl-dr-name-tracking=-0.02em",
+            "howPx": "--gl-dr-how-px=22px",
+            "howGap": "--gl-dr-how-gap=10px"
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dr-progress-3-of-3-growth"
+          },
+          "voice": {
+            "question": "¿Y si no funciona?",
+            "answer": "pronto",
+            "eyebrow": "Riesgo controlado",
+            "answerLead": "Lo sabrás"
+          },
+          "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+          "headers": {
+            "risk": "El riesgo",
+            "how": "Cómo lo cubrimos"
+          },
+          "risks": [
+            {
+              "risk": "Promesas sin respaldo",
+              "name": "Sin promesas vacías",
+              "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+            },
+            {
+              "risk": "Condiciones erradas",
+              "name": "Revisión del banco",
+              "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+            },
+            {
+              "risk": "Esperar a TI",
+              "name": "Plan alternativo",
+              "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+            },
+            {
+              "risk": "Depender de una persona",
+              "name": "Traspaso documentado",
+              "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+            }
+          ],
+          "selection": {
+            "label": "Pibank",
+            "anchor": "top-start",
+            "participantKind": "department",
+            "scale": 1.15,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 1
+          }
+        }
+      },
+      {
+        "slideId": "p09-deck-close-proposal",
+        "contentType": "deck.close-proposal",
+        "slots": {
+          "frame": {
+            "line": "engine",
+            "margin": 140,
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=230px",
+            "logoWidth": "--gl-logo-width=500px",
+            "sloganTop": "--gl-slogan-top=420px",
+            "sloganPx": "--gl-slogan-px=72px",
+            "sloganLeading": "--gl-slogan-leading=1.15",
+            "contactTop": "--gl-contact-top=600px",
+            "contactPx": "--gl-contact-px=20px",
+            "contactWeight": "--gl-contact-wght=500",
+            "contactLeading": "--gl-contact-leading=1.3",
+            "contactRowGap": "--gl-contact-row-gap=18px",
+            "contactBubbleHeight": "--gl-contact-bubble-height=32px",
+            "contactSocialGap": "--gl-contact-social-gap=28px",
+            "contactSocialIcon": "--gl-contact-social-icon=32px",
+            "contactSocialIconGap": "--gl-contact-social-icon-gap=14px",
+            "contactItemIcon": "--gl-contact-item-icon=23px",
+            "contactItemGap": "--gl-contact-item-gap=8px",
+            "contactIconOpacity": "--gl-contact-icon-opacity=0.78",
+            "contactSocialBelow": "--gl-contact-social-below=0px",
+            "sloganRunLeading": "--gl-slogan-run-leading=1.15"
+          },
+          "backdrop": {
+            "src": "asset-ref:plate:BR3-contra-horizonte",
+            "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte"
+          },
+          "slogan": [
+            {
+              "text": "Empower",
+              "style": "800 italic #e2e2e2"
+            },
+            {
+              "text": "your",
+              "style": "800 normal #e2e2e2"
+            },
+            {
+              "text": "Engine",
+              "style": "900 italic #0375db"
+            }
+          ],
+          "contact": {
+            "email": "sales@efeoncepro.com",
+            "phoneFirst": "+56 9 3732 3064",
+            "phoneSecond": "+1 (239) 235-2073",
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "p01-deck-cover-proposal",
+      "contentType": "deck.cover-proposal",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "eyebrowTop": 410,
+          "questionTop": 458,
+          "answerTop": 520,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 790,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px",
+          "clientLeft": "--gl-client-left=1170px",
+          "clientTop": "--gl-client-top=440px",
+          "clientWidth": "--gl-client-width=460px",
+          "clientHeight": "--gl-client-height=200px",
+          "clientBorder": "--gl-client-border=2px",
+          "clientRadius": "--gl-client-radius=24px",
+          "clientLabelPx": "--gl-client-label-px=26px",
+          "clientLabelWeight": "--gl-client-label-wght=500",
+          "clientLabelLeading": "--gl-client-label-leading=1.2",
+          "clientLabelTracking": "--gl-client-label-tracking=0.14em"
+        },
+        "backdrop": {
+          "src": "asset-ref:layer:cover-proposal-orbit-engine",
+          "alt": ""
+        },
+        "voice": {
+          "question": "¿Dónde nace una cuenta?",
+          "answer": "búsqueda",
+          "eyebrow": "Propuesta técnica · Octubre 2026",
+          "answerLead": "En la"
+        },
+        "evidence": "Preparada para <strong>Pibank</strong> · Confidencial",
+        "clientLogo": {
+          "src": "asset-ref:file:pibank-logo",
+          "alt": "Pibank"
+        },
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "overlay": "none"
+        }
+      },
+      "template": "CoverProposalOrbit",
+      "contractHash": "5163faba45f9265dcb1257a9fdbb798a31c78b1b8411abd1f465dfa13e57d3aa",
+      "templateHash": "9f64d6ebd322024143eaf3e42dc61c86bf6fb453c57e486d279bfcf5b22ab0eb"
+    },
+    {
+      "slideId": "p02-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-1-of-3-growth"
+        },
+        "progress": {
+          "number": "01",
+          "label": "Sección 1 de 3"
+        },
+        "voice": {
+          "question": "¿Nos encuentran hoy al buscar?",
+          "answer": "Casi nunca"
+        }
+      },
+      "template": "SectionClassic",
+      "contractHash": "b190482380ed22df94f7bf6f668a6501ffa200b7e7cfd3bd58e26782072193a4",
+      "templateHash": "fa087073f40d696777254b00afce89cb44091950ae1cc54015bb07b8d720aed4"
+    },
+    {
+      "slideId": "p03-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-2-of-3-growth"
+        },
+        "progress": {
+          "number": "02",
+          "label": "Sección 2 de 3"
+        },
+        "voice": {
+          "question": "¿Qué cambia en pibank.pe?",
+          "answer": "El recorrido"
+        }
+      },
+      "template": "SectionClassic",
+      "contractHash": "b190482380ed22df94f7bf6f668a6501ffa200b7e7cfd3bd58e26782072193a4",
+      "templateHash": "fa087073f40d696777254b00afce89cb44091950ae1cc54015bb07b8d720aed4"
+    },
+    {
+      "slideId": "p04-deck-method-surround-cycle",
+      "contentType": "deck.method-surround-cycle",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 280,
+          "answerPx": 150,
+          "bodyTop": 640,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-sur-question-width=470px",
+          "answerLeading": "--gl-sur-answer-leading=0.9",
+          "answerTracking": "--gl-sur-answer-tracking=-0.05em",
+          "answerInset": "--gl-sur-answer-inset=-8px",
+          "answerShadowY": "--gl-sur-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-sur-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-sur-answer-shadow-opacity=35%",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "answerShadowColor": "--gl-sur-answer-shadow-color=#000000",
+          "cardGlowColor": "--gl-sur-card-glow-color=#72ded8",
+          "coreGlowColor": "--gl-sur-core-glow-color=#72ded8",
+          "coreLeft": "--gl-sur-core-left=1140px",
+          "coreTop": "--gl-sur-core-top=558px",
+          "coreWidth": "--gl-sur-core-width=300px",
+          "coreTitlePx": "--gl-sur-core-title-px=38px",
+          "coreTitleLeading": "--gl-sur-core-title-leading=1",
+          "coreTitleTracking": "--gl-sur-core-title-tracking=-0.03em",
+          "coreGlowBlur": "--gl-sur-core-glow-blur=30px",
+          "coreGlowOpacity": "--gl-sur-core-glow-opacity=50%",
+          "coreCaptionPx": "--gl-sur-core-caption-px=16px",
+          "coreCaptionWght": "--gl-sur-core-caption-wght=400",
+          "coreCaptionGap": "--gl-sur-core-caption-gap=6px",
+          "coreCaptionColor": "--gl-sur-core-caption-color=#d6e2ec",
+          "iconShadowY": "--gl-sur-icon-shadow-y=18px",
+          "iconShadowBlur": "--gl-sur-icon-shadow-blur=24px",
+          "iconShadowColor": "--gl-sur-icon-shadow-color=#000610",
+          "iconShadowOpacity": "--gl-sur-icon-shadow-opacity=60%",
+          "cardPadTop": "--gl-sur-card-pad-top=16px",
+          "cardPadX": "--gl-sur-card-pad-x=20px",
+          "cardPadBottom": "--gl-sur-card-pad-bottom=18px",
+          "cardRadius": "--gl-sur-card-radius=18px",
+          "cardAngle": "--gl-sur-card-angle=160deg",
+          "leadFillFrom": "--gl-sur-lead-from-color=#0f4a5c",
+          "leadFillTo": "--gl-sur-lead-to-color=#0a2a40",
+          "restFillFrom": "--gl-sur-rest-from-color=#0e2a44",
+          "restFillTo": "--gl-sur-rest-to-color=#081c30",
+          "leadBorder": "--gl-sur-lead-border=2px",
+          "leadBorderColor": "--gl-sur-lead-border-color=#72ded8",
+          "leadBorderOpacity": "--gl-sur-lead-border-opacity=90%",
+          "restBorder": "--gl-sur-rest-border=1px",
+          "restBorderColor": "--gl-sur-rest-border-color=#ffffff",
+          "restBorderOpacity": "--gl-sur-rest-border-opacity=16%",
+          "shadowY": "--gl-sur-shadow-y=30px",
+          "shadowBlur": "--gl-sur-shadow-blur=70px",
+          "shadowColor": "--gl-sur-shadow-color=#000610",
+          "shadowOpacity": "--gl-sur-shadow-opacity=60%",
+          "leadGlowBlur": "--gl-sur-lead-glow-blur=70px",
+          "leadGlowOpacity": "--gl-sur-lead-glow-opacity=40%",
+          "restGlowBlur": "--gl-sur-rest-glow-blur=24px",
+          "restGlowOpacity": "--gl-sur-rest-glow-opacity=10%",
+          "kickerPx": "--gl-sur-kicker-px=14px",
+          "kickerWght": "--gl-sur-kicker-wght=600",
+          "kickerTracking": "--gl-sur-kicker-tracking=0.12em",
+          "kickerLeadColor": "--gl-sur-kicker-lead-color=#72ded8",
+          "kickerColor": "--gl-sur-kicker-color=#e2e2e2",
+          "kickerStartColor": "--gl-sur-kicker-start-color=#ffffff",
+          "titlePx": "--gl-sur-title-px=34px",
+          "titleLeading": "--gl-sur-title-leading=1",
+          "titleTracking": "--gl-sur-title-tracking=-0.03em",
+          "titleGap": "--gl-sur-title-gap=6px",
+          "descPx": "--gl-sur-desc-px=15px",
+          "descWght": "--gl-sur-desc-wght=400",
+          "descLeading": "--gl-sur-desc-leading=1.45",
+          "descGap": "--gl-sur-desc-gap=8px",
+          "descColor": "--gl-sur-desc-color=#d6e2ec"
+        },
+        "stage": {
+          "src": "asset-ref:layer:method-surround-cycle-stage"
+        },
+        "loop": {
+          "src": "asset-ref:layer:method-surround-cycle-loop"
+        },
+        "voice": {
+          "question": "¿Cómo se sostiene?",
+          "answer": "En ciclo",
+          "eyebrow": "Cómo trabajamos cada mes"
+        },
+        "body": "El programa no termina en una implementación: cada mes aprende del anterior y sube a Pibank un <strong>nivel</strong>.",
+        "stations": [
+          {
+            "role": "lead",
+            "iconLeft": "--gl-sur-icon-left=1231px",
+            "iconTop": "--gl-sur-icon-top=367.96px",
+            "iconSize": "--gl-sur-icon-size=118px",
+            "cardLeft": "--gl-sur-card-left=1110px",
+            "cardTop": "--gl-sur-card-top=160px",
+            "cardWidth": "--gl-sur-card-width=360px",
+            "src": "asset-ref:file:measure",
+            "number": "01",
+            "start": "Empieza aquí",
+            "title": "Medir",
+            "description": "Search Console, analítica y el panel de IA: dónde aparece Pibank, qué consultas llegan y qué avanza a la apertura."
+          },
+          {
+            "role": "rest",
+            "iconLeft": "--gl-sur-icon-left=1620px",
+            "iconTop": "--gl-sur-icon-top=522px",
+            "iconSize": "--gl-sur-icon-size=100px",
+            "cardLeft": "--gl-sur-card-left=1560px",
+            "cardTop": "--gl-sur-card-top=338px",
+            "cardWidth": "--gl-sur-card-width=300px",
+            "src": "asset-ref:file:create",
+            "number": "02",
+            "title": "Crear",
+            "description": "Hasta cinco artículos al mes y mejoras del pilar Cuenta Soles, con fuente y revisión del banco."
+          },
+          {
+            "role": "rest",
+            "iconLeft": "--gl-sur-icon-left=1240px",
+            "iconTop": "--gl-sur-icon-top=662px",
+            "iconSize": "--gl-sur-icon-size=100px",
+            "cardLeft": "--gl-sur-card-left=1110px",
+            "cardTop": "--gl-sur-card-top=804px",
+            "cardWidth": "--gl-sur-card-width=360px",
+            "src": "asset-ref:file:distribute",
+            "number": "03",
+            "title": "Distribuir",
+            "description": "Comunidad, PR y enlaces llevan los recursos a quien compara cuentas, más allá del sitio."
+          },
+          {
+            "role": "rest",
+            "iconLeft": "--gl-sur-icon-left=860px",
+            "iconTop": "--gl-sur-icon-top=522px",
+            "iconSize": "--gl-sur-icon-size=100px",
+            "cardLeft": "--gl-sur-card-left=620px",
+            "cardTop": "--gl-sur-card-top=660px",
+            "cardWidth": "--gl-sur-card-width=300px",
+            "src": "asset-ref:file:optimize",
+            "number": "04",
+            "title": "Optimizar",
+            "description": "Corregimos lo que la medición muestra: consultas sin respuesta, condiciones desactualizadas y fricciones."
+          }
+        ],
+        "core": {
+          "title": "Pibank",
+          "caption": "sube un nivel en cada vuelta"
+        }
+      },
+      "template": "MethodSurroundCycle",
+      "contractHash": "b743a8e2de5283d5eea7b9a054a58c0199fb03703815ed211eebfffdd6153776",
+      "templateHash": "7c198430deeb841498813c1e01d588dcf20e2a4255dd22d5ed91f365387b5974"
+    },
+    {
+      "slideId": "p05-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-3-of-3-growth"
+        },
+        "progress": {
+          "number": "03",
+          "label": "Sección 3 de 3"
+        },
+        "voice": {
+          "question": "¿Cuándo se mide el aporte?",
+          "answer": "Cada mes"
+        }
+      },
+      "template": "SectionClassic",
+      "contractHash": "b190482380ed22df94f7bf6f668a6501ffa200b7e7cfd3bd58e26782072193a4",
+      "templateHash": "fa087073f40d696777254b00afce89cb44091950ae1cc54015bb07b8d720aed4"
+    },
+    {
+      "slideId": "p06-deck-content-measure-formulas",
+      "contentType": "deck.content-measure-formulas",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "cardWidth": "--gl-cmf-card-width=330px",
+          "cardHeight": "--gl-cmf-card-height=262px",
+          "cardPadY": "--gl-cmf-card-pad-y=22px",
+          "cardPadX": "--gl-cmf-card-pad-x=24px",
+          "cardRadius": "--gl-cmf-card-radius=22px",
+          "iconSize": "--gl-cmf-icon=52px",
+          "titlePx": "--gl-cmf-title-px=28px",
+          "titleTracking": "--gl-cmf-title-tracking=-0.56px",
+          "titleGap": "--gl-cmf-title-gap=16px",
+          "titleColor": "--gl-cmf-title-color=#ffffff",
+          "formulaPx": "--gl-cmf-formula-px=16px",
+          "formulaWeight": "--gl-cmf-formula-wght=500",
+          "formulaLeading": "--gl-cmf-formula-leading=1.4",
+          "formulaGap": "--gl-cmf-formula-gap=10px",
+          "formulaPadY": "--gl-cmf-formula-pad-y=8px",
+          "formulaPadX": "--gl-cmf-formula-pad-x=12px",
+          "formulaRadius": "--gl-cmf-formula-radius=10px",
+          "formulaFill": "--gl-cmf-formula-fill-color=#ffffff",
+          "formulaFillOpacity": "--gl-cmf-formula-fill-opacity=8%",
+          "formulaColor": "--gl-cmf-formula-color=#e6edf3",
+          "metaPx": "--gl-cmf-meta-px=13px",
+          "metaWeight": "--gl-cmf-meta-wght=500",
+          "metaTracking": "--gl-cmf-meta-tracking=1.3px",
+          "metaGapFirst": "--gl-cmf-meta-gap-first=12px",
+          "metaGapNext": "--gl-cmf-meta-gap-next=6px",
+          "metaColor": "--gl-cmf-meta-color=#e2e2e2"
+        },
+        "stage": {
+          "src": "asset-ref:layer:cmf-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:cmf-platform"
+        },
+        "voice": {
+          "question": "¿Cómo sabremos si funciona?",
+          "answer": "medimos",
+          "eyebrow": "Medición y atribución",
+          "answerLead": "Lo"
+        },
+        "body": "Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>. Una cuenta se cuenta una vez, aunque la hayan tocado varios canales.",
+        "note": "Sin cifras de promesa: la línea base se fija en el primer mes con datos del banco",
+        "metrics": [
+          {
+            "icon": "asset-ref:icon:medicion-engine-dark-52",
+            "name": "Visitas elegibles",
+            "formula": "Sesiones en páginas de ahorro, por canal",
+            "sourceLabel": "Fuente",
+            "source": "Analítica web",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=760px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:checklist-engine-dark-52",
+            "name": "Aperturas validadas",
+            "formula": "Cuentas abiertas confirmadas por el banco",
+            "sourceLabel": "Fuente",
+            "source": "Registro Pibank",
+            "ownerLabel": "Dueño",
+            "owner": "Analítica Pibank",
+            "left": "--gl-cmf-left=1110px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:base-de-datos-engine-dark-52",
+            "name": "Cuentas con fondos",
+            "formula": "Primer depósito dentro de la ventana acordada",
+            "sourceLabel": "Fuente",
+            "source": "Datos del banco",
+            "ownerLabel": "Dueño",
+            "owner": "Onboarding Pibank",
+            "left": "--gl-cmf-left=1460px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:ia-engine-dark-52",
+            "name": "Presencia en IA",
+            "formula": "Respuestas que citan bien a Pibank ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Panel AEO",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=935px",
+            "top": "--gl-cmf-top=480px"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-engine-dark-52",
+            "name": "Referencias",
+            "formula": "Coberturas y enlaces editoriales verificados",
+            "sourceLabel": "Fuente",
+            "source": "Registro de PR",
+            "ownerLabel": "Dueño",
+            "owner": "Comunicaciones",
+            "left": "--gl-cmf-left=1285px",
+            "top": "--gl-cmf-top=480px"
+          }
+        ]
+      },
+      "template": "ContentMeasureFormulas",
+      "contractHash": "35488938636cf73de112d6c55ed89a36226f890be009021a55fec69d28bc52e3",
+      "templateHash": "5a50c85ed97aa406f54bbad048d9b5d4409de0b8c8f0ec2b808bbfb4c6c348ff"
+    },
+    {
+      "slideId": "p07-deck-content-team",
+      "contentType": "deck.content-team",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 140,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-tm-question-width=470px",
+          "answerLeading": "--gl-tm-answer-leading=0.9",
+          "answerTracking": "--gl-tm-answer-tracking=-0.05em",
+          "answerInset": "--gl-tm-answer-inset=-8px",
+          "answerShadowY": "--gl-tm-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-tm-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-tm-answer-shadow-opacity=35%",
+          "perspective": "--gl-tm-perspective=1800px",
+          "originX": "--gl-tm-origin-x=1300px",
+          "originY": "--gl-tm-origin-y=450px",
+          "fillFrom": "--gl-tm-fill-from-color=#0e2a44",
+          "fillTo": "--gl-tm-fill-to-color=#081c30",
+          "leadRadius": "--gl-tm-lead-radius=24px",
+          "restRadius": "--gl-tm-rest-radius=20px",
+          "leadBorder": "--gl-tm-lead-border=2px",
+          "leadBorderColor": "--gl-tm-lead-border-color=#72ded8",
+          "leadBorderOpacity": "--gl-tm-lead-border-opacity=85%",
+          "restBorder": "--gl-tm-rest-border=1px",
+          "restBorderColor": "--gl-tm-rest-border-color=#ffffff",
+          "restBorderOpacity": "--gl-tm-rest-border-opacity=16%",
+          "shadowY": "--gl-tm-shadow-y=40px",
+          "shadowBlur": "--gl-tm-shadow-blur=90px",
+          "shadowColor": "--gl-tm-shadow-color=#000610",
+          "shadowOpacity": "--gl-tm-shadow-opacity=70%",
+          "haloColor": "--gl-tm-halo-color=#72ded8",
+          "leadGlowBlur": "--gl-tm-lead-glow-blur=90px",
+          "leadGlowOpacity": "--gl-tm-lead-glow-opacity=45%",
+          "restGlowBlur": "--gl-tm-rest-glow-blur=40px",
+          "restGlowOpacity": "--gl-tm-rest-glow-opacity=16%",
+          "leadPadTop": "--gl-tm-lead-pad-top=18px",
+          "leadPadX": "--gl-tm-lead-pad-x=20px",
+          "leadPadBottom": "--gl-tm-lead-pad-bottom=20px",
+          "restPadTop": "--gl-tm-rest-pad-top=14px",
+          "restPadX": "--gl-tm-rest-pad-x=16px",
+          "restPadBottom": "--gl-tm-rest-pad-bottom=16px",
+          "leadNamePx": "--gl-tm-lead-name-px=30px",
+          "restNamePx": "--gl-tm-rest-name-px=22px",
+          "leadRolePx": "--gl-tm-lead-role-px=18px",
+          "restRolePx": "--gl-tm-rest-role-px=15px",
+          "roleGap": "--gl-tm-role-gap=3px",
+          "roleColor": "--gl-tm-role-color=#c9d6e2",
+          "reflectGap": "--gl-tm-reflect-gap=14px",
+          "reflectFrom": "--gl-tm-reflect-from=72%",
+          "reflectOpacity": "--gl-tm-reflect-opacity=16%",
+          "centerLeft": "--gl-tm-center-left=1050px",
+          "centerTop": "--gl-tm-center-top=815px",
+          "centerWidth": "--gl-tm-center-width=500px",
+          "centerPx": "--gl-tm-center-px=46px",
+          "centerTracking": "--gl-tm-center-tracking=-0.03em",
+          "centerGlowBlur": "--gl-tm-center-glow-blur=30px",
+          "centerGlowOpacity": "--gl-tm-center-glow-opacity=45%",
+          "centerNotePx": "--gl-tm-center-note-px=19px",
+          "centerNoteGap": "--gl-tm-center-note-gap=4px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:content-team-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:content-team-platform"
+        },
+        "voice": {
+          "question": "¿Quién trabaja en la cuenta?",
+          "answer": "reales",
+          "eyebrow": "Tu equipo",
+          "answerLead": "Personas"
+        },
+        "body": "Un equipo que orbita Pibank y <strong>un</strong> solo interlocutor: tu Responsable de Cuenta.",
+        "team": [
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=790px",
+            "top": "--gl-tm-top=330px",
+            "width": "--gl-tm-width=190px",
+            "photoHeight": "--gl-tm-photo-height=213px",
+            "rotate": "--gl-tm-rotate=18deg",
+            "z": "--gl-tm-z=2",
+            "src": "asset-ref:file:squad-andres",
+            "alt": "Andrés, SEO Specialist",
+            "name": "Andrés",
+            "title": "SEO Specialist"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=952.5px",
+            "top": "--gl-tm-top=300px",
+            "width": "--gl-tm-width=225px",
+            "photoHeight": "--gl-tm-photo-height=252px",
+            "rotate": "--gl-tm-rotate=12deg",
+            "z": "--gl-tm-z=3",
+            "src": "asset-ref:file:squad-valentina",
+            "alt": "Valentina, Redactora SEO",
+            "name": "Valentina",
+            "title": "Redactora SEO"
+          },
+          {
+            "role": "lead",
+            "left": "--gl-tm-left=1155px",
+            "top": "--gl-tm-top=240px",
+            "width": "--gl-tm-width=290px",
+            "photoHeight": "--gl-tm-photo-height=325px",
+            "rotate": "--gl-tm-rotate=0deg",
+            "z": "--gl-tm-z=5",
+            "src": "asset-ref:file:squad-julio",
+            "alt": "Julio, Responsable de Cuenta",
+            "name": "Julio",
+            "title": "Responsable de Cuenta"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=1452.5px",
+            "top": "--gl-tm-top=300px",
+            "width": "--gl-tm-width=225px",
+            "photoHeight": "--gl-tm-photo-height=252px",
+            "rotate": "--gl-tm-rotate=-12deg",
+            "z": "--gl-tm-z=3",
+            "src": "asset-ref:file:squad-daniela",
+            "alt": "Daniela, Creative Operations Lead",
+            "name": "Daniela",
+            "title": "Creative Operations Lead"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=1705px",
+            "top": "--gl-tm-top=330px",
+            "width": "--gl-tm-width=170px",
+            "photoHeight": "--gl-tm-photo-height=190px",
+            "rotate": "--gl-tm-rotate=-18deg",
+            "z": "--gl-tm-z=2",
+            "src": "asset-ref:file:squad-melkin",
+            "alt": "Melkin, Senior Visual Designer",
+            "name": "Melkin",
+            "title": "Senior Visual Designer"
+          }
+        ],
+        "center": {
+          "title": "Pibank",
+          "note": "al centro de todo"
+        },
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 3
+        }
+      },
+      "template": "ContentTeam",
+      "contractHash": "01256d65703547fc16ed2b4b58e7bec70ad35f0bf735e1971a14a6b16cd96e9f",
+      "templateHash": "1f88134dfd64fa1474a181cb7f48c5a8d3f2bdf2f56c26ffa6d2351741e371d3"
+    },
+    {
+      "slideId": "p08-deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-3-of-3-growth"
+        },
+        "voice": {
+          "question": "¿Y si no funciona?",
+          "answer": "pronto",
+          "eyebrow": "Riesgo controlado",
+          "answerLead": "Lo sabrás"
+        },
+        "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Promesas sin respaldo",
+            "name": "Sin promesas vacías",
+            "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+          },
+          {
+            "risk": "Condiciones erradas",
+            "name": "Revisión del banco",
+            "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+          },
+          {
+            "risk": "Esperar a TI",
+            "name": "Plan alternativo",
+            "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+          },
+          {
+            "risk": "Depender de una persona",
+            "name": "Traspaso documentado",
+            "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+          }
+        ],
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk",
+      "contractHash": "420185fb14c39fd0ccf8c37752ac800ac7e7fc7a44451b2b860a4e1f1d848a7b",
+      "templateHash": "517045e0ad356372e3c3eb8e49beae36b4d3f8528ae837524510548c952dabf1"
+    },
+    {
+      "slideId": "p09-deck-close-proposal",
+      "contentType": "deck.close-proposal",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=230px",
+          "logoWidth": "--gl-logo-width=500px",
+          "sloganTop": "--gl-slogan-top=420px",
+          "sloganPx": "--gl-slogan-px=72px",
+          "sloganLeading": "--gl-slogan-leading=1.15",
+          "contactTop": "--gl-contact-top=600px",
+          "contactPx": "--gl-contact-px=20px",
+          "contactWeight": "--gl-contact-wght=500",
+          "contactLeading": "--gl-contact-leading=1.3",
+          "contactRowGap": "--gl-contact-row-gap=18px",
+          "contactBubbleHeight": "--gl-contact-bubble-height=32px",
+          "contactSocialGap": "--gl-contact-social-gap=28px",
+          "contactSocialIcon": "--gl-contact-social-icon=32px",
+          "contactSocialIconGap": "--gl-contact-social-icon-gap=14px",
+          "contactItemIcon": "--gl-contact-item-icon=23px",
+          "contactItemGap": "--gl-contact-item-gap=8px",
+          "contactIconOpacity": "--gl-contact-icon-opacity=0.78",
+          "contactSocialBelow": "--gl-contact-social-below=0px",
+          "sloganRunLeading": "--gl-slogan-run-leading=1.15"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:BR3-contra-horizonte",
+          "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte"
+        },
+        "slogan": [
+          {
+            "text": "Empower",
+            "style": "800 italic #e2e2e2"
+          },
+          {
+            "text": "your",
+            "style": "800 normal #e2e2e2"
+          },
+          {
+            "text": "Engine",
+            "style": "900 italic #0375db"
+          }
+        ],
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phoneFirst": "+56 9 3732 3064",
+          "phoneSecond": "+1 (239) 235-2073",
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        }
+      },
+      "template": "CloseProposal",
+      "contractHash": "bee7137e5e2de3e05c5d50190df3e242130f874da2a34025d802496e0304233c",
+      "templateHash": "719b84f5d3ea20777b254657fa7c2e906f600c46497c0ea1e18b43f30cffc38a"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

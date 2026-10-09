@@ -21,6 +21,10 @@ Los controles históricos están comprobados con aritmética decimal independien
 
 - [Manual V3](../../../docs/manual-de-uso/finance/cotizar-v3-por-cli.md): cálculo, validación, explicación, replay, comparación y exportación de borrador.
 - [Demostración completa sintética](scenarios/synthetic-co-cl.json): prueba de reglas; ningún costo/factor/hora/tasa habilita precios comerciales.
-- [Piloto real pendiente Colombia→Chile](scenarios/colombia-chile-design-needs-input.json): combinación elegida por el operador, sin costo localizado ni políticas/FX inventados. Perfil, dedicación y duración son un escenario editable.
+- [Piloto real pendiente Colombia→Chile](scenarios/colombia-chile-design-needs-input.json): combinación elegida por el operador, sin costo localizado ni políticas/FX inventados. Diseñador senior al 50% confirmado; headcount, plazo, modalidad y moneda siguen como supuestos.
 
 `parameters.json` y `reference-calculations.json` siguen siendo revisión/controles; no se pasan directamente al motor como snapshots completos.
+
+- [Ficha económica Colombia→Chile](../../../docs/documentation/finance/cotizador-v3-piloto-colombia-chile.md) y [ledger para agentes](economics/colombia-chile-review.json): confirmaciones, bindings y sensibilidad preparada; costos vigentes pendientes. [Readiness](economics/colombia-chile-readiness.json): sin precio exportable.
+
+- [Simulación histórica ejecutable](scenarios/colombia-chile-design-historical-hypothesis.json): diseñador senior 50% con costo colombiano supuesto, kit histórico y placeholders de prueba; [supuestos](economics/historical-simulation/assumptions.json) y [cinco resultados](economics/historical-simulation/results.json). `calculated/requires_review`, sin habilitación comercial.

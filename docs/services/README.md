@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-09-19
+> **Última actualización:** 2026-10-09
 
 ## Propósito
 
@@ -46,6 +46,13 @@ Cada servicio debe declarar como mínimo:
 8. métricas con definición, período, baseline y denominador;
 9. continuidad, soporte, cadence y procedimiento de cambio;
 10. arquitectura, documentación funcional, manual y casos de referencia.
+
+## RevOps & CRM — capacidad especializada regional
+
+[Capacidad especializada de CRM y RevOps](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md): servicio estructurado con Staff
+Augmentation y operación gestionada. Dirección regional y [Talent Assurance](../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md)
+aprobados el 2026-10-09; oferta `Approved for validation`, con capacidad, pricing y habilitación contractual
+por configuración pendientes. No crea una línea nueva ni una séptima familia HubSpot.
 
 ## Vía comercial On-Demand: Efeonce Factory
 

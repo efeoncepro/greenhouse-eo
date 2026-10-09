@@ -1,0 +1,125 @@
+{
+  "verifiedAt": "2026-10-09",
+  "scope": "Local readiness; no commercial economics validated",
+  "inputPath": "data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json",
+  "inputSha256": "2d9fafd802b966bf4e8b5e54b6b6a8b298e67817ec8db73467ba66799b688de6",
+  "calculate": {
+    "exitCode": 2,
+    "result": {
+      "engineVersion": "pricing-v3-local/1.0.0",
+      "binding": false,
+      "calculationStatus": "needs_input",
+      "reviewStatus": "not_evaluated",
+      "dataMode": "commercial_draft",
+      "calculationCurrency": "USD",
+      "outputCurrency": "CLP",
+      "diagnostics": [
+        {
+          "code": "MISSING_FX",
+          "fieldPath": "snapshot.fx.output",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_FX",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_MARKET_POLICY",
+          "fieldPath": "snapshot.marketFactors",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_MARKET_POLICY",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_COST",
+          "fieldPath": "snapshot.profiles.ECG-002.cost",
+          "lineId": "design",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_COST",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_POLICY",
+          "fieldPath": "request.lines.0",
+          "lineId": "design",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_POLICY",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        }
+      ],
+      "lines": [],
+      "totals": null,
+      "precisionPolicy": "decimal-80-half-up-final-line-largest-remainder-v1"
+    },
+    "calculationId": "local-fb397f774df79f17689d3d24",
+    "replayDigest": "fb397f774df79f17689d3d247ec6e5ed4f47a65e8c2e10202f9df80076206090"
+  },
+  "validate": {
+    "exitCode": 2,
+    "matchesSavedArtifact": true
+  },
+  "replay": {
+    "exitCode": 2,
+    "verified": true,
+    "sameResult": true
+  },
+  "export": {
+    "exitCode": 1,
+    "fileCreated": false,
+    "stderr": "{\n  \"error\": {\n    \"code\": \"EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY\",\n    \"message\": \"Operation failed. Check arguments, readable JSON, frozen version and output availability.\"\n  },\n  \"binding\": false\n}"
+  },
+  "interpretation": "Four initial diagnostics are not an exhaustive cost checklist; allocation-policy absence short-circuits line evaluation. See economic review for all required decisions.",
+  "reviewBindings": {
+    "inputHashMatches": true,
+    "selectorsMatch": true,
+    "historicalReferencesResolve": true
+  },
+  "sensitivity": [
+    {
+      "scenarioId": "shared-half-three",
+      "exitCode": 2,
+      "calculationStatus": "needs_input",
+      "totals": null,
+      "diagnosticCodes": [
+        "MISSING_FX",
+        "MISSING_MARKET_POLICY",
+        "MISSING_COST",
+        "MISSING_POLICY"
+      ]
+    },
+    {
+      "scenarioId": "shared-full-three",
+      "exitCode": 2,
+      "calculationStatus": "needs_input",
+      "totals": null,
+      "diagnosticCodes": [
+        "MISSING_FX",
+        "MISSING_MARKET_POLICY",
+        "MISSING_COST",
+        "MISSING_POLICY"
+      ]
+    },
+    {
+      "scenarioId": "dedicated-half-three",
+      "exitCode": 2,
+      "calculationStatus": "needs_input",
+      "totals": null,
+      "diagnosticCodes": [
+        "MISSING_FX",
+        "MISSING_MARKET_POLICY",
+        "MISSING_COST",
+        "MISSING_POLICY"
+      ]
+    },
+    {
+      "scenarioId": "shared-half-six",
+      "exitCode": 2,
+      "calculationStatus": "needs_input",
+      "totals": null,
+      "diagnosticCodes": [
+        "MISSING_FX",
+        "MISSING_MARKET_POLICY",
+        "MISSING_COST",
+        "MISSING_POLICY"
+      ]
+    }
+  ]
+}

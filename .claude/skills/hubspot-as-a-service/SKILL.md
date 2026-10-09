@@ -18,6 +18,16 @@ For an operator-authorized stage and value update after submitting a proposal, r
 
 Reconcile stale descriptions that still claim no offer was submitted. Read back the exact changes and check stability after native automation; update both local CRM registers and the existing preparation task with submission evidence. Preserve the submitted deliverables. Case and dated readbacks: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). This task-specific authorization does not authorize other CRM changes or communications.
 
+## Regional CRM specialist capacity
+
+For vacancy-led capacity needs, load `docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md`, the regional
+[decision](../../../docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) and [activation playbook](../../../docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md).
+Direction accepted 2026-10-09; offer `Approved for validation`. Separate client-directed Staff Augmentation
+from Efeonce-managed delivery; do not create a seventh solution family. Talent Assurance is an accepted
+standard, not an active claim store or universal badge. Confirm evidence, real capacity, fully loaded economics
+and contracting per client/person/employer/direction before commitments. Vacancy intent is not provider buying
+intent; lead registration does not authorize outreach.
+
 ## Commercial context
 
 The canonical commercial structure is **Efeonce → RevOps & CRM → Kortex (when applicable) → HubSpot as

@@ -244,3 +244,16 @@ Para valorar o dimensionar una propuesta SEO/AEO, cargar
 [caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Costear todos los roles,
 meses, revisiones, PR, herramientas y reserva; comparar valor neto por cohorte con costos del mismo
 horizonte. Capacidad estimada, roster, costo y fee son estados separados bajo la autoridad vigente.
+
+## Costeo local sin UI (Excel de pricing)
+
+Cuando el operador quiera revisar el Excel o costear sin la UI del cotizador, usar
+`pnpm --silent pricing:workbook`: `search`, `role`, `audit`, `scenario`, `estimate` y `compare`.
+[Manual](../../../docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md) y
+[contrato](../../../docs/architecture/GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md).
+La extracción JSON conserva celdas/fórmulas y verifica SHA256; los planes JSON permiten costos
+reemplazados con fuente/fecha. Declarar capacidad vendible, dedicación, gastos y margen sobre venta.
+Dedicado absorbe costo completo; compartido exige hipótesis explícita de venta restante.
+Es una alternativa local usable sin UI/DB; no remitir al operador a una UI que no le funciona.
+Sus resultados son hipótesis sobre costos históricos/declarados, no precios aprobados ni cotizaciones
+emitidas. No importar al catálogo, tocar payroll ni publicar costos internos por inferencia.

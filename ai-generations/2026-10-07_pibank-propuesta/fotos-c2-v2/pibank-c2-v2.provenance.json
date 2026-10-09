@@ -1,0 +1,24 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "bd06baa7999a6bd2b16e91acf5fe5816897acf376f416a44b28faeafd2ea0b05",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.proposal-cinematic"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:SE1-te-encuentran-isotipo",
+      "path": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "sha256": "f8fc99ac450c24f551da251abb2ae017d42f646f40a09ef5da3c8671e035b789"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

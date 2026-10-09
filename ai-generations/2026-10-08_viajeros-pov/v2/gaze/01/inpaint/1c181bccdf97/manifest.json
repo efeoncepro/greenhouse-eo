@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "1c181bccdf97",
+  "key": "1c181bccdf97ece1aa571e7864b3766a7487be844df4758b92f21de5b15fd532",
+  "status": "completed",
+  "createdAt": "2026-10-08T16:55:02.951Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-08_viajeros-pov/v2/01-austral-baker-termo.png",
+    "imageSha256": "9d9a1861a5ad4899efbcfbf454c682e79171dac983bf87d476c3c4ef37d2302e",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-08_viajeros-pov/v2/qa/01-eyes-mask.png",
+    "maskSha256": "37ae869fbbba48fb2e108e1ef81fdabc3d59d66b288b3efc6d259bba1535124e",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-08_viajeros-pov/v2/anchors/austral.png",
+        "sha256": "394aa0d42d537cea45934f46427f3be19f086f6b57490388439dd75247a49f0b"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "GAZE — priority instruction:\nAt this captured instant, her attentive gaze is directed toward the traveling companion whose eyes are immediately above the camera lens. Both pupils fixate that single point at the same distance, with ordinary coordinated convergence. The face can remain slightly tilted from the pouring action, but the eyes are lifted toward the companion in a brief conversational glance, not lowered independently or unfocused. Preserve the exact face, natural iris color, eyelid anatomy, age and healthy skin. No exaggerated wide eyes, asymmetrical gaze, milky irises or detached stare.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nGAZE — priority instruction:\nAt this captured instant, her attentive gaze is directed toward the traveling companion whose eyes are immediately above the camera lens. Both pupils fixate that single point at the same distance, with ordinary coordinated convergence. The face can remain slightly tilted from the pouring action, but the eyes are lifted toward the companion in a brief conversational glance, not lowered independently or unfocused. Preserve the exact face, natural iris color, eyelid anatomy, age and healthy skin. No exaggerated wide eyes, asymmetrical gaze, milky irises or detached stare.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.022358940972222224,
+    "editable": 59280,
+    "soft": 23144,
+    "protected": 3603976
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2560,
+      "height": 1440
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 10.817,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.1,
+        "bestError": 3.1,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.43,
+        -0.36,
+        -0.5
+      ],
+      "protected": {
+        "pixels": 3603976,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 59280,
+        "maxDelta": 168,
+        "meanDelta": 13.953,
+        "worst": {
+          "x": 941,
+          "y": 232
+        }
+      },
+      "seam": {
+        "pixels": 23144,
+        "maxDelta": 67,
+        "meanDelta": 2.783,
+        "worst": {
+          "x": 948,
+          "y": 210
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3603976,
+        "maxDelta": 142,
+        "meanDelta": 6.734,
+        "worst": {
+          "x": 699,
+          "y": 419
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4824,
+        "input_tokens_details": {
+          "image_tokens": 4552,
+          "text_tokens": 272
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 6667
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

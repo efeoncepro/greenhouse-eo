@@ -28,8 +28,8 @@ Tres estados de la esfera: punto final (cierra la palabra respuesta), órbita y 
 
 **Efeonce firma todo** (operador, 2026-09-26): toda pieza, de cualquier línea de servicio, sale con la firma de
 Efeonce. Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como **contexto** —nombre, interfaz
-o isotipo pequeño dentro de su superficie—, nunca como firma; el lockup «by efeonce» sólo vive en la superficie del
-producto. Kortex y Verk, fuera por ahora. **La palabra del eslogan es de la línea de servicio** (operador, 2026-09-26):
+o isotipo pequeño dentro de su superficie—, nunca como firma; junto a Efeonce van en su lockup de familia
+(«efeonce | producto», ruta H3, 2026-10-09) y el endoso «by efeonce» quedó **retirado**. Kortex y Verk, fuera por ahora. **La palabra del eslogan es de la línea de servicio** (operador, 2026-09-26):
 servicios creativos → «Empower your **Brand**» (producto Globe); web, infraestructura, SEO y medición → «Empower your
 **Engine**» (Wave); medios y distribución → «**Voice**» (Reach, por confirmar); Efeonce → «**Growth**», con **Greenhouse** como su
 producto (la plataforma que controla todas las líneas; su UI sigue con `DESIGN.md`). RevOps y CRM: pendiente;
@@ -223,6 +223,8 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 - **Archivos:** `@efeoncepro/axis-brand-assets` 0.3.0: 19 SVG oficiales (logo e isotipo positivo/negativo de Efeonce,
   Globe, Wave y Reach; `url-bubble-source` gris para fusionar; `url-bubble-baked-light` y `url-bubble-baked-dark`)
   y 48 órbitas estáticas (6 líneas × 2 fondos × 4 canales, SVG y PNG), con SHA-256 sellado y proporción del viewBox.
+  Desde 0.4.28 (H3, 2026-10-09) Wave, Reach y Globe tienen además `white`, `lockup` y, Reach y Globe, `isotype-small`;
+  su `logo` ya no lleva «by efeonce» (ver skill `efeonce-graphic-line`, ledger 2026-10-09).
   Se piden por id con `findBrandAsset` / `brandAssetUrl` y `findOrbitAsset`. **Nunca**
   copiar un SVG a mano. Las copias locales que aún leen renderers y catálogos (`public/branding/*`,
   `deliverables/assets/url-lum-{light,dark}.svg`, `url-lum.svg` de los catálogos del Artifact Composer) las vigila la

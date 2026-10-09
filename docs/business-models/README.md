@@ -46,6 +46,15 @@ Campaign organiza delivery; no sustituye el contrato, pricing, capacidad ni life
 La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
 captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
+## RevOps & CRM — capacidad especializada
+
+- [Modelo de negocio V1](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md): cliente, buying group, modalidades y economics.
+- [Servicio](../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) y [activación regional](../operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md).
+- [Talent Assurance — guardrails aceptados](EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md).
+
+Dirección aprobada el 2026-10-09; modelo `Approved for validation`. Demanda por servicios, precios, capacidad
+y habilitación contractual requieren evidencia por caso. Ver [ADR](../architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md).
+
 ## Efeonce Factory — vía comercial On-Demand
 
 - [Decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).

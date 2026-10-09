@@ -1,5 +1,7 @@
 # Commercial Audits
 
+- [Lógica del prototipo de cotizador — 09/10/2026](2026-10-09-pricing-workbook-logic-analysis.md): 13 hojas, dependencias, dos rutas de cálculo, casos conciliados y reglas incompletas para una CLI independiente.
+- [CLI de Excel/costeo local — 09/10/2026](2026-10-09-pricing-workbook-cli.md): 23 tests, extracción conciliada y alternativa sin UI/DB.
 Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
@@ -13,6 +15,8 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 
 - [Prospecting Agent HubSpot — voz de Julio, 07-10-2026](2026-10-07-hubspot-prospecting-agent-voz.md) — prompt y CTA guardados con readback; nueva generación final pendiente, sin envío.
+
+- [Pibank — conciliación del paquete, 07-10-2026](2026-10-07-pibank-conciliacion-paquete.md) — tres PDF coherentes, diagnóstico recuperado y comparación de rutas; aporte y margen aún pendientes.
 
 - [Pibank — oferta híbrida, 07-10-2026](2026-10-07-pibank-oferta-hibrida.md) — base y activaciones, costos repartidos sin duplicación, selector, PDF y paquete para Claude; precios propuestos.
 

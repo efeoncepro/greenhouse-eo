@@ -2,6 +2,14 @@
 
 ## Qué es
 
+**Estado:** estándar y arquitectura objetivo aprobados por el operador el 2026-10-09. Catálogo/policy de
+claims, revisión de dominios y sistema integrado siguen pendientes en `TASK-1602` / `EPIC-038`. Las capacidades
+descritas son el diseño aprobado, no prueba de un sello o Quality Gate operativo. No emitir `Verificado
+por Efeonce` sin evidencia y policy aplicable. [Aceptación y límites](../../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md#aceptación-2026-10-09--estándar-transversal-y-alcance).
+
+Aplicación inicial documentada: [capacidad regional de CRM y RevOps](../../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md).
+El estándar es transversal; no se restringe a esa práctica.
+
 `Efeonce Talent Assurance` es el sistema que permite a Efeonce seleccionar, verificar, asignar, desarrollar y sostener capacidades humanas para clientes.
 
 Su promesa visible es `Verificado por Efeonce`.

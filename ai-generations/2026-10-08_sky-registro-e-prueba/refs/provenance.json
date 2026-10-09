@@ -1,0 +1,35 @@
+{
+  "purpose": "Prueba interna del registro E + tratamiento D, solicitada por el operador; no publicación",
+  "styleAuthority": "https://app.notion.com/p/5e4b2473c7914933a3e65531bb72c885",
+  "styleReadbackTimestamp": "2026-10-08T17:27:36.258Z",
+  "references": [
+    {
+      "file": "experiencia-austral.png",
+      "role": "Companion fictitious identity and approved experience; not geographic evidence",
+      "source": "../2026-10-08_viajeros-pov/v3-experiencias/01-austral-kayak.png",
+      "origin": "AI generated, Sunburst, locally created"
+    },
+    {
+      "file": "geo-general-carrera.jpg",
+      "role": "Real geographic shape reference, Capilla de Mármol, General Carrera",
+      "sourcePage": "https://chile.travel/atractivos/lago-general-carrera-y-capillas-de-marmol/",
+      "sourceImage": "https://chile.travel/wp-content/uploads/2025/08/5d765519-atractivo_lago-general-carrera_cabecera.jpg",
+      "rights": "Public official geographic reference, commercial reuse licence not confirmed. Used solely for this internal proof, no publication clearance claimed."
+    },
+    {
+      "file": "experiencia-cancun.png",
+      "role": "Companion fictitious identity and approved experience; not geographic evidence",
+      "source": "../2026-10-08_viajeros-pov/v3-experiencias/03-cancun-ola.png",
+      "origin": "AI generated, Sunburst, locally created"
+    },
+    {
+      "file": "geo-playa-delfines.jpg",
+      "role": "Real Cancún coastline reference; no identifiable people copied, no exact beach-name assertion",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Playa_Delfines.jpg",
+      "sourceImage": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Playa_Delfines.jpg",
+      "author": "Pikilita1024",
+      "rights": "CC0 1.0",
+      "photographed": "2022-07-18"
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "tenderId": "utem-sec",
+  "slides": [
+    {
+      "slideId": "p01-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-1-of-5-growth"
+        },
+        "progress": {
+          "number": "01",
+          "label": "Sección 1 de 5"
+        },
+        "voice": {
+          "question": "¿Encuentran a UTEM al buscar?",
+          "answer": "Casi nunca"
+        }
+      },
+      "template": "SectionClassic"
+    },
+    {
+      "slideId": "p02-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-2-of-5-growth"
+        },
+        "progress": {
+          "number": "02",
+          "label": "Sección 2 de 5"
+        },
+        "voice": {
+          "question": "¿Cómo se ejecuta el trabajo?",
+          "answer": "Paso a paso"
+        }
+      },
+      "template": "SectionClassic"
+    },
+    {
+      "slideId": "p03-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 107,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-3-of-5-growth"
+        },
+        "progress": {
+          "number": "03",
+          "label": "Sección 3 de 5"
+        },
+        "voice": {
+          "question": "¿Cuándo se mide el avance?",
+          "answer": "Desde el inicio"
+        }
+      },
+      "template": "SectionClassic"
+    },
+    {
+      "slideId": "p04-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-4-of-5-growth"
+        },
+        "progress": {
+          "number": "04",
+          "label": "Sección 4 de 5"
+        },
+        "voice": {
+          "question": "¿Quién lo ejecuta?",
+          "answer": "Un equipo"
+        }
+      },
+      "template": "SectionClassic"
+    },
+    {
+      "slideId": "p05-deck-content-clients",
+      "contentType": "deck.content-clients",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 318,
+          "answerPx": 120,
+          "sourceLeft": "--gl-cc-source-left=500px",
+          "sourceTop": "--gl-cc-source-top=1000px",
+          "sourcePx": "--gl-cc-source-px=15px",
+          "questionWidth": "--gl-cc-question-width=320px",
+          "statsTop": "--gl-cc-stats-top=196px",
+          "statPx": "--gl-cc-stat-px=184px",
+          "statWght": "--gl-cc-stat-wght=300",
+          "statLeading": "--gl-cc-stat-leading=0.9",
+          "statTracking": "--gl-cc-stat-tracking=-0.05em",
+          "statLabelPx": "--gl-cc-stat-label-px=23px",
+          "statLabelGap": "--gl-cc-stat-label-gap=14px",
+          "statLabelInset": "--gl-cc-stat-label-inset=8px",
+          "statLabelWidth": "--gl-cc-stat-label-width=300px",
+          "gridLeft": "--gl-cc-grid-left=140px",
+          "gridTop": "--gl-cc-grid-top=616px",
+          "cellWidth": "--gl-cc-cell-width=328px",
+          "cellHeight": "--gl-cc-cell-height=160px",
+          "ruleStroke": "--gl-cc-rule=1.5px",
+          "marketsPx": "--gl-cc-markets-px=22px",
+          "marketsTextPx": "--gl-cc-markets-text-px=20px",
+          "marketsGap": "--gl-cc-markets-gap=6px",
+          "marketsInset": "--gl-cc-markets-inset=36px",
+          "logoMaxWidth": "--gl-cc-logo-max-width=230px",
+          "logoMaxHeight": "--gl-cc-logo-max-height=104px",
+          "stat1Left": "--gl-cc-stat1-left=760px",
+          "stat2Left": "--gl-cc-stat2-left=1290px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-cc-progress-4-of-5-growth"
+        },
+        "voice": {
+          "question": "¿Quién confía en nosotros?",
+          "answer": "líderes",
+          "eyebrow": "Clientes",
+          "answerLead": "Marcas"
+        },
+        "stats": [
+          {
+            "value": "+39 %",
+            "label": "citabilidad en IA de Sky en 6 meses"
+          },
+          {
+            "value": "+54 %",
+            "label": "tráfico orgánico de Berel en 12 meses"
+          }
+        ],
+        "clients": [
+          {
+            "src": "asset-ref:file:universidad-temuco",
+            "alt": "Universidad Católica de Temuco"
+          },
+          {
+            "src": "asset-ref:file:gobierno-santiago",
+            "alt": "Gobierno de Santiago"
+          },
+          {
+            "src": "asset-ref:file:marca-chile",
+            "alt": "Marca Chile"
+          },
+          {
+            "src": "asset-ref:file:anam",
+            "alt": "ANAM"
+          },
+          {
+            "src": "asset-ref:file:aguas-andinas",
+            "alt": "Aguas Andinas"
+          },
+          {
+            "src": "asset-ref:file:sky",
+            "alt": "Sky Airline"
+          },
+          {
+            "src": "asset-ref:file:berel",
+            "alt": "Berel"
+          },
+          {
+            "src": "asset-ref:file:bresler",
+            "alt": "Bresler"
+          },
+          {
+            "src": "asset-ref:file:carozzi",
+            "alt": "Carozzi"
+          }
+        ],
+        "markets": {
+          "title": "Operamos en",
+          "text": "Chile, EE. UU., Colombia, México y Perú"
+        },
+        "source": "Fuente: programa SEO/AEO editorial de Sky · Google Search Console y GA4 de Berel",
+        "selection": {
+          "label": "SEO",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.2,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "ContentClients"
+    },
+    {
+      "slideId": "p06-deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-5-of-5-growth"
+        },
+        "progress": {
+          "number": "05",
+          "label": "Sección 5 de 5"
+        },
+        "voice": {
+          "question": "¿Qué recibe la Universidad?",
+          "answer": "7 entregables"
+        }
+      },
+      "template": "SectionClassic"
+    }
+  ]
+}

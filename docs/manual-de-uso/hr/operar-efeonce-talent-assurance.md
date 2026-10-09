@@ -2,6 +2,15 @@
 
 ## Propósito
 
+**Disponibilidad:** estándar aprobado 2026-10-09; este manual describe la operación objetivo. La aceptación
+no activa un claim store, sello, gates automáticos ni revisión 30/60/90 en runtime. Completar `TASK-1602`
+y las unidades de `EPIC-038` antes de usar esos estados como operativos. Los expedientes manuales de evaluación
+referencian sistemas canónicos y no constituyen por sí solos un claim formal.
+
+Para el servicio regional de CRM/RevOps cargar también el
+[playbook de activación](../../operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md), con responsabilidades,
+validación contractual por configuración y evidencias del piloto.
+
 Usa este manual para operar la promesa `Verificado por Efeonce` desde la demanda de capacidad hasta la revisión post-hire.
 
 La decisión arquitectónica está en [Talent Assurance Decision V1](../../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md). La explicación funcional está en [Efeonce Talent Assurance](../../documentation/hr/efeonce-talent-assurance.md).
@@ -134,4 +143,3 @@ Escala a Finance + Commercial cuando:
 - el cliente exige seniority no financiado;
 - el descuento compromete el piso de margen;
 - el modelo requiere backup o bench no presupuestado.
-

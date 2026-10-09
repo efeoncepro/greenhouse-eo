@@ -1,5 +1,15 @@
 # Pibank · Brief vigente para el deck integrado
 
+**Estimación vigente · 08-10 · supuestos autorizados por Julio:** [estimación SEO/AEO y ajustes para Claude](estimacion-seo-aeo-2026-10-08/ESTIMACION-Y-AJUSTES-PARA-CLAUDE.md). Central: 33.670 visitas orgánicas, 504 cuentas con fondos directas y 154 adicionales por cada 100.000 visitas elegibles de otros canales. Incluye escenarios y el requisito para la meta completa; no contiene presupuesto de pauta. Prevalece sobre instrucciones anteriores de aporte pendiente y sobre §17 del complemento previo. Precio y alcance híbrido conservados; PDF pendiente de actualización por Claude.
+
+**Corrección de alcance de Julio · 08-10 · prevalece sobre propuestas de dimensionamiento de medios:** esta es una licitación de agencia SEO/AEO. Mantener SEO técnico, hub, contenidos, herramientas, PR/enlaces, comunidad y mejora de los destinos como palancas de la meta bancaria. SEM se presenta exclusivamente para explicar eficiencia y coordinación con la adquisición del banco. **No incorporar presupuestos de pauta, campañas de conquista de marca ni cuotas de captación pagada como nuestra propuesta.** El cálculo exploratorio cercano a USD 900.000 queda descartado del caso comercial. No trasladar la meta global de 15.200 cuentas a una garantía exclusiva del servicio ni asignar su diferencia a una compra de medios. Preservar meta, investigación, cálculos históricos y precios del servicio; demostrar la contribución SEO/AEO y asistencias sin inventar resultados.
+
+**Antecedente conservado · 08-10:** [meta integrada de 15.200 cuentas con fondos](meta-integrada-2026-10-08/README.md). Diseñar y dimensionar el conjunto de tácticas para la meta; La estimación SEO/AEO enlazada arriba sustituye §17 como instrucción numérica para el deck. La estimación de 33 familias queda como anexo parcial, no como resultado total del programa. Requisitos calculados no equivalen a factibilidad demostrada.
+
+**Demanda ampliada 08-10:** [escenario enero 2026 y audiencia](demanda-audiencia-2026-10-08/README.md): 33 familias, 66.030 búsquedas/mes estimadas, escenario central condicional de 18.150 visitas y 236 cuentas con fondos; no es el aporte global ni volumen demográficamente filtrado. Ver §16 del MD para Claude. Los resultados originales se conservan.
+
+**Complemento vigente 08-10:** [caso y ajustes para Claude](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Complemento-del-caso-y-ajustes-para-Claude-2026-10-08.md>), basado en el correo de Jesús del 07-10: USD confirmado, audiencia A/B 35–55, evaluación desde enero de 2026 y entrega 09-10. Incluye simulación retrospectiva y matriz por lámina. Este complemento actualiza el encargo; conserva precios/modelos originales. El PDF de 44 láminas todavía requiere esos ajustes. Casos internacionales validados por Julio; no hay caso documentado en Perú. Equipo: nombres confirmados y roles por asignar antes del inicio. Sin datos bancarios; lanzamiento reciente confirmado por el operador. §15 incorpora benchmark internacional y su utilidad para demanda local; forecast absoluto sigue condicionado.
+
 **07-10-2026 · Modelo híbrido evolutivo.** Leer primero la [oferta cliente](oferta-hibrida/OFERTA-PARA-PIBANK.md) y el [modelo operativo](oferta-hibrida/MODELO-EVOLUTIVO.md). Sustituyen las cadencias y el fee fijo de versiones anteriores. Los documentos históricos conservan valor como evidencia, no como alcance actual.
 
 **Recomendación:** doce meses, base US$4.500/mes y activaciones US$25.200: total gradual US$79.200. Integral US$89.200 como alternativa. Precios propuestos, sin aceptación bancaria.
@@ -24,7 +34,7 @@ Julio pidió explícitamente doce meses, PR, content hub en WordPress, comunidad
 
 ## 2. Números y estado: mostrar primero el 100%
 
-**US$38m ÷ US$2.500 = 15.200 fondeadas → ~23.385 aperturas → ~1.169.231 visitas**, a 65% de fondeo y 2% de apertura. Promedio ~97.436 al mes si se usan doce meses de planificación. La cuenta objetivo es una cuenta con fondos, según la definición acordada con Julio. Moneda y período requieren formalización bancaria; US$38m es interpretación de Julio. Tasas ilustrativas, no benchmark/observación Pibank. Redondeos independientes.
+**US$38m ÷ US$2.500 = 15.200 fondeadas → ~23.385 aperturas → ~1.169.231 visitas**, a 65% de fondeo y 2% de apertura. Promedio ~97.436 al mes si se usan doce meses de planificación. La cuenta objetivo es una cuenta con fondos, según la definición acordada con Julio. USD y ejercicio 2026 confirmados por el correo de Jesús del 07-10; la misma meta para 2027 aún no está confirmada. Tasas ilustrativas, no benchmark/observación Pibank. Redondeos independientes.
 
 Es requisito del embudo completo, no forecast ni 1,17m de visitas nuevas SEO. **760 es sólo 5%, no proyección final; 762 no es un resultado.** Excel v0.6 inicia en 1%/Aperturas (152), ejemplo editable, no meta decidida. No intercambiar apertura, primer fondeo, saldo o beneficio.
 
@@ -32,13 +42,13 @@ Es requisito del embudo completo, no forecast ni 1,17m de visitas nuevas SEO. **
 
 Research actual: 2.278 observaciones banco/keyword normalizada/URL, 1.594 keywords, 19 representantes: seis directos (3.740 búsquedas estimadas/mes), cuatro condicionales (3.330), cinco rivales (18.300), cuatro asistidos (5.680). No sumar como TAM/personas/visitas. El inventario 4.855/32 es otro corpus/purpose. El panel no demuestra que se llegue al requisito de visitas ni cubre todo el sistema integrado.
 
-**Pendiente real:** estimación defendible del aporte integrado, contrafactual cuantificado de lanzamiento, baseline/definiciones bancarias, roster/costos reales y aceptación del presupuesto propuesto. No atribuir a hub, comunidad o SEM cantidades arbitrarias del millón de visitas para cerrar la suma.
+**Estado actualizado:** contrafactual parcial ampliado cuantificado en §16 del complemento. Pendientes: aporte integrado con datos bancarios, definiciones contables, costos/disponibilidad y aceptación del presupuesto. El equipo se presenta con nombres confirmados y roles por asignar antes del inicio; casos internacionales validados por Julio. No atribuir a hub, comunidad o SEM cantidades arbitrarias del millón de visitas para cerrar la suma.
 
 ## 3. Ocho láminas sugeridas
 
 | Lámina | Mensaje y visual | Condición visible |
 |---|---|---|
-| 1 · Meta y decisión | Referencia del 100% → aperturas/fondeo → requisito de visitas; objetivo del programa integrado | Meta monetaria provisional y tasas ilustrativas; no forecast SEO |
+| 1 · Meta y decisión | Referencia del 100% → aperturas/fondeo → requisito de visitas; objetivo del programa integrado | Meta monetaria 2026 declarada por Jesús y tasas ilustrativas; no forecast SEO |
 | 2 · Arquitectura alrededor de Cuenta Soles | Pilar comercial existente; hub y satélites por decisión; tools; apertura/fondeo | WordPress público confirmado; implementación/accesos por acordar |
 | 3 · Trabajo editorial y herramientas | Rendimiento, comparación, ahorro disponible, confianza, apertura/fondeo; artículos/FAQ/tools con siguientes pasos | Hasta cinco artículos/mes; actualizaciones sustanciales acordadas ocupan espacios. FAQ según evidencia; tools según activación |
 | 4 · SEM y eficiencia de búsqueda | Contexto de captación/aprendizaje SEM ↔ contenido/destinos SEO; recomendaciones y evaluación por costo de cuenta | CPC menor no garantizado; Quality Score diagnóstico; demostrar resultados combinados |
@@ -74,7 +84,7 @@ Acumulación: recursos mantenidos pueden seguir captando/ayudando; nuevas piezas
 | Fuente | Uso |
 |---|---|
 | [Estrategia integrada](ESTRATEGIA-INTEGRADA-DE-CRECIMIENTO-2027.md) | Canon de arquitectura, hipótesis, envolvente y modelo multicanal |
-| [Propuesta](PROPUESTA-PARA-PIBANK-2027.md) / [resumen](RESUMEN-PARA-GERENCIA.md) | Fuentes estratégicas actualizadas; PDF comercial híbrido vigente. PDFs técnicos v0.7 conservados como históricos por alcance anterior |
+| [Propuesta](PROPUESTA-PARA-PIBANK-2027.md) / [resumen](RESUMEN-PARA-GERENCIA.md) | Técnica, resumen y oferta PDF conciliados en revisión híbrida; todos abren con ruta gradual. Anteriores preservados fuera del paquete vigente |
 | [Calendario v0.7](CALENDARIO-CRECIMIENTO-V0.7.csv) / [24 briefs](PLAN-DE-CONTENIDOS-V0.7.csv) | Calendario integral de referencia y backlog inicial; ruta gradual en oferta-hibrida/activaciones-mensuales.csv |
 | [Matriz mensual](MATRIZ-CONTRIBUCION-MULTICANAL-V0.7.csv) | 96 filas/12 meses/ocho orígenes; vacíos son pendientes, no cero |
 | [Condiciones](CONDICIONES-DE-EJECUCION-2027.md) / [PR](PLAN-PR-Y-AUTORIDAD-2027.md) | Owners propuestos, aprobaciones, distribución y condiciones de ejecución |
@@ -88,3 +98,9 @@ Acumulación: recursos mantenidos pueden seguir captando/ayudando; nuevas piezas
 Comparativos con competidores requieren aprobación específica de Producto/Cumplimiento: marcas/productos, comparabilidad, método, fecha, fuentes y claims. Alternativa sin marcas en el slot. WordPress público no acredita tecnología/acceso a registro/app; cuentas y datos agregados bajo autoridad bancaria. No asumir aprobados contactos, pauta, canales o incentivos.
 
 Antes de entregar: comprobar coherencia de alcance/cadencia, meta completa y unidades, tasas etiquetadas, estimación de contribución pendiente y presupuesto propuesto, una cuenta por total, fuentes y costos internos ausentes de láminas cliente. No inventar ROI, proyección de 760, presupuesto o contratos. Entregar editable para revisión de Julio; este trabajo no envía ni publica el deck.
+
+## Conciliación posterior a revisión de Claude
+
+Los tres PDF actuales tienen la misma revisión y alcance gradual. Recuperan diagnóstico fechado: 0 apariciones en 17 capturas genéricas, canonical doble idéntico, FAQ duplicadas y summary de 2 backlinks/1 dominio; no presentar los conteos como censo ni penalización. WordPress y señales Yoast sólo identifican el sitio público.
+
+Los precios están propuestos; la rentabilidad no está aprobada. Usar [conciliación interna](CONCILIACION-COMERCIAL-Y-APORTE.md) para comparar 2.654h/US$79.200 gradual y 2.924h/US$89.200 integral. No llevar horas o margen al cliente. Los pedidos de Jesús siguen abiertos: estimación prospectiva y retrospectiva desde lanzamiento. El panel 39–195 fondeadas no es forecast incremental; tampoco está probado que conversión existente sea la mayor fuente de valor.

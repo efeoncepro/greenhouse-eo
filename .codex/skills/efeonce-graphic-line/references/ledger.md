@@ -1,5 +1,7 @@
 # Registro de decisiones y versiones
 
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` no encontrado en el remoto) — 2026-10-09.
+
 > Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
@@ -124,6 +126,7 @@
 | 2026-10-02 (c) | **El avatar oficial con la bomber es la referencia de identidad del equipo** («Es el último, descarta los anteriores, es donde salen con la bomber»). Andrés, Daniela, Melkin, Humberly y Valentina se anclan en su avatar (maestro 1080 de `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/`, copiado como `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png`); `actual` y `antiguo` quedan en disco, fuera de uso. Julio conserva su set propio. Aplicado en `scripts/foto/build-prompt.mjs` (`PERSONAS`), `scripts/foto/assets.lock.json` (376 assets), el roster y `_identidad-equipo/LEEME.md`. Reemplaza la regla del 2026-09-29 que trataba los avatares como derivados no aptos de referencia |
 | 2026-10-03 | **El cine también vale en superficies de producto** («Si, para producto también es necesario el estilo cine»). Caso 6 del registro cine, `alcance: "producto"` en `ALCANCES_CINE` (`scripts/foto/build-prompt.mjs`, con aviso y prueba): escenario del login, hero de producto; protagonista Nexa, roster con la prenda de su línea o casting anclado a su retrato; la superficie no dibuja otra órbita encima. `LG2e` pasa de `publicidad-prueba` a `producto`. **Pendiente:** llevarlo al contrato AXIS (`surfaces.photo.cine`, issue `cine-requires-nexa-or-proposal`) |
 | 2026-10-08 | **Marca de Efeonce Rooms aprobada («eslabón leve») y dos reglas para toda la línea:** la esfera nunca va en un cruce de órbitas (en la punta de la almendra de dos círculos se lee como figura anatómica; la primera versión aprobada se descartó el mismo día, antes de publicar) y una letra dentro de una órbita no puede ser R (se lee ®). Detalle en [2026-10-08 — Logo de Efeonce Rooms](#2026-10-08--logo-de-efeonce-rooms-18-piezas). |
+| 2026-10-09 | **Efeonce Wave, Efeonce Reach y Efeonce Globe entran a la familia por la ruta H3** («ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave»): cada producto conserva su logotipo y la familia vive en el lockup; se retira el endoso «by efeonce». Descartadas Ruta 1 (órbita), H1 (palabra en Poppins: perdía presencia) y H2 (símbolo en órbita). Detalle en [2026-10-09 — Wave, Reach y Globe en la familia](#2026-10-09--wave-reach-y-globe-en-la-familia-h3-33-piezas). |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -253,6 +256,9 @@
 
 ### Pendiente de implementación (decidido, falta código o texto)
 
+- Familia H3 (Wave, Reach, Globe; 2026-10-09): `axis-brand-assets` 0.4.28 en AXIS `main` (`7c96680`); falta el tag
+  `v0.4.28` con readback, que Greenhouse suba de 0.4.25 (TASK-2014), probar `*-isotype-small-*` en un favicon real y,
+  si se suma otro producto con colores propios, llevar los de Wave/Globe sobre oscuro a tokens de producto.
 - Íconos (D16–D22): **hecho y publicado** (tag `v0.3.6`: `axis-tokens` 0.3.6, `axis-graphic-line` 0.4.0). Falta que un
   consumidor los fije. Los SVG del set se exportan con `pnpm icons:export` (no van a `axis-brand-assets`).
 - Plastilina en volumen (D24): **hecho y publicado** (tag `v0.3.7`, 2026-09-27: `axis-tokens` **0.3.7** con
@@ -737,6 +743,29 @@ EE.UU.): búsqueda formal y solicitud **«EFEONCE ROOMS» mixta** (palabra + dis
 probar el símbolo solo a 16–32 px frente a 🔗, ⚣ y argollas de boda; **nunca** mover la esfera a un cruce. Pendientes:
 tag `v0.4.27`, prueba sin contexto del símbolo y búsqueda formal de marca. Aplicaciones del canvas «Efeonce Rooms —
 Logo» exploradas, no aprobadas como composiciones de la sala ([A13](applications.md#a13-efeonce-rooms--design-system-de-producto-2026-10-07)).
+
+### 2026-10-09 — Wave, Reach y Globe en la familia (H3, 33 piezas)
+
+El operador pidió llevar Wave, Reach y Globe a la dinámica de Marketing Studio, Creative Studio, Factory y Rooms («ya no
+es Wave solo ni Wave by Efeonce, sino Efeonce Wave»). Se probaron Ruta 1 (redibujo con la órbita), H1 (palabra en
+Poppins con sólo el gesto: **perdía presencia**, la letra de cada marca es identidad) y H2 (gesto en órbita). Eligió
+**H3**: cada producto conserva su logotipo y la familia vive en el lockup — Efeonce adelante (30 de alto, 20 de aire,
+filete 1 × 26, 20 de aire), logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con sólo su gesto en
+color; tamaño por presencia (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce. **Se retira «by efeonce»:**
+`*-logo-*` pasa a ser el logotipo solo (palabras en el navy de la familia `#023c70`). Gestos: Wave = la W (dos V),
+`#0375db` + `#091951` (los de Engine; reemplazan el `#082e8e` del archivo), oscuro `#2e8be8` + `#a6cdf5` (también su
+isotipo); Reach = «a» con flecha `#f83902`, punta corrida 7 u (logotipo) / 16 u (isotipo) para no rozar el asta, en la
+palabra sobre oscuro la «a» va naranja maciza (blanca se funde con la «e») y el isotipo suelto sobre oscuro va blanco con
+sólo la punta naranja; Globe = globo `#bb1954` papel / `#ee4274` oscuro (**excepción de producto**: no toma el naranja
+Brand `#ff6500`, que queda para Creative Studio), sin la mota `#ff6500` suelta y con su despegue original. Isotipos
+chicos (≤ 24 px) sólo de Reach (ranura cerrada, chevrón más grueso) y Globe (gajos fundidos en un cuerpo paralelo al
+anillo). Paquete `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`): 33 archivos, 12 reemplazados y 21 nuevos;
+ids `{wave,reach,globe}-{logo,lockup,isotype}-{positive,negative,white}` + `{reach,globe}-isotype-small-{positive,negative,white}`.
+Generador AXIS `packages/brand-assets/scripts/product-family.mjs` sobre `sources/product-family/` (originales
+versionados, nunca publicados); regenerar = generador + `pnpm seal`, nunca a mano; sólo contornos, sin máscaras ni
+`clipPath`. Las piezas nuevas quedan sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`), como Creative Studio y Rooms; los
+`logo`/`isotype` de siempre siguen públicos con bytes nuevos. Tag `v0.4.28` no visto en el remoto al 2026-10-09;
+Greenhouse fija 0.4.25 y adopta en TASK-2014. ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`.
 
 ### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
 

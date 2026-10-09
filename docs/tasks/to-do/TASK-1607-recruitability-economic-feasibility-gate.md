@@ -21,7 +21,7 @@ no estima salarios, no crea role costs ni decide pricing por su cuenta.
 - Motion: `none`
 - Backend impact: `reader|command`
 - Epic: `EPIC-038`
-- Status real: `Inputs Finance/Capacity verificados; contrato de feasibility y gate siguen Proposed/no implementados`
+- Status real: `2026-10-09: guardrails económicos Talent Assurance aceptados; contrato técnico de feasibility y gate siguen pendientes/no implementados. CostCard y revisión de inputs conservan sus gates propios.`
 - Rank: `EPIC-038-phase-0`
 - Domain: `workforce|finance|commercial|hiring`
 - Blocked by: `TASK-1602`

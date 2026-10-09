@@ -1,5 +1,7 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+> Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` no encontrado en el remoto) — 2026-10-09.
+
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
@@ -633,6 +635,20 @@ su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del 
 Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. La adopción local y el renderer se registran en TASK-1938; el estado de publicación se verifica por separado.
 
 **Aplicación PDF verificada localmente (2026-10-03):** TASK-1938 conserva react-pdf, snapshot, métricas y flujo de envío. Usa tokens `0.3.41`, contracts `0.3.40` y brand-assets `0.4.15`, sin bump de paquetes; la anatomía editorial faltante sale de una extensión generada en AXIS y sellada en el consumidor, todavía sin publicar. Seis variantes normales ES/EN/PT-BR × cliente/prospecto, seis A4; nombres largos se miden con la fuente real y el contenido extenso continúa sin truncarse. Diez PDFs auditados, contraste y 24 comparaciones color/gris en `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`. Recursos oficiales y seis pesos estáticos: `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`; registro aditivo. Redes: el PNG oficial incluye el disco, se muestra completo a 40 px, sin doble reducción. Corrección posterior de anotaciones (03/10): el chip de período centra el texto en un contenedor independiente; las versiones de metodología se presentan como números, nunca como IDs técnicos. Pie interior confirmado: organización/período, burbuja URL y folio, sin lockup Insights. Eslogan Engine al 64 %, divisor canónico 11,263 em. Tipos, build y 108 pruebas focales PASS; desincronización de metadata Manzanitas corregida con autorización del operador (check de 49 archivos y siete tests PASS; suite general no repetida). **Code complete local, rollout pendiente**, no acredita envío ni publicación.
+
+### B3d. Efeonce Wave, Reach y Globe — dónde se aplican (2026-10-09, H3)
+
+| Pieza | Dónde va |
+|---|---|
+| `*-lockup-*` («efeonce \| producto») | junto a Efeonce, por defecto: encabezados, decks, informes, correo |
+| `*-logo-*` | el logotipo solo, a todo color, donde el producto está solo (su propia superficie) |
+| `*-isotype-*` | el símbolo: corchetes de Wave, «a» de Reach, globo de Globe; mapa de portafolio (E7) |
+| `{reach,globe}-isotype-small-*` | sólo a 24 px o menos: favicon, chips (Wave no tiene versión chica) |
+
+- **Nunca** «by efeonce», nunca rearmar el lockup a mano ni repintar el gesto (los colores sobre oscuro de Wave y Globe
+  son de producto, no el acento de línea). El producto sigue sin firmar: la firma es `efeonce-logo-*`.
+- **Estado:** decisión aceptada; paquete 0.4.28 en AXIS `main` sin tag verificado; Greenhouse fija 0.4.25 (TASK-2014);
+  versión chica pendiente de probar en un favicon real. Detalle: [ledger.md](ledger.md) 2026-10-09.
 
 ### B4. Deck de Insights y correo de aviso
 

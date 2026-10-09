@@ -1,5 +1,17 @@
 # TASK-2014 — Adoptar los paquetes AXIS publicados y retirar la copia generada del informe AI Visibility
 
+## Delta 2026-10-09 — `axis-brand-assets` 0.4.28 (Wave, Reach y Globe, ruta H3)
+
+- La adopción suma `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`), que lleva a Wave, Reach y Globe a la
+  familia por la ruta H3 ([ADR](../../architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md)): reemplaza los bytes
+  de `{wave,reach,globe}-{logo,isotype}-{positive,negative}` y agrega 21 archivos (`-lockup-*`, la variante `white` y
+  `{reach,globe}-isotype-small-*`). Antes de fijarla, verificar el tag `v0.4.28` (no existía el 2026-10-09).
+- Quien consuma `wave-logo-*`, `reach-logo-*` o `globe-logo-*` recibe el logotipo **sin «by efeonce»**; junto a Efeonce
+  corresponde el `-lockup-*`. Hoy ningún código de Greenhouse importa esos ids del paquete (barrido del 2026-10-09): la
+  UI y los PDF usan copias locales de `public/branding/SVG/` (`src/components/greenhouse/brand-assets.ts`,
+  `scripts/build-pdf-brand-assets.ts`), con el dibujo anterior y fuera de la guarda de deriva
+  `src/config/efeonce-brand-assets.test.ts`. Reemplazarlas es una decisión aparte de este pin.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

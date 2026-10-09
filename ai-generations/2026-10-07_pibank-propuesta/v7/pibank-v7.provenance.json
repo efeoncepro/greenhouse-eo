@@ -1,0 +1,47 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "9f872eebdb1dbff9c77d372734c75bcc62d0066a067337f42686e4fbc77d276f",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 4,
+  "contentTypes": [
+    "deck.content-team",
+    "deck.content-measure-formulas",
+    "deck.decision-difference",
+    "deck.content-clients"
+  ],
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:squad-andres",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e"
+    },
+    {
+      "ref": "asset-ref:file:squad-valentina",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+      "sha256": "c268125b320560a51815243e9d2a223288d41e4c3a954a744d95edaf6ab5e18b"
+    },
+    {
+      "ref": "asset-ref:file:squad-julio",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+      "sha256": "71728dfe3a8fccac6ec99338ebf176dc8eca6247f22beb0714a633657f9bf27e"
+    },
+    {
+      "ref": "asset-ref:file:squad-daniela",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53"
+    },
+    {
+      "ref": "asset-ref:file:squad-melkin",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+      "sha256": "3ed018d2435331cb1978bf46ef5a4580a9661ef5625d359a358da5d34146d085"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

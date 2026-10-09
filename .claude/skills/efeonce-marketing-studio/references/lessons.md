@@ -366,6 +366,24 @@
 - **Avisar «no push» a una sesión no frena a las demás:** una sesión de branding empujó a `main` y desplegó el código en
   espera. Con trabajo en producción pendiente, revertir en `main` o confirmar con `ListAgents` y todas las sesiones activas.
 
+
+## 2026-10-07 — Incorporar programación existente de Metricool
+
+- Discovery importa evidencia, no crea activaciones. Comparar IDs del planner con `execution.unlinked.list` y el calendario antes de repetir discovery o programar de nuevo. Las autolistas sin ID/content no son posts concretos.
+- `from_execution` requiere campaña, cuenta, canal, mercado y versiones exactas; nunca asociar sólo por parecido del texto. El manifiesto original puede demostrar ID, medio, copy literal, ruta y hash.
+- Un dry-run HTTP 200 no certifica permiso de apply: la CLI exige credencial para escribir, aunque la web tenga ventana open. El bearer de cargas no concede `studio:write`; no crear/ampliar credenciales ni pasar a operator_cli por un 403. En esta sesión el operador autorizó explícitamente el carril administrativo después del rechazo.
+- El slug de campañas antiguas requiere persona y prefijo `<campaignId en minúsculas>-`; `cmp-002-tu-ia-no-conoce-tu-negocio` es válido, el título sin prefijo no. Declarar el slug no reescribe UTMs del proveedor.
+- Ingresar un archivo crea `pending_review`, que bloquea un plan `planned`. El contrato permite plan `draft` con esa versión y evidencia `scheduled`: usarlo cuando sólo se incorpora programación ya existente sin nueva aprobación. No aprobar una pieza por inferencia ni degradar manualmente la revisión a imported.
+- Evidencia de la operación: `docs/audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md`. Los conteos y estado final se leen allí, no en esta regla reusable.
+
+
+### 2026-10-07 — Evidencia del proveedor no completa el copy del plan
+
+- Al reconciliar Metricool, comprobar tanto `execution.records[].bodyText` como `activation.copyId` y `activation.copy.primaryText`. Igualdad del texto de ejecución no acredita que la ficha muestre copy; abrir al menos una ficha real. Caso: 25 de 26 activaciones cargadas conservaban el texto sólo como evidencia.
+- Recuperar el copy exacto por publicación/cuenta, preservando menciones, emojis y saltos; no sustituirlo por una variante publicitaria parecida. Para campañas OneDrive, ampliar el catálogo gobernado con backup y usar import acotado. El registry del import debe preservar estados/metadatos y títulos de conceptos leídos en vivo; un subconjunto de copies sin títulos puede convertir el título del concepto en su ID. Verificar después por API.
+- Los canales orgánicos IG/LinkedIn v1 consultados tienen placements/formats/copyLimits vacíos: un campo sin especificación no se completa inventando claves o copiando límites de paid. Separar este gap del trabajo de importar copys.
+- Una línea editorial permanente no obliga a una sola campaña always_on. El concepto actual sólo tiene título/orden; carece de brief/ventana propios. Comparar continuidad frente a gobierno por temporada antes de agrupar Seasonalities. Propuesta sin decidir: `docs/audits/marketing-studio/2026-10-07-seasonalities-model-comparison.md`.
+
 ### 2026-10-07 — Reutilizar el pipeline de Studio al adoptar AXIS
 
 - Revisar `upload.ts`, `derivatives.ts` y `toolkit-node.ts` antes de diseñar «un servicio nuevo»: Studio ya

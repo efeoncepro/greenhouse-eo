@@ -57,6 +57,11 @@ your Voice» (Reach, por confirmar); Efeonce → «Growth», con **Greenhouse** 
 todas las líneas (su interfaz sigue con `DESIGN.md`). Pendiente: palabra de RevOps y CRM y de Growth Strategy, y si los
 acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §7 y §8.1.
 
+> **Superado en parte el 2026-10-09:** el lockup «Producto by efeonce» se retiró. Wave, Reach y Globe van junto a
+> Efeonce con el lockup «Efeonce | Producto» y su logotipo solo donde el producto está solo
+> ([ADR de la familia H3](brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md); manual §7.5). La regla «Efeonce firma todo»
+> no cambia.
+
 ### Delta 2026-09-26 (b) — La lente lleva la órbita; la esfera final es parte del texto
 
 - **La lente** usa la anatomía de la órbita medida en la lámina 1.3 (anillo 1,4 px al 28 %, arco de 50° y esfera r

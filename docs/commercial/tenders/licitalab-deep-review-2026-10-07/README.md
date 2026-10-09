@@ -1,5 +1,7 @@
 # LicitaLAB — revisión comercial amplia de Efeonce
 
+**Actualización 09/10 — SANNA y UNAP descartadas:** Julio confirmó que no alcanzamos a postular por falta de tiempo. No se enviaron ofertas. Ambos Deals se cerraron como perdidos y sus tareas se cancelaron. [Registro y verificación](../../follow-up-agent/runs/2026-10-09-sanna-unap-no-presentadas.md). Las recomendaciones inferiores son históricas y ya no aplican a estos dos procesos.
+
 **Corte: noche del 7 de octubre de 2026, hora de Chile continental (America/Santiago).**
 **Estado del corte de investigación:** selección propuesta el 07/10. **Actualización 08/10:** las trece altas fueron autorizadas, creadas y verificadas; ver [resultado en HubSpot](HUBSPOT_ALTA_2026-10-08.md). No se enviaron ofertas ni comunicaciones. Las referencias a autorización pendiente más abajo conservan el estado histórico de la revisión.
 

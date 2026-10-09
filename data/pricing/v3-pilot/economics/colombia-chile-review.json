@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.economic-review.v1",
+  "preparedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "runtimeUse": "review_only",
+  "commercialReady": false,
+  "input": {
+    "path": "data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json",
+    "sha256": "2d9fafd802b966bf4e8b5e54b6b6a8b298e67817ec8db73467ba66799b688de6",
+    "hashKind": "sha256-raw-file",
+    "lineBinding": {
+      "pointer": "/request/lines/0",
+      "expectedLineId": "design",
+      "expectedProfileId": "ECG-002"
+    },
+    "profileBinding": {
+      "pointer": "/snapshot/profiles/0",
+      "expectedProfileId": "ECG-002"
+    }
+  },
+  "authority": "Request/snapshot son input ejecutable. Este ledger registra revisión y no es aceptado ni cargado automáticamente por la CLI. Bindings a hijos ausentes son destinos propuestos, no valores existentes.",
+  "historicalReferences": [
+    {
+      "path": "data/pricing/v3-pilot/parameters.json",
+      "collection": "profiles",
+      "idField": "profileId",
+      "idValue": "ECG-002",
+      "use": "Antecedente de componentes humanos/fee; no costo localizado actual."
+    },
+    {
+      "path": "data/pricing/v3-pilot/reference-calculations.json",
+      "collection": "cases",
+      "idField": "referenceId",
+      "idValue": "REF-01",
+      "use": "Control histórico y prueba de fee no lineal; no precio V3."
+    }
+  ],
+  "reviewRules": [
+    "No duplicar importes vigentes en este ledger; completar el snapshot con source y vigencia.",
+    "No usar source.status=confirmed sin evidencia; estimated requiere review y no habilita export comercial.",
+    "No promover historical/synthetic a commercial_draft cambiando sólo la etiqueta.",
+    "No interpretar referencias ausentes, exclusiones sin motivo, share o factor por defecto como validaciones.",
+    "Revisar hash y selectores antes de usar bindings; si cambió el input, reconciliar decisiones y volver a validar."
+  ],
+  "decisions": [
+    {
+      "decisionId": "pilot-scope",
+      "status": "confirmed",
+      "ownerRole": "Commercial",
+      "inputBindings": [
+        "/request/offerMarketCountry",
+        "/request/lines/0/profileId",
+        "/request/lines/0/seniorityCode",
+        "/request/lines/0/talentCountry",
+        "/request/lines/0/dedication"
+      ],
+      "availableEvidence": "Operador, conversación 2026-10-09: diseñador senior al 50%; talento Colombia → mercado Chile.",
+      "requiredEvidence": "Confirmado para piloto, sin aprobación de tarifa o contrato."
+    },
+    {
+      "decisionId": "commercial-terms",
+      "status": "pending",
+      "ownerRole": "Commercial + Creative Operations",
+      "inputBindings": [
+        "/request/lines/0/headcount",
+        "/request/duration",
+        "/request/lines/0/allocationMode",
+        "/request/outputCurrency"
+      ],
+      "availableEvidence": "Input usa 1 persona, 3 meses, shared y CLP para análisis.",
+      "requiredEvidence": "Confirmar cada término; 50% no confirma capacidad compartida ni costo de media persona."
+    },
+    {
+      "decisionId": "creative-delivery",
+      "status": "pending",
+      "ownerRole": "Commercial + Creative Operations",
+      "inputBindings": [
+        "/request/offerId",
+        "/request/deliveryModel"
+      ],
+      "availableEvidence": "Kernel sólo acepta staffing. Oferta creativa vigente incluye gobierno de delivery (Embedded Creative Pod).",
+      "requiredEvidence": "Definir integración, dirección, QA, continuity, alcance y accountability; no emitir la simulación de perfil como una oferta de pod completa."
+    },
+    {
+      "decisionId": "human-cost",
+      "status": "pending",
+      "ownerRole": "People + Finance",
+      "inputBindings": [
+        "/snapshot/profiles/0/cost",
+        "/snapshot/profiles/0/requiredCoverages"
+      ],
+      "availableEvidence": "ECG-002 histórico: salaryBase y bonos; sin país ni vigencia. Operador sólo dispone del Excel.",
+      "requiredEvidence": "Costo mensual completo con moneda, localización Colombia, fuente, vigencia, salario/honorarios, bonos, cargas, vacaciones/beneficios según modalidad; covers human_* sin mezclar licencias/fee. Cero requiere razón de no aplicación."
+    },
+    {
+      "decisionId": "talent-localization",
+      "status": "pending",
+      "ownerRole": "Finance + People",
+      "inputBindings": [
+        "/snapshot/profiles/0/cost/localization",
+        "/snapshot/talentFactors"
+      ],
+      "availableEvidence": "USD histórico no determina país.",
+      "requiredEvidence": "Usar costo specific CO sin factor adicional, o referencia con país explícito y factor confirmado hacia CO. No asignar US porque moneda sea USD."
+    },
+    {
+      "decisionId": "capacity-policy",
+      "status": "pending",
+      "ownerRole": "Creative Operations",
+      "inputBindings": [
+        "/request/lines/0/allocationPolicyRef",
+        "/snapshot/allocationPolicies"
+      ],
+      "availableEvidence": "180 horas mensuales es histórico, no capacidad aprobada.",
+      "requiredEvidence": "Horas/FTE, mínimo facturable, compromiso dedicated y reclutabilidad para 50%. Política con source y vigencia."
+    },
+    {
+      "decisionId": "tools",
+      "status": "pending",
+      "ownerRole": "Creative Operations + Finance",
+      "inputBindings": [
+        "/snapshot/resources",
+        "/request/lines/0/assignments",
+        "/request/lines/0/notApplicable"
+      ],
+      "availableEvidence": "Kit visual-design-core propuesto; precios/divisiones históricos.",
+      "requiredEvidence": "Seleccionar herramientas necesarias y entitlements; costo vigente, moneda, mensual/anual, usuario/equipo/cuenta, quantity/share y cashTiming. No asumir licencia compartible por tener varios usuarios."
+    },
+    {
+      "decisionId": "platform-fee",
+      "status": "pending",
+      "ownerRole": "Finance + People",
+      "inputBindings": [
+        "/snapshot/resources",
+        "/request/lines/0/assignments",
+        "/request/lines/0/notApplicable"
+      ],
+      "availableEvidence": "platformFee histórico separado del subtotal humano; marca no es el concepto.",
+      "requiredEvidence": "Proveedor/modalidad, monto/unidad vigente, por persona/equipo/cuenta, cobertura y atribución. No multiplicar fee por 0.5 automáticamente."
+    },
+    {
+      "decisionId": "talent-assurance",
+      "status": "pending",
+      "ownerRole": "People + Creative Operations + Finance",
+      "inputBindings": [
+        "/snapshot/resources",
+        "/request/lines/0/assignments",
+        "/snapshot/profiles/0/requiredCoverages"
+      ],
+      "availableEvidence": "Guardrails aprobados como principios, no importes.",
+      "requiredEvidence": "Costear formación/certificación, seguimiento, reemplazo/ramp-up, continuidad y exposición a bench; evitar doble conteo con salario/cargas/operación. Sin porcentaje nuevo por default."
+    },
+    {
+      "decisionId": "operations",
+      "status": "pending",
+      "ownerRole": "Creative Operations + Finance",
+      "inputBindings": [
+        "/snapshot/resources",
+        "/request/lines/0/assignments"
+      ],
+      "availableEvidence": "Alcance creativo requiere gobierno/QA, costos ausentes.",
+      "requiredEvidence": "Costear dirección, QA, coordinación, infraestructura y seguimiento con unidad/base/atribución. Si se cobra una cuenta completa, no reducir por FTE sin decisión."
+    },
+    {
+      "decisionId": "setup",
+      "status": "pending",
+      "ownerRole": "Creative Operations + Finance",
+      "inputBindings": [
+        "/snapshot/resources",
+        "/request/lines/0/assignments",
+        "/snapshot/profiles/0/requiredCoverages"
+      ],
+      "availableEvidence": "Input no registra setup; ausencia no acredita costo cero.",
+      "requiredEvidence": "Decidir onboarding, transferencia de contexto, accesos/configuración y ramp inicial; once separado o no aplicación explícita con motivo. Para exigir cobertura setup, agregarla a requiredCoverages."
+    },
+    {
+      "decisionId": "tier-price-market",
+      "status": "pending",
+      "ownerRole": "Commercial + Finance",
+      "inputBindings": [
+        "/snapshot/profiles/0/tierCode",
+        "/snapshot/pricingPolicies",
+        "/snapshot/marketFactors",
+        "/request/adjustments"
+      ],
+      "availableEvidence": "Tier 2 y markup 0.30 del Excel no son política V3 vigente.",
+      "requiredEvidence": "Tier y criterio; markup o target_margin, rate/basis/minimumMargin; factor Chile (sólo precio humano) con fuente y vigencia. Factor 1 es decisión, no default. Validar WTP con evidencia de comprador; descuento sólo si autorizado."
+    },
+    {
+      "decisionId": "currency-fx",
+      "status": "pending",
+      "ownerRole": "Finance",
+      "inputBindings": [
+        "/snapshot/calculationCurrency",
+        "/snapshot/currencies",
+        "/snapshot/fx",
+        "/request/outputCurrency"
+      ],
+      "availableEvidence": "USD cálculo y CLP salida propuestos; tasas históricas no vigentes.",
+      "requiredEvidence": "Fuente, fecha, vigencia y pares dirigidos necesarios. Si costo es COP, registrar moneda y conversión hacia calculationCurrency; no inferir inversa/cruzada."
+    },
+    {
+      "decisionId": "tax-contract-cash",
+      "status": "pending",
+      "ownerRole": "Finance + Legal + Commercial",
+      "inputBindings": [
+        "/request/taxTreatment"
+      ],
+      "availableEvidence": "not_resolved explícito; no precio final ni impuestos asumidos.",
+      "requiredEvidence": "Tratamiento fiscal y entidad/contrato; plazos de pago, obligaciones laborales/comerciales, compromiso anual de licencias, riesgo de caja y cancelación. Terms/cashflow contractual no están modelados completamente por este kernel."
+    }
+  ],
+  "sensitivity": {
+    "status": "validated_incomplete_inputs",
+    "method": "Derivar cada request del mismo input revisado y calcular con pricing:v3; nunca calcular precios en este ledger. Mantener las mismas fuentes/políticas, excepto compromiso de capacidad o periodo que corresponda.",
+    "hypothesisOnly": true,
+    "results": {
+      "evidencePath": "data/pricing/v3-pilot/economics/colombia-chile-readiness.json",
+      "allNeedsInput": true,
+      "pricedResults": null
+    },
+    "cases": [
+      {
+        "scenarioId": "shared-half-three",
+        "patches": []
+      },
+      {
+        "scenarioId": "shared-full-three",
+        "patches": [
+          {
+            "op": "replace",
+            "path": "/request/lines/0/dedication/value",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "scenarioId": "dedicated-half-three",
+        "patches": [
+          {
+            "op": "replace",
+            "path": "/request/lines/0/allocationMode",
+            "value": "dedicated"
+          },
+          {
+            "op": "replace",
+            "path": "/request/lines/0/allocationPolicyRef",
+            "value": "pending-dedicated-allocation"
+          }
+        ],
+        "additionalDecision": "Definir política dedicated y su FTE comprometido, sin asumir 0.5 ni 1."
+      },
+      {
+        "scenarioId": "shared-half-six",
+        "patches": [
+          {
+            "op": "replace",
+            "path": "/request/duration/periods",
+            "value": 6
+          }
+        ],
+        "additionalDecision": "Validar vigencia/cobertura para quoteDate y compromiso/caja del horizonte extendido; no implica mínimo comercial de 6 meses."
+      }
+    ],
+    "measures": [
+      "result.totals.cost",
+      "result.totals.net",
+      "result.totals.marginAmount",
+      "result.totals.marginRate",
+      "result.totals.cashCommitment",
+      "result.totals.uniformMonthlyNet",
+      "result.lines (setup/periods)",
+      "result.reviewStatus"
+    ],
+    "discountSensitivity": "Pendiente de política; no se preparan porcentajes arbitrarios."
+  },
+  "promotionGates": [
+    "Fuentes/coberturas/capacidad/política/FX completos y con vigencia.",
+    "Alcance creativo y contrato compatibles, revisados por dueños.",
+    "calculationStatus=calculated y reviewStatus=within_policy; revisar impuestos/neto y caja.",
+    "Revisión Commercial/Finance antes de emisión; cálculo completo no equivale a aprobación."
+  ],
+  "readinessEvidence": "data/pricing/v3-pilot/economics/colombia-chile-readiness.json",
+  "artifactEvidence": "data/pricing/v3-pilot/economics/colombia-chile-artifact.json",
+  "exploratorySimulation": {
+    "inputPath": "data/pricing/v3-pilot/scenarios/colombia-chile-design-historical-hypothesis.json",
+    "assumptionsPath": "data/pricing/v3-pilot/economics/historical-simulation/assumptions.json",
+    "resultsPath": "data/pricing/v3-pilot/economics/historical-simulation/results.json",
+    "commercialReady": false,
+    "relation": "Separado del input comercial referenciado arriba. No modifica sus faltantes ni estados de confirmación."
+  }
+}

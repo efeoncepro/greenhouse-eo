@@ -19,11 +19,19 @@ Delta autorizado de la cohorte 06/10: una empresa y un contacto. Segmentos activ
 
 La asociación automática por dominio generó una empresa vacía secundaria. Se verificó Primary de contacto y Deal en Sika Mexicana; el registro secundario se conserva y no gobierna la cohorte. Identidad personal/cargo no revalidados independientemente; sólo el email fue aportado por el operador.
 
+## Propuesta técnica · corte 07/10/2026
+
+La [propuesta técnica de Codex](oferta-tecnica.md) fue descartada y eliminada por instrucción del operador. Word/Markdown v0.1, decks v0.2/v0.3, ZIP de fuentes, plan y derivados propios retirados a la Papelera. No existe propuesta técnica aprobada para envío. El [anexo gráfico POSIBLE](propuesta-grafica-creativa.md) y las bases originales se conservan intactos.
+
+Wherex vivo revisado: seis preguntas, cuatro respuestas, dos pendientes y un anuncio. Comprador confirma Master Graphic + lanzamiento tipo para cotizar, muestras de un solo producto y storyboard/animatic admitido para reel. Anuncio 06/10 13:48 informa renders cargados. [Fuentes, reconciliación y QA internos](research/2026-10-07-propuesta-tecnica-INTERNO.md).
+
+Las hipótesis de modalidad, plazo 15–20 días productivos y dos rondas pertenecían al borrador descartado; no son términos aprobados. El horizonte 2026–diciembre 2027 no acredita retainer. Los cinco posts y tres historias/red no se multiplican por plataformas sin confirmación. `proposal-studio.json` conserva `workshop_only`; `economica.json` sigue siendo plantilla sin cotización aprobada.
+
 ## Próximo gate
 
-- Leer anuncios y preguntas/respuestas vigentes; confirmar zona horaria del plazo.
-- Reconciliar la muestra de concurso con el alcance del brief y la contratación.
-- Preparar propuesta técnica/creativa y económica; validar costos, margen y condiciones antes de presentar.
-- Propuesta y muestra no producidas por esta operación. Plantillas presentes no son una oferta terminada ni un Proposal Studio verificado.
+- Nueva propuesta técnica y presentación pendientes de dirección del operador; releer respuestas/anuncios antes de congelar oferta.
+- Cerrar las dudas aún sin respuesta: manual corporativo, moneda/facturación transfronteriza, zona del cierre, historias por red y versión TikTok.
+- Confirmar productos/lanzamientos, originales/adaptaciones/formatos, equipo/capacidad, revisiones y fechas; validar claims, marcas/IA/licencias y el conflicto de interés interno señalado en el caso gráfico.
+- Costear y preparar económica desglosada; validar margen/condiciones y campos/anexos de Wherex. Comprobar necesidad de exportar muestras independientes. Borrador revisable no equivale a paquete listo para presentar ni a Proposal Studio verificado.
 
 Evidencia controlada: `/Users/jreye/Documents/Codex/2026-10-06-sika-mexico-1164/CRM-READBACK.json`, manifiesto de cuatro originales y `CRM-REGISTRO-INTERNO.md` en OneDrive. [Registro de licitaciones](../LICITATION_CRM_REGISTER.md) · [Registro comercial](../../CRM_DEAL_REGISTER.md).

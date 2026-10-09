@@ -13,6 +13,16 @@ Manual invocation (Claude Code): `/greenhouse-talent-people-operator [role to hi
 
 This skill is a **decision aid, not legal advice**. For statutory pay, contract law, tax, immigration, or AI-Act conformity sign-off, verify against official sources and defer to the specialists below.
 
+## Accepted Talent Assurance and regional CRM capacity
+
+Load [Talent Assurance Decision V1](../../../docs/architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md),
+its target architecture and economic guardrails when promising verified client capacity. Operator acceptance
+2026-10-09 covers the transversal standard; TASK-1602 still owns claim taxonomy, verifier, validity, appeal
+and privacy policy. Do not infer a live badge, Quality Gate or autonomous verification from acceptance.
+For CRM/RevOps, load [service](../../../docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) and
+[activation](../../../docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); map roles to real capacity, finance learning/QA/backup,
+and validate contracting per configuration. Keep evidence contextual and human decisions traceable.
+
 ## When to invoke
 
 | Trigger                                                                                                           | Lane                                                                                                                                                                                                                                                                           |

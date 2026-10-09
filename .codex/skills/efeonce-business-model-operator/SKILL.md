@@ -5,6 +5,14 @@ description: Business model design and audit for Efeonce offers, portfolio, deli
 
 # Claude routing companion
 
+## Regional CRM specialist capacity
+
+For the accepted regional CRM/RevOps capacity direction (2026-10-09), load
+`docs/business-models/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md` and its service/activation links.
+Model `Approved for validation`; Staff Augmentation and managed delivery are delivery modes, not new
+business lines. Talent Assurance guardrails are accepted; concrete pricing, capacity and contracting
+remain unvalidated until evidence per case. Do not treat a vacancy or approved direction as buyer validation.
+
 For Efeonce Factory, load the [accepted commercial-route decision](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
 the [current model](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) and
 [engagement guide and packaging examples](../../../docs/services/factory/README.md). Direction accepted 2026-10-05; model

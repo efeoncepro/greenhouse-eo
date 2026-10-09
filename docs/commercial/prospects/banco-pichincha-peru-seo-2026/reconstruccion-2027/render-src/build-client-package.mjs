@@ -26,16 +26,18 @@ const css=`${tokenCss}${fonts}*{box-sizing:border-box}html,body{margin:0;color:v
 const skeleton=(label,cls)=>`<!doctype html><html lang="es-PE"><head><meta charset="utf-8"><title>${label}</title><style>${css}</style></head><body class="${cls}"><div id="source"></div></body></html>`;
 const browser=await chromium.launch();
 try{
- const hybridOnly=process.argv.includes('--hybrid-only');
- const jobs=hybridOnly?[['Pibank-Oferta-hibrida-2027','oferta-hibrida/OFERTA-PARA-PIBANK.md','annex']]:[['Pibank-Propuesta-tecnica-2027','PROPUESTA-PARA-PIBANK-2027.md','annex'],['Pibank-Resumen-para-gerencia-2027','RESUMEN-PARA-GERENCIA.md','annex']];
+ const jobs=[['Pibank-Propuesta-tecnica-2027','PROPUESTA-PARA-PIBANK-2027.md','annex'],['Pibank-Resumen-para-gerencia-2027','RESUMEN-PARA-GERENCIA.md','annex'],['Pibank-Oferta-hibrida-2027','oferta-hibrida/OFERTA-PARA-PIBANK.md','annex']];
+ // A revision always rebuilds the complete client package, including legacy --hybrid-only callers.
  for(const [name,source,mode] of jobs){
+  const isHybrid=name.includes('Oferta-hibrida');
   let md=fs.readFileSync(path.join(caseDir,'reconstruccion-2027',source),'utf8');
+  if(/Recomendación para presentar|Alcance vigente de autoridad|Capacidad editorial vigente|costeo interno|margen bruto|para Claude/i.test(md))throw new Error('Internal copy in client source: '+source);
   if(mode==='annex')md=md.replace(' El [costeo interno](ALCANCE-Y-COSTEO-INTERNO.md) no constituye cotización.','');
   // Client-facing sources exclude internal costing; local links become readable labels.
   md=md.replace(/\[([^\]]+)\]\((?!https?:\/\/)([^)]+)\)/g,'$1');
   const chunks=mode==='memo'?md.split('## Qué proponemos ejecutar').map((s,i)=>marked.parse(i?'## Qué proponemos ejecutar'+s:s)):[marked.parse(md)];
   const page=await browser.newPage({viewport:{width:794,height:1123}});
-  await page.setContent(skeleton(name.includes('gerencia')?'Pibank Perú · Resumen para gerencia · 2027':'Pibank Perú · Propuesta técnica SEO/AEO · 2027',name.includes('gerencia')?mode+' summary':mode+(hybridOnly?' hybrid':'')),{waitUntil:'load'});
+  await page.setContent(skeleton(name.includes('gerencia')?'Pibank Perú · Resumen para gerencia · 2027':isHybrid?'Pibank Perú · Oferta híbrida · 2027':'Pibank Perú · Propuesta técnica SEO/AEO · 2027',name.includes('gerencia')?mode+' summary':mode+(isHybrid?' hybrid':'')),{waitUntil:'load'});
   await page.emulateMedia({media:'print',reducedMotion:'reduce'});
   const report=await page.evaluate(async({chunks,mode,logo,bank,bubble,contact,label,revision})=>{
    await Promise.all([document.fonts.load("400 11pt Poppins"),document.fonts.load("600 11pt Poppins"),document.fonts.load("700 21pt Poppins"),document.fonts.load("400 9pt Geist")]); await document.fonts.ready;
@@ -65,7 +67,7 @@ try{
    sheets.forEach((s,i)=>{const f=document.createElement('footer');f.className='ftr';f.innerHTML=`<a href="https://efeoncepro.com"><img src="${bubble}" alt="efeoncepro.com"></a><span>${contact.address}<br>${contact.chilePhone}</span><span class="page">Rev. ${revision} · 07/10/26<br>${i+1} / ${sheets.length}</span>`;s.append(f)});
    await Promise.all([...document.images].map(i=>i.decode()));
    return{pages:sheets.length,toc,fontsOk:['400 11px Poppins','600 11px Poppins','400 11px Geist'].every(f=>document.fonts.check(f)),overflow:sheets.flatMap((s,i)=>over(s.querySelector('.body'))?[i+1]:[]),brokenImages:[...document.images].filter(i=>!i.complete||!i.naturalWidth).length};
-  },{chunks,mode,logo,bank,bubble,contact,revision:hybridOnly?'híbrida':'v0.7',label:hybridOnly?'Propuesta comercial · 2027':name.includes('gerencia')?'Resumen ejecutivo · 2027':'Propuesta técnica · 2027'});
+  },{chunks,mode,logo,bank,bubble,contact,revision:'híbrida conciliada',label:isHybrid?'Propuesta comercial · 2027':name.includes('gerencia')?'Resumen ejecutivo · 2027':'Propuesta técnica · 2027'});
   if(report.overflow.length||report.brokenImages||!report.fontsOk||(mode==='memo'&&report.pages!==2))throw new Error(name+' '+JSON.stringify(report));
   fs.writeFileSync(path.join(metadata,name+'.html'),await page.content());
   const pdf=path.join(out,name+'.pdf');await page.pdf({path:pdf+'.tmp',printBackground:true,preferCSSPageSize:true,tagged:true,outline:true}); fs.renameSync(pdf+'.tmp',pdf);

@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.historical-simulation-review.v1",
+  "preparedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "runtimeUse": "review_only",
+  "commercialReady": false,
+  "approvalScope": "Operador autorizó prototipar con datos históricos e hipótesis explícitas; no confirmó costos, factores, markup ni tarifa vigente.",
+  "baseInput": {
+    "path": "data/pricing/v3-pilot/scenarios/colombia-chile-design-historical-hypothesis.json",
+    "sha256": "0840c3819bbb2aa99992185087bc1555a7fc27dfca12633634f3c2e68758c61d"
+  },
+  "evaluationWindow": "source.effectiveFrom/Until coincide con quoteDate sólo para permitir evaluar hipótesis. No declara vigencia real del Excel ni de proveedores; todos los registros son estimated y el snapshot historical.",
+  "assumptions": [
+    {
+      "decisionId": "human-cost-CO-assumed",
+      "classification": "historical_value_with_localization_hypothesis",
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "profileId": "ECG-002",
+        "field": "historicalHumanMonthlySubtotalUsd",
+        "actualTalentCountry": null,
+        "actualEffectiveDate": null
+      },
+      "note": "Asignar CO sólo como hipótesis del ensayo, sin descuento de talento ni dato salarial actual. El histórico no acredita costo cargado completo: cargas laborales siguen pendientes fuera de este costo de ensayo."
+    },
+    {
+      "decisionId": "shared-capacity-180",
+      "classification": "historical_hours_with_policy_hypothesis",
+      "note": "180 horas/FTE históricas y mínimo shared 0 para ensayo; no horas billables ni mínimos aprobados."
+    },
+    {
+      "decisionId": "dedicated-full-commitment",
+      "classification": "capacity_hypothesis",
+      "note": "Caso dedicated compromete 1 FTE aunque se solicite 0.5; sensibilidad, no política aprobada."
+    },
+    {
+      "decisionId": "historical-markup-no-approved-floor",
+      "classification": "historical_pricing_hypothesis",
+      "note": "Markup histórico 30% sobre costos modelados. minimumMargin 0 evita inventar un piso comercial; no aprueba operar sin piso. Margen sobre venta es distinto de markup."
+    },
+    {
+      "decisionId": "neutral-market-experiment",
+      "classification": "neutral_factor_hypothesis",
+      "note": "Factor Chile 1 para aislar costos; no evidencia de disposición de pago."
+    },
+    {
+      "decisionId": "historical-FX-not-current",
+      "classification": "historical_conversion_hypothesis",
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "collection": "historicalFx",
+        "fromCurrency": "USD",
+        "toCurrency": "CLP",
+        "historicalRateDate": "2025-11-09"
+      },
+      "note": "1000 CLP/USD sólo como hipótesis histórica ilustrativa, sin tasa actual verificada."
+    },
+    {
+      "decisionId": "tool-ETG-001",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-ETG-001"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "collection": "toolReferences",
+        "idField": "toolId",
+        "idValue": "ETG-001",
+        "field": "historicalAttributedAmountUsd",
+        "sourcePeriod": "Mensual",
+        "sourceAssignmentUnit": "Proyectos/mes",
+        "validatedPlan": false
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "tool-ETG-015",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-ETG-015"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "collection": "toolReferences",
+        "idField": "toolId",
+        "idValue": "ETG-015",
+        "field": "historicalAttributedAmountUsd",
+        "sourcePeriod": "Mensual",
+        "sourceAssignmentUnit": "Usuarios/mes",
+        "validatedPlan": false
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "tool-ETG-016",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-ETG-016"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "collection": "toolReferences",
+        "idField": "toolId",
+        "idValue": "ETG-016",
+        "field": "historicalAttributedAmountUsd",
+        "sourcePeriod": "Mensual",
+        "sourceAssignmentUnit": "Clientes activos",
+        "validatedPlan": false
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "tool-ETG-007",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-ETG-007"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "collection": "toolReferences",
+        "idField": "toolId",
+        "idValue": "ETG-007",
+        "field": "historicalAttributedAmountUsd",
+        "sourcePeriod": "Mensual",
+        "sourceAssignmentUnit": "Proyectos",
+        "validatedPlan": false
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "full-platform-fee",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-platform"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/parameters.json",
+        "profileId": "ECG-002",
+        "component": "platformFee",
+        "assignment": "Una persona; fee completo supuesto, independiente de FTE."
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "test-assurance-cost",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-assurance"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/scenarios/synthetic-co-cl.json",
+        "resourceId": "assurance",
+        "classification": "test_placeholder_not_estimated_actual_cost"
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "test-operations-cost",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-ops"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/scenarios/synthetic-co-cl.json",
+        "resourceId": "ops",
+        "classification": "test_placeholder_not_estimated_actual_cost"
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    },
+    {
+      "decisionId": "test-onboarding-cost",
+      "inputBinding": {
+        "collection": "snapshot.resources",
+        "idField": "resourceId",
+        "idValue": "hyp-onboarding"
+      },
+      "origin": {
+        "path": "data/pricing/v3-pilot/scenarios/synthetic-co-cl.json",
+        "resourceId": "onboarding",
+        "classification": "test_placeholder_not_estimated_actual_cost"
+      },
+      "note": "Hipótesis de costo/atribución mensual; sin habilitación comercial."
+    }
+  ],
+  "resourceAttribution": "Se conservan importes atribuidos históricos de tools como costo normalizado de la cuenta, share=1. No se interpreta el divisor como usuarios ni permiso de compartir credenciales. Mantener tools/fee/Assurance/operación constantes al variar FTE es una hipótesis explícita del ensayo.",
+  "limitations": [
+    "Cargas y obligaciones laborales/fiscales actuales sin validar.",
+    "Assurance, gestión y setup usan importes de prueba existentes, no cotización de proveedor ni presupuesto operativo.",
+    "No representa por sí solo alcance de Embedded Creative Pod.",
+    "Impuestos pendientes; no grandTotal.",
+    "Input comercial y catálogo operativo conservan sus faltantes; no se promueven estos supuestos."
+  ],
+  "cases": [
+    {
+      "scenarioId": "shared-half-three",
+      "patches": []
+    },
+    {
+      "scenarioId": "shared-full-three",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/request/lines/0/dedication/value",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "scenarioId": "dedicated-half-three",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/request/lines/0/allocationMode",
+          "value": "dedicated"
+        },
+        {
+          "op": "replace",
+          "path": "/request/lines/0/allocationPolicyRef",
+          "value": "hyp-dedicated"
+        }
+      ]
+    },
+    {
+      "scenarioId": "shared-half-six",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/request/duration/periods",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "scenarioId": "shared-half-three-clp",
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/request/outputCurrency",
+          "value": "CLP"
+        }
+      ]
+    }
+  ],
+  "resultPath": "data/pricing/v3-pilot/economics/historical-simulation/results.json",
+  "exportPolicy": "Todos los casos deben conservar requires_review; export comercial rechazado."
+}

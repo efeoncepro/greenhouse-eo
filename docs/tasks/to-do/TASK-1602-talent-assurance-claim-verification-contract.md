@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-038`
-- Status real: `Baseline documental verificado; decisión y policy siguen Proposed, sin runtime autorizado`
+- Status real: `2026-10-09: decisión y arquitectura objetivo aceptadas por el operador; catálogo de claims, policy detallada y revisión de owners pendientes. Sin nuevo runtime activado.`
 - Rank: `EPIC-038-phase-0`
 - Domain: `agency|hr|workforce|delivery`
 - Blocked by: `none`
@@ -49,7 +49,7 @@ Reglas: el claim es acotado; la evidencia se distingue de inferencias; una infer
 
 ### Depends on
 
-- `EPIC-038` y sus decisiones propuestas.
+- `EPIC-038` y su decisión/arquitectura objetivo aceptadas; completar policy y revisión de dominios.
 
 ### Blocks / Impacts
 
@@ -65,14 +65,23 @@ Reglas: el claim es acotado; la evidencia se distingue de inferencias; una infer
 
 ### Already exists
 
-- Decision y arquitectura V1 en estado `Proposed`.
+- Decision y arquitectura objetivo V1 en estado `Accepted` desde 2026-10-09 por aprobación explícita del operador.
 - `Verificado por Efeonce` definido como claim acotado conceptualmente.
 
 ### Gap
 
-- Falta aceptación formal, catálogo V1 de claims y policy versionada para vigencia, apelación y revocación.
+- Falta catálogo V1 de claims y policy versionada para vigencia, apelación, revocación y ownership operativo.
 
-### Baseline verified 2026-08-15
+### Avance documental 2026-10-09
+
+- Aceptación registrada en el ADR con fuente y rationale: evidencia contextual, formación, desempeño,
+  continuidad y economía sostenible. No equivale a revisión firmada de cada dominio ni a claim emitido.
+- [Servicio regional CRM/RevOps](../../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md)
+  consume Talent Assurance y separa responsabilidades de Staff Augmentation y operación gestionada.
+- Se retira el bloqueo de aceptación conceptual; catálogo/policy y revisión cross-domain siguen pendientes.
+  Esta actualización de progreso no cierra la task ni autoriza schema o rollout.
+
+### Baseline verified 2026-08-15 (histórico; aceptación resuelta el 2026-10-09)
 
 - `HiringHandoff`/activación, validity, capacity y pricing son evidencia o inputs de dominios dueños; ninguno
   constituye hoy un claim `Verificado por Efeonce` ni autoriza emitirlo, suspenderlo o revocarlo.
@@ -109,14 +118,14 @@ Reglas: el claim es acotado; la evidencia se distingue de inferencias; una infer
 
 ## Acceptance Criteria
 
-- [ ] Decision V1 aceptada o rechazada explícitamente con rationale.
+- [x] Decision V1 aceptada explícitamente con rationale — aprobación del operador 2026-10-09 registrada en [ADR, aceptación y alcance](../../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md#aceptación-2026-10-09--estándar-transversal-y-alcance).
 - [ ] Claim taxonomy y evidence policy versionadas.
 - [ ] Owners, gates humanos, privacy y límites comerciales documentados.
 - [ ] Tasks downstream referencian la policy sin reinterpretarla.
 
 ## Rollout Plan & Risk Matrix
 
-Impact-only: policy first; ningún cambio runtime hasta aceptación. Rollback = revert documental y mantener el sello fuera de superficies públicas.
+Impact-only: decisión aceptada; policy y revisión cross-domain antes de activar claims/runtime. La aceptación no completa esta task. Cambiar la decisión requiere delta trazable; mantener el sello fuera de superficies públicas hasta completar sus gates.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---:|---|---|

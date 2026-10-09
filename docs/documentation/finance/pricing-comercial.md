@@ -1,5 +1,7 @@
 # Pricing Comercial — Catálogo, Motor y Builder de Cotizaciones
 
+Para costear localmente sin depender de la UI: [CLI de Excel y planes editables](pricing-workbook-cli.md).
+
 > **Capa estratégica:** la metodología transversal de pricing y packaging vive en
 > [`.codex/skills/efeonce-pricing-operator/SKILL.md`](../../../.codex/skills/efeonce-pricing-operator/SKILL.md) y su
 > referencia general. Este documento conserva el diseño histórico del programa. La operación vigente de catálogo,

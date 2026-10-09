@@ -1,45 +1,45 @@
 {
-  "pages": 6,
+  "pages": 5,
   "toc": [
     {
       "target": "seccion-1",
       "page": 1,
-      "title": "1. Objetivo y lógica del programa"
+      "title": "1. Objetivo y alcance recomendado"
     },
     {
       "target": "seccion-2",
       "page": 1,
-      "title": "2. Partir de la meta completa y calcular hacia atrás"
+      "title": "2. Diagnóstico que orienta las primeras intervenciones"
     },
     {
       "target": "seccion-3",
       "page": 2,
-      "title": "3. Arquitectura en WordPress: producto, hub y satélites"
+      "title": "3. Arquitectura y SEO técnico en WordPress"
     },
     {
       "target": "seccion-4",
       "page": 3,
-      "title": "4. SEO/AEO como palanca de eficiencia para SEM"
+      "title": "4. Producción y AEO que evolucionan con la evidencia"
     },
     {
       "target": "seccion-5",
       "page": 3,
-      "title": "5. Comunidad y PR para relación y distribución"
+      "title": "5. Comunidad, PR y eficiencia de captación"
     },
     {
       "target": "seccion-6",
-      "page": 3,
-      "title": "6. Alcance candidato y secuencia anual"
+      "page": 4,
+      "title": "6. Calendario de la ruta gradual"
     },
     {
       "target": "seccion-7",
-      "page": 5,
-      "title": "7. Medición y acumulación de activos"
+      "page": 4,
+      "title": "7. Aporte estimado y ejercicio desde el lanzamiento"
     },
     {
       "target": "seccion-8",
       "page": 5,
-      "title": "8. Equipo, inversión y decisión"
+      "title": "8. Responsabilidades, inversión y aceptación"
     }
   ],
   "fontsOk": true,

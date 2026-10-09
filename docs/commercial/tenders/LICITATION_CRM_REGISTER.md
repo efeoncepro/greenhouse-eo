@@ -1,5 +1,23 @@
 # Registro operativo CRM de licitaciones
 
+## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
+
+**Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.
+
+Alta expresa de Julio: [Company 59076520008](https://app.hubspot.com/contacts/48713323/record/0-2/59076520008?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), [Deal 65843869022](https://app.hubspot.com/contacts/48713323/record/0-3/65843869022?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) y nota 118286393402. Dos lecturas: `default/qualifiedtobuy`, `newbusiness`, `Strategic Bets`, owner Julio 75788512; Company Primary verificada. Selección del operador para crear Deal; presupuesto, admisibilidad, margen y GO de participación pendientes. Sin amount/closedate ni fecha-hora inventada. Company en ACTIVE187, cohorte09. Contacto 254010206318 creado y asociado a Company Primary, Deal y nota tras confirmación de créditos Apollo. Identidad/cargo corroborados; calidad del correo contradictoria entre Apollo y validador, documentada en CRM para revalidación antes de envío. Consumo 2 créditos. Membresía efectiva ACTIVE182 verificada por CRM search; un solo contacto por email.
+
+Convocatoria abierta del 06-10 al **30-10-2026** para preinscripción; preselección23-11, caso18-12, adjudicación28-12, inicioenero2027. Ficha [LinkedIn4474064758](https://cl.linkedin.com/jobs/view/licitaci%C3%B3n-agencia-integral-de-medios-2027-at-pierre-fabre-laboratories-4474064758); llave `hubspot-private-tender:linkedin:4474064758`. El formulario público fue leído completo: antecedentes, cobertura directa, experiencia, inversión administrada, hasta tres referencias, herramientas, IA/automatización, conflictos y credenciales por correo. Admite propuestas conjuntas identificadas. Requisitos y destinatario están en nota/descripcion CRM; sin envío ni inscripción. Grupo internacional grande califica por instrucción de Julio; tamaño global separado del local. Evidencia y datos privados en el expediente local `hubspot-saas-prospecting/pierre-fabre-hubspot-2026-10-09.json`.
+
+## USACH CRM descartada — 08/10/2026
+
+**NO-BID por decisión de Julio — 08/10/2026:** USACH CRM `5067-2456-COT26` descartada por presupuesto insuficiente (CLP690.000 para 12 meses). HubSpot Lead `595416937995`: **Disqualified**, razón `BUDGET_CONSTRAINTS`; Company USACH preservada. No invertir en propuesta ni reabrir sin nueva instrucción/evidencia. USACH difusión `564162-139-LE26` conserva su estado. Cartera de esta ronda: 18 Leads New, uno Disqualified y 15 Deals anteriores.
+
+## Leads nuevos y empresas de rondas anteriores — 08/10/2026 19:05
+
+**34 procesos con Company Primary verificada:** 19 Leads nativos nuevos por calificar y 15 Deals existentes. Se crearon nueve empresas, se reutilizaron 19 y se completaron las 13 asociaciones pendientes de la ronda anterior; ProChile/UNAP ya tenían Company. [IDs, empresas, notas y dos readbacks](licitalab-novedades-2026-10-08/HUBSPOT-ALTA-Y-EMPRESAS.md).
+
+UTEM conserva oferta presentada, etapa `presentationscheduled` y CLP4.800.000 netos; ahora tiene Company UTEM. Las demás etapas anteriores se preservaron. Los 19 Leads permanecen `new-stage-id`; no son Deals calificados ni suman presupuesto comprador como forecast. No se enviaron ofertas ni comunicaciones. Este corte actualiza las menciones históricas de Company pendiente de las trece altas.
+
 ## UTEM · presentada — actualización puntual 08-10-2026
 
 **Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Evidencia y readback](utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). La fila vigente de UTEM prevalece sobre el estado histórico de las trece altas.
@@ -64,7 +82,7 @@ Chat de trabajo Q4: [Sika México · LIC-1169 · Campaña Q4 Home Center](codex:
 
 Participación confirmada por el operador; estado local **En desarrollo**, CRM `default/qualifiedtobuy`, owner Julio `75788512`. Empresa México creada tras deduplicación, distinta de Sika Chile. Contacto individual proporcionado por el operador y nota de intención asociados; México verificada como Primary de contacto y deal. Datos personales en CRM/OneDrive.
 
-Origen Wherex, evolución de campaña «Innovar es hacerlo posible, innovar es hacerlo Sika». Ficha: publicación 02/10/2026 15:41, cierre 16/10/2026 19:00 **sin zona visible**; no se inventó UTC ni cierre comercial. Monto no informado. `Core Pipeline/newbusiness` live por automatización no acredita cliente existente. Brief DOCX leído y cuatro originales conservados en OneDrive. Muestra solicitada distinta del alcance de ejecución: ver workspace. Falta revisar anuncios/Q&A, precisar alcance y validar economía antes de presentar; no hay comprobante de postulación.
+Origen Wherex, evolución de campaña «Innovar es hacerlo posible, innovar es hacerlo Sika». Ficha: publicación 02/10/2026 15:41, cierre 16/10/2026 19:00 **sin zona visible**; no se inventó UTC ni cierre comercial. Monto no informado. `Core Pipeline/newbusiness` live por automatización (readback CRM 06/10) no acredita cliente existente. Corte de propuesta 07/10: brief/PDF completos, seis preguntas/cuatro respuestas/dos pendientes y un anuncio revisados en Wherex vivo. [Técnica Codex eliminada](sika-mexico-campana-creativa-1164/oferta-tecnica.md) por instrucción del operador, con gráfica POSIBLE preservada; Master + lanzamiento tipo como base económica, storyboard/animatic admitido para muestra. Faltan definiciones por red/producto, marca, zona, facturación, capacidad, derechos y costeo; no hay comprobante de postulación. CRM no releído/modificado en este corte.
 
 Cohorte `research_2026_10_06`: nuevo contacto en ACTIVE 174/176; nueva empresa en ACTIVE **177 Química y materiales**, por atributos. Readback de conjuntos exactos: 81 empresas, 81 contactos, 63 individuales con email, 51 creativos, CRM 26 y 177 con una empresa. Sin inscripción manual en listas estáticas.
 

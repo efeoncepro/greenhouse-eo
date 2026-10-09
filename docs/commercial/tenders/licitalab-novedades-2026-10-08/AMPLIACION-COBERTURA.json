@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "cut_chile": "2026-10-08T18:47:55-03:00",
+  "status": "read_only_review",
+  "searches": [
+    {
+      "term": "GCP",
+      "pages_observed": 1,
+      "unique_ids": 2,
+      "visible_result_counts": [
+        2
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "Google Cloud",
+      "pages_observed": 3,
+      "unique_ids": 41,
+      "visible_result_counts": [
+        41
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "Google cloud platform",
+      "pages_observed": 3,
+      "unique_ids": 43,
+      "visible_result_counts": [
+        44
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "cloud computing",
+      "pages_observed": 2,
+      "unique_ids": 32,
+      "visible_result_counts": [
+        32
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "hosting",
+      "pages_observed": 1,
+      "unique_ids": 0,
+      "visible_result_counts": [],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "posicionamiento",
+      "pages_observed": 2,
+      "unique_ids": 26,
+      "visible_result_counts": [
+        26
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "SEO",
+      "pages_observed": 1,
+      "unique_ids": 1,
+      "visible_result_counts": [
+        1
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "AEO",
+      "pages_observed": 1,
+      "unique_ids": 1,
+      "visible_result_counts": [
+        1
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "GEO",
+      "pages_observed": 6,
+      "unique_ids": 110,
+      "visible_result_counts": [
+        114
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "diseño web",
+      "pages_observed": 29,
+      "unique_ids": 470,
+      "visible_result_counts": [
+        561
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "desarrollo web",
+      "pages_observed": 32,
+      "unique_ids": 540,
+      "visible_result_counts": [
+        622
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "sitio web",
+      "pages_observed": 5,
+      "unique_ids": 90,
+      "visible_result_counts": [
+        95
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "página web",
+      "pages_observed": 7,
+      "unique_ids": 133,
+      "visible_result_counts": [
+        137
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "portal web",
+      "pages_observed": 17,
+      "unique_ids": 306,
+      "visible_result_counts": [
+        327
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "CRM",
+      "pages_observed": 1,
+      "unique_ids": 6,
+      "visible_result_counts": [
+        6
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "HubSpot",
+      "pages_observed": 1,
+      "unique_ids": 0,
+      "visible_result_counts": [],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "Salesforce",
+      "pages_observed": 1,
+      "unique_ids": 0,
+      "visible_result_counts": [],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "Zoho",
+      "pages_observed": 1,
+      "unique_ids": 0,
+      "visible_result_counts": [],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "Claude",
+      "pages_observed": 1,
+      "unique_ids": 7,
+      "visible_result_counts": [
+        7
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "OpenAI",
+      "pages_observed": 1,
+      "unique_ids": 2,
+      "visible_result_counts": [
+        2
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    },
+    {
+      "term": "ChatGPT",
+      "pages_observed": 1,
+      "unique_ids": 5,
+      "visible_result_counts": [
+        5
+      ],
+      "scope": "resultados observados, no certificacion del universo nacional"
+    }
+  ],
+  "union_observed_unique": 1355,
+  "selected_records": [
+    {
+      "id": "857-61-COT26",
+      "relation_to_prior_review": "radar_previo_sin_deal",
+      "name": "Servicios Google Cloud Platform",
+      "buyer": "SERVICIO NACIONAL DE LA DISCAPACIDAD",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 6600000,
+      "published_chile": "05-10-2026 13:20",
+      "close_chile": "09-10-2026 08:39"
+    },
+    {
+      "id": "2403-72-LP26",
+      "relation_to_prior_review": "radar_previo_sin_deal",
+      "name": "Servicios Cloud",
+      "buyer": "I MUNICIPALIDAD DE PENALOLEN",
+      "status": "Publicada",
+      "currency": "USD",
+      "budget_api": 320000,
+      "published_chile": "23-09-2026 12:43",
+      "close_chile": "15-10-2026 15:30"
+    },
+    {
+      "id": "799595-5-LP26",
+      "relation_to_prior_review": "hallazgo_omitido_06_oct",
+      "name": "Servicio de Cloud Computing MINDEP",
+      "buyer": "SUBSECRETARIA DEL DEPORTE",
+      "status": "Publicada",
+      "currency": "USD",
+      "budget_api": 106618,
+      "published_chile": "06-10-2026 18:55",
+      "close_chile": "26-10-2026 17:00"
+    },
+    {
+      "id": "1191449-19-LP26",
+      "relation_to_prior_review": "hallazgo_omitido_29_sep",
+      "name": "SERVICIOS  DE ADMINIS DE INFRAES CLOUD Y MANTEN AN",
+      "buyer": "SERVICIO NACIONAL DEL PATRIMONIO CULTURAL",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 114470000,
+      "published_chile": "29-09-2026 14:54",
+      "close_chile": "19-10-2026 20:00"
+    },
+    {
+      "id": "1108660-10-LE26",
+      "relation_to_prior_review": "ya_registrada",
+      "name": "SERVICIO DE REDISEÑO DEL PORTAL INSTITUCIONAL",
+      "buyer": "FUND DE COMUNICACIONES CAPACITACION Y CULTURA DEL AGRO",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 13000000,
+      "published_chile": "02-10-2026 12:29",
+      "close_chile": "14-10-2026 15:30"
+    },
+    {
+      "id": "2432-31-LE26",
+      "relation_to_prior_review": "ya_registrada",
+      "name": "SERVICIO INTEGRAL DE CONTINUIDAD PAGINA WEB",
+      "buyer": "I MUNICIPALIDAD ESTACION CENTRAL",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": null,
+      "published_chile": "07-10-2026 10:54",
+      "close_chile": "13-10-2026 15:20"
+    },
+    {
+      "id": "5251-1060-COT26",
+      "relation_to_prior_review": "ya_presentada_cierre_superado",
+      "name": "Servicio de posicionamiento digital SEO, GEO y AEO ",
+      "buyer": "UNIVERSIDAD TECNOLOGICA METROPOLITANA",
+      "status": "Cerrada",
+      "currency": "CLP",
+      "budget_api": 6800000,
+      "published_chile": "07-10-2026 09:58",
+      "close_chile": "08-10-2026 18:00"
+    },
+    {
+      "id": "2013-13-LE26",
+      "relation_to_prior_review": "ya_registrada",
+      "name": "SERVICIO DE GESTIÓN DE PUBLICIDAD DIGITAL Y GENERA",
+      "buyer": "UNIVERSIDAD ARTURO PRAT",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 15000000,
+      "published_chile": "28-09-2026 12:56",
+      "close_chile": "08-10-2026 19:00"
+    },
+    {
+      "id": "564162-139-LE26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "Servicio de Difusión y Producción de Contenidos",
+      "buyer": "UNIVERSIDAD DE SANTIAGO DE CHILE",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 12419440,
+      "published_chile": "08-10-2026 17:32",
+      "close_chile": "19-10-2026 15:00"
+    },
+    {
+      "id": "1147293-193-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "ADQUISICIÓN LICENCIAS IA ",
+      "buyer": "Fundación para la Innovación Agraria",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 6262000,
+      "published_chile": "08-10-2026 15:20",
+      "close_chile": "14-10-2026 11:00"
+    },
+    {
+      "id": "5709-48-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "WD 4930 Licencia Claude MAX de Anthropic",
+      "buyer": "UNIVERSIDAD DE CHILE",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 1650000,
+      "published_chile": "08-10-2026 13:02",
+      "close_chile": "12-10-2026 11:00"
+    },
+    {
+      "id": "5423-170-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "LICENCIAS (SASERVI 84275)",
+      "buyer": "UNIVERSIDAD DE LOS LAGOS",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 934415,
+      "published_chile": "08-10-2026 17:01",
+      "close_chile": "09-10-2026 17:15"
+    },
+    {
+      "id": "2427-1134-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "SERVICIO DE ABONO DE CRÉDITOS EN CUENTAS OPENAI Y ANTHROPIC, SECPLA",
+      "buyer": "I MUNICIPALIDAD DE VALPARAISO",
+      "status": "Publicada",
+      "currency": "USD",
+      "budget_api": 500,
+      "published_chile": "08-10-2026 09:47",
+      "close_chile": "09-10-2026 11:30"
+    },
+    {
+      "id": "5067-2456-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "Suscripción anual a una plataforma CRM y de gestión de comunicaciones digitales",
+      "buyer": "UNIVERSIDAD DE SANTIAGO DE CHILE",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 690000,
+      "published_chile": "08-10-2026 11:59",
+      "close_chile": "09-10-2026 13:00"
+    },
+    {
+      "id": "5872-54-COT26",
+      "relation_to_prior_review": "nueva_hoy",
+      "name": "WD 4929 Servicio de Plataforma de Email Marketing",
+      "buyer": "UNIVERSIDAD DE CHILE",
+      "status": "Publicada",
+      "currency": "CLP",
+      "budget_api": 5500000,
+      "published_chile": "08-10-2026 13:16",
+      "close_chile": "12-10-2026 10:00"
+    }
+  ],
+  "cloud_rag_status": {
+    "857-61-COT26": "ok",
+    "2403-72-LP26": "ok",
+    "799595-5-LP26": "ok",
+    "1191449-19-LP26": "ok"
+  },
+  "new_crm_writes": 0,
+  "limitations": [
+    "Resultados observados y coincidencias amplias; conteos UI varian durante la paginacion",
+    "Ausencia CRM contrastada con el snapshot 178 Deals con ID de este turno",
+    "No certificacion de canal/margen ni lectura integral de todas las bases"
+  ],
+  "evidence_sha256": {
+    ".auth/licitalab-radar-reports/ampliacion-categorias-20261008.json": "454c2edf5645d4eb94255af5103aa77c6afed17fbf25dcb088b69d765f5f69ae",
+    ".auth/licitalab-radar-reports/ampliacion-857-61-COT26-scope.json": "308a6160270dfe2a30180f9a029aa1329e841bc6eaaf78761c9c0ad107187d12",
+    ".auth/licitalab-radar-reports/ampliacion-2403-72-LP26-scope.json": "646d7cfb2541d3556cbe5814bc3a9b38415c7d585e29eef3ee57f603fd900fc8",
+    ".auth/licitalab-radar-reports/ampliacion-799595-5-LP26-scope.json": "8d26a30e98dec549a8591a3e2e642cd9b9179dc7ee6ee19959692de20d2e137b",
+    ".auth/licitalab-radar-reports/ampliacion-1191449-19-LP26-scope.json": "1a15138a34ad4e584576074bd4a3e3c875f1440b4c667b89d2e1d259291a4a7e",
+    ".auth/licitalab-radar-reports/ampliacion-reconciliacion-20261008.json": "f05a9ce762e60bc0f921b8563ac8ef187d3b6b9710963503494552054358c902"
+  },
+  "reconciliation_runs": [
+    {
+      "term": "sitio web",
+      "pages": 5,
+      "unique_ids": 94,
+      "page_delay_seconds": 6
+    },
+    {
+      "term": "Google cloud platform",
+      "pages": 3,
+      "unique_ids": 43,
+      "page_delay_seconds": 6
+    }
+  ],
+  "crm_registration_after_research": {
+    "new_leads": 19,
+    "new_deals": 0,
+    "existing_deals": 15,
+    "primary_company_verified": 34,
+    "new_companies": 9,
+    "report": "HUBSPOT-ALTA-Y-EMPRESAS.md",
+    "verified_at_utc": "2026-10-08T22:05:03.866692+00:00"
+  }
+}

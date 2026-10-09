@@ -1,0 +1,40 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "b84cedbb0fb0efd4fe9301c19874db0ea2215c45935386f283033b8a52206626",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.content-day.live-progress"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:articulo-analisis-datos-review-340x425",
+      "path": "ai-generations/2026-10-08_utem-propuesta/plates/articulo-analisis-datos.png",
+      "sha256": "a8104700cf8e3453e77e5059e8e3c46d91cf6823fea55220473e8c4745416502"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:notion-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "sha256": "73e1972c42eeb5b337bbeb2b4a02a9315ddb1921e690725e89f1fcec96203816"
+    },
+    {
+      "ref": "asset-ref:file:frameio-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "sha256": "a1ba5e2f7c3eda6dca595eae3ce49b90a94417fc46fdb5762eb5aa9bf989add8"
+    },
+    {
+      "ref": "asset-ref:file:efeonce-isotype-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/efeonce-isotype-negative.svg",
+      "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

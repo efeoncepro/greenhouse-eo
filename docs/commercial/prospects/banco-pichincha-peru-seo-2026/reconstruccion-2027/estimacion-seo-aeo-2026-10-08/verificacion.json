@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "63_queries": true,
+    "monthly_demand": true,
+    "annual_demand": true,
+    "copied_document_matches": true,
+    "pdf_xlsx_preserved": true,
+    "source_inputs_preserved": true,
+    "central_direct": true,
+    "goal_reconciles": true
+  },
+  "scope": "arithmetic_sources_preservation_and_delivery_not_validation_of_assumptions",
+  "pdf_modified": false
+}

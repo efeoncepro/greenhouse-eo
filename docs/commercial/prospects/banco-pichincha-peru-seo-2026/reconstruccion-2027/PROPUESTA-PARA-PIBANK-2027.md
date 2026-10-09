@@ -1,122 +1,95 @@
-# Pibank Perú · Programa integrado de captación y eficiencia 2027
+# Pibank Perú · Crecimiento orgánico y autoridad 2027
 
-**Alcance vigente de autoridad y técnica:** [SEO técnico/schema y refuerzos de enlaces](oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md). Se retiran las sesiones digitales y no se incorporan tutoriales. Gradual: dos campañas M3/M8 + dos refuerzos M6/M11; integral: cuatro campañas y cuatro refuerzos. Precios anuales intactos; técnico/schema dentro de base y 8h CMS/mes.
+**Efeonce · Propuesta técnica para revisión · Rev. híbrida conciliada · 07 de octubre de 2026**
 
-**Recomendación para presentar:** programa anual gradual de **US$79.200** (base US$54.000 + activaciones US$25.200). Abrir con encontrar → entender/comparar → abrir → fondear; mostrar después calendario e inversión. [Comunidad y acciones AEO](oferta-hibrida/COMUNIDAD-Y-RECORRIDO.md) precisan el mecanismo dentro del alcance existente. El menú unitario queda como detalle.
+### 1. Objetivo y alcance recomendado
 
-**Capacidad editorial vigente:** hasta cinco artículos al mes incluidos en base US$4.500; máximo 60 al año, sin suplemento editorial. Las 24 piezas del plan anterior son backlog inicial. Ruta gradual US$79.200/año; integral US$89.200. Mayor capacidad no modifica automáticamente la demanda ni la captación proyectada. [Oferta y calendario actual](oferta-hibrida/README.md).
+Proponemos un programa de doce meses para que más personas encuentren Cuenta Soles Pibank, comprendan sus condiciones, comparen alternativas y avancen hacia la apertura y el primer depósito. Conectamos SEO/AEO, contenidos, herramientas, comunidad y relaciones con medios, con mejoras del recorrido que también pueden apoyar la eficiencia de SEM.
 
-**Efeonce · Propuesta técnica anual v0.7 · 07 de octubre de 2026**
+La ruta gradual recomendada asciende a **US$79.200 al año**: servicio base de **US$4.500 mensuales** más US$25.200 en activaciones. Esta propuesta técnica describe esa ruta. La alternativa integral, de **US$89.200**, incorpora activaciones adicionales identificadas al final; su alcance no está incluido en el precio gradual.
 
-### 1. Objetivo y lógica del programa
+La meta de referencia es **15.200 cuentas con fondos**. Con un ticket de US$2.500 equivale a US$38 millones; moneda y período deben formalizarse con el banco. Si el 2% de las visitas abre y el 65% de las aperturas fondea, el embudo completo requiere aproximadamente **1.169.231 visitas y 23.385 aperturas**. Son tasas de prueba: este cálculo dimensiona la meta y no proyecta visitas adicionales atribuibles a SEO.
 
-Proponemos conectar SEO/AEO, contenido, herramientas, comunidad y relaciones con medios con el contexto de búsqueda pagada para ayudar a descubrir Cuenta Soles Pibank, elegirla, abrirla y realizar el primer depósito. Un programa de doce meses permite construir activos, implementar mejoras, aprender del recorrido y ajustar inversión según resultados.
+### 2. Diagnóstico que orienta las primeras intervenciones
 
-SEM aporta captación y aprendizaje desde el inicio autorizado. El hub y SEO/AEO desarrollan recursos que pueden seguir descubriéndose y reutilizarse; PR amplía sus referencias; comunidad mantiene la relación; conversión y activación buscan aprovechar mejor las visitas y aperturas. Evaluaremos el conjunto por cuentas validadas, fondeo y calidad del ahorro, además de sus métricas de descubrimiento.
+La revisión pública del 06-10-2026 encontró producto, calculadora, documentación y 51 FAQ. La inspección del 07-10 identificó WordPress, tema Pibank y señales de Yoast SEO. Las observaciones siguientes son un corte fechado; se revalidan al inicio con el banco.
 
-### 2. Partir de la meta completa y calcular hacia atrás
-
-La conversación aportó una referencia de 15.200 cuentas, 38 millones y ticket de US$2.500/S/10.000. Moneda, período y definición del resultado requieren acuerdo. Para explorar el objetivo monetario usamos provisionalmente US$38 millones y US$2.500 por cuenta; esa interpretación no constituye una confirmación del banco.
-
-| Requisito bajo supuestos ilustrativos | Cálculo y resultado |
-|---|---|
-| Cuentas con primer depósito para el 100% monetario provisional | US$38.000.000 ÷ US$2.500 = **15.200 fondeadas** |
-| Aperturas si el 65% realiza primer fondeo | 15.200 ÷ 65% = **~23.385 aperturas** |
-| Visitas elegibles si el 2% abre | 15.200 ÷ 65% ÷ 2% = **~1.169.231 visitas** |
-| Promedio en doce meses de planificación | **~97.436 visitas mensuales**, sin fijar con ello el período bancario |
-
-Este cálculo describe requisitos del embudo completo, no un forecast ni 1,17 millones de visitas adicionales que deba producir SEO por sí solo. Una trayectoria que comience bajo exigiría meses posteriores superiores al promedio. Las tasas son hipótesis, no datos medidos de Pibank; los redondeos se aplican al final sin propagarlos entre fórmulas.
-
-760 fondeadas representan únicamente el escenario parcial del 5% —US$1,9 millones al ticket supuesto—; no son la proyección final ni una meta acordada del programa. Si 15.200 significa aperturas, a 65% resultarían 9.880 fondeadas y US$24,7 millones de primeros depósitos al ticket supuesto. Mantendremos separados ambos objetivos. Depósito inicial, saldo mantenido y beneficio bancario tienen definiciones diferentes.
-
-Mejorar conversión y fondeo puede reducir el requisito de visitas. Como sensibilidad, 3% de apertura y 75% de fondeo exigirían ~675.556 visitas; 4% y 80%, 475.000. No seleccionaremos una tasa por conveniencia: la contribución esperada se estimará con demanda alcanzable, datos disponibles y supuestos identificados por canal. Aún falta cuantificar el aporte del programa completo y el ejercicio desde el lanzamiento.
-
-### 3. Arquitectura en WordPress: producto, hub y satélites
-
-La página existente de Cuenta Soles será el pilar comercial. Mejoraremos su explicación de uso, rendimiento/costos, liquidez, respaldo, fuentes, requisitos y acceso a apertura. Desde ella se podrá profundizar en recursos específicos; cada recurso ofrecerá un regreso contextual al producto cuando ayude a decidir.
-
-Proponemos un hub de ahorro dentro de pibank.pe, organizado por decisiones. El sitio público fue verificado como WordPress el 07-10; plantillas, acceso, pruebas y despliegue se coordinarán con TI/proveedor. Tecnología y permisos del registro bancario se validan por separado.
-
-| Territorio | Contenido y herramienta | Progreso esperado |
+| Evidencia observada | Implicación | Intervención y comprobación |
 |---|---|---|
-| Rendimiento y costos | TREA, ejemplos y calculadora existente mejorada | Comprender condiciones y estimar con supuestos explícitos |
-| Comparación | Guías y comparador con metodología/fuentes | Evaluar rendimiento, costos, liquidez y encaje |
-| Ahorro disponible | Separar ahorro/gasto y planificador | Aplicar criterios a una meta o necesidad de disponibilidad |
-| Confianza e identidad | Fuentes de respaldo, documentos y canales oficiales | Verificar y reducir incertidumbre |
-| Apertura y primer fondeo | Requisitos, pasos, transferencias y ayuda oficial | Avanzar al registro y primer depósito bancarios |
+| Pibank no apareció en los resultados orgánicos capturados en **17 capturas genéricas** | Brecha frente a competidores en esa muestra; no ausencia en todo Google | Priorizar familias de ahorro y comparación; contrastar consultas y URL con Search Console |
+| Páginas clave y FAQ emitían **dos canonical idénticos**; identificadores de host distintos en grafos | Duplicidad de implementación y oportunidad de coherencia; no prueba de penalización | Revisar plantillas/plugins, emitir una canónica consistente y validar HTML y datos estructurados |
+| FAQ de horarios con el mismo cuerpo; también dos respuestas de cancelación | Revisar cobertura e intención antes de producir más respuestas | Mantener, mejorar o consolidar según consultas, enlaces y utilidad; comprobar destinos y redirecciones |
+| Respuestas sobre comisiones y tasa requieren contraste o mejor acceso al tarifario | La exactitud de condiciones influye en comprensión y confianza | Revisión de Producto/Cumplimiento y enlaces a fuentes vigentes; comprobar consistencia entre producto, FAQ y calculadora |
+| Índice DataForSEO: **2 backlinks y 1 dominio referente**; detalle: un enlace seguido activo | Referencias detectadas limitadas en ese índice; no censo de todos los enlaces | Revalidar línea base, gestionar referencias editoriales y registrar origen, destino y atributo |
 
-Cada satélite tendrá intención distinta, fuentes, revisión, enlaces y siguiente paso. Las FAQ resuelven dudas puntuales; los artículos profundizan decisiones; las herramientas aplican un método. Mantendremos consistencia entre condiciones visibles, cálculos y datos estructurados. Comparaciones con marcas requieren aprobación específica de Producto/Cumplimiento; la alternativa son criterios generales sin marcas.
+Las 17 son capturas, no 17 consultas únicas: el estudio reúne 19 capturas válidas —17 genéricas y dos propias— sobre diez consultas. El resumen y el detalle de backlinks son observaciones distintas. Domain Rank de DataForSEO no equivale a Domain Authority ni a Brand Authority.
 
-El comparador y el planificador requieren diseño funcional, fórmulas, accesibilidad, privacidad, medición, QA y mantenimiento. Sus plazos se acuerdan tras validación de método y capacidad de implementación.
+La ampliación competitiva reúne **2.278 observaciones únicas de banco/consulta/URL, 1.594 consultas distintas y 19 familias**. Incluye búsquedas de productos de Interbank, Scotiabank, BCP y BBVA como oportunidades para comparativas y alternativas. Seis representantes directos suman 3.740 búsquedas mensuales estimadas y cinco rivales 18.300; los grupos no constituyen audiencias únicas ni el mercado total. Comparaciones con marcas se publican con método, fuentes fechadas y aprobación de Producto/Cumplimiento; puede utilizarse una comparación general si la revisión lo requiere.
 
-### 4. SEO/AEO como palanca de eficiencia para SEM
+### 3. Arquitectura y SEO técnico en WordPress
 
-Los recursos servirán a descubrimiento y a destinos de campañas por intención. Una búsqueda comercial puede conducir directamente a producto; una necesidad de cálculo o comparación, al recurso pertinente con continuidad hacia apertura. Priorizaremos relevancia, utilidad, experiencia móvil y claridad.
+La página actual de Cuenta Soles será el pilar comercial. Su mejora inicial conectará rendimiento, costos, disponibilidad, respaldo, requisitos y apertura con fuentes claras. El hub de ahorro reunirá artículos y herramientas por decisiones: rendimiento, comparación, confianza, liquidez, apertura y fondeo. Cada recurso tendrá intención diferenciada y un siguiente paso pertinente hacia el producto.
 
-SEM permitirá aprender de términos, mensajes y resultados; SEO aportará consultas y recursos que pueden orientar campañas. Revisaremos presencia y desempeño combinados para orientar ajustes de pauta, distinguiendo marca/no marca. El rendimiento orgánico no garantiza menor CPC ni justifica retirar pauta automáticamente.
+En M1–M2 implementaremos el hub y mejoraremos la calculadora existente. El comparador se desarrolla en M4–M5, para hasta cinco productos, con criterios verificables y actualización manual. El planificador de ahorro es una activación adicional de la alternativa integral.
 
-Una sensibilidad aislada muestra el mecanismo: con iguales clics y gasto, pasar de 2% a 3% de apertura genera 50% más aperturas y reduce 33,3% el gasto de pauta por apertura. Es un ejemplo, no una mejora observada. Si fondeo se mantiene, también baja el gasto de pauta por fondeada; el costo total debe incluir producción, tecnología, gestión y operación correspondientes.
+El servicio base prioriza rastreo e indexación, robots/sitemaps, canónicas, redirecciones, enlaces internos y rendimiento móvil, incluidos **Core Web Vitals** según datos disponibles. Revisaremos schema pertinente de organización, artículos y navegación, consistencia con el contenido visible y duplicidades de emisión. No se asigna schema por cuota ni se garantiza una presentación especial en buscadores.
 
-El Quality Score de Google ayuda a diagnosticar anuncio, intención y destino; no demuestra ahorro ni es un KPI económico. Evaluaremos costo por apertura y fondeada de cohortes maduras, junto a conversiones, costos completos y cambios concurrentes. Las recomendaciones se apoyarán en los datos de búsqueda pagada disponibles y en prioridades compartidas con Marketing.
+La base incluye **hasta ocho horas mensuales de ajustes en WordPress**. El plan mensual elige cambios según impacto y complejidad; carga editorial y proyectos del hub/herramientas tienen su capacidad propia. Cada intervención registra evidencia inicial, responsable, implementación y QA posterior. TI habilita permisos, pruebas y despliegue; la tecnología y medición de registro.pibank.pe se validan por separado.
 
-### 5. Comunidad y PR para relación y distribución
+### 4. Producción y AEO que evolucionan con la evidencia
 
-La comunidad forma parte de la recomendación anual. Comenzará con una propuesta de utilidad recurrente: newsletter, preguntas, herramientas y respuestas editoriales, apoyada por canales acordados. Definiremos audiencia, consentimiento, escucha, moderación y responsables. Mediremos retorno, uso y progresión; seguidores o suscriptores no equivalen a clientes.
+Incluimos **hasta cinco artículos sustanciales al mes**, con investigación, revisión y carga: hasta sesenta espacios anuales. El plan puede destinar espacios a actualizaciones sustanciales, registradas como tales. Los 24 briefs ya preparados son un backlog inicial. Las FAQ se mejoran cuando hay dudas, cambios o fricciones; no tienen una cuota fija y no se contabilizan como artículos.
 
-El recorrido propuesto es recurso → suscripción voluntaria/participación → regreso a recurso o producto → apertura → acompañamiento bancario de primer fondeo. El banco conserva la operación de registro, cuentas y comunicaciones financieras; referidos o incentivos requieren definición y aprobación propia.
+Cada mes investigamos → priorizamos → producimos o mejoramos → medimos → decidimos. Las nuevas piezas amplían cobertura; los recursos existentes se actualizan o consolidan cuando la evidencia lo justifica. La mejora inicial de producto tiene criterios de cierre; su evolución posterior responde a necesidades observadas.
 
-PR distribuirá recursos públicos citables y vocería a Gestión, El Comercio, RPP y Andina, con medios especializados según afinidad. Mantendremos cuatro campañas en M3/M5/M8/M11: comparar ahorro, entender rendimiento, separar ahorro/gasto y revisar decisiones al cierre. Cada salida exige fuente, recurso implementado, vocero y mensajes/destinatarios aprobados.
+El panel AEO incluye **24 preguntas en tres superficies**: rendimiento, comparación, confianza, liquidez, apertura y fondeo. Se registra una línea base de **72 observaciones en M1 y 144 observaciones mensuales desde M2**, en dos cortes. Se mantienen separados los resultados genéricos, de marca y comparativos, con fecha, superficie, presencia, exactitud y fuentes. Las respuestas observadas orientan mejoras de información y citabilidad; no equivalen a visitas o cuentas. Las superficies y su acceso se acuerdan al inicio.
 
-Se proponen 12 ángulos y 48 propuestas individuales anuales, cuatro preparaciones de vocería y seguimiento de referencias. Objetivos iniciales: 8–12 coberturas originales y 4–8 enlaces editoriales relevantes, sujetos a baseline y respuesta editorial. No son garantías; cobertura previa y sindicación se separan. Newsletter y PR comparten fuentes. La ruta integral añade cuatro refuerzos de enlaces en M2/M4/M7/M10, sin duplicar gestiones.
+### 5. Comunidad, PR y eficiencia de captación
 
-### 6. Alcance candidato y secuencia anual
+La comunidad se activa en **M3–M12**: diez newsletters, cuarenta adaptaciones y hasta 16 horas mensuales de escucha/moderación en canales acordados. Cada ciclo aborda una decisión de ahorro, invita a utilizar un recurso y recoge preguntas para el contenido siguiente. Se miden participación, retorno, uso y progresión; gestiones personales de cuenta se derivan a los canales oficiales.
 
-Una marca, dominio principal pibank.pe, Perú y español local; foco inicial Cuenta Soles. La tabla y secuencia siguientes describen la **alternativa integral**. La ruta gradual recomendada y su calendario se presentan en la [oferta híbrida](oferta-hibrida/OFERTA-PARA-PIBANK.md). El [modelo evolutivo](oferta-hibrida/MODELO-EVOLUTIVO.md) define el ciclo mensual y sus decisiones.
+La ruta gradual incluye **dos campañas PR en M3 y M8 y dos refuerzos de enlaces en M6 y M11**. Cada campaña prepara tres ángulos, doce propuestas personalizadas a medios, dossier sobre un activo existente, vocería y seguimiento durante seis a ocho semanas. Se priorizan Gestión, El Comercio, RPP, Andina y medios especializados según pertinencia y coordinación con Comunicaciones.
 
-| Frente | Cadencia candidata anual | Evidencia de entrega |
+Cada refuerzo revisa hasta diez oportunidades adicionales y realiza hasta seis gestiones con un seguimiento: menciones sin enlace, enlaces perdidos o páginas donde un recurso sea útil. No se duplican gestiones entre campañas. Se registran referencias, atributo del enlace y tráfico referido disponible. Las publicaciones y enlaces dependen de la decisión editorial del medio; los recursos, fuentes y mensajes deben estar aprobados antes de cada salida.
+
+Los artículos, el producto y las herramientas también pueden mejorar los destinos de SEM. El análisis de términos, intención, comportamiento y conversión permite recomendar mejoras para tráfico orgánico y pagado. No se presume un ahorro por posicionar: se contrasta el costo por apertura y por cuenta con fondos, junto con los costos completos y las condiciones de comparación.
+
+### 6. Calendario de la ruta gradual
+
+| Fase | Entregables y activaciones | Condición de avance |
 |---|---|---|
-| Arquitectura y hub | Mejora del pilar, un hub y plantillas/relaciones | Inventario, fuentes, navegación y QA implementado |
-| Artículos | **Hasta cinco artículos/mes**, nuevos o actualizaciones sustanciales acordadas | Brief, revisión, publicación y recorrido verificados |
-| FAQ | Mejora del corpus según preguntas, cambios y resultados; **sin cuota fija de FAQ** | Fuente, respuesta y enlaces revisados; no contarlas como artículos |
-| Herramientas | Calculadora mejorada + **dos tools nuevas** | Método, fórmulas, experiencia, eventos y mantenimiento |
-| Comunicaciones | **48 adaptaciones**, cuatro por mes en canales acordados | Utilidad y formato pertinente; publicación por owner autorizado |
-| Comunidad | **12 newsletters y devolución de preguntas**; escucha/moderación acordada | Entrega, participación, retorno y progresión disponibles |
-| Eficiencia SEO–SEM | Lectura conjunta por intención y recomendaciones de mejora de destinos | Análisis y recomendaciones con datos de campañas disponibles |
-| PR | Cuatro campañas, 12 ángulos, 48 propuestas, cuatro preparaciones de vocería | Materiales/gestiones y referencias verificadas |
-| Técnico y medición | Mantenimiento, hub/tools, continuidad y panel GEO de **144 observaciones al mes desde M2; 72 en M1** | Cambios, pruebas, fuentes y exactitud por superficie |
-| Gestión | **12 informes y cuatro revisiones trimestrales** | Decisiones y próximos trabajos en un tablero conjunto |
+| M1–M2 | Diagnóstico validado, medición, pilar/hub y primeras piezas; calculadora M2; AEO 72 en M1 y 144 desde M2 | Accesos, definiciones, revisión bancaria y QA |
+| M3–M5 | Comunidad desde M3; primera campaña PR M3; comparador M4–M5; expansión editorial | Recursos listos y fuentes aprobadas antes de distribuir |
+| M6–M8 | Refuerzo de enlaces M6; revisión semestral; mejoras por cohortes; segunda campaña PR M8 | Evidencia de uso, revisión de prioridades y vocería habilitada |
+| M9–M12 | Cobertura y optimización continuas; refuerzo M11; balance anual y siguiente ciclo | Resultados conciliados, inventario y documentación de entrega |
 
-Esta envolvente reemplaza la anterior de 12 entregas sustanciales/hasta seis destinos nuevos. Las adaptaciones reutilizan recursos sin duplicar artículos. Hub/tools, comunidad y análisis de eficiencia amplían el trabajo; el modelo híbrido dimensiona provisionalmente desarrollo, producción, medición y operación; disponibilidad y costos reales se confirman antes del acuerdo. No se incluyen cambios de app/core por inferencia ni se presume acceso concedido.
+M1 corresponde al inicio acordado. El mantenimiento de herramientas se presupuesta de M3 a M12, desde entrega y final de garantía correctiva. El servicio continuo incluye doce informes y cuatro revisiones trimestrales. Una demora de aprobaciones reprograma el hito dependiente y permite priorizar trabajo alternativo.
 
-| Fase | Trabajo y condición de avance |
-|---|---|
-| **M1–M3 · Base y primera distribución** | Mejorar pilar; preparar/implementar hub; establecer medición; publicar hasta quince espacios editoriales y mejoras según evidencia sujetos a revisión; mejorar calculadora en M2; preparar comunidad y lectura SEO–SEM; primera campaña PR en M3 con recurso listo |
-| **M4–M6 · Elección y eficiencia** | Hasta quince espacios editoriales y mejoras según evidencia; comparador propuesto M4 y planificador M6; aprendizaje de destinos/SEM; newsletter mensual, PR M5 y revisión semestral |
-| **M7–M9 · Activación y relación** | Hasta quince espacios editoriales y mejoras según evidencia; mejorar fricciones observadas; distribuir recurso de ahorro disponible; newsletter mensual, PR M8 y revisión de cohortes |
-| **M10–M12 · Actualización y consolidación** | Hasta quince espacios editoriales y mejoras según evidencia; revalidar condiciones; segundo corte comparable; newsletter mensual, PR M11 y balance de activos/contribución |
+### 7. Aporte estimado y ejercicio desde el lanzamiento
 
-M1 es el mes desde el inicio acordado. La lectura SEO–SEM requiere acceso a resultados autorizados y destinos comparables. Las cuatro adaptaciones mensuales se distribuyen según canales habilitados. Si un recurso o vocero no está listo, su campaña se reprograma; no se declara implementado un trabajo sólo especificado.
+La investigación permite explorar la demanda; aún no sustenta una previsión del aporte total del programa. Sobre las 19 familias y el calendario del anexo se probaron capturas maduras de 2%, 5% y 10%, una curva de maduración y tasas de 2% apertura/65% fondeo. El resultado aritmético va de **60 a 299 aperturas y de 39 a 195 cuentas con fondos** —aproximadamente 0,26% a 1,28% de la meta—. Hay solapamiento residual y las tasas no están medidas: es sensibilidad parcial del panel, no captación nueva demostrada, mínimo asegurado ni techo del programa.
 
-### 7. Medición y acumulación de activos
+El potencial adicional de mejorar la conversión del tráfico existente y el primer depósito debe cuantificarse con datos bancarios. Por cada 10.000 visitas hipotéticas, 2%/65% producen 130 cuentas con fondos; a 3%/75%, 225. La diferencia de 95 explica el mecanismo, no prueba que ese volumen o esa mejora existan en Pibank.
 
-El efecto compuesto se evaluará como acumulación de recursos útiles, distribución y aprendizaje: piezas anteriores pueden seguir captando o ayudando a decidir mientras nuevas piezas amplían cobertura. Mantenimiento, actualización y consolidación forman parte del trabajo; no se asume crecimiento exponencial ni que cada página aporte visitas adicionales.
+Proponemos trabajar dos entregables en M1, sujetos a la disponibilidad de datos:
 
-Mediremos por cohorte de publicación y actualización: descubrimiento, visitas elegibles, uso de tools, retorno/participación, progresión hacia producto, aperturas validadas, primer fondeo y saldo/permanencia cuando existan agregados autorizados. Separaremos los canales de origen de las asistencias: una misma cuenta se cuenta una vez, aunque haya tenido contactos orgánicos, PR, comunidad y pauta.
+- **Estimación prospectiva de aporte:** aperturas y cuentas con fondos por mes/cohorte, separando demanda captada, mejora de tráfico existente y activación de cuentas previas; conciliación sin doble conteo.
+- **Escenario retrospectivo desde el lanzamiento:** reconstruir tráfico, aperturas, fondeo y cambios de producto/campañas; simular cuándo habrían estado listos los activos y cómo habría madurado su contribución. Un escenario retrospectivo no prueba causalidad ni se calcula multiplicando el último mes por todo el período.
 
-AEO observará preguntas, motor/superficie, fecha, presencia, fuentes y exactitud. Las citas e impresiones no se suman como visitas o cuentas. La referencia bancaria y los cambios de tasas, campañas y onboarding deben acompañar cualquier estimación incremental.
+Para ambos se requieren fecha de lanzamiento y series por canal/página de destino: sesiones elegibles, aperturas validadas, primer fondeo por ventana, ticket/saldo y cambios de campañas/producto. Marketing y Analítica habilitan datos agregados; Efeonce prepara el modelo y Producto valida definiciones. M1 establece la referencia y la calidad de datos; no demuestra por sí solo el efecto anual de SEO/AEO. Si faltan datos, se entrega sensibilidad identificada y se precisa qué no puede estimarse.
 
-La matriz mensual contrastará meta completa con visitas alcanzables, conversión, fondeo, madurez y costos por origen. La mejora de conversión sobre tráfico existente se calcula contra una referencia, sin añadirla otra vez al total de cuentas. Activar una cuenta previa no satisface una meta de nuevas aperturas. Sin datos comparables mostraremos el alcance de lo observado y los supuestos de cada escenario.
+### 8. Responsabilidades, inversión y aceptación
 
-### 8. Equipo, inversión y decisión
+Efeonce prepara dirección, contenido, SEO/AEO, implementación web autorizada, herramientas, analítica, PR y comunidad del alcance. El banco valida condiciones y mensajes, habilita entornos/canales/datos y conserva registro, cuentas y primer depósito. Un responsable bancario consolida revisiones; proponemos cinco días hábiles y hasta dos rondas por lote editorial o proyecto. El silencio no autoriza publicación. Los errores respecto del brief aprobado se corrigen sin nuevo cobro.
 
-Efeonce propone dirección del programa, SEO/AEO, contenido, experiencia/herramientas, CMS, analítica, PR, comunidad y recomendaciones de eficiencia. El banco acuerda la operación de sus canales, valida condiciones/mensajes, habilita entornos y conserva registro/app/operación bancaria. Seguimiento semanal, informe mensual y revisión trimestral; revisores y plazos por acordar.
+La inversión gradual de **US$79.200** combina US$54.000 de base y US$25.200 de activaciones; **US$6.600 mensuales en promedio**, con máximo presupuestado de US$7.700 en un mes. Los precios y condiciones detallados figuran en la oferta económica; cada activación se acuerda antes de ejecutar. Valores en USD antes de impuestos aplicables.
 
-La oferta híbrida propone base US$4.500/mes, ruta gradual US$79.200/año e integral US$89.200/año; dimensiona honorarios, desarrollo y operación sin duplicar recursos compartidos. El costeo es provisional. La inversión en medios disponible se considera al evaluar la eficiencia de captación. La valoración se hará con el método neto que Finanzas del banco valide; depósitos no son ingresos del programa. El alcance técnico ampliado no acredita por sí mismo disponibilidad, presupuesto, precio o retorno.
+La **alternativa integral, US$89.200 al año**, añade planificador, dos meses de comunidad, dos campañas y dos refuerzos. Comunidad M1–M12, comparador M3–M4, planificador M5–M6; campañas M3/M5/M8/M11 y refuerzos M2/M4/M7/M10. No se atribuye el mismo resultado a ambas rutas.
 
-**Decisión propuesta:** evaluar un programa anual integrado; acordar meta/período, responsables, envolvente de entregas e inversión; completar una estimación defendible de contribución por canal y una referencia comparable para medirla.
+La evaluación mensual y trimestral relacionará ejecución con resultados disponibles. Una misma cuenta se cuenta una vez; canales y asistencias no se suman como cuentas nuevas. Primer depósito, saldo mantenido y beneficio son magnitudes distintas. El acuerdo final define alcance, responsables, inversión y medición; la meta bancaria no es una garantía de captación atribuible al servicio.
 
-## Fuentes y continuidad
+## Fuentes del diagnóstico
 
-[Cuenta Soles](https://pibank.pe/cuenta-soles-pibank/), [documentos](https://pibank.pe/documentos/) y [ayuda oficial](https://pibank.pe/centro-de-ayuda/). Research Efeonce/DataForSEO al 06-10: 2.278 observaciones únicas, 1.594 consultas y 19 familias; seis representantes directos suman 3.740 búsquedas estimadas/mes. Es cobertura parcial con fechas originales, no TAM, visitas ni forecast del programa ampliado. CMS público verificado 07-10. Condiciones por revalidar antes de publicación.
+Revisión pública Efeonce del 06-10-2026: [Cuenta Soles](https://pibank.pe/cuenta-soles-pibank/), [documentos](https://pibank.pe/documentos/), [centro de ayuda](https://pibank.pe/centro-de-ayuda/) y [sitemap FAQ](https://pibank.pe/faq-sitemap.xml). Condiciones de producto por revalidar antes de publicar.
 
-[Google: enlaces](https://developers.google.com/search/docs/crawling-indexing/links-crawlable), [búsqueda generativa](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), [Quality Score](https://support.google.com/google-ads/answer/6167118?hl=es) y [medición orgánico/pagado](https://support.google.com/google-ads/answer/3097241?hl=es). Estas fuentes explican mecanismos; no prueban resultados de Pibank.
+Investigación Efeonce/DataForSEO, Perú/español, corte 06-10 y ampliación hasta 07-10 UTC: capturas SERP, consultas competitivas y resumen/detalle de backlinks. Sus poblaciones e índices son parciales. Inspección pública de CMS del 07-10. Evidencia y método disponibles como respaldo. Los supuestos de captación son del anexo de planificación y no proceden de datos de conversión del banco.

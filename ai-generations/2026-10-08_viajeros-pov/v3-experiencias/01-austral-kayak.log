@@ -1,0 +1,9 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:image /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts --model gpt-image-2.5-sunburst --image ai-generations/2026-10-08_viajeros-pov/v2/anchors/austral.png --prompt-file ai-generations/2026-10-08_viajeros-pov/v3-experiencias/prompts/01-austral-kayak.txt --size 2560x1440 --quality high --format png --count 1 --timeout 600000 --out ai-generations/2026-10-08_viajeros-pov/v3-experiencias/01-austral-kayak.png
+
+  $ costo estimado ≈ USD 0.055 (1 × 1843 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-08_viajeros-pov/v3-experiencias/01-austral-kayak.png (edit) …
+  ✓ 5681KB · gpt-image-2.5-sunburst · 2560x1440 · high
+    usage: in 2179 (img 1536 · txt 643) · out 1843 · total 4022
+done

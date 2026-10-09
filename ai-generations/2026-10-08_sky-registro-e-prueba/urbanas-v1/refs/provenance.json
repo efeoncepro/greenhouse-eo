@@ -1,0 +1,33 @@
+[
+  {
+    "file": "01-valparaiso.jpg",
+    "sourcePage": "https://chile.travel/atractivos/cerro-alegre-y-concepcion/",
+    "sourceImage": "https://chile.travel/wp-content/uploads/2025/08/7040105f-atractivo_cerro-alegre-y-concepcion_cabecera.jpg",
+    "role": "real geographic reference; not a style reference",
+    "rights": "Commercial derivative permission unverified; internal direction proof only",
+    "downloaded": "2026-10-08",
+    "verifiedLocation": "Casa Cuatro Vientos, Cerro Artillería near Paseo 21 de Mayo; supplied official header is not Cerro Alegre",
+    "locationEvidence": "https://chileestuyo.cl/destacado/paseo-21-de-mayo/"
+  },
+  {
+    "file": "02-miami.webp",
+    "sourcePage": "https://www.miamiandbeaches.com/things-to-do/history-and-heritage/inside-miamis-historic-spanish-village",
+    "sourceImage": "https://www.miamiandbeaches.com/getContentAsset/2f93ad9a-1251-485a-852d-c903f6fb5370/7eab3ba5-a41a-4047-ad08-bad4a225d248/Large/hero-EspanolaWayNight-1440x900_Large.webp?language=en-US",
+    "role": "real geographic reference; not a style reference",
+    "rights": "Commercial derivative permission unverified; internal direction proof only",
+    "downloaded": "2026-10-08"
+  },
+  {
+    "file": "03-buenos-aires.jpg",
+    "sourcePage": "https://turismo.buenosaires.gob.ar/es/otros-establecimientos/obelisco",
+    "sourceImage": "https://turismo.buenosaires.gob.ar/sites/turismo/files/obelisco_sol_diagonal_norte_1500x610.jpg",
+    "role": "real geographic reference; not a style reference",
+    "rights": "Commercial derivative permission unverified; internal direction proof only",
+    "downloaded": "2026-10-08"
+  },
+  {
+    "file": "../dop-v2/02-cancun-ola.png",
+    "role": "Synthetic E photographic finishing reference only, not D original or geographic evidence",
+    "rights": "internal test; operator approval pending"
+  }
+]

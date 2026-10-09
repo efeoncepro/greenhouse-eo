@@ -1,6 +1,14 @@
 # Pibank · Intents del compositor de la propuesta técnica 2027
 
-> **Estado:** v10 del 2026-10-07, OK del CEO para presentar. **No se ha enviado.** Hay cuatro puntos pendientes antes de enviar (ver al final).
+**Aporte actualizado 08-10:** [estimación con supuestos autorizados y ajustes para Claude](../estimacion-seo-aeo-2026-10-08/ESTIMACION-Y-AJUSTES-PARA-CLAUDE.md). Incluye captación directa, mejora de conversión y condiciones para 15.200 cuentas con fondos. Sustituye cifras parciales como resultado total; PDF a cargo de Claude.
+
+**Dirección vigente del caso · 08-10:** [meta integrada de 15.200 cuentas con fondos](../meta-integrada-2026-10-08/README.md). Diseñar y dimensionar el conjunto de tácticas para la meta; §17 del MD para Claude gobierna la narrativa. La estimación de 33 familias queda como anexo parcial, no como resultado total del programa. Requisitos calculados no equivalen a factibilidad demostrada.
+
+**Demanda ampliada 08-10:** [escenario enero 2026 y audiencia](../demanda-audiencia-2026-10-08/README.md): 33 familias, 66.030 búsquedas/mes estimadas, escenario central condicional de 18.150 visitas y 236 cuentas con fondos; no es el aporte global ni volumen demográficamente filtrado. Ver §16 del MD para Claude. Los resultados originales se conservan.
+
+**Complemento vigente 08-10:** [caso y ajustes para Claude](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Complemento-del-caso-y-ajustes-para-Claude-2026-10-08.md>), basado en el correo de Jesús del 07-10: USD confirmado, audiencia A/B 35–55, evaluación desde enero de 2026 y entrega 09-10. Incluye simulación retrospectiva y matriz por lámina. Este complemento actualiza el encargo; conserva precios/modelos originales. El PDF de 44 láminas todavía requiere esos ajustes. Casos internacionales validados por Julio; no hay caso documentado en Perú. Equipo: nombres confirmados y roles por asignar antes del inicio. Sin datos bancarios; lanzamiento reciente confirmado por el operador. §15 incorpora benchmark internacional y su utilidad para demanda local; forecast absoluto sigue condicionado.
+
+> **Estado:** v10 del 2026-10-07, OK del CEO para presentar. **No se ha enviado.** El complemento del 08-10 actualiza los pendientes al final; el PDF aún conserva el contenido del 07-10.
 > **Registro de la sesión:** [auditoría del 2026-10-07](../../../../../audits/commercial/2026-10-07-pibank-propuesta-tecnica-v10.md)
 > **Método y reglas del estilo:** [`propuesta-tecnica-seo-sin-presentador.md`](../../../../../../.claude/skills/deck-studio/references/propuesta-tecnica-seo-sin-presentador.md) (skill `deck-studio`)
 > **Carpeta de producción:** [`ai-generations/2026-10-07_pibank-propuesta/`](../../../../../../ai-generations/2026-10-07_pibank-propuesta/LEEME.md)
@@ -109,7 +117,7 @@ Verificado con `ls` el 2026-10-07. Las recetas se leen dentro de cada archivo.
 
 ## Pendiente antes de enviar (OK del CEO)
 
-1. Cifras y logos de BICECORP, Banco BICE y Berel en esta licitación. La decisión de usarlos «tal cual» en el deck SEO no se extiende a esta licitación, y los logos dependen de TASK-1937.
+1. **Actualizado 08-10:** Julio confirma los casos internacionales validados. Conservarlos con su país y contexto; no existe caso documentado en Perú. No volver a pedir la validación de cifras resuelta por el operador. La confirmación no se presenta como nueva auditoría de reportes realizada por Codex.
 2. Confirmar si el correo de Insights y el modo presentación que muestran «Tu día a día», «A la vista» y el reporte están operando.
 3. Confirmar si aplica el gate `pnpm tender:canonical-gate`.
-4. Melkin está como quinto integrante del equipo de forma provisional, y la foto de cierre BR3f está por aprobar.
+4. **Equipo actualizado 08-10:** Julio definirá nombres confirmados junto con roles por asignar antes del inicio. No presentar el roster anterior como confirmado ni bloquear el viernes por las asignaciones pendientes. La foto de cierre BR3f conserva su estado de aprobación anterior.

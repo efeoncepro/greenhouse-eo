@@ -12,7 +12,9 @@ Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONC
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-## Actualización documental reciente
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [pricing](data/pricing/README.md).
+
+## Actualización documental
 
 CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
@@ -222,7 +224,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo vender Revenue Operations & CRM y elegir HubSpot-first, Salesforce-first o híbrido | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + `docs/services/salesforce/README.md` + skills del provider + `.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md`; claims y reventa exigen evidencia vigente |
 | Cómo operar y entregar la landing, Customer Agent y handoff de Emma para ANAM | Skill `hubspot-as-a-service` → `anam-case.md` + canon CMS `anam-chat-landing.md` + entrega/soporte `anam-entrega-documentacion-y-soporte-2026-09-02.md`; cada superficie conserva ownership y readback separados |
 | Licitaciones: Proposal versionada y oferta documental rápida | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`; quote congelado/IVA, `pnpm tender:canonical-gate <slug>`, sin stubs/HOLD. HTML/PDF local (multimoneda y FX explícito) → `docs/commercial/templates/cotizacion-a4/README.md`; cotizador → `docs/documentation/finance/cotizador.md`. Frontera y fuentes: `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`; skills `greenhouse-public-private-tenders`/`deck-studio`/`report-studio` |
-| Cómo descubrir y calificar licitaciones públicas de LicitaLAB | skill espejo `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md` + `licitalab-mcp.md`; LicitaLAB sólo ve contratación pública. El radar entrega códigos al MCP documental. La promoción manual usa MCP HubSpot con confirmación, búsqueda por ID exacto + llave de idempotencia cuando esté poblada, asociaciones y readback; `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`. El bridge pendiente afecta automatización, no cargas manuales |
+| LicitaLAB: discovery público, calificación y presentación | Skill `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md`, `licitalab-mcp.md`, `platform-bids-and-administrative-package.md`; códigos del radar al MCP documental. Promoción manual HubSpot: confirmación, ID exacto + llave poblada, asociaciones/readback. `gh_deal_origin` vacío mientras su enum sólo admite `greenhouse_quote_builder`. Bridge pendiente sólo para automatización |
 | Cómo descubrir y calificar oportunidades privadas de Wherex | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; lectura protegida evidence-first, sin acción comercial |
 | Cómo funcionan partnerships/providers, licencias, co-selling y captura de valor | `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` (vigente) + `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/README.md` (evidencia fechada) + `efeonce-agency` |
 | Cómo se priorizan beachheads, ofertas de entrada, rutas de expansión, proof y cross-sell | `docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` + `docs/context/13_icp-buyer-personas-jtbd.md` + `gtm-architect`/`efeonce-customer-model-operator` |

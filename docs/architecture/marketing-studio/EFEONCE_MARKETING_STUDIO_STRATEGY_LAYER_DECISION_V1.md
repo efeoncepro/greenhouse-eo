@@ -1,5 +1,34 @@
 # Efeonce Marketing Studio — Capa de estrategia: canales, ICP, plan de campaña, SEO/AEO, IA y paridad total (ADR)
 
+## Precisión aceptada 2026-10-07 — tácticas dentro de campaña
+
+Decisión del operador: «Ajustemos eso entonces», tras comparar iniciativa y táctica. **Táctica** sustituye
+a «iniciativa» en la propuesta de agrupación de acciones. Se define como una **intervención concreta que
+contribuye al objetivo de una campaña, mediante una o varias ejecuciones**. Es opcional y ligera; no se
+añaden ambos niveles ni se exige otra campaña por cada post con adaptaciones.
+
+Se distinguen: campaña (objetivo/gobierno), táctica (intervención y contribución), contexto (ocasión/noticia,
+si corresponde), enfoque (seasonality/trendjacking cuando aplique), concepto (idea creativa/editorial) y
+activación (cuenta, canal, mercado, material, copy, fechas y ejecución observada). Una táctica puede combinar
+modalidades y canales, incluidos SEO/AEO y otros usos fuera de social. Always On conserva su significado de continuidad.
+
+Ejemplo conceptual: táctica «Día de Muertos 2026», propósito de generar afinidad mediante una interpretación de
+la fecha desde la marca; contexto Día de Muertos/México, enfoque seasonality, concepto «Hay abrazos que encendemos».
+El título puede ser breve; la fecha por sí sola no define la intervención. No se reorganiza CMP-006 con esta precisión.
+
+La táctica no duplica brief, presupuesto, aprobaciones ni lifecycle de work items. El contexto táctico debe
+vincularse explícitamente a la activación; no inferirse por la primera pieza o por el nombre del concepto.
+Piezas/versiones y copys siguen siendo referencias existentes. Las ventanas de oportunidad, ejecución y medición
+son distintas; archivar la agrupación no cancela publicaciones ni borra resultados.
+
+`utm_marketing_tactic` conserva su semántica actual de tracking (always_on/prospecting/retargeting); no equivale
+a la identidad de esta entidad ni se reemplaza por su nombre, ID o enfoque. Cualquier cambio de tracking requiere
+su propia decisión versionada.
+
+**Alcance de aceptación:** nombre, definición y separación conceptual. Persistencia, cardinalidades detalladas,
+comandos, políticas históricas, UI y rollout siguen pendientes de diseño/implementación. No hay una nueva capability
+productiva ni migración aprobada por este ajuste. [Discovery y dependencias](../../audits/marketing-studio/2026-10-07-initiatives-channels-discovery.md).
+
 ## Decisión vigente 2026-10-04 — TASK-1899 retirada
 
 El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula

@@ -1,0 +1,117 @@
+# Capacidad especializada de CRM y RevOps — Business Model V1
+
+> **Estado:** `Approved for validation`, 2026-10-09; dirección aprobada, economics sin validar.
+> **Owner:** RevOps & CRM + Commercial; Finance/Pricing y Talent/Operations en sus fronteras.
+> **Fuentes:** [ADR](../../architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md),
+> [ficha](../../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), conversación y señal de vacante Station 24.
+> **Confianza:** media sobre el problema; baja sobre compra, precio y escalabilidad. No hay VoC de comprador registrada.
+
+## Clasificación y tesis
+
+Efeonce vende capacidad especializada respaldada por selección, formación, gobierno y continuidad. Pertenece
+a RevOps & CRM; HubSpot es el primer carril a validar. Staff Augmentation y Managed Delivery son modalidades
+del mismo servicio, no dos líneas de negocio. Es un servicio estructurado en validación, sin declaración de
+Product Service maduro ni nuevo SKU activado.
+
+Reusar el [Product Service Operating Model](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) y el
+[Engagement–Project Operating Model](../EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md): Organization →
+Engagement → Project/Campaign → Task. Contrato/SOW gobierna la venta; un proyecto o registro CRM no la sustituye.
+
+## Cliente, ICP y anti-fit
+
+Hipótesis inicial: organizaciones con CRM relevante para marketing, ventas o lifecycle, backlog observable,
+owner interno y necesidad de capacidad que puedan financiar. La vacante aumenta prioridad de investigación;
+no define tamaño, solvencia ni intención de externalizar. Priorizar por necesidad, complejidad, gobierno,
+presupuesto, modalidad aceptable y capacidad de Efeonce, no sólo por país o título de quien publica.
+
+Anti-fit: sólo busca reclutamiento sin operación posterior; exige control absoluto sin dirección contractual
+clara; espera un perfil que cubra todas las plataformas; carece de accesos/consentimiento o sponsor;
+presupuesto no financia el estándar; riesgo jurídico sin solución; conflicto de capacidad/exclusividad;
+expectativa de resultados comerciales garantizados. Reencuadrar o declinar con motivo documentado.
+
+## Operator & Buying Group Contract
+
+| Elemento | Hipótesis y prueba requerida |
+|---|---|
+| Operador | CRM/RevOps Lead, Lifecycle/Growth Lead o responsable funcional; confirmar quién prioriza y acepta |
+| JTBD funcional | Resolver backlog, mantener datos/workflows y liberar capacidad para dirigir el negocio |
+| JTBD emocional/social | Confiar en la competencia y explicar la inversión sin convertirse en supervisor permanente |
+| Primer valor | Workflow prioritario aceptado y usado; registrar días hasta aceptación y supervisión requerida |
+| Operator-champion | Usa la entrega, reconoce capacidad útil, comparte evidencia al sponsor y solicita continuidad/expansión |
+| Problem owner / sponsor | Responsable de Growth, Marketing, Ventas u Operaciones afectado por el backlog |
+| Economic buyer | Persona con autoridad sobre presupuesto; HR puede tener presupuesto de contratación que no sea transferible a servicios |
+| Governance owners | IT/Security, Legal/Privacy y HR para datos, accesos y dirección del trabajo |
+| Decision process | Discovery → modalidad y fit → evidencia de perfil/servicio → costo/valor → validación funcional y presupuesto |
+| Paper process | Vendor onboarding, seguridad/DPA, clasificación contractual, SOW, firmas, factura/PO y condiciones de pago |
+| Adopción | Entregas usadas, calidad, autonomía, horas de supervisión y documentación transferible |
+| Renovación / expansión | Necesidad persiste, estándar y margen sostenidos, cliente acepta valor; nueva lane requiere capacidad/costeo propios |
+
+Owner: Commercial + RevOps & CRM. Fuente y fecha: propuesta del operador y vacante observada, 2026-10-09;
+confianza de roles/buying group baja hasta entrevistas. Validar diferencias entre quien publica, quien opera,
+quien compra y quien puede vetar. No atribuir este mapa a Station 24 sin discovery.
+
+## Packaging y unidades
+
+| Modalidad | Unidad comercial a validar | Variables que debe declarar |
+|---|---|---|
+| Staff Augmentation | Fee por rol/seniority/dedicación y período | Capacidad neta, horario, gestión/QA, formación, respaldo y condiciones de continuidad |
+| Operación gestionada | Fee por alcance y capacidad de servicio | Lanes, volumen/complejidad, entregas/SLA, responsables, dependencias y change control |
+| Activación / transición | Fee separado sólo si hay trabajo adicional definido | Assessment pertinente, onboarding y documentación; evitar duplicar costos incluidos |
+
+Dedicación parcial/completa no es tier universal ni derecho ilimitado a cambios. Período mínimo, ramp-up,
+salida, pausa, notice, contratación directa eventual y reemplazo se diseñan antes del SOW; no hay plazos o
+penalidades aprobados aquí. Licencias, seats y consumo de agentes/provider se muestran expresamente.
+Capacidad humana y consumo de IA se contabilizan por separado; no monetizar mejoras de IA sólo multiplicando
+horas ni asumir que todas las horas liberadas se pueden revender.
+
+## Economics y pricing integrity
+
+El [guardrail Talent Assurance](../EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) es el piso de diseño.
+Costear salario/honorarios y obligaciones aplicables, dedicación real, selección/onboarding, Account Lead,
+supervisión técnica/QA, formación y evaluaciones, herramientas, cobertura/backup, bench/ramp, transición,
+administración/cobranza y riesgos de FX/impuestos/pago. Costos fijos ya absorbidos no hacen gratuita la capacidad.
+
+Para el mismo período y moneda:
+
+```text
+Contribución = ingreso neto de impuestos indirectos − costo atribuible de entrega y servicio
+Margen de contribución = contribución / ingreso neto
+Capacidad vendible = capacidad laboral disponible − compromisos − aprendizaje/QA/gestión − reservas
+```
+
+Finance define la base de costos y piso de margen; Commercial/Pricing valida disposición de pago y value
+metric. No hay porcentajes, salarios, rate card ni descuentos autorizados en este modelo. Si el costo no
+financia el estándar: re-price, reducir alcance/dedicación con promesa explícita, cambiar composición,
+borrow con respaldo o no-go. Un piloto pagado no puede esconder pérdidas sin aprobación económica específica.
+
+Comparar con contratación directa sobre costo total y capacidad útil, incluyendo onboarding, aprendizaje y
+gestión en ambos lados. No prometer menor costo ni mayor desempeño antes de medir. Probar sensibilidad por
+utilización, ausencias, reemplazo, FX, demora de cobro y presión de salarios. Registrar precio/versiones,
+moneda ISO, impuestos y condiciones de ajuste; proteger costos internos y datos salariales frente al cliente.
+
+## Adquisición, permanencia y salida
+
+Investigar vacantes/publicaciones, relaciones existentes y referencias donde haya necesidad compatible.
+Registrar señal, fuente/fecha, plataforma, país y modalidad por confirmar. El CRM conserva contacto/company
+y relación; una búsqueda laboral no se convierte automáticamente en Deal o permiso para outreach.
+La calificación puede concluir Staff Augmentation, operación gestionada, cobertura interina, otro servicio
+o no-fit. No encuadrar cada vacante como oposición a una contratación interna.
+
+Retener por calidad, confianza y utilidad. El cliente conserva sus datos, credenciales, documentación y
+capacidad transferible según contrato/IP. Definir transición, revocación de accesos y eventual contratación
+directa de la persona con condiciones justas y verificadas. Preservar bienestar, descansos, feedback y ruta
+de desarrollo; la continuidad no justifica sobreasignación del especialista o backup.
+
+## Validación y escala
+
+Propuesta: dos o tres pilotos pagados, con baseline y alcance acotado. Seleccionar al menos casos con
+dirección claramente definida; validar otras configuraciones regionales antes de ampliarlas. No es un
+compromiso de cantidad de ventas ni plazo. [Activación y scorecard](../../operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md).
+
+Medir primer valor aceptado, calidad/retrabajo, autonomía y horas de supervisión, satisfacción de operador
+y especialista, continuidad probada, costo completo, contribución real, cobro y renovación. Una mejora
+comercial es evidencia adicional si existe atribución razonable, no aceptación automática de capacidad.
+
+Escalar sólo con fit y compra demostrados, costo/capacidad sostenibles, procedimientos reproducibles,
+verificación de competencias, evidencia de continuidad y configuración contractual habilitada. Empaquetar
+precios después de calibrar resultados. Oferta aprobada ≠ demanda validada ≠ contrato firmado ≠ entrega aceptada.
