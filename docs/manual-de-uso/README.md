@@ -41,11 +41,11 @@ La diferencia con otras capas de documentacion:
 - [Usar la marca de Efeonce Rooms](creative/usar-marca-efeonce-rooms.md) — qué pieza usar dónde (lockup Efeonce | Rooms
   por defecto, compacto, apilado, símbolo, ícono), variantes `positive`/`negative`/`white`, nunca «Rooms» suelto en
   publicidad ni la marca sobre el arte del cliente, y cómo regenerar los 18 SVG (generador + sello AXIS). Aceptada el
-  2026-10-08; release `v0.4.27` por verificar.
+  2026-10-08; publicado en el release `v0.4.27`; desde 0.4.29, también en la página «Logotipos» del Lab.
 - [Usar las marcas de Efeonce Wave, Reach y Globe](creative/usar-marcas-wave-reach-globe.md) — ruta H3: qué archivo usar
   dónde (lockup Efeonce | Producto por defecto, logotipo solo, isotipo e isotipo chico de Reach y Globe a 24 px o
-  menos), variantes `positive`/`negative`/`white`, sin «by efeonce», globo frambuesa sobre oscuro y la «a» naranja en
-  la palabra de Reach, y cómo regenerar los 33 SVG en AXIS. Aceptada el 2026-10-09; paquete 0.4.28, tag por verificar.
+  menos), variantes `positive`/`negative`/`white`, sin «by efeonce», isotipos todo en blanco sobre oscuro, globo
+  frambuesa y la «a» naranja de Reach sobre oscuro sólo en logotipo y lockup, y cómo regenerar los 33 SVG en AXIS. Aceptada el 2026-10-09; paquete 0.4.28 (tag `v0.4.28` publicado); desde 0.4.29, todas las piezas públicas en el Lab.
 - [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
   qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
   el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente

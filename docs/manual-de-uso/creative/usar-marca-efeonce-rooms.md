@@ -23,8 +23,9 @@ de [EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform
 - **Toma los archivos del paquete**, nunca de una captura ni del canvas: `@efeoncepro/axis-brand-assets` **0.4.27**,
   archivos `rooms-<pieza>-<variante>.svg`. Publicado en el release `v0.4.27` (2026-10-08); fíjalo exacto (ver el
   [runbook de consumo de AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)).
-- **No busques Rooms en el catálogo público de logos del Lab**: como Creative Studio, vive sólo en el paquete hasta que
-  el índice de búsqueda del Lab se fragmente (`AXIS_LOGO_EXCLUSIONS`).
+- **En el Lab:** hasta 0.4.28 Rooms, como Creative Studio, vivía sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`). Desde
+  0.4.29 (tag `v0.4.29`, índice de búsqueda fragmentado) sus 18 piezas están en la página «Logotipos»
+  (`/references/logos/`) y en la búsqueda global.
 - **Ten a mano las reglas de la familia** (área de resguardo, tamaños mínimos, logo frente a isotipo) en el
   [manual técnico de La órbita](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) y en
   [Usar la línea gráfica de Efeonce](usar-linea-grafica-efeonce.md). Este manual no fija medidas propias de Rooms.
@@ -102,8 +103,8 @@ alguno, los archivos no salieron del generador.
 
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
-| No encuentro Rooms en el Lab | Está excluido del catálogo público (`AXIS_LOGO_EXCLUSIONS`) | Tómalo del paquete `@efeoncepro/axis-brand-assets` |
-| `0.4.27` no se instala | El release `v0.4.27` aún no tiene tag | Verifica el tag en AXIS antes de fijar la versión |
+| No encuentro Rooms en el Lab | El Lab todavía no tiene 0.4.29 (hasta 0.4.28 Rooms estaba excluido) | Búscalo en «Logotipos» (`/references/logos/`) o tómalo del paquete `@efeoncepro/axis-brand-assets` |
+| `0.4.27` no se instala | No es el tag: `v0.4.27` está publicado (2026-10-08); suele ser el acceso al registro o el pin | Revisa el runbook de consumo de AXIS y fija la versión exacta |
 | El SVG se ve distinto en un visor | Archivo editado a mano o exportado desde otra herramienta | Vuelve a tomar el archivo del paquete; los cortes son contornos, no máscaras |
 | `git diff --check` falla en AXIS | Espacios al final de línea | Regenera con el generador en vez de copiar a mano |
 | Alguien lee el símbolo como 🔗, ⚣ o argollas | Lectura conocida del símbolo solo | Muéstralo junto a la palabra (lockup); nunca muevas la esfera para corregirlo |

@@ -113,7 +113,8 @@ aparece como nombre, interfaz en un mockup o isotipo chico dentro de su propia s
 lockup de familia (`wave-lockup-*`, `reach-lockup-*`, `globe-lockup-*`; el endoso «by efeonce» está retirado desde el
 2026-10-09, ruta H3). Un acento por pieza; el teal es sólo de Efeonce (Growth). Los colores del **gesto** de cada
 producto no son el acento de la línea: Globe usa `#bb1954` / `#ee4274` (no el `#ff6500` Brand) y Wave `#2e8be8` +
-`#a6cdf5` sobre oscuro; vienen dentro del SVG, nunca se repintan ([ledger.md](ledger.md) 2026-10-09).
+`#a6cdf5` sobre oscuro, en el logotipo y el lockup; vienen dentro del SVG, nunca se repintan. Sobre oscuro, los
+isotipos de producto van todo en blanco (`isotype-negative` = `isotype-white`) ([ledger.md](ledger.md) 2026-10-09).
 
 **Cómo se usa el acento** (D1, 2026-09-26; token `accentContrast`): en gráfico (arco, esfera, halo) y en texto de 24 px o
 más, siempre ≥ 3:1 contra su fondo (todos los acentos de la tabla lo pasan). **Nunca en texto de menos de 24 px**: ahí

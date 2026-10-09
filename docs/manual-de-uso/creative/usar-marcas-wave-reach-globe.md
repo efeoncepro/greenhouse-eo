@@ -1,7 +1,7 @@
 # Usar las marcas de Efeonce Wave, Reach y Globe — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-09 por Claude
 > **Ultima actualizacion:** 2026-10-09 por Claude
 > **Modulo:** Creative · marcas de producto de Efeonce (familia de La órbita, ruta H3)
@@ -22,15 +22,16 @@ de Efeonce.
 ## Antes de empezar
 
 - **Toma los archivos del paquete**, nunca de una captura, del canvas ni de una copia vieja:
-  `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`), archivos `<producto>-<pieza>-<variante>.svg`. Antes de
-  fijar la versión, verifica que exista el tag `v0.4.28` (ver el
+  `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680` + `5346761`; tag `v0.4.28` publicado), archivos
+  `<producto>-<pieza>-<variante>.svg`. Antes de fijar la versión, confirma que ya esté en el registro (ver el
   [runbook de consumo de AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)).
 - **Greenhouse todavía fija 0.4.25**, y sus copias de `public/branding/SVG/` (`wave-full`, `reach-negativo`,
   `isotipo-globe-negativo` y similares) conservan el dibujo anterior, con «by efeonce». No las uses para piezas nuevas;
   la adopción del paquete entra en
   [TASK-2014](../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md).
-- **En el catálogo público del Lab** están sólo `logo` e `isotype` (con el dibujo nuevo). Los lockups, la variante
-  `white` y los isotipos chicos viven sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`), como Creative Studio y Rooms.
+- **En el Lab:** con 0.4.28 el catálogo público mostraba sólo `logo` e `isotype` (con el dibujo nuevo). Desde 0.4.29
+  (tag `v0.4.29`) todas las piezas —lockups, variante `white` e isotipos chicos— están en la página «Logotipos»
+  (`/references/logos/`) y en la búsqueda global, junto a Rooms y Creative Studio.
 - **Ten a mano las reglas de la familia** (resguardo, tamaños mínimos, logo frente a isotipo) en el
   [manual técnico de La órbita](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
 
@@ -52,15 +53,16 @@ Si dudas, usa el lockup.
 | Variante | Úsala sobre | Qué cambia |
 | --- | --- | --- |
 | `positive` | Papel / fondos claros | Logotipo en navy de la familia `#023c70` (en el lockup, gris `#6b6b6b`); gestos: Wave `#0375db` + `#091951`, Reach `#f83902`, Globe `#bb1954` |
-| `negative` | Navy / fondos oscuros | Logotipo en blanco (en el lockup, gris `#6f89a2`); gestos: Wave `#2e8be8` + `#a6cdf5`, Reach `#f83902`, Globe `#ee4274` |
+| `negative` | Navy / fondos oscuros | Logotipo en blanco (en el lockup, gris `#6f89a2`); gestos: Wave `#2e8be8` + `#a6cdf5`, Reach `#f83902`, Globe `#ee4274`. **Los isotipos van todo en blanco**: `isotype-negative` e `isotype-small-negative` son el mismo archivo que su `-white` |
 | `white` | Foto o color donde la versión a color no funciona | Todo en blanco |
 
-### Paso 3 · Revisa los dos casos sensibles sobre oscuro
+### Paso 3 · Revisa los casos sensibles sobre oscuro
 
+- **Isotipos:** sobre oscuro, los tres van **todo en blanco** (decisión del operador, 2026-10-09: son lo
+  suficientemente distintivos para funcionar así). El color sobre oscuro vive sólo en el logotipo y el lockup.
 - **Reach:** en la palabra, la «a» va **naranja maciza** (blanca se funde con la «e» con la que se superpone). El
-  isotipo suelto, en cambio, va blanco con sólo la punta de la flecha en naranja. Las dos cosas ya vienen así en los
-  archivos `negative`.
-- **Globe:** el globo va **frambuesa `#ee4274`**, no en el naranja de la línea Brand (`#ff6500`), que sigue siendo el de
+  isotipo suelto, en cambio, va todo blanco. Las dos cosas ya vienen así en los archivos `negative`.
+- **Globe:** en el logotipo y el lockup, el globo va **frambuesa `#ee4274`**, no en el naranja de la línea Brand (`#ff6500`), que sigue siendo el de
   Creative Studio. El globo es el objeto, no un acento de línea.
 
 ### Paso 4 · Firma con Efeonce
@@ -82,7 +84,9 @@ técnico §7 y §8.1). No reemplaces la firma por el lockup.
 
 - **Nunca** rearmes un lockup a mano juntando el logo de Efeonce y el del producto: el lockup es un archivo.
 - **Nunca** uses ni pidas «by efeonce»: el endoso está retirado. Si una superficie todavía lo muestra, es una copia vieja.
-- **Nunca** pintes el globo de Globe en naranja sobre oscuro: va frambuesa `#ee4274`.
+- **Nunca** pintes el globo de Globe en naranja sobre oscuro: en el logotipo y el lockup va frambuesa `#ee4274`.
+- **Nunca** uses un isotipo de color sobre oscuro (los azules de Wave, la punta naranja de Reach, el globo frambuesa):
+  sobre oscuro, el isotipo va todo en blanco.
 - **Nunca** pongas blanca la «a» en la palabra de Reach sobre oscuro: va naranja maciza.
 - **Nunca** uses el isotipo normal de Reach o Globe a 24 px o menos: usa `-isotype-small`.
 - **Nunca** firmes una pieza con el lockup o el logotipo del producto: firma Efeonce.
@@ -103,11 +107,12 @@ Sólo cuando cambia la marca o la geometría de la familia, y con la decisión r
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
 | El logo todavía dice «by efeonce» | Copia vieja (`public/branding/SVG/`, OneDrive) o versión del paquete anterior a 0.4.28 | Toma el archivo del paquete 0.4.28 |
-| No encuentro el lockup en el Lab | Las piezas nuevas están excluidas del catálogo público (`AXIS_LOGO_EXCLUSIONS`) | Tómalo del paquete `@efeoncepro/axis-brand-assets` |
-| `0.4.28` no se instala | El release `v0.4.28` aún no tiene tag | Verifica el tag en AXIS antes de fijar la versión |
+| No encuentro el lockup en el Lab | El Lab todavía no tiene 0.4.29 (hasta 0.4.28 las piezas nuevas estaban excluidas) | Búscalo en «Logotipos» (`/references/logos/`) o tómalo del paquete `@efeoncepro/axis-brand-assets` |
+| `0.4.28` no se instala | El tag `v0.4.28` está publicado, pero el paquete aún no llega al registro | Confirma la versión en el registro antes de fijarla |
 | El favicon de Reach o Globe se ve empastado | Se usó el isotipo normal reducido | Usa `-isotype-small` |
 | El SVG se ve distinto en un visor | Archivo editado a mano o exportado desde otra herramienta | Vuelve a tomar el archivo del paquete; los cortes son contornos, no máscaras |
 | El globo sale naranja sobre oscuro | Archivo anterior a 0.4.28 o recoloreado a mano | Usa `globe-*-negative` del paquete |
+| El isotipo sale en color sobre oscuro | Exploración intermedia o copia vieja | Usa `<producto>-isotype-negative` (o `-white`) del paquete: todo blanco |
 
 ## Referencias técnicas
 

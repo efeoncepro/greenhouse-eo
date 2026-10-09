@@ -1,6 +1,6 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
-> Delta familia H3 (Wave, Reach, Globe) verificado contra: `packages/brand-assets/src/manifest.ts` de AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` no encontrado en el remoto) — 2026-10-09. Sólo §2.3 (nota) y §6 (filas de Wave/Reach/Globe).
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: `packages/brand-assets/src/manifest.ts` de AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09. Sólo §2.3 (nota) y §6 (filas de Wave/Reach/Globe).
 
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
@@ -230,7 +230,7 @@ aprobado tal cual (D2, 2026-09-26); el naranja de HubSpot no se usa.
 
 Estos acentos son los de la **línea** (compatibilidad y mapa de portafolio), no los colores del logotipo. Desde la ruta
 H3 (2026-10-09) el gesto de Globe es `#bb1954` / `#ee4274` (nunca el `#ff6500` Brand) y el de Wave sobre oscuro
-`#2e8be8` + `#a6cdf5`; hoy viven sólo en los SVG de `axis-brand-assets` 0.4.28, no en tokens (si se suma otro producto
+`#2e8be8` + `#a6cdf5`, en el logotipo y el lockup (sobre oscuro, los isotipos van todo en blanco); hoy viven sólo en los SVG de `axis-brand-assets` 0.4.28, no en tokens (si se suma otro producto
 con colores propios, el ADR recomienda llevarlos a tokens de producto).
 
 ### 2.4 Contrastes medidos (WCAG 2.x, calculados desde estos tokens)
@@ -793,12 +793,15 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |
 
-**Wave, Reach y Globe en la familia (0.4.28, AXIS `7c96680`; ruta H3, 2026-10-09):** 33 archivos (12 reemplazados:
+**Wave, Reach y Globe en la familia (0.4.28, AXIS `7c96680` + `5346761`, tag `v0.4.28`; ruta H3, 2026-10-09):** 33 archivos (12 reemplazados:
 `logo` e `isotype` positivo/negativo; 21 nuevos: `white`, `lockup` e `isotype-small`). El `lockup` es «efeonce | producto»
-con el logotipo en el gris de la familia y sólo el gesto en color; el `logo` dejó de llevar «by efeonce». Generador
+con el logotipo en el gris de la familia y sólo el gesto en color; el `logo` dejó de llevar «by efeonce». En los
+isotipos, `negative` es idéntico a `white` (todo blanco sobre oscuro; el color sobre oscuro vive en `logo` y `lockup`).
+Generador
 `packages/brand-assets/scripts/product-family.mjs` sobre `sources/product-family/` (originales versionados, nunca
-publicados) + `pnpm seal`; sólo contornos, sin máscaras ni `clipPath`. Las piezas nuevas quedan fuera del catálogo del
-Lab (`AXIS_LOGO_EXCLUSIONS`). Greenhouse fija 0.4.25 (adopción: TASK-2014). Criterio: [criteria.md](criteria.md) (H3).
+publicados) + `pnpm seal`; sólo contornos, sin máscaras ni `clipPath`. En 0.4.28 las piezas nuevas quedaban fuera del
+catálogo del Lab (`AXIS_LOGO_EXCLUSIONS`); desde 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice del Lab está
+fragmentado y son públicas en «Logotipos», como Rooms y Creative Studio. Greenhouse fija 0.4.25 (adopción: TASK-2014). Criterio: [criteria.md](criteria.md) (H3).
 
 **Insights (0.4.0, tag `v0.4.0`):** marca `insights` en `AXIS_BRAND_ASSET_BRANDS`; `kind: 'lockup'` es nuevo y sólo lo usa
 `insights-lockup-*`. Se generan en Greenhouse con `scripts/brand/build-insights-logo.mjs` y se re-sellan con

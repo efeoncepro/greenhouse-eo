@@ -1,6 +1,6 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
-> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28) — 2026-10-09; corrige el endoso «by efeonce» de §6.
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` + `5346761` (paquete 0.4.28, tag `v0.4.28`) — 2026-10-09; corrige el endoso «by efeonce» de §6.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
 
@@ -58,7 +58,8 @@ El operador llevó Wave, Reach y Globe a la familia: «ya no es Wave solo ni Wav
 
 - **No se redibujan en Poppins** (H1, descartada): la letra de cada marca es identidad (REACH modular, WAVE bloque en mayúsculas, globe redondo); en Poppins se volvían genéricas y perdían presencia.
 - **Lockup:** Efeonce adelante (30 de alto, 20 de aire, filete 1 × 26, 20 de aire) y el logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con **sólo su gesto en color**, para que Efeonce predomine. Tamaño por presencia, no por altura de mayúscula (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce; el globo conserva su despegue.
-- **Gestos:** la W de Wave (`#0375db` + `#091951`; oscuro `#2e8be8` + `#a6cdf5`), la «a» con flecha de Reach (`#f83902`), el globo de Globe (`#bb1954`; oscuro `#ee4274`). Globe sobre oscuro **no** toma el naranja Brand `#ff6500` (sigue siendo de Creative Studio): el globo es el objeto, no un acento de línea.
+- **Gestos:** la W de Wave (`#0375db` + `#091951`; oscuro `#2e8be8` + `#a6cdf5`), la «a» con flecha de Reach (`#f83902`), el globo de Globe (`#bb1954`; oscuro `#ee4274`). Globe sobre oscuro **no** toma el naranja Brand `#ff6500` (sigue siendo de Creative Studio): el globo es el objeto, no un acento de línea. Esos colores sobre oscuro son del logotipo y el lockup.
+- **Isotipos sobre oscuro: todo en blanco** (operador, 2026-10-09: «son lo suficientemente distintivos para funcionar así»). `isotype-negative` = `isotype-white` en los tres, y lo mismo en `isotype-small` de Reach y Globe. Un isotipo de color sobre oscuro (los azules de Wave, la punta naranja de Reach, el globo frambuesa) es una exploración superada.
 - **«by efeonce» queda retirado**: `*-logo-*` es el logotipo solo; junto a Efeonce va siempre el `*-lockup-*`, nunca armado a mano. El producto sigue sin firmar (§6).
 
 Ejemplo corregido: «WAVE by efeonce» en el encabezado de un informe → `wave-lockup-positive` («efeonce | WAVE» con sólo la W en color). Motivo: el endoso se leía como marca distinta que Efeonce respalda; el lockup la lee como familia. [ADR H3](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md).
@@ -547,7 +548,9 @@ Además, dentro de piezas aprobadas ese día: la portada de propuesta comercial 
 foco.**», evidencia «Preparada para **[Cliente]** · Confidencial»; el nombre del cliente nunca como título), la
 contraportada de brochure («¿Conversamos? **Cuando quieras.**») y la lámina que abre la sección del equipo («¿Quién
 hace crecer tu marca? **Este equipo.**»). La portada general de brochure y la lámina que abre la sección de servicios
-usan «¿Qué hace Efeonce? **Crecer.**». Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
+usan «¿Qué genera Efeonce? **Crecimiento.**» (operador, 2026-10-09: «Efeonce GENERA crecimiento para nuestros
+clientes»; reemplaza a «¿Qué hace Efeonce? Crecer.», que ya no se usa en piezas nuevas; «Genera crecimiento» como
+respuesta no entra en los 12 caracteres del slot, por eso el verbo vive en la pregunta). Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
 (≥ 3× la pregunta) · evidencia con una palabra en negrita; nunca un título suelto tipo «Servicios 2026». Si la
 pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acorta la frase** («¿Qué hacemos por tu
 marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3

@@ -224,7 +224,9 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
   Globe, Wave y Reach; `url-bubble-source` gris para fusionar; `url-bubble-baked-light` y `url-bubble-baked-dark`)
   y 48 órbitas estáticas (6 líneas × 2 fondos × 4 canales, SVG y PNG), con SHA-256 sellado y proporción del viewBox.
   Desde 0.4.28 (H3, 2026-10-09) Wave, Reach y Globe tienen además `white`, `lockup` y, Reach y Globe, `isotype-small`;
-  su `logo` ya no lleva «by efeonce» (ver skill `efeonce-graphic-line`, ledger 2026-10-09).
+  su `logo` ya no lleva «by efeonce» y, sobre oscuro, sus isotipos van todo en blanco (`isotype-negative` =
+  `isotype-white`; el color sobre oscuro vive en el logotipo y el lockup) (ver skill `efeonce-graphic-line`, ledger
+  2026-10-09).
   Se piden por id con `findBrandAsset` / `brandAssetUrl` y `findOrbitAsset`. **Nunca**
   copiar un SVG a mano. Las copias locales que aún leen renderers y catálogos (`public/branding/*`,
   `deliverables/assets/url-lum-{light,dark}.svg`, `url-lum.svg` de los catálogos del Artifact Composer) las vigila la

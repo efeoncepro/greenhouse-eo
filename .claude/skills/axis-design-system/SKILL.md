@@ -749,8 +749,10 @@ sphere, air and concentric terminations as the family; cuts computed as outlines
   avatar and app icon, never next to the name). Next to Efeonce, «Rooms» goes in the family's measured gray and only the
   sphere keeps the accent. AXIS commits on `main`: `6e1621b` (release) + `1dfb95c` (eslabón leve) + `f249e82` (no
   trailing whitespace). **Published in release `v0.4.27` on 2026-10-08 (GitHub Packages readback).**
-- **Package only**, like Creative Studio: not in the Lab's public logo catalog until the search index is split
-  (`AXIS_LOGO_EXCLUSIONS`).
+- **Lab:** through 0.4.28 package only, like Creative Studio (`AXIS_LOGO_EXCLUSIONS`). Since 0.4.29 (AXIS `74bb2e7`,
+  tag `v0.4.29`) the Lab search index is sharded (logos in `/search-index/logos.json`; the root
+  `/search-index.json` lists `shards`) and all 18 pieces are public on the «Logotipos» page (`/references/logos/`) and
+  in global search.
 - **Generation:** Greenhouse `scripts/brand/build-rooms-logos.mjs` (strips the trailing whitespace the Efeonce logo
   carries, which AXIS's `git diff --check` gate rejects); copy to `packages/brand-assets/assets/` and
   `apps/lab/public/branding/`, then `pnpm seal`; never edit the SVG by hand.
@@ -769,20 +771,27 @@ baseline of Efeonce's «n».
 
 - **The «by efeonce» endorsement is retired:** `*-logo-*` is now the logotype alone (standalone words in family navy
   `#023c70`). Next to Efeonce use `*-lockup-*`; never assemble it by hand.
-- **Gestures:** Wave's W `#0375db` + `#091951` (dark `#2e8be8` + `#a6cdf5`, also its isotype on dark); Reach's «a» with
-  arrow `#f83902` (arrowhead shifted so it no longer touches the stem; on dark the word keeps a solid orange «a», the
-  standalone isotype is white with only the arrowhead orange); Globe's balloon `#bb1954` (dark `#ee4274`, a product
+- **Gestures:** Wave's W `#0375db` + `#091951` (dark `#2e8be8` + `#a6cdf5`); Reach's «a» with arrow `#f83902`
+  (arrowhead shifted so it no longer touches the stem; on dark the word keeps a solid orange «a», since a white one
+  fuses with the «e»); Globe's balloon `#bb1954` (dark `#ee4274`, a product
   exception: **not** the Brand line orange `#ff6500`, which stays with Creative Studio). These product colors live in
   the SVG only, not in `axis-tokens` (`efeonceGraphicLine.family` still holds line accents).
-- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.28`** (AXIS `7c96680` on `main`; tag `v0.4.28` not seen on
-  the remote as of 2026-10-09, so do not call it published without a readback): 33 files, 12 replaced and 21 new.
+- **Isotypes on dark are all white** (operator, 2026-10-09: distinctive enough to work that way):
+  `{wave,reach,globe}-isotype-negative` and `{reach,globe}-isotype-small-negative` are identical to their `-white`
+  versions. The dark-ground colors above live only in the logotype and the lockup; colored dark isotypes (two light
+  blues, orange arrowhead, raspberry balloon, white tile, gray variants) were explorations and are superseded.
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.28`** (AXIS `7c96680` H3 pieces + `5346761` all-white
+  isotypes on dark; tag `v0.4.28` published to the registry): 33 files, 12 replaced and 21 new.
   Ids `{wave,reach,globe}-{logo,lockup,isotype}-{positive,negative,white}` + `{reach,globe}-isotype-small-{positive,negative,white}`
   (≤ 24 px only: favicon, chips; Wave has no small version).
 - **Generation:** `packages/brand-assets/scripts/product-family.mjs` from `packages/brand-assets/sources/product-family/`
   (originals versioned, never published), then `pnpm seal`; never edit the SVG by hand. Outlines only, no masks or
-  `clipPath`. New pieces are **package only** in the Lab catalog (`AXIS_LOGO_EXCLUSIONS`), like Creative Studio and
-  Rooms; the long-standing `logo`/`isotype` stay public with new bytes.
-- **Adoption:** Greenhouse still pins `0.4.25`; moving to 0.4.28 belongs to Greenhouse TASK-2014. Decision: Greenhouse
+  `clipPath`. In 0.4.28 the new pieces were package only (`AXIS_LOGO_EXCLUSIONS`), like Creative Studio and Rooms,
+  while the long-standing `logo`/`isotype` stayed public with new bytes. Since 0.4.29 (AXIS `74bb2e7`, release in
+  progress) the sharded Lab index makes every Efeonce mark public: «Logotipos» and global search include Rooms (18),
+  Creative Studio (24) and the new H3 pieces (lockups, white, small isotypes); `AXIS_LOGO_EXCLUSIONS` no longer lists
+  them (HubSpot's 7 authorized marks became public too).
+- **Adoption:** Greenhouse still pins `0.4.25`; moving to 0.4.29 belongs to Greenhouse TASK-2014. Decision: Greenhouse
   ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` and `efeonce-graphic-line` →
   `references/ledger.md` (2026-10-09).
 

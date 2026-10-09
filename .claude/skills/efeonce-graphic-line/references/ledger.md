@@ -1,6 +1,6 @@
 # Registro de decisiones y versiones
 
-> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` no encontrado en el remoto) — 2026-10-09.
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
 
@@ -27,6 +27,7 @@
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-09 | Portada general del brochure: «¿Qué genera Efeonce? **Crecimiento.**» reemplaza a «¿Qué hace Efeonce? Crecer.» («Efeonce GENERA crecimiento para nuestros clientes»; confirmado en el canvas «Brochure Efeonce»). Vale para la portada general y la lámina que abre servicios. Los plates no llevan texto: el par nuevo va en el intent y no se regenera ninguna foto (las imágenes de referencia del catálogo todavía muestran «Crecer.»). Abierto: la pregunta sigue en voz de Efeonce (regla 3 del delta 2026-10-06); pasarla a la voz del cliente es decisión del operador. |
 | 2026-10-07 | «efeonce-graphic-line es el nuevo design system»: Rooms adopta La órbita en toda su UI, Bricolage editorial/Poppins funcional, componentes/color/iconografía/motion canónicos. AXIS distribuye; sustituida la base Poppins/Geist propuesta. Arte cliente intacto y sin imponer narrativa pregunta/respuesta. Dossier y EPIC-052 corregidos; sin implementación, pins, release ni migración automática de Greenhouse. |
 | 2026-09-25 | «La órbita» es la línea gráfica canónica de la marca propia Efeonce y su familia: rodea, mide y enfoca. |
 | 2026-09-26 | Efeonce firma todas las piezas; Globe, Wave, Reach y Greenhouse son contexto. Verk y Kortex quedan fuera por ahora. |
@@ -256,8 +257,8 @@
 
 ### Pendiente de implementación (decidido, falta código o texto)
 
-- Familia H3 (Wave, Reach, Globe; 2026-10-09): `axis-brand-assets` 0.4.28 en AXIS `main` (`7c96680`); falta el tag
-  `v0.4.28` con readback, que Greenhouse suba de 0.4.25 (TASK-2014), probar `*-isotype-small-*` en un favicon real y,
+- Familia H3 (Wave, Reach, Globe; 2026-10-09): `axis-brand-assets` 0.4.28 en AXIS `main` (`7c96680` + `5346761`, tag
+  `v0.4.28` publicado; 0.4.29 en curso la deja pública en el Lab); falta que Greenhouse suba de 0.4.25 (TASK-2014, a 0.4.29), probar `*-isotype-small-*` en un favicon real y,
   si se suma otro producto con colores propios, llevar los de Wave/Globe sobre oscuro a tokens de producto.
 - Íconos (D16–D22): **hecho y publicado** (tag `v0.3.6`: `axis-tokens` 0.3.6, `axis-graphic-line` 0.4.0). Falta que un
   consumidor los fije. Los SVG del set se exportan con `pnpm icons:export` (no van a `axis-brand-assets`).
@@ -710,7 +711,8 @@ Greenhouse `scripts/brand/build-creative-studio-logos.mjs` (copia del de Marketi
 la palabra «Creative»; usa `orbit-ring.mjs` y las terminaciones concéntricas de la familia). Destino:
 `@efeoncepro/axis-brand-assets` 0.4.26 (AXIS `f4dd2fe` en `main`, tag `v0.4.26`, 2026-10-06). Quedan sólo en el
 paquete, como las de HubSpot: el índice de búsqueda del Lab pasaba de 399 KB a 416 KB (`AXIS_LOGO_EXCLUSIONS` las
-lista); entran al catálogo público al fragmentar el índice. **Regla de las piezas cortas:** las que dicen sólo
+lista); entran al catálogo público al fragmentar el índice (*Delta 2026-10-09: ocurrió en 0.4.29, AXIS `74bb2e7`; las 24
+piezas están en «Logotipos» del Lab*). **Regla de las piezas cortas:** las que dicen sólo
 «Studio» (`short-lockup`, `compact`, `short-stacked-lockup`, `isotype` S, `icon` con nave sobre «Studio») se parecen a
 las de Marketing Studio salvo por el acento; existen en el paquete, pero su uso visible queda sujeto a «Studio a secas
 es Marketing Studio» y a nombrar cada vista completa en superficies visibles (ADR `EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1`
@@ -743,6 +745,8 @@ EE.UU.): búsqueda formal y solicitud **«EFEONCE ROOMS» mixta** (palabra + dis
 probar el símbolo solo a 16–32 px frente a 🔗, ⚣ y argollas de boda; **nunca** mover la esfera a un cruce. Pendientes:
 tag `v0.4.27`, prueba sin contexto del símbolo y búsqueda formal de marca. Aplicaciones del canvas «Efeonce Rooms —
 Logo» exploradas, no aprobadas como composiciones de la sala ([A13](applications.md#a13-efeonce-rooms--design-system-de-producto-2026-10-07)).
+*Delta 2026-10-09: el tag `v0.4.27` existe (pendiente cerrado); desde 0.4.29 (AXIS `74bb2e7`) las 18 piezas son
+públicas en «Logotipos» del Lab.*
 
 ### 2026-10-09 — Wave, Reach y Globe en la familia (H3, 33 piezas)
 
@@ -753,11 +757,15 @@ Poppins con sólo el gesto: **perdía presencia**, la letra de cada marca es ide
 filete 1 × 26, 20 de aire), logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con sólo su gesto en
 color; tamaño por presencia (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce. **Se retira «by efeonce»:**
 `*-logo-*` pasa a ser el logotipo solo (palabras en el navy de la familia `#023c70`). Gestos: Wave = la W (dos V),
-`#0375db` + `#091951` (los de Engine; reemplazan el `#082e8e` del archivo), oscuro `#2e8be8` + `#a6cdf5` (también su
-isotipo); Reach = «a» con flecha `#f83902`, punta corrida 7 u (logotipo) / 16 u (isotipo) para no rozar el asta, en la
-palabra sobre oscuro la «a» va naranja maciza (blanca se funde con la «e») y el isotipo suelto sobre oscuro va blanco con
-sólo la punta naranja; Globe = globo `#bb1954` papel / `#ee4274` oscuro (**excepción de producto**: no toma el naranja
-Brand `#ff6500`, que queda para Creative Studio), sin la mota `#ff6500` suelta y con su despegue original. Isotipos
+`#0375db` + `#091951` (los de Engine; reemplazan el `#082e8e` del archivo), oscuro `#2e8be8` + `#a6cdf5`; Reach = «a»
+con flecha `#f83902`, punta corrida 7 u (logotipo) / 16 u (isotipo) para no rozar el asta, en la palabra sobre oscuro la
+«a» va naranja maciza (blanca se funde con la «e»); Globe = globo `#bb1954` papel / `#ee4274` oscuro (**excepción de
+producto**: no toma el naranja Brand `#ff6500`, que queda para Creative Studio), sin la mota `#ff6500` suelta y con su
+despegue original. **Sobre oscuro, los tres isotipos van todo en blanco** (ajuste final del operador, antes de publicar
+el paquete: «son lo suficientemente distintivos para funcionar así»): `{wave,reach,globe}-isotype-negative` y
+`{reach,globe}-isotype-small-negative` son idénticos a su `-white`; el color sobre oscuro vive sólo en el logotipo y el
+lockup. Quedan superadas para el isotipo las exploraciones intermedias: Wave en dos azules claros, Reach con la «a»
+blanca y la punta naranja, Globe en frambuesa, la baldosa blanca y las variantes en gris. Isotipos
 chicos (≤ 24 px) sólo de Reach (ranura cerrada, chevrón más grueso) y Globe (gajos fundidos en un cuerpo paralelo al
 anillo). Paquete `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`): 33 archivos, 12 reemplazados y 21 nuevos;
 ids `{wave,reach,globe}-{logo,lockup,isotype}-{positive,negative,white}` + `{reach,globe}-isotype-small-{positive,negative,white}`.
@@ -766,6 +774,8 @@ versionados, nunca publicados); regenerar = generador + `pnpm seal`, nunca a man
 `clipPath`. Las piezas nuevas quedan sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`), como Creative Studio y Rooms; los
 `logo`/`isotype` de siempre siguen públicos con bytes nuevos. Tag `v0.4.28` no visto en el remoto al 2026-10-09;
 Greenhouse fija 0.4.25 y adopta en TASK-2014. ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`.
+*Delta 2026-10-09 (más tarde): tag `v0.4.28` publicado sobre `5346761` (contenido `7c96680` + `5346761`, isotipos todo
+en blanco sobre oscuro). En 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice de búsqueda del Lab está fragmentado (`/search-index/logos.json`) y todas las marcas Efeonce son públicas en «Logotipos» (`/references/logos/`) y en la búsqueda global, incluidas Rooms (18), Creative Studio (24) y las piezas nuevas de Wave, Reach y Globe; `AXIS_LOGO_EXCLUSIONS` ya no las lista.*
 
 ### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
 

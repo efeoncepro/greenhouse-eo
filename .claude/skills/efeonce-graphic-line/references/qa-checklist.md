@@ -1,6 +1,6 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
-> Delta familia H3 (2026-10-09): checks de Wave, Reach y Globe junto a Efeonce; AXIS `main` en `7c96680` (paquete 0.4.28, tag sin verificar). Prueba de los isotipos chicos en favicon real aún sin ejecutar.
+> Delta familia H3 (2026-10-09): checks de Wave, Reach y Globe junto a Efeonce; AXIS `main` en `7c96680` + `5346761` (paquete 0.4.28, tag `v0.4.28` publicado). Prueba de los isotipos chicos en favicon real aún sin ejecutar.
 
 > Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
 
@@ -549,7 +549,8 @@ Fuente: ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/
 |---|---|---|
 | [ ] | Junto a Efeonce va `{wave,reach,globe}-lockup-*`; nunca «by efeonce» ni un lockup rearmado a mano | `assetId` del manifest (0.4.28) |
 | [ ] | El logotipo en el gris de la familia y sólo el gesto en color; el logotipo propio, nunca una versión en Poppins | Revisión del SVG del paquete; se regenera con `product-family.mjs` + `pnpm seal` en AXIS |
-| [ ] | Globe sobre oscuro en `#ee4274`, nunca el naranja Brand `#ff6500`; Wave sobre oscuro `#2e8be8` + `#a6cdf5` | Variante `negative` del paquete; sin repintar |
+| [ ] | Globe sobre oscuro en `#ee4274`, nunca el naranja Brand `#ff6500`; Wave sobre oscuro `#2e8be8` + `#a6cdf5` (logotipo y lockup) | Variante `negative` del paquete; sin repintar |
+| [ ] | Sobre oscuro, el isotipo de producto va todo en blanco; nunca en color | `*-isotype-negative` (o `-small-negative`) del paquete, idéntico a su `-white` |
 | [ ] | A 24 px o menos, Reach y Globe usan `*-isotype-small-*` | `assetId`; prueba en favicon real pendiente al 2026-10-09 |
 
 Fuente: ADR [`EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md) y [ledger 2026-10-09](ledger.md#2026-10-09--wave-reach-y-globe-en-la-familia-h3-33-piezas).

@@ -50,8 +50,9 @@ Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
 [`scripts/brand/build-rooms-logos.mjs`](../../../scripts/brand/build-rooms-logos.mjs) y se sellan en
 `@efeoncepro/axis-brand-assets` **0.4.27** (commits AXIS en `main`, empujados: `6e1621b` release, `1dfb95c` eslabón leve,
 `f249e82` sin espacios al final de línea). Publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages).
-Quedan sólo en el paquete, como Creative Studio, hasta que el índice de búsqueda del Lab se fragmente
-(`AXIS_LOGO_EXCLUSIONS`). Nunca se editan a mano: regenerar es correr el generador, copiar a
+Hasta 0.4.28 quedaron sólo en el paquete, como Creative Studio (`AXIS_LOGO_EXCLUSIONS`); desde 0.4.29 (AXIS `74bb2e7`,
+tag `v0.4.29`) el índice de búsqueda del Lab está fragmentado y las 18 piezas están en la página «Logotipos» y en la
+búsqueda global. Nunca se editan a mano: regenerar es correr el generador, copiar a
 `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y correr `pnpm seal`. El generador quita los
 espacios al final de línea que trae el logo de Efeonce (gate `git diff --check` de AXIS).
 

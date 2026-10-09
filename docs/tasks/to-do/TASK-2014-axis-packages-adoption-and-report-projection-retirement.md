@@ -2,10 +2,16 @@
 
 ## Delta 2026-10-09 — `axis-brand-assets` 0.4.28 (Wave, Reach y Globe, ruta H3)
 
-- La adopción suma `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`), que lleva a Wave, Reach y Globe a la
+- La adopción suma `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680` + `5346761`; tag `v0.4.28` publicado), que lleva a Wave, Reach y Globe a la
   familia por la ruta H3 ([ADR](../../architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md)): reemplaza los bytes
   de `{wave,reach,globe}-{logo,isotype}-{positive,negative}` y agrega 21 archivos (`-lockup-*`, la variante `white` y
-  `{reach,globe}-isotype-small-*`). Antes de fijarla, verificar el tag `v0.4.28` (no existía el 2026-10-09).
+  `{reach,globe}-isotype-small-*`). Antes de fijarla, confirmar la versión en el registro.
+- **Versión a adoptar: 0.4.29** (AXIS `74bb2e7`, tag `v0.4.29`): trae todo lo anterior y además fragmenta el
+  índice de búsqueda del Lab, con lo que Rooms, Creative Studio y las piezas nuevas de Wave, Reach y Globe pasan a la
+  página «Logotipos» y a la búsqueda global (`AXIS_LOGO_EXCLUSIONS` ya no las lista).
+- Sobre oscuro, los isotipos van **todo en blanco** (decisión del operador del 2026-10-09): `{wave,reach,globe}-isotype-negative`
+  y `{reach,globe}-isotype-small-negative` son idénticos a su `-white`. El color sobre oscuro queda sólo en `-logo-negative`
+  y `-lockup-negative`. Quien hoy muestre un isotipo de producto en color sobre oscuro verá el cambio al adoptar.
 - Quien consuma `wave-logo-*`, `reach-logo-*` o `globe-logo-*` recibe el logotipo **sin «by efeonce»**; junto a Efeonce
   corresponde el `-lockup-*`. Hoy ningún código de Greenhouse importa esos ids del paquete (barrido del 2026-10-09): la
   UI y los PDF usan copias locales de `public/branding/SVG/` (`src/components/greenhouse/brand-assets.ts`,
