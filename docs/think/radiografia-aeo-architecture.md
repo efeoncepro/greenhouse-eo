@@ -1,9 +1,9 @@
 # Radiografía AEO — Arquitectura
 
 > **Tipo de documento:** Documentación técnica / arquitectura
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-30
+> **Última actualización:** 2026-10-09 por Claude (contrato 0.2.0 y segunda muestra publicada)
 > **Owner:** Growth / Think · Comercial (es una herramienta de venta)
 > **Task:** [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md)
 > **Repo del runtime:** `efeonce-think` (NO `greenhouse-eo`)
@@ -11,6 +11,22 @@
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 
 ---
+
+## Contrato 0.2.0 y segunda muestra publicada — 09/10/2026
+
+`efeonce.aeo-xray` 0.2.0 (AXIS `909229a`) es aditivo y opcional: un intent 0.1.0 resuelve igual y la muestra Pichincha
+no cambia. Suma a `experience` los bloques de experiencia temprana `aiPanel`, `today`, `review`, `measure` y `nextStep`;
+a `ui`, `welcomeTitle`/`welcomeEnter`; a `brand`, `logoOnDarkAssetId`. La cadena de distribución no cambia: fuente en
+AXIS → `docs/generated/aeo-xray/` → copias en `src/lib/axis/aeo-xray/` de Greenhouse y Think; el verificador
+`scripts/qa/verify-aeo-xray-distribution.mjs` de ambos repos acepta 0.1.0 y 0.2.0. Think los renderiza con componentes
+genéricos (`AiPanel`, `TodayCompare`, `ReviewPanel`, `NextStep`) y copy `early`; ningún componente conoce al cliente.
+
+El carril `sample_*` tiene dos muestras: Banco Pichincha y Pibank Perú (`published/pibank.json`, landing
+`cuenta-soles` y artículo `comparar-cuentas`, con video vertical en el campo `reel`). Los gates de navegador eligen
+artefactos con `XRAY_VERIFY_ARTIFACTS` o la muestra por su clave; el gate `media` sigue siendo del video de Pichincha.
+Campos y reglas: [guía de otro cliente](aeo-xray-nuevo-cliente.md#bloques-de-experiencia-temprana-contrato-020-2026-10-09);
+operación y trampas: [manual](radiografia-aeo-manual.md#delta-2026-10-09--dos-muestras-publicadas-y-gates-por-artefacto);
+registro de la sesión: [Pibank · X-Ray y propuesta v12](../audits/commercial/2026-10-09-pibank-xray-experiencia-temprana-y-propuesta-v12.md).
 
 ## Continuidad propuesta en Rooms — 07/10/2026
 

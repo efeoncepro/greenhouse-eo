@@ -47,6 +47,7 @@ Las recetas siguientes son aplicaciones con límites propios; no todas están ap
 
 | **Key visual estático → loop de social** ⭐ | llevar una pieza estática aprobada a movimiento sin inventar un lenguaje paralelo: referencias, arco entrada→sostén→fade, sonido por sustracción y QA del loop | **validado** 2026-09-22 | `static-key-visual-to-looping-social-motion.md` |
 | **Spot animado 2D con assets de marca compuestos** | explainer/spot 2D cel-shaded: elenco 2D + mascotas desde SVG con mirada del rig, cuadros clave GPT Image, H3 i2v inicio/fin, placas vectoriales, cierre animado sin voz en el logo, audio y subtítulos PNG | **validado** 2026-10-03 (v2 aprobada) | `animated-2d-spot-composed-brand-assets.md` |
+| **Fotos aprobadas → reel vertical con transición punto → logo** | reel 9:16 corto desde fotos aprobadas: cuadros clave GPT Image, Omni image-to-video 1080p, capa gráfica HTML con `seek(t)` a PNG alfa, punto del logo medido con `getBoundingClientRect`, montaje ffmpeg por segmentos, Eleven Music por conector remoto y verificación sin voz con `whisper-cli` | **validado** 2026-10-09 (publicado en la muestra X-Ray Pibank) | `approved-photos-to-vertical-reel-with-logo-transition.md` |
 
 ## Estructura estándar de un workflow
 

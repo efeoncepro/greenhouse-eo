@@ -1,6 +1,6 @@
 # AEO X-Ray — composición, evidencia y experiencia reutilizable
 
-Actualizado: 2026-09-30. Cargar únicamente cuando se cree, extienda, revise o entregue un X-Ray.
+Actualizado: 2026-09-30; delta 2026-10-09 (§10, contrato 0.2.0 y caso Pibank). Cargar únicamente cuando se cree, extienda, revise o entregue un X-Ray.
 Esta referencia fija criterios del oficio y de ejecución aprendidos en el caso de Banco Pichincha;
 no sustituye arquitectura, contracts, manuales ni el estado del runtime.
 
@@ -237,3 +237,73 @@ X-Ray se preparó para el cliente, qué puede explorar y qué se implementaría 
 Identificar Insights muestra como datos de ejemplo. Reunión ya agendada no requiere otra agenda.
 Enviar correo, mover CRM o publicar requiere la autorización aplicable a esas acciones; preparar
 la muestra no la concede. El CRM debe verificarse en HubSpot, no inferirse del correo redactado.
+
+## 10. Delta 2026-10-09 — contrato 0.2.0, experiencia temprana y caso Pibank
+
+### Contrato `efeonce.aeo-xray` 0.2.0
+
+Aditivo y opcional: **0.1.0 sigue vigente** (Pichincha no cambia). Fuente en AXIS
+(`packages/contracts/src/aeo-xray*.ts`, doc `docs/agent-composition/aeo-xray.md`); se exporta con
+`scripts/export-aeo-xray.mjs` y se copia a `greenhouse-eo/src/lib/axis/aeo-xray/` y
+`efeonce-think/src/lib/axis/aeo-xray/`. `scripts/qa/verify-aeo-xray-distribution.mjs` (en ambos repos)
+acepta 0.1.0 y 0.2.0. Guía de autoría: `docs/think/aeo-xray-nuevo-cliente.md` §«Bloques de experiencia temprana».
+
+| Campo en `experience` | Qué muestra | Reglas del contrato |
+|---|---|---|
+| `aiPanel` | Panel AEO real: qué responde la IA hoy a preguntas genéricas y de marca | Filas con `question`, `kind` generic\|brand, `appears`, `accuracy` correct\|incorrect\|not-mentioned, `citesOwnSite`, `cited`, `detail`; `surface`/`asOf` opcionales. Sin mención ⇒ `not-mentioned` |
+| `today` | «Hoy vs. con la pieza»: lectura pública de la página actual frente a la propuesta | `label`/`today`/`proposed`/`verdict` keep\|improve\|add; `url` https; `asOf` ISO |
+| `review` | Cómo se revisaría y aprobaría la pieza | `items` con `claim`, `coupleId` a un bloque real, `document`, `owner`, `status` pending\|approved\|changes; `comments` |
+| `measure` | Qué se mediría | El explorador de valor lo usa si existe |
+| `nextStep` | Cierre con siguiente paso | `ctaHref` https o mailto |
+| `ui.welcomeTitle` / `welcomeEnter` | Texto de la cortina | Personaliza invitación y botón |
+| `brand.logoOnDarkAssetId` | Logo oficial del cliente para fondos oscuros | Encabezado y cortina lo muestran **sin el recuadro claro** |
+
+En Think los renderizan `AiPanel.astro`, `TodayCompare.astro`, `ReviewPanel.astro` y `NextStep.astro`; el copy vive
+en `src/lib/aeo-xray/copy.ts` (`early`).
+
+**Evidencia de cada bloque.** El panel AEO es una **observación fechada** (motor, mercado, idioma, dispositivo,
+consulta, fecha), no una medición de desempeño ni una promesa. «Hoy» sale de una lectura pública con fecha. La
+revisión puede ser un **ejemplo ilustrativo** si lo declara en pantalla. Por regla del operador se retiró el texto
+defensivo («no acredita ranking…», «no garantía de visibilidad»): el límite se dice una vez donde corresponde,
+no en cada bloque.
+
+### Uso comercial: muestra breve de lo que vende la propuesta
+
+Los bloques tempranos convierten el X-Ray en un **adelanto del servicio**: el panel AEO anticipa el panel mensual,
+«hoy vs. con la pieza» anticipa el diagnóstico de página, la revisión anticipa el flujo de aprobación y `nextStep`
+lleva a una conversación concreta. Elegir piezas que correspondan a frentes reales de la propuesta y declarar en la
+propia propuesta (lámina «Muestra X-Ray», ver `deck-studio`) qué parte del plan representan.
+
+### Caso de referencia: Pibank Perú (publicado 2026-10-09)
+
+- **Carril:** muestra Think no listada `sample_…` (`src/lib/aeo-xray/published/pibank.json` + `published.ts` + medios en
+  `public/aeo-xray-media/<key>/`). La clave del enlace **nunca** va a git: se lee del expediente
+  (`SAMPLE_KEY.txt`, fuera de git, 0600). Commits efeonce-think `be453b0`, `eb9c35d` (0.2.0), `5594128` (música).
+- **Piezas:** landing «Cuenta Soles Pibank» (`cuenta-soles`) y artículo comparativo de cuentas de ahorro
+  (`comparar-cuentas`); representan el pilar Cuenta Soles M1–M2, comparativas desde M3, panel AEO mensual y
+  comunidad desde M3 de la propuesta técnica.
+- **Expediente** (fuera de git): `build-intent.py` genera el intent desde el modelo de Pichincha; luego
+  `node scripts/aeo-xray/client-kit.mjs validate|build --dir <expediente>` y se copia el manifest al JSON publicado.
+- **Panel AEO:** 7 observaciones (Google AI Mode Perú, español, escritorio, vía DataForSEO, 08/10/2026, más un resumen
+  de IA de Google del 06/10/2026 que atribuía a Pibank una tasa de Pibank Colombia). **Hoy vs. pieza:** lectura
+  pública del 09/10/2026 de la página actual. **Cierre:** mailto con propuesta de semana para revisar la muestra.
+- **Verificación:** `pnpm test:aeo-xray-v2` 23/23, `astro check` 0 errores, build OK y gates de navegador en Pibank
+  (v2, motion, value, curtain) con regresión Pichincha, en local y producción.
+
+### Trampas aprendidas
+
+- Los gates aceptan `XRAY_VERIFY_ARTIFACTS=landingId,articleId` (default Pichincha). El gate `media` es específico del
+  video de Pichincha (720×1280, 10 s): no sirve para otro cliente sin adaptarlo.
+- El cargador local `fixture-case` (`XRAY_CASE_DIR`) sólo acepta raster (webp/png/jpg/avif): un SVG de logo o un mp4 no
+  cargan en la vista local; el carril publicado sí sirve mp4.
+- `astro dev` no admite dos servidores en el mismo repo. Para una vista aislada, copiar el repo al scratchpad con
+  `node_modules` clonado (`cp -cR`), no con symlink (rompe la resolución de Vite).
+- El módulo de condiciones de la landing agrupa por la primera columna y muestra la tercera como cifra grande: pocas
+  categorías cortas (Tasa/Costos/Uso) y valores cortos («Digital», no «100% digital»), o desborda a 320 px.
+- La fecha visible de la observación SERP sale de `preparedAt`, no de la captura: la SERP debe ser del mismo día
+  (Pibank se re-capturó el 08/10 por eso). Con `--target`, DataForSEO devuelve 40102 «No Search Results» si el
+  dominio no aparece.
+- La integración Git de Vercel de efeonce-think una vez no reaccionó a un push; se desplegó ese commit por la API de
+  Vercel con `gitSource`. Verificar siempre el alias productivo.
+- Antes de publicar en efeonce-think con WIP ajeno: comparar el WIP con origin y respaldarlo antes de igualar el árbol.
+- Video del X-Ray: receta en `motion-design-studio/workflows/approved-photos-to-vertical-reel-with-logo-transition.md`.

@@ -1,6 +1,6 @@
 # Producción y posproducción de video: aprendizajes y modos de falla
 
-**Corte de evidencia: 2026-09-24; delta 2026-10-03 (§11, spot animado 2D «Sparks × Efeonce AEO»).** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
+**Corte de evidencia: 2026-09-24; delta 2026-10-03 (§11, spot animado 2D «Sparks × Efeonce AEO»); delta 2026-10-09 (§12, reel X-Ray Pibank).** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
 
 **Estado del caso:** V17 exportado y revisado visual/técnicamente; aprobación final del operador y escucha perceptual del agente no acreditadas. Punch-v3 sí tiene aprobación registrada. El pedido de documentar el proceso no convierte todo el video en aprobado. No se hicieron nuevas llamadas pagadas para esta sistematización.
 
@@ -397,3 +397,32 @@ la aprobación sonora. Licencia comercial de la música generada [pendiente]; pu
 
 Excepciones del caso (no reglas): registro de energía bajo locución, contra el canon sonoro, por decisión del
 operador; licencia de la música generada sin confirmar con legal.
+
+## 12. Delta 2026-10-09 — reel vertical de 12 s para la muestra X-Ray de Pibank
+
+**Estado del caso:** publicado dentro de la muestra AEO X-Ray de Pibank Perú (campo `reel`; commit efeonce-think
+`5594128`). Receta en [fotos aprobadas → reel vertical con transición punto → logo](../workflows/approved-photos-to-vertical-reel-with-logo-transition.md);
+expediente fuera de git (`09-XRay-Pibank/video/`). Costo aproximado: US$1,9 imagen + Omni y US$0,70 música.
+
+### F29 — Un filtro ffmpeg único que se queda trabado
+
+- **Síntoma:** un montaje en un solo filtro con `zoompan` + `xfade` quedó detenido sin consumir CPU.
+- **Prevención y recuperación:** renderizar por segmentos (toma + overlay) a intermedios y concatenar al final.
+
+### F30 — Conector local que falla y se confunde con bloqueo del servicio
+
+- **Síntoma:** los conectores locales `elevenlabs` y «ElevenLabs Player» fallan (clave cargada como ID, no `sk_…`).
+- **Prevención:** antes de declarar bloqueo, probar los demás conectores del mismo servicio. El remoto oficial
+  (`creative_generate_in_flow`, nodo `music`, `eleven_music_v2_5`) funcionó: ≈ US$0,35 por pista, ≈ 5–7 min.
+
+### F31 — Envío a Omni con ADC vencida
+
+- **Síntoma:** el intento falló antes del envío (sin cobro).
+- **Recuperación:** `pnpm gcloud:auth:playwright -- --force` (requirió login del operador) y reintento.
+
+### F32 — Música «instrumental» sin comprobar
+
+- **Prevención:** pasar cada pista por `whisper-cli` (modelos en `~/.cache/hyperframes/whisper/models/`) para detectar
+  voz. Un ASR vacío no reemplaza la escucha del operador.
+- **Nivel por destino:** el destino entregado es el reproductor de la muestra web; se mezcló a −16 LUFS (medido
+  −15,5) con fades. Si luego se publica en redes, re-masterizar según F28.

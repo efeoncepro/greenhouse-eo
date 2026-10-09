@@ -154,6 +154,14 @@ Cuando la Radiografía entra a una propuesta:
 - Conecta explícitamente la cadena: Grader mide → Radiografía demuestra →
   propuesta define alcance → servicio opera.
 
+### Delta 2026-10-09 — la muestra dentro de la propuesta
+
+En la propuesta técnica de Pibank v12, la muestra entra como lámina propia: un mockup dibujado (no una captura) de la
+ventana del X-Ray en «La radiografía» y un celular con la guía, el QR y el enlace. La clave y el QR se leen del expediente
+privado; no se copian a Git. Al exportar a PDF, los enlaces externos de cada lámina se conservan como enlaces clicables.
+Si la muestra incluye bloques de experiencia temprana (panel AEO, «hoy vs. con la pieza», revisión, siguiente paso),
+úsalos en la demo para mostrar cómo sería trabajar juntos, con los datos reales del cliente.
+
 ## Objeciones frecuentes
 
 **"Esto es solo una página bonita."**

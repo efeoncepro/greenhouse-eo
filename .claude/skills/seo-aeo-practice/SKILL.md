@@ -315,6 +315,16 @@ simulada no demuestra aparición en un motor y un dashboard de muestra no demues
 Para producir, cargar la referencia X-Ray y el kit `docs/think/aeo-xray-nuevo-cliente.md`; aquí vive su propósito
 comercial, no otro manual técnico.
 
+**Delta 2026-10-09 — el X-Ray como muestra breve de lo que vende la propuesta.** El contrato 0.2.0 (aditivo; 0.1.0
+sigue vigente) suma bloques de experiencia temprana: **panel AEO real** (qué responde hoy la IA a preguntas genéricas y
+de marca, con fecha y motor), **hoy vs. con la pieza** (lectura pública de la página actual), **revisión** (cómo se
+aprobaría, ilustrativa si lo declara) y **siguiente paso** (CTA concreto). Úsalos para que el comprador vea en pequeño
+los frentes de la propuesta, no como teoría: en Pibank Perú la landing y el artículo representan el pilar y las
+comparativas del plan, y el panel AEO anticipa el panel mensual. Caso, campos y trampas:
+[`../seo-aeo/references/aeo-xray.md`](../seo-aeo/references/aeo-xray.md) §10. La propuesta lo integra en una lámina
+«Muestra X-Ray» con mockup dibujado, QR y enlace (`deck-studio`, `references/propuesta-tecnica-seo-sin-presentador.md`).
+Muestra publicada y propuesta v12 preparadas; envío no realizado al 2026-10-09.
+
 **Dos trabajos — no los confundas:**
 
 | | Trabajo | Cuándo |

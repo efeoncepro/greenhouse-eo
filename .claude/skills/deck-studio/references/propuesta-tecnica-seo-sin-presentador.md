@@ -1,7 +1,8 @@
 # Propuesta técnica SEO/AEO para leer sin presentador — alternativa aprobada
 
 > **Estado:** aprobada por el operador (CEO) el 2026-10-07 como **alternativa** para propuestas técnicas SEO/AEO;
-> actualizada el 2026-10-08 con el segundo caso y las correcciones del operador.
+> actualizada el 2026-10-08 con el segundo caso y las correcciones del operador; delta 2026-10-09 (Pibank v12: lámina
+> «Muestra X-Ray», enlaces clicables en el PDF y logo del cliente sobre fondos oscuros).
 > **No reemplaza** a los brochures ni a las propuestas compuestas con las recetas de La órbita (`pnpm brand:compose`):
 > para brochure manda el set de recetas aprobado. Caso fuente: propuesta técnica Pibank / Banco Pichincha Perú 2027
 > (v11 del 2026-10-08, 46 láminas, con la evaluación 2026 que pidió el banco). Segundo caso: deck de la propuesta técnica UTEM, Compra Ágil SEO/GEO/AEO (2026-10-08, 35 láminas,
@@ -100,7 +101,8 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - Cifras y logos de casos importados: requieren OK explícito para **esta** pieza (la decisión de otro deck no se
   extiende) y autorización de logos (TASK-1937).
 - No prometer formatos de producto que no estén operando (correo de Insights, modo presentación).
-- Si es licitación formal, ver el gate de Proposal Studio (`pnpm tender:canonical-gate`).
+- Si es licitación formal, ver el gate de Proposal Studio (`pnpm tender:canonical-gate`). No aplica a un prospecto
+  que no es licitación (Pibank v12, 2026-10-09).
 - Nada se envía ni se mueve a la carpeta de envío sin aprobación del operador.
 
 ## UTEM: paquete presentado y preservación — 08/10/2026
@@ -108,3 +110,25 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 El segundo caso ya fue presentado por Julio en Mercado Público. El deck v2 de 35 láminas y la técnica v1.1 forman el paquete preparado; la cotización formal se mantiene separada en HTML/PDF A4 vertical. [Estado, precio final y evidencia](../../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md).
 
 Después de presentar, conservar archivos y hashes aprobados. Actualizar estado en el expediente y seguimiento sin regenerar la técnica/deck ni sustituir adjuntos. La confirmación de envío no acredita adjudicación ni valida por sí sola los pendientes internos de costos, capacidad, panel o fuentes de casos.
+
+## Pibank v12: muestra X-Ray, enlaces y logo del cliente — 09/10/2026
+
+Canvas Design versión 67, 47 láminas; PDF en `ai-generations/2026-10-07_pibank-propuesta/out/` y copia en OneDrive
+(carpeta del banco). **No enviado.** Commits `c0c9954fa`, `68bd5cab5`, `0068fee71`, `12d63b542`.
+
+- **Lámina «Muestra X-Ray»** (lámina 20, capítulo 2, después de «Comunidad y PR»): cuando existe una muestra AEO X-Ray
+  del cliente, la propuesta la presenta como prueba breve de lo que vende. El **mockup se dibuja en HTML** (ventana del
+  X-Ray en «La radiografía» + celular con la guía), **no es una captura**: así queda nítido y editable. Lleva **QR y
+  enlace**; la clave del enlace y el QR se leen del expediente fuera de git (`SAMPLE_KEY.txt`, `qr-muestra.svg`),
+  nunca se escriben en el generador ni en el repo. Contrato y caso del X-Ray: `seo-aeo/references/aeo-xray.md` §10.
+- **Enlaces clicables en el PDF:** cada lámina entra al PDF como JPEG y los enlaces se perdían. `render-pdf.mjs` ahora
+  copia los enlaces externos de cada lámina como **anotaciones clicables** del PDF. Verificar que el QR y el enlace
+  abran la muestra desde el PDF final.
+- **Logo del cliente sobre fondos oscuros (regla del operador, 09-10):** sobre fondos navy u oscuros usar el **logo
+  blanco oficial del cliente con su color propio, sin recuadro blanco**. Si el fondo es del mismo color que el acento
+  del logo (en Pibank, amarillo), resolverlo aparte con el operador; no improvisar. El mismo criterio aplica en el X-Ray
+  (`brand.logoOnDarkAssetId`).
+- **Glosario a tres columnas** (46 términos) cuando no cabe en dos; incluye las definiciones operativas acordadas con el
+  cliente (Pibank: «Solicitud iniciada», evento a acordar con su Analítica en M1, sin tasa).
+- **Foto de cierre:** la decide el operador entre candidatas (Pibank: BR3f aprobada con logo completo; BR3e descartada).
+

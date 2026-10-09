@@ -74,6 +74,12 @@ que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_br
 - **Conector MCP de ElevenLabs (local):** credencial mal cargada (se cargó el ID de la clave, no la clave `sk_…`; error
   `api_key_id_used_as_api_key`). Seguía igual el 2026-10-03 (no se tocó). Mientras no se corrija, ElevenLabs va por fal
   o por el conector **ElevenLabs Creative** (arriba), que sí funciona.
+- **Delta 2026-10-09 (reel X-Ray Pibank):** los dos conectores locales (`elevenlabs` y «ElevenLabs Player») seguían con
+  la clave mal (ID en vez de `sk_…`). La música salió por el **remoto oficial**: `creative_generate_in_flow`, nodo
+  `music`, modelo `eleven_music_v2_5`, ≈ US$0,35 por pista y ≈ 5–7 min por generación. Antes de declarar bloqueo,
+  probar los demás conectores del mismo servicio. **Ausencia de voz:** verificada con `whisper-cli` local (modelos en
+  `~/.cache/hyperframes/whisper/models/`); es señal ASR, no escucha. Mezcla a −16 LUFS (medido −15,5) para el
+  reproductor web de la muestra. Receta: `motion-design-studio/workflows/approved-photos-to-vertical-reel-with-logo-transition.md`.
 - **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
   maqueta determinística propia (`rock.mjs`, `composer.mjs`, `dsp.mjs`); Stable Audio 2.5 audio-to-audio la
   re-graba (intensidad 0,7) conservando el tiempo; la esfera propia (campana La + golpe grave) se monta encima

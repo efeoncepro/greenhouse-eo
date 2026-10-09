@@ -1,9 +1,9 @@
 # Radiografía AEO — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 2.0
+> **Versión:** 2.1
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-30
+> **Última actualización:** 2026-10-09 por Claude (segunda muestra publicada, contrato 0.2.0)
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 > **Repo del runtime:** `efeonce-think` (**NO** `greenhouse-eo`)
@@ -547,6 +547,32 @@ error. Capturas: `.captures/aeo-xray-v2`, `aeo-xray-motion`, `aeo-xray-value`, `
 `aeo-xray-curtain`; son evidencia ignorada, no assets de entrega. Verde automático no sustituye
 revisión de píxeles. No llamar a una medición local de demo «CWV del banco».
 
+### Delta 2026-10-09 — dos muestras publicadas y gates por artefacto
+
+El carril `sample_*` de Think tiene dos muestras: Banco Pichincha (`published/pichincha.json`) y Pibank Perú
+(`published/pibank.json`, landing `cuenta-soles` y artículo `comparar-cuentas`, contrato 0.2.0 con bloques de
+experiencia temprana). Cada una tiene su JSON, su registro en `published.ts` y su carpeta de medios. La clave de cada
+enlace queda en el expediente privado del cliente.
+
+Los gates de navegador `verify-aeo-xray-v2`, `-motion` y `-curtain` aceptan los IDs de artefacto por entorno; `-value`
+reconoce la muestra por la clave de `XRAY_VERIFY_TOKEN` (Pichincha o Pibank) y recorre sus artefactos:
+
+```bash
+XRAY_VERIFY_BASE=<base> XRAY_VERIFY_TOKEN=<clave desde el entorno> \
+  XRAY_VERIFY_ARTIFACTS=<landingId>,<articleId> pnpm verify:aeo-xray-v2
+```
+
+Sin `XRAY_VERIFY_ARTIFACTS`, v2, motion y curtain usan los IDs de Pichincha (`ahorro-preferente,guia-cuenta-online`). El gate `media` es
+específico del video de Pichincha (720×1280, 10 s): no certifica el video de otra muestra, que se revisa reproduciéndolo.
+Al tocar el runtime compartido, correr la regresión de las dos muestras, en local y contra producción tras el deploy.
+Referencia del 09/10: Pibank v2 198, motion 49, value 87, curtain 44; Pichincha v2, motion, value, curtain y media 113,
+en verde; `pnpm test:aeo-xray-v2` 23/23.
+
+Tras el push a `main` de Think, confirmar que existe un deployment para ese SHA. La integración Git de Vercel una vez no
+reaccionó al push y el deploy de ese commit se lanzó por la API de Vercel con `gitSource`; la vez siguiente desplegó sola.
+Registro de la sesión: [Pibank · X-Ray y propuesta v12](../audits/commercial/2026-10-09-pibank-xray-experiencia-temprana-y-propuesta-v12.md).
+Trampas de producción y patrón de video: [guía de otro cliente](aeo-xray-nuevo-cliente.md#delta-2026-10-09--trampas-de-producción-y-video-de-dónde-más-vive).
+
 ### Diagnóstico rápido
 
 | Síntoma | Revisar | Acción |
@@ -559,3 +585,8 @@ revisión de píxeles. No llamar a una medición local de demo «CWV del banco»
 | Preview conserva versión anterior | Build kit rechazado, manifest anterior conservado | Leer salida/exit code; no confundir draft nuevo con manifest viejo |
 | Página muestra marca anterior | Servidor Astro existente o manifest equivocado | `astro dev status`; detener sólo sesión prescindible y reiniciar con expediente correcto |
 | Grant gobernado no abre | Provider/flag/migración/canary pendientes | No improvisar auth; separar demo autónoma de integración futura |
+| Logo SVG o video no aparece en la vista local | El fixture local sólo carga raster (webp/png/jpg/avif) | Revisar video y SVG en la vista publicada o en copia aislada; no ampliar el loader para salir del paso |
+| Tabla de condiciones de la landing desborda a 320 px | Muchas categorías o valores largos en la tabla | Pocas categorías cortas y valores cortos en la tercera columna |
+| La observación SERP muestra otra fecha | La fecha visible sale de `preparedAt`, no de la captura | Re-capturar la SERP el mismo día de `preparedAt` |
+| Segundo `astro dev` reutiliza el servidor existente | Un solo servidor por repo | Copiar el repo al scratchpad con `node_modules` clonado (`cp -cR`), no symlink |
+| Push a `main` de Think sin deployment nuevo | La integración Git de Vercel no reaccionó | Lanzar el deploy del commit por la API de Vercel con `gitSource`; confirmar SHA y alias |
