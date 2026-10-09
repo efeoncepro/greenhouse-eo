@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.resource-research.v1",
+  "preparedAt": "2026-10-09",
+  "runtimeUse": "review_only",
+  "automaticCatalogUpdate": false,
+  "commercialReady": false,
+  "observations": [
+    {
+      "id": "adobe-teams",
+      "provider": "Adobe",
+      "source": "https://helpx.adobe.com/account/individual/subscriptions-and-plans/plan-types-and-eligibility/changes-to-teams-plan.html",
+      "observedAt": "2026-10-09",
+      "plan": "Creative Cloud Pro for teams",
+      "currency": "USD",
+      "monthlyReference": "99.99",
+      "annualPrepaidReference": "1199.88",
+      "unit": "license",
+      "commitment": "annual",
+      "paymentOptions": [
+        "monthly",
+        "annual_prepaid"
+      ],
+      "region": "Public USD reference; price varies by country; not confirmed for Efeonce billing entity",
+      "taxIncluded": false,
+      "confidence": "official_public_reference",
+      "operationalAmount": null,
+      "requirements": [
+        "Assigned named license and permission to use in client delivery",
+        "Actual seats and account/renewal invoice",
+        "Cancellation/reassignment and remaining commitment"
+      ],
+      "note": "Avoid promotional first-year prices as steady-state cost."
+    },
+    {
+      "id": "m365-business-basic",
+      "provider": "Microsoft",
+      "source": "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-plans-and-pricing",
+      "observedAt": "2026-10-09",
+      "plan": "Microsoft 365 Business Basic with Teams",
+      "currency": "USD",
+      "monthlyEquivalentReference": "7.00",
+      "unit": "user",
+      "commitment": "annual",
+      "payment": "paid yearly",
+      "region": "en-us public page, not Efeonce Colombian/Chilean invoice",
+      "confidence": "official_public_reference",
+      "operationalAmount": null,
+      "requirements": [
+        "Choose Basic vs Standard/Premium by functional needs",
+        "Confirm tenant assignment, entity, tax and actual subscription",
+        "Confirm annual exposure and existing paid capacity"
+      ],
+      "note": "Public page also distinguishes monthly commitment vs annual commitment with monthly payment. Neither historical USD80 package nor public price proves account cost."
+    },
+    {
+      "id": "notion",
+      "provider": "Notion",
+      "source": "https://www.notion.com/pricing",
+      "observedAt": "2026-10-09",
+      "plan": "Plus or Business, pending functional selection",
+      "currency": "EUR",
+      "visiblePerMemberMonthReference": "9.50",
+      "visibleBusinessReference": "19.50",
+      "usdOperationalAmount": null,
+      "billingToggleVerified": false,
+      "region": "Direct read served EUR; selected monthly/yearly toggle not verified",
+      "confidence": "unit_verified_price_context_incomplete",
+      "requirements": [
+        "Actual USD/local price and selected billing cycle",
+        "Paid member vs guest permissions",
+        "Whether M365/other workspace already covers tracking",
+        "AI functionality requires correct plan and separate usage checks"
+      ],
+      "note": "Notion bills members, not projects. Do not convert EUR or extrapolate a USD monthly price from this read; historical USD144 package has unresolved unit/seats."
+    },
+    {
+      "id": "ai-business",
+      "provider": "OpenAI",
+      "source": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+      "observedAt": "2026-10-09",
+      "plan": "ChatGPT Business Standard",
+      "currency": "USD",
+      "monthlyReference": "25",
+      "annualPerMonthReference": "20",
+      "unit": "user",
+      "minimumPaidSeats": 2,
+      "region": "Published USD rates vary by country/currency",
+      "confidence": "official_public_reference",
+      "operationalAmount": null,
+      "requirements": [
+        "Approved workspace/seat and data-use policy",
+        "Existing two funded seats or budget all required new seats",
+        "Capacity/usage limits and API costs independently assessed"
+      ],
+      "note": "New minimum two Standard seats implies USD50/month on monthly billing before applicable tax. Existing funded seats can change incremental cash but do not make attributable cost zero. Historical Plus20 is a different plan."
+    },
+    {
+      "id": "platform-management",
+      "providerEvidenceName": "Deel",
+      "publicCatalogLabel": "Plataforma de contratación/pago",
+      "source": "https://www.deel.com/pricing/",
+      "observedAt": "2026-10-09",
+      "currency": "USD",
+      "publicMonthlyReferences": [
+        {
+          "plan": "Contractor management",
+          "perPerson": "49"
+        },
+        {
+          "plan": "Contractor of Record",
+          "perPerson": "325"
+        },
+        {
+          "plan": "Employer of Record",
+          "perPerson": "599"
+        }
+      ],
+      "confidence": "official_public_reference",
+      "operationalAmount": null,
+      "requirements": [
+        "Classify actual engagement and permitted operating direction",
+        "Contract/quote for configured country/entity",
+        "Determine labor/benefits coverage and additional costs without duplication"
+      ],
+      "note": "References are service fees, not total compensation or confirmation of all employer costs. Generic catalog naming preserved; no vendor choice, hire or classification approved."
+    }
+  ]
+}

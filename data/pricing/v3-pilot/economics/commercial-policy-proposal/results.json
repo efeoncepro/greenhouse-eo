@@ -1,0 +1,655 @@
+{
+  "preparedAt": "2026-10-09",
+  "runtimeUse": "review_only",
+  "commercialReady": false,
+  "baselineDigest": "b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02",
+  "previewDigest": "eb4ae2ca05dd3cec7c2a6ea9e073dd2b4b7c22837da000dbd31c5c6b4daaa600",
+  "candidateDigest": "34446590fc5dc545f25641f14e32576f808dcb75fd863f697305d88fde9a0501",
+  "scenarios": {
+    "margin-35": {
+      "totals": {
+        "cost": "3334.00",
+        "undiscountedPrice": "5129.23",
+        "discount": "0.00",
+        "net": "5129.23",
+        "marginAmount": "1795.23",
+        "marginRate": "0.34999990251948148162589706447166533768226419949972997896370410373486858651298538",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "1709.74",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY",
+        "MARGIN_BELOW_FLOOR"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1178.00",
+            "undiscountedPrice": "1812.31",
+            "discount": "0.00",
+            "net": "1812.31",
+            "marginAmount": "634.31",
+            "marginRate": "0.35000082767296985615043783900105390358161683155751499467530389392543218323575989",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1178.00",
+            "uniformMonthlyNet": "1658.46"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1658.46",
+            "discount": "0.00",
+            "net": "1658.46",
+            "marginAmount": "580.46",
+            "marginRate": "0.34999939703098054821943248555889198412985540802913546301991003702229779433932685",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1658.46"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1658.46",
+            "discount": "0.00",
+            "net": "1658.46",
+            "marginAmount": "580.46",
+            "marginRate": "0.34999939703098054821943248555889198412985540802913546301991003702229779433932685",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1658.46"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        }
+      ]
+    },
+    "margin-40": {
+      "totals": {
+        "cost": "3334.00",
+        "undiscountedPrice": "5556.68",
+        "discount": "0.00",
+        "net": "5556.68",
+        "marginAmount": "2222.68",
+        "marginRate": "0.40000143970860297875709956304843899594722028261479876473001864422640857490443934",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "1852.23",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1178.00",
+            "undiscountedPrice": "1963.34",
+            "discount": "0.00",
+            "net": "1963.34",
+            "marginAmount": "785.34",
+            "marginRate": "0.40000203734452514592480161357686391557244287795287622113337475933867796713763281",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1178.00",
+            "uniformMonthlyNet": "1796.67"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "0.00",
+            "net": "1796.67",
+            "marginAmount": "718.67",
+            "marginRate": "0.40000111317047649262246266704514462867415830397346201584041588049001764375205241",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1796.67"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "0.00",
+            "net": "1796.67",
+            "marginAmount": "718.67",
+            "marginRate": "0.40000111317047649262246266704514462867415830397346201584041588049001764375205241",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1796.67"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        }
+      ]
+    },
+    "margin-45": {
+      "totals": {
+        "cost": "3334.00",
+        "undiscountedPrice": "6061.82",
+        "discount": "0.00",
+        "net": "6061.82",
+        "marginAmount": "2727.82",
+        "marginRate": "0.45000016496695711848916661992602881642806945768762516867871365365517286887436446",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "2020.61",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1178.00",
+            "undiscountedPrice": "2141.82",
+            "discount": "0.00",
+            "net": "2141.82",
+            "marginAmount": "963.82",
+            "marginRate": "0.4500004668926427057362430082826754815997609509669346630435797592701534209223931",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1178.00",
+            "uniformMonthlyNet": "1960.00"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1960.00",
+            "discount": "0.00",
+            "net": "1960.00",
+            "marginAmount": "882.00",
+            "marginRate": "0.45",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1960.00"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1960.00",
+            "discount": "0.00",
+            "net": "1960.00",
+            "marginAmount": "882.00",
+            "marginRate": "0.45",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1960.00"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        }
+      ]
+    },
+    "reserved-full-cost": {
+      "totals": {
+        "cost": "5299.00",
+        "undiscountedPrice": "8831.66",
+        "discount": "0.00",
+        "net": "8831.66",
+        "marginAmount": "3532.66",
+        "marginRate": "0.3999995470840136508878285622408471340608673794054571847195204525536535600328817",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "5299.00",
+        "averageMonthlyNet": "2943.89",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1833.00",
+            "undiscountedPrice": "3055.00",
+            "discount": "0.00",
+            "net": "3055.00",
+            "marginAmount": "1222.00",
+            "marginRate": "0.4",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1833.00",
+            "uniformMonthlyNet": "2888.33"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1733.00",
+            "undiscountedPrice": "2888.33",
+            "discount": "0.00",
+            "net": "2888.33",
+            "marginAmount": "1155.33",
+            "marginRate": "0.39999930755834686479730501708599779111112649870340300450433295364449353086385558",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1733.00",
+            "uniformMonthlyNet": "2888.33"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1733.00",
+            "undiscountedPrice": "2888.33",
+            "discount": "0.00",
+            "net": "2888.33",
+            "marginAmount": "1155.33",
+            "marginRate": "0.39999930755834686479730501708599779111112649870340300450433295364449353086385558",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1733.00",
+            "uniformMonthlyNet": "2888.33"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        }
+      ]
+    },
+    "discount-0.05": {
+      "totals": {
+        "cost": "3334.00",
+        "undiscountedPrice": "5556.68",
+        "discount": "277.83",
+        "net": "5278.85",
+        "marginAmount": "1944.85",
+        "marginRate": "0.36842304668630478229159760175038123833789556437481648465101300472640821391022666",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "1759.62",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1178.00",
+            "undiscountedPrice": "1963.34",
+            "discount": "98.17",
+            "net": "1865.17",
+            "marginAmount": "687.17",
+            "marginRate": "0.36842218135612303436147911450430791831307601988022539500420873164376437536524821",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1178.00",
+            "uniformMonthlyNet": "1706.83"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "89.83",
+            "net": "1706.84",
+            "marginAmount": "628.84",
+            "marginRate": "0.36842351948630217243561200815542171498207213329896182418973073047268636779077125",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1706.84"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "89.83",
+            "net": "1706.84",
+            "marginAmount": "628.84",
+            "marginRate": "0.36842351948630217243561200815542171498207213329896182418973073047268636779077125",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1706.84"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY"
+          ]
+        }
+      ]
+    },
+    "discount-0.10": {
+      "totals": {
+        "cost": "3334.00",
+        "undiscountedPrice": "5556.68",
+        "discount": "555.67",
+        "net": "5001.01",
+        "marginAmount": "1667.01",
+        "marginRate": "0.333334666397387727679008840214276716103347123880976042839346452016692628089126",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "3334.00",
+        "averageMonthlyNet": "1667.00",
+        "currency": "USD"
+      },
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "diagnostics": [],
+      "periodDiagnosticCodes": [
+        "ESTIMATED_SOURCE",
+        "HISTORICAL_ONLY",
+        "MARGIN_BELOW_FLOOR"
+      ],
+      "periodSummaries": [
+        {
+          "periodId": 1,
+          "totals": {
+            "cost": "1178.00",
+            "undiscountedPrice": "1963.34",
+            "discount": "196.33",
+            "net": "1767.01",
+            "marginAmount": "589.01",
+            "marginRate": "0.33333710618502441978257055704268793045879762989456765949258917606578344208578333",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1178.00",
+            "uniformMonthlyNet": "1617.01"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        },
+        {
+          "periodId": 2,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "179.67",
+            "net": "1617.00",
+            "marginAmount": "539.00",
+            "marginRate": "0.33333333333333333333333333333333333333333333333333333333333333333333333333333333",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1617.00"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        },
+        {
+          "periodId": 3,
+          "totals": {
+            "cost": "1078.00",
+            "undiscountedPrice": "1796.67",
+            "discount": "179.67",
+            "net": "1617.00",
+            "marginAmount": "539.00",
+            "marginRate": "0.33333333333333333333333333333333333333333333333333333333333333333333333333333333",
+            "tax": null,
+            "grandTotal": null,
+            "cashCommitment": "1078.00",
+            "uniformMonthlyNet": "1617.00"
+          },
+          "diagnosticCodes": [
+            "ESTIMATED_SOURCE",
+            "HISTORICAL_ONLY",
+            "MARGIN_BELOW_FLOOR"
+          ]
+        }
+      ]
+    }
+  },
+  "pendingDiagnostics": [
+    {
+      "code": "SIMULATION_ONLY_CATALOG",
+      "path": "mode"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.cost"
+    },
+    {
+      "code": "MISSING_HUMAN_COMPONENT",
+      "path": "lines.design"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.design-license"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.design-license"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.collaboration"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.collaboration"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.tracking"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.tracking"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.ai"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.ai"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.platform"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.platform"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.training"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.training"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.verification"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.verification"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.backup"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.backup"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.replacement"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.replacement"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.management"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.management"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.infrastructure"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.infrastructure"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.onboarding"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.onboarding"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.financial-cost"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.financial-cost"
+    },
+    {
+      "code": "PENDING_CATALOG_VALUE",
+      "path": "lines.design.annual-exposure"
+    },
+    {
+      "code": "MISSING_RESOURCE_AMOUNT",
+      "path": "lines.design.annual-exposure"
+    },
+    {
+      "code": "UNCONFIRMED_COMMERCIAL_SELECTION",
+      "path": "bindings"
+    }
+  ],
+  "verification": {
+    "replay": true,
+    "explain": true,
+    "unapprovedExportBlocked": true,
+    "baselineUnchanged": true,
+    "sixReplays": {
+      "margin-35": true,
+      "margin-40": true,
+      "margin-45": true,
+      "reserved-full-cost": true,
+      "discount-0.05": true,
+      "discount-0.10": true
+    },
+    "readinessReplay": true,
+    "independentDecimalReconciliation": true,
+    "tenPercentDiscountCrossesFloor": true,
+    "fivePercentDiscountPreservesFloor": true,
+    "roundingAtFloorVisible": true,
+    "commercialReadinessHasNoTotal": true
+  },
+  "note": "Historical costs plus unmeasured trial resources; proposed margins are not approved. Candidate exists only by explicit --catalog. All totals exclude unresolved indirect taxes."
+}

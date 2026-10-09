@@ -4,7 +4,7 @@
 
 - `TASK-2018` — [prueba V3 Pibank](complete/TASK-2018-pricing-v3-pibank-team-simulation.md), prueba local completa; capacidad Perú/Chile, hipótesis del expediente.
 
-- `TASK-2017` — [economics Colombia→Chile](in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md), parcial: diseñador senior 50%; ficha y simulación histórica calculable, costos/políticas vigentes pendientes.
+- `TASK-2017` — [economics Colombia→Chile](in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md), parcial: diseñador50%, propuesta de política/provisiones y seis sensibilidades; costos/decisiones vigentes pendientes.
 
 - `TASK-2016` — [motor V3 local y CLI](complete/TASK-2016-pricing-v3-local-prototype.md), completo local; sin integración canónica ni tarifas aprobadas.
 

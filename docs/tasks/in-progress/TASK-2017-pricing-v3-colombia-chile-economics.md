@@ -177,6 +177,8 @@ retirar sólo los artefactos de esta task y sus enlaces; no hay estado remoto qu
 - [x] CLI conserva `needs_input`, sin neto ni precio exportable — evidencia local de readiness.
 - [x] Sensibilidad de asignación/plazo preparada sin importes sintéticos — matriz del ledger.
 - [x] Simulación histórica con cinco casos calculados y comparados; replay verificado y export bloqueado — `data/pricing/v3-pilot/economics/historical-simulation/results.json`.
+- [x] Propuesta económica/provisiones/kits y fuentes oficiales preparada; seis sensibilidades con CLI/replay, piso y desglose verificados; carpeta commercial-policy-proposal.
+- [x] Catálogo candidato y brief comercial completos en estructura, pendientes de datos; needs_input sin totales y export histórico bloqueado.
 - [ ] Costos actuales/localización, capacidad y coberturas validados — no hay fuentes actuales disponibles.
 - [ ] Alcance creativo, política de precio/mercado/margen/FX y terms aprobados por sus dueños.
 - [ ] Cálculo completo, comparación y borrador revisados — depende de datos anteriores.
@@ -215,3 +217,12 @@ control decimal independiente reconciliado. Base USD 1.064,70/mes + USD 130 setu
 ## Open Questions
 
 Headcount, duración, modalidad shared/dedicated, moneda comercial, alcance creativo y sourcing del costo colombiano.
+
+## Avance 2026-10-09 — política y componentes
+
+Operador pidió ayuda para preparar todas las reglas económicas, costos, herramientas y ensayo comercial.
+Pack: `docs/business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md`; objetivo40%/piso35% propuestos, no aprobados.
+Drivers/provisiones, fuentes oficiales y borrador de alcance preparados. Seis quote/replay vía CLI y conciliación decimal independientes; descuento10% cruza piso35 y redondeo al35% queda visible.
+Candidato local histórico genera32 diagnósticos al comercializar; costoCO y recursos pendientes no se reemplazan por trial25/25/100.
+Base histórica/catalogo/input comercial previo intactos. Artefactos en `data/pricing/v3-pilot/economics/commercial-policy-proposal/`.
+Status real sigue Parcial: faltan costo actual, modalidad/delivery, capacidad, contratos/recursos y aprobación de políticas nuevas.

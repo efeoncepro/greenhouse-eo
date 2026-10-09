@@ -274,3 +274,5 @@ Todo business model debe separar al menos estas dimensiones:
   benchmark de wedge visual, workflow productization, ecosystem distribution, expansión Business/Enterprise y límites de evidencia.
 - [Globe Market, Distribution & Monetization Strategy V1](../strategy/EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md) —
   arquitectura de segmentos, distribución masiva, ventas B2B/enterprise, canales, packaging y validación; `Approved for validation`.
+
+[Pricing de capacidad especializada — propuesta](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md): drivers, margen/guardrails y validación del piloto V3; sin pricing comercial aprobado.

@@ -32,3 +32,5 @@ Los controles históricos están comprobados con aritmética decimal independien
 - [Prueba de equipo Pibank Perú/Chile](../../../docs/documentation/finance/cotizador-v3-prueba-pibank.md): ruta gradual, diez funciones con capacidad media, costo reconciliado y ensayo de margen 40%; [input](scenarios/pibank-gradual-peru-chile.json), [supuestos](economics/pibank/assumptions.json) y [resultados](economics/pibank/results.json). Sin cambiar la oferta documental.
 
 [Selección desde catálogo y mantenimiento](../v3-catalog/README.md): recorrido implementado después de los ensayos con snapshots. Pibank pasa a demanda; catálogo aporta costos.
+
+[Propuesta económica/provisiones del piloto](economics/commercial-policy-proposal/README.md): policy40%/35% por revisar, seis sensibilidades y fuentes oficiales; costo comercial pendiente.

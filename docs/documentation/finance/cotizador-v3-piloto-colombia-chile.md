@@ -200,3 +200,7 @@ herramientas, fee, Assurance, operación y setup, que deben revisarse antes de v
 Próximo avance: ajustar los supuestos en el input histórico para seguir prototipando; para promoción comercial, conseguir costo colombiano con coberturas y elegir atribuciones/capacidad,
 luego validar política comercial y comparar los casos. La fuente actual disponible sigue
 siendo el Excel histórico; no hay costo salarial, tipo de cambio o precio vigente verificado.
+
+## Propuesta económica preparada — siguiente carril
+
+[Pack de pricing](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), [componentes/provisiones](cotizador-v3-provisiones-y-costos.md), [borrador de alcance](cotizador-v3-borrador-alcance-piloto.md) y [artefactos de revisión](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/README.md). Seis sensibilidades calculadas con CLI, objetivo40% y piso35% propuestos; recursos públicos investigados y costos comerciales pendientes explícitos. No cambia ninguna tarifa anterior ni valida el salario colombiano. TASK-2017 conserva avance parcial.

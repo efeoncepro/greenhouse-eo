@@ -23,3 +23,5 @@ No importar esta proyección como catálogo comercial vigente ni exponer costos 
 ## Selección y mantenimiento V3
 
 [Catálogo local versionado](v3-catalog/README.md): brief → selección → cálculo → explicación; actualizaciones con fecha efectiva, impacto y conflicto de base. Histórico/simulación, no tarifas vigentes.
+
+[Reglas económicas y provisiones propuestas](v3-pilot/economics/commercial-policy-proposal/README.md): avance TASK-2017, sin tarifa aprobada.
