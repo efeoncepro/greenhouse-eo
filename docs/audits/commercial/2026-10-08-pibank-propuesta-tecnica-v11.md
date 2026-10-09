@@ -65,3 +65,14 @@ países (casos internacionales validados por Julio el 08-10).
 2. Foto de cierre BR3f por aprobar.
 3. Decidir si la lámina de medición de negocio suma la definición de «inicio de solicitud».
 4. Envío a Jesús en la misma cadena: lo hace el operador.
+
+## 5. Delta 2026-10-09 (v12)
+
+- Lámina 20, «Muestra X-Ray»: mockup dibujado del X-Ray de Pibank publicado en Think, con QR y enlace (47 láminas;
+  canvas versión 66; PDF `Pibank-Propuesta-tecnica-SEO-AEO-2027-v12.pdf`, también en OneDrive). No enviado.
+- Pendiente 1 cerrado: `pnpm tender:canonical-gate` no aplica; evalúa sólo `docs/commercial/tenders/` y esta propuesta
+  es un prospecto, no una licitación formal.
+- Pendiente 2 cerrado: foto de cierre BR3f aprobada por el CEO (logo completo en la espalda); BR3e descartada.
+- Pendiente 3 cerrado: «Solicitud iniciada» definida en el glosario (lámina 46); evento a acordar con Analítica de
+  Pibank en M1, sin tasa asignada.
+- Queda: el envío a Jesús en la misma cadena, que lo hace el operador.

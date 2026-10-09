@@ -20,7 +20,7 @@ Producción de la propuesta técnica para Pibank (Banco Pichincha Perú). Vigent
 | `logo-en-centro.mjs` | Reemplaza la palabra «Pibank» por el logo en una lámina compuesta. |
 | `teal2engine.cjs` | Lleva el turquesa de una imagen al acento Engine (láminas importadas, E-E-A-T, reporte). Revisar fotos al 100 %. |
 | `render-pdf.mjs` | Renderiza las láminas con las imágenes locales y arma el PDF 16:9. |
-| `fichas/`, `prompts/` | Foto de cierre BR3e/BR3f (portal Engine). |
+| `fichas/`, `prompts/` | Foto de cierre BR3f (portal Engine), aprobada el 09-10. BR3e descartada. |
 | `equipo/por-asignar.png` | Ficha neutra para un rol por asignar en `content-team` (exige cinco fichas). Fuera de git. |
 | `logos-terceros/FUENTES.md` | Procedencia de los logos de bancos peruanos. |
 
@@ -40,7 +40,8 @@ de a uno) y se corre `render-pdf.mjs <project> <carpeta de blobs> <salida.pdf>` 
 
 1. ~~Si aplica `pnpm tender:canonical-gate`~~: no aplica (09-10). El gate evalúa sólo `docs/commercial/tenders/<slug>/`
    y esta propuesta es un prospecto (`docs/commercial/prospects/`), no una licitación formal.
-2. Foto de cierre BR3f por aprobar (comparada con BR3e el 09-10; recomendación: BR3f).
+2. ~~Foto de cierre BR3f por aprobar~~: aprobada por el CEO el 09-10 porque lleva el logo completo en la espalda. BR3e
+   queda descartada (sólo emblema, ilegible); no se usa en ninguna versión.
 3. ~~Definición de «inicio de solicitud»~~: resuelto el 09-10 en el glosario (lámina 46, «Solicitud iniciada»; evento a
    acordar con Analítica de Pibank en M1, sin tasa asignada). La lámina 29 es una receta de cinco tarjetas y no cambia.
 
