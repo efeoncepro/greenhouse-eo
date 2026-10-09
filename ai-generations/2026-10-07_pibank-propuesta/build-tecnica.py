@@ -896,15 +896,15 @@ for i, ((k, n, ref), c) in enumerate(zip(scen, cpa)):
                f'<div style="position: absolute; left: {x}px; top: {base - h}px; width: 150px; height: {h}px; border-radius: 10px 10px 4px 4px; background: {"linear-gradient(180deg, rgba(3, 117, 219, 1), rgba(3, 117, 219, 0.45)); box-shadow: 0 0 0 2px rgba(3, 117, 219, 0.95), 0 0 50px rgba(3, 117, 219, 0.5)" if hero else "linear-gradient(180deg, rgba(207, 228, 250, 0.45), rgba(207, 228, 250, 0.14))"}"></div>'
                f'<div style="position: absolute; left: {x - 25}px; top: {base + 14}px; width: 200px; text-align: center"><div style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {W_ if hero else SOFT_}">{k}</div>'
                f'<div style="font-family: {ID}; font-size: 22px; font-weight: 700; margin-top: 4px">{format(n, ",").replace(",", ".")} cuentas</div>'
-               f'<div style="font-size: 13px; color: {SOFT_}; margin-top: 3px">{ref}</div></div>')
+               f'<div style="font-size: 13px; color: {W_}; margin-top: 3px">US${str(round(dep, 2)).replace(".", ",").rstrip("0").rstrip(",")} M en depósitos</div><div style="font-size: 12px; color: {SOFT_}; margin-top: 2px">{ref}</div></div>')
 LT = '<span style="font-weight: 300; letter-spacing: -0.025em">'
 S.append(('Costo por cuenta', page('Pibank · Costo por cuenta', halo_only(1300, 520) + bars25 +
     zone(label('Costo por cuenta con fondos: inversión anual ÷ cuentas que aporta el programa', W_), 820, 160, 960) +
     zone(callout('Para comparar: lo que hoy le cuesta a Pibank cada cuenta con fondos que llega por pauta. Lo calculamos con sus datos en el mes 1.'), 820, 790, 960) +
-    col(eyebrow('Inversión') + headline([LT + '¿Cuánto costaría</span>', LT + 'cada cuenta?</span>', 'Unos US$157'], 76, extra='; margin-top: 64px') +
+    col(eyebrow('Proyección de retorno') + headline([LT + '¿Cuánto costaría</span>', LT + 'cada cuenta?</span>', 'Unos US$157'], 76, extra='; margin-top: 64px') +
         body('Es la inversión del año (US$79.200) dividida por las cuentas con fondos que aporta el programa en los escenarios de la lámina ⟦Evaluación 2026⟧ y al nivel de la meta de la lámina ⟦Cómo se conecta con la meta⟧. En el escenario central, unos US$157 por cuenta.', 20, 580, extra='; margin-top: 32px'), 120, 640) +
-    means('Una vara simple para decidir: lo que cuesta cada cuenta del programa frente a lo que cuesta hoy en pauta, medido con datos del banco.',
-          'US$79.200 ÷ cuentas con fondos atribuidas al programa en cada escenario. Ejercicio hipotético: no es pronóstico ni costo total de adquisición. ' + FX_NOTE) + bubble(), section=5)))
+    means('En el escenario central, US$79.200 traen unas 504 cuentas y US$1,26 M en depósitos. El retorno se confirma frente al costo actual por pauta y al valor de cada cuenta, con datos del banco.',
+          'US$79.200 ÷ cuentas con fondos atribuidas al programa en cada escenario. Ejercicio hipotético, no pronóstico. Depósitos al ticket de US$2.500; no son ingreso del banco: el ROI se calcula con el valor por cuenta de Pibank en el mes 1. ' + FX_NOTE) + bubble(), section=5)))
 
 # 26 · Siguiente paso — capítulo 5
 cal = [('09-10', 'Entrega de la propuesta'), ('Semana del 12-10', 'Revisión con el equipo de Pibank'), ('Semana del 19-10', 'Revisión con gerencia'), ('2027', 'Inicio del mes 1')]
