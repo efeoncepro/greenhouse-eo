@@ -1,0 +1,89 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-stack",
+  "voice": {
+    "eyebrow": "Nuestro stack",
+    "question": "¿Con qué lo medimos?",
+    "answer": [
+      "Con todo",
+      "visible"
+    ]
+  },
+  "body": "{count} herramientas en tres capas: lo que se busca, lo que responde la IA y lo que se coordina.",
+  "layers": [
+    {
+      "name": "Medir",
+      "note": "lo que se busca",
+      "tools": [
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/search-console-isotype.svg",
+          "name": "Search Console"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/google-analytics-isotype.svg",
+          "name": "Google Analytics"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/semrush-isotype.svg",
+          "name": "Semrush"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/brand-visibility-grader-isotype.svg",
+          "name": "Visibility Grader"
+        }
+      ]
+    },
+    {
+      "name": "Observar IA",
+      "note": "lo que responde",
+      "tools": [
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/chatgpt-isotype.svg",
+          "name": "ChatGPT"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/gemini-isotype.svg",
+          "name": "Gemini"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/google-ai-overview-isotype.svg",
+          "name": "AI Overviews"
+        }
+      ]
+    },
+    {
+      "name": "Operar",
+      "note": "lo que se coordina",
+      "tools": [
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/notion-isotype.svg",
+          "name": "Notion"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+          "name": "Frame.io"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/teams-isotype.svg",
+          "name": "Teams"
+        },
+        {
+          "path": "node_modules/@efeoncepro/axis-brand-assets/assets/insights-isotype-positive.svg",
+          "name": "Efeonce Insights"
+        }
+      ]
+    }
+  ],
+  "highlightedLayer": "Observar IA",
+  "base": {
+    "lead": "Todo se conecta en",
+    "note": "donde Pibank ve cada avance"
+  }
+}

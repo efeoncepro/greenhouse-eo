@@ -997,7 +997,8 @@ FOTOS = [('De la búsqueda a la cuenta', 'Encuentran a Pibank al buscar', 'd675c
          ('Inversión', 'Caso Berel', '36de7907d0d999ab6414d06bc8cbebf8', 'Caso de éxito Berel: ¿Qué cambió? Lo eligen.'),
          ('Inversión', 'Cinco países', 'cdb4ea4bbba4a91bcfb9df3f7555d139', '¿Dónde operamos? Cinco países: Chile, Estados Unidos, Colombia, México y Perú.'),
          ('Por qué Efeonce', 'Tu día a día', '7a7c5e3e80d16d7c4c9b7c60d2056050', 'Tu día a día con Efeonce: ¿Dónde ves lo que pasa? Todo junto: Teams, Notion, Frame.io y el reporte en vivo de Efeonce Insights en tu panel.'),
-         ('Por qué Efeonce', 'A la vista', '4835e2eb55685adff4305e18bc2bdd88', 'Tu día a día con Efeonce: ¿Cómo avanza tu SEO? A la vista: plan en Notion y aprobación de cada landing en Frame.io.')]
+         ('Por qué Efeonce', 'A la vista', '4835e2eb55685adff4305e18bc2bdd88', 'Tu día a día con Efeonce: ¿Cómo avanza tu SEO? A la vista: plan en Notion y aprobación de cada landing en Frame.io.'),
+         ('Por qué Efeonce', 'Stack de herramientas', 'e664af479141b6d3a9a277bb0e671ad4', 'Nuestro stack: ¿Con qué lo medimos? Con todo visible: once herramientas en tres capas, medir (Search Console, Google Analytics, Semrush, Visibility Grader), observar la IA (ChatGPT, Gemini, AI Overviews) y operar (Notion, Frame.io, Teams, Efeonce Insights), conectadas en Efeonce.')]
 # La sección partida abre el capítulo 1: sobre el papel, debajo de la voz, el índice del capítulo (lectura sin presentador).
 NAVY, PSOFT = '#023c70', '#5f5a69'
 toc1 = [('De la búsqueda a la cuenta', 'De la búsqueda a la cuenta'), ('Lo que vimos en Google', 'Hoy no encuentra a Pibank'),
@@ -1018,7 +1019,7 @@ assert not any('⟦' in h for _, h in S)
 
 # ── canvas: cuatro láminas por fila ──
 N = len(S)
-assert N == 48, N
+assert N == 49, N
 idx = json.load(open(f'{ROOT}/canvas.json'))
 for f in list(idx['boards']):
     if f.startswith('Tec-'):
@@ -1032,7 +1033,7 @@ idx['order'] = [f'Tec-{i + 1:02d}.dc.html' for i in range(N)] + others
 for p in idx['pages']:
     if p['id'] == 'tecnica':
         p['name'] = f'Propuesta técnica · {N}'
-idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v13 del 09-10 · 48 láminas · con primer semestre y continuidad trimestral, leads y la muestra X-Ray'
+idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v13 del 09-10 · 49 láminas · con primer semestre y continuidad trimestral, leads y la muestra X-Ray'
 idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Andrés, Valentina, Julio y Daniela confirmados; diseño visual por asignar antes del inicio.\n\n'
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'
