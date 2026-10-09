@@ -560,12 +560,14 @@ describe('Frozen artifacts, projections and CLI parity', () => {
     const input = sample()
 
     input.snapshot.profiles[0].cost!.source.reference = 'private-personal-cost-record'
+    input.request.lines[0].notApplicable.push({ coverage: 'extra-coverage', reason: 'private-finance-exclusion-note' })
     const artifact = runPricingV3(input).artifact!
     const view = projectPricingV3ForClient(artifact)
     const output = JSON.stringify(view)
 
     for (const secret of [
       'private-personal-cost-record',
+      'private-finance-exclusion-note',
       'cost',
       'margin',
       'factor',

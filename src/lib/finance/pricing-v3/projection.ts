@@ -27,7 +27,7 @@ export function projectPricingV3ForClient(artifact: PricingV3Artifact) {
       included: line.assignments.map(
         assignment => input.snapshot.resources.find(resource => resource.resourceId === assignment.resourceId)?.label
       ),
-      exclusions: line.notApplicable.map(item => ({ coverage: item.coverage, reason: item.reason }))
+      exclusions: line.notApplicable.map(item => item.coverage)
     })),
     schedule: result.lines.map(line => ({
       lineId: line.lineId,

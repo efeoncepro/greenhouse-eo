@@ -68,7 +68,7 @@ Los valores internos de componentes permanecen en `calculationCurrency` sin redo
 
 `compare` es interno: muestra ambas evidencias, cambios de alcance/configuración/moneda y diferencias de totales cuando moneda y resultados completos permiten aritmética. No resta monedas diferentes. Comparar alcances distintos no afirma equivalencia comercial.
 
-La proyección cliente usa allowlist. Excluye costos, márgenes, factores, fuentes privadas, políticas, traces y diagnósticos; mantiene alcance, calendario/neto e impuestos pendientes. El ejemplo conserva una advertencia de datos sintéticos. No es permiso para exponer artefactos internos; futuras audiencias se autorizan en el servidor canónico, nunca con un flag del caller.
+La proyección cliente usa allowlist. Excluye costos, márgenes, factores, fuentes privadas, justificaciones internas de exclusión, políticas, traces y diagnósticos; mantiene alcance, calendario/neto e impuestos pendientes. El ejemplo conserva una advertencia de datos sintéticos. No es permiso para exponer artefactos internos; futuras audiencias se autorizan en el servidor canónico, nunca con un flag del caller.
 
 ## Primer caso comercial y límites abiertos
 

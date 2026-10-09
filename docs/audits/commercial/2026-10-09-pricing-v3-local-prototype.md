@@ -39,7 +39,7 @@ Codex: `software-architect-2026` (boundary/ADR), `efeonce-pricing-operator` (eco
 | Lint focal | PASS | `pnpm exec eslint src/lib/finance/pricing-v3 scripts/commercial/pricing-v3.ts`, exit 0; commit hook también limpio |
 | Núcleo/CLI | PASS | Mismo resultado sobre fixture sintético; CLI desde directorio temporal; cálculo/explain/replay/export/catalog y no overwrite |
 | Estados | PASS | Exit 0 cálculo completo, 2 CO→CL incompleto, 3 revisión, 1 error técnico; stdout JSON limpio y stderr sanitizado |
-| Snapshots/redacción | PASS | Timestamp fuera del hash; input/result/version alterados rechazados; cliente sin costo/margen/factores/fuentes/traces/políticas; pendiente/review no exporta |
+| Snapshots/redacción | PASS | Timestamp fuera del hash; input/result/version alterados rechazados; cliente sin costo/margen/factores/fuentes/traces/políticas ni notas financieras de exclusión; pendiente/review no exporta |
 | Gate QA focal | Evaluado | `pnpm qa:gates --changed --agent codex --task TASK-2016 --finance --docs -- <paths>`; dominios finance/data/docs/tooling, skills cargadas y evidencia proporcional |
 | Task/ops | PASS | Task focal 0 errores/0 warnings; ops changed exit0/0 errores, 19 warnings ajenos de registry/epic parity |
 | Docs/context | Cierre focal | Closure strict sin faltantes; context strict se ejecuta tras última edición documental y sus resultados quedan en la ejecución del cierre |
