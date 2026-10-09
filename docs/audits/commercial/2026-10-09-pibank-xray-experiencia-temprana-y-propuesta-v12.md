@@ -153,3 +153,12 @@
 
 1. Envío de la propuesta v12 a Jesús en la misma cadena: lo hace el operador.
 2. Revisión de la muestra con el equipo de Pibank, propuesta para la semana del 12 de octubre.
+
+## Delta 2026-10-09 (tarde) · propuesta v13 y cotización alineada
+
+- **v13 (48 láminas, canvas versión 88).** Responde los vacíos del correo de Jesús: equipo híbrido con banderas (32: SEO, contenido y diseño en Perú; dirección de cuenta en Chile), leads proyectados (26: unas 1.500 solicitudes iniciadas con tasa de prueba de 50 %, rango 1.300–1.900; supuestos 46 y glosario 47), Autoridad de marca en las métricas (30, ícono `autoridad-marca` de AXIS 0.17.0 empalmado porque el compositor fija 0.11.0), eficiencia de la pauta legible (21: 20 contra 30 aperturas por cada 1.000 clics).
+- **Inversión rediseñada.** 42: «US$4.500 al mes, más los módulos que construyen el plan», fichas con precio, soles y cuándo entra cada módulo, y la ecuación anual Base US$54.000 + módulos US$25.200 = US$79.200. 43: «Seis meses para ver señales; luego, trimestre a trimestre» (primer semestre US$42.500 con revisión M3 y decisión M6; T3 US$19.100; T4 US$17.600). Tres meses se descartó: el programa no se ejecuta en un trimestre y la propia propuesta ubica las primeras señales en el primer semestre. 44: proyección de retorno por escenarios (barras por cuentas; central 504 cuentas, US$157 por cuenta, US$1,26 M en depósitos; el ROI real necesita el valor por cuenta de Pibank).
+- **Soles** a S/ 3.437 por US$ (BCRP, venta SBS, 06-10-2026) en formato peruano, igual que la cotización.
+- **Receta `method-surround-cycle` corregida en raíz:** los filtros de halo no declaraban región y recortaban el desenfoque en un cuadrado (`filterUnits="userSpaceOnUse"`, lienzo completo); visual-gate de La órbita a cero píxeles.
+- **Cotización detallada** regenerada con el `render.mjs` de Codex: v2 (USD) y pen-v4 (PEN), compromiso inicial de seis meses y renovación trimestral; precios y tasa sin cambios; copias verificadas en OneDrive y registro en `entrega-2026-10-09.json`. Oferta económica en markdown alineada.
+- **Pendiente:** fila de esta auditoría en `docs/audits/commercial/README.md`, que tiene entradas de otra sesión que apuntan a archivos aún sin commit.
