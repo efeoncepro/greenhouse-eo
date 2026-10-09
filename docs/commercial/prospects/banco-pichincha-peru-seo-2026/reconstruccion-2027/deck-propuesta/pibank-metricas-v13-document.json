@@ -1,0 +1,63 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "line": "engine",
+  "sections": 5,
+  "use": "proposal",
+  "pages": [
+    {
+      "role": "content",
+      "recipe": "content-measure-formulas",
+      "voice": {
+        "eyebrow": "Qué medimos · SEO y AEO",
+        "question": "¿Cómo se mide la visibilidad?",
+        "answer": [
+          "Cinco",
+          "métricas"
+        ]
+      },
+      "body": "Lo que pasa en Google y en las respuestas de IA, con fórmula, fuente y **dueño**, cada mes en Efeonce Insights.",
+      "note": "Sin cifras de promesa: la línea base se mide en el mes 1",
+      "metrics": [
+        {
+          "glyph": "busqueda",
+          "name": "Clics no-marca",
+          "formula": "Clics desde Google en consultas sin la marca",
+          "source": "Search Console",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "medicion",
+          "name": "Autoridad de marca",
+          "formula": "Fuerza de marca: índice Brand Authority",
+          "source": "Moz",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "ia",
+          "name": "Presencia en IA",
+          "formula": "Observaciones que nombran a Pibank ÷ observaciones",
+          "source": "Panel AEO",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "checklist",
+          "name": "Exactitud en IA",
+          "formula": "Respuestas correctas ÷ respuestas con Pibank",
+          "source": "Panel AEO",
+          "owner": "Efeonce"
+        },
+        {
+          "glyph": "embudo",
+          "name": "Share of voice",
+          "formula": "Menciones de Pibank ÷ menciones de bancos",
+          "source": "Panel AEO",
+          "owner": "Efeonce"
+        }
+      ]
+    }
+  ],
+  "_nota": "metrics[1].glyph se compone con «medicion» y se reemplaza por autoridad-marca de AXIS (axis-graphic-line 0.17.0, candidata) con metricas-v13/icon-swap.mjs: el pin 0.11.0 no la trae."
+}

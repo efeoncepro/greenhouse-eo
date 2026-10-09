@@ -860,7 +860,8 @@ sups = [('Meta de referencia', '15.200 cuentas con fondos y US$38 millones (tick
         ('Ejemplos ilustrativos', 'Los hallazgos técnicos dibujados, el newsletter, el ejemplo de 100 clics y el de 10.000 visitas explican mecanismos; no son resultados observados.'),
         ('Respuestas de IA', 'Una mención en una respuesta de IA no es una visita ni una cuenta. Las superficies y su acceso se acuerdan al inicio.'),
         ('Condiciones y comparaciones', 'Toda condición de producto y toda comparación con otras marcas se publica con fuente vigente y visto bueno de Producto y Cumplimiento.'),
-        ('Precios', 'Valores en USD antes de impuestos. Cada activación se acuerda antes de ejecutarse.')]
+        ('Precios', 'Valores en USD antes de impuestos. Cada activación se acuerda antes de ejecutarse.'),
+        ('Autoridad de marca', 'Índice Brand Authority de Moz, citado con fecha y alcance en cada medición. Es una referencia del proveedor, no un score de Efeonce: línea base en el mes 1 y sin puntos prometidos.')]
 sup_html = ''.join(f'<div style="padding: 11px 0; border-top: 1px solid {RULE_}"><div style="font-family: {ID}; font-size: 21px; font-weight: 740">{t}</div>'
                    f'<div style="font-size: 15px; font-weight: 300; line-height: 1.38; color: {SOFT_}; margin-top: 4px">{d}</div></div>' for t, d in sups)
 S.append(('Supuestos y fuentes', page('Pibank · Supuestos',
@@ -880,6 +881,7 @@ glos = [('SEO', 'Optimización para buscadores: que las páginas de Pibank apare
         ('Pilar y hub', 'El pilar es la página principal de Cuenta Soles; el hub, la sección que reúne artículos y herramientas.'),
         ('Captura', 'Una página de resultados de Google guardada para revisar quién aparece.'),
         ('Observación', 'En el panel AEO: una pregunta, en una superficie de IA, en un corte de medición.'),
+        ('Autoridad de marca', 'Cuánto reconocen y confían en la marca dentro de su categoría. La seguimos con el índice Brand Authority de Moz.'),
         ('Apertura y cuenta con fondos', 'Apertura: cuenta abierta y validada por el banco. Cuenta con fondos: la que además recibió su primer depósito.'),
         ('Solicitud iniciada', 'El lead: cuando alguien empieza el formulario de apertura en registro.pibank.pe. Se estima con una tasa de prueba de 50 % hacia la apertura; el evento exacto y la tasa real se fijan con Analítica de Pibank en el mes 1.'),
         ('Captación', 'Depósitos que traen las cuentas nuevas; si se mide como primer depósito o saldo mantenido se define con el banco.'),
@@ -905,7 +907,7 @@ FOTOS = [('De la búsqueda a la cuenta', 'Encuentran a Pibank al buscar', 'd675c
          ('SEO técnico', 'Y si hay que tocar código', '9840a86dca8a3254268812d6a519d9c0', '¿Y si hay que tocar código? Lo hacemos: WordPress de pibank.pe.'),
          ('Respuestas de IA (AEO)', 'Qué dice la IA de Pibank', '6540e9e599c1d73e1c312e6aa958d40c', '¿Qué dice la IA de Pibank? Lo sabremos: panel de respuestas de IA.'),
          ('Comunidad y PR', 'E-E-A-T', '81f7c41d2e679b0e5f31cc6fc5498ee7', 'E-E-A-T en banca: ¿Qué hace citable a Pibank? Lo verificable: fuentes vigentes, autoría y revisión, condiciones claras y datos consistentes.'),
-         ('Equipo de la cuenta', 'Métricas SEO y AEO', '02654e6b3f11d2753c580dee51977793', '¿Cómo se mide la visibilidad? Cinco métricas de SEO y AEO con fórmula, fuente y dueño.'),
+         ('Equipo de la cuenta', 'Métricas SEO y AEO', '3457eee0c07b8d3bd016590b7c5e89bd', '¿Cómo se mide la visibilidad? Cinco métricas de SEO y AEO con fórmula, fuente y dueño: clics no-marca, autoridad de marca, presencia en IA, exactitud en IA y share of voice.'),
          ('Equipo de la cuenta', 'Reporte mensual', '48d063a211117f41d6652bcdfb94b9cc', '¿Cómo lo verán? Cada mes: reporte de Efeonce Insights y revisión en Teams.'),
          ('Inversión', 'Por qué Efeonce', '182202cde0d97d420102df86c5e84201', '¿Qué nos hace distintos? Se puede medir: método medible frente a una agencia commodity.'),
          ('Inversión', 'Clientes', '12372e4e846fefaf3f764ce6ee3e3953', '¿Quién confía en nosotros? Marcas líderes: clientes de Efeonce y casos publicados.'),
