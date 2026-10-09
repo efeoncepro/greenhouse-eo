@@ -9,6 +9,12 @@ import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
 import { projectCatalogQuote, catalogQuoteMarkdown } from '../../src/lib/finance/pricing-v3/catalog/client'
 import { planCreditBudget } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
 import {
+  COMPOSITION_VERSION,
+  runResourceComposition,
+  replayResourceComposition,
+  explainResourceComposition
+} from '../../src/lib/finance/pricing-v3/adapters/resource-composition'
+import {
   catalogDigest,
   compareCatalogQuotes,
   runCatalogQuote,
@@ -51,6 +57,8 @@ try {
       format: { type: 'string' },
       query: { type: 'string' },
       catalog: { type: 'string' },
+      policy: { type: 'string' },
+      credits: { type: 'string' },
       kind: { type: 'string' },
       date: { type: 'string' },
       impact: { type: 'string' },
@@ -72,6 +80,7 @@ try {
     prepare: ['catalog', 'input', 'out', 'help'],
     quote: ['catalog', 'input', 'out', 'help'],
     resources: ['catalog', 'input', 'out', 'help'],
+    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'help'],
     help: ['help']
   }
 
@@ -107,6 +116,8 @@ try {
           prepare: '--input brief.json [--catalog catalog.json] [--out selection.json]',
           quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json]',
           resources: 'budget --input credit-budget-request.json --catalog credit-catalog.json [--out budget.json]',
+          compose:
+            'prepare|quote --input composition-demand.json --policy resource-policy.json --credits credit-catalog.json [--catalog monetary-catalog.json] [--out artifact.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
         },
@@ -117,6 +128,36 @@ try {
         ]
       })
     )
+  } else if (command === 'compose') {
+    if (!['prepare', 'quote'].includes(subcommand) || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+
+    const artifact = runResourceComposition(
+      read(catalogPath),
+      read(required(values.policy)),
+      read(required(values.credits)),
+      read(required(values.input))
+    )
+
+    const result = artifact.semantic.result
+
+    if (values.out) writeNew(values.out, artifact)
+    process.stdout.write(
+      json(
+        subcommand === 'prepare'
+          ? {
+              calculationId: artifact.calculationId,
+              selections: result.selections,
+              attributions: result.attributions,
+              creditBudgets: result.creditBudgets,
+              diagnostics: result.quote.diagnostics,
+              assumptions: result.quote.resolution.assumptions,
+              calculationStatus: result.quote.calculationStatus,
+              binding: false
+            }
+          : { calculationId: artifact.calculationId, replayDigest: artifact.replayDigest, ...result }
+      )
+    )
+    process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
   } else if (command === 'resources') {
     if (subcommand !== 'budget' || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
     const result = planCreditBudget(read(required(values.catalog)), read(required(values.input)))
@@ -269,7 +310,19 @@ try {
     } else {
       const raw = read(required(values.input))
 
-      if ((raw as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION) {
+      if ((raw as { artifactVersion?: string })?.artifactVersion === COMPOSITION_VERSION) {
+        if (command === 'export') throw new Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
+        const artifact = replayResourceComposition(raw)
+
+        process.stdout.write(
+          json(
+            command === 'replay'
+              ? { verified: true, calculationId: artifact.calculationId, result: artifact.semantic.result }
+              : explainResourceComposition(raw)
+          )
+        )
+        process.exitCode = artifact.semantic.result.quote.calculationStatus === 'calculated' ? 3 : 2
+      } else if ((raw as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION) {
         const frozen = replayCatalogQuote(raw)
 
         if (command === 'export') {

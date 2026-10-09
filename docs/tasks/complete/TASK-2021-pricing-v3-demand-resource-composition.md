@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `reader`
-- Status real: `En progreso`
+- Status real: `Completa local; economía y runtime canónico pendientes fuera de alcance`
 - Rank: `2021`
 - Domain: `finance`
 - Blocked by: `none`
@@ -125,6 +125,12 @@ Una unidad backend-data reversible local: contratos → composición/kernel → 
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 
+<!-- ZONE 2 — DISCOVERY, AUDIT & PLAN -->
+
+## Plan
+
+Plan documentado y commiteado antes de código en `89588fd92`. Secuencial, dominio puro y reuso del kernel; sin worktrees/subagentes, migración o runtime externo.
+
 ## Scope
 
 ### Slice 1 — Contrato y policy
@@ -155,22 +161,22 @@ Local opt-in. Riesgos: duplicación, créditos gastados dos veces, FX/planes his
 
 ## Acceptance Criteria
 
-- [ ] Base común + perfil/tareas y selección AI explicables, sin herramientas inaplicables.
-- [ ] Seats/pools/consumo asignados sin duplicación ni prorrateo FTE implícito; huecos bloquean.
-- [ ] Suscripción/paquetes integrados al quote, con remanente/vigencia y caja adicional separados.
-- [ ] CLI prepare/quote/explain/replay de composición con artifacts congelados.
-- [ ] Tres casos y negativos pasan; regresiones anteriores permanecen verdes.
-- [ ] Documentación, registro, índices y continuidad actualizados con estado local honesto.
+- [x] Base común + perfil/tareas y selección AI explicables, sin herramientas inaplicables.
+- [x] Seats/pools/consumo asignados sin duplicación ni prorrateo FTE implícito; huecos bloquean.
+- [x] Suscripción/paquetes integrados al quote, con remanente/vigencia y caja adicional separados.
+- [x] CLI prepare/quote/explain/replay de composición con artifacts congelados.
+- [x] Tres casos y negativos pasan; regresiones anteriores permanecen verdes.
+- [x] Documentación, registro, índices y continuidad actualizados con estado local honesto.
 
 ## Verification
 
-Pendiente: tests V3, typecheck/lint focal, CLI/replay y reconciliación independiente, task/docs/context gates. Sin UI ni verificación remota aplicable.
+108 tests/4 archivos verdes (19 nuevos); typecheck y ESLint focal exit0. Tres compose quote/replay exit3: calculated/requires_review y verified; replay legacy verified. Explain y conciliación Python Decimal verificados; overwrite/export rechazados sin mutar el artifact. Mirrors exit0. [QA local](../../audits/commercial/2026-10-09-pricing-v3-resource-composition.md). Task lint previo al move: template1/errors0/warnings0. Gates finales: task lint errors0/warnings0, ops lint exit0 con19 warnings de paridad preexistentes ajenos, closure exit0 con dos avisos advisory de contexto/registro. project_context revisado: su enlace V3 ya llega al índice y manual actualizados; Handoff/changelog/skills sincronizados. Contexto strict exit0/errors0/warnings0. sin UI/verificación remota aplicable.
 
 ## Closing Protocol
 
-- [ ] Acceptance y evidencia registrados.
-- [ ] Lifecycle/registry/README sincronizados tras QA local.
-- [ ] TASK-2017 conserva economía parcial; límites canónicos visibles.
+- [x] Acceptance y evidencia registrados.
+- [x] Lifecycle/registry/README sincronizados tras QA local.
+- [x] TASK-2017 conserva economía parcial; límites canónicos visibles.
 
 ## Follow-ups
 

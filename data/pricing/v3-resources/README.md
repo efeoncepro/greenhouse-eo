@@ -9,4 +9,4 @@ TASK-2020. [Catálogo observado](ai-credits.review-v1.json):7packsHiggsfield y3M
 
 Disponibilidad y fechas de ejemplo son hipótesis, no saldo real/reserva. El planner usa catálogo, no Excel o precios escritos por agente. Mismo pack repetido sólo por supuesto explícito; no click/compra. El resultado conserva fuente/método/request/catálogo, sin checksum de quote ni aprobación.
 
-Catálogo separado del monetario actual, no `--catalog` de `quote`. Binding automático a quote/kit, cartera de clientes, reservas concurrentes, FX, Vercel/GCP y Adobe son siguientes incrementos. Baseline histórica y cotizaciones congeladas intactas.
+Catálogo separado del monetario actual, no `--catalog` de `quote`. [Compositor integrado](../v3-composition/README.md) une estos presupuestos al kernel/quote y recursos monetarios por demanda. Inventario/cartera/reservas live, FX real y planes/asignaciones confirmadas siguen pendientes. Baseline histórica y cotizaciones congeladas intactas.

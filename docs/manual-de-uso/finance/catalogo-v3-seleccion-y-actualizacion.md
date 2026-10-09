@@ -5,7 +5,15 @@ Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; 
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
+Para un pedido con herramientas/consumo y costos compartidos, usar la [composición integrada](componer-cotizacion-v3-con-herramientas.md). Los pasos de este manual conservan el carril legacy de kits explícitos.
+
 ## Qué hace el agente
+
+Antes de preparar el brief, leer las [reglas de herramientas por trabajo](../../documentation/finance/cotizador-v3-seleccion-herramientas.md):
+base Notion/Microsoft365 para todos, SEMrush para redactor SEO y Adobe/IA según alcance. Consultar el kit
+elegido y comprobar que cubre esas necesidades; si falta una, preparar actualización versionada antes de
+cotizar, sin dar por hecho que la CLI lee el registro del operador. Claude Team tiene referencia pública,
+no plan/cantidad de Efeonce confirmados. Conservar razón de inclusiones/omisiones y reparto explícito.
 
 1. Consultar catálogo/perfiles/variantes y kits. Elegir versión explícita con `--catalog`; sin esa opción usa la baseline `catalog.review-v1.json`, NO descubre automáticamente una versión más reciente.
 2. Traducir el pedido a brief: país del talento y mercado cliente, perfil, dedicación/horas, headcount, modalidad, duración, kit y alternativas. No introducir precios ni porcentajes inline.
@@ -31,7 +39,7 @@ Archivos nuevos usan `wx` y `0600`; nunca sobrescriben. Repetir comandos con `--
 
 ## Catálogo y reglas
 
-[Presupuesto IA](presupuestar-creditos-ia-v3.md): comando `resources budget` calcula desde catálogo de packs separado; no pasarlo a `quote` como catálogo monetario ni a `replay` como quote. Binding automático pendiente.
+[Presupuesto IA](presupuestar-creditos-ia-v3.md): comando `resources budget` calcula desde catálogo de packs separado; no pasarlo a `quote` como catálogo monetario ni a `replay` como quote. Binding al kernel disponible por `compose`; el presupuesto separado no es input directo de quote legacy.
 
 Los [antecedentes del operador](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md) completan costos actuales de herramientas y plataforma. Leerlos antes de normalizar: completar planes/asignaciones/fechas/FX y policy, convertir a registros y kit, luego preview/apply. No pasar ese JSON como brief o catálogo; el motor no lo importa. Adobe futuro sin fecha, rango Vercel y créditos AI requieren normalización explícita. Las cifras históricas de abajo describen sólo la baseline vigente de simulación.
 

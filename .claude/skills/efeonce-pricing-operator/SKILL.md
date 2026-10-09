@@ -160,3 +160,15 @@ reutilizar confirmación de otra propuesta/base/impacto. Apply local no es aprob
 runtime; cotizar con el sucesor requiere `--catalog new-version.json`. Nunca reprecificar artefactos existentes.
 Snapshot `calculate` permanece como operación de bajo nivel. Excel/workbook CLI es investigación histórica,
 no dependencia del flujo V3. API/UI/MCP canónicos quedan fuera de la implementación local.
+
+## Cotizador V3: composición de herramientas por demanda
+
+Para pedidos con personas/servicio más licencias, plataforma o créditos, usar `pricing:v3 compose prepare|quote`
+con catálogo monetario, policy y catálogo de créditos explícitos. [Manual](../../../docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md).
+Interpretar perfil/tareas sin cambiar salario por especialidad inferida; base Notion/M365 obligatoria, SEO→SEMrush,
+Adobe/IA según trabajo. IA se elige con motivo; planes múltiples requieren priceId, no el más barato por defecto.
+Declarar slots/seatCapacity/contrato, cantidad, driver/parte atribuida y presupuesto por proveedor/mes. No inventar
+precios, denominadores ni permisos de compartir seats; dedicación parcial no reduce licencia automáticamente.
+Quote nuevo congela todos los inputs; explain/replay usan ese artefacto. Tres fixtures son hipótesis, no defaults
+operativos; Adobe current/EURsinFX/faltantes bloquean. Composición es simulation/requires_review y export bloqueado;
+servicios conservan unidad comercial, pricing de capacidad interno no valida fee/contrato del programa.

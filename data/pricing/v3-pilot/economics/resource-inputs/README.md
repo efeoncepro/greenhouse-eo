@@ -8,6 +8,12 @@ Vercel60–100 y GCP264 son mensuales, confirmados por el operador: pool324–36
 
 ## Uso por agentes
 
+Las [reglas de selección confirmadas](tool-selection.operator-2026-10-09.json) agregan Notion/Microsoft365
+como base común y SEMrush para redacción SEO; Adobe/IA dependen del trabajo. Incluyen Claude Team con
+[cuatro referencias públicas verificadas](claude-team.public-pricing-2026-10-09.json), separadas de gasto
+real/asignaciones aún desconocidos. [Reglas y límites](../../../../../docs/documentation/finance/cotizador-v3-seleccion-herramientas.md).
+Estos JSON tampoco son inputs ejecutables ni actualizan kits automáticamente.
+
 Las capturas posteriores completan [paquetes extra y planner IA](../../../v3-resources/README.md): suscripción y compra incremental separadas. Planner local operativo, sin import automático al catálogo monetario ni reservas live.
 
 1. Leer estos inputs junto al [catálogo local](../../../v3-catalog/README.md), conservando fuente/fecha. No sustituir versiones ni quotes anteriores.
@@ -19,3 +25,7 @@ Las capturas posteriores completan [paquetes extra y planner IA](../../../v3-res
 [Tratamiento de costos compartidos](../../../../../docs/documentation/finance/cotizador-v3-provisiones-y-costos.md#licencias-y-plataforma-declaradas-por-el-operador).
 
 Verificación local: JSON/5registros, aritmética306 y pool324–364, asignaciones desconocidas y enlaces válidos; Excel, catálogos baseline/candidato y nueve artefactos piloto intactos frente a Git. Task lint0errores/0warnings. Sin cambios de código; no requiere repetir tests del kernel. La promoción/asignación comercial sigue pendiente.
+
+## Integración local TASK-2021
+
+[Policy y compositor ejecutables](../../../v3-composition/README.md) normalizan selección/precios de revisión y unen herramientas, cuotas de plataforma declaradas y presupuesto IA al kernel. Estos antecedentes raw no se importan automáticamente. Adobe current sigue bloqueado; Claude público y datos históricos/asignaciones de ensayo no acreditan gastos actuales. Baseline/quotes previas intactas; economía TASK-2017 parcial.

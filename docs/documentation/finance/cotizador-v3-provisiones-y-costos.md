@@ -53,7 +53,7 @@ Compromiso anual con pago mensual necesita términos de contrato separados: unit
 
 ## Licencias y plataforma declaradas por el operador
 
-[Presupuesto IA y recargas](cotizador-v3-creditos-ia.md): primitive/CLI incorpora paquetes enteros observados, remanente/caducidad y costo de compra separado de cuota existente. No hidrata automáticamente quote/kit ni modifica el reparto de plataforma pendiente.
+[Presupuesto IA y recargas](cotizador-v3-creditos-ia.md): primitive/CLI incorpora paquetes enteros observados, remanente/caducidad y costo de compra separado de cuota existente. El [compositor](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md) integra presupuestos y asignaciones declaradas al quote local; el reparto real de plataforma sigue pendiente.
 
 [Registro2026-10-09](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md): Higgsfield139USD/mes con3000créditos, Magnific40EUR/mes con45000créditos, Adobe180USD/mes y3CC Teams+3Express, Vercel60–100USD/mes, GCP/BBDD264USD/mes. Son declaraciones del operador; no facturas verificadas, import automático, accesos asignados ni tarifa aprobada. Magnific mantiene EUR y requiere FX explícito al convertir.
 

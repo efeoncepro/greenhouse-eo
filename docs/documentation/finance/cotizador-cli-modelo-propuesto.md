@@ -79,7 +79,7 @@ Asignación al trabajo → personas, cuentas, consumo o capacidad compartida
 Cotización → costo de herramientas necesario para ese trabajo
 ```
 
-Cada perfil tiene un kit predeterminado editable, con herramientas requeridas y opcionales. Por ejemplo, un diseñador puede necesitar suite de diseño, AI y revisión; un consultor CRM, acceso a entorno de trabajo/sandbox, automatización y AI. Son categorías ilustrativas; aún no hay kits ni tarifas aprobados.
+Cada perfil tiene un kit predeterminado editable, con herramientas requeridas y opcionales. Por ejemplo, un diseñador puede necesitar suite de diseño, AI y revisión; un consultor CRM, acceso a entorno de trabajo/sandbox, automatización y AI. Son categorías ilustrativas. El operador confirmó [base común y selección por trabajo](cotizador-v3-seleccion-herramientas.md): Notion/Microsoft365 para todos, SEMrush para redactor SEO, Adobe/IA según tarea y Claude Team como recurso a costear cuando se asigna. La [composición local](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md) conecta esas reglas y costos al quote con asignaciones explícitas. Tarifas/planes actuales y repartos reales siguen pendientes; los kits históricos no se actualizan por esta declaración.
 
 La relación pertenece al perfil, pero la licencia se asigna a una persona, un equipo o una cuenta. No toda repetición de un rol requiere comprar una licencia nueva; tampoco se presupone que una licencia de usuario se pueda compartir.
 

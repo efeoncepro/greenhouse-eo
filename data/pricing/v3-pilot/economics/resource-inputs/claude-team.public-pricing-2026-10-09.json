@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.public-license-reference.v1",
+  "recordedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "provider": "Anthropic",
+  "product": "Claude Team",
+  "runtimeUse": "review_only",
+  "automaticCatalogUpdate": false,
+  "source": {
+    "kind": "official_public_pricing",
+    "urls": ["https://claude.com/pricing", "https://support.claude.com/en/articles/9266767-what-is-the-team-plan", "https://support.claude.com/en/articles/9267247-get-started-with-the-team-plan"],
+    "checkedAt": "2026-10-09",
+    "invoiceVerified": false,
+    "region": "US_public_reference",
+    "currency": "USD",
+    "taxIncluded": false,
+    "effectiveFrom": null,
+    "priceValidUntil": null,
+    "note": "Precio público observado, no factura ni contrato de Efeonce. Confirmar precio, moneda e impuestos en la región de contratación; no se inventa vigencia contractual."
+  },
+  "variants": [
+    {"id": "claude-team-standard-monthly", "seatType": "standard", "billingFrequency": "month", "amountPerSeatPerPayment": "25", "monthlyEquivalentPerSeat": "25", "currency": "USD"},
+    {"id": "claude-team-standard-annual", "seatType": "standard", "billingFrequency": "year", "amountPerSeatPerPayment": "240", "monthlyEquivalentPerSeat": "20", "currency": "USD", "annualAmountBasis": "published_monthly_equivalent_times_12"},
+    {"id": "claude-team-premium-monthly", "seatType": "premium", "billingFrequency": "month", "amountPerSeatPerPayment": "125", "monthlyEquivalentPerSeat": "125", "currency": "USD"},
+    {"id": "claude-team-premium-annual", "seatType": "premium", "billingFrequency": "year", "amountPerSeatPerPayment": "1200", "monthlyEquivalentPerSeat": "100", "currency": "USD", "annualAmountBasis": "published_monthly_equivalent_times_12"}
+  ],
+  "publishedTeamMinimum": {"members": 2, "basis": "current_canonical_pricing_and_help_pages", "efeonceContractVerified": false},
+  "efeonceSubscription": {"seatTypes": null, "purchasedSeats": null, "assignedMemberIds": null, "freeSeats": null, "billingFrequency": null, "billingEntity": null, "effectiveFrom": null, "invoiceAmount": null},
+  "additionalUsage": {"budget": null, "rate": null, "note": "No inventar créditos incluidos, costo de excedentes ni equivalencia con paquetes Higgsfield/Magnific desde el precio de un seat; requiere política y presupuesto propios."},
+  "selection": {"rule": "include_when_needed_and_assigned", "defaultVariant": null, "universalRequirementConfirmed": false},
+  "pending": ["regional_checkout_or_invoice", "actual_seat_types_and_count", "billing_and_contract_dates", "named_assignments", "allocation_policy", "additional_usage_if_needed"]
+}

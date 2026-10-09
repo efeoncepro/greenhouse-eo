@@ -1,5 +1,7 @@
 # Commercial Audits
 
+- [Composición local V3 — 09/10/2026](2026-10-09-pricing-v3-resource-composition.md): herramientas por trabajo, pools/créditos integrados, 108 tests y tres simulaciones reproducibles.
+
 - [Lógica del prototipo de cotizador — 09/10/2026](2026-10-09-pricing-workbook-logic-analysis.md): 13 hojas, dependencias, dos rutas de cálculo, casos conciliados y reglas incompletas para una CLI independiente.
 - [CLI de Excel/costeo local — 09/10/2026](2026-10-09-pricing-workbook-cli.md): 23 tests, extracción conciliada y alternativa sin UI/DB.
 Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.

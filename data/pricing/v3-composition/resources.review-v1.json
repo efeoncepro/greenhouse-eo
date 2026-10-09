@@ -1,0 +1,298 @@
+{
+  "schemaVersion": "pricing-v3-resource-policy/1",
+  "version": "operator-rules-review-2026-10-09-v1",
+  "mode": "review_only",
+  "source": {
+    "reference": "operator-tool-selection-2026-10-09",
+    "effectiveFrom": "2026-10-09",
+    "effectiveUntil": "9999-12-31",
+    "status": "estimated"
+  },
+  "commonToolIds": [
+    "notion",
+    "microsoft-365"
+  ],
+  "taskCodes": [
+    "seo-writing",
+    "visual-design",
+    "image-generation",
+    "image-upscale"
+  ],
+  "profileTasks": [
+    {
+      "profileId": "ECG-011",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-002",
+      "tasks": [
+        "visual-design"
+      ]
+    },
+    {
+      "profileId": "ECG-020",
+      "tasks": [
+        "seo-writing"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "toolId": "notion",
+      "label": "Notion",
+      "tasks": [],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-015"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current plan, invoice and purchased-seat quantity not confirmed."
+        }
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "label": "Microsoft 365",
+      "tasks": [],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-016"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current plan, invoice and purchased-seat quantity not confirmed."
+        }
+      ]
+    },
+    {
+      "toolId": "semrush",
+      "label": "SEMrush",
+      "tasks": [
+        "seo-writing"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-004"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current subscription and sharing/consumer allocation not confirmed."
+        }
+      ]
+    },
+    {
+      "toolId": "adobe",
+      "label": "Adobe Creative Cloud",
+      "tasks": [
+        "visual-design"
+      ],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-001"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "USD180 reported covers unresolved CC Teams/Express scope; renewal date and breakdown pending."
+        }
+      ]
+    },
+    {
+      "toolId": "chatgpt",
+      "label": "ChatGPT",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical-plus",
+          "basis": "seat",
+          "catalogResourceId": "ETG-007"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current ChatGPT plan and invoice not confirmed."
+        }
+      ]
+    },
+    {
+      "toolId": "claude-team",
+      "label": "Claude Team",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "standard-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "25",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "claude-public-pricing-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "minimumContractSeats": 2
+        },
+        {
+          "priceId": "standard-annual",
+          "basis": "seat",
+          "price": {
+            "amount": "240",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "claude-public-pricing-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "minimumContractSeats": 2
+        },
+        {
+          "priceId": "premium-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "125",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "claude-public-pricing-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "minimumContractSeats": 2
+        },
+        {
+          "priceId": "premium-annual",
+          "basis": "seat",
+          "price": {
+            "amount": "1200",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "claude-public-pricing-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "minimumContractSeats": 2
+        }
+      ]
+    },
+    {
+      "toolId": "higgsfield",
+      "label": "Higgsfield",
+      "tasks": [
+        "image-generation"
+      ],
+      "access": "credits",
+      "ai": true,
+      "prices": [],
+      "providerId": "higgsfield"
+    },
+    {
+      "toolId": "magnific",
+      "label": "Magnific",
+      "tasks": [
+        "image-upscale"
+      ],
+      "access": "credits",
+      "ai": true,
+      "prices": [],
+      "providerId": "magnific"
+    },
+    {
+      "toolId": "vercel",
+      "label": "Vercel Greenhouse",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "reported-range-minimum",
+          "basis": "package",
+          "price": {
+            "amount": "60",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          }
+        },
+        {
+          "priceId": "reported-range-maximum",
+          "basis": "package",
+          "price": {
+            "amount": "100",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "toolId": "gcp",
+      "label": "GCP BBDD",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "reported-monthly",
+          "basis": "package",
+          "price": {
+            "amount": "264",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -234,3 +234,20 @@ Status real sigue Parcial: faltan costo actual, modalidad/delivery, capacidad, c
 Operador aporta Higgsfield139USD/3000créditos y Magnific40EUR/45000créditos mensuales, Adobe180USD/mes y3CC Teams+3Express con alza70% próxima, Vercel60–100USD/mes y GCP264USD/mes. Magnific mensual explícito; Vercel/GCP confirmados mensuales en respuesta posterior. Registro con fuente operator_statement, sin factura ni asignaciones inventadas. Cobertura/base del alza Adobe y fecha pendientes;306 condicional. Pool plataforma324–364USD/mes, reparto delivery/interno propuesto, sin precio por cliente.
 
 Datos review-only; no cambiar baseline histórico, quotes previas, DB/CLI o runtime. ADR de mantenimiento reutilizado; integración futura por normalización + preview/apply. Costeo de servicios y acceso API/Globe no se certifican por este registro. Task conserva Parcial.
+
+## Avance 2026-10-09 — selección de herramientas por trabajo
+
+Operador confirma base común Notion/Microsoft365 para todos y SEMrush para redactor SEO; Adobe no requerido
+por redacción sola. Higgsfield/Magnific/ChatGPT y Claude Team se seleccionan según trabajo; no se declara
+IA universal ni exclusividad. [Reglas y registro](../../documentation/finance/cotizador-v3-seleccion-herramientas.md).
+Precios Claude Team investigados a petición del operador en fuentes oficiales: cuatro variantes públicas,
+separadas de cantidad/tipos/asignación/factura Efeonce desconocidos. No se normaliza el precio como gasto real.
+
+Clarificación documental bajo ADR de catálogo existente, sin modificación de kernel/CLI/schema runtime.
+JSON/enlaces/correspondencia con IDs históricos y anualidades verificados; catálogos/artefactos previos
+intactos. Se actualizó manual y modelo; no corresponde repetir tests de código por este delta documental.
+TASK-2017 sigue Parcial: falta normalizar kits/valores, reparto, binding al quote y economía comercial.
+
+## Avance 2026-10-09 — composición integrada local
+
+[TASK-2021](../complete/TASK-2021-pricing-v3-demand-resource-composition.md) integra reglas/allocations/IA al quote, explain y replay; tres casos reproducibles y108 tests verdes. Policy inicial para Copywriter/diseñador senior/SEO Specialist. [Manual](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md). Asignaciones hipotéticas e históricos explícitos, sin inventario o tarifa comercial aprobada. TASK-2017 sigue Parcial: planes/costos vigentes, drivers reales, alcance/delivery y aprobación económica pendientes.

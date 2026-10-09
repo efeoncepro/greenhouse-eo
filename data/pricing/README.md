@@ -28,4 +28,6 @@ No importar esta proyección como catálogo comercial vigente ni exponer costos 
 
 [Licencias y plataforma declaradas por el operador](v3-pilot/economics/resource-inputs/README.md): montos actuales, créditos, renovación Adobe y reparto pendiente; antecedente para actualizar catálogo, no import automático.
 
-[Presupuesto IA por CLI](v3-resources/README.md): suscripción atribuida y paquetes extra enteros, remanente y vencimiento; revisión obligatoria. Binding automático a quote y reparto de plataforma pendientes.
+[Presupuesto IA por CLI](v3-resources/README.md): suscripción atribuida y paquetes extra enteros, remanente y vencimiento; revisión obligatoria. Binding al quote por el compositor siguiente; datos de reparto reales pendientes.
+
+[Composición por demanda](v3-composition/README.md): base común, herramientas por perfil/tarea y presupuestos IA integrados; CLI compose/explain/replay, tres casos de simulación.

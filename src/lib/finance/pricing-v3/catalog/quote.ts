@@ -11,6 +11,12 @@ export const QUOTE_VERSION = 'pricing-v3-selection-quote/1'
 /** Capacity timeline orchestration; all selling prices come from the existing kernel. */
 export function calculateCatalogQuote(catalog: unknown, brief: unknown) {
   const resolution = resolveBrief(catalog, brief)
+
+  return calculateResolvedQuote(resolution)
+}
+
+/** Shared orchestration for resolved catalog and composed resource snapshots. */
+export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrief>) {
   const diagnostics: Diagnostic[] = [...resolution.diagnostics]
 
   const periods =

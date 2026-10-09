@@ -32,4 +32,4 @@ Diagnósticos: proveedor desconocido, capacidad disponible fuera del paquete, su
 
 ## Llevarlo a la cotización
 
-Este paso sigue pendiente de binding automático al catálogo/brief y composición de servicios. El resultado es evidencia de presupuesto, no input directo para quote. Finance/Operations normaliza recursos y reglas siguiendo [mantenimiento de catálogo](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md), conservando moneda, alcance, fuentes y costos sin duplicar. No emitir cotización comercial sólo porque el planner calcule.
+El [compositor de recursos](componer-cotizacion-v3-con-herramientas.md) integra presupuestos agregados por proveedor/mes al kernel y quote local. Este comando de presupuesto separado mantiene su propio formato. El resultado es evidencia de presupuesto, no input directo para quote. Finance/Operations normaliza recursos y reglas siguiendo [mantenimiento de catálogo](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md), conservando moneda, alcance, fuentes y costos sin duplicar. No emitir cotización comercial sólo porque el planner calcule.
