@@ -528,6 +528,82 @@ S.append(('Comunidad y PR', page('Pibank · Comunidad y PR', halo_platform(1300,
     means('La comunidad sostiene la relación con quien ya llegó; los medios suman alcance y referencias. Ambos llevan a recursos útiles, no a avisos.',
           'Medios prioritarios. Publicar y enlazar es decisión de cada medio; Comunicaciones aprueba mensajes y voceros. El newsletter es un ejemplo ilustrativo.') + bubble(), section=2)))
 
+# 15b · Muestra X-Ray (v12, 2026-10-09) — capítulo 2 · mockup dibujado (no captura) del X-Ray publicado en Think:
+# ventana en el paso «La radiografía» (landing de Cuenta Soles + anotaciones) y celular con la guía comparativa.
+# La clave del enlace no está en git: se lee del expediente del caso.
+XR_KEY_FILE = os.path.expanduser('~/Documents/Banco Pichincha Peru — Prospect Case/09-XRay-Pibank/SAMPLE_KEY.txt')
+XR_URL = 'https://think.efeoncepro.com/aeo-xray/r/' + open(XR_KEY_FILE).read().strip()
+XR_LANDING, XR_ARTICLE = 'd666401a8b28f43aa9daadbbdbcb94df', 'bc1aea914f880d208215d36f7ec1553b'
+PNAVY, PYEL = '#0F265C', '#FFDC00'
+PIBN = lambda h: f'<img src="data:image/svg+xml;base64,{base64.b64encode(open(os.path.join(HERE, "logos-cliente/pibank-logo-navy.svg"), "rb").read()).decode()}" alt="Pibank" style="height: {h}px; width: auto; display: block">'
+glines = lambda ws, c='rgba(15, 38, 92, 0.16)', h=5: ''.join(f'<div style="height: {h}px; width: {w}%; border-radius: 3px; background: {c}; margin-top: 6px"></div>' for w in ws)
+scan = (f'<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="display: block"><path d="M1 6V1h5M12 1h5v5M17 12v5h-5M6 17H1v-5" fill="none" stroke="{SOFT_}" stroke-width="1.8"/></svg>')
+steps = ''.join(f'<div style="display: flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; '
+                f'{"background: " + ACC + "; color: #ffffff; box-shadow: 0 0 22px rgba(3, 117, 219, 0.55)" if on else "color: " + SOFT_}">'
+                f'<span style="width: 17px; height: 17px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; '
+                f'{"background: rgba(255, 255, 255, 0.25)" if on else "box-shadow: inset 0 0 0 1px rgba(207, 228, 250, 0.45)"}">{n}</span>{t}</div>'
+                for n, t, on in [(1, 'La oportunidad', False), (2, 'La pieza', False), (3, 'La radiografía', True), (4, 'Dónde más vive', False)])
+probe = f'<span style="position: absolute; right: -7px; top: -7px; width: 13px; height: 13px; border-radius: 50%; background: {ACC}; box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(3, 117, 219, 0.9)"></span>'
+tabs = ''.join(f'<span style="padding: 4px 11px; border-radius: 999px; font-size: 10px; font-weight: 500; {"background: " + PNAVY + "; color: #ffffff" if k == 0 else "color: " + PNAVY}">{t}</span>' for k, t in enumerate(['Tasa', 'Costos', 'Uso']))
+landing = (f'<div style="background: #ffffff; color: {PNAVY}; height: 100%; overflow: hidden; font-family: {ST}">'
+           f'<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px">{PIBN(17)}'
+           f'<div style="display: flex; align-items: center; gap: 14px; font-size: 10px; color: {PNAVY}"><span>Beneficios</span><span>Condiciones</span><span>Preguntas</span>'
+           f'<span style="padding: 6px 10px; border-radius: 4px; background: {PYEL}; font-weight: 600">Conocer las condiciones</span></div></div>'
+           f'<div style="position: relative; height: 196px; overflow: hidden"><img src="{BL(XR_LANDING)}" alt="" style="position: absolute; left: 0; top: 0; width: 100%; height: 196px; object-fit: cover">'
+           f'<div style="position: absolute; left: 18px; top: 30px; width: 230px"><div style="font-size: 27px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05">Cuenta Soles Pibank</div>'
+           f'<div style="font-size: 10.5px; line-height: 1.45; color: #34436a; margin-top: 8px">Ahorra en soles con 5% TREA desde el primer sol, sin comisiones de mantenimiento.</div>'
+           f'<div style="display: inline-block; margin-top: 12px; padding: 7px 12px; border-radius: 4px; background: {PYEL}; font-size: 10.5px; font-weight: 600">Conocer las condiciones →</div></div></div>'
+           f'<div style="position: relative; margin: 14px 18px 0; padding: 10px 12px; border-radius: 6px; box-shadow: 0 0 0 2px {ACC}; background: rgba(3, 117, 219, 0.06)">{probe}'
+           f'<div style="font-size: 10.5px; line-height: 1.45; color: #23325a">La Cuenta Soles Pibank es una cuenta de ahorros 100% digital en soles: paga 5% TREA desde el primer sol y no cobra mantenimiento.</div></div>'
+           f'<div style="margin: 14px 18px 0; padding: 12px 14px; border-radius: 6px; background: #f4f6fa"><div style="display: flex; gap: 4px; padding: 3px; width: fit-content; border-radius: 999px; background: #ffffff; box-shadow: inset 0 0 0 1px #dce2ec">{tabs}</div>'
+           f'<div style="display: flex; align-items: center; gap: 16px; margin-top: 10px"><div style="font-size: 40px; font-weight: 500; letter-spacing: -0.02em; line-height: 1">5.00%</div>'
+           f'<div style="font-size: 10px; line-height: 1.4; color: #34436a">TEA igual a la TREA desde S/ 1,<br>base de 360 días</div></div></div></div>')
+def xcard(status, title, text, on=False):
+    box = f'box-shadow: 0 0 0 2px {ACC}, 0 0 26px rgba(3, 117, 219, 0.35); background: rgba(3, 117, 219, 0.12)' if on else 'box-shadow: inset 0 0 0 1px rgba(207, 228, 250, 0.18)'
+    dot = f'<span style="position: absolute; left: -7px; top: 14px; width: 13px; height: 13px; border-radius: 50%; background: {ACC}; box-shadow: 0 0 0 2px #0a1c3a"></span>' if on else ''
+    return (f'<div style="position: relative; padding: 11px 13px; border-radius: 10px; {box}">{dot}<div style="font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {SOFT_}">{status}</div>'
+            f'<div style="font-size: 14px; font-weight: 600; margin-top: 4px">{title}</div><div style="font-size: 11.5px; line-height: 1.4; color: #c9d6e2; margin-top: 4px">{text}</div></div>')
+radio = (f'<div style="height: 100%; box-sizing: border-box; padding: 16px 18px; background: #0a1c3a">'
+         f'<div style="display: flex; justify-content: space-between; align-items: center"><div style="font-family: {ID}; font-size: 19px; font-weight: 740">La radiografía</div>'
+         f'<div style="padding: 4px 10px; border-radius: 999px; font-size: 10px; color: {SOFT_}; box-shadow: inset 0 0 0 1px rgba(207, 228, 250, 0.3)">Ver toda la capa</div></div>'
+         f'<div style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {SOFT_}; margin: 14px 0 10px">Cómo está escrito</div>'
+         f'<div style="display: grid; gap: 9px">'
+         + xcard('Elemento · propuesto', 'Respuesta compacta', 'Para qué sirve: entender la decisión antes del detalle, con alcance y condiciones.', True)
+         + xcard('Elemento · propuesto', 'Condiciones junto al dato', 'Tasa, base, fecha y fuente viajan juntas.')
+         + xcard('Medido · AEO', 'Qué responde hoy la IA', 'AI Mode cita a Afluenta, Comparabanca e Infobae, no a pibank.pe.')
+         + '</div></div>')
+window = (f'<div style="position: absolute; left: 800px; top: 176px; width: 800px; height: 610px; border-radius: 18px; overflow: hidden; background: #0b1f45; '
+          f'box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 50px 110px rgba(0, 6, 16, 0.75), 0 0 120px rgba(3, 117, 219, 0.3)">'
+          f'<div style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #071634">'
+          + ''.join('<span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(207, 228, 250, 0.3)"></span>' for _ in range(3)) +
+          f'<div style="margin-left: 18px; padding: 5px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); font-size: 11px; color: {SOFT_}">think.efeoncepro.com/aeo-xray</div></div>'
+          f'<div style="height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.08)">'
+          f'<div style="display: flex; align-items: center; gap: 10px">{scan}<span style="font-size: 16px; font-weight: 600">X-Ray</span><span style="font-size: 11px; color: {SOFT_}">El contenido, por dentro</span></div>'
+          f'<div style="padding: 6px 12px; border-radius: 8px; background: #ffffff">{PIBN(15)}</div></div>'
+          f'<div style="height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08)">{steps}</div>'
+          f'<div style="display: grid; grid-template-columns: 500px minmax(0, 1fr); height: 470px">{landing}{radio}</div></div>')
+phone = (f'<div style="position: absolute; left: 1580px; top: 366px; width: 200px; height: 420px; box-sizing: border-box; padding: 9px; border-radius: 36px; background: #050d1f; '
+         f'box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 40px 90px rgba(0, 6, 16, 0.8)">'
+         f'<div style="height: 100%; border-radius: 28px; overflow: hidden; background: #ffffff; color: {PNAVY}">'
+         f'<div style="padding: 16px 14px 10px">{PIBN(13)}</div>'
+         f'<img src="{BL(XR_ARTICLE)}" alt="" style="display: block; width: 100%; height: 112px; object-fit: cover">'
+         f'<div style="padding: 12px 14px"><div style="font-size: 8px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #4a5a7a">Ahorro en simple</div>'
+         f'<div style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; margin-top: 6px">¿Qué cuenta de ahorros te conviene?</div>'
+         + glines([96, 88, 60]) +
+         ''.join(f'<div style="display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid #dce2ec; font-size: 10px; margin-top: {8 if k == 0 else 0}px"><span style="font-weight: 600">{a}</span><span style="color: #4a5a7a">{b}</span></div>'
+                 for k, (a, b) in enumerate([('Rendimiento', 'TREA'), ('Costos', 'ITF y comisiones'), ('Liquidez', 'Cómo retiras')])) +
+         '</div></div></div>')
+QR_SVG = open(os.path.join(os.path.dirname(XR_KEY_FILE), 'qr-muestra.svg')).read()  # codifica XR_URL; fuera de git
+S.append(('Muestra X-Ray', page('Pibank · Muestra X-Ray', halo_platform(1290, 480, 1290, 800, 560, 44) + window + phone +
+    col(eyebrow('Una muestra, ya hecha') + headline(['Ya hay una', 'muestra hecha', 'con Cuenta Soles'], 72, extra='; margin-top: 64px') +
+        body('Con datos públicos de Pibank preparamos una landing de Cuenta Soles y una guía para comparar cuentas. El X-Ray las abre por dentro: lo que ve la persona, lo que lee la máquina y lo que responde hoy la IA.', 21, 580, extra='; margin-top: 36px') +
+        f'<div style="display: grid; grid-template-columns: 116px minmax(0, 1fr); column-gap: 24px; align-items: center; margin-top: 34px">'
+        f'<a href="{XR_URL}" aria-label="Abrir la muestra X-Ray de Pibank" style="display: block; width: 116px; height: 116px; box-sizing: border-box; padding: 8px; border-radius: 14px; background: #ffffff">{QR_SVG}</a>'
+        f'<div>{label("Ábrela aquí", W_)}<a href="{XR_URL}" style="display: block; font-family: {ID}; font-size: 26px; font-weight: 740; letter-spacing: -0.01em; color: #ffffff; text-decoration: none; margin-top: 6px">think.efeoncepro.com</a>'
+        f'<div style="font-size: 16px; font-weight: 300; line-height: 1.4; color: {SOFT_}; margin-top: 4px">Escanea el código o haz clic. Enlace privado, no aparece en buscadores.</div></div></div>', 120, 620) +
+    means('Es una muestra de lo que entrega el programa: el pilar de Cuenta Soles (M1–M2), las guías comparativas (desde M3) y lo que mide el panel AEO (lámina ⟦Respuestas de IA (AEO)⟧).',
+          'Muestra editorial con datos públicos consultados el 08-10-2026; no está publicada en pibank.pe. Fotos ilustrativas generadas. Publicarla requiere el visto bueno de Producto y Cumplimiento.') + bubble(), section=2)))
+
 # 16 · SEM — capítulo 2 · los mismos 100 clics, dos páginas: los puntos encendidos son aperturas (geometría desde el dato)
 def sbar(lab, w, color, val, glow=False):
     return (f'<div style="display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 24px; align-items: center; padding: 16px 0; border-top: 1px solid {RULE_}">'
@@ -858,7 +934,7 @@ assert not any('⟦' in h for _, h in S)
 
 # ── canvas: cuatro láminas por fila ──
 N = len(S)
-assert N == 46, N
+assert N == 47, N
 idx = json.load(open(f'{ROOT}/canvas.json'))
 for f in list(idx['boards']):
     if f.startswith('Tec-'):
@@ -872,7 +948,7 @@ idx['order'] = [f'Tec-{i + 1:02d}.dc.html' for i in range(N)] + others
 for p in idx['pages']:
     if p['id'] == 'tecnica':
         p['name'] = f'Propuesta técnica · {N}'
-idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v11 del 08-10 · con la evaluación 2026 que pidió el banco'
+idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v12 del 09-10 · con la evaluación 2026 y la muestra X-Ray'
 idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Andrés, Valentina, Julio y Daniela confirmados; diseño visual por asignar antes del inicio.\n\n'
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'

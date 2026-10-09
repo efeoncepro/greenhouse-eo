@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFString } from 'pdf-lib';
 const [dir, blobs, out] = process.argv.slice(2);
 const map = Object.fromEntries(fs.readdirSync(blobs).map(f => [f.split('.')[0], `file://${blobs}/${f}`]));
 const b = await chromium.launch();
@@ -14,8 +14,15 @@ for (const f of files) {
   await p.goto('file://' + tmp, { waitUntil: 'networkidle' });
   await p.evaluate(() => document.fonts.ready);
   const buf = await p.screenshot({ type: 'jpeg', quality: 92 });
+  // Enlaces externos de la lámina → zonas clicables en el PDF (la lámina entra como imagen).
+  const links = await p.$$eval('a[href^="http"]', as => as.map(a => { const r = a.getBoundingClientRect(); return { href: a.href, x: r.left, y: r.top, w: r.width, h: r.height }; }).filter(l => l.w > 0 && l.h > 0));
   fs.unlinkSync(tmp);
   const j = await pdf.embedJpg(buf); const pg = pdf.addPage([960, 540]); pg.drawImage(j, { x: 0, y: 0, width: 960, height: 540 });
+  for (const l of links) {
+    const rect = [l.x / 2, 540 - (l.y + l.h) / 2, (l.x + l.w) / 2, 540 - l.y / 2];
+    const annot = pdf.context.obj({ Type: 'Annot', Subtype: 'Link', Rect: rect, Border: [0, 0, 0], A: { Type: 'Action', S: 'URI', URI: PDFString.of(l.href) } });
+    pg.node.addAnnot(pdf.context.register(annot));
+  }
 }
 pdf.setTitle('Pibank · Propuesta técnica SEO y AEO 2027'); pdf.setAuthor('Efeonce');
 fs.writeFileSync(out, await pdf.save()); await b.close(); console.log('pages', files.length);

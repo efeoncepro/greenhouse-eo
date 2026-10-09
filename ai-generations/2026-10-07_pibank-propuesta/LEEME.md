@@ -1,11 +1,11 @@
 # Pibank · Propuesta técnica SEO/AEO 2027 — carpeta de producción
 
-Producción de la propuesta técnica para Pibank (Banco Pichincha Perú). Vigente: **v11 del 2026-10-08**, 46 láminas
-16:9, línea Engine, con la evaluación 2026 que pidió el banco (registro: `docs/audits/commercial/2026-10-08-pibank-propuesta-tecnica-v11.md`). La v10 (44) se conserva. Aprobada por el CEO para presentar y como **estilo alternativo canónico** para propuestas técnicas SEO/AEO
+Producción de la propuesta técnica para Pibank (Banco Pichincha Perú). Vigente: **v12 del 2026-10-09**, 47 láminas
+16:9, línea Engine: la v11 (evaluación 2026, registro `docs/audits/commercial/2026-10-08-pibank-propuesta-tecnica-v11.md`) más la lámina 20, «Muestra X-Ray», con un mockup dibujado del X-Ray publicado en Think y su enlace (QR y texto clicable en el PDF). La clave del enlace y el QR se leen del expediente del caso (`09-XRay-Pibank/SAMPLE_KEY.txt`, `qr-muestra.svg`), fuera de git. La v10 (44) y la v11 (46) se conservan. Aprobada por el CEO para presentar y como **estilo alternativo canónico** para propuestas técnicas SEO/AEO
 (los brochures siguen con las recetas de La órbita).
 
 - Canvas Design (privado): https://claude.ai/artifact/XpdEeKjFLWrCikqBEvnSfw, página «tecnica».
-- PDF vigente: `out/Pibank-Propuesta-tecnica-SEO-AEO-2027-v11.pdf` (copia en OneDrive `Alineación/4. Comercial/Licitaciones/Banco Pichincha/`, junto a la v10).
+- PDF vigente: `out/Pibank-Propuesta-tecnica-SEO-AEO-2027-v12.pdf` (copia en OneDrive `Alineación/4. Comercial/Licitaciones/Banco Pichincha/`, junto a la v10 y la v11). `render-pdf.mjs` copia los enlaces externos de cada lámina como zonas clicables.
 - Método y reglas: `.claude/skills/deck-studio/references/propuesta-tecnica-seo-sin-presentador.md`.
 - Intents del compositor: `docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/`.
 
