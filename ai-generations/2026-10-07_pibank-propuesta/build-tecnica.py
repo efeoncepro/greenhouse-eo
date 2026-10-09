@@ -877,7 +877,7 @@ for i, (k_, sub_, ms, mods, dec) in enumerate(quarters):
     qcards += obj(inner, 820 + i * 245, 250 if i else 222, 230, i == 0, '; height: ' + ('524px' if i == 0 else '484px') + '; padding: 22px 18px')
 at3 = ['Medición y panel de IA con línea base', 'Auditoría técnica y pilar mejorado', 'Hub y calculadora publicados', 'Hasta 15 artículos y comunidad activa']
 S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 500, 1300, 760, 600, 44) + qcards +
-    col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; luego,', 'trimestre a trimestre'], 64, extra='; margin-top: 56px') +
+    col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; <span style="font-weight: 300; letter-spacing: -0.025em">luego,</span>', '<span style="font-weight: 300; letter-spacing: -0.025em">trimestre a trimestre</span>'], 64, extra='; margin-top: 56px') +
         body('El primer trimestre deja la base funcionando. Desde ahí Pibank decide cada trimestre con el avance a la vista, sin firmar el año por adelantado.', 20, 560, extra='; margin-top: 26px') +
         label('Lo que tiene Pibank al mes 3', W_, extra='; margin-top: 30px') +
         ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 18px; line-height: 1.35; margin-top: 10px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in at3), 120, 600) +
