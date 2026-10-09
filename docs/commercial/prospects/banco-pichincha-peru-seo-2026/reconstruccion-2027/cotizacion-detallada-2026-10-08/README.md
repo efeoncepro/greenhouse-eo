@@ -6,6 +6,9 @@ Pedido: revisar el negocio Banco Pichincha/Pibank con todo su contexto y prepara
 
 ## Documento y edición
 
+**Vigente desde el 09-10 (rev. compromiso):** [PDF en soles](pen-v4/Pibank-Cotizacion-detallada-2027-PEN.pdf) · [PDF en USD](v2/Pibank-Cotizacion-detallada-2027-USD.pdf), 19 páginas cada una. Cambia el compromiso: programa anual con **compromiso inicial de seis meses** (primer semestre US$42.500 / S/ 146,072.50) y renovación trimestral con aviso de 30 días, en línea con la propuesta técnica v13 (láminas 42–45). Precios, alcance y tasa (S/ 3.437, fx/usd-pen-2026-10-08.json) sin cambios. Copias en OneDrive (raíz y `Cotizacion detallada 2027/2026-10-09-v2`, `…-PEN-v2`); registro en `entrega-2026-10-09.json`. Las versiones del 08-10 quedan preservadas.
+
+Histórico 08-10:
 - [PDF en soles · 19 páginas](pen-v3/Pibank-Cotizacion-detallada-2027-PEN.pdf) · [HTML PEN](pen-v3/Pibank-Cotizacion-detallada-2027-PEN.html).
 - [PDF original USD · 19 páginas](v1/Pibank-Cotizacion-detallada-2027.pdf).
 - [HTML autónomo con fuentes y marca embebidas](v1/Pibank-Cotizacion-detallada-2027.html).

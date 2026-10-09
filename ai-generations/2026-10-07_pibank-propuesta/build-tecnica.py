@@ -848,11 +848,10 @@ op = lambda t: f'<div style="font-family: {ID}; font-size: 34px; font-weight: 30
 sum_html = (f'<div style="margin-top: 14px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: {SOFT_}">Ruta recomendada · inversión anual</div><div style="margin-top: 8px; display: flex; align-items: center; gap: 12px">'
             + eqcell('Base · 12 meses', 54000) + op('+') + eqcell('Módulos · 12 meses', 25200) + op('=') + eqcell('Total anual', 79200, True) + '</div>')
 base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
-base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
-             + f'<div style="font-size: 18px; color: {SOFT_}; margin-top: 2px">{pen(4500)} al mes</div>'
-             + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc).replace('margin-top: 9px', 'margin-top: 7px'))
+base_card = (okicker('Qué incluye la base cada mes') + f'<div style="font-size: 17px; color: {SOFT_}; margin-top: 6px">US$4.500 · {pen(4500)} al mes</div>'
+             + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 18px; line-height: 1.35; margin-top: 10px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc))
 S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
-    obj(base_card, 140, 522, 600, True, '; height: 334px; padding-top: 20px') +
+    obj(base_card, 140, 560, 600, True, '; height: 280px; padding-top: 22px') +
     col(eyebrow('Inversión') + headline(['US$4.500 al mes,', '<span style="font-weight: 300; letter-spacing: -0.025em">más los módulos que</span>', '<span style="font-weight: 300; letter-spacing: -0.025em">construyen el plan</span>'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
     zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 12px">{menu_html}</div>' + sum_html, 880, 112, 820) +
@@ -892,19 +891,19 @@ S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 5
 # 25b · Costo por cuenta — capítulo 5 · la vara para medirnos: inversión ÷ cuentas con fondos aportadas (aritmética, sin promesa)
 scen = [('Prudente', 171, 'Evaluación 2026'), ('Central', 504, 'Evaluación 2026'), ('Favorable', 1357, 'Evaluación 2026'), ('Al nivel de la meta', 2081, 'Aporte con 1,03 M de visitas')]
 cpa = [round(79200 / n) for _, n, _ in scen]
-H25 = 330; base = 650
+H25 = 300; base = 650; NMAX = max(n for _, n, _ in scen)
 bars25 = ''
 for i, ((k, n, ref), c) in enumerate(zip(scen, cpa)):
-    x = 850 + i * 235; h = max(round(H25 * c / cpa[0]), 26); hero = k == 'Central'
+    x = 850 + i * 235; h = max(round(H25 * n / NMAX), 22); hero = k == 'Central'
     dep = n * 2500 / 1e6
-    bars25 += (f'<div style="position: absolute; left: {x - 25}px; top: {base - h - 84}px; width: 200px; text-align: center"><div style="font-family: {ID}; font-size: {46 if hero else 38}px; font-weight: 760; letter-spacing: -0.03em">US${c}</div><div style="font-size: 14px; color: {SOFT_}">{pen(c)} por cuenta</div></div>'
+    bars25 += (f'<div style="position: absolute; left: {x - 25}px; top: {base - h - 86}px; width: 200px; text-align: center"><div style="font-family: {ID}; font-size: {46 if hero else 38}px; font-weight: 760; letter-spacing: -0.03em; line-height: 1.05">{format(n, ",").replace(",", ".")} <span style="font-family: Poppins, sans-serif; font-size: 15px; font-weight: 400; letter-spacing: 0">cuentas</span></div><div style="font-size: 14px; color: {SOFT_}; margin-top: 4px">US${str(round(dep, 2)).replace(".", ",").rstrip("0").rstrip(",")} M en depósitos</div></div>'
                f'<div style="position: absolute; left: {x}px; top: {base - h}px; width: 150px; height: {h}px; border-radius: 10px 10px 4px 4px; background: {"linear-gradient(180deg, rgba(3, 117, 219, 1), rgba(3, 117, 219, 0.45)); box-shadow: 0 0 0 2px rgba(3, 117, 219, 0.95), 0 0 50px rgba(3, 117, 219, 0.5)" if hero else "linear-gradient(180deg, rgba(207, 228, 250, 0.45), rgba(207, 228, 250, 0.14))"}"></div>'
                f'<div style="position: absolute; left: {x - 25}px; top: {base + 14}px; width: 200px; text-align: center"><div style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {W_ if hero else SOFT_}">{k}</div>'
-               f'<div style="font-family: {ID}; font-size: 22px; font-weight: 700; margin-top: 4px">{format(n, ",").replace(",", ".")} cuentas</div>'
-               f'<div style="font-size: 13px; color: {W_}; margin-top: 3px">US${str(round(dep, 2)).replace(".", ",").rstrip("0").rstrip(",")} M en depósitos</div><div style="font-size: 12px; color: {SOFT_}; margin-top: 2px">{ref}</div></div>')
+               f'<div style="font-family: {ID}; font-size: 24px; font-weight: 740; margin-top: 4px">US${c} <span style="font-family: Poppins, sans-serif; font-size: 14px; font-weight: 400; color: {SOFT_}">por cuenta</span></div>'
+               f'<div style="font-size: 13px; color: {SOFT_}; margin-top: 2px">{pen(c)} · {ref}</div></div>')
 LT = '<span style="font-weight: 300; letter-spacing: -0.025em">'
 S.append(('Costo por cuenta', page('Pibank · Costo por cuenta', halo_only(1300, 520) + bars25 +
-    zone(label('Costo por cuenta con fondos: inversión anual ÷ cuentas que aporta el programa', W_), 820, 160, 960) +
+    zone(label('Cuentas con fondos que aporta el programa y lo que cuesta cada una', W_), 820, 160, 960) +
     zone(callout('Para comparar: lo que hoy le cuesta a Pibank cada cuenta con fondos que llega por pauta. Lo calculamos con sus datos en el mes 1.'), 820, 790, 960) +
     col(eyebrow('Proyección de retorno') + headline([LT + '¿Cuánto costaría</span>', LT + 'cada cuenta?</span>', 'Unos US$157'], 76, extra='; margin-top: 64px') +
         body('Es la inversión del año (US$79.200) dividida por las cuentas con fondos que aporta el programa en los escenarios de la lámina ⟦Evaluación 2026⟧ y al nivel de la meta de la lámina ⟦Cómo se conecta con la meta⟧. En el escenario central, unos US$157 por cuenta.', 20, 580, extra='; margin-top: 32px'), 120, 640) +

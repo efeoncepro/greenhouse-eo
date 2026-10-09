@@ -2,7 +2,7 @@
   "version": 2,
   "status": "draft_for_review",
   "reference": "EO–PIBANK–2027–01",
-  "date": "2026-10-08",
+  "date": "2026-10-09",
   "currency": "USD",
   "principal": "gradual",
   "tax": {
@@ -35,7 +35,7 @@
       "billing_unit": "mes",
       "full_plan_units": "12",
       "scope": "SEO técnico y schema pertinentes dentro de 8h CMS/mes, Panel AEO de 24 preguntas en 3 superficies: 72 observaciones iniciales y 144/mes desde M2, hasta 5 artículos/mes, evolución de contenidos y FAQ según evidencia, implementación web priorizada, medición, CRO y dirección",
-      "activation_terms": "12 meses; revisión trimestral"
+      "activation_terms": "Compromiso inicial de 6 meses; luego renovación trimestral"
     },
     {
       "id": "HUB",
@@ -762,7 +762,7 @@
       ],
       "subtitle": "Programa anual de SEO, AEO y autoridad para Pibank Perú",
       "label": "Cotización detallada · Ruta gradual recomendada",
-      "note": "Doce meses de ejecución durante 2027. Inicio y fechas exactas por acordar. Propuesta económica y condiciones para revisión."
+      "note": "Programa anual durante 2027, con compromiso inicial de seis meses y renovación trimestral. Inicio y fechas exactas por acordar. Propuesta económica y condiciones para revisión."
     },
     {
       "title": "Una inversión conectada al negocio",
@@ -820,7 +820,7 @@
         {
           "kind": "note",
           "title": "Cómo se compra",
-          "text": "Un servicio continuo de {{money:4500}} al mes, por doce meses, y proyectos/campañas acordados individualmente. La ruta gradual reserva {{money:79200}} en el año. Cada activación tiene alcance, precio, fechas y aceptación propios."
+          "text": "Un servicio continuo de {{money:4500}} al mes, con compromiso inicial de seis meses y renovación trimestral, y proyectos/campañas acordados individualmente. La ruta gradual reserva {{money:42500}} en el primer semestre y {{money:79200}} en el año. Cada activación tiene alcance, precio, fechas y aceptación propios."
         }
       ]
     },
@@ -1619,7 +1619,7 @@
           "rows": [
             [
               "Servicio continuo",
-              "{{money:4500}} mensuales anticipados, durante doce meses. Revisión trimestral de ejecución y prioridades."
+              "{{money:4500}} mensuales anticipados. Compromiso inicial de seis meses (M1–M6); luego renovación por trimestre, con aviso de treinta días antes del cierre de cada trimestre. Revisión trimestral de ejecución y prioridades."
             ],
             [
               "Proyectos",
@@ -1725,9 +1725,9 @@
       "blocks": [
         {
           "kind": "section",
-          "title": "Una contratación anual y activaciones explícitas",
+          "title": "Un programa anual, con compromiso inicial de seis meses",
           "paragraphs": [
-            "La recomendación gradual combina {{money:54000}} de servicio continuo y {{money:25200}} de activaciones. Si el banco elige la ruta integral, el presupuesto total es {{money:89200}}. Una negociación de presupuesto se documenta ajustando capacidades o calendario y haciendo visible su efecto; no reduce de forma implícita los compromisos."
+            "La recomendación gradual combina {{money:54000}} de servicio continuo y {{money:25200}} de activaciones en el año. El primer semestre reserva {{money:42500}}: construye la base y las herramientas y deja ver las primeras señales de visibilidad; desde ahí la continuidad se decide cada trimestre ({{money:19100}} y {{money:17600}} en la ruta gradual). Si el banco elige la ruta integral, el presupuesto total es {{money:89200}}. Una negociación de presupuesto se documenta ajustando capacidades o calendario y haciendo visible su efecto; no reduce de forma implícita los compromisos."
           ]
         },
         {
