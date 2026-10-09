@@ -145,3 +145,23 @@ carril gobernado y tienen aceptación separada. Las muestras SKY existentes cons
 > deep links. Verifica contenido, píxeles, playback y CSS compilada antes de publicar solamente Think,
 > si esa publicación está autorizada. No copies datos ni permisos de otro cliente y no despliegues
 > Greenhouse. Deja SHA, deployment, readback, límites y procedimiento de retiro en evidencia privada.
+
+## Bloques de experiencia temprana (contrato 0.2.0, 2026-10-09)
+
+Opcionales y aditivos: un intent 0.1.0 sigue resolviendo igual. Sirven para que el cliente viva cómo sería trabajar con
+Efeonce, con datos reales, y no sólo vea la pieza terminada. Declarar `version: "0.2.0"` en el intent.
+
+| Campo | Qué muestra | Dónde aparece en Think |
+|---|---|---|
+| `experience.aiPanel` | Preguntas reales a la IA: si aparece la marca, si el dato es correcto, si cita el sitio propio y qué fuentes cita | Paso 1, debajo de la observación SEO |
+| `experience.today` | Lo que la máquina lee hoy de la página real del cliente frente a la pieza (se conserva, se mejora o se suma) | Paso 1 |
+| `experience.review` | Cada dato con su documento, responsable y estado, más comentarios de ejemplo | Paso 2, debajo de la pieza |
+| `experience.measure` | Las métricas de la propuesta, en reemplazo del texto genérico | «Cómo mediríamos esta pieza», paso 2 |
+| `experience.nextStep` | Invitación final con botón (`https:` o `mailto:`) | Cierre del paso 4 |
+| `ui.welcomeTitle` / `ui.welcomeEnter` | Texto de la cortina de entrada | Cortina |
+| `brand.logoOnDarkAssetId` | Logo oficial para fondos oscuros: se muestra sobre el navy sin recuadro claro | Encabezado y cortina |
+
+Reglas: el panel de IA usa sólo capturas reales con fecha; una fila sin mención va como `not-mentioned`. El «hoy» se
+escribe en tono factual y reconoce lo que el sitio ya hace bien (`verdict: keep`). La revisión es un ejemplo del flujo y lo
+dice en su nota. Caso de referencia: muestra de Pibank Perú (expediente `09-XRay-Pibank/build-intent.py`). Contrato y
+pruebas en AXIS (`docs/agent-composition/aeo-xray.md`, `packages/contracts/src/aeo-xray.test.ts`).

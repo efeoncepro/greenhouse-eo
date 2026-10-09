@@ -579,7 +579,7 @@ window = (f'<div style="position: absolute; left: 800px; top: 176px; width: 800p
           f'<div style="margin-left: 18px; padding: 5px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); font-size: 11px; color: {SOFT_}">think.efeoncepro.com/aeo-xray</div></div>'
           f'<div style="height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.08)">'
           f'<div style="display: flex; align-items: center; gap: 10px">{scan}<span style="font-size: 16px; font-weight: 600">X-Ray</span><span style="font-size: 11px; color: {SOFT_}">El contenido, por dentro</span></div>'
-          f'<div style="padding: 6px 12px; border-radius: 8px; background: #ffffff">{PIBN(15)}</div></div>'
+          f'<img src="data:image/svg+xml;base64,{base64.b64encode(open(os.path.join(HERE, "logos-cliente/pibank-logo-blanco.svg"), "rb").read()).decode()}" alt="Pibank" style="height: 20px; width: auto; display: block"></div>'
           f'<div style="height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08)">{steps}</div>'
           f'<div style="display: grid; grid-template-columns: 500px minmax(0, 1fr); height: 470px">{landing}{radio}</div></div>')
 phone = (f'<div style="position: absolute; left: 1580px; top: 366px; width: 200px; height: 420px; box-sizing: border-box; padding: 9px; border-radius: 36px; background: #050d1f; '

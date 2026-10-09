@@ -56,9 +56,104 @@ export function validateXrayExperience(input, blocks, assets, path) {
         "atomsIntro",
         "atoms",
         "evidence",
+        "aiPanel",
+        "today",
+        "review",
+        "measure",
+        "nextStep",
         "ui",
     ], path);
     required(input, ["thesis", "atomsIntro"], path);
+    const isoDate = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+    const oneOf = (v, values, p) => {
+        if (!values.includes(v))
+            fail("experience-enum-invalid", p);
+    };
+    const flag = (v, p) => {
+        if (typeof v !== "boolean")
+            fail("boolean-invalid", p);
+    };
+    if (input.aiPanel !== undefined) {
+        const a = input.aiPanel, p = `${path}.aiPanel`;
+        fields(a, ["title", "intro", "surface", "market", "asOf", "method", "note", "rows"], p);
+        required(a, ["title", "intro", "surface", "market", "method", "note"], p);
+        if (!isoDate(a?.asOf))
+            fail("experience-date-invalid", `${p}.asOf`);
+        array(a?.rows, `${p}.rows`, 1).forEach((r, i) => {
+            const rp = `${p}.rows.${i}`;
+            fields(r, ["question", "kind", "appears", "accuracy", "citesOwnSite", "cited", "detail", "surface", "asOf"], rp);
+            required(r, ["question", "detail"], rp);
+            oneOf(r?.kind, ["generic", "brand"], `${rp}.kind`);
+            flag(r?.appears, `${rp}.appears`);
+            flag(r?.citesOwnSite, `${rp}.citesOwnSite`);
+            oneOf(r?.accuracy, ["correct", "incorrect", "not-mentioned"], `${rp}.accuracy`);
+            // Sin mención no hay dato que juzgar; con mención el dato se juzga.
+            if (r?.appears === false && r?.accuracy !== "not-mentioned")
+                fail("ai-panel-accuracy-invalid", rp);
+            if (r?.appears === true && r?.accuracy === "not-mentioned")
+                fail("ai-panel-accuracy-invalid", rp);
+            array(r?.cited, `${rp}.cited`).forEach((c, j) => {
+                if (!text(c))
+                    fail("experience-text-required", `${rp}.cited.${j}`);
+            });
+            if (r?.surface !== undefined && !text(r.surface))
+                fail("experience-text-required", `${rp}.surface`);
+            if (r?.asOf !== undefined && !isoDate(r.asOf))
+                fail("experience-date-invalid", `${rp}.asOf`);
+        });
+    }
+    if (input.today !== undefined) {
+        const t = input.today, p = `${path}.today`;
+        fields(t, ["title", "intro", "url", "asOf", "method", "note", "rows"], p);
+        required(t, ["title", "intro", "url", "method", "note"], p);
+        if (!isoDate(t?.asOf))
+            fail("experience-date-invalid", `${p}.asOf`);
+        if (typeof t?.url === "string" && !/^https:\/\//.test(t.url))
+            fail("experience-url-invalid", `${p}.url`);
+        array(t?.rows, `${p}.rows`, 1).forEach((r, i) => {
+            fields(r, ["label", "today", "proposed", "verdict"], `${p}.rows.${i}`);
+            required(r, ["label", "today", "proposed"], `${p}.rows.${i}`);
+            oneOf(r?.verdict, ["keep", "improve", "add"], `${p}.rows.${i}.verdict`);
+        });
+    }
+    if (input.review !== undefined) {
+        const r = input.review, p = `${path}.review`;
+        fields(r, ["title", "intro", "version", "note", "items", "comments"], p);
+        required(r, ["title", "intro", "version", "note"], p);
+        array(r?.items, `${p}.items`, 1).forEach((it, i) => {
+            const ip = `${p}.items.${i}`;
+            fields(it, ["claim", "coupleId", "document", "owner", "status"], ip);
+            required(it, ["claim", "document", "owner"], ip);
+            oneOf(it?.status, ["pending", "approved", "changes"], `${ip}.status`);
+            if (!blocks.has(it?.coupleId))
+                fail("reference-missing", `${ip}.coupleId`);
+        });
+        array(r?.comments, `${p}.comments`).forEach((c, i) => {
+            const cp = `${p}.comments.${i}`;
+            fields(c, ["role", "text", "coupleId"], cp);
+            required(c, ["role", "text"], cp);
+            if (c?.coupleId !== undefined && !blocks.has(c.coupleId))
+                fail("reference-missing", `${cp}.coupleId`);
+        });
+    }
+    if (input.measure !== undefined) {
+        const m = input.measure, p = `${path}.measure`;
+        fields(m, ["title", "intro", "items"], p);
+        required(m, ["title", "intro"], p);
+        array(m?.items, `${p}.items`, 1).forEach((it, i) => {
+            fields(it, ["label", "question", "method"], `${p}.items.${i}`);
+            required(it, ["label", "question", "method"], `${p}.items.${i}`);
+        });
+    }
+    if (input.nextStep !== undefined) {
+        const n = input.nextStep, p = `${path}.nextStep`;
+        fields(n, ["title", "body", "ctaLabel", "ctaHref", "note"], p);
+        required(n, ["title", "body", "ctaLabel", "ctaHref"], p);
+        if (typeof n?.ctaHref === "string" && !/^(https:\/\/|mailto:)/.test(n.ctaHref))
+            fail("experience-url-invalid", `${p}.ctaHref`);
+        if (n?.note !== undefined && !text(n.note))
+            fail("experience-text-required", `${p}.note`);
+    }
     if (input.meta !== undefined) {
         if (!obj(input.meta))
             fail("experience-meta-invalid", path);
@@ -280,7 +375,10 @@ export function validateXrayExperience(input, blocks, assets, path) {
         "verifyNote",
     ];
     required(input.ui, uiKeys, `${path}.ui`);
-    fields(input.ui, [...uiKeys, "verifySteps"], `${path}.ui`);
+    fields(input.ui, [...uiKeys, "verifySteps", "welcomeTitle", "welcomeEnter"], `${path}.ui`);
+    for (const k of ["welcomeTitle", "welcomeEnter"])
+        if (obj(input.ui) && input.ui[k] !== undefined && !text(input.ui[k]))
+            fail("experience-text-required", `${path}.ui.${k}`);
     array(input.ui?.verifySteps, `${path}.ui.verifySteps`, 2).forEach((v, i) => required(v, ["what", "how"], `${path}.ui.verifySteps.${i}`));
     const stats = (v, p) => {
         if (Array.isArray(v)) {

@@ -3,10 +3,14 @@ import { type AxisAeoXrayExperience } from "./aeo-xray-experience.js";
 export type { AxisAeoXrayExperience } from "./aeo-xray-experience.js";
 export declare const AXIS_AEO_XRAY_CONTRACT: {
     readonly id: "efeonce.aeo-xray";
-    readonly version: "0.1.0";
+    readonly version: "0.2.0";
     readonly lifecycle: "candidate";
     readonly owner: "efeonce-aeo-xray";
     readonly anatomy: readonly ["shell", "artifact", "block", "annotation", "evidence", "source"];
+    readonly states: readonly ["proposed", "implemented", "verified", "measured"];
+    readonly accessibility: readonly ["text-4.5-normal", "text-3-large", "target-44px", "reduced-motion-respected", "evidence-status-visible"];
+    readonly responsive: readonly ["desktop-instrument", "mobile-sheet"];
+    readonly motion: readonly ["original-xray-choreography", "reduced-motion-none"];
     readonly consumers: readonly ["efeonce-think", "greenhouse-aeo-xray"];
     readonly evidence: readonly ["TASK-1950", "tokens:aeoXray"];
 };
@@ -118,7 +122,7 @@ export type AxisAeoXrayArtifact = {
 };
 export type AxisAeoXrayIntent = {
     contract: "efeonce.aeo-xray";
-    version: "0.1.0";
+    version: "0.1.0" | "0.2.0";
     locale: string;
     title: string;
     preparedFor: string;
@@ -156,6 +160,8 @@ export type AxisAeoXrayIntent = {
         fontFamily?: keyof typeof aeoXray.fonts;
         displayFontFamily?: keyof typeof aeoXray.fonts;
         logoAssetId?: string;
+        /** 0.2.0 · versión oficial del logo para fondos oscuros; evita el recuadro claro detrás del logo. */
+        logoOnDarkAssetId?: string;
     };
     flow: {
         entryArtifactId: string;
