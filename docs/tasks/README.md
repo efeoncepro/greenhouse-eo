@@ -1,5 +1,6 @@
 # Task Index
 
+- `TASK-2022` — [flujo operativo V3](in-progress/TASK-2022-pricing-v3-operational-agent-workflow.md), en progreso local; catálogo completo, reparto/readiness y agentes.
 - `TASK-2021` — [composición de recursos V3](complete/TASK-2021-pricing-v3-demand-resource-composition.md), completa local; selección/asignación/IA al quote, explain/replay y108 tests verdes.
 
 - `TASK-2020` — [presupuesto IA y recargas V3](complete/TASK-2020-pricing-v3-ai-credit-budget.md), CLI local completa; packs/caja/remanente/vencimiento, binding automático a quote pendiente.
