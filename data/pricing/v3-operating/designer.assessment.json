@@ -1,0 +1,110 @@
+{
+  "calculationStatus": "calculated",
+  "commercialStatus": "requires_review",
+  "binding": false,
+  "gaps": [
+    {
+      "code": "COMMERCIAL_APPROVAL_REQUIRED",
+      "path": "quote",
+      "owner": "Commercial/Finance",
+      "action": "Review scope, complete costs, terms and the selling policy before issuing a quote."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "design",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "PROVISION_COST_EVIDENCE_REQUIRED",
+      "path": "design",
+      "owner": "Operations/Finance",
+      "action": "Measure Assurance, operations and onboarding activities and cost."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:notion",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "1:notion",
+      "owner": "Operations",
+      "action": "Replace the simulated denominator and assignments with declared operational capacity."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:microsoft-365",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:microsoft-365",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "1:microsoft-365",
+      "owner": "Operations",
+      "action": "Replace the simulated denominator and assignments with declared operational capacity."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:adobe",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:adobe",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "1:adobe",
+      "owner": "Operations",
+      "action": "Replace the simulated denominator and assignments with declared operational capacity."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:higgsfield",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:higgsfield",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:magnific",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:magnific",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "TAX_AND_ENTITY_REQUIRED",
+      "path": "quote",
+      "owner": "Finance",
+      "action": "Resolve contractual entity, currency and applicable tax treatment."
+    }
+  ],
+  "margin": {
+    "modeledRate": "0.23076982052088045203284444887413461317304669830487683331672199520060107488135671",
+    "proposedTarget": "0.40",
+    "proposedFloor": "0.35",
+    "approved": false,
+    "belowProposedFloor": true
+  }
+}

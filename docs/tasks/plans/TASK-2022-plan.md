@@ -6,7 +6,7 @@ de recursos. TASK-2017 conserva evidencias económicas; no duplicar el canon TAS
 1. Completar policy sucesora para32perfiles/26tools, registrar fuentes nuevas y Adobe combinado confirmado;
    investigar facturas Outlook sólo read-only y referencias públicas. No promover desconocidos.
 2. Primitives puros: discovery/planning, reparto cartera con parte interna/noasignada, cobertura cliente específica,
-   readiness y preview redacted. CLIthin y adapters de snapshots. No fórmulas en consumers.
+   readiness y preview redacted; mantenimiento versionado de policy/packs con base/impacto/confirmación. CLIthin y adapters de snapshots. No fórmulas en consumers.
 3. Tests negativos/precisión/replay de legacy y nuevo, CLI casos, documentación/skills y QA local.
 
 Rollback aditivo: retirar comandos/policy nueva; catálogos y artifacts anteriores intactos. Promocióncanónica

@@ -144,6 +144,33 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
   const usedBudgets = new Set<string>()
   const usedDemand = new Set<string>()
   const usedFx = new Set<string>()
+  const usedClient = new Set<string>()
+  const clientCoverages = demand.clientProvidedTools ?? []
+
+  if (!unique(clientCoverages.map(c => `${c.periodId}:${c.toolId}`)))
+    issue('DUPLICATE_CLIENT_TOOL_COVERAGE', 'clientProvidedTools')
+
+  for (const c of clientCoverages) {
+    if (policy.commonToolIds.includes(c.toolId) || policy.tools.find(t => t.toolId === c.toolId)?.access === 'credits')
+      issue('CLIENT_COVERAGE_NOT_ALLOWED', c.toolId)
+    const start = new Date(`${asOf.slice(0, 7)}-01T00:00:00Z`)
+
+    start.setUTCMonth(start.getUTCMonth() + c.periodId - 1)
+    const end = new Date(start)
+
+    end.setUTCMonth(end.getUTCMonth() + 1)
+    end.setUTCDate(0)
+    const from = c.periodId === 1 ? asOf : start.toISOString().slice(0, 10)
+    const until = end.toISOString().slice(0, 10)
+
+    if (
+      c.evidence.effectiveFrom > from ||
+      c.evidence.effectiveUntil < until ||
+      c.evidence.status !== 'confirmed' ||
+      !unique(c.lineIds)
+    )
+      issue('CLIENT_ACCESS_EVIDENCE_REQUIRED', c.toolId)
+  }
 
   for (const period of resolution.inputs) {
     const { snapshot, request } = period.input
@@ -179,6 +206,14 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           reasons: reasons.length ? reasons : ['not-required-for-work']
         })
         if (!reasons.length) continue
+        const coverage = clientCoverages.find(c => c.periodId === period.periodId && c.toolId === tool.toolId)
+
+        if (coverage?.lineIds.includes(line.lineId)) {
+          usedClient.add(`${period.periodId}:${tool.toolId}:${line.lineId}`)
+          selections[selections.length - 1].reasons.push(`client-provided:${coverage.reason}`)
+          continue
+        }
+
         const d = w?.creditDemand.find(d => d.periodId === period.periodId && d.toolId === tool.toolId)
 
         if (d) usedDemand.add(`${line.lineId}:${d.periodId}:${d.toolId}`)
@@ -304,6 +339,16 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           continue
         }
 
+        if (price.bundledToolIds?.some(id => selected.has(id))) {
+          issue('BUNDLED_TOOL_DOUBLE_COUNT', key)
+          continue
+        }
+
+        if (tool.access === 'named' && !new D(allocation.quantity).isInteger()) {
+          issue('WHOLE_NAMED_LICENSE_REQUIRED', key)
+          continue
+        }
+
         if (price.pendingReason) {
           issue('RESOURCE_PRICE_PENDING', key, price.pendingReason)
           continue
@@ -357,6 +402,14 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
             allocation.contractSeatCount < Math.max(price.minimumContractSeats, consumerIds.length))
         ) {
           issue('TEAM_CONTRACT_CAPACITY_REQUIRED', key)
+          continue
+        }
+
+        if (
+          price.includedSeats &&
+          (!allocation.seatCapacity || allocation.seatCapacity > price.includedSeats * Number(allocation.quantity))
+        ) {
+          issue('PACKAGE_SEAT_CAPACITY_EXCEEDED', key)
           continue
         }
 
@@ -478,6 +531,10 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
       if (!usedDemand.has(`${w.lineId}:${d.periodId}:${d.toolId}`))
         issue('UNUSED_CREDIT_DEMAND', `${w.lineId}:${d.periodId}:${d.toolId}`)
   for (const id of demand.fxRecordIds) if (!usedFx.has(id)) issue('UNUSED_FX_SELECTION', id)
+  for (const c of clientCoverages)
+    for (const lineId of c.lineIds)
+      if (!usedClient.has(`${c.periodId}:${c.toolId}:${lineId}`))
+        issue('UNUSED_CLIENT_TOOL_COVERAGE', `${c.periodId}:${c.toolId}:${lineId}`)
   resolution.diagnostics.push(...diagnostics)
   if (diagnostics.length) resolution.status = 'needs_input'
   const quote = calculateResolvedQuote(resolution)

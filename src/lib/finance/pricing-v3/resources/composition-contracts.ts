@@ -36,6 +36,8 @@ export const compositionPolicySchema = z
                     priceId: id,
                     basis: z.enum(['seat', 'package']),
                     minimumContractSeats: z.number().int().min(1).max(10000).optional(),
+                    includedSeats: z.number().int().min(1).max(10000).optional(),
+                    bundledToolIds: z.array(id).max(30).optional(),
                     catalogResourceId: id.optional(),
                     price: z
                       .object({
@@ -122,7 +124,21 @@ export const compositionDemandSchema = z
           .strict()
       )
       .max(120),
-    fxRecordIds: z.array(id).max(30)
+    fxRecordIds: z.array(id).max(30),
+    clientProvidedTools: z
+      .array(
+        z
+          .object({
+            periodId: period,
+            toolId: id,
+            lineIds: z.array(id).min(1).max(100),
+            reason: z.string().min(1).max(1000),
+            evidence: sourceSchema
+          })
+          .strict()
+      )
+      .max(6000)
+      .optional()
   })
   .strict()
 

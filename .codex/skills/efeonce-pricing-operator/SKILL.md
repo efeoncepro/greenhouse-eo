@@ -170,5 +170,22 @@ Adobe/IA según trabajo. IA se elige con motivo; planes múltiples requieren pri
 Declarar slots/seatCapacity/contrato, cantidad, driver/parte atribuida y presupuesto por proveedor/mes. No inventar
 precios, denominadores ni permisos de compartir seats; dedicación parcial no reduce licencia automáticamente.
 Quote nuevo congela todos los inputs; explain/replay usan ese artefacto. Tres fixtures son hipótesis, no defaults
-operativos; Adobe current/EURsinFX/faltantes bloquean. Composición es simulation/requires_review y export bloqueado;
+operativos; baselineAdobe/EURsinFX/faltantes bloquean. Composición es simulation/requires_review y export bloqueado;
 servicios conservan unidad comercial, pricing de capacidad interno no valida fee/contrato del programa.
+
+
+## Cotizador V3: operación y mantenimiento completos locales
+
+Para nuevos pedidos preferir [flujo operativo](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md)
+y [policy sucesora](../../../data/pricing/v3-operating/README.md). `resources inspect` descubre perfiles/tasks/planes,
+fuentes/faltantes y digests; `compose scaffold|plan` prepara entradas/preguntas, no inventa asignaciones o variante.
+Portfolio calcula cuota desde capacidad declarada y reconcilia clientes/interno/sin asignar; seats por usuario
+continúan nominativos. Nunca confundir reparto de costo con permiso de compartir credenciales o inventario live.
+`clientProvidedTools` exige evidencia/ventana/líneas; no elimina la baseNotion/M365. Adobe180 es paquete3CC+3Express,
+306 condicional sin fecha; noExpress duplicado. FacturaNotion/públicos/operador/histórico se distinguen.
+`compose assess` separa evidencia económica de cálculo; `compose preview` genera simulación redactada local
+(rol o fee de servicio), no oferta emitida. Propuestas40/35 no están aprobadas. `resources preview|apply` versiona
+policy/packs con baseDigest/impacto/confirmación y ruta nueva. Fuente confirmada no se hereda a precio cambiado.
+Exit3 indica revisión; exit2 falta dato; exit1 rechazo. Explain/replay salen del snapshot, jamás recalcular mentalmente.
+El agente interpreta lenguaje, el motor calcula. [Promocióncanónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
+reutiliza autoridad/lifecycle/audienciasV2; no crear consumers productivos desde el prototipo por inferencia.

@@ -251,3 +251,16 @@ TASK-2017 sigue Parcial: falta normalizar kits/valores, reparto, binding al quot
 ## Avance 2026-10-09 — composición integrada local
 
 [TASK-2021](../complete/TASK-2021-pricing-v3-demand-resource-composition.md) integra reglas/allocations/IA al quote, explain y replay; tres casos reproducibles y108 tests verdes. Policy inicial para Copywriter/diseñador senior/SEO Specialist. [Manual](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md). Asignaciones hipotéticas e históricos explícitos, sin inventario o tarifa comercial aprobada. TASK-2017 sigue Parcial: planes/costos vigentes, drivers reales, alcance/delivery y aprobación económica pendientes.
+
+
+## Delta verificado — operación local TASK-2022, 2026-10-09
+
+[Flujo operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) completo local:32reglas de perfiles,
+recursos originales con fee genérico separado, portfolio de capacidad declarada, cobertura cliente específica,
+readiness/preview y actualización de policy/packs con preview/apply. Operador confirma180USD cubre3CC+3Express;
+fecha del alza pendiente,306 sólo escenario. FacturaNotion acredita9usuarios×24USD+30USDcréditos para21sep–21oct,
+sin confirmar pago. Planes públicosM365/SEMrush/ChatGPT/Claude y FXECB se conservan como referencias explícitas.
+[Pendientes por owner](../../../data/pricing/v3-operating/operational-gaps.json): salarios/localización, provisiones
+medidas, contratos/seats/acceso, capacidad declarada real, precio/margen/factores aprobados y SOW/entidad/impuestos.
+El operador no tiene salarios nuevos y autorizó método por capacidad; no inventar valores ni repetir la solicitud.
+TASK-2017 permaneceParcial por estas evidencias económicas, no por falta del flujoCLI. Promocióncanónica separada.

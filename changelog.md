@@ -11,6 +11,8 @@
 
 - [Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md): propuesta técnica v13 (49 láminas) y cotización USD/PEN enviadas a Jesús Vargas Serpa; compromiso inicial de seis meses y renovación trimestral sobre el plan anual de US$79.200; deal en Presentación de soluciones. [Deck v13](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/README.md), [región de filtros SVG](docs/architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) en `method-surround-cycle` y [manual: `content-stack` y empalme](docs/manual-de-uso/creative/componer-deck-con-recetas.md).
 
+- Pricing V3: [operación para agentes](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md),32perfiles, herramientas por trabajo, reparto reconciliado, costosAdobe/Notion con fuentes, mantenimiento con impacto, evaluación y preview redactado. TASK-2022 completa local;213 testsV2/V3 y26operacionesCLI verificados; economíaTASK-2017 parcial e integración canónica pendiente.
+
 - Pricing V3: [composición por demanda](docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md), base/roles/tareas, seats/pools y créditos integrados al quote; explain/replay congelados, tres casos y revisión obligatoria. TASK-2021 local; sin inventario live ni tarifa comercial aprobada.
 
 - Pricing V3: [presupuesto IA por CLI](docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md), suscripción y paquetes extra discretos, caja/remanente/vencimiento; TASK-2020 local, sin compra ni binding automático a quotes.

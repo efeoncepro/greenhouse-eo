@@ -33,3 +33,8 @@ como costeo interno. Nunca filtra costos, tasas internas, país de talento, marg
 Artifacts previos se conservan y replay se verifica. Nuevos contratos additive; ningún defaultnuevo cambia su
 digest. API/UI/MCP canónicos requieren unidad de promoción propia: auth/tenancy/audiencias, snapshots/lifecycle,
 contrasteV2/V3 y cutover/rollback. No crear endpoint o UI que eluda esa autoridad.
+
+Mantenimiento de policy/créditos: replacement íntegro versionado, baseDigest y previewDigest con impactos sobre
+demandas; schema/referencias/evidencia vigentes y no heredar confirmación de una factura al modificar precio.
+Apply escribe sucesor nuevo sin activar, conserva padre/artifacts y no implica aprobación comercial. Adapter
+posee hashing/FS, dominio conserva fórmulas. Manual operativo y mapa de promoción son el handoff de TASK-2022.

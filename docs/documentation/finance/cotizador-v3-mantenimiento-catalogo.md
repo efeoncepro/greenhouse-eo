@@ -69,3 +69,17 @@ para nuevas simulaciones, sin editar artefactos ni usar tarifas retiradas como v
 Tests: fechas futuras, add/replace/retire, identidad/vigencia/conflictos, quote vieja, fuentes, licencias completas,
 compartidos, anualidades y calendarios. [Prueba real de CLI](../../../data/pricing/v3-catalog/examples/verification.json).
 El incremento de ejemplo10% es ilustrativo; no orden salarial ni precio actual de Adobe.
+
+## Planes, reglas y créditos por demanda
+
+TASK-2022 amplía mantenimiento local con `resources preview|apply`: schema
+`pricing-v3-resource-change/1`, kind`policy|credits`, baseDigest/reason/replacement completo y versión nueva.
+[Flujo y comandos](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Discovery expone el digest de
+policy y, con `--credits`, el del catálogo de créditos. Preview presenta sucesor e impactos sobre demandas;
+apply exige idéntico digest y escribe archivo nuevo, sin activarlo. Conservar change-set/preview como registro
+del responsable/factura/fecha. Base o confirmación stale bloquean; precio confirmado cambiado necesita nueva
+referencia y packs/costosIA cambian con evidencia nueva. Reglas review-only no se convierten en tarifas aprobadas.
+
+La fecha de una renovación desconocida no se inventa. Adobe306 permanece como variante condicional explícita;
+180 combinado no agrega Express por separado. Versionar por separado portfolio/capacidad y una nueva demanda.
+Snapshots previos conservan policy/precios/créditos/FX; ninguna actualización recalcula una quote existente.

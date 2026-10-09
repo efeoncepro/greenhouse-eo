@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "pricing-v3-resource-portfolio/1",
+  "version": "example-capacity-v1",
+  "mode": "simulation",
+  "resources": [
+    {
+      "periodId": 1,
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "driverUnit": "declared-capacity-hours",
+      "totalUnits": "160",
+      "internalUnits": "80",
+      "unallocatedUnits": "40",
+      "accounts": [
+        {
+          "accountId": "design-simulation",
+          "units": "40"
+        }
+      ],
+      "reason": "Hypothetical capacity for reproducible demo; not actual staffing or license access."
+    }
+  ]
+}

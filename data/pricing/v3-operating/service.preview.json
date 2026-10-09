@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "pricing-v3-composition-preview/1",
+  "status": "Simulación interna pendiente de revisión",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "currency": "USD",
+  "periods": [
+    {
+      "periodId": 1,
+      "currency": "USD",
+      "items": [
+        {
+          "label": "Servicio gestionado — fee del periodo",
+          "net": "2847.75"
+        },
+        {
+          "label": "Implementación inicial",
+          "net": "142.50"
+        }
+      ],
+      "net": "2990.25"
+    }
+  ],
+  "net": "2990.25",
+  "tax": null,
+  "grandTotal": null,
+  "note": "No es una oferta emitida. Validar alcance, recursos, precio, impuestos y condiciones antes de presentación."
+}

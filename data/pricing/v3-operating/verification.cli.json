@@ -1,0 +1,111 @@
+{
+  "asOf": "2026-10-09",
+  "scope": "local simulation only",
+  "operations": [
+    {
+      "operation": "discovery",
+      "exit": 0
+    },
+    {
+      "operation": "portfolio",
+      "exit": 3
+    },
+    {
+      "operation": "scaffold",
+      "exit": 2
+    },
+    {
+      "operation": "designer-plan",
+      "exit": 3
+    },
+    {
+      "operation": "designer-quote",
+      "exit": 3
+    },
+    {
+      "operation": "designer-explain",
+      "exit": 3
+    },
+    {
+      "operation": "designer-replay",
+      "exit": 3
+    },
+    {
+      "operation": "designer-assessment",
+      "exit": 3
+    },
+    {
+      "operation": "designer-preview",
+      "exit": 3
+    },
+    {
+      "operation": "service-plan",
+      "exit": 3
+    },
+    {
+      "operation": "service-quote",
+      "exit": 3
+    },
+    {
+      "operation": "service-explain",
+      "exit": 3
+    },
+    {
+      "operation": "service-replay",
+      "exit": 3
+    },
+    {
+      "operation": "service-assessment",
+      "exit": 3
+    },
+    {
+      "operation": "service-preview",
+      "exit": 3
+    },
+    {
+      "operation": "crm-quote",
+      "exit": 3
+    },
+    {
+      "operation": "legacy-seo-writer",
+      "exit": 3
+    },
+    {
+      "operation": "legacy-designer",
+      "exit": 3
+    },
+    {
+      "operation": "legacy-seo-service",
+      "exit": 3
+    },
+    {
+      "operation": "export-denied",
+      "exit": 1
+    },
+    {
+      "operation": "overwrite-denied",
+      "exit": 1
+    },
+    {
+      "operation": "ignored-option-denied",
+      "exit": 1
+    },
+    {
+      "operation": "resource-update-preview",
+      "exit": 0
+    },
+    {
+      "operation": "resource-update-apply",
+      "exit": 0
+    },
+    {
+      "operation": "resource-update-conflict",
+      "exit": 1
+    },
+    {
+      "operation": "discovery-policy-credit-digests",
+      "exit": 0
+    }
+  ],
+  "maintenanceContextVerified": true
+}

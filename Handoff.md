@@ -1,6 +1,6 @@
 # Handoff
 
-[V3](data/pricing/README.md): recursos.
+[V3](data/pricing/README.md): operación.
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 ## 2026-10-09 — CRM y Talent Assurance

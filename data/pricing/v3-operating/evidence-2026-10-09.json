@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "pricing-v3-operating-evidence/1",
+  "asOf": "2026-10-09",
+  "mode": "review_only",
+  "operatorConfirmations": {
+    "adobe": {
+      "monthlyAmount": "180",
+      "currency": "USD",
+      "ccTeamSeats": 3,
+      "expressSeats": 3,
+      "combinedPackage": true,
+      "nextIncreaseRate": "0.70",
+      "conditionalRenewalAmount": "306",
+      "renewalDate": null,
+      "source": "operator_reply:2026-10-09:Así es"
+    },
+    "allocation": {
+      "method": "declared-capacity",
+      "includeInternalShare": true,
+      "source": "operator_reply:2026-10-09:Aún no existe; usar capacidad declarada"
+    }
+  },
+  "notionInvoice": {
+    "reference": "notion-0D8C80A9-0039",
+    "receivedDate": "2026-09-21",
+    "periodFrom": "2026-09-21",
+    "periodUntilExclusive": "2026-10-21",
+    "businessSeats": 9,
+    "seatMonthlyAmount": "24",
+    "seatTotal": "216",
+    "creditPacks": 30,
+    "creditsPerPack": 100,
+    "creditBudget": "30",
+    "total": "246",
+    "currency": "USD",
+    "paymentStatus": "not_verified",
+    "sha256": "a482a9b7a9eca0617bbab0b284e7c88491b9fdc93f92a73e1082a4d5d88b4787",
+    "source": "Outlook attachment notion-invoice-0D8C80A9-0039.pdf; extracted privately; no rawPDF/PII in repo"
+  },
+  "publicReferences": [
+    {
+      "tool": "microsoft-365",
+      "source": "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-business-standard",
+      "market": "US",
+      "teamsMonthly": "16.80",
+      "teamsAnnual": "168",
+      "noTeamsMonthly": "12.95",
+      "actualContract": "unknown"
+    },
+    {
+      "tool": "semrush",
+      "source": "https://www.semrush.com/kb/1547-seo-toolkit-pricing-and-plans",
+      "proMonthly": "139.95",
+      "guruMonthly": "249.95",
+      "actualContract": "unknown",
+      "note": "Pricing page rounds139/249; KB exact decimals chosen explicitly; access/additional users separate."
+    },
+    {
+      "tool": "chatgpt",
+      "source": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+      "plusMonthly": "20",
+      "businessStandardMonthly": "25",
+      "businessStandardAnnual": "240",
+      "businessPremiumMonthly": "125",
+      "businessPremiumAnnual": "1200",
+      "minimumBusinessSeats": 2,
+      "currency": "USD",
+      "actualContract": "unknown",
+      "note": "Annual amounts are per-seat yearly cost; subscriptions do not include API usage."
+    }
+  ],
+  "fx": {
+    "from": "EUR",
+    "to": "USD",
+    "rate": "1.1206",
+    "asOf": "2026-10-09",
+    "purpose": "reference_simulation",
+    "source": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
+  },
+  "mailResearch": {
+    "mailbox": "jreyes@efeoncepro.com",
+    "Microsoft": "September15/17 invoice notices found; no amount in preview/attachment, admin readback still required",
+    "Adobe": "no billing evidence found in targeted searches; operator source retained",
+    "Semrush": "no relevant receipt found in targeted search",
+    "ChatGPT": "historical international-expense mail found; currentplan unknown",
+    "Claude": "partner notices found, no relevant billing evidence",
+    "notExhaustive": true
+  }
+}

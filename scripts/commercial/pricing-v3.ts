@@ -7,7 +7,23 @@ import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
 import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
 import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
 import { projectCatalogQuote, catalogQuoteMarkdown } from '../../src/lib/finance/pricing-v3/catalog/client'
-import { planCreditBudget } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
+import {
+  allocateResourcePortfolio,
+  inspectOperatingResources,
+  prepareOperatingPlan,
+  scaffoldResourceDemand
+} from '../../src/lib/finance/pricing-v3/resources/operating'
+import {
+  assessCompositionReadiness,
+  compositionPreviewMarkdown,
+  projectCompositionPreview
+} from '../../src/lib/finance/pricing-v3/resources/readiness'
+import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
+import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
+import {
+  previewResourceChange,
+  applyResourceChange
+} from '../../src/lib/finance/pricing-v3/adapters/resource-maintenance'
 import {
   COMPOSITION_VERSION,
   runResourceComposition,
@@ -79,8 +95,8 @@ try {
     catalog: ['catalog', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
     prepare: ['catalog', 'input', 'out', 'help'],
     quote: ['catalog', 'input', 'out', 'help'],
-    resources: ['catalog', 'input', 'out', 'help'],
-    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'help'],
+    resources: ['catalog', 'policy', 'credits', 'date', 'query', 'input', 'out', 'impact', 'confirm', 'help'],
+    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'format', 'help'],
     help: ['help']
   }
 
@@ -115,9 +131,10 @@ try {
           export: '--input frozen-artifact.json --out draft.md [--format markdown|json]',
           prepare: '--input brief.json [--catalog catalog.json] [--out selection.json]',
           quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json]',
-          resources: 'budget --input credit-budget-request.json --catalog credit-catalog.json [--out budget.json]',
+          resources:
+            'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'prepare|quote --input composition-demand.json --policy resource-policy.json --credits credit-catalog.json [--catalog monetary-catalog.json] [--out artifact.json]',
+            'scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
         },
@@ -129,42 +146,151 @@ try {
       })
     )
   } else if (command === 'compose') {
-    if (!['prepare', 'quote'].includes(subcommand) || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+    if (!['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview'].includes(subcommand) || positionals.length !== 2)
+      throw new Error('INVALID_ARGUMENT')
 
-    const artifact = runResourceComposition(
-      read(catalogPath),
-      read(required(values.policy)),
-      read(required(values.credits)),
-      read(required(values.input))
-    )
+    const allowed = ['assess', 'preview'].includes(subcommand)
+      ? ['input', 'out', 'format', 'help']
+      : subcommand === 'scaffold'
+        ? ['catalog', 'policy', 'input', 'out', 'help']
+        : ['catalog', 'policy', 'credits', 'input', 'out', 'help']
 
-    const result = artifact.semantic.result
+    if (Object.keys(values).some(key => !allowed.includes(key))) throw new Error('INVALID_ARGUMENT')
 
-    if (values.out) writeNew(values.out, artifact)
-    process.stdout.write(
-      json(
-        subcommand === 'prepare'
-          ? {
-              calculationId: artifact.calculationId,
-              selections: result.selections,
-              attributions: result.attributions,
-              creditBudgets: result.creditBudgets,
-              diagnostics: result.quote.diagnostics,
-              assumptions: result.quote.resolution.assumptions,
-              calculationStatus: result.quote.calculationStatus,
-              binding: false
-            }
-          : { calculationId: artifact.calculationId, replayDigest: artifact.replayDigest, ...result }
+    if (subcommand === 'scaffold') {
+      const result = scaffoldResourceDemand(
+        read(catalogPath),
+        read(required(values.policy)),
+        read(required(values.input))
       )
-    )
-    process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
-  } else if (command === 'resources') {
-    if (subcommand !== 'budget' || positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
-    const result = planCreditBudget(read(required(values.catalog)), read(required(values.input)))
 
-    if (values.out) writeNew(values.out, result)
-    process.stdout.write(json(result))
-    process.exitCode = result.calculationStatus === 'calculated' ? 3 : 2
+      if (values.out) writeNew(values.out, result.demand)
+      process.stdout.write(json(result))
+      process.exitCode = 2
+    } else if (subcommand === 'plan') {
+      const result = prepareOperatingPlan(
+        read(catalogPath),
+        read(required(values.policy)),
+        read(required(values.credits)),
+        read(required(values.input))
+      )
+
+      if (values.out) {
+        if (!result.demand) throw new Error('PLAN_REQUIRES_VALID_ALLOCATION')
+        writeNew(values.out, result.demand)
+      }
+
+      process.stdout.write(json(result))
+      process.exitCode = result.status === 'calculated' ? 3 : 2
+    } else if (subcommand === 'assess' || subcommand === 'preview') {
+      const artifact = replayResourceComposition(read(required(values.input)))
+
+      const result =
+        subcommand === 'assess'
+          ? assessCompositionReadiness(artifact.semantic.result)
+          : projectCompositionPreview(artifact.semantic.result)
+
+      const format = values.format ?? 'json'
+
+      if (!['json', 'markdown'].includes(format) || (subcommand === 'assess' && format !== 'json'))
+        throw new Error('INVALID_FORMAT')
+      const output = format === 'markdown' ? compositionPreviewMarkdown(artifact.semantic.result) : json(result)
+
+      if (values.out) writeFileSync(values.out, output, { flag: 'wx', mode: 0o600 })
+      process.stdout.write(output)
+      process.exitCode = 3
+    } else {
+      const artifact = runResourceComposition(
+        read(catalogPath),
+        read(required(values.policy)),
+        read(required(values.credits)),
+        read(required(values.input))
+      )
+
+      const result = artifact.semantic.result
+
+      if (values.out) writeNew(values.out, artifact)
+      process.stdout.write(
+        json(
+          subcommand === 'prepare'
+            ? {
+                calculationId: artifact.calculationId,
+                selections: result.selections,
+                attributions: result.attributions,
+                creditBudgets: result.creditBudgets,
+                diagnostics: result.quote.diagnostics,
+                assumptions: result.quote.resolution.assumptions,
+                calculationStatus: result.quote.calculationStatus,
+                binding: false
+              }
+            : { calculationId: artifact.calculationId, replayDigest: artifact.replayDigest, ...result }
+        )
+      )
+      process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
+    }
+  } else if (command === 'resources') {
+    if (positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+
+    const allowed: Record<string, string[]> = {
+      inspect: ['catalog', 'policy', 'credits', 'date', 'query', 'out', 'help'],
+      portfolio: ['catalog', 'policy', 'date', 'input', 'out', 'help'],
+      budget: ['catalog', 'input', 'out', 'help'],
+      preview: ['catalog', 'policy', 'credits', 'input', 'impact', 'out', 'help'],
+      apply: ['catalog', 'policy', 'credits', 'input', 'impact', 'confirm', 'out', 'help']
+    }
+
+    if (!allowed[subcommand] || Object.keys(values).some(key => !allowed[subcommand].includes(key)))
+      throw new Error('INVALID_ARGUMENT')
+
+    if (subcommand === 'preview' || subcommand === 'apply') {
+      const args = [
+        read(catalogPath),
+        read(required(values.policy)),
+        read(required(values.credits)),
+        read(required(values.input))
+      ] as const
+
+      const result =
+        subcommand === 'preview'
+          ? previewResourceChange(...args, impacts())
+          : applyResourceChange(...args, required(values.confirm), impacts())
+
+      if (subcommand === 'apply') writeNew(required(values.out), result.successor)
+      else if (values.out) writeNew(values.out, result)
+      process.stdout.write(json(result))
+    } else if (subcommand === 'inspect') {
+      const policy = compositionPolicySchema.parse(read(required(values.policy)))
+      const discovery = inspectOperatingResources(read(catalogPath), policy, required(values.date), values.query)
+
+      const result = {
+        ...discovery,
+        policyDigest: catalogDigest(policy),
+        ...(values.credits
+          ? { creditCatalogDigest: catalogDigest(creditCatalogSchema.parse(read(values.credits))) }
+          : {})
+      }
+
+      if (values.out) writeNew(values.out, result)
+      process.stdout.write(json(result))
+    } else if (subcommand === 'portfolio') {
+      const result = allocateResourcePortfolio(
+        read(required(values.input)),
+        read(required(values.policy)),
+        read(catalogPath),
+        values.date
+      )
+
+      if (values.out) writeNew(values.out, result)
+      process.stdout.write(json(result))
+      process.exitCode = result.status === 'prepared' ? 3 : 2
+    } else {
+      if (subcommand !== 'budget') throw new Error('INVALID_ARGUMENT')
+      const result = planCreditBudget(read(required(values.catalog)), read(required(values.input)))
+
+      if (values.out) writeNew(values.out, result)
+      process.stdout.write(json(result))
+      process.exitCode = result.calculationStatus === 'calculated' ? 3 : 2
+    }
   } else if (command === 'catalog') {
     if (!['search', 'show', 'validate', 'preview', 'apply'].includes(subcommand) || positionals.length !== 2)
       throw new Error('INVALID_ARGUMENT')

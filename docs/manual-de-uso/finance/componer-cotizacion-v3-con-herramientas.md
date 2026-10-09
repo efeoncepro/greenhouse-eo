@@ -1,6 +1,7 @@
 # Cotizador V3: componer un pedido con herramientas
 
 Estado: local ejecutable,2026-10-09; siempre simulación con revisión. No registra quote comercial ni inventario.
+[Flujo operativo ampliado TASK-2022](operar-cotizador-v3-con-agentes.md) usa la policy sucesora para32perfiles y reparto/mantenimiento; este manual conserva los tres casos de baseline.
 [Contrato técnico](../../architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md),
 [reglas funcionales](../../documentation/finance/cotizador-v3-seleccion-herramientas.md),
 [policy y casos](../../../data/pricing/v3-composition/README.md).

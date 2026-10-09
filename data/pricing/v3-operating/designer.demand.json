@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "role_capacity",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-09",
+    "offerId": "talent-assurance-staffing",
+    "engagementCode": "monthly",
+    "accountId": "design-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "USD",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-002",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "design-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [
+        "higgsfield",
+        "magnific"
+      ],
+      "aiSelectionReason": "Image production and upscaling demand declared for simulation.",
+      "creditDemand": [
+        {
+          "periodId": 1,
+          "toolId": "higgsfield",
+          "credits": 1000
+        },
+        {
+          "periodId": 1,
+          "toolId": "magnific",
+          "credits": 12000
+        }
+      ]
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Simulation of one licensed Business user at invoiced24USD; not a confirmed user assignment."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "public-standard-teams-monthly",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Explicit publicUS plan simulation, not actualEfeonce billing."
+    },
+    {
+      "periodId": 1,
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "serviceShare": "0.25",
+      "driver": {
+        "unit": "declared-capacity-hours",
+        "totalUnits": "160",
+        "allocatedUnits": "40"
+      },
+      "reason": "Portfolio example-capacity-v1 (simulation): Hypothetical capacity for reproducible demo; not actual staffing or license access."
+    }
+  ],
+  "creditBudgets": [
+    {
+      "periodId": 1,
+      "toolId": "higgsfield",
+      "purchaseDate": "2026-10-09",
+      "useBy": "2026-10-31",
+      "subscriptionCreditsAllocated": 400,
+      "subscriptionCreditsAvailable": 400,
+      "activeSubscription": true,
+      "allowRepeatedPacks": false
+    },
+    {
+      "periodId": 1,
+      "toolId": "magnific",
+      "purchaseDate": "2026-10-09",
+      "useBy": "2026-10-31",
+      "subscriptionCreditsAllocated": 2000,
+      "subscriptionCreditsAvailable": 2000,
+      "activeSubscription": true,
+      "allowRepeatedPacks": false
+    }
+  ],
+  "fxRecordIds": [
+    "fx:EUR:USD:ECB:2026-10-09"
+  ]
+}

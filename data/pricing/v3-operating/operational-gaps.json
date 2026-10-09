@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "pricing-v3-operational-gaps/1",
+  "asOf": "2026-10-09",
+  "commercialStatus": "requires_review",
+  "items": [
+    {
+      "code": "ADOBE_RENEWAL_DATE",
+      "owner": "Operations/Finance",
+      "required": "Effective date and billing terms for conditional306USD",
+      "known": "180USD covers3CC+3Express; operatorconfirmed"
+    },
+    {
+      "code": "CURRENT_LICENSE_CONTRACTS",
+      "owner": "Operations/Finance",
+      "required": "Plan, seats, frequency, tax and billing evidence of all actually used tools",
+      "known": "Notion invoice9Business×24USD +30USDcredits through2026-10-20; payment unverified. Other variants historical/public/operator."
+    },
+    {
+      "code": "RESOURCE_ASSIGNMENTS",
+      "owner": "Operations",
+      "required": "Stable user IDs, access rights, purchased quantity and declared client/internal/unassigned capacity perresource/period",
+      "known": "Operator approved declared-capacity method; no actual portfolio provided. Examples synthetic."
+    },
+    {
+      "code": "LOCALIZED_TALENT_COSTS",
+      "owner": "People/Finance",
+      "required": "Current salary/honorarium, location, burden, bonus and cost coverage by profile variant",
+      "known": "Only historicalExcel values supplied; not request same data again or assert local salary."
+    },
+    {
+      "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
+      "owner": "Operations/Finance",
+      "required": "Measured delivery cost and driver for assurance, operations, continuity and initial onboarding",
+      "known": "Trialvalues for simulation only."
+    },
+    {
+      "code": "COMMERCIAL_POLICY",
+      "owner": "Commercial/Finance",
+      "required": "Approved margin/markup, floors, country/market factors and exception authority",
+      "known": "40target/35floorproposed; historicalmarkup stays as simulation."
+    },
+    {
+      "code": "SERVICE_AND_CONTRACT_TERMS",
+      "owner": "Practice/Commercial/Finance",
+      "required": "Deliverables, cadence, limits, SOW, entity, tax, payment and lifecycle approvals",
+      "known": "Managedservice preview is local redacted simulation; no issue/send."
+    },
+    {
+      "code": "CANONICAL_PROMOTION",
+      "owner": "Platform/Finance",
+      "required": "Accepted integrationunit, V2/V3 parity, tenant/auth/audience/snapshot/lifecycle and rollout verification",
+      "known": "Promotion handoff prepared; no API/UI/MCP migration or deploy."
+    }
+  ]
+}

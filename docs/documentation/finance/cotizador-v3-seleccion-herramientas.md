@@ -81,10 +81,10 @@ Copywriter y SEO Specialist siguen distintos: tareaSEO agrega SEMrush sin cambia
 La composición de servicio es costeo/modelado interno y no certifica alcance, precio o contrato de delivery.
 Quote/prepare legacy conservan kits explícitos previos; el binding nuevo ocurre con `compose`, no mutando baseline.
 
-Notion/M365/SEMrush/ChatGPT actuales y asignaciones siguen pendientes; sus variantes históricas requieren
-selección explícita en simulación. Adobe current bloquea por cobertura/base/fecha pendientes;80histórico
-sólo en el ejemplo declarado. Claude público no es gasto real y exige tipo/calendario/usuarios/capacidad
-contractual declarados. Vercel60/100son escenarios del rango, no cargo fijo; cuota de plataforma exige driver.
-Magnific conserva EUR y necesita moneda/FXen el catálogo: sin ellos, needs_input. Reservas/portfolio/inventario
-live e integración canónica API/UI/MCP no implementados. Cada composición continúa review_only y sin export
-comercial; TASK-2017 mantiene economía parcial. Baseline y quotes anteriores permanecen intactas.
+TASK-2022 agrega [flujo operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
+[policy sucesora](../../../data/pricing/v3-operating/README.md):32perfiles/25tools históricas más nuevos recursos,
+feeETG-017 separado, portfolio de capacidad declarada, cobertura cliente, readiness y preview seguro.
+Adobe180USD cubre3CC+3Express (operador confirmado),306 es escenario sin fecha conocida. Notion24/seat y
+créditos30USD tienen respaldo de factura por periodo; públicoM365/SEMrush/ChatGPT/Claude sigue separado de gasto
+real. EUR/FX referencial explícito permite simularMagnific. Planes, salarios, usuarios y cartera reales pendientes
+quedan en evaluación; no inventario live o integración canónica. Legacy permanece intacto y TASK-2017 parcial.

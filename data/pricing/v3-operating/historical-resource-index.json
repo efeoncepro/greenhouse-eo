@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "pricing-v3-historical-resource-index/1",
+  "source": "../seed/tool-catalog.csv",
+  "historicalCount": 26,
+  "records": [
+    {
+      "resourceId": "ETG-001",
+      "label": "Adobe Creative Cloud",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-002",
+      "label": "Envato Elements",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-003",
+      "label": "Metricool",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-004",
+      "label": "SEMrush",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-005",
+      "label": "HubSpot",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-006",
+      "label": "Zapier",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-007",
+      "label": "ChatGPT Plus",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-008",
+      "label": "Midjourney",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-009",
+      "label": "Cloudways VPS",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-010",
+      "label": "Elementor Pro",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-011",
+      "label": "WP Rocket",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-012",
+      "label": "Crocoblock Suite",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-013",
+      "label": "GTM Server-side",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-014",
+      "label": "BigQuery",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-015",
+      "label": "Notion",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-016",
+      "label": "Microsoft 365",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-017",
+      "label": "Deel",
+      "classification": "platform_fee"
+    },
+    {
+      "resourceId": "ETG-018",
+      "label": "Gemini",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-019",
+      "label": "Figma",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-020",
+      "label": "Shutterstock",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-021",
+      "label": "Freepik",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-022",
+      "label": "Frame.io",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-023",
+      "label": "Eleven Labs",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-024",
+      "label": "Github Copilot",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-025",
+      "label": "Adobe Express",
+      "classification": "tool"
+    },
+    {
+      "resourceId": "ETG-026",
+      "label": "Favikon",
+      "classification": "tool"
+    }
+  ]
+}

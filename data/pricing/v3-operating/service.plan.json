@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "pricing-v3-operating-plan/1",
+  "demand": {
+    "schemaVersion": "pricing-v3-composition-demand/1",
+    "commercialUnit": "managed_service",
+    "brief": {
+      "schemaVersion": "pricing-v3-brief/1",
+      "mode": "simulation",
+      "quoteDate": "2026-10-09",
+      "offerId": "talent-assurance-staffing",
+      "engagementCode": "monthly",
+      "accountId": "service-simulation",
+      "offerMarketCountry": "CL",
+      "outputCurrency": "USD",
+      "periods": 1,
+      "lines": [
+        {
+          "lineId": "writer",
+          "profile": "ECG-011",
+          "talentCountry": "CO",
+          "headcount": 1,
+          "dedication": {
+            "unit": "fte",
+            "value": "0.5"
+          },
+          "allocationMode": "shared",
+          "allocationPolicyId": "allocation:shared",
+          "allowUnlocalizedCost": true,
+          "choices": []
+        },
+        {
+          "lineId": "seo",
+          "profile": "ECG-020",
+          "talentCountry": "CO",
+          "headcount": 1,
+          "dedication": {
+            "unit": "fte",
+            "value": "0.5"
+          },
+          "allocationMode": "shared",
+          "allocationPolicyId": "allocation:shared",
+          "allowUnlocalizedCost": true,
+          "choices": []
+        }
+      ]
+    },
+    "work": [
+      {
+        "lineId": "writer",
+        "assigneeIds": [
+          "writer-slot"
+        ],
+        "tasks": [
+          "seo-writing"
+        ],
+        "aiToolIds": [
+          "claude-team"
+        ],
+        "creditDemand": [],
+        "aiSelectionReason": "Text research and drafting assistance for this SEO work; Standard seats explicitly simulated."
+      },
+      {
+        "lineId": "seo",
+        "assigneeIds": [
+          "seo-slot"
+        ],
+        "tasks": [],
+        "aiToolIds": [
+          "claude-team"
+        ],
+        "creditDemand": [],
+        "aiSelectionReason": "Text research and drafting assistance for this SEO work; Standard seats explicitly simulated."
+      }
+    ],
+    "serviceToolIds": [
+      "vercel",
+      "gcp"
+    ],
+    "allocations": [
+      {
+        "periodId": 1,
+        "toolId": "notion",
+        "priceId": "current",
+        "quantity": "2",
+        "serviceShare": "1",
+        "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+        "seatCapacity": 2,
+        "driver": {
+          "unit": "assigned-user-seat",
+          "totalUnits": "2",
+          "allocatedUnits": "2"
+        }
+      },
+      {
+        "periodId": 1,
+        "toolId": "microsoft-365",
+        "priceId": "public-standard-teams-monthly",
+        "quantity": "2",
+        "serviceShare": "1",
+        "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+        "seatCapacity": 2,
+        "driver": {
+          "unit": "assigned-user-seat",
+          "totalUnits": "2",
+          "allocatedUnits": "2"
+        }
+      },
+      {
+        "periodId": 1,
+        "toolId": "semrush",
+        "priceId": "public-seo-pro-monthly",
+        "quantity": "1",
+        "serviceShare": "0.1",
+        "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+        "driver": {
+          "unit": "declared-simulation-service-units",
+          "totalUnits": "100",
+          "allocatedUnits": "10"
+        }
+      },
+      {
+        "periodId": 1,
+        "toolId": "claude-team",
+        "priceId": "standard-monthly",
+        "quantity": "2",
+        "serviceShare": "1",
+        "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+        "driver": {
+          "unit": "declared-simulation-service-units",
+          "totalUnits": "100",
+          "allocatedUnits": "100"
+        },
+        "contractSeatCount": 2
+      }
+    ],
+    "creditBudgets": [],
+    "fxRecordIds": []
+  },
+  "portfolio": {
+    "schemaVersion": "pricing-v3-resource-portfolio/1",
+    "version": "service-capacity-example-v1",
+    "mode": "simulation",
+    "resources": [
+      {
+        "periodId": 1,
+        "toolId": "vercel",
+        "priceId": "reported-range-maximum",
+        "quantity": "1",
+        "driverUnit": "declared-platform-capacity-units",
+        "totalUnits": "100",
+        "internalUnits": "50",
+        "unallocatedUnits": "20",
+        "accounts": [
+          {
+            "accountId": "service-simulation",
+            "units": "10"
+          },
+          {
+            "accountId": "another-simulation",
+            "units": "20"
+          }
+        ],
+        "reason": "Synthetic portfolio capacity; replace with declared operational denominator. No actual client allocation."
+      },
+      {
+        "periodId": 1,
+        "toolId": "gcp",
+        "priceId": "reported-monthly",
+        "quantity": "1",
+        "driverUnit": "declared-platform-capacity-units",
+        "totalUnits": "100",
+        "internalUnits": "50",
+        "unallocatedUnits": "20",
+        "accounts": [
+          {
+            "accountId": "service-simulation",
+            "units": "10"
+          },
+          {
+            "accountId": "another-simulation",
+            "units": "20"
+          }
+        ],
+        "reason": "Synthetic portfolio capacity; replace with declared operational denominator. No actual client allocation."
+      }
+    ]
+  }
+}
