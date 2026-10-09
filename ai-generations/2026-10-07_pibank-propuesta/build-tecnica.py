@@ -818,11 +818,11 @@ base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex;
              + ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 17px; line-height: 1.35; margin-top: 9px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in base_inc))
 S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
     obj(base_card, 140, 530, 600, True, '; height: 318px; padding-top: 22px') +
-    col(eyebrow('Inversión') + headline(['US$4.500 al mes.', 'Lo demás, cuando', 'lo decidan'], 72, extra='; margin-top: 56px') +
-        body('La base es lo continuo. Los proyectos y campañas se suman uno a uno, con precio cerrado, solo cuando Pibank los aprueba.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
-    zone(label('Lo que se suma a demanda, con su precio', W_) + f'<div style="margin-top: 10px">{menu_html}</div>', 900, 150, 880) +
-    means('Pibank sabe cuánto cuesta un mes y cuánto cuesta cada pieza. La ruta recomendada para el año suma US$79.200; la integral, US$89.200.',
-          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los extras requieren la base activa.') + bubble(), section=5)))
+    col(eyebrow('Inversión') + headline(['US$4.500 al mes,', 'más los módulos que', 'construyen el plan'], 64, extra='; margin-top: 56px') +
+        body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
+    zone(label('Módulos que se suman al plan, con su precio', W_) + f'<div style="margin-top: 10px">{menu_html}</div>', 900, 150, 880) +
+    means('Pibank ve cuánto vale un mes de trabajo y cuánto suma cada módulo. En doce meses, base y módulos construyen la ruta recomendada: US$79.200; la integral, US$89.200.',
+          'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa.') + bubble(), section=5)))
 
 # 25a · Cómo empezar — capítulo 5 · arranque de tres meses y continuidad trimestral (montos del mismo calendario)
 quarters = [('Arranque', 'Meses 1 a 3', monthly[0:3], ['Base, hub y calculadora', 'Comunidad y primera campaña de PR'], ('Decisión M3', 'Arranque listo')),
@@ -842,7 +842,7 @@ for i, (k_, sub_, ms, items, dec) in enumerate(quarters):
 at3 = ['Medición y panel de IA con línea base', 'Auditoría técnica y pilar mejorado', 'Hub y calculadora publicados', 'Hasta 15 artículos y comunidad activa']
 S.append(('Cómo empezar', page('Pibank · Cómo empezar', halo_platform(1300, 500, 1300, 760, 600, 44) + qcards +
     col(eyebrow('Cómo empezar') + headline(['Tres meses para', 'arrancar; luego,', 'trimestre a trimestre'], 64, extra='; margin-top: 56px') +
-        body('El primer trimestre deja la base funcionando. Desde ahí Pibank decide cada trimestre con resultados a la vista, sin firmar el año por adelantado.', 20, 560, extra='; margin-top: 26px') +
+        body('El primer trimestre deja la base funcionando. Desde ahí Pibank decide cada trimestre con el avance a la vista, sin firmar el año por adelantado.', 20, 560, extra='; margin-top: 26px') +
         label('Lo que tiene Pibank al mes 3', W_, extra='; margin-top: 30px') +
         ''.join(f'<div style="display: flex; gap: 10px; align-items: baseline; font-size: 18px; line-height: 1.35; margin-top: 10px"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: {ACC}; transform: translateY(-2px)"></span>{x}</div>' for x in at3), 120, 600) +
     means('Compromiso inicial de tres meses y renovación trimestral con aviso de 30 días. El precio de la base no cambia y los cuatro trimestres suman la misma ruta recomendada: US$79.200.',
