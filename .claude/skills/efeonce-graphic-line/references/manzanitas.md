@@ -241,8 +241,15 @@ propuestas). El diseño de partida se hizo antes de la línea: [Content Hub Land
 - **Pendiente antes de aprobar:** la línea de IA; el camino recorrido de la medida, que pide
   `@efeoncepro/axis-graphic-line` ≥ 0.13.0 (Greenhouse fija 0.11.0); la foto del bloque de Glitch, que debe ser
   foto de noticia con su crédito y su falla en bytes, no una imagen generada; y todos los datos y autores, que hoy son
-  de ejemplo (`[N]`, «Equipo editorial»). Las miniaturas generadas de los recursos se retiraron: eran colores por
-  formato y objetos de plastilina repetidos, lo contrario de la Plastilina en volumen (D24).
+  de ejemplo (`[N]`, «Equipo editorial»).
+- **Color y Plastilina en «Para usar» (operador, mismo día):** al verla sin color dijo «perdió colorido» y que las
+  portadas en plastilina «van con nuestra iconografía brand, esa me gustaba». Las tarjetas de Tools, Videos,
+  Webinars, Guías y Podcast volvieron a tener color y objeto, ahora con la **Plastilina en volumen oficial** de
+  `@efeoncepro/axis-brand-assets` (`escuadra`, `reproducir`, `laptop`, `biblioteca`, `microfono`; nunca las imágenes
+  generadas del diseño de partida) sobre acentos del token con texto blanco ≥ 4,5:1 (Engine, Brand, Revenue
+  Salesforce, navy y Revenue HubSpot). **Esto choca con dos reglas y espera la confirmación explícita del operador
+  como excepción del hub:** D24 (volumen nunca en listas ni UI, uno por pieza) y «el acento nunca como superficie»
+  (§11); además vuelve a asociar un color a cada formato. No la extiendas a otra pieza sin esa confirmación.
 
 ## 5. La mano «Desliza» (sitio fijo)
 
