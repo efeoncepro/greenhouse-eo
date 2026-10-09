@@ -216,6 +216,19 @@ describe('Pricing V3 pure financial kernel', () => {
     expect(result.calculationStatus).toBe('invalid')
   })
 
+  it('an unsplit platform fee inside human loaded cost cannot be prorated or receive market adjustment', () => {
+    const result = calc(input => {
+      input.snapshot.profiles[0].cost!.covers.push('platform_fee')
+      input.request.lines[0].assignments = input.request.lines[0].assignments.filter(
+        item => item.resourceId !== 'payment-platform'
+      )
+    })
+
+    expect(has(result, 'NON_HUMAN_LOADED_COST_REQUIRES_SPLIT')).toBe(true)
+    expect(result.calculationStatus).toBe('invalid')
+    expect(result.totals).toBeNull()
+  })
+
   it('same license across lines must declare shares totaling <=1', () => {
     const shared = sample()
     const second = structuredClone(shared.request.lines[0])

@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.reference-cases.v1",
+  "preparedAt": "2026-10-09",
+  "sourceSha256": "68a0c361e7ec3b188419cc5d5c7b758419e4d4d499eba5d9242b3f78a1c78d1b",
+  "runtimeUse": "review_only",
+  "method": "Aritmética decimal independiente del motor V2 y de la CLI existente; no es implementación de V3. Sin recálculo nativo del Excel.",
+  "cases": [
+    {
+      "referenceId": "REF-01",
+      "profileId": "ECG-002",
+      "name": "Senior Visual Designer",
+      "referenceMode": "historical_reference",
+      "commercialStatus": "historical_unapproved",
+      "input": {
+        "fteFraction": "0.5",
+        "hoursPerMonth": "90",
+        "laborHoursBase": "180",
+        "periods": 3,
+        "headcount": 1,
+        "talentCountry": null,
+        "offerMarketCountry": null
+      },
+      "steps": [
+        {
+          "operation": "recorded_monthly_cost * fte",
+          "operands": ["1359", "0.5"],
+          "result": "679.50"
+        },
+        {
+          "operation": "attributed_recorded_cost * (1 + historical_markup)",
+          "operands": ["679.50", "0.30"],
+          "result": "883.35"
+        },
+        {
+          "operation": "historical_monthly_price * periods",
+          "operands": ["883.35", 3],
+          "result": "2650.05"
+        },
+        {
+          "operation": "historical_usd_amount * usd_clp_rate",
+          "operands": ["883.35", "1000"],
+          "result": "883350.000"
+        }
+      ],
+      "expectedHistorical": {
+        "recordedMonthlyCostUsd": "1359",
+        "attributedRecordedCostUsd": "679.50",
+        "monthlyPriceUsd": "883.35",
+        "threeMonthPriceUsd": "2650.05",
+        "monthlyPriceClp": "883350.000",
+        "threeMonthPriceClp": "2650050.000",
+        "markupFraction": "0.30",
+        "marginOnRecordedRoleCostsFraction": "0.230769230769"
+      },
+      "feeNonlinearProbe": {
+        "mode": "synthetic_allocation_probe_not_commercial_policy",
+        "historicalHumanAt50PercentUsd": "655.00",
+        "fullHistoricalFeeUsd": "49",
+        "knownMonthlySubtotalBeforeToolsAssuranceAndOtherCostsUsd": "704.00",
+        "reason": "Demostrar fee mensual completo en una asignación de un usuario; no equivale a tarifa ni política real validada."
+      },
+      "v3Expected": {
+        "calculationStatus": "needs_input",
+        "reviewStatus": "not_evaluated",
+        "finalPrice": null,
+        "finalMargin": null,
+        "missingInputs": [
+          "localized_current_cost",
+          "cost_coverage",
+          "talent_country",
+          "seniority_if_required",
+          "tier_pricing_policy",
+          "capacity_policy",
+          "tool_assignments_and_prices",
+          "market_factor",
+          "talent_assurance_cost",
+          "margin_floor",
+          "fx_if_converted"
+        ]
+      },
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A3:AB3"
+      },
+      "fxSource": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "C2:D2"
+      },
+      "limitations": [
+        "Sin herramientas, Talent Assurance, gestión, setup, impuestos ni factores de país/mercado.",
+        "Prorrateo lineal legacy incluye fee; no se adopta para V3.",
+        "Costos/FX históricos, no tarifas vigentes."
+      ]
+    },
+    {
+      "referenceId": "REF-02",
+      "profileId": "ECG-027",
+      "name": "Consultor HubSpot",
+      "referenceMode": "historical_reference",
+      "commercialStatus": "historical_unapproved",
+      "input": {
+        "fteFraction": "0.5",
+        "hoursPerMonth": "90",
+        "laborHoursBase": "180",
+        "periods": 3,
+        "headcount": 1,
+        "talentCountry": null,
+        "offerMarketCountry": null
+      },
+      "steps": [
+        {
+          "operation": "recorded_monthly_cost * fte",
+          "operands": ["11224", "0.5"],
+          "result": "5612.00"
+        },
+        {
+          "operation": "attributed_recorded_cost * (1 + historical_markup)",
+          "operands": ["5612.00", "0.60"],
+          "result": "8979.20"
+        },
+        {
+          "operation": "historical_monthly_price * periods",
+          "operands": ["8979.20", 3],
+          "result": "26937.60"
+        },
+        {
+          "operation": "historical_usd_amount * usd_clp_rate",
+          "operands": ["8979.20", "1000"],
+          "result": "8979200.000"
+        }
+      ],
+      "expectedHistorical": {
+        "recordedMonthlyCostUsd": "11224",
+        "attributedRecordedCostUsd": "5612.00",
+        "monthlyPriceUsd": "8979.20",
+        "threeMonthPriceUsd": "26937.60",
+        "monthlyPriceClp": "8979200.000",
+        "threeMonthPriceClp": "26937600.000",
+        "markupFraction": "0.60",
+        "marginOnRecordedRoleCostsFraction": "0.375000000000"
+      },
+      "feeNonlinearProbe": {
+        "mode": "synthetic_allocation_probe_not_commercial_policy",
+        "historicalHumanAt50PercentUsd": "5587.50",
+        "fullHistoricalFeeUsd": "49",
+        "knownMonthlySubtotalBeforeToolsAssuranceAndOtherCostsUsd": "5636.50",
+        "reason": "Demostrar fee mensual completo en una asignación de un usuario; no equivale a tarifa ni política real validada."
+      },
+      "v3Expected": {
+        "calculationStatus": "needs_input",
+        "reviewStatus": "not_evaluated",
+        "finalPrice": null,
+        "finalMargin": null,
+        "missingInputs": [
+          "localized_current_cost",
+          "cost_coverage",
+          "talent_country",
+          "seniority_if_required",
+          "tier_pricing_policy",
+          "capacity_policy",
+          "tool_assignments_and_prices",
+          "market_factor",
+          "talent_assurance_cost",
+          "margin_floor",
+          "fx_if_converted"
+        ]
+      },
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A28:AB28"
+      },
+      "fxSource": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "C2:D2"
+      },
+      "limitations": [
+        "Sin herramientas, Talent Assurance, gestión, setup, impuestos ni factores de país/mercado.",
+        "Prorrateo lineal legacy incluye fee; no se adopta para V3.",
+        "Costos/FX históricos, no tarifas vigentes."
+      ]
+    },
+    {
+      "referenceId": "REF-03",
+      "profileId": "ECG-032",
+      "name": "Consultor HubSpot Premium",
+      "referenceMode": "historical_reference",
+      "commercialStatus": "historical_unapproved",
+      "input": {
+        "fteFraction": "0.5",
+        "hoursPerMonth": "90",
+        "laborHoursBase": "180",
+        "periods": 3,
+        "headcount": 1,
+        "talentCountry": null,
+        "offerMarketCountry": null
+      },
+      "steps": [
+        {
+          "operation": "recorded_monthly_cost * fte",
+          "operands": ["23140", "0.5"],
+          "result": "11570.00"
+        },
+        {
+          "operation": "attributed_recorded_cost * (1 + historical_markup)",
+          "operands": ["11570.00", "0.60"],
+          "result": "18512.00"
+        },
+        {
+          "operation": "historical_monthly_price * periods",
+          "operands": ["18512.00", 3],
+          "result": "55536.00"
+        },
+        {
+          "operation": "historical_usd_amount * usd_clp_rate",
+          "operands": ["18512.00", "1000"],
+          "result": "18512000.000"
+        }
+      ],
+      "expectedHistorical": {
+        "recordedMonthlyCostUsd": "23140",
+        "attributedRecordedCostUsd": "11570.00",
+        "monthlyPriceUsd": "18512.00",
+        "threeMonthPriceUsd": "55536.00",
+        "monthlyPriceClp": "18512000.000",
+        "threeMonthPriceClp": "55536000.000",
+        "markupFraction": "0.60",
+        "marginOnRecordedRoleCostsFraction": "0.375000000000"
+      },
+      "feeNonlinearProbe": {
+        "mode": "synthetic_allocation_probe_not_commercial_policy",
+        "historicalHumanAt50PercentUsd": "11570.00",
+        "fullHistoricalFeeUsd": null,
+        "knownMonthlySubtotalBeforeToolsAssuranceAndOtherCostsUsd": null,
+        "reason": "Demostrar fee mensual completo en una asignación de un usuario; no equivale a tarifa ni política real validada."
+      },
+      "v3Expected": {
+        "calculationStatus": "needs_input",
+        "reviewStatus": "not_evaluated",
+        "finalPrice": null,
+        "finalMargin": null,
+        "missingInputs": [
+          "localized_current_cost",
+          "cost_coverage",
+          "talent_country",
+          "seniority_if_required",
+          "tier_pricing_policy",
+          "capacity_policy",
+          "tool_assignments_and_prices",
+          "market_factor",
+          "talent_assurance_cost",
+          "margin_floor",
+          "fx_if_converted",
+          "platform_fee_or_confirmed_not_applicable"
+        ]
+      },
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A33:AB33"
+      },
+      "fxSource": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "C2:D2"
+      },
+      "limitations": [
+        "Sin herramientas, Talent Assurance, gestión, setup, impuestos ni factores de país/mercado.",
+        "Prorrateo lineal legacy incluye fee; no se adopta para V3.",
+        "Costos/FX históricos, no tarifas vigentes.",
+        "La celda del fee está vacía; Excel la omitió en la suma. V3 exige resolverla."
+      ]
+    },
+    {
+      "referenceId": "REF-04",
+      "profileId": "PILOT-SALESFORCE-CONSULTANT",
+      "name": "Consultor Salesforce",
+      "referenceMode": "missing_input_reference",
+      "input": {
+        "fteFraction": "0.5",
+        "periods": 3,
+        "headcount": 1
+      },
+      "expectedHistorical": null,
+      "v3Expected": {
+        "calculationStatus": "needs_input",
+        "reviewStatus": "not_evaluated",
+        "finalPrice": null,
+        "finalMargin": null,
+        "missingInputs": [
+          "product_and_variant",
+          "profile_id_and_seniority",
+          "all_cost_components",
+          "talent_country",
+          "all_pricing_and_allocation_policies",
+          "tool_access_and_costs",
+          "talent_assurance_cost",
+          "fx_if_converted"
+        ]
+      },
+      "reason": "Sin perfil/costo en el Excel inspeccionado. No trasladar costos de consultores HubSpot a Salesforce."
+    }
+  ]
+}

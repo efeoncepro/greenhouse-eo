@@ -25,6 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2016` | `complete` | Pricing V3 local motor and CLI prototype | `docs/tasks/complete/TASK-2016-pricing-v3-local-prototype.md` |
 | `TASK-001` | `in-progress` | `CODEX_TASK_HR_Payroll_Operational_Hardening_v1` | `docs/tasks/in-progress/TASK-001-hr-payroll-operational-hardening.md` |
 | `TASK-002` | `to-do` | `CODEX_TASK_Tenant_Notion_Mapping` | `docs/tasks/to-do/TASK-002-tenant-notion-mapping.md` |
 | `TASK-003` | `to-do` | `CODEX_TASK_Invoice_Payment_Ledger_Correction_v1` | `docs/tasks/to-do/TASK-003-invoice-payment-ledger-correction.md` |
@@ -2583,3 +2584,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex 2026-10-05: TASK-2009 (backend-data) y TASK-2010 (ui-ux), remediación autorizada de ISSUE-179. Barrido: TASK-792/796/977/981 son entregas históricas completas; TASK-798 gobierna observabilidad, no este repair de integridad. Siguiente ID libre TASK-2011.
 
 > Registro Claude 2026-10-08: `TASK-2014` (standard, platform) a pedido del operador. Barrido por dominio/superficie: TASK-1938 conserva el PDF y cede aquí el retiro de su copia generada; TASK-1944 conserva los módulos de correo y recibe el pin resuelto; TASK-2007 es AXIS (primitivas), no adopción en Greenhouse. `TASK-2011`…`TASK-2013` ya existen en `docs/tasks/` sin fila en este registro (deriva previa, no corregida aquí). Siguiente ID libre `TASK-2015`.
+
+> Registro Codex 2026-10-09: `TASK-2015` — CLI local de Excel/costeo para agentes, completa; motor/catálogo/runtime sin cambios. Siguiente ID libre `TASK-2016`.

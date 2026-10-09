@@ -253,6 +253,8 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
 
     if (profile.cost) {
       sourceOk(profile.cost.source, `snapshot.profiles.${line.profileId}.cost`, profile.cost.amount, line.lineId)
+      if (profile.cost.covers.some(coverage => !coverage.startsWith('human_')))
+        report('NON_HUMAN_LOADED_COST_REQUIRES_SPLIT', path, 'error', line.lineId)
       if (profile.cost.localization.kind === 'specific' && profile.cost.localization.country !== line.talentCountry)
         report('COST_COUNTRY_MISMATCH', path, 'error', line.lineId)
       if (profile.cost.localization.kind === 'reference_adjusted' && !factor)
