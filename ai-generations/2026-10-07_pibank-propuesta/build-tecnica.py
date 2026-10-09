@@ -15,7 +15,7 @@ AX = json.load(open(os.path.join(HERE, 'axis-assets.json')))
 BL = lambda i: f'/_blob/{i}'
 BUB = '434cdccb13af2a417f555053d9a45582'
 IMG = {'C01': 'd8a543dde98647bb5c4f3a2338930929', 'C04': '443f206029e67e2f2177a8749d01157e', 'C06': '5f3c83b94f1bcab135421beb67d092aa',
-       'C07': 'f116209d1cd6415a3bbe77dd498f8503', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
+       'C07': '338ba6df486de9dda0abcd62b1a9fdd7', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
 ACC = '#0375db'
 DARK = dict(name='dark', bg='#091951', ink='#ffffff', soft='#cfe4fa', rule='rgba(114, 222, 216, 0.16)', eb='#ffffff')
 LIGHT = dict(name='light', bg='#f7f8f6', ink='#023c70', soft='#5f5a69', rule='rgba(2, 60, 112, 0.14)', eb='#5f5a69')
@@ -707,7 +707,7 @@ S.append(('Evaluación 2026', page('Pibank · Evaluación 2026', halo_only(1300,
     col(eyebrow('Evaluación de oportunidad 2026') + headline(['Si Pibank', 'hubiera empezado', 'en enero de 2026'], 66, extra='; margin-top: 56px') +
         f'<div style="display: flex; align-items: baseline; gap: 16px; margin-top: 30px"><div style="font-family: {ID}; font-size: 120px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.85">≈500</div>'
         f'<div style="font-family: {ID}; font-size: 24px; font-weight: 640; line-height: 1.15; color: {SOFT_}">cuentas con fondos<br>en el año</div></div>' +
-        para('Lo que pidió el banco, en el escenario central: 33.700 visitas orgánicas, unas 760 aperturas y cerca de 500 cuentas con fondos, equivalentes a US$1,26 millones al ticket de US$2.500.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
+        para('Lo que pidió el banco, en el escenario central: 33.700 visitas orgánicas, unas 1.500 solicitudes iniciadas (leads), 760 aperturas y cerca de 500 cuentas con fondos: US$1,26 millones al ticket de US$2.500.', 19, '; margin-top: 22px; max-width: 560px'), 120, 620) +
     zone(label('Cuentas con fondos por trimestre, escenario central') + f'<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 6px">{qbars}</div>', 820, 200, 960) +
     means('El aporte crece a medida que los recursos se publican y maduran: casi seis de cada diez cuentas del año llegan en el último trimestre.',
           'Estimación Efeonce con hipótesis, ejercicio enero–diciembre 2026: producto y programa disponibles desde enero. No es pronóstico ni dato del banco. Supuestos en lámina ⟦Supuestos y fuentes⟧.') + bubble(), section=3)))
@@ -752,7 +752,7 @@ S.append(('Convertir lo que ya llega', page('Pibank · Medir en M1',
 S.append(('Medición y atribución', img_page('Pibank · Medición', IMG['C06'], '¿Cómo sabremos si funciona? Lo medimos: cinco métricas con fórmula, fuente y dueño.')))
 
 # 22 · Equipo (compositor)
-S.append(('Equipo de la cuenta', img_page('Pibank · Equipo', IMG['C07'], '¿Quién trabaja en la cuenta? Expertos por área: Andrés, Valentina, Julio y Daniela, y diseño visual por asignar antes del inicio.')))
+S.append(('Equipo de la cuenta', img_page('Pibank · Equipo', IMG['C07'], '¿Quién trabaja en la cuenta? Expertos por área: SEO, contenido y diseño en Perú, junto a Pibank (Andrés, Valentina y diseño visual por asignar antes del inicio), y dirección de cuenta en Chile (Julio y Daniela).')))
 
 # 23 · Responsabilidades — capítulo 4 · dos objetos, qué hace cada uno, y la cadencia de trabajo al pie
 EFE_LOGO = base64.b64encode(open(os.path.join(HERE, '../../node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-negative.svg'), 'rb').read()).decode()
@@ -852,11 +852,11 @@ S.append(('Siguiente paso', page('Pibank · Siguiente paso',
 
 # 26b · Supuestos y fuentes (anexo) — todas las advertencias reunidas en un solo lugar
 sups = [('Meta de referencia', '15.200 cuentas con fondos y US$38 millones (ticket US$2.500), del correo del banco del 07-10, con su público NSE A/B de 35 a 55 años. La meta del servicio 2027 se confirma al inicio.'),
-        ('Tasas del embudo', '2 % de visitas que abren y 65 % de aperturas que depositan: tasas de prueba para dimensionar la meta, no datos de Pibank.'),
+        ('Tasas del embudo', '2 % de visitas que abren, 65 % de aperturas que depositan y 1 de cada 2 solicitudes iniciadas que termina en apertura (rango de 40 a 60 %): tasas de prueba para dimensionar la meta, no datos de Pibank. Se calibran en el mes 1 con los agregados del banco.'),
         ('Ticket de referencia', 'US$2.500 por cuenta, mencionado en la reunión. Un depósito inicial no es un ingreso del banco.'),
         ('Muestra de búsqueda', '17 capturas de 9 búsquedas genéricas en Google Perú, en móvil y escritorio, el 06-10-2026: 301 resultados. Es una muestra fechada; se contrasta con Search Console en el mes 1.'),
         ('Demanda estimada', 'Búsquedas mensuales estimadas por grupo, corte 06-10. Los grupos se solapan: no se suman como mercado ni como personas.'),
-        ('Evaluación 2026', 'Ejercicio hipotético: producto y programa disponibles desde enero de 2026. 63 consultas (140.130 búsquedas/mes); ene–ago según el proveedor, sep–dic constante. Captura 2/5/10 %, apertura 2→2,3 %, fondeo 65→70 % (80 % en el mes de apertura), 230 visitas de PR. No es pronóstico ni dato del banco.'),
+        ('Evaluación 2026', 'Ejercicio hipotético: producto y programa disponibles desde enero de 2026. 63 consultas (140.130 búsquedas/mes); ene–ago según el proveedor, sep–dic constante. Captura 2/5/10 %, apertura 2→2,3 %, fondeo 65→70 % (80 % en el mes de apertura), 230 visitas de PR. Leads: 760 aperturas ÷ 50 % ≈ 1.500 (1.300 a 1.900). No es pronóstico ni dato del banco.'),
         ('Ejemplos ilustrativos', 'Los hallazgos técnicos dibujados, el newsletter, el ejemplo de 100 clics y el de 10.000 visitas explican mecanismos; no son resultados observados.'),
         ('Respuestas de IA', 'Una mención en una respuesta de IA no es una visita ni una cuenta. Las superficies y su acceso se acuerdan al inicio.'),
         ('Condiciones y comparaciones', 'Toda condición de producto y toda comparación con otras marcas se publica con fuente vigente y visto bueno de Producto y Cumplimiento.'),
@@ -881,7 +881,7 @@ glos = [('SEO', 'Optimización para buscadores: que las páginas de Pibank apare
         ('Captura', 'Una página de resultados de Google guardada para revisar quién aparece.'),
         ('Observación', 'En el panel AEO: una pregunta, en una superficie de IA, en un corte de medición.'),
         ('Apertura y cuenta con fondos', 'Apertura: cuenta abierta y validada por el banco. Cuenta con fondos: la que además recibió su primer depósito.'),
-        ('Solicitud iniciada', 'Cuando alguien empieza el formulario de apertura en registro.pibank.pe. El evento exacto se acuerda con Analítica de Pibank en el mes 1; mientras no se mida, no se le asigna una tasa.'),
+        ('Solicitud iniciada', 'El lead: cuando alguien empieza el formulario de apertura en registro.pibank.pe. Se estima con una tasa de prueba de 50 % hacia la apertura; el evento exacto y la tasa real se fijan con Analítica de Pibank en el mes 1.'),
         ('Captación', 'Depósitos que traen las cuentas nuevas; si se mide como primer depósito o saldo mantenido se define con el banco.'),
         ('M1 a M12', 'Meses del programa, contados desde el inicio acordado.'),
         ('Activación', 'Proyecto o campaña con fecha y precio propios, que se acuerda antes de ejecutar.')]
@@ -949,7 +949,7 @@ idx['order'] = [f'Tec-{i + 1:02d}.dc.html' for i in range(N)] + others
 for p in idx['pages']:
     if p['id'] == 'tecnica':
         p['name'] = f'Propuesta técnica · {N}'
-idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v12 del 09-10 · con la evaluación 2026 y la muestra X-Ray'
+idx['notes']['titulo-tecnica']['text'] = 'Pibank 2027 · Propuesta técnica · v13 del 09-10 · con la evaluación 2026, leads y la muestra X-Ray'
 idx['notes']['pendientes-tecnica']['text'] = ('Para revisar\n\n1. Equipo: Andrés, Valentina, Julio y Daniela confirmados; diseño visual por asignar antes del inicio.\n\n'
     '2. v5: cada título afirma su conclusión y las láminas con datos explican al pie qué significan para Pibank.\n\n'
     '3. v7: por qué Efeonce y clientes, costo por cuenta y anexo de supuestos.\n\n'
