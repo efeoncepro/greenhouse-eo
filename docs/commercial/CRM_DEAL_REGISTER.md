@@ -1,5 +1,9 @@
 # Registro operativo general de negocios CRM
 
+## Banco Pichincha Perú / Pibank · propuesta enviada — 09-10-2026
+
+**Estado vigente 09/10/2026:** Julio envió a Jesús Vargas Serpa, en el hilo «Pibank | SEO Efeonce», la propuesta técnica SEO/AEO 2027 v13 (49 láminas) y la cotización detallada en USD y PEN. Programa anual con compromiso inicial de seis meses y renovación trimestral: base US$4.500/mes + módulos; ruta recomendada **US$79.200 al año** (S/ 272,210.40 a S/ 3.437 por US$, BCRP venta SBS 06-10-2026); primer semestre US$42.500; ruta integral US$89.200. [Deal 65352884246](https://app.hubspot.com/contacts/48713323/record/0-3/65352884246): `presentationscheduled` / Presentación de soluciones (antes `1356915244` Sample Sprint / Validación), `amount=272210.40` PEN (antes 126,596.45); readback verificado el 09-10. Próximo hito declarado por el cliente: revisión con gerencia la semana del 19-10 y decisión en noviembre. Archivos enviados: `00 FINAL ENVIAR 2026-10-09 - …` en OneDrive `4. Comercial/Licitaciones/Banco Pichincha/`. Expediente: [prospecto](prospects/banco-pichincha-peru-seo-2026/README.md).
+
 ## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
 
 **Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](tenders/pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.
