@@ -216,6 +216,34 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
 - **Pódcast (1:1):** la cabecera del programa en grande (**420 px**), porque la portada se ve a 160 px (ahí queda en
   62 px). Sin eslogan.
 
+### 4.7 Hub web del blog (aplicación nueva, en exploración — 2026-10-09)
+
+El operador abrió el **hub del blog** (`/blog`, TASK-1802) como **aplicación nueva de esta sub-línea** y aceptó que
+**los formatos se distinguen por ícono y el color queda para el tema** («Vamos», 2026-10-09, sobre esas dos
+propuestas). El diseño de partida se hizo antes de la línea: [Content Hub Landing Design](https://claude.ai/artifact/R6cXzuh9prfCrSQRbmeJMR)
+(v3, el logo de MCM ya va en la portada). La versión convergida, **todavía sin aprobar**, es
+[Content Hub · La órbita](https://claude.ai/artifact/3sQNzMA9kwiqcvdwnVa63D).
+
+- **Tres zonas, tres líneas.** El encabezado, el pie y la firma son de Efeonce (La órbita). El hub es de MCM. El
+  bloque de Glitch, la lista de ediciones y la suscripción a Glitch siguen [glitch.md](glitch.md), sólo dentro de
+  ese bloque. El verde de Glitch nunca sale de ahí: botones, chips y puntos del hub van en navy.
+- **Formato ≠ tema** (PDR-020): cada formato lleva su ícono del catálogo con `resolveIcon` (Artículo `contenido`,
+  Tool `medicion`, Video `multimedia`, Webinar `presentacion`, Guía `informe`, Podcast `medios`, Archivo
+  `calendario`, buscar `busqueda`), en reposo y en tinta. **Nunca** un color por formato: esos colores ya significan
+  línea de negocio.
+- **El color es del tema.** En «Por tema», cada tema lleva su acento como una barra gráfica, nunca como texto pequeño.
+  Mapa usado: AEO y SEO = Engine, Growth = Growth, HubSpot = Revenue (HubSpot), Diseño = Brand. **Inteligencia
+  artificial = Growth es provisional:** cae entre dos líneas y hay que preguntarle al operador (§2).
+- **Una órbita en la página:** la cifra del mes es una medida con `measureSvg` (línea Engine sobre navy) y fuente
+  visible; mientras no haya fuente real, «Ejemplo ilustrativo · Fuente: [FUENTE, AÑO]».
+- **Tipografía y superficies desde el token:** Bricolage Grotesque en títulos y cifras (760), Poppins en el texto,
+  papel y navy de `efeonceGraphicLine.color`. Sin eslogan en el blog (también se quitó del pie).
+- **Pendiente antes de aprobar:** la línea de IA; el camino recorrido de la medida, que pide
+  `@efeoncepro/axis-graphic-line` ≥ 0.13.0 (Greenhouse fija 0.11.0); la foto del bloque de Glitch, que debe ser
+  foto de noticia con su crédito y su falla en bytes, no una imagen generada; y todos los datos y autores, que hoy son
+  de ejemplo (`[N]`, «Equipo editorial»). Las miniaturas generadas de los recursos se retiraron: eran colores por
+  formato y objetos de plastilina repetidos, lo contrario de la Plastilina en volumen (D24).
+
 ## 5. La mano «Desliza» (sitio fijo)
 
 - Mismo lugar en todas las láminas que la llevan (Pizarra, Escena, Lente): pegada al margen derecho (80 px). En
