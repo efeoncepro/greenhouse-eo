@@ -816,19 +816,37 @@ menu = [('Content hub', 'Arquitectura y hasta tres plantillas', 3000, 'proyecto'
         ('Campaña de PR', 'Tres ángulos y doce propuestas a medios', 2000, 'campaña', 'M3 y M8 · 2 campañas', 2),
         ('Refuerzo de enlaces', 'Hasta seis gestiones con seguimiento', 500, 'ronda', 'M6 y M11 · 2 rondas', 2),
         ('Mantenimiento', 'Hasta tres herramientas entregadas', 200, 'mes', 'M3–M12 · 10 meses', 10),
-        ('Planificador de ahorro', 'Meta, aportes y plazo', 3000, 'proyecto', 'Solo en la ruta integral', 0)]
+        ('Planificador', 'De ahorro: meta, aportes y plazo', 3000, 'proyecto', 'Solo en la ruta integral', 0)]
 assert sum(pr * q for *_, pr, _u, _w, q in [(m[0], m[1], m[2], m[3], m[4], m[5]) for m in menu]) == 25200
 usd = lambda v: 'US$' + format(v, ',').replace(',', '.')
-def rchip(t, off=False):
-    return (f'<span style="margin-left: 12px; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; vertical-align: 3px; '
-            + ('box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.45); color: #cfe4fa' if off else f'background: rgba(3, 117, 219, 0.28); color: #ffffff') + f'">{t}</span>')
-menu_html = ''.join(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 230px; column-gap: 20px; align-items: center; padding: 9px 0; border-top: 1px solid {RULE_}">'
-                    f'<div><div style="font-family: {ID}; font-size: 23px; font-weight: 740; letter-spacing: -0.01em">{n_}{rchip(w_, q_ == 0)}</div><div style="font-size: 15px; font-weight: 300; color: {SOFT_}; margin-top: 2px">{d_}</div></div>'
-                    f'<div style="text-align: right"><div style="font-family: {ID}; font-size: 26px; font-weight: 760; letter-spacing: -0.02em">{usd(p_)}<span style="font-family: Poppins, sans-serif; font-size: 14px; font-weight: 400; color: {SOFT_}"> / {u_}</span></div><div style="font-size: 15px; color: {SOFT_}">{pen(p_)}</div></div></div>' for n_, d_, p_, u_, w_, q_ in menu)
-sum_html = (f'<div style="margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(3, 117, 219, 0.16); box-shadow: inset 0 0 0 1px rgba(3, 117, 219, 0.5)">'
-            f'<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {SOFT_}">Ruta recomendada en doce meses</div>'
-            f'<div style="font-family: {ID}; font-size: 24px; font-weight: 740; margin-top: 4px">Base US$54.000 + módulos US$25.200 = US$79.200</div>'
-            f'<div style="font-size: 15px; color: {SOFT_}; margin-top: 2px">{pen(54000)} + {pen(25200)} = {pen(79200)}</div></div>')
+GLY = {'Content hub': 'web', 'Calculadora': 'finanzas', 'Comparador': 'medicion', 'Comunidad': 'correo', 'Campaña de PR': 'prensa',
+       'Refuerzo de enlaces': 'integracion', 'Mantenimiento': 'codigo', 'Planificador': 'objetivo'}
+def ico40(g):
+    svg = AX["icons"][g + "-dark"].replace('width="52" height="52"', 'width="40" height="40"')
+    return f'<div style="width: 40px; height: 40px; flex: none">{svg}</div>'
+def mtile(n_, d_, p_, u_, w_, q_):
+    off = q_ == 0
+    chip = (f'<span style="display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; '
+            + ('box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.45); color: #cfe4fa' if off else 'background: rgba(3, 117, 219, 0.30); color: #ffffff') + f'">{w_}</span>')
+    inner = (f'<div style="display: flex; gap: 14px; align-items: flex-start">{ico40(GLY[n_])}'
+             f'<div style="flex: 1; min-width: 0"><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px">'
+             f'<div style="font-family: {ID}; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.1">{n_}</div>'
+             f'<div style="font-family: {ID}; font-size: 26px; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap">{usd(p_)}</div></div>'
+             f'<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 3px"><div style="font-size: 14px; font-weight: 300; line-height: 1.3; color: {SOFT_}">{d_}</div>'
+             f'<div style="font-size: 13px; color: {SOFT_}; white-space: nowrap; text-align: right">{pen(p_)}<br>por {u_}</div></div>{chip}</div></div>')
+    st = ('box-shadow: inset 0 0 0 1.5px rgba(207, 228, 250, 0.22); background: rgba(8, 28, 48, 0.35); opacity: 0.85' if off else
+          'box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 18px 36px rgba(0, 6, 16, 0.45); background: linear-gradient(180deg, #10304b 0%, #081c30 100%)')
+    return f'<div style="border-radius: 18px; padding: 16px 18px; box-sizing: border-box; height: 128px; {st}">{inner}</div>'
+menu_html = f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px">' + ''.join(mtile(*m) for m in menu) + '</div>'
+def eqcell(k, v, hero=False):
+    st = ('background: linear-gradient(180deg, rgba(3, 117, 219, 0.55), rgba(3, 117, 219, 0.22)); box-shadow: 0 0 0 2px rgba(3, 117, 219, 0.95), 0 0 60px rgba(3, 117, 219, 0.35)' if hero else
+          'background: rgba(255, 255, 255, 0.06); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14)')
+    return (f'<div style="flex: 1; border-radius: 16px; padding: 14px 16px; {st}"><div style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #cfe4fa">{k}</div>'
+            f'<div style="font-family: {ID}; font-size: {34 if hero else 30}px; font-weight: 760; letter-spacing: -0.03em; margin-top: 4px">{usd(v)}</div>'
+            f'<div style="font-size: 14px; color: #cfe4fa; margin-top: 2px">{pen(v)}</div></div>')
+op = lambda t: f'<div style="font-family: {ID}; font-size: 34px; font-weight: 300; color: #cfe4fa; padding: 0 2px">{t}</div>'
+sum_html = (f'<div style="margin-top: 18px; display: flex; align-items: center; gap: 12px">'
+            + eqcell('Base · 12 meses', 54000) + op('+') + eqcell('Módulos de la ruta', 25200) + op('=') + eqcell('Ruta recomendada', 79200, True) + '</div>')
 base_inc = ['Dirección, plan mensual e informe', 'SEO técnico y hasta 8 h de ajustes en WordPress', 'Hasta cinco artículos al mes', 'Panel de IA: 24 preguntas en tres superficies', 'Medición hasta el primer depósito']
 base_card = (okicker('Servicio base · cada mes') + f'<div style="display: flex; align-items: baseline; gap: 12px; margin-top: 10px"><div style="font-family: {ID}; font-size: 64px; font-weight: 760; letter-spacing: -0.04em">US$4.500</div><div style="font-size: 18px; font-weight: 600">al mes</div></div>'
              + f'<div style="font-size: 18px; color: {SOFT_}; margin-top: 2px">{pen(4500)} al mes</div>'
@@ -837,7 +855,7 @@ S.append(('Inversión', page('Pibank · Inversión', halo_only(1300, 480) +
     obj(base_card, 140, 522, 600, True, '; height: 334px; padding-top: 20px') +
     col(eyebrow('Inversión') + headline(['US$4.500 al mes,', 'más los módulos que', 'construyen el plan'], 64, extra='; margin-top: 56px') +
         body('La base es el trabajo continuo de cada mes. Sobre ella se suman los módulos que construyen lo propuesto, cada uno con su precio y en el mes que le corresponde.', 20, 600, extra='; margin-top: 26px'), 120, 640) +
-    zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 8px">{menu_html}</div>' + sum_html, 900, 118, 800) +
+    zone(label('Módulos que se suman al plan: precio y cuándo entran en la ruta', W_) + f'<div style="margin-top: 12px">{menu_html}</div>' + sum_html, 880, 112, 820) +
     means('Pibank ve cuánto vale un mes, qué módulos se suman y cuándo. La ruta integral suma el planificador y más comunidad, PR y refuerzos: US$89.200 (' + pen(89200) + ').',
           'Valores en USD antes de impuestos. Base facturada mensualmente por adelantado; proyectos 50 % al inicio y 50 % a la aceptación. Los módulos requieren la base activa. ' + FX_NOTE) + bubble(), section=5)))
 
