@@ -15,7 +15,7 @@ AX = json.load(open(os.path.join(HERE, 'axis-assets.json')))
 BL = lambda i: f'/_blob/{i}'
 BUB = '434cdccb13af2a417f555053d9a45582'
 IMG = {'C01': 'd8a543dde98647bb5c4f3a2338930929', 'C04': '443f206029e67e2f2177a8749d01157e', 'C06': '5f3c83b94f1bcab135421beb67d092aa',
-       'C07': '338ba6df486de9dda0abcd62b1a9fdd7', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
+       'C07': '18b1f9c9d08d41dbd21d53b3b0308da6', 'C08': '37cf716674faaa8d5f2a522eb8833d0a', 'C09': 'f343972502695c0194d54cdd5d86a5d8'}
 ACC = '#0375db'
 DARK = dict(name='dark', bg='#091951', ink='#ffffff', soft='#cfe4fa', rule='rgba(114, 222, 216, 0.16)', eb='#ffffff')
 LIGHT = dict(name='light', bg='#f7f8f6', ink='#023c70', soft='#5f5a69', rule='rgba(2, 60, 112, 0.14)', eb='#5f5a69')
