@@ -2,7 +2,7 @@
 
 > **Estado:** aprobada por el operador (CEO) el 2026-10-07 como **alternativa** para propuestas técnicas SEO/AEO;
 > actualizada el 2026-10-08 con el segundo caso y las correcciones del operador; delta 2026-10-09 (Pibank v12: lámina
-> «Muestra X-Ray», enlaces clicables en el PDF y logo del cliente sobre fondos oscuros).
+> «Muestra X-Ray», enlaces clicables en el PDF y logo del cliente sobre fondos oscuros; Pibank v13, enviada: inversión, «Cómo empezar», retorno y stack).
 > **No reemplaza** a los brochures ni a las propuestas compuestas con las recetas de La órbita (`pnpm brand:compose`):
 > para brochure manda el set de recetas aprobado. Caso fuente: propuesta técnica Pibank / Banco Pichincha Perú 2027
 > (v11 del 2026-10-08, 46 láminas, con la evaluación 2026 que pidió el banco). Segundo caso: deck de la propuesta técnica UTEM, Compra Ágil SEO/GEO/AEO (2026-10-08, 35 láminas,
@@ -132,3 +132,46 @@ Canvas Design versión 67, 47 láminas; PDF en `ai-generations/2026-10-07_pibank
   cliente (Pibank: «Solicitud iniciada», evento a acordar con su Analítica en M1, sin tasa).
 - **Foto de cierre:** la decide el operador entre candidatas (Pibank: BR3f aprobada con logo completo; BR3e descartada).
 
+
+## Pibank v13: inversión que se explica sola, cómo empezar y retorno — 09/10/2026
+
+Canvas Design versión 89, 49 láminas. **Enviada** por el operador el 09-10 (propuesta + cotización detallada USD y
+PEN), en respuesta al correo del cliente del 08-10. El operador revisó las láminas 42–44 con la pregunta «¿se explican
+solas?»: si una lámina de inversión necesita un comentario para entenderse, está mal planteada.
+
+- **Lámina de inversión:** valor del mes como titular («US$4.500 al mes, más los módulos que construyen el plan») y una
+  ficha por módulo con ícono Trazo, precio y **cuándo entra en la ruta** (M1–M2, M3–M12 · 10 meses, «Solo en la ruta
+  integral»). Cierra con la **ecuación anual visible**: base · 12 meses + módulos · 12 meses = total anual, más una
+  tarjeta «Qué incluye la base cada mes». Rechazado: «Lo demás, cuando lo decidan», porque convierte los módulos en
+  extras opcionales cuando son parte del plan propuesto.
+- **Totales anuales siempre rotulados** («anual», «12 meses») junto a los precios mensuales; un total sin rótulo se lee
+  como mensual.
+- **Lámina «Cómo empezar»** cuando el cliente pide empezar mensual o por tres meses: precio mensual visible, pero
+  **compromiso inicial igual o mayor al plazo en que la propuesta promete las primeras señales**. Pibank: seis meses
+  (revisión en M3, decisión en M6), luego renovación trimestral con aviso de 30 días y la base sin recargo; total del
+  primer semestre y de cada trimestre siguiente. Tres meses se descartó: el programa no alcanza a ejecutarse y no
+  habría nada que medir al salir. Regla de precio en `efeonce-pricing-operator`.
+- **Proyección de retorno:** barras en la métrica donde más es mejor (cuentas abiertas por escenario, con el central
+  destacado y el nivel de la meta como referencia) y el costo por cuenta como etiqueta. Nunca rotular ROI con depósitos:
+  no son ingreso del cliente; el ROI requiere su valor por cuenta, que se calibra en el mes 1.
+- **Contraste en pauta:** cuando la diferencia es pequeña en porcentaje (2 vs 3 de cada 100), mostrarla en una base
+  concreta (1.000 clics: 20 vs 30 aperturas), con chip «+50 % aperturas» y la barra de costo por apertura (100 % → 67 %).
+- **Lámina de herramientas:** receta `content-stack` del compositor con logos de AXIS en tres grupos (Medir · Observar
+  IA destacado · Operar). Sólo herramientas con uso verificado y logo en AXIS; un isotipo negativo desaparece sobre
+  ficha blanca (usar el positivo). Detalle del stack en `seo-aeo-practice`.
+- **Tipografía de cifras:** Bricolage 760 sólo en la cifra o la afirmación; el complemento en Bricolage 300 en la misma
+  línea; las descripciones en Poppins 300.
+- **Moneda para prospectos peruanos:** USD con los soles debajo, en formato peruano (S/ 15,466.50) y con la tasa citada
+  (fuente y fecha) en supuestos. Misma tasa en el deck y en la cotización.
+- **Responder el correo del cliente punto por punto:** listar lo que pidió y verificar que cada punto tenga lámina o
+  respuesta en el correo. Ubicación del equipo en la lámina de equipo (banderas por persona en Pibank). Experiencia
+  local que falta se encuadra en positivo y en el correo, no en el deck: «sería nuestra cuenta de referencia en la
+  banca peruana», nunca «primera» en negativo.
+- **Métrica de autoridad:** si se usa una métrica de proveedor (Brand Authority de Moz), se rotula con su fuente, como
+  referencia y sin puntos prometidos; no es un score de Efeonce.
+- **Empalme sobre lámina aprobada:** para cambiar una parte de una lámina con post-proceso (logo del cliente, órbita),
+  se compone la versión nueva, se calcula el diff contra la anterior y se transplantan sólo los píxeles que cambian,
+  verificando que el diff no toque la zona post-procesada. Si el defecto nace en la receta, se corrige la receta (ver
+  `efeonce-graphic-line`, `references/lessons.md`) y no se atenúa en la imagen.
+- **Publicar en un canvas Design con `root`:** las rutas publicadas deben quedar bajo `project/…`; un publish con root
+  mal puesto dejó duplicados en la raíz (se retiraron mapeándolos a `null`).

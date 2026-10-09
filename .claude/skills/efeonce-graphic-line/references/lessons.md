@@ -711,3 +711,20 @@ Por mandato de Julio, el HTML aprobado se guardó como [plantilla A4 para oferta
 Conserva cuatro hojas, recursos AXIS y pie institucional; calcula neto/IVA/total y referencia mensual opcional. Los datos se sustituyen en el JSON; no se editan tokens ni recetas de deck. El generador rechaza desborde y versiones firmadas/presentadas; cada PDF exige revisión visual propia. La cotización enviada a UTEM permanece intacta.
 
 Es un artefacto documental local: no crea `quoteId`, costea/valida margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Pedir operar el sistema de cotizaciones Greenhouse activa [Cotizador](../../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../../docs/documentation/finance/pricing-comercial.md), con catálogo/engine/Quote Builder/snapshots y estado runtime verificado; no activa esta plantilla por compartir el nombre «cotización». Su manifiesto no es el de Artifact Composer ni un snapshot del sistema.
+
+## 2026-10-09 — Halo recortado en cuadrado: región de filtro sin declarar (Pibank v13, `method-surround-cycle`)
+
+- **Síntoma:** en la lámina del ciclo (Pibank v13, lámina 22) el halo detrás del ícono «Crear» terminaba en un borde
+  cuadrado.
+- **Causa raíz:** en la receta `method-surround-cycle`
+  (`src/lib/brand-surfaces/recipes/seo-aeo/method-surround-cycle.ts`) los filtros SVG `sur-sphere-glow` y
+  `sur-lit-glow` no declaraban región. Por defecto, un filtro SVG pinta sólo dentro de la caja del objeto más 10 % por
+  lado (`objectBoundingBox`, `-10%`/`120%`): un desenfoque amplio se corta en ese rectángulo.
+- **Corrección:** declarar la región en coordenadas del lienzo completo:
+  `filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%"`. Snapshot actualizado (1 línea) y visual-gate
+  de La órbita a cero píxeles en el resto del set. La lámina aprobada se recompuso y se transplantaron sólo los píxeles
+  que cambian, sin tocar la zona post-procesada (logo del cliente).
+- **Regla:** todo filtro con desenfoque o resplandor que pueda exceder su objeto declara su región. Ante un artefacto
+  visual, se corrige la **receta** del compositor, no se atenúa el síntoma en la imagen: el primer intento (difuminar
+  el borde a mano) fue rechazado por el operador porque «no se ve que se resolvió, solo atenuaste»; además dejaba el
+  defecto vivo para la próxima composición.

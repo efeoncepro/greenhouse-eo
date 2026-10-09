@@ -509,6 +509,22 @@ equilibrar las métricas propias de SEO/AEO (posiciones, menciones en IA, orgán
 AEO valen por sí mismos y además conectan con el negocio, así que la meta del cliente cierra la cadena, no la
 protagoniza, y nunca se promete volumen de negocio.
 
+**Notas de venta de la propuesta Pibank v13 (enviada 2026-10-09).** Forma de las láminas en el reference de
+`deck-studio` enlazado arriba.
+
+- **Autoridad de marca:** si la propuesta mide autoridad con una métrica de proveedor (Brand Authority de Moz), se
+  rotula con su fuente, fecha y alcance, como referencia del proveedor y sin puntos prometidos. No es un score de
+  Efeonce ni reemplaza las métricas propias (posiciones, menciones en IA, orgánico sin marca).
+- **Stack que se muestra al prospecto** (lámina con la receta `content-stack` y logos de AXIS): **Medir** — Search
+  Console, Google Analytics, Semrush y el Visibility Grader (motor del Efeonce AEO Assessment; ver «Nombre comercial
+  vigente»); **Observar IA** — ChatGPT, Gemini y AI Overviews como superficies observadas; **Operar** — Notion,
+  Frame.io, Teams y Efeonce Insights. Sólo herramientas con uso verificado y logo en AXIS: Ahrefs y Screaming Frog
+  quedaron fuera por falta de evidencia de uso; DataForSEO, por no tener logo en AXIS (se usa, pero no se exhibe).
+- **Compromiso inicial de seis meses:** si el comprador pide empezar mensual o por tres meses, el precio mensual se
+  muestra abierto y el compromiso inicial cubre el plazo en que la propuesta promete las primeras señales (en Pibank,
+  el primer semestre: revisión en M3, decisión en M6), con renovación trimestral después. Tres meses no alcanzan para
+  ejecutar el programa ni para medir nada. Regla de precio en `efeonce-pricing-operator`.
+
 **Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
 `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
 si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).

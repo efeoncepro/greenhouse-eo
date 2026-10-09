@@ -88,6 +88,17 @@ borrador no aprueba presupuesto ni pricing; sin valoración bancaria, presentar 
 requerida para recuperar la inversión como escenarios, sin declarar ROI confirmado. La propuesta conserva los
 gates de Finance, Commercial y Operations para precio, capacidad y compromisos.
 
+## Compromiso inicial en programas por resultado (delta 2026-10-09)
+
+Cuando el comprador pide «empezar mensual» o «por tres meses» un programa cuyo valor aparece con el tiempo (SEO/AEO,
+contenido, autoridad), mostrar el valor mensual abierto, pero fijar el **compromiso inicial en el plazo en que la
+propuesta promete las primeras señales**; después, renovación por periodos más cortos. No ofrecer una salida antes de
+que haya algo que medir: un compromiso más corto que ese plazo deja al cliente evaluando un programa que no alcanzó a
+ejecutarse. Caso Pibank (propuesta v13 enviada): base US$4.500/mes, compromiso inicial de seis meses con revisión en
+M3 y decisión en M6, renovación trimestral con aviso de 30 días, base sin recargo por la renovación corta; tres meses
+se descartó. La regla de forma (lámina «Cómo empezar») vive en `deck-studio`,
+`references/propuesta-tecnica-seo-sin-presentador.md`.
+
 ## Guardrails
 
 - ASaaS no equivale a SaaS, ARR ni producto software.
